@@ -95,6 +95,36 @@ use crate::prime_hyperelliptic::ops as bitop_ops;
 use crate::utils::mod_inverse;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// Public Semaev / IC walks: default vartime point ops.
+/// `IC_IC_CT=1` restores CT for A/B.
+static IC_CT: AtomicBool = AtomicBool::new(false);
+
+pub(crate) fn refresh_ic_ct_flag() {
+    IC_CT.store(
+        std::env::var("IC_IC_CT").as_deref() == Ok("1"),
+        Ordering::Relaxed,
+    );
+}
+
+#[inline(always)]
+pub(crate) fn ic_padd(p: &Point, q: &Point, a: &FieldElement) -> Point {
+    if IC_CT.load(Ordering::Relaxed) {
+        p.add(q, a)
+    } else {
+        p.add_vartime(q, a)
+    }
+}
+
+#[inline(always)]
+pub(crate) fn ic_smul(p: &Point, k: &BigUint, a: &FieldElement) -> Point {
+    if IC_CT.load(Ordering::Relaxed) {
+        p.scalar_mul(k, a)
+    } else {
+        p.scalar_mul_vartime(k, a)
+    }
+}
 
 // ── Operation counters (per thread) ───────────────────────────────────
 //
@@ -330,6 +360,158 @@ fn one(p: &BigUint) -> FieldElement {
     FieldElement::one(p.clone())
 }
 
+/// Stack-resident degree-≤4 polynomial over a single-word prime (`p < 2^63`).
+///
+/// Round-4 audit: the generic [`semaev_s4_in_x4`] path allocates dozens of
+/// `FieldElement`/`BigUint` values per factor-base pair.  `Poly4Fp` keeps the
+/// same resultant algebra in five `u64` limbs so S₄ sieving stays in registers.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Poly4Fp {
+    /// Coefficients `c[0] + c[1] X + … + c[4] X⁴` reduced mod `p`.
+    pub c: [u64; 5],
+    pub p: u64,
+}
+
+impl Poly4Fp {
+    /// Horner evaluation at `x`.
+    #[inline]
+    pub fn eval(&self, x: u64) -> u64 {
+        let p = self.p as u128;
+        let mut acc = 0u128;
+        for &ci in self.c.iter().rev() {
+            acc = (acc * (x as u128) + ci as u128) % p;
+        }
+        acc as u64
+    }
+
+    /// Lift to the heap [`FieldElement`] coefficient form used by older callers.
+    pub fn to_field_elements(&self) -> [FieldElement; 5] {
+        let p = BigUint::from(self.p);
+        std::array::from_fn(|i| FieldElement::new(BigUint::from(self.c[i]), p.clone()))
+    }
+
+    /// `F_p`-rational roots of this quartic, without heap `FieldElement`s.
+    ///
+    /// For `p ≤ 2^20` brute-forces via [`Self::eval`] (S₄ IC benches).
+    /// Larger odd word primes reuse the stack Cantor–Zassenhaus path
+    /// through a thin FieldElement shim (same roots as [`find_roots_fp_fast`]).
+    pub fn roots(&self) -> Vec<u64> {
+        let p = self.p;
+        if p <= (1u64 << 20) {
+            let mut out = Vec::new();
+            for x in 0..p {
+                if self.eval(x) == 0 {
+                    out.push(x);
+                }
+            }
+            return out;
+        }
+        let fe = self.to_field_elements();
+        find_roots_fp_fast(&fe, &BigUint::from(p))
+            .into_iter()
+            .map(|r| r.value.to_u64_digits().first().copied().unwrap_or(0))
+            .collect()
+    }
+}
+
+/// Stack-resident Semaev `S₄(X₁,X₂,X₃,X₄)` as a quartic in `X₄` for `p < 2^63`.
+///
+/// Bit-identical to [`semaev_s4_in_x4`] on single-word primes (see unit test).
+pub fn semaev_s4_poly4fp(x1: u64, x2: u64, x3: u64, a: u64, b: u64, p: u64) -> Poly4Fp {
+    debug_assert!(p > 3 && (p & 1) == 1 && (p >> 63) == 0);
+    #[inline(always)]
+    fn add(x: u64, y: u64, p: u64) -> u64 {
+        // Safe: callers keep `x, y < p < 2^63`, so `x + y` fits in `u64`.
+        let s = x + y;
+        if s >= p {
+            s - p
+        } else {
+            s
+        }
+    }
+    #[inline(always)]
+    fn sub(x: u64, y: u64, p: u64) -> u64 {
+        if x >= y {
+            x - y
+        } else {
+            x.wrapping_add(p).wrapping_sub(y)
+        }
+    }
+    #[inline(always)]
+    fn mul(x: u64, y: u64, p: u64) -> u64 {
+        ((x as u128 * y as u128) % (p as u128)) as u64
+    }
+    #[inline(always)]
+    fn neg(x: u64, p: u64) -> u64 {
+        if x == 0 {
+            0
+        } else {
+            p - x
+        }
+    }
+    #[inline(always)]
+    fn sm(k: u64, x: u64, p: u64) -> u64 {
+        mul(k % p, x, p)
+    }
+
+    // S₃(X₁, X₂, X) = α₂ X² + α₁ X + α₀ — same closed form as [`semaev_s3_in_x3`].
+    let s = add(x1, x2, p);
+    let pr = mul(x1, x2, p);
+    let dx12 = sub(x1, x2, p);
+    let alpha2 = mul(dx12, dx12, p);
+    let alpha1 = neg(
+        sm(2, add(mul(s, add(pr, a, p), p), sm(2, b, p), p), p),
+        p,
+    );
+    let alpha0 = sub(
+        mul(sub(pr, a, p), sub(pr, a, p), p),
+        sm(4, mul(b, s, p), p),
+        p,
+    );
+
+    // β₂, β₁, β₀ as degree-≤2 polys in X₄ (same as FieldElement path).
+    let x3sq = mul(x3, x3, p);
+    let b2 = [x3sq, neg(sm(2, x3, p), p), 1u64 % p];
+    let b1 = [
+        neg(sm(2, add(mul(a, x3, p), sm(2, b, p), p), p), p),
+        neg(sm(2, add(x3sq, a, p), p), p),
+        neg(sm(2, x3, p), p),
+    ];
+    let b0 = [
+        sub(mul(a, a, p), sm(4, mul(b, x3, p), p), p),
+        neg(add(sm(2, mul(a, x3, p), p), sm(4, b, p), p), p),
+        x3sq,
+    ];
+
+    let scale = |c: u64, poly: [u64; 3]| -> [u64; 3] {
+        [mul(c, poly[0], p), mul(c, poly[1], p), mul(c, poly[2], p)]
+    };
+    let sub3 = |u: [u64; 3], v: [u64; 3]| -> [u64; 3] {
+        [sub(u[0], v[0], p), sub(u[1], v[1], p), sub(u[2], v[2], p)]
+    };
+    let a_poly = sub3(scale(alpha2, b0), scale(alpha0, b2));
+    let b_poly = sub3(scale(alpha2, b1), scale(alpha1, b2));
+    let c_poly = sub3(scale(alpha1, b0), scale(alpha0, b1));
+
+    // S₄ = A² − B·C, degree ≤ 4.
+    let mut a_sq = [0u64; 5];
+    let mut bc = [0u64; 5];
+    for i in 0..3 {
+        for j in 0..3 {
+            a_sq[i + j] = add(a_sq[i + j], mul(a_poly[i], a_poly[j], p), p);
+            bc[i + j] = add(bc[i + j], mul(b_poly[i], c_poly[j], p), p);
+        }
+    }
+    let c = [
+        sub(a_sq[0], bc[0], p),
+        sub(a_sq[1], bc[1], p),
+        sub(a_sq[2], bc[2], p),
+        sub(a_sq[3], bc[3], p),
+        sub(a_sq[4], bc[4], p),
+    ];
+    Poly4Fp { c, p }
+}
+
 // ── Univariate root finder over F_p ─────────────────────────────────────
 
 /// Find every `F_p`-rational root of the polynomial
@@ -401,6 +583,16 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     // Small primes: reuse the brute force (it is exact and trivial).
     if p.bits() <= 20 {
         return find_roots_fp(coeffs, p);
+    }
+    // Stack-resident u64 Shoup Cantor-Zassenhaus fast path for p < 2^63 and deg <= 8
+    // (eliminates all BigUint / Vec<FieldElement> heap allocations in S3/S4 IC sieving).
+    if p.bits() <= 63 && coeffs.len() <= 9 {
+        if let Some(roots_u64) = find_roots_fp_u64_stack(coeffs, p) {
+            return roots_u64
+                .into_iter()
+                .map(|r| FieldElement::new(BigUint::from(r), p.clone()))
+                .collect();
+        }
     }
     // Normalize to a canonical coefficient slice with nonzero lead.
     let mut f: Vec<FieldElement> = coeffs.to_vec();
@@ -528,6 +720,373 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     }
     roots.dedup_by(|a, b| a.value == b.value);
     roots
+}
+
+/// Stack-resident `[u64; 9]` polynomial Cantor–Zassenhaus root-finder for odd primes
+/// `2^20 < p < 2^63` and `deg(f) <= 8`, using division-free Montgomery arithmetic.
+fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<Vec<u64>> {
+    let digits = p_big.to_u64_digits();
+    if digits.len() != 1 {
+        return None;
+    }
+    let p = digits[0];
+    if p <= 3 || (p & 1) == 0 || (p >> 63) != 0 {
+        return None;
+    }
+
+    // Single-word Montgomery context (`R = 2^64`, `-p^-1 mod 2^64`):
+    let mut pinv = 1u64;
+    for _ in 0..6 {
+        pinv = pinv.wrapping_mul(2u64.wrapping_sub(p.wrapping_mul(pinv)));
+    }
+    let neg_pinv = pinv.wrapping_neg();
+    let r_mod_p = (((1u128 << 64) % (p as u128)) as u64) % p;
+    let r2_mod_p = (((r_mod_p as u128) * (r_mod_p as u128)) % (p as u128)) as u64;
+
+    #[inline(always)]
+    fn mmul(a: u64, b: u64, p: u64, neg_pinv: u64) -> u64 {
+        let t = (a as u128) * (b as u128);
+        let m = (t as u64).wrapping_mul(neg_pinv);
+        let u = ((t + (m as u128) * (p as u128)) >> 64) as u64;
+        if u >= p { u - p } else { u }
+    }
+    #[inline(always)]
+    fn madd(a: u64, b: u64, p: u64) -> u64 {
+        let s = a + b;
+        if s >= p { s - p } else { s }
+    }
+    #[inline(always)]
+    fn msub(a: u64, b: u64, p: u64) -> u64 {
+        if a >= b { a - b } else { a + (p - b) }
+    }
+    #[inline(always)]
+    fn mneg(a: u64, p: u64) -> u64 {
+        if a == 0 { 0 } else { p - a }
+    }
+    #[inline]
+    fn mpow(mut base: u64, mut exp: u64, p: u64, neg_pinv: u64, one_m: u64) -> u64 {
+        let mut acc = one_m;
+        while exp > 0 {
+            if exp & 1 == 1 {
+                acc = mmul(acc, base, p, neg_pinv);
+            }
+            exp >>= 1;
+            if exp > 0 {
+                base = mmul(base, base, p, neg_pinv);
+            }
+        }
+        acc
+    }
+    #[inline]
+    fn minv(a_mont: u64, p: u64, neg_pinv: u64, r2: u64) -> Option<u64> {
+        if a_mont == 0 {
+            return None;
+        }
+        let a_can = mmul(a_mont, 1, p, neg_pinv);
+        let (mut old_r, mut r) = (a_can, p);
+        let (mut old_s, mut s) = (1i64, 0i64);
+        while r != 0 {
+            let q = old_r / r;
+            (old_r, r) = (r, old_r - q * r);
+            (old_s, s) = (s, old_s - (q as i64) * s);
+        }
+        if old_r != 1 {
+            return None;
+        }
+        let inv_can = if old_s < 0 {
+            (old_s + p as i64) as u64
+        } else {
+            old_s as u64
+        };
+        Some(mmul(inv_can, r2, p, neg_pinv))
+    }
+
+    #[derive(Clone, Copy)]
+    struct StackPoly {
+        c: [u64; 9],
+        len: usize,
+    }
+    impl StackPoly {
+        #[inline(always)]
+        fn zero() -> Self {
+            Self { c: [0; 9], len: 1 }
+        }
+        #[inline(always)]
+        fn trim(&mut self) {
+            while self.len > 1 && self.c[self.len - 1] == 0 {
+                self.len -= 1;
+            }
+        }
+        #[inline(always)]
+        fn deg(&self) -> usize {
+            self.len - 1
+        }
+        #[inline(always)]
+        fn is_zero(&self) -> bool {
+            self.len == 1 && self.c[0] == 0
+        }
+    }
+
+    let poly_mul_mod_monic = |a: &StackPoly, b: &StackPoly, m: &StackPoly| -> StackPoly {
+        let md = m.deg();
+        let mut prod = [0u64; 18];
+        for i in 0..a.len {
+            let ai = a.c[i];
+            if ai == 0 {
+                continue;
+            }
+            for j in 0..b.len {
+                prod[i + j] = madd(prod[i + j], mmul(ai, b.c[j], p, neg_pinv), p);
+            }
+        }
+        let top = (a.len + b.len - 1).min(17);
+        for k in (md..=top).rev() {
+            let lead = prod[k];
+            if lead == 0 {
+                continue;
+            }
+            prod[k] = 0;
+            let sh = k - md;
+            for i in 0..md {
+                prod[sh + i] = msub(prod[sh + i], mmul(lead, m.c[i], p, neg_pinv), p);
+            }
+        }
+        let mut out = StackPoly {
+            c: [0; 9],
+            len: md.max(1),
+        };
+        out.c[..md].copy_from_slice(&prod[..md]);
+        out.trim();
+        out
+    };
+
+    let poly_pow_mod_monic = |mut base: StackPoly, mut exp: u64, m: &StackPoly| -> StackPoly {
+        let mut acc = StackPoly::zero();
+        acc.c[0] = r_mod_p;
+        while exp > 0 {
+            if exp & 1 == 1 {
+                acc = poly_mul_mod_monic(&acc, &base, m);
+            }
+            exp >>= 1;
+            if exp > 0 {
+                base = poly_mul_mod_monic(&base, &base, m);
+            }
+        }
+        acc
+    };
+
+    let poly_gcd_monic = |mut a: StackPoly, mut b: StackPoly| -> Option<StackPoly> {
+        a.trim();
+        b.trim();
+        while !b.is_zero() {
+            let bd = b.deg();
+            if bd == 0 {
+                let mut one_p = StackPoly::zero();
+                one_p.c[0] = r_mod_p;
+                return Some(one_p);
+            }
+            let binv = minv(b.c[bd], p, neg_pinv, r2_mod_p)?;
+            while !a.is_zero() && a.deg() >= bd {
+                let ad = a.deg();
+                let factor = mmul(a.c[ad], binv, p, neg_pinv);
+                let sh = ad - bd;
+                a.c[ad] = 0;
+                for i in 0..bd {
+                    a.c[sh + i] = msub(a.c[sh + i], mmul(factor, b.c[i], p, neg_pinv), p);
+                }
+                a.trim();
+            }
+            core::mem::swap(&mut a, &mut b);
+        }
+        let ad = a.deg();
+        let ainv = minv(a.c[ad], p, neg_pinv, r2_mod_p)?;
+        for i in 0..=ad {
+            a.c[i] = mmul(a.c[i], ainv, p, neg_pinv);
+        }
+        Some(a)
+    };
+
+    let poly_div_exact_monic = |mut a: StackPoly, b: &StackPoly| -> StackPoly {
+        let bd = b.deg();
+        let mut q = StackPoly {
+            c: [0; 9],
+            len: a.deg() - bd + 1,
+        };
+        while !a.is_zero() && a.deg() >= bd {
+            let ad = a.deg();
+            let sh = ad - bd;
+            let factor = a.c[ad]; // b is monic (`b.c[bd] == r_mod_p`)
+            q.c[sh] = factor;
+            a.c[ad] = 0;
+            for i in 0..bd {
+                a.c[sh + i] = msub(a.c[sh + i], mmul(factor, b.c[i], p, neg_pinv), p);
+            }
+            a.trim();
+        }
+        q.trim();
+        q
+    };
+
+    let sqrt_mont = |n_m: u64| -> Option<u64> {
+        if n_m == 0 {
+            return Some(0);
+        }
+        if mpow(n_m, (p - 1) >> 1, p, neg_pinv, r_mod_p) != r_mod_p {
+            return None;
+        }
+        if p & 3 == 3 {
+            return Some(mpow(n_m, (p + 1) >> 2, p, neg_pinv, r_mod_p));
+        }
+        let s = (p - 1).trailing_zeros();
+        let q = (p - 1) >> s;
+        let mut z = madd(r_mod_p, r_mod_p, p);
+        let minus_one = p - r_mod_p;
+        while mpow(z, (p - 1) >> 1, p, neg_pinv, r_mod_p) != minus_one {
+            z = madd(z, r_mod_p, p);
+        }
+        let mut m_ts = s;
+        let mut c = mpow(z, q, p, neg_pinv, r_mod_p);
+        let mut t = mpow(n_m, q, p, neg_pinv, r_mod_p);
+        let mut r = mpow(n_m, (q + 1) >> 1, p, neg_pinv, r_mod_p);
+        while t != r_mod_p {
+            let mut i = 1u32;
+            let mut tt = mmul(t, t, p, neg_pinv);
+            while tt != r_mod_p {
+                tt = mmul(tt, tt, p, neg_pinv);
+                i += 1;
+            }
+            let mut b = c;
+            for _ in 0..(m_ts - i - 1) {
+                b = mmul(b, b, p, neg_pinv);
+            }
+            m_ts = i;
+            c = mmul(b, b, p, neg_pinv);
+            t = mmul(t, c, p, neg_pinv);
+            r = mmul(r, b, p, neg_pinv);
+        }
+        Some(r)
+    };
+
+    let mut f = StackPoly {
+        c: [0; 9],
+        len: coeffs.len(),
+    };
+    for (idx, fe) in coeffs.iter().enumerate() {
+        let v = if fe.value.is_zero() {
+            0u64
+        } else {
+            let d = fe.value.to_u64_digits();
+            if d.len() > 1 {
+                return None;
+            }
+            d[0] % p
+        };
+        f.c[idx] = mmul(v, r2_mod_p, p, neg_pinv);
+    }
+    f.trim();
+    if f.is_zero() || f.deg() == 0 {
+        return Some(Vec::new());
+    }
+    let lead_inv = minv(f.c[f.deg()], p, neg_pinv, r2_mod_p)?;
+    for i in 0..f.len {
+        f.c[i] = mmul(f.c[i], lead_inv, p, neg_pinv);
+    }
+
+    if f.deg() == 1 {
+        let root_m = mneg(f.c[0], p);
+        return Some(vec![mmul(root_m, 1, p, neg_pinv)]);
+    }
+
+    // X^p mod f(X)
+    let x_poly = if f.deg() > 1 {
+        let mut xp = StackPoly { c: [0; 9], len: 2 };
+        xp.c[1] = r_mod_p;
+        xp
+    } else {
+        let mut xp = StackPoly::zero();
+        xp.c[0] = mneg(f.c[0], p);
+        xp
+    };
+    let mut x_pow_p = poly_pow_mod_monic(x_poly, p, &f);
+    if x_pow_p.len < 2 {
+        x_pow_p.len = 2;
+    }
+    x_pow_p.c[1] = msub(x_pow_p.c[1], r_mod_p, p);
+    x_pow_p.trim();
+
+    let g = poly_gcd_monic(f, x_pow_p)?;
+    if g.deg() == 0 {
+        return Some(Vec::new());
+    }
+
+    let mut roots_m = [0u64; 8];
+    let mut n_roots = 0usize;
+    let mut queue = [StackPoly::zero(); 16];
+    let mut q_len = 1usize;
+    queue[0] = g;
+    let half_pm1 = (p - 1) >> 1;
+    let inv2_m = minv(madd(r_mod_p, r_mod_p, p), p, neg_pinv, r2_mod_p)?;
+
+    while q_len > 0 {
+        q_len -= 1;
+        let h = queue[q_len];
+        let hd = h.deg();
+        if hd == 0 {
+            continue;
+        }
+        if hd == 1 {
+            roots_m[n_roots] = mneg(h.c[0], p);
+            n_roots += 1;
+            continue;
+        }
+        if hd == 2 {
+            let qb = h.c[1];
+            let qc = h.c[0];
+            let four_qc = {
+                let two_qc = madd(qc, qc, p);
+                madd(two_qc, two_qc, p)
+            };
+            let disc = msub(mmul(qb, qb, p, neg_pinv), four_qc, p);
+            if let Some(sq) = sqrt_mont(disc) {
+                let nqb = mneg(qb, p);
+                roots_m[n_roots] = mmul(madd(nqb, sq, p), inv2_m, p, neg_pinv);
+                roots_m[n_roots + 1] = mmul(msub(nqb, sq, p), inv2_m, p, neg_pinv);
+                n_roots += 2;
+            }
+            continue;
+        }
+        let mut split_opt = None;
+        for c_u32 in 1u64..64 {
+            let c_m = mmul(c_u32 % p, r2_mod_p, p, neg_pinv);
+            let mut xc = StackPoly { c: [0; 9], len: 2 };
+            xc.c[0] = c_m;
+            xc.c[1] = r_mod_p;
+            let mut pow = poly_pow_mod_monic(xc, half_pm1, &h);
+            pow.c[0] = msub(pow.c[0], r_mod_p, p);
+            pow.trim();
+            if let Some(d) = poly_gcd_monic(h, pow) {
+                if d.deg() > 0 && d.deg() < hd {
+                    split_opt = Some(d);
+                    break;
+                }
+            }
+        }
+        if let Some(d) = split_opt {
+            let q_poly = poly_div_exact_monic(h, &d);
+            queue[q_len] = d;
+            queue[q_len + 1] = q_poly;
+            q_len += 2;
+        }
+    }
+
+    let mut out = Vec::with_capacity(n_roots);
+    for &rm in &roots_m[..n_roots] {
+        let rc = mmul(rm, 1, p, neg_pinv);
+        if !out.contains(&rc) {
+            out.push(rc);
+        }
+    }
+    Some(out)
 }
 
 /// Polynomial remainder `a mod modulus` over `F_p` (any nonzero lead).
@@ -1080,7 +1639,21 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
     let x_to_idx = factor_base_x_index(factor_base);
-    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, None, max_trials, rng)
+    let word = if std::env::var("IC_FAST_SWEEP").as_deref() == Ok("0") {
+        None
+    } else {
+        WordSweep::new(curve, factor_base)
+    };
+    find_one_relation_sweep_with_index(
+        curve,
+        g,
+        q,
+        factor_base,
+        &x_to_idx,
+        word.as_ref(),
+        max_trials,
+        rng,
+    )
 }
 
 /// [`find_one_relation`] with a prebuilt x-index (from [`factor_base_x_index`]
@@ -1109,9 +1682,9 @@ pub(crate) fn find_one_relation_with_index(
 }
 
 /// The sweep's inner loop on `u64` words (small odd prime fields below 2^40): the same candidate set,
-/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Experimental
-/// (`IC_FAST_SWEEP=1`, which also hoists the x-index); the default sweep is unchanged.  The design and
-/// the equality of results were first established by an independent validator's probe.
+/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Enabled by
+/// default when [`WordSweep::new`] succeeds; `IC_FAST_SWEEP=0` selects the BigUint sweep.  The design
+/// and the equality of results were first established by an independent validator's probe.
 struct WordSweep {
     p: u64,
     a: u64,
@@ -1358,7 +1931,7 @@ fn try_finalise(
         for s_j in [1i64, -1i64] {
             let p_i = if s_i > 0 { f_i.clone() } else { f_i.neg() };
             let p_j = if s_j > 0 { f_j.clone() } else { f_j.neg() };
-            let lhs = p_i.add(&p_j, &a_fe);
+            let lhs = ic_padd(&p_i, &p_j, &a_fe);
             if &lhs == r {
                 let i_idx = factor_base.iter().position(|fb| &fb.point == f_i)?;
                 let mut entries = Vec::new();
@@ -1414,48 +1987,156 @@ pub fn find_one_relation_s4_counted(
         }
     }
 
+    // Round-4: single-word primes use stack Poly4Fp + u64 root-finding.
+    // Round-6: JSF/mont double-scalar for R; Poly4Fp::roots / u64 x-index.
+    // Round-9: default probes Semaev poly only at factor-base x-coords
+    // (O(fb) evals/pair) instead of enumerating all roots in F_p then
+    // filtering — wins when fb ≪ p.  `IC_S4_FB_PROBE=0` restores roots().
+    let p_u64 = curve.p.to_u64_digits();
+    let fast_u64 = matches!(p_u64.as_slice(), [p] if *p > 3 && (*p & 1) == 1 && (*p >> 63) == 0);
+    let (a_u64, b_u64, p_word) = if fast_u64 {
+        (
+            a_fe.value.to_u64_digits().first().copied().unwrap_or(0),
+            b_fe.value.to_u64_digits().first().copied().unwrap_or(0),
+            p_u64[0],
+        )
+    } else {
+        (0, 0, 0)
+    };
+    let fb_probe = std::env::var("IC_S4_FB_PROBE").as_deref() != Ok("0");
+    let fb_xs_u64: Option<Vec<(u64, usize)>> = if fast_u64 {
+        let mut v = Vec::with_capacity(factor_base.len());
+        for fb in factor_base {
+            if let Point::Affine { x, .. } = &fb.point {
+                if let Some(xu) = x.value.to_u64_digits().first().copied() {
+                    v.push((xu, fb.idx));
+                }
+            }
+        }
+        Some(v)
+    } else {
+        None
+    };
+    let x_to_idx_u64: Option<std::collections::HashMap<u64, usize>> =
+        if fast_u64 && !fb_probe {
+            let mut m = std::collections::HashMap::with_capacity(factor_base.len());
+            for &(xu, idx) in fb_xs_u64.as_ref().expect("word fb") {
+                m.insert(xu, idx);
+            }
+            Some(m)
+        } else {
+            None
+        };
+
     for trial in 1..=max_trials {
         let a = random_scalar(&curve.n);
         let b = random_scalar(&curve.n);
-        let ag = g.scalar_mul(&a, &a_fe);
-        let bq = q.scalar_mul(&b, &a_fe);
-        let r = ag.add(&bq, &a_fe);
+        let r = g.double_scalar_mul_vartime(&a, q, &b, &a_fe);
         let xr = match &r {
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
         };
+        let xr_u = if fast_u64 {
+            xr.value.to_u64_digits().first().copied().unwrap_or(0)
+        } else {
+            0
+        };
 
         // Sweep factor-base pairs (i < j keeps the sweep half-size; the
         // sign resolution below covers both orders).
-        for (i, fb_i) in factor_base.iter().enumerate() {
-            let xi = match &fb_i.point {
-                Point::Affine { x, .. } => x.clone(),
-                Point::Infinity => continue,
-            };
-            for (j, fb_j) in factor_base.iter().enumerate().skip(i + 1) {
-                let xj = match &fb_j.point {
+        if fast_u64 {
+            let fb_xs = fb_xs_u64.as_ref().expect("word fb");
+            for (i, fb_i) in factor_base.iter().enumerate() {
+                let xi_u = match &fb_i.point {
+                    Point::Affine { x, .. } => {
+                        x.value.to_u64_digits().first().copied().unwrap_or(0)
+                    }
+                    Point::Infinity => continue,
+                };
+                for (j, fb_j) in factor_base.iter().enumerate().skip(i + 1) {
+                    let xj_u = match &fb_j.point {
+                        Point::Affine { x, .. } => {
+                            x.value.to_u64_digits().first().copied().unwrap_or(0)
+                        }
+                        Point::Infinity => continue,
+                    };
+                    let poly = semaev_s4_poly4fp(xr_u, xi_u, xj_u, a_u64, b_u64, p_word);
+                    if fb_probe {
+                        for &(xk, k) in fb_xs {
+                            if poly.eval(xk) != 0 {
+                                continue;
+                            }
+                            if let Some(rel) = try_finalise_s4(
+                                &r,
+                                i,
+                                &fb_i.point,
+                                j,
+                                &fb_j.point,
+                                k,
+                                &factor_base[k].point,
+                                curve,
+                                &a,
+                                &b,
+                            ) {
+                                return Some((rel, trial));
+                            }
+                        }
+                    } else {
+                        let idx_u = x_to_idx_u64.as_ref().expect("word index");
+                        for xk in poly.roots() {
+                            let k = match idx_u.get(&xk).copied() {
+                                Some(k) => k,
+                                None => continue,
+                            };
+                            if let Some(rel) = try_finalise_s4(
+                                &r,
+                                i,
+                                &fb_i.point,
+                                j,
+                                &fb_j.point,
+                                k,
+                                &factor_base[k].point,
+                                curve,
+                                &a,
+                                &b,
+                            ) {
+                                return Some((rel, trial));
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            for (i, fb_i) in factor_base.iter().enumerate() {
+                let xi = match &fb_i.point {
                     Point::Affine { x, .. } => x.clone(),
                     Point::Infinity => continue,
                 };
-                let quartic = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
-                for xk in find_roots_fp_fast(&quartic, &curve.p) {
-                    let k = match x_to_idx.get(&xk.value).copied() {
-                        Some(k) => k,
-                        None => continue,
+                for (j, fb_j) in factor_base.iter().enumerate().skip(i + 1) {
+                    let xj = match &fb_j.point {
+                        Point::Affine { x, .. } => x.clone(),
+                        Point::Infinity => continue,
                     };
-                    if let Some(rel) = try_finalise_s4(
-                        &r,
-                        i,
-                        &fb_i.point,
-                        j,
-                        &fb_j.point,
-                        k,
-                        &factor_base[k].point,
-                        curve,
-                        &a,
-                        &b,
-                    ) {
-                        return Some((rel, trial));
+                    let quartic = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
+                    for xk in find_roots_fp_fast(&quartic, &curve.p) {
+                        let k = match x_to_idx.get(&xk.value).copied() {
+                            Some(k) => k,
+                            None => continue,
+                        };
+                        if let Some(rel) = try_finalise_s4(
+                            &r,
+                            i,
+                            &fb_i.point,
+                            j,
+                            &fb_j.point,
+                            k,
+                            &factor_base[k].point,
+                            curve,
+                            &a,
+                            &b,
+                        ) {
+                            return Some((rel, trial));
+                        }
                     }
                 }
             }
@@ -1489,7 +2170,7 @@ fn try_finalise_s4(
                 let p_i = if s_i > 0 { f_i.clone() } else { f_i.neg() };
                 let p_j = if s_j > 0 { f_j.clone() } else { f_j.neg() };
                 let p_k = if s_k > 0 { f_k.clone() } else { f_k.neg() };
-                let lhs = p_i.add(&p_j, &a_fe).add(&p_k, &a_fe);
+                let lhs = ic_padd(&ic_padd(&p_i, &p_j, &a_fe), &p_k, &a_fe);
                 if &lhs == r {
                     let mut entries: Vec<(usize, i64)> = vec![(i, s_i), (j, s_j), (k, s_k)];
                     // Merge duplicate factor-base indices.
@@ -2158,9 +2839,9 @@ pub fn ec_index_calculus_dlp(
         return None;
     }
     let x = solution.values[m].clone();
-    // Verify Q ≡ x·G independently of the linear algebra.
+    // Verify Q ≡ x·G independently of the linear algebra (public `x`: vartime).
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    let candidate = g.scalar_mul_vartime(&x, &a_fe);
     if &candidate == q {
         Some(x)
     } else {
@@ -2766,6 +3447,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     rng: &mut R,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
+    refresh_ic_ct_flag();
     reset_counters();
     let total_started = Instant::now();
 
@@ -2784,13 +3466,20 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let relations_started = Instant::now();
     // Experimental: IC_SUM_TABLE=1 swaps the per-trial sweep for a pair-sum table lookup.
     // Table construction is charged to the relation-collection stage.
-    // Default: the table for a small factor base (its build is O(fb^2) point
-    // additions and it loses from fb about 128); `IC_SUM_TABLE=1` forces it,
-    // `IC_SUM_TABLE=0` selects the per-trial sweep.
+    // Default: the table while it wins wall time.  Refined A/B
+    // (`examples/ic_fb_crossover_refine.rs`):
+    //   16-bit: table@256 (~0.71×), sweep@320 (~1.17×)
+    //   18-bit: table@384 (~0.50×), tie@512, sweep@640
+    //   20-bit: table through fb=768 (~0.56×)
+    // `IC_SUM_TABLE=1` forces the table, `IC_SUM_TABLE=0` the per-trial sweep.
     let use_table = match std::env::var("IC_SUM_TABLE").as_deref() {
         Ok("1") => true,
         Ok("0") => false,
-        _ => fb.len() <= 64,
+        _ => {
+            let n = fb.len();
+            let pb = curve.p.bits();
+            n <= 256 || (n <= 512 && pb >= 18) || (n <= 768 && pb >= 20)
+        }
     };
     if !use_table {
         // the per-trial sweep's square roots and Semaev evaluations are not counted
@@ -2810,11 +3499,6 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let hoist_sweep = fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() != Ok("0");
     let hoisted_index = if !use_table && hoist_sweep {
         Some(factor_base_x_index(&fb))
-    } else {
-        None
-    };
-    let word_sweep = if fast_sweep {
-        WordSweep::new(curve, &fb)
     } else {
         None
     };
@@ -2983,7 +3667,8 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let (va, vd) = scalar_mult_ops(&x);
     count("group_additions", va);
     count("group_doublings", vd);
-    let candidate = g.scalar_mul(&x, &a_fe);
+    // Public recovered `x`: Word/specialised vartime ladder (~13× vs CT on word primes).
+    let candidate = g.scalar_mul_vartime(&x, &a_fe);
     let verified = &candidate == q;
     let verify_ms = verify_started.elapsed().as_secs_f64() * 1e3;
     if !verified {
@@ -3032,6 +3717,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
     max_relation_attempts: usize,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
+    refresh_ic_ct_flag();
     let total_started = Instant::now();
 
     let fb_started = Instant::now();
@@ -3093,7 +3779,8 @@ pub fn ec_index_calculus_dlp_s4_staged(
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    // Public recovered `x`: vartime (matches staged S₃ verify).
+    let candidate = g.scalar_mul_vartime(&x, &a_fe);
     let verified = &candidate == q;
     let verify_ms = verify_started.elapsed().as_secs_f64() * 1e3;
     if !verified {
@@ -4280,6 +4967,39 @@ mod tests {
         let mut expected = vec![r1, r2, r3];
         expected.sort_by_key(|r| r.value.clone());
         assert_eq!(roots, expected);
+    }
+
+    /// Round-4: stack [`Poly4Fp`] matches heap [`semaev_s4_in_x4`] bit-for-bit.
+    #[test]
+    fn poly4fp_matches_heap_s4_on_tiny_curve() {
+        let curve = tiny_curve();
+        let p = curve.p.to_u64_digits()[0];
+        let a = curve.a_fe().value.to_u64_digits().first().copied().unwrap_or(0);
+        let b = curve.b.to_u64_digits().first().copied().unwrap_or(0);
+        let a_fe = curve.a_fe();
+        let b_fe = curve.fe(curve.b.clone());
+        for (x1, x2, x3) in [(1u64, 2, 3), (5, 8, 13), (17, 19, 23)] {
+            let heap = semaev_s4_in_x4(
+                &FieldElement::new(BigUint::from(x1), curve.p.clone()),
+                &FieldElement::new(BigUint::from(x2), curve.p.clone()),
+                &FieldElement::new(BigUint::from(x3), curve.p.clone()),
+                &a_fe,
+                &b_fe,
+            );
+            let stack = semaev_s4_poly4fp(x1, x2, x3, a, b, p);
+            for i in 0..5 {
+                let hv = heap[i].value.to_u64_digits().first().copied().unwrap_or(0);
+                assert_eq!(hv, stack.c[i], "coef {i} x=({x1},{x2},{x3})");
+            }
+            // Root sets agree.
+            let heap_roots = find_roots_fp_fast(&heap, &curve.p);
+            let stack_roots = find_roots_fp_fast(&stack.to_field_elements(), &curve.p);
+            let mut h: Vec<_> = heap_roots.iter().map(|r| r.value.clone()).collect();
+            let mut s: Vec<_> = stack_roots.iter().map(|r| r.value.clone()).collect();
+            h.sort();
+            s.sort();
+            assert_eq!(h, s);
+        }
     }
 
     /// **S_4 + root finder, end-to-end 3-decomposition oracle**.
