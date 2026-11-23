@@ -32,7 +32,6 @@ pub fn round138_cases(p: u64, kind: &str) -> Vec<Vec<u64>> {
 
 pub fn round138_benchmark(p: u64, kind: &str, reps: usize) -> u64 {
     let mut tally = FieldTally::default();
-    let mut f = Fp { p, tally: &mut tally };
     let mut checksum = 0u64;
     if kind.starts_with("isogeny") {
         let mut state = p ^ 0x138_150_6e6u64;
@@ -64,6 +63,7 @@ pub fn round138_benchmark(p: u64, kind: &str, reps: usize) -> u64 {
         }
         return checksum;
     }
+    let mut f = Fp { p, tally: &mut tally };
     let polynomials = round138_cases(p,kind);
     for _ in 0..reps {
         for polynomial in &polynomials {
