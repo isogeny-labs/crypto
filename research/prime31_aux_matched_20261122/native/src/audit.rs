@@ -47,7 +47,21 @@ fn choice_plain_control(cell: &Value) -> Result<bool, String> {
     }
 }
 fn choice_v2(cell: &Value) -> bool {
-    cell["schema"] == "prime31-isogeny-choice.cell/v2"
+    matches!(
+        cell["schema"].as_str(),
+        Some("prime31-isogeny-choice.cell/v2" | "prime31-isogeny-choice.cell/v3")
+    )
+}
+fn choice_v3(cell: &Value) -> bool {
+    cell["schema"] == "prime31-isogeny-choice.cell/v3"
+}
+fn choice_recovery(cell: &Value) -> Result<&str, String> {
+    match cell.get("recovery_mode").and_then(Value::as_str) {
+        None if cell.get("recovery_mode").is_none() => Ok("dual_matrices"),
+        Some("dual_matrices") => Ok("dual_matrices"),
+        Some("augmented_only") => Ok("augmented_only"),
+        _ => Err("unsupported recovery implementation".into()),
+    }
 }
 fn choice_factorization(cell: &Value) -> Result<KernelFactorization, String> {
     if cell.get("factorization").is_some() {
@@ -61,7 +75,10 @@ fn choice_backend(cell: &Value) -> Result<&str, String> {
         None => Ok("polynomial"),
         Some(value) => match value.as_str() {
             Some("polynomial") => Ok("polynomial"),
+            Some("prepared_polynomial") => Ok("prepared_polynomial"),
+            Some("prepared_fiber") => Ok("prepared_fiber"),
             Some("pair_table") => Ok("pair_table"),
+            Some("specialized_pair_table") => Ok("specialized_pair_table"),
             _ => Err("unsupported frozen decomposition backend".into()),
         },
     }
@@ -972,6 +989,10 @@ struct State {
     choice_reference_from_fixture: bool,
     choice_plain: bool,
     choice_pair_setup: bool,
+    choice_specialized_setup: bool,
+    choice_polynomial_setup: Option<Value>,
+    selected_membership_values: usize,
+    selected_tower_depth: usize,
     signed_points: Vec<PointDefinition>,
     signed_columns: BTreeMap<(u64, u64), (usize, i64)>,
     arity: usize,
@@ -1005,6 +1026,10 @@ impl Default for State {
             choice_reference_from_fixture: false,
             choice_plain: false,
             choice_pair_setup: false,
+            choice_specialized_setup: false,
+            choice_polynomial_setup: None,
+            selected_membership_values: 0,
+            selected_tower_depth: 0,
             signed_points: vec![],
             signed_columns: BTreeMap::new(),
             arity: 0,
@@ -1039,6 +1064,8 @@ impl State {
     }
 
     fn install_base(&mut self, base: AuditBase) {
+        self.selected_membership_values = base.columns;
+        self.selected_tower_depth = 0;
         for (column, &q) in base.canonical_points.iter().enumerate() {
             let neg = PointDefinition {
                 x: q.x,
@@ -1152,6 +1179,18 @@ impl State {
         if (status == "recovered") != self.rows.pinned.is_some() {
             return Err("summary status contradicts recovery".into());
         }
+        if self.cell.as_ref().is_some_and(choice_v3) {
+            let work = field(summary, "rank_a_work")?;
+            if work["schema"] != "prime31-recovery-work/v2"
+                || work["implementation"] != "augmented_only"
+                || boolean(work, "a_matrix_materialized")?
+                || !boolean(work, "rank_derived_from_augmented")?
+                || work["rank_rule"] != "rank_augmented_minus_target_pinned"
+                || !field(work, "separate_matrix_counters")?.is_null()
+            {
+                return Err("v3 summary changes the registered recovery accounting".into());
+            }
+        }
         if let Some(d) = self.rows.pinned {
             self.scalar_replays(d)?;
         }
@@ -1181,7 +1220,11 @@ impl State {
                 let cell = field(&value, "cell")?.clone();
                 if !matches!(
                     field(&cell, "schema")?.as_str(),
-                    Some("prime31-isogeny-choice.cell/v1" | "prime31-isogeny-choice.cell/v2")
+                    Some(
+                        "prime31-isogeny-choice.cell/v1"
+                            | "prime31-isogeny-choice.cell/v2"
+                            | "prime31-isogeny-choice.cell/v3"
+                    )
                 ) {
                     return Err("unsupported isogeny-choice cell schema".into());
                 }
@@ -1194,6 +1237,27 @@ impl State {
                 let kernel: KernelChoice = decode(&cell, "kernel")?;
                 let factorization = choice_factorization(&cell)?;
                 let backend = choice_backend(&cell)?;
+                if choice_v3(&cell) {
+                    if choice_recovery(&cell)? != "augmented_only"
+                        || (matches!(
+                            backend,
+                            "prepared_polynomial" | "prepared_fiber" | "specialized_pair_table"
+                        ) && cell["method"] != "ic")
+                        || (backend == "prepared_fiber" && cell["presentation"] == "dense")
+                    {
+                        return Err(
+                            "v3 requires augmented-only recovery and compatible prepared backend"
+                                .into(),
+                        );
+                    }
+                } else if choice_recovery(&cell)? != "dual_matrices"
+                    || matches!(
+                        backend,
+                        "prepared_polynomial" | "prepared_fiber" | "specialized_pair_table"
+                    )
+                {
+                    return Err("v1/v2 choice carries v3-only recovery or prepared backend".into());
+                }
                 if factorization != KernelFactorization::Standard
                     && kernel != KernelChoice::AminusH2
                 {
@@ -1263,7 +1327,7 @@ impl State {
                         "transported membership is certified only in the dense presentation".into(),
                     );
                 }
-                if backend == "pair_table"
+                if matches!(backend, "pair_table" | "specialized_pair_table")
                     && (cell["method"] != "ic" || presentation != Presentation::Dense)
                 {
                     return Err(
@@ -1331,6 +1395,9 @@ impl State {
                 self.choice_reference = Some(checked.clone());
                 if !choice_plain_control(self.cell.as_ref().unwrap())? {
                     self.install_base(checked);
+                    self.selected_membership_values = base.v.len();
+                    self.selected_tower_depth =
+                        base.tower.as_ref().map_or(0, TowerDescription::depth);
                 }
             }
             "choice_plain_reference" => {
@@ -1451,6 +1518,134 @@ impl State {
                 // Table contents, operation ledgers and timings are not replayed.
                 self.choice_pair_setup = true;
             }
+            "choice_specialized_setup" => {
+                let cell = self
+                    .cell
+                    .as_ref()
+                    .ok_or("specialized setup before choice_start")?;
+                if !choice_v3(cell)
+                    || cell["method"] != "ic"
+                    || choice_backend(cell)? != "specialized_pair_table"
+                    || self.choice_specialized_setup
+                    || self.stream.is_some()
+                {
+                    return Err("unexpected, duplicate, or late specialized setup".into());
+                }
+                let columns = self.selected_base()?.columns as u64;
+                let setup = field(&value, "setup")?;
+                if setup["schema"] != "prime31-specialized-pair-setup/v1"
+                    || setup["backend"] != "specialized_pair_table"
+                    || setup["repository"] != "isogeny-labs/cryptanalysis"
+                    || setup["source_revision"] != "457ae1818aaf8134bd833ad9c1b9d57015264510"
+                    || integer(setup,"columns")? != columns
+                    || integer(setup,"abscissae")? != columns
+                    || integer(setup,"signed_points")? != 2 * columns
+                    || integer(setup,"summands")? != 3
+                    || setup["config"] != json!({"setup_chunk":1024,"probe_chunk":16})
+                    || setup["table_kind"] != "negation_folded_prime_batch_xonly"
+                    || setup["first_witness_policy"] != "cancellation_first_then_native_abscissa_groups; scalar_signed_index_order_at_infinity"
+                    || boolean(setup,"native_group_operations_are_complete_field_ledger")?
+                    || !field(setup,"field_operation_counters")?.is_null()
+                    || boolean(setup,"payload_is_total_allocation_or_rss")?
+                { return Err("specialized setup differs from pinned source/configuration or checked signed base".into()); }
+                self.choice_specialized_setup = true;
+            }
+            "choice_polynomial_setup" => {
+                let cell = self
+                    .cell
+                    .as_ref()
+                    .ok_or("prepared setup before choice_start")?;
+                if !choice_v3(cell)
+                    || cell["method"] != "ic"
+                    || !matches!(
+                        choice_backend(cell)?,
+                        "prepared_polynomial" | "prepared_fiber"
+                    )
+                    || self.choice_polynomial_setup.is_some()
+                    || self.stream.is_some()
+                {
+                    return Err("unexpected, duplicate, or late prepared polynomial setup".into());
+                }
+                let columns = self.selected_base()?.columns as u64;
+                let setup = field(&value, "setup")?;
+                let presentation: Presentation = decode(cell, "presentation")?;
+                let expected_depth = if presentation == Presentation::Dense {
+                    0
+                } else {
+                    self.selected_tower_depth as u64
+                };
+                let fiber_mode = choice_backend(cell)? == "prepared_fiber";
+                if setup["backend"] != "polynomial"
+                    || setup["mode"]
+                        != if fiber_mode {
+                            "prepared_fiber_triangular"
+                        } else {
+                            "prepared_target_liftable_domains"
+                        }
+                    || field(setup, "presentation")? != field(cell, "presentation")?
+                    || integer(setup, "summands")? != integer(cell, "arity")?
+                    || integer(setup, "full_membership_values")?
+                        != self.selected_membership_values as u64
+                    || integer(setup, "leaf_domain_values")? != columns
+                    || integer(setup, "signed_points")? != 2 * columns
+                    || integer(setup, "validation_point_checks")? != 2 * columns
+                    || integer(setup, "validated_tower_depth")? != expected_depth
+                    || integer(setup, "fixed_validation_passes")? != 1
+                    || integer(setup, "logical_leaf_domain_payload_bytes")? != 8 * columns
+                {
+                    return Err(
+                        "prepared polynomial setup differs from the independently checked base"
+                            .into(),
+                    );
+                }
+                if fiber_mode {
+                    let index = field(setup, "fiber_index")?;
+                    let width = if presentation == Presentation::Tower4 {
+                        2
+                    } else {
+                        1
+                    };
+                    if integer(index, "full_leaf_values")? != self.selected_membership_values as u64
+                        || integer(index, "live_leaf_values")? != columns
+                        || integer(index, "block_width")? != width
+                        || integer(index, "variable_levels")? != expected_depth.div_ceil(width)
+                    {
+                        return Err(
+                            "conditional fiber-index metadata differs from the checked tower/base"
+                                .into(),
+                        );
+                    }
+                    // The first v3 development snapshot reported a separate
+                    // arithmetic traversal and predates these reuse fields.
+                    // Preserve its replay; bind the additional fields whenever
+                    // a newer report explicitly claims shared validation paths.
+                    if [
+                        "reuses_fixed_validation_paths",
+                        "reused_block_path_values",
+                        "logical_temporary_path_payload_bytes",
+                    ]
+                    .iter()
+                    .any(|key| index.get(key).is_some())
+                    {
+                        let values = self.selected_membership_values as u64
+                            * (expected_depth.div_ceil(width) + 1);
+                        if !boolean(index, "reuses_fixed_validation_paths")?
+                            || integer(index, "construction_field_multiplications")? != 0
+                            || integer(index, "reused_block_path_values")? != values
+                            || integer(index, "logical_temporary_path_payload_bytes")? != 8 * values
+                        {
+                            return Err("shared validation-path metadata contradicts the checked tower shape".into());
+                        }
+                    }
+                } else if setup.get("fiber_index").is_some() {
+                    return Err(
+                        "plain prepared setup carries unexpected conditional-fiber work".into(),
+                    );
+                }
+                // Bind setup metadata to the independently reconstructed base.
+                // This is not a timing, allocation or operation-count replay.
+                self.choice_polynomial_setup = Some(setup.clone());
+            }
             "cell_start" => {
                 if self.cell.is_some() {
                     return Err("audit accepts exactly one cell per JSONL stream".into());
@@ -1533,6 +1728,11 @@ impl State {
                     let expected_backend = choice_backend(self.cell.as_ref().unwrap())?;
                     if choice_backend(&value)? != expected_backend
                         || (expected_backend == "pair_table") != self.choice_pair_setup
+                        || matches!(expected_backend, "prepared_polynomial" | "prepared_fiber")
+                            != self.choice_polynomial_setup.is_some()
+                        || (expected_backend == "specialized_pair_table")
+                            != self.choice_specialized_setup
+                        || choice_recovery(&value)? != choice_recovery(self.cell.as_ref().unwrap())?
                     {
                         return Err("collection backend or required pair setup differs from the frozen cell".into());
                     }
@@ -1657,6 +1857,117 @@ impl State {
                                     .into(),
                             );
                         }
+                    } else if choice_backend(cell)? == "specialized_pair_table" {
+                        let work = oracle
+                            .backend_work
+                            .as_ref()
+                            .ok_or("specialized query omits backend work identity")?;
+                        if !self.choice_specialized_setup
+                            || work["backend"] != "specialized_pair_table"
+                            || work["source_revision"] != "457ae1818aaf8134bd833ad9c1b9d57015264510"
+                            || boolean(work,"native_ledger_merged_into_collector")?
+                            || boolean(work,"complete_operation_ledger")?
+                            || !boolean(work,"outer_process_cap_required")?
+                            || work["first_witness_policy"] != "cancellation_first_then_native_abscissa_groups; scalar_signed_index_order_at_infinity"
+                            || !oracle.charts.is_empty() || oracle.polynomial_build_ns != 0
+                            || oracle.counters.polynomial_build_multiplications != 0
+                            || oracle.counters.f4_field_operations != 0 || oracle.counters.f4_runs != 0
+                        { return Err("specialized query changes its source/accounting or claims polynomial execution".into()); }
+                        let checked = boolean(work, "cancellation_checked")?;
+                        let hit = boolean(work, "cancellation_hit")?;
+                        let native = field(work, "native")?;
+                        let target = self.current.as_ref().unwrap().target;
+                        let in_base = self.signed_points.contains(&target);
+                        if (!checked && (hit || !native.is_null()))
+                            || (checked && hit != in_base)
+                            || (hit
+                                && (oracle.status != OracleStatus::FoundFirst || !native.is_null()))
+                            || (oracle.status == OracleStatus::CompleteNegative
+                                && (!checked || hit || native.is_null()))
+                            || (oracle.status == OracleStatus::FoundFirst
+                                && !hit
+                                && native.is_null())
+                        {
+                            return Err("specialized cancellation/native path contradicts the target or outcome".into());
+                        }
+                        if !native.is_null()
+                            && (!boolean(native, "native_called")?
+                                || boolean(native, "scalar_identity_fallback")? != target.infinity
+                                || field(native, "field_operation_counters")? != &Value::Null
+                                || boolean(native, "group_counts_are_complete_native_arithmetic")?
+                                || !matches!(
+                                    oracle.status,
+                                    OracleStatus::FoundFirst | OracleStatus::CompleteNegative
+                                ))
+                        {
+                            return Err("specialized native path changes its identity handling or partial ledger".into());
+                        }
+                    } else if matches!(
+                        choice_backend(cell)?,
+                        "prepared_polynomial" | "prepared_fiber"
+                    ) {
+                        let setup = self
+                            .choice_polynomial_setup
+                            .as_ref()
+                            .ok_or("prepared query without setup")?;
+                        let work = oracle
+                            .backend_work
+                            .as_ref()
+                            .ok_or("prepared query omits its backend work identity")?;
+                        if work["backend"] != "polynomial"
+                            || work["mode"] != setup["mode"]
+                            || field(work, "full_membership_values")?
+                                != field(setup, "full_membership_values")?
+                            || field(work, "leaf_domain_values")?
+                                != field(setup, "leaf_domain_values")?
+                            || boolean(work, "fixed_validation_repeated")?
+                            || integer(work, "target_point_checks")? != 1
+                            || work["setup_accounting"] != "separate_prepared_setup_record_required"
+                            || oracle.counters.validation_field_multiplications != 0
+                        {
+                            return Err("prepared polynomial query changes its certified setup or work scope".into());
+                        }
+                        if choice_backend(cell)? == "prepared_fiber"
+                            && work["fiber_limits"]
+                                != json!({"max_nodes":4096,"max_f4_runs":64,"max_root_degree":1024,"max_retained_terms":100000})
+                        {
+                            return Err(
+                                "conditional-fiber query changes its frozen driver limits".into()
+                            );
+                        }
+                        if choice_backend(cell)? == "prepared_fiber" {
+                            let policy = json!({
+                                "schema":"prime31-fiber-extraction-policy/v1",
+                                "selector_domain":"descendants_of_nearest_fixed_selector_ancestor",
+                                "univariate_roots":"direct_domain_horner_at_limit_else_pinned_dense_roots_fp",
+                                "direct_domain_limit":4,
+                                "root_filter":"all_available_univariates_and_conditional_domain",
+                                "substitution":"pinned_substitute_var_per_child_and_forced_ancestor",
+                                "selector_branch":"strict_domain_reduction_or_singleton",
+                                "preserves_incoming_equations_and_f4_consequences":true,
+                                "legacy_domain_roots_applied":false,
+                                "legacy_sibling_batch_applied":false,
+                                "static_cartesian_fallback":false,
+                                "full_field_scan_fallback":false
+                            });
+                            if work["effective_policy"] != policy
+                                || oracle
+                                    .charts
+                                    .iter()
+                                    .any(|chart| match chart.status.as_str() {
+                                        "impossible_identity_plus_finite_equals_identity" => {
+                                            !chart.visit.is_null()
+                                        }
+                                        "error" => {
+                                            oracle.status != OracleStatus::UnknownError
+                                                || !chart.visit["error"].is_string()
+                                        }
+                                        _ => chart.visit["effective_policy"] != policy,
+                                    })
+                            {
+                                return Err("conditional-fiber query changes its effective extraction policy".into());
+                            }
+                        }
                     } else if oracle.backend_work.is_some() {
                         return Err(
                             "polynomial cell carries an unexpected alternate-backend result".into(),
@@ -1775,6 +2086,7 @@ impl State {
                     let cell = self.cell.as_ref().unwrap();
                     if field(&value, "stage")? != field(cell, "stage")?
                         || choice_backend(&value)? != choice_backend(cell)?
+                        || choice_recovery(&value)? != choice_recovery(cell)?
                     {
                         return Err(
                             "cell summary changes the frozen stage or decomposition backend".into(),
@@ -1958,6 +2270,9 @@ pub fn audit_jsonl(mut reader: impl BufRead) -> Result<Value, String> {
         "choice_plain_reference_independently_verified":state.choice_reference_from_fixture,
         "choice_plain_independently_verified":state.choice_plain,
         "choice_pair_setup_checked":state.choice_pair_setup,
+        "choice_specialized_setup_checked":state.choice_specialized_setup,
+        "choice_polynomial_setup_checked":state.choice_polynomial_setup.is_some(),
+        "prepared_setup_costs_independently_replayed":false,
         "pair_table_contents_independently_replayed":false,
         "source_public_scalar_equation_verified":state.choice_source.is_some() && recovered.is_some(),
         "negative_exhaustion_independently_replayed":false,
