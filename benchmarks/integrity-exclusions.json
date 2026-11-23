@@ -121,7 +121,7 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     },
     "benchmarks/records/20261117T0334Z-hec-multi-production-cold.json": {
-      "reason": "Historical receipt lacks current comparison-eligibility metadata: command 1 has no successful integer exit code; use invalid/censored or an explicit pinned historical exclusion; command 2 has no successful integer exit code; use invalid/censored or an explicit pinned historical exclusion; metric None name must be a stable lowercase key. Original record is preserved. This excludes automated comparisons; it does not decide the validity of every underlying measurement.",
+      "reason": "Historical receipt is not in bench.record/v1 measurement form: its commands are recorded as strings with no integer exit code, and its 90 metrics are raw per-workload rows (median_batch_ns, min_batch_ns, max_batch_ns, spread) without name, value, unit or better fields. It aborts progress regeneration for every later record. Original record and its raw rows are preserved. This excludes automated comparisons; it does not decide the validity of every underlying measurement.",
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   },

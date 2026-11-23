@@ -236,7 +236,7 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
                 // 2^61 = 1 mod p: end-around carry rather than u128 divide.
                 let product = a as u128 * b as u128;
                 let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-                let folded = (folded & MAX_PRIME) + (folded >> 61);
+                // Canonical product < p^2, hence the first fold < 2p.
                 if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
             } else if p <= u32::MAX as u64 && a < p && b < p {
                 (a * b) % p
@@ -555,7 +555,8 @@ fn vmul(a: u64, b: u64, p: u64) -> u64 {
     if p == MAX_PRIME && a < p && b < p {
         let product = a as u128 * b as u128;
         let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-        let folded = (folded & MAX_PRIME) + (folded >> 61);
+        // Independent verifier: one fold plus one correction is exact
+        // for canonical operands, including p-1 times p-1.
         if folded >= p { folded - p } else { folded }
     } else if p <= u32::MAX as u64 && a < p && b < p {
         (a * b) % p
