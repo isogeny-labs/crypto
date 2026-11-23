@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261123T1852Z-ecc2k-halftrace-baseline-profile",
+  "latest_record": "20261123T1913Z-ecc2k-halftrace-preflight",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 8,
-    "measured": 313,
+    "measured": 314,
     "open": 62
   },
   "repo": "crypto",
@@ -31228,6 +31228,29 @@
       ],
       "problem": "kernel:ecc2k130-ic-halftrace-setup",
       "unit": "ir"
+    },
+    {
+      "better": "neutral",
+      "first": 12.0,
+      "latest": 12.0,
+      "latest_derived": {},
+      "metric": "pilot_calls",
+      "points": [
+        {
+          "commit": "8d3905a93a51",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T1913Z-ecc2k-halftrace-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Both partition calibrations and12-call engineering pilot complete; fixed source/cases/criteria retained. No primary gain conclusion.",
+          "value": 12.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "count"
     },
     {
       "better": "lower",
