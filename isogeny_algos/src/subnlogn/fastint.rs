@@ -19,6 +19,10 @@
 //! place on those buffers, so a node allocates O(1) buffers rather than O(1)
 //! integers per butterfly. Squaring reuses one forward transform.
 //!
+//! Nodes with K >= `PARALLEL_BITS` split the low transform stages and the
+//! pointwise products over `std::thread::scope` workers (cap with
+//! `set_threads`; 1 disables). Products never depend on the thread count.
+//!
 //! The recurrence has L*K' = 2K+O(K/sqrt K) and log K' = (log K)/2+O(1). Its
 //! bit cost is O(K log K log log K). These are mathematical operation bounds,
 //! not a runtime benchmark or a proof that Rust's allocator is a multitape
@@ -67,51 +71,17 @@ pub fn multiply_with_work(a: &Big, b: &Big) -> (Big, Work) {
     (value, work)
 }
 
-/// Exact product through one top-level Fermat node whose ring size n >= bits
-/// is chosen together with its dimensions, so that the coefficient ring is
-/// not rounded up by a whole granule when the product length is a power of
-/// two.
+/// Exact product through one top-level Fermat node of ring size n >= bits.
 fn multiply_top(a: &Big, b: &Big, bits: usize, leaf: usize, work: &mut Work) -> Big {
-    let (n, len, width, child) = plan_top(bits, leaf);
     // a*b < 2^bits <= 2^n, so the modular result is the ordinary product.
-    let m = n / 64;
-    let load = |x: &Big| {
-        let mut v = vec![0u64; m + 1];
-        v[..x.0.len()].copy_from_slice(&x.0);
-        v
-    };
-    let (x, y) = (load(a), load(b));
-    let mut out = vec![0u64; m + 1];
-    let square = a == b;
-    node(&x, &y, &mut out, square, leaf, work, 0, (len, width, child));
-    Big::from_limbs(&out)
+    multiply_mod_with(a, b, top_ring_bits(bits), leaf, work)
 }
 
-/// Top-level dimensions (n, len, width, child) with n = len*width >= bits,
-/// n a multiple of 64, minimizing `node_cost`.
-fn plan_top(bits: usize, leaf: usize) -> (usize, usize, usize, usize) {
-    let mut best: Option<(f64, (usize, usize, usize, usize))> = None;
-    for i in 2..=30u32 {
-        let len = 1usize << i;
-        if len * 64 > bits {
-            break;
-        }
-        let unit = (64 / len).max(1);
-        let width = bits.div_ceil(len).next_multiple_of(unit);
-        let n = len * width;
-        let needed = 2 * width + i as usize + 2;
-        for t in 0..GRANULE_STEPS {
-            let child = needed.next_multiple_of(len.max(64) << t);
-            if child >= n {
-                continue;
-            }
-            let cost = node_cost(len, child, leaf);
-            if best.is_none_or(|(c, _)| cost < c) {
-                best = Some((cost, (n, len, width, child)));
-            }
-        }
-    }
-    best.expect("invalid top-level Fermat dimensions").1
+/// Smallest multiple of a power-of-two granule near sqrt(bits) that is >= bits.
+fn top_ring_bits(bits: usize) -> usize {
+    let granule = pow2_floor(bits.isqrt()).max(64);
+    bits.checked_next_multiple_of(granule)
+        .expect("product length overflow")
 }
 
 fn pow2_floor(x: usize) -> usize {
@@ -123,7 +93,6 @@ fn pow2_floor(x: usize) -> usize {
 }
 
 /// `a*b mod 2^n+1` for `a, b <= 2^n`, `n` a multiple of 64.
-#[cfg(test)]
 fn multiply_mod_with(a: &Big, b: &Big, n: usize, leaf: usize, work: &mut Work) -> Big {
     assert!(n.is_multiple_of(64) && n > 0);
     let m = n / 64;
@@ -439,7 +408,7 @@ fn inverse(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut 
 static THREADS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
 /// Nodes with K at least this many bits use worker threads.
-pub const PARALLEL_BITS: usize = 1 << 18;
+pub const PARALLEL_BITS: usize = 1 << 19;
 
 /// Set the worker-thread cap for large products: 0 (default) means
 /// `std::thread::available_parallelism`, 1 disables threading (for isolated
@@ -538,26 +507,20 @@ fn inverse_par(
     inverse_stages(data, s, 2 * sub, len, sc, work);
 }
 
-/// Granule choices: the child ring size is a multiple of max(len, 64) << t.
-const GRANULE_STEPS: usize = 7;
-
 /// Valid recursive dimensions for a K-bit node: (len, chunk width, child K').
+/// The child is a multiple of a power-of-two granule >= max(len, 64) close to
+/// its own square root, which leaves it transform lengths to choose from.
 fn candidates(k: usize) -> Vec<(usize, usize, usize)> {
-    let mut out = Vec::new();
-    for i in 2..=k.trailing_zeros().min(40) {
-        let len = 1usize << i;
-        let width = k / len;
-        let needed = 2 * width + i as usize + 2;
-        let mut last = 0;
-        for t in 0..GRANULE_STEPS {
-            let child = needed.next_multiple_of(len.max(64) << t);
-            if child < k && child != last {
-                out.push((len, width, child));
-            }
-            last = child;
-        }
-    }
-    out
+    (2..=k.trailing_zeros().min(40))
+        .filter_map(|i| {
+            let len = 1usize << i;
+            let width = k / len;
+            let needed = 2 * width + i as usize + 2;
+            let granule = pow2_floor(needed.isqrt()).max(64).max(len);
+            let child = needed.next_multiple_of(granule);
+            (child < k).then_some((len, width, child))
+        })
+        .collect()
 }
 
 /// Relative cost model (seconds-like units) used only to choose dimensions:
@@ -823,11 +786,6 @@ mod tests {
         Big::from_u64(1).shl(n)
     }
 
-    /// A ring size >= bits usable with `multiply_mod_with`.
-    fn top_ring_bits(bits: usize) -> usize {
-        bits.next_multiple_of(pow2_floor(bits.isqrt()).max(64))
-    }
-
     fn modulus(n: usize) -> Big {
         pow2(n).add_small(1)
     }
@@ -1036,33 +994,6 @@ mod tests {
                 assert!(child < kk);
             }
             k *= 2;
-        }
-    }
-
-    #[test]
-    fn top_level_plan_is_valid_and_tight() {
-        for base in [BASE_BITS, 1 << 18, 1 << 20, 1 << 23, 1 << 26] {
-            for bits in [
-                base + 1,
-                base + 64,
-                base * 5 / 4,
-                base * 3 / 2,
-                base * 2 - 7,
-                base * 2,
-            ] {
-                let (n, len, width, child) = plan_top(bits, LEAF_BITS);
-                assert!(n >= bits && n.is_multiple_of(64));
-                assert_eq!(len * width, n);
-                assert!(len.is_power_of_two() && len >= 4);
-                assert!(child.is_multiple_of(64) && child.is_multiple_of(len));
-                assert!(child >= 2 * width + len.trailing_zeros() as usize + 2);
-                assert!(child < n);
-                // The ring is never more than one chunk row per element above bits.
-                assert!(
-                    n - bits < len * (64 / len).max(1) + len,
-                    "bits {bits} n {n}"
-                );
-            }
         }
     }
 
