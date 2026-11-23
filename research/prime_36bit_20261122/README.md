@@ -123,6 +123,14 @@ moves the optimal B from 2048 to 3072, and takes the four-seed IC CPU from
 31.4–33.1 s to 13.8–16.1 s (~2.2×). The remaining 36-bit wall is relation
 collection and sparse-LA fill-in, in that order.
 
+**Update, same day (relation probe):** the u64 MITM probe now batch-inverts
+the shared denominator `x(F_k) - x(R)` for all `k` (one inverse + `3B`
+multiplications instead of `2B` inversions per trial). Same four seeds, same
+B=3072: CPU drops from 13.77–16.09 s to **7.85–8.47 s** (median 14.0 → 8.1 s,
+**1.73×**), every seed still recovers the truth scalar. Details:
+`batchinv/BATCH_INVERSION.md`. This is a constant-factor win; IC remains
+~4×10² slower than tuned rho.
+
 - **32 → 36 bits costs ~10× CPU**, at the tuned B on the same four seeds:
   3.19–3.33 s at 32 bits (`a3_32bit_cpu.txt`) against 31.4–33.1 s here. The
   `p^{2/3}` projection of this family predicts 2^(8/3) = 6.3×, so this one

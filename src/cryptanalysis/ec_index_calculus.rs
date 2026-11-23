@@ -1290,6 +1290,29 @@ fn inv_prime_u64(a: u64, p: u64) -> u64 {
     (t.rem_euclid(p as i128)) as u64
 }
 
+/// Montgomery batch inversion over a prime `p`: one extended-Euclid inverse
+/// and `3n` multiplications for `n` nonzero inputs. Zero inputs must be
+/// replaced by 1 by the caller (their inverses are unused).
+fn batch_inv_prime_u64(vals: &[u64], p: u64) -> Vec<u64> {
+    let n = vals.len();
+    let mut out = vec![0u64; n];
+    if n == 0 {
+        return out;
+    }
+    let mut prefix = Vec::with_capacity(n + 1);
+    prefix.push(1u64);
+    for &v in vals {
+        let last = *prefix.last().unwrap();
+        prefix.push(mul_mod_u64(last, v, p));
+    }
+    let mut acc = inv_prime_u64(prefix[n], p);
+    for i in (0..n).rev() {
+        out[i] = mul_mod_u64(acc, prefix[i], p);
+        acc = mul_mod_u64(acc, vals[i], p);
+    }
+    out
+}
+
 /// Affine `(x1,y1) + (x2,y2)` over `F_p`, `p < 2^63`, with `u128`
 /// products. Returns `None` for the point at infinity.
 fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(u64, u64)> {
@@ -1487,16 +1510,66 @@ pub fn find_one_relation_s4_via_mitm_counted(
                     let rx = x.value.to_u64_digits().first().copied();
                     let ry = y.value.to_u64_digits().first().copied();
                     if let (Some(rx), Some(ry)) = (rx, ry) {
-                        for k in 0..factor_base.len() {
+                        // R + F_k and R - F_k share the denominator
+                        // x(F_k) - x(R); invert all of them at once.
+                        let nfb = factor_base.len();
+                        let mut dens = Vec::with_capacity(nfb);
+                        let mut raw = Vec::with_capacity(nfb);
+                        for k in 0..nfb {
+                            let d = match table.fb_u64[k] {
+                                Some((fx, _)) => sub_mod_u64(fx, rx, p),
+                                None => 0,
+                            };
+                            raw.push(d);
+                            dens.push(if d == 0 { 1 } else { d });
+                        }
+                        let invs = batch_inv_prime_u64(&dens, p);
+                        for k in 0..nfb {
                             let Some((fx, fy)) = table.fb_u64[k] else {
                                 continue;
                             };
-                            let candidates = [
-                                add_point_u64(p, a_u64, rx, ry, fx, sub_mod_u64(p, fy, p)),
-                                add_point_u64(p, a_u64, rx, ry, fx, fy),
-                            ];
-                            for candidate in candidates.into_iter().flatten() {
-                                let Some(pairs) = table.by_x_u64.get(&candidate.0) else {
+                            let mut cand = [0u64; 2];
+                            let mut nc = 0usize;
+                            if raw[k] == 0 {
+                                if let Some((cx, _)) = add_point_u64(
+                                    p,
+                                    a_u64,
+                                    rx,
+                                    ry,
+                                    fx,
+                                    sub_mod_u64(p, fy, p),
+                                ) {
+                                    cand[nc] = cx;
+                                    nc += 1;
+                                }
+                                if let Some((cx, _)) =
+                                    add_point_u64(p, a_u64, rx, ry, fx, fy)
+                                {
+                                    cand[nc] = cx;
+                                    nc += 1;
+                                }
+                            } else {
+                                let inv = invs[k];
+                                let lam_p = mul_mod_u64(sub_mod_u64(fy, ry, p), inv, p);
+                                let lam_m = mul_mod_u64(
+                                    sub_mod_u64(sub_mod_u64(0, fy, p), ry, p),
+                                    inv,
+                                    p,
+                                );
+                                cand[0] = sub_mod_u64(
+                                    sub_mod_u64(mul_mod_u64(lam_m, lam_m, p), rx, p),
+                                    fx,
+                                    p,
+                                );
+                                cand[1] = sub_mod_u64(
+                                    sub_mod_u64(mul_mod_u64(lam_p, lam_p, p), rx, p),
+                                    fx,
+                                    p,
+                                );
+                                nc = 2;
+                            }
+                            for &cx in &cand[..nc] {
+                                let Some(pairs) = table.by_x_u64.get(&cx) else {
                                     continue;
                                 };
                                 for &(i, j) in pairs {
