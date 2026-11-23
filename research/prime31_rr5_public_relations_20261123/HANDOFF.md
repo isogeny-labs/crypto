@@ -1,0 +1,78 @@
+# Resume: RR5 public relation integration
+
+## Goal and location
+
+Finish public nonenumerative four-summand extraction on the original Prime31
+curve, signed independent authentic-RHS relations, complete scalar recovery,
+and fully charged cold one-target comparison with the strongest applicable IC
+and optimized negation-map rho.
+
+- Worktree: /workspace/scratch/22854d1d6689/crypto-rr5-integration.
+- Branch: lane/prime31-rr5-public-relations-integration-20261123.
+- Draft PR: https://github.com/isogeny-labs/crypto/pull/4970.
+- Study: research/prime31_rr5_public_relations_20261123.
+- Integration base: e51060051c6963b8852f86844f1ec53dc61f895f.
+- Publication base: 816f9c3a942efed569049618c056d12a0c56d693; all 41 qualified
+  production/source-selector inputs match the e510 execution snapshot.
+- Published integration producer: 9db32aeb03d7f1c1964016efcb23ed9c8241ed9f.
+- Preserved producer core: 269cd7b552bd3abcc88c88a6eb5771b59cceb0bf.
+
+Read LINEAGE.md before interpreting historical paths or exports. Main's
+concurrent research/prime31_four_summand_20261122 study remains unchanged.
+
+## State
+
+Historical development06 passed 21 local controls; development08 separately
+passed the corrected compact-selector setup check after the retained inherited
+constant failure in development07. Original B677 cofactor input is checked,
+not root extraction. The compact-selector argument and setup certificate do not
+establish an elimination bound or full solver cost.
+
+Concurrent main has a byte-identical general row adapter, a test-only F11 public
+label recovery loop, and completed Grevlex cofactor B8 positive/empty controls.
+The historical Lex B8 inconclusive results are configuration-specific. They are
+not the latest repository-wide B8 frontier.
+
+Development09 is prospectively specified in PROTOCOL.md: 22 existing controls
+on the new F4 source, separately invoked exact main Grevlex B8 controls at
+30 seconds/degree 10, and a separate F11 public loop through the selected-form
+reusable solver. The original interfaces and stricter deadline/status guards
+remain. All 22 regression controls and each of the 3 separate gates passed on the
+frozen current-source executable. Positive B8 returns 1 exact row, generator
+B8 returns Empty, and selected-form F11 recovers 3 after 9 queries at augmented rank 3.
+The new reports/integration-export/observation.json pins 160 raw files, 41 marker
+records and 2 identity certificates; SHA-256
+688e4c7dd5ca6be980ecf1c5c29dcfa355a4e994724f0e5a7bb951a1f736a507.
+
+The published producer tree exactly matches the staged source, evidence and
+inspected nine-page PDF. Native registration created PCC-20261123-688e4c at
+ledger sequence 1564, preserving the full existing raw ledger prefix. Its
+standing is unverified; no signature, independent execution or verdict was
+issued. The receipt is reports/pcc-registration.json.
+
+## Next actions
+
+The producer and unsigned registration are published in draft PR #4970. The
+registration commit is baaa7b04f60fe10802f1a04e4facaf999cfa0691. Preserve
+all earlier branches, evidence and concurrent main work. The copied
+reports/development-export observation is historical and must not be registered
+as a current-checkout artifact.
+
+Continue with actual B677 roots and complete public recovery, the remaining
+charts, complete phase accounting and supported EKS image/checkpoint integration.
+The cold comparison has not run; no speed ratio, GAE or exponent is established.
+
+## Gates and resources
+
+Use at most two compiler workers and one test worker. Each new B8 target is
+its own process, with 2 GiB virtual memory and 180 seconds external limit. Retain
+all caps and failures; no silent enumeration fallback. The integration-base
+root-library test command separately reached its 60-second cap during dependency
+compilation (exit 124). Historical 60/300-second root caps remain historical.
+No root-library pass is established.
+
+No paid research job was launched. The actual earlier upload checkpoint failed
+for missing authentication, and the supported source/image route requires an
+adapter. These execution gates are separate from B677 elimination. The original
+user objective remains open until complete validated recovery and the requested
+fully charged matched comparison are available.

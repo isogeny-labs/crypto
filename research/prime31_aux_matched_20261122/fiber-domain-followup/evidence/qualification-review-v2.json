@@ -1,0 +1,151 @@
+{
+  "binary_custody": {
+    "all_actual_immutable_hashes_match": true,
+    "all_cargo_artifact_paths_and_build_cache_hashes_match_copies": true,
+    "all_four_cli_binaries_contain_exact_embedded_manifest_bytes": true,
+    "cli_manifest_verification_method": "static byte inspection; no CLI invocation during this review",
+    "four_cli_identities": [
+      {
+        "name": "prime31-aux-matched",
+        "sha256": "c4d4b1e85ab8c4149eef6a625e6d3e3d5f8b16635bcbd66a7b4a7628bb53e80d"
+      },
+      {
+        "name": "prime31-isogeny-choices",
+        "sha256": "f786b5de6592f35954f5716343859c171f871958fb2ee53b63c787cc896692f0"
+      },
+      {
+        "name": "prime31-sparse-identity",
+        "sha256": "19202e70a81a5c222624eb911cd039adb0639d266a24d431b0f3b3a431d3e37b"
+      },
+      {
+        "name": "prime31-ic-incumbent",
+        "sha256": "1711499b1c2684ccc990ab387b6c526c5a21174c6e3be2462899cf14410a3e64"
+      }
+    ],
+    "pre_equals_post": true,
+    "pre_post_hash_entries": 28
+  },
+  "build": {
+    "all_native_artifacts_newly_built": true,
+    "cargo_build_finished_success": true,
+    "cargo_native_artifact_fresh_flags_all_false": true,
+    "cli_executables": 4,
+    "compiler_errors": 0,
+    "compiler_warning_records": 23,
+    "native_artifacts": 28,
+    "opt_level": "3",
+    "recorded_exit_code": 0,
+    "recorded_offline_locked_release_no_run": true,
+    "test_executables": 24
+  },
+  "candidate_change": "PreparedOracle captures already validated full-V forward paths for FiberIndex; no duplicate original-map arithmetic traversal",
+  "evidence_hashes": {
+    "artifacts.tsv": "e8d1f64b22acbacb70b510ec40027127e805cea905b98896c6bf4820ddf5552c",
+    "build.jsonl": "fa2b84bb5b77eb99452a97017ee97e0acc550a26568ef755a7e1dbdd784fc686",
+    "command.json": "7016bc996f21e09c1e188794239d0ab2af8cdfee1b33db4bf616955b846efb25",
+    "embedded-source-manifest.json": "6fee1711ea8161d8aad649497dbbec2c4c2c8372ce92e940df6373cbc71be79c",
+    "post-call.sha256": "4c831fb88e5ac0a0853fbe33e2cc0eaf6700cd1919d52edbb733154beb97e38e",
+    "pre-call.sha256": "4c831fb88e5ac0a0853fbe33e2cc0eaf6700cd1919d52edbb733154beb97e38e",
+    "result.json": "be621c569ccd6e8e17225ff2e66d122f1a53a6de48350ef39f3ba8b7f8d43aa0",
+    "source-check-before.json": "179c817c56340a4c06fa2202fbdcd49fb15f7c97d4828b8f97e6fd94d23cd660",
+    "source-revision.txt": "7c0f76504570b39fbee2025e1738b79e9fbc6d945e4f5a071cc582e7c202009e",
+    "tests/command.json": "2e48935a0674971e848c5fd11eda087592acd1641a839ee17be3c4713703aec9",
+    "tests/exits.tsv": "22dfec85b9fa8e7cd0b4f0285a46219d3b5fa1464dcf96538ed9ce0b403ca3af",
+    "tests/finished-utc.txt": "b6dae0dc0e373da19c48c157d7b03f52944a2d0dff7c25b74d9c25610d0df3f2"
+  },
+  "previous_evidence": {
+    "original_103_test_evidence_replaced": false,
+    "original_review_unchanged": true,
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/evidence/qualification-review.json",
+    "pcc_proof_subjects_modified_by_review": false,
+    "sha256": "f136ff468604f3ad7b25da0740d8bb2d4adc794054c5ced3fe2231cf6dc85479"
+  },
+  "raw_attempt_directory": "/workspace/scratch/caf932c2ca37/tmp/fiber_domains/native-attempt2",
+  "review_execution": {
+    "arithmetic_experiments_executed": false,
+    "builds_executed": false,
+    "metadata_and_saved_record_inspection_only": true,
+    "native_programs_executed": false,
+    "native_sources_modified": false,
+    "tests_executed": false
+  },
+  "reviewed_at_utc": "2026-11-23T05:36:06.997107+00:00",
+  "reviewer": "/root/baseline_extractor_review",
+  "schema": "prime31-fiber-domain-independent-qualification-review/v2",
+  "scope_limits": {
+    "compiler_reproducibility_verified": false,
+    "complete_cold_prime31_advantage_established": false,
+    "external_execution_admission_verified": false,
+    "fixed_fixture_correctness_and_integration_only": true,
+    "general_negative_search_exhaustion_established": false,
+    "natural_prime31_yield_established": false,
+    "new_asymptotic_claim": false,
+    "performance_or_timing_admission": false,
+    "root_library_gate_reviewed": false,
+    "signed_pcc_status": "unverified"
+  },
+  "source_custody": {
+    "all_104_current_source_files_match_inventory": true,
+    "all_104_source_files_match_frozen_git_revision_bytes": true,
+    "all_24_contract_source_files_inventoried": true,
+    "complete_hermetic_build_manifest": false,
+    "embedded_source_manifest_sha256": "de0f17188090bb41b8aed4e36eef88090eb4e1d84044438eb8e8461e73564802",
+    "saved_choice_source_check_verified": true,
+    "saved_manifest_file_sha256": "6fee1711ea8161d8aad649497dbbec2c4c2c8372ce92e940df6373cbc71be79c",
+    "saved_manifest_has_one_trailing_print_newline": true,
+    "saved_source_check_binary_hash_matches_choice_cli": true,
+    "unique_sources": 104
+  },
+  "source_revision": "559302c7df0cb411ce345b98b2650f33ee6e137d",
+  "status": "passed_fixed_fixture_qualification_metadata_review",
+  "test_results": {
+    "additional_named_case": "fiber_extract_contract::captured_shifted_dickson_paths_preserve_index_structure_and_signed_queries",
+    "all_24_source_contract_files_present_in_saved_executions": true,
+    "all_named_cases_match_frozen_source_test_definitions": true,
+    "all_test_stderr_files_empty": true,
+    "changed_suite_counts_from_attempt1": {
+      "fiber_extract_contract": {
+        "after": 8,
+        "before": 7
+      }
+    },
+    "exact_named_case_inventory_sha256": "96aaa0d2491bf5745072ef0d05e823330dabe5228979d8989457b6a3da67db91",
+    "executable_exits_all_zero": true,
+    "failed": 0,
+    "filtered_out": 0,
+    "ignored": 0,
+    "measured": 0,
+    "named_case_inventory_format": "suite names sorted, then case names sorted; one suite::case per UTF-8 line, final newline",
+    "one_invocation_summary_per_saved_stdout": true,
+    "passed": 104,
+    "per_executable_passed": {
+      "adversarial_contracts": 2,
+      "audit_contracts": 5,
+      "base_certificates": 8,
+      "choice_audit_contract": 7,
+      "collector_contracts": 5,
+      "domain_modes_contract": 1,
+      "fiber_extract_contract": 8,
+      "identity_contract": 1,
+      "incumbent_control_contract": 4,
+      "incumbent_driver_contract": 2,
+      "kernel_fiber_contract": 2,
+      "oracle_contracts": 8,
+      "pair_control_contract": 6,
+      "plain_reference_contract": 8,
+      "prepared_oracle_contract": 4,
+      "prepared_panel_contract": 3,
+      "provenance_contracts": 2,
+      "recovery_modes_contract": 3,
+      "rho_v6_contract": 5,
+      "sparse_h2_contract": 4,
+      "specialized_control_contract": 4,
+      "staged_panel_contract": 3,
+      "target_transport_contract": 3,
+      "tower4_contract": 6
+    },
+    "test_logs_inventory_entries": 48,
+    "test_logs_inventory_hash_format": "SHA256 of compact sort_keys JSON list of {path,sha256}, sorted by relative tests/*.log path",
+    "test_logs_inventory_sha256": "0cb47a76153a6d35512db6fb6536818633123b2ad0f73d9d9dfa1f731c5b3830"
+  }
+}

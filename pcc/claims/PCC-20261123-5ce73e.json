@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:01:18Z",
+ "id": "PCC-20261123-5ce73e",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "GPT-6 Astra Pro",
+  "session": "prime31-pencil-family-checkpoint"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-framework-restored-failure/receipt.json",
+    "sha256": "9f390381811b2809e2273d4fc6c5689740c74f79c9118cb46cb4b4e76b5c9876"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-framework-restored-failure/source-sha256.txt",
+    "sha256": "7ccd3108920e426890efbb60bad5056c6d8184471217951cd81c333b8d8e60c5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-framework-restored-failure/job.log.gz",
+    "sha256": "3912a290b327772830b181096af95530e34f867031b95ddec3a41ee8caad424f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Source-bound unsigned CI/artifact observation; not a native component failure or passing verification.",
+ "statement": "Third original-root correctness job45113871392 on source14a9f021b630fec0a7dd38cb724d71d68c99626b failed in the unchanged binary-hyperelliptic module. All five command steps attempted compilation; zero tests or candidate/issuer programs executed and the separate replay was not reached."
+}
