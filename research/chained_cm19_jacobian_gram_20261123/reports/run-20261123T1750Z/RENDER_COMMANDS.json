@@ -1,0 +1,40 @@
+{
+  "cwd": "this report directory",
+  "environment": {
+    "XDG_CACHE_HOME": "/dev/shm/ct23-report-font-cache",
+    "XDG_CONFIG_HOME": "/dev/shm/ct23-report-config",
+    "SOURCE_DATE_EPOCH": "1795442400"
+  },
+  "argv": [
+    [
+      "dot",
+      "-Tsvg",
+      "gram.dot",
+      "-o",
+      "gram.svg"
+    ],
+    [
+      "inkscape",
+      "gram.svg",
+      "--export-type=pdf",
+      "--export-filename=gram.pdf"
+    ],
+    [
+      "pdflatex",
+      "-interaction=nonstopmode",
+      "-halt-on-error",
+      "-output-directory",
+      "/dev/shm/ct23-gram-report-render-v3",
+      "REPORT.tex"
+    ],
+    [
+      "pdftoppm",
+      "-scale-to",
+      "1550",
+      "-png",
+      "/dev/shm/ct23-gram-report-render-v3/REPORT.pdf",
+      "/dev/shm/ct23-gram-report-render-v3/page"
+    ]
+  ],
+  "scientific_reexecution": false
+}

@@ -2484,7 +2484,6 @@ fn groebner_basis_f4_skeleton_with_fl(
         Some(&mut *skeleton),
         TraceMode::Off,
         allow_fl,
-        fl_enabled(),
     );
     st.skeleton_bytes = skeleton.bytes;
     (basis, st)
@@ -2546,7 +2545,6 @@ fn groebner_basis_f4_traced_with_fl(
             None,
             mode,
             allow_fl,
-            fl_enabled(),
         )
     };
     let inputs: Vec<F2BoolPoly> = initial.into_iter().filter(|p| !p.is_zero()).collect();

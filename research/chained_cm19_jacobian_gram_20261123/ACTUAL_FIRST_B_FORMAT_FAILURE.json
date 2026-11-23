@@ -1,0 +1,171 @@
+{
+  "schema": "actual-jacobian-gram-format-failure/v1",
+  "recorded": "2026-11-23T17:48:57.709897+00:00",
+  "source": "60dc033daa96da27be28f3a93f31fe789a2ea384",
+  "full_input_readbacks": 25,
+  "outer_exit": 1,
+  "guard_failures": [],
+  "phases": {
+    "format": {
+      "recorded": "2026-11-23T17:48:01.238934+00:00",
+      "name": "format",
+      "expected_exit": 0,
+      "exit": 1,
+      "complete_stdout": {
+        "bytes": 17469,
+        "sha256": "d29e303b6eef1617c82602eb3ebdc1c1ed9575eac30b7c5caf37e844116499f8",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "rustfmt-version": {
+      "recorded": "2026-11-23T17:48:01.063708+00:00",
+      "name": "rustfmt-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 46,
+        "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "clippy-version": {
+      "recorded": "2026-11-23T17:48:00.882404+00:00",
+      "name": "clippy-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 38,
+        "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "rustc-version": {
+      "recorded": "2026-11-23T17:48:00.702742+00:00",
+      "name": "rustc-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 36,
+        "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    }
+  },
+  "native_run": false,
+  "compile_run": false,
+  "files": {
+    "BUILD_MANIFEST.json": {
+      "bytes": 19239,
+      "sha256": "e0cfed666be5ec57db62ed8dadf176a35adefd4e950d5440d39de35bacb6fb19"
+    },
+    "CONTEXT.json": {
+      "bytes": 5185,
+      "sha256": "18a3ebca87e1404b404379ddc44a78f2b955b7163bffe4926ff1a7499a378fd6"
+    },
+    "POST_CALL_MANIFEST.json": {
+      "bytes": 19348,
+      "sha256": "269fd82d73823f86dd6b6c5236f33818433275262d86569c7a47170423ef2561"
+    },
+    "clippy-version.argv": {
+      "bytes": 43,
+      "sha256": "76845bb28fc4cca7a47668988a31ba3a650a88808014e5dac29b8f2812391548"
+    },
+    "clippy-version.phase.json": {
+      "bytes": 401,
+      "sha256": "cb85a0848b1ab11ea1baec2ed2307784146a8531468f4477cf9a30feaf410617"
+    },
+    "clippy-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy-version.stdout": {
+      "bytes": 38,
+      "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038"
+    },
+    "final-guards.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final-guards.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "format.argv": {
+      "bytes": 348,
+      "sha256": "7a4abe82b7565f4cca8f571cb7549d8eacc3355ca6b9a79833a8675c234c9a96"
+    },
+    "format.phase.json": {
+      "bytes": 396,
+      "sha256": "7735553259c6fe2ccf19acaed53bfe689bd0f479779bcac18d60823733529961"
+    },
+    "format.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "format.stdout": {
+      "bytes": 17469,
+      "sha256": "d29e303b6eef1617c82602eb3ebdc1c1ed9575eac30b7c5caf37e844116499f8"
+    },
+    "init.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "init.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rustc-version.argv": {
+      "bytes": 35,
+      "sha256": "0c84f2e54be6a2a8da3f7574fbb69a9de26a77188e5b56a10aef6e49ded0004f"
+    },
+    "rustc-version.phase.json": {
+      "bytes": 400,
+      "sha256": "aa7862ae5b0bc31c3284be61ed65cb0fe46655ed2c5ed913211f9e64c7815ada"
+    },
+    "rustc-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rustc-version.stdout": {
+      "bytes": 36,
+      "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98"
+    },
+    "rustfmt-version.argv": {
+      "bytes": 37,
+      "sha256": "29d02920eed6ed38c5977a39ed0de2ff173f7555bacd2b97b0e8f7ac242bb168"
+    },
+    "rustfmt-version.phase.json": {
+      "bytes": 402,
+      "sha256": "9afe8b367d73650d63a1c400dff2d632b96a88f02e3e95a1970cffce4291255b"
+    },
+    "rustfmt-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rustfmt-version.stdout": {
+      "bytes": 46,
+      "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be"
+    }
+  },
+  "standing": "Strict format1 stops before compile/Clippy/science; all originals retained, no scientific result."
+}

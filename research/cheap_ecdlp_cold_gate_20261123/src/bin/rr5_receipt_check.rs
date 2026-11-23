@@ -180,8 +180,12 @@ fn dual_from_rows(rows:&[Vec<u64>], base_size:usize, expected:u64)
                 let earlier_pivots=eliminated.iter().map(|&(prior,factor)|
                     (prior,neg(mul(factor,inverse)))
                 ).collect();
+                // Move the normalized pivot without leaving `row` moved:
+                // the no-pivot path below still needs to inspect it. `take`
+                // is O(1) in the vector buffer and does not copy coefficients.
                 pivots[col]=Some(DualPivot{
-                    row,source_index:index,source_inverse:inverse,
+                    row:std::mem::take(&mut row),
+                    source_index:index,source_inverse:inverse,
                     earlier_pivots,
                 });
                 base_pivot_installed=true;
