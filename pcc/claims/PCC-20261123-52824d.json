@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:27:31Z",
+ "id": "PCC-20261123-52824d",
+ "kind": "execution",
+ "producer": {
+  "commit": "b38c11ad95b96f4c06f18ee0dfdd69f876a3b931",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/workspace/crypto_pr_context/setup-20261123/build/test-flat.json",
+    "sha256": "1f4e087a52baed7cf5cd4c77d9e2cd735cd3be5c1404f81bf222ba1455fd3bda"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/workspace/crypto_pr_context/setup-20261123/build/confirmation-construction.json",
+    "sha256": "32d506d1d53338804e4c6c710503820b221f1903a61e3d2d0cf9683aaa3e838c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Flat-container unit test passes120048 exact set/map, duplicate, absent and forced-collision checks; confirmation constructor emits480 public targets with private scalar records separate. Producer checks, unsigned."
+}
