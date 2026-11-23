@@ -1,0 +1,250 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h6d456b2a22da4771",
+  "statement": {
+    "name": "Quadratic selector squaring step",
+    "source": "selector/REPORT.md; q(y)q(-y)",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "y"
+    ],
+    "degree_bound": 6,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "y"
+                        },
+                        {
+                          "op": "var",
+                          "args": "y"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "c"
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "y"
+                        },
+                        {
+                          "op": "var",
+                          "args": "y"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "var",
+                        "args": "y"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "c"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "a"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "y"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "const",
+                          "args": 2
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "a"
+                            },
+                            {
+                              "op": "var",
+                              "args": "c"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "b"
+                          },
+                          {
+                            "op": "var",
+                            "args": "b"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "y"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "c"
+            },
+            {
+              "op": "var",
+              "args": "c"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261124,
+  "value_digest": "76a652b38846381b113526b11cad38983f2331855ae7efa5beb9edacd379286f",
+  "independence": "producer-issued; checked by existing repository checker; no signed PCC or Lean proof",
+  "proof": null
+}

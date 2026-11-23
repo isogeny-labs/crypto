@@ -409,6 +409,7 @@ pub mod semaev_higher;
 pub mod semaev_leading_form;
 pub mod semaev_linear;
 pub mod semaev_prime_poly;
+pub mod semaev_selector;
 pub mod semaev_projection;
 pub mod semaev_s3_cost;
 pub mod semaev_sat;
