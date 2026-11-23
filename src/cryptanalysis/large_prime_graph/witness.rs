@@ -54,6 +54,10 @@ pub struct WitnessStats {
     /// Anchor projections and inversions computed for a previously uncached root.
     #[serde(default)]
     pub anchor_cache_misses: u64,
+    /// Independent singleton or distinct-component bridge admitted without
+    /// expanding tree-edge sources. This is an opt-in work counter, not timing.
+    #[serde(default)]
+    pub independent_projection_skips: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -138,6 +142,8 @@ pub struct ForestWitnessExtractor {
     /// Exact inverses of both coefficients for each independent tree edge.
     /// None for anchors and dependent input rows. Indexed by original row.
     edge_inverses: Vec<Option<[u64; 2]>>,
+    /// Opt-in: avoid source-map projections for rank-increasing singleton/bridge rows.
+    lazy_independent_admission: bool,
     stats: WitnessStats,
 }
 
@@ -156,8 +162,18 @@ impl ForestWitnessExtractor {
             anchor_cache: vec![None; vertices],
             rows: Vec::new(),
             edge_inverses: Vec::new(),
+            lazy_independent_admission: false,
             stats: WitnessStats::default(),
         })
+    }
+
+    /// Opt into a zero-source-expansion path for provably independent
+    /// singleton and distinct-component bridge rows. Rank-dependent rows
+    /// still follow exact field reduction and original-source replay.
+    /// The legacy constructor remains unchanged for matched comparisons.
+    pub fn with_lazy_independent_admission(mut self) -> Self {
+        self.lazy_independent_admission = true;
+        self
     }
 
     fn root(&self, mut v: usize) -> usize {
@@ -352,7 +368,30 @@ impl ForestWitnessExtractor {
         } else {
             None
         };
-        let projection = self.project(terms)?;
+        // An unanchored singleton fixes its component's only free scalar;
+        // a bridge between components removes one free scalar unless BOTH
+        // components are already anchored. Neither independent case needs a
+        // source-bearing projection now: the row and both endpoint inverses
+        // are retained for future dependent witnesses.
+        let skip_projection = self.lazy_independent_admission
+            && match (terms, original_roots) {
+                ([(u, _)], _) => self.anchor[self.root(*u)].is_none(),
+                ([_, _], Some((u, v))) => {
+                    u != v && (self.anchor[u].is_none() || self.anchor[v].is_none())
+                }
+                _ => false,
+            };
+        let projection = if skip_projection {
+            Reduced {
+                roots: BTreeMap::new(),
+                basis: BTreeMap::new(),
+                scans: 0,
+                steps: 0,
+                reads: 0,
+            }
+        } else {
+            self.project(terms)?
+        };
         let mut source = projection.basis.clone();
         add_term(&mut source, row_idx, 1, p);
         let mut outstanding = Vec::new();
@@ -362,6 +401,16 @@ impl ForestWitnessExtractor {
         let mut inversions = inversions;
         let mut new_anchor_caches = Vec::new();
         let mut cache_hits = 0u64;
+        if skip_projection {
+            // This index is only an admission marker; its root is genuinely
+            // unanchored. Forest attachment below uses original_roots.
+            let free_root = if let Some((u, v)) = original_roots {
+                if self.anchor[u].is_none() { u } else { v }
+            } else {
+                self.root(terms[0].0)
+            };
+            outstanding.push(free_root);
+        } else {
         for (&root, &gamma) in &projection.roots {
             if let Some(anchor_idx) = self.anchor[root] {
                 // Borrow warm source maps instead of cloning a potentially
@@ -400,7 +449,9 @@ impl ForestWitnessExtractor {
                 outstanding.push(root);
             }
         }
+        }
         // All arithmetic has succeeded: metadata and forest changes follow.
+        self.stats.independent_projection_skips += u64::from(skip_projection);
         self.stats.adjacency_scans += scans;
         self.stats.path_steps += steps;
         self.stats.parent_path_reads += reads;
@@ -486,6 +537,29 @@ impl ForestWitnessExtractor {
 /// Every dependent row has one source coefficient exactly equal to 1.
 pub fn collect_witnesses(index: &LpIndex) -> Result<WitnessBatch, LpGraphError> {
     let mut f = ForestWitnessExtractor::new(index.num_columns(), index.modulus)?;
+    let mut witnesses = Vec::new();
+    for row in &index.rows {
+        if let Some(w) = f.add_row(row)? {
+            witnesses.push(w);
+        }
+    }
+    let stats = f.stats();
+    debug_assert_eq!(stats.rows, stats.independent_rows + stats.dependent_rows);
+    Ok(WitnessBatch {
+        modulus: index.modulus,
+        lp_columns: index.num_columns(),
+        rank: f.rank(),
+        witnesses,
+        stats,
+    })
+}
+
+/// Opt-in lazy independent-row admission using the same exact source replay
+/// and forest/anchor rank semantics as `collect_witnesses`.
+/// Counter improvements alone are not evidence of wall-time savings.
+pub fn collect_witnesses_lazy(index: &LpIndex) -> Result<WitnessBatch, LpGraphError> {
+    let mut f = ForestWitnessExtractor::new(index.num_columns(), index.modulus)?
+        .with_lazy_independent_admission();
     let mut witnesses = Vec::new();
     for row in &index.rows {
         if let Some(w) = f.add_row(row)? {
