@@ -158,5 +158,81 @@ class ReplayChecks(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"producer recovered_scalar mismatch"):
             checker.validate({},self.base,self.q,bad,producer=True)
 
+    def test_producer_receipt_must_bind_to_extractor_candidate_prefix(self):
+        # All accepted rows are mathematically true. A forged producer may
+        # nevertheless attach them to unrelated extracted candidates. Their
+        # group truth MUST NOT be admitted as evidence of extraction.
+        manifest={"curve":"ordinary_prime31","p":checker.P,"n":checker.N,
+                  "a":checker.A,"b":checker.B,"g":list(checker.G),
+                  "base":[list(p) for p in self.base]}
+        first={"canonical_terms":[[0,1]],"a":1,"b":0,
+               "rank_before":0,"rank_after":1,
+               "disposition":"Independent","recovered_scalar":None}
+        second={"canonical_terms":[[0,1]],"a":checker.N-4,"b":1,
+                "rank_before":1,"rank_after":2,
+                "disposition":"Independent","recovered_scalar":5}
+        rec={"target":list(self.q),
+             "attempts":[
+                 {"a":1,"b":0,"point":list(self.base[0]),
+                  "extraction":{"relations":[{"terms":[[0,1]]}]},
+                  "receipts":[first]},
+                 {"a":checker.N-4,"b":1,"point":list(self.base[0]),
+                  "extraction":{"relations":[{"terms":[[0,1]]}]},
+                  "receipts":[second]}],
+             "rank":2,"scalar":5,"status":"solved","final_replay_passed":True}
+        with tempfile.TemporaryDirectory() as td:
+            manifest_path=Path(td)/"base.json"
+            record_path=Path(td)/"record.json"
+            manifest_path.write_text(json.dumps(manifest))
+            cmd=[sys.executable,str(HERE/"independent_rr5_replay.py"),
+                 "--record",str(record_path),"--base",str(manifest_path)]
+            def run(record):
+                record_path.write_text(json.dumps(record))
+                return subprocess.run(cmd,capture_output=True,text=True,check=False)
+            good=run(rec)
+            self.assertEqual(good.returncode,0,good.stderr)
+            out=json.loads(good.stdout)
+            self.assertEqual((out["authenticated_rows"],out["recovered"]),(2,5))
+            self.assertEqual(out["extracted_candidate_rows"],2)
+
+            bad=copy.deepcopy(rec)
+            bad["attempts"][1]["extraction"]["relations"][0]["terms"]=[[1,1]]
+            denied=run(bad)
+            self.assertNotEqual(denied.returncode,0)
+            self.assertIn("not canonical extraction prefix",denied.stderr)
+
+            # The native adapter consumes candidates in order, not by
+            # selecting a later candidate with a matching EC identity.
+            bad=copy.deepcopy(rec)
+            bad["attempts"][1]["extraction"]["relations"].insert(0,{"terms":[[1,1]]})
+            denied=run(bad)
+            self.assertNotEqual(denied.returncode,0)
+            self.assertIn("not canonical extraction prefix",denied.stderr)
+
+            # A and B may be algebraically changed to preserve the same
+            # elliptic-curve equation; the original public-query labels
+            # are still mandatory for extraction-provenance admission.
+            bad=copy.deepcopy(rec)
+            bad["attempts"][1]["receipts"][0]["a"]=1
+            bad["attempts"][1]["receipts"][0]["b"]=0
+            denied=run(bad)
+            self.assertNotEqual(denied.returncode,0)
+            self.assertIn("not canonical extraction prefix",denied.stderr)
+
+    def test_producer_negative_first_leaf_normalizes_both_rhs_fields(self):
+        # Exact original RelationAdapter convention: a negative leading
+        # signed leaf negates *both* public RHS scalars, not just the terms.
+        original_a,original_b=checker.N-1,2
+        terms,a,b=checker.canonicalized_extraction(
+            {"terms":[[0,-1]]},original_a,original_b,len(self.base),"sample")
+        self.assertEqual((terms,a,b),([[0,1]],1,checker.N-2))
+        self.assertEqual(checker.canonicalized_extraction(
+            {"terms":[[2,1],[0,-1],[2,-1]]},checker.N-1,0,len(self.base),"sample"),
+            ([[0,1]],1,0))
+        for bad in ({"terms":[[0,5]]},{"terms":[[0,True]]},{"terms":[[0,1.0]]},
+                    {"terms":[[len(self.base),1]]}):
+            with self.assertRaises(ValueError):
+                checker.canonicalized_extraction(bad,1,0,len(self.base),"poison")
+
 if __name__=="__main__":
     unittest.main()
