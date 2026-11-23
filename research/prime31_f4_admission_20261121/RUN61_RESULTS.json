@@ -1,0 +1,71 @@
+{
+  "label": "Prime31 run61 fixed-generator public-shift component ablation, not an ECDLP solver",
+  "curve": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "a": 847514846,
+    "b": 2087444724,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "source": {
+    "repository": "isogeny-labs/crypto",
+    "branch": "research/prime31-f4-admission-run51-20261121",
+    "source_file": "research/prime31_ic_20261115/native/examples/prime31_run61_mixed_shift.rs",
+    "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/45017580013",
+    "job_id": 137193135104,
+    "rust_version": "1.100.0",
+    "conclusion": "success"
+  },
+  "configuration": {
+    "repetitions": 5,
+    "iterations_per_repetition": 250000,
+    "original_affine_crosscheck_prefix": 1024,
+    "final_endpoint_crosscheck_each_rep": true,
+    "operation": "P <- P + G",
+    "fixed_generator": true,
+    "benchmark_type": "same-process component comparison on shared GitHub runner"
+  },
+  "results": {
+    "mixed_jacobian_ns_per_add": [
+      27.077,
+      26.85,
+      26.943,
+      27.116,
+      26.846
+    ],
+    "original_affine_ns_per_add": [
+      282.851,
+      283.77,
+      282.852,
+      284.974,
+      282.94
+    ],
+    "mixed_jacobian_median_ns": 26.943,
+    "original_affine_median_ns": 282.94,
+    "speedup_paired_medians": 10.501,
+    "group_law_checks": "all passed",
+    "scalar_endpoint_checks": "all passed",
+    "digest": 1443434777
+  },
+  "hypothetical_conditional_model": {
+    "run59_uniform_queries_for_1024_targets": 4699949,
+    "historical_shared_bsgs_ms": 170.113,
+    "historical_comparison_same_host": false,
+    "historical_required_all_in_ns_per_probe": 36.195,
+    "mixed_shift_only_projected_ms": 126.632,
+    "remaining_hypothetical_total_ms": 43.481,
+    "remaining_hypothetical_ns_per_probe": 9.252
+  },
+  "validation": {
+    "blind_unknown_index_root": false,
+    "new_public_q_log_verified": false,
+    "complete_index_calculus_solver": false,
+    "end_to_end_speed_advantage": false,
+    "signed_pcc": "unverified"
+  },
+  "next": "Integrate as opt-in shift primitive into existing Rust S3/RR9 extractor, charge negative algebraic extraction, factor-base setup, rank, verified public-only logs, compare same-runner optimized index calculus / negation-BSGS / rho"
+}

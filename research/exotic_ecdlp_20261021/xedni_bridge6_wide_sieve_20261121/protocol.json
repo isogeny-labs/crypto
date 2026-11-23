@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-bridge6-wide-sieve-protocol-v1",
+  "source_numerator_sha256": "71810e340227aa95f199a8902811c7a50c153018147bc556f017727bc989712e",
+  "source_surface_commit": "bcb5672c7f0",
+  "fixed_pair": {"P": [2, 2], "Q": [-16, 17]},
+  "coefficient_law": "k1=-3+77u, k2=-11+77v, k3=1+77t; u,v in [-10,10], t any integer",
+  "test": "specialize full primitive integer numerator N(u,v,t) of x(6Q)-x(P); primitive-normalize each univariate integer polynomial; seek first prime in [13,257] at which it has no root in F_p",
+  "statuses": ["excluded_all_integer_t", "unresolved", "producer_failure"],
+  "output": "441 individual sorted-key JSONL records with full primitive univariate coefficients and first rootless prime or explicit unresolved status; aggregate counts and ordered SHA-256",
+  "resource": "local pure-Python exact integer arithmetic, 300-second process cap; preserve every cell",
+  "claim_boundary": "one fixed source point pair and bounded u,v window; rootless full numerator certifies an all-integer t exclusion for that cell; unresolved means only no certificate within the declared prime list"
+}

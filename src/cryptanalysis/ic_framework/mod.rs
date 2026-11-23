@@ -67,6 +67,7 @@ pub mod binary_subtract;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
+pub mod genroot;
 pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
@@ -75,11 +76,18 @@ pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
+pub mod prime_tower_wide;
 pub mod recursive_adapter;
 pub mod registry;
 pub mod residual;
 pub mod rootfind;
+pub mod rootfind_floor;
 pub mod rootfind_gpu;
+pub mod semaev_projection_oracle;
+pub mod rootfind_kmitm;
+#[cfg(target_arch = "x86_64")]
+mod rootfind_kmitm_avx2;
+mod rootfind_kmitm_ifma;
 pub mod shared_rank;
 pub mod solver_units;
 pub mod solvers;
@@ -558,6 +566,11 @@ fn run_pipeline_inner<G: CountedGroup>(
     mut progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
     matrix_factory: Option<&dyn RelationSolverFactory>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    // Input hardening from f73b2edcc7, lost in a 2026-11-16 merge: reject a
+    // degenerate subgroup order before any work.
+    if ctx.r < 2 || ctx.cofactor.is_multiple_of(ctx.r) {
+        return Err("pipeline requires r >= 2 and a cofactor nonzero modulo r".into());
+    }
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -574,6 +587,22 @@ fn run_pipeline_inner<G: CountedGroup>(
     }
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    // Plug-in output check from f73b2edcc7 (lost in the same merge): every
+    // index a factor-base plug-in returns must point inside its own tables.
+    if fb.points.len() != fb.col_of.len()
+        || fb.points.len() != fb.coef_of.len()
+        || fb.points.len() != fb.neg_index.len()
+        || fb.col_of.iter().any(|&column| column >= fb.columns)
+        || fb.neg_index.iter().any(|&index| index >= fb.points.len())
+        || fb
+            .point_index
+            .values()
+            .any(|&index| index >= fb.points.len())
+            .x_index
+            .flatten()
+    {
+        return Err("factor-base plug-in returned inconsistent point/column indexes".into());
+    }
     // A base without its hash index (`lean_layout`) can be read only by the
     // oracle that names base points by orbit-layout index.
     if fb.index_elided() && oracle.name() != "mitm-frobenius-layout-counted" {
@@ -581,7 +610,6 @@ fn run_pipeline_inner<G: CountedGroup>(
             "a base without its index (lean_layout) needs mitm-frobenius-layout-counted, not {}",
             oracle.name()
         ));
-    }
     let archive_import = base_builder.name() == "archive";
     if archive_import
         && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")
@@ -1010,6 +1038,13 @@ fn run_pipeline_inner<G: CountedGroup>(
         } else {
             "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work"
         });
+    }
+    if oracle.name() == "genroot" {
+        unpriced_work.push(
+            "genroot charges each S3 fiber as two group additions; the root-finding inside a fiber \
+             (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted \
+             but not priced",
+        );
     }
     if oracle.name() == "hashed-tensor" && !tensor_steps_pinned {
         unpriced_work.push(
@@ -2824,6 +2859,93 @@ mod tests {
             sparse.decomposition.relations_found,
             dense.decomposition.relations_found
         );
+    }
+
+    /// **Attempt schedules end to end.**  On a 16-bit roster curve with a
+    /// 96-point base (stride `cols / 32 = 3`), every schedule of
+    /// `sparse-cado`, `wiedemann` and `lanczos` recovers the logarithm the dense
+    /// full-rank matrix recovers; the relations read past the dense
+    /// full-rank point (the overshoot) stay within the schedule's bound;
+    /// totals are printed (`--nocapture`).
+    #[test]
+    fn sparse_attempt_schedules_match_the_full_rank_matrix_end_to_end() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        println!("| matrix | seed | relations (dense) | overshoot | attempt points | failed | LA row_ops | targets tried |");
+        for seed in [7u64, 8, 9] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "mitm".into(),
+                targets: Targets::Walk,
+                max_trials: 2_000_000,
+                seed,
+                linalg: "incremental-gauss-full-rank".into(),
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", "96");
+            spec.oracle_params.set("negation_folded", "1");
+            let run = |spec: &PipelineSpec| {
+                run_pipeline(
+                    &ctx,
+                    spec,
+                    &base,
+                    &mut MitmOracle::new(2),
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .unwrap()
+            };
+            let dense = run(&spec);
+            assert!(dense.verified);
+            let cols = dense.factor_base.columns as u64 + 1;
+            for (name, bound) in [
+                ("sparse-cado", (cols / 32).max(1)),
+                ("sparse-cado:schedule=fixed", (cols / 32).max(1)),
+                ("sparse-cado:schedule=geometric,start=1,growth=2", u64::MAX),
+                ("sparse-cado:schedule=predicted,margin=0", 1),
+                ("sparse-cado:schedule=predicted,margin=1", 1),
+                ("wiedemann:schedule=fixed", (cols / 32).max(1)),
+                ("wiedemann:schedule=predicted,margin=1", (cols / 32).max(1)),
+                ("lanczos:schedule=fixed", (cols / 32).max(1)),
+                ("lanczos:schedule=predicted,margin=1", (cols / 32).max(1)),
+            ] {
+                spec.linalg = name.into();
+                let other = run(&spec);
+                assert!(other.verified, "{name}");
+                assert_eq!(other.recovered, dense.recovered, "{name}");
+                assert_eq!(
+                    other.linear_algebra.rank, dense.linear_algebra.rank,
+                    "{name}"
+                );
+                let over = other
+                    .decomposition
+                    .relations_found
+                    .checked_sub(dense.decomposition.relations_found)
+                    .expect("no answer below full rank");
+                assert!(
+                    over <= bound,
+                    "{name} seed {seed}: overshoot {over} > {bound}"
+                );
+                let wn = &other.linear_algebra.cost.work_native;
+                let get = |k: &str| wn.get(k).map_or("-".to_string(), u64::to_string);
+                if let Some(b) = wn.get("sparse_overshoot_rows_bound") {
+                    assert!(
+                        over <= *b,
+                        "{name}: overshoot {over} above reported bound {b}"
+                    );
+                }
+                println!(
+                    "| {name} | {seed} | {} | {over} | {} | {} | {} | {} |",
+                    dense.decomposition.relations_found,
+                    get("sparse_attempt_points"),
+                    get("sparse_failed_attempt_points"),
+                    other.linear_algebra.work,
+                    other.decomposition.targets_tried,
+                );
+            }
+        }
     }
 
     #[test]

@@ -1,0 +1,17 @@
+scope: producer-side deterministic algebra, trajectory, and counter validation; no timing claim
+standalone_r17_r33_exit_status: 0
+production_build_exit_status_after_fix: 0
+production_selftest_exit_status: 0
+production_selftest_final_line: SELFTEST OK
+q223_jsonl_parse_and_invariant_check_exit_status: 0
+q223_jsonl_parse_and_invariant_check_stdout: true
+checked:
+- all candidate arms recover the planted scalar and match trajectory/native fields
+- mul5 fq_mul reduction equals f3_mul independently in setup, walk, and verification
+- mul5 fq_small_div equals four times f3_mul independently in every phase
+- joint-table setup deltas match the R36 recomputation
+- counter-free composed candidate has count_authoritative=false and zero field counters
+retained_failure:
+- initial build failed E0063 at the fallback-c self-test literal
+- stale-binary output from the non-fail-fast command is excluded
+- corrected commands were rerun with set -e

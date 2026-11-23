@@ -1,0 +1,301 @@
+{
+  "schema": "ic_autolab.ledger/v1",
+  "family": "prime-generic",
+  "created": "",
+  "updated": "",
+  "notes": [
+    "Seeded 2026-11-18 from verified Round-0 ecbench sessions (research/prime_generic_autolab_20261118/baseline/) on the four canonical registered prime_search seed 59297 curves (cofactor 1, prime order): icv1-fp20-t727-cd198a38, icv1-fp24-t1059-6df599df, icv1-fp28-tm3161-380f655a, icv1-fp32-t74357-b7396dac.",
+    "Round-0 incumbents on both multibase (N >= 3 independent columns) and generic tracks are the standing prime-abscissa + mitm:negation_folded=1 recipe (N = 45 at k=20 from research/prime_base_oracle_tuning_20261029, and N = N_a = round(0.63 r^(1/3)) = 160, 402, 953 at k=24, 28, 32), measured in-tree with 100% replay-all verification.",
+    "Two generic-decomposition tracks are separated explicitly: multibase excludes C <= 2 BSGS-boundary arms so genuine multi-column (N >= 3) factor-base improvements ratchet unconfounded; generic includes all owner-admitted prime-field IC arms including fresh-per-run C = 2 walk/target-walk families (owner rulings 2026-11-04 and 2026-11-10).",
+    "Exposures record every target_seed used on prime_search seed 59297 across smoke-prime-v2, panel-prime-rootfind, and Round-0 baseline sessions so no round reuses an exposed target seed."
+  ],
+  "sizes": {
+    "20": {
+      "k": 20,
+      "r": 562427,
+      "log2_r": 19.101306328859888,
+      "n_a": 52,
+      "curve": {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      }
+    },
+    "24": {
+      "k": 24,
+      "r": 16482251,
+      "log2_r": 23.974409950711376,
+      "n_a": 160,
+      "curve": {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      }
+    },
+    "28": {
+      "k": 28,
+      "r": 260192759,
+      "log2_r": 27.955005572422284,
+      "n_a": 402,
+      "curve": {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      }
+    },
+    "32": {
+      "k": 32,
+      "r": 3466623553,
+      "log2_r": 31.69088403413618,
+      "n_a": 953,
+      "curve": {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 59297
+      }
+    }
+  },
+  "tracks": {
+    "multibase": {
+      "20": {
+        "arm": {
+          "name": "mitm2-n45",
+          "family": "mitm2",
+          "n": 45,
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          10.34463,
+          11.76763,
+          24.574636
+        ],
+        "rho_s": [
+          1.299793,
+          1.40775,
+          2.379363
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1h6a7cf080ed52",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k20",
+          "spec_sha256": "c9dc975835d1ddcb94eaeaeefe57ab52d65c0082ec39862420d74d3baecd249e",
+          "verify_receipt_sha256": "a7bd86e6f89015c317e629b8a8e80386585648d007869674881bf9d31eff0387",
+          "validation_gate": "none (development loop)"
+        }
+      },
+      "24": {
+        "arm": {
+          "name": "mitm2-n160",
+          "family": "mitm2",
+          "n": 160,
+          "factor_base": "prime-abscissa:size=160",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          13.300198,
+          15.250145,
+          32.799672
+        ],
+        "rho_s": [
+          1.196647,
+          1.307219,
+          2.302365
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1h31fedbf2ea3e",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k24",
+          "spec_sha256": "4fab57e41cbcf349ff4c75188ae9807de22c08451b4e36c58baeda94efadad1e",
+          "verify_receipt_sha256": "2b6430e04b12d507102b45c77d0efc910375679a0d59bfe5d1c3d6d70b09b348",
+          "validation_gate": "none (development loop)"
+        }
+      },
+      "28": {
+        "arm": {
+          "name": "mitm2-n402",
+          "family": "mitm2",
+          "n": 402,
+          "factor_base": "prime-abscissa:size=402",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          20.640471,
+          23.748812,
+          51.723889
+        ],
+        "rho_s": [
+          0.898795,
+          0.986282,
+          1.773663
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1hdd960964ad94",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k28",
+          "spec_sha256": "1d9cc7043d75bdee3ec9c66fba8ded0472c6e5af5344392a0580e0cf201db84f",
+          "verify_receipt_sha256": "a0e8c336d39292d030f265db60cdfe4b038b82db82b001994b2f426c84dfd674",
+          "validation_gate": "none (development loop)"
+        }
+      },
+      "32": {
+        "arm": {
+          "name": "mitm2-n953",
+          "family": "mitm2",
+          "n": 953,
+          "factor_base": "prime-abscissa:size=953",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          31.269877,
+          35.980768,
+          78.378786
+        ],
+        "rho_s": [
+          0.908845,
+          0.999054,
+          1.810933
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1hcb28a02cb5f9",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k32",
+          "spec_sha256": "dd79f425a35a53da315f6f79353b61abaab17643e1979f0e930968cd2c815baf",
+          "verify_receipt_sha256": "0baae9e30b7f96f2839f90913c507f4a6344e9193b42958b316704a83cb136d2",
+          "validation_gate": "none (development loop)"
+        }
+      }
+    },
+    "generic": {
+      "20": {
+        "arm": {
+          "name": "mitm2-n45",
+          "family": "mitm2",
+          "n": 45,
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          10.34463,
+          11.76763,
+          24.574636
+        ],
+        "rho_s": [
+          1.299793,
+          1.40775,
+          2.379363
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1h6a7cf080ed52",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k20",
+          "spec_sha256": "c9dc975835d1ddcb94eaeaeefe57ab52d65c0082ec39862420d74d3baecd249e",
+          "verify_receipt_sha256": "a7bd86e6f89015c317e629b8a8e80386585648d007869674881bf9d31eff0387",
+          "validation_gate": "none (development loop)"
+        }
+      },
+      "24": {
+        "arm": {
+          "name": "mitm2-n160",
+          "family": "mitm2",
+          "n": 160,
+          "factor_base": "prime-abscissa:size=160",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          13.300198,
+          15.250145,
+          32.799672
+        ],
+        "rho_s": [
+          1.196647,
+          1.307219,
+          2.302365
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1h31fedbf2ea3e",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k24",
+          "spec_sha256": "4fab57e41cbcf349ff4c75188ae9807de22c08451b4e36c58baeda94efadad1e",
+          "verify_receipt_sha256": "2b6430e04b12d507102b45c77d0efc910375679a0d59bfe5d1c3d6d70b09b348",
+          "validation_gate": "none (development loop)"
+        }
+      },
+      "28": {
+        "arm": {
+          "name": "mitm2-n402",
+          "family": "mitm2",
+          "n": 402,
+          "factor_base": "prime-abscissa:size=402",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          20.640471,
+          23.748812,
+          51.723889
+        ],
+        "rho_s": [
+          0.898795,
+          0.986282,
+          1.773663
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1hdd960964ad94",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k28",
+          "spec_sha256": "1d9cc7043d75bdee3ec9c66fba8ded0472c6e5af5344392a0580e0cf201db84f",
+          "verify_receipt_sha256": "a0e8c336d39292d030f265db60cdfe4b038b82db82b001994b2f426c84dfd674",
+          "validation_gate": "none (development loop)"
+        }
+      },
+      "32": {
+        "arm": {
+          "name": "mitm2-n953",
+          "family": "mitm2",
+          "n": 953,
+          "factor_base": "prime-abscissa:size=953",
+          "oracle": "mitm:negation_folded=1"
+        },
+        "s": [
+          31.269877,
+          35.980768,
+          78.378786
+        ],
+        "rho_s": [
+          0.908845,
+          0.999054,
+          1.810933
+        ],
+        "since_round": 0,
+        "evidence": {
+          "study": "research/prime_generic_autolab_20261118/baseline",
+          "session_id": "ECBS1hcb28a02cb5f9",
+          "session_dir": "research/prime_generic_autolab_20261118/baseline/sessions/k32",
+          "spec_sha256": "dd79f425a35a53da315f6f79353b61abaab17643e1979f0e930968cd2c815baf",
+          "verify_receipt_sha256": "0baae9e30b7f96f2839f90913c507f4a6344e9193b42958b316704a83cb136d2",
+          "validation_gate": "none (development loop)"
+        }
+      }
+    }
+  },
+  "exposures": [
+    {"size": 20, "target_seed": 20261002, "targets": 2, "source": "docs/ecbench/specs/smoke-prime-v2.json"},
+    {"size": 20, "target_seed": 20261003, "targets": 8, "source": "docs/ecbench/specs/panel-prime-rootfind.json"},
+    {"size": 24, "target_seed": 20261003, "targets": 8, "source": "docs/ecbench/specs/panel-prime-rootfind.json"},
+    {"size": 20, "target_seed": 2026111820, "targets": 16, "source": "research/prime_generic_autolab_20261118/baseline (k20)"},
+    {"size": 24, "target_seed": 2026111824, "targets": 16, "source": "research/prime_generic_autolab_20261118/baseline (k24)"},
+    {"size": 28, "target_seed": 2026111828, "targets": 16, "source": "research/prime_generic_autolab_20261118/baseline (k28)"},
+    {"size": 32, "target_seed": 2026111832, "targets": 16, "source": "research/prime_generic_autolab_20261118/baseline (k32)"},
+    {"size": 20, "target_seed": 2026111860, "targets": 4, "source": "research/prime_generic_autolab_20261118/baseline (alg-k20)"}
+  ],
+  "trials": [],
+  "rounds": [],
+  "history": []
+}
