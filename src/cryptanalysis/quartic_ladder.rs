@@ -47,7 +47,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    build_rows, mulmod, pa, peel, pm, ppow, split_order, subm, wiedemann, Dsu, Nat, Rel, REL_FB,
+    addm, build_rows, mulmod, pa, peel, pm, ppow, split_order, subm, Dsu, Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{rho_reference_walk, CountedGroup, GroupOps, RhoWalk};
 use super::plane_quartic_pic::{
@@ -758,6 +758,7 @@ impl Ctx {
         }
     }
 }
+
 
 /// A conic of the net in the chart `x = 1` with unknowns `(u, w)` (`w` the
 /// variable eliminated; `swap`: `u = z`, `w = y`): the six coefficients of
@@ -1653,9 +1654,9 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
 
         // ── counted attempt ──
         res.attempts += 1;
-        let mut rows = build_rows(&rels, nver, tcol, r, &mut res.la);
+        let mut rows = build_rows(&rels, nver, tcol, r, &mut res.la_split.rows);
         strip_zeros(&mut rows);
-        let (core, cc, ct) = peel(&rows, nunk, tcol, &mut res.la);
+        let (core, cc, ct) = peel(&rows, nunk, tcol, &mut res.la_split.peel);
         res.core_rows = core.len();
         res.core_cols = cc;
         if core.len() >= cc + margin(cc) {
@@ -1827,15 +1828,279 @@ pub fn run_rho(inst: &QInstance, seed: u64) -> QRhoOut {
 
 // ── tests ───────────────────────────────────────────────────────────────
 
-/// How the degree-3 divisor of a decomposition class is found.
+// ── linear algebra with a per-source breakdown ──────────────────────────
+//
+// `wiedemann_split` is `ic_control::wiedemann` with every `Nat` increment
+// sent to one of three buckets (matrix products / Berlekamp-Massey / vector
+// work); the sum is the same count, step for step (test
+// `wiedemann_split_equals_reference`).  `coord_square_split` is the
+// coordinate Wiedemann of `ic_control::wiedemann_coord(square = true)` on a
+// square system given row by row (no random row subset).
+
+/// Where the counted linear algebra (`la`) of a Diem run goes.  Every field
+/// is inside `la`; `la` is their sum.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct QLaSplit {
+    /// Cycle rows of the large-prime graph (`build_rows`: adjacency and
+    /// the row combinations along the breadth-first tree).
+    pub rows: Nat,
+    /// Union-find of the relation graph (finds and unions).
+    pub dsu: Nat,
+    /// Weight-one peel (`peel`).
+    pub peel: Nat,
+    /// [`QSolve::Linked`]: the scan for a core row holding `t`.
+    pub tscan: Nat,
+    /// [`QLinAlg::SgeCoord`]: row selection (trim and square choice).
+    pub trim: Nat,
+    /// Structured Gaussian elimination (`genus_ladder::sge_reduce`).
+    pub sge: Nat,
+    /// Sparse matrix-vector products: `A x`, `Aᵀ y`, the diagonal `D`,
+    /// the right-hand side `AᵀD c` and the residual check.
+    pub spmv: Nat,
+    /// Berlekamp-Massey (with its pivot inversions).
+    pub bm: Nat,
+    /// Dense vector work: projections, Horner accumulation, final scaling.
+    pub vec: Nat,
+}
+
+impl QLaSplit {
+    pub fn total(&self) -> Nat {
+        let mut t = Nat::default();
+        for n in [
+            self.rows, self.dsu, self.peel, self.tscan, self.trim, self.sge, self.spmv, self.bm,
+            self.vec,
+        ] {
+            t.merge(n);
+        }
+        t
+    }
+
+/// `y = A x` with the count of `ic_control::mat_vec`.
+fn q_mat_vec(rows: &[Row], x: &[u64], y: &mut [u64], r: u64, nat: &mut Nat) {
+    for (i, (t, _)) in rows.iter().enumerate() {
+        let mut acc = 0u64;
+        for &(c, v) in t {
+            let xv = x[c as usize];
+            if v == 1 {
+                acc = addm(acc, xv, r);
+            } else if v == r - 1 {
+                acc = subm(acc, xv, r);
+            } else {
+                nat.mul += 1;
+                acc = addm(acc, mulmod(v, xv, r), r);
+            }
+            nat.add += 1;
+        y[i] = acc;
+
+/// `z = Aᵀ y` with the count of `ic_control::mat_t_vec`.
+fn q_mat_t_vec(rows: &[Row], y: &[u64], z: &mut [u64], r: u64, nat: &mut Nat) {
+    z.iter_mut().for_each(|v| *v = 0);
+        let yv = y[i];
+        if yv == 0 {
+            continue;
+            let term = if v == 1 {
+                yv
+                subm(0, yv, r)
+                mulmod(v, yv, r)
+            };
+            z[c as usize] = addm(z[c as usize], term, r);
+
+/// `out = AᵀDA v` with the count of `ic_control::m_apply`.
+fn q_m_apply(
+    rows: &[Row],
+    d: &[u64],
+    v: &[u64],
+    tmp: &mut [u64],
+    out: &mut [u64],
+    r: u64,
+    nat: &mut Nat,
+) {
+    q_mat_vec(rows, v, tmp, r, nat);
+    for (t, &di) in tmp.iter_mut().zip(d.iter()) {
+        nat.mul += 1;
+        *t = mulmod(*t, di, r);
+    q_mat_t_vec(rows, tmp, out, r, nat);
+
+fn q_powm(mut a: u64, mut e: u64, r: u64) -> u64 {
+    let mut res = 1;
+    while e > 0 {
+        if e & 1 == 1 {
+            res = mulmod(res, a, r);
+        a = mulmod(a, a, r);
+        e >>= 1;
+    res
+
+fn q_invm(a: u64, r: u64) -> u64 {
+    q_powm(a, r - 2, r)
+
+/// Berlekamp-Massey with the count of `ic_control::berlekamp_massey`.
+fn q_berlekamp_massey(s: &[u64], r: u64, nat: &mut Nat) -> Vec<u64> {
+    let mut c = vec![1u64];
+    let mut b = vec![1u64];
+    let mut l = 0usize;
+    let mut m = 1usize;
+    let mut binv = 1u64;
+    for n in 0..s.len() {
+        let mut d = s[n];
+        for i in 1..=l.min(c.len() - 1) {
+            nat.mul += 1;
+            d = addm(d, mulmod(c[i], s[n - i], r), r);
+        if d == 0 {
+            m += 1;
+        let coef = {
+            mulmod(d, binv, r)
+        };
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        for (i, &bv) in b.iter().enumerate() {
+            c[i + m] = subm(c[i + m], mulmod(coef, bv, r), r);
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            nat.mul += pivot_inversion_steps(r);
+            binv = q_invm(d, r);
+            m = 1;
+        } else {
+    c.truncate(l + 1);
+    c.resize(l + 1, 0);
+    c
+
+/// `ic_control::wiedemann` (same draws, same output, same total count)
+/// with the count split into `sp.spmv`, `sp.bm` and `sp.vec`.
+fn wiedemann_split(
+    ncols: usize,
+    rng: &mut StdRng,
+    dense_u: bool,
+    sp: &mut QLaSplit,
+) -> Option<Vec<u64>> {
+    let nr = rows.len();
+    let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+    let mut tmp = vec![0u64; nr];
+    for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+        sp.spmv.mul += 1;
+        *t = mulmod(row.1, di, r);
+    let mut bp = vec![0u64; ncols];
+    q_mat_t_vec(rows, &tmp, &mut bp, r, &mut sp.spmv);
+    let mut proj: Vec<(usize, u64)> = Vec::new();
+    if dense_u || ncols <= 16 {
+        proj.extend((0..ncols).map(|i| (i, rng.gen_range(1..r))));
+    } else {
+        for _ in 0..16 {
+            proj.push((rng.gen_range(0..ncols), rng.gen_range(1..r)));
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    let mut v = bp.clone();
+    let mut w = vec![0u64; ncols];
+    for _ in 0..len {
+        let mut s = 0u64;
+        for &(i, uv) in &proj {
+            sp.vec.mul += 1;
+            sp.vec.add += 1;
+            s = addm(s, mulmod(uv, v[i], r), r);
+        seq.push(s);
+        q_m_apply(rows, &d, &v, &mut tmp, &mut w, r, &mut sp.spmv);
+        std::mem::swap(&mut v, &mut w);
+    let c = q_berlekamp_massey(&seq, r, &mut sp.bm);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    let mut acc = vec![0u64; ncols];
+    for j in 0..l {
+        let coef = c[l - 1 - j];
+        for (a, &vi) in acc.iter_mut().zip(v.iter()) {
+            *a = addm(*a, mulmod(coef, vi, r), r);
+        if j + 1 < l {
+            q_m_apply(rows, &d, &v, &mut tmp, &mut w, r, &mut sp.spmv);
+            std::mem::swap(&mut v, &mut w);
+    sp.vec.mul += pivot_inversion_steps(r);
+    let sc = subm(0, q_invm(c[l], r), r);
+    for a in acc.iter_mut() {
+        sp.vec.mul += 1;
+        *a = mulmod(*a, sc, r);
+    let mut ax = vec![0u64; nr];
+    q_mat_vec(rows, &acc, &mut ax, r, &mut sp.spmv);
+    if ax.iter().zip(rows.iter()).all(|(a, row)| *a == row.1) {
+        Some(acc)
+        None
+
+/// `x[ct]` for a square system `A' x = c'` (`rows.len() == ncols`) by the
+/// non-symmetric coordinate Wiedemann of
+/// `ic_control::wiedemann_coord(square = true)`: `2 ncols + 2` products by
+/// `A'`, Berlekamp-Massey, one dot product.  No residual check: the caller
+/// certifies by `[t]G = T` (a singular `A'` gives `None` or a wrong value).
+fn coord_square_split(rows: &[Row], ncols: usize, ct: usize, r: u64, sp: &mut QLaSplit) -> Option<u64> {
+    if rows.len() != ncols || ncols == 0 {
+    let mut v: Vec<u64> = rows.iter().map(|row| row.1).collect();
+        seq.push(v[ct]);
+        q_mat_vec(rows, &v, &mut w, r, &mut sp.spmv);
+    let mut acc = 0u64;
+        sp.vec.add += 1;
+        acc = addm(acc, mulmod(c[l - 1 - j], seq[j], r), r);
+    sp.vec.mul += pivot_inversion_steps(r) + 1;
+    Some(mulmod(acc, subm(0, q_invm(c[l], r), r), r))
+
+/// Charged cost of ordering `m` keys by a comparison sort: `m ceil(log2 m)`
+/// additions (one per comparison, an upper bound for merge sort).
+fn sort_charge(m: usize) -> u64 {
+    if m < 2 {
+        return 0;
+    m as u64 * u64::from(usize::BITS - (m - 1).leading_zeros())
+
+/// Keep `keep` rows of `rows` (`ncols` columns): drop the heaviest rows
+/// first, never an anchor row (a nonzero right-hand side or a nonzero
+/// coefficient at `ct`: they carry `t` and the inhomogeneous information)
+/// and never a row whose removal would leave one of its columns empty;
+/// if that is not enough, a second pass drops the heaviest remaining
+/// non-anchor rows regardless (the caller's certificate catches a
+/// singular choice).  Counted: one addition per entry for the column
+/// weights, one per row for the anchor test and the length, [`sort_charge`]
+/// for the ordering, and one addition per entry of every row examined.
+/// Returns the kept rows in original order.
+fn select_rows(rows: &[Row], ncols: usize, ct: u32, keep: usize, nat: &mut Nat) -> Vec<Row> {
+    if rows.len() <= keep {
+        return rows.to_vec();
+    let mut w = vec![0u32; ncols];
+    for (t, _) in rows {
+        for &(c, _) in t {
+            w[c as usize] += 1;
+        nat.add += t.len() as u64;
+    nat.add += rows.len() as u64 + sort_charge(rows.len());
+    let anchor = |(t, b): &Row| *b != 0 || t.last().is_some_and(|&(c, v)| c == ct && v != 0);
+    // heaviest first, ties: later row first
+    let mut ord: Vec<(usize, usize)> = (0..rows.len())
+        .filter(|&i| !anchor(&rows[i]))
+        .map(|i| (rows[i].0.len(), i))
+        .collect();
+    ord.sort_unstable_by(|a, b| b.cmp(a));
+    let mut drop = vec![false; rows.len()];
+    let mut need = rows.len() - keep;
+    for strict in [true, false] {
+        for &(_, i) in &ord {
+            if need == 0 {
+                break;
+            if drop[i] {
+                continue;
+            let t = &rows[i].0;
+            nat.add += t.len() as u64;
+            if strict && t.iter().any(|&(c, _)| w[c as usize] <= 1) {
+            for &(c, _) in t {
+                w[c as usize] -= 1;
+            drop[i] = true;
+            need -= 1;
+    rows.iter()
+        .zip(drop)
+        .filter(|(_, d)| !d)
+        .map(|(row, _)| row.clone())
+        .collect()
+
+/// How the degree-3 divisor of a decomposition class is found.
 pub enum Decomp {
     /// Evaluate the conics at every rational point of `C` (`O(q)`).
     #[default]
     Scan,
     /// Intersect two conics of the net by a resultant (`O(log q)`).
     Algebraic,
-}
 
 /// Additive options of [`run_diem_opts`]; the default reproduces
 /// [`run_diem`] exactly.  (Kept apart from [`QIcParams`] so that existing
@@ -1845,7 +2110,6 @@ pub struct QIcOpts {
     pub decomp: Decomp,
     /// Structured Gaussian elimination between the peel and Wiedemann.
     pub sge: Option<SgeParams>,
-}
 
 /// A conic of the net in the chart `x = 1` with unknowns `(u, w)` (`w` the
 /// variable eliminated; `swap`: `u = z`, `w = y`): the six coefficients of
@@ -1854,30 +2118,19 @@ fn conic_uw(c: &[u32; 6], swap: bool) -> [u64; 6] {
     let c: [u64; 6] = std::array::from_fn(|i| c[i] as u64);
     if swap {
         [c[0], c[2], c[1], c[5], c[4], c[3]]
-    } else {
         c
-    }
-}
 
 /// Counted product of polynomials (ascending coefficients).
 fn pmul_poly(q: u64, a: &[u64], b: &[u64], n: &mut Nat) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return Vec::new();
-    }
     let mut c = vec![0u64; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         if x == 0 {
-            continue;
-        }
         for (j, &y) in b.iter().enumerate() {
             if y != 0 {
                 let t = pm(q, x, y, n);
                 c[i + j] = pa(q, c[i + j], t, n);
-            }
-        }
-    }
-    c
-}
 
 fn psub_poly(q: u64, a: &[u64], b: &[u64], n: &mut Nat) -> Vec<u64> {
     let mut c = vec![0u64; a.len().max(b.len())];
@@ -1885,9 +2138,6 @@ fn psub_poly(q: u64, a: &[u64], b: &[u64], n: &mut Nat) -> Vec<u64> {
         let x = a.get(i).copied().unwrap_or(0);
         let y = b.get(i).copied().unwrap_or(0);
         *ci = if y == 0 { x } else { fs(q, x, y, n) };
-    }
-    c
-}
 
 /// Resultant in `w` of two conics given by `conic_uw` coefficient vectors:
 /// `(a2 b0 - a0 b2)^2 - (a2 b1 - a1 b2)(a1 b0 - a0 b1)`, a polynomial in `u`
@@ -1901,7 +2151,6 @@ fn resultant_w(q: u64, a: &[u64; 6], b: &[u64; 6], n: &mut Nat) -> Vec<u64> {
     let xx = pmul_poly(q, &x, &x, n);
     let yz = pmul_poly(q, &y, &z, n);
     psub_poly(q, &xx, &yz, n)
-}
 
 /// Advance `rng` exactly as `wiedemann` on an `nr x ncols` system would
 /// (see `genus_ladder::skip_wiedemann_draws`), so that the relation phase
@@ -1909,18 +2158,9 @@ fn resultant_w(q: u64, a: &[u64; 6], b: &[u64; 6], n: &mut Nat) -> Vec<u64> {
 fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense_u: bool) {
     for _ in 0..nr {
         let _: u64 = rng.gen_range(1..r);
-    }
-    if dense_u || ncols <= 16 {
         for _ in 0..ncols {
             let _: u64 = rng.gen_range(1..r);
-        }
-    } else {
-        for _ in 0..16 {
             let _: usize = rng.gen_range(0..ncols);
-            let _: u64 = rng.gen_range(1..r);
-        }
-    }
-}
 
 /// Run one Diem arm on an instance with the additive options.
 pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResult {
@@ -1942,7 +2182,6 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
         kappa: None,
         pclass: HashMap::new(),
         scratch: Nat::default(),
-    };
 
     // ── points (counted) ──
     let mut ctx = Ctx::new(inst.q, &inst.f, &mut res.rel_enum);
@@ -1960,17 +2199,12 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
             for i in (1..order.len()).rev() {
                 let j = prng.gen_range(0..=i);
                 order.swap(i, j);
-            }
             order.truncate(prm.nb.clamp(2, n - 1));
             order
-        }
-    };
     for &k in &base {
         if k != p0i {
             col[k] = ncols;
             ncols += 1;
-        }
-    }
     let kcol = ncols;
     let tcol = ncols + 1;
     let nunk = ncols as usize + 2;
@@ -1979,9 +2213,7 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
         let mut tn = Nat::default();
         for &k in &base {
             ctx.taylor(k, &mut tn);
-        }
         res.rel.merge(tn);
-    }
 
     let mut rels: Vec<Rel> = Vec::new();
     let mut vid: HashMap<u32, u32> = HashMap::new();
@@ -2005,34 +2237,24 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
             nlp: 0,
             tcoef,
             rhs,
-        };
         let mut lps = Vec::new();
         for &k in pts_in {
             if k as usize == p0i {
-                continue;
-            }
             let c = col[k as usize];
             if c != u32::MAX {
                 rel.fb[rel.nfb as usize] = (c, 1);
                 rel.nfb += 1;
-            } else {
                 lps.push(k);
-            }
-        }
         if lps.len() > 2 {
             return None;
-        }
         rel.fb[rel.nfb as usize] = (kcol, -1);
         rel.nfb += 1;
         Some((rel, lps))
-    };
 
     'outer: while !solved {
         // ── line relations ──
         while (rels.len() as u64) < next_check {
             if res.lines_tried >= prm.max_lines || pairs_done {
-                break;
-            }
             let (i, j) = match prm.arm {
                 QArm::Full => {
                     let i = rng.gen_range(0..n);
@@ -2047,38 +2269,24 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
                     if a >= base.len() {
                         pairs_done = true;
                         break;
-                    }
                     pair = if b + 1 < a { (a, b + 1) } else { (a + 1, 0) };
                     (base[a], base[b])
-                }
-            };
             res.lines_tried += 1;
             let (p3, p4) = match ctx.line(i, j, &mut res.rel) {
                 LineRes::Split(a, b) => (a, b),
                 LineRes::Bad => {
                     res.bad_relations += 1;
                     continue;
-                }
                 _ => continue,
-            };
             let mut key = [i as u32, j as u32, p3, p4];
             key.sort_unstable();
             if !seen_lines.insert(key) {
-                continue;
-            }
             let Some((rel, lps)) = make_rel(&key, 0, 0, &col) else {
-                continue;
-            };
             if prm.verify_relations {
                 let kap = ver.kappa(&pq, &mut ctx);
                 if !ver.check(&pq, &mut ctx, &key, false, &kap) {
-                    res.bad_relations += 1;
-                    continue;
-                }
-            }
             push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
             res.line_relations += 1;
-        }
 
         // ── inhomogeneous rows: x = [a]G + [b]T, a stepped by G ──
         if ninhom < want_inhom {
@@ -2092,7 +2300,6 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
                 if res.decomp_trials >= max_decomp {
                     res.exhausted = true;
                     break 'outer;
-                }
                 res.decomp_trials += 1;
                 if let PicClass::Typ(m) = &x {
                     let dec = match opts.decomp {
@@ -2116,14 +2323,9 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
                             } else {
                                 res.bad_relations += 1;
                             }
-                        }
-                    }
-                }
                 x = pq.add(&x, &g);
                 ops.adds += 1;
                 a = if a + 1 == r { 0 } else { a + 1 };
-            }
-        }
 
         let out_of_lines = pairs_done || res.lines_tried >= prm.max_lines;
 
@@ -2134,26 +2336,14 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
             let cyc = dsu.cycles0();
             if cyc < need {
                 if out_of_lines {
-                    res.exhausted = true;
                     break;
-                }
                 next_check = rels.len() as u64 + (need - cyc).max(1) as u64;
-                continue;
-            }
-        } else {
             let mut scratch = Nat::default();
             let mut rows = build_rows(&rels, nver, tcol, r, &mut scratch);
             strip_zeros(&mut rows);
             let (core, cc, _) = peel(&rows, nunk, tcol, &mut scratch);
             if core.len() < cc + margin(cc) {
-                if out_of_lines {
-                    res.exhausted = true;
-                    break;
-                }
                 next_check = rels.len() as u64 + (nunk as u64 / 32).max(8);
-                continue;
-            }
-        }
 
         // ── counted attempt ──
         res.attempts += 1;
@@ -2167,7 +2357,6 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
             let sol = match opts.sge {
                 None => {
                     wiedemann(&core, cc, r, &mut rng, dense, &mut res.la).map(|xs| xs[ct as usize])
-                }
                 Some(sp) => {
                     let mut s_nat = Nat::default();
                     let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
@@ -2180,25 +2369,17 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
                     skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
                     wiedemann(&red, rcc, r, &mut wrng, dense, &mut res.la)
                         .map(|xs| xs[rct as usize])
-                }
-            };
             if let Some(t) = sol {
                 let chk = cmul(&pq, &mut ops, &g, t);
                 if chk == tgt {
                     res.recovered = Some(t);
                     res.certified = true;
                     solved = true;
-                    continue;
-                }
-            }
-        }
         if out_of_lines || res.attempts >= 40 {
             res.exhausted = true;
             break;
-        }
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
         want_inhom += 4;
-    }
     res.la.add += dsu.ops;
     res.rel.merge(res.rel_enum);
     res.rel.merge(res.rel_decomp);
@@ -2210,8 +2391,6 @@ pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResu
     res.verify_ops = ver.ops;
     res.verify_pic_mul = ver.fq.mul;
     res.wall_ns = start.elapsed().as_nanos() as u64;
-    res
-}
 
 #[cfg(test)]
 mod tests {

@@ -18570,7 +18570,7 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     if let Some(o) = &s4 {
         calibrate_s4(inst, o, &mut calib);
     }
-    // Its factored counterpart, where the half-trace exists (odd `n`).
+    // Its factored counterpart (any parity of `n`).
     let s4f = (m_used == 3 && inst.n <= cfg.s4_max_degree)
         .then(|| FactoredSubspaceOracle::new(&basis, inst.b, &inst.gf))
         .flatten();
