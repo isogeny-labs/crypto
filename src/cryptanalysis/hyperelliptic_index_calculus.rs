@@ -2060,7 +2060,7 @@ pub fn prime_order_of(
 pub fn hasse_interval_big(curve: &HyperellipticCurveP) -> (BigUint, BigUint) {
     let root = curve.p.sqrt();
     let one = BigUint::one();
-    let g = curve.genus.max(1);
+    let g = curve.genus.max(1) as u32;
     let lo = if root > one {
         (&root - &one).pow(2 * g)
     } else {
@@ -2069,6 +2069,8 @@ pub fn hasse_interval_big(curve: &HyperellipticCurveP) -> (BigUint, BigUint) {
     let hi = (&root + &one).pow(2 * g);
     (lo.max(one), hi)
 }
+
+    let g = curve.genus.max(1);
 
 pub fn hasse_interval(curve: &HyperellipticCurveP) -> Option<(u128, u128)> {
     // The frozen hyperelliptic rows use the real square root approximation

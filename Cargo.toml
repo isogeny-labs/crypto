@@ -121,24 +121,23 @@ path = "src/bin/quartic_ic.rs"
 name = "hyperelliptic-cover"
 path = "src/bin/hyperelliptic_cover.rs"
 
+# `hecx` — inspect, estimate and solve HECDLP instances over prime and binary
+# fields, with arbitrary genus, coefficients and subgroup orders.
+[[bin]]
+name = "hecx"
+path = "src/bin/hecx.rs"
+
 # Finite, replayable enumeration of the explicit cover shapes implemented by
 # this repository. Empty searches retain an explicit nonexistence disclaimer.
-[[bin]]
 name = "curve-transfer-sweep"
 path = "src/bin/curve_transfer_sweep.rs"
 
 # Deterministic export and byte-for-byte replay of the retained
 # odd-characteristic named-subgroup transfer corpus. Unsupported rows are
 # preserved and make the command exit nonzero after writing its result.
-[[bin]]
 name = "odd-transfer-catalog"
 path = "src/bin/odd_transfer_catalog.rs"
 
-# `hecx` — inspect, estimate and solve HECDLP instances over prime and binary
-# fields, with arbitrary genus, coefficients and subgroup orders.
-[[bin]]
-name = "hecx"
-path = "src/bin/hecx.rs"
 
 # `icx` — index calculus across every standardized curve (catalog + engine).
 [[bin]]
@@ -230,7 +229,7 @@ path = "research/full_volcano_graphwide_ic_20261017/execution/summarize.rs"
 # Keep the existing Redis TLS behavior in normal builds. The isolated,
 # network-disabled N83 capacity worker can omit its unused native OpenSSL
 # dependency when cross-building a static Linux binary.
-default = ["redis-native-tls"]
+default = ["redis-native-tls", "jemalloc"]
 redis-native-tls = ["redis/tls-native-tls"]
 # Boolean monomial bitmasks of 128 bits instead of 64, so the F2 Gröbner and
 # SAT decomposition engines accept up to 128 unknowns
@@ -248,12 +247,18 @@ f4-wide-tables = []
 redis-cache = []
 # Verbose tracing in the isogeny rho attack's linear-algebra step.
 rho_debug = []
-# jemalloc as the global allocator of the binaries that opt in (today
-# examples/jv_cover.rs). F4 over F_p allocates one exponent vector per term,
-# and glibc's allocator was ~30% of F4's instructions on jv_cover's systems;
-# jv_cover --exp dlp ran 1.18x faster with jemalloc preloaded
-# (research/f4_inner_dispatch_20261120). Off by default so every other wall
-# time in the lab stays comparable; counted operations are unchanged.
+# jemalloc as the global allocator of the binaries that opt in with
+# `#[cfg(feature = "jemalloc")] #[global_allocator]`: examples/jv_cover.rs and
+# examples/jv_quartic.rs; every other binary keeps the system allocator. F4 over
+# F_p allocates one exponent vector per term, and glibc's allocator was ~30% of
+# F4's instructions on jv_cover's small systems: jv_cover --exp dlp 1.256x
+# faster (pre-registered, 8/8; research/f4_inner_dispatch_20261120),
+# jv_quartic --exp cprime 1.40x (4/4). It is NOT a general win: on large F4
+# systems (jv_quintic, ~1e10 multiplications per test) jemalloc was 0.94x,
+# 0/4, from extra system time that MALLOC_CONF decay and oversize settings did
+# not remove (research/f4_alloc_round3_20261121). On by default since
+# 2026-11-21; counted operations are unchanged; `--no-default-features` turns
+# it off.
 jemalloc = ["dep:tikv-jemallocator"]
 # Field-operation counters in the CryptoPro-B field (`cryptopro_b_field::opcount`),
 # for the counting run of `cryptopro-b-chain-sweep`; timing builds leave it off.
@@ -594,6 +599,12 @@ test = true
 
 
 [[example]]
+name = "f4_f5_boolean_runtime_analyze"
+path = "examples/maintained/wide/f4_f5_boolean_runtime_analyze.rs"
+test = true
+
+
+[[example]]
 name = "ic_qualified_closure_audit"
 path = "examples/maintained/wide/ic_qualified_closure_audit.rs"
 test = true
@@ -669,4 +680,19 @@ test = true
 name = "ecbench_open_questions_replay_failures"
 path = "examples/maintained/wide/ecbench_open_questions_replay_failures.rs"
 test = true
+
+
+# Go-style benchmarks (`testing.B` auto-scaled b.N) in the Go benchmark
+# format, so `benchstat` can compare them with any other Go/benchfmt
+# producer.  See src/benchfmt.rs.
+[[bench]]
+name = "go_bench"
+path = "benches/go_bench.rs"
+harness = false
+
+[[example]]
+name = "hw_counter_ab_bench"
+path = "examples/hw_counter_ab_bench.rs"
+name = "floor_crater_bridge_cost"
+path = "research/floor_crater_ecdlp_gap_20261120/bridge_cost.rs"
 

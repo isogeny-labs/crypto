@@ -1,0 +1,22 @@
+{
+  "schema": "h4-n17-native-xor-pair-v1",
+  "question": "On the same frozen n=17 Boolean decomposition inputs, does native XOR-DIMACS improve verified first-witness performance over the prior shared-monomial Tseitin CNF encoding?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "cnf_encoder": "research/exotic_ecdlp_20261021/H4_prime_descent/sat_followup_20261119/run.py",
+  "cnf_encoder_sha256": "dd66d2629db22706a345ca54b184c43d7cea3c1c44172234599d838815b9d2ff",
+  "solver": "/opt/homebrew/bin/cryptominisat5",
+  "solver_version": "5.14.7",
+  "solver_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "instance": {"field_degree": 17, "instance_index": 0, "seed_formula": "20261022*1000+17*10+0", "arms": ["planted", "random"], "subspace_dimension": 6, "summands": 3},
+  "method": "Share exact nonlinear monomial AND gates; compare old four-clause XOR chains to one native XOR-DIMACS row per original Boolean equation; all solver results replayed through original equations and exact V^3 solution enumeration",
+  "stage_order": [{"arm": "planted", "encoding": "cnf"}, {"arm": "planted", "encoding": "native_xor"}, {"arm": "random", "encoding": "native_xor"}, {"arm": "random", "encoding": "cnf"}],
+  "per_cell_solver_deadline_seconds": 180,
+  "process_deadline_seconds": 840,
+  "memory_observation_limit_bytes": 12884901888,
+  "host": "local macOS, one checked Sage producer and one CryptoMiniSat process at a time; ordinary diagnostic tier",
+  "statistics": ["exact_solution_count", "input_variables", "constraints", "build_seconds", "solver_seconds", "status", "solver_peak_rss_bytes", "witness_residual", "witness_in_exact_set"],
+  "checks": "source and solver hashes; XOR-DIMACS truth table; exact V^3 enumeration; planted residual; independent equation replay; all four statuses and timeouts retained",
+  "claim_boundary": "paired fixed-input stage diagnostic on an ordinary host; no isolated wall-time speedup, natural relation-yield estimate, n=131 extrapolation, or full target pipeline",
+  "status": "frozen before execution"
+}

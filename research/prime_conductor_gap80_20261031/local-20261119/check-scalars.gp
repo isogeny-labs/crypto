@@ -1,0 +1,10 @@
+require(ok,why)={if(!ok,print("FAIL: ",why);quit(2))};
+hexnum(s)=eval(Str("0x",s));
+pt(P,p)={if(type(P)=="t_INT",[0],[Mod(hexnum(P[1]),p),Mod(hexnum(P[2]),p)])};
+s=readstr("research/prime_conductor_gap80_20261031/local-20261119/scalar-audit.gpvec");
+defs=eval(s[1]);curves=vector(#defs);primes=vector(#defs);orders=vector(#defs);
+for(i=1,#defs,v=defs[i];p=eval(v[1]);q=v[4];require(isprime(p)&&isprime(q),"prime field/order");curves[i]=ellinit([eval(v[2]),eval(v[3])],p);primes[i]=p;orders[i]=q);
+checked=0;
+for(i=2,#s,v=eval(s[i]);E=curves[v[1]];p=primes[v[1]];P=pt(v[3],p);R=pt(v[4],p);k=eval(v[2]);require(ellisoncurve(E,P)&&P!=[0]&&ellmul(E,P,orders[v[1]])==[0],"base membership/order");require(ellisoncurve(E,R)&&ellmul(E,P,k)==R,"independent scalar result");checked++);
+print("{\"independent_PARI_scalar_samples\":",checked,",\"curve_models\":",#defs,",\"all_outputs_match\":true,\"timings_independently_remeasured\":false}");
+quit(0);

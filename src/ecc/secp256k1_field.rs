@@ -19,10 +19,98 @@
 //! secp256k1 specifically.  P-256 will get a parallel module once this
 //! one is wired into [`crate::ecc::point::Point`].
 
-use crate::ct_bignum::{compute_minv64, Uint, U256};
-use crate::ecc::mont_vt::ct_mont_mul4;
+use crate::ct_bignum::{compute_minv64, mul_wide_4, sqr_wide_4, Uint, U256};
 use num_bigint::BigUint;
 use subtle::{Choice, ConstantTimeEq};
+
+const SECP_K: u128 = 0x1_0000_03D1;
+
+/// Specialized constant-time Montgomery reduction `T · 2^(-256) mod p` for
+/// secp256k1's `p = 2^256 - K` (`K = 2^32 + 977`).
+///
+/// Since `m_i = t_i · K^(-1) mod 2^64`, `m_i · K = t_i + q_hi · 2^64` with
+/// `0 ≤ q_hi < K < 2^33` and `m_i ≥ 1` whenever `q_hi > 0`, so
+/// `(t_i + m_i · p) / 2^64 = m_i · 2^192 - q_hi`, requiring only **2**
+/// multiplies per limb (`8` total instead of `20` in generic CIOS).
+#[inline(always)]
+fn secp_mont_reduce_wide(t: &[u64; 8]) -> U256 {
+    let s0 = t[0];
+    let mut s1 = t[1];
+    let mut s2 = t[2];
+    let mut s3 = t[3];
+    let mut s4 = t[4] as u128;
+    let mut s5 = t[5] as u128;
+    let mut s6 = t[6] as u128;
+    let s7 = t[7] as u128;
+
+    // Step 0: fold s0 into s1..s4
+    let m = s0.wrapping_mul(P_INV_LOW);
+    let q_hi = ((m as u128 * SECP_K) >> 64) as u64;
+    let (v1, b1) = s1.overflowing_sub(q_hi);
+    let (v2, b2) = s2.overflowing_sub(b1 as u64);
+    let (v3, b3) = s3.overflowing_sub(b2 as u64);
+    s1 = v1;
+    s2 = v2;
+    s3 = v3;
+    s4 += (m - (b3 as u64)) as u128;
+
+    // Step 1: fold s1 into s2..s5
+    let m = s1.wrapping_mul(P_INV_LOW);
+    let q_hi = ((m as u128 * SECP_K) >> 64) as u64;
+    let (v2, b1) = s2.overflowing_sub(q_hi);
+    let (v3, b2) = s3.overflowing_sub(b1 as u64);
+    let s4_lo = s4 as u64;
+    let s4_hi = s4 >> 64;
+    let (v4, b3) = s4_lo.overflowing_sub(b2 as u64);
+    s2 = v2;
+    s3 = v3;
+    s4 = v4 as u128;
+    s5 += s4_hi + ((m - (b3 as u64)) as u128);
+
+    // Step 2: fold s2 into s3..s6
+    let m = s2.wrapping_mul(P_INV_LOW);
+    let q_hi = ((m as u128 * SECP_K) >> 64) as u64;
+    let (v3, b1) = s3.overflowing_sub(q_hi);
+    let (v4, b2) = (s4 as u64).overflowing_sub(b1 as u64);
+    let s5_lo = s5 as u64;
+    let s5_hi = s5 >> 64;
+    let (v5, b3) = s5_lo.overflowing_sub(b2 as u64);
+    s3 = v3;
+    s4 = v4 as u128;
+    s5 = v5 as u128;
+    s6 += s5_hi + ((m - (b3 as u64)) as u128);
+
+    // Step 3: fold s3 into s4..s7
+    let m = s3.wrapping_mul(P_INV_LOW);
+    let q_hi = ((m as u128 * SECP_K) >> 64) as u64;
+    let (v4, b1) = (s4 as u64).overflowing_sub(q_hi);
+    let (v5, b2) = (s5 as u64).overflowing_sub(b1 as u64);
+    let s6_lo = s6 as u64;
+    let s6_hi = s6 >> 64;
+    let (v6, b3) = s6_lo.overflowing_sub(b2 as u64);
+    let r0 = v4;
+    let r1 = v5;
+    let r2 = v6;
+    let top = s7 + s6_hi + ((m - (b3 as u64)) as u128);
+    let r3 = top as u64;
+    let r4 = (top >> 64) as u64;
+
+    // Constant-time conditional subtraction of P = 2^256 - K:
+    // Note R - P = R + K - 2^256, so R >= P iff R + K >= 2^256 (or r4 != 0)!
+    let (d0, c1) = r0.overflowing_add(0x0000_0001_0000_03D1);
+    let (d1, c2) = r1.overflowing_add(c1 as u64);
+    let (d2, c3) = r2.overflowing_add(c2 as u64);
+    let (d3, c4) = r3.overflowing_add(c3 as u64);
+    let need_sub = (r4 | (c4 as u64)) & 1;
+    let mask = core::hint::black_box(0u64.wrapping_sub(need_sub));
+    let _ = s0;
+    Uint([
+        r0 ^ (mask & (r0 ^ d0)),
+        r1 ^ (mask & (r1 ^ d1)),
+        r2 ^ (mask & (r2 ^ d2)),
+        r3 ^ (mask & (r3 ^ d3)),
+    ])
+}
 
 /// secp256k1 prime modulus, as little-endian limbs.
 ///
@@ -53,14 +141,6 @@ pub const R_MOD_P: U256 = Uint([0x0000_0001_0000_03D1, 0, 0, 0]);
 /// [`tests::r_squared_constant_is_correct`].
 pub const R_SQUARED_MOD_P: U256 = Uint([0x0000_07A2_000E_90A1, 1, 0, 0]);
 
-/// `a·b·R⁻¹ mod p` (the value of `U256::mont_mul(a, b, &P, P_INV_LOW)`
-/// for `a, b < p`) by the interleaved constant-time pass of
-/// [`crate::ecc::mont_vt::ct_mont_mul4`].
-#[inline(always)]
-fn mm(a: &U256, b: &U256) -> U256 {
-    Uint(ct_mont_mul4(&a.0, &b.0, &P.0, P_INV_LOW))
-}
-
 /// A field element over secp256k1's prime, stored in Montgomery form.
 #[derive(Copy, Clone, Debug)]
 pub struct SecpFieldElement(U256);
@@ -79,13 +159,13 @@ impl SecpFieldElement {
     ///
     /// Caller must ensure `a < p`; this is not runtime-checked.
     pub fn from_canonical(a: &U256) -> Self {
-        SecpFieldElement(mm(a, &R_SQUARED_MOD_P))
+        SecpFieldElement(U256::mont_mul(a, &R_SQUARED_MOD_P, &P, P_INV_LOW))
     }
 
     /// Extract the canonical form: `a_M · R^(-1) mod p = a`, which is
     /// `mont_mul(a_M, 1)`.
     pub fn to_canonical(&self) -> U256 {
-        mm(&self.0, &U256::ONE)
+        U256::mont_mul(&self.0, &U256::ONE, &P, P_INV_LOW)
     }
 
     /// Construct from a `BigUint`, reducing mod p first.  The reduction
@@ -129,14 +209,16 @@ impl SecpFieldElement {
         SecpFieldElement(self.0.sub_mod(&other.0, &P))
     }
 
-    /// Field multiplication via Montgomery multiplication.
+    /// Field multiplication via specialized secp256k1 `2^256 - K` Montgomery reduction.
+    #[inline]
     pub fn mul(&self, other: &Self) -> Self {
-        SecpFieldElement(mm(&self.0, &other.0))
+        SecpFieldElement(secp_mont_reduce_wide(&mul_wide_4(&self.0 .0, &other.0 .0)))
     }
 
-    /// Field squaring.
+    /// Field squaring via 10-product squaring + specialized secp256k1 reduction.
+    #[inline]
     pub fn sqr(&self) -> Self {
-        SecpFieldElement(mm(&self.0, &self.0))
+        SecpFieldElement(secp_mont_reduce_wide(&sqr_wide_4(&self.0 .0)))
     }
 
     /// Additive inverse: `0 - self mod p`.  Reduces to one [`U256::sub_mod`].
@@ -156,28 +238,34 @@ impl SecpFieldElement {
     /// Returns `Self::ZERO` if `self.is_zero()`.  Callers that care
     /// about the zero case must check explicitly — there is no `Option`
     /// return because branching on zero would itself leak.
-    pub fn inv(&self) -> Self {
-        // exp = p - 2.  Since p[0] = 0x...FC2F is far above 2, this is
-        // just (p[0] - 2, p[1], p[2], p[3]).
-        let exp = Uint([P.0[0].wrapping_sub(2), P.0[1], P.0[2], P.0[3]]);
-        let mut r0 = SecpFieldElement::ONE;
-        let mut r1 = *self;
-        for i in (0..256).rev() {
-            let limb = i / 64;
-            let bit_in_limb = i % 64;
-            let bit = (exp.0[limb] >> bit_in_limb) & 1;
-            let choice = Choice::from(bit as u8);
-
-            // Always compute all three; the cmov picks the right pair.
-            // bit == 1: r0 ← r0 * r1, r1 ← r1²
-            // bit == 0: r0 ← r0²,     r1 ← r0 * r1
-            let prod = r0.mul(&r1);
-            let r0_sq = r0.sqr();
-            let r1_sq = r1.sqr();
-            r0 = SecpFieldElement::cmov(&r0_sq, &prod, choice);
-            r1 = SecpFieldElement::cmov(&prod, &r1_sq, choice);
+    #[inline]
+    fn sqr_n(&self, n: usize) -> Self {
+        let mut r = *self;
+        for _ in 0..n {
+            r = r.sqr();
         }
-        r0
+        r
+    }
+
+    pub fn inv(&self) -> Self {
+        // Fixed constant-time addition chain for secp256k1 p - 2:
+        // 255 squarings + 15 multiplications, zero secret-dependent branches.
+        let x1 = *self;
+        let x2 = x1.sqr().mul(&x1);
+        let x3 = x2.sqr().mul(&x1);
+        let x6 = x3.sqr_n(3).mul(&x3);
+        let x9 = x6.sqr_n(3).mul(&x3);
+        let x11 = x9.sqr_n(2).mul(&x2);
+        let x22 = x11.sqr_n(11).mul(&x11);
+        let x44 = x22.sqr_n(22).mul(&x22);
+        let x88 = x44.sqr_n(44).mul(&x44);
+        let x176 = x88.sqr_n(88).mul(&x88);
+        let x220 = x176.sqr_n(44).mul(&x44);
+        let x223 = x220.sqr_n(3).mul(&x3);
+        let t = x223.sqr_n(23).mul(&x22);
+        let t = t.sqr_n(5).mul(&x1);
+        let t = t.sqr_n(3).mul(&x2);
+        t.sqr_n(2).mul(&x1)
     }
 
     // ── Comparison / selection ───────────────────────────────────────────
@@ -198,6 +286,11 @@ impl SecpFieldElement {
     /// Constant-time conditional move: returns `b` iff `choice == 1`.
     pub fn cmov(a: &Self, b: &Self, choice: Choice) -> Self {
         SecpFieldElement(U256::cmov(&a.0, &b.0, choice))
+    }
+
+    #[inline]
+    pub fn cswap(a: &mut Self, b: &mut Self, choice: Choice) {
+        U256::cswap(&mut a.0, &mut b.0, choice);
     }
 
     /// Internal accessor for tests and lower-level interop.  The raw
