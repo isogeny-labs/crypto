@@ -1,0 +1,22 @@
+{
+  "schema": "xedni-first-hit-distribution-protocol-v1",
+  "source_panel_protocol": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/protocol.json",
+  "source_threshold_result": "research/exotic_ecdlp_20261021/xedni_radius_threshold_20261120/result.json",
+  "source_threshold_result_raw_sha256": "63c6021c256d0382e003f0a4e38560441d28274af8519f3620a94696fa2b0322",
+  "source_rational_cost_result": "research/exotic_ecdlp_20261021/xedni_threshold_rational_cost_20261120/result.json",
+  "source_rational_cost_result_raw_sha256": "1edd93fb8928f5aeab236c7a806efa29a780ab42cdee7375978a0e294d0fa60a",
+  "source_rational_cost_rows": "research/exotic_ecdlp_20261021/xedni_threshold_rational_cost_20261120/rows.jsonl",
+  "source_rational_cost_rows_raw_sha256": "dc931772eb8e8ae7c95634a10b80fdde4e1014f702054df8a718d7999aa4740d",
+  "source_fresh_target_result": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/result.json",
+  "source_fresh_target_result_raw_sha256": "f77828af2b70e4b7622619fbdbc9cf205c63bdd776ac54138075184e02db9101",
+  "source_fresh_target_rows": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/arm-rows.jsonl",
+  "cells": [
+    {"p": 1531, "q": 1553, "R_over_Q": 11, "radius": 65},
+    {"p": 2287, "q": 2251, "R_over_Q": 1238, "radius": 54}
+  ],
+  "candidate_law": "all nonzero integer (a,b) in [-B,B]^2, ascending frozen Decimal quadratic height score, then a,b",
+  "target_law": "uniform over all q-1 nonidentity points; enumerate every scalar k=1,...,q-1 exactly once; scalar labels are an audit oracle, not supplied to an online solver",
+  "first_hit": "first candidate index i whose residue (a+R_over_Q*b) mod q equals k; stop candidate scan once all q-1 first hits are recorded",
+  "statistics": "retain every target first-hit row, exact sum and rational mean, median-times-two, nearest-rank p90, maximum, and exact combinatorial q/2 lower-bound comparison",
+  "claim_boundary": "secondary exhaustive target-distribution analysis after the frozen six single-target comparisons; candidate counts only, no shared-setup amortized wall-time or Tier 0/1 speedup claim"
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "xedni-radius-threshold-protocol-v1",
+  "source_panel": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/prime-rows.jsonl",
+  "source_panel_raw_sha256": "dde18ca90a0cacfd1837734f03f39f8343521c86123a62900eeb6bae7f3428df",
+  "cells": [
+    {"p": 1531, "q": 1553, "R_over_Q": 11, "prior_radius": 41},
+    {"p": 2287, "q": 2251, "R_over_Q": 1238, "prior_radius": 49}
+  ],
+  "radius_range_inclusive": [0, 128],
+  "image_rule": "for each radius B, enumerate all integer pairs -B<=a,b<=B and take (a+R_over_Q*b) mod q; include zero in the image, count nonidentity separately",
+  "threshold_rule": "first scanned B whose scalar image equals all q residues; preserve every radius row and status through B=128",
+  "verification": "check source panel hash, exact source p/q/radius/scalar, independently reconstruct reduced Q and R group points in checked Sage, and directly compare scalar image to elliptic-curve point image at first complete radius and the immediately preceding radius",
+  "claim_boundary": "fixed two cells selected and measured in the prior preregistered panel; exact coefficient-box image threshold, not an inference about untested curves or rational-coordinate cost"
+}
