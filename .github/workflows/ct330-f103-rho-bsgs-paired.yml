@@ -1,0 +1,139 @@
+name: CT330 original-source F103 paired diagnostic rho and BSGS
+
+on:
+  pull_request:
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT330_*"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_*"
+      - ".github/workflows/ct330-f103-rho-bsgs-paired.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ct330-f103-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  original-source-f103-paired:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tests/ct238_native_cubic_norm_compression.rs
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct328_standalone_source.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_compose.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_paired.rs.inc
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_oracle.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT330_STANDALONE_MATCHED_RHO_BSGS_PROTOCOL.md
+      - name: Pin original source and reject altered source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT330_COMMIT %H'
+          test "$(git hash-object tests/ct238_native_cubic_norm_compression.rs)" = "234e14f2aea35b8ef3203065a5e2468aae9eb71f"
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('tests/ct238_native_cubic_norm_compression.rs').read_bytes()
+          assert src.count(b'const R: i64 = 109;') == 1
+          Path('/tmp/ct330-mutated.rs').write_bytes(src.replace(
+              b'const R: i64 = 109;',b'const R: i64 = 110;',1))
+          PY
+          BASE=research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          if python3 -B "$BASE/ct330_compose.py" --source /tmp/ct330-mutated.rs --append "$BASE/ct330_paired.rs.inc" --out /tmp/ct330-mutated-result.rs; then
+            echo "CT330_ERROR source mutation accepted"; exit 1
+          fi
+          test ! -e /tmp/ct330-mutated-result.rs
+          echo CT330_MUTATED_SOURCE_REFUSED
+          python3 -B "$BASE/ct330_compose.py" --source tests/ct238_native_cubic_norm_compression.rs --append "$BASE/ct330_paired.rs.inc" --out /tmp/ct330-native.rs
+          sha256sum /tmp/ct330-native.rs
+          python3 -B "$BASE/ct330_oracle.py" | tee /tmp/ct330-python.txt
+          python3 -O -B "$BASE/ct330_oracle.py" > /tmp/ct330-python-O.txt
+          cmp /tmp/ct330-python.txt /tmp/ct330-python-O.txt
+          test "$(grep -c '^CT330_PY_RHO_PASS logs=109 q73_adds=332 q73_steps=2 q73_restarts=1 aggregate_adds=48147 pcc=unverified      - name: Build exact-source Rust and execute three bounded matched pairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustc --version
+          rustc --edition=2021 -O --test /tmp/ct330-native.rs -o /tmp/ct330-tests
+          /tmp/ct330-tests --test-threads=1 --nocapture 2>&1 | tee /tmp/ct330-native.log
+          test "$(grep -c 'CT327_CORRECTNESS_PASS logs=109 mutations=110 ' /tmp/ct330-native.log)" -eq 1
+          test "$(grep -c '^CT330_PAIRED_JSON ' /tmp/ct330-native.log)" -eq 3
+          test "$(grep -c '^CT330_THREE_PAIRED_Q73_COMPLETE ' /tmp/ct330-native.log)" -eq 1
+          grep 'test result: ok. 2 passed; 0 failed' /tmp/ct330-native.log
+          python3 -B research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_audit.py --native-log /tmp/ct330-native.log
+      - name: Record parser tampering controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'research/chained_jacobian_transfers_20261110/toy_dlp_ct204')
+          from ct330_audit import audit
+          source=Path('/tmp/ct330-native.log').read_text()
+          audit(source)
+          mutations=[
+              ('wrong_scalar',source.replace('"rho_log":73','"rho_log":72',1)),
+              ('wrong_order',source.replace('"RHO_BSGS"','"BSGS_RHO"',1)),
+              ('duplicate_record',source+"\n"+next(line for line in source.splitlines() if line.startswith("CT330_PAIRED_JSON "))+"\n"),
+              ('duplicate_json_key',source.replace('"round":0','"round":0,"round":0',1)),
+              ('missing_terminal',source.replace('CT330_THREE_PAIRED_Q73_COMPLETE','CT330_TERMINAL_REMOVED',1)),
+          ]
+          for label,mutant in mutations:
+              if mutant == source:
+                  raise AssertionError('mutation did not change actual native record '+label)
+              try: audit(mutant)
+              except (ValueError,KeyError,TypeError,AssertionError):
+                  print('CT330_MUTATION_REJECTED',label)
+              else: raise AssertionError('accepted bad record '+label)
+          print('CT330_AUDIT_CONTROLS_PASS 5 pcc=unverified')
+          PY
+          echo 'CT330_SCOPE_PASS paired original F103 rho/BSGS only; NOT original complete cold IC or 695/701 norm-point transfer'
+ /tmp/ct330-python.txt)" -eq 1
+      - name: Build exact-source Rust and execute three bounded matched pairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustc --version
+          rustc --edition=2021 -O --test /tmp/ct330-native.rs -o /tmp/ct330-tests
+          /tmp/ct330-tests --test-threads=1 --nocapture 2>&1 | tee /tmp/ct330-native.log
+          test "$(grep -c 'CT327_CORRECTNESS_PASS logs=109 mutations=110 ' /tmp/ct330-native.log)" -eq 1
+          test "$(grep -c '^CT330_PAIRED_JSON ' /tmp/ct330-native.log)" -eq 3
+          test "$(grep -c '^CT330_THREE_PAIRED_Q73_COMPLETE ' /tmp/ct330-native.log)" -eq 1
+          grep 'test result: ok. 2 passed; 0 failed' /tmp/ct330-native.log
+          python3 -B research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct330_audit.py --native-log /tmp/ct330-native.log
+      - name: Record parser tampering controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'research/chained_jacobian_transfers_20261110/toy_dlp_ct204')
+          from ct330_audit import audit
+          source=Path('/tmp/ct330-native.log').read_text()
+          audit(source)
+          mutations=[
+              ('wrong_scalar',source.replace('"rho_log":73','"rho_log":72',1)),
+              ('wrong_order',source.replace('"RHO_BSGS"','"BSGS_RHO"',1)),
+              ('duplicate_record',source+"\n"+next(line for line in source.splitlines() if line.startswith("CT330_PAIRED_JSON "))+"\n"),
+              ('duplicate_json_key',source.replace('"round":0','"round":0,"round":0',1)),
+              ('missing_terminal',source.replace('CT330_THREE_PAIRED_Q73_COMPLETE','CT330_TERMINAL_REMOVED',1)),
+          ]
+          for label,mutant in mutations:
+              if mutant == source:
+                  raise AssertionError('mutation did not change actual native record '+label)
+              try: audit(mutant)
+              except (ValueError,KeyError,TypeError,AssertionError):
+                  print('CT330_MUTATION_REJECTED',label)
+              else: raise AssertionError('accepted bad record '+label)
+          print('CT330_AUDIT_CONTROLS_PASS 5 pcc=unverified')
+          PY
+          echo 'CT330_SCOPE_PASS paired original F103 rho/BSGS only; NOT original complete cold IC or 695/701 norm-point transfer'
