@@ -169,6 +169,70 @@ fn gain_dsu_refuses_wide_rows_and_bad_modulus() {
 }
 
 #[test]
+fn gain_dsu_direct_admission_is_atomic_and_preserves_rank() {
+    let mut dsu = GainDsu::new(3, 7).unwrap();
+    let initial = vec![(0, 1), (1, 2)];
+    dsu.add_row(&initial).unwrap();
+    let before = dsu.snapshot();
+    assert_eq!((before.rows, before.rank, before.left_nullity), (1, 1, 0));
+
+    // A duplicated column can masquerade as a new independent cycle if
+    // accepted without first combining coefficients. Both versions must fail.
+    for bad in [
+        vec![(0, 0)],
+        vec![(0, 7)],
+        vec![(0, 8)],
+        vec![(0, 1), (0, 2)],
+        vec![(1, 1), (1, 1)],
+    ] {
+        assert_eq!(
+            dsu.add_row(&bad),
+            Err(LpGraphError::NonCanonicalRow { row: before.rows })
+        );
+        assert_eq!(dsu.snapshot(), before, "rejection changed rank metadata");
+    }
+    assert_eq!(
+        dsu.add_row(&[(3, 1)]),
+        Err(LpGraphError::ColumnOutOfRange { column: 3 })
+    );
+    assert_eq!(dsu.snapshot(), before);
+    assert_eq!(
+        dsu.add_row(&[(0, 1), (1, 1), (2, 1)]),
+        Err(LpGraphError::RowTooWide { row: 1, entries: 3 })
+    );
+    assert_eq!(dsu.snapshot(), before);
+
+    // A refused row must not consume a stream index. The later legitimate
+    // closing edge still gives the same exact rank as dense elimination.
+    let accepted = vec![vec![(1, 1), (2, 1)], vec![(2, 1), (0, 1)]];
+    for row in &accepted {
+        dsu.add_row(row).unwrap();
+    }
+    let rows = [vec![(0, 1), (1, 2)], accepted[0].clone(), accepted[1].clone()];
+    assert_eq!(dsu.snapshot().rows, rows.len());
+    assert_eq!(dsu.rank(), dense_rank(&rows, 3, 7).unwrap());
+    assert_eq!(dsu.rank(), 3);
+}
+
+#[test]
+fn gain_dsu_noninvertible_refusal_keeps_stream_counters() {
+    // A composite modulus violates the caller's field precondition. Even
+    // so, a refused nonunit pivot must not increment rows or union counters.
+    let mut dsu = GainDsu::new(2, 9).unwrap();
+    let before = dsu.snapshot();
+    assert_eq!(
+        dsu.add_row(&[(0, 1), (1, 3)]),
+        Err(LpGraphError::NonInvertible { value: 3 })
+    );
+    assert_eq!(dsu.snapshot(), before);
+    assert_eq!(
+        dsu.add_row(&[(0, 1), (1, 1)]),
+        Ok(GainRowEffect::Union { rank_increment: 1 })
+    );
+    assert_eq!((dsu.snapshot().rows, dsu.rank()), (1, 1));
+}
+
+#[test]
 fn lp_index_combines_repeats_and_drops_zeros() {
     let stream = vec![PartialRelation {
         id: 9,
