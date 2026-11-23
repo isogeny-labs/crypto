@@ -30,7 +30,8 @@ fn factorbase_prefix(max: usize, ar: &mut Arithmetic) -> Vec<(u64,u64)> {
     assert_eq!(xs.len(),max,"did not reproduce the prior W");
     let mut out=Vec::new();
     for x in xs {
-        let y=ar.sqrt(ar.rhs(PRIME31,x),P).expect("rational factor base");
+        let rhs=ar.rhs(PRIME31,x);
+        let y=ar.sqrt(rhs,P).expect("rational factor base");
         assert_ne!(y,0,"odd-order curve cannot contain 2-torsion");
         let point=(x,y.min(P-y));
         assert!(ar.on_curve(PRIME31,Some(point)));
@@ -51,10 +52,10 @@ fn exact_support(base: &[(u64,u64)], ar: &mut Arithmetic) -> serde_json::Value {
         for &q in &base[i..] {
             // Group laws applied only in this independent reference scorer.
             // The ± sign orbit of {p+q,p-q} is all 4 signed combinations.
-            for target in [
-                ar.add(PRIME31,Some(p),Some(q)),
-                ar.add(PRIME31,Some(p),ar.neg(PRIME31,Some(q)))
-            ] {
+            let minus_q=ar.neg(PRIME31,Some(q));
+            let plus=ar.add(PRIME31,Some(p),Some(q));
+            let difference=ar.add(PRIME31,Some(p),minus_q);
+            for target in [plus,difference] {
                 if let Some((x,y))=target {
                     assert!(ar.on_curve(PRIME31,target),"reference off curve");
                     x_hits.insert(x);
