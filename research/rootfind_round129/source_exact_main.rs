@@ -34,7 +34,7 @@ fn main() {
     optimized::round129_independent_oracle();
     println!("independent correctness oracle: PASS, both production Rust sources, 5 fields");
     for p in [65_521u64, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
-        for op in ["psi3", "cubic_monic", "cubic_scaled3",
+        for op in ["isogeny2", "isogeny3", "psi3", "cubic_monic", "cubic_scaled3",
             "quartic_monic", "quartic_scaled3", "quartic_random"] {
             let repetitions = 10usize;
             let (a, _) = baseline_run(op, p, 1);
