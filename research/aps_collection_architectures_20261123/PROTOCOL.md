@@ -31,6 +31,7 @@ for the still-open growing-size/exponent goal in PR #4531.
   Qualification requires four planned/attempted/completed, zero exclusions.
 - No timing, host capsule, performance profile, cloud experiment or scaling
   run. Counts are diagnostic and unpriced. No success threshold on a speedup.
+  [pcc:unverified]
 
 ## Accounting and integration gaps
 
@@ -75,3 +76,6 @@ changed to explicitly repeated draw pairs; the assertion was retained.
 Initial strict Clippy found an index-only row loop. Replaced it with a cloned
 pivot row and zipped mutable iteration; no lint suppression or weakened check.
 Original logs remain private. Later checks keep their own source boundaries.
+
+Post-call editorial note: the unverified tag above was added for prose lint;
+the workload and acceptance rules are unchanged from the source-pinned plan.
