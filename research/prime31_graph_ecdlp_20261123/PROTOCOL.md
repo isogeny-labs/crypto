@@ -89,6 +89,51 @@ implementation uses x-keyed sign variants and must be measured separately.
 An improvement requires a source with conditional yield, per-probe cost,
 or projected-rank behavior outside this model, with exact group replay.
 
+## Algebraic partial producer to qualify next
+
+The repository's RR5 public four-summand extractor is a specific candidate
+outside the pair-table screen. For a public query `R=aG+bQ=(r,s)` on a curve
+`y²=x³+Ax+B`, it constructs a monic quartic `U_R(X)` whose four distinct
+roots lift to signed points summing to `R`. Its complete-relation form
+requires all four roots in the factor base. A one-LP form would use disjoint
+abscissa selectors `h_F` and `h_L` and accept only a recovered quartic with
+exactly three roots in `h_F`, one root in `h_L`, and a verified signed point
+sum. It would emit the actual equation
+
+`aG+bQ = ε₁F_i+ε₂F_j+ε₃F_k+ε₄L_t`.
+
+The external point `L_t` must carry a stable identity across queries; it
+cannot be relabelled by abscissa alone because the sign is part of the row.
+For a fixed disjoint base of `B` abscissae and LP pool of `S` abscissae, a
+uniform `R` has exactly `16*C(B,3)*S/n` expected **signed witness tuples**
+per draw in the three-base/one-LP family, compared with
+`16*C(B,4)/n` in the four-base family. This follows by linearity of
+expectation over signed tuples, even when several tuples have the same sum.
+Their ratio is `4S/(B-3)` for `B≥4`. It is a witness-count ratio, not a
+probability of successful extraction or independent-row yield. In particular,
+it does not include the cost of building and solving the enlarged selector
+system, the occupancy loss `E-U`, or the factor-base rank of its projection.
+
+The published RR5 Prime31 controls use
+`E:y²=x³+847514846x+2087444724`, order `2147446831`, whereas this study's
+registered curve is `E:y²=x³-3x+21`, order `2147487637`. Its completed B8
+controls and public-query recovery on a smaller field establish neither
+extractor completion nor useful graph rank on this registered curve. The
+existing B677 input-construction check is likewise not an extraction result.
+
+The first falsifier is a fixed, source-replayed panel on the registered curve:
+use a disjoint public base and LP pool, retain `Complete`, `Empty`, and every
+incomplete extractor state separately, replay every signed equation, then
+measure accepted `E`, occupied `U`, projected factor-base rank, wall time,
+CPU time, and memory against the same queries with four-base extraction.
+Count selector construction, Groebner work, roots, signs, group replays,
+graph elimination, linear algebra, target recovery, and failed queries.
+If the larger signed witness family does not produce useful rank at a lower
+cold cost than direct rows and matched negation-map rho, it does not advance
+the end-to-end boundary. Only after this gate should gain-aware DSU,
+two-core filtering, low-stretch forest, MST, matching/DM, and block
+Wiedemann be evaluated on the actual partial stream.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on
