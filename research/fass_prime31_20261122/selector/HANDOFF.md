@@ -27,3 +27,5 @@ The PR stays draft because current-main integration, whole-library qualification
 Pages searches and an inventory request returned no usable result before the execution runtime reset. No Page was edited. When the connector responds, find and freshly read the existing FASS research page or ECDLP benchmark tracker before reconciling its status; do not create a duplicate from a failed lookup.
 
 There are no research runs in flight from this work.
+
+The immutable selector source/evidence commit is `883e2d2dda223ae1b8eafdc83b289a49fa178855`. The intended unsigned statement is `PCC-20261123-b6b455`; `PCC-20261123-f307d3` is retained only as a superseded administrative record with the earlier producer commit. Preserve concurrent coupled-study commit `2ac638f69c95e9966ce8dd29505b67337d6a9bba` when updating the lane. [pcc:unverified]
