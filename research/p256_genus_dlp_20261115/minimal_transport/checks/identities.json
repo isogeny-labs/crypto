@@ -1,0 +1,573 @@
+[
+  {
+    "schema": "identity.certificate/v1",
+    "id": "IDC1h82e7e46ec2f57561",
+    "statement": {
+      "name": "quadraticNorm reciprocal-root factorization",
+      "source": "CryptoLean.quadraticNorm_reciprocal_factorization at f74b0e8; generic integer proof already kernel-gated",
+      "variables": [
+        "t",
+        "u",
+        "a",
+        "b",
+        "ell"
+      ],
+      "degree_bound": 5,
+      "lhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "t"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "var",
+                "args": "b"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "u"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "b"
+                  },
+                  {
+                    "op": "var",
+                    "args": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 1
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "t"
+                        },
+                        {
+                          "op": "var",
+                          "args": "ell"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "u"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "ell"
+                          },
+                          {
+                            "op": "var",
+                            "args": "ell"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "b"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "ell"
+                      },
+                      {
+                        "op": "var",
+                        "args": "a"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "u"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "t"
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "op": "var",
+                                  "args": "u"
+                                },
+                                {
+                                  "op": "var",
+                                  "args": "ell"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "modulus": 2305843009213693951,
+    "points": 32,
+    "seed": 2026111517,
+    "value_digest": "9246e983ce8809e6a487987b7a042dd2b35115a77e9103befa2ff795e3cc6899",
+    "independence": "Supplemental serialization/replay with the unchanged existing checker after the Lean kernel proof; same producer, no independent signer and no candidate qualification",
+    "proof": {
+      "kind": "lean4",
+      "path": "https://github.com/aburan28/crypto-lean/blob/f74b0e8bd3815fdf2adae5b180431fc94d2be107/CryptoLean/Curve/QuadraticNormTransport.lean",
+      "sha256": "18ec943fc3e511cd21b40e353f54f4913f73e1149b5f4f67f40a4c0088f6248d"
+    }
+  },
+  {
+    "schema": "identity.certificate/v1",
+    "id": "IDC1h8068f6a8ac2949f7",
+    "statement": {
+      "name": "Eisenstein norm as three squares",
+      "source": "CryptoLean.eisenstein_norm_doubled at f74b0e8; kernel-gated over integers",
+      "variables": [
+        "a",
+        "b"
+      ],
+      "degree_bound": 2,
+      "lhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "const",
+            "args": 2
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": -1
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "b"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 1
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "b"
+              },
+              {
+                "op": "var",
+                "args": "b"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "modulus": 2305843009213693951,
+    "points": 32,
+    "seed": 2026111517,
+    "value_digest": "fc0f87caeb5bed47e58cbfbf585dc7c7f08d16be1a18c059eda8f51fad7f8710",
+    "independence": "Supplemental serialization/replay with the unchanged existing checker after the Lean kernel proof; same producer, no independent signer and no candidate qualification",
+    "proof": {
+      "kind": "lean4",
+      "path": "https://github.com/aburan28/crypto-lean/blob/f74b0e8bd3815fdf2adae5b180431fc94d2be107/CryptoLean/Curve/QuadraticNormTransport.lean",
+      "sha256": "18ec943fc3e511cd21b40e353f54f4913f73e1149b5f4f67f40a4c0088f6248d"
+    }
+  },
+  {
+    "schema": "identity.certificate/v1",
+    "id": "IDC1h0e308c2151b7d837",
+    "statement": {
+      "name": "Eisenstein rotation preserves norm",
+      "source": "CryptoLean.eisenstein_norm_rotate at f74b0e8; kernel-gated over integers",
+      "variables": [
+        "a",
+        "b"
+      ],
+      "degree_bound": 2,
+      "lhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "neg",
+                "args": {
+                  "op": "var",
+                  "args": "b"
+                }
+              },
+              {
+                "op": "neg",
+                "args": {
+                  "op": "var",
+                  "args": "b"
+                }
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": -1
+              },
+              {
+                "op": "neg",
+                "args": {
+                  "op": "var",
+                  "args": "b"
+                }
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 1
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "a"
+                      },
+                      {
+                        "op": "neg",
+                        "args": {
+                          "op": "var",
+                          "args": "b"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "a"
+                      },
+                      {
+                        "op": "neg",
+                        "args": {
+                          "op": "var",
+                          "args": "b"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "rhs": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": -1
+              },
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "var",
+                "args": "b"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 1
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "b"
+                  },
+                  {
+                    "op": "var",
+                    "args": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "modulus": 2305843009213693951,
+    "points": 32,
+    "seed": 2026111517,
+    "value_digest": "18451f6a3197abd70cc60f4cbe771ef645b79f179fbedbb7b6e24438a63a2a56",
+    "independence": "Supplemental serialization/replay with the unchanged existing checker after the Lean kernel proof; same producer, no independent signer and no candidate qualification",
+    "proof": {
+      "kind": "lean4",
+      "path": "https://github.com/aburan28/crypto-lean/blob/f74b0e8bd3815fdf2adae5b180431fc94d2be107/CryptoLean/Curve/QuadraticNormTransport.lean",
+      "sha256": "18ec943fc3e511cd21b40e353f54f4913f73e1149b5f4f67f40a4c0088f6248d"
+    }
+  }
+]

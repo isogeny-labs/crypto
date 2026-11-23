@@ -1,0 +1,14 @@
+[package]
+name = "dedupe-measure"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Edges, exact counts and charged steps of hashed-ecdl-tensor decomposition networks and solves, run unchanged against two crate revisions."
+
+[dependencies]
+hashed-ecdl-tensor = { path = "../../../crates/hashed-ecdl-tensor" }
+num-bigint = "=0.5.1"
+num-traits = "0.2"
+serde_json = "1"
+
+[workspace]

@@ -1,5 +1,7 @@
 # Item 03 protocol: trace-zero pre-filter and free relations on the compact-orbit IC
 
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands.
+
 Frozen 2026-10-14, before any arm data. Rules: [`../RULES.md`](../RULES.md).
 
 ## Incumbent

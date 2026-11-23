@@ -1,0 +1,578 @@
+{
+  "schema": "pencil.continuation_protocol_field_proposal/v1",
+  "created_utc": "2026-10-31T00:26:19Z",
+  "status": "draft_fields_not_canonical_not_frozen_not_admitted",
+  "intended_final_schema": "experiment.protocol/v1",
+  "canonical_protocol_validation_performed": false,
+  "independent_review": null,
+  "scientific_execution_authorized_by_this_document": false,
+  "known_data": {
+    "prior_run": "pencil-p186379-20261030-c1",
+    "observed_executions": 7,
+    "observed_measured_executions": 4,
+    "missing_executions": 11,
+    "pencil_watchdog_timeouts": 2,
+    "pencil_solves": 0,
+    "qualified_ratios": null,
+    "prior_records_enrolled_as_replacement_successes": false,
+    "preserve_b1_c1_and_all_prior_costs": true,
+    "filed_before_prior_observations": false,
+    "filed_before_new_affected_data": null,
+    "source": "research/pencil_large_prime_20261029/protocol_draft/post_c1_continuation_20261030/PLAN.md",
+    "source_sha256": "f96fd643684f260b1ddee4509087f0f32a8154ab30ff8c234f140ae88fb03137"
+  },
+  "proposed_change": {
+    "kind": "diagnostic_instrument_and_custody_only",
+    "algorithm_change": false,
+    "early_rejection_integrated": false,
+    "new_source_commit": null,
+    "new_binary_sha256": null,
+    "new_image_digest": null,
+    "request_binding": null,
+    "donor_algorithm_and_counter_equivalence_review": null,
+    "performance_gain_claim": null,
+    "purpose": "Observe explicitly scoped lifecycle, retained prefix counters and resource custody under unchanged mathematical inputs; characterize missing work without treating partial observations as completed prices.",
+    "source_manifest_sha256": null,
+    "runtime_archive_sha256": null,
+    "controller_package_sha256": null,
+    "owner_binary_sha256": null,
+    "build_toolchain_flags_receipt": null,
+    "runtime_qualification_receipt": null,
+    "published_versioned_artifact_receipt": null,
+    "actual_owner_custody": null,
+    "actual_job_and_pod_identity": null,
+    "campaign_reservation_receipt": null,
+    "actual_prepared_session_binding": null,
+    "ordered_actual_context_subset_binding": null
+  },
+  "resource_envelope": {
+    "recorded_utc": "2026-10-30T23:12:46.615469+00:00",
+    "cumulative_active_worker_seconds": 25200,
+    "absolute_deadline_utc": "2026-10-31T06:00:00Z",
+    "maximum_concurrent_scientific_payloads": 1,
+    "prior_allowances_reset": false,
+    "charged": [
+      "candidate",
+      "rho",
+      "rho_AA",
+      "warmups",
+      "independent replay/audit execution",
+      "fresh validation",
+      "recovery",
+      "failed attempts",
+      "diagnostic and owner work",
+      "active collection/report work"
+    ],
+    "proposed_collection_reserve_seconds": 1800,
+    "proposed_latest_scientific_stop_utc": "2026-10-31T05:30:00Z",
+    "collection_reserve_basis": "Scheduling reserve for terminal custody collection, versioned retrieval, native analysis and review; not a measured duration or guarantee. All active worker work within it remains charged. It does not authorize extending either deadline or cumulative cap.",
+    "effective_stop_rule": "Earliest of verified cumulative worker exhaustion, reviewed actual reservation cutoff, and proposed05:30UTC payload cutoff; no collection or recovery past06:00UTC. Tighten earlier if terminal custody/grace cannot fit1800-second planning reserve. Remaining allowance must come from owner ledger, never wall-clock subtraction.",
+    "remaining_active_worker_seconds": null,
+    "owner_enforcement_review": null,
+    "operational_request_deadline": null,
+    "resource_authorization_binding": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/continuation-planning-20261030/authorization.json",
+      "sha256": "4298c27d695cea6f0c2ea8d9e8dfe372154f5737aa32098dace6f9d04dc4c856"
+    },
+    "authorization_scope": "planning_limits_only"
+  },
+  "cohort": {
+    "models": 21,
+    "targets_per_model": 60,
+    "workloads": 1260,
+    "arms": [
+      "pencil",
+      "rho",
+      "rho_AA"
+    ],
+    "measured_streams_per_arm": 5,
+    "warmups_per_arm": 1,
+    "base_executions": 22680,
+    "measured_arm_executions": 18900,
+    "warmup_executions": 3780,
+    "measured_candidate_reference_pairs": 6300,
+    "pricing_cells": 36,
+    "original_target_seed_stream_and_sequence_mapping_preserved": true,
+    "enrollment_scope": "full1260-disjoint-p739/v1",
+    "prior_p739_reuse_admission": null,
+    "plans": [
+      {
+        "name": "gate-p739.json",
+        "sha256": "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776",
+        "workloads": 60,
+        "executions": 1080,
+        "classification": "prior_gate_reuse_only_if_admitted"
+      },
+      {
+        "name": "cohort-16-remainder-plan.json",
+        "sha256": "39b73d2a2ffbab3deec9dbdf9857af15a66607ca8843b8f29c64cd94c7d2d9c9",
+        "workloads": 120,
+        "executions": 2160,
+        "classification": "prospective_remainder"
+      },
+      {
+        "name": "cohort-20.json",
+        "sha256": "51a99e83c38b4d5d6b19f82337918b2f64f34b4934a5361298e84fc2f8bd432f",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-24.json",
+        "sha256": "7d34d0ce87c5a167ee1e94fecb08bcac34c9b4339570deb6377effe75efc28c4",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-28.json",
+        "sha256": "87760bc68b7598250c22976f15e4dbb36b5f2d738647de501222de1a8b27b001",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-32.json",
+        "sha256": "a9aebbc3120b61380a6936408635ac0f0e60715b4b4918dc826fbab4b578ae96",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-36.json",
+        "sha256": "6bb162d846bfbfe68b1bf7ba330abbc1e11c403b003215c960e7e71d81be3aa2",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-40.json",
+        "sha256": "8f2ec73a139f84b660573bd67c54ebfc567626ce7068a135dcb52c61891b22d5",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      }
+    ],
+    "timing_reuse_boundary": "Finite non-wall reuse does not qualify old p739 clocks. Full1260 individual-timing completion still requires qualified clock rows for those60targets; any additional fresh validation is separately charged and prospectively bound, not silently omitted."
+  },
+  "proposed_gate": {
+    "status": "proposed_one_changed_instrument_gate_pending_scientific_review",
+    "workload": "p186379-target0",
+    "plan_sha256": "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf",
+    "workloads": 1,
+    "base_executions": 18,
+    "measured_arm_executions": 15,
+    "warmup_executions": 3,
+    "measured_pairs": 5,
+    "enrolled_in_full_cohort": false,
+    "charged_separately_to_same_envelope": true,
+    "maximum_new_scientific_gate_attempts_proposed": 1,
+    "automatic_scientific_retry": false,
+    "per_execution_timeout_seconds_proposed": 3600,
+    "memory_gib_proposed": 8,
+    "matrix_coefficient_cap_proposed": 25000000,
+    "runtime_estimate_seconds": null,
+    "complete_gate_required_before_remainder": true,
+    "independent_non_wall_replay_measured_executions": 15,
+    "independent_review_required_before_remainder": true,
+    "incomplete_capped_wrong_answer_or_invalid_stops_extension": true,
+    "same_failed_instrument_retry_authorized": false
+  },
+  "metrics": {
+    "primary": "existing exact disjoint finite-count model; complete denominators only",
+    "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+    "square_prices": [
+      0,
+      0.5,
+      1
+    ],
+    "inverse_prices": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_prices": [
+      0,
+      0.1,
+      1
+    ],
+    "analysis_source_binding": null,
+    "coverage_review": null,
+    "partial_counter_prices_are_completed_costs": false,
+    "diagnostic_io_or_wall_converted_to_GAE": false,
+    "timing_qualified": false,
+    "timing_completion_obligation_preserved": true,
+    "missing_failed_or_capped_pairs": "retain explicit rows and null ratios; no survivor-only complete aggregate",
+    "finite_aggregate": "retain existing exact ratio-of-complete-sums contract and all36cells; no new rank or speed verdict",
+    "diagnostic_endpoint": {
+      "estimand": "run_session_origin_to_owner_post_reap_evidence_sync",
+      "scope": "Includes owner evidence read and sync; excludes process startup/input acquisition and subsequent owner receipt publication. Distinct from exact kernel/runner exit latency and scientific method clocks.",
+      "authenticated_owner_custody_required": true,
+      "exact_runner_exit_ns": null,
+      "total_active_worker_ns": null,
+      "accepted_enclosing_closure": null,
+      "owner_receipt_publication_tail_pending": true,
+      "source_review_only": true,
+      "source_review_path": "../owner-enclosing-v2-independent-review.md",
+      "source_review_sha256": "1b17f0f85aad200feba6c8943c25e274d02578a60f26f1931a1dda8a6a38da43"
+    }
+  },
+  "controls": {
+    "reference": "rho",
+    "aa": "rho_AA",
+    "candidate": "pencil",
+    "same_new_instrument_for_new_pairs": true,
+    "source_and_answer_verification": "existing public synthetic known-answer source checks plus separately reviewed replay",
+    "arm_order_and_seeds": "unchanged exact retained plans; no post-data reseeding/reordering",
+    "prior_p739_instrument_compatibility": "independently establish finite algorithm/counter equivalence and per-plan lineage before reuse; old timing remains invalid",
+    "prior_p739_replay_requirement": "Bind independent replay or independently reviewed exact non-wall equivalence to the actual original fresh-session rows. The computation epoch 900 reproduced measured executions alone does not certify those fresh-session rows. Preserve original record/session/sequence identities and old invalid clocks.",
+    "baseline": {
+      "arm": null,
+      "not_applicable_reason": "No candidate-vs-old-instrument performance claim. Historical failed C1 observations remain separate, not a matched baseline or replacement arm. Current pencil/rho/rho_AA retain existing algorithm identities; instrumentation equivalence requires prospective review."
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every fixed public fixture contains a known synthetic answer checked in child and independently by parent/source audit; a wrong answer invalidates the execution. These checks exercise the same method path; no fourth arm is introduced.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "No detection or enrichment/null-population claim. Deterministic rejection fixtures for altered identity, wrong equation, cap, missing phases and missing partners validate the analysis separately before freeze; they are not timed cohort samples.",
+      "null_population": null,
+      "present": false
+    }
+  },
+  "pending_final_protocol_blocks": [
+    "allocate/review correct additive protocol lineage and version without reusing p739-only scope identity",
+    "complete actual instrument/source/build/binary/image/request/owner/analysis bindings",
+    "qualify deployed runtime and terminal custody, including deadline/signal/retention behavior",
+    "resolve individual timing design and prior p739 exact-fresh-row reuse applicability",
+    "independent prospective review of known-C1 changed-instrument response and full variable/metric ledger",
+    "validate canonical experiment.protocol/v1, freeze before affected data, commit/publish exact bytes",
+    "reconcile live owner/EKS/campaign ledger and prepare actual single-session/context subset before any admission"
+  ],
+  "freeze": null,
+  "launch_request": null,
+  "supersedes_author_draft": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/known-c1-amendment-draft/amendment-draft-v2.json",
+    "sha256": "71f4c719107093feec983b34e965c59fb336c6020ef2c9d526aebd4ed4d7e045"
+  },
+  "protocol_id": null,
+  "version": null,
+  "claims": [
+    {
+      "id": "finite_count_observations",
+      "class": "exact_computation",
+      "text": "Report complete fixed-denominator finite model prices in all36cells, algorithm-only and calibration-inclusive separately; missing pairs yield null complete aggregate."
+    },
+    {
+      "id": "method_comparison",
+      "class": "comparative",
+      "comparison": "C-method",
+      "text": "Report exact candidate/reference ratios only within individually qualified complete paired scopes; no superiority or significance verdict."
+    },
+    {
+      "id": "clock_observations",
+      "class": "comparative",
+      "comparison": "C-method",
+      "text": "Individual cold and online ratios require their own L2/five-stream A/A qualification; diagnostic lifecycle clocks cannot substitute."
+    },
+    {
+      "id": "lifecycle_diagnostics",
+      "class": "exact_computation",
+      "text": "Retain verified partial counters, byte totals and observed endpoint differences with explicit missing closure; not completed work prices."
+    },
+    {
+      "id": "global_complexity_or_general_cryptanalysis",
+      "class": "out_of_scope",
+      "text": "No asymptotic, novelty or general solver conclusion from this diagnostic continuation."
+    }
+  ],
+  "randomization": {
+    "arm_order": "randomized",
+    "arm_order_reason": "Prepared measurement.order=shuffle, with interleaved workload/round scheduling; plan bytes frozen before observations.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Known deterministic fixtures and method structures already observed; report unblinded descriptive measurements, not out-of-sample discovery or significance.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "All exact1260 original workloads across8disjoint enrolled plans; separate1workload18slot upper gate. No resampling, reseeding, arm reordering or replacement of cohort32 occurrence by gate."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "Prepared spec measurement.seed=2026101801 and algorithm_seed_round=measured_index. Native ecbench plan resolves per-workload archived seed at measured index0 and predetermined streams1..4. Exact decimal algorithm_seed, absolute round and sequence retained; all three arms must match within pair.",
+      "seeds": []
+    }
+  },
+  "sample_size": {
+    "cohort_instances": 1260,
+    "upper_gate_instances": 1,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "other",
+      "min_attainable_two_sided_p": null,
+      "note": "Fixed complete cohort for descriptive reproducibility, not a powered hypothesis test. Five streams characterize observed range only. The [0.90,1.10] rule is operational admission, not a confidence interval; alpha is schema-required and unused. No significance or power claim.",
+      "passes": false,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "estimated_total_seconds": null,
+      "note": "Known two pencil watchdog timeouts retained;25200seconds is authorization ceiling, not runtime estimate. Review actual measured costs and feasibility before execution; preserve missing denominator if time expires."
+    }
+  },
+  "variable_ledger": {
+    "aa_not_applicable": null,
+    "comparisons": [
+      {
+        "arms": [
+          "pencil",
+          "rho"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ],
+        "id": "C-method"
+      },
+      {
+        "arms": [
+          "rho_AA",
+          "rho"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "C-aa"
+      }
+    ],
+    "crosses_map": true,
+    "factors": [
+      {
+        "how": "21 models x60 exact archived targets; all arms share workload SHA and original source equation.",
+        "name": "workload",
+        "treatment": "fixed",
+        "value": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339"
+      },
+      {
+        "how": "One immutable source commit, lockfile, flags, binary and image for all arms; unresolved hashes block freezing.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Single method thread; pin physical-core placement and SMT sibling exclusion before execution.",
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "Record instance ID/type, CPU model/microcode, SMT, affinity, NUMA, kernel, hypervisor, governor/frequency, steal, PSI, co-tenants and isolation blockers. Reject timed rows below L2; no cross-host timing pooling after recovery.",
+        "name": "host",
+        "treatment": "measured"
+      },
+      {
+        "how": "Dedicated qualified L2 c8a.2xlarge Spot placement; no heterogeneous fallback.",
+        "name": "placement",
+        "treatment": "fixed",
+        "value": "c8a.2xlarge"
+      },
+      {
+        "how": "8GiB execution cap, same allocator preparation/environment for every arm; record actual RSS, allocator, ASLR and resolved environment. No memory-cap increase.",
+        "name": "memory_environment",
+        "treatment": "fixed",
+        "value": 8
+      },
+      {
+        "how": "Use existing prepared spec shuffle rule and seed2026101801; freeze emitted plan bytes before data. Interleave all three arms in each workload/round.",
+        "name": "arm_order",
+        "treatment": "randomized"
+      },
+      {
+        "how": "Five predetermined measured streams per workload shared exactly across all three arms; index0 preserves archived seed; indices1..4 are new streams, not repeat measurements of index0.",
+        "name": "algorithm_stream",
+        "treatment": "crossed"
+      },
+      {
+        "how": "One warmup execution per arm/workload; retain records but exclude from ratios.",
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "Retain checkpoint, interruption and restore records; resumed execution clocks invalid. Restart only under frozen infrastructure retry limit, never restart a scientific cap.",
+        "name": "preemption",
+        "treatment": "measured"
+      },
+      {
+        "how": "Unblinded deterministic native exporter; no hand-selected workloads, thresholds or best stream. External reviewer receives all rows and reasons.",
+        "name": "analyst",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Retain DefaultHasher/BuildHasherDefault policy version1 and exact resolved rho semantics. Actual final compiler/source/binary pins are unresolved and must establish equivalence; do not silently import historical clock comparability.",
+        "name": "rho_hash_policy",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "pencil-algorithm-cost/atomic-scalar-disjoint-v1; source-bound nine-category independent coverage required.36cells, symmetric scalar inverse normalization, disjoint primitive registry, separate algorithm/calibration/resource boundaries.",
+        "name": "finite_operation_model",
+        "treatment": "fixed",
+        "value": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8"
+      },
+      {
+        "name": "diagnostic_callbacks_and_publication",
+        "treatment": "fixed",
+        "how": "Same prospective instrument/profile across all three arms; bind exact callback and I/O semantics and retain costs. Source parity alone cannot qualify timing."
+      },
+      {
+        "name": "owner_and_campaign_enforcement",
+        "treatment": "fixed",
+        "how": "One owner and one active scientific payload; fixed authenticated accounting/stop semantics; actual job/pod/session IDs measured and bound after preparation."
+      },
+      {
+        "name": "legacy_reuse",
+        "treatment": "measured",
+        "how": "Prior p739 exact fresh-row finite equivalence/replay must be reviewed for changed instrument; old clocks remain invalid and are never pooled into qualified fresh timing."
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "ic.three_leads_genus2_pencil_symbolic_v2",
+          "rho.three_leads_negation_v1"
+        ],
+        "name": "method"
+      }
+    ],
+    "transfer_obligations": [
+      {
+        "mapping": "source elliptic curve to mapped genus-2 Jacobian",
+        "requirement": "Verify domain/model/transfer identity on frozen fixtures; verify accepted geometric relations and returned synthetic answer on original source curve. Charge candidate setup and transfer inside method call; do not infer universal transfer theorem from finite checks."
+      }
+    ]
+  },
+  "metric_field_mapping_file": "metric-map.csv",
+  "individual_timing_rule": "All five rho_AA/rho ratios separately in[0.90,1.10] for cold and online; exact integer check90*rho<=100*rho_AA<=110*rho.",
+  "decisions": {
+    "vocabulary": [
+      "qualified_observation",
+      "incomplete",
+      "capped",
+      "invalid_measurement",
+      "unknown"
+    ],
+    "scope": "Unblinded descriptive finite exact observations; no new significance or speed verdict. All5stream pairs required; preserve incomplete/invalid/capped/null. Counted qualification does not imply clock qualification.",
+    "gate_to_remainder": "No remainder automatically; one prospectively reviewed changed-instrument gate, all18slots accounted/completed and all15measured independently replayed, correctness and applicable finite+individual-timing checks reviewed before extension. Any cap/incomplete/wrong-answer/invalid result stops extension."
+  },
+  "execution_proposal": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "measurement_class": "measurement",
+    "maximum_concurrent_scientific_payloads": 1,
+    "threads": 1,
+    "per_execution_seconds": 3600,
+    "memory_bytes": 8589934592,
+    "matrix_coefficient_cap": 25000000,
+    "fresh_benchmark_epoch": {
+      "isolation_required": "L2",
+      "checkpoint_policy": "none",
+      "restore_clock_admission": false,
+      "note": "Retain historical computation/checkpoint observations separately. No new computation epoch is silently admitted by this field proposal."
+    },
+    "infrastructure_retry_proposal": {
+      "max_attempts": 2,
+      "infrastructure_only": true,
+      "same_inputs_and_remaining_allowance": true,
+      "scientific_cap_retry": false,
+      "owner_review_binding": null
+    },
+    "scientific_gate_attempts": 1,
+    "actual_native_request": null
+  },
+  "metric_policy": "Preserve existing finite formula and source fields; additional lifecycle mapping is diagnostic. No conversion of bytes/wall/RSS/allocator/infrastructure intoGAE. All separately charged resources remain reported.",
+  "arms": [
+    {
+      "description": "Signed symbolic point-driven pencil collector, cold per-call construction/transfer charged. Actual prepared arm label is pencil.",
+      "id": "pencil",
+      "instrument": {
+        "binary_sha256": null,
+        "build": null,
+        "commit": null,
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": null,
+        "image_digest": null,
+        "repo": "crypto",
+        "threads": 1,
+        "binding_status": "unresolved_until_actual_final_instrument"
+      },
+      "parameters": {
+        "matrix_coefficient_cap": 25000000,
+        "method": "ic.three_leads_genus2_pencil_symbolic_v2",
+        "small_denominator": 8
+      },
+      "role": "candidate",
+      "same_instrument_as": "rho"
+    },
+    {
+      "description": "Matched source-negation rho with retained DefaultHasher collision-table policy v1; final instrument/compiler identity unresolved and finite equivalence must be reviewed.",
+      "id": "rho",
+      "instrument": {
+        "binary_sha256": null,
+        "build": null,
+        "commit": null,
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": null,
+        "image_digest": null,
+        "repo": "crypto",
+        "threads": 1,
+        "binding_status": "unresolved_until_actual_final_instrument"
+      },
+      "parameters": {
+        "method": "rho.three_leads_negation_v1",
+        "trial_cap": "resolved exact archived per-workload value"
+      },
+      "role": "reference"
+    },
+    {
+      "description": "Identical resolved rho method and algorithm seed, separate scheduled execution.",
+      "id": "rho_AA",
+      "instrument": {
+        "binary_sha256": null,
+        "build": null,
+        "commit": null,
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": null,
+        "image_digest": null,
+        "repo": "crypto",
+        "threads": 1,
+        "binding_status": "unresolved_until_actual_final_instrument"
+      },
+      "parameters": {
+        "method": "rho.three_leads_negation_v1",
+        "trial_cap": "same as rho"
+      },
+      "role": "control_aa",
+      "same_instrument_as": "rho"
+    }
+  ],
+  "source_stage": "private_proposed_fields_not_canonical_protocol"
+}

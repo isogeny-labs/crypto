@@ -1,0 +1,124 @@
+{
+  "all_passed": false,
+  "cases": [
+    {
+      "case": "compact",
+      "detail": {
+        "accepted": false,
+        "arithmetic_exit": 0,
+        "stderr": "   ? cannot open `standard.lib`\n",
+        "stdout": "CERTIFICATE_REPLAY_OK\n"
+      },
+      "expected": "accept",
+      "passed": false
+    },
+    {
+      "case": "expanded",
+      "detail": {
+        "accepted": false,
+        "arithmetic_exit": 0,
+        "stderr": "   ? cannot open `standard.lib`\n",
+        "stdout": "CERTIFICATE_REPLAY_OK\n"
+      },
+      "expected": "accept",
+      "passed": false
+    },
+    {
+      "case": "wrong-membership-coefficient",
+      "detail": {
+        "accepted": false,
+        "arithmetic_exit": 0,
+        "stderr": "   ? cannot open `standard.lib`\n",
+        "stdout": "REPLAY_FAIL:identity\n"
+      },
+      "expected": "arithmetic",
+      "passed": false
+    },
+    {
+      "case": "circular-reference",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: future/out-of-range reference\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "missing-input",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: missing input/S-pair coverage\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "missing-pair",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: missing input/S-pair coverage\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "malformed-exponent",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: malformed/duplicate cofactor\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "out-of-range-index",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: future/out-of-range reference\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "non-monic",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: non-monic basis\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "non-reduced",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: non-reduced basis\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    },
+    {
+      "case": "non-gb-forged-zero-pair",
+      "detail": {
+        "accepted": false,
+        "arithmetic_exit": 0,
+        "stderr": "   ? cannot open `standard.lib`\n",
+        "stdout": "REPLAY_FAIL:identity\n"
+      },
+      "expected": "arithmetic",
+      "passed": false
+    },
+    {
+      "case": "non-gb-true-nonstandard-pair",
+      "detail": {
+        "consumer_exit": 1,
+        "rejection": "Error: \"replay: nonstandard S-pair representation\"\n"
+      },
+      "expected": "shape",
+      "passed": true
+    }
+  ],
+  "same_constructor_basis": true,
+  "schema": "replay-qualification/v1",
+  "standing": "unsigned correctness/tamper qualification; no runtime claim"
+}

@@ -1,0 +1,56 @@
+     Locking 5 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+   Compiling autocfg v1.5.1
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling num-traits v0.2.19
+   Compiling num-integer v0.1.47
+   Compiling num-bigint v0.4.8
+   Compiling hec-normalize631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_normalize631_20261115)
+warning: function `resultant` is never used
+   --> functions.rs:160:4
+    |
+160 | fn resultant(a: &Pol, b: &Pol, f: &Field) -> E {
+    |    ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `frobh` is never used
+   --> functions.rs:222:4
+    |
+222 | fn frobh(h: &H, f: &Field) -> H {
+    |    ^^^^^
+
+warning: field `q` is never read
+  --> ../hec_kernel631_20261115/arith.rs:19:9
+   |
+17 | pub struct Field {
+   |            ----- field in this struct
+18 |     pub c: u64,
+19 |     pub q: u128,
+   |         ^
+   |
+   = note: `Field` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: associated function `new` is never used
+  --> ../hec_kernel631_20261115/arith.rs:94:12
+   |
+21 | impl Field {
+   | ---------- associated function in this implementation
+...
+94 |     pub fn new() -> Self {
+   |            ^^^
+
+warning: methods `scalar` and `operator` are never used
+   --> ../hec_kernel631_20261115/arith.rs:304:12
+    |
+228 | impl Curve {
+    | ---------- methods in this implementation
+...
+304 |     pub fn scalar(&self, a: &Div, k: &BigUint) -> Div {
+    |            ^^^^^^
+...
+322 |     pub fn operator(&self, a: &Div, cs: &[u64]) -> Div {
+    |            ^^^^^^^^
+
+warning: `hec-normalize631` (bin "normalize631") generated 5 warnings
+    Finished `release` profile [optimized] target(s) in 3.70s

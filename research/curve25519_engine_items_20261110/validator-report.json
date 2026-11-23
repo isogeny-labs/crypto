@@ -1,0 +1,196 @@
+{
+ "schema": "validator-report/v1",
+ "track": "curve25519-engine-items",
+ "track_dir": "research/curve25519_engine_items_20261110",
+ "validator": "independent adversarial validator (Claude Opus 5.5, Validator agent), 2026-11-10",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "Validated: the freeze order, the 4,160 records and their certificates, every printed README number, the frozen-prediction verdicts as scored on the records' counted work, the (A) identity and the (B) negative result. Not validated as stated: the claim that cv=0 does nothing but drop the verification ledger, and therefore A4 and the (A) and cv0-distance rows at w > 0 under the default reading. The measured cv=0 code does uncounted sign-map work (E1), so those rows are lower bounds for the cv0 arm until E1 is fixed or disclosed. E2 (a failing existing test) blocks a merge.",
+ "validated_artifact_set": {
+  "commit": "b543ece570c6e66d9c9f61c16bf941dc6d7f3bf0",
+  "commit_subject": "curve25519 engine items: 16 single-target sessions, analysis, report",
+  "branch": "claude/engine-items-20261110 (worktree /home/user/crypto-eng; 4 local commits on 0c06160e5e = origin/main: 6b9830aa2e 03:46:12Z resume state, 545749ac7d 03:48:30Z freeze hash, 2fb33b08c2 04:22:56Z test-helper fix, b543ece570 04:28:38Z data and report)",
+  "working_tree": "clean (`git status --short` empty) at the start and before this file was written. sessions/*/records.jsonl are gitignored; every one equals its session.json records_sha256 and the matching member of the committed data/sessions-k*-records.tar.gz (16/16).",
+  "binary": "/home/user/ctarget-f1/release/ecbench, sha256 af8d10db76540c741c54d441a239dd3d48fece2616463dd26f94cf8ca585c8ce (equals data/binary-k*.sha256, every session.json and every record's binary_sha256; still on disk unchanged when this report was written). /home/user/ctarget-eng/release/ecbench does not exist. Its mtime is 03:56Z, and its dep-info (release/ecbench.d) names /home/user/crypto-eng sources. The only src change after the build is the test helper in the #[cfg(test)] mod engine_items_tests (commit 2fb33b08c2), so the release binary corresponds to HEAD src. Byte identity was not re-established by a rebuild (none done, about 65 MB free disk); behavioural identity rests on the replays.",
+  "tools": "Python 3.13.18, stdlib only, own code, no producer script imported; t(0.975, 7) = 2.3646242510; ecbench verify --replay-all with the binary above on scratch copies (BENCHREC_SKIP=\"validation replay of a committed session, no new measurement\"); no CHECKPOINT_SKIP. I ran the producer's prebuilt lib test binary /home/user/ctarget-f1/release/deps/crypto_lib-24e7e65220b9e040 (built 04:22:18Z from HEAD src; nothing was built).",
+  "own_code": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/eng/v_sess.py, v_pool.py, v_pool_log.py, v_pool_log6.py, v_pool_signmap.py, v_misc.py, v_cap.py (read-only on the artifacts)",
+  "paths": [
+   "research/curve25519_engine_items_20261110/ (PROTOCOL.md, README.md, REPORT.typ/pdf, data/, specs/, sessions/, scripts/, figures/)",
+   "benchmarks/records/20261110T0357Z-curve25519-engine-items-k20.json, -k24.json",
+   "benchmarks/20261110-curve25519-engine-items/ (report.pdf byte-identical to REPORT.pdf, engine_items.png identical to the figure)",
+   "src/cryptanalysis/ic_boundary.rs, ic_framework/plugins.rs, ecbench/methods.rs, ecbench/optimization.rs (diff 0c06160e5e..HEAD)"
+  ]
+ },
+ "checks": [
+  {
+   "n": 1,
+   "check": "freeze order",
+   "result": "pass (commit timestamps are self-reported; no external timestamp)",
+   "evidence": "sha256(PROTOCOL.md) = 36f33d55...29e6 = data/frozen.sha256, identical at 6b9830aa2e, 545749ac7d and HEAD (`git log` touches PROTOCOL.md only in 6b9830aa2e). Specs, analyse.py, pooled_compare.py, model.py, model.json and run_sessions.sh (the last edited in the freeze commit) are unchanged from 545749ac7d to HEAD; the only script change is a one-line edit to make_figure.py. Times: freeze commit 03:48:30Z; binary built 03:56Z; benchrec records created 03:57:07Z on commit 545749ac7d with commit_dirty false; run.log starts at 04:22:56Z; earliest session preflight 04:22:57.247Z (k20-s0); every record's isolation.before.unix_ms is later than the freeze (4,160/4,160); plan-*.txt, run-*.log, band-*, verify-* and sessions/* were all written between 04:22 and 04:24. A filesystem search found no other session.json carrying this study's spec ids. The local agent transcripts (timestamps only, not quoted) show the PROTOCOL.md content was last edited at 03:17:18Z, before the restart, and that no `ecbench run/plan/band/verify` or run_sessions.sh call was made before 04:22:48Z. So the predictions were fixed before any measured run, and also before the targeted unit tests first ran (03:25Z). frozen.sha256 binds PROTOCOL.md only; the rest is bound by the commits."
+  },
+  {
+   "n": 2,
+   "check": "every session single-target; all 4,160 records verified; warm-ups excluded",
+   "result": "pass",
+   "evidence": "16 sessions x 260 records (4 arms x (1 warm-up at round 0 + 64 measured rounds 1..64)); each session has one workload_id (8 distinct per size), target_index 0, and target_seed = 3026115000+100k+s; measurement seed = 3026111000+100k+s; targets_per_curve 1, order alternate. spec.json is byte-identical to specs/*.json (16/16); plan_sha256, host_sha256 and records_sha256 match (16/16); status complete, 260/260. outcome.status verified with matches_target true: 4,160/4,160. Within a session all arms recover one scalar. My pooling uses warmup=false only (512 records per arm per size, 2,048 per size) and reproduces every README mean, so the producer excluded warm-ups too."
+  },
+  {
+   "n": 3,
+   "check": "pooled ratios and intervals recomputed under both band readings",
+   "result": "pass (every printed number reproduced to 3 d.p.)",
+   "evidence": "Own resolver following band.rs: cost.unpriced resolved from counters, else phase natives as X_uncharged or X; NON_OPERATION_COUNTERS excluded; in the default reading table_insert_attempts is added from work_native only when a phase carries counted:table_insert_attempts; calibration_pinned_units is empty. All 40 mean-S cells of README section 4 agree. Every ratio and interval in sections 4, 5 and 7 and in the Answer paragraph agrees, using the frozen script's interval R*exp(+-t*se/R), se = sd(z)/sqrt(8), z_k = (A_k - R*B_k)/mean(B). The section 6 phase table, B3 (1.927 [1.737, 2.138]; 2.974 [2.790, 3.170]), B4 set-up means (61.158 and 68.408 GAE), the verification shares (0.1210 and 0.0506) and the walk counters all agree. A plain linear-scale interval differs only in the third decimal, for the wide B intervals (k = 20: [1.397, 1.667] against [1.402, 1.673]); no verdict changes. data/pooled_measured.json equals mine. The benchrec metrics agree."
+  },
+  {
+   "n": 4,
+   "check": "frozen predictions decided from PROTOCOL.md section 5",
+   "result": "pass (verdicts as in README; failed stays failed)",
+   "evidence": "A1: 0.8790 <= 0.95 and upper end 0.8818 < 1: PASS. A1b: 0.879 in [0.86, 0.90]: PASS. A2: 0.9494 in [0.93, 0.97], upper end 0.9511 < 1: PASS. A3: 1,024 paired measured runs (plus 16 warm-up pairs), 0 mismatches. Checked for each pair: tw_steps, tw_rows, tw_rank, tw_collisions, tw_walk_adds, tw_setup_*, tw_steps_rank_two, algorithm_seed and the recovered log are equal; total(twcj) - total(cv0) = twcj tw_verify_adds exactly; cv0 has tw_verify_adds = tw_collision_verify = 0 and tw_unverified_collisions = tw_collisions; work_native is identical. PASS. A4 (priced, w = 1): upper ends 0.9293 and 0.9738 < 1: PASS on the records' counted work, but not robust (E1). B1: 1.5315 not in [0.91, 0.95]: FAIL. B2: 1.5315 not in [0.84, 0.90] and 2.7383 not in [0.93, 0.99]: FAIL. B3: 1.927 and 2.974 not in [0.95, 1.05]: FAIL. B4: 61.158/61.5 = 0.994 and 68.408/68.1 = 1.005, within 10 %: PASS. C: 4,160/4,160 verified, no verification failure: PASS. The audit rule: 16/16 producer receipts ok, 1 replay each, 0 problems: PASS."
+  },
+  {
+   "n": 5,
+   "check": "code review of cv=0 (false collisions, key exactness, final check, refusals)",
+   "result": "pass on correctness; errata E1 (uncounted work) and E9 (refusal wording)",
+   "evidence": "PrimeCurve::key = ((x+1)<<1) | [y > p-y] (ic_boundary.rs:4914). The table key key>>1 = x+1 is the exact abscissa for p < 2^62, which ecbench enforces (ecbench/workload.rs:500). So on these curves equal table keys mean E_t = +-E_s, and the stored sign bit decides the sign (y != 0 for odd-order points). In the 1,024 twcj runs every one of 2,134 key collisions passed the recomputation (tw_verified_collisions = tw_collisions), so cv=0 never had a collision that cv=1 would have rejected. Final check: run_relation_loop computes g.mul(&mut ver.group_ops, generator, d) (charged: the verify phase, 23 GAE per run in these records). On a mismatch it counts verification_failures, sets stop and breaks out of both loops (ic_boundary.rs:11183-11194); an inconsistent row also stops the loop. No path retries, and ecbench marks a run verified only when [d]G = Q. So a false collision can make a run fail, but it cannot produce a wrong verified answer or be silently retried. The refusal (build_cv) tests only key(-P1) == key(P1)^1 (see E9). The default path (verify_collisions = true) leaves `signs` empty and emits exactly the committed counters, as the replays confirm (check 6). The cv=0 path keeps the sign in a second HashMap and does not count that work (E1)."
+  },
+  {
+   "n": 6,
+   "check": "rho.negation_chained: defaults unchanged; producer's explanation of the failure",
+   "result": "pass (defaults identical); the explanation is supported but incomplete (E5)",
+   "evidence": "The new binary replayed two committed sessions of research/curve25519_f1_targetwalk_20261108 (k20-s0 and k24-s7, recorded by binary b2d6c799...; arms rho.negation, wwalk g=1 without tw, tw=1, tw=1 cj=1) with --replay-all: 256/256 identical in each, 64 per arm (receipts d7fef762...25db and b5cd9cb4...bd04). In the code, policy.chained_setup is false in legacy() and the Brent policy, and the else branch is the old table code verbatim. Counters per measured run (rho-neg vs chained), k = 20: cycles_other_length 0.42 vs 17.78, escape doublings 1.61 vs 22.29, walks_capped 0.025 vs 0.420, useless_collisions 0.008 vs 0.801, walk_operations 382.3 vs 744.6. k = 24: 1.64 vs 90.90, 7.20 vs 112.61, 0.063 vs 2.955, 0.033 vs 2.816, 1,540.3 vs 4,635.4. These are the README's figures. With walk_cap = 20*2^dp_bits + 64 = 384 (k = 20) and 704 (k = 24) steps, walks lost to the cap account for at least about 48 % (k = 20) and 73 % (k = 24) of the chained walk's extra steps. Set-up saved: 74.70 and 74.34 GAE against the model's 74.57; the model's 13.428 GAE per joint 9-bit multiplication reproduced by exact enumeration."
+  },
+  {
+   "n": 7,
+   "check": "certificates (own EC arithmetic) and replay-all",
+   "result": "pass",
+   "evidence": "Own affine Weierstrass arithmetic. p and r are prime (1,048,573 / 131,203 and 16,777,213 / 2,097,349); r divides the group order; the Hasse bound holds; G and every target are on the curve with r*G = r*Q = O. [recovered]G == target for 4,160/4,160 records, with 0 < d < r. --replay-all on scratch copies of k20-s3 and k24-s5: audit ok, 260 records, 256/256 replays identical (the 4 warm-ups are not replayed); receipts 351f0279...73c6 and 617b7766...894e."
+  },
+  {
+   "n": 8,
+   "check": "benchrec records",
+   "result": "pass with errata (E4)",
+   "evidence": "Both records: status measured, commit 545749ac7d (the freeze commit; the run itself was at 2fb33b08c2, a test-only diff), commit_dirty false, command exit 0, wall 42.889 s and 42.83 s (matching run.log), 26 raw entries each. Every raw path exists and its sha256 and byte count match (52/52). Metric values and spreads equal my recomputation. Every raw entry has uploaded: false and validation is null. No benchmarks/README.md row and no leaderboard change (validation gate respected)."
+  },
+  {
+   "n": 9,
+   "check": "scope and overclaims",
+   "result": "pass with errata (E1, E5, E6, E7, E8, E9)",
+   "evidence": "The scope statement is present: constant-factor changes; the F = 1 arm is one unknown from rho and is not decomposition IC; (B) changes the reference; no security claim; [pcc:unverified] throughout; pcc lint-prose 0 findings. Distances (priced): twcj-cv0/rho-neg 1.207 [1.172, 1.243], 1.211, 1.235 (k = 20) and 1.248 [1.179, 1.320], 1.248, 1.251 (k = 24), lower ends > 1 at every weight, so rho-neg ranks ahead. Unpriced: 1.129 and 0.719 (k = 20), 1.145 and 0.661 (k = 24) at w = 0.1 and 1: the order flips inside the band (16/16 band-np files say unresolved; 16/16 band files say rho-neg < twcj and rho-neg < twcj-cv0). The rejection of the chained reference is supported (1.53x and 2.74x dearer; the README correctly says the sub-1 ratios against it are not distances). 'Candidate default' appears only in docs/session-logs/2026-11-10.md, qualified by 'on exact-abscissa keys' and 'needs the validation gate'; it should also wait for E1 and E9. The shrinking gain is stated but not explained (E6)."
+  }
+ ],
+ "predictions": {
+  "A1": "pass",
+  "A1b": "pass",
+  "A2": "pass",
+  "A3": "pass",
+  "A4": "pass as scored on counted work; a lower bound for cv0 because of uncounted sign-map work (E1)",
+  "B1": "fail",
+  "B2": "fail",
+  "B3": "fail",
+  "B4": "pass",
+  "C": "pass",
+  "audit": "pass"
+ },
+ "numbers_that_disagree": "None of the printed README, REPORT or benchrec numbers disagrees with my recomputation at the printed precision. The differences are (i) the interval form: log-symmetric per the frozen script, while a plain linear interval differs in the 3rd decimal for B; and (ii) the cv0 arm at w > 0 under the default reading once its uncounted sign-map operations (E1) are priced like the counted inserts: cv0/twcj becomes 0.947 [0.944, 0.950] and 1.315 [1.311, 1.319] at k = 20 (w = 0.1, 1) and 1.032 [1.030, 1.034] and 1.432 [1.430, 1.435] at k = 24, against the printed 0.887, 0.927, 0.953 and 0.973. cv0/rho-neg becomes 1.294 and 1.752 (k = 20) and 1.351 and 1.842 (k = 24).",
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "major",
+   "location": "src/cryptanalysis/ic_boundary.rs TargetWalk::build_cv (field `signs: FastMap<bool>`, `tw.signs.insert` per new entry, `tw.signs.get` per collision); PROTOCOL.md section 2 ('stored beside the coefficients'); README Answer (A), sections 1, 4, 5 (A4), 7 and 8",
+   "issue": "cv=0 keeps the sign bit in a second hash map. That is one extra hash insert per stored entry and one extra lookup per collision, equal per run to table_insert_attempts: 499.2 at k = 20 and 1,973.6 at k = 24. No counter records it (work_native is identical between twcj and twcj-cv0) and cost.unpriced does not list it, so the default band charges both arms the same table work. 'Saves exactly the collision verification ledger and nothing else' holds for counted group operations only. The w = 0 results (A1, A1b, A2, A3) are unaffected. The w = 0.1 and w = 1 rows for (A), the cv0 distance rows at w > 0 and A4 are lower bounds for the code as measured. Priced at the counted inserts' weight, cv0/twcj is 0.947 and 1.315 (k = 20) and 1.032 and 1.432 (k = 24) at w = 0.1 and 1. A4 would then fail and the cv0/twcj order would be unresolved across the default band.",
+   "fix": "Store the sign inside the existing map value, either (u, z, b, sign) or a spare high bit of u, and drop `signs`. Then show by replay that every count is unchanged: no counter touches `signs`, so the published numbers would then describe the fixed code exactly. Alternatively, count the sign-map operations behind a counted: marker and rescore. Until then, label A4 and the w > 0 (A) and cv0-distance rows as lower bounds for cv0, and correct PROTOCOL/README wording to 'kept in a separate hash map (uncounted)'. Do not rewrite the frozen protocol; add a correction note."
+  },
+  {
+   "id": "E2",
+   "severity": "major (blocks merge)",
+   "location": "src/cryptanalysis/ecbench/registry_audit_tests.rs (CASES/SKIPS); README section 2",
+   "issue": "The existing test every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum fails. I ran it from the producer's prebuilt test binary (built 04:22:18Z from HEAD src): 'rho.negation_chained: registered but neither a case nor a skip'. That is the only problem it lists. The README's targeted test filter did not include it. PROTOCOL section 2 says 'every existing test unchanged'; the test file is unchanged, but the change makes this test fail. (Band tests that need artifact-store records absent from the sparse worktree also fail. That is environmental and not caused by this change.)",
+   "fix": "Add (\"rho.negation_chained\", Fx::Prime18, &[]) to CASES, rerun the registry audit test, and report it in README section 2."
+  },
+  {
+   "id": "E3",
+   "severity": "moderate",
+   "location": "src/cryptanalysis/ecbench/work.rs gae_carries_group_ops and generic_rule; src/cryptanalysis/ecbench/optimization.rs policy for rho.negation_chained; methods.rs test chained_rho_jump_table_obeys_its_recurrence",
+   "issue": "The bitop/v1 work block of every rho-neg-chained record leaves out its search and verification group operations. The id is missing from gae_carries_group_ops, so search group_add = 0 although search_gae is 777 or 4,709 per run; chained_setup is not a recognised counter, so the block is marked incomplete. The records therefore carry work.ratio_to_floor of 0.316 (k = 20) and 0.199 (k = 24) on average: below the generic floor, which is impossible. The study does not cite bitops. Also, the method is registered ClaimScope FrontierEligible although the study rejects it. And the test named '..._obeys_its_recurrence' does not check the recurrence its doc comment promises ('coefficient by coefficient').",
+   "fix": "Add rho.negation_chained to gae_carries_group_ops and chained_setup to the Shape list in generic_rule (a pricing change; committed records are not rewritten, so state the replay consequence). Register the method DiagnosticOnly. Make the test assert M_j = M_{j-1} + M_{j-2} on the coefficients, or rename it. Note in the README that the chained arm's bitop block is invalid."
+  },
+  {
+   "id": "E4",
+   "severity": "moderate",
+   "location": "research/curve25519_engine_items_20261110/data/sessions-k20-records.tar.gz (1,453,116 B), sessions-k24-records.tar.gz (1,477,446 B); benchrec raw entries",
+   "issue": "Two .gz data files over 64 KiB are committed to Git. AGENTS.md section 13 and tools/artifacts (data_min_bytes = 64 KiB for .gz) require the artifact store with a data/.artifacts.json manifest, as the prior study did. Every benchrec raw entry has uploaded: false, against the benchmark-records rule (raw data in S3 by SHA-256).",
+   "fix": "Push the tarballs with tools/artifacts (artifacts.py push) and commit data/.artifacts.json instead of the blobs. Since the commits are local only, the producer should drop the blobs from the branch history before pushing. Upload the raw entries (benchrec add-raw / upload)."
+  },
+  {
+   "id": "E5",
+   "severity": "minor",
+   "location": "README section 6 'Why (B) fails'",
+   "issue": "The counters are reproduced, but the explanation is stated as fact and is incomplete. 'Merge walks' is not measured. The counters show that walks lost to the cap dominate: at least about 48 % (k = 20) and 73 % (k = 24) of the chained walk's extra steps, estimated as walks_capped x (walk_cap + 1) with walk_cap = 384 and 704. Runs with at least one capped walk: 159/512 vs 12/512 at k = 20 and 434/512 vs 29/512 at k = 24. The legacy policy (brent = false) does not detect cycles longer than the 16-point window. So the window-caught cycles and escapes assumed by the model are only part of the penalty.",
+   "fix": "Write 'consistent with short integer relations among the jumps' and add the capped-walk share. For a causal claim, run an ablation (the extra_counters/Brent policy, which reports steps_in_walks_capped and cycles_longer_than_window)."
+  },
+  {
+   "id": "E6",
+   "severity": "minor",
+   "location": "README section 8 (and Answer (A))",
+   "issue": "The gain shrinking from 12.1 % to 5.1 % is stated but not explained. The records show 2.08 collisions per run at both sizes and recomputation adds per collision rising only with log r (44.9 to 56.0, x1.25, against a bit-length ratio of 21/17 = 1.24). The walk grows as sqrt(r) (499 to 1,974 adds, x3.95). So the share falls as about log r / sqrt(r). The recomputation is not a fixed number of adds per collision: it grows with log r.",
+   "fix": "Add this mechanism with the numbers. Any figure for larger k (e.g. a share of about 1.5 % at k = 28) must be labelled as an extrapolation with its exponents."
+  },
+  {
+   "id": "E7",
+   "severity": "minor",
+   "location": "README sections 4 and 7 (AGENTS.md section 5a listing)",
+   "issue": "The README does not list each arm's unpriced counters with their counts. Per measured run: rho-neg canonicalisations_uncharged 404.2 (k = 20) and 1,584.4 (k = 24); rho-neg-chained 778.0 and 4,710.3. twcj and twcj-cv0: sqrt_solves 1, row_ops 10.25 / 10.26, legendre_symbols 1, projected_base_column_map_entries 2, projected_base_dedup_probes 1, projected_base_membership_checks 1, and counted table_insert_attempts 499.2 / 1,973.6. cv0 also has the uncounted sign-map operations of E1.",
+   "fix": "Add the listing table."
+  },
+  {
+   "id": "E8",
+   "severity": "minor",
+   "location": "README Answer, sections 3, 4 and 8",
+   "issue": "(a) 'All four A predictions pass': five A rows are scored (A1, A1b, A2, A3, A4), and A4 carries E1. (b) 'Linearised t interval': the frozen script's interval is log-symmetric, R*exp(+-t*se/R). (c) The section 3 class of the AGENTS.md rule is not named.",
+   "fix": "Write 'A1, A1b, A2 and A3 pass; A4 passes on counted work (E1)'. Write 'log-scale linearised t interval (scripts/pooled_compare.py)'. Name (A) as engineering (S fell, floor flat), and (B) as a rejected reference variant, not an arm change."
+  },
+  {
+   "id": "E9",
+   "severity": "minor",
+   "location": "README section 1 ('A group whose key is not abscissa·2 + sign is refused'); ic_boundary.rs build_cv refusal",
+   "issue": "The guard tests only that negation flips the key's low bit at P1. It refuses every hashed key in the codebase: Curve25519Wide and Genus2 always, because their low bit is forced to 1, and the mix64 keys except with probability about 2^-64. It does not test that key>>1 is injective. A key of the form (f(x)<<1)|sign with a non-injective f would pass, e.g. ExtCurve's packed abscissa once p^k >= 2^62 overflows. There a false collision would emit a wrong row. The charged final check would then fail the solve without a retry, so correctness holds, but the README's statement is stronger than the code.",
+   "fix": "Reword to 'refuses keys whose low bit is not the negation sign; correctness on other keys rests on the charged final check'. Or accept cv=0 only for groups that declare an exact-abscissa key (PrimeCurve with p < 2^62, BinaryGroup)."
+  }
+ ],
+ "replays": {
+  "study": [
+   {
+    "session": "k20-s3",
+    "mode": "--replay-all",
+    "result": "audit ok, 256/256 identical",
+    "receipt_sha256": "351f027927b57f8159739732836d1ee415947209792141d1d3f00d48d45773c6"
+   },
+   {
+    "session": "k24-s5",
+    "mode": "--replay-all",
+    "result": "audit ok, 256/256 identical",
+    "receipt_sha256": "617b77664acade8748309e303ee8482d7c02ab52fdd4eb6208cf9dd46161894e"
+   }
+  ],
+  "defaults_unchanged": [
+   {
+    "session": "research/curve25519_f1_targetwalk_20261108/sessions/k20-s0 (copy)",
+    "mode": "--replay-all",
+    "result": "audit ok, 256/256 identical (rho-neg, f1-x07, tw-x15, twcj-x15: 64 each)",
+    "receipt_sha256": "d7fef762aed203bac4e2654cb6bccf7d755bff254be21f92f6ca4a8534b125db"
+   },
+   {
+    "session": "research/curve25519_f1_targetwalk_20261108/sessions/k24-s7 (copy)",
+    "mode": "--replay-all",
+    "result": "audit ok, 256/256 identical",
+    "receipt_sha256": "b5cd9cb49f8b19535b1c3536e7575665de23254d07d1fc5978fc2a213500bd04"
+   }
+  ],
+  "receipts_dir": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/eng/rp"
+ },
+ "not_checked": [
+  "Byte identity of the binary to HEAD src (no rebuild; about 65 MB free disk).",
+  "The full lib test suite (only the ecbench optimization, work, band and registry_audit filters were run from the prebuilt binary).",
+  "The target derivation law hash_to_subgroup_v1 from target_seed (targets are checked to be on the curve and in the subgroup, one per session, distinct).",
+  "Novelty: research-kb and ecdb were not queried; no novelty claim is made by the study."
+ ]
+}

@@ -63,21 +63,36 @@
 //! report what comes out.
 
 pub mod archive;
+pub mod binary_subtract;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
+pub mod genroot;
+pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
+pub mod linalg_mixed;
 pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
 pub mod prime_tower_wide;
+pub mod recursive_adapter;
+pub mod registry;
 pub mod residual;
 pub mod rootfind;
+pub mod rootfind_floor;
+pub mod rootfind_gpu;
+pub mod semaev_projection_oracle;
+pub mod rootfind_kmitm;
+#[cfg(target_arch = "x86_64")]
+mod rootfind_kmitm_avx2;
+mod rootfind_kmitm_ifma;
 pub mod shared_rank;
+pub mod solver_units;
 pub mod solvers;
 pub mod stages;
+pub mod subgroup_semaev;
 pub mod subspace_select;
 pub mod useful_rank;
 
@@ -86,14 +101,17 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations, price_phase, Calibration, CompletionRule, CountedGroup,
-    FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
-    TargetSource,
+    collect_and_solve_relations_touching_check, price_phase, Calibration, CompletionRule,
+    CountedGroup, FactorBase, GroupOps, KnownLogSolver, OracleCounters, PhaseCost, PipelineOutcome,
+    RecoveryCheck, Relation, RelationSolver, RestartPool, TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
 use linalg::matrix_by_name;
-use stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SystemShape, Targets};
+use stages::{
+    DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, PipelineStages,
+    RelationSolverFactory, SystemShape, Targets,
+};
 
 /// One configuration: a choice at each stage, with its parameters.
 #[derive(Clone, Debug, Default, Serialize)]
@@ -217,7 +235,41 @@ pub struct SolverReport {
     /// Mean solving degree over that bound: below one is structure the
     /// solver exploited.
     pub degree_over_bound: Option<f64>,
+    /// Sum of the per-call solving degrees over the run (the "total" solving
+    /// degree): `solving_degree_mean * calls_with_a_degree`.
+    pub solving_degree_sum: u64,
+    /// Measured degree-fall observables over the run (diagnostic, never
+    /// priced): the smallest working degree at which a fall occurred
+    /// (first fall), the largest (last fall), and the observed degree of
+    /// regularity of the system shape where the engine exposes its Hilbert
+    /// series.  Distinct from the advisory `forecaster` below.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// The per-working-degree history of the richest solver call, for the
+    /// trace drawing.  Empty unless the engine recorded a trace.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
     pub extra: std::collections::BTreeMap<String, u64>,
+    /// The advisory degree-of-regularity forecaster over the run's solver
+    /// calls, with the relation matrix's columns and rank set; the
+    /// consumer (ecbench) prices its hope band with the curve's
+    /// automorphism fold and writes the forecast.  Not serialised here.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    /// Why no forecaster exists, when the oracle's solver gave none.
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
+    /// Why a pinned calibration key for `op_unit` was not used to charge
+    /// the count (`solvers::solver_unit_key`: the count does not cover the
+    /// engine's whole run).  Absent, and not serialised, whenever the unit's
+    /// key is not pinned, so an unpinned report is byte-identical to one
+    /// written before the key existed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pricing_qualification: Option<String>,
 }
 
 /// What the relation matrix did.
@@ -346,6 +398,92 @@ fn check_full_rank_base_columns<G: CountedGroup>(
     valid
 }
 
+/// Borrowed live observations from the pluggable pipeline. An oracle witness
+/// is emitted before matrix admission and final verification, not as a claim
+/// that the target logarithm has been recovered.
+pub enum PipelineEvent<'a, E> {
+    FactorBaseStarted,
+    FactorBaseReady {
+        points: &'a [E],
+        columns: usize,
+    },
+    PrecomputeStarted,
+    PrecomputeFinished,
+    Query {
+        trial: u64,
+        a: u64,
+        b: u64,
+        point: E,
+        relations: &'a [Relation],
+    },
+    Finished {
+        trials: u64,
+        relations: u64,
+        rank: u64,
+        verified: bool,
+    },
+}
+
+/// [`run_pipeline`] with live setup and query notifications. Callbacks borrow
+/// the existing points and oracle output; no query is replayed or retained.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_progress<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: u64,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+    progress: &mut dyn FnMut(PipelineEvent<'_, G::Elt>),
+) -> Result<RunReport, String> {
+    run_pipeline_inner(
+        ctx,
+        spec,
+        base_builder,
+        oracle,
+        Some(planted),
+        calib,
+        rho_s,
+        Some(progress),
+        None,
+    )
+    .map(|(report, _)| report)
+}
+
+/// Run with application-supplied factor-base, decomposition and matrix stages.
+/// The optional observer sees the actual queries and borrowed witnesses. The
+/// matrix's completion/verification contract is independent of `spec.linalg`;
+/// reports use the injected factory's name. No registry or CLI changes needed.
+/// `expected` is optional: with `None`, the recovered logarithm is verified
+/// solely by its group equation, so consumers need not know it beforehand.
+///
+/// These are variable-time research APIs for public fixtures, not secret-key
+/// arithmetic. Plug-ins run in process as trusted code; this is not a sandbox.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_stages<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    stages: PipelineStages<'_, G>,
+    expected: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+    progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(
+        ctx,
+        spec,
+        stages.factor_base,
+        stages.oracle,
+        expected,
+        calib,
+        rho_s,
+        progress,
+        Some(stages.matrix),
+    )
+    .map(|(report, _)| report)
+}
+
 /// Run one configuration end to end.
 ///
 /// `planted` is the logarithm the runner checks the answer against.  No
@@ -378,6 +516,61 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    run_pipeline_inner(
+        ctx,
+        spec,
+        base_builder,
+        oracle,
+        Some(planted),
+        calib,
+        rho_s,
+        None,
+        None,
+    )
+}
+
+/// Run the pipeline using only public instance and target inputs; recovery is
+/// checked against the source point, without supplying a held answer.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_public<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(
+        ctx,
+        spec,
+        base_builder,
+        oracle,
+        None,
+        calib,
+        rho_s,
+        None,
+        None,
+    )
+    .map(|(report, _)| report)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_pipeline_inner<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+    mut progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
+    matrix_factory: Option<&dyn RelationSolverFactory>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    // Input hardening from f73b2edcc7, lost in a 2026-11-16 merge: reject a
+    // degenerate subgroup order before any work.
+    if ctx.r < 2 || ctx.cofactor.is_multiple_of(ctx.r) {
+        return Err("pipeline requires r >= 2 and a cofactor nonzero modulo r".into());
+    }
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -389,8 +582,34 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // `collect_and_solve_with`) and closes after the verified recovery.
     measurement::mark(measurement::Phase::FactorBase);
     let mut fb_ops = GroupOps::default();
+    if let Some(progress) = &mut progress {
+        progress(PipelineEvent::FactorBaseStarted);
+    }
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    // Plug-in output check from f73b2edcc7 (lost in the same merge): every
+    // index a factor-base plug-in returns must point inside its own tables.
+    if fb.points.len() != fb.col_of.len()
+        || fb.points.len() != fb.coef_of.len()
+        || fb.points.len() != fb.neg_index.len()
+        || fb.col_of.iter().any(|&column| column >= fb.columns)
+        || fb.neg_index.iter().any(|&index| index >= fb.points.len())
+        || fb
+            .point_index
+            .values()
+            .any(|&index| index >= fb.points.len())
+            .x_index
+            .flatten()
+    {
+        return Err("factor-base plug-in returned inconsistent point/column indexes".into());
+    }
+    // A base without its hash index (`lean_layout`) can be read only by the
+    // oracle that names base points by orbit-layout index.
+    if fb.index_elided() && oracle.name() != "mitm-frobenius-layout-counted" {
+        return Err(format!(
+            "a base without its index (lean_layout) needs mitm-frobenius-layout-counted, not {}",
+            oracle.name()
+        ));
     let archive_import = base_builder.name() == "archive";
     if archive_import
         && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")
@@ -405,7 +624,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     if audit_enabled && (fb.columns == 0 || fb.columns > 4096) {
         return Err("rank audit requires 1..4096 columns".into());
     }
-    let linalg_name = if spec.linalg.is_empty() {
+    // An injected factory owns the matrix contract and names it; the
+    // built-in name is the fallback.
+    let linalg_name = if let Some(factory) = matrix_factory {
+        factory.name()
+    } else if spec.linalg.is_empty() {
         "incremental-gauss"
     } else {
         spec.linalg.as_str()
@@ -424,6 +647,13 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     let mut fb_cost = fb.cost.clone();
     fb_cost.group_ops.merge(fb_ops);
     fb_cost.wall_ns = fb_cost.wall_ns.max(fb_started.elapsed().as_nanos() as u64);
+    if let Some(progress) = &mut progress {
+        progress(PipelineEvent::FactorBaseReady {
+            points: &fb.points,
+            columns: fb.columns,
+        });
+        progress(PipelineEvent::PrecomputeStarted);
+    }
 
     // ── Stage 2: whatever the oracle precomputes ───────────────────
     //
@@ -444,6 +674,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     prep_cost.native = oracle.setup_native();
     prep_cost.work_native = oracle.setup_work_native();
     prep_cost.wall_ns = prep_started.elapsed().as_nanos() as u64;
+    if let Some(progress) = &mut progress {
+        progress(PipelineEvent::PrecomputeFinished);
+    }
 
     // ── Stages 3 and 4: relations, then the matrix ─────────────────
     //
@@ -463,37 +696,105 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // The loop's unknowns are the logs of `[h]P_v` (its rows read
     // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
     // log `s` enters as `h·s`; at `h = 1` this is the identity.
-    let mut plain = Some(match &fb.known_logs {
+    // An injected matrix may borrow its factory, so it is kept apart from
+    // the built-in (owned) matrices the rank audit can wrap.
+    let mut injected = match matrix_factory {
+        Some(factory) if !known => {
+            let columns = fb
+                .columns
+                .checked_add(1)
+                .ok_or("factor-base column count overflow")?;
+            Some(factory.create(columns, ctx.r)?)
+        }
+        _ => None,
+    };
+    let plain = injected.is_none().then(|| match &fb.known_logs {
         Some(logs) => {
             let h = ctx.cofactor % ctx.r;
             let scaled = logs
                 .iter()
                 .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
                 .collect();
-            Box::new(KnownLogSolver::new(scaled, ctx.r)) as Box<dyn RelationSolver>
+            Ok(Box::new(KnownLogSolver::new(scaled, ctx.r)) as Box<dyn RelationSolver>)
         }
-        None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
+        None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r),
     });
+    let mut plain = plain.transpose()?;
     let mut audited = if audit_enabled && !known {
         Some(useful_rank::AuditedMatrix::new(
             ctx,
             &fb,
-            plain.take().unwrap(),
+            plain
+                .take()
+                .ok_or("rank audit requires a built-in incremental Gaussian solver")?,
         )?)
     } else {
         None
     };
     let matrix: &mut dyn RelationSolver = if let Some(m) = &mut audited {
         m
+    } else if let Some(m) = &mut injected {
+        m.as_mut()
     } else {
         plain.as_mut().unwrap().as_mut()
     };
+    if fb.known_logs.is_none() {
+        // A base seeded with the generator knows that column's logarithm: one
+        // unit row, so the relation search pins the target with one fewer row.
+        for (col, x) in base_builder.known_column_logs(ctx, &spec.factor_base_params)? {
+            if col >= fb.columns {
+                return Err(format!(
+                    "known column {col} is outside the base's {} columns",
+                    fb.columns
+                ));
+            }
+            let mut row = vec![0u64; fb.columns + 1];
+            row[col] = 1;
+            if matrix.add_row(row, x % ctx.r)
+                != crate::cryptanalysis::ic_boundary::RowStatus::Independent
+            {
+                return Err(format!(
+                    "known column {col} did not enter the matrix independently"
+                ));
+            }
+        }
+    }
+    let seed_start = std::time::Instant::now();
+    let (mut setup_seed_independent, mut setup_seed_dependent) = (0u64, 0u64);
+    for seed_row in oracle.setup_rows() {
+        if seed_row.len() != fb.columns {
+            return Err(format!(
+                "oracle setup row has {} columns, expected {}",
+                seed_row.len(),
+                fb.columns
+            ));
+        }
+        let mut row = seed_row.clone();
+        row.push(0);
+        match matrix.add_row(row, 0) {
+            crate::cryptanalysis::ic_boundary::RowStatus::Independent => {
+                setup_seed_independent += 1
+            }
+            crate::cryptanalysis::ic_boundary::RowStatus::Dependent => setup_seed_dependent += 1,
+            crate::cryptanalysis::ic_boundary::RowStatus::Inconsistent => {
+                return Err("verified oracle setup row was inconsistent".into());
+            }
+        }
+    }
+    let setup_seed_ns = seed_start.elapsed().as_nanos() as u64;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::StrideGenerator => TargetSource::StrideGenerator,
         Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
-        Targets::Walk | Targets::Residual => TargetSource::Walk,
+        Targets::StrideRenewJoint => TargetSource::StrideRenewJoint,
+        Targets::Walk
+        | Targets::Residual
+        | Targets::ResidualFused
+        | Targets::ResidualFusedDp
+        | Targets::ResidualFusedEq
+        | Targets::ResidualFusedEqChain => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
             lanes: 4,
@@ -519,6 +820,14 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             lanes: 16,
             batched: true,
         },
+        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: true,
+        },
     };
     if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
         return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
@@ -529,25 +838,58 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
     }
     measurement::begin_online(measurement::Phase::TargetQuery);
-    let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
-    // `sparse-cado` is a batch solver that answers only at full column
-    // rank, so it runs under the full-rank rule.
-    let completion = if linalg_name == "incremental-gauss-full-rank"
-        || checked_full_rank
-        || linalg::is_deferred_sparse(linalg_name)
-    {
-        CompletionRule::FullRank
-    } else {
-        CompletionRule::TargetPinned
+    let (checked_full_rank, completion) = match matrix_factory.filter(|_| !known) {
+        // An injected factory states its own completion and verification
+        // policy instead of the built-in name comparison below.
+        Some(factory) => {
+            let checked = factory.verify_base_columns();
+            let completion = factory.completion_rule();
+            if checked && completion != CompletionRule::FullRank {
+                return Err("base-column verification requires full-rank completion".into());
+            }
+            (checked, completion)
+        }
+        None => {
+            let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
+            // `sparse-cado` is a batch solver that answers only at full column
+            // rank, so it runs under the full-rank rule.
+            let completion = if linalg_name == "incremental-gauss-full-rank"
+                || checked_full_rank
+                || linalg::is_deferred_sparse(linalg_name)
+            {
+                CompletionRule::FullRank
+            } else {
+                CompletionRule::TargetPinned
+            };
+            (checked_full_rank, completion)
+        }
     };
-    let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
+    let mut outcome: PipelineOutcome = if matches!(
+        spec.targets,
+        Targets::Residual
+            | Targets::ResidualFused
+            | Targets::ResidualFusedDp
+            | Targets::ResidualFusedEq
+            | Targets::ResidualFusedEqChain
+    ) {
         if completion != CompletionRule::TargetPinned {
             return Err(
                 "the residual collector stops when the target is pinned; use incremental-gauss"
                     .into(),
             );
         }
-        residual_mod::collect_residual_and_solve(
+        let collect = if spec.targets == Targets::ResidualFusedEqChain {
+            residual_mod::collect_residual_fused_eq_chain_and_solve
+        } else if spec.targets == Targets::ResidualFusedEq {
+            residual_mod::collect_residual_fused_eq_and_solve
+        } else if spec.targets == Targets::ResidualFusedDp {
+            residual_mod::collect_residual_fused_dp_and_solve
+        } else if spec.targets == Targets::ResidualFused {
+            residual_mod::collect_residual_fused_and_solve
+        } else {
+            residual_mod::collect_residual_and_solve
+        };
+        collect(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -563,7 +905,40 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // large primes (the trait default), so this is the loop every
         // recorded run took; the large-prime collector returns merged
         // rows through the same call.
-        collect_and_solve_relations(
+        let line_guard = oracle.line_guard();
+        let recovery_ladder = oracle.recovery_ladder();
+        let recovery_tau = oracle.recovery_tau_orbit();
+        let recovery_check = match (&recovery_ladder, &recovery_tau) {
+            (Some(ladder), _) if !ladder.is_empty() => RecoveryCheck::Ladder(ladder),
+            (_, Some(tau)) => RecoveryCheck::TauOrbit(tau),
+            _ => RecoveryCheck::DoubleAndAdd,
+        };
+        // `walk_sib=m`: the same progression, formed by sibling pairs with
+        // x-only probes (`TargetSource::StrideGeneratorSib`).
+        let walk_sib = oracle.walk_siblings();
+        let source = match (walk_sib, source) {
+            (0, s) => s,
+            (m, TargetSource::StrideGenerator) => TargetSource::StrideGeneratorSib { m },
+            (m, TargetSource::StrideRenew) => TargetSource::StrideRenewSib { m, joint: false },
+            (m, TargetSource::StrideRenewJoint) => TargetSource::StrideRenewSib { m, joint: true },
+            (_, s) => {
+                return Err(format!(
+                    "walk_sib needs targets=stride-generator, stride-renew or stride-renew-joint, not {}",
+                    s.name()
+                ))
+            }
+        };
+        let oracle_cell = std::cell::RefCell::new(&mut *oracle);
+        let mut xprobe_fn = |counters: &mut OracleCounters, x: u64| -> bool {
+            oracle_cell
+                .borrow_mut()
+                .probe_x(ctx, &fb, counters, x)
+                .expect("walk_sib oracle answers probe_x")
+        };
+        let xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool> =
+            (walk_sib > 0).then_some(&mut xprobe_fn as _);
+        let mut trial = 0u64;
+        collect_and_solve_relations_touching_check(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -577,12 +952,45 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             matrix,
             completion,
             |ops, counters, point, a, b| {
-                oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
+                let relations = oracle_cell
+                    .borrow_mut()
+                    .decompose_relations(ctx, &fb, ops, counters, point, a, b);
+                if let Some(progress) = &mut progress {
+                    progress(PipelineEvent::Query {
+                        trial,
+                        a,
+                        b,
+                        point,
+                        relations: &relations,
+                    });
+                }
+                trial += 1;
+                relations
             },
+            |point| oracle_cell.borrow().touch(ctx, point),
+            line_guard,
+            recovery_check,
+            xprobe,
         )
     };
     for (name, value) in oracle.relation_counters() {
         outcome.relations.count(&name, value);
+    }
+    let setup_seed_rows = setup_seed_independent + setup_seed_dependent;
+    if setup_seed_rows > 0 {
+        outcome.linear_algebra.wall_ns += setup_seed_ns;
+        outcome
+            .linear_algebra
+            .count("setup_seed_rows", setup_seed_rows);
+        outcome
+            .linear_algebra
+            .count("setup_seed_independent", setup_seed_independent);
+        outcome
+            .linear_algebra
+            .count("setup_seed_dependent", setup_seed_dependent);
+        outcome
+            .linear_algebra
+            .work("row_build_words", setup_seed_rows * (fb.columns as u64 + 1));
     }
     outcome.relations.work_all(&oracle.relation_work_native());
     // Kept opt-in so the previously recorded full-rank sessions retain
@@ -609,12 +1017,52 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         outcome.verified &= audit.audit.invalid_rows == 0;
         audit.audit
     });
-    let cost_qualification = audit_enabled.then(|| {
-        if archive_import {
-            "partial_counted_cost: archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced; total-cost and speedup unknown".to_string()
+    let verified = outcome.verified && planted.is_none_or(|known| outcome.recovered == Some(known));
+    if let Some(progress) = &mut progress {
+        progress(PipelineEvent::Finished {
+            trials: outcome.trials,
+            relations: outcome.relations_found,
+            rank: outcome.rank,
+            verified,
+        });
+    }
+    let mut unpriced_work = Vec::new();
+    // A pinned `ns_per_hashed_tensor_step` charges the steps
+    // (`price_phase`, `PINNABLE_NATIVE`) and lifts only the step clauses:
+    // the tensor curve's certification is still omitted work, so a
+    // hashed-affine run stays qualified until that is charged too.
+    let tensor_steps_pinned = calib.pinned_unit_ns("ns_per_hashed_tensor_step").is_some();
+    if base_builder.name() == "hashed-affine" {
+        unpriced_work.push(if tensor_steps_pinned {
+            "hashed-affine setup omits tensor-curve certification work (hashed_tensor_steps are charged at the pinned ns_per_hashed_tensor_step)"
         } else {
-            "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()
-        }
+            "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work"
+        });
+    }
+    if oracle.name() == "genroot" {
+        unpriced_work.push(
+            "genroot charges each S3 fiber as two group additions; the root-finding inside a fiber \
+             (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted \
+             but not priced",
+        );
+    }
+    if oracle.name() == "hashed-tensor" && !tensor_steps_pinned {
+        unpriced_work.push(
+            "tensor-contraction primitive steps are uncalibrated, so S excludes most of the relation phase",
+        );
+    }
+    if archive_import {
+        unpriced_work.push(
+            "archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced",
+        );
+    } else if audit_enabled {
+        unpriced_work.push("rank normalization is unpriced");
+    }
+    let cost_qualification = (!unpriced_work.is_empty()).then(|| {
+        format!(
+            "partial_counted_cost: {}; total-cost and speedup unknown",
+            unpriced_work.join("; ")
+        )
     });
 
     // ── The report ─────────────────────────────────────────────────
@@ -640,9 +1088,31 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // Buchberger "monomial operation" costs about 50 ns here against
     // 0.4 ns for a word XOR, and pricing it at the word ratio would have
     // flattered the engine a hundredfold.  `ns_per_op` records the
-    // measured conversion so the count can be re-priced later.
+    // measured conversion so the count can be re-priced later.  Since
+    // 2026-11-12 each other unit has its own key (conflicts, monomial
+    // operations and tests, vector XORs, F_p multiply-adds, …; the audit
+    // table in docs/ic/FRAMEWORK.md), priced by count only where
+    // `docs/ic/calibration.json` pins it — no curve does yet.
     let solver_report = oracle.solver_totals().map(|t| {
         let wall_per_op = (t.ops > 0).then(|| t.wall_ns as f64 / t.ops as f64);
+        // Every unit outside the word-XOR family and the counted field
+        // multiplications has its own key (`solvers::solver_unit_key`).
+        // It charges by count only once pinned for the curve; a pinned key
+        // whose count does not cover the whole run is refused and the
+        // reason recorded.  With no key pinned — every curve today — both
+        // are `None` and the match below is the one it always was.
+        let unit_key = solvers::solver_unit_key(&t.op_unit);
+        let pinned_unit_ns = unit_key
+            .filter(|k| k.refused.is_none())
+            .and_then(|k| calib.pinned_unit_ns(k.key));
+        let pricing_qualification = unit_key.and_then(|k| {
+            let why = k.refused?;
+            calib.pinned_unit_ns(k.key)?;
+            Some(format!(
+                "{} is pinned for this curve but not charged by count: {why}; priced as an unpinned unit",
+                k.key
+            ))
+        });
         // `pinned` means the ratio came from the repository's table, and
         // only `Calibration::pin` can say so: a word-XOR factor that is
         // merely present was measured on this host (every bench
@@ -682,10 +1152,15 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
                         None,
                     )
                 }
-                _ if calib.ns_per_add > 0.0 => {
-                    (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
-                }
-                _ => (0.0, "unpriced", wall_per_op),
+                _ => match pinned_unit_ns {
+                    Some(ns) if calib.ns_per_add > 0.0 => {
+                        (t.ops as f64 * ns / calib.ns_per_add, "pinned", Some(ns))
+                    }
+                    _ if calib.ns_per_add > 0.0 => {
+                        (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
+                    }
+                    _ => (0.0, "unpriced", wall_per_op),
+                },
             };
         rel.count("solver_calls", t.calls);
         rel.count("solver_ops", t.ops);
@@ -706,12 +1181,28 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             solving_degree_max: t.solving_degree_max,
             semi_regular_degree: t.semi_regular_degree(),
             degree_over_bound: t.degree_over_bound(),
+            solving_degree_sum: t.solving_degree_sum,
+            first_fall_degree: t.first_fall_degree,
+            last_fall_degree: t.last_fall_degree,
+            degree_of_regularity_observed: t.degree_of_regularity_observed,
+            degree_trace: t.degree_trace.clone(),
             extra: t.extra.clone(),
+            forecaster: t.forecaster.clone().map(|mut f| {
+                f.set_relation_state(fb.columns, outcome.rank as usize);
+                f.set_linear_algebra_total(outcome.relations_found as usize, work, work_unit);
+                f
+            }),
+            forecast_unavailable: t.forecast_unavailable.clone(),
+            pricing_qualification,
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;
     let sqrt_r = (ctx.r as f64).sqrt();
     let s = total_gae / sqrt_r;
+    let mut effective_spec = spec.clone();
+    if matrix_factory.is_some() && !known {
+        effective_spec.linalg = linalg_name.to_string();
+    }
 
     Ok((
         RunReport {
@@ -719,8 +1210,8 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             log2_r: (ctx.r as f64).log2(),
             r: ctx.r,
             group_order: ctx.group_order,
-            spec: spec.clone(),
-            label: spec.label(),
+            label: effective_spec.label(),
+            spec: effective_spec,
             factor_base: FactorBaseReport {
                 name: base_builder.name().to_string(),
                 description: base_builder.describe(&spec.factor_base_params),
@@ -756,7 +1247,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             cost_qualification: cost_qualification.clone(),
             verify: ver,
             recovered: outcome.recovered,
-            verified: outcome.verified && outcome.recovered == Some(planted),
+            verified,
             total_gae,
             s,
             rho_s,
@@ -769,12 +1260,13 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         fb,
     ))
 }
-
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
     if rows.iter().any(|r| r.cost_qualification.is_some()) {
-        out.push_str("Archive/rank-audit rows report partial counted cost only. Original generation/transfer and unpriced work prevent total-cost or speedup claims.\n\n");
+        out.push_str(
+            "Rows with a cost qualification report partial counted cost only; total-cost and speedup claims are unavailable.\n\n",
+        );
     }
     out.push_str(
         "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n",
@@ -818,6 +1310,14 @@ pub fn format_markdown(rows: &[RunReport]) -> String {
             },
         ));
     }
+    for r in rows {
+        if let Some(qualification) = &r.cost_qualification {
+            out.push_str(&format!(
+                "\n- **{} / {}**: {}\n",
+                r.instance, r.label, qualification
+            ));
+        }
+    }
     out
 }
 
@@ -854,6 +1354,88 @@ mod tests {
         )
     }
 
+    #[test]
+    fn live_pipeline_witnesses_are_real_equations_and_preserve_the_result() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "prime-abscissa".into(),
+            oracle: "mitm".into(),
+            targets: Targets::Walk,
+            max_trials: 100_000,
+            seed: 7,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", "24");
+        let original = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut MitmOracle::new(2),
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .unwrap();
+        let mut points = Vec::new();
+        let mut witnesses = 0;
+        let mut finished = false;
+        let traced = run_pipeline_with_progress(
+            &ctx,
+            &spec,
+            &base,
+            &mut MitmOracle::new(2),
+            planted,
+            &Calibration::default(),
+            None,
+            &mut |event| match event {
+                PipelineEvent::FactorBaseReady { points: base, .. } => points = base.to_vec(),
+                PipelineEvent::Query {
+                    a,
+                    b,
+                    point,
+                    relations,
+                    ..
+                } => {
+                    // Separate counters for test replay must never enter the
+                    // pipeline's operation accounting.
+                    let mut replay = GroupOps::default();
+                    let ag = ctx.group.mul(&mut replay, ctx.generator, a);
+                    let bq = ctx.group.mul(&mut replay, ctx.target, b);
+                    assert_eq!(ctx.group.add(&mut replay, ag, bq), point);
+                    for relation in relations {
+                        if let Relation::Summands(indices) = relation {
+                            let sum = indices.iter().fold(ctx.group.identity(), |sum, &i| {
+                                ctx.group.add(&mut replay, sum, points[i])
+                            });
+                            assert_eq!(sum, point);
+                            witnesses += 1;
+                        }
+                    }
+                }
+                PipelineEvent::Finished { verified, .. } => {
+                    assert!(verified);
+                    finished = true;
+                }
+                _ => {}
+            },
+        )
+        .unwrap();
+        assert!(witnesses > 0 && finished);
+        assert!(traced.verified && original.verified);
+        assert_eq!(traced.recovered, original.recovered);
+        assert_eq!(
+            traced.decomposition.targets_tried,
+            original.decomposition.targets_tried
+        );
+        assert_eq!(
+            traced.decomposition.relations_found,
+            original.decomposition.relations_found
+        );
+        assert_eq!(traced.linear_algebra.rank, original.linear_algebra.rank);
+    }
+
     fn known_log_spec(size: u64) -> PipelineSpec {
         let mut spec = PipelineSpec {
             factor_base: "known-log".into(),
@@ -866,6 +1448,43 @@ mod tests {
         spec.factor_base_params.set("size", size.to_string());
         spec.oracle_params.set("negation_folded", "1");
         spec
+    }
+
+    #[test]
+    fn hashed_affine_setup_qualification_is_independent_of_oracle() {
+        use super::hashed::HashedAffineBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+
+        let inst = prime_instance_for(24, 11);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = HashedAffineBase { instance: &inst };
+        let mut oracle = SubtractOracle;
+        let spec = PipelineSpec {
+            factor_base: "hashed-affine".into(),
+            oracle: "subtract".into(),
+            targets: Targets::Walk,
+            max_trials: 1,
+            ..Default::default()
+        };
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            Some(1.0),
+        )
+        .expect("the bounded hashed-affine pipeline should report its costs");
+
+        let qualification = report
+            .cost_qualification
+            .as_deref()
+            .expect("hashed-affine setup is not fully priced");
+        assert!(qualification.contains("hashed_tensor_steps"));
+        assert!(qualification.contains("tensor-curve certification"));
+        assert!(report.s_over_rho.is_none());
+        assert!(format_markdown(std::slice::from_ref(&report)).contains(qualification));
     }
 
     /// **The known-log base recovers the planted logarithm on a 24-bit
@@ -921,16 +1540,17 @@ mod tests {
     }
 
     /// **The `k`-sum table oracle recovers the planted logarithm** on a
-    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
-    /// has `k` summands, and the table holds one entry per negation orbit
-    /// of the signed `k`-sums of the base.
+    /// 24-bit prime-order curve with `k = 3` to `7` (`k = 6, 7` pack their
+    /// summand indices in 10 and 9 bits): every relation has `k` summands,
+    /// and the table holds one entry per negation orbit of the signed
+    /// `k`-sums of the base.
     #[test]
-    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+    fn ksum_oracle_recovers_logs_with_three_to_seven_summands() {
         use super::plugins::{KSumOracle, PrimeAbscissaBase};
         use crate::cryptanalysis::ic_boundary::prime_instance_for;
         let inst = prime_instance_for(24, 5);
         let (ctx, planted) = ctx_and_planted(&inst);
-        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10), (6, 10), (7, 10)] {
             let mut spec = PipelineSpec {
                 factor_base: "prime-abscissa".into(),
                 oracle: "ksum".into(),
@@ -1030,6 +1650,8 @@ mod tests {
             r: 562021,
             cofactor: 16,
             generator: (4890799, 2220468),
+
+            representation: None,
         };
         let mut scratch = GroupOps::default();
         let g = inst.generator_point();
@@ -1146,6 +1768,19 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+
+        let mut public_oracle = MitmOracle::new(2);
+        let public_report = run_pipeline_public(
+            &ctx,
+            &spec,
+            &base,
+            &mut public_oracle,
+            &Calibration::default(),
+            None,
+        )
+        .expect("public-only pipeline should run");
+        assert!(public_report.verified, "public source-point check failed");
+        assert_eq!(public_report.recovered, report.recovered);
         // Every stage marks the work it now counts for `bitop/v1`, and
         // counts some: the base's indexes, the table's inserts, the walk's
         // bookkeeping, the rows and the elimination's scans.
@@ -1533,6 +2168,289 @@ mod tests {
             bare.decomposition.solver.as_ref().unwrap().priced_by,
             "unpriced"
         );
+    }
+
+    /// The descent-algebraic + `sat-cdcl` run the solver-unit keys are
+    /// tested on: binary `n = 11`, a 5-dimensional subspace base, `m = 2`.
+    fn sat_descent_run(calib: &Calibration, relabel: Option<&'static str>) -> (RunReport, String) {
+        use super::plugins::{BinarySubspaceBase, DescentAlgebraicOracle};
+        use super::solvers::solver_by_name;
+        use crate::cryptanalysis::ic_boundary::{random_binary_instance, BinaryGroup};
+        let inst = random_binary_instance(11, 3, 8).expect("a curve at n = 11");
+        let group = BinaryGroup(&inst.fast);
+        let planted = 1 + 30_011 % (inst.r - 1);
+        let ctx = binary_ctx_and_planted(&inst, &group, planted);
+        let base = BinarySubspaceBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "binary-subspace".into(),
+            oracle: "descent-algebraic".into(),
+            solver: Some("sat-cdcl".into()),
+            targets: Targets::Walk,
+            max_trials: 200_000,
+            seed: 7,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("dimension", "5");
+        let engine: Box<dyn super::stages::SystemSolver> = match relabel {
+            None => solver_by_name("sat-cdcl").unwrap(),
+            Some(unit) => Box::new(RelabelledEngine(solver_by_name("sat-cdcl").unwrap(), unit)),
+        };
+        let mut oracle = DescentAlgebraicOracle::new(2, &inst, engine, Params::default(), None);
+        let r = run_pipeline(&ctx, &spec, &base, &mut oracle, planted, calib, None).unwrap();
+        (r, serde_json::to_string(calib).unwrap())
+    }
+
+    /// `sat-cdcl` with its cost relabelled, to put another engine's unit
+    /// through the pricing path on the same systems.
+    struct RelabelledEngine(Box<dyn super::stages::SystemSolver>, &'static str);
+
+    impl super::stages::SystemSolver for RelabelledEngine {
+        fn name(&self) -> &str {
+            "relabelled-engine"
+        }
+        fn describe(&self) -> String {
+            format!("sat-cdcl reporting its conflicts as `{}`", self.1)
+        }
+        fn accepts(&self, shape: &super::stages::SystemShape) -> bool {
+            self.0.accepts(shape)
+        }
+        fn solve(
+            &self,
+            system: &super::stages::BooleanSystem,
+            params: &Params,
+            budget: Option<std::time::Duration>,
+        ) -> (super::stages::SolverVerdict, super::stages::SolverCost) {
+            let (verdict, mut cost) = self.0.solve(system, params, budget);
+            cost.op_unit = self.1.into();
+            (verdict, cost)
+        }
+    }
+
+    /// **No solver-unit key pinned: the run is the one it was.**  Snapshot
+    /// taken on this checkout before the keys existed (2026-11-12): the
+    /// same `S` bits, the same `priced_by`, no qualification, and the
+    /// calibration serialises to the same JSON (the new keys are absent).
+    #[test]
+    fn solver_pricing_is_unchanged_with_no_solver_unit_key_pinned() {
+        let (bare, json) = sat_descent_run(&Calibration::default(), None);
+        let s = bare.decomposition.solver.as_ref().unwrap();
+        assert!(bare.verified);
+        assert_eq!((s.op_unit.as_str(), s.ops), ("conflicts", 6260));
+        assert_eq!(s.priced_by, "unpriced");
+        assert!(s.pricing_qualification.is_none());
+        assert_eq!(
+            bare.decomposition.gae_before_solver.to_bits(),
+            4646201887446532096
+        );
+        assert_eq!(bare.total_gae.to_bits(), 4646958351446441984);
+        assert_eq!(bare.cost_qualification, None);
+        assert_eq!(
+            json,
+            r#"{"ns_per_add":0.0,"ns_per_double":0.0,"ns_per_sqrt":null,"ns_per_as_solve":null,"ns_per_s4_pair":null,"ns_per_lookup":0.0,"ns_per_row_op":0.0,"ns_per_word_xor":null,"ns_per_legendre":null,"ns_per_inversion":null,"ns_per_frobenius":null,"ns_per_canon":null,"pinned_units":[]}"#
+        );
+
+        let calib = Calibration {
+            ns_per_add: 1.0,
+            ns_per_double: 1.0,
+            ns_per_word_xor: Some(0.002),
+            pinned_units: vec!["ns_per_word_xor".into()],
+            ..Default::default()
+        };
+        let (measured, _) = sat_descent_run(&calib, None);
+        let s = measured.decomposition.solver.as_ref().unwrap();
+        assert_eq!(s.priced_by, "measured");
+        assert!(s.pricing_qualification.is_none());
+        assert_eq!(
+            measured.decomposition.gae_before_solver.to_bits(),
+            4645832451539599360
+        );
+        assert_eq!(measured.cost_qualification, None);
+        assert!(
+            serde_json::to_value(s)
+                .unwrap()
+                .get("pricing_qualification")
+                .is_none(),
+            "an unpinned solver block serialises as before"
+        );
+    }
+
+    /// **A pinned `ns_per_conflict` charges `sat-cdcl`'s conflicts by
+    /// count**, and only a pinned one: the same value merely present is a
+    /// host figure and prices nothing by count.
+    #[test]
+    fn a_pinned_conflict_key_charges_sat_conflicts_by_count() {
+        let mut calib = Calibration {
+            ns_per_add: 2.0,
+            ns_per_double: 2.0,
+            ns_per_conflict: Some(3.0),
+            ..Default::default()
+        };
+        let (present, _) = sat_descent_run(&calib, None);
+        let s = present.decomposition.solver.as_ref().unwrap();
+        assert_eq!(s.priced_by, "measured", "present but not pinned");
+
+        calib.pinned_units = vec!["ns_per_conflict".into()];
+        let (pinned, json) = sat_descent_run(&calib, None);
+        let p = pinned.decomposition.solver.as_ref().unwrap();
+        assert_eq!(p.priced_by, "pinned");
+        assert_eq!(p.ns_per_op, Some(3.0));
+        assert_eq!(p.ops, s.ops, "the same run does the same work");
+        assert_eq!(p.gae, p.ops as f64 * 3.0 / 2.0);
+        assert!(p.pricing_qualification.is_none());
+        assert_eq!(
+            pinned.decomposition.cost.gae,
+            pinned.decomposition.gae_before_solver + p.gae
+        );
+        assert_eq!(pinned.cost_qualification, None);
+        assert!(json.contains(r#""ns_per_conflict":3.0"#));
+        assert!(json.contains(r#""pinned_units":["ns_per_conflict"]"#));
+    }
+
+    /// **A count that does not cover the engine's whole run is refused even
+    /// when its key is pinned**, and the solver block says why: the
+    /// `crossbred-f2` partial unit and the `xl-f2` modelled unit price
+    /// exactly as with no key at all.
+    #[test]
+    fn a_partial_coverage_unit_stays_uncharged_even_when_pinned() {
+        for (unit, key) in [
+            (
+                "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)",
+                "ns_per_word_op",
+            ),
+            ("monomial operations (modelled)", "ns_per_monomial_op"),
+        ] {
+            let k = super::solvers::solver_unit_key(unit).unwrap();
+            assert_eq!(k.key, key);
+            assert!(k.refused.is_some());
+            let mut calib = Calibration {
+                pinned_units: vec![key.into()],
+                ..Default::default()
+            };
+            match key {
+                "ns_per_word_op" => calib.ns_per_word_op = Some(0.5),
+                _ => calib.ns_per_monomial_op = Some(0.5),
+            }
+            // `ns_per_add = 0`: an unpinned unit is `unpriced` at zero, so a
+            // refused pin must leave exactly that.
+            let (r, _) = sat_descent_run(&calib, Some(unit));
+            let s = r.decomposition.solver.as_ref().unwrap();
+            assert_eq!(s.op_unit, unit);
+            assert_eq!(s.priced_by, "unpriced", "{unit}");
+            assert_eq!(s.gae, 0.0);
+            let why = s.pricing_qualification.as_deref().expect("says why");
+            assert!(why.starts_with(key), "{why}");
+            assert!(why.contains("does not cover the engine's whole run"), "{why}");
+            assert_eq!(
+                r.decomposition.cost.gae, r.decomposition.gae_before_solver,
+                "nothing charged by count"
+            );
+            // And with a host calibration it is the wall-time price.
+            calib.ns_per_add = 1.0;
+            calib.ns_per_double = 1.0;
+            let (r, _) = sat_descent_run(&calib, Some(unit));
+            let s = r.decomposition.solver.as_ref().unwrap();
+            assert_eq!(s.priced_by, "measured");
+            assert_eq!(s.gae, s.wall_ns as f64);
+            assert!(s.pricing_qualification.is_some());
+        }
+    }
+
+    /// Every solver unit the framework ships maps to its key, and the word-
+    /// XOR family and `F_q multiplications` keep their own path (a field
+    /// multiplication unit with `fp_muls_per_add` is `counted` first).
+    #[test]
+    fn every_shipped_solver_unit_has_its_calibration_key() {
+        use super::solvers::solver_unit_key;
+        use crate::cryptanalysis::ic_boundary::SOLVER_UNIT_KEYS;
+        for (unit, key, refused) in [
+            ("conflicts", Some("ns_per_conflict"), false),
+            ("monomial operations", Some("ns_per_monomial_op"), false),
+            (
+                "monomial operations (modelled)",
+                Some("ns_per_monomial_op"),
+                true,
+            ),
+            ("monomial tests", Some("ns_per_monomial_test"), false),
+            (
+                "vector XORs (Gray-code steps, 8 lanes of 32 bits)",
+                Some("ns_per_vector_xor_8x32"),
+                false,
+            ),
+            (
+                "vector XORs (Gray-code steps, 16 lanes of 32 bits)",
+                Some("ns_per_vector_xor_16x32"),
+                false,
+            ),
+            (
+                "F_p multiply-adds (elimination only)",
+                Some("ns_per_f4_muladd"),
+                false,
+            ),
+            ("F_p multiplications (grid)", Some("ns_per_fp_mul"), false),
+            ("word XORs (elimination only)", None, false),
+            ("word XORs (Gray-code steps)", None, false),
+            ("F_p multiplications", Some("ns_per_fp_mul"), false),
+            ("F_q multiplications", None, false),
+            ("none (external process; wall time only)", None, false),
+        ] {
+            let got = solver_unit_key(unit);
+            assert_eq!(got.map(|k| k.key), key, "{unit}");
+            assert_eq!(got.is_some_and(|k| k.refused.is_some()), refused, "{unit}");
+            if let Some(k) = key {
+                assert!(SOLVER_UNIT_KEYS.contains(&k), "{k}");
+            }
+        }
+    }
+
+    /// **A pinned `ns_per_hashed_tensor_step` charges the hashed-affine
+    /// set-up's steps and lifts only the step clause**: the run stays
+    /// qualified for the tensor curve's uncharged certification.
+    #[test]
+    fn a_pinned_hashed_tensor_step_key_charges_the_steps() {
+        use super::hashed::HashedAffineBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+
+        let inst = prime_instance_for(24, 11);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = HashedAffineBase { instance: &inst };
+        let spec = PipelineSpec {
+            factor_base: "hashed-affine".into(),
+            oracle: "subtract".into(),
+            targets: Targets::Walk,
+            max_trials: 1,
+            ..Default::default()
+        };
+        let run = |calib: &Calibration| {
+            let mut oracle = SubtractOracle;
+            run_pipeline(&ctx, &spec, &base, &mut oracle, planted, calib, Some(1.0)).unwrap()
+        };
+        let mut calib = Calibration {
+            ns_per_add: 1.0,
+            ns_per_double: 1.0,
+            ns_per_hashed_tensor_step: Some(0.25),
+            ..Default::default()
+        };
+        let present = run(&calib);
+        calib.pinned_units = vec!["ns_per_hashed_tensor_step".into()];
+        let pinned = run(&calib);
+
+        let steps = present.factor_base.cost.get("hashed_tensor_steps");
+        assert!(steps > 0);
+        assert_eq!(pinned.factor_base.cost.get("hashed_tensor_steps"), steps);
+        let charged = pinned.factor_base.cost.gae - present.factor_base.cost.gae;
+        assert!(
+            (charged - 0.25 * steps as f64).abs() < 1e-6 * steps as f64,
+            "{charged} GAE for {steps} steps"
+        );
+        let before = present.cost_qualification.as_deref().unwrap();
+        assert!(before.contains("uncalibrated hashed_tensor_steps"));
+        let after = pinned
+            .cost_qualification
+            .as_deref()
+            .expect("still qualified");
+        assert!(!after.contains("uncalibrated"), "{after}");
+        assert!(after.contains("tensor-curve certification"), "{after}");
+        assert!(pinned.s_over_rho.is_none());
     }
 
     /// An engine that reports its work as `word XORs`, the one unit with
@@ -1943,6 +2861,93 @@ mod tests {
         );
     }
 
+    /// **Attempt schedules end to end.**  On a 16-bit roster curve with a
+    /// 96-point base (stride `cols / 32 = 3`), every schedule of
+    /// `sparse-cado`, `wiedemann` and `lanczos` recovers the logarithm the dense
+    /// full-rank matrix recovers; the relations read past the dense
+    /// full-rank point (the overshoot) stay within the schedule's bound;
+    /// totals are printed (`--nocapture`).
+    #[test]
+    fn sparse_attempt_schedules_match_the_full_rank_matrix_end_to_end() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        println!("| matrix | seed | relations (dense) | overshoot | attempt points | failed | LA row_ops | targets tried |");
+        for seed in [7u64, 8, 9] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "mitm".into(),
+                targets: Targets::Walk,
+                max_trials: 2_000_000,
+                seed,
+                linalg: "incremental-gauss-full-rank".into(),
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", "96");
+            spec.oracle_params.set("negation_folded", "1");
+            let run = |spec: &PipelineSpec| {
+                run_pipeline(
+                    &ctx,
+                    spec,
+                    &base,
+                    &mut MitmOracle::new(2),
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .unwrap()
+            };
+            let dense = run(&spec);
+            assert!(dense.verified);
+            let cols = dense.factor_base.columns as u64 + 1;
+            for (name, bound) in [
+                ("sparse-cado", (cols / 32).max(1)),
+                ("sparse-cado:schedule=fixed", (cols / 32).max(1)),
+                ("sparse-cado:schedule=geometric,start=1,growth=2", u64::MAX),
+                ("sparse-cado:schedule=predicted,margin=0", 1),
+                ("sparse-cado:schedule=predicted,margin=1", 1),
+                ("wiedemann:schedule=fixed", (cols / 32).max(1)),
+                ("wiedemann:schedule=predicted,margin=1", (cols / 32).max(1)),
+                ("lanczos:schedule=fixed", (cols / 32).max(1)),
+                ("lanczos:schedule=predicted,margin=1", (cols / 32).max(1)),
+            ] {
+                spec.linalg = name.into();
+                let other = run(&spec);
+                assert!(other.verified, "{name}");
+                assert_eq!(other.recovered, dense.recovered, "{name}");
+                assert_eq!(
+                    other.linear_algebra.rank, dense.linear_algebra.rank,
+                    "{name}"
+                );
+                let over = other
+                    .decomposition
+                    .relations_found
+                    .checked_sub(dense.decomposition.relations_found)
+                    .expect("no answer below full rank");
+                assert!(
+                    over <= bound,
+                    "{name} seed {seed}: overshoot {over} > {bound}"
+                );
+                let wn = &other.linear_algebra.cost.work_native;
+                let get = |k: &str| wn.get(k).map_or("-".to_string(), u64::to_string);
+                if let Some(b) = wn.get("sparse_overshoot_rows_bound") {
+                    assert!(
+                        over <= *b,
+                        "{name}: overshoot {over} above reported bound {b}"
+                    );
+                }
+                println!(
+                    "| {name} | {seed} | {} | {over} | {} | {} | {} | {} |",
+                    dense.decomposition.relations_found,
+                    get("sparse_attempt_points"),
+                    get("sparse_failed_attempt_points"),
+                    other.linear_algebra.work,
+                    other.decomposition.targets_tried,
+                );
+            }
+        }
+    }
+
     #[test]
     fn checked_full_rank_point_checks_each_column_without_changing_the_relation_stream() {
         let inst = roster_prime_instance(16).unwrap();
@@ -2073,6 +3078,1263 @@ mod tests {
     /// assumes), the symmetrised oracle's relations lift back to the
     /// base and solve for the planted logarithm, and its solver is
     /// priced inside the decomposition phase like every other oracle's.
+    /// The generator's own orbit as column 0: no lift, projection or order
+    /// check (one scalar multiplication, the eigenvalue check), a known
+    /// column logarithm, and one relation instead of two at one column,
+    /// with the same logarithm recovered as the archived scan's base.
+    #[test]
+    fn generator_orbit_base_pins_the_target_with_one_relation() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{koblitz_instance, BinaryGroup, CountedGroup};
+
+        for (a, n, planted_seed) in [(1u8, 29u32, 40_009u64), (0, 13, 77), (1, 17, 30_011)] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let run = |generator: bool, targets: Targets, seed: u64| {
+                let mut spec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-lazy-counted".into(),
+                    targets,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                spec.factor_base_params.set("columns", "1");
+                spec.factor_base_params.set("raw_x_cap", "100000000");
+                if generator {
+                    spec.factor_base_params.set("generator_orbit", "1");
+                }
+                spec.oracle_params.set("m", "2");
+                let mut oracle = FrobeniusMitmOracle::new_lazy_counted(2, &inst);
+                run_pipeline(
+                    &ctx,
+                    &spec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run")
+            };
+
+            // The base itself: G's signed orbit, coefficients lambda^k, x = h.
+            let (_, params) = Params::parse_spec(
+                "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+            )
+            .unwrap();
+            let mut ops = GroupOps::default();
+            let fb = base.build(&ctx, &params, &mut ops).unwrap();
+            assert_eq!(fb.columns, 1);
+            assert_eq!(fb.points.len(), 2 * n as usize);
+            assert_eq!(fb.points[0], inst.generator);
+            assert_eq!(ops.scalar_mults, 0, "nothing to lift, project or check");
+            assert_eq!(fb.cost.get("cofactor_projected_points"), 0);
+            assert_eq!(
+                base.known_column_logs(&ctx, &params).unwrap(),
+                vec![(0, inst.cofactor % inst.r)]
+            );
+            let x = inst.cofactor % inst.r;
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let e = ((fb.coef_of[i] as u128 * x as u128) % inst.r as u128) as u64;
+                assert_eq!(
+                    group.mul(&mut check, inst.generator, e),
+                    group.mul(&mut check, *p, inst.cofactor),
+                    "member {i} of the generator's orbit has the wrong coefficient"
+                );
+            }
+
+            for seed in [3u64, 11, 29] {
+                let plain = run(false, Targets::StrideRenew, seed);
+                let gen = run(true, Targets::StrideRenew, seed);
+                let walk = run(true, Targets::StrideGenerator, seed);
+                for (what, rep) in [
+                    ("plain", &plain),
+                    ("gen", &gen),
+                    ("gen+stride-generator", &walk),
+                ] {
+                    assert!(rep.verified, "n{n} seed {seed} {what}");
+                    assert_eq!(rep.recovered, Some(planted), "n{n} seed {seed} {what}");
+                }
+                assert_eq!(gen.decomposition.relations_found, 1, "n{n} seed {seed}");
+                assert_eq!(walk.decomposition.relations_found, 1, "n{n} seed {seed}");
+                assert!(plain.decomposition.relations_found >= 2, "n{n} seed {seed}");
+                assert!(
+                    gen.factor_base.cost.gae < plain.factor_base.cost.gae,
+                    "n{n}: the generator orbit should cost less than a scanned seed"
+                );
+                // Q + [k]G: the relation search draws no scalar multiple.
+                assert_eq!(
+                    walk.decomposition.cost.group_ops.scalar_mults, 0,
+                    "n{n} seed {seed}"
+                );
+                assert_eq!(
+                    walk.decomposition.cost.group_ops.doubles, 0,
+                    "n{n} seed {seed}"
+                );
+            }
+        }
+    }
+
+    /// `generator_multiples` (Koblitz small-row lever, 2026-11-18): absent
+    /// or 1 builds the generator-orbit base unchanged (same points, counters
+    /// and known logs); k > 1 seeds columns 0..k with the orbits of
+    /// [1]G..[k]G (one doubling, k - 2 additions, no scalar multiplication),
+    /// every column log known, so an all-known base pins the target with one
+    /// relation and recovers the planted logarithm.
+    #[test]
+    fn generator_multiples_seed_known_log_columns_and_default_is_unchanged() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{koblitz_instance, BinaryGroup, CountedGroup};
+
+        for (a, n, planted_seed, k) in [(1u8, 23u32, 4_242u64, 3u64), (1, 29, 40_009, 2)] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let build = |spec: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+                let mut ops = GroupOps::default();
+                let fb = base.build(&ctx, &params, &mut ops).unwrap();
+                let logs = base.known_column_logs(&ctx, &params).unwrap();
+                (fb, ops, logs)
+            };
+            // Default unchanged: generator_multiples=1 is the plain base.
+            let plain_spec = "columns=2,raw_x_cap=100000000,generator_orbit=1";
+            let (p0, o0, l0) = build(plain_spec);
+            let (p1, o1, l1) = build(&format!("{plain_spec},generator_multiples=1"));
+            assert_eq!(p0.points, p1.points);
+            assert_eq!(p0.coef_of, p1.coef_of);
+            assert_eq!(p0.cost.native, p1.cost.native);
+            assert_eq!(
+                (o0.adds, o0.doubles, o0.scalar_mults),
+                (o1.adds, o1.doubles, o1.scalar_mults)
+            );
+            assert_eq!(l0, l1);
+            assert_eq!(p0.cost.get("generator_multiple_columns"), 0);
+
+            // k known columns: [j]G seeds column j - 1 with log h*j.
+            let spec = format!(
+                "columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k}"
+            );
+            let (fb, ops, logs) = build(&spec);
+            assert_eq!(fb.columns, k as usize);
+            assert_eq!(fb.frobenius_orbit_layout, Some(n));
+            assert_eq!(ops.scalar_mults, 0);
+            assert_eq!((ops.doubles, ops.adds), (1, k - 2));
+            assert_eq!(fb.cost.get("cofactor_projected_points"), 0);
+            assert_eq!(fb.cost.get("generator_multiple_columns"), k);
+            let h = inst.cofactor % inst.r;
+            assert_eq!(
+                logs,
+                (1..=k)
+                    .map(|j| (
+                        (j - 1) as usize,
+                        (h as u128 * j as u128 % inst.r as u128) as u64
+                    ))
+                    .collect::<Vec<_>>()
+            );
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let x = logs[fb.col_of[i]].1;
+                let e = ((fb.coef_of[i] as u128 * x as u128) % inst.r as u128) as u64;
+                assert_eq!(
+                    group.mul(&mut check, inst.generator, e),
+                    group.mul(&mut check, *p, inst.cofactor),
+                    "{spec}: member {i} has the wrong coefficient"
+                );
+            }
+            for bad in [
+                format!("columns={k},raw_x_cap=100000000,generator_multiples={k}"),
+                format!("columns=1,raw_x_cap=100000000,generator_orbit=1,generator_multiples={k}"),
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,generator_multiples=0".into(),
+            ] {
+                let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{bad}")).unwrap();
+                assert!(
+                    base.build(&ctx, &params, &mut GroupOps::default()).is_err(),
+                    "{bad}"
+                );
+            }
+
+            // End to end: one relation pins the target on the all-known base.
+            for seed in [3u64, 11, 29] {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                pspec.factor_base_params.set("columns", k.to_string());
+                pspec.factor_base_params.set("raw_x_cap", "100000000");
+                pspec.factor_base_params.set("generator_orbit", "1");
+                pspec
+                    .factor_base_params
+                    .set("generator_multiples", k.to_string());
+                pspec.oracle_params.set("m", "2");
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                let rep = run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run");
+                assert!(rep.verified, "n{n} seed {seed}");
+                assert_eq!(rep.recovered, Some(planted), "n{n} seed {seed}");
+                assert_eq!(rep.decomposition.relations_found, 1, "n{n} seed {seed}");
+            }
+        }
+    }
+
+    /// The n29 generator-orbit levers (2026-11-18): `lean_layout` (base
+    /// without its index), `sib` (sibling pair-table build) and `tau_verify`
+    /// (τ-adic recovery check over the stored orbit).  Each one absent or 0
+    /// is the incumbent bit for bit; on, the base, the table's probes, the
+    /// walk and the recovered log are unchanged and only work goes.
+    #[test]
+    fn generator_orbit_lean_sib_tau_levers_keep_the_solve_and_remove_work() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{
+            koblitz_instance, tau_naf, tau_orbit_mul, BinaryGroup, CountedGroup,
+            FrobeniusPairTable, OracleCounters, TauOrbitCheck,
+        };
+
+        // τ-NAF: the digits evaluate to d in Z[τ] (τ² = μτ − 2), no two
+        // adjacent non-zero.
+        for mu in [1i64, -1] {
+            for d in (0u64..2_000).chain([65_535, 1 << 20, 536_911_222, u64::from(u32::MAX)]) {
+                let digits = tau_naf(d, mu);
+                let (mut v0, mut v1, mut p0, mut p1) = (0i128, 0i128, 1i128, 0i128);
+                for (i, &u) in digits.iter().enumerate() {
+                    v0 += u as i128 * p0;
+                    v1 += u as i128 * p1;
+                    (p0, p1) = (-2 * p1, p0 + mu as i128 * p1);
+                    if i > 0 {
+                        assert!(u == 0 || digits[i - 1] == 0, "d {d}: adjacent digits");
+                    }
+                }
+                assert_eq!((v0, v1), (d as i128, 0), "d {d} mu {mu}");
+            }
+        }
+
+        for (a, n, planted_seed) in [(1u8, 29u32, 40_009u64), (1, 23, 4_242), (0, 37, 777)] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let build = |spec: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+                let mut ops = GroupOps::default();
+                let fb = base.build(&ctx, &params, &mut ops).unwrap();
+                (fb, ops)
+            };
+            let plain = "columns=1,raw_x_cap=100000000,generator_orbit=1";
+            let (p0, o0) = build(plain);
+            let (z, oz) = build(&format!("{plain},lean_layout=0"));
+            assert_eq!(p0.points, z.points);
+            assert_eq!(p0.cost.native, z.cost.native);
+            assert_eq!(p0.cost.work_native, z.cost.work_native);
+            assert_eq!((o0.adds, o0.doubles), (oz.adds, oz.doubles));
+            let (l, ol) = build(&format!("{plain},lean_layout=1"));
+            assert_eq!(p0.points, l.points);
+            assert_eq!(p0.col_of, l.col_of);
+            assert_eq!(p0.coef_of, l.coef_of);
+            assert_eq!(p0.neg_index, l.neg_index);
+            assert_eq!(p0.frobenius_orbit_layout, l.frobenius_orbit_layout);
+            assert_eq!(
+                (o0.adds, o0.doubles, o0.scalar_mults),
+                (ol.adds, ol.doubles, ol.scalar_mults)
+            );
+            assert!(l.index_elided() && !p0.index_elided());
+            assert_eq!(l.cost.get("hash_probes_uncharged"), 0);
+            assert_eq!(l.cost.get("factor_point_inserts_uncharged"), 0);
+            assert_eq!(l.cost.get("curve_equation_checks_uncharged"), 1);
+            assert_eq!(l.cost.get("min_key_field_squares_uncharged"), 0);
+            assert_eq!(l.cost.get("point_negations_uncharged"), n as u64);
+            assert_eq!(l.cost.get("frobenius_maps"), p0.cost.get("frobenius_maps"));
+            assert_eq!(p0.cost.get("hash_probes_uncharged"), 6 * n as u64);
+            for bad in [
+                "columns=1,raw_x_cap=100000000,lean_layout=1",
+                "columns=2,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=2",
+            ] {
+                let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{bad}")).unwrap();
+                assert!(
+                    base.build(&ctx, &params, &mut GroupOps::default()).is_err(),
+                    "{bad}"
+                );
+            }
+
+            // The sibling table: the same probes, an addition fewer per
+            // sibling pair and none for P + (−P).  Also on a two-column
+            // all-known base, whose cross-orbit pairs are siblings too.
+            let (k2, _) = build("columns=2,raw_x_cap=100000000,generator_orbit=1,generator_multiples=2,lean_layout=1");
+            for fb in [&l, &k2] {
+                let t0 = FrobeniusPairTable::build_layout(&inst, fb).unwrap();
+                let t1 = FrobeniusPairTable::build_layout_with(&inst, fb, true).unwrap();
+                assert_eq!(t0.entries, t1.entries);
+                assert_eq!(t0.build_canonicalisations, t1.build_canonicalisations);
+                assert_eq!(t0.insert_attempts, t1.insert_attempts);
+                assert!(t1.sib_second_points > 0 && t0.sib_second_points == 0);
+                let orbits = (fb.points.len() / (2 * n as usize)) as u64;
+                assert_eq!(
+                    t1.build_ops.adds + t1.sib_second_points + orbits,
+                    t0.build_ops.adds
+                );
+                assert_eq!(
+                    t1.work_counters().get("sibling_second_points"),
+                    Some(&t1.sib_second_points)
+                );
+                assert!(!t0
+                    .work_counters()
+                    .contains_key("counted:sibling_second_points"));
+                let mut walk = ctx.target;
+                for _ in 0..3_000 {
+                    let (mut a0, mut a1) = (GroupOps::default(), GroupOps::default());
+                    let (mut c0, mut c1) = (OracleCounters::default(), OracleCounters::default());
+                    assert_eq!(
+                        t0.probe(&group, fb, &mut a0, &mut c0, walk),
+                        t1.probe(&group, fb, &mut a1, &mut c1, walk)
+                    );
+                    walk = group.add(&mut GroupOps::default(), walk, inst.generator);
+                }
+            }
+
+            // τ-adic check: the stored orbit gives [d]G, with fewer
+            // operations than double-and-add.
+            let tau = TauOrbitCheck {
+                orbit: (0..n as usize).map(|t| l.points[2 * t]).collect(),
+                neg: (0..n as usize).map(|t| l.points[2 * t + 1]).collect(),
+                mu: if a == 1 { 1 } else { -1 },
+            };
+            let (mut ops_tau, mut ops_dbl) = (GroupOps::default(), GroupOps::default());
+            for d in (0..inst.r)
+                .step_by((inst.r / 997).max(1) as usize)
+                .chain([inst.r - 1])
+            {
+                let (p, steps) = tau_orbit_mul(&group, &mut ops_tau, &tau, d);
+                assert_eq!(p, group.mul(&mut ops_dbl, inst.generator, d), "n{n} d {d}");
+                assert_eq!(steps, tau_naf(d, tau.mu).len() as u64);
+            }
+            assert!(
+                ops_tau.gae() < ops_dbl.gae(),
+                "n{n}: {} vs {}",
+                ops_tau.gae(),
+                ops_dbl.gae()
+            );
+
+            // End to end: the incumbent, its explicit off state, and all
+            // three levers on recover the same log on the same walk.
+            let run = |fbp: &[(&str, &str)], op: &[(&str, &str)], seed: u64| {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                pspec.factor_base_params.set("columns", "1");
+                pspec.factor_base_params.set("raw_x_cap", "100000000");
+                pspec.factor_base_params.set("generator_orbit", "1");
+                for (k, v) in fbp {
+                    pspec.factor_base_params.set(k, *v);
+                }
+                pspec.oracle_params.set("m", "2");
+                for (k, v) in op {
+                    pspec.oracle_params.set(k, *v);
+                }
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+            };
+            for seed in [3u64, 11] {
+                let inc = run(&[], &[], seed).expect("incumbent");
+                let off = run(
+                    &[("lean_layout", "0")],
+                    &[("sib", "0"), ("tau_verify", "0")],
+                    seed,
+                )
+                .expect("off");
+                // Everything but the wall clock.
+                fn no_wall(v: &mut serde_json::Value) {
+                    match v {
+                        serde_json::Value::Object(m) => {
+                            m.remove("wall_ns");
+                            m.values_mut().for_each(no_wall);
+                        }
+                        serde_json::Value::Array(a) => a.iter_mut().for_each(no_wall),
+                        _ => {}
+                    }
+                }
+                let (mut di, mut doff) = (
+                    serde_json::to_value(&inc.decomposition).unwrap(),
+                    serde_json::to_value(&off.decomposition).unwrap(),
+                );
+                no_wall(&mut di);
+                no_wall(&mut doff);
+                assert_eq!(di, doff);
+                assert_eq!(inc.total_gae, off.total_gae);
+                let on = run(
+                    &[("lean_layout", "1")],
+                    &[("sib", "1"), ("tau_verify", "1")],
+                    seed,
+                )
+                .expect("on");
+                assert!(inc.verified && on.verified, "n{n} seed {seed}");
+                assert_eq!(on.recovered, Some(planted));
+                assert_eq!(
+                    on.decomposition.targets_tried,
+                    inc.decomposition.targets_tried
+                );
+                assert!(
+                    on.total_gae < inc.total_gae,
+                    "n{n}: {} vs {}",
+                    on.total_gae,
+                    inc.total_gae
+                );
+                assert!(on.verify.get("tau_naf_recode_steps_uncharged") > 0);
+                assert_eq!(on.verify.group_ops.doubles, 0);
+                // The lean base refuses every other oracle.
+                let mut other = FrobeniusMitmOracle::new_counted(2, &inst);
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 1_000,
+                    seed,
+                    ..Default::default()
+                };
+                for (k, v) in [
+                    ("columns", "1"),
+                    ("raw_x_cap", "100000000"),
+                    ("generator_orbit", "1"),
+                    ("lean_layout", "1"),
+                ] {
+                    pspec.factor_base_params.set(k, v);
+                }
+                pspec.oracle_params.set("m", "2");
+                assert!(run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut other,
+                    planted,
+                    &Calibration::default(),
+                    None
+                )
+                .is_err());
+            }
+        }
+    }
+
+    /// The Koblitz K1 set-up levers (2026-11-18): `lazy_neg=1` (the base
+    /// does not form its negatives) and `orbit_ids=1` (the sibling table
+    /// build skips the same-orbit pairs three `Z[τ]` identities name as
+    /// repeats).  Off (absent or 0) is the incumbent bit for bit; on, the
+    /// table has the same keys and answers every probe alike, the counts
+    /// move by exactly `k·n` negations and, per orbit, one addition, two
+    /// `sibling_second_points`, three canonicalisations and three inserts,
+    /// and the pipeline tries the same targets and recovers the same log.
+    #[test]
+    fn k1_lazy_negatives_and_orbit_identities_keep_the_solve() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{
+            koblitz_instance, BinaryGroup, CountedGroup, FrobeniusPairTable, OracleCounters,
+        };
+        use crate::cryptanalysis::koblitz_fast::FastPoint;
+
+        for (a, n, k, d, planted_seed) in [
+            (1u8, 23u32, 4u64, 5u64, 4_242u64),
+            (1, 29, 1, 0, 40_009),
+            (0, 37, 8, 5, 777),
+        ] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let mu: i64 = if a == 1 { 1 } else { -1 };
+            assert_eq!(inst.koblitz.as_ref().unwrap().trace, mu);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let fbspec = if k == 1 {
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1".to_string()
+            } else {
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d},lean_layout=1,orbit_key_reuse=1")
+            };
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let build = |extra: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}{extra}")).unwrap();
+                let mut ops = GroupOps::default();
+                base.build(&ctx, &params, &mut ops).map(|fb| (fb, ops))
+            };
+            // The base: off is the incumbent; on keeps every slot, column,
+            // coefficient and negation map, stores the identity in each odd
+            // slot, and drops exactly the k·n negations.
+            let (b0, o0) = build("").unwrap();
+            let (bz, oz) = build(",lazy_neg=0").unwrap();
+            let (b1, o1) = build(",lazy_neg=1").unwrap();
+            assert_eq!(b0.points, bz.points);
+            assert_eq!(b0.cost.native, bz.cost.native);
+            assert!(!b0.negations_deferred && !bz.negations_deferred && b1.negations_deferred);
+            assert_eq!(b0.points.len(), b1.points.len());
+            for (i, (p, q)) in b0.points.iter().zip(&b1.points).enumerate() {
+                if i % 2 == 0 {
+                    assert_eq!(p, q);
+                } else {
+                    assert_eq!(*q, FastPoint::INFINITY);
+                    assert_eq!(*p, group.neg(b0.points[i - 1]));
+                }
+            }
+            assert_eq!(b0.col_of, b1.col_of);
+            assert_eq!(b0.coef_of, b1.coef_of);
+            assert_eq!(b0.neg_index, b1.neg_index);
+            assert_eq!(b0.generator_ladder, b1.generator_ladder);
+            assert_eq!((o0.adds, o0.doubles), (oz.adds, oz.doubles));
+            assert_eq!((o0.adds, o0.doubles), (o1.adds, o1.doubles));
+            assert_eq!(b0.cost.get("point_negations_uncharged"), k * n as u64);
+            assert_eq!(b1.cost.get("point_negations_uncharged"), 0);
+            for (name, v) in &b0.cost.native {
+                if name != "point_negations_uncharged" {
+                    assert_eq!(b1.cost.native.get(name), Some(v), "{name}");
+                }
+            }
+            assert!(build(",lean_layout=0,lazy_neg=1").is_err());
+            assert!(build(",lazy_neg=2").is_err());
+            // Tables that read every stored point refuse such a base.
+            assert!(FrobeniusPairTable::build(&inst, &b1).is_none());
+            assert!(FrobeniusPairTable::build_lazy(&inst, &b1).is_none());
+
+            // The table: the plan keeps every key (same entries, same
+            // answer to every probe) and drops exactly its work.
+            let t0 = FrobeniusPairTable::build_layout_with(&inst, &b0, true).unwrap();
+            let tz = FrobeniusPairTable::build_layout_plan(&inst, &b0, true, None).unwrap();
+            assert_eq!(
+                (
+                    t0.entries,
+                    t0.build_ops.adds,
+                    t0.sib_second_points,
+                    t0.build_canonicalisations
+                ),
+                (
+                    tz.entries,
+                    tz.build_ops.adds,
+                    tz.sib_second_points,
+                    tz.build_canonicalisations
+                )
+            );
+            assert_eq!(tz.identity_skips, 0);
+            let tn = FrobeniusPairTable::build_layout_plan(&inst, &b1, true, None).unwrap();
+            let t1 = FrobeniusPairTable::build_layout_plan(&inst, &b1, true, Some(mu)).unwrap();
+            let tb = FrobeniusPairTable::build_layout_plan(&inst, &b0, true, Some(mu)).unwrap();
+            assert!(FrobeniusPairTable::build_layout_plan(&inst, &b0, false, Some(mu)).is_none());
+            assert!(FrobeniusPairTable::build_layout_plan(&inst, &b0, true, Some(2)).is_none());
+            for t in [&tn, &t1, &tb] {
+                assert_eq!(t.entries, t0.entries);
+                assert_eq!(t.build_point_negations, 0);
+            }
+            assert_eq!(tn.build_ops.adds, t0.build_ops.adds);
+            assert_eq!(tn.build_canonicalisations, t0.build_canonicalisations);
+            for t in [&t1, &tb] {
+                assert_eq!(t.identity_skips, 3 * k);
+                assert_eq!(t.build_ops.adds + k, t0.build_ops.adds);
+                assert_eq!(t.build_ops.doubles, t0.build_ops.doubles);
+                assert_eq!(t.sib_second_points + 2 * k, t0.sib_second_points);
+                assert_eq!(
+                    t.build_canonicalisations + 3 * k,
+                    t0.build_canonicalisations
+                );
+                assert_eq!(t.insert_attempts + 3 * k, t0.insert_attempts);
+            }
+            let mut walk = ctx.target;
+            let mut hits = 0;
+            let mut negs = 0;
+            for _ in 0..4_000 {
+                let mut c0 = OracleCounters::default();
+                let r0 = t0.probe(&group, &b0, &mut GroupOps::default(), &mut c0, walk);
+                for (t, fb) in [(&tn, &b1), (&t1, &b1), (&tb, &b0)] {
+                    let mut c = OracleCounters::default();
+                    let r = t.probe(&group, fb, &mut GroupOps::default(), &mut c, walk);
+                    assert_eq!(r.is_some(), r0.is_some());
+                    assert_eq!(c.frobfold_mismatches, 0);
+                    assert_eq!((c.canonicalisations, c.lookups), (1, 1));
+                    if let Some((i, j)) = r {
+                        // Named by the full base: the pair sums to the walk point.
+                        let s = group.add(&mut GroupOps::default(), b0.points[i], b0.points[j]);
+                        assert_eq!(s, walk);
+                        if fb.negations_deferred {
+                            negs += c.point_negations;
+                        } else {
+                            assert_eq!(c.point_negations, 0);
+                        }
+                    }
+                }
+                if r0.is_some() {
+                    hits += 1;
+                }
+                walk = group.add(&mut GroupOps::default(), walk, inst.generator);
+            }
+            assert!(hits > 0, "n{n}: the probe test saw no hit");
+            assert!(negs <= 4 * hits);
+
+            // End to end, against the current best arm of the curve.
+            let run = |fbp: &[(&str, &str)], op: &[(&str, &str)], seed: u64| {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}")).unwrap();
+                pspec.factor_base_params = params;
+                for (key, v) in fbp {
+                    pspec.factor_base_params.set(key, *v);
+                }
+                pspec.oracle_params.set("m", "2");
+                pspec.oracle_params.set("sib", "1");
+                if k > 1 {
+                    pspec.oracle_params.set("walk_sib", "8");
+                    pspec.oracle_params.set("ladder_verify", "1");
+                }
+                for (key, v) in op {
+                    pspec.oracle_params.set(key, *v);
+                }
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+            };
+            fn no_wall(v: &mut serde_json::Value) {
+                match v {
+                    serde_json::Value::Object(m) => {
+                        m.remove("wall_ns");
+                        m.values_mut().for_each(no_wall);
+                    }
+                    serde_json::Value::Array(a) => a.iter_mut().for_each(no_wall),
+                    _ => {}
+                }
+            }
+            let strip = |r: &RunReport| {
+                let mut v = serde_json::to_value((
+                    &r.factor_base,
+                    &r.decomposition,
+                    &r.linear_algebra,
+                    &r.verify,
+                    r.recovered,
+                    r.verified,
+                    r.total_gae,
+                ))
+                .unwrap();
+                no_wall(&mut v);
+                v
+            };
+            for seed in [3u64, 11] {
+                let inc = run(&[], &[], seed).expect("incumbent");
+                let off = run(&[("lazy_neg", "0")], &[("orbit_ids", "0")], seed).expect("off");
+                assert_eq!(strip(&inc), strip(&off), "n{n}: off is the incumbent");
+                assert!(inc.verified && inc.recovered == Some(planted));
+                let on = run(&[("lazy_neg", "1")], &[("orbit_ids", "1")], seed).expect("on");
+                assert!(on.verified && on.recovered == Some(planted), "n{n}");
+                assert_eq!(
+                    on.decomposition.targets_tried,
+                    inc.decomposition.targets_tried
+                );
+                assert_eq!(
+                    on.decomposition.relations_found,
+                    inc.decomposition.relations_found
+                );
+                assert_eq!(
+                    on.decomposition.cost.group_ops,
+                    inc.decomposition.cost.group_ops
+                );
+                assert_eq!(on.verify.group_ops, inc.verify.group_ops);
+                assert_eq!(on.linear_algebra.rows, inc.linear_algebra.rows);
+                let (s0, s1) = (&inc.decomposition.setup, &on.decomposition.setup);
+                assert_eq!(s1.group_ops.adds + k, s0.group_ops.adds);
+                assert_eq!(
+                    s1.get("canonicalisations") + 3 * k,
+                    s0.get("canonicalisations")
+                );
+                assert_eq!(s1.get("pair_table_entries"), s0.get("pair_table_entries"));
+                assert_eq!(s1.get("orbit_identity_skips"), 3 * k);
+                assert_eq!(on.factor_base.cost.get("point_negations_uncharged"), 0);
+                assert_eq!(
+                    inc.factor_base.cost.get("point_negations_uncharged"),
+                    k * n as u64
+                );
+                assert!(on.decomposition.cost.get("point_negations_uncharged") <= 2);
+                assert_eq!(inc.decomposition.cost.get("point_negations_uncharged"), 0);
+                // Each lever alone is accepted too.
+                assert!(run(&[("lazy_neg", "1")], &[], seed).unwrap().verified);
+                assert!(run(&[], &[("orbit_ids", "1")], seed).unwrap().verified);
+            }
+            // Refusals: a deferred base with tau_verify or m = 3, and the
+            // plan without sib.
+            assert!(run(
+                &[("lazy_neg", "1")],
+                &[("tau_verify", "1"), ("ladder_verify", "0")],
+                3
+            )
+            .is_err());
+            assert!(run(
+                &[],
+                &[("orbit_ids", "1"), ("sib", "0"), ("walk_sib", "0")],
+                3
+            )
+            .is_err());
+        }
+    }
+
+    /// The Koblitz K1 speed-up levers (2026-11-18): `walk_sib=m` (the
+    /// stride-generator progression formed by sibling pairs with x-only
+    /// probes), `ladder_verify=1` (the recovery check reads the base's
+    /// stored doubling chain) and `orbit_key_reuse=1` (a seed's orbit key
+    /// from its formed Frobenius images).  Each one absent or 0 is the
+    /// incumbent bit for bit; on, the targets, their order, the relation and
+    /// the recovered log are unchanged, and the counts are exactly the
+    /// model's: the walk `m + 2 + (blocks)(m + 1) + lift` additions and one
+    /// `sibling_second_points` a pair, the check `popcount(d) - 1`
+    /// additions and doublings only above the chain, no key squarings.
+    #[test]
+    fn k1_sibling_walk_ladder_verify_and_key_reuse_keep_the_solve() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{
+            koblitz_instance, BinaryGroup, CountedGroup, FrobeniusPairTable, OracleCounters,
+        };
+
+        /// Walk additions (set-up, centres, pairs, lift) and sibling
+        /// second points to try `k = 0..K` with the hit at `K - 1`.
+        fn walk_model(big_k: u64, m: u64) -> (u64, u64) {
+            if big_k <= 1 {
+                return (0, 0);
+            }
+            let (mut adds, mut sibs) = (m + 2, 0u64);
+            let (mut kc, last) = (m + 1, big_k - 1);
+            loop {
+                if kc > m + 1 {
+                    adds += 1;
+                }
+                for i in (1..=m).rev() {
+                    adds += 1;
+                    sibs += 1;
+                    if kc - i == last {
+                        return (adds + 1, sibs);
+                    }
+                }
+                if kc + m >= last {
+                    return (adds, sibs);
+                }
+                kc += 2 * m + 1;
+            }
+        }
+
+        for (a, n, k, d, planted_seed) in [
+            (1u8, 23u32, 4u64, 5u64, 4_242u64),
+            (1, 29, 1, 0, 40_009),
+            (0, 37, 8, 5, 777),
+        ] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let fbspec = if k == 1 {
+                "columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1".to_string()
+            } else {
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d},lean_layout=1")
+            };
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let build = |extra: &str| {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}{extra}")).unwrap();
+                let mut ops = GroupOps::default();
+                let fb = base.build(&ctx, &params, &mut ops).unwrap();
+                (fb, ops)
+            };
+            // The base: key reuse keeps points, columns, coefficients and
+            // every other count, and drops the k(n-1) key squarings.
+            let (b0, o0) = build("");
+            let (bz, oz) = build(",orbit_key_reuse=0");
+            let (b1, o1) = build(",orbit_key_reuse=1");
+            assert_eq!(b0.cost.native, bz.cost.native);
+            assert_eq!(b0.points, b1.points);
+            assert_eq!(b0.col_of, b1.col_of);
+            assert_eq!(b0.coef_of, b1.coef_of);
+            assert_eq!(b0.neg_index, b1.neg_index);
+            assert_eq!((o0.adds, o0.doubles), (oz.adds, oz.doubles));
+            assert_eq!((o0.adds, o0.doubles), (o1.adds, o1.doubles));
+            let sq = if k == 1 { 0 } else { k * (n as u64 - 1) };
+            assert_eq!(b0.cost.get("min_key_field_squares_uncharged"), sq);
+            assert_eq!(b1.cost.get("min_key_field_squares_uncharged"), 0);
+            for (name, v) in &b0.cost.native {
+                if name != "min_key_field_squares_uncharged" {
+                    assert_eq!(b1.cost.native.get(name), Some(v), "{name}");
+                }
+            }
+            // The stored chain is [2^i]G, i = 0..=d(k-1), the doublings the
+            // base charged; empty without multiple_doublings.
+            if k > 1 {
+                assert_eq!(b0.generator_ladder.len() as u64, d * (k - 1) + 1);
+                let mut p = inst.generator;
+                for (i, rung) in b0.generator_ladder.iter().enumerate() {
+                    assert_eq!(*rung, p, "rung {i}");
+                    p = group.double(&mut GroupOps::default(), p);
+                }
+            } else {
+                assert!(b0.generator_ladder.is_empty());
+            }
+            // x-only siblings: the full plus point and the minus abscissa
+            // are those of two full additions.
+            let mut p = ctx.target;
+            for i in 0..500u64 {
+                let j = group.mul(&mut GroupOps::default(), inst.generator, 1 + i % 17);
+                if let Some((plus, mx)) = group.x_sibling_pair(p, j) {
+                    let mut ops = GroupOps::default();
+                    assert_eq!(plus, group.add(&mut ops, p, j));
+                    assert_eq!(mx, group.add(&mut ops, p, group.neg(j)).x);
+                }
+                p = group.add(&mut GroupOps::default(), p, inst.generator);
+            }
+            // The x-only probe agrees with the full probe on hit or miss.
+            let table = FrobeniusPairTable::build_layout_with(&inst, &b1, true).unwrap();
+            let mut walk = ctx.target;
+            for _ in 0..3_000 {
+                let mut c = OracleCounters::default();
+                let full = table
+                    .probe(&group, &b1, &mut GroupOps::default(), &mut c, walk)
+                    .is_some();
+                let mut cx = OracleCounters::default();
+                let hit = table.probe_x(&mut cx, walk.x);
+                assert_eq!((cx.canonicalisations, cx.lookups), (1, 1));
+                assert!(hit || !full);
+                walk = group.add(&mut GroupOps::default(), walk, inst.generator);
+            }
+
+            // End to end.
+            let run = |fbp: &[(&str, &str)], op: &[(&str, &str)], seed: u64| {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}")).unwrap();
+                pspec.factor_base_params = params;
+                for (key, v) in fbp {
+                    pspec.factor_base_params.set(key, *v);
+                }
+                pspec.oracle_params.set("m", "2");
+                pspec.oracle_params.set("sib", "1");
+                for (key, v) in op {
+                    pspec.oracle_params.set(key, *v);
+                }
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+            };
+            fn no_wall(v: &mut serde_json::Value) {
+                match v {
+                    serde_json::Value::Object(m) => {
+                        m.remove("wall_ns");
+                        m.values_mut().for_each(no_wall);
+                    }
+                    serde_json::Value::Array(a) => a.iter_mut().for_each(no_wall),
+                    _ => {}
+                }
+            }
+            let strip = |r: &RunReport| {
+                let mut v = serde_json::to_value((
+                    &r.factor_base,
+                    &r.decomposition,
+                    &r.linear_algebra,
+                    &r.verify,
+                    r.recovered,
+                    r.verified,
+                    r.total_gae,
+                ))
+                .unwrap();
+                no_wall(&mut v);
+                v
+            };
+            for seed in [3u64, 11] {
+                let inc = run(&[], &[], seed).expect("incumbent");
+                let off = run(
+                    &[("orbit_key_reuse", "0")],
+                    &[("walk_sib", "0"), ("ladder_verify", "0")],
+                    seed,
+                )
+                .expect("off");
+                assert_eq!(strip(&inc), strip(&off), "n{n}: off is the incumbent");
+                assert!(inc.verified && inc.recovered == Some(planted));
+                let big_k = inc.decomposition.targets_tried;
+                let inc_adds = inc.decomposition.cost.group_ops.adds;
+                assert_eq!(
+                    inc_adds, big_k,
+                    "n{n}: K - 1 walk steps and the hit's addition"
+                );
+                for m in [1u64, 2, 3, 5] {
+                    let mut op = vec![("walk_sib", m.to_string())];
+                    let mut fbp = vec![];
+                    if k > 1 {
+                        op.push(("ladder_verify", "1".into()));
+                        fbp.push(("orbit_key_reuse", "1"));
+                    }
+                    let op: Vec<(&str, &str)> = op.iter().map(|(a, b)| (*a, b.as_str())).collect();
+                    let on = run(&fbp, &op, seed).expect("on");
+                    assert!(on.verified, "n{n} m{m}");
+                    assert_eq!(on.recovered, Some(planted));
+                    assert_eq!(
+                        on.decomposition.targets_tried, big_k,
+                        "n{n} m{m}: same targets"
+                    );
+                    assert_eq!(
+                        on.decomposition.relations_found,
+                        inc.decomposition.relations_found
+                    );
+                    assert_eq!(on.linear_algebra.rows, inc.linear_algebra.rows);
+                    let c = &on.decomposition.cost;
+                    assert_eq!(c.get("walk_sibling_full_pairs"), 0);
+                    assert_eq!(c.get("direct_relations_skipped"), 0);
+                    let (wa, ws) = walk_model(big_k, m);
+                    // m + 1 set-up operations ([2]G a doubling), the
+                    // first centre, the centres and pairs, a lift, and
+                    // the hit's own addition.
+                    assert_eq!(
+                        c.group_ops.adds + c.group_ops.doubles,
+                        wa + 1,
+                        "n{n} m{m} K{big_k}: walk operations"
+                    );
+                    assert_eq!(c.group_ops.doubles, if big_k > 1 { 1 } else { 0 });
+                    assert_eq!(
+                        c.work_native
+                            .get("sibling_second_points")
+                            .copied()
+                            .unwrap_or(0),
+                        ws
+                    );
+                    assert_eq!(c.get("walk_sibling_pairs"), ws);
+                    assert!(c.get("walk_sibling_lifts") <= 1);
+                    // One canonicalisation and lookup per target tried,
+                    // plus the full re-probe of a lifted hit.
+                    assert_eq!(
+                        c.get("canonicalisations"),
+                        big_k + c.get("walk_sibling_lifts")
+                    );
+                    assert_eq!(c.get("lookups"), big_k + c.get("walk_sibling_lifts"));
+                    // The same oracle set-up.
+                    assert_eq!(
+                        on.decomposition.setup.group_ops.adds,
+                        inc.decomposition.setup.group_ops.adds
+                    );
+                    if k > 1 {
+                        let len = d * (k - 1) + 1;
+                        let bl = 64 - planted.leading_zeros() as u64;
+                        assert_eq!(on.verify.group_ops.adds, inc.verify.group_ops.adds);
+                        assert_eq!(on.verify.group_ops.doubles, bl.saturating_sub(len));
+                        assert_eq!(
+                            on.factor_base.cost.get("min_key_field_squares_uncharged"),
+                            0
+                        );
+                    } else {
+                        assert_eq!(on.verify.group_ops, inc.verify.group_ops);
+                    }
+                }
+                // walk_sib refuses other target sources and other oracles.
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::Random,
+                    max_trials: 1_000,
+                    seed,
+                    ..Default::default()
+                };
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}")).unwrap();
+                pspec.factor_base_params = params;
+                pspec.oracle_params.set("m", "2");
+                pspec.oracle_params.set("walk_sib", "2");
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                assert!(run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None
+                )
+                .is_err());
+                if k == 1 {
+                    // No chain to read: ladder_verify is refused.
+                    let r = run(&[], &[("ladder_verify", "1")], seed);
+                    assert!(r.is_err());
+                }
+            }
+        }
+    }
+
+    /// `multiple_doublings=d`: the known seeds are `[2^(d(j-1))]G`, built by
+    /// `d(k-1)` doublings and no addition, with logs `h*2^(d(j-1))`; the
+    /// all-known base still pins the target with one relation.
+    #[test]
+    fn multiple_doublings_spread_the_known_log_seeds() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{koblitz_instance, BinaryGroup, CountedGroup};
+
+        for (a, n, planted_seed, k, d) in
+            [(1u8, 23u32, 4_242u64, 4u64, 3u64), (1, 29, 40_009, 2, 5)]
+        {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let planted = 1 + planted_seed % (inst.r - 1);
+            let ctx = binary_ctx_and_planted(&inst, &group, planted);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let spec = format!(
+                "columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d}"
+            );
+            let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+            let mut ops = GroupOps::default();
+            let fb = base.build(&ctx, &params, &mut ops).unwrap();
+            assert_eq!(
+                (ops.doubles, ops.adds, ops.scalar_mults),
+                (d * (k - 1), 0, 0)
+            );
+            let logs = base.known_column_logs(&ctx, &params).unwrap();
+            let h = (inst.cofactor % inst.r) as u128;
+            for j in 1..=k {
+                let s = (1u128 << (d * (j - 1))) % inst.r as u128;
+                assert_eq!(
+                    logs[(j - 1) as usize],
+                    ((j - 1) as usize, (h * s % inst.r as u128) as u64)
+                );
+            }
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let x = logs[fb.col_of[i]].1;
+                let e = ((fb.coef_of[i] as u128 * x as u128) % inst.r as u128) as u64;
+                assert_eq!(
+                    group.mul(&mut check, inst.generator, e),
+                    group.mul(&mut check, *p, inst.cofactor),
+                    "{spec}: member {i}"
+                );
+            }
+            for bad in [
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,multiple_doublings={d}"),
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings=0"),
+            ] {
+                let (_, params) =
+                    Params::parse_spec(&format!("compact-orbit-scan:{bad}")).unwrap();
+                assert!(base.build(&ctx, &params, &mut GroupOps::default()).is_err(), "{bad}");
+            }
+            for seed in [3u64, 11] {
+                let mut pspec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: "mitm-frobenius-layout-counted".into(),
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                for (key, v) in [
+                    ("columns", k.to_string()),
+                    ("raw_x_cap", "100000000".to_string()),
+                    ("generator_orbit", "1".to_string()),
+                    ("generator_multiples", k.to_string()),
+                    ("multiple_doublings", d.to_string()),
+                ] {
+                    pspec.factor_base_params.set(key, v);
+                }
+                pspec.oracle_params.set("m", "2");
+                let mut oracle = FrobeniusMitmOracle::new_layout_counted(2, &inst);
+                let rep = run_pipeline(
+                    &ctx,
+                    &pspec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run");
+                assert!(rep.verified, "n{n} seed {seed}");
+                assert_eq!(rep.recovered, Some(planted), "n{n} seed {seed}");
+                assert_eq!(rep.decomposition.relations_found, 1, "n{n} seed {seed}");
+            }
+        }
+    }
+
+    #[test]
+    fn layout_table_returns_the_lazy_pairs_with_no_maps_and_half_the_same_orbit_sums() {
+        use super::plugins::{CompactOrbitScanBase, FrobeniusMitmOracle};
+        use super::stages::FactorBaseBuilder;
+        use crate::cryptanalysis::ic_boundary::{
+            koblitz_instance, BinaryGroup, CountedGroup, FrobeniusPairTable, OracleCounters,
+        };
+
+        for (a, n, spec) in [
+            (
+                1u8,
+                29u32,
+                "columns=1,raw_x_cap=100000000,generator_orbit=1",
+            ),
+            (1, 29, "columns=2,raw_x_cap=100000000,generator_orbit=1"),
+            (0, 13, "columns=3,raw_x_cap=100000000"),
+            (1, 17, "columns=2,raw_x_cap=100000000,norm=2"),
+        ] {
+            let inst = koblitz_instance(a, n).expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let ctx = binary_ctx_and_planted(&inst, &group, 5);
+            let base = CompactOrbitScanBase { instance: &inst };
+            let (_, params) = Params::parse_spec(&format!("compact-orbit-scan:{spec}")).unwrap();
+            let mut ops = GroupOps::default();
+            let fb = base.build(&ctx, &params, &mut ops).unwrap();
+            assert_eq!(fb.frobenius_orbit_layout, Some(n));
+            // The layout itself: σ^t of a member is the member the index names.
+            let nn = n as usize;
+            for i in 0..fb.points.len() {
+                let (block, within) = (i / (2 * nn), i % (2 * nn));
+                let next = block * 2 * nn + 2 * ((within / 2 + 1) % nn) + within % 2;
+                assert_eq!(
+                    inst.fast.frobenius_k(fb.points[i], 1),
+                    fb.points[next],
+                    "{spec} {i}"
+                );
+            }
+            let lazy = FrobeniusPairTable::build_lazy(&inst, &fb).expect("lazy table");
+            let layout = FrobeniusPairTable::build_layout(&inst, &fb).expect("layout table");
+            assert_eq!(lazy.entries, layout.entries, "{spec}");
+            assert_eq!(lazy.representatives, layout.representatives, "{spec}");
+            assert_eq!((layout.build_frobenius_maps, layout.build_lookups), (0, 0));
+            // Each orbit's own pairs: n + 1 sums (one of them O) instead of 2n.
+            let orbits = layout.representatives;
+            assert_eq!(
+                lazy.build_ops.adds - layout.build_ops.adds,
+                orbits * (n as u64 - 1)
+            );
+            assert_eq!(
+                lazy.build_canonicalisations - layout.build_canonicalisations,
+                orbits * (n as u64 - 1)
+            );
+            let g = BinaryGroup(&inst.fast);
+            let (mut cl, mut cy) = (OracleCounters::default(), OracleCounters::default());
+            let mut hits = 0u64;
+            for i in 0..fb.points.len() {
+                for j in i..fb.points.len() {
+                    let s = g.add(&mut ops, fb.points[i], fb.points[j]);
+                    if g.is_identity(&s) {
+                        continue;
+                    }
+                    let x = lazy.probe(&g, &fb, &mut ops, &mut cl, s);
+                    let y = layout.probe(&g, &fb, &mut ops, &mut cy, s);
+                    assert_eq!(x, y, "{spec}: pair ({i}, {j})");
+                    assert!(y.is_some(), "{spec}: every pair sum is in the table");
+                    hits += 1;
+                }
+            }
+            assert_eq!(cy.frobfold_mismatches, 0);
+            assert_eq!(cy.frobenius_maps, 0, "{spec}: no map at a hit");
+            assert!(cl.frobenius_maps > 0);
+            // One canonicalisation and one lookup a probe, nothing to resolve.
+            assert_eq!((cy.canonicalisations, cy.lookups), (hits, hits));
+        }
+
+        // End to end: the same logarithm and relations as the lazy oracle.
+        let inst = koblitz_instance(1, 29).expect("roster Koblitz instance");
+        let group = BinaryGroup(&inst.fast);
+        let planted = 1 + 40_009 % (inst.r - 1);
+        let ctx = binary_ctx_and_planted(&inst, &group, planted);
+        let base = CompactOrbitScanBase { instance: &inst };
+        for seed in [3u64, 11] {
+            let run = |layout: bool| {
+                let mut spec = PipelineSpec {
+                    factor_base: "compact-orbit-scan".into(),
+                    oracle: if layout {
+                        "mitm-frobenius-layout-counted".into()
+                    } else {
+                        "mitm-frobenius-lazy-counted".into()
+                    },
+                    targets: Targets::StrideGenerator,
+                    max_trials: 10_000_000,
+                    seed,
+                    ..Default::default()
+                };
+                spec.factor_base_params.set("columns", "1");
+                spec.factor_base_params.set("raw_x_cap", "100000000");
+                spec.factor_base_params.set("generator_orbit", "1");
+                spec.oracle_params.set("m", "2");
+                let mut oracle = if layout {
+                    FrobeniusMitmOracle::new_layout_counted(2, &inst)
+                } else {
+                    FrobeniusMitmOracle::new_lazy_counted(2, &inst)
+                };
+                run_pipeline(
+                    &ctx,
+                    &spec,
+                    &base,
+                    &mut oracle,
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .expect("the configuration should run")
+            };
+            let (lazy, layout) = (run(false), run(true));
+            assert!(lazy.verified && layout.verified, "seed {seed}");
+            assert_eq!(layout.recovered, Some(planted));
+            assert_eq!(
+                lazy.decomposition.targets_tried,
+                layout.decomposition.targets_tried
+            );
+            assert!(
+                layout.decomposition.setup.gae < lazy.decomposition.setup.gae,
+                "seed {seed}: fewer same-orbit sums"
+            );
+        }
+    }
+
     #[test]
     fn the_symmetrised_koblitz_pipeline_recovers_the_logarithm_over_a_torsion_closed_base() {
         use super::plugins::{KoblitzSymmetrisedBase, SymmetrisedOracle};
@@ -2141,5 +4403,133 @@ mod tests {
             "the solver is inside the phase"
         );
         assert!(report.s > 0.0 && report.s.is_finite());
+
+        // `bitop/v1` completeness.  The base's phase and the oracle's
+        // set-up each carry what `bitop_tally` saw as `tally_*` counters,
+        // every one of them nonzero (the subspace's XORs and set probes,
+        // the lifts' products, squarings and inversions, the Artin–
+        // Schreier squarings, the frame's inversions; the set-up repeats
+        // the base and adds the membership probes), the set-up carries
+        // the marker, `native` carries none of it, and every solve set
+        // `bitop_complete`.
+        use crate::cryptanalysis::bitop_tally::WORK_NATIVE_KEYS;
+        use std::collections::BTreeMap;
+        for (phase, cost) in [
+            ("factor_base", &report.factor_base.cost),
+            ("oracle_setup", &report.decomposition.setup),
+        ] {
+            for key in WORK_NATIVE_KEYS {
+                assert!(
+                    cost.work_native.get(key).copied().unwrap_or(0) > 0,
+                    "{phase}: {key} is zero"
+                );
+                assert!(
+                    !cost.native.contains_key(key),
+                    "{phase}: {key} leaked into native"
+                );
+            }
+        }
+        assert_eq!(
+            report
+                .decomposition
+                .setup
+                .work_native
+                .get("counted:table_insert_attempts"),
+            Some(&1)
+        );
+        assert_eq!(solver.extra.get("bitop_complete"), Some(&1));
+        // Priced as `ecbench work` prices a record, the run is complete:
+        // nothing unpriced, nothing known uncounted.
+        use crate::cryptanalysis::ecbench::methods::{phase_of, SolverStats};
+        use crate::cryptanalysis::ecbench::work::{price, Priceable};
+        use crate::cryptanalysis::ecbench::workload::CurveFacts;
+        let phases = vec![
+            phase_of("factor_base", &report.factor_base.cost),
+            phase_of("oracle_setup", &report.decomposition.setup),
+            phase_of("relations", &report.decomposition.cost),
+            phase_of("linear_algebra", &report.linear_algebra.cost),
+            phase_of("verify", &report.verify),
+        ];
+        let stats = SolverStats::from_report(solver, oracle.last_system().as_ref());
+        let curve = CurveFacts {
+            slug: inst.name.clone(),
+            icv1: String::new(),
+            family: "koblitz".into(),
+            construction: String::new(),
+            field_degree: Some(inst.n),
+            field_bits: None,
+            group_order: u128::from(inst.group_order).into(),
+            r: u128::from(inst.r).into(),
+            cofactor: u128::from(inst.cofactor).into(),
+            generator: [String::new(), String::new()],
+            automorphisms_available: 2 * inst.n,
+            registered: false,
+            ec1: None,
+            curve_uid: None,
+        };
+        let params = BTreeMap::new();
+        let counters = BTreeMap::new();
+        let work = price(&Priceable {
+            method_id: "ic.pipeline",
+            method_params: &params,
+            curve: &curve,
+            phases: &phases,
+            counters: &counters,
+            solver: Some(&stats),
+        })
+        .expect("the record prices");
+        assert!(work.unpriced.is_empty(), "unpriced: {:?}", work.unpriced);
+        assert!(
+            work.known_uncounted.is_empty(),
+            "known_uncounted: {:?}",
+            work.known_uncounted
+        );
+        assert!(work.complete);
+        let setup = work
+            .phases
+            .iter()
+            .find(|p| p.name == "oracle_setup")
+            .expect("the set-up phase is priced");
+        assert!(setup.prims.get("field_inv").copied().unwrap_or(0) > 0);
+        assert!(setup.prims.get("hash_probe").copied().unwrap_or(0) > 0);
+
+        // Nothing is priced twice.  `koblitz_factor_base` still writes
+        // the natives `as_solves` and `frobenius_maps` (replay compares
+        // them), and marks them as carried by the builder's tally; the
+        // base's phase then prices to exactly its tally plus the index
+        // build, primitive for primitive, with no Artin–Schreier solve
+        // of its own.
+        let fbc = &report.factor_base.cost;
+        for native in ["as_solves", "frobenius_maps"] {
+            assert!(fbc.native.get(native).copied().unwrap_or(0) > 0, "{native}");
+            assert_eq!(
+                fbc.work_native.get(&format!("tallied:{native}")),
+                Some(&1),
+                "{native} is not marked"
+            );
+        }
+        let wn = |k: &str| u128::from(fbc.work_native.get(k).copied().unwrap_or(0));
+        let expect: BTreeMap<String, u128> = [
+            ("word_op", wn("tally_word_ops") + wn("index_sort_word_ops")),
+            ("hash_probe", wn("tally_hash_probes") + wn("index_inserts")),
+            (
+                "field_add",
+                wn("tally_field_adds") + wn("index_point_negations"),
+            ),
+            ("field_mul", wn("tally_field_muls")),
+            ("field_sqr", wn("tally_field_sqrs")),
+            ("field_inv", wn("tally_field_invs")),
+            ("group_add", u128::from(fbc.group_ops.adds)),
+            ("group_double", u128::from(fbc.group_ops.doubles)),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+        let base = work
+            .phases
+            .iter()
+            .find(|p| p.name == "factor_base")
+            .expect("the base's phase is priced");
+        assert_eq!(base.prims, expect, "the base's phase is priced twice");
     }
 }

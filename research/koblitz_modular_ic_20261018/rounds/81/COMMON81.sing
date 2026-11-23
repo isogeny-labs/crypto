@@ -1,0 +1,57 @@
+LIB "primdec.lib";
+proc require81(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../50/runs/normal-relative-finite50-01/normalization50.sing"));
+require81(char(basering)==2 && npars(basering)==0 && nvars(basering)==22,"CAND81_COEFFICIENT_AND_RING_SHAPE");
+require81(size(norid)==400 && size(normap)==3 && normap[1]==x && normap[2]==y && normap[3]==p,"CAND81_SAVED_SOURCE_MAP");
+ideal specialized81=subst(norid,p,0);
+ideal base81;
+if(component81==0){base81=specialized81,p,y;}
+else{base81=specialized81,p,y+1;}
+ideal full81=std(base81);
+require81(vdim(full81)==16,"CAND81_COMPLETE_COMPONENT_LENGTH");
+ideal reduced81=std(radical(full81));
+require81(vdim(reduced81)==4,"CAND81_REDUCED_DIMENSION");
+list primes81=minAssGTZ(reduced81);
+require81(size(primes81)==2,"CAND81_TWO_PRIMES");
+int branch81;int i81;int j81;int code81;int generatorIndex81;
+poly generator81;poly relation81;ideal prime81;ideal map81;ideal checkedMap81;
+intvec codes81a=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
+intvec codes81b=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
+for(branch81=1;branch81<=2;branch81++){
+ prime81=std(primes81[branch81]);
+ require81(vdim(prime81)==2,"CAND81_PRIME_DEGREE_TWO");
+ generatorIndex81=0;
+ for(i81=1;i81<=22;i81++){
+  if(generatorIndex81==0 && reduce(var(i81)^2+var(i81)+1,prime81)==0){generatorIndex81=i81;}
+ }
+ require81(generatorIndex81>0,"CAND81_NO_F4_GENERATOR");
+ generator81=var(generatorIndex81);
+ map81=generator81^2+generator81+1;
+ print("CAND81_BEGIN component="+string(component81)+" prime="+string(branch81)+" generator_index="+string(generatorIndex81));
+ for(i81=1;i81<=22;i81++){
+  code81=-1;relation81=0;
+  if(reduce(var(i81),prime81)==0){code81=0;relation81=var(i81);}
+  if(reduce(var(i81)+1,prime81)==0){code81=1;relation81=var(i81)+1;}
+  if(reduce(var(i81)+generator81,prime81)==0){code81=2;relation81=var(i81)+generator81;}
+  if(reduce(var(i81)+generator81+1,prime81)==0){code81=3;relation81=var(i81)+generator81+1;}
+  require81(code81>=0,"CAND81_VARIABLE_NOT_IN_F4_SPAN");
+  if(branch81==1){codes81a[i81]=code81;}
+  else{codes81b[i81]=code81;}
+  map81=map81,relation81;
+  print("CAND81_MAP component="+string(component81)+" prime="+string(branch81)+" variable="+string(i81)+" name="+string(var(i81))+" code="+string(code81));
+ }
+ checkedMap81=std(map81);
+ require81(vdim(checkedMap81)==2,"CAND81_MAP_DIMENSION");
+ for(j81=1;j81<=size(prime81);j81++){
+  require81(reduce(prime81[j81],checkedMap81)==0,"CAND81_PRIME_NOT_IN_MAP");
+ }
+ for(j81=1;j81<=size(checkedMap81);j81++){
+  require81(reduce(checkedMap81[j81],prime81)==0,"CAND81_MAP_NOT_IN_PRIME");
+ }
+ print("CAND81_PRIME component="+string(component81)+" index="+string(branch81)+" degree=2 map_verified=1");
+}
+require81(codes81a!=codes81b,"CAND81_DUPLICATE_MAPS");
+print("CAND81_RESULT component="+string(component81)+" full_dim=16 reduced_dim=4 primes=2 maps_verified=2 candidate_only=1");
+if(component81==0){print("CANDIDATE_V0_81_ALL_CHECKS_PASS");}
+else{print("CANDIDATE_V1_81_ALL_CHECKS_PASS");}
+quit;

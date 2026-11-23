@@ -1,0 +1,36 @@
+   Compiling hec-native2lp v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_native2lp_20261116)
+error[E0753]: expected outer doc comment
+ --> native.rs:2:1
+  |
+2 | //! Bounded 0/1/2-large-prime baseline using exact partial elimination.
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: inner doc comments like this (starting with `//!` or `/*!`) can only appear before items
+help: you might have meant to write a regular comment
+  |
+2 - //! Bounded 0/1/2-large-prime baseline using exact partial elimination.
+2 + // Bounded 0/1/2-large-prime baseline using exact partial elimination.
+  |
+
+error[E0753]: expected outer doc comment
+  --> native.rs:3:1
+   |
+ 3 |   //! The full catalogue is materialized; this is a correctness baseline.
+   |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 4 | / use hec_native_ic::{
+ 5 | |     fp::Fp,
+ 6 | |     instance::{factor_base, order_bsgs, Instance},
+ 7 | |     oracle::{split, OracleStats},
+ 8 | |     rng::Rng,
+ 9 | |     solve::{solve_fast, Row, SolveStats},
+10 | | };
+   | |__- the inner doc comment doesn't annotate this `use` import
+   |
+help: to annotate the `use` import, change the doc comment from inner to outer style
+   |
+ 3 - //! The full catalogue is materialized; this is a correctness baseline.
+ 3 + /// The full catalogue is materialized; this is a correctness baseline.
+   |
+
+For more information about this error, try `rustc --explain E0753`.
+error: could not compile `hec-native2lp` (bin "curve2lp-control") due to 2 previous errors

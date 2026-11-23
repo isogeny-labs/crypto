@@ -1,0 +1,437 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "solver-multiplicity-20261109",
+  "version": 1,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/solver_multiplicity_audit_20261109",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "formal_source": "../theorem_census_20261109/lean/BivariateMultiplicity.lean",
+    "original_requirements": "../theorem_census_20261109/README.md"
+  },
+  "question": "On four fixed known-answer ideals, do msolve basis and parametrization outputs preserve the distinction between distinct solution support and quotient-algebra dimension?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The actual bivariate quotient has dimension two for every c; c=0 has a unique solution. This theorem is decided only by Lean, independently of solver output.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "On each of the four fixtures the returned basis matches the fixed certificate and the parameter qdim/degree equal registered quotient/support counts.",
+      "class": "exact_computation",
+      "decided_by": [
+        "known-answers"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "General Diem Bezout, minimal solver degree, asymptotic behavior, C-to-F4Run refinement and independent-host validation are outside this fixture decision.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "gb",
+      "role": "reference",
+      "description": "Full reduced grevlex basis output -g2",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "2",
+          "genericity": "2 (default)",
+          "SIMD": "disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu"
+        }
+      },
+      "parameters": {
+        "mode": "-g 2",
+        "fixtures": [
+          "double",
+          "split",
+          "simple",
+          "degree3"
+        ]
+      }
+    },
+    {
+      "id": "param",
+      "role": "candidate",
+      "description": "Default finite-field parametrization; read qdim separately from eliminant degree",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "2",
+          "genericity": "2 (default)",
+          "SIMD": "disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu"
+        }
+      },
+      "parameters": {
+        "mode": "default",
+        "fixtures": [
+          "double",
+          "split",
+          "simple",
+          "degree3"
+        ]
+      },
+      "same_instrument_as": "gb"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact algebraic invariants, no sampling noise or timing claim; each fixed call repeats twice as a consistency check, not an A/A variance estimate."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "All fixtures are known-answer controls. Before freeze the c=2 calibration detected a wrong constant and rejected a zero basis element. No statistical detector claim."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No population or random-null inference; exact solution count/ideal certificates replace a statistical null."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "fixture",
+        "levels": [
+          "double",
+          "split",
+          "simple",
+          "degree3"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "how": "Same binary/dependencies/one thread/exact sparse linear algebra on both modes."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": {
+          "os": "Linux",
+          "release": "6.18.57",
+          "arch": "x64",
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "compiler": "gcc (Debian 14.2.0-19) 14.2.0",
+          "cpp_compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+          "isolation": "none; single shared local host",
+          "paid_spend": 0
+        },
+        "how": "provenance.json; no clock accepted as evidence."
+      },
+      {
+        "name": "mode",
+        "treatment": "crossed",
+        "value": [
+          "gb",
+          "param"
+        ],
+        "how": "Every fixture in both modes, two repetitions."
+      },
+      {
+        "name": "layout_order_warmup",
+        "treatment": "fixed",
+        "value": "double,split,simple,degree3; reps0,1; gb,param; no warmups",
+        "how": "Frozen run.sh; no timing metric."
+      },
+      {
+        "name": "internal_randomness",
+        "treatment": "measured",
+        "value": "srand(time(0)) when genericity uses random linear form",
+        "how": "CLI has no seed option; capture containing start/end epoch interval and full parameter output. Exact verified invariants only."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded known answers",
+        "how": "Frozen native analysis and expected values before affected data."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "value": "local per-call checkpoints",
+        "how": "No paid cloud; every outcome retained; no outcome-dependent retry."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "known-answers",
+        "arms": [
+          "gb",
+          "param"
+        ],
+        "differs_in": [
+          "mode"
+        ],
+        "design": "absolute",
+        "threshold": "Every fixture basis/certificate, input reductions, S-pairs, staircase, qdim, eliminant degree, points and exit status must match the registered expected values; zero discrepancies."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Upstream msolve.c:718 seeds libc rand with time(0) if a random form is needed. No external seeding is supported. Run.sh records start/end epoch seconds containing this internal seed. No random-support distribution claim."
+    },
+    "instance_sampling": {
+      "rule": "Four explicitly listed fixed fixtures, fully crossed across both modes; not sampled from a population.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact known-answer validation; expected identities known before solver data."
+    }
+  },
+  "sample_size": {
+    "instances": 4,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "No sampling test or confidence interval; all sixteen fixed calls included. Alpha is schema metadata and carries no inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 0.217,
+      "threads": 1,
+      "estimated_total_seconds": 10,
+      "measured_on": "Held-out c=2: GB0.012s,param0.217s, two variables degree<=2 like registered class; unisolated budget estimate only. 16*0.217=3.472s, rounded up to10s excluding completed builds/proofs."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "basis_ok",
+        "name": "Exact GB certificate",
+        "unit": "integer or Boolean exact check",
+        "kind": "exact",
+        "definition": "Normalized basis equals frozen expected basis, S-pairs and input reductions vanish.",
+        "source": "evidence/analysis.jsonl:basis_matches,buchberger,inputs_reduce",
+        "aggregation": "per_row",
+        "resolution": "exact integers",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "multiplicity",
+        "name": "Quotient dimension",
+        "unit": "integer or Boolean exact check",
+        "kind": "exact",
+        "definition": "Finite standard-monomial staircase and printed qdim equal2/2/1/1.",
+        "source": "evidence/analysis.jsonl:standard_monomials,msolve_qdim",
+        "aggregation": "per_row",
+        "resolution": "exact integers",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "support",
+        "name": "Distinct solution support",
+        "unit": "integer or Boolean exact check",
+        "kind": "exact",
+        "definition": "Exhaustive base-field point count and eliminant degree equal1/2/1/1 on these split known-answer systems.",
+        "source": "evidence/analysis.jsonl:points,parameter_degree",
+        "aggregation": "per_row",
+        "resolution": "exact integers",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "selected_degree",
+        "name": "Exploratory selected-pair degree",
+        "unit": "integer or Boolean exact check",
+        "kind": "exact",
+        "definition": "Maximum parsed degree from GB-mode verbose round lines;0 if no round. Does not certify minimal solving degree.",
+        "source": "evidence/analysis.jsonl:selected_degree_max_exploratory",
+        "aggregation": "per_row",
+        "resolution": "exact integers",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "binary/source/input SHA256",
+      "compiler/dependencies/CPU/kernel in provenance.json",
+      "threads1",
+      "argv",
+      "stdout/stderr/output/exit",
+      "start/end epoch (seed interval only)"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 30,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly four fixtures times two modes times two repetitions. Retain every outcome and stop after these16calls.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Each call terminates after30seconds; timeout is retained and never rerun based on outcome.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output or nonzero exit means fixture not validated; preserve data and report the diagnostic.",
+    "No after-data parser patch under this protocol; any correction requires a new labelled version preserving originals."
+  ],
+  "decision_rule": {
+    "text": "Report exact fixture_pass only when every registered check passes in both repetitions; otherwise report discrepancy or not_validated, never silently discard a call.",
+    "comparison_ids": [
+      "known-answers"
+    ],
+    "threshold": "zero discrepancies",
+    "statistic": "exact integer equality and polynomial reductions",
+    "interval": "none; exact finite known-answer checks",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancy from registered known answer; no sampling inference",
+    "verdict_vocabulary": [
+      "fixture_pass",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "5c809337803de22ec66939d6838df18a722db4181c67a8fc8fe96d9a6af7e6d2"
+    },
+    "inputs": [
+      "inputs/*.ms",
+      "evidence/runs/*"
+    ],
+    "outputs": [
+      "evidence/analysis.jsonl",
+      "export.json",
+      "report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "support-vs-length.svg"
+    ],
+    "report_dir": "."
+  },
+  "inadmissible": [
+    "Calling c=2 preflight out-of-sample or confirmatory.",
+    "Suppressing failed outputs or regenerating the frozen analysis after seeing affected data.",
+    "Treating point support as scheme length or pair-degree logs as minimal solving-degree proofs.",
+    "Claiming statistical, timing, generic F4 conformance, independent-host or signed validation from these fixtures."
+  ],
+  "literature": [
+    {
+      "ref": "Diem2011; ../theorem_audit_20261108/sources.json and SOURCE_AUDIT.md",
+      "provenance": "retrieved",
+      "claim": "General bound scope/multiplicities and incomplete F4 refinement; fixture is a control only."
+    },
+    {
+      "ref": "algebraic-solving/msolve@5e72b9d99eaea55fe87eb8ac945ec9e914a69327:src/msolve/main.c,msolve.c and upstream nonradical_shape-31.res",
+      "provenance": "retrieved",
+      "claim": "CLI/output schema prints quotient dimension and univariate degree separately; genericity may reorder/add a variable."
+    },
+    {
+      "ref": "Mathlib56a00585 AdjoinRoot; ../theorem_census_20261109/lean/BivariateMultiplicity.lean",
+      "provenance": "internal",
+      "claim": "Actual quotient-algebra equivalence and support counterexample checked by Lean; no new axioms."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "cff556238d4049de994e63b2f25896ffaf0e8574c1a9b6b6f358b43053cd35b5",
+    "commit": "29ad31394fd2588621c4c9e05562d9cf8e60ecc7",
+    "frozen_at": "2026-11-09T04:08:15Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "analysis_binary_sha256": "835e5854faee3f38e550fc4cc45a13153138731388a923f48d4625adabb4a786",
+    "provenance_sha256": "d741580690ca661dcc4d639c8657e7a28b69ff8b0f7994936f052a7c7c6de6a1",
+    "preflight_scope": "c=2 only, in-sample calibration; affected c=0,c=1,simple,degree3 outputs unseen",
+    "original_items": [
+      8,
+      12,
+      14
+    ],
+    "checkpoint_exception": "User approved local checkpoints for this audit; bounded independent call files; zero paid spend."
+  }
+}

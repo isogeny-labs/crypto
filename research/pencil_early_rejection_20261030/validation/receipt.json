@@ -1,0 +1,98 @@
+{
+  "schema": "pencil-early-rejection-software-validation/v1",
+  "instrument": "pencil-early-rejection-20261030",
+  "status": "isolated_prospective_instrument_software_checked",
+  "baseline_sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+  "runtime_fork_sha256": "6a8041b6ec015590d0f0ae105a483e4a4f0fb45357a2fd591ec9424542bf51d3",
+  "tests_source_sha256": "9b0ca3a2175128a2309977988c7abb84e0a735472c357d109c7d72a4679a363c",
+  "tests": {
+    "selected": 5,
+    "debug_passed": 5,
+    "release_passed": 5,
+    "failed_final": 0,
+    "inherited_filtered": 12,
+    "threads": 1,
+    "cargo_jobs": 2,
+    "toolchain": "1.99.1",
+    "debug_log": {
+      "path": "final-tests.log",
+      "sha256": "95fb00bd7e5be1dc8ff9fa805c48de6185fc8b66a0d0106ac182bea7e4023ebe"
+    },
+    "release_log": {
+      "path": "release-tests.log",
+      "sha256": "2eb0f12a85978abed27624c3396543375883001889d63a8e545df87a633af424"
+    }
+  },
+  "clippy": {
+    "passed": true,
+    "all_targets": true,
+    "denied_warnings": true
+  },
+  "fmt_passed": true,
+  "software_fixture_coverage": {
+    "field_prime": 19,
+    "ordinary_origin_candidates": 612,
+    "exceptional_only_candidates": 470,
+    "exceptional_accepted": 214,
+    "exceptional_rejected": 256,
+    "total_accepted": 826,
+    "rejected_length_fixture": [
+      0,
+      1,
+      2,
+      4,
+      5
+    ],
+    "all_lambda_fixture": "singular polynomial h=x^3(x^2+1), outside smooth-curve equivalence"
+  },
+  "exact_removed_counts_one_rejected_fixture": {
+    "D": 4,
+    "L": 1,
+    "T": 17,
+    "V": 16,
+    "base_multiplications": 24,
+    "base_additions": 30,
+    "entry_visits": 78,
+    "copied_elements": 4,
+    "initialized_elements": 18,
+    "predicate_comparisons": 27,
+    "inversions": 0,
+    "engine_group_operations": 0
+  },
+  "independent_review": {
+    "path": "independent-review.json",
+    "sha256": "d9affb22f5b28bb5afb19ebf9f11d1f2ab2686068ab5e3f87551c39cff7f3ee1",
+    "scope": "source/software fidelity only"
+  },
+  "static_rejection_bound": {
+    "per_sieve": 2,
+    "over_16_walks": 32,
+    "source": "../provenance/rejection-count-bound.json",
+    "scope": "valid smooth odd-characteristic quintic hypotheses, not a performance estimate"
+  },
+  "execution": {
+    "solve_one_invocations": 0,
+    "rho_runs": 0,
+    "cohort_targets": 0,
+    "benchmarks": 0,
+    "cloud_actions": 0,
+    "ecbench_integration": false
+  },
+  "performance_ratio": null,
+  "scientific_admission": false,
+  "limitations": [
+    "Five debug/release checks repeat the same software fixtures, not independent experiments",
+    "No arbitrary-u64 panic/resource/deadline equivalence",
+    "Graph evidence is selected source-bound parity, not global graph-state proof",
+    "Conditional normalized-field proof domain p<=2^63 not enforced by inherited API",
+    "Existing frozen files and incomplete-gate stopping rule remain unchanged"
+  ],
+  "preserved_development_evidence": [
+    "attempt1.log",
+    "attempt2.log",
+    "attempt3.log",
+    "attempt3-clippy.log",
+    "pre-origin-review-tests.log",
+    "pre-origin-review-clippy.log"
+  ]
+}

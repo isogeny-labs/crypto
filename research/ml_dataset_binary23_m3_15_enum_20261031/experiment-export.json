@@ -1,0 +1,1532 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "script": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "id": "binary23-m3-15-enumerate-untwisted",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "id": "binary23-m3-15-enumerate-twisted",
+      "role": "candidate"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-31T17:14:59.203134+00:00",
+  "export_id": "binary23-m3-15-enum-26-20261031",
+  "files": [
+    {
+      "bytes": 16587,
+      "kind": "raw",
+      "path": "experiment-rows.jsonl",
+      "sha256": "913253085965140c66627d046b05e7d0792a0395a90cc8bf661a203222b097aa"
+    },
+    {
+      "bytes": 19404,
+      "kind": "protocol",
+      "path": "protocol.json",
+      "sha256": "6abd4361f7d96583a3ec81e54fd93d85e1aef48056fda76926888051eac81638"
+    },
+    {
+      "bytes": 561,
+      "kind": "raw",
+      "path": "plan.json",
+      "sha256": "4906b6c2a1372f6a10f161e05187a9d7d3b3ffa1317c9cd186840f58e60e1c55"
+    },
+    {
+      "bytes": 10175,
+      "kind": "other",
+      "path": "make_experiment_export.py",
+      "sha256": "cf50706093518c6e9d5e99ae2c80866706d42d84dfb78d8b62e9c662f2633e18"
+    }
+  ],
+  "flow": {
+    "attempted": 26,
+    "completed": 26,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 26,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": null,
+    "path": null,
+    "sha256": null,
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": null,
+      "kernel": null,
+      "logical_cpus": null,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "deterministic receipt projection",
+      "kind": "observation",
+      "text": "All 26 fixed ordinary-binary n23 m3..15 enumeration cells remain in the export, including native partial, budget_exhausted, unsupported, failed and timeout outcomes. Bounded negatives and timeouts are kept distinct; no shared-host timing comparison is made."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "executor",
+    "runtime": "codex_cli",
+    "session": "binary23-m3-15-enum-20261031"
+  },
+  "protocol": {
+    "path": "protocol.json",
+    "protocol_id": "ML-DATASET-BINARY23-M3-15-ENUM-20261031",
+    "sha256": "74d789dbd62cb665eda7aaa95800970dd39c56807bf2f77da6ad3b9fbb6d7d68",
+    "version": 2
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4497,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-00.json",
+          "sha256": "3ae618fea4650115fa8c756dd69734db3c48d7051e7f18135a45e029a241e62c"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000000",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:20:24.355617+00:00",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 64,
+          "native_group_add_api_calls": 84,
+          "observed-wall-ns": "812575975"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.812575975,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-00",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:20:23.543041+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4496,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-01.json",
+          "sha256": "79a79196564439f4ded017df9c2abec98c917a1e0cf43d5b5d85ad8d7e44093d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000001",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:22:41.794575+00:00",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 64,
+          "native_group_add_api_calls": 84,
+          "observed-wall-ns": "1163732220"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 1.16373222,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-01",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:22:40.630842+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4497,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-02.json",
+          "sha256": "97116cb2493ac561c5a901c79763140afb1ab501436984851d9d26070bff3e4a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000002",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:23:32.061553+00:00",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 256,
+          "native_group_add_api_calls": 340,
+          "observed-wall-ns": "3026697935"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.026697935,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-02",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:23:29.034854+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4496,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-03.json",
+          "sha256": "41eaa92372aea12ac1ea19fb099abb13f74b5392f7c012e2797f0b77ef4b8aa9"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000003",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:25:42.779952+00:00",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 256,
+          "native_group_add_api_calls": 340,
+          "observed-wall-ns": "2241869709"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 2.241869709,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-03",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:25:40.538081+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4498,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-04.json",
+          "sha256": "f10b7ae758ecde1a9fd447f5acc4f48a650197cd46f42e4e6b15f7dab2abe07f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000004",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:29:28.750782+00:00",
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 1024,
+          "native_group_add_api_calls": 1364,
+          "observed-wall-ns": "7426460673"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 7.426460673,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-04",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:29:21.324321+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4497,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-05.json",
+          "sha256": "bc5574ef8e35eabcaf494851391931dd6d1315057e24d1bab8951f9b53b372d9"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000005",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:30:59.183395+00:00",
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 1024,
+          "native_group_add_api_calls": 1364,
+          "observed-wall-ns": "7025310268"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 7.025310268,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-05",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:30:52.158084+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4506,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-06.json",
+          "sha256": "2c9d265fee1d6c0c879120e858dc3d1347bfb0685209e3f4ffb1b123a7f3cba3"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000006",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:32:16.968511+00:00",
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3072,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "25291557460"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 25.29155746,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-06",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:31:51.676952+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4505,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-07.json",
+          "sha256": "9ca782acca0144719c04ccaf9b75113708f555e7e91220ac51dcbb40ddfcf913"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000007",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:34:29.409678+00:00",
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3072,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21863916509"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.863916509,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-07",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:34:07.545760+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4506,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-08.json",
+          "sha256": "df0c23a60d1390d19d065870ae31611f3e23a4e6a9bc13cb2561f760f8f15163"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000008",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:36:23.829750+00:00",
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3072,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "23623252938"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 23.623252938,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-08",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:36:00.206496+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4505,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-09.json",
+          "sha256": "abbd6a7152583810db828c3a81fa2b833e7eb54dbfa3fadd9a799f67d493c530"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000009",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:41:31.616869+00:00",
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3072,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "22247057297"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 22.247057297,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-09",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:41:09.369810+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-10.json",
+          "sha256": "042dc916caa66c61e7421422459a3933711a6fea111576dc7bb11445a6a6f4b1"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000010",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:43:35.940595+00:00",
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3071,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "27003213450"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 27.00321345,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-10",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:43:08.937380+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4509,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-11.json",
+          "sha256": "2c72bcc6b81c86c0eaa2505da6e7731ca494ca857523045dc68ad37d4a45aef0"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000011",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:45:46.166463+00:00",
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3071,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "30291199495"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 30.291199495,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-11",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:45:15.875262+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-12.json",
+          "sha256": "97ef63b145794e8f4300bc67e76983953daf3b2f796670ba91341d1ea531bd1e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000012",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:47:22.649163+00:00",
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3070,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21361414708"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.361414708,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-12",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:47:01.287748+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4509,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-13.json",
+          "sha256": "79fe92525f01712fa1062fd1409e06475a3b8674df8e36e8f440567996203940"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000013",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:50:08.980557+00:00",
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3070,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21870115814"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.870115814,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-13",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:49:47.110440+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4511,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-14.json",
+          "sha256": "2421ec40abc5d8c465c95571a7113705a626969e152e8ec22a4924711d15581a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000014",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:51:19.561951+00:00",
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3069,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "22587958260"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 22.58795826,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-14",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:50:56.973989+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-15.json",
+          "sha256": "b7ea07a88348421433232e0689a991d5baef4d908461c472bbe779c7c1483e46"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000015",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:52:58.996758+00:00",
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3069,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "22049537726"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 22.049537726,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-15",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:52:36.947219+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4511,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-16.json",
+          "sha256": "f57e4e09cc4f1361cc68f426b556ba9679bb9fe9c9b7c78e7c3cbc173ffedf8a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000016",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:54:12.469423+00:00",
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3068,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21939459055"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.939459055,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-16",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:53:50.529963+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-17.json",
+          "sha256": "d692c21c4768e3854a3a1e8ebc0e5cac784752e577db53b8acbef61744790358"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000017",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T16:55:36.780203+00:00",
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3068,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21559405016"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.559405016,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-17",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T16:55:15.220797+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4511,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-18.json",
+          "sha256": "df125a9d94859a01bb4bfe63b23d2ff9c7bac69648ba18e0374a929f79e6044c"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000018",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:00:29.355299+00:00",
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3068,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "26875858149"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 26.875858149,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-18",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:00:02.479440+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-19.json",
+          "sha256": "5c6f517065316317b51ffbd939507392ef80a8ec531fb118512dcf9052f71a45"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000019",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:02:18.662275+00:00",
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3068,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "26107284140"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 26.10728414,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-19",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:01:52.554989+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4511,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-20.json",
+          "sha256": "1f7ce2c8804c279cb6e8cc3e6109c6a723e8f68e010965ed3bb8d057a653d5f8"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000020",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:03:31.232419+00:00",
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3067,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21948618231"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.948618231,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-20",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:03:09.283797+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-21.json",
+          "sha256": "4662ac0f515aa3a8df16c4b2111f4c2ee3a9b001e1f0bf31b8724e3c04aa810a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000021",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:05:24.127285+00:00",
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3067,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "21653920033"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.653920033,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-21",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:05:02.473364+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4511,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-22.json",
+          "sha256": "4e5240a3f95b0f72aa65b25df02e84e53ee499b42c01cd82943aef9c8b3e102a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000022",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:06:42.094078+00:00",
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3066,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "28821152231"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 28.821152231,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-22",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:06:13.272925+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-23.json",
+          "sha256": "3c7857e32abb9ee244ae1db7ceb0447593b0b173d33850ef03dfbd852fd66b18"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000023",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:10:48.102542+00:00",
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3066,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "22106423474"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 22.106423474,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-23",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:10:25.996117+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-untwisted",
+      "artifacts": [
+        {
+          "bytes": 4511,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-24.json",
+          "sha256": "e7fb6c25abcc1bb00f04306f99af426410d946ac9bd79c0d2017d80aaf450b7d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000024",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:13:29.033495+00:00",
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3065,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "23553914696"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 23.553914696,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-24",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:13:05.479579+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "binary23-m3-15-enumerate-twisted",
+      "artifacts": [
+        {
+          "bytes": 4510,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-25.json",
+          "sha256": "5cbe59c0ace36a6d79a6b0e3929f5461113074eff97d62d21f26d6bb419dc517"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000025",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T17:14:59.122988+00:00",
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "durable-cell": 1,
+          "method-artifact-verified": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_complete_candidate_tests": 3065,
+          "native_group_add_api_calls": 4096,
+          "observed-wall-ns": "22254761231"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 22.254761231,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-25",
+      "seed": 2026103107,
+      "started_at": "2026-10-31T17:14:36.868227+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; exact native method scope and scalar replay only where promoted"
+      },
+      "warmup": false,
+      "worker": null
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

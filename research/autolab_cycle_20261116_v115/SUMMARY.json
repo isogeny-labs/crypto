@@ -1,0 +1,185 @@
+{
+  "oracle": {
+    "out": {
+      "root_multisets": 1104,
+      "odd_leading_cases": 616,
+      "all_upper_cases": 192,
+      "repeated_cases": 963,
+      "zero_root_cases": 400,
+      "linearization_cases": 80,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "rank_profile": {
+    "out": {
+      "original_complete": false,
+      "recovered_point_controls": 128,
+      "old_dimension": 67,
+      "degree_equations": 14,
+      "equation_labels": [
+        {
+          "coefficient": 0,
+          "bit": 81,
+          "bound": 80
+        },
+        {
+          "coefficient": 0,
+          "bit": 82,
+          "bound": 80
+        },
+        {
+          "coefficient": 0,
+          "bit": 83,
+          "bound": 80
+        },
+        {
+          "coefficient": 0,
+          "bit": 84,
+          "bound": 80
+        },
+        {
+          "coefficient": 0,
+          "bit": 85,
+          "bound": 80
+        },
+        {
+          "coefficient": 1,
+          "bit": 65,
+          "bound": 64
+        },
+        {
+          "coefficient": 1,
+          "bit": 66,
+          "bound": 64
+        },
+        {
+          "coefficient": 1,
+          "bit": 67,
+          "bound": 64
+        },
+        {
+          "coefficient": 1,
+          "bit": 68,
+          "bound": 64
+        },
+        {
+          "coefficient": 2,
+          "bit": 49,
+          "bound": 48
+        },
+        {
+          "coefficient": 2,
+          "bit": 50,
+          "bound": 48
+        },
+        {
+          "coefficient": 2,
+          "bit": 51,
+          "bound": 48
+        },
+        {
+          "coefficient": 3,
+          "bit": 33,
+          "bound": 32
+        },
+        {
+          "coefficient": 3,
+          "bit": 34,
+          "bound": 32
+        }
+      ],
+      "new_feasible": true,
+      "new_dimension": 57,
+      "additional_rank": 10,
+      "advancement_rule_met": true,
+      "scope": "necessary raw translated-degree conditions only on w=1;not roots or alloutercharts",
+      "contracted_chart_sha256": "1284311fc5fc6ac3c77481bdf3e81a7835fee9c925d2c2847ee0c5b9007fc79e",
+      "total_seconds": 0.010314693994587287
+    },
+    "error": null
+  },
+  "conditional_search": {
+    "out": {
+      "models": [],
+      "actual_controls": 16,
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "only contracted w=1necessary branch;w=0andotherfamilies unresolved",
+      "inputs": 57,
+      "variables": 46330,
+      "clauses": 169845,
+      "graph_sha256": "7ca232a0a0dff7f569f118e3143aa233a802ce68bf4afe5ac2fa2a1967f28159",
+      "synthesis": {
+        "synthesis_rounds": 256,
+        "pair_events": 533708,
+        "stop_reason": "round_cap",
+        "target_forms": 403,
+        "pair_index_entries": 22274,
+        "fallback_forms": 0
+      },
+      "cold_compile_and_controls_seconds": 0.6095391059934627,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 3.0133673200034536,
+      "cpu_affinity": [
+        0
+      ],
+      "version": "4.15.4",
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "155237",
+        "sat mk clause 3ary": "54329",
+        "sat mk clause nary": "364264",
+        "sat mk var": "92530",
+        "sat gc clause": "83626",
+        "sat del clause": "232829",
+        "sat conflicts": "117327",
+        "sat decisions": "194749",
+        "sat propagations 2ary": "52833303",
+        "sat propagations nary": "192223232",
+        "sat restarts": "11358",
+        "sat minimized lits": "2296005",
+        "sat subs resolution dyn": "6882",
+        "sat units": "490",
+        "sat elim bool vars res": "22370",
+        "sat backjumps": "117327",
+        "sat elim clauses": "484",
+        "sat elim literals": "487",
+        "sat subsumed": "1150",
+        "sat subs resolution": "1221",
+        "sat scc elim vars": "46270",
+        "sat tr": "2",
+        "sat probing assigned": "1",
+        "sat-cut.eqs": "150",
+        "sat-cut.cuts": "296138",
+        "sat-cut.ands": "15341",
+        "sat-cut.xors": "30857",
+        "sat-cut.xands": "5966",
+        "sat-cut.xites": "11307",
+        "sat-cut.xxors": "25685",
+        "sat-cut.dc-reduce": "5882",
+        "rlimit count": "217233465",
+        "max memory": "232.21",
+        "memory": "83.67",
+        "num allocs": "10543034437.0",
+        "time": "42.024"
+      },
+      "engine_seconds": 45.04094947199337,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

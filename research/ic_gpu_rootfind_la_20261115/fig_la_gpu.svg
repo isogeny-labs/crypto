@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 366" width="1000" height="366" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">GPU m = 3 rootfind solve by phase, incremental-gauss against incremental-gauss-echelon</title>
+<desc id="d">Median solve wall of the GPU arm split into set-up, relation phase, linear algebra and the rest; echelon cuts linear algebra about tenfold, the solve to 0.18-0.20 of gauss at |F_x| = 4096.</desc>
+<style>.bg{fill:#fcfcfb}.c1{fill:#c3c2b7}.c2{fill:#86b6ee}.c3{fill:#2a78d6}.c4{fill:#e4e3df}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.c1{fill:#6b6a64}.c2{fill:#1f5ea8}.c3{fill:#3987e5}.c4{fill:#383835}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="bg" width="1000" height="366"/>
+<text class="p" x="20" y="30" font-size="17" font-weight="600">m = 3 on the A100: the solve by phase, gauss against echelon</text>
+<text class="q" x="20" y="52" font-size="12.5">median of 6, L0 [pcc:unverified]; identical S, relations and logarithm in all 84 checks; right: one-thread CPU (gauss) solve</text>
+<line class="g" x1="250.0" x2="250.0" y1="84" y2="322"/><text class="q" x="250.0" y="338" font-size="11" text-anchor="middle">0 s</text>
+<line class="g" x1="326.9" x2="326.9" y1="84" y2="322"/><text class="q" x="326.9" y="338" font-size="11" text-anchor="middle">0.25 s</text>
+<line class="g" x1="403.8" x2="403.8" y1="84" y2="322"/><text class="q" x="403.8" y="338" font-size="11" text-anchor="middle">0.5 s</text>
+<line class="g" x1="480.8" x2="480.8" y1="84" y2="322"/><text class="q" x="480.8" y="338" font-size="11" text-anchor="middle">0.75 s</text>
+<line class="g" x1="557.7" x2="557.7" y1="84" y2="322"/><text class="q" x="557.7" y="338" font-size="11" text-anchor="middle">1 s</text>
+<line class="g" x1="634.6" x2="634.6" y1="84" y2="322"/><text class="q" x="634.6" y="338" font-size="11" text-anchor="middle">1.25 s</text>
+<line class="g" x1="711.5" x2="711.5" y1="84" y2="322"/><text class="q" x="711.5" y="338" font-size="11" text-anchor="middle">1.5 s</text>
+<text class="p" x="240" y="110" font-size="12" text-anchor="end">log2 r = 37.4, |F_x| = 2048</text>
+<text class="q" x="860" y="110" font-size="11">CPU 5.7 s</text>
+<rect class="c1" x="250.0" y="92" width="13.0" height="16"/>
+<rect class="c2" x="263.0" y="92" width="16.1" height="16"/>
+<rect class="c3" x="279.1" y="92" width="58.9" height="16"/>
+<rect class="c4" x="338.1" y="92" width="0.4" height="16"/>
+<text class="q" x="343.4" y="104" font-size="10.5">gauss 0.287 s</text>
+<rect class="c1" x="250.0" y="112" width="11.8" height="16"/>
+<rect class="c2" x="261.8" y="112" width="16.9" height="16"/>
+<rect class="c3" x="278.7" y="112" width="6.9" height="16"/>
+<rect class="c4" x="285.6" y="112" width="0.8" height="16"/>
+<text class="q" x="291.4" y="124" font-size="10.5">echelon 0.118 s</text>
+<text class="p" x="240" y="166" font-size="12" text-anchor="end">log2 r = 37.4, |F_x| = 4096</text>
+<text class="q" x="860" y="166" font-size="11">CPU 8.1 s</text>
+<rect class="c1" x="250.0" y="148" width="37.8" height="16"/>
+<rect class="c2" x="287.8" y="148" width="12.3" height="16"/>
+<rect class="c3" x="300.1" y="148" width="425.3" height="16"/>
+<rect class="c4" x="725.4" y="148" width="1.9" height="16"/>
+<text class="q" x="732.3" y="160" font-size="10.5">gauss 1.551 s</text>
+<rect class="c1" x="250.0" y="168" width="37.4" height="16"/>
+<rect class="c2" x="287.4" y="168" width="11.3" height="16"/>
+<rect class="c3" x="298.7" y="168" width="36.1" height="16"/>
+<rect class="c4" x="334.8" y="168" width="1.5" height="16"/>
+<text class="q" x="341.3" y="180" font-size="10.5">echelon 0.280 s</text>
+<text class="p" x="240" y="222" font-size="12" text-anchor="end">log2 r = 39.3, |F_x| = 2048</text>
+<text class="q" x="860" y="222" font-size="11">CPU 20.2 s</text>
+<rect class="c1" x="250.0" y="204" width="11.6" height="16"/>
+<rect class="c2" x="261.6" y="204" width="47.1" height="16"/>
+<rect class="c3" x="308.7" y="204" width="58.0" height="16"/>
+<rect class="c4" x="366.7" y="204" width="2.5" height="16"/>
+<text class="q" x="374.2" y="216" font-size="10.5">gauss 0.387 s</text>
+<rect class="c1" x="250.0" y="224" width="10.0" height="16"/>
+<rect class="c2" x="260.0" y="224" width="49.9" height="16"/>
+<rect class="c3" x="309.9" y="224" width="7.4" height="16"/>
+<rect class="c4" x="317.3" y="224" width="1.5" height="16"/>
+<text class="q" x="323.7" y="236" font-size="10.5">echelon 0.223 s</text>
+<text class="p" x="240" y="278" font-size="12" text-anchor="end">log2 r = 39.3, |F_x| = 4096</text>
+<text class="q" x="860" y="278" font-size="11">CPU 20.0 s</text>
+<rect class="c1" x="250.0" y="260" width="36.5" height="16"/>
+<rect class="c2" x="286.5" y="260" width="25.0" height="16"/>
+<rect class="c3" x="311.5" y="260" width="410.9" height="16"/>
+<rect class="c4" x="722.4" y="260" width="1.8" height="16"/>
+<text class="q" x="729.2" y="272" font-size="10.5">gauss 1.541 s</text>
+<rect class="c1" x="250.0" y="280" width="37.3" height="16"/>
+<rect class="c2" x="287.3" y="280" width="23.5" height="16"/>
+<rect class="c3" x="310.8" y="280" width="31.9" height="16"/>
+<rect class="c4" x="342.7" y="280" width="1.2" height="16"/>
+<text class="q" x="348.9" y="292" font-size="10.5">echelon 0.305 s</text>
+<rect class="c1" x="20" y="350" width="11" height="11" rx="2"/><text class="q" x="36" y="359.5" font-size="11">oracle set-up</text>
+<rect class="c2" x="140.5" y="350" width="11" height="11" rx="2"/><text class="q" x="156.5" y="359.5" font-size="11">relation phase</text>
+<rect class="c3" x="267.5" y="350" width="11" height="11" rx="2"/><text class="q" x="283.5" y="359.5" font-size="11">linear algebra</text>
+<rect class="c4" x="394.5" y="350" width="11" height="11" rx="2"/><text class="q" x="410.5" y="359.5" font-size="11">rest</text>
+</svg>

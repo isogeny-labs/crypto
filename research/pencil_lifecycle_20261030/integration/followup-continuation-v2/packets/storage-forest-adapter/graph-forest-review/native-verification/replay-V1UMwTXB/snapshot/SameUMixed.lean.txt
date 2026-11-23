@@ -1,0 +1,83 @@
+import MixedCancellation
+import SameSupport
+set_option autoImplicit false
+namespace SameUMixed
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+
+theorem factor_identity (f : K[X]) (q r s1 t1 s2 t2 : K)
+ (h1 : support q r ∣ f-(ordinate s1 t1)^2)
+ (h2 : support q r ∣ f-(ordinate s2 t2)^2) :
+ (ordinate s1 t1-ordinate s2 t2)*(ordinate s1 t1+ordinate s2 t2) =
+ C ((s1-s2)*(s1+s2))*support q r := by
+ have hd := dvd_sub h2 h1
+ have he : (f-(ordinate s2 t2)^2)-(f-(ordinate s1 t1)^2) =
+ (ordinate s1 t1-ordinate s2 t2)*(ordinate s1 t1+ordinate s2 t2) := by ring
+ rw [he] at hd
+ have hm : support q r ∣ C ((s1-s2)*(s1+s2))*support q r := dvd_mul_left _ _
+ have hrem := dvd_sub hd hm
+ let aa := (s1-s2)*(t1+t2)+(t1-t2)*(s1+s2)-(s1-s2)*(s1+s2)*q
+ let bb := (t1-t2)*(t1+t2)-(s1-s2)*(s1+s2)*r
+ have hr : (ordinate s1 t1-ordinate s2 t2)*(ordinate s1 t1+ordinate s2 t2)-
+ C ((s1-s2)*(s1+s2))*support q r = C aa*X+C bb := by
+  dsimp [aa,bb,ordinate,MixedCancellation.support]
+  simp only [C_mul,C_add,C_sub]; ring
+ rw [hr] at hrem
+ have hu : (support q r).natDegree=2 := by
+  simpa [MixedCancellation.support] using natDegree_quadratic (R:=K) (a:=(1:K)) (b:=q) (c:=r) one_ne_zero
+ have hl : (C aa*X+C bb).natDegree ≤ 1 := natDegree_linear_le
+ have hz := eq_zero_of_dvd_of_natDegree_lt hrem (by omega : (C aa*X+C bb).natDegree < (support q r).natDegree)
+ exact sub_eq_zero.mp (hr.trans hz)
+
+theorem coefficient_relations (f : K[X]) (q r s1 t1 s2 t2 : K)
+ (h1 : support q r ∣ f-(ordinate s1 t1)^2)
+ (h2 : support q r ∣ f-(ordinate s2 t2)^2) :
+ (s1-s2)*(t1+t2)+(t1-t2)*(s1+s2)=(s1-s2)*(s1+s2)*q ∧
+ (t1-t2)*(t1+t2)=(s1-s2)*(s1+s2)*r := by
+ have h := factor_identity f q r s1 t1 s2 t2 h1 h2
+ have he : C ((s1-s2)*(t1+t2)+(t1-t2)*(s1+s2)-(s1-s2)*(s1+s2)*q)*X +
+ C ((t1-t2)*(t1+t2)-(s1-s2)*(s1+s2)*r) = (0:K[X]) := by
+  calc
+   _ = (ordinate s1 t1-ordinate s2 t2)*(ordinate s1 t1+ordinate s2 t2)-
+     C ((s1-s2)*(s1+s2))*support q r := by
+      simp only [ordinate,MixedCancellation.support,C_mul,C_add,C_sub]; ring
+   _ = 0 := sub_eq_zero.mpr h
+ constructor
+ · have hh := congrArg (fun p : K[X] => p.coeff 1) he
+   have coeff1_linear (a b : K) : (C a*X+C b : K[X]).coeff 1=a := by simp
+   rw [coeff1_linear,coeff_zero] at hh
+   exact sub_eq_zero.mp hh
+ · have hh := congrArg (fun p : K[X] => p.coeff 0) he
+   exact sub_eq_zero.mp (by simpa using hh)
+
+theorem sum_slope_nonzero (f : K[X]) (q r s1 t1 s2 t2 : K)
+ (h1 : support q r ∣ f-(ordinate s1 t1)^2)
+ (h2 : support q r ∣ f-(ordinate s2 t2)^2)
+ (hk : s1-s2 ≠ 0) (hn : ¬(s1= -s2 ∧ t1= -t2)) : s1+s2 ≠ 0 := by
+ intro hs
+ have hc := (coefficient_relations f q r s1 t1 s2 t2 h1 h2).1
+ have hi : (s1-s2)*(t1+t2)=0 := by simpa [hs] using hc
+ have ht := (mul_eq_zero.mp hi).resolve_left hk
+ exact hn ⟨eq_neg_of_add_eq_zero_left hs,eq_neg_of_add_eq_zero_left ht⟩
+
+theorem extracted_point_valid (f : K[X]) (q r s1 t1 s2 t2 : K)
+ (h1 : support q r ∣ f-(ordinate s1 t1)^2)
+ (h2 : support q r ∣ f-(ordinate s2 t2)^2)
+ (hk : s1-s2 ≠ 0) (hn : ¬(s1= -s2 ∧ t1= -t2)) :
+ let x := (t2-t1)/(s1-s2)
+ x^2+q*x+r=0 ∧ (X-C x) ∣ f-(C (s1*x+t1))^2 := by
+ let x := (t2-t1)/(s1-s2)
+ have hl := sum_slope_nonzero f q r s1 t1 s2 t2 h1 h2 hk hn
+ obtain ⟨hc,hd⟩ := coefficient_relations f q r s1 t1 s2 t2 h1 h2
+ have hh : (s1-s2)^2*(s1+s2)*(x^2+q*x+r)=0 := by
+  dsimp [x]
+  field_simp
+  have hc0 := sub_eq_zero.mpr hc
+  have hd0 := sub_eq_zero.mpr hd
+  calc
+   _ = (t1-t2)*((s1-s2)*(t1+t2)+(t1-t2)*(s1+s2)-(s1-s2)*(s1+s2)*q) -
+      (s1-s2)*((t1-t2)*(t1+t2)-(s1-s2)*(s1+s2)*r) := by ring
+   _ = 0 := by rw [hc0,hd0]; ring
+ have hx := (mul_eq_zero.mp hh).resolve_left (mul_ne_zero (pow_ne_zero 2 hk) hl)
+ exact ⟨hx,(MixedCancellation.extracted_valid f x q r s1 t1 hx h1).1⟩
+end SameUMixed

@@ -1,0 +1,155 @@
+{
+  "branch": "claude/hyperelliptic-index-calculus-td1fdn",
+  "closed_utc": "2026-11-16T01:33:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "target/release/ic_positive_control",
+        "run",
+        "--primes",
+        "128,256,512,1024,2048,4096,8192,16384,32768,65536",
+        "--curves",
+        "5",
+        "--curves-map",
+        "4099=3,8209=3,16411=2,32771=2,65537=1",
+        "--seeds",
+        "4",
+        "--arms",
+        "CLMR",
+        "--threads",
+        "3",
+        "--json",
+        "research/ic_positive_control_lucas_20261116/run.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T01:22:42+00:00",
+      "wall_s": 583.12
+    }
+  ],
+  "commit": "4feb188f4747be1d38c8acc4cfa2aea0c36fafe1",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T01:22:34+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-ic-positive-control-lucas"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T0122Z-ic-positive-control-lucas",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "rel_mul_l_over_c_p32771",
+      "note": "paired exact; Lucas test only; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.45,
+        0.457
+      ],
+      "unit": "ratio",
+      "value": 0.454
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "rel_mul_m_over_c_p32771",
+      "note": "Lucas test + Cardano roots; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.194,
+        0.197
+      ],
+      "unit": "ratio",
+      "value": 0.196
+    },
+    {
+      "baseline": 7.44,
+      "better": "lower",
+      "n": 8,
+      "name": "m_over_rho_w01_p32771",
+      "note": "baseline C 7.44; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.08,
+        7.12
+      ],
+      "unit": "ratio",
+      "value": 3.69
+    },
+    {
+      "baseline": 40.24,
+      "better": "lower",
+      "n": 8,
+      "name": "m_over_rho_w1_p32771",
+      "note": "baseline C 40.24; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        11.02,
+        37.84
+      ],
+      "unit": "ratio",
+      "value": 19.57
+    },
+    {
+      "baseline": 5.82,
+      "better": "lower",
+      "n": 4,
+      "name": "l_over_rho_w01_p65537",
+      "note": "M=L at 65537 (3 divides n/3); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.62,
+        6.38
+      ],
+      "unit": "ratio",
+      "value": 3.97
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 557670,
+      "path": "research/ic_positive_control_lucas_20261116/run.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e9/e966830b3fd83a6617726af3859b87fb2c1a2c7474f1222c57d85361e8ae53fd",
+      "sha256": "e966830b3fd83a6617726af3859b87fb2c1a2c7474f1222c57d85361e8ae53fd",
+      "uploaded": false
+    },
+    {
+      "bytes": 54154,
+      "path": "research/ic_positive_control_lucas_20261116/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b3/b3abfcbe8cb6ae6facfd8870950eeaef0e4c3d35afcca0a60193f1beb5774319",
+      "sha256": "b3abfcbe8cb6ae6facfd8870950eeaef0e4c3d35afcca0a60193f1beb5774319",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261116-ic-positive-control-lucas/REPORT.pdf",
+    "png": [
+      "benchmarks/20261116-ic-positive-control-lucas/figure.png"
+    ],
+    "svg": [
+      "benchmarks/20261116-ic-positive-control-lucas/figure.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-positive-control-lucas",
+  "status": "measured",
+  "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
+  "validation": null
+}

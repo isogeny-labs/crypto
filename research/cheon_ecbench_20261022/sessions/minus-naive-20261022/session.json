@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h6323501e31ef",
+  "label": "cheon-ecbench minus, naive: matched rho and Cheon n-1 with a full double-and-add per step (the algorithm of cheon_attack.rs), 32 to 52 bits",
+  "spec_id": "ECS1hfc8dda230071",
+  "spec_sha256": "fc8dda23007131069cc909886d516d19db4d58106c8c20f698daec120481e90a",
+  "env_class_id": "ECBENV2h058cf76d2adc",
+  "host_sha256": "f9955dc2c9344499c4555dd70491a344a68abf1d998491b2972233cb730b40df",
+  "plan_sha256": "3bdc2466319808952af7a531754e00db724c8d211f4a9cff38b2775ad1b939b2",
+  "binary_sha256": "0750e00f676c7bd5e225c8edd9ebb07e9b017a45f5e7bf1a2072ae009573f6e5",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/claude-0/-home-user-crypto/2a54bff3-908b-5431-b68f-58bfacb5aefc/scratchpad/lock-minus-naive",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792696536360,
+  "finished_unix_ms": 1792698493752,
+  "status": "complete",
+  "executions_planned": 96,
+  "records_written": 96,
+  "records_sha256": "3701f02c1ec965d2cbe011704556bbc4e3e6853721d7829009d76b614c8d722b",
+  "status_counts": {
+    "verified": 96
+  }
+}

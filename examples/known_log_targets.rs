@@ -122,6 +122,8 @@ fn fixtures(study: &Path, repo: &Path) -> Result<(), String> {
             r,
             cofactor: h,
             generator: generator.ok_or("no fixture subgroup generator")?,
+
+            representation: None,
         };
         let id = i.curve_id();
         rows.push(json!({"a":i.curve.a,"b":i.curve.b,"cofactor":h,

@@ -1,0 +1,197 @@
+{
+  "schema": "research.source-fidelity-review-contract/v1",
+  "task": "T-1187",
+  "producer_prior": "Exact native statements have producer checks; independent source fidelity not established.",
+  "producer_authored": true,
+  "independent_verdict": null,
+  "mutual_blindness": "Separate reviewer sessions; withhold other reviewers findings until independent reports are sealed.",
+  "joints": [
+    {
+      "id": "source",
+      "joint": "Source identity",
+      "claim": "canonical choose/transform/map_divisor and related collector bodies",
+      "proposed_reviewer_role": "independent-source",
+      "assigned_reviewer": null,
+      "worked_attack": "Try the known wrong first-61-line gate excerpt; demand exact named ranges and explicit identifier changes.",
+      "blind_rederivation": "Independently extract each named body and reconstruct call order.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "arithmetic",
+      "joint": "Word arithmetic",
+      "claim": "small powers, binomial recurrence, wide modular product and inversion",
+      "proposed_reviewer_role": "independent-arithmetic",
+      "assigned_reviewer": null,
+      "worked_attack": "Use p=0,1, composite p, noncanonical residues, a=0, k>5 and maximal words; identify excluded domains before applying lemmas.",
+      "blind_rederivation": "Derive each intermediate bound and inverse premise directly from Rust operations.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "traversal",
+      "joint": "Traversal and storage",
+      "claim": "nested immutable coefficient / mutable slot traversal, trim and pad",
+      "proposed_reviewer_role": "independent-traversal",
+      "assigned_reviewer": null,
+      "worked_attack": "Drop a row, change iteration order, alias coefficient with output, insert an internal zero, exceed capacity.",
+      "blind_rederivation": "Derive the coefficient sum and prove exact slice lengths from source degree constraints.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "metadata",
+      "joint": "Representation premises",
+      "claim": "degree metadata, monicity, canonical inputs and ignored array tails",
+      "proposed_reviewer_role": "independent-metadata",
+      "assigned_reviewer": null,
+      "worked_attack": "Supply degree metadata inconsistent with natDegree, degree>2, or nonzero unused tails; check what is assumed and what source actually validates.",
+      "blind_rederivation": "Trace constructors/callers that establish each premise; do not infer validity from array length.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "identity",
+      "joint": "Degree-zero branch",
+      "claim": "source returns original divisor unchanged; model proves decoded identity validity",
+      "proposed_reviewer_role": "independent-identity",
+      "assigned_reviewer": null,
+      "worked_attack": "Keep arbitrary unused storage words with degree0; distinguish byte identity from decoded polynomial identity.",
+      "blind_rederivation": "Derive u=1,v=0 from the precise validity predicate and degree premise.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "validity",
+      "joint": "Mumford predicate",
+      "claim": "monic u, degree bound, ordinate bound and divisibility",
+      "proposed_reviewer_role": "independent-validity",
+      "assigned_reviewer": null,
+      "worked_attack": "Use singular f, a=0 and nonmonic u; determine whether any geometric claim was smuggled into polynomial validity.",
+      "blind_rederivation": "Derive scaling powers d,3,6 and transport each of the four clauses.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "inverse",
+      "joint": "Inverse and sign",
+      "claim": "polynomial round trips and affine signed-support equivalence",
+      "proposed_reviewer_role": "independent-inverse",
+      "assigned_reviewer": null,
+      "worked_attack": "Reverse direction, negate beta incorrectly, omit y scaling, or discard sign; verify which controls detect each mutation.",
+      "blind_rederivation": "Derive inverse coordinate map from x_old=a*x_new+b and y_old=a^3*y_new.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "multiplicity",
+      "joint": "Multiplicity",
+      "claim": "all-power divisibility and exact finite polynomial multiplicity",
+      "proposed_reviewer_role": "independent-multiplicity",
+      "assigned_reviewer": null,
+      "worked_attack": "Use zero polynomial, k=0, repeated root, ramified curve point; reject any inference equating polynomial and curve valuation without a bridge.",
+      "blind_rederivation": "Derive quotient transport and both directions using the inverse; state valuation obligations separately.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "trust",
+      "joint": "Proof execution and dependencies",
+      "claim": "native checks, axiom audit, compiled cache trust boundary",
+      "proposed_reviewer_role": "independent-trust",
+      "assigned_reviewer": null,
+      "worked_attack": "Alter imported helper after receipt; omit a module; use prebuilt olean with mismatched source.",
+      "blind_rederivation": "Rebuild exact named modules in an isolated immutable tree and perform fresh axiom readback.",
+      "status": "awaiting_independent_review"
+    },
+    {
+      "id": "geometry",
+      "joint": "Geometric scope boundary",
+      "claim": "remaining local valuations, infinity and principal-divisor transport",
+      "proposed_reviewer_role": "independent-geometry",
+      "assigned_reviewer": null,
+      "worked_attack": "Attempt to claim a Jacobian group isomorphism from rational-point tests or polynomial validity alone.",
+      "blind_rederivation": "Construct the curve/function-field map, extend it at infinity and derive local orders before group transport.",
+      "status": "awaiting_independent_review"
+    }
+  ],
+  "required_outputs": [
+    "fresh native receipts and axiom audit",
+    "clause-by-clause source/model mapping",
+    "counterexample or explicit domain for each attack",
+    "independent report with precise scope"
+  ],
+  "scientific_execution": false,
+  "packet_custody_checks": [
+    {
+      "packet": "mumford-normalization-transport",
+      "included_files_verified": 52,
+      "custody_sha256": "ae54d7b744e88dc5f155f5ffd876544014f6d200e32fae40a1dede62df55fa60",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "mumford-normalization-validity",
+      "included_files_verified": 75,
+      "custody_sha256": "dbfeae949905ac16545786b34738c36929a05ade20df4937379c5a09cd6e68a3",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "affine-coefficient-loop",
+      "included_files_verified": 71,
+      "custody_sha256": "6efb5c3388df7392e9f80f2d8abf14c60bff2595f5966cf9de35d80c2f903faa",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "word-coefficient-update",
+      "included_files_verified": 71,
+      "custody_sha256": "29d6dc7dcdc4aadc8b06c239372dbba1734d1fed42ca16dab2a5bc7a69d9ec58",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "wide-modpow-inversion",
+      "included_files_verified": 74,
+      "custody_sha256": "ccee06b74396b082b19b3ae1805092446f2df9ca393fc0aece62e8659cff9d1d",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "coefficient-array-storage",
+      "included_files_verified": 63,
+      "custody_sha256": "c8ec03704518e74cfc52c59683098c49ce1768b77349a8c5d3ea4730d10ccadc",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "coefficient-traversal",
+      "included_files_verified": 48,
+      "custody_sha256": "40c0cc8b06428a4b8ec76954292ec2ad79b080c37c59f351b556dfc46e34fe1f",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "traversal-polynomial-composition",
+      "included_files_verified": 80,
+      "custody_sha256": "3094be08a23d858b6053bd51d6a0a59fca6d98bda0b18a860886d3e41374c474",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "scale-trim-storage",
+      "included_files_verified": 73,
+      "custody_sha256": "6517d2a6beb8b131276cd0cad2fa219354c6e152e5e065f5d8ce516b62dc8b3e",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "normalization-source-correction",
+      "included_files_verified": 68,
+      "custody_sha256": "4fd6493b0ddc416f921b25e291b223ba5946d0fe164bd62ec890e1c6bf3d2883",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "stored-divisor-validity",
+      "included_files_verified": 92,
+      "custody_sha256": "b063ded19409cdc0b2d65a520f6db2691999bad2cc06f2c88bcbaacd9c9322aa",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "normalization-inverse-support",
+      "included_files_verified": 67,
+      "custody_sha256": "4c92c89cda02d2a9720987f0c20b02b2af2f6a4c838367013402d73526794165",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    },
+    {
+      "packet": "normalization-multiplicity",
+      "included_files_verified": 68,
+      "custody_sha256": "0b3d2181b93dd0ca52c26f2d4bdc0b408ad34bc849174bb486c418c614487e24",
+      "scope": "included bytes only; excluded build artifacts not rechecked"
+    }
+  ]
+}

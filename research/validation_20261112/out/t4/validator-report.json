@@ -1,0 +1,1121 @@
+{
+ "schema": "validator-report/v1",
+ "target": "research/small_de_endo_fb_20261112 (bench record 20261112T1753Z-small-de-endo-fb)",
+ "validated_commit": "c5678a98aef6bbee34df3f277e618dd0a00f8ab1",
+ "validator": "validator role (Claude Opus 5.5), not the producer; restart 3, 2026-11-13",
+ "status": "pass",
+ "independent": true,
+ "standing": "[pcc:unverified]: no pcc claim id; this report carries no keyring signature",
+ "raw_data": [
+  {
+   "path": "small_de_derived.json",
+   "sha256": "f7454eae917c89d50f7413f7aeed1bf2af7855756a6375ed4aa1c665313e464e"
+  },
+  {
+   "path": "tables.md",
+   "sha256": "ce0184fcc363af772cbd0d8f10f14315e8279a905b0356ccc1b56885d6bf1e05"
+  },
+  {
+   "path": "run.log",
+   "sha256": "537b83f40397b7e60a1d472d1f592b9d2fe572377ed156d48627d2fad5026f4a"
+  },
+  {
+   "path": ".artifacts.json",
+   "sha256": "aa162b4229ad321fe516d7142020f4a57a651968b05bb4e516acdab63c3f8c41"
+  },
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "54dad8696d0bc2e47da51629a16c1edb11e378705d781c71a1758de0179c4560"
+  },
+  {
+   "path": "../validation_20261112/out/t4/band.json",
+   "sha256": "0cd151490c8a1b6e821e29f487b889e3318bd6519cf92035824155a113963e66"
+  },
+  {
+   "path": "../validation_20261112/out/t4/recompute.json",
+   "sha256": "956ebea08e2a64a06cd92dc4de956dc9177ddd68c63c315a12281650edf76ce7"
+  },
+  {
+   "path": "../validation_20261112/out/t4/sd_dump.jsonl",
+   "sha256": "c86095b2744c0cb961357c4dcab3fa27c454c30cca5b4e2e01f08dc95e0d0666"
+  }
+ ],
+ "raw_data_note": "small_de.json (store sha256 8bcdde7c..., 1,584,609 bytes, .artifacts.json) could not be fetched: the environment's S3 credentials were rejected (InvalidAccessKeyId). The validator replayed the recorded command from c5678a9 and recomputed from that replay; render.py applied to the replay gives small_de_derived.json, tables.md and small_de.svg byte-identical to the committed files, and the replay's sha256 differs from the store pin only through timing fields (construction_ms, wall_ms). The store bytes themselves are unverified.",
+ "method": [
+  "recompute_small_de.py: single-instance and relation-phase totals at w = 0, 0.1, 1, best matched rho, 720 per-arm-cell values vs small_de_derived.json (0 mismatches), A2 vs A1 rule verdicts",
+  "band_small_de.py: order of every arm-cell against the best matched rho at 0, 0.1, 1; extra unemitted rho native work needed to reverse it",
+  "check_small_de_prose.py: RESULTS.md Answer-section ratios",
+  "check_sd_instances.py / check_sd_cm.py: curves, CM data, lambda, and 1,920 IC target logs certified with vlib",
+  "val_sd_rho output: 2,240 rho logs certified with vlib; costs equal small_de.json"
+ ],
+ "headline": [
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm11_a2",
+   "claimed": 27877900.497916672,
+   "recomputed": 27877900.497916672,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm11_a2:reference(best matched rho, w=0.1)",
+   "claimed": 12347.18125,
+   "recomputed": 12347.18125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm11_a2",
+   "claimed": 27864243.86666667,
+   "recomputed": 27864243.86666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm11_a2:reference(best matched rho, w=0.1)",
+   "claimed": 12347.18125,
+   "recomputed": 12347.18125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm11_a2",
+   "claimed": 3234.0,
+   "recomputed": 3234,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm11_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm11_a1",
+   "claimed": 112972294.31041668,
+   "recomputed": 112972294.31041668,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm11_a1:reference(best matched rho, w=0.1)",
+   "claimed": 12347.18125,
+   "recomputed": 12347.18125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm11_a1",
+   "claimed": 112957261.96666668,
+   "recomputed": 112957261.96666668,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm11_a1:reference(best matched rho, w=0.1)",
+   "claimed": 12347.18125,
+   "recomputed": 12347.18125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm11_a1",
+   "claimed": 12935.0,
+   "recomputed": 12935,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm11_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm8_a2",
+   "claimed": 29199318.37291667,
+   "recomputed": 29199318.37291667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm8_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6037.45625,
+   "recomputed": 6037.45625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm8_a2",
+   "claimed": 29183687.96666667,
+   "recomputed": 29183687.96666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm8_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6037.45625,
+   "recomputed": 6037.45625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm8_a2",
+   "claimed": 3234.0,
+   "recomputed": 3234,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm8_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm8_a1",
+   "claimed": 112774162.47083333,
+   "recomputed": 112774162.47083333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm8_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6037.45625,
+   "recomputed": 6037.45625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm8_a1",
+   "claimed": 112757719.43333334,
+   "recomputed": 112757719.43333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm8_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6037.45625,
+   "recomputed": 6037.45625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm8_a1",
+   "claimed": 12936.0,
+   "recomputed": 12936,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm8_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm7_a2",
+   "claimed": 27893111.1625,
+   "recomputed": 27893111.1625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm7_a2:reference(best matched rho, w=0.1)",
+   "claimed": 7037.712500000001,
+   "recomputed": 7037.712500000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm7_a2",
+   "claimed": 27873857.3,
+   "recomputed": 27873857.3,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm7_a2:reference(best matched rho, w=0.1)",
+   "claimed": 7037.712500000001,
+   "recomputed": 7037.712500000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm7_a2",
+   "claimed": 3234.0,
+   "recomputed": 3234,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm7_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm7_a1",
+   "claimed": 113512018.5875,
+   "recomputed": 113512018.5875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm7_a1:reference(best matched rho, w=0.1)",
+   "claimed": 7037.712500000001,
+   "recomputed": 7037.712500000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm7_a1",
+   "claimed": 113498358.80000001,
+   "recomputed": 113498358.80000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm7_a1:reference(best matched rho, w=0.1)",
+   "claimed": 7037.712500000001,
+   "recomputed": 7037.712500000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm7_a1",
+   "claimed": 12936.0,
+   "recomputed": 12936,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm7_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm4_a2",
+   "claimed": 56384753.393750004,
+   "recomputed": 56384753.393750004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm4_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6890.15625,
+   "recomputed": 6890.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm4_a2",
+   "claimed": 56371725.900000006,
+   "recomputed": 56371725.900000006,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm4_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6890.15625,
+   "recomputed": 6890.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm4_a2",
+   "claimed": 6468.0,
+   "recomputed": 6468,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm4_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm4_a1",
+   "claimed": 113300892.79791668,
+   "recomputed": 113300892.79791668,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm4_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6890.15625,
+   "recomputed": 6890.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm4_a1",
+   "claimed": 113287897.86666667,
+   "recomputed": 113287897.86666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm4_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6890.15625,
+   "recomputed": 6890.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm4_a1",
+   "claimed": 12936.0,
+   "recomputed": 12936,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm4_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm3_a2",
+   "claimed": 37812090.18750001,
+   "recomputed": 37812090.18750001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm3_a2:reference(best matched rho, w=0.1)",
+   "claimed": 4486.16875,
+   "recomputed": 4486.16875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm3_a2",
+   "claimed": 37798437.300000004,
+   "recomputed": 37798437.300000004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm3_a2:reference(best matched rho, w=0.1)",
+   "claimed": 4486.16875,
+   "recomputed": 4486.16875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm3_a2",
+   "claimed": 4311.0,
+   "recomputed": 4311,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm3_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm3_a1",
+   "claimed": 112569652.17500003,
+   "recomputed": 112569652.17500003,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_dm3_a1:reference(best matched rho, w=0.1)",
+   "claimed": 4486.16875,
+   "recomputed": 4486.16875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm3_a1",
+   "claimed": 112555291.40000002,
+   "recomputed": 112555291.40000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_dm3_a1:reference(best matched rho, w=0.1)",
+   "claimed": 4486.16875,
+   "recomputed": 4486.16875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_dm3_a1",
+   "claimed": 12933.0,
+   "recomputed": 12933,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_dm3_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_d0_a3",
+   "claimed": 28551936.845833335,
+   "recomputed": 28551936.845833335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_d0_a3:reference(best matched rho, w=0.1)",
+   "claimed": 14322.35,
+   "recomputed": 14322.35,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_d0_a3",
+   "claimed": 28538946.033333335,
+   "recomputed": 28538946.033333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_d0_a3:reference(best matched rho, w=0.1)",
+   "claimed": 14322.35,
+   "recomputed": 14322.35,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_d0_a3",
+   "claimed": 3234.0,
+   "recomputed": 3234,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_d0_a3",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_d0_a0",
+   "claimed": 112746351.08125003,
+   "recomputed": 112746351.08125003,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m2_d0_a0:reference(best matched rho, w=0.1)",
+   "claimed": 14322.35,
+   "recomputed": 14322.35,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_d0_a0",
+   "claimed": 112732671.40000002,
+   "recomputed": 112732671.40000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m2_d0_a0:reference(best matched rho, w=0.1)",
+   "claimed": 14322.35,
+   "recomputed": 14322.35,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m2_d0_a0",
+   "claimed": 12934.0,
+   "recomputed": 12934,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m2_d0_a0",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm11_a2",
+   "claimed": 35580535.233333334,
+   "recomputed": 35580535.233333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm11_a2:reference(best matched rho, w=0.1)",
+   "claimed": 14194.9375,
+   "recomputed": 14194.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm11_a2",
+   "claimed": 35232647.93333334,
+   "recomputed": 35232647.93333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm11_a2:reference(best matched rho, w=0.1)",
+   "claimed": 14194.9375,
+   "recomputed": 14194.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm11_a2",
+   "claimed": 138.0,
+   "recomputed": 138,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm11_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm11_a1",
+   "claimed": 134721270.15000004,
+   "recomputed": 134721270.15000004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm11_a1:reference(best matched rho, w=0.1)",
+   "claimed": 14194.9375,
+   "recomputed": 14194.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm11_a1",
+   "claimed": 134304965.50000003,
+   "recomputed": 134304965.50000003,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm11_a1:reference(best matched rho, w=0.1)",
+   "claimed": 14194.9375,
+   "recomputed": 14194.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm11_a1",
+   "claimed": 552.0,
+   "recomputed": 552,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm11_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm8_a2",
+   "claimed": 47151231.31250001,
+   "recomputed": 47151231.31250001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm8_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6235.70625,
+   "recomputed": 6235.70625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm8_a2",
+   "claimed": 46735966.800000004,
+   "recomputed": 46735966.800000004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm8_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6235.70625,
+   "recomputed": 6235.70625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm8_a2",
+   "claimed": 138.0,
+   "recomputed": 138,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm8_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm8_a1",
+   "claimed": 119323852.94583336,
+   "recomputed": 119323852.94583336,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm8_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6235.70625,
+   "recomputed": 6235.70625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm8_a1",
+   "claimed": 118869453.23333335,
+   "recomputed": 118869453.23333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm8_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6235.70625,
+   "recomputed": 6235.70625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm8_a1",
+   "claimed": 552.0,
+   "recomputed": 552,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm8_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm7_a2",
+   "claimed": 34357859.237500004,
+   "recomputed": 34357859.237500004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm7_a2:reference(best matched rho, w=0.1)",
+   "claimed": 7791.25,
+   "recomputed": 7791.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm7_a2",
+   "claimed": 34039906.800000004,
+   "recomputed": 34039906.800000004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm7_a2:reference(best matched rho, w=0.1)",
+   "claimed": 7791.25,
+   "recomputed": 7791.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm7_a2",
+   "claimed": 138.0,
+   "recomputed": 138,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm7_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm7_a1",
+   "claimed": 118995764.47083333,
+   "recomputed": 118995764.47083333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm7_a1:reference(best matched rho, w=0.1)",
+   "claimed": 7791.25,
+   "recomputed": 7791.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm7_a1",
+   "claimed": 118585219.83333333,
+   "recomputed": 118585219.83333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm7_a1:reference(best matched rho, w=0.1)",
+   "claimed": 7791.25,
+   "recomputed": 7791.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm7_a1",
+   "claimed": 552.0,
+   "recomputed": 552,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm7_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm4_a2",
+   "claimed": 54384176.329166666,
+   "recomputed": 54384176.329166666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm4_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6533.375,
+   "recomputed": 6533.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm4_a2",
+   "claimed": 54003557.46666667,
+   "recomputed": 54003557.46666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm4_a2:reference(best matched rho, w=0.1)",
+   "claimed": 6533.375,
+   "recomputed": 6533.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm4_a2",
+   "claimed": 276.0,
+   "recomputed": 276,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm4_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm4_a1",
+   "claimed": 114524471.96249999,
+   "recomputed": 114524471.96249999,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm4_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6533.375,
+   "recomputed": 6533.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm4_a1",
+   "claimed": 114169616.39999999,
+   "recomputed": 114169616.39999999,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm4_a1:reference(best matched rho, w=0.1)",
+   "claimed": 6533.375,
+   "recomputed": 6533.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm4_a1",
+   "claimed": 552.0,
+   "recomputed": 552,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm4_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm3_a2",
+   "claimed": 38052528.97083333,
+   "recomputed": 38052528.97083333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm3_a2:reference(best matched rho, w=0.1)",
+   "claimed": 4508.39375,
+   "recomputed": 4508.39375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm3_a2",
+   "claimed": 37624054.03333333,
+   "recomputed": 37624054.03333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm3_a2:reference(best matched rho, w=0.1)",
+   "claimed": 4508.39375,
+   "recomputed": 4508.39375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm3_a2",
+   "claimed": 184.0,
+   "recomputed": 184,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm3_a2",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm3_a1",
+   "claimed": 112135913.78750001,
+   "recomputed": 112135913.78750001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_dm3_a1:reference(best matched rho, w=0.1)",
+   "claimed": 4508.39375,
+   "recomputed": 4508.39375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm3_a1",
+   "claimed": 111767139.10000001,
+   "recomputed": 111767139.10000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_dm3_a1:reference(best matched rho, w=0.1)",
+   "claimed": 4508.39375,
+   "recomputed": 4508.39375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_dm3_a1",
+   "claimed": 552.0,
+   "recomputed": 552,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_dm3_a1",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_d0_a3",
+   "claimed": 34630647.300000004,
+   "recomputed": 34630647.300000004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_d0_a3:reference(best matched rho, w=0.1)",
+   "claimed": 13367.9375,
+   "recomputed": 13367.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_d0_a3",
+   "claimed": 34332645.800000004,
+   "recomputed": 34332645.800000004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_d0_a3:reference(best matched rho, w=0.1)",
+   "claimed": 13367.9375,
+   "recomputed": 13367.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_d0_a3",
+   "claimed": 138.0,
+   "recomputed": 138,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_d0_a3",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_d0_a0",
+   "claimed": 116191372.78333335,
+   "recomputed": 116191372.78333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_single_instance_w0p1_b28_m3_d0_a0:reference(best matched rho, w=0.1)",
+   "claimed": 13367.9375,
+   "recomputed": 13367.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_d0_a0",
+   "claimed": 115823267.53333335,
+   "recomputed": 115823267.53333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:ic_relation_phase_w0p1_b28_m3_d0_a0:reference(best matched rho, w=0.1)",
+   "claimed": 13367.9375,
+   "recomputed": 13367.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:columns_b28_m3_d0_a0",
+   "claimed": 552.0,
+   "recomputed": 552,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:targets_certified_b28_m3_d0_a0",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm11_a2",
+   "claimed": 0.8690957644794349,
+   "recomputed": 0.8690957644794349,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm11_a1",
+   "claimed": 0.8620108969242836,
+   "recomputed": 0.8620108969242836,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm8_a2",
+   "claimed": 0.7564780690685815,
+   "recomputed": 0.7564780690685815,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm8_a1",
+   "claimed": 0.8673257263632276,
+   "recomputed": 0.8673257263632276,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm7_a2",
+   "claimed": 0.7738809734511856,
+   "recomputed": 0.7738809734511856,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm7_a1",
+   "claimed": 0.8657852119177164,
+   "recomputed": 0.8657852119177164,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm4_a2",
+   "claimed": 0.8706887125628998,
+   "recomputed": 0.8706887125628998,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm4_a1",
+   "claimed": 0.8637440974829166,
+   "recomputed": 0.8637440974829166,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm3_a2",
+   "claimed": 0.8626746270681439,
+   "recomputed": 0.8626746270681439,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_dm3_a1",
+   "claimed": 0.8651696546058137,
+   "recomputed": 0.8651696546058137,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_d0_a3",
+   "claimed": 0.8675877999984714,
+   "recomputed": 0.8675877999984714,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m2_d0_a0",
+   "claimed": 0.8662368424740995,
+   "recomputed": 0.8662368424740995,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm11_a2",
+   "claimed": 0.7077075624561658,
+   "recomputed": 0.7077075624561658,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm11_a1",
+   "claimed": 0.7197128158694169,
+   "recomputed": 0.7197128158694169,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm8_a2",
+   "claimed": 0.6893069421716692,
+   "recomputed": 0.6893069421716692,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm8_a1",
+   "claimed": 0.7241608251809302,
+   "recomputed": 0.7241608251809302,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm7_a2",
+   "claimed": 0.6805605606056511,
+   "recomputed": 0.6805605606056511,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm7_a1",
+   "claimed": 0.7137904898098743,
+   "recomputed": 0.7137904898098743,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm4_a2",
+   "claimed": 0.7548218506979781,
+   "recomputed": 0.7548218506979781,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm4_a1",
+   "claimed": 0.7376846225949222,
+   "recomputed": 0.7376846225949222,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm3_a2",
+   "claimed": 0.7505724917704307,
+   "recomputed": 0.7505724917704307,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_dm3_a1",
+   "claimed": 0.759405558703968,
+   "recomputed": 0.759405558703968,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_d0_a3",
+   "claimed": 0.7060756793121404,
+   "recomputed": 0.7060756793121404,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:decomposition_probability_b28_m3_d0_a0",
+   "claimed": 0.7443042741701399,
+   "recomputed": 0.7443042741701399,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md:min single-instance IC/rho, w=0",
+   "claimed": 2.32,
+   "recomputed": 2.32493919837607,
+   "rel_tol": 0.002150593875096783
+  },
+  {
+   "name": "RESULTS.md:min single-instance IC/rho, w=0.1",
+   "claimed": 7.62,
+   "recomputed": 7.616457533077251,
+   "rel_tol": 0.0006564731672546813
+  },
+  {
+   "name": "RESULTS.md:min single-instance IC/rho, w=1",
+   "claimed": 40.16,
+   "recomputed": 40.15612462654716,
+   "rel_tol": 0.0001245140074272632
+  },
+  {
+   "name": "RESULTS.md:best amortised IC/rho w=0.1 (12 bits, m=2, D=-11, A2)",
+   "claimed": 2.29,
+   "recomputed": 2.2919696969696974,
+   "rel_tol": 0.0021815297150789975
+  },
+  {
+   "name": "RESULTS.md:28-bit amortised IC/rho w=0.1, low end",
+   "claimed": 125,
+   "recomputed": 125.44554068175498,
+   "rel_tol": 0.003985793335360233
+  },
+  {
+   "name": "RESULTS.md:28-bit amortised IC/rho w=0.1, high end",
+   "claimed": 1631,
+   "recomputed": 1631.2286124631416,
+   "rel_tol": 0.0003065174287526775
+  },
+  {
+   "name": "RESULTS.md:arm-cells below matched rho at all three prices",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md:arm-cells (IC arms x cells)",
+   "claimed": 120,
+   "recomputed": 120,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md:targets certified (16 x 120 arm-cells)",
+   "claimed": 1920,
+   "recomputed": 1920,
+   "rel_tol": 1e-09
+  }
+ ],
+ "headline_failures": [],
+ "findings": [
+  "RESULTS.md:19 and :111 say the per-trial solving cost is the same 'to the operation' in every arm of every cell; in 12 of 60 cells (all m = 3, 12 to 20 bits) the per-trial field-operation count differs between repetitions and arms by up to 0.85%; the A2/A1 ratio of the means is 1.000 to three decimals in 59 of 60 cells and 1.0007 in one. Prose overstatement; no headline number changes.",
+  "Record commit b7e8c68 (commit_dirty true) does not contain small_de.rs or small_de_ic.rs; they were first committed in e0f476b, 30 minutes after the run. No binary hash recorded. The source is unchanged from e0f476b to c5678a9 and reproduces the data.",
+  "PROTOCOL.md: the pre-data draft (57ea773, 05:45 UTC) is the byte-identical prefix before Amendment 1; Amendment 1 and frozen.sha256 were committed with the results (e0f476b), so its pre-data status rests on the producer's statement."
+ ]
+}

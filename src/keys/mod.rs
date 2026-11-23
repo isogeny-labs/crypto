@@ -26,24 +26,28 @@ impl KeyBundle {
         }
     }
 
-    /// Print a human-readable key summary.
+    /// Print public key metadata. Private material requires an explicit
+    /// export API such as [`ecc_private_to_hex`].
     pub fn summary(&self) {
-        println!("=== ECC (secp256k1) ===");
-        println!(
-            "Private: {}",
-            to_hex(&bigint_to_bytes_be(&self.ecc.private.scalar, 32))
-        );
+        self.write_summary(&mut std::io::stdout().lock())
+            .expect("failed to write key summary");
+    }
+
+    /// Write the public summary to the caller's sink, propagating I/O errors.
+    /// This does not format or serialize either private key.
+    pub fn write_summary(&self, out: &mut (impl std::io::Write + ?Sized)) -> std::io::Result<()> {
+        writeln!(out, "=== ECC ({}) ===", self.ecc.public.curve_name)?;
         if let Some(pub_bytes) = self.ecc.public.to_sec1_uncompressed() {
-            println!("Public:  {}", to_hex(&pub_bytes));
+            writeln!(out, "Public:  {}", to_hex(&pub_bytes))?;
         }
-        println!();
-        println!("=== RSA-{} ===", self.rsa.public.bits);
+        writeln!(out)?;
+        writeln!(out, "=== RSA-{} ===", self.rsa.public.bits)?;
         let n_hex = to_hex(&bigint_to_bytes_be(
             &self.rsa.public.n,
             (self.rsa.public.bits as usize).div_ceil(8),
         ));
-        println!("n (first 32 bytes): {}", &n_hex[..64]);
-        println!("e: {}", self.rsa.public.e);
+        writeln!(out, "n (first 32 bytes): {}", &n_hex[..n_hex.len().min(64)])?;
+        writeln!(out, "e: {}", self.rsa.public.e)
     }
 }
 

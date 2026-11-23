@@ -24,12 +24,26 @@ fn emulator() -> PathBuf {
     static BINARY: OnceLock<PathBuf> = OnceLock::new();
     BINARY
         .get_or_init(|| {
-            let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-            let source = manifest
-                .ancestors()
-                .map(|p| p.join("gpu/certicom/emulator.cpp"))
-                .find(|p| p.is_file())
-                .expect("tracked gpu/certicom source must be materialized");
+            // Embed the complete native source closure, so sparse CI and
+            // installed-tree tests compile exactly the Rust revision's bytes.
+            // ci-scope follows these inputs without hydrating archive data.
+            let inputs: [(&str, &[u8]); 3] = [
+                (
+                    "emulator.cpp",
+                    include_bytes!("../../../gpu/certicom/emulator.cpp"),
+                ),
+                ("wire.hpp", include_bytes!("../../../gpu/certicom/wire.hpp")),
+                (
+                    "arithmetic.h",
+                    include_bytes!("../../../gpu/certicom/arithmetic.h"),
+                ),
+            ];
+            let source_dir = test_dir().join("source");
+            std::fs::create_dir_all(&source_dir).unwrap();
+            for (name, bytes) in inputs {
+                std::fs::write(source_dir.join(name), bytes).unwrap();
+            }
+            let source = source_dir.join("emulator.cpp");
             let binary = test_dir().join("certicom_emulator");
             let output = Command::new(std::env::var("CXX").unwrap_or_else(|_| "c++".into()))
                 .args(["-O2", "-std=c++17", "-Wall", "-Wextra", "-Werror"])

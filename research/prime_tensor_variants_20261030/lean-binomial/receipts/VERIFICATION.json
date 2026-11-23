@@ -1,0 +1,34 @@
+{
+  "source_sha256": "e39f42e32d2cbe728536e1ef84a587c94c861d5393538fe3bbea8a9d971824e2",
+  "lean": "leanprover/lean4:v4.35.0",
+  "shared_revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+  "mathlib_revision": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "reported_theorem_count": 9,
+  "lake_build_exit_code": 0,
+  "explicit_module_build_exit_code": 0,
+  "axiom_audit": {
+    "exit_code": 0,
+    "audited": 9,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms_subset": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "shared_gate": {
+    "exit_code": 0,
+    "status": "PASS",
+    "source_inventory": ["LevelwiseBinomial.lean"]
+  },
+  "module_replay": {
+    "command": "lake env leanchecker --verbose LevelwiseBinomial",
+    "exit_code": 0
+  },
+  "fresh_replay": {
+    "command": "lake env leanchecker --fresh --verbose LevelwiseBinomial",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "frozen_label_package_hashes": 62,
+  "frozen_digits_package_hashes": 38,
+  "frozen_packages_verified_unchanged": true,
+  "formalization_status": "partial: signed binomial parity and actual polynomial origin/node-value consequences checked; full coefficientwise chart obstruction remains open"
+}

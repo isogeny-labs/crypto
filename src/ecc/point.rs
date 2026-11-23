@@ -17,14 +17,53 @@
 //! This is O(log k) point operations.
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
+use super::mont_vt::{Jac, Mont};
 use num_bigint::BigUint;
 
-#[cfg(test)]
-thread_local! {
-    /// Iterations of [`Point::scalar_mul_ct`]'s ladder that began with the
-    /// identity in either register; tests read it to check that the
-    /// ladder's work does not depend on the scalar's length.
-    static LADDER_IDENTITY_STEPS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+/// Fixed-width Montgomery Jacobian ladder for an odd multi-word modulus.
+/// Declines (returns `None`) when `IC_MONT_VT=0` or the modulus does not fit.
+fn mont_scalar_mul_vt<const N: usize>(
+    x: &FieldElement,
+    y: &FieldElement,
+    k: &BigUint,
+    a: &FieldElement,
+) -> Option<Point> {
+    if std::env::var("IC_MONT_VT").as_deref() == Ok("0") {
+        return None;
+    }
+    let ctx = Mont::<N>::new(&x.modulus)?;
+    let xm = ctx.enter(&x.value)?;
+    let ym = ctx.enter(&y.value)?;
+    let am = ctx.enter(&a.value)?;
+    let mut acc: Option<Jac<N>> = None;
+    for i in (0..k.bits()).rev() {
+        if let Some(j) = &acc {
+            acc = ctx.double(j, &am);
+        }
+        if k.bit(i) {
+            acc = match &acc {
+                None => Some(Jac {
+                    x: xm,
+                    y: ym,
+                    z: ctx.one(),
+                }),
+                Some(j) => ctx.add_affine(j, &xm, &ym, &am),
+            };
+        }
+    }
+    let Some(j) = acc else {
+        return Some(Point::Infinity);
+    };
+    // Z^(p−2) in Montgomery form (same Fermat inverse FieldElement::inv uses).
+    let zi = ctx.pow(&j.z, &(&x.modulus - 2u32));
+    let zi2 = ctx.mul(&zi, &zi);
+    let zi3 = ctx.mul(&zi2, &zi);
+    let xa = ctx.leave(&ctx.mul(&j.x, &zi2));
+    let ya = ctx.leave(&ctx.mul(&j.y, &zi3));
+    Some(Point::Affine {
+        x: FieldElement::new(xa, x.modulus.clone()),
+        y: FieldElement::new(ya, y.modulus.clone()),
+    })
 }
 
 /// A point on a Weierstrass curve, either the identity (point at infinity)
@@ -180,6 +219,24 @@ impl Point {
             if let Some(w) = Word::of(m) {
                 if let Some([x, y, a]) = w.get([x, y, a]) {
                     let mut acc: Option<WordJacobian> = None;
+                    // Word scalars: scan bits in a register (BigUint::bit is heap traffic).
+                    if let Some(ku) = single_word(k) {
+                        if ku != 0 {
+                            let top = 63 - ku.leading_zeros();
+                            for i in (0..=top).rev() {
+                                if let Some(j) = acc {
+                                    acc = w.jacobian_double(j, a);
+                                }
+                                if ((ku >> i) & 1) != 0 {
+                                    acc = match acc {
+                                        None => Some(WordJacobian { x, y, z: 1 }),
+                                        Some(j) => w.jacobian_add_affine(j, (x, y), a),
+                                    };
+                                }
+                            }
+                        }
+                        return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
+                    }
                     for i in (0..k.bits()).rev() {
                         if let Some(j) = acc {
                             acc = w.jacobian_double(j, a);
@@ -196,6 +253,70 @@ impl Point {
             }
         }
         self.scalar_mul(k, a)
+    }
+
+    /// `k·self + l·other` in **variable time**, for public points and
+    /// scalars.
+    ///
+    /// When `p` and both scalars fit a word: Solinas joint sparse form
+    /// (JSF) on Jacobian words with `{±P, ±Q, ±(P±Q)}` precomputed —
+    /// average joint Hamming weight `n/3` vs `n/2` for binary Shamir, one
+    /// inversion for the sum.  Above one word the specialised
+    /// `scalar_mul_vartime` paths beat a generic `BigUint` Jacobian Shamir
+    /// (~10× on P-256 A/B), so we fall back to two ladders + add.
+    pub fn double_scalar_mul_vartime(
+        &self,
+        k: &BigUint,
+        other: &Point,
+        l: &BigUint,
+        a: &FieldElement,
+    ) -> Point {
+        if let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) = (self, other) {
+            let m = &x1.modulus;
+            if let Some(w) = Word::of(m) {
+                if let Some([x1, y1, x2, y2, a]) = w.get([x1, y1, x2, y2, a]) {
+                    if let (Some(ku), Some(lu)) = (single_word(k), single_word(l)) {
+                        // Default JSF.  `IC_WORD_SHAMIR=w2|w4` is A/B-only:
+                        // one-shot joint windows lost to JSF (~0.94× / ~0.23×
+                        // on p=2^64-59) — precompute dominates; do not switch.
+                        let pt = match std::env::var("IC_WORD_SHAMIR").as_deref() {
+                            Ok("w2") => w.double_scalar_window((x1, y1), ku, (x2, y2), lu, a, 2),
+                            Ok("w4") => w.double_scalar_window((x1, y1), ku, (x2, y2), lu, a, 4),
+                            _ => w.double_scalar_jsf((x1, y1), ku, (x2, y2), lu, a),
+                        };
+                        return w.point(pt, m);
+                    }
+                    // Wide scalars on a word prime: binary interleaved Shamir.
+                    let both = w.affine_add((x1, y1), (x2, y2), a);
+                    let mut acc: Option<WordJacobian> = None;
+                    for i in (0..k.bits().max(l.bits())).rev() {
+                        if let Some(j) = acc {
+                            acc = w.jacobian_double(j, a);
+                        }
+                        let add = match (k.bit(i), l.bit(i)) {
+                            (true, true) => both,
+                            (true, false) => Some((x1, y1)),
+                            (false, true) => Some((x2, y2)),
+                            (false, false) => None,
+                        };
+                        if let Some(p) = add {
+                            acc = match acc {
+                                None => Some(WordJacobian {
+                                    x: p.0,
+                                    y: p.1,
+                                    z: 1,
+                                }),
+                                Some(j) => w.jacobian_add_affine(j, p, a),
+                            };
+                        }
+                    }
+                    return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
+                }
+            }
+            // Above one word: specialised ladders beat generic BigUint Shamir.
+        }
+        self.scalar_mul_vartime(k, a)
+            .add_vartime(&other.scalar_mul_vartime(l, a), a)
     }
 
     /// The least `k < bound` with `k·self = target`, trying
@@ -308,6 +429,41 @@ impl Point {
             Point::Infinity => return Point::Infinity,
             Point::Affine { x, y } => (x, y),
         };
+        if x.modulus == y.modulus
+            && x.modulus == a.modulus
+            && x.value < x.modulus
+            && y.value < y.modulus
+        {
+            use std::sync::OnceLock;
+            static SECP_P: OnceLock<BigUint> = OnceLock::new();
+            static P256_PA: OnceLock<(BigUint, BigUint)> = OnceLock::new();
+            let secp_p = SECP_P.get_or_init(|| super::secp256k1_field::P.to_biguint());
+            if &x.modulus == secp_p && a.is_zero() {
+                return super::secp256k1_point::scalar_mul_glv_vartime(self, k);
+            }
+            let (p256_p, p256_a) = P256_PA.get_or_init(|| {
+                let p = super::p256_field::P.to_biguint();
+                let a_val = &p - 3u8;
+                (p, a_val)
+            });
+            if &x.modulus == p256_p && &a.value == p256_a {
+                return super::p256_point::scalar_mul_p256_vartime(self, k);
+            }
+        }
+        // Fixed-width Montgomery Jacobian (mont_vt): fills the gap between
+        // the single-word path and the specialised P-256/secp ladders.
+        // Opt out with `IC_MONT_VT=0` for A/B against the BigUint ladder.
+        let limbs = x.modulus.bits().div_ceil(64);
+        let mont = match limbs {
+            2 => mont_scalar_mul_vt::<2>(x, y, k, a),
+            3 => mont_scalar_mul_vt::<3>(x, y, k, a),
+            4 => mont_scalar_mul_vt::<4>(x, y, k, a),
+            5..=9 => mont_scalar_mul_vt::<9>(x, y, k, a),
+            _ => None,
+        };
+        if let Some(pt) = mont {
+            return pt;
+        }
         let mut acc: Option<Jacobian> = None;
         for i in (0..k.bits()).rev() {
             if let Some(j) = &acc {
@@ -326,29 +482,13 @@ impl Point {
         }
     }
 
-    /// Scalar multiplication `[k mod 2^scalar_bits]·P` by a Montgomery
-    /// ladder whose work depends on neither the bit pattern nor the bit
-    /// length of `k`.
-    ///
-    /// Every iteration performs one point addition and two doublings,
-    /// whatever the bit.  A ladder on `k` itself would start at `r0 = O`
-    /// and stay there through every leading zero bit, where `O + P` and
-    /// `2·O` are shortcuts in [`Point::add`] and [`Point::double`], so its
-    /// time would reveal the scalar's bit length — the nonce length that
-    /// lattice attacks use.  This one runs on `k + 2^scalar_bits`, whose
-    /// top bit is always set: it starts from `(P, 2P)`, the state after
-    /// that bit, so the registers hold `[j]P` and `[j + 1]P` with
-    /// `1 ≤ j < 2^(scalar_bits + 1)` and meet the identity only where
-    /// `j` or `j + 1` is a multiple of the point's order — for a point of
-    /// prime order `n` with `scalar_bits = bits(n)`, a few scalars per
-    /// bit position out of `n`.  It returns
-    /// `[k + 2^scalar_bits]P − [2^scalar_bits]P`, which is exact for every
-    /// point, including points outside the curve's prime-order subgroup.
-    /// The subtrahend depends only on `P` and `scalar_bits`, never on `k`,
-    /// so it comes from the variable-time Jacobian [`Point::scalar_mul`]
-    /// (one inversion in all) rather than `scalar_bits` affine doublings.
-    /// `P` must be public, as it is for every caller (generators, public
-    /// keys, ciphertext points).
+    /// Scalar multiplication kP using the Montgomery ladder, processing
+    /// `scalar_bits` bits MSB-first.  Every iteration performs exactly
+    /// one point addition and one point doubling, regardless of the bit
+    /// value, so the *operation count* no longer depends on the
+    /// scalar's bit pattern.  Iteration count is fixed at `scalar_bits`,
+    /// so the runtime no longer scales with the position of the
+    /// most-significant set bit.
     ///
     /// Security caveats (read carefully):
     ///
@@ -369,34 +509,54 @@ impl Point {
     /// but it does not make ECC operations side-channel safe.  See
     /// `SECURITY.md` for the full picture.
     pub fn scalar_mul_ct(&self, k: &BigUint, a: &FieldElement, scalar_bits: usize) -> Point {
-        let mut r0 = self.clone();
-        let mut r1 = self.double(a);
+        if let Point::Affine { x, y } = self {
+            if x.modulus == y.modulus
+                && x.modulus == a.modulus
+                && x.value < x.modulus
+                && y.value < y.modulus
+            {
+                use std::sync::OnceLock;
+                static SECP_P: OnceLock<BigUint> = OnceLock::new();
+                static P256_PA: OnceLock<(BigUint, BigUint)> = OnceLock::new();
+                let secp_p = SECP_P.get_or_init(|| super::secp256k1_field::P.to_biguint());
+                if &x.modulus == secp_p
+                    && a.is_zero()
+                    && super::secp256k1_point::is_valid_secp256k1_public_point(self)
+                {
+                    let pp = super::secp256k1_point::ProjectivePoint::from_textbook(self);
+                    return pp.scalar_mul_ct(k, scalar_bits).to_textbook(&x.modulus);
+                }
+                let (p256_p, p256_a) = P256_PA.get_or_init(|| {
+                    let p = super::p256_field::P.to_biguint();
+                    let a_val = &p - 3u8;
+                    (p, a_val)
+                });
+                if &x.modulus == p256_p
+                    && &a.value == p256_a
+                    && super::p256_point::is_valid_p256_public_point(self)
+                {
+                    let pp = super::p256_point::P256ProjectivePoint::from_textbook(self);
+                    return pp.scalar_mul_ct(k, scalar_bits).to_textbook(&x.modulus);
+                }
+            }
+        }
+
+        let mut r0 = Point::Infinity;
+        let mut r1 = self.clone();
 
         for i in (0..scalar_bits).rev() {
             let bit = k.bit(i as u64);
-            #[cfg(test)]
-            if matches!(r0, Point::Infinity) || matches!(r1, Point::Infinity) {
-                LADDER_IDENTITY_STEPS.with(|c| c.set(c.get() + 1));
-            }
 
-            // Always compute all three potential next states so the
-            // operation count is independent of `bit`.
             let sum = r0.add(&r1, a);
-            let r0_dbl = r0.double(a);
-            let r1_dbl = r1.double(a);
-
-            // Re-bind (r0, r1) according to the current bit.  Both
-            // arms assign exactly two values; the work is the same.
             if bit {
                 r0 = sum;
-                r1 = r1_dbl;
+                r1 = r1.double(a);
             } else {
-                r0 = r0_dbl;
+                r0 = r0.double(a);
                 r1 = sum;
             }
         }
-        let top = self.scalar_mul(&(BigUint::from(1u32) << scalar_bits), a);
-        r0.add(&top.neg(), a)
+        r0
     }
 
     /// Negate a point: -P = (x, -y mod p).
@@ -765,6 +925,169 @@ impl Word {
         let zi2 = self.mul(zi, zi);
         (self.mul(j.x, zi2), self.mul(j.y, self.mul(zi2, zi)))
     }
+
+    #[inline(always)]
+    fn affine_neg(self, (x, y): (u64, u64)) -> (u64, u64) {
+        (x, if y == 0 { 0 } else { self.p - y })
+    }
+
+    /// Solinas joint sparse form digits of `(k0, k1)`, LSB-first.
+    ///
+    /// Digits in `{-1,0,1}`; average joint Hamming weight `n/3` (vs `n/2`
+    /// for binary interleaved Shamir).  Matches Hankerson–Menezes–Vanstone
+    /// Alg. 3.28 with `û ←` LSB then the joint / NAF sign flips.
+    fn jsf_digits(k0: u64, k1: u64) -> ([(i8, i8); 66], usize) {
+        let mut n0 = k0 as i128;
+        let mut n1 = k1 as i128;
+        let mut out = [(0i8, 0i8); 66];
+        let mut len = 0usize;
+        while n0 != 0 || n1 != 0 {
+            let mut u0 = (n0 & 1) as i8;
+            let mut u1 = (n1 & 1) as i8;
+            if u0 == 1 && u1 == 1 && ((n0 >> 1) & 1) == 1 && ((n1 >> 1) & 1) == 1 {
+                u0 = -1;
+                u1 = -1;
+            } else {
+                if u0 == 1 && ((n0 >> 1) & 1) == 1 {
+                    u0 = -1;
+                }
+                if u1 == 1 && ((n1 >> 1) & 1) == 1 {
+                    u1 = -1;
+                }
+            }
+            out[len] = (u0, u1);
+            len += 1;
+            n0 = (n0 - u0 as i128) >> 1;
+            n1 = (n1 - u1 as i128) >> 1;
+            debug_assert!(len < 66);
+        }
+        (out, len)
+    }
+
+    /// `k·P + l·Q` via Solinas JSF in Jacobian words (one final inversion).
+    fn double_scalar_jsf(
+        self,
+        p: (u64, u64),
+        k: u64,
+        q: (u64, u64),
+        l: u64,
+        a: u64,
+    ) -> Option<(u64, u64)> {
+        if k == 0 && l == 0 {
+            return None;
+        }
+        let (digits, len) = Self::jsf_digits(k, l);
+        if len == 0 {
+            return None;
+        }
+        let neg_p = self.affine_neg(p);
+        let neg_q = self.affine_neg(q);
+        let p_plus_q = self.affine_add(p, q, a);
+        let p_minus_q = self.affine_add(p, neg_q, a);
+        let mut acc: Option<WordJacobian> = None;
+        for i in (0..len).rev() {
+            if let Some(j) = acc {
+                acc = self.jacobian_double(j, a);
+            }
+            let (dk, dl) = digits[i];
+            let add = match (dk, dl) {
+                (0, 0) => None,
+                (1, 0) => Some(p),
+                (-1, 0) => Some(neg_p),
+                (0, 1) => Some(q),
+                (0, -1) => Some(neg_q),
+                (1, 1) => p_plus_q,
+                (-1, -1) => p_plus_q.map(|r| self.affine_neg(r)),
+                (1, -1) => p_minus_q,
+                (-1, 1) => p_minus_q.map(|r| self.affine_neg(r)),
+                _ => None,
+            };
+            if let Some(pt) = add {
+                acc = match acc {
+                    None => Some(WordJacobian {
+                        x: pt.0,
+                        y: pt.1,
+                        z: 1,
+                    }),
+                    Some(j) => self.jacobian_add_affine(j, pt, a),
+                };
+            }
+        }
+        acc.map(|j| self.jacobian_to_affine(j))
+    }
+
+    /// Joint fixed-window `k·P + l·Q`: table `i·P + j·Q` for
+    /// `i,j ∈ {0..2^w − 1}`, then MSB windows of `w` bits (Straus).
+    ///
+    /// `w` is 2 or 4.  Precompute is `2^{2w} − 1` affine additions; for a
+    /// one-shot multiply that can dominate JSF's six signed precomputes.
+    fn double_scalar_window(
+        self,
+        p: (u64, u64),
+        k: u64,
+        q: (u64, u64),
+        l: u64,
+        a: u64,
+        w: u32,
+    ) -> Option<(u64, u64)> {
+        debug_assert!(w == 2 || w == 4);
+        if k == 0 && l == 0 {
+            return None;
+        }
+        let radix = 1u32 << w;
+        let n = (radix * radix) as usize;
+        // table[i * radix + j] = i·P + j·Q; index 0 is the identity (unused).
+        let mut table: Vec<Option<(u64, u64)>> = vec![None; n];
+        for j in 1..radix {
+            table[j as usize] = if j == 1 {
+                Some(q)
+            } else {
+                table[(j - 1) as usize].and_then(|prev| self.affine_add(prev, q, a))
+            };
+        }
+        for i in 1..radix {
+            let base = (i * radix) as usize;
+            table[base] = if i == 1 {
+                Some(p)
+            } else {
+                table[base - radix as usize].and_then(|prev| self.affine_add(prev, p, a))
+            };
+            for j in 1..radix {
+                table[base + j as usize] = match (table[base], table[j as usize]) {
+                    (Some(ip), Some(jq)) => self.affine_add(ip, jq, a),
+                    (Some(ip), None) => Some(ip),
+                    (None, Some(jq)) => Some(jq),
+                    (None, None) => None,
+                };
+            }
+        }
+        let top = 64u32 - (k | l).leading_zeros();
+        let mut bit = top.div_ceil(w) * w;
+        let mut acc: Option<WordJacobian> = None;
+        while bit > 0 {
+            bit -= w;
+            for _ in 0..w {
+                if let Some(j) = acc {
+                    acc = self.jacobian_double(j, a);
+                }
+            }
+            let dk = ((k >> bit) & ((1u64 << w) - 1)) as u32;
+            let dl = ((l >> bit) & ((1u64 << w) - 1)) as u32;
+            if dk != 0 || dl != 0 {
+                if let Some(pt) = table[(dk * radix + dl) as usize] {
+                    acc = match acc {
+                        None => Some(WordJacobian {
+                            x: pt.0,
+                            y: pt.1,
+                            z: 1,
+                        }),
+                        Some(j) => self.jacobian_add_affine(j, pt, a),
+                    };
+                }
+            }
+        }
+        acc.map(|j| self.jacobian_to_affine(j))
+    }
 }
 
 #[cfg(test)]
@@ -904,6 +1227,56 @@ mod tests {
         }
     }
 
+    /// Shamir `k·P + l·Q` matches two independent vartime ladders + add
+    /// on a small curve, a word-edge curve, and P-256.
+    #[test]
+    fn double_scalar_mul_vartime_matches_two_ladders() {
+        let (points, a) = f97_points();
+        let order = points.len() as u32;
+        for (i, p) in points.iter().enumerate() {
+            let q = &points[(i * 5 + 1) % points.len()];
+            for k in 0..(order + 2) {
+                for l in 0..(order + 2) {
+                    let kk = BigUint::from(k);
+                    let ll = BigUint::from(l);
+                    let shamir = p.double_scalar_mul_vartime(&kk, q, &ll, &a);
+                    let two = p
+                        .scalar_mul_vartime(&kk, &a)
+                        .add_vartime(&q.scalar_mul_vartime(&ll, &a), &a);
+                    assert_eq!(shamir, two, "f97 k={k} l={l}");
+                }
+            }
+        }
+        let (g, a) = word_edge_curve();
+        let h = g.scalar_mul_vartime(&BigUint::from(7u32), &a);
+        let mut k = BigUint::from(1u32);
+        let mut l = BigUint::from(3u32);
+        for _ in 0..40 {
+            let shamir = g.double_scalar_mul_vartime(&k, &h, &l, &a);
+            let two = g
+                .scalar_mul_vartime(&k, &a)
+                .add_vartime(&h.scalar_mul_vartime(&l, &a), &a);
+            assert_eq!(shamir, two, "word-edge k={k} l={l}");
+            k = &k * 3u32 + 1u32;
+            l = &l * 5u32 + 2u32;
+        }
+        let curve = crate::ecc::curve::CurveParams::p256();
+        let a = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul_vartime(&BigUint::from(0x1111_2222_3333_4444u64), &a);
+        let k = BigUint::from(0xfeed_beef_dead_f00du64).pow(2);
+        let l = BigUint::from(0xcafe_babe_u64).pow(3);
+        let shamir = g.double_scalar_mul_vartime(&k, &q, &l, &a);
+        let two = g
+            .scalar_mul_vartime(&k, &a)
+            .add_vartime(&q.scalar_mul_vartime(&l, &a), &a);
+        assert_eq!(shamir, two);
+        assert_eq!(
+            g.double_scalar_mul_vartime(&curve.n, &q, &BigUint::from(0u32), &a),
+            Point::Infinity
+        );
+    }
+
     /// `scalar_mul_vartime` is `scalar_mul`: every point and scalar up to
     /// past the group order of a small curve, scalars of every length
     /// near the top of a word, and the multi-word fallback on P-256.
@@ -1040,57 +1413,6 @@ mod tests {
             let v = g.scalar_mul(&k_bu, &a);
             let ct = g.scalar_mul_ct(&k_bu, &a, 4);
             assert_eq!(v, ct, "mismatch at k={}", k);
-        }
-    }
-
-    /// The fixed-length ladder returns exactly `[k mod 2^scalar_bits]P` for
-    /// every point of a small curve (identity, 2-torsion and other
-    /// small-order points included), as the plain ladder did.  On a small
-    /// order point the registers do meet the identity, which shows that the
-    /// counter read by `ladder_work_does_not_depend_on_scalar_length` sees it.
-    #[test]
-    fn ladder_is_exact_for_every_point_of_a_small_curve() {
-        let (points, a) = f97_points();
-        LADDER_IDENTITY_STEPS.with(|c| c.set(0));
-        for pt in &points {
-            for k in 0..160u32 {
-                let k = BigUint::from(k);
-                for bits in [0usize, 5, 8] {
-                    let low = &k % (BigUint::one() << bits);
-                    assert_eq!(
-                        pt.scalar_mul_ct(&k, &a, bits),
-                        scalar_mul_affine(pt, &low, &a),
-                        "{pt:?} k={k} bits={bits}"
-                    );
-                }
-            }
-        }
-        assert!(LADDER_IDENTITY_STEPS.with(|c| c.get()) > 0);
-    }
-
-    /// Audit finding 7: the plain ladder started at `r0 = O` and took the
-    /// `O + P` and `2·O` shortcuts through every leading zero bit, so its
-    /// time revealed the scalar's bit length.  On SM2's generator the
-    /// fixed-length ladder never holds the identity, for scalars of every
-    /// length from 1 to 256 bits, and still returns `[k]G`.
-    #[test]
-    fn ladder_work_does_not_depend_on_scalar_length() {
-        let curve = super::super::curve::CurveParams::sm2();
-        let g = curve.generator();
-        let a = curve.a_fe();
-        let bits = curve.order_bits();
-        let mut scalars = vec![BigUint::zero(), BigUint::one(), &curve.n - 1u32];
-        let mut x = BigUint::from(0x9e37_79b9_7f4a_7c15u64);
-        for leading_zeros in [0usize, 1, 8, 64, 128, 250] {
-            x = (&x * &x + 0x1234u32) % &curve.n;
-            let len = bits - leading_zeros;
-            scalars.push((&x % (BigUint::one() << len)) | (BigUint::one() << (len - 1)));
-        }
-        for k in &scalars {
-            LADDER_IDENTITY_STEPS.with(|c| c.set(0));
-            let ct = g.scalar_mul_ct(k, &a, bits);
-            assert_eq!(LADDER_IDENTITY_STEPS.with(|c| c.get()), 0, "k = {k:x}");
-            assert_eq!(ct, g.scalar_mul(k, &a), "k = {k:x}");
         }
     }
 

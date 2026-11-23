@@ -1,0 +1,78 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "method": "fresh-process rerun of arm B at the recorded instances with the same jv_cover binary sha256 223902e2... (git 1f006b002, RAYON_NUM_THREADS=1); total_muls, relation_digest, f4_native_ops, residuals, relations, decompositions, stop_mode and S compared against raw/, and the digest against the recorded arm A",
+ "binary_sha256": "223902e28201ce9a468769ec37fe7e50e7b6330afc21f05a2de36c6c08652543",
+ "source_commit": "1f006b002f02e28ad1626338dc504960d6a1dd92",
+ "runs": [
+  {
+   "p": 101,
+   "seed": 4,
+   "arm": "B",
+   "recorded": "raw/p101_s4_B.json",
+   "recorded_sha256": "a0a947c4600676dd11da1e3a42f7ccdd22fdc70f1fe5bcfc5e1df916e760ba24",
+   "replay": "replay/p101_s4_B_replay.json",
+   "replay_sha256": "8528d926c9e7ee3fe4917df554ea83d3b473f9b35ce60ec1201c80b65efeaab2",
+   "fields": [
+    "total_muls",
+    "relation_digest",
+    "f4_native_ops",
+    "residuals",
+    "relations",
+    "decompositions",
+    "stop_mode"
+   ],
+   "matched": {
+    "total_muls": true,
+    "relation_digest": true,
+    "f4_native_ops": true,
+    "residuals": true,
+    "relations": true,
+    "decompositions": true,
+    "stop_mode": true,
+    "S": true,
+    "digest_equals_A": true
+   },
+   "total_muls": 12436296272,
+   "relation_digest": 4527408559774455177,
+   "f4_native_ops": 1251341905,
+   "S": 72.933857270986
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "arm": "B",
+   "recorded": "raw/p53_s2_B.json",
+   "recorded_sha256": "bfdf3711fc7193c633554ff62240ae2d9f61abe7a6912f18d800af461e3b8642",
+   "replay": "replay/p53_s2_B_replay.json",
+   "replay_sha256": "914ad0516017c5d2325f0468b76a4a6b6d582218efdc9b474eed577c64799b46",
+   "fields": [
+    "total_muls",
+    "relation_digest",
+    "f4_native_ops",
+    "residuals",
+    "relations",
+    "decompositions",
+    "stop_mode"
+   ],
+   "matched": {
+    "total_muls": true,
+    "relation_digest": true,
+    "f4_native_ops": true,
+    "residuals": true,
+    "relations": true,
+    "decompositions": true,
+    "stop_mode": true,
+    "S": true,
+    "digest_equals_A": true
+   },
+   "total_muls": 4423274119,
+   "relation_digest": 3844607112822951055,
+   "f4_native_ops": 437445945,
+   "S": 179.52262774694424
+  }
+ ],
+ "errors": []
+}

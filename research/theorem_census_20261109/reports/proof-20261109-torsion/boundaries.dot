@@ -1,0 +1,21 @@
+digraph boundaries {
+ graph [rankdir=LR,bgcolor="white",pad="0.18",nodesep="0.3",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f4ed",fontname="DejaVu Sans",fontsize=10];
+ edge [color="#385e50"];
+ subgraph cluster_fst {
+  label="FST2010 Algorithm3.3(1): actual F7 curve";fontname="DejaVu Sans";fontsize=11;color="#aaaaaa";
+  f [label="y²=x³+x\n#E(F7)=8; trace0\n(0,0) has order2"];
+  roots [label="All ζ²=1 lie in F7\nF7(μ2)=F7\nActual field degree1"];
+  tor [label="α²=−1; α ∉ F7\nP=(α,0); 2P=O\nP not rational"];
+  correction [label="Full torsion field differs\nfrom cyclotomic field\nLiteral r=2 sentence fails",fillcolor="#ffe5dc"];
+  f -> roots -> correction;
+  f -> tor -> correction;
+ }
+ subgraph cluster_bk {
+  label="BK: excluded r dividing q−1";fontname="DejaVu Sans";fontsize=11;color="#aaaaaa";
+  b [label="F7: y²=x³+3x+2\n#E(F7)=9; Δ≠0\n3 divides7−1"];
+  cubic [label="α³+5α²+3α+2=0\nα not in F7\nLifted P: 3P=O"];
+  boundary [label="r² divides group order\nFull r-torsion not rational\nQualified BK not refuted",fillcolor="#eef0f7"];
+  b -> cubic -> boundary;
+ }
+}

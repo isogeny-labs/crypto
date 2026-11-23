@@ -1,0 +1,114 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1
+experiment_id: isogeny_class_ic_yield_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: ef9d986d756f8af489b6c64fa0d0351ccd22ee80
+receipt: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.receipt.json
+binds:
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/FOLLOWUP_c32A_m3.md, sha256: 4edee7f2379d3c71429415b865374cfa154c01f4bc22ac5d0aedd40ea7c5ff5f}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/protocol_followup1.json, sha256: 4de51667746ef027ab5c350cc6a76ae6d82869736d396afdb58f5880d05fd566}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/NOTE_F1.1.md, sha256: 3c31d7e560573165273aa32ef4f1bcf29d1e70ccb08c0afaaf52aa7c481ec9fe}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json, sha256: 0340494ad36574f7d27283617096cdfe4a9bf8160cad3810c0405484f73a92d7}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json, sha256: 7e79c642399cdda52e0e6666123cf8abcad27dbf68c9ff7dda14f0d3316adb47}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml, sha256: a67a7a8d9b2174d36053be66e0f46d2c044147bcfe74dc33c902b604fac2b933}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/analyze.rs, sha256: f6cc7286daae471bc40e5860ed8673f1e1676b9fadce3199b8fe67ca8d167678}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/analyze_focus.rs, sha256: 2112d2034503e18bf903283859b4f652835cb79ecc026d0b43bb769ab5343ba3}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/ec.rs, sha256: 6762cfc839973a16b10e9173c6817813e2dddb492a1739b9f0ecc19d68643ce1}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/main.rs, sha256: ce9a01553ee730b2dc6a8afc253c4e9e36e1e24c971b5291d64ae8b6998bfeb5}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/pari.rs, sha256: 6adde8853496a94865df6301b7f7ad2539afa5c7d2aacb87ff602fea94d5caf2}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/spec.rs, sha256: 850a3b3d7a0bdc976ecc11d3d8b0fefdbcfb929a414c3dfd25b4f4dfd28a486d}
+  - {path: research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool-f1, sha256: db00363617c26bb9ff6b48fc0fda577d49dac391e256eca4348fd936c3a99120}
+  - {path: target/release/ecbench, sha256: 3447ba8a3e410bf816f0fbb13fc7aed235c63a834d31ab32b00f480a930fac1c}
+must_not_exist: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/audit.json, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json]
+commands:
+  - id: spec
+    argv:
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool-f1"
+      - "spec"
+      - "--classes"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json"
+      - "--class"
+      - "c32A"
+      - "--m"
+      - "3"
+      - "--y"
+      - "0.1"
+      - "--isolation"
+      - "L0"
+      - "--focus"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json"
+      - "--targets"
+      - "12"
+      - "--rounds"
+      - "4"
+      - "--aa"
+      - "0"
+      - "--seed"
+      - "363589115"
+      - "--out"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json"
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.spec.stdout
+    stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.spec.stderr
+    outputs: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json]
+  - id: run
+    argv:
+      - "target/release/ecbench"
+      - "run"
+      - "--wait"
+      - "--allow-busy"
+      - "--spec"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json"
+      - "--out"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session"
+    env:
+      ALLOW_BUSY: "1"
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.run.stdout
+    stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.run.stderr
+    outputs: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/session.json, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/records.jsonl]
+  - id: verify
+    argv:
+      - "target/release/ecbench"
+      - "verify"
+      - "--dir"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session"
+      - "--replay"
+      - "12"
+      - "--out"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/audit.json"
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.verify.stdout
+    stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.verify.stderr
+    outputs: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/audit.json]
+  - id: analyze
+    argv:
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool-f1"
+      - "analyze-focus"
+      - "--spec"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json"
+      - "--focus"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json"
+      - "--classes"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json"
+      - "--session"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session"
+      - "--out"
+      - "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json"
+    timeout_seconds: 900
+    success_exit_codes: [0]
+    stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.analyze.stdout
+    stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.analyze.stderr
+    outputs: [research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json]
+bus_address: executor-mechanical-isogeny-ic-yield-p2fu1
+background: true
+write_scope: [research/isogeny_class_ic_yield_20261102/cards/, research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the output directory research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3 unchanged and run nothing further.
+  - The command prints that the card does not lint, a bound digest differs or must_not_exist paths exist; return refused with that line.
+notes: "P2 follow-up 1 (c32A, m=3, curve 80 replication), local backend of amendment A1: isolation L0, ALLOW_BUSY=1, only counted metrics are used. Not an EKS card. Run in the worktree /home/user/crypto-p2fu (detached at the pin, commit ef9d986d756f8af489b6c64fa0d0351ccd22ee80). The main session dispatches this card only after the P2 queue in /home/user/crypto-p2run has printed queue done, because ecbench holds one benchmark lock per host. Launch detached: setsid nohup python3 tools/task_card.py run research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.yaml > research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.launch.log 2>&1 < /dev/null &. Command 4 (analyze) has never run on a real session; on its failure the session stays as it is, per note F1.1 section 3. Do not compress the session directory."

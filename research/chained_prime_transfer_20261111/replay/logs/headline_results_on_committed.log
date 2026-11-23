@@ -1,0 +1,29 @@
+PASS row count: 4 rows
+PASS p=211 IC/rho: 4184/428 = 9.7757 -> 9.8 (claimed 9.8)
+  info p=211 r=109: S=ops/sqrt(r): rho_src 41.0, rho_isog 50.8, rho_jac 37.9, IC 400.8 (asymptotic rho S about 1.3)
+PASS p=211 jac_order = e1*e2: 49268 vs 49268
+PASS p=211 r || #J (r | e1, r^2 not | e1, r not | e2): e1=218 e2=226 r=109
+PASS p=211 relations = fb + 8, trials >= relations: fb 116 rel 124 trials 244 (smooth fraction 0.508)
+PASS p=211 recovered/chain flags: ic_recovered_ok and chain_verified both true in the raw JSON
+PASS p=419 IC/rho: 9366/357 = 26.2353 -> 26.2 (claimed 26.2)
+  info p=419 r=113: S=ops/sqrt(r): rho_src 33.6, rho_isog 52.9, rho_jac 46.8, IC 881.1 (asymptotic rho S about 1.3)
+PASS p=419 jac_order = e1*e2: 187128 vs 187128
+PASS p=419 r || #J (r | e1, r^2 not | e1, r not | e2): e1=452 e2=414 r=113
+PASS p=419 relations = fb + 8, trials >= relations: fb 223 rel 231 trials 532 (smooth fraction 0.434)
+PASS p=419 recovered/chain flags: ic_recovered_ok and chain_verified both true in the raw JSON
+PASS p=821 IC/rho: 13313/370 = 35.9811 -> 36.0 (claimed 36.0)
+  info p=821 r=71: S=ops/sqrt(r): rho_src 43.9, rho_isog 32.5, rho_jac 46.2, IC 1580.0 (asymptotic rho S about 1.3)
+PASS p=821 jac_order = e1*e2: 657744 vs 657744
+PASS p=821 r || #J (r | e1, r^2 not | e1, r not | e2): e1=852 e2=772 r=71
+PASS p=821 relations = fb + 8, trials >= relations: fb 401 rel 409 trials 869 (smooth fraction 0.471)
+PASS p=821 recovered/chain flags: ic_recovered_ok and chain_verified both true in the raw JSON
+PASS p=1619 IC/rho: 36363/847 = 42.9315 -> 42.9 (claimed 42.9)
+  info p=1619 r=401: S=ops/sqrt(r): rho_src 42.3, rho_isog 32.4, rho_jac 28.0, IC 1815.9 (asymptotic rho S about 1.3)
+PASS p=1619 jac_order = e1*e2: 2502240 vs 2502240
+PASS p=1619 r || #J (r | e1, r^2 not | e1, r not | e2): e1=1604 e2=1560 r=401
+PASS p=1619 relations = fb + 8, trials >= relations: fb 772 rel 780 trials 1588 (smooth fraction 0.491)
+PASS p=1619 recovered/chain flags: ic_recovered_ok and chain_verified both true in the raw JSON
+PASS ratio grows with p: [9.78, 26.24, 35.98, 42.93]
+PASS LSQ slope ln(IC ops) vs ln p: 1.008082 (claimed 1.01)
+  info LSQ slope ln(rho_src ops) vs ln p = 0.307 (rho here is set-up dominated)
+summary: 23 PASS, 0 FAIL

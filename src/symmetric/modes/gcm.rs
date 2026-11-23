@@ -94,7 +94,12 @@ fn ghash(h: &[u8; 16], aad: &[u8], ciphertext: &[u8]) -> [u8; 16] {
 }
 
 /// Generic CTR over a 16-byte block cipher, starting at the given counter.
-fn ctr_from<C: BlockCipher128>(cipher: &C, nonce: &[u8; 12], start: u32, data: &[u8]) -> Vec<u8> {
+fn ctr_from<C: BlockCipher128 + ?Sized>(
+    cipher: &C,
+    nonce: &[u8; 12],
+    start: u32,
+    data: &[u8],
+) -> Vec<u8> {
     let mut out = data.to_vec();
     let mut ctr = start;
     for chunk in out.chunks_mut(16) {
@@ -110,13 +115,13 @@ fn ctr_from<C: BlockCipher128>(cipher: &C, nonce: &[u8; 12], start: u32, data: &
     out
 }
 
-fn hash_key<C: BlockCipher128>(cipher: &C) -> [u8; 16] {
+fn hash_key<C: BlockCipher128 + ?Sized>(cipher: &C) -> [u8; 16] {
     let mut h = [0u8; 16];
     cipher.encrypt_block(&mut h);
     h
 }
 
-fn encrypt_j0<C: BlockCipher128>(cipher: &C, nonce: &[u8; 12]) -> [u8; 16] {
+fn encrypt_j0<C: BlockCipher128 + ?Sized>(cipher: &C, nonce: &[u8; 12]) -> [u8; 16] {
     let mut j0 = [0u8; 16];
     j0[..12].copy_from_slice(nonce);
     j0[15] = 1;
@@ -125,7 +130,7 @@ fn encrypt_j0<C: BlockCipher128>(cipher: &C, nonce: &[u8; 12]) -> [u8; 16] {
 }
 
 /// **GCM encrypt** with a 12-byte nonce.  Returns `ciphertext || 16-byte tag`.
-pub fn gcm_encrypt<C: BlockCipher128>(
+pub fn gcm_encrypt<C: BlockCipher128 + ?Sized>(
     cipher: &C,
     nonce: &[u8; 12],
     aad: &[u8],
@@ -145,7 +150,7 @@ pub fn gcm_encrypt<C: BlockCipher128>(
 
 /// **GCM decrypt**.  Returns `Ok(plaintext)` on tag match; `Err(())` otherwise.
 /// Tag comparison is constant-time.
-pub fn gcm_decrypt<C: BlockCipher128>(
+pub fn gcm_decrypt<C: BlockCipher128 + ?Sized>(
     cipher: &C,
     nonce: &[u8; 12],
     aad: &[u8],

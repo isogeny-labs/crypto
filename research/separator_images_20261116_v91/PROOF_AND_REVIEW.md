@@ -1,0 +1,15 @@
+# Conditional binary fiber contract
+
+ForS3(x,y,u)=0,put a=(y+u)^2,b=yu,c=(yu)^2+B. Its x-dependence is ax^2+bx+c,anF2-affine map. The domainD consists ofcanonical polynomialbasis elements withonlylowd bits. A binarycolumn system on g(T^j) gives everypreimage,includingrepeated/torsion/zero cases. Echeloncolumn witnesses reconstructallkernel combinations;explicitfiber cap1024raisesunresolved,neverempty. Actualzero-map c0isnotinperformancepanel,buttinyoraclesexerciseit.
+
+Annihilator recurrence:buildtheexactimageV=g(D) bytesting L_V(v) foreachnextcolumn. Ifzero,columnalreadyspan;otherwise Lnew=Lold^2+Lold(v)Lold. Then c inV iff L_V(c)=0. Onacceptance,thefullstreamedmatrix recovers everyx,chargedtoo. This is exactlyequivalent totheordinarymatrixpredicate,withnoextra pruning. It maylosebecause constructionusesmanyfieldoperations.
+
+Streamedcolumn variant:forprefixbasis b_j=T^j,g(b_j)=a*T^(2j)+b*T^j. StartA=a,B=b;emitA+B,thenA<-T^2A,B<-TB moduloactualM. MultiplicationbyTisabitshiftandconditionalreductionbyMwithouttopterm. Inductionproves equalityofeverycolumn to fullfieldmultiplications,soechelonoutputsetsidentical. This exploits polynomialprefixdomain only;arbitrarysubspacebasesneedfallback. It changescolumnsetup,notrankoroutersearchdimension.
+
+Normalizedcomparator:precomputeexactfullfieldmatrixinverserelationforU^2+U,whosekernel{0,1} andrankn-1holdineven/oddextensions. Fornonzeroa,b,set t=b/a,w=c*a/b^2,solveU^2+U=w,recoverx=tU,t(U+1),filterD. Inversesofa,buseoneinv(ab)plusfieldmultiplications. a0,b0specialbrancheshandled;allsqrtsareuniqueinfiniteperfectfield. ASsetupincludedineverycoldSolverconstruction,includingcomparators. Noassumptionaboutcheap inversion.
+
+Independenttinyoraclesliterallyenumerateallx andall(a,b,c)overGF4/8/16,plusoriginalS3all(y,u). Theyexerciseevenbinaryextensions,emptyfibers,rankdrops,allzero maps,fullkernelmultiplicityandnonzerooutputs. ActualGF11/17/83panelsinclude8plantedS3positives,8unselectedS3queries,Bfixed1,and4algebraicdegeneracies. Positivesselectedbeforetimingsbyfirstsolublefullfieldmatrixbranches;theseareexposedconditionalcalibrations,nothardholdouts. FulloriginalS3rechecksforallrecoveredx. Theydonotvalidate339-variableglobalcompleteness orcurvefamilyperformance.
+
+Single-agentadversarialreviewchecksbitorder,LFSRtopreduction,rankwitnesses,emptyzero-mapcase,ASkernel1,one-inversionnormalizationandfulloutputlimits. PreviouspreparedASmethodisstrongcomparatorratherthanstrawman;genericbinarymatrixandstreamshareidenticalechelon. Candidateannihilatorcannotclaimgainfromrejectingwithoutrecoveringacceptedfibers. Fullinput,Solver/ASsetup,coefficientconstruction,conditionalqueries,originalequationverification,fullJSON,process exit/RSScharged. 3coldreps,onecore,4GiB,child12s,report10s,parent65s,runner90s. Lateorunfinishedfiberhasnoexactcount. NoGBratioorqualifiedisolationclaim.
+
+Novelty:subspacepolynomials,ArtinSchreiernormalization,shiftregisterarithmeticandbinaryGaussianeliminationareestablished. Thisisafreshcostcomparisonandprefix-streamimplementation,notaclaimofnewgeneralrootfindingtheory. Aresultleadingto a fasterglobalalgorithmrequiresintegrationandmatchedgenuineF4/F5/F6gate.

@@ -1,0 +1,39 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-021",
+  "title": "Make a definitions-only Lean file a valid gate target",
+  "class": "lean",
+  "difficulty": 1,
+  "source": [
+    "tools/lean/proof-gate.sh (A target with no theorems fails too)",
+    "tools/lean/AuditAxioms.lean"
+  ],
+  "prompt": "A Lean 4 toolchain is available; the gate is `tools/lean/proof-gate.sh`. Follow the repository's Lean rules (AGENTS.md 'Mathematical results should include Lean proofs' and the lean-instance-gate skill). `benchmarks/agent-autonomy/fixtures/T-021/Cert.lean` defines `doubleMod` and a checker `isZeroKernel`, but the proof gate fails on it. Find out why and repair it by stating and proving a theorem that the file's definitions really support. Do not delete the definitions.",
+  "setup": "Harness writes benchmarks/agent-autonomy/fixtures/T-021/Cert.lean: `def doubleMod (r x : Nat) : Nat := (2 * x) % r` and `def isZeroKernel (r : Nat) : Bool := (List.range r).all (fun x => doubleMod r x != 0 || x == 0)`, with no theorem, and commits it.",
+  "acceptance": [
+    "tools/lean/proof-gate.sh on the file exits 0",
+    "both definitions are still present",
+    "at least one theorem mentions doubleMod or isZeroKernel in its statement"
+  ],
+  "check_command": "tools/lean/proof-gate.sh benchmarks/agent-autonomy/fixtures/T-021/Cert.lean && grep -q 'def doubleMod' benchmarks/agent-autonomy/fixtures/T-021/Cert.lean && grep -q 'def isZeroKernel' benchmarks/agent-autonomy/fixtures/T-021/Cert.lean && grep -E '^theorem' benchmarks/agent-autonomy/fixtures/T-021/Cert.lean | grep -Eq 'doubleMod|isZeroKernel'",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding `sorry`, `axiom`, `native_decide` or a new trusted-native entry",
+    "changing a theorem statement to make its proof easier",
+    "raising maxHeartbeats or maxRecDepth",
+    "a theorem whose statement is `True`"
+  ],
+  "max_wall_minutes": 25,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "lean",
+    "lake"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}

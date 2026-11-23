@@ -1,0 +1,48 @@
+# nc2_stage0 args: r=[2097349, 2097559, 2097523] c=[1, 2] n=2000 seed=20261108 d1=None d3=true train=300 restarts=8 steps=40
+# pool mode: SP(m, M) with M=64
+
+## r=2097349 C=1 (K=2, sqrt(r)=1448.2)
+D0  E_points = 1.3684 +- 0.0111 (n=2000)
+D0i E_points = 1.3251 +- 0.0104 (n=2000)
+SP m=4  M=64 E_points = 1.3500 +- 0.0109 (n=2000)  E_parents = 0.1704 +- 0.0014  rank-K hit = 1.0000  E_points/D0 = 0.9865
+SP m=8  M=64 E_points = 1.3506 +- 0.0109 (n=2000)  E_parents = 0.0854 +- 0.0007  rank-K hit = 1.0000  E_points/D0 = 0.9871
+
+## r=2097349 C=2 (K=3, sqrt(r)=1448.2)
+D0  E_points = 1.7278 +- 0.0114 (n=2000)
+D0i E_points = 1.6532 +- 0.0107 (n=2000)
+SP m=4  M=64 E_points = 1.6804 +- 0.0110 (n=2000)  E_parents = 0.2120 +- 0.0014  rank-K hit = 1.0000  E_points/D0 = 0.9726
+SP m=8  M=64 E_points = 1.6905 +- 0.0112 (n=2000)  E_parents = 0.1069 +- 0.0007  rank-K hit = 1.0000  E_points/D0 = 0.9784
+
+## r=2097559 C=1 (K=2, sqrt(r)=1448.3)
+D0  E_points = 1.3980 +- 0.0112 (n=2000)
+D0i E_points = 1.3229 +- 0.0107 (n=2000)
+SP m=4  M=64 E_points = 1.3673 +- 0.0107 (n=2000)  E_parents = 0.1725 +- 0.0014  rank-K hit = 1.0000  E_points/D0 = 0.9780
+SP m=8  M=64 E_points = 1.3469 +- 0.0110 (n=2000)  E_parents = 0.0852 +- 0.0007  rank-K hit = 1.0000  E_points/D0 = 0.9634
+
+## r=2097559 C=2 (K=3, sqrt(r)=1448.3)
+D0  E_points = 1.7238 +- 0.0114 (n=2000)
+D0i E_points = 1.6629 +- 0.0106 (n=2000)
+SP m=4  M=64 E_points = 1.6817 +- 0.0112 (n=2000)  E_parents = 0.2122 +- 0.0014  rank-K hit = 1.0000  E_points/D0 = 0.9756
+SP m=8  M=64 E_points = 1.6978 +- 0.0108 (n=2000)  E_parents = 0.1073 +- 0.0007  rank-K hit = 1.0000  E_points/D0 = 0.9849
+
+## r=2097523 C=1 (K=2, sqrt(r)=1448.3)
+D0  E_points = 1.3716 +- 0.0114 (n=2000)
+D0i E_points = 1.3409 +- 0.0109 (n=2000)
+SP m=4  M=64 E_points = 1.3643 +- 0.0109 (n=2000)  E_parents = 0.1722 +- 0.0014  rank-K hit = 1.0000  E_points/D0 = 0.9947
+SP m=8  M=64 E_points = 1.3486 +- 0.0108 (n=2000)  E_parents = 0.0853 +- 0.0007  rank-K hit = 1.0000  E_points/D0 = 0.9833
+
+## r=2097523 C=2 (K=3, sqrt(r)=1448.3)
+D0  E_points = 1.6839 +- 0.0112 (n=2000)
+D0i E_points = 1.6540 +- 0.0109 (n=2000)
+SP m=4  M=64 E_points = 1.6781 +- 0.0110 (n=2000)  E_parents = 0.2117 +- 0.0014  rank-K hit = 1.0000  E_points/D0 = 0.9965
+SP m=8  M=64 E_points = 1.6830 +- 0.0107 (n=2000)  E_parents = 0.1064 +- 0.0007  rank-K hit = 1.0000  E_points/D0 = 0.9994
+
+## aggregate over 3 curves (mean of means, SE = sqrt(sum se^2)/m)
+AGG C=1 D0       E_points = 1.3793 +- 0.0065  hit = 1.0000
+AGG C=1 D0i      E_points = 1.3296 +- 0.0061  hit = 1.0000
+AGG C=1 SP m=4 M=64 E_points = 1.3605 +- 0.0063  E_parents = 0.1717 +- 0.0008  hit = 1.0000
+AGG C=1 SP m=8 M=64 E_points = 1.3487 +- 0.0063  E_parents = 0.0853 +- 0.0004  hit = 1.0000
+AGG C=2 D0       E_points = 1.7119 +- 0.0065  hit = 1.0000
+AGG C=2 D0i      E_points = 1.6567 +- 0.0062  hit = 1.0000
+AGG C=2 SP m=4 M=64 E_points = 1.6801 +- 0.0064  E_parents = 0.2120 +- 0.0008  hit = 1.0000
+AGG C=2 SP m=8 M=64 E_points = 1.6904 +- 0.0063  E_parents = 0.1068 +- 0.0004  hit = 1.0000

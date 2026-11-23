@@ -1,0 +1,1183 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-field-cost-scale-20261116",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116",
+  "authors": [
+    "producer"
+  ],
+  "question": "On four deterministic larger actual CM8 twist fixtures, compare full cold generic recovery controls and SAME-input polynomial certificate/root kernels against NTL, with independent scalars/event traces and retained per-input timing distributions. Kernel and generic recovery are separate scopes, not complete IC cost.",
+  "claims": [
+    {
+      "id": "row-degree-frontier",
+      "text": "Exact complete scale/cost-control census and per-input timing observations, not signed verification or IC-vs-rho/fastest speed claim",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Complete admitted-public-log IC, stationary yield, intrinsic regularity and global hardness outside this component scope",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "producerC",
+      "role": "candidate",
+      "description": "producerC complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "auditC",
+      "role": "control_positive",
+      "description": "auditC complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "producerA",
+      "role": "candidate",
+      "description": "producerA complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3e55a0a7f6e0bb18f52bee03b61ceb4358b7db0ba1eb77c3dbe17fcd2c2063d1",
+        "threads": 1,
+        "flags": {
+          "binary": "release",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "auditA",
+      "role": "reference",
+      "description": "auditA complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "producerB",
+      "role": "control_aa",
+      "description": "producerB complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3e55a0a7f6e0bb18f52bee03b61ceb4358b7db0ba1eb77c3dbe17fcd2c2063d1",
+        "threads": 1,
+        "flags": {
+          "binary": "release",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "auditB",
+      "role": "control_aa",
+      "description": "auditB complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-prime",
+      "role": "candidate",
+      "description": "mutate-prime complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-prime",
+      "role": "control_negative",
+      "description": "reject-prime complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-subgroup",
+      "role": "candidate",
+      "description": "mutate-subgroup complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-subgroup",
+      "role": "control_negative",
+      "description": "reject-subgroup complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-scalar",
+      "role": "candidate",
+      "description": "mutate-scalar complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "reject-scalar complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-target",
+      "role": "candidate",
+      "description": "mutate-target complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-target",
+      "role": "control_negative",
+      "description": "reject-target complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-map",
+      "role": "candidate",
+      "description": "mutate-map complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-map",
+      "role": "control_negative",
+      "description": "reject-map complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-cost",
+      "role": "candidate",
+      "description": "mutate-cost complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "reject-cost complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-trace",
+      "role": "candidate",
+      "description": "mutate-trace complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-trace",
+      "role": "control_negative",
+      "description": "reject-trace complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-phase-sum",
+      "role": "candidate",
+      "description": "mutate-phase-sum complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-phase-sum",
+      "role": "control_negative",
+      "description": "reject-phase-sum complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-missing-run",
+      "role": "candidate",
+      "description": "mutate-missing-run complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-missing-run",
+      "role": "control_negative",
+      "description": "reject-missing-run complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-degree",
+      "role": "candidate",
+      "description": "mutate-degree complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-degree",
+      "role": "control_negative",
+      "description": "reject-degree complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-witness",
+      "role": "candidate",
+      "description": "mutate-witness complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "reject-witness complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-root",
+      "role": "candidate",
+      "description": "mutate-root complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "reject-root complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-missing-kernel",
+      "role": "candidate",
+      "description": "mutate-missing-kernel complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-missing-kernel",
+      "role": "control_negative",
+      "description": "reject-missing-kernel complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "mutate-base-size",
+      "role": "candidate",
+      "description": "mutate-base-size complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+        "threads": 1,
+        "flags": {
+          "binary": "counted",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 21632
+      }
+    },
+    {
+      "id": "reject-base-size",
+      "role": "control_negative",
+      "description": "reject-base-size complete four-field native bundle or predeclared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+        "build": null,
+        "binary_sha256": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 21632
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "auditC",
+      "expected_detection": "Fresh independent audit accepts exact full partial/cold-recovery bundle",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-prime",
+      "null_population": {
+        "description": "14 genuine source/scalar/map/cost/trace/time-interval/coverage/witness/root/degree controls",
+        "generator": "Native C++ mutation modes in frozen order",
+        "n": 14,
+        "why_n": "All predeclared semantic controls, no sampling or null exemption",
+        "matched_on": [
+          "same original bundle",
+          "all untargeted fields",
+          "rehash rule"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "native C++ with counted and uninstrumented release binaries",
+          "independent Rust field/group/polynomial/trace/scalar auditor"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "FIRST prime p>=61/257/1024/4096 with p=5mod8 and r=(p+1)/2prime, p<65536; exact oldE61 or standard CM8 short model, nonsquare-2 twist",
+        "how": "Native independent field/group route checks"
+      },
+      {
+        "name": "policy_encoding_cap",
+        "treatment": "fixed",
+        "value": "32 fixed seeded point workloads;4cold generic methods;512kernel polynomial inputs;3kernel engines;each2warmups+11measured, all failures retained",
+        "how": "Complete nested native loops, unchanged after data"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Fresh full executions"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "producerC",
+          "auditC",
+          "producerA",
+          "auditA",
+          "producerB",
+          "auditB",
+          "mutate-prime",
+          "reject-prime",
+          "mutate-subgroup",
+          "reject-subgroup",
+          "mutate-scalar",
+          "reject-scalar",
+          "mutate-target",
+          "reject-target",
+          "mutate-map",
+          "reject-map",
+          "mutate-cost",
+          "reject-cost",
+          "mutate-trace",
+          "reject-trace",
+          "mutate-phase-sum",
+          "reject-phase-sum",
+          "mutate-missing-run",
+          "reject-missing-run",
+          "mutate-degree",
+          "reject-degree",
+          "mutate-witness",
+          "reject-witness",
+          "mutate-root",
+          "reject-root",
+          "mutate-missing-kernel",
+          "reject-missing-kernel",
+          "mutate-base-size",
+          "reject-base-size"
+        ],
+        "how": "Fixed dependency order, no timing metric"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "auditC",
+          "auditA",
+          "auditB",
+          "reject-prime",
+          "reject-subgroup",
+          "reject-scalar",
+          "reject-target",
+          "reject-map",
+          "reject-cost",
+          "reject-trace",
+          "reject-phase-sum",
+          "reject-missing-run",
+          "reject-degree",
+          "reject-witness",
+          "reject-root",
+          "reject-missing-kernel",
+          "reject-base-size"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All1664cold records and19968kernel records per native stream, exact source/seed/phase/trace/cert/scalar validation, semantic equality counted/releaseA/releaseB and14false controls101/no receipt"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "producerA",
+          "producerB"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "threshold": "Exact complete native stream and receipt equality"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "Actual cyclic subgroup on each separately independently counted curve/twist fixture",
+        "check": "Every r source point paired, Tate denominator-elimination equality and primitive roots, every recovered scalar checked on ORIGINAL source, no label input to recovery"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Complete fixed deterministic bundle, NOT independent batch challenges or significance from timing repeats; every workload remains one target."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 20,
+      "per_sample_seconds": 500,
+      "threads": 1,
+      "estimated_total_seconds": 800,
+      "measured_on": "Bounded engineering census, conservative800s bundle estimate; every process<=600s and existing01:42UTCdeadline. Exact larger field selection not executed before freeze, no speed inference."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Execution-protocol exact native exit status; scientific per-input timing and cost vectors are retained separately in native data, not collapsed to batch throughput",
+        "source": "data-stages.json exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "fixtures",
+        "name": "fixtures",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Four exact deterministic scale fixtures",
+        "source": "audit*.json fixtures",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "pipeline_records",
+        "name": "pipeline_records",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "1664 separate cold records including warmups",
+        "source": "audit*.json pipeline_records",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "kernel_records",
+        "name": "kernel_records",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "19968 certificate/root kernel records including warmups",
+        "source": "audit*.json kernel_records",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "trace_files",
+        "name": "trace_files",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Counted primitive-arithmetic traces; release is null/absent, not zero cost",
+        "source": "audit*.json trace_files",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "fixtures",
+      "pipeline_records",
+      "kernel_records",
+      "trace_files"
+    ],
+    "record": [
+      "actual sources/binaries and NTL archive/config/library hashes",
+      "all per-input cold5phase ns and arithmetic vectors",
+      "separate counted execution traces and uninstrumented measured streams",
+      "all kernel inputs/outputs/certificates/roots/external degree unknown",
+      "all exceptions/false payloads/exits/logs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 800,
+    "placement": {
+      "outer_seconds": 800,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete34data/control processes after3builds or first failure; max600sstage and01:42UTCdeadline; all failures incomplete/invalid, no favorable subset",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Correctness/coverage first; retain per-input eleven-replicate medians/IQR/ranges for all methods including losses; do not infer complete IC/fastest/security speed",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All1664cold records and19968kernel records per native stream, exact source/seed/phase/trace/cert/scalar validation, semantic equality counted/releaseA/releaseB and14false controls101/no receipt",
+    "statistic": "Per-target/per-polynomial-input measured cold or kernel median,11replicates,2excluded stored warmups; source arithmetic traces counted separately, no batch throughput",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defects, no statistical effect size",
+    "verdict_vocabulary": [
+      "finite_frontier_extension_unsigned",
+      "finite_null_unsigned",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/audit.rs",
+      "sha256": "9ff13e449c0b5ffbff401cf92e804d4c95ef2d73c5b4bf6430aef31c79b96a1b"
+    },
+    "inputs": [
+      "Full counted/releaseA/releaseB case JSONs",
+      "All original primitive traces",
+      "14 genuine false payload/trace trees",
+      "exact source/binary/qualifier/native external dependency bindings"
+    ],
+    "outputs": [
+      "auditC.json",
+      "auditA.json",
+      "auditB.json",
+      "per-input timing medians/IQR/ranges",
+      "all true/false cases/traces/exits/logs"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-target cold method costs across4actual fields, no batch averaging",
+      "Per-input NTL/legacy/terminal kernel costs and output degree scopes"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Use reference pair enumeration to supply candidate stopping/roots",
+    "Admit an uncertified branch root",
+    "Hide diagonal/O/failed branches or blocked setups",
+    "Read target scalar labels in recovery",
+    "Call chord expanded degree original S3 pullback degree or intrinsic regularity",
+    "Free log/setup caching between cold targets",
+    "Select favorable policy/cap prefix",
+    "Upload denied raw archives or use credentials/paid resources",
+    "Interpret conditional state counts as stationary weights or iid stopping expectation",
+    "Treat query-call proxy as complete polynomial/field/root/setup cost",
+    "Interpret source6 span containment as a universal cost or ECDLP impossibility"
+  ],
+  "literature": [
+    {
+      "ref": "https://crypto.stanford.edu/pbc/notes/ep/optimize.html",
+      "provenance": "retrieved",
+      "claim": "Author primary twist maps and denominator elimination; not novel"
+    },
+    {
+      "ref": "https://crypto.stanford.edu/pbc/notes/ep/exptate.html",
+      "provenance": "retrieved",
+      "claim": "Frobenius final exponentiation"
+    },
+    {
+      "ref": "https://libntl.org/doc/tour-unix.html",
+      "provenance": "retrieved",
+      "claim": "Free local build procedure, actual check0 and version11.6.0 artifact pins"
+    },
+    {
+      "ref": "../quadratic_twist_chord_proof_20261105/cm8-61-field-full-20261115/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Prior same-field engine frontier, not a new larger-field or speed result"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "f289584a7ba6555e7927415918bc8860c9fa1e519ce4ec6eb7b752dbe993249e",
+    "commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+    "frozen_at": "2026-11-16T01:29:33Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "source_commit": "a54f058fcf1ec210029b7633c627f3ca9885be26",
+    "binary_pins": {
+      "counted": "9598afbaee6410af42d5913d2569e7dcfb6a72ef3386ab2e308e5498991d07f2",
+      "release": "3e55a0a7f6e0bb18f52bee03b61ceb4358b7db0ba1eb77c3dbe17fcd2c2063d1",
+      "auditor": "3d41fd9b68de9dbde10032cfd63b6e62f1e7db068199c2f84c60e80b42320406"
+    },
+    "modes": [
+      "prime",
+      "subgroup",
+      "scalar",
+      "target",
+      "map",
+      "cost",
+      "trace",
+      "phase-sum",
+      "missing-run",
+      "degree",
+      "witness",
+      "root",
+      "missing-kernel",
+      "base-size"
+    ],
+    "scope_contract": "PROTOCOL.md",
+    "native_timing_phases": [
+      "validation",
+      "cold public setup",
+      "target map",
+      "solve",
+      "original check plus table destruction"
+    ],
+    "timing_executables_uninstrumented": true,
+    "counter_executable_timing_excluded": true,
+    "cold_control_is_generic_not_IC": true,
+    "kernel_is_phase_only": true,
+    "NTL_intermediate_degree_and_operation_counts": null,
+    "counted_vectors_not_full_bit_cost": true,
+    "matrix_degree": null,
+    "fresh_input_seed_rule_frozen": true,
+    "new_larger_data_seen": false,
+    "resource_window": "00:42-01:42UTC,2existingLOCALworkers,no paidresources",
+    "checkpoint": "Actual authorized samebranch GitHub source/protocol publication, no S3 or raw upload"
+  }
+}

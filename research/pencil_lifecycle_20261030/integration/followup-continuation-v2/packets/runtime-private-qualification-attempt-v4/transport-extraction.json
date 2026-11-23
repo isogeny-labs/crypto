@@ -1,0 +1,127 @@
+{
+  "observed_utc": "2026-11-03T19:47:08.165728+00:00",
+  "commands": [
+    {
+      "path": "030-release-Q1/receipt.json",
+      "argv": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "30s",
+        "prlimit",
+        "--as=536870912",
+        "--fsize=10485760",
+        "/usr/sbin/debugfs",
+        "-R",
+        "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/030-release-Q1/receipt.json",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0,
+      "bytes": 885
+    },
+    {
+      "path": "030-release-Q1/stderr",
+      "argv": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "30s",
+        "prlimit",
+        "--as=536870912",
+        "--fsize=10485760",
+        "/usr/sbin/debugfs",
+        "-R",
+        "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/030-release-Q1/stderr",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0,
+      "bytes": 65
+    },
+    {
+      "path": "030-release-Q1/stdout",
+      "argv": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "30s",
+        "prlimit",
+        "--as=536870912",
+        "--fsize=10485760",
+        "/usr/sbin/debugfs",
+        "-R",
+        "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/030-release-Q1/stdout",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0,
+      "bytes": 0
+    },
+    {
+      "path": "release-Q1/host-ancestry.json",
+      "argv": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "30s",
+        "prlimit",
+        "--as=536870912",
+        "--fsize=10485760",
+        "/usr/sbin/debugfs",
+        "-R",
+        "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/release-Q1/host-ancestry.json",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0,
+      "bytes": 396
+    },
+    {
+      "path": "release-Q1/token-custody.json",
+      "argv": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "30s",
+        "prlimit",
+        "--as=536870912",
+        "--fsize=10485760",
+        "/usr/sbin/debugfs",
+        "-R",
+        "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/release-Q1/token-custody.json",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0,
+      "bytes": 171
+    },
+    {
+      "path": "028-held-gate-logs-Q1/stdout",
+      "argv": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "30s",
+        "prlimit",
+        "--as=536870912",
+        "--fsize=10485760",
+        "/usr/sbin/debugfs",
+        "-R",
+        "cat /qualification-receipts-3f18b4ff-4e50-4f17-8bd8-924fcca3958d/028-held-gate-logs-Q1/stdout",
+        "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4"
+      ],
+      "exit_code": 0,
+      "bytes": 323
+    }
+  ],
+  "disk_stat_unchanged": true,
+  "disk_content_rehashed": false
+}

@@ -1,0 +1,11 @@
+name = "tate_miller_evaluation_audit"
+version = "0.1.0"
+defaultTargets = ["TateMillerEvaluationAudit"]
+
+[[require]]
+name = "weil_rational_domain_audit"
+path = "../../weil_rational_domain_audit_20261116/lean"
+
+[[lean_lib]]
+name = "TateMillerEvaluationAudit"
+roots = ["TateMillerImports", "TateMillerFunction", "TateMillerEvaluation", "TateMillerRepresentative", "TateMillerNineteen", "TateMillerCertificate"]

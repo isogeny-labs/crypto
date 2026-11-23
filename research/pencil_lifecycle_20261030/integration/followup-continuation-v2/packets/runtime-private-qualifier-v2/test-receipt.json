@@ -1,0 +1,17 @@
+{
+  "command": "timeout 60s bash -c 'ulimit -v 524288; python3 -B -m unittest -v test_private'",
+  "exit_code": 0,
+  "tests": 14,
+  "stderr_sha256": "f01a5441927989c67e513c8ff14fcac61c6a8bcdc634a47d2e48b9b817044f3a",
+  "source_hashes": {
+    "supervise.py": "23f726c63740205e5041af3af3c364de7864fa8b36ed2ffa93c33a277c1c89ae",
+    "private_contract.py": "c968d2e0cc0463f4fc8977e8701005e89f49d8d25ce98160d030203b657be442",
+    "test_private.py": "673f8e1e1ba8c087480f533b1543b35d155bcfdcea0b80d857cbf50d61fd3632",
+    "gate.c": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc"
+  },
+  "real_tempfile_umask": "0077",
+  "test_uid_gid_override": "current unprivileged worker; production requires0:0",
+  "runtime_invoked": false,
+  "pdf_pages": 1,
+  "pdf_visually_inspected": true
+}

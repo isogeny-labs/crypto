@@ -1,0 +1,27 @@
+# Existing trace writer: signed native events and Kummer label boundary
+
+Source-only candidate patch; nothing is applied to live or frozen sources. The Conductor check found no overlapping reservations for the two inspected native producer/schema paths. A new packet scope owns these candidate files. The root's current native/library validation and branch replay remain unchanged.
+
+## Reconciliation
+
+Current HEAD already supplies solve_genus2_observed and callbacks for header, candidate, node, edge, duplicate, identity, nonsplit, choice, restart and terminal. Identity and solved-edge events precede their early walk exits. Duplicate callbacks carry the retained first_attempt. The original pencil record writer supplies sequence numbers, finite record/byte ceilings, flush-per-record, output poisoning and terminal state. Its offline consumer expects pencil augmented-RHS rows and cannot interpret signed graph events as pencil rows.
+
+The patch adds ObservedHeader/Observed/ObservedTerminal variants to the SAME Event/Record/Trace types. Existing pencil encodings and formulas are unchanged. NativeEvents accepts the exact externally bound expected native header, tracks candidate attempts and requires exactly one disposition before the next candidate or terminal, retains node announcements, verifies duplicate first-event references, and rejects events after a recovered scalar except terminal. It writes each callback once through the existing bounded Trace. All native JSON fields remain present, including rank-score, counters and raw labels. Native envelopes are explicitly rejected by the pencil rank consumer; this patch does not invent Admission outcomes for SignedGraph or claim offline rank computation for these events.
+
+The adapter supports a separate KummerLabels boundary using the same Record/Trace envelope. A new opt-in Labels::ingest_observed method emits a candidate before the existing ingest and its exact result afterward. This includes noncanonical-label early returns, redundant/inconsistent duplicates, verified/rejected scalar candidates and first labels. The original ingest body is byte-identical. Observer errors propagate as incomplete attempts. A panic also leaves an incomplete prefix with no terminal and must be charged by the outer attempt receipt.
+
+## Integration and exact boundaries
+
+For signed collection, construct Trace with the existing Identity and finite limits, construct NativeEvents with SignedCollector and the externally prepared exact source header, then pass `Some(&mut |v| adapter.observe(v).map_err(|e| e.to_string()))` to solve_genus2_observed. No native algorithm patch is required. The expected header must bind the real source target/curve/seed/flags; source authenticity remains external custody. All considered candidates are captured, not only selected next states.
+
+For Kummer, the proposed wrapper is a successor source to the retained Labels adapter. Do not apply its patch hunk to the frozen historical packet. Copy the exact original into a new prospective instrument and use the added wrapper; supply a target-bound header with explicit fixed/archive/natural provenance and a terminal after the enclosing driver stops. This patch covers every exit of Labels::ingest, not every geometric advance/lift outcome in the archived batch runner. The separately inspected pruned.rs has early identity/degree-one lift and transition/fallback paths; attaching this event boundary to a newly admitted natural Kummer driver remains required. The 420 archived cases and planted duplicate fixture are not relabeled as natural observations.
+
+## Prospective controls
+
+Six added Rust controls cover identity event before terminal, duplicate first-reference retention, missing disposition rejection, post-scalar candidate rejection, changed target header rejection and Kummer noncanonical early result retention. They are uncompiled. Existing Trace controls supply byte/event limits and sink failure cases; prospective integration must additionally inject sink failure at the identity/duplicate/result callback, verify no successful Outcome/terminal, and compare observed versus absent-observer output and underlying arithmetic counters on a fixed admitted source fixture. Add negative first-reference, stale node, truncated terminal and unknown-kind cases before accepting the adapter. Test producer hooks with actual collector and actual Labels inputs, not only fabricated callback records.
+
+No compiler, tests, trajectories or timing runs occurred. Callback construction, JSON copying, serialization, state maps and flushes remain unpriced instrumentation. No online rank computation, field arithmetic or counter reset was introduced. The existing all-cost protocol must decide observer overhead and qualify the new runtime before future comparisons.
+
+## Review and publication
+
+Independent review should check additive schema compatibility, exact callback coverage, expected-header custody, poisoning, duplicate key identity, source ordering and the explicitly narrower Kummer stage scope. Before tests: freeze exact candidate/base hashes, a bounded single serial software-validation plan and meaningful real-producer fixtures; publish/read back and obtain coordinator release within the existing campaign deadline. No worker allowance is allocated in this packet. KB unavailable; exact current Git blobs, prior target-stream report/source map, native duplicate source/review and Kummer source bodies are the fallback.

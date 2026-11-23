@@ -1,0 +1,149 @@
+{
+  "card_id": "CARD-BLINDSPOT-02-02",
+  "card_path": "research/blindspots_20261018/02-deployed-binary-pricing/card-02.yaml",
+  "card_sha256": "f98dd5c6fffd12db89e1f68720163663c1d9e20382f59cb8495dd9542ae2bf85",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-02/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-02/card-02/b02",
+        "examples/blindspots_02_deployed_binary_pricing.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.685,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 1.685,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-02/card-02/b02",
+        "scan",
+        "--out-dir",
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 28.996,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "scan",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.md": "8bf7e8b51307afbafe926bfd9028ac41afb7c62b9d0c517e17d7975acf159e56",
+        "research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.tsv": "12407af106de05350c109851c9f0386c745c47741edbd782a2c4a1a6b2a4221e"
+      },
+      "seconds": 28.996,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "de7c25292e8a9a41f362f24054b176517493c95aeb6f7d373afbedb6e24f6b3d",
+      "stdout_tail": [
+        "wrote research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.tsv (30341 bytes)",
+        "wrote research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.md (36947 bytes)",
+        "scan: 132 (family, model, m, w, K) rows have a grid n with gap <= 0"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-02/card-02/b02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "cf8fd63c43ba61685703a3b66f618068ba34c22e",
+  "dirty_after": [
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-02-scan.stderr.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/card-02-scan.stdout.log",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.md",
+    "research/blindspots_20261018/02-deployed-binary-pricing/raw/scan.tsv"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/05-elimination-orders/raw/card-01-sens.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-01-sens.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/receipt-card-01.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

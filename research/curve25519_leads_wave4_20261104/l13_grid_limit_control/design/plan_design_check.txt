@@ -1,0 +1,23 @@
+spec ECS1h3366162cea58 (Curve25519 k=20: F4 winner vs its own grid limit and the pair table on the same isogeny base, ecbench counted unit): 160 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm proj-a           baseline   ECM1h899163a49ab7 ic.pipeline {"factor_base": "prime-projected-abscissa:size=32,scan_cap=512", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm pkm-iso-t5-g4-s1307 candidate  ECM1h29e77bb23d68 ic.pipeline {"factor_base": "prime-isogeny:t=5,seed=1307", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "pkm-semaev:m=2,mode=full,guess=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm grid-iso-t5-s1307 candidate  ECM1h6269ff61be68 ic.pipeline {"factor_base": "prime-isogeny:t=5,seed=1307", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm mitm-iso-t5-s1307 candidate  ECM1h2fbd06b1b9b3 ic.pipeline {"factor_base": "prime-isogeny:t=5,seed=1307", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload W675567d65fd7 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W493f67d5112f icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wb57e338a7441 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W4b8b4cbd692f icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wd04523b84240 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W32e00bf8f963 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wfc9461012fe7 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W336e5820258d icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W7528b3151564 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wafef46d88519 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W5ac243d0797e icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wac30fe16b29b icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wc235a7e1bd70 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wf80905fbaabf icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W801924f28a5d icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W2d870b554fae icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+note: 16 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

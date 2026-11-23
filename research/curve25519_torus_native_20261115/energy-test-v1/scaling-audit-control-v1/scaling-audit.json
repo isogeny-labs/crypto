@@ -1,0 +1,73 @@
+{
+  "actual_complexity_bound_established": false,
+  "base_sampling_invoked": false,
+  "conditional_examples": [
+    {
+      "actual_growing_parameter_family_available": false,
+      "beta": "2/9",
+      "decomposition_algorithm_available": false,
+      "hypothetical_gamma": "1/2",
+      "modeled_time_exponent": "4/9",
+      "summands": 4
+    },
+    {
+      "actual_growing_parameter_family_available": false,
+      "beta": "1/5",
+      "decomposition_algorithm_available": false,
+      "hypothetical_gamma": "3/2",
+      "modeled_time_exponent": "1/2",
+      "summands": 5
+    },
+    {
+      "actual_growing_parameter_family_available": false,
+      "beta": "1/6",
+      "decomposition_algorithm_available": false,
+      "hypothetical_gamma": "3/2",
+      "modeled_time_exponent": "5/12",
+      "summands": 6
+    },
+    {
+      "actual_growing_parameter_family_available": false,
+      "beta": "1/8",
+      "decomposition_algorithm_available": false,
+      "hypothetical_gamma": "5/2",
+      "modeled_time_exponent": "7/16",
+      "summands": 8
+    }
+  ],
+  "current_class_lower_bound_assuming_existing_transport": "6482566348945103",
+  "current_lower_bound_fifth_power_gt_order": true,
+  "current_lower_bound_sixth_power_gt_order": true,
+  "current_torus_order": "12965132697890207",
+  "floor_sixth_root_scalar_order": "4398046511104",
+  "hypotheses": [
+    "yield is Theta(min(1,B^m/N))",
+    "D is soft-O(B^gamma)",
+    "setup and sparse linear algebra are soft-O(B^2)",
+    "all remaining phases and constants are charged",
+    "admissible growing family exists"
+  ],
+  "many_coset_parameter_proposals": [
+    {
+      "exact_coset_order_and_admissibility_checked": false,
+      "proposed_cosets": "72308",
+      "proposed_raw_cardinality": "4398097729076",
+      "recognition_cost_and_normalized_base_size_checked": false,
+      "subgroup_order": 60824497
+    },
+    {
+      "exact_coset_order_and_admissibility_checked": false,
+      "proposed_cosets": "20633",
+      "proposed_raw_cardinality": "4398056640823",
+      "recognition_cost_and_normalized_base_size_checked": false,
+      "subgroup_order": 213156431
+    }
+  ],
+  "model": "max(2 beta,(1+gamma) beta+max(0,1-m beta))",
+  "pcc_standing": "unverified",
+  "pre_call_sha256": "e3171602a7241601b21ec07a973c6aa48d89979c712571bc3c75a13122089f8d",
+  "purpose": "exact conditional model and current integer parameters only",
+  "scalar_order": "7237005577332262213973186563042994240857116359379907606001950938285454250989",
+  "schema": "torus-energy.scaling-audit/v1",
+  "solver_invoked": false
+}

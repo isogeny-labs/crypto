@@ -298,6 +298,18 @@ crypto cryptanalysis rho-collab status --job job.json --peer alice:7000
 crypto cryptanalysis rho-collab status --mailbox /nfs/collab --json
 ```
 
+`work` and `status` also accept an indexed `store:NAME` or
+`sha256:DIGEST` reference for `--job`. The job JSON is downloaded into the
+checked artifact cache, limited to 64 KiB, parsed, and validated against its
+curve and subgroup parameters as for a local file. Keep mutable mailbox and
+Cairn state in local paths; when `--job` is a store reference, the default
+Cairn state directory is `--mailbox` if supplied, otherwise the current
+directory. The artifact-store setup and S3 prefix layout are in
+[`store/README.md`](store/README.md). A live public job-document round trip,
+including a fresh-cache status read, bounded worker startup, digest reference,
+and exact-object cleanup, is recorded in
+[`RHO_COLLAB_JOB_S3_ACCEPTANCE_20261023.json`](store/RHO_COLLAB_JOB_S3_ACCEPTANCE_20261023.json).
+
 On the 40-bit demo curve (`√n ≈ 2²⁰`) three nodes with two lanes each solve
 the instance in about five seconds in a release build; every node prints the
 same `solution:` line and `verified: true`.

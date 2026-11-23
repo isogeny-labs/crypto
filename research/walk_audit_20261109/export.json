@@ -1,0 +1,888 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "walk-census-20261109-v1",
+  "created": "2026-11-09T04:56:31.842Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "dfd90b02047a4dd8c59453d4f5f1099ecbf3cbd9667fb041218b14f9a6677452",
+    "protocol_id": "walk-census-20261109",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "d801653d085b0951356ffb3a2686349582347884",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "provenance.json",
+    "sha256": "bf3b03371bd97033cb85d0f8b7a7d194a11a64ef52c5335adf00a738e807f4da",
+    "class_id": "local-shared-walk-audit",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "mix",
+      "role": "reference",
+      "binary_sha256": "35de6f81723fb12ea2f9756634ec7b7bbbcf32da10aa4bc6636d4256ceb90080",
+      "commit": "8c376a41754c03c8baa045e316ea2514f3363491"
+    },
+    {
+      "id": "rho",
+      "role": "reference",
+      "binary_sha256": "35de6f81723fb12ea2f9756634ec7b7bbbcf32da10aa4bc6636d4256ceb90080",
+      "commit": "8c376a41754c03c8baa045e316ea2514f3363491"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "mix-0",
+      "arm": "mix",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population": 3930,
+          "checks": 1,
+          "censored": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; clocks are not metrics."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native sparse/matrix or visited/Floyd checks, exact mass/variance and deterministic repeat. One host; no independent signed promotion."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/mix-0.argv",
+          "sha256": "95b1e0d9249c8d03e4696c973068acf93df3396c062e65c83d7780703f6ad3ac",
+          "bytes": 37,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-0.end-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-0.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-0.jsonl",
+          "sha256": "433254a902d361619dab6c4cc0e6bd49c0cd1a2e53a6e445f155b6fd47cbd7c9",
+          "bytes": 1351994,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-0.start-epoch",
+          "sha256": "a3698c08f736a9cb2b6b1c63521f4a5829d16c7695f1b663b25120a9e0198f7f",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-0.stderr",
+          "sha256": "e8c7a828a4b5bd2a8b1446ea1c4384d3c44f18a4c395e22ad1897e5e2c854731",
+          "bytes": 2199,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:55:09.000Z",
+      "finished_at": "2026-11-09T04:55:10.000Z",
+      "worker": "one local host",
+      "backend_ref": "evidence/runs/mix-0"
+    },
+    {
+      "run_id": "rho-0",
+      "arm": "rho",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population": 80,
+          "checks": 1,
+          "maps": 82034
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; clocks are not metrics."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native sparse/matrix or visited/Floyd checks, exact mass/variance and deterministic repeat. One host; no independent signed promotion."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/rho-0.argv",
+          "sha256": "0b4ebe775f193fdfd68a52b14a2e43d0c1ba96f390bf6b95aee9443b20791155",
+          "bytes": 37,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-0.end-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-0.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-0.jsonl",
+          "sha256": "998a479ecfd9318110751c26392f8b311910d545ec58eaca9b4662ea5a5469cc",
+          "bytes": 26559,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-0.start-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-0.stderr",
+          "sha256": "b75f18d1a6be577f930a5bbf577b637359cda1b71abd9f9b3b32ce38ad38da1d",
+          "bytes": 3303,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:55:10.000Z",
+      "finished_at": "2026-11-09T04:55:10.000Z",
+      "worker": "one local host",
+      "backend_ref": "evidence/runs/rho-0"
+    },
+    {
+      "run_id": "mix-1",
+      "arm": "mix",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population": 3930,
+          "checks": 1,
+          "censored": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; clocks are not metrics."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native sparse/matrix or visited/Floyd checks, exact mass/variance and deterministic repeat. One host; no independent signed promotion."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/mix-1.argv",
+          "sha256": "95b1e0d9249c8d03e4696c973068acf93df3396c062e65c83d7780703f6ad3ac",
+          "bytes": 37,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-1.end-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-1.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-1.jsonl",
+          "sha256": "433254a902d361619dab6c4cc0e6bd49c0cd1a2e53a6e445f155b6fd47cbd7c9",
+          "bytes": 1351994,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-1.start-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/mix-1.stderr",
+          "sha256": "e8c7a828a4b5bd2a8b1446ea1c4384d3c44f18a4c395e22ad1897e5e2c854731",
+          "bytes": 2199,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:55:10.000Z",
+      "finished_at": "2026-11-09T04:55:10.000Z",
+      "worker": "one local host",
+      "backend_ref": "evidence/runs/mix-1"
+    },
+    {
+      "run_id": "rho-1",
+      "arm": "rho",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "population": 80,
+          "checks": 1,
+          "maps": 82034
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; clocks are not metrics."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native sparse/matrix or visited/Floyd checks, exact mass/variance and deterministic repeat. One host; no independent signed promotion."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/rho-1.argv",
+          "sha256": "0b4ebe775f193fdfd68a52b14a2e43d0c1ba96f390bf6b95aee9443b20791155",
+          "bytes": 37,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-1.end-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-1.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-1.jsonl",
+          "sha256": "998a479ecfd9318110751c26392f8b311910d545ec58eaca9b4662ea5a5469cc",
+          "bytes": 26559,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-1.start-epoch",
+          "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/rho-1.stderr",
+          "sha256": "b75f18d1a6be577f930a5bbf577b637359cda1b71abd9f9b3b32ce38ad38da1d",
+          "bytes": 3303,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:55:10.000Z",
+      "finished_at": "2026-11-09T04:55:10.000Z",
+      "worker": "one local host",
+      "backend_ref": "evidence/runs/rho-1"
+    }
+  ],
+  "flow": {
+    "planned": 4,
+    "attempted": 4,
+    "completed": 4,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "7793bae984dbbe740cef53748b57abacd1ce40d90e79e1ed8bfe4c1c28025eb5",
+      "bytes": 17114,
+      "kind": "protocol"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "87dfc920f27ff6413b01d6e7c4d2fb73a168132d4d3d4bbb875b74cd2aaa0094",
+      "bytes": 4985,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "bf3b03371bd97033cb85d0f8b7a7d194a11a64ef52c5335adf00a738e807f4da",
+      "bytes": 2381,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "dd36accd7652c5cd3853c5f00c5c8225eb1699d858efb521146ff4d9d262234e",
+      "bytes": 317,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "e2328a2c5ef0e1de67c7486538430ce7861460ac7a7ab647c8a2adc9765cfefc",
+      "bytes": 1606,
+      "kind": "raw"
+    },
+    {
+      "path": "native/census.cpp",
+      "sha256": "d9057ad43ea91aff1b13511901b8d0e4ff3b78e49e6aba01568fd3dcbed3d776",
+      "bytes": 11954,
+      "kind": "analysis"
+    },
+    {
+      "path": "evidence/run.log",
+      "sha256": "460095e136c301c39d01e45c635a07dd80d940c05c1a3ae110353b75d5e04c97",
+      "bytes": 69,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-0.argv",
+      "sha256": "95b1e0d9249c8d03e4696c973068acf93df3396c062e65c83d7780703f6ad3ac",
+      "bytes": 37,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-0.end-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-0.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-0.jsonl",
+      "sha256": "433254a902d361619dab6c4cc0e6bd49c0cd1a2e53a6e445f155b6fd47cbd7c9",
+      "bytes": 1351994,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-0.start-epoch",
+      "sha256": "a3698c08f736a9cb2b6b1c63521f4a5829d16c7695f1b663b25120a9e0198f7f",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-0.stderr",
+      "sha256": "e8c7a828a4b5bd2a8b1446ea1c4384d3c44f18a4c395e22ad1897e5e2c854731",
+      "bytes": 2199,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-1.argv",
+      "sha256": "95b1e0d9249c8d03e4696c973068acf93df3396c062e65c83d7780703f6ad3ac",
+      "bytes": 37,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-1.end-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-1.jsonl",
+      "sha256": "433254a902d361619dab6c4cc0e6bd49c0cd1a2e53a6e445f155b6fd47cbd7c9",
+      "bytes": 1351994,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-1.start-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-1.stderr",
+      "sha256": "e8c7a828a4b5bd2a8b1446ea1c4384d3c44f18a4c395e22ad1897e5e2c854731",
+      "bytes": 2199,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-repeat.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-repeat.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-summary-repeat.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/mix-summary-repeat.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-0.argv",
+      "sha256": "0b4ebe775f193fdfd68a52b14a2e43d0c1ba96f390bf6b95aee9443b20791155",
+      "bytes": 37,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-0.end-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-0.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-0.jsonl",
+      "sha256": "998a479ecfd9318110751c26392f8b311910d545ec58eaca9b4662ea5a5469cc",
+      "bytes": 26559,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-0.start-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-0.stderr",
+      "sha256": "b75f18d1a6be577f930a5bbf577b637359cda1b71abd9f9b3b32ce38ad38da1d",
+      "bytes": 3303,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-1.argv",
+      "sha256": "0b4ebe775f193fdfd68a52b14a2e43d0c1ba96f390bf6b95aee9443b20791155",
+      "bytes": 37,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-1.end-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-1.jsonl",
+      "sha256": "998a479ecfd9318110751c26392f8b311910d545ec58eaca9b4662ea5a5469cc",
+      "bytes": 26559,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-1.start-epoch",
+      "sha256": "682d361a0073eb884eb2dc38c37ec7c663961adc7b18d414455bf18d3597643b",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-1.stderr",
+      "sha256": "b75f18d1a6be577f930a5bbf577b637359cda1b71abd9f9b3b32ce38ad38da1d",
+      "bytes": 3303,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-repeat.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-repeat.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-summary-repeat.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/rho-summary-repeat.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/census-before-moments.cpp",
+      "sha256": "cdf6dda7e1b47c046e2bb40cf5e9efb6d182ea8d28afa0038e4857ef905759bb",
+      "bytes": 8782,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/mix.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/mix.jsonl",
+      "sha256": "cb89331ad5c15c0491401e4e505ffa292a798ebd05cbf58c0708cd0af9e79c6c",
+      "bytes": 1522,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/mix.stderr",
+      "sha256": "38ce3a9f15c620f3927144485f560b683120facca8447ec2115ec8a4b665aff0",
+      "bytes": 58,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/mix.time",
+      "sha256": "6b1d47540a2bd727d5607f3fcd929de53695f84a57461b487cdf7f7a682da685",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/rho.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/rho.jsonl",
+      "sha256": "b82601e837fad109085ff0783ffb45f98a558e1b71dc51adc089a792b14a666c",
+      "bytes": 415,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/rho.stderr",
+      "sha256": "bc75b2752c0138d525948129fe40cc49519769a3312298ef080305c255e6cc30",
+      "bytes": 59,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/rho.time",
+      "sha256": "2e9fe2b47c97a350188d73dfe3053c8f9aa9a74f3ee14678c14923296cd64a05",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/source-before-moments.sha256",
+      "sha256": "fb5c6657c27ac23d8d1e066540db092eea173e62df5379aa48517dc7de7ec183",
+      "bytes": 210,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/census-before-strata.cpp",
+      "sha256": "3c252d4f9bec28c762cfbf563961ef73e107d523a0b5e58e95c728c18b631d50",
+      "bytes": 11261,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/mix.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/mix.jsonl",
+      "sha256": "cb89331ad5c15c0491401e4e505ffa292a798ebd05cbf58c0708cd0af9e79c6c",
+      "bytes": 1522,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/mix.stderr",
+      "sha256": "de604f8312b996f4544847ad4d98daf774c34240c34090a3160d288eba2e2bd1",
+      "bytes": 336,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/mix.time",
+      "sha256": "55fad6fde4b33b1826eb85a16ac9a04ad8420444600878ae9d4c236ec86e4871",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/rho.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/rho.jsonl",
+      "sha256": "b775b0d871928c2964e326dc1375cfd4748c99b9b745172983f9f50ec4cd00c1",
+      "bytes": 639,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/rho.stderr",
+      "sha256": "9fa21590fe2ed88b6cf40c61cdee3149b5375dabd2c534b3df7bab6ad7dfe882",
+      "bytes": 623,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/rho.time",
+      "sha256": "e06c43a21b70ff2bbf64564131830ca7ffd049ff4a898bbee47b9aa5fa99c455",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/source-before-strata.sha256",
+      "sha256": "aafcb280a6e9ade177d1cfb2141fd8d465d3ef9ef618b1b91722ce85fac0ff57",
+      "bytes": 210,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-final/source.sha256",
+      "sha256": "aafcb280a6e9ade177d1cfb2141fd8d465d3ef9ef618b1b91722ce85fac0ff57",
+      "bytes": 210,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/mix.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/mix.jsonl",
+      "sha256": "cb89331ad5c15c0491401e4e505ffa292a798ebd05cbf58c0708cd0af9e79c6c",
+      "bytes": 1522,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/mix.stderr",
+      "sha256": "de604f8312b996f4544847ad4d98daf774c34240c34090a3160d288eba2e2bd1",
+      "bytes": 336,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/mix.time",
+      "sha256": "873c51ec7e24e184caf99fd742d8a54ad9a81885acb5ce95347c81919d91168c",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/rho.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/rho.jsonl",
+      "sha256": "a22557f07d4772153568a1241f3b2b13dc07f8eb0b59f9323f05565ddf9ce14f",
+      "bytes": 691,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/rho.stderr",
+      "sha256": "7dcaff8735ab4afd763e901bd79a0b6e8c40d5db6900fadc68b6dfce8b6dc8d2",
+      "bytes": 816,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/rho.time",
+      "sha256": "a63a5b83dd712c426a8880ff6a5beaefaba29571ddb938346ceceb87c2c33051",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-frozen-binary/source.sha256",
+      "sha256": "abc1125e3b2acd8d6a20f8672f2d10e842bbab42a29fc7ce570976b852d145d2",
+      "bytes": 210,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/census.cpp",
+      "sha256": "d9057ad43ea91aff1b13511901b8d0e4ff3b78e49e6aba01568fd3dcbed3d776",
+      "bytes": 11954,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/runs/mix-0.jsonl",
+        "sha256": "433254a902d361619dab6c4cc0e6bd49c0cd1a2e53a6e445f155b6fd47cbd7c9",
+        "bytes": 1351994,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/mix-0.stderr",
+        "sha256": "e8c7a828a4b5bd2a8b1446ea1c4384d3c44f18a4c395e22ad1897e5e2c854731",
+        "bytes": 2199,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/mix-1.jsonl",
+        "sha256": "433254a902d361619dab6c4cc0e6bd49c0cd1a2e53a6e445f155b6fd47cbd7c9",
+        "bytes": 1351994,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/mix-1.stderr",
+        "sha256": "e8c7a828a4b5bd2a8b1446ea1c4384d3c44f18a4c395e22ad1897e5e2c854731",
+        "bytes": 2199,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/rho-0.jsonl",
+        "sha256": "998a479ecfd9318110751c26392f8b311910d545ec58eaca9b4662ea5a5469cc",
+        "bytes": 26559,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/rho-0.stderr",
+        "sha256": "b75f18d1a6be577f930a5bbf577b637359cda1b71abd9f9b3b32ce38ad38da1d",
+        "bytes": 3303,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/rho-1.jsonl",
+        "sha256": "998a479ecfd9318110751c26392f8b311910d545ec58eaca9b4662ea5a5469cc",
+        "bytes": 26559,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/runs/rho-1.stderr",
+        "sha256": "b75f18d1a6be577f930a5bbf577b637359cda1b71abd9f9b3b32ce38ad38da1d",
+        "bytes": 3303,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Four calls exit0, both raw/summary repetitions match byte-for-byte. Each mix call enumerates3930supports,0censored; each rho call enumerates80supports/82034maps. All inline exact checks complete.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "Native source committed in8c376a41754c03c8baa045e316ea2514f3363491; canonical protocol frozen/committed in d801653d085b0951356ffb3a2686349582347884 before affected calls. Protocol hashdfd90b02047a4dd8c59453d4f5f1099ecbf3cbd9667fb041218b14f9a6677452. Only untracked local PCC receipts preceded calls; frozen source/file/binary hashes verified. source.dirty records those untracked receipts, not a source change.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "Preflight generations are in-sample calibration and excluded from the four full-population rows. No clock is accepted as a metric; no statistical, nonuniform-weight or asymptotic decision.",
+      "by": "executor"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

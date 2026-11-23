@@ -1,0 +1,106 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T18:35:27+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/inherited_f4_batched_20261112/run_ab.sh",
+        "research/inherited_f4_batched_20261112/results"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T18:29:52+00:00",
+      "wall_s": 73.029
+    }
+  ],
+  "commit": "eb01341d3aa27f114ad849babca8cabe93bed881",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T18:29:47+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-inherited-f4-batched"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1829Z-inherited-f4-batched-ab",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 13,
+      "name": "ops_ratio_batched_over_eager_median",
+      "note": "median over 13 cells of the cell-median per-target word-XOR ratio inherited-f4-batched / inherited-f4; per-target range 0.696-0.908; never more on any of 78 targets",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.696,
+        0.908
+      ],
+      "unit": "ratio",
+      "value": 0.84
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 13,
+      "name": "wall_ratio_batched_over_eager_median",
+      "note": "median over 13 cells of the paired per-target wall ratio; 1.08-1.14 at 14-16 unknowns, 0.99 at 18, 1.04 and 1.08 at 20 (R 19:10:2 above the pre-stated 1.05 falsifier threshold), 1.02 at 22, 0.91-0.95 at 24, 0.90 and 0.85 at 30 and 32",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.853,
+        1.139
+      ],
+      "unit": "ratio",
+      "value": 1.02
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 78,
+      "name": "disagreements_with_fes",
+      "note": "every decided answer of both engines equals fes-f2",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "study:inherited_f4_batched_20261112:descent-ab",
+  "raw": [
+    {
+      "bytes": 105103,
+      "path": "research/inherited_f4_batched_20261112/results.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/98/98f250ec4ec5da59a422f4748f2354bd73998995c17ccfeb33c035f72581407e",
+      "sha256": "98f250ec4ec5da59a422f4748f2354bd73998995c17ccfeb33c035f72581407e",
+      "uploaded": false
+    },
+    {
+      "bytes": 13217,
+      "path": "research/inherited_f4_batched_20261112/results_ab.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/713f388d32f4a7e6b0041b7cbf0e943fbaff710249f745acbe597a023d03d6a3",
+      "sha256": "713f388d32f4a7e6b0041b7cbf0e943fbaff710249f745acbe597a023d03d6a3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/inherited_f4_batched_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/inherited_f4_batched_20261112/results_ab.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "inherited-f4-batched-ab",
+  "status": "measured",
+  "summary": "Paired ic descent of inherited-f4 and inherited-f4-batched (arena fix 4f0eca9eb4) with fes-f2 as reference, 13 cells 14-32 unknowns, 6 targets x 3 repeats: word XORs 0.70-0.91 per target (median 0.84), never more, 0 disagreements; wall 0.85-0.95 from 24 unknowns up, 1.02-1.14 at 14-22 (pre-stated falsifier fired on R 19:10:2 at 1.08). Local container; unverified.",
+  "validation": null
+}

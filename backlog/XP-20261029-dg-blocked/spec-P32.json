@@ -1,0 +1,21 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "XP-20261029-dg-blocked P32 wall session: wall time per operation, prime-blocked pair table against the folded pair table at N 1024",
+ "description": "Frozen protocol (backlog/XP-20261029-dg-blocked/PROTOCOL.md and APPROVAL.md): ns per GAE of ic.pipeline targets stride-renew-deferred-guard with oracle mitm-prime-blocked:m=2 (dgb) against the same with oracle mitm:negation_folded=1 (dg), same factor base prime-abscissa:size=1024 (identical charged work), A/A-corrected by dg-aa, on two fresh 32-bit prime-order curves. Arm order dg, dg-aa, dgb, dgb-edge puts dgb and dg-aa at the same middle positions of the alternate order; dgb-edge (a copy of dgb; structural reference role for native A/A admission) and dg share the edge positions and give a descriptive position control. No rho arm: the matched rho is in spec-P32-rho.json. Public synthetic curves and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {"kind": "prime_search", "bits": 32, "seed": 202610295323},
+   {"kind": "prime_search", "bits": 32, "seed": 202610295324}
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 202610295326,
+  "target_kind": "public"
+ },
+ "arms": [
+  {"name": "dg", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=1024", "oracle": "mitm:negation_folded=1", "max_trials": "167871873", "targets": "stride-renew-deferred-guard"}}},
+  {"name": "dg-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=1024", "oracle": "mitm:negation_folded=1", "max_trials": "167871873", "targets": "stride-renew-deferred-guard"}}},
+  {"name": "dgb", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=1024", "oracle": "mitm-prime-blocked:m=2", "max_trials": "167871873", "targets": "stride-renew-deferred-guard"}}},
+  {"name": "dgb-edge", "role": "reference", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=1024", "oracle": "mitm-prime-blocked:m=2", "max_trials": "167871873", "targets": "stride-renew-deferred-guard"}}}
+ ],
+ "measurement": {"rounds": 6, "warmup": 1, "order": "alternate", "seed": 202610295328, "isolation_required": "L2", "timeout_seconds": 1800}
+}

@@ -1,0 +1,13 @@
+digraph C {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf3fa",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.10",color="#456987"];
+ edge [fontname="DejaVu Sans",fontsize=10,color="#456987"];
+ input [label="Canonical UInt64 triple
+a,b,c < 223"];
+ cofactor [label="P=(a²-3bc,3c²-ab,b²-ac)
+Exact raw canonical values",fillcolor="#eaf5ed"];
+ norm [label="Original norm + Fp.inv
+Full native refinement open",fillcolor="#fff2df"];
+ input -> cofactor [label="Word07: 11 named lemmas"];
+ cofactor -> norm [label="Rust15 fixture parity"];
+}

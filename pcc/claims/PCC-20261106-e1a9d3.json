@@ -1,0 +1,20 @@
+{
+ "created_at": "2026-11-06T19:08:19Z",
+ "id": "PCC-20261106-e1a9d3",
+ "kind": "measurement",
+ "producer": {
+  "commit": "048a52ab4de886ad68e600c391ea8b4c2fa2ef26",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/lift_dense_conjugate_pair_infinity_20261106/reports/run-20261106T1550Z/validator-report.json",
+   "sha256": "791ee35e720b48e175d38357494c35a8cb259c24d14972d2dd4efe5de9217d8c"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "counted k=4 Gaudry solver (gaudry_quartic, chains+sparsest), p=29, 2 curves with full 2-torsion, 40 solves at Macaulay degree 29 (12 plain repeats, 12 transformed, 8 planted 3-point targets plain and transformed) + 6 Amendment-A1 transformed solves at degree 30-32; research/lift_dense_conjugate_pair_infinity_20261106",
+ "statement": "On all 20 plain solves the quotient dimension is below 4096 exactly when the target is a sum of at most 3 factor-base points of the line (0 exceptions), on conjugate-pair and F_p lines alike. After a random projective change of coordinates (A in GL5(F_p)), 19 of 20 transformed solves succeed and return exactly the oracle's 4-point decompositions, including the 3/3 and 2/2 previously missed on curve 1; the failing one is a target that is itself a factor-base point (dimension 4130). Transformed cost is 0.970-1.030x the generic plain solve. On curve 1's two previously failing targets the transformed dimension stays at 4095 and 4094 at Macaulay degree 29-32."
+}

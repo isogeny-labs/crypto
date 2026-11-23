@@ -1,0 +1,185 @@
+{
+  "branch": "aburan28/wizardly-einstein-i9seky",
+  "closed_utc": "2026-11-07T07:40:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_ic_auto_vs_tuned_20261107/specs/P20.json",
+        "--out",
+        "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P20",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T07:38:05+00:00",
+      "wall_s": 5.253
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_ic_auto_vs_tuned_20261107/specs/P24.json",
+        "--out",
+        "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P24",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T07:38:10+00:00",
+      "wall_s": 8.393
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_ic_auto_vs_tuned_20261107/specs/P28.json",
+        "--out",
+        "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P28",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T07:38:18+00:00",
+      "wall_s": 31.376
+    }
+  ],
+  "commit": "553a4c2aeb36442aa04a65a6519ef1f0e65f2b8a",
+  "commit_dirty": false,
+  "created_utc": "2026-11-07T07:38:00+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261107-ic-auto-vs-tuned"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T0738Z-ic-auto-vs-tuned",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 96,
+      "name": "ic_auto_over_tuned_p28_w0",
+      "note": "28 bits, w=0; flips to 1.107 at w=1: not an improvement under the band rule",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.86,
+        0.91
+      ],
+      "unit": "ratio",
+      "value": 0.8848
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 96,
+      "name": "ic_auto_over_tuned_p20_w0",
+      "note": "20 bits; equal",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.987,
+        1.01
+      ],
+      "unit": "ratio",
+      "value": 0.998
+    }
+  ],
+  "problem": "ecdlp:prime-ladder-20-28",
+  "raw": [
+    {
+      "bytes": 4777740,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P20/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/ae669b692daa10a934f4f963bdfb2f41c9eb139095209c02bc4da3fa442ff999",
+      "sha256": "ae669b692daa10a934f4f963bdfb2f41c9eb139095209c02bc4da3fa442ff999",
+      "uploaded": false
+    },
+    {
+      "bytes": 2078,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P20/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a8/a896728860398fb7136d514a006c2167ea1b144ccb54ba68ca4dab53f32ba21d",
+      "sha256": "a896728860398fb7136d514a006c2167ea1b144ccb54ba68ca4dab53f32ba21d",
+      "uploaded": false
+    },
+    {
+      "bytes": 49467,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/audit-P20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5d/5d82813a175465213c09913641793702278228a1bf9599efb3d13567d63b469e",
+      "sha256": "5d82813a175465213c09913641793702278228a1bf9599efb3d13567d63b469e",
+      "uploaded": false
+    },
+    {
+      "bytes": 4816619,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P24/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3c/3c1297b7d6ff4e678f74cb64059c9b70410e26e3cb4624f91632a79d50dc97f1",
+      "sha256": "3c1297b7d6ff4e678f74cb64059c9b70410e26e3cb4624f91632a79d50dc97f1",
+      "uploaded": false
+    },
+    {
+      "bytes": 2079,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P24/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cc/cc5c67a68b3181f3a41124099d2b7ae7f5d9658ee559e2172f80345a6f72a5cc",
+      "sha256": "cc5c67a68b3181f3a41124099d2b7ae7f5d9658ee559e2172f80345a6f72a5cc",
+      "uploaded": false
+    },
+    {
+      "bytes": 49467,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/audit-P24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/17/1749d25055cd0dcf89fced53e2e5a6ab34c19b5505239857a3249676e7db4460",
+      "sha256": "1749d25055cd0dcf89fced53e2e5a6ab34c19b5505239857a3249676e7db4460",
+      "uploaded": false
+    },
+    {
+      "bytes": 4851539,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P28/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/648c34972c3e295cdf588f74664ab58bbe6a8a15b1c6f859ba9f3ecaec12cd22",
+      "sha256": "648c34972c3e295cdf588f74664ab58bbe6a8a15b1c6f859ba9f3ecaec12cd22",
+      "uploaded": false
+    },
+    {
+      "bytes": 2079,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/sessions/P28/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ff/fffc6859e090bb7d14083180a7eff6334afe1cb9e1b70211181803c9fb147c1a",
+      "sha256": "fffc6859e090bb7d14083180a7eff6334afe1cb9e1b70211181803c9fb147c1a",
+      "uploaded": false
+    },
+    {
+      "bytes": 49467,
+      "path": "research/ecbench_ic_auto_vs_tuned_20261107/audit-P28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/79b7f2312fd926ba31955a58b3f6e65c3e20ef8cc49c39e0c59a1b9169792349",
+      "sha256": "79b7f2312fd926ba31955a58b3f6e65c3e20ef8cc49c39e0c59a1b9169792349",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261107-ic-auto-vs-tuned/REPORT.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-auto-vs-tuned",
+  "status": "measured",
+  "summary": "ic size=auto vs tuned N baseline (45/162/407) on the prime_base study holdout curves, local L0: equal at 20 bits; at 24/28 cheaper at w=0 (0.914, 0.885) but costlier at w=1 (1.153, 1.107): band-order flips, not an improvement.",
+  "validation": null
+}

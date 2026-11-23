@@ -1,0 +1,107 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Validator confirmation session F6: Koblitz a=1 n=23, koblitz ksum fold study (VAL), nonce-derived seed",
+ "description": "Validator confirmation of the incumbent selected on F1-F3 (gen-layout-c4), new nonce-derived seeds, no reselection. Engineering; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 396322689580,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-v2",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong_v2"
+   }
+  },
+  {
+   "name": "rho-frob-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "lazy-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "gen-layout-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-lazy-c4-sr",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g-sr",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 396322690580,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

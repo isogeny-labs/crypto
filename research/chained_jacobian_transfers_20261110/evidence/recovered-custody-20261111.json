@@ -1,0 +1,24 @@
+{
+  "schema": "chained-transfer.recovered-custody/v1",
+  "observed_at": "2026-11-11T18:08:36Z",
+  "original_parent": "ad10b21a3578dadf2366dbd793ebed2f7aea319a",
+  "recovery_parent": "45e3498a6821d7537cc62b114d4c5f0224b713e2",
+  "original_backup_sha256": "3930e2d2d779442a325640cc32c5a4167e0e4e6239ec15ebaac348fe591c642d",
+  "original_records": [
+    {
+      "path": "pcc/claims/PCC-20261111-7e9547.json",
+      "sha256": "23cc9345ad8fa16d433ecf8f5ffd2640cb2e68d9be8b11e1690c1372fa7d3e88"
+    },
+    {
+      "path": "pcc/claims/PCC-20261111-58dbb8.json",
+      "sha256": "56b73829ced7b424f321f99d39efbbce129a95cda7ca739d5c87b2baaa648cee"
+    }
+  ],
+  "source_comparison": "original root example and Lean module byte-identical to recovered sources",
+  "ledger": "original two rows restored unchanged;extends45e3498 prefix",
+  "local_verification": "58dbb8 passes four Lean proofs;7e9547 not_covered unsigned statement/attestations",
+  "consumer_pr": 1483,
+  "consumer_head": "ef9a542598c1b0ebfde03cf27f77929b928391cd",
+  "consumer_merge": "52fe5eba0834358549ad88981510067a4b7f8c24",
+  "scientific_standing": "unverified"
+}

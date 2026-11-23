@@ -1,0 +1,314 @@
+{
+  "schema": "prepared-point-tables.development-qualification/v1",
+  "recorded_at": "2026-11-15T20:51:58.247543+00:00",
+  "scope": "Native two-slot prime-field point-table integration; development correctness only",
+  "standing": "Producer observations only; no signed execution or independent audit verdict",
+  "dependency_base_commit": "b42bc6d1ae547d9cbc84d8a512c894db396c89af",
+  "source_manifest": {
+    "path": "source.sha256",
+    "sha256": "8e7d89af5a9144d840552f37b9ad056599014a6e470884b59837effc45873e71",
+    "scope": "Complete native Rust source/test set and JSON fixtures, native manifest/lock and parent mirror workspace manifest/lock"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "checks": [
+    {
+      "stage": "baseline",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "source": "baseline main",
+      "logs": [
+        {
+          "member": "development/crypto.baseline.stdout.log",
+          "sha256": "904dc4ae8f9681a8d19d9d2f64f2688aac7798b882bc1491bf6c7c064121c70e"
+        },
+        {
+          "member": "development/crypto.baseline.stderr.log",
+          "sha256": "4be676c7d099c752b5cf069a3308ee8c52ea533e05011b11d46096367eddc7a7"
+        }
+      ]
+    },
+    {
+      "stage": "initial",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--lib",
+        "--test",
+        "prepared_pairs"
+      ],
+      "exit_code": 0,
+      "source": "source.initial",
+      "logs": [
+        {
+          "member": "development/crypto.initial.stdout.log",
+          "sha256": "4abeaf0c9598696c16c7eba66d9a9989d6028a70b37f263aa21fd73f63efed67"
+        },
+        {
+          "member": "development/crypto.initial.stderr.log",
+          "sha256": "e0680928cb0c94809d4e3249ab603fc8744e387affc4062989803f3de5faec31"
+        }
+      ]
+    },
+    {
+      "stage": "corrected",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "exit_code": 1,
+      "source": "source.corrected",
+      "logs": [
+        {
+          "member": "development/crypto.corrected.stdout.log",
+          "sha256": "7bc313951986a7957a0e75bb50335ae54e38b3f6ea4c93bd56c48f78e6ee310b"
+        },
+        {
+          "member": "development/crypto.corrected.stderr.log",
+          "sha256": "92d6a708a0a65a6152afa06f38df00d8b108393966f308355aa4b0ca1485b9ba"
+        }
+      ]
+    },
+    {
+      "stage": "final",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--lib",
+        "--bin",
+        "hashed-ecdl",
+        "--test",
+        "finite_extensions",
+        "--test",
+        "prepared_pairs",
+        "--test",
+        "prepared_root_diagnostics",
+        "--test",
+        "strict_json"
+      ],
+      "exit_code": 0,
+      "source": "source.final",
+      "logs": [
+        {
+          "member": "development/crypto.final.stdout.log",
+          "sha256": "c09037c30b71ddc8534b5cbea2497d5f5502d17836fe97f564ca4e5169f63fe3"
+        },
+        {
+          "member": "development/crypto.final.stderr.log",
+          "sha256": "7d8119568bf954d27337aaa999de33b7c56600dd6047c37bb18a77fc2b22cf12"
+        }
+      ]
+    },
+    {
+      "stage": "clippy.initial",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "source": "source.corrected",
+      "logs": [
+        {
+          "member": "development/crypto.clippy.initial.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "development/crypto.clippy.initial.stderr.log",
+          "sha256": "f416c18bd998b00ea945925574ecdf0a3be9ace885364cf47c030b23e4f987fb"
+        }
+      ]
+    },
+    {
+      "stage": "clippy.final",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "source": "source.final",
+      "logs": [
+        {
+          "member": "development/crypto.clippy.final.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "development/crypto.clippy.final.stderr.log",
+          "sha256": "477b9f8774f0fef2fd611953a23187b4c03f8dd58ba71d72118a8b645b8d005a"
+        }
+      ]
+    },
+    {
+      "stage": "msrv.final",
+      "argv": [
+        "cargo",
+        "+1.78.0",
+        "check",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "source": "source.final",
+      "logs": [
+        {
+          "member": "development/crypto.msrv.final.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "development/crypto.msrv.final.stderr.log",
+          "sha256": "98a5763aff634ec350d59580ef093f192a8da84e3565e5b1b610b2440e84e9e2"
+        }
+      ]
+    },
+    {
+      "stage": "fmt",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "crates/hashed-ecdl-tensor/src/prepared.rs",
+        "crates/hashed-ecdl-tensor/src/reduction.rs",
+        "crates/hashed-ecdl-tensor/src/curve.rs",
+        "crates/hashed-ecdl-tensor/src/bin/hashed-ecdl.rs",
+        "crates/hashed-ecdl-tensor/tests/prepared_pairs.rs",
+        "crates/hashed-ecdl-tensor/tests/prepared_root_diagnostics.rs"
+      ],
+      "exit_code": 0,
+      "source": "source.final",
+      "logs": [
+        {
+          "member": "development/crypto.fmt.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "member": "development/crypto.fmt.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "stage": "all-targets.final",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "source": "source.final",
+      "logs": [
+        {
+          "member": "development/crypto.all-targets.final.stdout.log",
+          "sha256": "587aa251fa2f0786372cb35ee291bf106bd891cd2e24cecc486cc7df08bf7b6b"
+        },
+        {
+          "member": "development/crypto.all-targets.final.stderr.log",
+          "sha256": "5593301daad8c046fc354b9c52eb8b66107b636c3787168b87ac05eebd9f35a8"
+        }
+      ]
+    }
+  ],
+  "final_test_groups": [
+    {
+      "status": "ok",
+      "passed": 102,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "status": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "shared_files": {
+    "src/prepared.rs": "d3ce4544bf6cd5cea03965eed7e011b6ff6446afecd15e4c330e8314a16e6233",
+    "tests/prepared_pairs.rs": "bcf6edc82b60ef61d01022a3edd383aa31512417452fb3efebf23a09c019eec8",
+    "PREPARED_PAIRS.md": "65e7aee17d7065408990ae632871bcbcc8cdcb39272bd0be61da585cb98ed64e"
+  },
+  "whole_crate_parity": "Not asserted: existing current-main differences are preserved; the new module/common controls/documentation match exactly",
+  "archive": {
+    "path": "development.tar.xz",
+    "sha256": "3dffb0cbe9e40d17e68df7a8c77687900449ba0a09e339d187cad988ee37682e",
+    "bytes": 46220,
+    "members": 55,
+    "member_manifest": "development/SHA256SUMS"
+  },
+  "failure_provenance": [
+    "Cryptanalysis baseline removed getrandom API; corrected to the current fill entry without dependency changes.",
+    "Initial mirrored test assumed an extra Crypto Meter field; moved root diagnostics to a separate Crypto control.",
+    "Initial unused import and strict-clippy struct update/range assertion failures are preserved.",
+    "Crypto corrected-stage Cargo summary printed success but wrapper completion was 1; direct final all-target invocation exits 0 and is retained."
+  ],
+  "compatibility": "Rust 1.78 locked all-targets passes",
+  "scientific_or_benchmark_runs": 0,
+  "runtime_speedup_claimed": false,
+  "nonsecret_build_env": {
+    "PATH_prefix": "/home/agent/.cargo/bin",
+    "CARGO_TARGET_DIR": "/workspace/.task-cache/point-tables-crypto"
+  }
+}

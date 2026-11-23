@@ -1,0 +1,17 @@
+{
+  "reviewed_candidate": "private_contract.py 7d2616452e61014fc4785902f5daa8c834dbabd648962f31ca1c381b62bd25b4; supervise.py7c8b28f0577a6855ac90abc5be0dc84108092e83f4d6aeaae4b1e93952d3dc03",
+  "source_only": true,
+  "tests_run": 0,
+  "findings": [
+    {
+      "id": "R1",
+      "issue": "Repeated transport.json open(w) truncates sole prepublication possible-release record after rename",
+      "requested": "Immutable prepublication record and separate subsequent states with directory persistence"
+    },
+    {
+      "id": "R2",
+      "issue": "Receipt fsync occurs after prepublish boundary; deferred signal/deadline can arise during I/O before rename",
+      "requested": "Final revalidation after durable prepublication record immediately before sole rename"
+    }
+  ]
+}

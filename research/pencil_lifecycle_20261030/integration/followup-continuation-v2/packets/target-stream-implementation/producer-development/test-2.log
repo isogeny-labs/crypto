@@ -1,0 +1,23 @@
+   Compiling libc v0.2.191
+   Compiling pencil-symbolic-graph v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029)
+error[E0631]: type mismatch in function arguments
+   --> src/native_solver.rs:479:59
+    |
+479 |                 traced.collector.pending_constraint().map(Vec::as_slice)
+    |                                                       --- ^^^^^^^^^^^^^
+    |                                                       |   |
+    |                                                       |   expected due to this
+    |                                                       |   found signature defined here
+    |                                                       required by a bound introduced by this call
+    |
+    = note: expected function signature `fn(&sparse::TrackedMap<u64>) -> _`
+               found function signature `fn(&Vec<_, _>) -> _`
+note: required by a bound in `std::option::Option::<T>::map`
+   --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/option.rs:1158:4
+help: consider wrapping the function in a closure
+    |
+479 |                 traced.collector.pending_constraint().map(|arg0: &sparse::TrackedMap<u64>| Vec::as_slice(/* &Vec<_, _> */))
+    |                                                           ++++++++++++++++++++++++++++++++              ++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0631`.
+error: could not compile `pencil-symbolic-graph` (lib test) due to 1 previous error

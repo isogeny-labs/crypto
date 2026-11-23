@@ -1,0 +1,52 @@
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/SameUComposition.lean:47:47: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/SameUComposition.lean:47:62: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/SameUComposition.lean:47:12: error: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+a0 a1 a2 a3 : K
+a b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+ha : validTwo (WeightedDoubling.curve a0 a1 a2 a3) a
+hb : validTwo (WeightedDoubling.curve a0 a1 a2 a3) b
+hq : crossQ a b = crossQ b a
+hr : crossR a b = crossR b a
+hni : ¬(crossS a b = -crossS b a ∧ crossT a b = -crossT b a)
+hne : ¬(crossS a b = crossS b a ∧ crossT a b = crossT b a)
+hg : IsCoprime (WeightedDoubling.curve a0 a1 a2 a3) (derivative (WeightedDoubling.curve a0 a1 a2 a3))
+hchar : 2 ≠ 0
+hkr : sourceK a b ≠ 0
+qa : crossQ a b = (a.z * b.z) ^ 2 * nq a
+ra : crossR a b = (a.z * b.z) ^ 4 * nr a
+sa : crossS a b = (a.z * b.z) ^ 3 * (a.w * b.w) * ns a
+ta : crossT a b = (a.z * b.z) ^ 5 * (a.w * b.w) * nt a
+qb : crossQ b a = (a.z * b.z) ^ 2 * nq b
+rb : crossR b a = (a.z * b.z) ^ 4 * nr b
+sb : crossS b a = (a.z * b.z) ^ 3 * (a.w * b.w) * ns b
+tb : crossT b a = (a.z * b.z) ^ 5 * (a.w * b.w) * nt b
+hz : a.z * b.z ≠ 0
+hqn : nq a = nq b
+hrn : nr a = nr b
+hkn : ns a - ns b ≠ 0
+hnn : ¬(ns a = -ns b ∧ nt a = -nt b)
+pz : (sourcePoint a b).z ≠ 0
+pw : (sourcePoint a b).w ≠ 0
+pv : validPoint (WeightedDoubling.curve a0 a1 a2 a3) (sourcePoint a b)
+hl : SameULocal.LocalNonsingular a0 a1 a2 a3 ((nt b - nt a) / (ns a - ns b))
+py : (sourcePoint a b).y ≠ 0
+oz : (MixedPositiveDistinct.doubled a0 a1 a2 a3 (sourcePoint a b)).z ≠ 0
+ow : (MixedPositiveDistinct.doubled a0 a1 a2 a3 (sourcePoint a b)).w ≠ 0
+ov : validTwo (MixedGeneric.curve a0 a1 a2 a3) (MixedPositiveDistinct.doubled a0 a1 a2 a3 (sourcePoint a b))
+⊢ (if False then Route.inverse
+    else if False then Route.equalDouble22 else if False then Route.zeroSlopeError else Route.mixed) =
+    Route.mixed
+/var/tmp/pencil-sameu-mixed-composition-20261031-v1/SameUComposition.lean:47:62: warning: This simp argument is unused:
+  if_neg
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [route, hq, hr, and_self, if_pos, hni, hne, hkr]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

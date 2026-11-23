@@ -1,5 +1,5 @@
 //! Lead L2: the degree-`D` MutantXL closure by partial enlargement, on
-//! committed refutation-degree draws ([`pe_closure_with`]).
+//! committed refutation-degree draws ([`pe_closure_checkpointed`]).
 //!
 //! ```sh
 //! cargo run --release --example pe_closure -- \
@@ -16,7 +16,9 @@
 use crypto_lib::binary_ecc::F2mElement;
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-use crypto_lib::cryptanalysis::partial_enlargement::{pe_closure_with, PeMode, PeOptions, PeOrder};
+use crypto_lib::cryptanalysis::partial_enlargement::{
+    pe_closure_checkpointed, PeCheckpoint, PeMode, PeOptions, PeOrder,
+};
 use num_bigint::BigUint;
 use serde_json::Value;
 
@@ -95,7 +97,17 @@ fn main() {
         v["n_vars"].as_u64().unwrap(),
         "rebuilt shape"
     );
-    let r = pe_closure_with(
+    // `--checkpoint PATH [--checkpoint-every SECS]`: save the engine's state
+    // at consistent points and resume from PATH when it exists, so a killed
+    // process or a lost host whose disk survives continues where it stopped.
+    let ckpt = flag("--checkpoint").map(|p| PeCheckpoint {
+        path: p.into(),
+        every: std::time::Duration::from_secs(
+            flag("--checkpoint-every").map_or(1800, |v| v.parse().expect("--checkpoint-every")),
+        ),
+    });
+    let resumed = ckpt.as_ref().is_some_and(|c| c.path.exists());
+    let r = pe_closure_checkpointed(
         &sys.equations,
         sys.n_vars,
         degree,
@@ -103,7 +115,9 @@ fn main() {
         max_cols,
         max_rows,
         opts,
+        ckpt.as_ref(),
     );
+    eprintln!("checkpoint resumed: {resumed}");
     let hwm = vm_hwm_kb();
     let body = match &r {
         None => r#""built":false"#.to_string(),

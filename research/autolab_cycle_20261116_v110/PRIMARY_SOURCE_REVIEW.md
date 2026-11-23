@@ -1,0 +1,7 @@
+# Primary-source boundary, reviewed2026-11-16
+
+[Demeulenaere et al., Compact-Table,2016](https://arxiv.org/abs/1604.06641v1), author-deposited paper abstract: generalized arc consistency for explicit tables, with incremental support maintenance and reversible sparse bit sets. This establishes the prior-art category of C110's domain filtering. C110 computes the implicit XOR relation via exact integer Walsh convolution; it does not implement or benchmark CT. No novelty follows from using table supports.
+
+[Verhaeghe, Lecoutre and Schaus, Compact-MDD, IJCAI2018,1383-1389](https://ijcai.org/proceedings/2018/192), DOI10.24963/ijcai.2018/192: decision-diagram table compression and bitwise filtering, including a nondeterministic central layer. This is directly relevant to the proposed next frontier DAG. Its published benchmark claims are not measurements on our rootfinding family. A frontier decomposition must beat a strong existing table/MDD implementation before a novelty or performance comparison.
+
+Only the linked primary abstracts were reviewed in this cycle; no exhaustive literature search or novelty certification is claimed. C99 already used exact integer Walsh counting, and C103 already derived local low-degree relations. The proposed next change is a global rank-width/ordering preflight of the same domain code, not a claim to have invented those tools. Prior F4/F5/F6 and full-field matching requirements remain independent.

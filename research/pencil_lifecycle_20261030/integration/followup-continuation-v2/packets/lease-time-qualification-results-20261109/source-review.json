@@ -1,0 +1,45 @@
+{
+  "schema": "source.review/v1",
+  "task": "T-1991",
+  "reviewer": "/root/renew_norm",
+  "recorded_utc": "2026-11-09T18:18:54.469920+00:00",
+  "verdict": "parser_correction_supported_cache_traversal_correction_requested",
+  "source_pins": {
+    "durable-launcher.py": "1be89bfce43a31d4cdfd2fb41400a7decbfadfec0b3bb11b887099c31d654fb6",
+    "durable-worker.py": "56ad78ad3a04e6a58764b8f6e2951c330a99c551a11abfb7676104403543f5e3",
+    "snapshot-cache.py": "417df8dffb1752d44d7e51899e80cc03a08d6e070615c799ca0803813d61f73e"
+  },
+  "findings": [
+    {
+      "id": "T1",
+      "status": "supported_source",
+      "finding": "parse_rfc3339 strict format0..9fraction, calendar validation, knownoffset, rejectsleapsecond/unknown-00:00, returnsawareUTC. Pads1..5 andfloors7..9 microseconds, neverextendsreportedexpiry."
+    },
+    {
+      "id": "T2",
+      "status": "supported_source",
+      "finding": "Actualheartbeatusesparser; identitychecks,15secondsafetyboundary and>30renewalwindow unchanged. Absolute deadline parsedwithsamefunction. Existingnative logfix unchanged."
+    },
+    {
+      "id": "T3",
+      "status": "needs_correction",
+      "finding": "Bothsnapshotandworker os.walk omit onerror; unreadabledirectory canbesilentlyskipped inboth, yieldingmatching incompleteinventory. Addfailclosed traversalerror handling."
+    },
+    {
+      "id": "T4",
+      "status": "supported_source",
+      "finding": "Freshcacheplan preservesoriginalc5178 immutablemanifest, records mutabletarget/cargo-home/tmp exactmembership/regularfiles/sizes/SHA, comparesprepostmetadata, bounded60snapshot/8GiBinputceiling; workerkeepsimmutable verification thenfreshcache check."
+    }
+  ],
+  "qualification": {
+    "cases": 61,
+    "python": "3.9",
+    "seconds": 60,
+    "source_only": true,
+    "network": false,
+    "live_lease_renewal": false,
+    "compiler": false
+  },
+  "correction_note": "Initial concern about doubleescaped regex was withdrawn after exactordinalinspectionconfirmedonebackslash beforedot; source remained1be89. No parserdefect alleged for that rendering artifact.",
+  "next": "Independentharnessreview/publishthenone60secondqualification; failclosedcachefix beforepublishedsnapshotrelease; bind actualsnapshot+ledger before existing1800fullvalidation."
+}

@@ -1,0 +1,7 @@
+# Replacement runtime assembler source
+
+Implement the runtime-only amendment against runtime-replacement-contract. Validate a fresh ownership nonce/tag and one-use marker, exact base/layers/daemon/context/source/binary identities, complete input-check output digest, assembler/reviewer joins and explicit execution allowance. Preserve no-pull/no-network COPY-only assembly and all previous images/tags. No current admission: binding.draft.json is false and its independent review path/hash are null.
+
+Software checks use mocked Docker responses and temporary local files only. Check successful single build, unsafe parent triggers, existing tag, source/context mismatch, failure/timeout no-retry, owner mismatch, admission false, duplicate JSON, review identity/hash joins, expiry, and one-use marker. Real sudo/subprocess termination, daemon behavior and storage semantics remain untested here. No image assembly, qualification or scientific execution is included in this task.
+
+The proposed execution remains one attempt, 600 seconds total with 60-second reconciliation reserve and at most 240 seconds for the build client. The absolute draft deadline is 2026-11-03 06:00 UTC; these limits do not renew an allowance. Failure retains client/PGID, tag/IID and receipts; readback does not prove daemon/build termination. No automatic retry, cleanup or image deletion. Independent source review and explicit bounded admission precede any real invocation. Qualification and scientific gates remain separate.

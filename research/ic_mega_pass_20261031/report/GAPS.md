@@ -102,3 +102,19 @@ Counts from literature/*.json. "inwin" means date ≥ 2026-09-12.
 4. adjacent_fields re-run over the GAP list: one lane agent.
 5. MP-lattices-4 corrected smallness model: minutes to an hour.
 6. MP-coding_comb-1 msolve d_F on the key-equation presentation at n ≤ 17: under 1 hour.
+
+
+
+
+
+- Lever 4 (PKM-tower plateau D=6,6,7,7; prediction d_F = 4+⌊(t−2)/4⌋): no dedicated card. ml_empirical-1 used the PKM data and was killed on design.
+
+
+
+
+
+
+
+
+
+

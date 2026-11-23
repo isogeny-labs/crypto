@@ -14,16 +14,23 @@
 //! two, or arbitrarily many large primes per relation and arbitrary nonzero
 //! coefficients over an odd prime field.
 
+use super::jv_bitops;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, HashMap, VecDeque};
+
+/// Bounded optional row-operation capture; the legacy filter remains unchanged.
+pub mod trace;
 
 #[inline]
 fn add_mod(a: u64, b: u64, modulus: u64) -> u64 {
+    jv_bitops::hook_add(modulus);
     ((a as u128 + b as u128) % modulus as u128) as u64
 }
 
 #[inline]
 fn mul_mod(a: u64, b: u64, modulus: u64) -> u64 {
+    jv_bitops::hook_mul(modulus);
     ((a as u128 * b as u128) % modulus as u128) as u64
 }
 
@@ -32,11 +39,13 @@ fn neg_mod(a: u64, modulus: u64) -> u64 {
     if a == 0 {
         0
     } else {
+        jv_bitops::hook_add(modulus);
         modulus - a
     }
 }
 
 fn inverse_mod(a: u64, modulus: u64) -> Option<u64> {
+    jv_bitops::hook_inv(modulus);
     let (mut old_r, mut r) = (a, modulus);
     let (mut old_s, mut s) = (1i128, 0i128);
     while r != 0 {
@@ -142,6 +151,58 @@ struct WorkRow {
     sources: Vec<(u64, u64)>,
 }
 
+/// Merge canonical sorted sparse rows, dropping cancellations. Each input
+/// coefficient is nonzero and reduced; each key occurs once per input.
+/// Counts cover this kernel's arithmetic and data scans/comparisons/copies,
+/// not the surrounding graph's maps, normalization or scheduling.
+fn sparse_axpy<K: Ord + Copy>(
+    left: &[(K, u64)],
+    scale: u64,
+    right: &[(K, u64)],
+    modulus: u64,
+) -> Vec<(K, u64)> {
+    fn emit<K>(out: &mut Vec<(K, u64)>, key: K, value: u64) {
+        jv_bitops::words(1); // coefficient's zero test
+        if value != 0 {
+            jv_bitops::words(2); // key and coefficient copied to the output
+            out.push((key, value));
+        }
+    }
+    let mut out = Vec::with_capacity(left.len() + right.len());
+    let (mut i, mut j) = (0, 0);
+    while i < left.len() && j < right.len() {
+        jv_bitops::words(1); // key comparison
+        match left[i].0.cmp(&right[j].0) {
+            Ordering::Less => {
+                jv_bitops::words(1); // consume one left term
+                emit(&mut out, left[i].0, left[i].1);
+                i += 1;
+            }
+            Ordering::Equal => {
+                jv_bitops::words(2); // consume both terms
+                let value = add_mod(left[i].1, mul_mod(scale, right[j].1, modulus), modulus);
+                emit(&mut out, left[i].0, value);
+                i += 1;
+                j += 1;
+            }
+            Ordering::Greater => {
+                jv_bitops::words(1); // consume one right term
+                emit(&mut out, right[j].0, mul_mod(scale, right[j].1, modulus));
+                j += 1;
+            }
+        }
+    }
+    for &(key, value) in &left[i..] {
+        jv_bitops::words(1);
+        emit(&mut out, key, value);
+    }
+    for &(key, value) in &right[j..] {
+        jv_bitops::words(1);
+        emit(&mut out, key, mul_mod(scale, value, modulus));
+    }
+    out
+}
+
 impl WorkRow {
     fn from_partial(row: PartialRelation, modulus: u64) -> Self {
         Self {
@@ -161,27 +222,11 @@ impl WorkRow {
 
     /// `self + scale * other`.
     fn axpy(&self, scale: u64, other: &Self, modulus: u64) -> Self {
-        fn combine<K: Ord + Copy>(
-            left: &[(K, u64)],
-            scale: u64,
-            right: &[(K, u64)],
-            modulus: u64,
-        ) -> Vec<(K, u64)> {
-            let mut out = BTreeMap::<K, u64>::new();
-            for &(key, value) in left {
-                out.insert(key, value);
-            }
-            for &(key, value) in right {
-                let slot = out.entry(key).or_default();
-                *slot = add_mod(*slot, mul_mod(scale, value, modulus), modulus);
-            }
-            out.into_iter().filter(|(_, value)| *value != 0).collect()
-        }
         Self {
-            small: combine(&self.small, scale, &other.small, modulus),
-            large: combine(&self.large, scale, &other.large, modulus),
+            small: sparse_axpy(&self.small, scale, &other.small, modulus),
+            large: sparse_axpy(&self.large, scale, &other.large, modulus),
             rhs: add_mod(self.rhs, mul_mod(scale, other.rhs, modulus), modulus),
-            sources: combine(&self.sources, scale, &other.sources, modulus),
+            sources: sparse_axpy(&self.sources, scale, &other.sources, modulus),
         }
     }
 
@@ -195,7 +240,8 @@ impl WorkRow {
     }
 }
 
-fn duplicate_key(row: &PartialRelation) -> (Vec<(u32, u64)>, Vec<(u64, u64)>, u64) {
+type RelationKey = (Vec<(u32, u64)>, Vec<(u64, u64)>, u64);
+fn duplicate_key(row: &PartialRelation) -> RelationKey {
     (row.small.clone(), row.large.clone(), row.rhs)
 }
 
@@ -386,6 +432,84 @@ mod tests {
 
     const P: u64 = 101;
 
+    #[test]
+    fn sorted_axpy_matches_map_oracle() {
+        // Independent map arithmetic, including arbitrary input cancellation.
+        fn reference(left: &[(u32, u64)], c: u64, right: &[(u32, u64)], p: u64) -> Vec<(u32, u64)> {
+            let mut out: BTreeMap<_, _> = left.iter().copied().collect();
+            for &(k, v) in right {
+                let slot = out.entry(k).or_default();
+                *slot = ((*slot as u128 + c as u128 * v as u128) % p as u128) as u64;
+            }
+            out.into_iter().filter(|(_, v)| *v != 0).collect()
+        }
+        let mut state = 0x13b9_48df_9257_a680u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for p in [7, 101, (1 << 61) - 1] {
+            for trial in 0..256 {
+                let mut left = Vec::new();
+                let mut right = Vec::new();
+                for key in 0..32 {
+                    if next() % 3 == 0 {
+                        left.push((key, next() % (p - 1) + 1));
+                    }
+                    if next() % 3 == 0 {
+                        right.push((key, next() % (p - 1) + 1));
+                    }
+                }
+                let scale = if trial % 8 == 0 { 0 } else { next() % p };
+                assert_eq!(
+                    sparse_axpy(&left, scale, &right, p),
+                    reference(&left, scale, &right, p)
+                );
+            }
+            assert_eq!(sparse_axpy(&[(0, 2)], p - 1, &[(0, 2)], p), Vec::new());
+            assert_eq!(sparse_axpy::<u32>(&[], 0, &[], p), Vec::new());
+        }
+    }
+
+    #[test]
+    fn graph_kernel_hooks_count_modular_work_in_the_current_phase() {
+        // As with jv_bitops' hook tests, ownership/tallies are thread-local.
+        // Other parallel tests may set foreign(); process-wide admission is
+        // therefore checked by isolated workers, not by this library test.
+        use jv_bitops::{Kind, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(103, P);
+        let before = jv_bitops::snapshot();
+        let other_before = jv_bitops::snapshot_other();
+        {
+            let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+            assert_eq!(
+                sparse_axpy(
+                    &[(1u32, 2), (3, 5), (7, 9)],
+                    2,
+                    &[(2, 4), (3, 48), (8, 1)],
+                    P
+                ),
+                vec![(1, 2), (2, 8), (7, 9), (8, 2)]
+            );
+            assert_eq!(neg_mod(0, P), 0);
+            assert_eq!(neg_mod(2, P), 99);
+            assert_eq!(inverse_mod(2, P), Some(51));
+        }
+        let t = jv_bitops::snapshot().since(&before);
+        let la = t.phase(Phase::LinearAlgebra);
+        assert_eq!(la.get(Kind::ModrMul), 3);
+        assert_eq!(la.get(Kind::ModrAdd), 2);
+        assert_eq!(la.get(Kind::ModrInv), 1);
+        assert_eq!(la.get(Kind::WordOp), 23);
+        assert_eq!(la.get(Kind::FieldMul), 0);
+        assert_eq!(t.total(), *la);
+        assert_eq!(jv_bitops::snapshot_other(), other_before);
+    }
+
     fn row(id: u64, small: &[(u32, u64)], large: &[(u64, u64)], rhs: u64) -> PartialRelation {
         PartialRelation {
             id,
@@ -487,3 +611,7 @@ mod tests {
         );
     }
 }
+
+#[path = "large_prime_filter_mst.rs"]
+mod mst;
+pub use mst::{filter_large_primes_mst, MstAttempt, MstLimits, MstStats};

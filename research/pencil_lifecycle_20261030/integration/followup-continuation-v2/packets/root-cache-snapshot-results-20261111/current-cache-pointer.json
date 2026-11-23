@@ -1,0 +1,42 @@
+{
+  "schema": "pencil.cache-manifest-pointer/v1",
+  "status": "terminal_receipt_preserved",
+  "manifest": {
+    "packet_path": "raw/native/current-cache.json",
+    "source_path": "/home/ec2-user/pencil-validation-receipts/root-cache-snapshot-renewal-20261111/current-cache.json",
+    "sha256": "9eae2a2fc003071692c5058e52b6e712f2d3ee0ad87e5c2086bc08240479c850",
+    "bytes": 593986,
+    "schema": "root-current-cache/v1",
+    "file_count": 2165,
+    "directory_count": 415,
+    "aggregate_file_bytes": 2618767578,
+    "initial_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
+  },
+  "local_physical_source": {
+    "roots": [
+      "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target",
+      "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/cargo-home",
+      "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/tmp"
+    ],
+    "characterization": "reproduced_from_published_sources",
+    "cache_body_in_packet": false,
+    "cache_body_uploaded_by_this_packet": false
+  },
+  "remote_publication_verification": [
+    {
+      "role": "pre_execution_source_binding",
+      "receipt": "raw/bindings/publication.json",
+      "commit": "36b55a2fb224720fd043b5728cb15c84f79646d1",
+      "remote_head": "36b55a2fb224720fd043b5728cb15c84f79646d1",
+      "observed_utc": "2026-11-11T01:12:24.770670+00:00"
+    },
+    {
+      "role": "caller_observation_publication",
+      "receipt": "raw/caller/publication.json",
+      "commit": "e5e262cafa7f05c1c5fa7769d999447fc4bc69d5",
+      "remote_head": "e5e262cafa7f05c1c5fa7769d999447fc4bc69d5",
+      "observed_utc": "2026-11-11T01:15:38.965046+00:00"
+    }
+  ],
+  "scope_note": "This pointer preserves the exact manifest receipt and its publication bindings. It does not assert that the 2,618,767,578-byte cache body was uploaded or archived."
+}

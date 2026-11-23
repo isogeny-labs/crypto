@@ -664,13 +664,18 @@ pub fn capture() -> Result<HostCapsule, String> {
 /// Recompute the class id from a capsule's stable facts; an audit
 /// compares it with the stored one.
 pub fn recompute_class(c: &HostCapsule) -> Result<String, String> {
-    // Each id recomputes under the definition it was made with.
+    recompute_class_identity(c).map(|(id, _)| id)
+}
+
+/// Recompute both producer identity fields; this authenticates no host or custody.
+/// Preserve the historical version selection used by recompute_class.
+pub(crate) fn recompute_class_identity(c: &HostCapsule) -> Result<(String, String), String> {
     if c.env_class_id.starts_with("ECBENV1h") {
-        Ok(short_id("ECBENV1", &class_view_v1(&c.stable))?.0)
+        short_id("ECBENV1", &class_view_v1(&c.stable))
     } else if c.env_class_id.starts_with("ECBENV3h") {
-        Ok(short_id("ECBENV3", &class_view_v3(&c.stable))?.0)
+        short_id("ECBENV3", &class_view_v3(&c.stable))
     } else {
-        Ok(short_id("ECBENV2", &class_view_v2(&c.stable))?.0)
+        short_id("ECBENV2", &class_view_v2(&c.stable))
     }
 }
 

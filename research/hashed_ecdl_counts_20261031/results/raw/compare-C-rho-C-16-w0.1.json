@@ -1,0 +1,318 @@
+{
+ "argv": [
+  "compare",
+  "--dir",
+  "/dev/shm/sessions/C-16",
+  "--a",
+  "rho-neg",
+  "--b",
+  "tensor-m2",
+  "--weight",
+  "0.1",
+  "--resamples",
+  "4000",
+  "--seed",
+  "20261002",
+  "--json"
+ ],
+ "result": {
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1hc89280c1d18e",
+  "pricing_weight": 0.1,
+  "resample_seed": 20261002,
+  "a": {
+   "session_id": "ECBS1hab6ef45acb59",
+   "arm": "rho-neg",
+   "method_id": "ECM1hefea4e0ebe79",
+   "method": "rho.negation",
+   "measured": 8,
+   "verified": 8,
+   "statuses": {
+    "verified": 8
+   },
+   "mean_s": 1.8620797325621146,
+   "mean_ratio_to_floor": 2.101131977693874,
+   "lower_bound": true,
+   "deterministic": true,
+   "censored": 0,
+   "tail": {
+    "runs": 8,
+    "median_s": 1.8728658710866974,
+    "max_s": 2.7965515520100848,
+    "max_over_median": 1.4931937172774872,
+    "top_run_share": 0.18773038441284887,
+    "top_run_id": "ECM1hefea4e0ebe79W3554bd5efd36R1",
+    "heavy_tail": false
+   },
+   "unpriced_counts": {
+    "canonicalisations_uncharged": 2569
+   }
+  },
+  "b": {
+   "session_id": "ECBS1hab6ef45acb59",
+   "arm": "tensor-m2",
+   "method_id": "ECM1h76b60a08c83a",
+   "method": "ic.tensor_contraction_v1",
+   "measured": 8,
+   "verified": 8,
+   "statuses": {
+    "verified": 8
+   },
+   "mean_s": 1253698.3374700458,
+   "mean_ratio_to_floor": 1414647.0858234793,
+   "lower_bound": true,
+   "deterministic": true,
+   "censored": 0,
+   "tail": {
+    "runs": 8,
+    "median_s": 1241126.322791298,
+    "max_s": 1340637.8758045312,
+    "max_over_median": 1.0801784243762,
+    "top_run_share": 0.1336683071732719,
+    "top_run_id": "ECM1h76b60a08c83aWb2e640038e3fR1",
+    "heavy_tail": false
+   },
+   "unpriced_counts": {
+    "factor_base.fb_membership_evals_uncharged": 1040032,
+    "factor_base.fb_points_listed_uncharged": 520016,
+    "linear_algebra.linalg_mulmod_uncharged": 9606,
+    "relation_search.contraction_rows_uncharged": 5120924794
+   }
+  },
+  "workloads": [
+   {
+    "workload_id": "W18cccd490a06",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 1.188828577018593,
+    "b_mean_s": 1494337.094719345,
+    "ratio_b_over_a": 1256982.817881887,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "W27cb8923070c",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 1.922285996690242,
+    "b_mean_s": 1532969.1293111215,
+    "ratio_b_over_a": 797471.9328708426,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "W3554bd5efd36",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 3.015804331473428,
+    "b_mean_s": 1437684.28235248,
+    "ratio_b_over_a": 476716.6978800884,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "W3b65ec56ed63",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 2.203902267986629,
+    "b_mean_s": 1438691.2997785285,
+    "ratio_b_over_a": 652792.6944296139,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "W8ca093a142b8",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 2.0736841592534807,
+    "b_mean_s": 1485148.9135960448,
+    "ratio_b_over_a": 716188.5801021373,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "Wa557aff9e61c",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 1.272764345900803,
+    "b_mean_s": 1448323.453660206,
+    "ratio_b_over_a": 1137935.2810477659,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "Wb2e640038e3f",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 2.455317351414184,
+    "b_mean_s": 1609186.1750847271,
+    "ratio_b_over_a": 655388.2634185302,
+    "censored_pairs": 0
+   },
+   {
+    "workload_id": "Wd5769d128175",
+    "slug": "icv1-fp16-t351-d433f24e",
+    "r": 65003,
+    "floor_s": 0.8862269254527579,
+    "pairs": 1,
+    "a_mean_s": 1.7716722805651546,
+    "b_mean_s": 1592407.6133501222,
+    "ratio_b_over_a": 898816.1246402479,
+    "censored_pairs": 0
+   }
+  ],
+  "curves": [
+   {
+    "slug": "icv1-fp16-t351-d433f24e",
+    "log2_r": 15.988218682078955,
+    "workloads": 8,
+    "pairs": 8,
+    "ratio_b_over_a": 756951.1869096645,
+    "ci95": [
+     585602.33991028,
+     978437.1753906164
+    ],
+    "ci_method": "linearised_t",
+    "indicative": false,
+    "censored_pairs": 0,
+    "ci95_bootstrap": [
+     627015.9623762803,
+     935192.4343570193
+    ]
+   }
+  ],
+  "ops": {
+   "status": "ok",
+   "unit": "ecbench.gae",
+   "ratio_b_over_a": 756951.1869096645,
+   "ci95": [
+    585602.33991028,
+    978437.1753906164
+   ],
+   "ci_method": "linearised_t",
+   "pairs": 8,
+   "unpaired_runs": 0,
+   "same_seeds": true,
+   "same_session": true,
+   "pooled_curves": 1,
+   "bounded": true,
+   "resamples": 4000,
+   "workloads": 8,
+   "dof": 7.0,
+   "indicative": false,
+   "interval_scope": "workloads",
+   "ci95_bootstrap": [
+    627015.9623762803,
+    935192.4343570193
+   ],
+   "ci_bootstrap_method": "cluster",
+   "censored_pairs": 0,
+   "verified_only_ratio": 756951.1869096645,
+   "band": {
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ],
+    "ratio_b_over_a": [
+     673278.547393365,
+     756951.1869096645,
+     1206157.7463483587
+    ],
+    "order": "tensor-m2 > rho-neg at every weight",
+    "pairs": 8,
+    "note": "point ratios of totals; rank only where the order holds at every weight"
+   }
+  },
+  "wall": {
+   "status": "admitted",
+   "reasons": [],
+   "required_level": "L0",
+   "pairs": 8,
+   "pairs_below_level": 0,
+   "median_ratio": 3729764.479979612,
+   "ci95": [
+    4.46379770422529,
+    5.743268795946841
+   ],
+   "aa_arms": [
+    "rho-neg",
+    "rho-neg-aa"
+   ],
+   "aa_pairs": 8,
+   "aa_median_ratio": 1.104912434038909,
+   "aa_ci95": [
+    0.96548015323089,
+    1.6292424230466642
+   ],
+   "outside_noise": true,
+   "ratio_b_over_a": 5.063278588631704,
+   "ns_per_gae_a": 436.0589784096893,
+   "ns_per_gae_b": 2207.888088762394,
+   "ns_per_gae_upper_bound_arms": [
+    "rho-neg",
+    "tensor-m2"
+   ],
+   "ci_method": "linearised_t_pairs",
+   "dof": 7.0,
+   "total_wall_ratio": 3408996.85320188,
+   "total_wall_ci95": [
+    2859837.146035173,
+    4063608.853130615
+   ],
+   "self_aa": false,
+   "aa_selection": "includes arm A",
+   "aa_ratio": 1.2541934556731509,
+   "corrected_ratio": 4.037079420027862,
+   "corrected_ci95": [
+    3.0715897600248416,
+    5.306050454954208
+   ],
+   "corrected_dof": 10.082119894870072,
+   "legacy_outside_noise": true,
+   "legacy_ci95": [
+    3729764.479979612,
+    3729764.479979612
+   ],
+   "legacy_aa_ci95": [
+    1.104912434038909,
+    1.104912434038909
+   ],
+   "legacy_aa_arms": [
+    "rho-neg",
+    "rho-neg-aa"
+   ]
+  },
+  "quality": {
+   "score": 0,
+   "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+   "paired_attempts": 8,
+   "verified_pairs": 8,
+   "admitted_pairs": 0,
+   "levels": {
+    "L0": 8
+   },
+   "p95_foreign_busy_percent": null,
+   "p95_run_queue_percent": 0.03896004483682087,
+   "contention_observed_runs": 0,
+   "notes": [
+    "A/A bonus unavailable: the spec permits wall runs below L2",
+    "contention telemetry is incomplete"
+   ]
+  },
+  "verdict": "ops (ok): tensor-m2 / rho-neg = 756951.1869 [585602.340, 978437.175] (linearised_t, df 7) over 8 pairs on 8 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 673278.5474, w=0.1: 756951.1869, w=1: 1206157.7463): tensor-m2 > rho-neg at every weight; wall: admitted ns/GAE tensor-m2/rho-neg 5.0633 [4.464, 5.743], bias-corrected 4.0371 [3.072, 5.306] (A/A 1.2542, includes arm A), outside noise; end-to-end wall 3408996.8532 [2859837.146, 4063608.853]; ns/GAE of rho-neg, tensor-m2 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+ },
+ "error": null
+}

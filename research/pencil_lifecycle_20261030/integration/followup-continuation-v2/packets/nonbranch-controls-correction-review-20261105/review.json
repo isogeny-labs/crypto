@@ -1,0 +1,57 @@
+{
+  "schema": "independent-formal-source-review/v1",
+  "producer_commit": "7863b3ea2c5bacc4a2bddd926d3a9bca1ca414d2",
+  "candidate_sha256": "448d5ab601e955b93a9071d6b5f932b38850f5728c9cf2c3fc3eb5b3742bb35d",
+  "status": "scoped_source_fidelity_supported",
+  "machine_status": "not_verified",
+  "compiler_runs": 0,
+  "blind": false,
+  "checks": {
+    "manifest_and_exact_git_bytes_match": true,
+    "all_twenty_theorem_statements_unchanged": true,
+    "no_fixture_coefficients_or_hypotheses_changed": true,
+    "no_sorry_admit_axiom_added": true,
+    "negative_and_thirty_name_protocol_not_modified": true,
+    "primary_api_sources_match_native_custody_hashes": true
+  },
+  "diagnostic_mapping": [
+    {
+      "location": "residual_value",
+      "correction": "ActualNonbranchNorm.residual qualified",
+      "basis": "Avoid unrelated open-namespace residual chosen as simp theorem; actual residual polynomial definition is intended."
+    },
+    {
+      "location": "valid_first/valid_second/bezout",
+      "correction": "Polynomial.C_ofNat normalization before ring",
+      "basis": "Primary theorem reduces constant-polynomial natural numerals to polynomial numerals, preserving expressions while removing atom mismatch."
+    },
+    {
+      "location": "selected_order",
+      "correction": "indent arguments under exact",
+      "basis": "Preserves same theorem and arguments; prevents continuation from being parsed as new tactic."
+    },
+    {
+      "location": "conjugate_order_unequal",
+      "correction": "AddValuation.map_mul twice",
+      "basis": "Pinned API states v(x*y)=v(x)+v(y); correct additive valuation product law, not multiplicative-hom law."
+    }
+  ],
+  "primary_sources": [
+    {
+      "file": "Mathlib/Algebra/Polynomial/Basic.lean",
+      "line": 451,
+      "sha256": "6cf18c0562bd1ce27fe5a018e1a1a897e7ddaaa1b1f9dbd1d7ff72d50842284a"
+    },
+    {
+      "file": "Mathlib/RingTheory/Valuation/Basic.lean",
+      "line": 1160,
+      "sha256": "06c1c23856898b765a5b98df0a298468cf0a37fa3758809c98d65ba3ff6df983"
+    }
+  ],
+  "limits": [
+    "Source correctness of intended corrections does not establish successful elaboration; other failures may remain.",
+    "No kernel, new axiom readback or intended negative-control run occurred.",
+    "Existing three-attempt ceiling remains exhausted; this review authorizes no fourth run."
+  ],
+  "next": "Use candidate only in a separately prospectively approved execution amendment retaining all controls and prior failures."
+}

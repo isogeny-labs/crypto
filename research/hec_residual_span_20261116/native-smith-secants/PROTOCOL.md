@@ -1,0 +1,17 @@
+# Rank-stopped secant relations: prospective setup comparison [pcc:unverified]
+
+Fixed both original F61canonical models, original ell124459, original two public source/target fixtures and same target-walk seeds as native-smith-quartic-ic. No labels in collector/solver. This is engineering on the known quartic route, not a new attack or full10xclaim.
+
+Producer: enumerate the same66rational factor-base points/conic values. Shuffle all2145distinct unordered point pairs with Rng seed2026112500 xor map; process without replacement. Their normalized secant lines are deduplicated. Compose the quartic with the line, remove the two known point factors with correct infinity accounting, and solve the remaining homogeneous quadratic. Retain only fully rational residuals. Reconstruct the complete binary degree4factorization exactly, including multiplicities; its monic finite factor product and infinity multiplicity must match the original restricted quartic. No Pic point-class construction or group relation verification in the producer.
+
+Insert relations into an incremental row-echelon basis over ell, including L_P0=0 and K-4P0. Stop at rank66 in67nuisance variables; cap is2145pairs. Store only independent rows for target elimination; print every accepted line, dependent or not, and preserve all counters/outcomes. Require rank66; exhaustion is a retained failure, not an adaptive rerun.
+
+Independent gate outside producer: frozen exhaustive catalogue (209lines/model) must match every accepted normalized line/support exactly. Recompute its full relation rank; require equality to the new rank, hence exact row-space equality. Catalogue contents are in audit.rs and unavailable to ic.rs. This audit is separate from producer cost. BTree ordering makes it deterministic.
+
+Fresh paired reference setup: import the unchanged exhaustive collector source into this new binary/protocol. Build a fresh reference Pic context and run its full setup once/model, in order reference-first on map0 and secant-first on map1. This is a new prospective paired comparison, not a retry of the earlier run. Record both setup Pic counters and exact native16-column phase deltas per modulus, with constructor/fixture/audit outside these setup boundaries. Counters are a component work comparison, not complete CPU cycles or total solve cost; report all modulus tradeoffs, not a selected scalar headline.
+
+Then solve the same4original transported targets using the rank basis and unchanged target-walk code, cap4096steps. Require k/originalHverification and exactly the previous7/35/16/17trials with2smooth equations each. Pivot sequences/LA cost may differ. Preserve all failures. Source/kernel/model/transport remain unchanged; setup sharing between2fixtures is explicit and not a single-target amortization claim.
+
+One600CPUprocess after Git-pushed source/protocol/import/input/binary hash freeze, overflow checks enabled. No scientific execution before freeze; no unchanged rerun. Raw lines/audits/reference/deltas/answers/exit/hashes retained. NoS3polling/cloud/merge. Complete construction/transport/host ledger and matched originalIC/rho comparison remain open, as do the other genera and full10xobjective. Independent signed review remains open.
+
+The secant/quadratic and relation-span arguments are direct divisor/polynomial/linear-algebra identities. Classical quartic IC transport source: Smith https://arxiv.org/abs/0806.2995 section7; exact class-reference derivation is in native-smith-quartic-ic/DERIVATION.md.

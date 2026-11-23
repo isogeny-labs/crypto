@@ -1,0 +1,9 @@
+# Guarded integration contract
+
+The cover map is injective on canonical encodings, with disjoint selectors0/1/2 for k1/k3/k5; selector3 and inactive padding remain excluded. On selector0, original parameters equal p0 + common*gamma + extras0*t. Construct the normalized raw coefficients in precisely this basis. Directions are raw(v)+raw(0), retaining the original global M*q, without coefficient reduction before normalization. The high-root lift therefore evaluates the same raw H.
+
+The prior simple-root proof gives tail=0 iff H admits its unique upper-half polynomial root. Multiply every tail output by selector0. For selectors1/2, all added outputs are zero; prior branch conditions stay unchanged. On selector0 the new feasible set is exactly prior conditions AND high-root-existence. Every fully prefix-split quintic in k1 has exactly one high root, so all original supported roots survive. Repeated lower roots, zero roots and k3/k5 multiplicities remain. A stricter necessary family does not establish that its remaining parameters are supported or original source/U solutions.
+
+Small exhaustive oracle uses every prefix-root multiset to create independent support sets. Three planted leading cases are embedded into affine coefficient families, preserving a positive case in every branch. Exhaust every original parameter and every canonical encoding, compare complete multisets and literal numeric high-root/tail values. Branch/padding checks verify off-branch neutrality. Actual controls compare every old predicate wire and recovered candidate.
+
+No fresh primary variables are introduced:65inputs remain. Existing500000gate cap bounds circuit size; worker outer90s/4GiB/onecore,78sdemotion and84sfinalization. All source/input bytes frozen before execution. No qualified speed claim or novelty claim. Simple-root series lifting is known; given-polynomial complexity does not transfer to unknown-family search.

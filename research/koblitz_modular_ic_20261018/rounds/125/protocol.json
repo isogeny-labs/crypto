@@ -1,0 +1,16 @@
+{
+  "id": "marked23-r125-n51-branch-corrections-v1",
+  "claim_class": "exact_computation",
+  "input_sha256": {
+    "119": "712278837f84ed1eba630a5aa368a534be7bdd381196ff27ff3fd1a0f52ffa71",
+    "120": "97c55481691f06b5b294956842a1d162c7d83d61722db1c5b812d0953146d297",
+    "121": "2baa0323bee345326da7196889598dd752a75ed6f20575a2b3348c856eb44053",
+    "122": "49710620cb89fb763fe13f952f64cfdc725094d87786c991d844a331fdd840fa",
+    "123": "1435f4fbc2d1b04d628b5adc326916ed1f3a1406c24271348aaffe857e0b3fe3",
+    "124": "2bff55ee15f77c64046d06eb6f3c5d1b0f4de5e213fed2eaff9cb83977a35b69"
+  },
+  "decision_rule": "A normalized N51 order is certified only below every unknown weighted bound and with nonzero F4 leading sum",
+  "controls": ["F4 conjugacy", "byte-identical replay", "changed-input rejection", "independent translated-series arithmetic", "Lean finite checks if resolved"],
+  "backend": "local exact F4 Laurent arithmetic",
+  "cloud_cost_usd": 0
+}

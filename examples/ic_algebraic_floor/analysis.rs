@@ -212,7 +212,10 @@ fn load(
                                 xors: v["word_xors"].as_f64().unwrap_or(0.0)
                                     + ex["split_word_xors"].as_f64().unwrap_or(0.0),
                                 conflicts: ex["conflicts"].as_f64().unwrap_or(0.0),
-                                nodes: ex["nodes"].as_f64().unwrap_or(0.0),
+                                nodes: ex["nodes"]
+                                    .as_f64()
+                                    .or(ex["trials"].as_f64())
+                                    .unwrap_or(0.0),
                                 unsupported: v["unsupported"].as_bool().unwrap_or(false),
                             });
                         }
@@ -448,6 +451,8 @@ pub fn cmd_analyze(args: &[String]) {
                     (confl, "conflicts")
                 } else if arm.starts_with("wide") {
                     (arm_cost(p, &ac.rows, |r| r.nodes), "search_nodes")
+                } else if arm.starts_with("lin21") {
+                    (arm_cost(p, &ac.rows, |r| r.nodes), "trials")
                 } else {
                     (xors, "word_xors")
                 };

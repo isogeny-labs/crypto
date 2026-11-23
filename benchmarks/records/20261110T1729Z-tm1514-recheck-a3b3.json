@@ -1,0 +1,318 @@
+{
+  "branch": "claude/tm1514-recheck-20261106",
+  "closed_utc": "2026-11-10T17:52:02+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/tm1514/bin/ecbench",
+        "run",
+        "--spec",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/spec-tm1514-A3.json",
+        "--out",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/sessions/A3"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T17:29:51+00:00",
+      "wall_s": 110.514
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/tm1514/bin/ecbench",
+        "run",
+        "--spec",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/spec-tm1514-B3.json",
+        "--out",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/sessions/B3"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T17:31:52+00:00",
+      "wall_s": 107.86
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/tm1514/bin/ecbench",
+        "verify",
+        "--dir",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/sessions/A3",
+        "--replay-all",
+        "--out",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/audit/verify-A3.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T17:33:48+00:00",
+      "wall_s": 54.168
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/tm1514/bin/ecbench",
+        "verify",
+        "--dir",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/sessions/B3",
+        "--replay-all",
+        "--out",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/audit/verify-B3.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T17:35:27+00:00",
+      "wall_s": 57.132
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/tm1514/bin/tm1514_analyze",
+        "--a",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/sessions/A3",
+        "--b",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/sessions/B3",
+        "--out",
+        "/tmp/claude-0/-home-user/bcb81261-6b2f-5531-9c6f-150f3e51a9ce/scratchpad/wt4/research/tm1514_recheck_20261106/analysis"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T17:36:32+00:00",
+      "wall_s": 9.265
+    }
+  ],
+  "commit": "ff23963210ff92719cfe799786dd7c1e359e35eb",
+  "commit_dirty": true,
+  "created_utc": "2026-11-10T17:29:05+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261110-tm1514-recheck"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39"
+  },
+  "id": "20261110T1729Z-tm1514-recheck-a3b3",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1152,
+      "name": "r_tm1514_inc_over_rho_neg_w0",
+      "note": "icv1-fp24-tm1514-dce9313c: inc (wwalkGg-x09-sr-n2) over matched rho-neg, ratio of mean S at w = 0 GAE per native op; candidate/reference (1.0 = parity, above 1 = rho-neg cheaper); spread = 95 % paired bootstrap interval; result.json C4.band; counted-only, local L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.7542629839936719,
+        1.8598388728025066
+      ],
+      "unit": "ratio",
+      "value": 1.8057732212159103
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1152,
+      "name": "r_tm1514_inc_over_rho_neg_w0.1",
+      "note": "icv1-fp24-tm1514-dce9313c: inc (wwalkGg-x09-sr-n2) over matched rho-neg, ratio of mean S at w = 0.1 GAE per native op; candidate/reference (1.0 = parity, above 1 = rho-neg cheaper); spread = 95 % paired bootstrap interval; result.json C4.band; counted-only, local L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.6401909366578673,
+        1.740359321328962
+      ],
+      "unit": "ratio",
+      "value": 1.6889976088017566
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1152,
+      "name": "r_tm1514_inc_over_rho_neg_w1",
+      "note": "icv1-fp24-tm1514-dce9313c: inc (wwalkGg-x09-sr-n2) over matched rho-neg, ratio of mean S at w = 1 GAE per native op; candidate/reference (1.0 = parity, above 1 = rho-neg cheaper); spread = 95 % paired bootstrap interval; result.json C4.band; counted-only, local L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1000784785717528,
+        1.1738903659577682
+      ],
+      "unit": "ratio",
+      "value": 1.135885836525833
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4608,
+      "name": "r_siblings_inc_over_rho_neg_w0",
+      "note": "pooled four sibling curves (tm1578, tm2338, tm3530, tm7826): inc over rho-neg, ratio of mean S at w = 0; candidate/reference; spread = 98.33 % interval; result.json C1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.7717418899823085,
+        1.835784188465284
+      ],
+      "unit": "ratio",
+      "value": 1.8029152839301916
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4608,
+      "name": "r_siblings_inc_over_rho_neg_w0.1",
+      "note": "pooled four sibling curves (tm1578, tm2338, tm3530, tm7826): inc over rho-neg, ratio of mean S at w = 0.1; candidate/reference; spread = 98.33 % interval; result.json C1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.656042031269855,
+        1.7168223586588123
+      ],
+      "unit": "ratio",
+      "value": 1.6854917628511399
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4608,
+      "name": "r_siblings_inc_over_rho_neg_w1",
+      "note": "pooled four sibling curves (tm1578, tm2338, tm3530, tm7826): inc over rho-neg, ratio of mean S at w = 1; candidate/reference; spread = 98.33 % interval; result.json C1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1074335033853948,
+        1.1534842981269195
+      ],
+      "unit": "ratio",
+      "value": 1.1298265174174729
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5760,
+      "name": "positive_control_rho_plain_over_rho_neg_w0",
+      "note": "C2 positive control, pooled over five curves at w = 0, rho-plain over rho-neg mean S; 95 % interval; detected (rule: lower end >= 1.20, every curve > 1.10)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.260939927775097,
+        1.3029730814285971
+      ],
+      "unit": "ratio",
+      "value": 1.2821223906263135
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": null,
+      "name": "records_verified",
+      "note": "A3 16,800 + B3 16,800 executions, all verified; ecbench verify --replay-all: 14,400 replays reproduced per session, 0 problems",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 33600.0
+    }
+  ],
+  "problem": "ic:curve25519-family-k24",
+  "raw": [
+    {
+      "bytes": 127081439,
+      "path": "research/tm1514_recheck_20261106/sessions/A3/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ad/ad6ba575e51e6616175c8f6439205aa655379aac66af7a052a8d07eb39270423",
+      "sha256": "ad6ba575e51e6616175c8f6439205aa655379aac66af7a052a8d07eb39270423",
+      "uploaded": true
+    },
+    {
+      "bytes": 3198831,
+      "path": "research/tm1514_recheck_20261106/sessions/A3/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd35135d95ade23ce468c9a3caa616c346432f026766cf9bcdc592a45eb34b2e",
+      "sha256": "fd35135d95ade23ce468c9a3caa616c346432f026766cf9bcdc592a45eb34b2e",
+      "uploaded": true
+    },
+    {
+      "bytes": 3424,
+      "path": "research/tm1514_recheck_20261106/sessions/A3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/28/285ff99cfb1141190600f8fd0372b2433c36bff26c54a094ea16726fc3973407",
+      "sha256": "285ff99cfb1141190600f8fd0372b2433c36bff26c54a094ea16726fc3973407",
+      "uploaded": true
+    },
+    {
+      "bytes": 3603,
+      "path": "research/tm1514_recheck_20261106/sessions/A3/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/07/074d404f463d7fdf59bc2c330bcd8f8453313d699af136e6b71f0254f072656b",
+      "sha256": "074d404f463d7fdf59bc2c330bcd8f8453313d699af136e6b71f0254f072656b",
+      "uploaded": true
+    },
+    {
+      "bytes": 127104720,
+      "path": "research/tm1514_recheck_20261106/sessions/B3/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0a/0a03a9fcbcb77e59a56b5566dd41299437d280e1ac66e874a3af20972f18190e",
+      "sha256": "0a03a9fcbcb77e59a56b5566dd41299437d280e1ac66e874a3af20972f18190e",
+      "uploaded": true
+    },
+    {
+      "bytes": 3198856,
+      "path": "research/tm1514_recheck_20261106/sessions/B3/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b98ca5c2bc6c72e2a71dad595ff0a3031dd73688a4fbcb9547381e038005710",
+      "sha256": "1b98ca5c2bc6c72e2a71dad595ff0a3031dd73688a4fbcb9547381e038005710",
+      "uploaded": true
+    },
+    {
+      "bytes": 3422,
+      "path": "research/tm1514_recheck_20261106/sessions/B3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/4592e27d724ef23e3e10ad4fbb9297a39b72a5fefef756fd5cdedb02cbc94f00",
+      "sha256": "4592e27d724ef23e3e10ad4fbb9297a39b72a5fefef756fd5cdedb02cbc94f00",
+      "uploaded": true
+    },
+    {
+      "bytes": 3603,
+      "path": "research/tm1514_recheck_20261106/sessions/B3/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/79dddc40c0aefb66af4135d9586796fdb45b0f47a1e7e8845f72739f51627016",
+      "sha256": "79dddc40c0aefb66af4135d9586796fdb45b0f47a1e7e8845f72739f51627016",
+      "uploaded": true
+    },
+    {
+      "bytes": 1822675,
+      "path": "research/tm1514_recheck_20261106/audit/verify-A3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/74d0abc86e393c4e874b55eaa30296f5c92a4290520f848717a070d06746f2e7",
+      "sha256": "74d0abc86e393c4e874b55eaa30296f5c92a4290520f848717a070d06746f2e7",
+      "uploaded": true
+    },
+    {
+      "bytes": 1822675,
+      "path": "research/tm1514_recheck_20261106/audit/verify-B3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bb/bb77b988d47fffbeab5642331d3fa842dcf730c4d2a4421130e9d82a6259bee4",
+      "sha256": "bb77b988d47fffbeab5642331d3fa842dcf730c4d2a4421130e9d82a6259bee4",
+      "uploaded": true
+    },
+    {
+      "bytes": 26130,
+      "path": "research/tm1514_recheck_20261106/analysis/result.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c7/c7c473deaf89495857ddb63b37ae3a4e3851e9a77acec167df34feb35650d236",
+      "sha256": "c7c473deaf89495857ddb63b37ae3a4e3851e9a77acec167df34feb35650d236",
+      "uploaded": true
+    },
+    {
+      "bytes": 1471,
+      "path": "research/tm1514_recheck_20261106/analysis/summary.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b9bb451dc26af62c4f5f2fa69b2b7c6423e95d7a5dd5862b28a8dcfc2daa596",
+      "sha256": "1b9bb451dc26af62c4f5f2fa69b2b7c6423e95d7a5dd5862b28a8dcfc2daa596",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261110-tm1514-recheck/REPORT.pdf",
+    "png": [
+      "benchmarks/20261110-tm1514-recheck/fig-ratio-per-curve.png",
+      "benchmarks/20261110-tm1514-recheck/fig-d-band.png"
+    ],
+    "svg": [
+      "benchmarks/20261110-tm1514-recheck/fig-ratio-per-curve.svg",
+      "benchmarks/20261110-tm1514-recheck/fig-d-band.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "tm1514-recheck-a3b3",
+  "status": "measured",
+  "summary": "tm1514 recheck k=24 (A3+B3, 1,152 paired solves/arm/curve, counted-only, local L0): inc/rho-neg on tm1514 1.806/1.689/1.136 at w=0/0.1/1, all 95% intervals above 1; within sibling ratio (D(0) 0.0016 [-0.038, 0.042]); earlier 1.52 a draw; C3 deferred; unvalidated",
+  "validation": null
+}

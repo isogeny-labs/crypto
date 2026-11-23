@@ -1,0 +1,30 @@
+{
+ "claim_type": "literature",
+ "created_at": "2026-11-16T09:18:39Z",
+ "id": "PCC-20261116-3aeb9e",
+ "kind": "statement",
+ "producer": {
+  "commit": "d4f4da8bbfdec953f0b60b26aa5acc8173bccc3d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/SOURCE_REVIEW.json",
+    "sha256": "b26a927e80d8da49e332666037ef54aa6eea6c90e0eaf5d02d1fec47d5df096f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/source-review-context.tar.xz",
+    "sha256": "722c9dd1b69f199e283c7f897e5bdbc9f61913d99aa2fcf8bc35af1ddb4c5e22"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-direct-elimination-admission",
+ "statement": "Source review before solver implementation: the existing dynamic prime F4 API uses28 variables and a concrete64-bit coefficient context; generic Buchberger has a5000-pair cap, which alone is not a complete work or allocation bound. Immutable source snapshots and primary-source reading scope are retained. PKM2016 low-degree-composition/generalized-root-finding results and Kosters--Yeo warnings do not supply a solving-degree or attack-exponent bound for this fixed-six-sum Curve25519 target law. No solver was run and no new algorithmic or novelty result is claimed."
+}

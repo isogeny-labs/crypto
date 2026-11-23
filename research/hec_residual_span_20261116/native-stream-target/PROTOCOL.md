@@ -1,0 +1,13 @@
+# Generic target-first incremental small-system recovery
+
+[pcc:unverified]. Classical target-last row echelon, reused existing orbit-core/sparse.rs; prior incremental-pencil and online-lp results already show special-family controls/mixed arithmetic. No novelty claim. Generic adapter retains exacttwo-LP elimination/collector/sharedresidueimages/deferredmembership. Replace final m+8-completerow cutoff/repeatedsolve_fast by existingincrementalSparse on smallcolumns0..m-1,targetm. Each completed row inserts into a basis with targetlast. Its targetpivot has nootherunknowncoefficients and yields k directly. For consistentrelations, k is determined iff such a pivot exists; earlier column pivots retain remainingdegreesfreedom. This is ordinary Gaussian rowspace reasoning, not a new mathematical attack.
+
+## Qualification and cost gate
+
+All11initialmixedterm models/all22samepublicfixtures/source1/17/seededtargets/512anchors. Counterdisabled audit=true solve first perfixture: retainedeveryqueriednorm/roottruth/everyadmittedprincipal groupidentity; first128rawLProws independentdensecompare; at EVERYcompletedsmallrow compare incremental.k with independent native solve_fast on ALL completedrows. Finalnativeverification required; no expectedk in solver. Then two audit=false freshcountcalls perfixture (44) mustexactlyreplay newlyqualifiedReport exceptdense_audits0, full16vectors/lookups repeat, finalnativeanswer equal driver. Completedrowprefix gate executesonlyauditmode andisnotinsidecostcalls. Differentstoppprefix allowed/explicit; priorReports/counts retained ascontrol, do notassertunchangedprefixorchargeoldworkwithnewtermination.
+
+Reuse same16availableoffsubgroup cataloguecontrolselection/sixunavailablecases fromdeferredmembership: badT=T+firstQwithellQ!=0; targeteligibilitytrue, finalkNone (rejected orunresolved retained), auditchecks pass. ZeroD/compositeellcontrols all22,wrongordersourcecontrols16. Sourceorder/uniqueellpart/geometry/finalverification remain. No publiclog/cofactor/sourceindexpassed.
+
+Countboundary samefreshsourceeligibility/preparation/collection/LP/newsmallbasis/nativefinalverification. Every16vector/lookup/rootbytes reported; compare strongestdeferredmembershipcontrols foreachfield andallcases. Natural-order incrementalelimination can lose toMarkowitz; retainregressions/nohandpickedfallback. Earlierterminationmayreducebasework, newpivot normalizationmayincreasesubgroupwork. Integer/map/snapshot/allocationcost notfieldpriced; no elapsedtimeor10x inference.
+
+One600CPU process aftersource/import/native/protocol/priorraw/binaryhashGitfreeze/push, preservefailures/partials, no unchangedrerun/tuningafteroutcome. Fullgenus2+10xgoalactive; independentreviewpending. GitcustodywhileS3down; no S3/cloud/merge/auto-merge.

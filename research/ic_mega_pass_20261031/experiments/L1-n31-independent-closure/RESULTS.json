@@ -1,0 +1,174 @@
+{
+ "experiment": "L1-n31-independent-closure",
+ "date": "2026-11-01",
+ "validation": {
+  "instances": 297,
+  "mismatches": 0,
+  "detail": "n=5,7,9 d=3,4 vs pure-Python ref AND gf2close (162); n=13..21 d=4 all 9 arms s=0..2 vs gf2close (135); 54 instances with 1 in W"
+ },
+ "main": {
+  "n29_C1_s0": {
+   "dim": 31929,
+   "low": 4524,
+   "one": 0,
+   "rounds": 5,
+   "bydeg": [
+    0,
+    29,
+    435,
+    4060,
+    27405
+   ],
+   "nprod": 135720,
+   "cpu": 99.44,
+   "rounds_log": [
+    "round 0 rank 29 low 29 bydeg 0 1 28 0 0",
+    "round 1 rank 898 low 898 bydeg 0 1 85 812 0 new_low 869 cpu 0.0",
+    "round 2 rank 13021 low 2465 bydeg 0 1 86 2378 10556 new_low 1567 cpu 1.4",
+    "round 3 rank 30131 low 2726 bydeg 0 1 86 2639 27405 new_low 261 cpu 57.8",
+    "round 4 rank 31929 low 4524 bydeg 0 29 435 4060 27405 new_low 1798 cpu 67.2",
+    "round 5 rank 31929 low 4524 bydeg 0 29 435 4060 27405 new_low 0 cpu 99.4"
+   ]
+  },
+  "n29_D1_s0": {
+   "dim": 31931,
+   "low": 4526,
+   "one": 1,
+   "rounds": 4,
+   "bydeg": [
+    1,
+    27,
+    435,
+    4060,
+    27405
+   ],
+   "nprod": 75778,
+   "cpu": 58.75,
+   "rounds_log": [
+    "round 0 rank 29 low 29 bydeg 0 1 28 0 0",
+    "round 1 rank 898 low 898 bydeg 0 1 91 806 0 new_low 869 cpu 0.0",
+    "round 2 rank 12982 low 2432 bydeg 0 1 91 2340 10550 new_low 1534 cpu 1.0",
+    "round 3 rank 30037 low 2632 bydeg 0 1 91 2540 27405 new_low 200 cpu 54.8",
+    "round 4 rank 31928 low 4523 bydeg 1 27 435 4060 27405 new_low 1891 cpu 58.7"
+   ]
+  },
+  "n31_A_s2": {
+   "dim": 41449,
+   "low": 5489,
+   "one": 1,
+   "rounds": 5,
+   "bydeg": [
+    1,
+    32,
+    496,
+    4960,
+    35960
+   ],
+   "nprod": 95972,
+   "cpu": 131.78,
+   "rounds_log": [
+    "round 0 rank 31 low 31 bydeg 0 1 30 0 0",
+    "round 1 rank 1022 low 1022 bydeg 0 1 91 930 0 new_low 991 cpu 0.0",
+    "round 2 rank 15841 low 2821 bydeg 0 1 92 2728 13020 new_low 1799 cpu 3.0",
+    "round 3 rank 37169 low 2945 bydeg 0 1 92 2852 34224 new_low 124 cpu 119.2",
+    "round 4 rank 39773 low 3813 bydeg 0 1 92 3720 35960 new_low 868 cpu 126.8",
+    "round 5 rank 41449 low 5489 bydeg 1 32 496 4960 35960 new_low 1676 cpu 131.8"
+   ]
+  },
+  "n31_C1_s0": {
+   "dim": 37293,
+   "low": 2821,
+   "one": 0,
+   "rounds": 3,
+   "bydeg": [
+    0,
+    1,
+    92,
+    2728,
+    34472
+   ],
+   "nprod": 90272,
+   "cpu": 121.57,
+   "rounds_log": [
+    "round 0 rank 31 low 31 bydeg 0 1 30 0 0",
+    "round 1 rank 1022 low 1022 bydeg 0 1 91 930 0 new_low 991 cpu 0.0",
+    "round 2 rank 15841 low 2821 bydeg 0 1 92 2728 13020 new_low 1799 cpu 3.2",
+    "round 3 rank 37293 low 2821 bydeg 0 1 92 2728 34472 new_low 0 cpu 121.6"
+   ]
+  },
+  "n31_C1_s1": {
+   "dim": 37293,
+   "low": 2821,
+   "one": 0,
+   "rounds": 3,
+   "bydeg": [
+    0,
+    1,
+    92,
+    2728,
+    34472
+   ],
+   "nprod": 90272,
+   "cpu": 120.64,
+   "rounds_log": [
+    "round 0 rank 31 low 31 bydeg 0 1 30 0 0",
+    "round 1 rank 1022 low 1022 bydeg 0 1 91 930 0 new_low 991 cpu 0.0",
+    "round 2 rank 15841 low 2821 bydeg 0 1 92 2728 13020 new_low 1799 cpu 3.0",
+    "round 3 rank 37293 low 2821 bydeg 0 1 92 2728 34472 new_low 0 cpu 120.6"
+   ]
+  },
+  "n31_D1_s0": {
+   "dim": 37278,
+   "low": 2821,
+   "one": 0,
+   "rounds": 4,
+   "bydeg": [
+    0,
+    2,
+    101,
+    2718,
+    34457
+   ],
+   "nprod": 90272,
+   "cpu": 92.96,
+   "rounds_log": [
+    "round 0 rank 31 low 31 bydeg 0 2 29 0 0",
+    "round 1 rank 1020 low 1020 bydeg 0 2 100 918 0 new_low 989 cpu 0.0",
+    "round 2 rank 15780 low 2760 bydeg 0 2 101 2657 13020 new_low 1740 cpu 2.2",
+    "round 3 rank 37062 low 2821 bydeg 0 2 101 2718 34241 new_low 61 cpu 88.4",
+    "round 4 rank 37278 low 2821 bydeg 0 2 101 2718 34457 new_low 0 cpu 93.0"
+   ]
+  }
+ },
+ "n1_reported": {
+  "n31_C1_s0": [
+   2821,
+   37293,
+   0
+  ],
+  "n31_C1_s1": [
+   2821,
+   37293,
+   0
+  ],
+  "n31_D1_s0": [
+   2821,
+   37278,
+   0
+  ],
+  "n31_A_s2": "one=1",
+  "n29_C1_s0": [
+   4524,
+   31929,
+   0
+  ],
+  "n29_D1_s0": "one=1"
+ },
+ "predictions": {
+  "P1": "HELD (0/297 mismatches)",
+  "P2": "HELD (all four n=31 instances reproduce N1 exactly, incl. D1 dim 37278)",
+  "P3": "MIXED: C1 n=29 low after round 2 = 2465 = 29*85 as predicted, and C1 has exactly 3n deg<=2 elements after round 1 at n=29,31; D1 n=29 gives 2432 (formula fails for D1); 'A has low>2821 before the degree-4 stage' FALSIFIED (A n=31 = C1 exactly through round 2, 2821)",
+  "P4": "HELD: n=31 C1/D1 degree-4 leading rank stalls at 34472/34457 < C(32,4)=35960; n=29 C1/D1 fill C(30,4)=27405 in round 3 and gain low elements; A n=31 gains 124 low in round 3 and fills 35960 in round 4"
+ },
+ "verdict": "Independent closure reproduces 2821 (C1,D1) vs 5489/1 (A) at n=31. The N1 anomaly is not a gf2close artefact."
+}

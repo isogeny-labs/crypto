@@ -1,0 +1,37 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T02:46:13Z",
+ "id": "PCC-20261116-6fe501",
+ "kind": "statement",
+ "producer": {
+  "commit": "4c59c865bcf8e3a49f9650e951c7549c33a656d4",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/query-row-contract-v1/REPORT.md",
+    "sha256": "21e3cd707930668d22ddf1f6e2f1c686c357cea66b73a0435df3bf6e0bcb3be7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/query-row-contract-v1/report.pdf",
+    "sha256": "af391c5e62735af480df7ad526034c784248c8a43cb9fb6d140237f40c7d7815"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/query-row-contract-v1/pipeline.dot",
+    "sha256": "c4506b4d0f8fec137efde7f8d3eb2290f9510833d1a9093f77cbbe3c4d4a9835"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-query-row-contract",
+ "statement": "Explicit application-contract addendum: the independent-row-tag proposal and P+B*D/y+L numeric models retain at most one checked relation per fresh private-coefficient query. Multiple outputs from one query share tags; a nonzero row-kernel vector alone may have zero query-aggregate vector and a deterministically zero denominator. Multi-output batching remains open and requires separate total-work/output accounting and a nonzero tag-blind query aggregate; probability yield is capped at one, while expected row counts can exceed one. The original frozen drafts/theorems retain their bytes; actual point/selection/probability and algorithmic cost bridges remain open. The F5 witness is separately certified; no novelty or changed exponent is established."
+}

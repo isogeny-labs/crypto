@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Delphi verifier tool: status of an Iso Lab workflow run.
+# Argument: GitHub run id. not_covered while running, pass on success, fail
+# otherwise. Proves only that the workflow run succeeded; the S3 receipt
+# verification is the workflow's own. Exit 3 if gh is missing or the view fails.
+set -euo pipefail
+
+command -v jq >/dev/null || { echo "isolab-status: jq not on PATH" >&2; exit 3; }
+command -v gh >/dev/null || { echo "isolab-status: gh not on PATH" >&2; exit 3; }
+[ $# -eq 1 ] || { echo "usage: isolab-status <run id>" >&2; exit 3; }
+[[ $1 =~ ^[0-9]{1,20}$ ]] || { echo "isolab-status: run id must be digits" >&2; exit 3; }
+
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+cd "$root"
+
+id=$1
+view=$(gh run view "$id" --json status,conclusion,url,headSha,displayTitle) || {
+  echo "isolab-status: gh run view $id failed" >&2
+  exit 3
+}
+
+src=""
+if [ -f ".delphi-tools/isolab/$id.json" ]; then
+  src=$(jq -r '.source_revision // empty' ".delphi-tools/isolab/$id.json" 2>/dev/null || true)
+fi
+
+jq -cn --argjson v "$view" --arg id "$id" --arg src "$src" --arg c "${DELPHI_CLAIM_ID:-}" '
+  ($v.status // "unknown") as $st
+  | ($v.conclusion // "") as $co
+  | (if $st != "completed" then "not_covered" elif $co == "success" then "pass" else "fail" end) as $verdict
+  | ("run " + $id + " is " + $st
+     + (if $st == "completed" then " (" + $co + ")" else "" end)
+     + "; url " + ($v.url // "?") + "; headSha " + ($v.headSha // "?")
+     + (if $src != "" then "; source_revision " + $src else "" end)) as $reason
+  | {schema: "pcc.verdict/v1", verdict: $verdict}
+    + (if $c != "" then {claim_id: $c} else {} end)
+    + {reason: $reason}'

@@ -1,0 +1,42 @@
+{
+  "schema": "composite-tate-verification/v1",
+  "created": "2026-11-10T11:32:25.948Z",
+  "source_commit": "0b81d51ac9f07bd1abe210757105633144d7f085",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/pairing_composite_order_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 50,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-5e63e9",
+    "claim_sha256": "5d87eaaccb10c5051793cfe7fcd408c4ad424ef0fb32c0c22e292807be2867f4",
+    "commit": "0b81d51ac9f07bd1abe210757105633144d7f085",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/pairing_composite_order_audit_20261110/lean (CompositeTateCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T11:31:14Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-5e63e9",
+    "claim_sha256": "5d87eaaccb10c5051793cfe7fcd408c4ad424ef0fb32c0c22e292807be2867f4",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "Actual nonsingular F3 curve/card4/order4 point and F5 curve/card6/order3 point; actual torsion kernels and curve and field-unit quotients. Literal source conditions hold, target quotients nontrivial/exponent2, nonzero doubles obstruct every left-bilinear left-nondegenerate map. Direct universal negation of literal composite-n implication. Primitive-root absence and primitive2 controls. No canonical pairing implementation, corrected primitive-root/prime-order refutation, or Frey–Rück-original theorem claim."
+}

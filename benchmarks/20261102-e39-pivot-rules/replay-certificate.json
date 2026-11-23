@@ -1,0 +1,1138 @@
+{
+  "schema": "replay-certificate/v1",
+  "status": "verified",
+  "independent": true,
+  "scalars_verified": true,
+  "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E39: a fresh build of the recorded commit from a git export into a fresh tmpfs target directory, with the validator's own export, replay and comparison scripts; nothing reused from the producer's target directory (/dev/shm/e39) or its pinned binaries (/dev/shm/e39bin was not used)",
+  "date": "2026-11-03",
+  "row": "E39 (GLV note §9.48/§9.49): pivot rules F, S, H (and B'', L, A, E25) end to end on the fresh stream 0xE39E0001, Stage A, pilot P1, the main control run, the 21 identity clauses of G2.191 and the matched rho walk (iii)",
+  "snapshot": "484766c0cb (remote head of claude/glv-endomorphism-index-calculus-pe7ige); committed records read from a git archive of it; E39's stage_a.json (local-only) pinned by its committed sha256",
+  "build": {
+    "detail": "replay/build.json",
+    "recorded_commit": "e1cd726577",
+    "binaries_rebuilt_byte_identical": "8/8 (e37_checks, e37_walk_e24, e38_checks, e39_checks, e39_stage_a, e39_tables, quartic_pipeline_gls, quartic_pipeline_v4) from a clean export (4,424 files, 0 blob mismatches); e27_walk built from the same tree for the GLS rho"
+  },
+  "nonce": {
+    "value": "cd3e6dcdf3d10bc9c0b6f015166604e4",
+    "draw": "replay/nonce_draw.txt (16 bytes from /dev/urandom at 2026-11-02T23:43:28Z, after the results commit 669a987eaf and the snapshot 484766c0cb; rule fixed before the draw)",
+    "selection": [
+      "e2e e24_chain-fifo-static_p101s2",
+      "e2e gls_chain-lifo_p197s1",
+      "e2e e24_chain-fifo-static_p197s2",
+      "e2e e24_chain-lifo_p269s1",
+      "e2e gls_chain-fifo_p269s1",
+      "e2e gls_chain-static_p197s2",
+      "pair e24_p149s1 (chain-counted and chain-fifo)"
+    ]
+  },
+  "coverage": "End to end: 8 of the 154 pipeline runs (nonce-selected: 6 from the 154, plus the A and F runs of one nonce-selected curve; 10 of the 32 rows touched: GLS p197 s1 A/B, p197 s2 A/B, p269 s1 A/B, E24 p101 s2, p149 s1, p197 s2, p269 s1 — arms A, F, S, H, L). Replayed in full: Stage A (10 curves x 1,000 calls x 9 solvers, 90,000 solves), pilot P1 (80 calls), the main control run (320 calls), all 21 identity clauses (18 configuration runs + the two E36-binary comparisons + walk_e24), and both walk (iii) reference records (E27 stage_w.json, E37 walk_e24.json).",
+  "comparison": "each replayed output against its committed record, every JSON leaf, timing keys (*_ms, ms, *wall*) skipped, by the validator's comparator (validate_e39 compare/cert); raw bytes as well (equal for every output without timing fields: Stage A, pilot, checks, e37_checks, both E38 pilots, both walks); identity configurations also by G2.191's canonical hash (jq -S -c without timing keys, sha256) against the E37/E38 reference records hashed by the validator (replay/comparison.txt)",
+  "scalar_verification": "total_muls, macaulay_entries, pivot_selection_ops, lead_scan_reads, solver_fallbacks, residuals, unsolved, the recovered logarithm and its correctness of every replayed pipeline record equal the committed values (they are leaves of the comparison; listed per run under scalars); the control files' identity_failures, calls and non-empty counts likewise; Stage A's per-call arrays are covered by its raw-byte identity (992,782 leaves)",
+  "runs_total": 31,
+  "runs_matched": 31,
+  "fields_compared": 1037565,
+  "fields_identical": 1037565,
+  "runs": [
+    {
+      "run": "e24_chain-counted_p149s1",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/e24_chain-counted_p149s1.json",
+        "sha256": "d6010f4851abe5637063ed4fd9a2f8132b1d7f07f93e1514e25f0d84cee3cc06"
+      },
+      "replay_output": {
+        "sha256": "461daf1a8c0fbb8fa57e98c6dd2affeba34b22d8e6621100039d77e8d4e49acd",
+        "leaves_compared": 434,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-counted",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 34520693619,
+          "macaulay_entries": 9509310720,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 4191482725,
+          "solver_fallbacks": 395,
+          "residuals": 52980,
+          "unsolved": 6,
+          "recovered": 72898577,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-fifo-static_p101s2",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/e24_chain-fifo-static_p101s2.json",
+        "sha256": "1e4456140fbf7a578737f01277d0e412d7ecaf6c0e711f51d60560291696d50d"
+      },
+      "replay_output": {
+        "sha256": "ba2fecc299037f2f0fe05fd6227f65394b174010e9d3eafed759caa430e241da",
+        "leaves_compared": 434,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-fifo-static",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 7980013303,
+          "macaulay_entries": 3314279808,
+          "pivot_selection_ops": 15466510,
+          "lead_scan_reads": 1446609728,
+          "solver_fallbacks": 206,
+          "residuals": 18285,
+          "unsolved": 2,
+          "recovered": 25391763,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-fifo-static_p197s2",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/e24_chain-fifo-static_p197s2.json",
+        "sha256": "486ec90fcf2e574c2c15d88e0f63b4c1e36067248eff8f696b551514431e85cd"
+      },
+      "replay_output": {
+        "sha256": "8703fa98b7bedb7fd91e4203da09a5b677ca93227510afac9ed34b505c0bc230",
+        "leaves_compared": 434,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-fifo-static",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 16765657644,
+          "macaulay_entries": 7086901248,
+          "pivot_selection_ops": 33670541,
+          "lead_scan_reads": 3147172389,
+          "solver_fallbacks": 181,
+          "residuals": 39780,
+          "unsolved": 3,
+          "recovered": 113158094,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-fifo_p149s1",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/e24_chain-fifo_p149s1.json",
+        "sha256": "aacbc5bc4e4152e2182db423f1997805a0533beb8bd9b7d5a53a8093cf7d2f9a"
+      },
+      "replay_output": {
+        "sha256": "cb9b78c0774e1848cd557b50046c6413eb34ba8af1405554a34dbfe52d0392fa",
+        "leaves_compared": 434,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-fifo",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 23124711112,
+          "macaulay_entries": 9509310720,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 4191482725,
+          "solver_fallbacks": 395,
+          "residuals": 52980,
+          "unsolved": 6,
+          "recovered": 72898577,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "e24_chain-lifo_p269s1",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/e24_chain-lifo_p269s1.json",
+        "sha256": "a18f3f0893ff2a8c7e903b08cc44e7808f8b5768ac77bbc3d2ccd6eff5c7b571"
+      },
+      "replay_output": {
+        "sha256": "cc94198c74599132b4e93b172eff1de00a9b41a2cd06f8b76d128fea8a92ee72",
+        "leaves_compared": 434,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-lifo",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 55580075118,
+          "macaulay_entries": 10933528704,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 4862674712,
+          "solver_fallbacks": 242,
+          "residuals": 61464,
+          "unsolved": 1,
+          "recovered": 1223824752,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-fifo_p269s1",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/gls_chain-fifo_p269s1.json",
+        "sha256": "37b4afff66424bc21841f97993606be7096c3ad2dc4979048867ce6a5e0c4bc0"
+      },
+      "replay_output": {
+        "sha256": "c3c3b0e749ba563716d92b691fca0c65cc688a02a1ae9871837c9fb986e25412",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-fifo",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 31928411242,
+          "macaulay_entries": 13299822144,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 5911066653,
+          "solver_fallbacks": 315,
+          "residuals": 74715,
+          "unsolved": 3,
+          "recovered": 270725152,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-fifo",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 10901974351,
+          "macaulay_entries": 4536653184,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 2015766349,
+          "solver_fallbacks": 110,
+          "residuals": 25479,
+          "unsolved": 1,
+          "recovered": 270725152,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-lifo_p197s1",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/gls_chain-lifo_p197s1.json",
+        "sha256": "aa6e73c3f0f1c5792a33c2ad099120039f98675b40bc404cf199434f728a173c"
+      },
+      "replay_output": {
+        "sha256": "4fbdc0c8555258f0ce88853ec9844440b0c9d138168e41a4fb79766310017a59",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-lifo",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 31426744230,
+          "macaulay_entries": 6146095872,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 2712708649,
+          "solver_fallbacks": 238,
+          "residuals": 34288,
+          "unsolved": 4,
+          "recovered": 79622603,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-lifo",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 12273367752,
+          "macaulay_entries": 2397131520,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 1056509588,
+          "solver_fallbacks": 101,
+          "residuals": 13354,
+          "unsolved": 3,
+          "recovered": 79622603,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "gls_chain-static_p197s2",
+      "kind": "end to end, salt 0xE39E0001 (nonce-selected)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/e2e/gls_chain-static_p197s2.json",
+        "sha256": "89aa624979980396a79bfd8233c6c6fa2579c6ba4afab0757eb77b475bc453de"
+      },
+      "replay_output": {
+        "sha256": "9706f800cb4262ce649857520f7f6cdda8dcad677e6508ec166dc2e78bb49aa6",
+        "leaves_compared": 1221,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-static",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 9612412873,
+          "macaulay_entries": 3760814400,
+          "pivot_selection_ops": 10773854,
+          "lead_scan_reads": 1663399983,
+          "solver_fallbacks": 128,
+          "residuals": 21025,
+          "unsolved": 1,
+          "recovered": 7399960,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-static",
+          "stream_salt": "0xe39e0001",
+          "total_muls": 4598634849,
+          "macaulay_entries": 1804743360,
+          "pivot_selection_ops": 5177082,
+          "lead_scan_reads": 799301137,
+          "solver_fallbacks": 56,
+          "residuals": 10103,
+          "unsolved": 0,
+          "recovered": 7399960,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "pilot",
+      "kind": "pilot P1 (e39_checks --salt E39D0001 --calls 8), full",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/pilot.json",
+        "sha256": "d63f44d92b72091b764e2c951022446b74f1e06218f49d8ba171adb0fa0e304a"
+      },
+      "replay_output": {
+        "sha256": "d63f44d92b72091b764e2c951022446b74f1e06218f49d8ba171adb0fa0e304a",
+        "leaves_compared": 752,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "identity_failures": 0,
+          "calls": 80,
+          "nonempty": 56
+        }
+      ]
+    },
+    {
+      "run": "checks",
+      "kind": "main control run (e39_checks --salt E39C0001 --calls 32), full",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/checks.json",
+        "sha256": "005f6fce159908683812aaeb9237772436e3958ebcbb01b11734bb3365506a2f"
+      },
+      "replay_output": {
+        "sha256": "005f6fce159908683812aaeb9237772436e3958ebcbb01b11734bb3365506a2f",
+        "leaves_compared": 2432,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "identity_failures": 0,
+          "calls": 320,
+          "nonempty": 194
+        }
+      ]
+    },
+    {
+      "run": "identity/macaulay",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/macaulay.json",
+        "sha256": "76e8d6e053c82a43028b0115640969b79d948e91f52a783ed46775775fe198a2"
+      },
+      "replay_output": {
+        "sha256": "f54b736a260436fe4234ee3a1fc44be4bb1241cbc716cfe4f207b99ffc72b940",
+        "leaves_compared": 1202,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": null,
+          "stream_salt": null,
+          "total_muls": 24712296642,
+          "macaulay_entries": 2665742016,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": null,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": null,
+          "stream_salt": null,
+          "total_muls": 11695092130,
+          "macaulay_entries": 1262331840,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": null,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/chain",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/chain.json",
+        "sha256": "165cde0f0580abeac2459d017f4d61ddad0f53bf990d20042499267ea9b5ebc8"
+      },
+      "replay_output": {
+        "sha256": "21a675316b958235a10206c5a68d38a242e59f5fedd4ce0f157ab8fb8e35b2da",
+        "leaves_compared": 1206,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain",
+          "stream_salt": null,
+          "total_muls": 9865699461,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain",
+          "stream_salt": null,
+          "total_muls": 4682498928,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/chainsparsest",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/chainsparsest.json",
+        "sha256": "8ce29573fb1a7769f90d1ce9a6d6f73caefef1add74d2e837fa944291b65145b"
+      },
+      "replay_output": {
+        "sha256": "7781eb09dc640ff0db8cff39e182616df7c38f86af43fcba9e507ed0bff23c55",
+        "leaves_compared": 1206,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-sparsest",
+          "stream_salt": null,
+          "total_muls": 5416154893,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-sparsest",
+          "stream_salt": null,
+          "total_muls": 2576029693,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/chain_karatsuba",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/chain_karatsuba.json",
+        "sha256": "a9ebaa987ff46aed30a111b3ef9ec73a6b93567bd6c85a463592ad3ebf195d5f"
+      },
+      "replay_output": {
+        "sha256": "6220c8571867d699100b2127e74ed0aeebd26f5e1c5b373096fa9fd1f83a9d29",
+        "leaves_compared": 1210,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain",
+          "stream_salt": null,
+          "total_muls": 9818244813,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain",
+          "stream_salt": null,
+          "total_muls": 4659726750,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/est_karatsuba",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/est_karatsuba.json",
+        "sha256": "1b6202cb24094bdb40e0db9a74733b83b29f2de6045c3bb1101b0f2d478b1c32"
+      },
+      "replay_output": {
+        "sha256": "96fe0ba5031723820d937b3d25dcafb6bdff5897128e07ac33241a1fe4e2f698",
+        "leaves_compared": 1220,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-sparsest-est",
+          "stream_salt": null,
+          "total_muls": 6370285500,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": 190554915,
+          "lead_scan_reads": 1187551953,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-sparsest-est",
+          "stream_salt": null,
+          "total_muls": 3027647044,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": 90218320,
+          "lead_scan_reads": 562208682,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/chain-fifo_karatsuba",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/chain-fifo_karatsuba.json",
+        "sha256": "f9c38cc42de2afe07697705366b8042ff9827f84bb258d3b5f49f41a62dd66f9"
+      },
+      "replay_output": {
+        "sha256": "00df7a69874fe360ebecc1ce96ed02da896cf687e6e37a7eb7e50d77f166c79e",
+        "leaves_compared": 1220,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-fifo",
+          "stream_salt": null,
+          "total_muls": 6689800327,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 1187551953,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-fifo",
+          "stream_salt": null,
+          "total_muls": 3178518650,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 562208682,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/chain-static_karatsuba",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/chain-static_karatsuba.json",
+        "sha256": "52edcd1321ddcf875d27d2051bbc0f509c7d84a344fca044a8b67c04bd11c672"
+      },
+      "replay_output": {
+        "sha256": "18faa7d30ee841a56845b7d80d71f36eb885d441a17ec2270f477e31a56965d1",
+        "leaves_compared": 1220,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-static",
+          "stream_salt": null,
+          "total_muls": 6961957260,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": 7683510,
+          "lead_scan_reads": 1187551953,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-static",
+          "stream_salt": null,
+          "total_muls": 3307212215,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": 3637477,
+          "lead_scan_reads": 562208682,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/chain-fifo-static_karatsuba",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/chain-fifo-static_karatsuba.json",
+        "sha256": "d8a926d43b147707647f713fd7e5436798173f068415ec434fdaaed7671dbac3"
+      },
+      "replay_output": {
+        "sha256": "6b15f1b0c162121f8c34d5696e0fe77f3a2e630e668c704d9434f36a8420b1fd",
+        "leaves_compared": 1220,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-fifo-static",
+          "stream_salt": null,
+          "total_muls": 6509017498,
+          "macaulay_entries": 2719210368,
+          "pivot_selection_ops": 12696312,
+          "lead_scan_reads": 1187551953,
+          "solver_fallbacks": 173,
+          "residuals": 15010,
+          "unsolved": 13,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-fifo-static",
+          "stream_salt": null,
+          "total_muls": 3092558539,
+          "macaulay_entries": 1288514304,
+          "pivot_selection_ops": 6010603,
+          "lead_scan_reads": 562208682,
+          "solver_fallbacks": 85,
+          "residuals": 7106,
+          "unsolved": 7,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/v4_default",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/v4_default.json",
+        "sha256": "dd1fed50a84a2c9145909121b694e1ff0e7beb8150d8ad73df43b7e19ca66a98"
+      },
+      "replay_output": {
+        "sha256": "4805b108bb0deb7e42c77d897221eda41bbcffca678f9525f5b6a0a00e48c71c",
+        "leaves_compared": 424,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": null,
+          "stream_salt": null,
+          "total_muls": 25529343540,
+          "macaulay_entries": 2732253888,
+          "pivot_selection_ops": null,
+          "lead_scan_reads": null,
+          "solver_fallbacks": null,
+          "residuals": 15387,
+          "unsolved": 5,
+          "recovered": 25391763,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37salt_gls_chain-counted",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37salt_gls_chain-counted.json",
+        "sha256": "91cfacea277f03dc638e61db56ffd2a1576f3ab45c80235976e499f9316cd15b"
+      },
+      "replay_output": {
+        "sha256": "0a013360f80e229055393bdb7fc9d15e151dcd8986bdd3e44346ace7323bc3b9",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-counted",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 7687691141,
+          "macaulay_entries": 2130129792,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 930969272,
+          "solver_fallbacks": 129,
+          "residuals": 11767,
+          "unsolved": 5,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-counted",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 4203565671,
+          "macaulay_entries": 1163385216,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 508248367,
+          "solver_fallbacks": 71,
+          "residuals": 6424,
+          "unsolved": 2,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37salt_gls_chain-fifo",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37salt_gls_chain-fifo.json",
+        "sha256": "567308bb921053eef06290dd4377261ee65b1565e580914517500564e1ab100a"
+      },
+      "replay_output": {
+        "sha256": "fec8dda92f04cd5a51ebee660d678ec5c85444b9bea1c855fce2c1eb34efa03a",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-fifo",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 5235501655,
+          "macaulay_entries": 2130129792,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 930969272,
+          "solver_fallbacks": 129,
+          "residuals": 11767,
+          "unsolved": 5,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-fifo",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 2864226303,
+          "macaulay_entries": 1163385216,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 508248367,
+          "solver_fallbacks": 71,
+          "residuals": 6424,
+          "unsolved": 2,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37salt_gls_chain-static",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37salt_gls_chain-static.json",
+        "sha256": "97a83be78953a5cadb0fe7460a7113da68ace859ca6538478bbcbb0497e2dbd5"
+      },
+      "replay_output": {
+        "sha256": "6f0d3d140877a8c2d26ffcad62132db0be5af30c33f63811caef41897d14f38f",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-static",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 5453315895,
+          "macaulay_entries": 2130129792,
+          "pivot_selection_ops": 6023543,
+          "lead_scan_reads": 930969272,
+          "solver_fallbacks": 129,
+          "residuals": 11767,
+          "unsolved": 5,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-static",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 2983183221,
+          "macaulay_entries": 1163385216,
+          "pivot_selection_ops": 3288497,
+          "lead_scan_reads": 508248367,
+          "solver_fallbacks": 71,
+          "residuals": 6424,
+          "unsolved": 2,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37salt_gls_chain-fifo-static",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37salt_gls_chain-fifo-static.json",
+        "sha256": "9327e22faa1f2e1f749d82d303d7309e7588918ac5a12adda258d652fab489ad"
+      },
+      "replay_output": {
+        "sha256": "da44520d20afa6094d9ebff6e41cb547811a8273617b91ed0626db4ea3639524",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-fifo-static",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 5097290156,
+          "macaulay_entries": 2130129792,
+          "pivot_selection_ops": 9953366,
+          "lead_scan_reads": 930969272,
+          "solver_fallbacks": 129,
+          "residuals": 11767,
+          "unsolved": 5,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-fifo-static",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 2788655420,
+          "macaulay_entries": 1163385216,
+          "pivot_selection_ops": 5433931,
+          "lead_scan_reads": 508248367,
+          "solver_fallbacks": 71,
+          "residuals": 6424,
+          "unsolved": 2,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37salt_gls_chain-sparsest-est",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37salt_gls_chain-sparsest-est.json",
+        "sha256": "1cf802a8c5c048aa5511efb8370afef7ed31f900b5e5a691c88898ab67cfaa4c"
+      },
+      "replay_output": {
+        "sha256": "c39f4d5ccf5c6b464d90b05fc4ceaa3988bfb361ed46b4a45d8d76c761eeb7b6",
+        "leaves_compared": 1222,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": "A",
+          "solver": "chain-sparsest-est",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 4984870717,
+          "macaulay_entries": 2130129792,
+          "pivot_selection_ops": 149367307,
+          "lead_scan_reads": 930969272,
+          "solver_fallbacks": 129,
+          "residuals": 11767,
+          "unsolved": 5,
+          "recovered": 557533,
+          "correct": true
+        },
+        {
+          "arm": "B",
+          "solver": "chain-sparsest-est",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 2728061660,
+          "macaulay_entries": 1163385216,
+          "pivot_selection_ops": 81551186,
+          "lead_scan_reads": 508248367,
+          "solver_fallbacks": 71,
+          "residuals": 6424,
+          "unsolved": 2,
+          "recovered": 557533,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37salt_e24_chain-fifo",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37salt_e24_chain-fifo.json",
+        "sha256": "f76346de9ded4c701e5d16196d70511db16aea16465bbd74e1a939c0af8e4305"
+      },
+      "replay_output": {
+        "sha256": "3506f124824c6dffce047fd9fe275227a7240a83fe00909554b3bac1e83e64e9",
+        "leaves_compared": 434,
+        "leaves_differing": 0,
+        "raw_bytes_identical": false
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "arm": null,
+          "solver": "chain-fifo",
+          "stream_salt": "0xe37e0001",
+          "total_muls": 7493261460,
+          "macaulay_entries": 3041054016,
+          "pivot_selection_ops": 0,
+          "lead_scan_reads": 1328416947,
+          "solver_fallbacks": 189,
+          "residuals": 16791,
+          "unsolved": 10,
+          "recovered": 25391763,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "run": "identity/e37_checks",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e37_checks.json",
+        "sha256": "7e1bf56ef4abefa0208d6272c1eebbc3717fb6c8a0bfea991a82aeeb2669f7ba"
+      },
+      "replay_output": {
+        "sha256": "7e1bf56ef4abefa0208d6272c1eebbc3717fb6c8a0bfea991a82aeeb2669f7ba",
+        "leaves_compared": 131,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "identity_failures": 0,
+          "calls": 320,
+          "nonempty": 199
+        }
+      ]
+    },
+    {
+      "run": "identity/e38_pilot",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e38_pilot.json",
+        "sha256": "2a927bc3278b714b02da6d62dd87afcd963469b9ecceaade42613d3e6c09da40"
+      },
+      "replay_output": {
+        "sha256": "2a927bc3278b714b02da6d62dd87afcd963469b9ecceaade42613d3e6c09da40",
+        "leaves_compared": 736,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "identity_failures": 0,
+          "calls": 80,
+          "nonempty": 57
+        }
+      ]
+    },
+    {
+      "run": "identity/e38_pilot_p2",
+      "kind": "G2.191 identity configuration (E39's own run of it)",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/identity/e38_pilot_p2.json",
+        "sha256": "3a53c60dc95acb97586bc2d8d5fc2dafe3c39b9b43c02e8abe032c717f752105"
+      },
+      "replay_output": {
+        "sha256": "3a53c60dc95acb97586bc2d8d5fc2dafe3c39b9b43c02e8abe032c717f752105",
+        "leaves_compared": 577,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "identity_failures": 0,
+          "calls": 80,
+          "nonempty": 58
+        }
+      ]
+    },
+    {
+      "run": "walk_e24",
+      "kind": "matched rho, E24 rows: e37_walk_e24 at the E39 commit vs E37's walk_e24.json",
+      "committed": {
+        "path": "../../experiments/44_pivot_rules_confirm/walk_e24.json",
+        "sha256": "c5b36693489ad9f43c9ed63e05d88ea536b217d27eee84aaf0fabab2f223027a"
+      },
+      "replay_output": {
+        "sha256": "c5b36693489ad9f43c9ed63e05d88ea536b217d27eee84aaf0fabab2f223027a",
+        "leaves_compared": 6604,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": []
+    },
+    {
+      "run": "stage_w",
+      "kind": "matched rho, GLS rows: e27_walk at the E39 commit vs E27's stage_w.json",
+      "committed": {
+        "path": "../../experiments/32_walk_karatsuba/stage_w.json",
+        "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+      },
+      "replay_output": {
+        "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1",
+        "leaves_compared": 11044,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": []
+    },
+    {
+      "run": "stage_a",
+      "kind": "Stage A (e39_stage_a --sizes 101,149,197,269,397 --seeds 1,2 --targets 1000, one thread), full: 10 curves x 1,000 calls x 9 solvers",
+      "committed": {
+        "path": "../../experiments/46_pivot_rules_confirm3/stage_a.json (local-only; sha256 committed in stage_a.json.sha256)",
+        "sha256": "e98e697c66fd23d8f4acac9617786db084eef1d147767267c9975864c6067ad4"
+      },
+      "replay_output": {
+        "sha256": "e98e697c66fd23d8f4acac9617786db084eef1d147767267c9975864c6067ad4",
+        "leaves_compared": 992782,
+        "leaves_differing": 0,
+        "raw_bytes_identical": true
+      },
+      "matches": true,
+      "scalars": [
+        {
+          "calls": 10000,
+          "solvers": 9,
+          "note": "every per-call C, echelon, entries, selection parts, lead scans, digest, diag and fallback call of the record"
+        }
+      ]
+    }
+  ]
+}

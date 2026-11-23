@@ -1,0 +1,17 @@
+{
+  "created_utc": "2026-11-07T02:13:27.462853+00:00",
+  "commands": [
+    "timeout 60 rustc --edition=2021 --test borrowed_page.rs -o page-tests",
+    "timeout 30 ./page-tests"
+  ],
+  "compile_exit_code": 0,
+  "test_exit_code": 0,
+  "tests_passed": 7,
+  "tests_failed": 0,
+  "compiled_scope": "actual borrowed_page.rs only; no stand-in owner or capture mock",
+  "projection_typechecked": false,
+  "production_owner_compiled": false,
+  "capture_written": false,
+  "cli_complete": false,
+  "scope": "Allocation-free borrowed element paging, not encoded byte or solver admission budget"
+}

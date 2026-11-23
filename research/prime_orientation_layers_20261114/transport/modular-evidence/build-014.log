@@ -1,0 +1,136 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_absolute_right_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.chartRootRep_den_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_right_modular_with_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.finiteExtract_intCast' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_finite_right_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.boxEval_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.modular_box_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.multiplicationProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-014.lean.txt:1169:2: error: Type mismatch when assigning motive
+  fun S => Code (Rep.prod S P r)
+has type
+  Finset I → Type
+of sort `Type (max 1 u_1)` but is expected to have type
+  Finset I → Prop
+of sort `Type u_1`
+../modular-evidence/draft-014.lean.txt:1194:58: error: don't know how to synthesize placeholder for argument `h`
+context:
+a : ℕ
+t : ℤ
+s : ℚ
+⊢ C (C (↑t - s)) + C (C (2 ^ (a + 1))) * C X = C (chart a t (X - C s))
+../modular-evidence/draft-014.lean.txt:1192:73: error: unsolved goals
+a : ℕ
+t : ℤ
+s : ℚ
+⊢ Code (chartRootRep a t s)
+../modular-evidence/draft-014.lean.txt:1199:42: error: don't know how to synthesize placeholder for argument `h`
+context:
+a j : ℕ
+t : ℤ
+d : ℚ
+⊢ (C (C (2 ^ j - ↑t)) - C (C (2 ^ (a + 1))) * C X) * C (C (2 ^ j - d)⁻¹) = C (chart a t (OrientationAnchor.factor d j))
+../modular-evidence/draft-014.lean.txt:1196:81: error: unsolved goals
+a j : ℕ
+t : ℤ
+d : ℚ
+⊢ Code (chartFactorRep a j t d)
+../modular-evidence/draft-014.lean.txt:1203:61: error: don't know how to synthesize placeholder for argument `h`
+context:
+S : Finset ℚ
+d : ℚ
+a : ℕ
+t : ℤ
+⊢ ∏ i ∈ S.erase d, C (chart a t (X - C i)) = C (chart a t (puncture S d))
+../modular-evidence/draft-014.lean.txt:1202:39: error: unsolved goals
+S : Finset ℚ
+d : ℚ
+a : ℕ
+t : ℤ
+⊢ Code (punctureChartRep S d a t)
+../modular-evidence/draft-014.lean.txt:1208:67: error: don't know how to synthesize placeholder for argument `h`
+context:
+a u x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ ∏ i ∈ mask u x y, C (chart a t (OrientationAnchor.factor (delta x y) i)) ^ m i = C (chart a t (correction u x y m))
+../modular-evidence/draft-014.lean.txt:1206:45: error: unsolved goals
+a u x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ Code (correctionChartRep a u x y t m)
+../modular-evidence/draft-014.lean.txt:1213:87: error: don't know how to synthesize placeholder for argument `h`
+context:
+S : Finset ℚ
+a u x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ C (C (normalizer S)⁻¹) * C (chart a t (puncture S (delta x y))) * C (chart a t (correction u x y m)) =
+    C (chart a t (completed S u x y m))
+../modular-evidence/draft-014.lean.txt:1211:46: error: unsolved goals
+S : Finset ℚ
+a u x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ Code (completedChartRep S a u x y t m)
+../modular-evidence/draft-014.lean.txt:1218:52: error: don't know how to synthesize placeholder for argument `h`
+context:
+a u i x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ C (C (diagonalJet a u i m)⁻¹) * C (chart a t (completed (grid a) u x y m)) = C (normalizedNodeEntry a u i x y t m)
+../modular-evidence/draft-014.lean.txt:1216:46: error: unsolved goals
+a u i x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ Code (normalizedNodeRep a u i x y t m)
+../modular-evidence/draft-014.lean.txt:1223:60: error: don't know how to synthesize placeholder for argument `h`
+context:
+a u i x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ (1 + C (C (chartSlope a u x y t)) * C X) * C (normalizedNodeEntry a u i (rowResidue u x) y t m) =
+    C (rowNumerator a u i x y t m)
+../modular-evidence/draft-014.lean.txt:1221:44: error: unsolved goals
+a u i x y : ℕ
+t : ℤ
+m : ℕ → ℕ
+⊢ Code (rowNumeratorRep a u i x y t m)
+'OrientationNumeratorCode.rowNumeratorCode' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.approximationCode' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

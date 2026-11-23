@@ -1,0 +1,48 @@
+--- original/IndependentControls.lean
++++ candidate/IndependentControls.lean
+@@ -16,23 +16,26 @@
+ theorem coefficients : Common22SupportHead.coefficientData (0:ℚ) (-1) 0 1 0 (-4) 0 1 =
+  (-9,0,0,-81,0) := by norm_num [Common22SupportHead.coefficientData]
+ theorem numerator_value : n = C (-9) := by norm_num [n,numerator,coefficients]
+-theorem residual_value : U = C (-81)*X := by norm_num [U,residual,coefficients]
++theorem residual_value : U = C (-81)*X := by norm_num [U,ActualNonbranchNorm.residual,coefficients]
+ theorem determinant_nonzero : b ≠ 0 := by norm_num [b,coefficients]
+ theorem valid_first : u ∣ F-(C (0:ℚ)*X+C 1)^2 := by
+  refine ⟨X*v, ?_⟩
+  simp only [u,v,F,Common22Coprime.firstSupport,Common22Coprime.secondSupport,quintic]
+  norm_num
++ simp only [Polynomial.C_ofNat]
+  ring
+ theorem valid_second : v ∣ F-(C (0:ℚ)*X+C 1)^2 := by
+  refine ⟨X*u, ?_⟩
+  simp only [u,v,F,Common22Coprime.firstSupport,Common22Coprime.secondSupport,quintic]
+  norm_num
++ simp only [Polynomial.C_ofNat]
+  ring
+ abbrev aa : ℚ[X] := -44150*X^3+14500*X^2+112400*X-42375
+ abbrev bb : ℚ[X] := 8830*X^4-2900*X^3-40140*X^2+14275*X+20236
+ -- Explicit exact Bezout certificate, independent of producer separability premise.
+ theorem bezout : aa*F+bb*derivative F = C (38569:ℚ) := by
+  norm_num [aa,bb,F,quintic,derivative_add,derivative_sub,derivative_mul,derivative_pow]
++ simp only [Polynomial.C_ofNat]
+  ring
+ theorem separable : F.Separable := by
+  rw [Polynomial.separable_def']
+@@ -71,7 +74,7 @@
+  IsDiscreteValuationRing.addVal Rp (ep u)+IsDiscreteValuationRing.addVal Rp (ep v)+
+  IsDiscreteValuationRing.addVal Rp (ep U) := by
+  exact source_actual_norm_order (-5:ℚ) 0 4 1 1 1 0 (-1) 0 1 0 (-4) 0 1
+- point_plus separable (by norm_num) (by norm_num) determinant_nonzero valid_first valid_second branch_plus
++   point_plus separable (by norm_num) (by norm_num) determinant_nonzero valid_first valid_second branch_plus
+ 
+ -- Independently expose the actual point-localization criterion used for the conjugate point.
+ theorem rho_unit_iff (t : A (-5:ℚ) 0 4 1) :
+@@ -117,7 +120,7 @@
+  IsDiscreteValuationRing.addVal Rm (em U) := by
+  intro he
+  have hz : IsDiscreteValuationRing.addVal Rm (em u*em v*em U) = 0 := by
+-  rw [map_mul,map_mul]
++  rw [AddValuation.map_mul,AddValuation.map_mul]
+   exact he.symm.trans conjugate_order_zero
+  exact conjugate_product_nonunit (IsDiscreteValuationRing.addVal_eq_zero_iff.mp hz)
+ end IndependentNonbranch

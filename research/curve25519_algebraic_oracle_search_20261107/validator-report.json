@@ -1,0 +1,34 @@
+{
+ "schema": "validator-report/v1",
+ "track": "algebraic",
+ "directory": "research/curve25519_algebraic_oracle_search_20261107",
+ "date": "2026-11-07",
+ "status": "pass_with_errata",
+ "independent_checks": {
+  "script": "independent code in validator scratchpad (not the producer's scripts)",
+  "curve": "p = 1048573 = 5 mod 8, #E = 1049624 = 8r by full character sum, r = 131203 prime, a point of order 8 exists (cyclic 2-part): reproduced",
+  "S3_identity": "roots in x2 of the Montgomery S3(x1, x2, xR) equal {x(R+P1), x(R-P1)}: 0 failures in 2000 random instances: reproduced",
+  "m2_coverage": "random base, F=128: 0.2213 r; F=256: 0.6313 r; law 1-exp(-2F^2/r) = 0.2210 / 0.6318: reproduced",
+  "m3_coverage": "F=46: 0.622 r, F=56: 0.837 r (different random base, triples only) vs producer 0.633 / 0.840: consistent",
+  "model": "D1 P_G F=128 gap 259.9/250.7/202.7, D1 P_N 1.67/97.4/596, D4 hash best F=29 gap 5.72/5.85/6.55, D5 MITM P_G F=56 20.0 and P_N F=32 7.12 at w=0.1: reproduced from the stated model",
+  "floor": "Gamma(F+3/2)/(Gamma(F+1)Gamma(3/2)) = 6.155 (F=29), 8.500 (F=56): reproduced",
+  "d2": "14587840/8497 = 1716.8, fit exponent 1.703 over d = 126..2394: reproduced from data",
+  "d7": "Gaussian-heuristic X_max (p/3456)^0.1 = 1.77 reproduced; weighted relation vector (sqrt6*X^4 = 198 at X=3) exceeds det^(1/6) (about 52), consistent with 0/40",
+  "ecbench": "no ecbench data in this track; single-target rule not exercised",
+  "code_changes": "none outside the research directory; no cargo test needed"
+ },
+ "errata": [
+  {"claim": "P9 / claim 9: every non-generic gap grows with r (S exponent 0.4 to 1.35)", "problem": "No measurement at any r other than k=20. The D2 exponent is 0.5*e_poly+0.5 under the assumptions F ~ sqrt r and d ~ F; the D7 exponent 0.4 and the F4 exponent 0.53 are hard-coded in model.py; only the D4 exponents come from re-solving the model at other r.", "fix": "Label the exponents and P9's outcome as derived (model extrapolation), not as a held prediction on measured data."},
+  {"claim": "Protocol frozen before any data", "problem": "PROTOCOL.md mtime is 20:00:55, after every data file (19:49-20:00); the directory is untracked in git and there is no hash, commit or run log of the pre-data version, so the freeze cannot be verified.", "fix": "State the freeze as an unverified assertion, or bind future protocols by hash/commit before the first run."},
+  {"claim": "D2: norm/resultant decision costs d^1.70, 1,717x the per-point decision", "problem": "The count is specific to the implementation (Karatsuba products plus a quadratic Euclidean gcd); it is not a lower bound. A half-gcd/quasi-linear implementation would cut the ratio to tens, not thousands.", "fix": "Call it the measured cost of this implementation; keep only the Omega(d) argument as the general statement (the conclusion that D2 is far beyond 10x still holds)."},
+  {"claim": "Design table column C/r is measured coverage", "problem": "The D3 rows use 300-trial hit rates (0.913, 0.897) as C/r, not enumerated coverage; the 'testing all orbit points costs 7.9x' figure is 7.74-7.91 across F.", "fix": "Mark D3 C/r as sampled hit rate and give 7.7-7.9x."},
+  {"claim": "Setup charged for every row", "problem": "The D5 F4 rows and the D2 polynomial rows have no group-op base-decoding setup (Gs = 0) while other rows charge 3F; their w=0 gaps (0.13, 1.4, 2.1) and the screen row's 0.44 are weight-0 artifacts of free native work.", "fix": "Charge the same setup on every row and add a note that gaps below 1 at w=0 are not speedups (none are claimed as such)."},
+  {"claim": "Collision floor bounds the generic D4 hash (5.9x)", "problem": "5.9x is against measured rho-neg while the floor 6.15x is against model rho; numerically 5.9 < 6.15, which reads as a design under the floor unless the reference is stated each time.", "fix": "Report D4 and the floor against the same reference (10.3x vs 6.15x of model rho)."},
+  {"claim": "D3 (P4): E[8]-closed base has the same decision cost per unknown", "problem": "The equality (930/1826/2722) is by construction: the closure_reps arm runs the same per-representative code as the E[r]-only arm, so the cost match is tautological; only the hit rate is an empirical comparison.", "fix": "Say the cost equality is by construction and only the hit-rate equality was tested."}
+ ],
+ "refuted_claims": [
+  "Every non-generic design with a defined exponent has a gap that grows with r (S exponent 0.4 to 1.35) [as a measured/held result: unsupported, model-derived only]"
+ ],
+ "relabelling_check": "No rho or BSGS design is presented as index calculus: the D1 screen row, D4 hash and D5 MITM are classed generic/BSGS-shaped and excluded from the trigger rule. No weight-0-only number is presented as a speedup.",
+ "notes": "All headline numbers reproduce with independent code. The negative verdict (no non-generic oracle within 10x of rho-neg at w=0.1; no ecbench design triggered) is supported for the designs tested. Every result is an unverified assertion; no pcc claim exists."
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "recorded-result-review/v1",
+  "created_utc": "2026-11-15T03:58:15.409459+00:00",
+  "raw_sha256": "0ae737ec83db80591e6de1e8216e5bdd471643bfa61169ab37bb239d5aaaa740",
+  "error": null,
+  "recorded_predicates": 16909,
+  "recorded_controls": 45,
+  "field_summaries": {
+    "2": {
+      "fixtures": 9,
+      "nonempty": 7,
+      "returned_root_tuples": 17
+    },
+    "3": {
+      "fixtures": 9,
+      "nonempty": 7,
+      "returned_root_tuples": 29
+    },
+    "4": {
+      "fixtures": 9,
+      "nonempty": 7,
+      "returned_root_tuples": 47
+    },
+    "8": {
+      "fixtures": 9,
+      "nonempty": 7,
+      "returned_root_tuples": 149
+    },
+    "9": {
+      "fixtures": 9,
+      "nonempty": 7,
+      "returned_root_tuples": 185
+    }
+  },
+  "actual_summaries": [
+    {
+      "rep": 0,
+      "matching": 79,
+      "matching_maximal_certificate": "79matched distinct nonzero rows, all79active rows exhausted",
+      "single_SCC_size": 79,
+      "independent_recorded_graph_reachability_replay": true,
+      "outer_variables": [
+        79,
+        80,
+        81,
+        82
+      ],
+      "unmatched_zero_rows": 87,
+      "nonzeros": 3184,
+      "active_density": 0.48558792130547507,
+      "recorded_rank": 79,
+      "recorded_nullity": 4,
+      "affine_family_recomputed": false
+    },
+    {
+      "rep": 1,
+      "matching": 79,
+      "matching_maximal_certificate": "79matched distinct nonzero rows, all79active rows exhausted",
+      "single_SCC_size": 79,
+      "independent_recorded_graph_reachability_replay": true,
+      "outer_variables": [
+        79,
+        80,
+        81,
+        82
+      ],
+      "unmatched_zero_rows": 87,
+      "nonzeros": 3184,
+      "active_density": 0.48558792130547507,
+      "recorded_rank": 79,
+      "recorded_nullity": 4,
+      "affine_family_recomputed": false
+    },
+    {
+      "rep": 2,
+      "matching": 79,
+      "matching_maximal_certificate": "79matched distinct nonzero rows, all79active rows exhausted",
+      "single_SCC_size": 79,
+      "independent_recorded_graph_reachability_replay": true,
+      "outer_variables": [
+        79,
+        80,
+        81,
+        82
+      ],
+      "unmatched_zero_rows": 87,
+      "nonzeros": 3184,
+      "active_density": 0.48558792130547507,
+      "recorded_rank": 79,
+      "recorded_nullity": 4,
+      "affine_family_recomputed": false
+    }
+  ],
+  "review_mode": "read recorded raw; replay matching/graph certificates and algebraic expected counts only; no rootfinder/oracle/candidate search rerun",
+  "interpretation": "Exact tiny allroots45controls passed. Under ONEdeterministicmaximum matching/freevariablechoice actualmatrix retains one79variableSCC, so thisspecificpermutation exposes no smaller blocks. Recorded repetitions are same frozenmatrix, not threecoldbenchmarkruns. No comparison speedup, independently rederivedrank/globaloriginalroots, originalencoder, Schurfill or neighboringdeltarank evidence."
+}

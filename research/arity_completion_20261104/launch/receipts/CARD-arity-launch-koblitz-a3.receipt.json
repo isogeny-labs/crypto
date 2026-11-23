@@ -1,0 +1,197 @@
+{
+  "card_id": "CARD-arity-launch-koblitz-a3",
+  "card_path": "research/arity_completion_20261104/cards/CARD-arity-launch-koblitz-a3.yaml",
+  "card_sha256": "937bc76aa267153ad4771e4ea1adf83918a0fa263099485eda864c230bf535bc",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/arity_completion_20261104/cards/gates/source-identity.py",
+        "research/arity_completion_20261104/launch/request-koblitz-a3.json",
+        "research/arity_completion_20261104/launch/image.json",
+        "4fa25efc0e2392b2e02e4c84253059ebc7c67e02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.605,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "source-identity",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.605,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "675f9b814a419e05e81b9474a1dbf6f73c58476eb198aea5f622843ebd35ad60",
+      "stdout_tail": [
+        "HEAD 4191ed09f47abb455889e75e1ee627d38ab63cff",
+        "request.provenance.source_revision 4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+        "image.source_revision 4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+        "request.job.image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "image.image_uri 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "OK   git HEAD is 40 hex",
+        "OK   git status --porcelain is empty",
+        "OK   request provenance.source_revision == image.json source_revision",
+        "OK   image.json source_revision == frozen commit",
+        "OK   request job.image == image.json image_uri"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/arity_completion_20261104/cards/gates/image-identity.py",
+        "research/arity_completion_20261104/launch/image.json",
+        "sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.834,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-identity",
+      "index": 2,
+      "outputs": {},
+      "seconds": 1.834,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3f6f1217c8435df44234906234b8646aa1ec947ab2b50a3d368113291ad73a25",
+      "stdout_tail": [
+        "aws exit 0",
+        "aws stdout sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+        "OK image digest present in ECR: sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "budgets",
+        "describe-budgets",
+        "--account-id",
+        "104186811093",
+        "--query",
+        "Budgets[].{name:BudgetName,actual:CalculatedSpend.ActualSpend.Amount,limit:BudgetLimit.Amount}",
+        "--output",
+        "json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.94,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "budget-readback",
+      "index": 3,
+      "outputs": {
+        "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-budgets.json": "a15272c5f938a9aa2ad2be00e76f7d49986ff596a7a091ff797c1ddbd35afe67"
+      },
+      "seconds": 0.94,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a15272c5f938a9aa2ad2be00e76f7d49986ff596a7a091ff797c1ddbd35afe67",
+      "stdout_tail": [
+        "[",
+        "    {",
+        "        \"name\": \"isolab-daily-cost-100\",",
+        "        \"actual\": \"107.557\",",
+        "        \"limit\": \"200.0\"",
+        "    },",
+        "    {",
+        "        \"name\": \"isolab-monthly-account-cost\",",
+        "        \"actual\": \"407.416\",",
+        "        \"limit\": \"1000.0\"",
+        "    },",
+        "    {",
+        "        \"name\": \"spot-experiments-daily-25\",",
+        "        \"actual\": \"44.125\",",
+        "        \"limit\": \"200.0\"",
+        "    }",
+        "]"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/arity_completion_20261104/launch/request-koblitz-a3.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 673.194,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "submit",
+      "index": 4,
+      "outputs": {
+        "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/build-start.json": "0c976b4bba64a2d5e16205136047bb7416114e59c49cc84ff02f155f6395cf8f",
+        "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/result.json": "e3f1c81839f906769cef1151fd3bf9062bc70ca04a35fab3203017c927a4aa0d"
+      },
+      "seconds": 673.194,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1e758e88375088fa014fa6c1ce4b16230d983e8f89150ba60ce10214da4e9950",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"arity-koblitz-m56-20261104-a3\",",
+        "  \"job_uid\": \"79c01853-83da-412b-8244-4f1cbaa75298\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"404f98e8-0ba0-474f-9ece-69794dad3af1\",",
+        "      \"phase\": \"Pending\",",
+        "      \"node\": null,",
+        "      \"exit_code\": null",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/arity-koblitz-m56-20261104-a3/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/arity-koblitz-m56-20261104-a3/launcher/10bad661-854b-4946-abb4-f3d967f0310e/\",",
+        "  \"request_sha256\": \"84a067c2ac06f48a344767e216309179ee69f8462d2f46e0abca76c8b1a7b33e\",",
+        "  \"manifest_sha256\": \"b27ebbedc90ccffbcebafcbecaa25f2b3d025cd42175a7832ef7382249e2611d\",",
+        "  \"launcher\": \"isolab-experiment-launcher:10bad661-854b-4946-abb4-f3d967f0310e\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "4191ed09f47abb455889e75e1ee627d38ab63cff",
+  "dirty_after": [
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-budgets.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-submit.stderr",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-submit.stdout",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/build-start.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/build.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/request.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/result.json",
+    "research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/start-request.json"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

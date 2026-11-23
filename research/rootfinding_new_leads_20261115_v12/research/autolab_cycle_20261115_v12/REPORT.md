@@ -1,0 +1,9 @@
+# New leads: binary centroid quartics and prime moment cuts
+
+The main new binary route combines a rank-frontier guard with exact factorization. For five distinct supported binary roots, affine rank3 is equivalent to H(e1)=0. Factoring this known centroid yields X4+uX2+vX+w, an affine-linearized quartic. Domain roots then come from one binary linear solve; exact multiplicities distinguish the4/2/1-distinct-root cases. At fixedh,k the centroid-incidence constraint itself is affine on the known73-bit family. Its surviving dimension and total cost remain unmeasured. Repeated sources outside this branch and the hard rank4 complement are retained. A repeated-root counterexample proves that H(e1)!=0 alone cannot certify rank4.
+
+The prime route uses exact Hermite/Newton moment inequalities on COHERENT integer coefficient-lift boxes. A negative rational quadratic-form upper bound rejects a whole box. A supplied quintic passes simple coefficient/variance bounds but has an explicit moment witness value-8. Conversely real-but-noninteger roots show that PSD does not certify integer support; final exact recovery stays mandatory. Wraparound requires shared quotient guards, and odd extensions need a separate coordinate proof.
+
+The previously prepared14-row dual atlas remains useful for exceptional-k classification:16383left labels versus2^83k choices. It does not reject generic fullrank73-bit fibers, so it ranks behind the two support-focused leads.
+
+This is a theory/design cycle with self-contained proofs and hand counterexamples, NOT independently executed small-oracle results, novelty clearance or a timing gain. New independent review is unavailable because the agent service reached its usage limit; previously frozen work is untouched. Exact bounded next protocols are supplied. Requested8x and the immutable2xrelease gate remain open, including20hardmatched genuineF4/F5/F6 all-original-roots cases and all requested fields.

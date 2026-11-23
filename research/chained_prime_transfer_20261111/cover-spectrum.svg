@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="300" viewBox="0 0 660 300" font-family="Helvetica,Arial,sans-serif" font-size="12">
+  <rect width="660" height="300" fill="#ffffff"/>
+  <text x="330" y="26" text-anchor="middle" font-size="15" font-weight="bold">Covering a fixed target over F₁₀₀₉: where the complement factor lands</text>
+  <text x="330" y="44" text-anchor="middle" fill="#555">target E₁ order 990 (largest prime 11); 504 covers swept; values [pcc:unverified]</text>
+  <!-- number line: Hasse interval [946.5, 1073.5], map o -> 70 + (o-946.5)/127*520 -->
+  <line x1="70" y1="150" x2="590" y2="150" stroke="#333" stroke-width="1.5"/>
+  <!-- ticks -->
+  <g fill="#444" text-anchor="middle">
+    <line x1="70" y1="145" x2="70" y2="155" stroke="#444"/><text x="70" y="172">947</text>
+    <line x1="330" y1="145" x2="330" y2="155" stroke="#444"/><text x="330" y="172">1010</text>
+    <line x1="590" y1="145" x2="590" y2="155" stroke="#444"/><text x="590" y="172">1073</text>
+  </g>
+  <text x="330" y="192" text-anchor="middle" fill="#666">complementary-factor order  (Hasse interval p+1 ± 2√p)</text>
+  <!-- complement spectrum band: min 948 -> x=76.1, max 1072 -> x=577.9 -->
+  <rect x="76.1" y="108" width="501.8" height="26" fill="#c0392b" fill-opacity="0.18" stroke="#c0392b" stroke-dasharray="3 2"/>
+  <text x="327" y="102" text-anchor="middle" fill="#c0392b">63 distinct complement orders reached — 87 of 504 covers are smoother than the target</text>
+  <!-- target order 990 -> x = 70 + (990-946.5)/127*520 = 248.1 -->
+  <line x1="248.1" y1="92" x2="248.1" y2="208" stroke="#2c3e50" stroke-width="2"/>
+  <circle cx="248.1" cy="150" r="5" fill="#2c3e50"/>
+  <text x="248.1" y="86" text-anchor="middle" fill="#2c3e50" font-weight="bold">target 990</text>
+  <!-- reachable band: only same-order (isogenous) complements, at 990 -->
+  <text x="248.1" y="226" text-anchor="middle" fill="#27ae60">reachable (isogenous): 22 covers, all at order 990 — same hardness</text>
+  <text x="248.1" y="242" text-anchor="middle" fill="#8e44ad">easier AND reachable: 0</text>
+  <!-- verdict -->
+  <rect x="70" y="256" width="520" height="34" fill="#f7f7f7" stroke="#ddd"/>
+  <text x="80" y="271" fill="#333">The cover reaches many different-order, even smoother, curves —</text>
+  <text x="80" y="285" fill="#333">but φ₂∗φ₁* ≡ 0, so the discrete logarithm follows to none of them.</text>
+</svg>

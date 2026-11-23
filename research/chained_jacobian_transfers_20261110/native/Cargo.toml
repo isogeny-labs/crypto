@@ -1,0 +1,16 @@
+[package]
+name = "chained-jacobian-transfer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Deliberately standalone: toy fixed-field development checks need no registry.
+[workspace]
+
+[features]
+# The feature imports the unchanged repository Fp2 reference outside this crate.
+# CI/source manifests must include src/prime_hyperelliptic/fp2.rs as well.
+small-prime = []
+
+[lib]
+path = "src/lib.rs"

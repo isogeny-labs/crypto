@@ -1,0 +1,3 @@
+# Prospective bounded forest review
+
+Before inspecting producer source or selection: independently parse retained archive and recompute undirected edge insertion by x support, distinguish duplicates, repeated/nonsplit and degree skips, count vertices/components and test forest identity E=V-C. Check whether discarding parallel edges or sign patterns can remove graph constraints; do not equate simple-graph forest with absence of signed duplicate-cycle constraints without checking. Preserve all420dispositions and frozen cap. No generator, predecessor search, or scientific run. Source/manifest hashes checked and derivation recorded separately.

@@ -1,0 +1,35 @@
+import DivisorArrayAccess
+set_option autoImplicit false
+namespace DivisorArrayCopy
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem shape_of_normalized_valid (p : UInt64) (u v : List UInt64) [Fact p.toNat.Prime]
+ (f : Polynomial (ZMod p.toNat)) (hp : 1<p.toNat)
+ (hu : Canon p u) (hv : Canon p v) (hun : Normal u) (hvn : Normal v)
+ (hvalid : MumfordValidity.Valid f (wordsPoly p u) (wordsPoly p v)) : shape u v := by
+ have hu0 := hvalid.1.ne_zero
+ have hue : u≠[] := by intro h;apply hu0;simp [h,wordsPoly,listPoly]
+ have hud := ReductionWord.normal_natDegree p u hp hu hun hue
+ have hupos := List.length_pos_iff.mpr hue
+ have hd := hvalid.2.1
+ refine ⟨hue,by omega,?_⟩
+ by_cases hve : v=[]
+ · simp [hve];exact hupos
+ · have hv0 : wordsPoly p v≠0 := by intro hz;exact hve ((zero_iff_empty p v hv hvn).mp hz)
+   have hvd := ReductionWord.normal_natDegree p v hp hv hvn hve
+   have hvpos := List.length_pos_iff.mpr hve
+   have hlt := hvalid.2.2.1
+   rw [degree_eq_natDegree hv0,degree_eq_natDegree hu0,hvd,hud] at hlt
+   have hh : v.length-1<u.length-1 := by exact_mod_cast hlt
+   omega
+
+theorem normalized_valid_construct (p : UInt64) (u v : List UInt64) [Fact p.toNat.Prime]
+ (f : Polynomial (ZMod p.toNat)) (hp : 1<p.toNat)
+ (hu : Canon p u) (hv : Canon p v) (hun : Normal u) (hvn : Normal v)
+ (hvalid : MumfordValidity.Valid f (wordsPoly p u) (wordsPoly p v)) :
+ ∃ d, construct u v=some d ∧ d.degree≤2 ∧ d.u.size=3 ∧ d.v.size=2 ∧
+ d.canonical p ∧ up d=u ∧ vp d=v ∧
+ wordsPoly p (up d)=wordsPoly p u ∧ wordsPoly p (vp d)=wordsPoly p v ∧
+ MumfordValidity.Valid f (wordsPoly p (up d)) (wordsPoly p (vp d)) :=
+ construct_valid p u v f (by omega) (shape_of_normalized_valid p u v f hp hu hv hun hvn hvalid) hu hv hvn hvalid
+end DivisorArrayCopy

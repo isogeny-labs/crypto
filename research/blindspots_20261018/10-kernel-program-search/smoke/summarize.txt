@@ -1,0 +1,19 @@
+== n=31 (ell from file; negatives 8, positives 8) ==
+prog   B_r     phi core/neg |       Q(w=0)     Q(w=0.1)       Q(w=1) | natural found
+A      236   1.000 18551821 |     3.9390e3     4.1622e3     6.1711e3 | 0/8
+A1     236   1.000  3959257 |     8.4065e2     8.8821e2     1.3163e3 | 0/8
+B      252   0.625  1957315 |     5.8511e2     6.1892e2     9.2322e2 | 0/8
+C      258   0.875  1300456 |     2.6510e2     2.8017e2     4.1580e2 | 0/8
+P      260   0.375  2068352 |     9.6716e2     1.0228e3     1.5231e3 | 0/8
+  Q(B)/Q(A): w=0 0.149 [0.106,0.371]  w=0.1 0.149 [0.106,0.248]  w=1 0.150 [0.094,0.374]  -> better
+  Q(B)/Q(A1): w=0 0.696 [0.497,1.740]  w=0.1 0.697 [0.498,1.161]  w=1 0.701 [0.438,1.753]  -> straddles
+  Q(B)/Q(C): w=0 2.207 [1.314,5.518]  w=0.1 2.209 [1.315,4.208]  w=1 2.220 [1.359,5.551]  -> worse
+  Q(C)/Q(A): w=0 0.067 [0.059,0.094]  w=0.1 0.067 [0.059,0.094]  w=1 0.067 [0.059,0.094]  -> better
+  Q(C)/Q(A1): w=0 0.315 [0.276,0.441]  w=0.1 0.315 [0.276,0.442]  w=1 0.316 [0.276,0.442]  -> better
+  Q(A1)/Q(A): w=0 0.213 [0.213,0.213]  w=0.1 0.213 [0.213,0.213]  w=1 0.213 [0.213,0.213]  -> better
+  Q(P)/Q(A): w=0 0.246 [0.123,0.737]  w=0.1 0.246 [0.147,0.737]  w=1 0.247 [0.123,0.740]  -> better
+  null (A first half / second half): 1.000 [1.000,1.000] 1.000 [1.000,1.000] 1.000 [1.000,1.000] interval covers 1 at all weights: true
+  cell verdict by the frozen rule: MATCHES (B vs A: Some("better"), B vs C: Some("worse"))
+overall verdict: MATCHES; per cell [(31, "MATCHES")]
+search positive control (arm p, n=31): best 6.1365e2, handicapped start 1.5505e4, incumbent 4.1622e3 -> PASS
+yield model (kappa = -ln(1-rate)/T_eff at the conservation cell), median over sub families 9.6963e-5

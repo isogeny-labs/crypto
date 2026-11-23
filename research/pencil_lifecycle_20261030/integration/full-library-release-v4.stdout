@@ -1,0 +1,148 @@
+
+running 5780 tests
+i....iiiiii..............................i......................................i...... 87/5780
+..............................................................................iiii...i. 174/5780
+.......i.............i...i.........................i.....i.......i..................... 261/5780
+......................................i...................i............................ 348/5780
+.............................i......................................................... 435/5780
+...................... 457/5780
+cryptanalysis::binary_semaev_chain_sat::tests::source_bound_covers_degree_83_without_constructing_a_model --- FAILED
+....................................................................................... 545/5780
+............................................................iiiiii.......i............. 632/5780
+....................................................................................... 719/5780
+....................................................................................... 806/5780
+....................................................................................... 893/5780
+....................................................................................... 980/5780
+....................................................i.................................. 1067/5780
+....................................................................................... 1154/5780
+....................................................................................... 1241/5780
+................i...................................................................... 1328/5780
+....................................................................................... 1415/5780
+....................................................................................... 1502/5780
+............i.......................................................................... 1589/5780
+....................................................................................... 1676/5780
+....................................................................................... 1763/5780
+....................................................................................... 1850/5780
+..........................................ii.i...................................i..... 1937/5780
+.............................i......................i.................i..ii............ 2024/5780
+....................................................................................... 2111/5780
+............................................i............................i..........i.. 2198/5780
+......................i................................................................ 2285/5780
+..................................................................i.......i............ 2372/5780
+.............test cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies has been running for over 60 seconds
+............i....i........................................................ 2459/5780
+..................................................................
+running 1 test
+test cryptanalysis::koblitz_groebner::checkpoint::tests::solver_checkpoint_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5779 filtered out; finished in 0.00s
+
+....................i 2546/5780
+iii....................i............................................................... 2633/5780
+.. 2635/5780
+cryptanalysis::koblitz_index_calculus::tests::chained_s3_four_to_six_summands_lift_on_the_original_curve --- FAILED
+cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits --- FAILED
+.. 2639/5780
+cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve --- FAILED
+....................................................................................... 2727/5780
+..i.....i............i................................................................. 2814/5780
+............................................i............i......................test cryptanalysis::koblitz_sym_s4::tests::symmetric_solver_agrees_with_chain_and_brute_force has been running for over 60 seconds
+....... 2901/5780
+....................................................................................... 2988/5780
+....................................................................i.................. 3075/5780
+....................................................................i.................. 3162/5780
+....................................................................................iii 3249/5780
+iiiiiii..iiii.iiiiiii...............ii.............................................test cryptanalysis::partial_enlargement::tests::every_order_computes_the_same_closure has been running for over 60 seconds
+.i.. 3336/5780
+iii...........i...........i............................................................ 3423/5780
+.............i......................................................................... 3510/5780
+....................................i.................................................. 3597/5780
+........................i....i......................................................... 3684/5780
+....................................................i.................................. 3771/5780
+............................................i......i........................ii......... 3858/5780
+....................................................................................... 3945/5780
+...iii........ii.....................i.....................................i........... 4032/5780
+..................i............................................................i..i...i 4119/5780
+.....i..ii............................................................................. 4206/5780
+....................................................................................... 4293/5780
+....................................................................................... 4380/5780
+...............................i....................................................... 4467/5780
+....................................................................................... 4554/5780
+..........................i............................................................ 4641/5780
+....................................................................................... 4728/5780
+....................................................................................... 4815/5780
+......... 4824/5780
+ml_dataset::restore::tests::native_budgeted_restore_retains_failed_attempt_and_retries_with_read_debits --- FAILED
+.........................................i............................................. 4912/5780
+. 4913/5780
+ml_dataset::storage::tests::resumed_publication_rejects_same_size_remote_corruption_without_overwrite --- FAILED
+ml_dataset::storage::tests::native_budgeted_publication_resume_catalog_lab_receipt_and_fetch_share_debits --- FAILED
+.................
+running 1 test
+test ml_dataset::telemetry::checked::tests::fifo_replacement_is_rejected_without_waiting_for_writer ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5779 filtered out; finished in 0.00s
+
+...................................................................... 5002/5780
+....................................................................................... 5089/5780
+....................................................................................... 5176/5780
+.............................................................i......................... 5263/5780
+....................................................................................... 5350/5780
+....................................................................................... 5437/5780
+....................................................................................... 5524/5780
+.......................................iii............................................. 5611/5780
+...................i.....................................................i...i......... 5698/5780
+..................................................................................
+failures:
+
+---- cryptanalysis::binary_semaev_chain_sat::tests::source_bound_covers_degree_83_without_constructing_a_model stdout ----
+
+thread 'cryptanalysis::binary_semaev_chain_sat::tests::source_bound_covers_degree_83_without_constructing_a_model' (552502) panicked at src/cryptanalysis/binary_semaev_chain_sat.rs:1105:9:
+assertion `left == right` failed
+  left: Some(190568)
+ right: None
+
+---- cryptanalysis::koblitz_index_calculus::tests::chained_s3_four_to_six_summands_lift_on_the_original_curve stdout ----
+
+thread 'cryptanalysis::koblitz_index_calculus::tests::chained_s3_four_to_six_summands_lift_on_the_original_curve' (596260) panicked at src/cryptanalysis/koblitz_index_calculus.rs:16847:51:
+m=4: ChainS3Stats { patterns_attempted: 0, patterns_refuted: 0, solver_calls: 0, models: 0, group_rejected_models: 0, invalid_models: 0, conflicts: 0, peak_variables: 0, peak_clauses: 0, peak_xors: 0, domain_clauses: 0, refuted: false, exhausted: true }
+
+---- cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits stdout ----
+
+thread 'cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits' (596261) panicked at src/cryptanalysis/koblitz_index_calculus.rs:16943:45:
+m=4, ordered=false: ChainS3Stats { patterns_attempted: 0, patterns_refuted: 0, solver_calls: 0, models: 0, group_rejected_models: 0, invalid_models: 0, conflicts: 0, peak_variables: 0, peak_clauses: 0, peak_xors: 0, domain_clauses: 0, refuted: false, exhausted: true }
+
+---- cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve stdout ----
+
+thread 'cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve' (596264) panicked at src/cryptanalysis/koblitz_index_calculus.rs:17006:13:
+assertion `left == right` failed: m=4: KoblitzIcReport { factor_base_size: 14, orbit_count: 1, ell: 7, relations: 0, independent_relations: 0, dependent_relations: 0, inconsistent_relations: 0, verification_failures: 0, trials: 16, log: None, reductions: 0, infeasible_branches: 0, sat_calls: 0, sat_refutations: 0, sat_unknowns: 15, sat_invalid_models: 0, sat_group_rejected_models: 0, sat_models: 0, sat_conflicts: 0, relation_collection_ns: 25986, linear_algebra_ns: 439, linear_solve_attempts: 1, collapse_negation: true, relation_batch_size: 1, relation_batches: 16, direct_relation: false, direct_relations_skipped: 1, m_cofactor_admissible: true, collapse_projected_orbits: false, projected_orbit_construction_ns: 81, cofactor_admission_ns: 14570, pair_table_entries: 0, pair_table_ns: 0, attempt_records: [KoblitzRelationAttemptRecord { trial: 1, coefficient_a: 16, coefficient_b: 14, target: Infinity, disposition: DirectSkipped, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 2, coefficient_a: 21, coefficient_b: 14, target: Affine { x: F2mElement { bits: [102], m: 7 }, y: F2mElement { bits: [115], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 3, coefficient_a: 10, coefficient_b: 19, target: Affine { x: F2mElement { bits: [80], m: 7 }, y: F2mElement { bits: [87], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 4, coefficient_a: 15, coefficient_b: 12, target: Affine { x: F2mElement { bits: [12], m: 7 }, y: F2mElement { bits: [29], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 5, coefficient_a: 25, coefficient_b: 17, target: Affine { x: F2mElement { bits: [124], m: 7 }, y: F2mElement { bits: [68], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 6, coefficient_a: 4, coefficient_b: 3, target: Affine { x: F2mElement { bits: [40], m: 7 }, y: F2mElement { bits: [59], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 7, coefficient_a: 27, coefficient_b: 27, target: Affine { x: F2mElement { bits: [30], m: 7 }, y: F2mElement { bits: [66], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 8, coefficient_a: 24, coefficient_b: 9, target: Affine { x: F2mElement { bits: [12], m: 7 }, y: F2mElement { bits: [29], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 9, coefficient_a: 1, coefficient_b: 14, target: Affine { x: F2mElement { bits: [98], m: 7 }, y: F2mElement { bits: [104], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 10, coefficient_a: 21, coefficient_b: 18, target: Affine { x: F2mElement { bits: [76], m: 7 }, y: F2mElement { bits: [50], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 11, coefficient_a: 7, coefficient_b: 19, target: Affine { x: F2mElement { bits: [108], m: 7 }, y: F2mElement { bits: [123], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 12, coefficient_a: 8, coefficient_b: 9, target: Affine { x: F2mElement { bits: [108], m: 7 }, y: F2mElement { bits: [123], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 13, coefficient_a: 18, coefficient_b: 19, target: Affine { x: F2mElement { bits: [76], m: 7 }, y: F2mElement { bits: [50], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 14, coefficient_a: 25, coefficient_b: 15, target: Affine { x: F2mElement { bits: [76], m: 7 }, y: F2mElement { bits: [126], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 15, coefficient_a: 23, coefficient_b: 19, target: Affine { x: F2mElement { bits: [12], m: 7 }, y: F2mElement { bits: [29], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }, KoblitzRelationAttemptRecord { trial: 16, coefficient_a: 15, coefficient_b: 8, target: Affine { x: F2mElement { bits: [46], m: 7 }, y: F2mElement { bits: [112], m: 7 } }, disposition: Unknown, decomposition_indices: None, solver_calls: 0, models: 0, conflicts: 0, implied_rows: 0 }], relation_matrix: [], matrix_rows: 0, matrix_columns: 2, terminal_matrix_rank: 0, rank_checks: 1, rank_history: [KoblitzRankRecord { rows: 0, columns: 2, rank: 0, candidate_produced: false, candidate_verified: false }] }
+  left: None
+ right: Some(3)
+
+---- ml_dataset::restore::tests::native_budgeted_restore_retains_failed_attempt_and_retries_with_read_debits stdout ----
+
+thread 'ml_dataset::restore::tests::native_budgeted_restore_retains_failed_attempt_and_retries_with_read_debits' (606856) panicked at src/ml_dataset/restore.rs:737:10:
+called `Result::unwrap()` on an `Err` value: "sha256/c7/c7ceb2d2c1e66eb9d160bb78ca7f47bcc7633d22a0a9cc45f3ff71424358537b: existing remote object has 459 bytes and digest None; expected 459 bytes and c7ceb2d2c1e66eb9d160bb78ca7f47bcc7633d22a0a9cc45f3ff71424358537b"
+
+---- ml_dataset::storage::tests::resumed_publication_rejects_same_size_remote_corruption_without_overwrite stdout ----
+
+thread 'ml_dataset::storage::tests::resumed_publication_rejects_same_size_remote_corruption_without_overwrite' (607005) panicked at src/ml_dataset/storage.rs:1552:9:
+sha256/be/bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721: existing remote object has mismatched size or digest; refusing overwrite
+
+---- ml_dataset::storage::tests::native_budgeted_publication_resume_catalog_lab_receipt_and_fetch_share_debits stdout ----
+
+thread 'ml_dataset::storage::tests::native_budgeted_publication_resume_catalog_lab_receipt_and_fetch_share_debits' (606997) panicked at src/ml_dataset/storage.rs:1084:10:
+called `Result::unwrap()` on an `Err` value: "sha256/be/bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721: existing remote object has 6 bytes and digest None; expected 6 bytes and bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721"
+
+
+failures:
+    cryptanalysis::binary_semaev_chain_sat::tests::source_bound_covers_degree_83_without_constructing_a_model
+    cryptanalysis::koblitz_index_calculus::tests::chained_s3_four_to_six_summands_lift_on_the_original_curve
+    cryptanalysis::koblitz_index_calculus::tests::chained_s3_frobenius_domain_lifts_and_rejects_incomplete_orbits
+    cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve
+    ml_dataset::restore::tests::native_budgeted_restore_retains_failed_attempt_and_retries_with_read_debits
+    ml_dataset::storage::tests::native_budgeted_publication_resume_catalog_lab_receipt_and_fetch_share_debits
+    ml_dataset::storage::tests::resumed_publication_rejects_same_size_remote_corruption_without_overwrite
+
+test result: FAILED. 5649 passed; 7 failed; 124 ignored; 0 measured; 0 filtered out; finished in 1005.83s
+

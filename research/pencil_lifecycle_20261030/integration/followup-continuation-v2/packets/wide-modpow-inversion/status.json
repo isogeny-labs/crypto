@@ -1,0 +1,339 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1154",
+  "main_declarations": 20,
+  "control_declarations": 18,
+  "readback": [
+    {
+      "name": "WideModPow.product_fits",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.wideMul_value",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.wideMul_canonical",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.wideMul_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.half_value",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WideModPow.lowbit_zero",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.nextR_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.nextA_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.binary_step",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.next_step",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.nextR_canonical",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.nextA_canonical",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.loop_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.modpow_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.fermat",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.inverse_exponent",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.generator_product",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.generator_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.generator_witness",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPow.generated_update_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.wide_overflow_control",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WideModPowControls.narrow_overflow_control",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WideModPowControls.maximum_product",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WideModPowControls.inverse_two",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.inverse_one",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.inverse_negative_one",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.exponent_zero",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.exponent_one",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.zero_base",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.full_width_exponent",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.full_width_odd_sign",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.generated_certificate",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.generated_slot",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.composite_generator",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.composite_not_certificate",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WideModPowControls.zero_modulus_excluded",
+      "axioms": []
+    },
+    {
+      "name": "WideModPowControls.modulus_one_excluded",
+      "axioms": []
+    },
+    {
+      "name": "WideModPowControls.zero_input_excluded",
+      "axioms": []
+    }
+  ],
+  "claims": [
+    {
+      "claim": "widened multiplication equals exact modular product",
+      "domain": "UInt64 operands; positive modulus",
+      "model": "BitVec128 products/remainders then UInt64 narrowing"
+    },
+    {
+      "claim": "binary modpow canonical and decodes to power",
+      "domain": "1<p; canonical base; arbitrary UInt64 exponent",
+      "fuel": 64
+    },
+    {
+      "claim": "inverse generator canonical and decodes to inverse",
+      "domain": "prime p;1<p; canonical nonzero input"
+    },
+    {
+      "claim": "generated InverseWitness and composed coefficient update",
+      "domain": "preceding hypotheses plus p<2^31; canonical coefficient inputs;0<=j<=k<=5"
+    }
+  ],
+  "independent_source_fidelity_review": "pending",
+  "compiled_rust_equivalence": "not established",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "attempts": {
+    "attempt1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "attempt2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "inversion1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "inversion2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "inversion3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "job": {
+    "command": [
+      "/opt/minors/entry.sh",
+      "12"
+    ],
+    "cpu": 12,
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:72934ab9ea2d9d93c50088972aca1924cfde23af87755cd8a802a04f6254dd4c",
+    "isolation_profile": "standard",
+    "job_name": "minors-gd-panel-20261108-b",
+    "memory": "32Gi",
+    "retries": 0,
+    "seconds": 43200,
+    "wait_seconds": 60
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "note": "r2img 2026-11-08. One Job runs the frozen run_panel.sh unchanged (48 shards, xargs -P 14), merges, runs minors_gd_analyze.py, uploads panel/ + SHA256SUMS to ISOLAB_RESULTS_URI (synced every 600 s). Planned 25-55 core-h => about 2-4 h on 14 vCPU; seconds=43200. Counts are deterministic; wall times informational. Relaunch B (2026-11-08): cpu 14 -> 12 and JOBS 14 -> 12, because a 14 vCPU pod (14180m with daemonsets) cannot fit the 14000m allocatable of a 16 vCPU cpu-spot node; see eks/RELAUNCH_B.md. Everything else identical.",
+    "protocol_sha256": "8f4f85b43546bf57efe7bca78aa7ef3bc83d6bd70ebe885c3f51e14d23764ebd",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "minors_guess_determine_20261107"
+  },
+  "schema": "isolab.eks.command-request/v1"
+}

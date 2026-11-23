@@ -1,0 +1,48 @@
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:7:89: error: Tactic `decide` failed for proposition
+  test 17 [0, 0, 0, 0, 0, 1] StoredControls.paddedIdentity = true
+because its `Decidable` instance
+  instDecidableEqBool (test 17 [0, 0, 0, 0, 0, 1] StoredControls.paddedIdentity) true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match test 17 [0, 0, 0, 0, 0, 1] StoredControls.paddedIdentity, true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:13:76: error: Tactic `decide` failed for proposition
+  test 17 [1] { degree := 1, u := #[0, 1, 0], v := #[0, 0] } = false
+because its `Decidable` instance
+  instDecidableEqBool (test 17 [1] { degree := 1, u := #[0, 1, 0], v := #[0, 0] }) false
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match test 17 [1] { degree := 1, u := #[0, 1, 0], v := #[0, 0] }, false with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:15:66: error: Tactic `decide` failed for proposition
+  test 17 [] { degree := 1, u := #[0, 1, 0], v := #[0, 0] } = true
+because its `Decidable` instance
+  instDecidableEqBool (test 17 [] { degree := 1, u := #[0, 1, 0], v := #[0, 0] }) true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match test 17 [] { degree := 1, u := #[0, 1, 0], v := #[0, 0] }, true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/pencil-stored-valid-wrapper-20261101-v1/StoredValidControls.lean:30:3: error: Tactic `decide` failed for proposition
+  test 17 [] { degree := 0, u := #[1, 17, 0], v := #[0, 0] } = true
+because its `Decidable` instance
+  instDecidableEqBool (test 17 [] { degree := 0, u := #[1, 17, 0], v := #[0, 0] }) true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match test 17 [] { degree := 0, u := #[1, 17, 0], v := #[0, 0] }, true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯

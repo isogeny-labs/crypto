@@ -1,0 +1,17 @@
+/var/tmp/pencil-mixed-positive-word-20261031-v1/WordPositive.lean:38:30: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod p.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/WordPositive.lean:38:64: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fact (Nat.Prime p.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-mixed-positive-word-20261031-v1/WordPositive.lean:38:57: error: Application type mismatch: The argument
+  f
+has type
+  @Polynomial (ZMod p.toNat) (@CommSemiring.toSemiring (ZMod p.toNat) CommRing.toCommSemiring)
+but is expected to have type
+  @Polynomial (ZMod p.toNat) (@CommSemiring.toSemiring (ZMod p.toNat) Field.toSemifield.toCommSemiring)
+in the application
+  MixedCancellation.validTwo f
+/var/tmp/pencil-mixed-positive-word-20261031-v1/WordPositive.lean:101:9: error(lean.unknownIdentifier): Unknown identifier `positive_valid_transport`

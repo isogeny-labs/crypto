@@ -1,0 +1,17 @@
+{
+  "inputs": {
+    "feature-native-multiseed-factor/transport.rs": "febd9e54445d77431878281ff1af74214538419d4443f34e2c3016eae6031848",
+    "feature-native-multiseed-factor/lib.rs": "7e5251112aca77c94851245bb6c1986ff6dbf9ef86f0d5013f8736c2757e9c34",
+    "feature-native-batch-reciprocals/lib.rs": "6460bc9a0ed543f13af0fa3251c5d00e8a4e5bcc6cdc480f62f07e51420123b0"
+  },
+  "outputs": {
+    "transport.rs": "75da9fd4af2680da8765cd432a1ab914514d2fdb59f88eaf88c685aed5dc80ad",
+    "source.rs": "cc063529b5b23f6aed6eeea437663f6722e8ab471a3b686dbc64c7cd9aad3234",
+    "lib.rs": "5b5ad35b814c5a465bdfdd0a4a7938571f2e93d5d92740e2cbde28a773fcc9f0"
+  },
+  "changes": [
+    "transport begin retains geometry tail, last two column vectors and middle x coordinates; budget covers initial plus extra rows",
+    "consumer gains begin, advance, skip_sign with shared normalization and test-only counters",
+    "quartic program construction/evaluation unchanged; source adapter gains explicit limits and initial-work fields"
+  ]
+}

@@ -1,0 +1,10 @@
+[package]
+name="hec-learn-eigenvalue"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="learn-eigenvalue"
+path="../main.rs"

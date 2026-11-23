@@ -1,0 +1,83 @@
+import Transport
+import Mathlib.Data.Nat.Choose.Sum
+set_option autoImplicit false
+namespace AffineCoefficientLoop
+open Polynomial MumfordNormalization
+variable {K : Type*} [Field K]
+noncomputable def term (k j : ℕ) (c a b s : K) : K[X] :=
+ C (c*((k.choose j : K)*(a^j*b^(k-j)))*s⁻¹)*X^j
+noncomputable def row (k : ℕ) (c a b s : K) : K[X] :=
+ ∑ j ∈ Finset.range (k+1),term k j c a b s
+
+theorem row_equation (k : ℕ) (c a b s : K) :
+ row k c a b s=C (c*s⁻¹)*(affine a b)^k := by
+ rw [row,affine,add_pow,Finset.mul_sum]
+ apply Finset.sum_congr rfl
+ intro j hj
+ have hc : (k.choose j : K[X])=C (k.choose j : K) := by simp
+ rw [hc]
+ simp only [term,map_mul,map_pow,mul_pow]
+ ring
+
+noncomputable def inner (k : ℕ) (c a b s : K) (out : K[X]) : ℕ → K[X]
+ | 0 => out
+ | m+1 => inner k c a b s out m+term k m c a b s
+
+theorem inner_prefix (k m : ℕ) (c a b s : K) (out : K[X]) :
+ inner k c a b s out m=out+∑ j ∈ Finset.range m,term k j c a b s := by
+ induction m with
+ | zero => simp [inner]
+ | succ m ih => simp only [inner,ih,Finset.sum_range_succ]; ring
+
+theorem inner_complete (k : ℕ) (c a b s : K) (out : K[X]) :
+ inner k c a b s out (k+1)=out+C (c*s⁻¹)*(affine a b)^k := by
+ rw [inner_prefix]
+ exact congrArg (out+·) (row_equation k c a b s)
+
+theorem slot_update (out : K[X]) (t : K) (i j : ℕ) :
+ (out+C t*X^j).coeff i=out.coeff i+if i=j then t else 0 := by
+ simp [coeff_C_mul,coeff_X_pow,eq_comm]
+
+noncomputable def sourcePoly (c : ℕ → K) (n : ℕ) : K[X] :=
+ ∑ k ∈ Finset.range n,C (c k)*X^k
+noncomputable def outer (c : ℕ → K) (a b s : K) : ℕ → K[X]
+ | 0 => 0
+ | n+1 => inner n (c n) a b s (outer c a b s n) (n+1)
+
+theorem outer_equation (c : ℕ → K) (a b s : K) (n : ℕ) :
+ outer c a b s n=C s⁻¹*(sourcePoly c n).comp (affine a b) := by
+ induction n with
+ | zero => simp [outer,sourcePoly]
+ | succ n ih =>
+  rw [outer,inner_complete,ih]
+  simp only [sourcePoly,Finset.sum_range_succ,add_comp,mul_comp,C_comp,pow_comp,X_comp]
+  rw [map_mul]
+  ring
+
+def chooseLoop (n k : ℕ) : ℕ := (List.range k).foldl (fun x i => x*(n-i)/(i+1)) 1
+
+theorem choose_small : ∀ n k : Fin 6, k.val≤n.val → chooseLoop n.val k.val=n.val.choose k.val := by decide
+
+theorem choose_product_bound : ∀ n i : Fin 6, i.val<n.val → chooseLoop n.val i.val*(n.val-i.val)≤30 := by decide
+
+theorem choose_denominator_positive (i : ℕ) : 0<i+1 := by omega
+
+theorem choose_product_fits_word : (30:ℕ)<2^64 := by norm_num
+theorem outer_is_T (c : ℕ → K) (a b : K) (m n : ℕ) :
+ outer c a b (a^m) n=T m a b (sourcePoly c n) := by
+ exact outer_equation c a b (a^m) n
+
+theorem trim_last_zero (c : ℕ → K) (n : ℕ) (h : c n=0) :
+ sourcePoly c (n+1)=sourcePoly c n := by
+ simp [sourcePoly,Finset.sum_range_succ,h]
+
+theorem loop_index_bounds (n k j : ℕ) (hk : k<n) (hj : j<k+1) :
+ j<n ∧ j≤k ∧ k-j+j=k := by omega
+
+def chooseWord (n k : ℕ) : UInt64 :=
+ (List.range k).foldl (fun (x : UInt64) i => x*UInt64.ofNat (n-i)/UInt64.ofNat (i+1)) 1
+
+theorem choose_word_small : ∀ n k : Fin 6, k.val≤n.val →
+ (chooseWord n.val k.val).toNat=n.val.choose k.val := by decide
+
+end AffineCoefficientLoop

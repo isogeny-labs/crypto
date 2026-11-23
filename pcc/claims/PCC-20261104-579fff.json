@@ -1,0 +1,34 @@
+{
+ "created_at": "2026-11-04T05:42:40Z",
+ "id": "PCC-20261104-579fff",
+ "kind": "measurement",
+ "producer": {
+  "commit": "40dbfbd4810eb47d37acdf10fab7854aba6f1a52",
+  "model": "",
+  "session": "scripts/pcc_leaderboard_claims.py"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/ic_tool_program/rule/v7/replay-certificate.json",
+   "sha256": "517e996cd8092957570c73ebfd735ae28b92a4f92e3fb36ea6220c998b2f75d5"
+  },
+  {
+   "evidence_dir": "research/ic_tool_program/rule/v7",
+   "kind": "recompute",
+   "path": "research/ic_tool_program/rule/v7/validator-report.json",
+   "sha256": "69481518bb30fd070b4be7f0387b6f9a89b20112982efd4ad2f3f3d27676bed6"
+  }
+ ],
+ "row": {
+  "board_key": "board:icv1-f2m47-t22705043-f4e44623:research/ic_tool_program/rule/v7/analysis.json",
+  "row_digest": "405b7c06054ff8fd1c2de98edaf16ffaeecbc8c0235785dbff8cc3c105c45496",
+  "slug": "icv1-f2m47-t22705043-f4e44623",
+  "source": "research/ic_tool_program/rule/v7/analysis.json",
+  "supersedes": null,
+  "table": "A"
+ },
+ "schema": "pcc.claim/v1",
+ "scope": "one leaderboard row as built by scripts/build_ic_leaderboard.py from research/ic_tool_program/rule/v7/analysis.json; validated under docs/VALIDATION_GATE.md by research/ic_tool_program/rule/v7/VALIDATION.json (rho reference kind negation_frobenius, order holds across the 0/0.1/1 GAE band: True)",
+ "statement": "Index-calculus leaderboard Table A, row icv1-f2m47-t22705043-f4e44623 (K_1 / GF(2^47), koblitz regime, log2 r = 36.64): recipe koblitz_one_target costs S = 6.02893 per sqrt(r) (setup 5.96942, online 0.0595049); the matched rho reference costs S = 1.75773; cold IC/rho = 3.42996 (bootstrap 95% CI 3.15967 to 3.74923); online rho/IC = 22.5922. The gap to matched rho is the distance remaining, not a speedup."
+}

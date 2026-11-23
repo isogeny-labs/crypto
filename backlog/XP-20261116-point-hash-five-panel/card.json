@@ -1,0 +1,107 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261116-point-hash-five-panel",
+  "title": "Matched evaluation of five native point-hash collection paths",
+  "created": "2026-11-16",
+  "authors": [
+    "point-hashing research lane"
+  ],
+  "status": "blocked",
+  "status_note": "Implementation PRs are published; no scientific panel driver/protocol or current-source checkpoint transport has been admitted. This card is not runnable or published to cairn.",
+  "blocked_on": [
+    "pr:4408 native Crypto implementation qualification",
+    "url:https://github.com/isogeny-labs/cryptanalysis/pull/1626 mirror qualification",
+    "note:Freeze exact standard prime-panel inputs, seeds, matched arm order, complete cost accounting, thresholds and independent replay before ready promotion.",
+    "note:Fresh source-bound checkpoint S3 upload/readback and authenticated native image/execution/L2 admission. Current checkpoint gate cannot select an upload transport."
+  ],
+  "links": {
+    "lead": "research/point_hash_five_leads_20261116/reports/REPORT.md",
+    "notes": [
+      "research/point_hash_five_leads_20261116/README.md"
+    ],
+    "prs": [
+      4408
+    ]
+  },
+  "question": "Which individual lead or composition lowers complete relation-collection cost and preserves useful relation yield on the fixed prime panel?",
+  "decision_value": "A qualified reduction against the joint prepared control selects a new baseline at the measured scope. Null, slower, memory-limited or low-yield arms retain their failures and inform the next component change. Local correctness controls cannot decide this comparison.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "lane/point-hash-five-leads",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--bin",
+        "hashed-ecdl"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 16,
+    "disk_gb": 32,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Proposed native L2 shape only; no measured cost estimate. First-pilot USD10 authorization persists. Freeze the finite request ceiling and retain all attempts before launch; unknown account/lane headroom alone does not revoke the owner override."
+  },
+  "run": {
+    "argv": [
+      "point-hash-five-panel-driver-pending",
+      "--out",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 900
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "pending-reviewed-panel-schema",
+    "verify": [],
+    "land": "research/point_hash_five_leads_20261116"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unselected",
+    "tasks": [
+      "XP-20261116-point-hash-five-panel"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "native-point-hash-five",
+      "recipe": "Not provisioned: bind the reviewed merged native source and digest-pinned image after all admission passes."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 16384,
+      "timeout_s": 900,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261116-point-hash-five-panel"
+    },
+    "notes": "The named panel driver and result schema are explicit missing implementation, not an available command. No remote funding, task publication or lease was created.",
+    "funding": {
+      "units": 65536,
+      "rationale": "Priority proposal below existing seed cards, matching other blocked native follow-ups; no remote allocation or new spending authorization."
+    }
+  },
+  "owner_hint": "native point-hashing research"
+}

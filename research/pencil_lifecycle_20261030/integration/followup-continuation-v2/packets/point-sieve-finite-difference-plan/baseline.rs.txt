@@ -1,0 +1,145 @@
+fn point_sieve_candidates(d: Divisor, h: &[u64], p: u64, rational_y: &[Vec<u64>]) -> SieveResult {
+    let mut buckets = vec![Vec::<u64>::new(); p as usize];
+    meter::collection(0, 0, p as usize, 0);
+    let mut point_probes = 0;
+    let mut denominators = Vec::new();
+    let mut exceptional_denominators = Vec::new();
+    let mut exceptional_points = Vec::new();
+    let mut all_lambda_points = Vec::new();
+    let u = &d.u[..=d.degree];
+    let v = &d.v[..d.degree];
+    let (q0, _) = complement(d, 0, h, p);
+    let mut exceptional = TrackedSet::new();
+    for x in 0..p {
+        let ux = peval(u, x, p);
+        let vx = peval(v, x, p);
+        meter::collection(0, 0, 0, 1);
+        if ux == 0 {
+            // q_lambda = q_0 + 2 lambda v + lambda^2 u.  At a root
+            // of u, this is linear in lambda even for a double root.
+            let qx = peval(&q0, x, p);
+            let slope = mul(2, vx, p);
+            meter::collection(0, 0, 0, 1 + usize::from(slope == 0));
+            if slope != 0 {
+                exceptional_denominators.push((x, qx, slope));
+                meter::collection(0, 0, 1, 0);
+            } else if qx == 0 {
+                exceptional.extend(0..p);
+                all_lambda_points.push(x);
+                meter::collection(0, 0, 1, 0);
+            }
+            continue;
+        }
+        meter::collection(1, 0, 0, 1);
+        if rational_y[x as usize].is_empty() {
+            continue;
+        }
+        denominators.push((x, ux, vx));
+        meter::collection(0, 0, 1, 0);
+    }
+    let ordinary_count = denominators.len();
+    let all_denominators: Vec<u64> = denominators
+        .iter()
+        .map(|&(_, ux, _)| {
+            meter::collection(1, 1, 0, 0);
+            ux
+        })
+        .chain(exceptional_denominators.iter().map(|&(_, _, slope)| {
+            meter::collection(1, 1, 0, 0);
+            slope
+        }))
+        .collect();
+    let mut prefix = vec![1; all_denominators.len() + 1];
+    meter::collection(0, 0, prefix.len(), 0);
+    let mut batch_multiplies = 0;
+    for (i, &d) in all_denominators.iter().enumerate() {
+        meter::collection(2, 0, 0, 0);
+        prefix[i + 1] = mul(prefix[i], d, p);
+        batch_multiplies += 1;
+    }
+    meter::collection(0, 0, 0, 2);
+    let batch_inversions = usize::from(!all_denominators.is_empty());
+    let mut suffix = if all_denominators.is_empty() {
+        1
+    } else {
+        meter::collection(1, 0, 0, 0);
+        pow(*prefix.last().unwrap(), p - 2, p)
+    };
+    for i in (0..all_denominators.len()).rev() {
+        meter::collection(3, 0, 0, 2); // denominator, prefix, selected tuple; inverse assertion and branch
+        let d_i = all_denominators[i];
+        let inv = mul(prefix[i], suffix, p);
+        suffix = mul(suffix, d_i, p);
+        batch_multiplies += 2;
+        assert_eq!(mul(inv, d_i, p), 1);
+        if i >= ordinary_count {
+            let (x, qx, _) = exceptional_denominators[i - ordinary_count];
+            let lambda = mul(sub(0, qx, p), inv, p);
+            exceptional.insert(lambda);
+            exceptional_points.push((lambda, x));
+            meter::collection(0, 0, 1, 0);
+            continue;
+        }
+        let (x, ux, vx) = denominators[i];
+        meter::collection(1, 0, 0, 1); // selected rational-y vector and inverse assertion
+        assert_eq!(mul(inv, ux, p), 1);
+        for &y in &rational_y[x as usize] {
+            meter::collection(1, 0, 0, 0);
+            point_probes += 1;
+            let lambda = mul(sub(y, vx, p), inv, p);
+            buckets[lambda as usize].push(x);
+            meter::collection(0, 0, 1, 0);
+        }
+    }
+    let collision_candidates = buckets
+        .iter()
+        .filter(|b| {
+            meter::collection(1, 0, 0, 1);
+            b.len() >= 3
+        })
+        .count();
+    let exceptional_count = exceptional.len();
+    let mut candidates = exceptional;
+    for (lambda, bucket) in buckets.iter().enumerate() {
+        meter::collection(1, 0, 0, 1);
+        if bucket.len() >= 3 {
+            meter::collection(0, 0, 0, 1); // duplicate cardinality assertion
+            assert_eq!(
+                bucket
+                    .iter()
+                    .map(|&x| {
+                        meter::collection(1, 1, 0, 0);
+                        x
+                    })
+                    .collect::<TrackedSet>()
+                    .len(),
+                bucket.len()
+            );
+            candidates.insert(lambda as u64);
+        }
+    }
+    for (lambda, x) in exceptional_points {
+        meter::collection(1, 0, 0, 0);
+        buckets[lambda as usize].push(x);
+        meter::collection(0, 0, 1, 0);
+    }
+    for x in all_lambda_points {
+        meter::collection(1, 0, 0, 0);
+        for bucket in &mut buckets {
+            meter::collection(1, 0, 0, 0);
+            bucket.push(x);
+            meter::collection(0, 0, 1, 0);
+        }
+    }
+    (
+        candidates,
+        ordinary_count,
+        exceptional_denominators.len(),
+        batch_inversions,
+        batch_multiplies,
+        point_probes,
+        collision_candidates,
+        exceptional_count,
+        buckets,
+    )
+}

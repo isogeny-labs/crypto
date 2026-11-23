@@ -1,0 +1,26 @@
+   Compiling version_check v0.9.5
+   Compiling typenum v1.20.1
+   Compiling cpufeatures v0.2.17
+   Compiling cfg-if v1.0.5
+   Compiling generic-array v0.14.7
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling torus-section-search v0.1.0 (/workspace/isogeny-labs/crypto-exponent-ideas-20261117/tools/torus-section-search)
+    Finished `release` profile [optimized] target(s) in 7.34s
+     Running unittests src/lib.rs (tools/torus-section-search/target/release/build/torus-section-search/b392e470a6b73c0f/out/torus_section_search-b392e470a6b73c0f)
+
+running 9 tests
+test identity::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity::tests::tampering_with_the_digest_is_detected ... ok
+test identity::tests::schoenhage_identity_certifies_and_checks ... ok
+test identity::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

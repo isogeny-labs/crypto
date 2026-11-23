@@ -1,0 +1,33 @@
+name: Independent S3 arithmetic validation
+# Research dispatch only, per AGENTS.md. No pull-request/feature push trigger.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: independent-s3-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rust-independent-check:
+    # Standard public runner only: no configured EKS, larger runner or GPU.
+    if: ${{ github.repository == 'isogeny-labs/crypto' && github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/independent_s3_validator_20261109/
+            /research/theorem_census_20261109/evidence/semaev-native.jsonl
+            /.github/workflows/theorem-audit-independent-s3.yml
+      - name: Compile distinct Rust arithmetic and compare all prime-field S3 models
+        env:
+          S3_VALIDATOR_ARM: github-hosted
+        run: |
+          bash research/independent_s3_validator_20261109/run-driver.sh "$RUNNER_TEMP/independent-s3-result"
+      # Evidence stays in the public job log; no artifact/cache upload or secrets.

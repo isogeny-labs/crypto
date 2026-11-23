@@ -1,0 +1,25 @@
+{
+  "schema": "twist.destination-discovery/v1",
+  "started_utc": "2026-10-25T03:02:42.299Z",
+  "requested_destination": "Ctech Astronomy artifacts",
+  "read_only": true,
+  "remote_write_performed": false,
+  "credentials_persisted": false,
+  "credential_values_in_receipts": false,
+  "script_sha256": "46db6c4951862a40915609af62fe732a6b8d535d6ec0a185ff4e45f1bfe6aab3",
+  "aws_binary_sha256": "84958b12b8c1d794ba565acec08444cba19704e3e484d38eb45c60c51772460d",
+  "argv": [
+    "/workspace/shared/twist-tools-20261023/awscli/aws/dist/aws",
+    "s3api",
+    "list-buckets",
+    "--output",
+    "json"
+  ],
+  "exit_code": 0,
+  "signal": null,
+  "matching_buckets": [
+    "setec-astronomy-artifacts"
+  ],
+  "status": "matching-destination-names-discovered",
+  "finished_utc": "2026-10-25T03:02:48.810Z"
+}

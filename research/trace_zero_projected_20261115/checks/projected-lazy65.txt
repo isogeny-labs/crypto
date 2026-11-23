@@ -1,0 +1,110 @@
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+   Compiling trace-zero-leads v0.1.0 (/workspace/crypto-trace/research/trace_zero_leads_20261109/native)
+   Compiling trace-zero-experiments v0.1.0 (/workspace/crypto-trace/research/trace_zero_experiments_20261109/native)
+   Compiling trace-zero-fast v0.1.0 (/workspace/crypto-trace/research/trace_zero_fast_20261115/native)
+warning: struct `TraceZeroLinearizedReport` is never constructed
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:19:12
+   |
+19 | pub struct TraceZeroLinearizedReport {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: type alias `WordMask` is never used
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:33:6
+   |
+33 | type WordMask = [u64; 3];
+   |      ^^^^^^^^
+
+warning: function `words` is never used
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:35:4
+   |
+35 | fn words(x: &F2mElement) -> WordMask {
+   |    ^^^^^
+
+warning: function `parity` is never used
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:41:4
+   |
+41 | fn parity(a: &WordMask, b: &WordMask) -> u64 {
+   |    ^^^^^^
+
+warning: enum `ProjectedResult` is never used
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:46:6
+   |
+46 | enum ProjectedResult {
+   |      ^^^^^^^^^^^^^^^
+
+warning: struct `ProductProjection` is never constructed
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:56:8
+   |
+56 | struct ProductProjection {
+   |        ^^^^^^^^^^^^^^^^^
+
+warning: associated items `reduce_with`, `new`, and `solve` are never used
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:63:8
+    |
+ 62 | impl ProductProjection {
+    | ---------------------- associated items in this implementation
+ 63 |     fn reduce_with(pivots: &[(usize, WordMask)], mut a: WordMask) -> WordMask {
+    |        ^^^^^^^^^^^
+...
+ 73 |     fn new(xs: &[F2mElement], ws: &[F2mElement], c: &BinaryCurve) -> Self {
+    |        ^^^
+...
+125 |     fn solve(
+    |        ^^^^^
+
+warning: function `basis` is never used
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:199:4
+    |
+199 | fn basis(values: impl IntoIterator<Item = BigUint>, n: u32) -> Vec<F2mElement> {
+    |    ^^^^^
+
+warning: function `point_key` is never used
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:509:4
+    |
+509 | fn point_key(p: &BinaryPoint) -> (BigUint, BigUint) {
+    |    ^^^^^^^^^
+
+warning: function `decompose_trace_zero_linearized` is never used
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:520:8
+    |
+520 | pub fn decompose_trace_zero_linearized(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `trace-zero-fast` (lib test) generated 10 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.36s
+     Running unittests src/lib.rs (research/trace_zero_fast_20261115/native/target/debug/deps/trace_zero_fast-7eda55fd2ce94367)
+
+running 4 tests
+test integration_tests::full_65_case_snapshot_equivalence_including_exact_witness_order ... ok
+test production_unit_tests::tests::batched_residuals_match_scalar_group_law_including_all_exceptions ... ok
+test production_unit_tests::tests::packed_elimination_matches_generic_solutions_kernels_and_inconsistency ... ok
+test production_unit_tests::tests::specialized_monic_roots_match_complete_field_enumeration_and_old_solver ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.29s
+
+     Running unittests src/bin/audit_grid.rs (research/trace_zero_fast_20261115/native/target/debug/deps/audit_grid-8fb0dad632cc9ee3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/check_polynomial.rs (research/trace_zero_fast_20261115/native/target/debug/deps/check_polynomial-4f4927faae836ce7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (research/trace_zero_fast_20261115/native/target/debug/deps/trace_zero_fast-42e0fb945cf69c62)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests trace_zero_fast
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

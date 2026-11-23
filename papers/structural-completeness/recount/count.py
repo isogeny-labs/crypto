@@ -31,7 +31,11 @@ sys.path.insert(0, os.path.join(ROOT, "secp256k1_cm_audit"))
 from exp_zprime2_generalized_lemma import count_points_j0, is_prime  # noqa: E402
 
 
-def enumerate_instances(ells, max_p, ordinary_only, skip_p_eq_ell):
+def enumerate_instances(ells, max_p, ordinary_only, skip_p_eq_ell, distinct=None):
+    """Count instances by class; if `distinct` is a dict, also add every
+    instance's (l, p, #E) to distinct["all"] and each ordinary instance in
+    the hypothesis class to distinct["hypothesis"] (the lemma depends on
+    (l, p, #E) only)."""
     c = Counter()
     for p in range(5, max_p):
         if not is_prime(p):
@@ -55,6 +59,10 @@ def enumerate_instances(ells, max_p, ordinary_only, skip_p_eq_ell):
                 cls = "excluded" if r == ell - 1 else "hypothesis"
                 kind = "ordinary" if ordinary else "supersingular"
                 c[(ell, kind, cls, "l|#E^t" if n_Et % ell == 0 else "l∤#E^t")] += 1
+                if distinct is not None:
+                    distinct.setdefault("all", set()).add((ell, p, n_E))
+                    if ordinary and cls == "hypothesis":
+                        distinct.setdefault("hypothesis", set()).add((ell, p, n_E))
     return c
 
 
@@ -82,10 +90,13 @@ def report(title, c):
 
 
 def main():
-    a = enumerate_instances([3, 5, 7], 500, ordinary_only=False, skip_p_eq_ell=False)
+    da, db = {}, {}
+    a = enumerate_instances([3, 5, 7], 500, ordinary_only=False, skip_p_eq_ell=False,
+                            distinct=da)
     ta, oa, ha, sa = report("[1] exp_zprime2_generalized_lemma.py enumeration: "
                             "l in {3,5,7}, 5 <= p < 500, all j=0 curves", a)
-    b = enumerate_instances([11, 13], 500, ordinary_only=True, skip_p_eq_ell=True)
+    b = enumerate_instances([11, 13], 500, ordinary_only=True, skip_p_eq_ell=True,
+                            distinct=db)
     tb, ob, hb, sb = report("[2] exp_zdoubleprime_lemma_extended.py enumeration: "
                             "l in {11,13}, 5 <= p < 500, p = 1 mod 3", b)
     print("[3] combined l in {3,5,7,11,13}")
@@ -102,6 +113,15 @@ def main():
           % (len(swept), swept[0], swept[-1]))
     print("  all primes p <= 5000                  %6d"
           % len([p for p in range(2, 5001) if is_prime(p)]))
+    print()
+    # Added 2026-11-06 (sheriff case SHF-20261106-a114e7, PPX-4): the
+    # distinct (l, p, #E) counts the paper quotes after the instance totals.
+    print("[5] distinct (l, p, #E) checks (the lemma depends on these only)")
+    for label, key in [("all instances", "all"),
+                       ("ordinary, in lemma hypothesis class", "hypothesis")]:
+        small = len(da.get(key, ()))
+        both = len(da.get(key, set()) | db.get(key, set()))
+        print("  %-36s l in {3,5,7}: %4d   l in {3,5,7,11,13}: %4d" % (label, small, both))
 
 
 if __name__ == "__main__":

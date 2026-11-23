@@ -1,0 +1,89 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "fes-f2 vs inherited-f4 descent solver, binary-subspace d=7, Koblitz a=0 n=13 (icv1-f2m13-t181-515ee569), validated isolab run [LOCAL SMOKE: 2 targets, 2 rounds]",
+  "description": "Validated, isolated re-measurement of research/inherited_f4_next_20261112 Run 2 at degree 13 [pcc:unverified]: the same factor base (binary-subspace:dimension=7) and target stream (walk) in front of the pair-table oracle (mitm:m=2, reference IC row) and of the m=2 symbolic descent solved by inherited-f4 and by fes-f2, with max_trials 2000000 as in the local sweep and no solver wall budget (deterministic, replayable). Rho: the strongest Koblitz reference (signed-Frobenius strong v2, A=2n) is the reference and has its A/A control; the negation-map rho (A=2) reproduces the local 'matched rho' S=2.76. Public targets, one target per workload, seeds derived from sha256 of the study path, arm order alternated over measured rounds. Protocol: research/fes_k13_validated_20261112/protocol.json.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 248600354536533,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-sfstrong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-negation",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-pairtable-mitm2",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=7",
+          "oracle": "mitm:m=2",
+          "targets": "walk",
+          "max_trials": "2000000"
+        }
+      }
+    },
+    {
+      "name": "ic-descent-inherited-f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=7",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "inherited-f4",
+          "targets": "walk",
+          "max_trials": "2000000"
+        }
+      }
+    },
+    {
+      "name": "ic-descent-fes-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=7",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "fes-f2",
+          "targets": "walk",
+          "max_trials": "2000000"
+        }
+      }
+    },
+    {
+      "name": "rho-sfstrong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 51364757418560,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

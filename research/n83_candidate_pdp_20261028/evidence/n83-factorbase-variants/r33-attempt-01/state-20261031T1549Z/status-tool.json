@@ -1,0 +1,46 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"job\":{\"created_at\":\"2026-10-31T15:48:14Z\",\"job_name\":\"n83-fb-variants-r33-20261031-r1\",\"state\":\"active\",\"status\":{\"active\":1,\"ready\":0,\"startTime\":\"2026-10-31T15:48:14Z\",\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"0b543e82-738f-4b3f-935d-6c179ab9c9a4\"},\"pods\":[{\"name\":\"n83-fb-variants-r33-20261031-r1-jb99r\",\"node\":null,\"status\":{\"conditions\":[{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-31T15:48:14Z\",\"message\":\"0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.\",\"observedGeneration\":1,\"reason\":\"Unschedulable\",\"status\":\"False\",\"type\":\"PodScheduled\"}],\"phase\":\"Pending\",\"qosClass\":\"Guaranteed\"},\"uid\":\"5e847fc6-21f6-4bbe-8942-0d609eeb3db3\"}]}"
+    }
+  ],
+  "structuredContent": {
+    "job": {
+      "created_at": "2026-10-31T15:48:14Z",
+      "job_name": "n83-fb-variants-r33-20261031-r1",
+      "state": "active",
+      "status": {
+        "active": 1,
+        "ready": 0,
+        "startTime": "2026-10-31T15:48:14Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "0b543e82-738f-4b3f-935d-6c179ab9c9a4"
+    },
+    "pods": [
+      {
+        "name": "n83-fb-variants-r33-20261031-r1-jb99r",
+        "node": null,
+        "status": {
+          "conditions": [
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T15:48:14Z",
+              "message": "0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.",
+              "observedGeneration": 1,
+              "reason": "Unschedulable",
+              "status": "False",
+              "type": "PodScheduled"
+            }
+          ],
+          "phase": "Pending",
+          "qosClass": "Guaranteed"
+        },
+        "uid": "5e847fc6-21f6-4bbe-8942-0d609eeb3db3"
+      }
+    ]
+  },
+  "isError": false
+}

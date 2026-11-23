@@ -1,0 +1,44 @@
+    Blocking waiting for file lock on build directory
+    Finished `release` profile [optimized] target(s) in 9m 58s
+     Running unittests src/lib.rs (target/release/build/crypto/1f3348487c0dcc6d/out/crypto_lib-1f3348487c0dcc6d)
+
+running 20 tests
+test cryptanalysis::jv_cover::tests::berlekamp_massey_recovers_a_linear_recurrence ... ok
+test cryptanalysis::jv_cover::tests::cover_map_lands_on_the_curve ... ok
+test cryptanalysis::jv_cover::tests::charpoly_satisfies_cayley_hamilton_and_has_the_right_roots ... ok
+test cryptanalysis::jv_cover::tests::jacobian_group_law ... ok
+test cryptanalysis::jv_cover::tests::jacobian_scalar_beyond_u128 ... ok
+test cryptanalysis::jv_cover::tests::instance_transfers_the_dlp ... ok
+test cryptanalysis::jv_cover::tests::distinguished_point_rho_finds_the_planted_logarithm ... ok
+test cryptanalysis::jv_cover::tests::polynomial_gcd_and_division ... ok
+trial 0: NagaoCost { hilbert_applied: false, hilbert_fallback: false, hilbert_check_muls: 0, weil_muls: 2730, f4_muls: 1245081, lin_muls: 178615, post_muls: 4960, delta: 64, degree_reached: 8, max_rows: 231, max_cols: 255, f4_ms: 22.223129, lin_ms: 0.28584299999999996, total_ms: 22.671674, inconsistent: false, incomplete: false, timed_out: false, degenerate: false, nonseparating: 0, lin_fallback: 0, stopped_at: None, replayed: false, trace_mismatch: false, fp_solutions: 3, split: 1, decompositions: 1 }
+trial 1: NagaoCost { hilbert_applied: false, hilbert_fallback: false, hilbert_check_muls: 0, weil_muls: 2730, f4_muls: 721179, lin_muls: 1261671, post_muls: 3516, delta: 64, degree_reached: 8, max_rows: 231, max_cols: 255, f4_ms: 4.158378, lin_ms: 4.279177000000001, total_ms: 8.670248, inconsistent: false, incomplete: false, timed_out: false, degenerate: false, nonseparating: 0, lin_fallback: 1, stopped_at: None, replayed: false, trace_mismatch: false, fp_solutions: 2, split: 1, decompositions: 1 }
+full f4 691651 (231 × 255, degree 7) vs replay 301877 (197 × 252, degree 7)
+trial 2: NagaoCost { hilbert_applied: false, hilbert_fallback: false, hilbert_check_muls: 0, weil_muls: 2730, f4_muls: 726395, lin_muls: 178963, post_muls: 4468, delta: 64, degree_reached: 8, max_rows: 231, max_cols: 255, f4_ms: 4.034514000000001, lin_ms: 0.24087699999999998, total_ms: 4.427926, inconsistent: false, incomplete: false, timed_out: false, degenerate: false, nonseparating: 0, lin_fallback: 0, stopped_at: None, replayed: false, trace_mismatch: false, fp_solutions: 3, split: 1, decompositions: 1 }
+full f4 693971 (231 × 255, degree 7) vs replay 302248 (197 × 252, degree 7)
+full f4 691500 (231 × 255, degree 7) vs replay 300455 (197 × 252, degree 7)
+trial 3: NagaoCost { hilbert_applied: false, hilbert_fallback: false, hilbert_check_muls: 0, weil_muls: 2730, f4_muls: 1448479, lin_muls: 177528, post_muls: 2499, delta: 64, degree_reached: 8, max_rows: 231, max_cols: 255, f4_ms: 5.182243, lin_ms: 0.258573, total_ms: 5.593432, inconsistent: false, incomplete: false, timed_out: false, degenerate: false, nonseparating: 0, lin_fallback: 0, stopped_at: None, replayed: false, trace_mismatch: false, fp_solutions: 1, split: 1, decompositions: 1 }
+trial 4: NagaoCost { hilbert_applied: false, hilbert_fallback: false, hilbert_check_muls: 0, weil_muls: 2730, f4_muls: 720749, lin_muls: 177430, post_muls: 2624, delta: 64, degree_reached: 8, max_rows: 231, max_cols: 255, f4_ms: 14.095933, lin_ms: 1.144484, total_ms: 17.142734, inconsistent: false, incomplete: false, timed_out: false, degenerate: false, nonseparating: 0, lin_fallback: 0, stopped_at: None, replayed: false, trace_mismatch: false, fp_solutions: 1, split: 1, decompositions: 1 }
+trial 5: NagaoCost { hilbert_applied: false, hilbert_fallback: false, hilbert_check_muls: 0, weil_muls: 2730, f4_muls: 829027, lin_muls: 178132, post_muls: 3314, delta: 64, degree_reached: 8, max_rows: 240, max_cols: 267, f4_ms: 15.792025, lin_ms: 0.51293, total_ms: 17.219459, inconsistent: false, incomplete: false, timed_out: false, degenerate: false, nonseparating: 0, lin_fallback: 0, stopped_at: None, replayed: false, trace_mismatch: false, fp_solutions: 2, split: 1, decompositions: 1 }
+test cryptanalysis::jv_cover::tests::nagao_finds_planted_six_sums_and_agrees_with_the_oracle ... ok
+test cryptanalysis::jv_cover::tests::solver_is_exact_on_1500_planted_sums_at_p61 ... ignored
+test cryptanalysis::jv_cover::tests::sparse_linear_stage_agrees_with_dense ... ok
+test cryptanalysis::jv_cover::tests::negation_rho_finds_the_planted_logarithm_in_fewer_operations ... ok
+test cryptanalysis::jv_cover::tests::table_search_matches_horner_and_exhaustive_dominates ... ok
+test cryptanalysis::jv_cover::tests::the_solver_loses_no_rational_solution_at_small_p ... ok
+test cryptanalysis::jv_cover::tests::tower_arithmetic ... ok
+test cryptanalysis::jv_cover::tests::tower_field_and_curve_scalars_beyond_u64 ... ok
+test cryptanalysis::jv_cover::tests::transfer_is_a_homomorphism_into_the_jacobian_over_fq ... ok
+test cryptanalysis::jv_cover::tests::hilbert_stop_agrees_with_the_full_solver_and_the_oracle ... ok
+test cryptanalysis::jv_cover::tests::stopped_f4_agrees_with_the_full_solver_and_the_oracle ... ok
+replayed 31 of 40, cheaper 31, mismatches 8
+  trace step 0: degree 2 useful rows 3 new lms 2
+  trace step 1: degree 3 useful rows 17 new lms 9
+  trace step 2: degree 4 useful rows 34 new lms 10
+  trace step 3: degree 5 useful rows 31 new lms 9
+  trace step 4: degree 6 useful rows 28 new lms 5
+  trace step 5: degree 7 useful rows 13 new lms 1
+test cryptanalysis::jv_cover::tests::replayed_f4_agrees_with_the_full_solver_and_the_oracle ... ok
+
+test result: ok. 19 passed; 0 failed; 1 ignored; 0 measured; 6678 filtered out; finished in 11.79s
+

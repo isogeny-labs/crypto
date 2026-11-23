@@ -1,0 +1,1 @@
+Producer residual_source; reviewer monic_review. Source-first local plan before proof-body inspection; published coordinator plan and producer bytes bound. Familiar prior monic/helper history, not blind. No official scientific decision or source mutation. Native receipts and exact declaration inventory determine acceptance.

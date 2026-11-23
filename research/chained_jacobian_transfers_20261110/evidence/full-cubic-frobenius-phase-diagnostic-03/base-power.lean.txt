@@ -1,0 +1,7 @@
+import Std.Tactic
+import Init.GrindInstances.Ring.Fin
+set_option autoImplicit false
+set_option maxRecDepth 8192
+open Lean.Grind
+theorem basePower : ∀ a : Fin 223, a^223=a := by decide
+#print axioms basePower

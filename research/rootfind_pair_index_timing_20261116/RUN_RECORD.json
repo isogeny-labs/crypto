@@ -1,0 +1,67 @@
+{
+  "schema": "rootfind-pair-index-run/v1",
+  "run_id": "run-20261116T141419Z",
+  "status": "completed_source_harness_passed_unreviewed",
+  "start_utc": "2026-11-16T14:14:19Z",
+  "end_utc": "2026-11-16T14:14:20Z",
+  "exit_code": 0,
+  "requested_tests": 1,
+  "completed_tests": 1,
+  "command": "gtimeout -s TERM -k 10s 600s /usr/bin/time -l /Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_pair_index_timing-79a07ef92fe2f245 --exact fixed_koblitz_pair_index_build_probe_timing --nocapture",
+  "workdir": "/Volumes/SSD990-2/crypto/wt/codex-rootfind-inline-page-index-20261116",
+  "branch": "codex/rootfind-pair-index-timing-20261116",
+  "branch_head_at_run": "92bf1257275ff3cb56a08fdb3153bcc407bd7bef",
+  "protocol_commit": "46faae79f8",
+  "amendment_commit": "71d5af799b",
+  "source_commit": "1b91f79a5c",
+  "tracked_tree_state_before_run": "clean; checked after checkpoint and immediately before launch",
+  "environment": {
+    "os": "Darwin 27.2.0",
+    "architecture": "arm64",
+    "macos_version": "27.2",
+    "hardware_model": "Mac16,7",
+    "logical_cpus": 14,
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "1.99.1 (5f94df478 2026-08-27)",
+    "isolation": "L0 shared host"
+  },
+  "checkpoint": {
+    "s3_uri": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__rootfind-pair-index-timing-20261116/20261116T141341Z-92bf1257275f/",
+    "resume_sha256": "2cd71da8aa01e4703dbfa3d4b0e5af54fa0f79c75bad87a46fef78fa84c88f6d",
+    "remote_resume_byte_comparison": "matched"
+  },
+  "sha256": {
+    "executable": "4f8e218be771a8cf58cc1005c9aa49561ae85701d3846f5af0f266ca862ec7ff",
+    "source": "f8e7d48cd2faa2eb6a2c04e5df095dc5263e9fe9209febf65073cf44a4fdcbcb",
+    "cargo_lock": "608cd364e6fd8d307b99ba7d02bdf50407ec42117065056c90a49ff88311f4e1",
+    "run_meta": "a1bee9d779d0a81d00fdfe78773b44c5e0861ff7c0fff94cfabac1f74f50d43c",
+    "run_stdout": "a87fdeb9db5a8831c0dddab7f41770362af562ecb910e8e514e0eb5d00be6bb9",
+    "run_stderr": "45e25f1d5de414c0962881fe740c5476e30184ebe3936b425cafddbf7185a7ad",
+    "results": "2ffbcb2724cfac2ae0d0ce2c769f1be011eb37a4533418cb8040dc142fca538d"
+  },
+  "fixed_parameters": {
+    "curve_degrees": [13, 19, 23],
+    "arms": ["hash", "hash-aa", "flat-direct-u32", "paged", "inline"],
+    "warmup_repetitions_per_curve": 7,
+    "measured_repetitions_per_curve": 101,
+    "case_records": 3,
+    "measured_rows": 1515,
+    "public_scalar": 641,
+    "residuals_per_curve": 64
+  },
+  "whole_process_resource_observation": {
+    "real_seconds": 0.38,
+    "user_seconds": 0.12,
+    "maximum_resident_set_size_bytes": 50593792,
+    "instructions_retired": 2193510251,
+    "cycles_elapsed": 502983773,
+    "scope": "entire diagnostic harness, not per-arm timing or memory"
+  },
+  "validity": {
+    "source_harness_assertions": "passed",
+    "group_equations_for_duplicate_pairs": "passed",
+    "first_witness_and_probe_checksums": "passed for every arm",
+    "independent_replay": false,
+    "complete_call_timing": false
+  }
+}

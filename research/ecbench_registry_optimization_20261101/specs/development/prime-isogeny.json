@@ -1,0 +1,17 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: rational isogeny transfer",
+  "description": "The source fixture is selected by the existing transfer test because it has a rational 3-isogeny. Development only.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 14, "seed": 59297}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010111,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg-reference", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}},
+    {"name": "isogeny-ell3", "role": "candidate", "method": {"id": "transfer.isogeny", "params": {"ell": "3", "inner": "rho.negation"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010112, "isolation_required": "L2", "timeout_seconds": 60}
+}

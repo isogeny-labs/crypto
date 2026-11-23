@@ -1,0 +1,49 @@
+{
+  "schema": "pencil-analysis-provenance-erratum-proposal/v1",
+  "created_utc": "2026-10-30T00:23:06Z",
+  "status": "proposal pending independent review",
+  "parent_protocol": {
+    "path": "../../protocol_draft/first_gate_p739_infrastructure_retry_20261030/protocol.json",
+    "sha256": "7d9f3a299c8d2e39f0a7b69aaab34a922dcc192102ab8d0ee1971ab6e635efee",
+    "version": 5
+  },
+  "timing": {
+    "after_payload_start": true,
+    "filed_before_affected_data": false,
+    "predata_analysis_values": "Already retained in commit99b10d5c and gate analysis manifests before submission; correction does not change those source/binary bytes"
+  },
+  "mismatches": [
+    {
+      "pointer": "/extensions/analysis_build/receipt",
+      "actual": "generic pencil-gate60-binding-receipt/v1",
+      "required": "pencil-native-analysis-build/v1 with source_revision, mapping_sha256, build_exit_code, source_files_match_commit, sources[], binaries[]"
+    },
+    {
+      "pointer": "/extensions/analysis_build/binaries/*/bytes",
+      "actual": "absent",
+      "required": "actual byte sizes matching preserved binary hash"
+    },
+    {
+      "pointer": "/extensions/finite_cost_model/analyzer_binaries_sha256",
+      "actual": "earlier cohort binaries eb2b2ce... and337e089...",
+      "required": "already-bound gate binaries3eb53f33... and0aa541a3..."
+    },
+    {
+      "pointer": "/extensions/analysis_support_sha256",
+      "actual": "full repository-relative keys",
+      "required": "same13source hashes keyed study-relative native_price/... and paired_export/..."
+    }
+  ],
+  "preserved": [
+    "frozen protocolv5 immutable",
+    "scientific methods and instrument",
+    "price mapping and mathematical arithmetic",
+    "all targets/seeds/controls/estimands",
+    "actual raw observations and attempts",
+    "original budget and deadlines"
+  ],
+  "proposal": "Publish standalone dated erratum with false filed_before_affected_data. Any new analysis protocol must retain parentv5 and truthfully mark post-data amendment. Do not backdate or assert raw data preregistered under corrected metadata.",
+  "software_diagnostic": "Separately labeled zero-observation plan-only packaging validation may use a software diagnostic protocol prepared before that diagnostic; it cannot certify the live run or substitute for truthful erratum admission.",
+  "native_admission_blocker": "Current validator and packaging admission both require every amendment.filed_before_affected_data true; truthful false erratum currently fails closed. Do not weaken or bypass checks here. Independent review and an explicitly reviewed metadata-erratum admission path are needed before canonical live-run claims.",
+  "experiments_executed": 0
+}

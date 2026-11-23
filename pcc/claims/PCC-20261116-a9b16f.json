@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T22:18:20Z",
+ "id": "PCC-20261116-a9b16f",
+ "kind": "theorem",
+ "producer": {
+  "commit": "90ea6cb42434698be3fac9d2d012a579f298b961",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "77ee101b29804e81455de7408f2a3ba3ffd9ed7ff164042befa4ff12fc606f41",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+   "theorem": "CubicNativeNormEuclid22309.actual_returned_inverse"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Canonical new record for byte-identical frozen legacy coefficient/word certificate from sourceeb3e882c; full original gate/type/negative provenance retained. No new Lean declaration, field/library instance, compiler/Jacobian/runtime/cost or signed promotion, and no legacy ledger reconciliation.",
+ "statement": "theorem actual_returned_inverse (n : Fin 223) (hn : n\u22600) (u : UInt64) (hu : checkedInverse n=some u) : u.toNat<223 \u2227 decodeWord u*n=1"
+}

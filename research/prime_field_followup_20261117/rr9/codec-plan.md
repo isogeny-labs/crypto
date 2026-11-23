@@ -1,0 +1,3 @@
+# Sign-independent identity encoding
+
+Follow-up after observing the fixed 20,672 terms at degree seven. This changes serialization only. Encode each multiplier by a support bitmap over all 3,432 monomials of total degree at most seven in seven variables, followed by canonical 32-bit coefficients. Reconstruct the RR9 equations from public input instead of storing them. Independently replay the decoded exact polynomial multiplication to 1 and reject modified and truncated encodings. Freeze all four previous negative outputs (two presentations per target) and compare exact serialized bytes. No change to algebraic generation cost is claimed.

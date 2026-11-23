@@ -1,0 +1,60 @@
+LIB "linalg.lib";
+proc require60(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump60(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require60(A[i,j]==1,"COHORT60_BINARY_CERTIFICATE");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../mixed60-02/mixed-space60.sing"));
+require60(ncols(Kmix60)==36 && ncols(Fmix60)==18,"COHORT60_ACCEPTED_MIXED_DONOR");
+matrix fixed10060=Kmix60*Fmix60;matrix profiles60=profile60*fixed10060;
+intvec caps60=24,8,14,2;intvec original60=56,8,14,2;intvec offsets60=0,224,256,312;
+proc constraints60(intvec signed){
+ matrix C[96][18];int row=0;int p;int e;int col;int src;
+ for(p=1;p<=4;p++){
+  for(e=-caps60[p];e<2*signed[p];e++){
+   src=offsets60[p]+2*(e+original60[p])+1;
+   for(col=1;col<=18;col++){C[row+1,col]=profiles60[src,col];C[row+2,col]=profiles60[src+1,col];}
+   row=row+2;
+  }
+ }
+ require60(row==96,"COHORT60_ALL_LOCAL_ROWS");return(C);
+}
+intvec empty60=0,0,0,0;matrix control60=constraints60(empty60);
+matrix controlK60=matrix(syz(module(control60)));int controlDim60=mat_rk(controlK60);
+require60(controlDim60==1 && mat_rk(control60)==17,"COHORT60_REGULAR_CONTROL_DIMENSION");
+matrix fixedOne60=Rfix60*one60;require60(Fmix60*fixedOne60==one60 && control60*fixedOne60==matrix(0,96,1),"COHORT60_REGULAR_ONE");
+link cert60="ASCII:w cohort-certificates60.sing";open(cert60);write(cert60,"ring cohortCertificate60=2,(w),dp;short=0;");
+dump60(cert60,"fixed10060",fixed10060);dump60(cert60,"control60",control60);dump60(cert60,"controlK60",controlK60);dump60(cert60,"fixedOne60",fixedOne60);
+link table60="ASCII:w cohort60.tsv";open(table60);write(table60,"id\te0\te1\te2\te3\tdegree\trank\tkernel_dimension\tstatus");
+int e060;int e160;int e260;int e360;int count60=0;int principal60=0;int excluded60=0;int dim60;int rank60;int ii60;int positive60;int degree60;intvec signed60;
+matrix C60[96][18];matrix K60[18][1];matrix R60[1][18];matrix H60[18][96];matrix bad60[18][96];
+list survivors60;list signs60;
+for(e160=-4;e160<=4;e160++){for(e260=-7;e260<=7;e260++){for(e360=-1;e360<=1;e360++){
+ e060=-e160-e260-e360;
+ if(e060!=0 || e160!=0 || e260!=0 || e360!=0){
+  require60(e060>=-12 && e060<=12,"COHORT60_COMPLETE_BALANCED_BOUND");count60++;signed60=e060,e160,e260,e360;
+  positive60=0;for(ii60=1;ii60<=4;ii60++){if(signed60[ii60]>0){positive60=positive60+signed60[ii60];}}
+  degree60=2*positive60;require60(degree60>0 && degree60<=24,"COHORT60_MAP_DEGREE_BOUND");
+  C60=constraints60(signed60);rank60=mat_rk(C60);dim60=18-rank60;
+  require60(dim60<=1,"COHORT60_GEOMETRY_KERNEL_MORE_THAN_ONE");
+  dump60(cert60,"Ccase"+string(count60),C60);
+  if(dim60==0){
+   H60=transpose(lift(module(transpose(C60)),module(unitmat(18))));require60(H60*C60==unitmat(18),"COHORT60_EXCLUSION_LEFT_INVERSE");excluded60++;
+   dump60(cert60,"Hcase"+string(count60),H60);
+  }else{
+   K60=matrix(syz(module(C60)));require60(ncols(K60)==1 && mat_rk(K60)==1 && C60*K60==matrix(0,96,1),"COHORT60_PRINCIPAL_KERNEL");
+   R60=transpose(lift(module(transpose(K60)),module(unitmat(1))));
+   H60=transpose(lift(module(transpose(C60)),module(transpose(unitmat(18)+K60*R60))));
+   require60(R60*K60==unitmat(1) && K60*R60+H60*C60==unitmat(18),"COHORT60_COMPLETE_PRINCIPAL_SPLITTING");
+   principal60++;survivors60[principal60]=K60;signs60[principal60]=signed60;
+   dump60(cert60,"Kcase"+string(count60),K60);dump60(cert60,"Rcase"+string(count60),R60);dump60(cert60,"Hcase"+string(count60),H60);
+  }
+  print("COHORT60_PATTERN id="+string(count60)+" e="+string(signed60)+" degree="+string(degree60)+" rank="+string(rank60)+" dimension="+string(dim60));
+  write(table60,string(count60)+"\t"+string(e060)+"\t"+string(e160)+"\t"+string(e260)+"\t"+string(e360)+"\t"+string(degree60)+"\t"+string(rank60)+"\t"+string(dim60)+"\t"+string(dim60));
+ }
+}}}
+require60(count60==404 && principal60+excluded60==404,"COHORT60_COMPLETE_COHORT_COUNT");
+// Check a deliberately corrupted left inverse on the regular control's nonzero kernel.
+bad60[1,1]=1;require60(bad60*control60!=unitmat(18),"COHORT60_BAD_RECOVERY_REJECTED");
+close(table60);close(cert60);
+link gen60="ASCII:w principal-generators60.sing";open(gen60);write(gen60,"ring principalSource60=2,(w),dp;short=0;");dump60(gen60,"fixed10060",fixed10060);
+for(ii60=1;ii60<=principal60;ii60++){dump60(gen60,"generator"+string(ii60),survivors60[ii60]);write(gen60,"intvec signs"+string(ii60)+"="+string(signs60[ii60])+";");}close(gen60);
+print("COHORT60_RESULT patterns="+string(count60)+" fixed_dimension=18 constraint_rows=96 principal_patterns="+string(principal60)+" excluded_patterns="+string(excluded60)+" complete_kernel_certificates=404 regular_control_dimension="+string(controlDim60)+" both_trace_parities=1");
+print("COHORT60_ALL_CHECKS_PASS");quit;

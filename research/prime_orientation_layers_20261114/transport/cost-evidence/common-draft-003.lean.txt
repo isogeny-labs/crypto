@@ -1,0 +1,430 @@
+module
+public import OrientationTransport
+public import Mathlib.NumberTheory.Height.NumberField
+import all OrientationTransport
+import all OrientationCompact
+import all OrientationAnchor
+import all OrientationMoment
+import all OrientationHigher
+public section
+noncomputable section
+namespace OrientationRationalSize
+open Finset Height OrientationAnchor OrientationMoment OrientationNodePolynomial
+
+def Bits (b : ℕ) (q : ℚ) : Prop := max q.num.natAbs q.den ≤ 2^b
+
+theorem bits_iff_height (b : ℕ) (q : ℚ) : Bits b q ↔ mulHeight₁ q ≤ (2:ℝ)^b := by
+  rw [Rat.mulHeight₁_eq_max]
+  unfold Bits
+  norm_cast
+
+theorem bits_zero : Bits 0 (0:ℚ) := by norm_num [Bits]
+theorem bits_one : Bits 0 (1:ℚ) := by norm_num [Bits]
+theorem bits_two : Bits 1 (2:ℚ) := by norm_num [Bits]
+
+theorem Bits.mono {b c : ℕ} {q : ℚ} (h : Bits b q) (hbc : b ≤ c) : Bits c q :=
+  h.trans (Nat.pow_le_pow_right (by decide) hbc)
+
+theorem Bits.neg {b : ℕ} {q : ℚ} (h : Bits b q) : Bits b (-q) := by
+  rw [bits_iff_height] at h ⊢
+  simpa only [mulHeight₁_neg] using h
+
+theorem Bits.inv {b : ℕ} {q : ℚ} (h : Bits b q) : Bits b q⁻¹ := by
+  rw [bits_iff_height] at h ⊢
+  simpa only [mulHeight₁_inv] using h
+
+theorem Bits.mul {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c) (q*r) := by
+  rw [bits_iff_height] at hq hr ⊢
+  calc
+    mulHeight₁ (q*r) ≤ mulHeight₁ q*mulHeight₁ r := mulHeight₁_mul_le q r
+    _ ≤ (2:ℝ)^b*2^c := mul_le_mul hq hr (by positivity) (by positivity)
+    _ = (2:ℝ)^(b+c) := (pow_add _ _ _).symm
+
+theorem Bits.div {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c) (q/r) := by simpa only [div_eq_mul_inv] using hq.mul hr.inv
+
+theorem Bits.add {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c+1) (q+r) := by
+  rw [bits_iff_height] at hq hr ⊢
+  have H : mulHeight₁ (q+r) ≤ 2*mulHeight₁ q*mulHeight₁ r := by
+    simpa only [NumberField.totalWeight_eq_finrank,Module.finrank_self,pow_one] using
+      mulHeight₁_add_le q r
+  calc
+    mulHeight₁ (q+r) ≤ 2*(mulHeight₁ q*mulHeight₁ r) := by simpa only [mul_assoc] using H
+    _ ≤ 2*((2:ℝ)^b*2^c) := mul_le_mul_of_nonneg_left
+      (mul_le_mul hq hr (by positivity) (by positivity)) (by norm_num)
+    _ = (2:ℝ)^(b+c+1) := by rw [pow_add,pow_add,pow_one]; ring
+
+theorem Bits.sub {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c+1) (q-r) := by simpa only [sub_eq_add_neg] using hq.add hr.neg
+
+theorem Bits.pow {b : ℕ} {q : ℚ} (h : Bits b q) (n : ℕ) : Bits (b*n) (q^n) := by
+  rw [bits_iff_height] at h ⊢
+  rw [mulHeight₁_pow,pow_mul]
+  exact pow_le_pow_left₀ (by positivity) h n
+
+theorem bits_int (b : ℕ) (z : ℤ) (hz : z.natAbs ≤ 2^b) : Bits b (z:ℚ) := by
+  unfold Bits
+  simp only [Rat.num_intCast,Rat.den_intCast]
+  exact max_le hz Nat.one_le_two_pow
+
+theorem bits_two_pow (n : ℕ) : Bits n ((2:ℚ)^n) := by
+  simpa only [one_mul] using bits_two.pow n
+
+theorem bits_prod {I : Type*} (S : Finset I) (q : I → ℚ) (b : I → ℕ)
+    (h : ∀ i ∈ S,Bits (b i) (q i)) : Bits (∑ i ∈ S,b i) (∏ i ∈ S,q i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using bits_one
+  | @insert i S hi ih =>
+    rw [sum_insert hi,prod_insert hi]
+    exact (h i (mem_insert_self _ _)).mul (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+
+theorem bits_sum {I : Type*} (S : Finset I) (q : I → ℚ) (b : I → ℕ)
+    (h : ∀ i ∈ S,Bits (b i) (q i)) : Bits (S.card+∑ i ∈ S,b i) (∑ i ∈ S,q i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using bits_zero
+  | @insert i S hi ih =>
+    have H := (h i (mem_insert_self _ _)).add (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+    have he : (insert i S).card+(∑ j ∈ insert i S,b j)=b i+(S.card+∑ j ∈ S,b j)+1 := by
+      rw [card_insert_of_notMem hi,sum_insert hi]
+      omega
+    rw [he,sum_insert hi]
+    exact H
+
+theorem grid_natAbs_bound (a : ℕ) (t : ℤ) (ht : (t:ℚ) ∈ grid a) : t.natAbs ≤ 2^a := by
+  rcases mem_image.mp ht with ⟨z,hz,he⟩
+  have hzt : z=t := by exact_mod_cast he
+  subst z
+  have h := mem_Ico.mp hz
+  have H : |t| ≤ (2:ℤ)^a := abs_le.mpr ⟨h.1,le_of_lt h.2⟩
+  have HC : (t.natAbs:ℤ) ≤ (2:ℤ)^a := by
+    simpa only [Int.natCast_natAbs] using H
+  exact_mod_cast HC
+
+theorem actual_grid_bits (a : ℕ) (t : ℤ) (ht : (t:ℚ) ∈ grid a) : Bits a (t:ℚ) :=
+  bits_int a t (grid_natAbs_bound a t ht)
+
+theorem actual_delta_bits (a r y : ℕ) (hr : r < 2^a) (hy : y < 2^a) : Bits a (delta r y) := by
+  have H : ((y:ℤ)-r).natAbs ≤ 2^a := by
+    have hrZ : (r:ℤ) < (2:ℤ)^a := by exact_mod_cast hr
+    have hyZ : (y:ℤ) < (2:ℤ)^a := by exact_mod_cast hy
+    have h : |(y:ℤ)-r| ≤ (2:ℤ)^a := abs_le.mpr ⟨by omega,by omega⟩
+    have HC : (((y:ℤ)-r).natAbs:ℤ) ≤ (2:ℤ)^a := by
+      simpa only [Int.natCast_natAbs] using h
+    exact_mod_cast HC
+  simpa only [Int.cast_sub,Int.cast_natCast,delta] using bits_int a ((y:ℤ)-r) H
+
+theorem actual_slope_bits (a u b x y : ℕ) (hu : u ≤ a) (hy : y < 2^a)
+    (q : ℚ) (hq : Bits b q) : Bits (u+(b+a+1)) (slope u (rowResidue u x) y q) := by
+  exact bits_two_pow u |>.div (hq.sub (actual_delta_bits a _ y (row_source_bound a u x hu) hy))
+
+theorem actual_chart_slope_bits (a u x y : ℕ) (t : ℤ) (hu : u ≤ a)
+    (hy : y < 2^a) (ht : (t:ℚ) ∈ grid a) : Bits ((a+1)+(a+a+1)) (chartSlope a u x y t) := by
+  exact (bits_two_pow (a+1)).div
+    ((actual_grid_bits a t ht).sub (actual_delta_bits a _ y (row_source_bound a u x hu) hy))
+
+theorem actual_anchor_slope_bits (a u j x y : ℕ) (hu : u ≤ a) (hy : y < 2^a) :
+    Bits (u+(j+a+1)) (slope u (rowResidue u x) y ((2:ℚ)^j)) :=
+  actual_slope_bits a u j x y hu hy _ (bits_two_pow j)
+
+end OrientationRationalSize
+#print axioms OrientationRationalSize.Bits.add
+#print axioms OrientationRationalSize.grid_natAbs_bound
+#print axioms OrientationRationalSize.actual_chart_slope_bits
+#print axioms OrientationRationalSize.actual_anchor_slope_bits
+
+namespace OrientationRationalSize
+open Polynomial Finset OrientationAnchor OrientationMoment OrientationNodePolynomial
+  OrientationJet OrientationDiagonal OrientationLeading OrientationAbsolutePrecision
+
+theorem bits_nat (b n : ℕ) (hn : n ≤ 2^b) : Bits b (n:ℚ) := by
+  simpa only [Int.cast_natCast,Int.natAbs_natCast] using bits_int b (n:ℤ) hn
+
+theorem actual_grid_member_bits (a : ℕ) (q : ℚ) (hq : q ∈ grid a) : Bits a q := by
+  rcases mem_image.mp hq with ⟨z,hz,rfl⟩
+  exact actual_grid_bits a z (mem_image.mpr ⟨z,hz,rfl⟩)
+
+def derivativeSize (a : ℕ) : ℕ := (2*2^a)*(a+a+1)
+def scalarSize (a : ℕ) : ℕ := (a+1)+derivativeSize a+derivativeSize a
+def correctionSize (u i : ℕ) (m : ℕ → ℕ) : ℕ := ∑ j ∈ range u,(j+i+1+j)*m j
+def diagonalSize (a u i : ℕ) (m : ℕ → ℕ) : ℕ := scalarSize a+i+correctionSize u i m
+
+theorem actual_derivative_bits (a : ℕ) (q : ℚ) (hq : q ∈ grid a) :
+    Bits (derivativeSize a) ((nodal (grid a)).derivative.eval q) := by
+  rw [nodal_derivative _ _ hq,puncture,eval_prod]
+  have H := bits_prod ((grid a).erase q) (fun s => q-s) (fun _ => a+a+1) (by
+    intro s hs
+    exact (actual_grid_member_bits a q hq).sub
+      (actual_grid_member_bits a s (mem_erase.mp hs).2))
+  have hb : ((grid a).erase q).card ≤ 2*2^a := by
+    rw [← grid_card]
+    exact card_erase_le
+  have hs : (∑ _ ∈ (grid a).erase q,(a+a+1))=((grid a).erase q).card*(a+a+1) := by
+    simp
+  rw [hs] at H
+  simpa only [derivativeSize,eval_sub,eval_X,eval_C] using H.mono (Nat.mul_le_mul_right _ hb)
+
+theorem actual_normalizer_bits (a : ℕ) : Bits (derivativeSize a) (normalizer (grid a)) :=
+  actual_derivative_bits a 0 (zero_in_grid a)
+
+theorem actual_jet_scalar_bits (a i : ℕ) (hi : i ≤ a) : Bits (scalarSize a) (jetScalar a i) := by
+  unfold jetScalar scalarSize
+  exact ((bits_two_pow (a+1)).mul (actual_normalizer_bits a).inv).mul
+    (actual_derivative_bits a (poleQ i) (pole_member a i hi))
+
+theorem actual_diagonal_value_bits (u i : ℕ) (m : ℕ → ℕ) :
+    Bits (correctionSize u i m) (diagonalValue u i m) := by
+  rw [diagonal_value_product]
+  unfold correctionSize
+  apply bits_prod
+  intro j _
+  exact (((bits_two_pow j).add (bits_two_pow i)).div (bits_two_pow j)).pow (m j)
+
+theorem actual_diagonal_bits (a u i : ℕ) (m : ℕ → ℕ) (hi : i ≤ a) :
+    Bits (diagonalSize a u i m) (diagonalJet a u i m) := by
+  rw [diagonalJet_formula a u i m hi]
+  exact ((actual_jet_scalar_bits a i hi).div (bits_two_pow i).neg).mul
+    (actual_diagonal_value_bits u i m)
+
+theorem actual_moment_left_bits (a u k : ℕ) (x : Ports a) (rb : MomentLabels u k) :
+    Bits (rb.2.val+a*rb.2.val) (momentLeft a u k x rb) := by
+  unfold momentLeft
+  split_ifs
+  · have hb : rowQuotient u x.val ≤ 2^a :=
+      (Nat.div_le_self _ _).trans (Nat.le_of_lt x.isLt)
+    exact (bits_two_pow rb.2.val).mul ((bits_nat a _ hb).pow rb.2.val)
+  · exact bits_zero.mono (by omega)
+
+theorem actual_absolute_left_coefficient_bits (a u i p : ℕ) (m : ℕ → ℕ)
+    (hi : i ≤ a) (x : Ports a) (rb : LabelsAt a u i p m) (n : ℕ) :
+    Bits (diagonalSize a u i m+(rb.2.val+a*rb.2.val))
+      ((absoluteLeft a u i p m x rb).coeff n) := by
+  have H := (actual_diagonal_bits a u i m hi).mul
+    (actual_moment_left_bits a u _ x rb)
+  unfold absoluteLeft OrientationBivariate.weightedLeft OrientationBivariate.polyLeft
+  rw [← map_mul]
+  by_cases hn : n=0
+  · subst n
+    simpa only [coeff_C_zero] using H
+  · simp only [coeff_C,hn,ite_false]
+    exact bits_zero.mono (by omega)
+
+end OrientationRationalSize
+#print axioms OrientationRationalSize.actual_derivative_bits
+#print axioms OrientationRationalSize.actual_diagonal_bits
+#print axioms OrientationRationalSize.actual_absolute_left_coefficient_bits
+
+namespace OrientationCommonDenominator
+open Finset Polynomial OrientationBivariate
+
+def geometric {R : Type*} [CommRing R] (x : R) (k : ℕ) : R := ∑ j ∈ range k,(1-x)^j
+
+def clearedGeometric {R : Type*} [CommRing R] (d A : R) : ℕ → R
+  | 0 => 0
+  | k+1 => d*clearedGeometric d A k+d*(d-A)^k
+
+theorem geometric_succ {R : Type*} [CommRing R] (x : R) (k : ℕ) :
+    geometric x (k+1)=geometric x k+(1-x)^k := sum_range_succ _ _
+
+theorem cleared_identity {R : Type*} [CommRing R] (d e A : R) (hde : d*e=1) (k : ℕ) :
+    clearedGeometric d A k=d^k*geometric (e*A) k := by
+  induction k with
+  | zero => simp [clearedGeometric,geometric]
+  | succ k ih =>
+    rw [clearedGeometric,ih,geometric_succ]
+    have he : d*(1-e*A)=d-A := by rw [mul_sub,mul_one,← mul_assoc,hde,one_mul]
+    have hp : (d-A)^k=d^k*(1-e*A)^k := by rw [← he,mul_pow]
+    rw [hp,pow_succ]
+    ring
+
+theorem cleared_map {R S : Type*} [CommRing R] [CommRing S]
+    (f : R →+* S) (d A : R) (k : ℕ) :
+    f (clearedGeometric d A k)=clearedGeometric (f d) (f A) k := by
+  induction k with
+  | zero => simp [clearedGeometric]
+  | succ k ih => simp only [clearedGeometric,map_add,map_mul,map_pow,map_sub,ih]
+
+def integerMap : (ℤ[X])[X] →+* (ℚ[X])[X] :=
+  Polynomial.mapRingHom (Polynomial.mapRingHom (Int.castRingHom ℚ))
+
+def integerNumerator (d : ℤ) (A : (ℤ[X])[X]) (k : ℕ) : (ℤ[X])[X] :=
+  clearedGeometric (C (C d)) A k
+
+theorem integerMap_constant (d : ℤ) : integerMap (C (C d))=C (C (d:ℚ)) := by
+  simp [integerMap]
+
+theorem integer_bivariate_clearing (d : ℤ) (hd : d ≠ 0) (A : (ℤ[X])[X]) (k : ℕ) :
+    C (C ((d:ℚ)^k))*geometricRows (C (C ((d:ℚ)⁻¹))*integerMap A) k=
+      integerMap (integerNumerator d A k) := by
+  have hq : (d:ℚ) ≠ 0 := by exact_mod_cast hd
+  have hu : (C (C (d:ℚ)) : (ℚ[X])[X])*C (C ((d:ℚ)⁻¹))=1 := by
+    rw [← map_mul,← map_mul,mul_inv_cancel₀ hq,map_one,map_one]
+  have H := cleared_identity (C (C (d:ℚ))) (C (C ((d:ℚ)⁻¹))) (integerMap A) hu k
+  rw [integerNumerator,cleared_map,integerMap_constant]
+  simpa only [geometric,geometricRows,map_pow] using H.symm
+
+end OrientationCommonDenominator
+#print axioms OrientationCommonDenominator.cleared_identity
+#print axioms OrientationCommonDenominator.integer_bivariate_clearing
+
+namespace OrientationCommonDenominator
+open Polynomial Finset OrientationBivariate
+
+structure Rep (P : (ℚ[X])[X]) where
+  den : ℕ
+  positive : 0 < den
+  num : (ℤ[X])[X]
+  formula : integerMap num=C (C (den:ℚ))*P
+
+def Rep.rational (q : ℚ) : Rep (C (C q)) where
+  den := q.den
+  positive := q.den_pos
+  num := C (C q.num)
+  formula := by
+    rw [integerMap_constant,← map_mul,← map_mul]
+    apply congrArg (fun r : ℚ => (C (C r) : (ℚ[X])[X]))
+    simpa only [mul_comm] using (Rat.mul_den_eq_num q).symm
+
+def Rep.one : Rep (1 : (ℚ[X])[X]) where
+  den := 1
+  positive := by decide
+  num := 1
+  formula := by simp
+
+def Rep.outerX : Rep (X : (ℚ[X])[X]) where
+  den := 1
+  positive := by decide
+  num := X
+  formula := by simp [integerMap]
+
+def Rep.innerX : Rep (C X : (ℚ[X])[X]) where
+  den := 1
+  positive := by decide
+  num := C X
+  formula := by simp [integerMap]
+
+def Rep.mul {P Q : (ℚ[X])[X]} (hP : Rep P) (hQ : Rep Q) : Rep (P*Q) where
+  den := hP.den*hQ.den
+  positive := Nat.mul_pos hP.positive hQ.positive
+  num := hP.num*hQ.num
+  formula := by
+    rw [map_mul,hP.formula,hQ.formula]
+    simp only [Nat.cast_mul,map_mul]
+    ring
+
+def Rep.add {P Q : (ℚ[X])[X]} (hP : Rep P) (hQ : Rep Q) : Rep (P+Q) where
+  den := hP.den*hQ.den
+  positive := Nat.mul_pos hP.positive hQ.positive
+  num := C (C (hQ.den:ℤ))*hP.num+C (C (hP.den:ℤ))*hQ.num
+  formula := by
+    simp only [map_add,map_mul,integerMap_constant,Int.cast_natCast,
+      hP.formula,hQ.formula,Nat.cast_mul]
+    ring
+
+def Rep.pow {P : (ℚ[X])[X]} (hP : Rep P) (k : ℕ) : Rep (P^k) where
+  den := hP.den^k
+  positive := pow_pos hP.positive k
+  num := hP.num^k
+  formula := by
+    rw [map_pow,hP.formula]
+    simp only [Nat.cast_pow,map_pow,mul_pow]
+
+def Rep.prod {I : Type*} (S : Finset I) (P : I → (ℚ[X])[X])
+    (hP : ∀ i,Rep (P i)) : Rep (∏ i ∈ S,P i) where
+  den := ∏ i ∈ S,(hP i).den
+  positive := prod_pos (by intro i _; exact (hP i).positive)
+  num := ∏ i ∈ S,(hP i).num
+  formula := by
+    rw [map_prod]
+    simp_rw [(hP _).formula]
+    rw [prod_mul_distrib]
+    simp only [Nat.cast_prod,map_prod]
+
+def Rep.geometric {P : (ℚ[X])[X]} (hP : Rep P) (k : ℕ) : Rep (geometricRows P k) where
+  den := hP.den^k
+  positive := pow_pos hP.positive k
+  num := integerNumerator (hP.den:ℤ) hP.num k
+  formula := by
+    have hd : (hP.den:ℤ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hP.positive)
+    have hq : (hP.den:ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hP.positive)
+    have hu : (C (C ((hP.den:ℚ)⁻¹)) : (ℚ[X])[X])*C (C (hP.den:ℚ))=1 := by
+      rw [← map_mul,← map_mul,inv_mul_cancel₀ hq,map_one,map_one]
+    have he : C (C ((hP.den:ℚ)⁻¹))*integerMap hP.num=P := by
+      rw [hP.formula,← mul_assoc,hu,one_mul]
+    have H := integer_bivariate_clearing (hP.den:ℤ) hd hP.num k
+    simpa only [Int.cast_natCast,Nat.cast_pow,he] using H.symm
+
+theorem geometric_denominator_exact {P : (ℚ[X])[X]} (hP : Rep P) (k : ℕ) :
+    (hP.geometric k).den=hP.den^k := by
+  unfold Rep.geometric
+  rfl
+
+end OrientationCommonDenominator
+#print axioms OrientationCommonDenominator.Rep.geometric
+#print axioms OrientationCommonDenominator.geometric_denominator_exact
+
+namespace OrientationCommonDenominator
+open Polynomial Finset OrientationBivariate OrientationMoment OrientationNodePolynomial
+  OrientationAnchor OrientationRationalSize
+
+def Rep.cast {P Q : (ℚ[X])[X]} (r : Rep P) (h : P=Q) : Rep Q where
+  den := r.den
+  positive := r.positive
+  num := r.num
+  formula := by rw [← h]; exact r.formula
+
+def actualDenomRep (a u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) : Rep (denomRows a u x y t m) := by
+  let h0 := (Rep.one.add ((Rep.rational (chartSlope a u x y t)).mul Rep.innerX)).add
+    ((Rep.rational (slope u (rowResidue u x) y (t:ℚ))).mul Rep.outerX)
+  let hA := Rep.prod (mask u x y)
+    (fun j => (1+C (C (slope u (rowResidue u x) y ((2:ℚ)^j)))*X)^m j)
+    (fun j => (Rep.one.add ((Rep.rational (slope u (rowResidue u x) y ((2:ℚ)^j))).mul Rep.outerX)).pow (m j))
+  have he : ((1+C (C (chartSlope a u x y t))*C X)+
+      C (C (slope u (rowResidue u x) y (t:ℚ)))*X)*
+      (∏ j ∈ mask u x y,(1+C (C (slope u (rowResidue u x) y ((2:ℚ)^j)))*X)^m j)=
+      denomRows a u x y t m := by
+    simp only [denomRows,anchorRows,map_add,map_one,map_mul]
+  exact (h0.mul hA).cast he
+
+theorem actualDenomRep_den (a u x y : ℕ) (t : ℤ) (m : ℕ → ℕ) :
+    (actualDenomRep a u x y t m).den=
+      (chartSlope a u x y t).den*(slope u (rowResidue u x) y (t:ℚ)).den*
+      ∏ j ∈ mask u x y,(slope u (rowResidue u x) y ((2:ℚ)^j)).den^m j := by
+  dsimp [actualDenomRep,Rep.cast,Rep.mul,Rep.add,Rep.one,Rep.rational,Rep.innerX,
+    Rep.outerX,Rep.prod,Rep.pow]
+  simp only [Nat.one_mul,Nat.mul_one]
+
+theorem bits_nat_iff (b n : ℕ) : Bits b (n:ℚ) ↔ n ≤ 2^b := by
+  unfold Bits
+  simp only [Rat.num_natCast,Rat.den_natCast,Int.natAbs_natCast]
+  exact ⟨fun h => (le_max_left _ _).trans h,fun h => max_le h Nat.one_le_two_pow⟩
+
+theorem Bits.den {b : ℕ} {q : ℚ} (h : Bits b q) : q.den ≤ 2^b :=
+  (le_max_right _ _).trans h
+
+def denominatorSize (a u x y : ℕ) (m : ℕ → ℕ) : ℕ :=
+  ((a+1)+(a+a+1))+(u+(a+a+1))+
+    ∑ j ∈ mask u x y,(u+(j+a+1))*m j
+
+theorem actualDenomRep_bound (a u x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hu : u ≤ a) (hy : y < 2^a) (ht : (t:ℚ) ∈ grid a) :
+    (actualDenomRep a u x y t m).den ≤ 2^(denominatorSize a u x y m) := by
+  have hL := bits_nat _ _ (actual_chart_slope_bits a u x y t hu hy ht).den
+  have hE := bits_nat _ _ (actual_slope_bits a u a x y hu hy _ (actual_grid_bits a t ht)).den
+  have hP := bits_prod (mask u x y)
+    (fun j => ((slope u (rowResidue u x) y ((2:ℚ)^j)).den:ℚ)^m j)
+    (fun j => (u+(j+a+1))*m j) (by
+      intro j _
+      exact (bits_nat _ _ (actual_anchor_slope_bits a u j x y hu hy).den).pow (m j))
+  have H := (hL.mul hE).mul hP
+  apply (bits_nat_iff _ _).mp
+  rw [actualDenomRep_den]
+  simpa only [denominatorSize,Nat.cast_mul,Nat.cast_prod,Nat.cast_pow] using H
+
+end OrientationCommonDenominator
+#print axioms OrientationCommonDenominator.actualDenomRep
+#print axioms OrientationCommonDenominator.actualDenomRep_bound
+

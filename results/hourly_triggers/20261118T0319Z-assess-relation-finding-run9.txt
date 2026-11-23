@@ -1,0 +1,7 @@
+Trigger: Assess relation-finding benchmark
+Requested: 2026-11-18T03:19:22Z
+Target: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen n=23 Koblitz m=2 control (not ECC2K-130)
+Baseline: results/relation_baseline.json; absolute threshold: 20%.
+Outputs: results/hourly_log.csv, optional GitHub issue.

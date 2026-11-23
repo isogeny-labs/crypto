@@ -1,0 +1,70 @@
+{
+  "schema": "signed.target-witness.checker-v2/v1",
+  "certificates": 64,
+  "rows": 6900,
+  "counts": {
+    "determined": 39,
+    "undetermined": 25
+  },
+  "negative_controls": [
+    {
+      "name": "duplicate_certificate_omits_stream",
+      "rejected": true,
+      "reason": "duplicate source_stream"
+    },
+    {
+      "name": "missing_certificate",
+      "rejected": true,
+      "reason": "complete source/summary coverage"
+    },
+    {
+      "name": "unexpected_source",
+      "rejected": true,
+      "reason": "complete source/summary coverage"
+    },
+    {
+      "name": "duplicate_summary",
+      "rejected": true,
+      "reason": "duplicate stream"
+    },
+    {
+      "name": "missing_summary",
+      "rejected": true,
+      "reason": "complete source/summary coverage"
+    },
+    {
+      "name": "summary_scalar",
+      "rejected": true,
+      "reason": "summary row join"
+    },
+    {
+      "name": "summary_counts",
+      "rejected": true,
+      "reason": "summary aggregate"
+    },
+    {
+      "name": "certificate_scalar",
+      "rejected": true,
+      "reason": "certificate equality"
+    },
+    {
+      "name": "source_row",
+      "rejected": true,
+      "reason": "row extraction"
+    },
+    {
+      "name": "terminal_scalar_self_consistent_binding",
+      "rejected": true,
+      "reason": "recovered classification/scalar"
+    },
+    {
+      "name": "terminal_exhaustion",
+      "rejected": true,
+      "reason": "recovered classification/scalar"
+    }
+  ],
+  "producer_invoked": false,
+  "elimination_invoked": false,
+  "collector_invoked": false,
+  "wrapper_independently_reviewed": false
+}

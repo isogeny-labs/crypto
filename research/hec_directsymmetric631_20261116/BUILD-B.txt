@@ -1,0 +1,345 @@
+   Compiling hec-directsymmetric631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_directsymmetric631_20261116)
+warning: function `reduce` is never used
+   --> ../hec_inverse631_20261116/verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `eval` is never used
+  --> main.rs:66:8
+   |
+11 | impl Pol {
+   | -------- method in this implementation
+...
+66 |     fn eval(&self, x: [u64; 8]) -> u64 {
+   |        ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `pow` is never used
+  --> main.rs:97:4
+   |
+97 | fn pow(mut a: u64, mut n: u64) -> u64 {
+   |    ^^^
+
+warning: constant `QUARTIC_MIN_P` is never used
+ --> ../hec_alignment13_20261115/atlas/target.rs:2:11
+  |
+2 | pub const QUARTIC_MIN_P: u64 = 29;
+  |           ^^^^^^^^^^^^^
+
+warning: constant `QUARTIC_MAX_P` is never used
+ --> ../hec_alignment13_20261115/atlas/target.rs:3:11
+  |
+3 | pub const QUARTIC_MAX_P: u64 = 1 << 11;
+  |           ^^^^^^^^^^^^^
+
+warning: constant `QUARTIC_LAW_MAX_P` is never used
+ --> ../hec_alignment13_20261115/atlas/target.rs:8:11
+  |
+8 | pub const QUARTIC_LAW_MAX_P: u64 = 1 << 31;
+  |           ^^^^^^^^^^^^^^^^^
+
+warning: function `field_muls` is never used
+  --> ../hec_alignment13_20261115/atlas/target.rs:20:8
+   |
+20 | pub fn field_muls() -> u64 {
+   |        ^^^^^^^^^^
+
+warning: function `rref` is never used
+  --> ../hec_alignment13_20261115/atlas/target.rs:52:4
+   |
+52 | fn rref(mut rows: Vec<Vec<u64>>, n: usize, p: u64) -> Vec<Vec<u64>> {
+   |    ^^^^
+
+warning: function `nullspace` is never used
+  --> ../hec_alignment13_20261115/atlas/target.rs:83:4
+   |
+83 | fn nullspace(m: Vec<Vec<u64>>, n: usize, p: u64) -> Vec<Vec<u64>> {
+   |    ^^^^^^^^^
+
+warning: function `basis` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:116:8
+    |
+116 | pub fn basis(n: usize) -> Vec<(u8, u8, u8)> {
+    |        ^^^^^
+
+warning: function `dim` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:120:8
+    |
+120 | pub fn dim(n: usize) -> usize {
+    |        ^^^
+
+warning: constant `MAX_DEG` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:125:7
+    |
+125 | const MAX_DEG: usize = 10;
+    |       ^^^^^^^
+
+warning: struct `Forms` is never constructed
+   --> ../hec_alignment13_20261115/atlas/target.rs:129:8
+    |
+129 | struct Forms {
+    |        ^^^^^
+
+warning: multiple associated items are never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:139:8
+    |
+138 | impl Forms {
+    | ---------- associated items in this implementation
+139 |     fn new(p: u64, f: &[u64; 15]) -> Forms {
+    |        ^^^
+...
+186 |     fn dim(&self, n: usize) -> usize {
+    |        ^^^
+...
+191 |     fn mul(&self, u: &[u64], a: usize, v: &[u64], b: usize) -> Vec<u64> {
+    |        ^^^
+...
+215 |     fn product(&self, us: &[Vec<u64>], a: usize, vs: &[Vec<u64>], b: usize) -> Vec<Vec<u64>> {
+    |        ^^^^^^^
+...
+227 |     fn colon(&self, ann: &[Vec<u64>], us: &[Vec<u64>], a: usize, b: usize) -> Vec<Vec<u64>> {
+    |        ^^^^^
+...
+255 |     fn ann(&self, rows: &[Vec<u64>], n: usize) -> Vec<Vec<u64>> {
+    |        ^^^
+...
+260 |     fn eval_row(&self, pt: [u64; 3], n: usize) -> Vec<u64> {
+    |        ^^^^^^^^
+...
+275 |     fn vanishing(&self, pts: &[[u64; 3]], n: usize) -> Vec<Vec<u64>> {
+    |        ^^^^^^^^^
+...
+280 |     fn full(&self, n: usize) -> Vec<Vec<u64>> {
+    |        ^^^^
+
+warning: struct `Ext` is never constructed
+   --> ../hec_alignment13_20261115/atlas/target.rs:493:8
+    |
+493 | struct Ext {
+    |        ^^^
+
+warning: type alias `E` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:500:6
+    |
+500 | type E = [u64; 3];
+    |      ^
+
+warning: multiple associated items are never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:503:8
+    |
+502 | impl Ext {
+    | -------- associated items in this implementation
+503 |     fn new(p: u64, k: usize) -> Ext {
+    |        ^^^
+...
+532 |     fn q(&self) -> u64 {
+    |        ^
+...
+535 |     fn element(&self, mut i: u64) -> E {
+    |        ^^^^^^^
+...
+543 |     fn add(&self, a: E, b: E) -> E {
+    |        ^^^
+...
+547 |     fn mul(&self, a: E, b: E) -> E {
+    |        ^^^
+...
+565 |     fn is_zero(&self, a: E) -> bool {
+    |        ^^^^^^^
+...
+568 |     fn inv(&self, a: E) -> E {
+    |        ^^^
+...
+582 |     fn one(&self) -> E {
+    |        ^^^
+...
+585 |     fn scalar(&self, c: u64) -> E {
+    |        ^^^^^^
+...
+588 |     fn neg(&self, a: E) -> E {
+    |        ^^^
+
+warning: function `ext_trim` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:595:4
+    |
+595 | fn ext_trim(e: &Ext, mut a: Vec<E>) -> Vec<E> {
+    |    ^^^^^^^^
+
+warning: function `ext_mulmod` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:602:4
+    |
+602 | fn ext_mulmod(e: &Ext, a: &[E], b: &[E], m: &[E]) -> Vec<E> {
+    |    ^^^^^^^^^^
+
+warning: function `ext_rem` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:615:4
+    |
+615 | fn ext_rem(e: &Ext, a: Vec<E>, m: &[E]) -> Vec<E> {
+    |    ^^^^^^^
+
+warning: function `ext_root_count` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:636:4
+    |
+636 | fn ext_root_count(e: &Ext, g: Vec<E>) -> u64 {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `count_points` is never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:679:8
+    |
+679 | pub fn count_points(f: &[u64; 15], p: u64, k: usize) -> u64 {
+    |        ^^^^^^^^^^^^
+
+warning: struct `QClass` is never constructed
+   --> ../hec_alignment13_20261115/atlas/target.rs:721:12
+    |
+721 | pub struct QClass(pub [u32; 30]);
+    |            ^^^^^^
+
+warning: struct `QuarticJacobian` is never constructed
+   --> ../hec_alignment13_20261115/atlas/target.rs:726:12
+    |
+726 | pub struct QuarticJacobian {
+    |            ^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ../hec_alignment13_20261115/atlas/target.rs:746:12
+    |
+743 | impl QuarticJacobian {
+    | -------------------- associated items in this implementation
+...
+746 |     pub fn new(p: u64, f: [u64; 15]) -> Result<QuarticJacobian, String> {
+    |            ^^^
+...
+758 |     pub fn with_points(
+    |            ^^^^^^^^^^^
+...
+834 |     fn check_dims(&self) -> Result<(), String> {
+    |        ^^^^^^^^^^
+...
+849 |     fn pack(&self, ann: &[Vec<u64>]) -> Result<QClass, String> {
+    |        ^^^^
+...
+862 |     fn unpack(&self, x: &QClass) -> Vec<Vec<u64>> {
+    |        ^^^^^^
+...
+869 |     fn w3(&self, x: &QClass) -> Vec<Vec<u64>> {
+    |        ^^
+...
+873 |     pub fn zero(&self) -> QClass {
+    |            ^^^^
+...
+879 |     pub fn eval_row3(&self, pt: [u64; 3]) -> Vec<u64> {
+    |            ^^^^^^^^^
+...
+887 |     pub fn class_from_conditions(&self, rows: Vec<Vec<u64>>) -> Result<QClass, String> {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+894 |     pub fn from_points(&self, pts: [[u64; 3]; 3]) -> Result<QClass, String> {
+    |            ^^^^^^^^^^^
+...
+909 |     pub fn add_raw(&self, x: &QClass, y: &QClass) -> QClass {
+    |            ^^^^^^^
+...
+939 |     pub fn neg_raw(&self, x: &QClass) -> QClass {
+    |            ^^^^^^^
+
+warning: function `splitmix64` is never used
+ --> ../hec_calibration631_20261115/target_api631.rs:1:4
+  |
+1 | fn splitmix64(mut x: u64) -> u64 {
+  |    ^^^^^^^^^^
+
+warning: function `is_prime_u64` is never used
+ --> ../hec_calibration631_20261115/target_api631.rs:8:4
+  |
+8 | fn is_prime_u64(p: u64) -> bool {
+  |    ^^^^^^^^^^^^
+
+warning: function `scalar` is never used
+  --> ../hec_calibration631_20261115/target_api631.rs:11:8
+   |
+11 | pub fn scalar(j: &QuarticJacobian, mut a: QClass, mut n: u64) -> QClass {
+   |        ^^^^^^
+
+warning: function `difference` is never used
+  --> ../hec_calibration631_20261115/target_api631.rs:22:8
+   |
+22 | pub fn difference(j: &QuarticJacobian, p: [u64; 3], q: [u64; 3]) -> QClass {
+   |        ^^^^^^^^^^
+
+warning: function `solve3` is never used
+  --> ../hec_calibration631_20261115/target_api631.rs:37:4
+   |
+37 | fn solve3(a: [[u64; 3]; 3], b: [u64; 3]) -> Option<[u64; 3]> {
+   |    ^^^^^^
+
+warning: function `rr` is never used
+  --> ../hec_calibration631_20261115/target_api631.rs:59:4
+   |
+59 | fn rr(a: [u64; 3], b: [u64; 3], u: [u64; 4]) -> [u64; 3] {
+   |    ^^
+
+warning: function `graph_chart` is never used
+  --> ../hec_calibration631_20261115/target_api631.rs:74:8
+   |
+74 | pub fn graph_chart(j: &QuarticJacobian, x: QClass, swap: bool) -> Option<([u64; 4], [u64; 3])> {
+   |        ^^^^^^^^^^^
+
+warning: function `graph` is never used
+   --> ../hec_calibration631_20261115/target_api631.rs:120:8
+    |
+120 | pub fn graph(j: &QuarticJacobian, x: QClass) -> Option<([u64; 4], [u64; 3])> {
+    |        ^^^^^
+
+warning: field `canonical` is never read
+  --> ../hec_calibration631_20261115/field_config.rs:11:9
+   |
+ 5 | pub struct Config {
+   |            ------ field in this struct
+...
+11 |     pub canonical: [[u64; 3]; 4],
+   |         ^^^^^^^^^
+   |
+   = note: `Config` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: function `gcd` is never used
+  --> ../hec_inverse631_20261116/verify_poly.rs:66:4
+   |
+66 | fn gcd(mut a: U, mut b: U) -> U {
+   |    ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `mpow` is never used
+  --> ../hec_inverse631_20261116/verify_poly.rs:92:4
+   |
+92 | fn mpow(mut a: U, mut e: u64, m: &[u64]) -> U {
+   |    ^^^^
+
+warning: function `eval` is never used
+   --> ../hec_inverse631_20261116/verify_poly.rs:103:4
+    |
+103 | fn eval(a: &[u64], x: u64) -> u64 {
+    |    ^^^^
+
+warning: function `deriv` is never used
+   --> ../hec_inverse631_20261116/verify_poly.rs:106:4
+    |
+106 | fn deriv(a: &[u64]) -> U {
+    |    ^^^^^
+
+warning: function `reduce` is never used
+   --> ../hec_inverse631_20261116/verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+
+warning: `hec-directsymmetric631` (bin "verify-direct631") generated 1 warning
+warning: `hec-directsymmetric631` (bin "directsymmetric631") generated 33 warnings
+warning: `hec-directsymmetric631` (bin "control-direct631") generated 5 warnings
+warning: `hec-directsymmetric631` (bin "control-b631") generated 5 warnings (5 duplicates)
+    Finished `release` profile [optimized] target(s) in 1.00s

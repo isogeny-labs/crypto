@@ -1,0 +1,24 @@
+{
+  "version": 18,
+  "protocol_sha256": "26446177ac80fae9ef001edef438e3a104c6bd73ae40bb0cf2a283463841038e",
+  "source_commit": "e2cdde6d6f1fd5c316d2e8c5b5dfc24723e80eff",
+  "source_archive_sha256": "b597dd5d362d2fcd8327496e64ed5408d859a8f9c4bb9763a2ed902d1b5cef41",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "rate_cap_usd_hour": 1.2,
+  "before_data": true,
+  "files": {
+    "controller.sh": "97feedd33cecd04a469e9145064de6b805914d2ce38aa1957f32af07612c8d34",
+    "bootstrap.sh": "679fdb1b9ef45aa0dd9363756e705a7a27262348034f5e1bcc50346f6b0d04c5",
+    "pod-command.sh": "32a72486016c0b874da64173660906c3ff05665f51e9d8c2425db92204eabd99",
+    "prepare-request.py": "03fd5dd9f7898a91e7b49175b6171189991de280cb8b48f27ff7b6d4a06aa4e2",
+    "controller-regression.py": "30afd66da278c868ef704ad0ccd3aef42dce2cbd946c26825ae1e2513f719cdf",
+    "controller-regression.log": "726bc1e229eb4f9a81ac7a02935aea0aafcf9921fb2d20d6d947133be130d94b",
+    "gpu-guard-tests.log": "5fecb133b901bef3362dd5d7f2d3153c56bb20f123f057e1f4b8a53a8635ede8",
+    "source-checkout.sha256": "be206105f67eadf4d898c51b6f1e7e9dbe7149be957109c55f90a3d607aaeafc"
+  },
+  "notes": [
+    "OneGPU,worker18000/controller18300s. Same bounded arity instruments; all clocksL0.",
+    "Periodic partial artifact copies, no solver restore. Final SHA and replay checks remain required.",
+    "Source sparse checkout preserves original Git metadata and verifies all materialized blob IDs. Initial NFS index-pack failure retained in admin log; local scratch retry passed and S3 fresh readback equals archive."
+  ]
+}

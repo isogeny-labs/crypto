@@ -1,0 +1,103 @@
+{
+  "schema": "split-norm-projection-verification/v1",
+  "source_commit": "99b3deaf48fb2601dc4c68c374aa828ecea22b5b",
+  "claim_id": "PCC-20261116-02c748",
+  "declaration_sha256": "7290edd42bdeee7698c14afe96f50140b667fda04943d6471b7cdd7b71ed4b68",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 275,
+  "gate_declarations": 51,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 251,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-02c748",
+    "claim_sha256": "f82a1f85a64823d6c53e02ad7ca0e620337bc710050a38c4f7c2e34d362308aa",
+    "commit": "99b3deaf48fb2601dc4c68c374aa828ecea22b5b",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/elliptic_split_norm_projection_audit_20261116/lean (SplitCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T02:36:18Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-02c748",
+    "claim_sha256": "f82a1f85a64823d6c53e02ad7ca0e620337bc710050a38c4f7c2e34d362308aa",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47274,
+    "sha256": "a97182d351a70519b21ae38ef08676e7e524e1a58fe2cb70c2583901a3832281",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "all282pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_elaboration_and_actual_default_recursion_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_base_restricted_valuation_ring_residue": true,
+    "actual_base_residue_constants_surjection_maximal_kernel": true,
+    "actual_base_unit_evaluation_compatibility": true,
+    "actual_conjugate_base_valuations_equal": true,
+    "actual_full_point_fiber_and_split_card_two": true,
+    "actual_base_parameter_nonzero_image": true,
+    "actual_split_parameter_order_one_value_exp_minus_one_surjectivity": true,
+    "actual_fixed_parameter_order_two": true,
+    "actual_norm_order_sum": true,
+    "actual_proper_classical_base_symbol": true,
+    "actual_split_norm_projection": true,
+    "actual_inverse_convention_projection": true,
+    "actual_F5_tangent_fraction_and_proper_residues": true,
+    "actual_F5_factors_two_three_base_one_missing_factor_counter": true,
+    "actual_F5_fixedpoint_order_two_value_exp_minus_two_counter": true,
+    "actual_binary_ternary_fullfiber_normalization_projection_positives": true,
+    "ramified_finite_normalized_projection": false,
+    "general_closed_point_projection": false,
+    "general_closed_point_ramification": false,
+    "general_global_reciprocity": false,
+    "arbitrary_divisor_representative_independence": false,
+    "multiplication_isogeny_comparison": false,
+    "general_geometric_descent_canonical_Tate_MOV_FR": false,
+    "full14complete": false,
+    "qualified_source_refuted": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 51,
+    "new_modules": 7,
+    "new_concrete_modules": 6,
+    "official_import_bridge_modules": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 218,
+    "actually_imported_custom_modules": 200,
+    "actually_imported_frozen_modules": 193
+  }
+}

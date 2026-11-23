@@ -1,0 +1,18 @@
+{
+  "schema": "square-kernel.backend-override/v1",
+  "date": "2026-11-07",
+  "user_instruction": "Approved the override",
+  "scope": "Previously requested bounded local exact-arithmetic panel and identical replay; no timing or speedup claims",
+  "protocol_sha256": "44899fb67b85f2c1403e92bc24057f58e56e08e29d8734e3c5ab94ff3cff5de6",
+  "backend": "local",
+  "logical_cpu": 0,
+  "address_space_limit_kib": 2097152,
+  "timeout_seconds_per_panel_invocation": 900,
+  "panel_invocations": 2,
+  "automatic_retries": 0,
+  "cloud_jobs": 0,
+  "instrument_sha256": "83de01c9153210582abd6417eab13e58379ef25794c01fb758bae41bb67c4d2e",
+  "command_per_invocation": ["taskset", "-c", "0", "timeout", "900", "/workspace/audit/square-kernel/check", "--panel"],
+  "shell_resource_setup": "ulimit -v 2097152",
+  "run_ids": ["local-20261107-main", "local-20261107-replay"]
+}

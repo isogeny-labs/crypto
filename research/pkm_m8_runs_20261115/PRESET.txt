@@ -1,0 +1,85 @@
+PRESET: m8-runs (follow-up to pkm-msolve, research/prime_field_ic_closure_20261112/finish/pkm-msolve).
+Frozen before any system of this study was generated or run. Standing: everything here is [pcc:unverified].
+Executor: local container, L0 shared VM (4 vCPU, 15 GB RAM), shared with other concurrent agents.
+No commit, no push, no PR (task constraint). No EKS: see section 2.
+
+1. QUESTION
+(a) F4 solving degree D of the PKM Kummer-chain presentation at arity m = 8, 9, 10.
+(b) Repeat m = 6, 7 with more N steps than the parent study (which had one t-step per arity).
+Compare the growth of D with N against the break-even slopes alpha*(m, w) of the parent PRESET.
+
+2. ROUTE AND WHY LOCAL
+Repository route (CLAUDE.md / AGENTS.md section 9a): isolab-eks. Checked before data, 2026-11-15T19:1xZ:
+- aws CLI, kubectl absent; ambient AWS keys rejected by STS (InvalidClientTokenId) via boto3.
+- isolab-eks requires source/spec committed and pushed (check-experiment-git) and a commit-built image;
+  this task forbids commit/push.
+- scripts/checkpoint.sh push needs CHECKPOINT_UPLOAD_TOKEN or AWS creds: neither available.
+- No Agent tool in this subagent, so no experiment-director / executor-mechanical relay.
+Fallback, as the task permits: largest feasible local subset, strict caps, kill rule frozen here.
+
+3. INSTRUMENT (unchanged from parent unless stated)
+- msolve 0.6.5 (apt), msolve -t T -v 2 -g 2 -f SYS.ms -o SYS.out.
+- Generator: parent scripts/pkmgen.py (git blob 1ca92b19 on HEAD and origin/main a10cb7b4) used as a library.
+  New wrapper gen_mixed.py builds the same system with a per-summand tower depth t_i
+  (tower for summand i: y{i}_{j+1} - y{i}_j^2 for j < t_i - 1, y{i}_{t_i-1}^2 - 1; x_i = g*y{i}_0;
+   V_i = g*mu_{2^{t_i}}, nested). For uniform depth it must reproduce pkmgen.build_system byte for byte
+   (selftest before any run; a mismatch voids the study).
+- Variable order: y0_*, y1_*, ..., then u0..u{m-3}. DRL, first variable largest.
+- Caps (smaller than parent because the VM is shared): RLIMIT_AS = 6e9 bytes; T = 1 if nvars <= 16 else 2;
+  wall 300 s if nvars <= 16 else 1200 s. Runs one at a time.
+- Global compute budget: 3.0 h of msolve wall in total. When exhausted, remaining cells are NOT RUN (reported).
+
+4. SYSTEMS AND ARMS
+Primes/curves as the parent (same seeds, BASE_SEED 0x504B4D53, PrimeSetup from gen_all.py):
+- Arm B (main here): P1 = 2013265921 with the repo curve A = 1373482479, B = 486145570 (refutation regime:
+  expected grid zeros 2^N 2^(m-1)/p << 1 for every cell here).
+- Arm A (replication): p = 40961, its seeded prime-order curve. Only uniform t = 1 at m = 8, 9, 10:
+  2 random + 1 planted draw each. (At p = 40961, m >= 9 random targets are expected to be consistent.)
+Ladders (arm B, 2 random draws per rung, seeds seed_of("L", p, m, depths, "random", idx)):
+- depth vector for rung k: first k summands deeper.
+  Stage 1: N = m + k, depths [2]*k + [1]*(m-k), k = 0..m.   (k = 0 is uniform t = 1, k = m is uniform t = 2)
+  Stage 2 (m = 6 only): N = 2m + k, depths [3]*k + [2]*(m-k), k = 1..m.
+- m in {6, 7, 8, 9, 10}.
+Run order: all cells sorted by (nvars, m, arm, rung, draw) globally (cheap first).
+Stop rule per ladder: draw r0 first; if r0 is censored (wall or memory), r1 of that rung is skipped and
+every deeper rung of that ladder is skipped. The rung is reported as a single-draw lower bound, never a value.
+Arm-A cells follow the same order and caps.
+
+5. OBSERVABLES AND CHECKS (as parent)
+- D = max "deg" over msolve F4 round lines; censored run gives D >= printed max.
+- W = max columns; unit = (GB == {1}); wall; peak RSS.
+- (i) unit iff 0 grid zeros, exhaustive MITM enumeration over E(F_{p^2}) with per-summand V_i (new code,
+  selftested against parent enumerate_zeros on uniform depth).
+- (ii) planted: GB non-unit and vanishes at the planted point.
+A failed check marks the run an instrument defect: excluded and reported.
+
+6. KILL RULE (per arity m, arm B ladder, min over draws per rung; exact rungs = both draws finished)
+- alpha*(m,1) / alpha*(m,2) = H^{-1}((1-3/m)/w):
+  m=6 0.1100/0.0417; m=7 0.1352/0.0498; m=8 0.1561/0.0563; m=9 0.1740/0.0615; m=10 0.1893/0.0658.
+- sigma_hat(m) = OLS slope of D_cell on N over the exact rungs. Needs >= 3 exact rungs spanning
+  Delta N >= ceil(m/2); otherwise INCONCLUSIVE(m).
+- KILL(m): sigma_hat >= alpha*(m,1).
+- WEAK-KILL(m): alpha*(m,2) <= sigma_hat < alpha*(m,1).
+- OPEN-LOW(m): sigma_hat < alpha*(m,2).
+- Reported, not deciding: endpoint slope over exact rungs; censored-rung lower-bound slope
+  (D_lb(r0) - D_cell(first rung)) / (N_cens - N_first); implied exponent e = 2/(m+1 - w*m*H(sigma)) for
+  w = 1, 2 (infinite if the denominator <= 0), the parent's cost model.
+- Item verdict, m >= 8 (m = 8, 9, 10):
+  CLOSED-AT-TOY-SCALE: each of m = 8, 9, 10 reads KILL or WEAK-KILL and at least one KILL.
+  OPEN: some m in {8, 9, 10} reads OPEN-LOW.
+  INCONCLUSIVE: otherwise (including any INCONCLUSIVE(m)).
+- Repeat verdict, m = 6, 7: CONFIRMS parent KILL if KILL(m); WEAKENS it if WEAK-KILL or OPEN-LOW;
+  else INCONCLUSIVE.
+- Arm A: reported as cross-prime replication of D at t = 1 only; does not change the reading.
+
+7. PREDICTIONS (before data)
+- Q1: uniform t = 1: D = 6 or 7 at m = 8, 9, 10, same D on arms A and B.
+- Q2: stage-1 ladders are step functions; D rises by 1-2 over k = 0..m at m = 6, 7 (sigma_hat ~ 0.1-0.25).
+- Q3: rungs with nvars >= 20 are censored under these caps, so m = 9, 10 ladders stop near k = 1..3
+  and are INCONCLUSIVE; m = 8 may also be INCONCLUSIVE.
+
+8. WHAT THIS CANNOT SHOW
+- Toy N <= 18; one presentation; one engine; D is msolve's F4 degree, not an algorithm-independent bound.
+- Mixed-depth rungs use unequal per-summand bases; they measure D(N) at finer N resolution, they are not a
+  different attack. The cost model's N is the total number of tower bits.
+- OLS slope on small-N integer step data is not an asymptotic statement.

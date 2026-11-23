@@ -1,0 +1,30 @@
+{
+  "module": "SameSupport",
+  "command": [
+    "timeout",
+    "-k",
+    "5s",
+    "120s",
+    "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+    "-j1",
+    "-M4096",
+    "-o",
+    "SameSupport.olean",
+    "SameSupport.lean"
+  ],
+  "cwd": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/work",
+  "exit_code": 1,
+  "elapsed_seconds": 5.6904979800165165,
+  "artifacts": [
+    {
+      "path": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/replay-attempt2/SameSupport.stdout",
+      "sha256": "d680dcc5c38a21b8e89ef52e5a4a4cdfacdfa6efa8cfe6ca1dce6cf995c35cf3",
+      "bytes": 524
+    },
+    {
+      "path": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/replay-attempt2/SameSupport.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ]
+}

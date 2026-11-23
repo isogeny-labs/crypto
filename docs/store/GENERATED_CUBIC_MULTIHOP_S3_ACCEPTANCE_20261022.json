@@ -1,0 +1,71 @@
+{
+  "checks": {
+    "aws_identity": true,
+    "cleanup_count": 1,
+    "final_head_404": true,
+    "fresh_cache_bytes": true,
+    "fresh_store_replay": true,
+    "head_exists": true,
+    "pull": true,
+    "remote_verify_download": true,
+    "upload": true
+  },
+  "date_utc": "2026-10-22T06:59:16.856748+00:00",
+  "name": "isogeny-routes/public-cubic-f7/degree2-depth2/routes.json",
+  "object_key": "ic/v1/acceptance/cubic-multihop-20261022T065916Z-6c699180/sha256/36/36d6222f3f1a00e5effc107ea76febfedd3d118e9f26725e2a21ed1c02ae798b",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-multihop-20261022T065916Z-6c699180",
+  "result": {
+    "ic_scalar": 5,
+    "rho_scalar": 5,
+    "route": {
+      "destination_curve": {
+        "a": [
+          0,
+          6,
+          1
+        ],
+        "b": [
+          4,
+          4,
+          6
+        ]
+      },
+      "destination_ref": "destination",
+      "edges_verified": 2,
+      "hops": 2,
+      "nodes_verified": 3,
+      "route_file_sha256": "36d6222f3f1a00e5effc107ea76febfedd3d118e9f26725e2a21ed1c02ae798b",
+      "route_id": "root-to-velu2-depth2",
+      "transported_generator": [
+        [
+          0,
+          0,
+          6
+        ],
+        [
+          3,
+          0,
+          1
+        ]
+      ],
+      "transported_target": [
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          5,
+          4
+        ]
+      ]
+    },
+    "status": "complete",
+    "verified": true
+  },
+  "route_file": "docs/ic/fixtures/cubic_f7_degree2_multihop_generated_route_20261022.json",
+  "schema": "crypto.cubic-multihop-s3-acceptance/v1",
+  "sha256": "36d6222f3f1a00e5effc107ea76febfedd3d118e9f26725e2a21ed1c02ae798b",
+  "source_parent_commit": "f3b259d69cc99a4e61d460fb0dd2f47eef928391"
+}

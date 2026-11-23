@@ -1,0 +1,18 @@
+bases=6188 group=Z/17Z base_size=5 ordered_pairs=25 ascending_residue_order probes=10
+uniform_draws=5 probes_per_draw=2 planted_draws=2 probes_per_draw=5
+prior_scope=two Z/19Z six-subsets with three-position gates at six probes
+delta=variance(planted mean)-variance(uniform mean)
+first_two planted,tie,uniform=1066,0,5122 delta_range=-107/3468,519/11560
+all_pairs_fresh_each_draw planted,tie,uniform=952,0,5236 delta_range=-7/578,11697/289000
+fixed=planted all_pairs(planted,tie,uniform)=476,0,590
+fixed=tie all_pairs(planted,tie,uniform)=0,0,0
+fixed=uniform all_pairs(planted,tie,uniform)=476,0,4646
+strict_reversals=1066
+support bases fixed(planted,tie,uniform) all_pairs(planted,tie,uniform) strict_reversals
+9 136 98,0,38 136,0,0 38
+10 272 178,0,94 272,0,0 94
+11 952 359,0,593 544,0,408 503
+12 2720 388,0,2332 0,0,2720 388
+13 1836 43,0,1793 0,0,1836 43
+14 272 0,0,272 0,0,272 0
+cross_checks=pair-tally,weighted-mean,direct-outcome-variance on every base and gate

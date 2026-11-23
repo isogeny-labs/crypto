@@ -1,0 +1,16 @@
+{
+  "schema": "twist.trace-fiber-geometry-contract/v1",
+  "status": "implementation-preflight-not-executed",
+  "fixture": {"p": 37, "a": 7, "b": 19, "d": 35, "twist_a": 28, "twist_b": 33, "r": 19, "generator": [1, 8], "half_scalar": 10},
+  "scopes": {"fixed": "P=(1,8) only; engineering preflight", "full": "identity then all 18 nonidentity subgroup points in lexicographic coordinate order"},
+  "producer": "quartic parameter enumeration with all 1369 attempted parameter pairs retained per query; separate identity branch",
+  "auditor": "independent extension-field curve enumeration and group trace selection; parameters reconstructed from points",
+  "acceptance": "exact equality of all fields, ordered queries, ordered records, candidate outcomes, source pins and dataset sidecar",
+  "controls": ["wrong-d", "wrong-target", "missing-tangent", "duplicate-record", "wrong-inverse", "missing-attempt", "false-root", "missing-case", "source-pin", "spurious-infinity"],
+  "control_inapplicability": "explicit failure; never counted as successful rejection of a changed payload",
+  "matrix_degree": null,
+  "scalar_recoveries": 0,
+  "relation_solver_executed": false,
+  "execution": "successful current official checkpoint required before produce, audit or mutate; new canonical protocol and source/binary/input/analysis pins before full study",
+  "resources": {"backend": "existing-local", "stage_seconds": 600, "workers": 2, "scientific_window_seconds": 3600}
+}

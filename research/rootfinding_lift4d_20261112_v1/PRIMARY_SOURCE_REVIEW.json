@@ -1,0 +1,23 @@
+{
+  "schema": "primary_source_scope_review_v1",
+  "repo": "flintlib/flint",
+  "commit": "979b0d658ea1326099a08e392601a65c8863b5c0",
+  "sources": [
+    {
+      "path": "src/fmpz_lll/wrapper.c",
+      "url": "https://github.com/flintlib/flint/blob/979b0d658ea1326099a08e392601a65c8863b5c0/src/fmpz_lll/wrapper.c"
+    },
+    {
+      "path": "src/fmpz_lll/is_reduced.c",
+      "url": "https://github.com/flintlib/flint/blob/979b0d658ea1326099a08e392601a65c8863b5c0/src/fmpz_lll/is_reduced.c"
+    }
+  ],
+  "actual_findings": [
+    "The public wrapper first tries fmpz_lll_d, checks reducedness, then selects a heuristic double stage or fmpz_lll_mpf fallback according to the context. This is adaptive arithmetic, so our rational GMP prototype cannot be labelled the fastest specialized reducer.",
+    "Reducedness checking for integer bases strips initial zero rows and tries double, MPFR and exact matrix checks. This is implementation evidence, not an independent benchmark or mathematical novelty certification.",
+    "Our lifted-mask soundness needs exact modular membership and range replay, not a particular LLL quality guarantee. A faster numerical discovery arm can therefore be tried with exact final certificate checking and complete recovery of every unexcluded fiber."
+  ],
+  "classical_overlap": "Integer dual lattices, unimodular basis changes, adaptive numerical LLL and exact final checks are known techniques. No novelty claim for these components. Full primary-literature review of the chart-specific construction remains open.",
+  "next_bounded_experiment": "Pin a genuine external FLINT/fplll binary/library and public context, then compare discovery-plus-replay-plus-complete survivor union to exact rational4D/7D on a newly fixed training ladder. Retain all failed arms; no arbitrary warm timeout retry.",
+  "gate_passed": false
+}

@@ -1,0 +1,17 @@
+../evidence/generic-draft-004.lean.txt:181:4: error: Tactic `assumption` failed
+
+case pos
+x i : ℕ
+t : ℤ
+ht : t ≠ 0
+hi : padicValInt 2 t = i
+hv : padicValRat 2 ↑t = ↑i
+hc : x.testBit i = x.testBit i
+⊢ ↑i ≤ ↑i
+'OrientationGradedNode.actual_crossing_graded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationGradedNode.indexed_base_graded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationGradedNode.actual_completed_graded' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationGradedNode.actual_node_coefficient_weight' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

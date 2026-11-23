@@ -1,0 +1,58 @@
+import Mathlib.Algebra.Polynomial.Div
+import Mathlib.Algebra.Polynomial.Splits
+import Mathlib.Tactic
+import Mathlib.Tactic.DeriveFintype
+
+/-! Actual bounded Mumford polynomial pairs for y^2=x^5-x over F3.
+The geometric identification with Pic^0 is a separate obligation; no
+arbitrary finite group or selected list is assumed to be that Jacobian. -/
+namespace MumfordSmoothnessAudit
+open Polynomial
+private instance primeThree : Fact (Nat.Prime 3) := ⟨by decide⟩
+abbrev K := ZMod 3
+
+def curvePolynomial : K[X] := X^5-X
+
+/-- Every monic u of degree at most two and every v of degree less than u
+has this canonical coefficient shape. Completeness is proved separately. -/
+inductive Candidate
+  | identity
+  | linear (a b : K)
+  | quadratic (a b c d : K)
+  deriving DecidableEq, Fintype
+
+def uPolynomial : Candidate→K[X]
+  | .identity => 1
+  | .linear a _ => X-C a
+  | .quadratic a b _ _ => X^2+C a*X+C b
+
+def vPolynomial : Candidate→K[X]
+  | .identity => 0
+  | .linear _ b => C b
+  | .quadratic _ _ c d => C c*X+C d
+
+/-- Monic division tests the actual polynomial divisibility condition. -/
+def Valid (D : Candidate) : Prop :=
+  (vPolynomial D^2-curvePolynomial) %ₘ uPolynomial D=0
+
+instance (D : Candidate) : Decidable (Valid D) := inferInstanceAs
+  (Decidable ((vPolynomial D^2-curvePolynomial) %ₘ uPolynomial D=0))
+
+theorem curve_factorization : curvePolynomial=
+    X*(X-1)*(X+1)*(X^2+1) := by unfold curvePolynomial; ring
+
+theorem candidate_cardinality : Fintype.card Candidate=91 := by decide
+
+theorem candidates_monic : ∀ D : Candidate, (uPolynomial D).Monic := by decide
+
+theorem candidates_degree_bound :
+    ∀ D : Candidate, (uPolynomial D).natDegree≤2 := by decide
+
+theorem candidates_v_degree :
+    ∀ D : Candidate, (vPolynomial D).degree<(uPolynomial D).degree := by decide
+
+theorem valid_cardinality : Fintype.card {D : Candidate // Valid D}=8 := by decide
+
+#print axioms candidate_cardinality
+#print axioms valid_cardinality
+end MumfordSmoothnessAudit

@@ -73,3 +73,31 @@ their designs in README.md are not completed experiments. Before ready-card
 promotion, pin a merged native source, fill the protocol blob, implement/check
 recovery, and replace same-implementation replay with the required independent
 verification/admission. No scheduler or funding state transition is implicit.
+
+## TR-04 finite census preparation, 2026-10-29
+
+The new user-authorized four-part implementation has a separate
+[human-readable contract](../../research/twist_relations_tr04_20261029/PROTOCOL.md)
+and [machine-readable record](../../research/twist_relations_tr04_20261029/protocol.json).
+This supplement does not change the older TR01-03 source, streams, finite
+audit fixtures or historical evidence above. The new record remains draft
+until its source/analysis/runtime-calibration identities and canonical hash
+are frozen before affected data.
+
+The declared new scope is every coefficient-model disposition over p=7,11,19,
+B=2,3, selector budget eight and relation-word length eight. It compares
+random, progression, collision-avoiding and four fixed twist-threshold
+selectors. The finite IID stream distribution is exhausted by exact weighted
+subset-state DP; progression starts/steps and all 256 binary query words are
+also exhausted. Every nonzero public target is included for the canonical G.
+Incomplete bases and missing independent-rank milestones remain in the
+unconditional distribution and paid-work vector. Exactness is confined to
+that declared finite population; arbitrary fields, generators or unbounded
+streams are outside it.
+
+Execution is prepared for the existing native workflow's `tr04` suite, a
+source/protocol/S3-checkpoint preflight and three parallel ARC EKS Spot field
+jobs. It is not a scheduler-ready or funded-card promotion. Source/evidence
+checkpointing does not establish process-memory recovery, and L0 operation
+counts do not establish an admitted runtime/GAE or ECDLP-solving speedup.
+No new data or cloud-execution result is asserted by this preparation note.

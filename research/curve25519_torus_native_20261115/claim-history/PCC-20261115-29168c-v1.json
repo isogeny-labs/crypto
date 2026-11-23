@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:14:39Z",
+ "id": "PCC-20261115-29168c",
+ "kind": "statement",
+ "producer": {
+  "commit": "84fd610de0727b15cb009951392f7b21fea585df",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/native-tests.log",
+    "sha256": "7557fd1db43a8efb671eeb2a65c61b59876a2a4175016f3582f57b953d373010"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "tools/torus-s4/src/lib.rs",
+    "sha256": "f693f45eb22cfac0db33aca34a4508fc226cbfdec818a55b3690f379417dde94"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "tools/torus-s4/tests/native.rs",
+    "sha256": "0b5967832f4cf78dd8f02c4a4b1b36e5b57437e6109b6e4b4d88bbc814def11e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Producer Rust development tests report six passing tests: coefficient identity against three frozen quadratic fixtures, actual-field planted circuit and signed point sum, M1 oracle control, Chebyshev recurrence, mutation and exceptional-input checks. No solver timing or signed verification is asserted."
+}

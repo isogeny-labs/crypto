@@ -1,0 +1,102 @@
+{
+  "scope": "LOCAL ONLY synthetic Git/CLI metadata controls, no AWS/native/scientific run or actual future timing guarantee",
+  "head": "8fd119e9012dfe9e619f675fae7a038562e4c108",
+  "only_setup_change": "Batch exact original bound-record selector with original complete session checkout before S3 hydration; retain all late bound/challenge/frontier validators",
+  "all_other_workflow_semantics_exact": true,
+  "audit_and_sentinel_jobs_exact": true,
+  "all_original_timeouts_commands_validators_assertions_inputs_preserved": true,
+  "bash_syntax": "PASS all original/repaired run blocks",
+  "actionlint": "PASS 1.7.12; external shellcheck/pyflakes absent",
+  "canonical_budget": "PASS 0 violations for exact workflow",
+  "canonical_policy_tests": 15,
+  "fixture_controls": [
+    {
+      "case": "normal",
+      "original": {
+        "exit": 0,
+        "calls": 2,
+        "sessions": "research/a\nresearch/session with spaces\n",
+        "files": [
+          "evidence/bound receipt.txt",
+          "other/session.json",
+          "research/a/session.json",
+          "research/session with spaces/session.json"
+        ]
+      },
+      "repaired": {
+        "exit": 0,
+        "calls": 1,
+        "sessions": "research/a\nresearch/session with spaces\n",
+        "files": [
+          "evidence/bound receipt.txt",
+          "other/session.json",
+          "research/a/session.json",
+          "research/session with spaces/session.json"
+        ]
+      }
+    },
+    {
+      "case": "malformed-record",
+      "original": {
+        "exit": 5,
+        "calls": 2,
+        "sessions": "research/a\nresearch/session with spaces\n",
+        "files": [
+          "other/session.json",
+          "research/a/session.json",
+          "research/session with spaces/session.json"
+        ]
+      },
+      "repaired": {
+        "exit": 5,
+        "calls": 1,
+        "sessions": null,
+        "files": [
+          "other/session.json",
+          "research/a/session.json",
+          "research/session with spaces/session.json"
+        ]
+      }
+    },
+    {
+      "case": "selector-failure",
+      "original": {
+        "exit": 44,
+        "calls": 2,
+        "sessions": "research/a\nresearch/session with spaces\n",
+        "files": [
+          "other/session.json",
+          "research/a/session.json",
+          "research/session with spaces/session.json"
+        ]
+      },
+      "repaired": {
+        "exit": 44,
+        "calls": 1,
+        "sessions": null,
+        "files": [
+          "other/session.json",
+          "research/a/session.json",
+          "research/session with spaces/session.json"
+        ]
+      }
+    },
+    {
+      "case": "git-failure",
+      "original": {
+        "exit": 43,
+        "calls": 1,
+        "sessions": null,
+        "files": []
+      },
+      "repaired": {
+        "exit": 43,
+        "calls": 1,
+        "sessions": null,
+        "files": []
+      }
+    }
+  ],
+  "actual_new_head_ci": "not published; unobserved",
+  "hypothesis": "One early Git sparse-checkout pass avoids late index reprocessing after S3 hydration. Actual45minute harness/all5lanes/all16exits/sentinel still required."
+}

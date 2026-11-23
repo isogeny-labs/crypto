@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T20:48:43Z",
+ "id": "PCC-20261116-a6488e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e12f0ed198ebe96f5be4e7e43ffa9613ab05fb51",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "6d5a1edf72e95a99bb0e229263727d8a26b33efdb5ae051f55d83b861ffcb27d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+   "theorem": "CubicNativeNormEuclid22309.nonzero_loop_terminates"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal normalized UInt64 q223 norm and actual signed Euclid arithmetic; finite223 certificates derive termination/gcd/unit/all-state signed64 safety. Original dual66/0/j1/120/default memory. Seventeen complete types include two explicit corollaries replacing original let-type binding limitations; no Rust compiler/complete composition/field/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem nonzero_loop_terminates (n : Fin 223) (hn : n\u22600) : (euclidLoop 16 (initialState n)).isSome=true \u2227 (finalState n).nr=0 \u2227 (finalState n).r=1 \u2227 0\u2264normalizedCoefficient (finalState n) \u2227 normalizedCoefficient (finalState n)<223"
+}

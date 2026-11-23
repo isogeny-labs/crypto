@@ -1,0 +1,31 @@
+{
+  "round": 44,
+  "claim_class": [
+    "theorem",
+    "exact_computation"
+  ],
+  "target": "P192 cached order5 orbit representative and collision labels",
+  "source": "Round18 cache, with shared inversion across multiple walks",
+  "batch_sizes": [
+    1,
+    4,
+    16
+  ],
+  "steps_per_walk": 8,
+  "baseline": "negation-only walk at B and 3B walkers, same affine group-addition and batch inversion schedule",
+  "state_model": "uncompressed affine coordinates plus two 192-bit scalar labels; cached state288 bytes, ordinary96 bytes",
+  "table_size": 16,
+  "table_coefficients": "c=1+17*i,d=3+11*i for i=0..15",
+  "start_coefficients": "a=1+101*i,b=7+103*i for i=0..B-1",
+  "public_control_secret": 20261107,
+  "collision_controls": "ten planted nondegenerate equal-orbit pairs, plus zero denominator control; not a collision search",
+  "walk_partition": "sha256 of canonical first-point 24-byte x and y, first8bytes mod16",
+  "cycle_policy": "record repeats, do not erase, restart, or claim random mixing",
+  "costs": "Fp M,S,I,A,K; scalar-label arithmetic and comparisons identified separately; no runtime claims",
+  "caps": {
+    "seconds_per_command": 120,
+    "processes": 1,
+    "cloud_submissions": 0
+  },
+  "ideal_collision_gain": "sqrt5 conditional model only; not measured or established by these fixtures"
+}

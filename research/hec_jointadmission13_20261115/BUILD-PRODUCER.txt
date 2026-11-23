@@ -1,0 +1,16 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-jointadmission13 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_jointadmission13_20261115)
+error: this file contains an unclosed delimiter
+ --> kernel_admission.rs:8:327
+  |
+2 | ...n(){let a:Vec<_>=std::env::args().collect();let src=Path::new(&a[1]);let mut paths:Vec<_>=fs::read_dir(src).unwrap().map(|e|e.unwrap().path()).filter(|p|p.extension().is_some_and(|e|e=="stdout")).collect();paths.sort();let cases=paths.len();let mut pass=0; let mut primary=0; let mut compatible=0;
+  |       - unclosed delimiter
+3 | ...th in paths {let text=fs::read_to_string(&path).unwrap();let l=text.lines().find(|s|s.starts_with("PASS source_weil ")).unwrap();let p:u64=l.split_whitespace().find_map(|s|s.strip_prefix("p=")).unwrap().parse().unwrap();assert_eq!(p%3,1);let at=l.find(" L=[").unwrap()+4;let end=l[at..].find(']').unwrap()+at;let coeff:Vec<...
+  |                - unclosed delimiter
+...
+8 | ...n!("KERNEL_ADMISSION case={} p={p} charpoly_mod3={chi:?} reciprocal_cubic_choices={} h={hs:?} necessary_condition_passes={} order13_primary_choices={} primary={order13:?} extension_cardinality_fits_u128={fits} kernel_constructed=false",path.file_stem().unwrap().to_str().unwrap(),hs.len(),!hs.is_empty(),order13.len());
+  |                                                                                                                                                                                                                                                                                                                                   ^
+
+error: could not compile `hec-jointadmission13` (bin "kernel-admission13") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

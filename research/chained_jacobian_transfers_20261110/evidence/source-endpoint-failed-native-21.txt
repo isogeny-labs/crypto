@@ -1,0 +1,51 @@
+   Compiling libc v0.2.191
+   Compiling cfg-if v1.0.5
+   Compiling zerocopy v0.8.63
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling num-integer v0.1.47
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling num-bigint v0.4.8
+   Compiling isogeny_algos v0.1.0 (/workspace/crypto/isogeny_algos)
+   Compiling serde v1.0.229
+   Compiling chained-jacobian-transfer v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/native)
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling chained-seven-reference v0.1.0 (/workspace/scratch/ct28-t1-prototype/independent-walk)
+   Compiling chained-transfer-reference v0.1.0 (/workspace/scratch/ct28-t1-prototype)
+    Finished `release` profile [optimized] target(s) in 7m 13s
+     Running unittests src/main.rs (target/release/deps/chained_transfer_reference-157d0dc5fc6a5631)
+
+running 1 test
+retained gluing[0, 0] raw[38, 0, 48, 0, 9, 0, 46]:nonsquare leading unsupported,no retwist
+retained gluing[0, 1] raw[32, 0, 26, 0, 49, 0, 41]:nonsquare leading unsupported,no retwist
+gluing[1, 0] raw[19, 0, 86, 0, 34, 0, 79],rho33,monic[68, 0, 42, 0, 26, 0, 1],charts[QuotientChart { destination: 1, shift: 76, scale: 21 }, QuotientChart { destination: 0, shift: 14, scale: 21 }],LLPoly { c1: 18, c2: 279 };descent,smoothness,actual quotient109/113 bijections,matched2-kernel support pass
+gluing[1, 1] raw[87, 0, 15, 0, 13, 0, 21],rho18,monic[33, 0, 44, 0, 92, 0, 1],charts[QuotientChart { destination: 1, shift: 98, scale: 7 }, QuotientChart { destination: 0, shift: 82, scale: 7 }],LLPoly { c1: 18, c2: 279 };descent,smoothness,actual quotient109/113 bijections,matched2-kernel support pass
+retained degenerate pairing[(0, 3), (1, 4), (2, 5)], delta0
+stable pairing[(0, 4), (1, 5), (2, 3)], delta63, target[56, 41, 62, 78, 24, 57, 80]
+stable pairing[(0, 5), (1, 3), (2, 4)], delta38, target[56, 60, 62, 23, 24, 44, 80]
+retained degenerate pairing[(0, 3), (1, 4), (2, 5)], delta0
+stable pairing[(0, 4), (1, 5), (2, 3)], delta63, target[56, 41, 62, 78, 24, 57, 80]
+stable pairing[(0, 5), (1, 3), (2, 4)], delta38, target[56, 60, 62, 23, 24, 44, 80]
+transported actual R1 pairing[(0, 5), (1, 3), (2, 4)],delta33,raw target[78, 66, 56, 53, 91, 29, 88];normalization/map/duals are the next acceptance step
+new-source stable pairing[(0, 4), (1, 5), (2, 3)],delta68,raw target[78, 35, 56, 48, 91, 72, 88]
+new-source stable pairing[(0, 5), (1, 3), (2, 4)],delta33,raw target[78, 66, 56, 53, 91, 29, 88]
+actual chain sourceT0[31, 75, 74, 54, 71, 55, 1],targetT1[95, 26, 19, 27, 94, 91, 1]
+
+thread 'nonsplit::map::seven_glue::torsion::chain::ct28_prime_psi::source_control::original_elliptic_sources_have_the_same_direct_endpoint' (117433) panicked at src/ct29_source_control.rs:44:13:
+assertion `left == right` failed
+  left: Aff(45, 66)
+ right: Aff(2, 37)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test nonsplit::map::seven_glue::torsion::chain::ct28_prime_psi::source_control::original_elliptic_sources_have_the_same_direct_endpoint ... FAILED
+
+failures:
+
+failures:
+    nonsplit::map::seven_glue::torsion::chain::ct28_prime_psi::source_control::original_elliptic_sources_have_the_same_direct_endpoint
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 93 filtered out; finished in 1.49s
+
+error: test failed, to rerun pass `--bin chained-transfer-reference`

@@ -23,18 +23,16 @@
 //!
 //! - [`TruncatedPattern`] — 16-bit bitmask marking active byte
 //!   positions in an AES state.
-//! - [`propagate_truncated_round`] — apply one round of AES through
-//!   the truncated model.  Returns the next-round pattern (a
-//!   `Result<Pattern, Reason>` because MixColumns can REJECT certain
-//!   input patterns).
-//! - [`enumerate_branches_per_column`] — for each column, list the
-//!   possible (input-active, output-active) byte-count pairs
-//!   compatible with branch number 5.
-//! - [`find_truncated_trails`] — search for all r-round truncated
-//!   trails starting from a given input pattern, ranked by the
-//!   "number of active S-boxes" cost (lower = better attack).
+//! - [`propagate_truncated_round`] — report the ShiftRows pattern and
+//!   branch-number-compatible MixColumns output counts for one round.
+//!   Counts alone do not certify an exact difference or a realizable trail.
+//! - [`mix_columns_branch_options`] — list output-active byte counts
+//!   that satisfy the branch-number necessary condition in one column.
+//! - [`greedy_active_sbox_count`] — count the activity in one illustrative
+//!   sequence that always chooses the least output count and lowest rows.
+//!   It is not a global minimum over realizable trails.
 //! - [`render_trail_diagram`] — Markdown / ASCII visualization of
-//!   a trail across rounds.
+//!   an activity sketch across rounds.
 
 use super::visualize::{format_round_bars, format_trail};
 
@@ -91,9 +89,9 @@ pub fn shift_rows_truncated(p: TruncatedPattern) -> TruncatedPattern {
 
 /// **MixColumns branch-number filter** applied per column in the
 /// truncated model.  A non-trivial input column (1, 2, 3, or 4
-/// active bytes in) can produce output columns with active-byte
-/// count satisfying `in + out ≥ 5`.  For each input count we
-/// enumerate the legal output counts:
+/// active bytes in) must have output-active count satisfying
+/// `in + out ≥ 5`.  For each input count we enumerate the counts
+/// that survive this necessary condition:
 ///
 /// - in = 1: out ∈ {4}
 /// - in = 2: out ∈ {3, 4}
@@ -101,7 +99,8 @@ pub fn shift_rows_truncated(p: TruncatedPattern) -> TruncatedPattern {
 /// - in = 4: out ∈ {1, 2, 3, 4}
 /// - in = 0: out = 0 (no diffusion of a zero column)
 ///
-/// Returns the set of legal output-active-byte counts.
+/// This does not test whether a specified input/output difference pair
+/// is attainable by the AES MixColumns matrix.
 pub fn mix_columns_branch_options(input_active: u32) -> Vec<u32> {
     if input_active == 0 {
         return vec![0];
@@ -121,7 +120,7 @@ pub struct TruncatedRoundStep {
     /// Active-byte count per column AFTER MixColumns, in the
     /// non-deterministic truncated model — one option per column.
     pub mc_output_counts: [Vec<u32>; 4],
-    /// Number of active S-boxes the trail commits to in this round
+    /// Number of active S-boxes in the input activity pattern
     /// (= `before_sb.active_bytes()`).
     pub active_sboxes: u32,
 }
@@ -143,25 +142,20 @@ pub fn propagate_truncated_round(input: TruncatedPattern) -> TruncatedRoundStep 
     }
 }
 
-/// Sum the minimum branch-number cost (= active S-boxes) over
-/// `n_rounds` of AES starting from `input`.  Returns the total
-/// minimum-active-S-box count, which lower-bounds the differential
-/// probability via the AES S-box max-DP `2⁻⁶`:
-///
-/// ```text
-///     log₂ Pr(trail) ≤ −6 · total_active_sboxes
-/// ```
-///
-/// Caller must specify a column-output-count chooser; we use the
-/// **minimum** per column (best-case attacker).
-pub fn minimum_active_sbox_count(input: TruncatedPattern, n_rounds: usize) -> u32 {
+/// Count active S-boxes in one illustrative sequence of truncated patterns.
+/// Each round chooses the least branch-number-compatible output count in
+/// each column and places those active bytes in the lowest rows.  This
+/// greedy choice is neither a global minimum nor a certificate that all
+/// consecutive difference patterns are jointly realizable.  No
+/// differential probability follows from this count alone.
+pub fn greedy_active_sbox_count(input: TruncatedPattern, n_rounds: usize) -> u32 {
     let mut total = 0u32;
     let mut current = input;
     for _ in 0..n_rounds {
         let step = propagate_truncated_round(current);
         total += step.active_sboxes;
-        // Choose the minimum active-byte output per column (attacker
-        // optimum) and reconstruct the next-round input.
+        // Choose the least allowed count per column for this sketch and
+        // reconstruct one next-round activity pattern.
         let mut next = 0u16;
         for c in 0..4 {
             let n = *step.mc_output_counts[c].iter().min().unwrap();
@@ -175,7 +169,13 @@ pub fn minimum_active_sbox_count(input: TruncatedPattern, n_rounds: usize) -> u3
     total
 }
 
-/// **Render a multi-round truncated trail** as ASCII art.  Returns
+/// Legacy name for [`greedy_active_sbox_count`].  The returned value is
+/// an illustrative greedy count, not a proven minimum.
+pub fn minimum_active_sbox_count(input: TruncatedPattern, n_rounds: usize) -> u32 {
+    greedy_active_sbox_count(input, n_rounds)
+}
+
+/// **Render a multi-round truncated activity sketch** as ASCII art.  Returns
 /// Markdown.
 pub fn render_trail_diagram(steps: &[TruncatedRoundStep]) -> String {
     let mut s = String::new();
@@ -195,9 +195,8 @@ pub fn render_trail_diagram(steps: &[TruncatedRoundStep]) -> String {
     let counts: Vec<usize> = steps.iter().map(|s| s.active_sboxes as usize).collect();
     s.push_str(&format_round_bars(&counts, "Active S-boxes per round", 30));
     s.push_str(&format!(
-        "\n**Total active S-boxes** (lower-bounds trail prob via Pr ≤ 2⁻⁶·N):\n  N = {}, Pr ≤ 2⁻{}\n",
+        "\n**Illustrative active S-box count**: N = {}. Branch-number-compatible counts alone do not certify a realizable exact trail or a differential probability bound.\n",
         counts.iter().sum::<usize>(),
-        6 * counts.iter().sum::<usize>(),
     ));
     s
 }
@@ -237,26 +236,16 @@ mod tests {
         assert_eq!(mix_columns_branch_options(4), vec![1, 2, 3, 4]);
     }
 
-    /// **Minimum active S-box bound on 4-round AES** is at least 25
-    /// (the classical wide-trail-strategy result).  We measure the
-    /// per-column-minimum trail and verify the bound.
+    /// The greedy sequence starting from one active byte has a stable
+    /// activity count.  It is a visualization fixture, not a bound.
     #[test]
-    fn minimum_active_sboxes_4_rounds_is_at_least_5() {
-        // For a single-active-byte input, the truncated trail visits:
-        //  R1: 1 active S-box, MC → 4 active in one column.
-        //  R2: 4 active (one full column), MC → can go to 1 per column
-        //      under minimum-cost choice (= 4 active columns × 1 byte = 4).
-        //  R3: 4 active, MC → choose 4 again under minimum.
-        //  R4: 4 active.
-        // Total: 1 + 4 + 4 + 4 = 13 (attacker-optimum), which is the
-        // well-known lower bound for the OPTIMUM trail (the 25
-        // figure is for OPTIMUM over BOTH directions, not just forward).
-        let mut p = TruncatedPattern(1);
-        let count = minimum_active_sbox_count(p, 4);
-        assert!(count >= 13, "got {} active S-boxes", count);
-        // Also: trail prob is bounded by 2^(-6 · 13) = 2^(-78) for this
-        // attacker-optimum trail.
-        let _ = &mut p;
+    fn greedy_activity_count_is_illustrative() {
+        // For a single active byte, the greedy sequence visits 1, 4, 16,
+        // and 4 active S-boxes.  The sum 25 is a count for this chosen
+        // sequence; this function does not certify a realizable trail.
+        let p = TruncatedPattern(1);
+        assert_eq!(greedy_active_sbox_count(p, 4), 25);
+        assert_eq!(minimum_active_sbox_count(p, 4), 25);
     }
 
     /// **Active-byte pattern visualisation** — 4 active bytes in
@@ -297,7 +286,9 @@ mod tests {
         assert!(s.contains("R1 SR"));
         assert!(s.contains("R3 SR"));
         assert!(s.contains("Active S-boxes per round"));
-        assert!(s.contains("Total active S-boxes"));
+        assert!(s.contains("Illustrative active S-box count"));
+        assert!(s.contains("do not certify a realizable exact trail"));
+        assert!(!s.contains("Pr ≤"));
     }
 
     /// **Demo emit**: print a 4-round trail visualization.  Marked
@@ -320,7 +311,7 @@ mod tests {
             current = TruncatedPattern(next);
             steps.push(step);
         }
-        println!("\n# 4-round AES truncated-differential trail\n");
+        println!("\n# 4-round AES truncated-differential activity sketch\n");
         println!("Starting pattern: single active byte at position 0.\n");
         println!("{}", render_trail_diagram(&steps));
     }

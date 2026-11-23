@@ -42,10 +42,17 @@ pub struct Fit {
     pub fitted: Vec<f64>,
 }
 
+/// The field degree of an ICV1 slug: `n` for `icv1-f2m<n>-…`, and `1` for
+/// a prime field `icv1-fp<bits>-…` (degree one, so `ln n = 0`: the `free_r`
+/// fit is the one that applies, `free_r_n` is singular and skipped, and the
+/// `model` fit reduces to `β ln r`).
 fn n_of(slug: &str) -> Result<u32, String> {
+    if slug.starts_with("icv1-fp") {
+        return Ok(1);
+    }
     let rest = slug
         .strip_prefix("icv1-f2m")
-        .ok_or_else(|| format!("{slug}: not a binary-field ICV1 slug"))?;
+        .ok_or_else(|| format!("{slug}: not an ICV1 slug of a binary or prime field"))?;
     let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
     digits
         .parse()
@@ -249,5 +256,32 @@ mod tests {
         assert!((model.coefficients[0].1 - 0.3f64.ln()).abs() < 1e-9);
         assert!(model.chi2_per_dof.unwrap() < 1e-12);
         assert_eq!(n_of("icv1-f2m41-tm2308219-7f48b14a").unwrap(), 41);
+    }
+
+    /// Prime-field slugs have degree one; a pure power law in `r` is
+    /// recovered by `free_r`, and `free_r_n` (singular, `ln n = 0`) is skipped.
+    #[test]
+    fn prime_field_slugs_fit_in_r_alone() {
+        assert_eq!(n_of("icv1-fp40-tm574071-afad8b26").unwrap(), 1);
+        assert!(n_of("p256").is_err());
+        let pts: Vec<Point> = [33.5f64, 35.0, 36.5, 38.0, 39.5]
+            .iter()
+            .enumerate()
+            .map(|(i, &l2r)| {
+                let ratio = 0.9 * 2f64.powf(l2r).powf(0.01);
+                Point {
+                    slug: format!("icv1-fp{}-t{i}-x", l2r as u32 + 1),
+                    n: 1,
+                    log2_r: l2r,
+                    ratio,
+                    ci95: [ratio * 0.9, ratio * 1.1],
+                    se_ln: 0.05,
+                }
+            })
+            .collect();
+        let f = fits(&pts, 0.0, 0.0);
+        let r = f.iter().find(|f| f.name == "free_r").unwrap();
+        assert!((r.coefficients[1].1 - 0.01).abs() < 1e-9);
+        assert!(f.iter().all(|f| f.name != "free_r_n"));
     }
 }

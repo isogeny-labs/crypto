@@ -1,0 +1,13 @@
+digraph G {
+rankdir=LR; graph [bgcolor="transparent",nodesep=.3,ranksep=.4];
+node [shape=box,style="rounded,filled",fillcolor="#e8f0fa",fontname="Helvetica",fontsize=10];
+a [label="Actual cast payloads
+exact prior outcome"];
+b [label="Recorded input size
+actual budget bound"];
+c [label="Separate signed fold
+value and ring calls"];
+d [label="OPEN: compose word bits
+and all preparation",style="rounded,dashed",fillcolor="white"];
+a->b; c->d [style=dashed]; b->d [style=dashed];
+}

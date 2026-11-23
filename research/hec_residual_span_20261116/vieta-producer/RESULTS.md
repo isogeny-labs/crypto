@@ -1,0 +1,9 @@
+# Vieta producer equivalence and complete cost
+
+[pcc:unverified] Freeze0a15e66fd7a pushed before one execution. Input hashes pass; exit0. All24measuredcalls on12originalgenus-two targets pass complete trace replay against lazy-certificate raw records, old quotient/nativegroup diagnostic on every primitive, full packet replay, subgroup counter replay, verifier phases and exact repeats. Each verifier accepts12original certificates and rejects84mutations. Repeated-root fallback/action controls unchanged.
+
+Only residual polynomial extraction changed to x3=t²+u1-x1-x2. No relation selection, seeds, attempt budget, labels, packet witness or scalar changed. Full cost still charges packet action/orbit row construction, sparse witnesses and verifier. Native final scalar-control delta separately retained; conservative totals also emitted.
+
+Producer old/new base-field REDC ratios range1.05384-1.11905 (approximately5.1-10.6percent fewer operations). Complete-candidate old/new range1.03023-1.07723 (approximately2.9-7.2percent fewer). Subgroup vectors are unchanged. Atp601 completecandidate/arm0base costs1.852-3.685; subgroup remains4.876-6.872. Registered10x gate fails. These are operation counts, not wall time or external-fastest comparisons; exact per-target/modulus values in SUMMARY.tsv, full16vectors in CONTROL.tsv. Independent signed verification remains pending.
+
+Decision: retain Vieta extraction as an exact local improvement. It cannot alone meet the target, and unchanged explicit certificate row construction still dominates. Next derive residual-coefficient recurrences for g3/4 and qualify exact polynomial equality; a full collector needs those residual root-solving costs plus changed setup/collection/construction. Do not infer genus3/4 performance from genus2 panel. Sources/assumptions in PROTOCOL.md and prior experiment records. Git custody, noS3/cloud/retry.

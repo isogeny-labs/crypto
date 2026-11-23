@@ -1,0 +1,34 @@
+{
+  "scope": "Exact block recurrence and residue-section algebra checks; no timed experiment",
+  "build_exit": 0,
+  "check_exit": 0,
+  "lean_exit": 0,
+  "compile_limit_seconds": 90,
+  "check_limit_seconds": 60,
+  "lean_limit_seconds": 30,
+  "commands": [
+    "rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info main.rs -o /tmp/t1904-v3-check",
+    "/tmp/t1904-v3-check",
+    "lean Algebra.lean"
+  ],
+  "binary_sha256": "5681d181f82287a48d4d365f274e7b17383f6c8609118f684cf94ba0332bb573",
+  "source_hashes": {
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-recurrence-compression-audit/main.rs": "c1526aa5e2eb8b23cb10084ec59a55ba29b6ab22506942da73d35c01a50eb696",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-signed-image/metered-polynomial.rs": "98a2a76377863064077262b2471db12fa2b1a1ccc9b27e3b7e5cdc71a43d1ae0",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-signed-image/meter.rs": "533392c70d7ac314d24ba3c20b68a4239d21e25ba20e897b28c6ce4472ae449f",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-hgcd-roots/gcd.rs": "9832817f5a0687ae8aa2b41a1970916f64e9b3beb531d74d536cd250e4b737b0",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-recurrence-compression-audit/checks.rs": "a9a84ae20652fbf965981b88009a0fe98716ba90fd2f6872fc39181c6bf9f9ff",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-recurrence-compression-audit/power.rs": "685f076cc2d27c7fe481118cf614042e9beb1fa322a4ca9f0ed166048c7053e2"
+  },
+  "logs": {
+    "check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lean.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stderr": "1e3d3df53901e2818a4b1c1c738e60ce4847534413f9b6612e8199ca743920c9",
+    "lean.stdout": "ad8248607552c3bd49d3f651d0d5319e89eccce14c3b532fc0da9119867ffef4",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "check.stdout": "6360a984b3611dc8975de823ca3d0d4edf1cf552db427e807675dc551fad193c"
+  },
+  "lean_source_sha256": "562c1b7f05946b1cdc229a3f938ff913d76204db87978f6175dd6e3c746a7394",
+  "lean_version": "4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52"
+}

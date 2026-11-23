@@ -1,0 +1,20 @@
+digraph proof {
+  rankdir=LR;
+  graph [bgcolor="white",fontname="Helvetica",nodesep="0.3",ranksep="0.35"];
+  node [shape=box,style="rounded,filled",fillcolor="#f1f4f8",fontname="Helvetica",fontsize=11];
+  edge [color="#596579"];
+  base [label="Same original P-256 base\n144 columns / 288 signs"];
+  dense [label="Dense point CI(3,96)\nquotient r=97"];
+  chain [label="Exact retained chain ideal\n9 coordinates; quotient r=5"];
+  common [label="Same degree-4 complete sum\nSame fixed unplanted target line"];
+  ref [label="All 288 squared tuples checked\nNo unplanted solution; f regular"];
+  hilbert [label="Artinian Hilbert certificate\nD dense=198; D chain=14",fillcolor="#d9f1eb"];
+  standing [label="Unsigned producer certificate\nIndependent admission pending",fillcolor="#fff1d8"];
+  base -> dense;
+  base -> chain;
+  dense -> common;
+  chain -> common;
+  common -> ref;
+  ref -> hilbert;
+  hilbert -> standing;
+}

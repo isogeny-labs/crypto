@@ -1,0 +1,19 @@
+import Controls
+namespace ReviewerSignedPair
+ def q4 (x : ZMod 4) : Nat := min x.val (-x).val
+ def q5 (x : ZMod 5) : Nat := min x.val (-x).val
+ theorem q4_fiber : ∀ x y : ZMod 4, q4 x = q4 y ↔ y=x ∨ y= -x := by decide
+ theorem q5_fiber : ∀ x y : ZMod 5, q5 x = q5 y ↔ y=x ∨ y= -x := by decide
+ theorem nonzero_two_torsion_ambiguity :
+ (2 : ZMod 4) ≠ 0 ∧ (2 : ZMod 4)+2=0 ∧
+ q4 (1 : ZMod 4)=q4 3 ∧ q4 (2+1)=q4 (2+3) ∧ (1 : ZMod 4)≠3 := by decide
+ theorem one_projection_insufficient : q5 1=q5 4 ∧ (1 : ZMod 5)≠4 := by decide
+ theorem neighbour_separates : q5 (1+1)≠q5 (1+4) := by decide
+ theorem constant_projection_fails_fiber :
+ ¬ (∀ x y : ZMod 5, (0 : Nat)=0 ↔ y=x ∨ y= -x) := by decide
+ theorem actual_fiber_application (e : ZMod 5)
+ (h : q5 2=q5 e) (hn : q5 (1+2)=q5 (1+e)) : e=2 :=
+ SignedPair.unique_signed_lift q5 q5_fiber 1 2 e (by decide) h hn
+ theorem empty_candidate_set_possible :
+ ¬ (∃ d : ZMod 5, q5 d=99 ∧ q5 (1+d)=0) := by decide
+end ReviewerSignedPair

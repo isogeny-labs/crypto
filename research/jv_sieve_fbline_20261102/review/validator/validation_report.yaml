@@ -1,0 +1,137 @@
+validation_report:
+  id: VAL-20261103-594245
+  task_id: "none allocated (main-session task card 2026-11-03: independent validation of PR #3342 studies A and B)"
+  snapshot: "main aa1c89ab2a1be0bcbc60ac9c595df58089a471d1 (merged via PR #3342); study files clean against HEAD (git status --porcelain empty)"
+  study: research/jv_sieve_fbline_20261102
+  claim_class: "measured paired comparison of two settings of one algorithm (JV12 sec. 3.2 sieve route), weak class only (full rational 2-torsion, #E = 4l, genus-3 cover over F_{p^2})"
+  run_ids:
+    - "results/{P,H,T,U}_{1009,1511,1823}.json: 12 arm files x 16 seeds (17-32) = 192 runs"
+    - "results/{c2h,c2t,c3}_{1009,1511,1823}.json: 9 control runs (seed 17)"
+  artifact_checks:
+    - check: presence and shape
+      result: pass
+      detail: "21 JSON + 21 log files; 16 records (seeds 17-32 in order) per arm file, 1 (seed 17) per control; p matches the file; log line count = record count"
+    - check: freeze hashes
+      result: pass
+      detail: "sha256sum -c of results/FROZEN.sha (PROTOCOL.md 2f0073e9, run.sh 18512f5e, results/rule.txt b65710c7) and results/FIT.sha (fit/src/*.rs, Cargo.toml): all OK on the snapshot"
+    - check: freeze ordering (git)
+      result: pass_with_note
+      detail: "FROZEN.sha timestamp 19:29:06Z is clock-only. First git evidence: 73582ce306 (committer 19:37:29Z) holds PROTOCOL.md, run.sh, rule.txt, FROZEN.sha, FIT.sha and fit/ byte-identical to the final versions, together with P_1009 (16), H_1009 (16) and T_1009 (6 of 16) records only; walls (P 285 s + H 161 s + 6 T seeds ~60 s) put the run start within seconds of the clock freeze. The design (arms P, H with n by a pre-data rule, T exhaustive, H1) was already committed in LEADS.md at 3764c93e98 (18:50:54Z). rule.txt is a deterministic function of V2 data and the frozen model and was recomputed (below). No third-party (push) timestamp was checked."
+    - check: source revision and dirty tree
+      result: pass
+      detail: "versions.txt: 3764c93e98 + modified jv_cover.rs (712366ee) and jv_sieve.rs (b83e10db); those exact blobs are committed in 73582ce306 and 44a1e45ddd. Main aa1c89ab2a differs only by cfa4ef08bc ((p+1)/2 -> p.div_ceil(2), identical for odd p)."
+    - check: producer binary
+      result: not_verifiable
+      detail: "FROZEN.sha binary 68f23f40 is not on disk; its records are reproduced by the main build (replays) and its plain arm reproduces V2 (C1)"
+    - check: receipts (C4)
+      result: pass
+      detail: "201/201 runs solved, correct, not exhausted, rels_failed_verify 0, lin_mode sparse; descent_timed_out 0, descent_incomplete 0"
+    - check: phase sums
+      result: pass
+      detail: "every run: relation = table+enum+sieve+extract+verify; descent = weil+f4+lin+post+verify+stream; total_muls = setup+base+relation+descent+la; la_muls = 16 la_ops; total_plus = total_muls + sieve_adds + sieve_lookups + enum_adds + search adds + search lookups (exact integers); s, s_plus to 1e-12; c_add_e = 331"
+    - check: pair identity
+      result: pass
+      detail: "l, c_add_e and seed of all 144 arm rows equal P's"
+    - check: search counters
+      result: pass
+      detail: "exact on all 144 rows: Horner adds 15pn, lookups pn; table adds 29q + 2pn, lookups q + pn, table_muls 38q; T exhaustive with candidates 1 + p(p+1)/2. Search muls above the counted floor are exactly 341 per extra Horner candidate (line_poly) + 374 (move of G, Q) [H], 374 [U], 374 + 17 per direction with a0 != 0 [T: 17(p+1) at 1009, 17(p-1) at 1511 and 1823]."
+    - check: code review (moved model everywhere)
+      result: pass
+      detail: "run_cover_sieve_dlp_on shadows `spec` with the moved spec before any context; Ctx::new / with_trace apply spec.line (cov.hx = line_poly(h, a, b)); unit_costs, factor_base, jac, gj/qj, sieve_setup, sieve_batch (Ctx::new(spec)), descent (Ctx::with_trace(&spec), nagao_decompose, verify_dec) and verification all use it; no generate_spec call remains in the route. End-to-end: all 144 moved runs recover the planted logarithm, which an inconsistent model would not."
+    - check: code review (chi-table charging)
+      result: pass_with_caveat
+      detail: "chi_table executes 5 products and 4 additions per Horner step x 7 plus a 3-product, 1-addition norm and one lookup per point = the charged 38 q muls, 29 q adds, q lookups; table_count executes 2 additions and 1 lookup per point = charged. Not charged, declared: the index arithmetic x0*p + x1 per lookup (1 integer mul + 1 add), the products by a' in {1, i} when enumerating offsets (trivial), loop control. Over-charged: the plain line is walked twice in exhaustive mode. The declared 'negligible' is false for arm T (see limitations)."
+    - check: code review (plain arm bit-identical)
+      result: pass
+      detail: "JV_FB_LINE unset -> fb_line_from_env returns (spec.clone(), None): line_muls = line_native = 0, fb_line skipped in serialization; C1 48/48 and the main-build replay of P seed 32 equal V2's records"
+  metric_recomputations:
+    tool: "review/validator/check/src/main.rs (Rust, independent of fit/); output review/validator/check_output.txt; numbers review/validator/recompute.json"
+    headline:
+      - {name: "H S pooled (48 pairs)", claimed: "0.623 [0.562, 0.689]", recomputed: "0.6230 [0.5632, 0.6882]", result: match}
+      - {name: "H S+ pooled", claimed: "0.550 [0.519, 0.584]", recomputed: "0.5503 [0.5177, 0.5840]", result: match}
+      - {name: "U S+ pooled", claimed: "0.525 [0.491, 0.561]", recomputed: "0.5249 [0.4914, 0.5602]", result: match}
+      - {name: "U S pooled", claimed: "0.600 [0.535, 0.674]", recomputed: "0.5999 [0.5357, 0.6733]", result: match}
+      - {name: "T S pooled", claimed: "0.560 [0.500, 0.631]", recomputed: "0.5604 [0.4994, 0.6320]", result: match}
+      - {name: "T S+ pooled", claimed: "0.800 [0.750, 0.853]", recomputed: "0.7997 [0.7505, 0.8529]", result: match}
+      - {name: "H S per prime", claimed: "0.495 / 0.644 / 0.759", recomputed: "0.4949 / 0.6440 / 0.7587", result: match}
+      - {name: "T S+ p=1823", claimed: "1.073 [0.968, 1.181]", recomputed: "1.0731 [0.9697, 1.1782]", result: match}
+      - {name: "5a band pooled H / T / U at w=0.1", claimed: "0.528 / 0.876 / 0.497", recomputed: "0.5279 / 0.8757 / 0.4973", result: match}
+      - {name: "5a band pooled H / T / U at w=1", claimed: "0.527 / 0.879 / 0.496", recomputed: "0.5271 / 0.8786 / 0.4962", result: match}
+    all_points: "60 point estimates of analysis/analysis.txt (S, S+, band at 3 w; per prime and pooled; 3 arms) within half a unit of the last printed decimal; bootstrap endpoints (independent stream, type-7 quantiles) within 0.0036"
+    other:
+      - "absolute arm S, S+ (arithmetic means) match README (S_P 0.02038/0.00615/0.00401, S+_U 0.0300/0.0130/0.00923, ...)"
+      - "phase shares match README to 0.1 point; search share of total_plus 1.2-1.3% (H), 2.6-3.0% (U), 26.4/45.1/52.9% (T)"
+      - "B model: measured/model 0.9303 (H), 0.9732 (T), 0.9615 (U); gamma_hat 5.915 (H), 5.476 (T), 5.412 (U) match; H interval [4.93, 6.89] vs producer [4.83, 6.94]: producer resamples the 48 pairs unstratified, validator by prime; both contain 5"
+      - "n rule (rule.txt) recomputed from V2 sparse means with an independent normal-maximum quadrature: k(4096) = 3.626, w=0 n_H = 4096 (J 0.6554), n_T = exhaustive (J 0.5642); w = 0.1 and 1: n_H = 8192, n_T = 32768 (J 0.6340 / 0.6108, 0.6336 / 0.6108); every per-prime J equal to 4 decimals"
+  control_checks:
+    - {id: C1, result: pass, detail: "P equals V2 sparse record in every field but wall_ms, key sets equal, 48/48"}
+    - {id: C2h/C2t, result: pass, detail: "seed 17 each prime: relations, descent_digest, descent_residuals, base, hits, lines equal P; d(total_muls) = search muls = (p-1)/2 + 5 + 17p (Horner: 17662 / 26447 / 31907) or (p-1)/2 + 5 + 38q (table: 38687587 / 86759358 / 126287418); d(total_plus) = muls + adds + lookups; best_index 0; the only differing fields are fb_line, setup/total muls and plus, s, s_plus and the *_over_rho derivatives"}
+    - {id: C3, result: pass, detail: "table n=4096 = Horner n=4096: B 511->554 idx 642, 768->824 idx 3928, 924->997 idx 1306; route muls equal"}
+    - {id: C4, result: pass, detail: "192 + 9 runs solved, correct, 0 failed verifications, not exhausted"}
+    - {id: C5, result: pass, detail: "b_plain = P base and b_best = arm base on 144/144 pairs"}
+    - {id: null_object, result: pass, detail: "the machinery null (n = 1) leaves the route bit-identical and adds exactly the search charge; the gain decays with p as the model says it should (H 0.495, 0.644, 0.759)"}
+  replay_checks:
+    certificate: review/validator/replay-certificate.json
+    binary: "jv_cover_round3_frozen sha256 d21002a309374e1a06caf3f93a4c6da212362a72e5987b4e80aa8a96fdc44f2c (main aa1c89ab2a per the task card)"
+    draw: "review/validator/replay/DRAW_sieve.txt (nonce 49aff9aa..., 2026-11-03T01:26:48Z)"
+    runs:
+      - {run: "H p=1511 seed 27", result: "identical in every field but wall_ms"}
+      - {run: "U p=1511 seed 21", result: "identical in every field but wall_ms"}
+      - {run: "P p=1511 seed 32", result: "identical to study record and to V2's record"}
+      - {run: "T p=1511 seed 18", result: "identical in every field but wall_ms"}
+  heuristic_validation_checks:
+    - {item: pre-registered prediction, result: pass, detail: "B^-5 route model and the rule's J were frozen in rule.txt/PROTOCOL.md before H/T/U data; measured vs model J at w=0: H 0.623 vs 0.655, T 0.560 vs 0.564; at w=0.1 the model was conservative (T 0.876 vs 0.989, U 0.497 vs 0.611)"}
+    - {item: sample integrity, result: pass, detail: "seeds 17-32 x 3 primes from run.sh; all statistics recomputed from raw records"}
+    - {item: correspondence validity, result: pass, detail: "the moved model H' : y'^2 = h(a s + b)/a^7 (a = t^2) is F_q-isomorphic to H; unit test (moved base has b_best points), C5 in data, and recovery of the planted log on all moved runs control it"}
+    - {item: scale binding, result: pass_with_limitation, detail: "p in {1009, 1511, 1823} only; the gain decays with p and no transfer is claimed"}
+  cost_model_checks:
+    - {item: unit, result: pass, detail: "S in F_p multiplications / (c_add_e sqrt l), c_add_e = 331 (GAE); S+ adds emitted F_p additions and lookups at one each; band prices native ops at w GAE"}
+    - {item: unpriced work (5a), result: pass_with_caveat, detail: "listed per arm with counts in check_output.txt; F4/descent additions have no counter on any arm (band cells are lower bounds on both); table index arithmetic uncounted (material for T)"}
+    - {item: memory, result: incomplete, detail: "not reported; the chi table is q = p^2 bytes (1.0 / 2.3 / 3.3 MB)"}
+    - {item: bookkeeping, result: not_applicable, detail: "every cost is a complete solved run, not a per-attempt cost times an inverse success probability"}
+  proof_architecture_checks: []
+  verdict: passed
+  gate_admissibility:
+    admissible: false
+    validation_json_written: false
+    present: ["replay certificate (sampled, review/validator/replay-certificate.json)", "validator report (review/validator/validator-report.json; status pass)"]
+    missing:
+      - "a rho reference named by this protocol: PROTOCOL.md says 'No rho is run' and 'there is no VALIDATION.json'; the README's distances use V2's R3 rho, which V2 withheld (A4 failed)"
+      - "a matched rho at p = 1009 and p = 1823 (study B covers p = 1511, seeds 17-24 only)"
+      - "a frozen arm-vs-rho comparison on the same instances with the 5a band (LEADS.md 'Combined' multiplies two ratios computed on different seed sets)"
+  limitations:
+    - "Arm T's S+ (0.800) and 5a band (pooled 0.876 at w = 0.1) are lower bounds: pricing the declared-uncounted index arithmetic x0*p + x1 of each line-walk lookup at 2 native operations gives T S+ 1.016 [0.956, 1.082] (1823: 1.447) and band 1.164 [1.101, 1.231] at w = 0.1, i.e. not below P. H is unaffected (no index arithmetic), U moves from 0.525 to 0.532 in S+ and 0.497 to 0.507 at w = 0.1. T's S (0.560, multiplications only) is unaffected. Under 5a T's band order against P is unresolved."
+    - "Uncharged on the moved arms: the moved model's line_poly inside every Ctx built (341 F_p mults each), estimated at <= 2.7e-4 of total_muls (model estimate from sieve_steps and descent_residuals)."
+    - "Freeze timestamps (19:29:06Z) are clock-only; git first records the frozen files at 19:37:29Z with P/H 1009 and 6 T 1009 records present. LEADS.md says only P and H existed then; T_1009 was 6/16 done."
+    - "The producer's binary (68f23f40) is not available; the replays used the main build, whose source differs only by a semantics-preserving div_ceil edit."
+    - "Run locally (4 cores, shared), not on isolab-eks; counted metrics are host-independent and replay bit-for-bit."
+    - "Bootstrap intervals are recomputed with an independent RNG; endpoints agree within Monte Carlo error (<= 0.0036), not bit-for-bit."
+    - "Rounding slips in the prose (no effect on any decision): README 'x1.91' for U S+ (1/0.5249 = 1.905), README T p=1009 S '0.488' (0.48748), LEADS.md 'T ... (x1.79)' (1/0.5604 = 1.784)."
+    - "The distances to rho in the README use V2's withheld R3 reference and were not validated."
+  artifact_paths:
+    - "REPORT.md: blocked by the validator harness (no report .md files); its full text is in the validator hand-back to the main session"
+    - research/jv_sieve_fbline_20261102/review/validator/validation_report.yaml
+    - research/jv_sieve_fbline_20261102/review/validator/check/Cargo.toml
+    - research/jv_sieve_fbline_20261102/review/validator/check/src/main.rs
+    - research/jv_sieve_fbline_20261102/review/validator/check_output.txt
+    - research/jv_sieve_fbline_20261102/review/validator/recompute.json
+    - research/jv_sieve_fbline_20261102/review/validator/replay-certificate.json
+    - research/jv_sieve_fbline_20261102/review/validator/validator-report.json
+    - research/jv_sieve_fbline_20261102/review/validator/replay/
+  review_attestation:
+    joints_owned: ["receipts", "controls", "metric recomputation", "code review of the moved model and the search charging", "replays", "gate admissibility"]
+    sources_read:
+      - /home/user/crypto-autoresearcher/docs/agent-runtime-core.md
+      - /home/user/crypto-autoresearcher/agents/validator.md
+      - docs/VALIDATION_GATE.md
+      - "AGENTS.md: Standing workflow rules, sec. 5a"
+      - research/jv_sieve_fbline_20261102/{PROTOCOL.md, README.md, run.sh, results/*, analysis/analysis.txt}
+      - "research/jv_sieve_fbline_20261102/fit/src/analyze.rs lines 155-166 only (after the independent recomputation, to explain the gamma_hat interval difference)"
+      - research/jv_sieve_strong_rho_v2_20261020/raw/ic_{1009,1511,1823}_sparse.json
+      - "research/jv_sieve_strong_rho_v2_20261020/PROTOCOL.md (rule A4 only)"
+      - research/jv_cover_next_leads_20261102/LEADS.md
+      - "src/cryptanalysis/jv_sieve.rs (run_cover_sieve_dlp_on, sieve_batch header) and jv_cover.rs (Fq counter, Spec, Ctx, line_poly, line_div, line_count, chi_table, table_count, search_fb_line_mode, pmul, pscale) at aa1c89ab2a; git diffs 3764c93e98..44a1e45ddd and 44a1e45ddd..aa1c89ab2a"
+      - examples/jv_cover.rs (seed loop)
+      - scripts/validation_gate.py (checker functions), scripts/fixtures/validation_gate/positive/
+    read_sibling_reports: false
+    verdict: passed

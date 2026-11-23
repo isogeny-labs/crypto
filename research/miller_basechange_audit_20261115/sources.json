@@ -1,0 +1,561 @@
+{
+  "schema": "actual-miller-basechange-source-plan/v1",
+  "created": "2026-11-15T10:00:02.665742+00:00",
+  "formal": {
+    "project": "research/miller_basechange_audit_20261115/lean",
+    "theorem": "MillerBasechangeAudit.miller_basechange_certificate",
+    "statement": "theorem miller_basechange_certificate : (∀ (K L : Type) [Field K] [Field L] [Algebra K L] (W : WeierstrassCurve.Affine K), Function.Injective (functionEmbedding W L) ∧ (∀ a : W.CoordinateRing, Algebra.norm L[X] (WeierstrassCurve.Affine.CoordinateRing.map W (algebraMap K L) a) = (Algebra.norm K[X] a).map (algebraMap K L)) ∧ (∀ f : W.FunctionField, functionValuation (curveOver W L) (functionEmbedding W L f) = functionValuation W f ∧ (InfinityMonic (curveOver W L) (functionEmbedding W L f) ↔ InfinityMonic W f))) ∧ (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [DecidableEq K] [DecidableEq L] (W : WeierstrassCurve.Affine K), Function.Injective (pointEmbedding W L) ∧ ∀ (P : W.Point) (n : ℕ), functionEmbedding W L (millerFunction W P n) = millerFunction (curveOver W L) (pointEmbedding W L P) n) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (P : W.Point) (n : ℕ), GeometricMiller W P n (millerFunction W P n) ∧ ∀ f : W.FunctionField, GeometricMiller W P n f → f = millerFunction W P n) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (P : W.Point) (i j : ℕ), millerFunction W P (i + j) = millerFunction W P i * millerFunction W P j * stepFunction W (i • P) (j • P)) ∧ rationalCurve.Δ ≠ 0 ∧ (∀ (P : rationalCurve.Point) (n : ℕ), IsMillerFunction rationalCurve P n (counterfeitMiller P n) ∧ counterfeitMiller P n ≠ millerFunction rationalCurve P n ∧ ¬ GeometricMiller rationalCurve P n (counterfeitMiller P n) ∧ functionDivisor (curveOver rationalCurve (AlgebraicClosure F3)) (functionEmbedding rationalCurve (AlgebraicClosure F3) (counterfeitMiller P n)) (field_base_nonzero rationalCurve (counterfeit_nonzero P n)) ≠ millerDivisor (curveOver rationalCurve (AlgebraicClosure F3)) (pointEmbedding rationalCurve (AlgebraicClosure F3) P) n) ∧ functionDivisor (curveOver rationalCurve (AlgebraicClosure F3)) (functionEmbedding rationalCurve (AlgebraicClosure F3) rationalFunction) (field_base_nonzero rationalCurve rational_function_nonzero) ≠ 0 ∧ (∀ P : rationalCurve.Point, counterfeitMiller P 0 = rationalFunction ∧ counterfeitMiller P 1 = rationalFunction)",
+    "decl_sha256": "6cc55f45b73f1c6359aaa6eca67cf5442be42a4594cff1553858aecaadbfee6a",
+    "scope": "Actual elliptic function-field embedding under every field extension K→L, using credited official coordinate embedding and fraction-field map. Actual coordinate norm polynomial mapping, norm degree/infinity valuation/adic/order and leading-residue-one normalization preserved. Actual injective point AddMonoidHom, all branches of Miller step and every-n actual chosen Miller function commute with actual embeddings. Actual GeometricMiller predicate includes actual nonzero discriminant and actual point/function images in actual AlgebraicClosureK, actual full geometric Miller divisor and normalization. Constructed functions satisfy predicate; any proper geometric Miller function equals chosen base function. Exact chosen all-n i+j identity descends to every base field including characteristics2/3 and zero/vertical branches. On actual prior F3 curve y²=x³+x+1, prior actual normalized nonconstant zero-rational-divisor ratio times every chosen Miller function satisfies old rational-only predicate yet differs from chosen, fails proper geometric predicate, and has wrong actual mapped geometric divisor, for every actual P,n. At n0/n1 it equals prior ratio; actual mapped ratio divisor is nonzero. Our weak definition is refuted, not qualified source Definition26.3.4/Exercise26.3.5.67modules58exactcredited+9new/defaults/standardfoundations. Initial full theorem gate471passed but frozen regex exported161of2253chars; independent native parser caught prefix despite exit0 before any issue. Transparent positional aliases preserve hypotheses/conclusions; final full native header check required. Full finite-point/local-divisor/scheme/tensor basechange, Galois descent, evaluation/translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonicalWeilTate/MOVFR/binaryruntime/full14 remainopen. Samehost/prover/Mathlib; header check procedural not compiler/parser/physicalhost refinement. No novelty/canonicalpromotion/signedstanding/newindependentimplementation/spend/upload claim.",
+    "sources": [
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeCertificate.lean",
+        "bytes": 4496,
+        "sha256": "d03f869d2acde28ff8d02d011cd4073afb7db656ff2ae5bf893b44f01d6b7ad7"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeControls.lean",
+        "bytes": 4445,
+        "sha256": "875fc10520cae10f9903588da8d345fb110032c70a1a06866ff56940286b6a3a"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeField.lean",
+        "bytes": 2669,
+        "sha256": "920636c22c6379526b0e4fc98baa3cfdfb5a81e20e06ccbd53b3c893ec606302"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeFunctions.lean",
+        "bytes": 1098,
+        "sha256": "69cbe26c9a84e11f4237e7ba5ac0eb950261c922c3cacac3b9836cbfb7611be5"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeInfinity.lean",
+        "bytes": 1023,
+        "sha256": "9496f761da59e3bbc4f0b3538fc946539e5e7ef68b21f0241ec632ca409a2704"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeMiller.lean",
+        "bytes": 2183,
+        "sha256": "9d98e2999bb57b6bbd4572783c7cf9a0c9b4d765cd0d33074abc988df4b4f5d2"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangeNorm.lean",
+        "bytes": 2816,
+        "sha256": "1ec5a84b4db059ab68b14d3eaacb2a89314c98e70ccea96a1598c2283153545f"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/BasechangePoints.lean",
+        "bytes": 1543,
+        "sha256": "e02e30cd0f8030f18fb1edde095e7464d1bd18f676d5957cd7f28013376af6b0"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ConstantDivisors.lean",
+        "bytes": 1879,
+        "sha256": "6824027e72964a8c468d1a6e32f0a099d3fe41501cbdecf4510ad8824966896d"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ConstantKernel.lean",
+        "bytes": 3505,
+        "sha256": "a66048dd185a17e3f9b49a0e0870260fe06ce8bf79c1fc491ec684c26d980c26"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/DivisorDegree.lean",
+        "bytes": 2090,
+        "sha256": "90f0b79b8973002613252cab0ca8b39125044daeb90135a7a06165d8929460ab"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FiniteZeros.lean",
+        "bytes": 3615,
+        "sha256": "87c1352f6a533b766cce10ca68f9e092547980451931e34946531dd6fe44f494"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FunctionDivisor.lean",
+        "bytes": 5039,
+        "sha256": "70866614e80ecc49200bc15a09f5b8d8ca30bf76c708d07246c07d5f970751d3"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/FunctionDivisorCertificate.lean",
+        "bytes": 2288,
+        "sha256": "713fa781862832962c898c6db56238c349efe184422ab03c77c45b6ac4914285"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/GeometricCertificate.lean",
+        "bytes": 3257,
+        "sha256": "06619bf9d34c7ad63c4cbaa24ae0364a74138ee0f214fd112a476a887a27eae0"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/GeometricControls.lean",
+        "bytes": 3994,
+        "sha256": "3a486893f0333ccc42aa363070992cd430948e8c804b144de097eb79616cda0e"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/GeometricDegree.lean",
+        "bytes": 1765,
+        "sha256": "d6cf4517944b22254bb4549919de849da9f212daf85651c1144cf522f678507f"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/GeometricFibers.lean",
+        "bytes": 1309,
+        "sha256": "39a7e06a20c0529ba59de470aae19dd32c8e08e9f7cf84f48af542daeb27d219"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/GeometricMiller.lean",
+        "bytes": 3786,
+        "sha256": "516ea587329e75fe95eb9dd5c903a4a58065726709acacaaa77e2074a9381d63"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/InfinityEvaluation.lean",
+        "bytes": 2135,
+        "sha256": "32790f41b39dd1bffe5c2af23dcdcaf198f44d58f37ec2a1ffbda4e372e0b764"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LocalNegation.lean",
+        "bytes": 3344,
+        "sha256": "389e1937500b192442e9f8dd858fd0f16c250a4112dc9beb1cbe6d0e7799a7e3"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationCertificate.lean",
+        "bytes": 2363,
+        "sha256": "634c422e8e6c752872b7a960545711bd2cc0c204e063dcd64a92f0546935b555"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationControls.lean",
+        "bytes": 2673,
+        "sha256": "d879a00357297322c628f90d29489694be39f15104c978c48cc0ff8f23eaf604"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationCoordinate.lean",
+        "bytes": 4229,
+        "sha256": "7757296d2542df2aadcb26c84754163f9c9cb184214305d49a5fa969813790f1"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationDivisor.lean",
+        "bytes": 2042,
+        "sha256": "eae68fd2af513043179747ff6c8db825ebb71bb2bdaf57fbade4c4b47c17dc84"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationField.lean",
+        "bytes": 2834,
+        "sha256": "b4e670cf28477dc9ca7e9152019ac047935dfada79bb56b151ff1f663464ad4c"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationNorm.lean",
+        "bytes": 1963,
+        "sha256": "d58625b3365f957f323a5b0893f593cfcb3b555e9523b3ef7aa018a5f79232b9"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NegationValuation.lean",
+        "bytes": 3340,
+        "sha256": "8ab265d21e0bbef2e6d32a3651310c4055585b369f5a97ddf2cd7d2ab8ff167e"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NormEvaluation.lean",
+        "bytes": 3070,
+        "sha256": "97a31eb12e47c3ca706def9b3d77947e792d18efb54a53f5272ee7805b9c2eed"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/NormalizedUniqueness.lean",
+        "bytes": 2812,
+        "sha256": "91f8ada30670005c05bced0979b820104a287fe584eac94828dcea53e8f2eaea"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/OrderBounds.lean",
+        "bytes": 2249,
+        "sha256": "ec6e5cfd59ae338ff4333043c9180a77083e0fbe829ce120b8c22e359b9be667"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/PolynomialValues.lean",
+        "bytes": 1292,
+        "sha256": "36b18679067f57503a2f3c37eca56d39397c467423fc7d30563c40167943fdf4"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/RationalControls.lean",
+        "bytes": 7157,
+        "sha256": "68b65085186d1011aff59d16671e9725b447c0aafa84a1214f464002804f653d"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/SplitPolynomialDivisors.lean",
+        "bytes": 3773,
+        "sha256": "b7123a14082b947c5ca9835226de09d149b9848ceb7f3149e10864dd33833495"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/lakefile.toml",
+        "bytes": 1617,
+        "sha256": "1941d8729c3928798e9da34ab6d51743494c0cda220a545fab2572cd9f7905b1"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/miller_basechange_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AllMiller",
+    "BasechangeCertificate",
+    "BasechangeControls",
+    "BasechangeField",
+    "BasechangeFunctions",
+    "BasechangeInfinity",
+    "BasechangeMiller",
+    "BasechangeNorm",
+    "BasechangePoints",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "ConstantDivisors",
+    "ConstantKernel",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "DivisorDegree",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteValuation",
+    "FiniteZeros",
+    "FunctionDivisor",
+    "FunctionDivisorCertificate",
+    "GeometricCertificate",
+    "GeometricControls",
+    "GeometricDegree",
+    "GeometricFibers",
+    "GeometricMiller",
+    "GuardControls",
+    "InfinityEvaluation",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalNegation",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "MillerFunctions",
+    "MillerStep",
+    "NegationCertificate",
+    "NegationControls",
+    "NegationCoordinate",
+    "NegationDivisor",
+    "NegationField",
+    "NegationNorm",
+    "NegationValuation",
+    "NormDegree",
+    "NormEvaluation",
+    "Normalization",
+    "NormalizedUniqueness",
+    "OrderBounds",
+    "OriginEvaluation",
+    "PointDivisor",
+    "PointLocalization",
+    "PolynomialValues",
+    "RationalControls",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "SplitPolynomialDivisors",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 23492,
+      "sha256": "6b6ce0063076f36cca48da4d0f807560310876bc48f1ee3941bbac1d69393fd6"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "f156c94bbb10fc6306a831b8f2f86585947e34973b7d539e65be8641f25a0d3c"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/attempts.json",
+      "bytes": 227,
+      "sha256": "f56a98cda5c997b8fd7ae79aed55c6a065cf7dabbe1c3973d8d17c1b3c537d18"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 7110,
+      "sha256": "cf078c581e66baa3c8ed49ab802181ba9bd3e201424a825cd9f567a37691d48f"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/gate.json",
+      "bytes": 1422,
+      "sha256": "1decfd49f53261bbba733e3432b7beb6b6f0a8fec99e60cddcdbb2647681a0a5"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/source-review.json",
+      "bytes": 17214,
+      "sha256": "1cfd574c213409a21f06317db7a6d1cd810d3acaf717a11b015aa27bc115fcbb"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/binding-check.json",
+      "bytes": 17120,
+      "sha256": "cfa9c3471377159147e98844be8dbc49ee9eab6807bd29263af8901bd9f96376"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/report-drafts.tar.xz",
+      "bytes": 51176,
+      "sha256": "f79dd8b26dd96653466227ed49aa03aa3f84f2cd3ac0f0350058b7f750909c97"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/evidence/report-drafts.json",
+      "bytes": 229,
+      "sha256": "c14ccac7fb2092bd39167b3a97af82735aea9391b50e8a241e614b1ae7177b79"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/proof-map.json",
+      "bytes": 11451,
+      "sha256": "6b1f4e5f22ccf85ff4e7683aea46f20e08e753901ab7bd499de1fe40f8642e30"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/render_report.py",
+      "bytes": 7955,
+      "sha256": "f3a2bdb5ec020bab5c51ea324cf05a37b0d0decb7da73c7bd5cc7b93842c92f9"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/export_binding_input.py",
+      "bytes": 1744,
+      "sha256": "9f8cb6b72bbe78697c1cfeed61436a0e25b5e38f4be237a77b6b4becd6cfd17a"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/PROTOCOL.md",
+      "bytes": 5318,
+      "sha256": "c745716e5d5fb3d76f13f7eb2065c23bb7b8ed240696cac33783001020cb3b3d"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/reports/layout.json",
+      "bytes": 360,
+      "sha256": "5d92feaf324531ed4633ac391fff65b858ecaad1706ece8483cd1ec15cc76906"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/reports/miller-basechange.svg",
+      "bytes": 1498,
+      "sha256": "817950c5a0984a0ef25764b7effbac462b8b8f63c832080284f0bb597c351cf0"
+    },
+    {
+      "path": "research/miller_basechange_audit_20261115/reports/report.pdf",
+      "bytes": 47596,
+      "sha256": "6331f21015370c4a57f4114bee976de4bbee904d8061c07812a42516527ef680"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 471,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "retained_prefix_negative_control": true,
+    "exact_reused_credited_modules": 58,
+    "new_modules": 9,
+    "actual_full_function_field_embedding": true,
+    "actual_norm_infinity_normalization_compatibility": true,
+    "actual_point_step_alln_miller_compatibility": true,
+    "proper_geometric_miller_predicate_uniqueness": true,
+    "chosen_addition_all_basefields": true,
+    "actual_F3_alln_weak_counterfeit_family": true,
+    "actual_mapped_ratio_geometric_divisor_nonzero": true,
+    "qualified_source_definition_exercise_survive": true,
+    "actual_hypotheses": "FieldsK/L/AlgebraKL; actual DecidableEq data for point/Miller group operations; actualWΔneq0 for propergeometricMiller and chosenaddition. Everycharacteristicincluding2/3.",
+    "full_finitepoint_divisor_basechange_or_scheme_descent": false,
+    "binary_runtime_complexity": false,
+    "canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

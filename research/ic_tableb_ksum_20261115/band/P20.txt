@@ -1,0 +1,43 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-t1293-3c2999ba | 20.00 | bsgs-neg | 432/432 | 1.057 | 1.162 | 2.105 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | inc-rec | 432/432 | 10.854 | 12.513 | 27.450 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | inc-sel | 432/432 | 10.356 | 11.769 | 24.486 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | inc-tb | 432/432 | 10.295 | 11.805 | 25.391 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | ksum4 | 432/432 | 6.635 | 7.468 | 14.964 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | ksum5 | 432/432 | 7.111 | 7.859 | 14.588 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | rho-neg | 432/432 | 1.269 | 1.380 | 2.375 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | rho-neg-aa | 432/432 | 1.269 | 1.380 | 2.375 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs inc-rec | bsgs-neg < inc-rec |
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs inc-sel | bsgs-neg < inc-sel |
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs inc-tb | bsgs-neg < inc-tb |
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs ksum4 | bsgs-neg < ksum4 |
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs ksum5 | bsgs-neg < ksum5 |
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-t1293-3c2999ba | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-t1293-3c2999ba | inc-rec vs inc-sel | inc-sel < inc-rec |
+| icv1-fp20-t1293-3c2999ba | inc-rec vs inc-tb | inc-tb < inc-rec |
+| icv1-fp20-t1293-3c2999ba | inc-rec vs ksum4 | ksum4 < inc-rec |
+| icv1-fp20-t1293-3c2999ba | inc-rec vs ksum5 | ksum5 < inc-rec |
+| icv1-fp20-t1293-3c2999ba | inc-rec vs rho-neg | rho-neg < inc-rec |
+| icv1-fp20-t1293-3c2999ba | inc-rec vs rho-neg-aa | rho-neg-aa < inc-rec |
+| icv1-fp20-t1293-3c2999ba | inc-sel vs inc-tb | unresolved inside the band |
+| icv1-fp20-t1293-3c2999ba | inc-sel vs ksum4 | ksum4 < inc-sel |
+| icv1-fp20-t1293-3c2999ba | inc-sel vs ksum5 | ksum5 < inc-sel |
+| icv1-fp20-t1293-3c2999ba | inc-sel vs rho-neg | rho-neg < inc-sel |
+| icv1-fp20-t1293-3c2999ba | inc-sel vs rho-neg-aa | rho-neg-aa < inc-sel |
+| icv1-fp20-t1293-3c2999ba | inc-tb vs ksum4 | ksum4 < inc-tb |
+| icv1-fp20-t1293-3c2999ba | inc-tb vs ksum5 | ksum5 < inc-tb |
+| icv1-fp20-t1293-3c2999ba | inc-tb vs rho-neg | rho-neg < inc-tb |
+| icv1-fp20-t1293-3c2999ba | inc-tb vs rho-neg-aa | rho-neg-aa < inc-tb |
+| icv1-fp20-t1293-3c2999ba | ksum4 vs ksum5 | unresolved inside the band |
+| icv1-fp20-t1293-3c2999ba | ksum4 vs rho-neg | rho-neg < ksum4 |
+| icv1-fp20-t1293-3c2999ba | ksum4 vs rho-neg-aa | rho-neg-aa < ksum4 |
+| icv1-fp20-t1293-3c2999ba | ksum5 vs rho-neg | rho-neg < ksum5 |
+| icv1-fp20-t1293-3c2999ba | ksum5 vs rho-neg-aa | rho-neg-aa < ksum5 |
+| icv1-fp20-t1293-3c2999ba | rho-neg vs rho-neg-aa | unresolved inside the band |

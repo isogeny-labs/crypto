@@ -1,0 +1,17 @@
+{
+  "schema": "n83.dataset-file-layout/v1",
+  "dataset": "candidate-first-fall-spike35-spike37-continuation-143",
+  "files": [
+    {"path": "run_remaining.py", "role": "continuation runner", "contents": "Revalidates all source files, excludes the already produced and replayed case, binds to the unchanged V2 protocol and pinned fall binary, and executes the remaining 143 cases exactly once."},
+    {"path": "analyze_run.py", "role": "independent checker", "contents": "Recomputes per-case source/certificate hashes, status counts and fresh replay counts."},
+    {"path": "preflight.json", "role": "pre-data continuation contract", "contents": "Frozen V2 protocol identity, binary/input hashes, prior recovered case, exact 143-row continuation, exclusions, resource limits and S3 namespace."},
+    {"path": "source-index.json", "role": "source map", "contents": "One row for each untouched PDP system with its original source SHA-256 and byte count."},
+    {"path": "script-binding.json", "role": "pre-data implementation binding", "contents": "SHA-256 of continuation and analysis scripts, and digest of preflight.json."},
+    {"path": "cases/<candidate>/<system-id>/attempt.json", "role": "raw execution and replay record", "contents": "Exact command, output, status, source and certificate hashes, S3 key and fresh-process replay result; uploaded after each case."},
+    {"path": "cases/<candidate>/<system-id>/output/<system-id>.json", "role": "native certificate", "contents": "Source-bound first-fall certificate, uploaded by the pinned native binary."},
+    {"path": "summary.json", "role": "producer summary", "contents": "143 planned/attempted rows and certificate/replay/status counts."},
+    {"path": "independent-validation.json", "role": "independent validation", "contents": "Recomputed counts and source, certificate, and replay consistency."},
+    {"path": "bundle.tar.gz", "role": "S3 archive", "contents": "Continuation scripts, preflight, input references, raw attempts, certificates, summaries and validation; source system bytes remain in the prior content-addressed store."},
+    {"path": "S3-CUSTODY.json", "role": "publication receipt", "contents": "Archive and per-object S3 keys, sizes and SHA-256 readback outcomes."}
+  ]
+}

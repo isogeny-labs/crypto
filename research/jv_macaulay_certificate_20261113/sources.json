@@ -1,0 +1,113 @@
+{
+  "schema": "jv-macaulay-source-plan/v1",
+  "created": "2026-11-13T02:21:13.018717+00:00",
+  "formal": {
+    "project": "research/jv_macaulay_certificate_20261113/lean",
+    "theorem": "JVMacaulayAudit.literal_jv_macaulay_upper_certificate",
+    "statement": "theorem literal_jv_macaulay_upper_certificate : affineIdeal=⊤ ∧ sourceIdeal≠⊤ ∧ ∀ i j k : ℕ, 4 ≤ i+j+k → (X 0^i*X 1^j*X 2^k : Poly)∈sourceIdeal",
+    "decl_sha256": "feb59c50506d5acff322ed7acec12f0be17f36e089b23aa6ba2d00cc7d346a6b",
+    "scope": "Literal printed first Joux-Vitse F101³toy coordinate equations only: actual homogeneous ideal is proper and contains every monomial with total degree>=4; actual dehomogenized ideal at h1 is unit, with no geometric affine zero. Explicit source-polynomial identities and actual quotient relations, no generic regularity premise. Uppercutoff only: no minimality/exactHilbertlength8/F101³elliptic-field-descent/internalF4/native-compiler-refinement theorem.",
+    "sources": [
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+        "bytes": 2914,
+        "sha256": "6f71f8014dee9a161b4a85efdacc7200611463f675c2d25893247f04c37c74c5"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+        "bytes": 4508,
+        "sha256": "c4fddf97dfcee2b00c4b1113282f57c83fca4d7eefbd89506912af036ae24615"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+        "bytes": 2125,
+        "sha256": "51196e6a76de350be0ece641393f58240beff5eff9903e6d31bca85f75893ecb"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+        "bytes": 4097,
+        "sha256": "b3c3f41025759c5c212cd858d7f43fc21da223b3287b133301b9d86cc160f5aa"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lake-manifest.json",
+        "bytes": 3557,
+        "sha256": "21b41c4e076c955374b730d6cc0a6c09033563089eab25dd0989b5084ff43c91"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lakefile.toml",
+        "bytes": 367,
+        "sha256": "f18793a72f079915913fa45693b8eabe5a0e33c7c04ad51353ddcc1726517fc0"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/jv_macaulay_certificate_20261113/evidence/attempts.tar.gz",
+      "bytes": 5240,
+      "sha256": "7194d68c09c47e2af55a12efb6f62030e6bf79404befa09fe3915b826f0f604a"
+    },
+    {
+      "path": "research/jv_macaulay_certificate_20261113/evidence/attempts.json",
+      "bytes": 3006,
+      "sha256": "c77c93e56ce451d1c82452cf1b47a316c33daf545e2f74ae2b162b1b4214a2d6"
+    },
+    {
+      "path": "research/jv_macaulay_certificate_20261113/evidence/gate.tar.gz",
+      "bytes": 1195,
+      "sha256": "c8da31226cc7fd87dcadd855235287700e2ec7dee854b32fa4f9ef41e606bfb1"
+    },
+    {
+      "path": "research/jv_macaulay_certificate_20261113/evidence/gate.json",
+      "bytes": 1171,
+      "sha256": "9ecc8bd47f4eefe7a78cb309601ea46b9244289aa8f20ea12fc306f337750ce7"
+    },
+    {
+      "path": "research/jv_macaulay_certificate_20261113/evidence/source-review.json",
+      "bytes": 1540,
+      "sha256": "26a7c2a10b9d958ca3e5d4ff374cedc21817aaec1d986cbbcc5e8bf09051e183"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/source-review.json",
+      "bytes": 1915,
+      "sha256": "96d2c0ab36cc7855414663c8e21149db06d5bb217a0dfc5b2af9544e3366a605"
+    }
+  ],
+  "gate": {
+    "archive": "research/jv_macaulay_certificate_20261113/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 39,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/jv_macaulay_certificate_20261113/evidence/attempts.tar.gz",
+    "files": 17,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "assumed_regularity": false,
+    "new_native_experiment": false,
+    "minimal_cutoff": false,
+    "exact_length_eight": false,
+    "source_extension_field_descent_proved": false,
+    "paid_compute_and_agent_storage_upload": 0
+  }
+}

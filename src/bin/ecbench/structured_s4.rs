@@ -1,7 +1,8 @@
 //! Product-space S4 relaxation in the native IC pipeline. Every returned
 //! relation is lifted and verified by the counted group. Native solver words
-//! are retained for the common band; raw S has a legacy wall-priced solver
-//! term. Incomplete construction/split accounting prevents a full-cost claim.
+//! are retained for the common band and use pinned rates where available.
+//! Measured solver wall terms are removed by ic_report. Incomplete
+//! construction/split accounting prevents a full-cost claim.
 use crypto_lib::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, lift_abscissae, BinaryGroup, BinaryInstance, FactorBase, GroupOps,
     OracleCounters,
@@ -312,6 +313,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for StructuredOracle<'_> {
             ("incomplete_queries".into(), u64::from(exhausted)),
         ]);
         let cost = SolverCost {
+            first_fall_degree: None,
+            last_fall_degree: None,
+            degree_of_regularity_observed: None,
+            degree_trace: Vec::new(),
             ops: words,
             op_unit: super::pdp3_koblitz::WORD_XOR_UNIT.into(),
             wall_ns: started.elapsed().as_nanos() as u64,

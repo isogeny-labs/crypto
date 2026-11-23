@@ -1,0 +1,14 @@
+{
+  "action": "simulate a two-phase cost (dominant low-alpha phase + 1%-share steep phase) and a fixed-cost case through the rule before accepting it; require per-phase max alpha and a held-out beyond projected crossovers",
+  "created": "2026-11-15T03:58:17Z",
+  "evidence": [
+    "docs/ic/SUCCESS_CRITERIA.md:91-103 (draft); AGENTS.md:1159-1165 residual-walk precedent; docs/bounds/README.md:277-280 fixed costs pull alpha down"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "a proposed exponent (alpha) acceptance rule based on a total-cost fit plus a held-out size",
+  "why": "a total-cost slope over 24 bits hides a steep phase; +8-bit held-out missed by only 10% in the simulation"
+}

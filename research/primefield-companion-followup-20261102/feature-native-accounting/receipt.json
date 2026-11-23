@@ -1,0 +1,19 @@
+{
+  "schema": "native-stage-accounting-check/v1",
+  "checked_source_commit": "3098275610ee2e1625c2c6f1f779fd232c3d6163",
+  "source_binding": "check-lock.sha256 fixed before build and verified afterward",
+  "build_attempts": 1,
+  "test_attempts": 1,
+  "build_exit": 0,
+  "test_exit": 0,
+  "tests_passed": 3,
+  "tests_filtered": 56,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "22277a4627bd96a7314db2db8f149142a63587cad608b443e71b770799b1043d",
+  "build_command": "timeout 120 rustc --edition=2021 --test lib.rs -o unit-tests",
+  "test_command": "timeout 30 ./unit-tests accounting_tests:: --test-threads=1 --nocapture",
+  "generator_failed_attempts": 2,
+  "generated_modules_reverse_exactly": 7,
+  "clock_comparison": false,
+  "full_cohort_executed": false
+}

@@ -1,0 +1,17 @@
+digraph chart {
+rankdir=TB;bgcolor="transparent";nodesep=0.6;ranksep=0.5;
+node[shape=box,style="rounded,filled",fillcolor="#edf2f8",fontname="DejaVu Sans",fontsize=11,color="#284b63"];
+edge[fontname="DejaVu Sans",fontsize=9,color="#284b63"];
+{rank=same; C[label="C: y² = f(x)"]; D[label="D: Y² = H(X)"];}
+{rank=same; F[label="Monic F(w)
+normalized source factors"]; G[label="Monic G(w)
+recorded target model"];}
+C->D[style=dashed,color="#747d87",label="Classical correspondence
+divisor execution next"];
+C->F[label="w=1/(x−a)
+z=yw³/b"];
+D->G[label="w=1/(X−a)
+v=Yw³/c"];
+F->G[label="Full bracket coefficients checked
+R_new / (bc)² = G"];
+}

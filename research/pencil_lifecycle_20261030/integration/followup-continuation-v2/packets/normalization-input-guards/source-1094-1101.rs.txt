@@ -1,0 +1,8 @@
+impl Scholten {
+    pub fn new(p: u64) -> Self {
+        assert!(p > 13 && p % 4 == 3 && geometry_events::constructor_prime(p));
+        let f = Field::new(p, 2, p - (-1i64).rem_euclid(p as i64) as u64);
+        // x^2+1: the packed low constant is 1.
+        assert_eq!(f.modulus, 1);
+        let i = p;
+        let r = f.add(f.constant(33), f.mul(f.constant(56), i));

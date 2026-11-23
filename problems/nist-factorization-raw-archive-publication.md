@@ -4,7 +4,7 @@
 - **Kind:** access/tool limit
 - **Affected work:** [R02 evidence](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md), [R05 relation checkpoint](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/README.md), PR #2379
 - **Next action owner:** artifact-store operator after connection setup
-- **Last updated:** 2026-10-25
+- **Last updated:** 2026-10-26
 
 ## Problem
 
@@ -15,7 +15,12 @@ using `tools/artifacts/artifacts.py` and real `.artifacts.json` entries.
 See [the artifact policy](../docs/artifacts.md). The earlier R02/R05
 manifests preserve their historical intended backend; they are not evidence
 of publication to either backend. New R06/R07 manifests name the current
-required remote and explicitly leave the remote object unset.
+required remote and explicitly leave the remote object unset. Completed
+R08 adds a [local-only archive](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/archive-manifest.json).
+Its compression integrity, streamed restoration of the saved relation
+file and byte-identical canonical repack are checked. A fresh full-directory
+extraction was not performed because local disk is constrained. Remote
+publication remains unresolved.
 
 ## Evidence and uncertainty
 
@@ -45,6 +50,13 @@ required remote and explicitly leave the remote object unset.
 
 Those checks establish durable bulk publication. They do not complete the
 remaining factorization or prove a historical seed-selection reason.
+
+The [R06/R08 filtering submission](../backlog/XP-20261026-nist-p256-checkpoint-filter/README.md)
+is blocked on publication before another runner can restore its inputs.
+The protocol, backlog card and draft expspec are definitions in Git; no
+queue task, lab lease or paid host is claimed. Runtime observations on
+October 26 still list no configured outbound identities, secrets or runtime
+variables. No credential value was inspected or copied into this evidence.
 
 ## Next discriminating step
 

@@ -1,0 +1,7 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|
+| ECBS1h202398cd10e1 | rho-neg | rho.negation | icv1-fp24-tm1578-e83ed1b2 | 21.00 | 16/16 | 1.232 | [0.989, 1.534] | 0.886 | 1.390 | 1.390 | 1.000 | yes | 0.435 | L1×16 | log2 r = 21.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h202398cd10e1 | proj-28 | ic.pipeline | icv1-fp24-tm1578-e83ed1b2 | 21.00 | 16/16 | 21.785 | [18.997, 24.981] | – | – | 24.581 | 17.683 | yes | 10.414 | L1×3 L2×13 | log2 r = 21.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h202398cd10e1 | proj-41 | ic.pipeline | icv1-fp24-tm1578-e83ed1b2 | 21.00 | 16/16 | 14.533 | [12.601, 16.761] | – | – | 16.399 | 11.797 | yes | 5.946 | L1×1 L2×15 | log2 r = 21.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h202398cd10e1 | proj-57 | ic.pipeline | icv1-fp24-tm1578-e83ed1b2 | 21.00 | 16/16 | 11.942 | [10.911, 13.070] | – | – | 13.475 | 9.694 | yes | 4.587 | L2×16 | log2 r = 21.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1h202398cd10e1 | proj-81 | ic.pipeline | icv1-fp24-tm1578-e83ed1b2 | 21.00 | 16/16 | 11.976 | [11.248, 12.751] | – | – | 13.514 | 9.721 | yes | 4.067 | L2×16 | log2 r = 21.0 is below the calibrated range (2^25); S has not reached its constant |

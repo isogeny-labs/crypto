@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T06:13:48Z",
+ "id": "PCC-20261118-c35f94",
+ "kind": "statement",
+ "producer": {
+  "commit": "abb7f0fec8d23e46e7cf01ff64bd73893f88c463",
+  "model": "Codex",
+  "session": "pr-4676"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/order_free_hyperelliptic_ic/mod.rs",
+    "sha256": "92005a55dcaac683f48dbf81c5a1d6250e345c306f025824ae46ca606878cbd6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/order_free_hyperelliptic_ic/factor_base.rs",
+    "sha256": "847232cbbdab234b3dfde583ef92bd71f9118fbe3cfbf158303ae863618cb22a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/order_free_hyperelliptic_ic/kernel.rs",
+    "sha256": "d501baa479d48bbcdd4106510822d5d8c75bc5624e62faf1674e758748dfb13d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/order_free_hyperelliptic_ic/tests.rs",
+    "sha256": "dc09e39d5b46bd41b2c19c2145087d1edf1d311d55938dcf76faabeade3dec11"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/ic/order-free-hyperelliptic-index-calculus.md",
+    "sha256": "e737faf28474241e33b9bc7ce9178fecb8e6cfd8f70ed20552fa75edf3615888"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Public bounded known-answer fixtures. Isolated native release compilation with the repository arithmetic sources. The full library build is blocked by unrelated base-revision compile errors.",
+ "statement": "An isolated release build of the Rust order-free hyperelliptic solver passes 11 component checks including the F29 genus-two order-seven logarithm 3 and the F3 genus-three order-seven logarithm 2 with a generator divisible by seven in the Jacobian."
+}

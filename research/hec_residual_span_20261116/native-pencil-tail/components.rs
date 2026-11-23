@@ -1,0 +1,6 @@
+use hec_native_ic::{fp::Fp,poly::Poly,jac::{Curve,Div}};
+pub fn controls(){let fp=Fp::new(101);let mut cases=0;
+ for g in 2usize..=4{for k in g-1..=g+1{let mut uc=vec![0;g+1];uc[0]=3;uc[1]=2;uc[g]=1;let u=Poly::from_coeffs(&uc);let v=Poly::from_coeffs(&[2,1]);let mut known_poly=Poly::one();for x in 1..=k{known_poly=known_poly.mul(&Poly::x_minus(x as u64,&fp),&fp);}let expected=match g+1-k{2=>Poly::from_coeffs(&[11,7,1]),1=>Poly::from_coeffs(&[7,1]),0=>Poly::one(),_=>unreachable!()};let h=known_poly.mul(&expected,&fp);let mut selected=None;let mut rejected=0;
+ for t in 1..=16{let vt=v.add(&u.scale(t,&fp),&fp);let f=u.mul(&h,&fp).add(&vt.mul(&vt,&fp),&fp);if f.c[2*g]==0||f.c[2*g-1]==0||Poly::gcd(&f,&f.deriv(&fp),&fp).deg()!=0{rejected+=1;continue;}let curve=Curve::new(fp.clone(),f);let anchor=Div{u,v};assert!(curve.is_valid(&anchor));let known:Vec<_>=(1..=k).map(|x|(x as u64,vt.eval(x as u64,&fp))).collect();let actual=crate::tail::extract(&curve,&anchor,t,&known);assert_eq!(actual,expected);let exact=curve.f.sub(&vt.mul(&vt,&fp),&fp).div_exact(&u,&fp).div_exact(&known_poly,&fp);assert_eq!(actual,exact);selected=Some(t);break;}
+ assert!(selected.is_some());println!("COMPONENT g={g} known={k} t={} structural_rejections={rejected} nonzero_two_high_f_coefficients=true exact_tail=true",selected.unwrap());cases+=1;
+ }}assert_eq!(cases,9);}

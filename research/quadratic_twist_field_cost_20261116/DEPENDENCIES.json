@@ -1,0 +1,50 @@
+{
+  "NTL_version": "11.6.0",
+  "archive_sha256": "bc0ef9aceb075a6a0673ac8d8f47d5f8458c72fe806e4468fbd5d3daff056182",
+  "library_sha256": "b0103ea4287fee1481326b5179efab4d6b349fdfc076f6bd1ceee7fa6a81afb4",
+  "build_check_install": [
+    {
+      "name": "configure",
+      "command": [
+        "./configure",
+        "PREFIX=/workspace/twist-field-cost-20261116/ntl",
+        "NTL_GMP_LIP=on",
+        "NTL_THREADS=off"
+      ],
+      "exit": 0,
+      "start": "2026-11-16T00:57:08.216119+00:00",
+      "finish": "2026-11-16T00:57:09.167049+00:00"
+    },
+    {
+      "name": "build",
+      "command": [
+        "make",
+        "-j2"
+      ],
+      "exit": 0,
+      "start": "2026-11-16T00:57:09.167800+00:00",
+      "finish": "2026-11-16T00:58:10.815717+00:00"
+    },
+    {
+      "name": "check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "exit": 0,
+      "start": "2026-11-16T00:58:10.815999+00:00",
+      "finish": "2026-11-16T01:05:54.321064+00:00"
+    },
+    {
+      "name": "install",
+      "command": [
+        "make",
+        "install"
+      ],
+      "exit": 0,
+      "start": "2026-11-16T01:05:54.321558+00:00",
+      "finish": "2026-11-16T01:05:54.519215+00:00"
+    }
+  ],
+  "paid_resources": false
+}

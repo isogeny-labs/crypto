@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-iso-t4-g3-s1193 | 32/32 | 44.640 | 66158.649 | 661184.730 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-iso-t4-g3-s1193-trace | 32/32 | 44.640 | 31361.041 | 313208.648 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-iso-t5-g4-s1307 | 32/32 | 28.491 | 110556.629 | 1105309.876 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | proj-a | 32/32 | 11.881 | 12.753 | 20.598 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 32/32 | 1.600 | 1.716 | 2.764 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193 vs pkm-iso-t4-g3-s1193-trace | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193 vs pkm-iso-t5-g4-s1307 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193 vs proj-a | proj-a < pkm-iso-t4-g3-s1193 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193 vs rho-neg | rho-neg < pkm-iso-t4-g3-s1193 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193-trace vs pkm-iso-t5-g4-s1307 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193-trace vs proj-a | proj-a < pkm-iso-t4-g3-s1193-trace |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t4-g3-s1193-trace vs rho-neg | rho-neg < pkm-iso-t4-g3-s1193-trace |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t5-g4-s1307 vs proj-a | proj-a < pkm-iso-t5-g4-s1307 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t5-g4-s1307 vs rho-neg | rho-neg < pkm-iso-t5-g4-s1307 |
+| icv1-fp20-tm1050-4295f05e | proj-a vs rho-neg | rho-neg < proj-a |

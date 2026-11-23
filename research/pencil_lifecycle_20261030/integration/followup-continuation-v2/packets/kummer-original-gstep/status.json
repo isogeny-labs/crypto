@@ -1,0 +1,77 @@
+{
+  "schema": "research.software-integration/v1",
+  "transition_family": "original_non_torsion_G_step",
+  "exit_code": 0,
+  "models": 21,
+  "transitions_per_arm": 63,
+  "selected_pairs_and_labels_equal": true,
+  "recovery_neighbour": "propagated pair[1], before reference construction",
+  "scientific_execution": false,
+  "complete_cost_ratio": null,
+  "arms": {
+    "eager": {
+      "exact_recoveries": 61,
+      "recovery_modes": {
+        "general_conversion_inapplicable": 2,
+        "computed": 61
+      },
+      "successful_repair_slots": 0,
+      "labelled_fallbacks": 0,
+      "internal_expected_transition_checks": 0,
+      "failures": [
+        {
+          "p": 739,
+          "index": 0,
+          "status": "general_conversion_inapplicable",
+          "expected": {
+            "degree": 1,
+            "u": [
+              362,
+              1,
+              0
+            ],
+            "v": [
+              303,
+              0
+            ]
+          }
+        },
+        {
+          "p": 3371,
+          "index": 1,
+          "status": "general_conversion_inapplicable",
+          "expected": {
+            "degree": 1,
+            "u": [
+              2603,
+              1,
+              0
+            ],
+            "v": [
+              1382,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    "candidate": {
+      "exact_recoveries": 63,
+      "recovery_modes": {
+        "degree1_unique_signed_lift": 2,
+        "computed": 61
+      },
+      "successful_repair_slots": 0,
+      "labelled_fallbacks": 0,
+      "internal_expected_transition_checks": 0,
+      "failures": []
+    }
+  },
+  "scope_notes": [
+    "all fixture outcomes retained",
+    "baseline helper failure is not asserted to be a full collector solve failure",
+    "no successful repair or Delta-zero branch coverage in this original G-step packet",
+    "square-root nonresidue search remains work and native counters are not a complete field-operation census",
+    "independent review pending"
+  ]
+}

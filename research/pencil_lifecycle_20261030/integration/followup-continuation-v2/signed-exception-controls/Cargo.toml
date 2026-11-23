@@ -1,0 +1,12 @@
+[package]
+name = "signed-exception-controls"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+signed-collector-replay = { path = "../signed-replay" }
+signed-collector-label-check = { path = "../signed-labels" }
+serde_json = "1"

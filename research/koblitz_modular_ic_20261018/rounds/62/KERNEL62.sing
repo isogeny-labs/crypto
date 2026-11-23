@@ -1,0 +1,80 @@
+LIB "linalg.lib";
+proc require62(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../61/runs/field61-01/field-space61.sing"));
+execute(read("../split62-02/split-functions62.sing"));
+require62(size(splitIdeal62)==size(sourceIdeal61),"KERNEL62_SOURCE_COUNT");
+int i62;for(i62=1;i62<=size(sourceIdeal61);i62++){require62(splitIdeal62[i62]==sourceIdeal61[i62],"KERNEL62_ALL_SOURCE_EQUATIONS");}
+ideal GB62=std(sourceIdeal61);require62(dim(GB62)==0 && vdim(GB62)==32,"KERNEL62_SOURCE_DIMENSION");
+require62(size(inputs62)==435 && size(evenParts62)==435 && size(oddParts62)==435 && size(cubicValues61)==324 && size(completeValues61)==76,"KERNEL62_COMPLETE_INPUT_SLOTS");
+for(i62=1;i62<=324;i62++){require62(reduce(inputs62[35+i62]+cubicValues61[i62],GB62)==0 && reduce(evenParts62[35+i62]^2+u*oddParts62[35+i62]^2+cubicValues61[i62],GB62)==0,"KERNEL62_ALL_CUBIC_BINDINGS");}
+for(i62=1;i62<=76;i62++){require62(reduce(inputs62[359+i62]+completeValues61[i62],GB62)==0 && reduce(evenParts62[359+i62]^2+u*oddParts62[359+i62]^2+completeValues61[i62],GB62)==0,"KERNEL62_ALL_MIXED_BINDINGS");}
+def sourceRing62=basering;
+ring binaryRing62=2,(u),dp;short=0;setring sourceRing62;
+proc dump62(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+proc squareKernel62(int offset,int count,string family){
+ string declarations="matrix numeratorRows62[32]["+string(count)+"];matrix denominatorRows62[32]["+string(count)+"];";
+ int i;int j;int k;int pos;intvec ex;poly p;number a;
+ for(j=1;j<=count;j++){
+  p=reduce(oddParts62[offset+j],GB62);
+  while(p!=0){
+   ex=leadexp(p);require62(ex[1]<16 && ex[2]<2,"KERNEL62_CANONICAL_ODD_COORDINATES");pos=1+ex[1]+16*ex[2];a=leadcoef(p);require62(numerator(a)/denominator(a)==a,"KERNEL62_RATIONAL_COORDINATE_IDENTITY");
+   declarations=declarations+"numeratorRows62["+string(pos)+","+string(j)+"]="+string(numerator(a))+";denominatorRows62["+string(pos)+","+string(j)+"]="+string(denominator(a))+";";
+   p=p-lead(p);
+  }
+ }
+ setring binaryRing62;execute(declarations);
+ matrix cleared62[32][count];list multipliers62;intvec offsets62;int rows62=0;int maxDegree62;poly binaryPoly62;poly common62;poly den62;poly quotient62;poly rebuilt62;matrix terms62;int exponent62;
+ for(i=1;i<=32;i++){
+  common62=1;
+  for(j=1;j<=count;j++){if(numeratorRows62[i,j]!=0){den62=denominatorRows62[i,j];require62(den62!=0,"KERNEL62_NONZERO_DENOMINATOR");common62=(common62*den62)/gcd(common62,den62);}}
+  require62(common62!=0,"KERNEL62_NONZERO_CLEARING_MULTIPLE");multipliers62[i]=common62;maxDegree62=-1;offsets62[i]=rows62;
+  for(j=1;j<=count;j++){
+   if(numeratorRows62[i,j]!=0){den62=denominatorRows62[i,j];quotient62=common62/den62;require62(quotient62*den62==common62,"KERNEL62_EXACT_DENOMINATOR_QUOTIENT");cleared62[i,j]=numeratorRows62[i,j]*quotient62;}
+   if(deg(cleared62[i,j])>maxDegree62){maxDegree62=deg(cleared62[i,j]);}
+  }
+  rows62=rows62+maxDegree62+1;
+ }
+ require62(rows62>0,"KERNEL62_NONTRIVIAL_ODD_MAP");matrix oddMatrix62[rows62][count];
+ for(i=1;i<=32;i++){for(j=1;j<=count;j++){
+  binaryPoly62=cleared62[i,j];rebuilt62=0;
+  if(binaryPoly62!=0){terms62=coef(binaryPoly62,u);for(k=1;k<=ncols(terms62);k++){
+   exponent62=deg(terms62[1,k]);require62(terms62[1,k]==u^exponent62 && terms62[2,k]==1,"KERNEL62_ALL_BINARY_MONOMIAL_COEFFICIENTS");
+   oddMatrix62[offsets62[i]+exponent62+1,j]=1;rebuilt62=rebuilt62+terms62[1,k]*terms62[2,k];
+  }}
+  require62(rebuilt62==binaryPoly62,"KERNEL62_EVERY_CLEARED_POLYNOMIAL_RECONSTRUCTED");
+ }}
+ matrix kernelBasis62=matrix(syz(module(oddMatrix62)));int dimension62=ncols(kernelBasis62);int rank62=mat_rk(oddMatrix62);
+ require62(dimension62>0 && rank62+dimension62==count && mat_rk(kernelBasis62)==dimension62,"KERNEL62_COMPLETE_BINARY_KERNEL_DIMENSION");
+ require62(oddMatrix62*kernelBasis62==matrix(0,rows62,dimension62),"KERNEL62_ALL_BINARY_KERNEL_PRODUCTS");
+ string transfer62="matrix sourceKernel62["+string(count)+"]["+string(dimension62)+"];";
+ for(i=1;i<=count;i++){for(j=1;j<=dimension62;j++){
+  require62(kernelBasis62[i,j]==0 || kernelBasis62[i,j]==1,"KERNEL62_KERNEL_OVER_F2_NOT_RATIONAL_FUNCTIONS");
+  if(kernelBasis62[i,j]==1){transfer62=transfer62+"sourceKernel62["+string(i)+","+string(j)+"]=1;";}
+ }}
+ matrix changed62=kernelBasis62;int changedColumn62=0;
+ for(j=1;j<=count;j++){if(changedColumn62==0 && oddMatrix62[1,j]!=0){changedColumn62=j;}}
+ if(changedColumn62==0){for(i=2;i<=rows62;i++){for(j=1;j<=count;j++){if(changedColumn62==0 && oddMatrix62[i,j]!=0){changedColumn62=j;}}}}
+ require62(changedColumn62>0,"KERNEL62_NONZERO_COLUMN_CONTROL");changed62[changedColumn62,1]=changed62[changedColumn62,1]+1;
+ require62(oddMatrix62*changed62!=matrix(0,rows62,dimension62),"KERNEL62_CHANGED_KERNEL_REJECTED");
+ link cert62="ASCII:w "+family+"-kernel62.sing";open(cert62);write(cert62,"ring binaryCertificate62=2,(u),dp;short=0;");
+ dump62(cert62,"numeratorRows62",numeratorRows62);dump62(cert62,"denominatorRows62",denominatorRows62);dump62(cert62,"cleared62",cleared62);dump62(cert62,"oddMatrix62",oddMatrix62);dump62(cert62,"kernelBasis62",kernelBasis62);close(cert62);
+ setring sourceRing62;execute(transfer62);
+ poly f;poly g;poly odd;int rootsChecked62=0;
+ link roots62="ASCII:w "+family+"-roots62.sing";open(roots62);write(roots62,"// Requires actual FIELD61; all roots verified in full source.");write(roots62,"list squareInputs62;list squareRoots62;");
+ for(j=1;j<=dimension62;j++){
+  f=0;g=0;odd=0;
+  for(i=1;i<=count;i++){if(sourceKernel62[i,j]!=0){f=f+inputs62[offset+i];g=g+evenParts62[offset+i];odd=odd+oddParts62[offset+i];}}
+  f=reduce(f,GB62);g=reduce(g,GB62);odd=reduce(odd,GB62);
+  require62(odd==0 && reduce(g^2+f,GB62)==0,"KERNEL62_EVERY_ROOT_WHOLE_SOURCE_IDENTITY");
+  require62(reduce((g+1)^2+f,GB62)!=0,"KERNEL62_CHANGED_ROOT_REJECTED");rootsChecked62++;
+  write(roots62,"squareInputs62["+string(j)+"]="+string(f)+";squareRoots62["+string(j)+"]="+string(g)+";");
+ }
+ close(roots62);require62(rootsChecked62==dimension62,"KERNEL62_ALL_KERNEL_ROOTS_RETAINED");
+ print("KERNEL62_RESULT family="+family+" functions="+string(count)+" binary_rows="+string(rows62)+" odd_rank="+string(rank62)+" square_dimension="+string(dimension62)+" whole_source_roots="+string(rootsChecked62)+" changed_kernel_rejected=1 changed_roots_rejected="+string(rootsChecked62));
+ return(dimension62);
+}
+squareKernel62(359,76,"mixed");squareKernel62(35,324,"cubic");
+print("KERNEL62_ALL_CHECKS_PASS");quit;

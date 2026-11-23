@@ -1,0 +1,91 @@
+# RUN CARD v4: ecgfp5_quotient_solve_20261101 (frozen command card, amendment A3)
+
+Executor tier: mechanical. Do exactly what is written. Do not interpret, retry,
+edit, repair or choose. If a step says stop, stop and report the fact.
+v1, v2 and v3 stay as they are and are not to be run.
+
+CHECKOUT = /tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr
+EXPDIR   = CHECKOUT/research/ecgfp5_quotient_solve_20261101
+
+Approval: owner requests 2026-11-01 ("try weighted ordering to lower the F4 cost", "try F5
+or a signature-based solver instead"); protocol amendments A2 and A3 (PROTOCOL.md sections
+11 and 12) frozen by commit 9efd4d3e0eaaf095f4e56134d0e073774d5ad3d4.
+
+Working directory: every command in sections 1, 3 and 5, and P2 to P6 in section 2, runs
+with the tool's working directory set to EXPDIR. Do not write `cd ... &&` or `cd ... ;` in
+front of any command. Run each command in its own tool call. The `&` appears only at the end
+of command a in section 3, exactly as written. P1 and P1b use absolute paths.
+
+## 1. Bindings (sha256, files under EXPDIR)
+
+| file | sha256 |
+|---|---|
+| PROTOCOL.md | 48acd3e8eeabdcfa7c951f906ac8d3c318718f8fa1b754df68cb4b457fa63ed2 |
+| run_probes.sh | 4ce34e77b9d4ebe98052a1f3fbd5b3dc489f6e19b6c9d80d7f63654297af9e17 |
+| run_weighted.sh | f20a0e413a1af43a7d13aa5f42ea96c271bea145f334d8d0d129702ab69dd09f |
+| run_cells.sh | eedcc4ad5d3a522ae8ebad99aa7ed938f1de688a385e047610ffdc86ae18cd49 |
+| ms2sing.sh | eacb5a8c6f129092c26a00796002881998916af914b367a7a438b8d1abca077a |
+| src/qsolve.rs | dff49f203567e0a262692b53070843c59a3610b1e4f540899965127576e2b51c |
+| bin/qsolve | 630f3a9da1272452a58bab9a46008738c292199f7a7c3a82d9fe979c016a9d35 |
+| bin/qsolve-w | c69c885cf59ead5fdd2812a62df8da36efe92ebff806d9bc2a5621212c884a06 |
+
+Check command: `sha256sum PROTOCOL.md run_probes.sh run_weighted.sh run_cells.sh ms2sing.sh src/qsolve.rs bin/qsolve bin/qsolve-w`
+Rule: stop with `specification_error` if any printed hash differs from the table.
+
+## 2. Preconditions (each is one command)
+
+P1. `git -C /tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr rev-parse HEAD`
+    expected: `9efd4d3e0eaaf095f4e56134d0e073774d5ad3d4`
+    If it prints anything else, run P1b; if P1b fails, stop with `specification_error`.
+P1b. `git -C /tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr diff --name-only 9efd4d3e0eaaf095f4e56134d0e073774d5ad3d4 HEAD -- research/ecgfp5_quotient_solve_20261101/PROTOCOL.md research/ecgfp5_quotient_solve_20261101/run_probes.sh research/ecgfp5_quotient_solve_20261101/run_weighted.sh research/ecgfp5_quotient_solve_20261101/run_cells.sh research/ecgfp5_quotient_solve_20261101/ms2sing.sh research/ecgfp5_quotient_solve_20261101/src/qsolve.rs`
+    expected: exit status 0 and no output lines.
+P2. `ps -o comm= -p 4562`
+    expected: `qsolve` (the running baseline 4111 solve).
+    If it prints nothing or anything else, stop with `precondition_failed` and run nothing in section 3.
+P3. `dpkg-query -W -f='${Version}' singular`
+    expected: `1:4.3.2-p10+ds-1.1build1`
+P4 (must_not_exist). `ls -d results/m5_p4111_sba results/m5_p4111_weighted results/m5_p262231_planted results/probes_drive.log`
+    expected: four lines `ls: cannot access 'results/...': No such file or directory`, one per path, and no path printed as existing.
+    If any of the four paths exists, stop with `precondition_failed`.
+P5. `pgrep -f 'run_weighted[.]sh drive'`
+    expected: no output (exit status 1): the A2 driver is stopped. Use exactly this pattern with the brackets; the
+    bracket form does not match the executor's own wrapper shell. If it prints a pid, stop with `precondition_failed`.
+P6. `pgrep -f 'run_probes[.]sh drive'`
+    expected: no output (exit status 1). If it prints a pid, stop with `precondition_failed`.
+
+Any precondition or hash mismatch: run nothing in section 3; go to section 5 and report the failing command and its output.
+
+## 3. Commands (verbatim, each in its own tool call, in this order, tool working directory = EXPDIR)
+
+a. `nohup ./run_probes.sh drive 4562 > results/probes_drive.log 2>&1 < /dev/null &`
+   Detached. The tool call returns at once. Do NOT wait for it, do NOT poll it, do NOT kill it.
+b. `sleep 2; pgrep -f 'run_probes[.]sh drive'; head -5 results/probes_drive.log`
+   timeout 30 s. Report the pgrep output and the head output as printed (empty output is reported as empty).
+   Then return. The driver runs for hours; do not wait for it.
+
+Stop rules (observable facts):
+- Run a only if all hashes and P1 (or P1b), P2, P3, P4, P5, P6 passed.
+- Run b only after a has returned.
+- No retries. No edits to any file. No reruns. No second launch. No commands other than those in sections 1, 2, 3 and 5.
+
+## 4. Declared outputs (paths only)
+
+- results/probes_drive.log
+(The driver itself later creates results/m5_p4111_sba/, results/m5_p4111_weighted/ and
+results/m5_p262231_planted/; the executor does not wait for them and does not list them.)
+
+## 5. Report back (verbatim, no interpretation, no summary)
+
+Return, in this order:
+1. The output of the section 1 sha256 check and of P1, P2, P3, P4, P5, P6 (and P1b if run).
+2. The exit status of a and of b.
+3. The pgrep output of b.
+4. The head output of b.
+Steps not run are reported as "not run" with the stop rule that applied.
+
+## 6. Write scope
+
+Only this directory may be created or changed:
+- /tmp/claude-0/-home-user/cf89363d-ad6e-5bef-bde6-195cbd206c93/scratchpad/crypto-pr/research/ecgfp5_quotient_solve_20261101/results/
+
+No git operations (no add, commit, push, checkout, reset). Do not edit any other file.

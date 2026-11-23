@@ -1,0 +1,59 @@
+import NonmonicExact
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial
+variable {K : Type*} [Field K]
+structure State (K : Type*) [Field K] where
+ r0 : K[X]
+ r1 : K[X]
+ s0 : K[X]
+ s1 : K[X]
+ t0 : K[X]
+ t1 : K[X]
+def initial (a b : K[X]) : State K := ⟨a,b,1,0,0,1⟩
+def step (z : State K) : State K :=
+ let q := z.r0 / z.r1
+ ⟨z.r1,z.r0 % z.r1,z.s1,z.s0-q*z.s1,z.t1,z.t0-q*z.t1⟩
+def Valid (a b : K[X]) (z : State K) : Prop :=
+ z.r0=z.s0*a+z.t0*b ∧ z.r1=z.s1*a+z.t1*b ∧
+ ∀h, (h∣z.r0 ∧ h∣z.r1) ↔ (h∣a ∧ h∣b)
+theorem initial_valid (a b : K[X]) : Valid a b (initial a b) := by
+ simp [Valid,initial]
+theorem division_identity (z : State K) : z.r0 = (z.r0/z.r1)*z.r1 + z.r0%z.r1 := by
+ simpa [mul_comm] using (EuclideanDomain.div_add_mod z.r0 z.r1).symm
+theorem step_valid (a b : K[X]) (z : State K) (hv : Valid a b z) : Valid a b (step z) := by
+ obtain ⟨h0,h1,hd⟩ := hv
+ have he := division_identity z
+ refine ⟨h1,?_,?_⟩
+ · change z.r0 % z.r1 = (z.s0 - z.r0/z.r1*z.s1)*a+(z.t0-z.r0/z.r1*z.t1)*b
+   linear_combination he - h0 + (z.r0/z.r1)*h1
+ · intro h
+   change (h∣z.r1 ∧ h∣z.r0%z.r1) ↔ _
+   rw [← hd h]
+   constructor
+   · rintro ⟨hx,hy⟩
+     exact ⟨he ▸ dvd_add (dvd_mul_of_dvd_right hx _) hy,hx⟩
+   · rintro ⟨hx,hy⟩
+     refine ⟨hy,?_⟩
+     have hh := dvd_sub hx (dvd_mul_of_dvd_right hy (z.r0/z.r1))
+     simpa [he] using hh
+noncomputable def run : Nat → State K → State K
+ | 0,z => z
+ | n+1,z => if z.r1=0 then z else run n (step z)
+theorem run_valid (n : Nat) (a b : K[X]) (z : State K) (hv : Valid a b z) :
+ Valid a b (run n z) := by
+ induction n generalizing z with
+ | zero => exact hv
+ | succ n ih =>
+   simp only [run]
+   split_ifs
+   · exact hv
+   · exact ih _ (step_valid a b z hv)
+theorem endpoint (a b : K[X]) (z : State K) (hv : Valid a b z) (hz : z.r1=0) :
+ z.r0=z.s0*a+z.t0*b ∧ z.r0∣a ∧ z.r0∣b ∧ ∀h, (h∣a ∧ h∣b) ↔ h∣z.r0 := by
+ refine ⟨hv.1,?_,?_,?_⟩
+ · exact ((hv.2.2 z.r0).mp ⟨dvd_refl _,hz ▸ dvd_zero _⟩).1
+ · exact ((hv.2.2 z.r0).mp ⟨dvd_refl _,hz ▸ dvd_zero _⟩).2
+ · intro h
+   simpa [hz] using (hv.2.2 h).symm
+end Pegcd

@@ -137,6 +137,19 @@ pub fn mitm_recover_two_round(cipher: &ReducedAes128) -> Vec<(u8, u8, u8)> {
     let delta = delta_set(&[0u8; 16], 0);
     let cts: Vec<_> = delta.iter().map(|p| cipher.encrypt(p)).collect();
 
+    mitm_recover_two_round_observed(&cts).expect("generated delta set has 256 ciphertexts")
+}
+
+/// Recover the two round-key bytes and intermediate constant from an observed
+/// delta set. `ciphertexts[i]` must encrypt `(i, 0, ..., 0)` under two-round
+/// AES-128 with the standard last round (no MixColumns). This does not recover
+/// the complete AES key.
+pub fn mitm_recover_two_round_observed(
+    ciphertexts: &[[u8; 16]],
+) -> Result<Vec<(u8, u8, u8)>, String> {
+    if ciphertexts.len() != 256 {
+        return Err("MITM requires exactly 256 indexed delta-set ciphertexts".into());
+    }
     let mut candidates = Vec::new();
     // Precompute g_j(i) = 2 · SBOX(i ⊕ j) for all j and i.
     let mut g = vec![[0u8; 256]; 256];
@@ -150,7 +163,7 @@ pub fn mitm_recover_two_round(cipher: &ReducedAes128) -> Vec<(u8, u8, u8)> {
     for k in 0..256usize {
         let mut f = [0u8; 256];
         for i in 0..256usize {
-            f[i] = INV_SBOX[(cts[i][0] ^ k as u8) as usize];
+            f[i] = INV_SBOX[(ciphertexts[i][0] ^ k as u8) as usize];
         }
         for j in 0..256usize {
             let m0 = f[0] ^ g[j][0];
@@ -166,7 +179,7 @@ pub fn mitm_recover_two_round(cipher: &ReducedAes128) -> Vec<(u8, u8, u8)> {
             }
         }
     }
-    candidates
+    Ok(candidates)
 }
 
 #[doc(hidden)]
@@ -227,5 +240,22 @@ mod tests {
             "expected unique recovery, got {} candidates",
             cands.len()
         );
+    }
+
+    #[test]
+    fn observed_mitm_accepts_ordered_ciphertexts_and_rejects_corruption() {
+        let key = [0x51u8; 16];
+        let cipher = ReducedAes128::new(&key, 2, false);
+        let mut cts: Vec<_> = delta_set(&[0; 16], 0)
+            .iter()
+            .map(|p| cipher.encrypt(p))
+            .collect();
+        let candidates = mitm_recover_two_round_observed(&cts).unwrap();
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].0, key[0]);
+        assert_eq!(candidates[0].1, cipher.round_key(2)[0][0]);
+        cts[17][0] ^= 1;
+        assert!(mitm_recover_two_round_observed(&cts).unwrap().is_empty());
+        assert!(mitm_recover_two_round_observed(&cts[..255]).is_err());
     }
 }

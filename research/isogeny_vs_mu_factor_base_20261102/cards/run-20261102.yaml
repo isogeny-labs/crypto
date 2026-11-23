@@ -1,0 +1,45 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-isogeny-vs-mu-factor-base-20261102-1
+experiment_id: isogeny_vs_mu_factor_base_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: de0b5628581f471491327d0c955f3033c7ef1364
+receipt: research/isogeny_vs_mu_factor_base_20261102/results/run-20261102.receipt.json
+binds:
+  - {path: research/isogeny_vs_mu_factor_base_20261102/run.sh, sha256: f39a75bba9e79475aa2cb5891794b7a5e20223752c1fc8665a7103313c7dd1b4}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/PROTOCOL.md, sha256: dfe6550b87b089e7c830c289682b42311eefe4a892246b2d51ad6157e3dd5c00}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/harness/src/main.rs, sha256: cd2cbd588bab74dff6d2e81c1e70d164a66d543f1f6ff94aec8aaab9c93d94bc}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/harness/Cargo.toml, sha256: c1fbcab9f501f017c24433a593b6bfb79b16b5d0151a35333158278830d65bcb}
+  - {path: research/isogeny_vs_mu_factor_base_20261102/harness/Cargo.lock, sha256: 7ec1d49e3d2856b7d69e1fc017a1509f5f8096b31d3e0ddad7857df3dc64ab07}
+must_not_exist:
+  - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102
+commands:
+  - id: run-study
+    argv:
+      - research/isogeny_vs_mu_factor_base_20261102/run.sh
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102
+    timeout_seconds: 5400
+    success_exit_codes: [0]
+    stdout: research/isogeny_vs_mu_factor_base_20261102/results/run-20261102.stdout
+    stderr: research/isogeny_vs_mu_factor_base_20261102/results/run-20261102.stderr
+    outputs:
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/verdicts.json
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/summary.json
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/q1_yield.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/q1_cells.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/q2_systems.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/q2_cells.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/q3_terminal.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/s1_structure.csv
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/host.txt
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/SHA256SUMS
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/progress.log
+      - research/isogeny_vs_mu_factor_base_20261102/results/run-20261102/cargo-test.log
+bus_address: executor-mechanical-isogeny-vs-mu-factor-base
+background: true
+write_scope: [research/isogeny_vs_mu_factor_base_20261102/results/]
+stop_when:
+  - The command exits nonzero or reaches its 5400 second timeout; return the receipt and the stderr tail unedited.
+  - A declared output file is missing from the output directory; return the receipt unedited.
+notes: The run is local in the session container. The build writes the gitignored directory research/isogeny_vs_mu_factor_base_20261102/harness/target. No retry is allowed and no environment variable is set.

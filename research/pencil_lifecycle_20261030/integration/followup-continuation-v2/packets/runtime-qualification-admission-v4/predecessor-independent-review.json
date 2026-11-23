@@ -1,0 +1,247 @@
+{
+  "schema": "runtime.retained-disk-provenance-review/v1",
+  "reviewer": "/root/witness_independent_review_v2",
+  "independent_of_derivation": true,
+  "prior_context": "Authored qualifier correction and inspected prior failure; did not author draft predecessor or supervisor-v4",
+  "draft_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v4/derived-predecessor.draft.json",
+  "draft_sha256": "974196984f11ceb5d3ba9ea01ccb38a2d942dd43c25516eaeac4be07e7b1b31e",
+  "decision": "accept_scoped_provenance_joins",
+  "observed_review_utc": "2026-11-03T19:41:45.283187+00:00",
+  "checks": [
+    {
+      "check": "direct reference assembly",
+      "passed": true
+    },
+    {
+      "check": "direct reference endpoint",
+      "passed": true
+    },
+    {
+      "check": "direct reference worker",
+      "passed": true
+    },
+    {
+      "check": "direct reference failure",
+      "passed": true
+    },
+    {
+      "check": "direct reference observation",
+      "passed": true
+    },
+    {
+      "check": "direct reference loops",
+      "passed": true
+    },
+    {
+      "check": "direct reference unit",
+      "passed": true
+    },
+    {
+      "check": "direct reference postreview",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact completion.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact native-binding.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact native-endpoint.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact native-worker-result.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact native-receipt.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact qualifier-receipt.stdout",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact qualifier-receipt.stderr",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact readonly-extraction.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact native-capture.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact unit.stdout",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact loops.stdout",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact disk-stat.stdout",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact disk-stat-after.stdout",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact publication.json",
+      "passed": true
+    },
+    {
+      "check": "postreview artifact journal.stdout",
+      "passed": true
+    },
+    {
+      "check": "original disk owner",
+      "passed": true
+    },
+    {
+      "check": "disk path ancestry and binding",
+      "passed": true
+    },
+    {
+      "check": "latest qualification owner",
+      "passed": true
+    },
+    {
+      "check": "latest qualification mode",
+      "passed": true
+    },
+    {
+      "check": "latest service identity",
+      "passed": true
+    },
+    {
+      "check": "service owner namespace",
+      "passed": true
+    },
+    {
+      "check": "historical image and daemon",
+      "passed": true
+    },
+    {
+      "check": "assembly predecessor receipt joins",
+      "passed": true
+    },
+    {
+      "check": "endpoint failure join",
+      "passed": true
+    },
+    {
+      "check": "source binary input joins",
+      "passed": true
+    },
+    {
+      "check": "latest disk digest and full custody",
+      "passed": true
+    },
+    {
+      "check": "retained file identity",
+      "passed": true
+    },
+    {
+      "check": "recorded stat fields",
+      "passed": true
+    },
+    {
+      "check": "recorded stat stable across extraction",
+      "passed": true
+    },
+    {
+      "check": "worker flags",
+      "passed": true
+    },
+    {
+      "check": "recorded empty process and cgroup",
+      "passed": true
+    },
+    {
+      "check": "recorded detached loop",
+      "passed": true
+    },
+    {
+      "check": "observation command subjects",
+      "passed": true
+    },
+    {
+      "check": "failed qualification explicit",
+      "passed": true
+    },
+    {
+      "check": "historical adapter semantics",
+      "passed": true
+    },
+    {
+      "check": "assembly nested reference worker",
+      "passed": true
+    },
+    {
+      "check": "assembly nested reference observation",
+      "passed": true
+    },
+    {
+      "check": "assembly nested reference execution_receipt",
+      "passed": true
+    },
+    {
+      "check": "assembly nested reference disposition_postreview",
+      "passed": true
+    },
+    {
+      "check": "historical worker assembled image",
+      "passed": true
+    }
+  ],
+  "missing_required_joins": [],
+  "semantics": {
+    "owner": "Original disk/image assembly owner, not latest process owner",
+    "service_identity": "Most recent failed qualification owner/unit/cgroup/invocation",
+    "status": "Historical assembled image retained and observed stopped; does not replace failed qualification status",
+    "mode": "Historical artifact origin/consumer adapter, not latest execution phase",
+    "disk_digest": "Latest worker-derived hash; older assembly digest intentionally differs"
+  },
+  "limits": [
+    "No disk rehash, mount, current stat, service, cloud or runtime call performed",
+    "Stopped/cgroup/loop claims are observations at recorded time, not fresh live checks",
+    "Disk-stat observation has second-resolution mtime; nanosecond custody and digest inherited from worker",
+    "Consumer setup_storage must still verify locked disk custody/digest and current cgroup emptiness before mounting",
+    "This review does not approve qualification, resources, cost balance or retry"
+  ],
+  "qualification_approved": false,
+  "budget_reviewed": false,
+  "runtime_executed": false,
+  "inputs": {
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-qualification-admission-v4/derived-predecessor.draft.json": "974196984f11ceb5d3ba9ea01ccb38a2d942dd43c25516eaeac4be07e7b1b31e",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v3/derived-predecessor-receipt.json": "d57eacf6a0b9b87ab858adc5f7006f1c431d110db41d913fdab83e2602dbdd07",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/native-endpoint.json": "1e675cf5adbc55346d5c5f65d15d4109f46f26e85f4c4801782687d6194114f3",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/native-worker-result.json": "8a28d0a6729c027645c02b26fb7e8f37f2028b559706625229f155b2578c59f2",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/qualifier-receipt.stdout": "fb31d284257a099bd74f13d6b3033e23a9bbdfdfe1ff0588512d9400df282f50",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/native-capture.json": "0bd10531e223832501aab7d362d6f26a987c5006c5edfd55e54307fb5506eb1f",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/loops.stdout": "3f1d39e826503300542203478b61c9393220197f672114f5813fa484380802ed",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/unit.stdout": "dbd2b630f468edf83388f88020f27e0d9748cba0840e1aa7e3553fb684302dc0",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/report/independent-postreview.json": "2f696003443e573584f61404ddbfbd63bdac015df8354ce9befe906dfb9ab841",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/completion.json": "7a8b3359aa56ae38e219185fb1178028f9400ec3b37b69d5ae3f0c6708b61dbf",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/native-binding.json": "f252e9cf5465638c79caffde233f19fdd88a462e05148e3736041d8ca3b91798",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/native-receipt.json": "d2ef44b416486d0924fb41979771360a3e90c2cb47600cd7c6bb2f75fa2276f2",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/qualifier-receipt.stderr": "c0eda8e792b06ab4531f47cc421ca68489490dd5a9aa7c1eeae93b4d3193ef44",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/readonly-extraction.json": "606d7edcc21990fd7010ebded2cb625cbd28e16ecb07f05d07c6463072af89d3",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/disk-stat.stdout": "1582da011f4a3b7793930c1a7e18562e664b1e0302a06d163b7bc2f39c90d6d7",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/disk-stat-after.stdout": "1582da011f4a3b7793930c1a7e18562e664b1e0302a06d163b7bc2f39c90d6d7",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/publication.json": "602931e981c9793a08eacaabc6b1be2e2bbb3ab075878436c0e37141d2a4978d",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/journal.stdout": "0129e3fecac8074fd90cccef2bef7fed359f4d3b780d33c72ec67ed55f99485a",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-assembly-attempt/native-worker-result.json": "dd9644ff189b735ffe98d01208dc4dffd18ddb469dd2651ac6382626900b406d",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-assembly-attempt/readonly-disposition.stdout": "fef60b3898121dfe111bcfecb8c6589cc4f391fa191a082e463d9b9a39c7c880",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-assembly-attempt/readonly-disposition.receipt.json": "f5849f34043a61568cd796ae19ca107a41cb398bab5067a76fe34b2906054033",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v3/predecessor-disposition-independent-review.json": "828b5cc7d5873c9d7f2ce90160263cbb00715c86965e57f0f9e968b63fa5dbd8",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v4/supervise.py": "d6587a8b2d7c169672d2d3dcbdc82a79bd4ee0ba38c324995c0e887a905d96b0"
+  }
+}

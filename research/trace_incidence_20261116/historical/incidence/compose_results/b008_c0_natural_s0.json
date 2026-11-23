@@ -1,0 +1,94 @@
+{
+  "status": "relation",
+  "witness": [
+    {
+      "pool": 0,
+      "index": 2,
+      "sign": -1
+    },
+    {
+      "pool": 1,
+      "index": 3,
+      "sign": 1
+    },
+    {
+      "pool": 2,
+      "index": 7,
+      "sign": 1
+    }
+  ],
+  "recovery": {
+    "A": 2749,
+    "B": 3056,
+    "k": 3356
+  },
+  "root_candidates": 1,
+  "gcd_evaluations": 8,
+  "uninformative_matches_skipped": 0,
+  "group_counters": {
+    "group_addition_calls": 27,
+    "field_inversions": 24
+  },
+  "arm": "split_compose",
+  "gcd_degree": 1,
+  "gcd_coefficients": [
+    737,
+    1
+  ],
+  "phase_cpu_seconds": {
+    "preprocessing": 2.415170542635654e-06,
+    "modular_composition_incidence": 6.0062919896641e-06,
+    "incidence_gcd": 0.0,
+    "witness_and_scalar_recovery": 9.661602067183676e-07
+  },
+  "solver_core_bracket_cpu_seconds": 0.0,
+  "solver_total_wall_seconds": 0.00019713763055242406,
+  "counters": {
+    "interpolation_scalar_inversions": 8,
+    "denominator_scalar_inversions": 8,
+    "quotient_multiplications": 40,
+    "polynomial_product_coefficient_pairs": 2248,
+    "native_modular_compositions": 16
+  },
+  "dimensions": {
+    "quotient_dimension": 8,
+    "first_pool_iterations": 8,
+    "largest_stored_univariate_degree": 8,
+    "backend_internal_workspace": "Native FLINT compose_mod workspace; not a pair table; peak process RSS measured."
+  },
+  "peak_process_rss_kib": 24352,
+  "complexity_scope": "B iterations, 2B native degree-B modular compositions, 5B explicit quotient products, O(B^2) classical interpolation coefficient work. compose_mod internals uncounted; no subquadratic claim.",
+  "schema": "incidence-compose-result/v1",
+  "fixture_id": "b008_c0_natural_s0",
+  "B": 8,
+  "kind": "natural",
+  "fixture_sha256": "fe682825d4897bfb6853b065a470452e60ad62a990635c172d5e9821ad8352b5",
+  "fixture_generation": {
+    "accepted": 24,
+    "counter_scope": "Public alpha*P+beta*Q pool construction, including rejected draws; Python modular inverse internals not expanded into multiplications.",
+    "counters": {
+      "affine_additions": 270,
+      "affine_doublings": 533,
+      "field_inversions": 803,
+      "field_multiplications": 1606,
+      "field_squarings": 1336,
+      "group_add_calls": 851,
+      "scalar_bits": 533,
+      "scalar_multiplications": 48
+    },
+    "cpu_seconds": 0.0015111489999999894,
+    "draws": 24,
+    "rejected": {},
+    "secret_used_for_pool_generation": false,
+    "wall_seconds": 0.0015128809991438175
+  },
+  "solver_total_cpu_seconds": 0.00020742572351421193,
+  "batch_cpu_seconds": 0.08027375500000002,
+  "batch_wall_seconds": 0.0802679629996419,
+  "timing_repetitions": 387,
+  "cpu_affinity": [
+    1
+  ],
+  "flint_version": "0.9.0",
+  "phase_timing_scope": "Short inner CPU intervals unreliable/undersum; outer batch complete-call CPU is primary."
+}

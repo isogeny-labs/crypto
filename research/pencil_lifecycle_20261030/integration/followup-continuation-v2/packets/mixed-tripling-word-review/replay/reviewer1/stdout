@@ -1,0 +1,143 @@
+theorem PencilWordRefinement.repeated_word_preserves : ∀ (p : UInt64) [inst : Fact (Nat.Prime p.toNat)],
+  5 ≤ p.toNat →
+    p.toNat < 2 ^ 31 →
+      ∀ (a0 a1 a2 a3 : UInt64) (a : WordD1) (b : WeightedWord),
+        a1.toNat < p.toNat →
+          a2.toNat < p.toNat →
+            a3.toNat < p.toNat →
+              WordD1.canonical p a →
+                WeightedWord.canonical p b →
+                  a.z ≠ 0 →
+                    a.w ≠ 0 →
+                      b.z ≠ 0 →
+                        b.w ≠ 0 →
+                          WordD1.normalizedValid p (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) a →
+                            WeightedWord.normalizedValid p (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat)
+                                b →
+                              (mixedWords p a b).k = 0 →
+                                (mixedWords p a b).l ≠ wordNeg p (mixedWords p a b).ry →
+                                  positiveXz p a b = (mixedWords p a b).point.x →
+                                    have c := tripleWords p a1 a2 a3 a;
+                                    a.y ≠ 0 ∧
+                                      tripleWordDispatch p a1 a2 a3 a b = some c ∧
+                                        WeightedWord.canonical p c ∧
+                                          c.z ≠ 0 ∧
+                                            c.w ≠ 0 ∧
+                                              WeightedWord.normalizedValid p
+                                                (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) c :=
+fun p [Fact (Nat.Prime p.toNat)] hfive hbound a0 a1 a2 a3 a b h1 h2 h3 ha hb haz haw hbz hbw hva hvb hk hc he =>
+  have hp := Decidable.byContradiction fun a => repeated_word_preserves._proof_1_1 p hfive hbound a1 a2 a3 a;
+  And.casesOn (mixed_decode p hfive hbound a b ha hb) fun hmk right =>
+    And.casesOn right fun hml right =>
+      And.casesOn right fun hmr right =>
+        And.casesOn right fun hmc right =>
+          And.casesOn right fun hmkd right =>
+            And.casesOn right fun hmld right =>
+              And.casesOn right fun hmrd hmpd =>
+                have fk :=
+                  Eq.mpr (id (congrArg (fun _a => _a = 0) (Eq.symm hmkd)))
+                    (Eq.mpr (id (congrArg (fun _a => ↑_a.toNat = 0) hk))
+                      (of_eq_true
+                        (Eq.trans
+                          (congrFun' (congrArg Eq (Eq.trans (congrArg Nat.cast UInt64.toNat_zero) Nat.cast_zero)) 0)
+                          (eq_self 0))));
+                have hn := wordNeg_composition p (mixedWords p a b).ry hp hmr;
+                have fc := fun heq =>
+                  hc
+                    (UInt64.toNat_inj.mp
+                      ((canonical_equality p.toNat (mixedWords p a b).l.toNat (wordNeg p (mixedWords p a b).ry).toNat
+                            hml hn.left).mp
+                        (Eq.mpr (id (congrArg (fun _a => _a = ↑(wordNeg p (mixedWords p a b).ry).toNat) hmld))
+                          (Eq.mpr
+                            (id
+                              (congrArg
+                                (fun _a =>
+                                  (WordD1.decode p a).y * MixedCancellation.rawW3 (WeightedWord.decodeTwo p b) = _a)
+                                hn.right))
+                            (Eq.mpr
+                              (id
+                                (congrArg
+                                  (fun _a =>
+                                    (WordD1.decode p a).y * MixedCancellation.rawW3 (WeightedWord.decodeTwo p b) = -_a)
+                                  hmrd))
+                              heq)))));
+                have hxd := (positive_xz_decode p hfive hbound a b ha hb).right;
+                have fe :=
+                  Eq.mpr
+                    (id
+                      (congrArg
+                        (fun _a => _a = (MixedCancellation.other (WordD1.decode p a) (WeightedWord.decodeTwo p b)).x)
+                        (Eq.symm hxd)))
+                    (Eq.mpr
+                      (id
+                        (congrArg
+                          (fun _a =>
+                            ↑_a.toNat = (MixedCancellation.other (WordD1.decode p a) (WeightedWord.decodeTwo p b)).x)
+                          he))
+                      (congrArg WeightedAdd11.Input.x hmpd));
+                have az := canonical_word_nonzero p a.z hp ha.right.right.left haz;
+                have aw := canonical_word_nonzero p a.w hp ha.right.right.right haw;
+                have bz := canonical_word_nonzero p b.z hp hb.right.right.right.right.left hbz;
+                have bw := canonical_word_nonzero p b.w hp hb.right.right.right.right.right hbw;
+                And.casesOn
+                  (MixedTripling.source_repeated_preserves (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (WordD1.decode p a) (WeightedWord.decodeTwo p b) az aw bz bw hva hvb fk fc fe)
+                  fun fclass right =>
+                  And.casesOn right fun left right =>
+                    And.casesOn right fun fy right =>
+                      And.casesOn right fun fz right =>
+                        And.casesOn right fun fw fv =>
+                          have cls :=
+                            Eq.mpr
+                              (id
+                                (congrArg (fun _a => _a = MixedCancellation.Branch.positiveCoincidence)
+                                  (mixed_classifier_decode p hfive hbound a b ha hb)))
+                              fclass;
+                          And.casesOn (triple_word_decode p hfive hbound a1 a2 a3 a h1 h2 h3 ha) fun cc cdec =>
+                            have ay := fun hz =>
+                              fy
+                                (id
+                                  (Eq.mpr (id (congrArg (fun _a => ↑_a.toNat = 0) hz))
+                                    (of_eq_true
+                                      (Eq.trans
+                                        (congrFun'
+                                          (congrArg Eq (Eq.trans (congrArg Nat.cast UInt64.toNat_zero) Nat.cast_zero))
+                                          0)
+                                        (eq_self 0)))));
+                            ⟨ay,
+                              ⟨of_eq_true
+                                  (Eq.trans
+                                    (congrFun'
+                                      (congrArg Eq
+                                        (Eq.trans
+                                          (ite_congr
+                                            (Eq.trans
+                                              (congrFun' (congrArg Eq cls) MixedCancellation.Branch.positiveCoincidence)
+                                              (eq_self MixedCancellation.Branch.positiveCoincidence))
+                                            (fun a_1 =>
+                                              Eq.trans
+                                                (ite_congr
+                                                  (Eq.trans (congrFun' (congrArg Eq he) (mixedWords p a b).point.x)
+                                                    (eq_self (mixedWords p a b).point.x))
+                                                  (fun a_2 => Eq.refl (some (tripleWords p a1 a2 a3 a))) fun a =>
+                                                  Eq.refl none)
+                                                (ite_true (some (tripleWords p a1 a2 a3 a)) none))
+                                            fun a => Eq.refl none)
+                                          (ite_true (some (tripleWords p a1 a2 a3 a)) none)))
+                                      (some (tripleWords p a1 a2 a3 a)))
+                                    (eq_self (some (tripleWords p a1 a2 a3 a)))),
+                                ⟨cc,
+                                  ⟨have hz := Eq.mpr (id (congrArg (fun _a => _a.z ≠ 0) cdec)) fz;
+                                    fun heq =>
+                                    hz
+                                      (id
+                                        (Eq.mpr (id (congrArg (fun _a => ⋯) heq))
+                                          (of_eq_true (Eq.trans (congrFun' ⋯ 0) (eq_self ⋯))))),
+                                    ⟨have hw := Eq.mpr (id (congrArg (fun _a => _a.w ≠ 0) cdec)) fw;
+                                      fun heq => hw (id (Eq.mpr (id (congrArg ⋯ heq)) (of_eq_true (Eq.trans ⋯ ⋯)))),
+                                      positive_valid_transport p
+                                        (MixedGeneric.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat)
+                                        (tripleWords p a1 a2 a3 a)
+                                        (MixedTripling.rawOutput (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                                          (WordD1.decode p a))
+                                        cdec fv⟩⟩⟩⟩⟩

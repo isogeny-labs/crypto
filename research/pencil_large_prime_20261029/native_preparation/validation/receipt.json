@@ -1,0 +1,118 @@
+{
+  "schema": "pencil-native-preparation-receipt/v1",
+  "status": "passed_run_free_validation",
+  "observed_at_utc": "2026-10-29T22:44:18Z",
+  "repository_head_at_validation": "7d2629acab6fa3285e3091f2c3b459df62c0b533",
+  "source_state": "uncommitted_standalone_crate",
+  "rust_toolchain": {
+    "release": "1.99.1",
+    "commit": "58cf8f9c35b355199727627d07ae34a4e2846d67",
+    "host": "x86_64-unknown-linux-gnu"
+  },
+  "source_sha256": {
+    "Cargo.toml": "0d5fafc970dbb9b9d9fea33fcd0344c130c7184f732858b26fa1b2290c0a200e",
+    "Cargo.lock": "22228eb5115c49911bc588d440baf7528eba4a6dd69eda763598b52308225726",
+    "README.md": "028fa02346a36a8f9a1fd7f2ae1f43b1802e263d41f736dcda82228404641642",
+    "src/lib.rs": "2f7d71644f0e8f1ea48a3c10cb840dc3ece761ae29721920550b83156d8bb45a",
+    "src/main.rs": "42b328416d52f0416ed700446fd0f948a5a6d2da75aba9ba30985b9861bb0eed"
+  },
+  "retained_input_sha256": {
+    "../validation_inputs/manifest.json": "3fd89cb47c5e1b2fb5e91edd298da6865513bbd5e36c422acd67284f96a099b4",
+    "../validation_inputs/expected-workloads.jsonl": "9a09feda9ade743ce58a6303b17463f0b8734bdddf36d4b5b7dcc5029b97334a",
+    "../prepared_specs/manifest.json": "31ac091fac15821fd86fbb3019e7a625376e3f86ae7da62a84bf60e654169179",
+    "source_archive_declared_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339"
+  },
+  "pinned_ecbench": {
+    "path_at_validation": "/home/ec2-user/pencil-build-40938439022/ecbench",
+    "sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+    "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "build_info_sha256": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5"
+  },
+  "native_preparation_binary_sha256": "11fb2aa25fe7cd737271c4a13236c0ae9be0346a437b776d3acaa8e4a1890360",
+  "preserved_historical_validation": {
+    "receipt": "historical-source3d/receipt.json",
+    "receipt_sha256": "b3130be7d35e19cac4878129819401b1a2fd2c4a94d2a4f2fdb23a772d27cbce",
+    "instrument_sha256": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3",
+    "instrument_source_revision": "3d99a998514c81a4095105ac71eb6df335bc55a2",
+    "status": "historical_run_free_plan_parity"
+  },
+  "software_checks": [
+    {
+      "command": "cargo +1.99.1 fmt --all -- --check",
+      "passed": true
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked",
+      "passed": true,
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "log": "cargo-test-release-locked.log",
+      "log_sha256": "1a6c2ffd43e5d89be21e07f92df045674b37e901e078c8c7c3e1f65964999603"
+    },
+    {
+      "command": "cargo +1.99.1 clippy --release --all-targets --locked -- -D warnings",
+      "passed": true,
+      "log": "cargo-clippy-release-locked.log",
+      "log_sha256": "dc2a5f918c631021d59b2c9fe85ddd5b708d497daf1e0c91c56e445bdbd5aef6"
+    },
+    {
+      "command": "cargo +1.99.1 build --release --locked",
+      "passed": true,
+      "log": "cargo-build-release-locked.log",
+      "log_sha256": "67c3c8510cdfaba51b8e80bb7a3829d548ce03e2ba86fcaa546c8f6dfe34f4dc"
+    }
+  ],
+  "archive_plan_parity": {
+    "passed": true,
+    "result": "archive-parity-result.json",
+    "result_sha256": "6e9e406e31a3ebb4acd45ec2b228c89e07e37ade922de6bbdd13f37a44772b0a",
+    "expected_workloads": 1260,
+    "observed_workloads": 1260,
+    "exact_retained_plan_bytes": true,
+    "identity_fields": [
+      "workload_id",
+      "target",
+      "target_seed",
+      "target_index",
+      "first_algorithm_seed",
+      "bits"
+    ]
+  },
+  "prepared_plan_parity": {
+    "passed": true,
+    "result": "prepared-parity-result.json",
+    "result_sha256": "b724a83f65780ceba0bcc43bf89db762ae8f4b00cb0efe96977c2e9b1df7d3cf",
+    "cohort_targets": 1260,
+    "cohort_planned_executions": 22680,
+    "cohort_measured_executions": 18900,
+    "cohort_warmup_executions": 3780,
+    "gate_targets": 61,
+    "gate_planned_executions": 1098,
+    "exact_retained_plan_bytes": true,
+    "prepared_specs_and_manifest_exact_retained_bytes": true
+  },
+  "archive_extraction_validation": {
+    "synthetic_native_zstd_tar_test_passed": true,
+    "projection_excludes_planted_answer": true,
+    "actual_frozen_archive_reextracted_in_this_validation": true,
+    "archive_path_at_validation": "/home/ec2-user/crypto-pr2304-external/research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+    "archive_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+    "archive_size_bytes": 1737313,
+    "projected_manifest_exact_retained_bytes": true,
+    "projected_expected_workloads_exact_retained_bytes": true,
+    "all_seven_archive_specs_exact_retained_bytes": true,
+    "prepared_manifest_exact_retained_bytes": true,
+    "all_nine_prepared_specs_exact_retained_bytes": true
+  },
+  "current_validation_log": {
+    "path": "current-source543-validation.log",
+    "sha256": "700964ee985f687eafe737a2e9df29ed07fbc6677cdec492cd478e836efaf1f1"
+  },
+  "execution_boundary": {
+    "ecbench_subcommand": "plan --doc",
+    "solver_executions_performed": 0,
+    "cohorts_launched": 0,
+    "cloud_jobs_launched": 0
+  },
+  "claim_boundary": "This receipt validates the native preparation implementation and run-free plan parity. It hash-binds the supplied ecbench binary and build-info to source revision 543a54b4b1c3be7052872af3ffe393a44c69a3c3 but does not independently reproduce that binary build. It does not attest an empirical run, a timing or memory result, an unknown-scalar recovery, or a cost ratio."
+}

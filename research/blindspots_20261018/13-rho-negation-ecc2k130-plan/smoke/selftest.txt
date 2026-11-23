@@ -1,0 +1,33 @@
+PASS is_prime: 40-bit
+PASS invmod: 
+PASS curve: p=869371 N=869543 (prime, [N]G=O)
+PASS counts: 200 random joint multiplications and verifications: points, adds, doubles, field ledger
+PASS agreement: 112 runs (14 arms x 2 r x 4 targets) identical in every counter, DP digest and recovered log; field ledger = constants x ops
+PASS recovery: baseline, min-of-2, look-ahead and the three look-ahead+periodic arms recovered the planted log on every target at N~2^20 (no run returned a wrong log)
+smoke cell 2^40 (N=1099511627689), r=16, 6 targets, cap 2.0 x sqrt(pi N/2)
+  base     solved 6/6 censored 0/6 mean ops/sqrt(N) 0.994 bad 0
+  none     solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+  dbl      solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+  min2     solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+  la       solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+  per2     solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+  per4     solved 6/6 censored 0/6 mean ops/sqrt(N) 1.443 bad 0
+  per8     solved 6/6 censored 0/6 mean ops/sqrt(N) 1.122 bad 0
+  per16    solved 6/6 censored 0/6 mean ops/sqrt(N) 1.550 bad 0
+  per32    solved 2/6 censored 4/6 mean ops/sqrt(N) 2.258 bad 0
+  per64    solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+  laper16  solved 6/6 censored 0/6 mean ops/sqrt(N) 0.918 bad 0
+  laper32  solved 6/6 censored 0/6 mean ops/sqrt(N) 0.974 bad 0
+  laper64  solved 6/6 censored 0/6 mean ops/sqrt(N) 1.088 bad 0
+PASS positive control (absorption): no-escape arm censored on 6/6 targets at r=16
+PASS positive control (baseline): baseline solved 6/6
+PASS positive control (detecting arms): windows of 4, 8, 16 and the three look-ahead+periodic arms solved at least 5 of 6 at r=16 (a window of k sees only cycles of length <= k, so the window of 2 is a 2-cycle-only rule like min-of-2 and dbl, which longer fruitless cycles absorb at r=16; windows of 32 and 64 lose to re-entry; those are not asserted, they are the effect under measurement)
+  r=2048 base     solved 6/6
+  r=2048 dbl      solved 6/6
+  r=2048 min2     solved 6/6
+  r=2048 la       solved 6/6
+  r=2048 per16    solved 6/6
+  r=2048 laper16  solved 6/6
+PASS positive control (r = 2048): baseline, doubling escape, min-of-2, look-ahead, window 16 and look-ahead+16 solved at least 5 of 6 at r=2048
+PASS ideal-map control: points/classes mean steps = 1.295 over 200 targets at 2^30 (sqrt2 = 1.414)
+selftest OK in 3.6s

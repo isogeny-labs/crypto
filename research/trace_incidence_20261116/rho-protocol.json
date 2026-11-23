@@ -1,0 +1,108 @@
+{
+  "schema": "trace-incidence-rho-preparation/v1",
+  "status": "descriptive source-exact Runpod execution complete; stronger admission and signed replay pending",
+  "question": "Do the native paper root backends or source-coordinate splitting lower complete prime-field relation-recovery cost relative to the matched native baseline and strongest registered rho?",
+  "hypotheses": [
+    "If the affected translation phase has nonzero measured share f and speedup s, total speedup follows 1/((1-f)+f/s), with new setup and recovery charged.",
+    "The historical timed incidence path makes no trace-kernel calls, so its recorded runtime cannot inherit that component ratio. The new optional native root backends require their own complete-call measurement."
+  ],
+  "inputs": {
+    "public_schema": "prime-pools/v1",
+    "B": [
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "group_order_path": "r approximately 8 B^3",
+    "curves_per_size": 3,
+    "public_seeds_per_curve": 4,
+    "primary_scope": "one public target at a time; aggregate panels are secondary",
+    "solver_excludes": "*.validation.json and all target scalars"
+  },
+  "reference": {
+    "native_adapter": "examples/trace_incidence_rho.rs (three source-exact native development tests passed; unsigned)",
+    "engine": "crypto_lib::cryptanalysis::prime_fast::rho_parallel",
+    "features": [
+      "u64 Montgomery arithmetic",
+      "r-adding table",
+      "batched additions",
+      "negation fold",
+      "fruitless-cycle escape"
+    ],
+    "selection": "Use the cheapest registered protocol-matched reference, including applicable automorphisms. Tune cold overhead on separate qualification inputs before held-out comparisons; do not select a post-hoc best seed.",
+    "adapter_gap": "Aggregate engine timer only; exclusive walk/collision/recovery intervals still required for admission."
+  },
+  "charged_work": [
+    "curve and input validation",
+    "public mixed-label generation including rejected draws",
+    "every attempted pool and miss",
+    "polynomial and table setup",
+    "translation including collisions and exceptional points",
+    "incidence selection",
+    "witness and scalar recovery",
+    "verification on the original curve",
+    "memory peaks"
+  ],
+  "retry_policy": "fixed seed order; stop at first informative relation, retain preceding costs; four misses are censored, not a completed solve",
+  "controls": [
+    "same-input native batched pairs",
+    "native quotient/GCD route",
+    "dense and trace translations on identical native backend",
+    "A/A repeats",
+    "collision and exceptional-point fixtures",
+    "uninformative-first witness regression",
+    "native source-coordinate root finder",
+    "charged auxiliary two-isogeny/codomain datum construction",
+    "FLINT nmod_poly_roots external root control on identical inputs, separately labelled randomized"
+  ],
+  "admission": {
+    "backend": "isolab EKS Spot with native L2",
+    "threads": 1,
+    "measured_rounds_minimum": 5,
+    "warmup": true,
+    "AA_control": true,
+    "cpu_request": 4,
+    "memory_request": "8Gi",
+    "proposed_run_deadline_seconds": 600,
+    "new_launches_until_budget_readback": 0,
+    "proposed_total_attempt_ceiling_usd": 1,
+    "budget_note": "Proposal only. Includes build, idle, failed and interrupted attempts; launch requires an authorized finite balance covering all of them.",
+    "identities": [
+      "published source commit",
+      "immutable pre-call qualifier hash",
+      "request hash",
+      "OCI digest",
+      "binary SHA-256",
+      "Job UID",
+      "Pod UID",
+      "post-call manifest"
+    ],
+    "outputs": "approved S3 custody, all raw records, independent replay and recompute; PCC standing before promotion"
+  },
+  "blocking_dependencies": [
+    "Independent signed replay and canonical-schema/isolated admission before promotion",
+    "Stronger external/control tuning and exclusive rho phase instrumentation before a fastest or security-tier claim",
+    "Wider-field arithmetic/datum support outside the declared small-word panel"
+  ],
+  "claim_boundary": "No measured ratio to rho, new arithmetic exponent or extrapolation to 256-bit/binary fields is asserted.",
+  "completed_native_paths": [
+    "literal auxiliary-curve/twist Algorithms1-6 with dense and trace translation",
+    "source-coordinate Sylow splitting without image reconstruction",
+    "explicit two-isogeny and counted toy codomain-basis completion",
+    "incidence GCD plus original-curve mixed-label witness recovery",
+    "native rho adapter development tests"
+  ],
+  "scope_note": "Native correctness panel uses p83/p97 and B2/3/4; it is separate from the historical growing-B timing panel and is not a new scaling measurement.",
+  "completed_runpod": {
+    "source_revision": "c0176f942c03a549a98cb680b816e864b8820333",
+    "results": "runpod/RESULTS.md",
+    "raw_archive_sha256": "0b27d27910807fc9e5b047e4f64999ba71d603178537c78ac7b7f1cb06be81fa",
+    "raw_rows": 6066,
+    "measured_rows": 5055,
+    "standing": "pcc:unverified",
+    "isolation": "shared Runpod host, no L2",
+    "pods_deleted": true
+  }
+}

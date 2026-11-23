@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "ec2",
+    "describe-spot-instance-requests",
+    "--query",
+    "SpotInstanceRequests[].{Id:SpotInstanceRequestId,Price:SpotPrice,State:State,Type:Type,Instance:InstanceId,Status:Status.Code}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:36.565464+00:00",
+  "observed_utc": "2026-11-03T22:29:38.258412+00:00",
+  "elapsed_seconds": 1.6929499419929925,
+  "stdout_sha256": "5da393c50d18cc45e95d20cd7f3f35326ed46bcf99a6c4359c02a0af6499ca1b",
+  "stdout_bytes": 822,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}

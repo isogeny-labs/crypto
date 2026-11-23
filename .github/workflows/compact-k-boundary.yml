@@ -50,6 +50,8 @@ jobs:
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/verify_panel.py
             research/notes/ecc2k130/compact_k_boundary_20260929
             .github/workflows/compact-k-boundary.yml
+            /tools/artifacts/
+            /.artifacts/
       - uses: Swatinem/rust-cache@v2
       - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v3 --example koblitz_orbit_dlp_fast

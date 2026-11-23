@@ -1,0 +1,32 @@
+LIB "normal.lib";
+option(redSB);short=0;
+execute(read("selected-prime49.sing"));
+execute(read("fractional-module49.sing"));
+execute(read("normalization49.sing"));
+ideal normalStd49=std(norid);
+map sourceMap49=selected49,normap;
+if(size(reduce(sourceMap49(selectedPrime49),normalStd49))!=0 || size(reduce(sourceMap49(originalIdeal49),normalStd49))!=0){ERROR("VERIFY49_SOURCE_IDENTITIES");quit;}
+ideal corruptMapImages49=normap;corruptMapImages49[4]=corruptMapImages49[4]+1;
+map corruptMap49=selected49,corruptMapImages49;
+if(size(reduce(corruptMap49(originalIdeal49),normalStd49))==0){ERROR("VERIFY49_CORRUPT_MAP_ACCEPTED");quit;}
+print("VERIFY49_STAGE source_identities_checked=true corrupted_map_rejected=true");
+list normalPrimes49=minAssGTZ(norid);
+if(size(normalPrimes49)!=1){ERROR("VERIFY49_NORMAL_RING_NOT_DOMAIN");quit;}
+if(size(reduce(norid,std(normalPrimes49[1])))!=0 || size(reduce(normalPrimes49[1],normalStd49))!=0){ERROR("VERIFY49_NORMAL_RING_RADICAL");quit;}
+list ringList49=normalized49;
+setring selected49;
+list moduleList49=module49;list deltaList49=intvec(delta49),delta49;
+list reconstructed49=ringList49,moduleList49,deltaList49;
+print("VERIFY49_STAGE full_norTest_begin=true");
+intvec test49=norTest(selectedPrime49,reconstructed49);
+if(test49[1]!=1 || test49[2]!=1 || test49[3]!=1){ERROR("VERIFY49_NORTEST");quit;}
+print("VERIFY49_STAGE injective=1 finite=1 normal=1");
+setring normalized49;
+string genericRingDecl49="ring genericNormalized49=(2,parameter49),("+varstr(basering)+"),dp;";
+execute(genericRingDecl49);
+ideal genericImages49=imap(normalized49,normap);
+ideal genericIdeal49=imap(normalized49,norid),genericImages49[4]-parameter49;
+int genericDegree49=vdim(std(genericIdeal49));
+if(genericDegree49!=32){ERROR("VERIFY49_NORMALIZED_GENERIC_DEGREE");quit;}
+print("VERIFY49_RESULT source_generic_degree=32 normalized_generic_degree=32 relative_field_degree=1 affine_verification=true projective_geometry_complete=false");
+print("VERIFY49_ALL_CHECKS_PASS");quit;

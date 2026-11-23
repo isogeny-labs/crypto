@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-08T00:50:49Z",
+ "id": "PCC-20261108-5b0817",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round54-p192/verification.json",
+    "sha256": "5dece91e2f4c4199ca0dcedd3f1b555fc169636928f30d88f2ddfc1f68d0d24c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round54-p192/P192-shift-verification.json",
+    "sha256": "e12c47f20b761dcd35909e4ec8af86048f768e27f2f02972773a10a410b81df4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round54-p192/report.md",
+    "sha256": "f5ccc883a1b53b26edb07907bf5e5c97fbe48b91a42efbf9e2a44a654cc79d42"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Written generic function-field argument and exact finite controls; no P192 trace computation, global quotient normalization, or fast trace algorithm",
+ "statement": "Round54 derives a mixed-trace quotient-field generator with exact kernel stabilizer, evaluates and independently verifies six small-field kernels and a fixed specialization panel, and constructs an independently checked pole-free P192 quadratic chart."
+}

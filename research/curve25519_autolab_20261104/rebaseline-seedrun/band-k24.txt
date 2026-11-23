@@ -1,0 +1,15 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc | 64/64 | 1.723 | 1.772 | 2.215 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc-aa | 64/64 | 1.723 | 1.772 | 2.215 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc-run | 64/64 | 2.105 | 2.148 | 2.531 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 64/64 | 1.084 | 1.181 | 2.051 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs inc-run | inc < inc-run |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm1578-e83ed1b2 | inc-aa vs inc-run | inc-aa < inc-run |
+| icv1-fp24-tm1578-e83ed1b2 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp24-tm1578-e83ed1b2 | inc-run vs rho-neg | rho-neg < inc-run |

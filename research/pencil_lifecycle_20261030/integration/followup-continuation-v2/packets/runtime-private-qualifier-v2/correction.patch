@@ -1,0 +1,81 @@
+--- runtime-private-qualifier/supervise.py
++++ runtime-private-qualifier-v2/supervise.py
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python3
+ """Prospective Q0-Q4 software supervisor. NOT ADMITTED. Never run while bindings are null."""
+ from head_contract import directory_header
+-from private_contract import validate_endpoint, live_endpoint, docker_prefix, archive_head_argv, check_host_ancestry, timestamp, success_boundary
++from private_contract import validate_endpoint, live_endpoint, docker_prefix, archive_head_argv, check_host_ancestry, timestamp, success_boundary, write_release_token
+ from urllib.parse import quote
+ import argparse, hashlib, io, json, os, pathlib, re, shutil, signal, stat, subprocess, tarfile, time, uuid, tempfile
+ P=pathlib.Path
+@@ -237,8 +237,8 @@
+   require(observed==again,'gate PID/cgroup changed before release')
+   live_endpoint(endpoint)
+   release=out/('release-'+case);release.mkdir(mode=0o700)
+-  token=release/'gate-release';fd=os.open(token,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444)
+-  with os.fdopen(fd,'wb') as f:f.write((nonce+'\n').encode());f.flush();os.fsync(f.fileno())
++  token=release/'gate-release';token_custody=write_release_token(token,nonce)
++  (release/'token-custody.json').write_text(json.dumps(token_custody,indent=2)+'\n')
+   (release/'host-ancestry.json').write_text(json.dumps(observed,indent=2)+'\n')
+   rc,_,_=cli('release-'+case,'cp',str(token),owned+':/work/gate-release',cap=5)
+   require(rc==0,'gate release transport failed')
+--- runtime-private-qualifier/private_contract.py
++++ runtime-private-qualifier-v2/private_contract.py
+@@ -1,5 +1,6 @@
+ """Private runtime endpoint and host cgroup checks. No subprocess calls."""
+ import datetime
++import hashlib
+ import os
+ from pathlib import Path, PurePosixPath
+ import re
+@@ -124,3 +125,17 @@
+ 
+ def success_boundary(pending_signal, monotonic_now, deadline, utc_now, expiry):
+     return pending_signal is None and monotonic_now < deadline and utc_now < timestamp(expiry)
++
++
++def write_release_token(path, nonce, *, expected_uid=0, expected_gid=0):
++    """Create exact token despite service umask; production requires root custody."""
++    require(re.fullmatch(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', nonce) is not None, 'release nonce')
++    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o444)
++    with os.fdopen(fd, 'wb') as f:
++        f.write((nonce + '\n').encode())
++        f.flush()
++        os.fchmod(f.fileno(), 0o444)
++        os.fsync(f.fileno())
++        s = os.fstat(f.fileno())
++        require(stat.S_ISREG(s.st_mode) and stat.S_IMODE(s.st_mode) == 0o444 and s.st_nlink == 1 and s.st_size == 37 and s.st_uid == expected_uid and s.st_gid == expected_gid, 'release token custody')
++    return {'sha256': hashlib.sha256((nonce + '\n').encode()).hexdigest(), 'device': s.st_dev, 'inode': s.st_ino, 'uid': s.st_uid, 'gid': s.st_gid, 'mode': stat.S_IMODE(s.st_mode), 'bytes': s.st_size}
+--- runtime-private-qualifier/test_private.py
++++ runtime-private-qualifier-v2/test_private.py
+@@ -75,7 +75,7 @@
+             def ancestry(*a):order.append('ancestry');return dict(pid=42,start_ticks=1,nonce=nonce)
+             def require(ok,msg):
+                 if not ok:raise ValueError(msg)
+-            g=dict(require=require,identity=lambda:container,cli=cli,time=types.SimpleNamespace(monotonic=lambda:1,sleep=lambda _:None),active_deadline=20,gate_line=lambda *a:b'',strict=json.loads,endpoint=endpoint(),check_host_ancestry=ancestry,live_endpoint=lambda _:order.append('endpoint'),out=Path(td),P=Path,os=os,json=json,owned=container['Id'],host_preexec_observations=[])
++            g=dict(require=require,identity=lambda:container,cli=cli,time=types.SimpleNamespace(monotonic=lambda:1,sleep=lambda _:None),active_deadline=20,gate_line=lambda *a:b'',strict=json.loads,endpoint=endpoint(),check_host_ancestry=ancestry,live_endpoint=lambda _:order.append('endpoint'),out=Path(td),P=Path,os=os,json=json,write_release_token=lambda path,nonce:pc.write_release_token(path,nonce,expected_uid=os.getuid(),expected_gid=os.getgid()),owned=container['Id'],host_preexec_observations=[])
+             exec(compile(ast.Module(body=[release],type_ignores=[]),'extracted-production-release','exec'),g)
+             g['release_gate']('Q1',nonce)
+             self.assertEqual(order,['held-gate-logs-Q1','ancestry','ancestry','endpoint','release-Q1'])
+@@ -85,6 +85,20 @@
+             g['check_host_ancestry']=Mock(side_effect=pc.ContractError('escaped'))
+             with self.assertRaises(pc.ContractError):g['release_gate']('Q2',nonce)
+             self.assertFalse(any(x.startswith('release-') for x in order))
++    def test_release_token_service_umask(self):
++        with tempfile.TemporaryDirectory() as td:
++            target=Path(td)/'gate-release';old_umask=os.umask(0o077)
++            try:
++                observed=pc.write_release_token(target,endpoint()['owner'],expected_uid=os.getuid(),expected_gid=os.getgid())
++            finally:os.umask(old_umask)
++            self.assertEqual(stat.S_IMODE(target.stat().st_mode),0o444)
++            self.assertEqual(target.read_bytes(),(endpoint()['owner']+'\n').encode())
++            self.assertEqual(observed['bytes'],37)
++            with self.assertRaises(FileExistsError):pc.write_release_token(target,endpoint()['owner'])
++    def test_release_token_wrong_custody(self):
++        with tempfile.TemporaryDirectory() as td:
++            with self.assertRaisesRegex(pc.ContractError,'custody'):
++                pc.write_release_token(Path(td)/'bad',endpoint()['owner'],expected_uid=os.getuid()+1,expected_gid=os.getgid())
+     def test_final_success_boundary(self):
+         expiry='2026-11-03T18:05:00Z'
+         self.assertTrue(pc.success_boundary(None,299,300,NOW,expiry))

@@ -1,0 +1,11 @@
+name = "elliptic_frobenius_degree_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticFrobeniusDegreeAudit"]
+
+[[require]]
+name = "isogeny_factorization_guard_audit"
+path = "../../isogeny_factorization_guard_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticFrobeniusDegreeAudit"
+roots = ["FrobeniusDegreeImports", "RationalFrobeniusDegree", "FieldDegreeTransfer", "EllipticFrobeniusDegree", "DegreeKernelControls", "FrobeniusDegreeCertificate"]

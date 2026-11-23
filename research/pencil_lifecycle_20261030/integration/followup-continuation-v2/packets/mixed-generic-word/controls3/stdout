@@ -1,0 +1,10 @@
+/var/tmp/pencil-mixed-generic-word-20261031-v1/Controls.lean:32:55: error: Tactic `decide` failed for proposition
+  4 / 81 = 1
+because its `Decidable` instance
+  ZMod.decidableEq (UInt64.toNat 7) (4 / 81) 1
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(4 / 81)).beq ↑1 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯

@@ -1,0 +1,990 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "XP-20261106-tm1514-recheck",
+  "version": 2,
+  "created": "2026-11-06",
+  "repository": "crypto",
+  "study_dir": "research/tm1514_recheck_20261106",
+  "authors": [
+    "main session (reasoning tier)",
+    "research subagent draft tm1514"
+  ],
+  "links": {
+    "prior_result": "crypto:research/curve25519_autolab_20261104/multicurve (k = 24 session ECBS1h21e3dc5b9123, claim PCC-20261105-37a78d, unverified)",
+    "spec": [
+      "research/tm1514_recheck_20261106/spec-tm1514-A3.json",
+      "research/tm1514_recheck_20261106/spec-tm1514-B3.json"
+    ],
+    "plan": "research/tm1514_recheck_20261106/PLAN.md",
+    "note": "DRAFT of version 2 (AMENDMENT-1, counted-only; C3 deferred). Not frozen. Version 1 was frozen at protocol_sha256 8cd5f85644d8091a5809df416fdc2ea5e449c82ac11d08da99fe14adcba9d645 (commit 363306c646, 2026-11-06T17:52:16Z). Replicate A (GitHub run 42269476702) is a dry run whose records were never read; replicate B never ran. Replicate A2 was withdrawn before any full session (development checks ran exact rows of it). Seeds of A3 and B3 and the new target_seed were derived before any row of them was produced.",
+    "amendment": "research/tm1514_recheck_20261106/PROTOCOL-AMENDMENT-1.md",
+    "superseded_spec": [
+      "research/tm1514_recheck_20261106/spec-tm1514.json",
+      "research/tm1514_recheck_20261106/spec-tm1514-B.json"
+    ]
+  },
+  "question": "On the Curve25519-family curve icv1-fp24-tm1514-dce9313c, is the incumbent-to-rho ratio of 1.52 at w = 0 (24 solves) a small-sample draw, or does tm1514 sit below its four family siblings with many fresh targets; and what does the native work that the 5a band prices at w actually cost relative to one group addition on these curves?",
+  "claims": [
+    {
+      "id": "C0",
+      "class": "exact_computation",
+      "decided_by": [],
+      "text": "Every measured row recovers the discrete logarithm of its public target ([d]G = Q checked by the harness); twin arms that share seeds reproduce their partner's counts exactly."
+    },
+    {
+      "id": "C1",
+      "class": "comparative",
+      "decided_by": [
+        "C-curve-w0",
+        "C-curve-w01",
+        "C-curve-w1"
+      ],
+      "text": "With 576 fresh solves per arm per curve in each of two replicates (1152 in all), the inc/rho-neg ratio of mean S on tm1514 is (or is not) below the pooled ratio of its four siblings, at w = 0, 0.1 and 1.",
+      "if_supported": "tm1514 is lower than its siblings on this instrument and design (a curve-level difference within this family; not a statement about other curves or sizes)",
+      "if_not_supported": "the earlier 1.52 is consistent with a small-sample draw; tm1514 is within the sibling ratio at this resolution"
+    },
+    {
+      "id": "C1b",
+      "class": "comparative",
+      "decided_by": [
+        "C-tm-inc-vs-rho"
+      ],
+      "text": "The fresh tm1514 ratio at w = 0 is (or is not) compatible with the earlier 1.52.",
+      "if_supported": "the fresh interval contains 1.52",
+      "if_not_supported": "the earlier 1.52 lies outside the fresh interval: it was a draw from sampling noise at n = 24"
+    },
+    {
+      "id": "C2",
+      "class": "comparative",
+      "decided_by": [
+        "C-pos"
+      ],
+      "text": "Positive control: rho.plain costs more S than rho.negation on every curve (expected ratio near sqrt 2), so the instrument resolves a known method effect at this n."
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "text": "Deferred by AMENDMENT-1: the measured price of the band's native units (w_meas) is not estimated in this study. It needs a separate protocol with an instrument whose timed samples each last at least 5 ms. The host-free bitop/v1 work model (ecbench work) is reported beside the band as a model, never as a measured price."
+    },
+    {
+      "id": "C4",
+      "class": "comparative",
+      "decided_by": [
+        "C-tm-inc-vs-rho"
+      ],
+      "text": "At each band weight w in {0, 0.1, 1} (AGENTS.md 5a), the tm1514 inc/rho-neg ratio of mean priced S is (or is not) above 1, with a 95% interval. No measured price enters.",
+      "if_supported": "R_tm1514(w) lies above 1 at that w: the incumbent costs more priced work than rho-neg on tm1514 at that weight",
+      "if_not_supported": "R_tm1514(w) lies below 1, or the interval contains 1 (unresolved at that w)"
+    },
+    {
+      "id": "C5",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "text": "Nothing here is a security statement about Curve25519 or a claim about sizes other than k = 24; a host-class price is not a portable constant."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "tm1514's 1.52 is a small-sample draw: with enough fresh targets inc/rho on tm1514 is not below the siblings' ratio.",
+      "mechanism": "inc's per-solve S has a heavy right tail (two collisions in a random walk table plus probes); with 12 targets x 2 rounds the mean can sit 15-20% low by chance. rho-neg on tm1514 (1.253) is inside the sibling range (1.03-1.29); the low ratio comes from inc (1.90 against 2.11-2.22).",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "ratio_inc_over_rho",
+          "direction": "equal_within",
+          "role": "decisive",
+          "minimum_effect": "the bootstrap interval of D = ln R_tm1514(0) - ln R_siblings(0) contains 0 or lies above 0",
+          "provenance": {
+            "written_at": "2026-11-06",
+            "data_seen": [
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/multicurve/band-k24.txt",
+                "measured": "inc/rho-neg mean-S ratio on tm1514 1.52 at w=0, 0.95 at w=1 (24 solves per arm, 12 targets x 2 rounds, L0 host); siblings 1.73-2.10 at w=0; claim PCC-20261105-37a78d, standing unverified"
+              },
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/multicurve/band-k24.json",
+                "measured": "native_sum over 24 runs: inc 13138 (about 547 per solve), rho-neg 39481 (about 1645 per solve) on tm1514"
+              },
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/ideas/OBSTRUCTION.md",
+                "measured": "derived two-unknown-seed floor S = 1.662, 1.875 x the rho-neg floor (unverified assertion)"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          }
+        },
+        {
+          "id": "P1b",
+          "metric": "ratio_inc_over_rho",
+          "direction": "higher",
+          "role": "decisive",
+          "minimum_effect": "the fresh tm1514 R(0) interval lies above 1.52",
+          "provenance": {
+            "written_at": "2026-11-06",
+            "data_seen": [
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/multicurve/band-k24.txt",
+                "measured": "inc/rho-neg mean-S ratio on tm1514 1.52 at w=0, 0.95 at w=1 (24 solves per arm, 12 targets x 2 rounds, L0 host); siblings 1.73-2.10 at w=0; claim PCC-20261105-37a78d, standing unverified"
+              },
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/multicurve/band-k24.json",
+                "measured": "native_sum over 24 runs: inc 13138 (about 547 per solve), rho-neg 39481 (about 1645 per solve) on tm1514"
+              },
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/ideas/OBSTRUCTION.md",
+                "measured": "derived two-unknown-seed floor S = 1.662, 1.875 x the rho-neg floor (unverified assertion)"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          }
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "DEFERRED by AMENDMENT-1 (C3 out of scope): The measured price of the uncounted native work is well below one group addition, so the w = 1 flip does not survive measured pricing. Not tested in this study; P4 is replaced by the band reading of C4.",
+      "mechanism": "on a prime curve the negation canonicalisation is a field negation and a comparison (bitop/v1 prices it as two field additions); a FastMap probe of a table of about 1.3k-3.9k entries is a hash and one cache-resident load; an affine addition contains a field inversion and several multiplications.",
+      "predictions": [
+        {
+          "id": "P4",
+          "metric": "ratio_inc_over_rho",
+          "direction": "higher",
+          "role": "calibration",
+          "minimum_effect": "reported only: the tm1514 R(w) 95% interval at w = 0, 0.1 and 1 against 1 (C4 band reading); no measured price",
+          "provenance": {
+            "written_at": "2026-11-06",
+            "data_seen": [
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/multicurve/band-k24.txt",
+                "measured": "inc/rho-neg mean-S ratio on tm1514 1.52 at w=0, 0.95 at w=1 (24 solves per arm, 12 targets x 2 rounds, L0 host); siblings 1.73-2.10 at w=0; claim PCC-20261105-37a78d, standing unverified"
+              },
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/multicurve/band-k24.json",
+                "measured": "native_sum over 24 runs: inc 13138 (about 547 per solve), rho-neg 39481 (about 1645 per solve) on tm1514"
+              },
+              {
+                "path": "crypto:research/curve25519_autolab_20261104/ideas/OBSTRUCTION.md",
+                "measured": "derived two-unknown-seed floor S = 1.662, 1.875 x the rho-neg floor (unverified assertion)"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          }
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation, the matched rho reference (both replicates)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "build": "local release build (cargo build --release --bin ecbench) in a sparse worktree of the study branch head, rustc 1.97.0; binary sha256 recorded in each session's host.json"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "inc",
+      "role": "baseline",
+      "description": "the ledger incumbent wwalkGg-x09-sr-n2, params identical to multicurve/spec-k24.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "build": "local release build (cargo build --release --bin ecbench) in a sparse worktree of the study branch head, rustc 1.97.0; binary sha256 recorded in each session's host.json"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "targets": "stride-generator"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation repeated under a second name in the same session: shares every algorithm seed with rho-neg, so it checks determinism (C0 twin identity, counts)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "build": "local release build (cargo build --release --bin ecbench) in a sparse worktree of the study branch head, rustc 1.97.0; binary sha256 recorded in each session's host.json"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "inc-aa",
+      "role": "control_aa",
+      "description": "inc repeated under a second name in the same session (determinism; shares seeds with inc)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "build": "local release build (cargo build --release --bin ecbench) in a sparse worktree of the study branch head, rustc 1.97.0; binary sha256 recorded in each session's host.json"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "targets": "stride-generator"
+      },
+      "same_instrument_as": "inc"
+    },
+    {
+      "id": "siblings",
+      "role": "control_negative",
+      "description": "not a separate method: the inc and rho-neg arms run on the four sibling curves in the same sessions; the population tm1514 is compared against",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "build": "local release build (cargo build --release --bin ecbench) in a sparse worktree of the study branch head, rustc 1.97.0; binary sha256 recorded in each session's host.json"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "curves": [
+          "icv1-fp24-tm1578-e83ed1b2",
+          "icv1-fp24-tm2338-191c1070",
+          "icv1-fp24-tm3530-7cdfa218",
+          "icv1-fp24-tm7826-eab5872b"
+        ]
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-plain",
+      "role": "control_positive",
+      "description": "rho.plain (no negation map, A = 1): positive control (C2)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "build": "local release build (cargo build --release --bin ecbench) in a sparse worktree of the study branch head, rustc 1.97.0; binary sha256 recorded in each session's host.json"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.plain"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa-seed-inc",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "rho-plain",
+      "expected_detection": "pooled rho-plain/rho-neg ratio of mean S at w = 0 with a 95% interval whose lower end is at least 1.20 (asymptotic expectation sqrt 2 = 1.414, diluted by fixed set-up and distinguished-point overheads at r near 2^21), and every per-curve point estimate above 1.10",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "siblings",
+      "null_population": {
+        "description": "the four sibling curves of the same family rule (curve25519_family siblings, k = 24): what tm1514 is claimed not to differ from",
+        "generator": "crypto:research/curve25519_autolab_20261104/multicurve/siblings-k24.json (largest p = 5 mod 8 below 2^24 and the next primes down, smallest valid A up to 4000); frozen before the earlier data",
+        "n": 4,
+        "why_n": "the population was fixed by the earlier study; 4 curves cannot rank tm1514 as unusual (best attainable rank p is 1/5), so C1 compares tm1514 with the pooled sibling ratio, and the between-sibling spread is reported beside it. A curve-population claim would need a larger, newly frozen sibling set (a separate protocol).",
+        "matched_on": [
+          "field size k = 24",
+          "family rule",
+          "prime field p = 5 mod 8",
+          "cofactor-8 group order shape",
+          "same targets law",
+          "same arms, seeds rule and instrument"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "ic.pipeline wwalk incumbent",
+          "rho.plain"
+        ]
+      },
+      {
+        "name": "curve",
+        "levels": [
+          "icv1-fp24-tm1514-dce9313c",
+          "icv1-fp24-tm1578-e83ed1b2",
+          "icv1-fp24-tm2338-191c1070",
+          "icv1-fp24-tm3530-7cdfa218",
+          "icv1-fp24-tm7826-eab5872b"
+        ]
+      },
+      {
+        "name": "replicate (measurement.seed)",
+        "levels": [
+          "A3: 8671006997891351",
+          "B3: 6232168080843969"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one commit (the study branch head), one locally built release ecbench binary",
+        "how": "both replicates run the same binary; its sha256 is in each session's host.json and must be equal"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "the session container (development host, L0)",
+        "how": "ecbench host.json per session; counts do not depend on the host"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "target_seed 546787239895877, 96 public targets per curve",
+        "how": "uniform hash-to-subgroup law, independent of arm; identical workloads in A3 and B3; no workload shared with version 1, replicate A or any development check"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "ecbench plan: derive_u64(ecbench.algorithm_seed, [measurement.seed, workload_id, round]) shared by all arms of a (workload, round) (src/cryptanalysis/ecbench/spec.rs:358-376); wwalk seed=run takes the run seed (methods.rs:6213-6219)"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "order alternate_measured with 6 measured rounds: spec order on even measured rounds, reversed on odd, so each arm leads and trails equally often"
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "one warm-up round per workload, own seed domain, excluded"
+      },
+      {
+        "name": "interruption",
+        "treatment": "measured",
+        "how": "local run: a killed or incomplete session has no complete session.json and contributes nothing; reported, never merged with partial records"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "arm labels masked by key-derived codes inside the frozen Rust analysis until every verdict is computed"
+      },
+      {
+        "name": "isolation",
+        "treatment": "measured",
+        "how": "recorded per record (L0); counts are valid at any level; no wall time is read (AMENDMENT-1)"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-tm-inc-vs-rho",
+        "arms": [
+          "rho-neg",
+          "inc"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-sib-inc-vs-rho",
+        "arms": [
+          "rho-neg",
+          "inc"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-curve-w0",
+        "arms": [
+          "inc",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-curve-w01",
+        "arms": [
+          "inc",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-curve-w1",
+        "arms": [
+          "inc",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa-seed-inc",
+        "arms": [
+          "inc",
+          "inc"
+        ],
+        "differs_in": [
+          "replicate (measurement.seed)"
+        ],
+        "design": "aa"
+      },
+      {
+        "id": "C-aa-seed-rho",
+        "arms": [
+          "rho-neg",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "replicate (measurement.seed)"
+        ],
+        "design": "aa"
+      },
+      {
+        "id": "C-aa-det-rho",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-aa-det-inc",
+        "arms": [
+          "inc",
+          "inc-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-pos",
+        "arms": [
+          "rho-neg",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        8671006997891351,
+        6232168080843969,
+        546787239895877,
+        244596609222896
+      ],
+      "nonce": null,
+      "note": "A3, B3 and target seeds derived from fixed domain strings before any row of them was produced; none reuses version 1's A (960559345608509, dry run) or B (4971825529176011, never run), the withdrawn A2/B2 (96725836575979, 2732357890408474) or the version-1 target_seed 1406057239440944, so no target or row overlaps replicate A or any development check. Values below 2^53. Per-execution algorithm seeds are harness-derived and recorded in records.jsonl."
+    },
+    "instance_sampling": {
+      "rule": "96 public targets per curve from target_seed 546787239895877 under the spec's public hash-to-subgroup law, identical in both replicates",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "experiment_protocol.py blind on the export: arm names replaced by opaque codes until the frozen analysis has produced every interval; the key is hashed into the export and opened after",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 480,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "bonferroni",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Per curve and arm: 96 targets x 6 rounds = 576 solves per replicate (1152 over A+B; the brief's floor was 256). Bootstrap resamples targets (all rounds of a target together), B = 10000 per interval, Bonferroni over the three weights of C1 (98.33% intervals). Resolution check (to be confirmed on the dry-run): if per-solve S has coefficient of variation about 0.5 for each arm, the SE of a per-curve mean at n = 576 is about 2%, so the ratio interval half-width is about 6% at 98.33% and the tm1514-vs-pooled-siblings difference resolves about 0.12 in ratio (against an observed gap of 0.2-0.6). That CV is an assumption from rho theory, not measured here; the dry-run on the earlier k = 24 records (main session, S3) must confirm it before freezing."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 120,
+      "per_sample_seconds": 0.01,
+      "threads": 1,
+      "estimated_total_seconds": 600,
+      "measured_on": "local devcheck in the session container (reduced specs, not data, 2026-11-10): 1800 executions in 15.7 s per replicate (8.7 ms each, about 3.5 s fixed), verify --replay-all of 1800 records in 3.4 s. Estimate per replicate: 16800 executions about 150 s, replay-all about 35 s; two replicates plus analysis about 7 min; budget 600 s."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "ratio_inc_over_rho",
+        "name": "inc / rho-neg ratio of mean S",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "per curve and weight w in {0, 0.1, 1}: sum over (workload, measured round) pairs of priced_S_inc(w) over the same sum for rho-neg, priced_S(w) = (G - C + w*(U + n_C))/sqrt(r) (src/cryptanalysis/ecbench/band.rs); siblings pooled by summing over all four curves' pairs",
+        "source": "records.jsonl cost.total_gae, the counters behind cost.unpriced, workload.curve.r",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95",
+        "formula": "per curve and weight w in {0, 0.1, 1}: sum over (workload, measured round) pairs of priced_S_inc(w) over the same sum for rho-neg, priced_S(w) = (G - C + w*(U + n_C))/sqrt(r) (src/cryptanalysis/ecbench/band.rs); siblings pooled by summing over all four curves' pairs"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "ratio_plain_over_neg",
+        "name": "rho-plain / rho-neg ratio of mean S",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "as ratio_inc_over_rho at w = 0",
+        "source": "records.jsonl cost.s",
+        "aggregation": "paired_ratio",
+        "uncertainty": "paired_bootstrap_ci95",
+        "formula": "as ratio_inc_over_rho at w = 0"
+      },
+      {
+        "id": "bitop_price",
+        "name": "bitop/v1 model price of each native unit",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "ecbench work on each session: bitop/v1 cost of canonicalisations_uncharged and lookups relative to one affine addition on the curve (model, host-free)",
+        "source": "ecbench work --dir SESSION",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "formula": "ecbench work on each session: bitop/v1 cost of canonicalisations_uncharged and lookups relative to one affine addition on the curve (model, host-free)"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "cost.total_gae",
+      "cost.unpriced",
+      "canonicalisations_uncharged",
+      "lookups (inc native)",
+      "table_insert_attempts (inc work_native)",
+      "steps",
+      "walk_operations"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "isolation.level",
+      "isolation.blockers",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "host": "the Claude Code session container (development host, 4 CPUs), isolation L0",
+      "threads": 1
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 21600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: per replicate 5 curves x 96 targets x (1 warm-up + 6 rounds) x 5 arms = 16800 executions, then stop; two replicates",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "stop and report invalid if the positive control C2 fails its expected detection",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "no third replicate or extra targets after looking; a larger run is a new protocol version",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "dollar ceiling (PLAN.md, USD 5, one attempt spent on the replicate A dry run): local L0 sessions add no cloud spend; no further cloud job",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a replicate whose ecbench verify --replay-all is not ok, or whose replays do not all reproduce, is invalid and contributes nothing; it is reported",
+    "a twin pair (rho-neg/rho-neg-aa or inc/inc-aa) whose counts differ on any (workload, round) invalidates the session's determinism claim C0 and the session",
+    "a killed or incomplete local session contributes nothing; it is reported",
+    "exhausted or timeout rows are kept as right-censored rows and reported per arm; a curve whose arm has any censored row is reported with and without them and cannot decide C1 alone"
+  ],
+  "decision_rule": {
+    "text": "C1: compute D(w) = ln R_tm1514(w) - ln R_sib(w) with a paired bootstrap over targets (stratified by curve, replicates A3 and B3 pooled as rounds of the same targets), 98.33% interval (Bonferroni over w in {0, 0.1, 1}). Verdict at each w: 'tm1514 lower than siblings' if the interval lies below 0; 'tm1514 higher than siblings' if it lies above 0; otherwise 'within the sibling ratio (draw not excluded)'. The interval alone decides; tm1514's seed-independent A/A interval of ln R (replicate A3 against B3 at the same w) and the five-curve pooled one are reported beside it, not used as a second bar, since the D interval already carries sampling error. The interval-non-overlap reading of the brief (tm1514's R interval entirely below the pooled sibling interval) is reported as a secondary, more conservative line. C1b: 'the earlier 1.52 was a draw' if the 95% interval of R_tm1514(0) excludes 1.52; 'compatible with 1.52' otherwise. C0: 'C0 holds' if every measured row verifies and the twins reproduce exactly. C2: 'positive control detected' if the pooled rho-plain/rho-neg 95% interval has lower end >= 1.20 and every per-curve point estimate > 1.10; otherwise the study is invalid. C3: 'deferred (AMENDMENT-1)'; not computed. C4, at each w in {0, 0.1, 1}: 'R_tm1514 above 1' if the 95% interval of R_tm1514(w) lies above 1; 'R_tm1514 below 1' if it lies below 1; 'unresolved (interval contains 1)' otherwise. No measured price enters any verdict; no wall time is read.",
+    "comparison_ids": [
+      "C-curve-w0",
+      "C-curve-w01",
+      "C-curve-w1",
+      "C-tm-inc-vs-rho",
+      "C-pos"
+    ],
+    "threshold": "interval excludes 0 (D), excludes 1.52 (C1b), lower end >= 1.20 (C2), excludes 1 (C4, per band weight)",
+    "statistic": "ratio of summed priced S (ecbench totals ratio, AGENTS.md section 8); D as a log ratio difference",
+    "interval": "paired bootstrap over targets, B = 10000, percentile; 98.33% for C1, 95% otherwise",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "ratio and log-ratio difference; per-curve ratios with intervals; A/A half-width beside every effect",
+    "verdict_vocabulary": [
+      "holds",
+      "positive control detected",
+      "tm1514 lower than siblings",
+      "tm1514 higher than siblings",
+      "within the sibling ratio (draw not excluded)",
+      "the earlier 1.52 was a draw",
+      "compatible with 1.52",
+      "positive control failed - invalid",
+      "deferred (AMENDMENT-1)",
+      "R_tm1514 above 1",
+      "R_tm1514 below 1",
+      "unresolved (interval contains 1)",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../examples/tm1514_analyze.rs",
+      "sha256": "6534cfe188a2e48dd1286af37b73006c85a579687102ed0cfbd90adf1f91f197"
+    },
+    "inputs": [
+      "research/tm1514_recheck_20261106/sessions/A3/records.jsonl",
+      "research/tm1514_recheck_20261106/sessions/B3/records.jsonl"
+    ],
+    "outputs": [
+      "ecbench verify --dir sessions/A3 --replay-all (and B3)",
+      "ecbench band --dir sessions/A3 (and B3)",
+      "ecbench compare --dir sessions/A3 --a inc --b-dir sessions/B3 --b inc (seed A/A, counts)",
+      "ecbench compare --dir sessions/A3 --a rho-neg --b rho-plain (counts)",
+      "ecbench work --dir sessions/A3 (bitop/v1 model, labelled as a model)",
+      "analysis/result.json"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per-curve inc/rho-neg ratio with 98.33% intervals at w = 0, 0.1, 1, earlier k = 24 points overlaid",
+      "D(w) with the seed A/A band",
+      "positive control per curve",
+      "C4: tm1514 R(w) 95% intervals against 1 at the band weights"
+    ],
+    "report_dir": "research/tm1514_recheck_20261106/reports"
+  },
+  "inadmissible": [
+    "changing targets, seeds, arms, rounds, weights or the decision thresholds after seeing either replicate",
+    "dropping a curve, a replicate, a censored row or a failed job from the report",
+    "a third replicate or more targets after a look (that is a new protocol version)",
+    "quoting the twin arms rho-neg-aa / inc-aa as a variance estimate",
+    "using wall time, cycles or any measured price in any verdict of this study",
+    "reading or citing replicate A (dry run) records as evidence"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:AGENTS.md section 5a",
+      "provenance": "internal",
+      "claim": "the pricing band 0 / 0.1 / 1 GAE per native operation on every arm; rank only where the order holds across it"
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/band.rs",
+      "provenance": "internal",
+      "claim": "priced_gae(w) = G - C + w (U + n_C); U is the sum of the counters named in cost.unpriced, byte counters exempt"
+    },
+    {
+      "ref": "crypto:research/curve25519_autolab_20261104/multicurve/README.md",
+      "provenance": "internal",
+      "claim": "the earlier five-curve k = 24 result (PCC-20261105-37a78d, unverified)"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "AMENDMENT-1",
+      "filed": "2026-11-07",
+      "filed_before_affected_data": true,
+      "reason": "Replicate A (GitHub run 42269476702) failed with exit 23 and no results URI; the inferred cause (not verified: receipts unread) is the L2 gate's 1 ms per-execution floor, which this k = 24 design (0.19-0.57 ms per solve) cannot meet, so admitted L2 wall time is unavailable.",
+      "changes": [
+        "replicate A is a dry run: its records are not evidence and are not read; its seeds are not reused",
+        "counted-only: C0, C1, C1b, C2 and C4 are decided from operation counts (cost.total_gae and band::priced_s); L2 admission and the wall A/A admission are not required; ecbench verify --replay-all and the C0 twin identity are required",
+        "C4 is reported at w = 0, 0.1 and 1 only; the measured-price variants are dropped",
+        "C3 is deferred to a separate protocol (timed samples of at least 5 ms each); H2 is not tested here",
+        "two fresh replicates A3 and B3 with measurement seeds from suffixes measurement.seed:A3 and measurement.seed:B3 (the version-1 form) and a new target_seed from suffix workloads.target_seed:3; curves, arms, targets per curve, rounds and warmup unchanged",
+        "replicate A2 (seeds 96725836575979 / 2732357890408474, suffixes measurement-A2 / measurement-B2) is withdrawn before any full session: development checks ran exact rows of it; no data of A2's full sessions was ever produced",
+        "execution route: local L0 counted sessions in the session container (owner's instruction 2026-11-10), a one-off departure from the EKS default",
+        "analysis: examples/tm1514_analyze.rs without wall inputs, C3 not computed, C4 at the band only, spec ids of A3/B3; new sha256 6534cfe188a2e48dd1286af37b73006c85a579687102ed0cfbd90adf1f91f197"
+      ],
+      "supersedes_fields": [
+        "version",
+        "links.spec",
+        "claims[C3]",
+        "claims[C4]",
+        "hypotheses[H2]",
+        "metrics",
+        "measurement",
+        "execution",
+        "sample_size.preflight_runtime",
+        "variable_ledger",
+        "randomization.seed_derivation",
+        "randomization.instance_sampling",
+        "stopping_rules",
+        "invalidation_rules",
+        "decision_rule",
+        "analysis_plan",
+        "reporting.graphs",
+        "inadmissible"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "d348123a53bf02b49597bbfffc9f4337a24708caf1897cdb14b5550a69c081d6",
+    "commit": "c8b5dbf54ff4fa4f88a8a1514d904a850524b539",
+    "frozen_at": "2026-11-10T17:17:31Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "crypto": {
+      ".controls.aa.note": "Two kinds. (1) Seed-independent A/A, the noise floor for C1: replicate A3 versus replicate B3, the same spec except label and measurement.seed, so every (workload, measured round) pair has the same target and an independent algorithm seed; compared with ecbench compare --b-dir (counts only). (2) Same-session twins rho-neg-aa and inc-aa share every algorithm seed with their partner; they check determinism (C0), not variance.",
+      ".variable_ledger.comparisons[C-tm-inc-vs-rho].scope": "icv1-fp24-tm1514-dce9313c, w in {0, 0.1, 1} (C1b at w = 0; C4 at each band weight)",
+      ".variable_ledger.comparisons[C-sib-inc-vs-rho].scope": "each sibling and the pooled siblings",
+      ".variable_ledger.comparisons[C-curve-w0].scope": "D = ln R_tm1514(0) - ln R_siblings(0)",
+      ".variable_ledger.comparisons[C-curve-w01].scope": "w = 0.1",
+      ".variable_ledger.comparisons[C-curve-w1].scope": "w = 1",
+      ".variable_ledger.comparisons[C-aa-seed-inc].scope": "replicate A3 vs B3, same workloads, every curve",
+      ".variable_ledger.comparisons[C-aa-seed-rho].scope": "replicate A3 vs B3",
+      ".variable_ledger.comparisons[C-aa-det-rho].scope": "determinism (C0 twin identity)",
+      ".variable_ledger.comparisons[C-aa-det-inc].scope": "determinism",
+      ".variable_ledger.comparisons[C-pos].scope": "every curve and pooled",
+      ".measurement.order_note": "ecbench order alternate_measured (the schema's alternate)",
+      ".measurement.isolation_note": "L0: a development host (the session container), stated as such. Counts are exact and host-independent; no wall time, cycle count or isolation tier enters any claim (AMENDMENT-1 section 2).",
+      ".execution.note": "Owner's instruction 2026-11-10: local L0 counted sessions in the session container, a one-off departure from the EKS default (CLAUDE.md, isolab-eks). Two sessions (A3 then B3), ecbench run into sessions/A3 and sessions/B3, each audited with ecbench verify --replay-all; zero automatic retries; a killed session is reported and needs a new decision.",
+      ".analysis_plan.script_note": "examples/tm1514_analyze.rs as amended by AMENDMENT-1 (no wall inputs, C3 not computed, C4 at the band weights only, spec ids of A3/B3), built with cargo build --release --example tm1514_analyze and run as tm1514_analyze --a sessions/A3 --b sessions/B3 --out analysis. Everything else is version 1's: ecbench record types, band::priced_s, stats::Resampler seeded with the bootstrap seed (B = 10000), masking until every verdict exists, deterministic analysis/result.json and analysis/summary.txt.",
+      "randomization.seed_derivation.seeds": [
+        {
+          "name": "replicate A3 measurement.seed",
+          "value": 8671006997891351,
+          "derivation": "int(sha256('crypto:research/tm1514_recheck_20261106:measurement.seed:A3')[0:16 hex]) mod 2^53 (the version-1 form, label A3)"
+        },
+        {
+          "name": "replicate B3 measurement.seed",
+          "value": 6232168080843969,
+          "derivation": "same rule, suffix measurement.seed:B3"
+        },
+        {
+          "name": "workloads.target_seed",
+          "value": 546787239895877,
+          "derivation": "int(sha256('crypto:research/tm1514_recheck_20261106:workloads.target_seed:3')[0:16 hex]) mod 2^53 (new; version 1 used suffix workloads.target_seed)"
+        },
+        {
+          "name": "analysis bootstrap seed",
+          "value": 244596609222896,
+          "derivation": "same rule, suffix analysis.bootstrap_seed (unchanged)"
+        }
+      ],
+      "controls.negative.arms": "inc and rho-neg on the four sibling curves (same session, same arms)"
+    },
+    "ecbench_specs": [
+      "research/tm1514_recheck_20261106/spec-tm1514-A3.json",
+      "research/tm1514_recheck_20261106/spec-tm1514-B3.json"
+    ],
+    "amendment_1": {
+      "document": "research/tm1514_recheck_20261106/PROTOCOL-AMENDMENT-1.md",
+      "prior_freeze": {
+        "version": 1,
+        "protocol_sha256": "8cd5f85644d8091a5809df416fdc2ea5e449c82ac11d08da99fe14adcba9d645",
+        "commit": "363306c646953dbbe97fd6d611e10417f5c4dc59",
+        "frozen_at": "2026-11-06T17:52:16Z",
+        "analysis_sha256": "59b83670a1fc7a7cd2c41b761fa570d0cb9fb18e6409b9f8a4c8ebc04313b6f2",
+        "specs": [
+          "research/tm1514_recheck_20261106/spec-tm1514.json",
+          "research/tm1514_recheck_20261106/spec-tm1514-B.json"
+        ]
+      },
+      "dry_run": {
+        "replicate": "A",
+        "github_run": 42269476702,
+        "job": "gh-42269476702-1",
+        "launcher_state": "failed",
+        "exit": 23,
+        "request_sha256": "0be570bd4b0aade2abb6789075878c56bc1ab0d109f197c2b48cfc98abaa134d",
+        "records_read": false
+      },
+      "analysis_sha256": "6534cfe188a2e48dd1286af37b73006c85a579687102ed0cfbd90adf1f91f197",
+      "withdrawn": {
+        "replicate": "A2",
+        "measurement_seeds": {
+          "A2": 96725836575979,
+          "B2": 2732357890408474
+        },
+        "seed_form": "int(sha256('crypto:research/tm1514_recheck_20261106:measurement-A2' or '...:measurement-B2')[0:16 hex]) mod 2^53",
+        "target_seed": 1406057239440944,
+        "spec_ids": {
+          "A2": "ECS1h02235b4f381e",
+          "B2": "ECS1h6856e77660ce"
+        },
+        "reason": "development checks of the amended analysis (2026-11-10) ran reduced copies of the A2/B2 specs with these seeds and the version-1 target_seed, so they produced exact rows of the planned A2/B2 sessions (100 and 1200 measured rows per replicate) and the preparing session saw a summary of them",
+        "full_sessions_produced": false
+      },
+      "target_seed": 546787239895877,
+      "specs": [
+        {
+          "replicate": "A3",
+          "path": "research/tm1514_recheck_20261106/spec-tm1514-A3.json",
+          "measurement_seed": 8671006997891351
+        },
+        {
+          "replicate": "B3",
+          "path": "research/tm1514_recheck_20261106/spec-tm1514-B3.json",
+          "measurement_seed": 6232168080843969
+        }
+      ],
+      "execution_route": "local L0 counted sessions in the session container (development host, stated as such), audited with ecbench verify --replay-all; owner's instruction 2026-11-10; one-off departure from the EKS default"
+    }
+  }
+}

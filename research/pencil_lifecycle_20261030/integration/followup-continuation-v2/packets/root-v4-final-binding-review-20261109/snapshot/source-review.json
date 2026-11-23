@@ -1,0 +1,136 @@
+{
+  "schema": "source-protocol-review/v1",
+  "verdict": "source_review_passed_scoped",
+  "reviewer": "renew_materializer",
+  "independence": "Authored v3 ancestor, not v4; architecture familiar, not blind. Prospective plan retained.",
+  "summary": "The corrected publisher verifies attempted launch, current invocation and nonempty matching cgroup before atomic permit publication and cumulative checkpoint. The worker retries exactly once only after expiry, with strict identity and final freshness. All three initial review findings are resolved in source and the 24-case prospective qualification.",
+  "execution_performed": false,
+  "qualification_result": "prospective_not_executed",
+  "initial_findings": "initial-findings.json",
+  "source_comparison": {
+    "candidate_and_inputs_unchanged": true,
+    "four_ordered_controls_unchanged": true,
+    "full_suite_command_unchanged": true,
+    "mutable_cache_requires_new_snapshot": true
+  },
+  "limits": {
+    "permit_seconds": 10,
+    "lease_margin_seconds": 15,
+    "attempt_seconds": 1800,
+    "cpus": 2,
+    "memory_bytes": 17179869184,
+    "swap_bytes": 0
+  },
+  "execution_admitted": false,
+  "reviewed_manifest_sha256": "5e8cbc58131f7fee7954ecdae543295003c9ad0ffa1bd06c42a5dcc1239aa7c8",
+  "reviewed_files": [
+    {
+      "path": "PLAN.md",
+      "sha256": "53cb98ef11f948f9a770aeba46146ce786c98c16c1ff097f6262ae0200029487",
+      "bytes": 4124
+    },
+    {
+      "path": "SESSION.md",
+      "sha256": "4570ae10a60c361f96d502f2ada3a776570f5115a369a4022879ea5a72310fbe",
+      "bytes": 1117
+    },
+    {
+      "path": "admission-draft.json",
+      "sha256": "5715187c8fef94a2dff51fe990475eb885c8d3b1d725d8ebc74800681c0c5d37",
+      "bytes": 3752
+    },
+    {
+      "path": "candidate-pencil.rs",
+      "sha256": "555a5c62339a927579599d46c7e94265e52497dc56bacf0b13bb53c2dcd133c4",
+      "bytes": 23299
+    },
+    {
+      "path": "candidate.patch",
+      "sha256": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75",
+      "bytes": 5220
+    },
+    {
+      "path": "durable-launcher.py",
+      "sha256": "32d752703c87cbdf369bd0799c7183d5aa3f0d6af21cc23c2336733bc916238a",
+      "bytes": 12602
+    },
+    {
+      "path": "durable-launcher.py.patch",
+      "sha256": "22c3a241a27edefd4d642bca48b920b23698d62f0cb927093665c16a97026302",
+      "bytes": 2866
+    },
+    {
+      "path": "durable-worker.py",
+      "sha256": "b3de879c3d030edc33441300cbdfb5558b17fcc423bd894feadf8968c0928e95",
+      "bytes": 11544
+    },
+    {
+      "path": "durable-worker.py.patch",
+      "sha256": "f536a41a645a11d6104c00fb2684a6a93fe72530d37c7e1ecea33f8d4dd21836",
+      "bytes": 2864
+    },
+    {
+      "path": "durable_io.py",
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c",
+      "bytes": 6447
+    },
+    {
+      "path": "fixture.json",
+      "sha256": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980",
+      "bytes": 2238
+    },
+    {
+      "path": "owner-dollar-waiver.json",
+      "sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90",
+      "bytes": 580
+    },
+    {
+      "path": "prior-bindings.json",
+      "sha256": "1dcc21b8263aa09229abc195ad8aa89c0ec28730e8c5303e09ada09f1d59a832",
+      "bytes": 842
+    },
+    {
+      "path": "qualification-pins.json",
+      "sha256": "3be1d8890e3a46d1842aba327ae0d61e1a21277dcd301fcea404968e8f5e3dfa",
+      "bytes": 187
+    },
+    {
+      "path": "qualify-permit.py",
+      "sha256": "14a87cdd104c1af60aa63d1036999bcb9ad527291eb343fb872c4e8f2e3a2993",
+      "bytes": 7225
+    },
+    {
+      "path": "recipe-proposal.json",
+      "sha256": "d339402ffe1835f057b297b7a88ce72cb6a7aaf053b679727b3010f64d8891af",
+      "bytes": 3013
+    },
+    {
+      "path": "snapshot-cache.py",
+      "sha256": "a473994c4bcc60a4b9204dd15e7c62078dfb21da5812200285a92d999e9ed746",
+      "bytes": 3732
+    },
+    {
+      "path": "source-bindings.json",
+      "sha256": "0cb53e87305fecdb313174c9824f57db239434f7e98fdd4cbf4673504c903f72",
+      "bytes": 1250
+    }
+  ],
+  "resolutions": [
+    {
+      "finding": "R1",
+      "resolved": true,
+      "basis": "show requires attempted launch and nonempty current cgroup; changed cgroup aborts before mint; prospective cases cover all three."
+    },
+    {
+      "finding": "R2",
+      "resolved": true,
+      "basis": "Actual extracted check_permit sees second read wall time advance from100 to100.2 past100.1expiry and must reject."
+    },
+    {
+      "finding": "R3",
+      "resolved": true,
+      "basis": "v4 recipe now has new unit/output and null lease/accounting/publication, explicitly prospective."
+    }
+  ],
+  "qualification_cases": 24
+}

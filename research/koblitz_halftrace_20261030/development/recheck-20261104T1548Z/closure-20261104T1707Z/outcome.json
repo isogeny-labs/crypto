@@ -1,0 +1,76 @@
+{
+  "schema": "crypto.native-halftrace-development-outcome/v1",
+  "observed_at": "2026-11-04T17:09:59Z",
+  "native_source_commit": "507829726fbc731543f4527348b55c5e479242c9",
+  "preparation_head_at_inspection": "3019171da05b6217539157b1e6c89ba7fc235c5a",
+  "native_sources_match_retained_manifest": true,
+  "e2e": {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--example",
+      "koblitz_halftrace",
+      "--locked"
+    ],
+    "harness_result": "ok",
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0,
+    "raw_log": "e2e.raw.txt",
+    "raw_log_sha256": "73e49e9b2941249eb96328b23868b6679318970fd0c8902a3eda9bac10475761",
+    "binary_sha256": "e74e6d53fb094c89906efe703a659b22b2b988e4e5bf7a7ed8b5f5ea3ffad1aa",
+    "cargo_exit_code": null,
+    "exit_status_note": "Original exec handle no longer exists; record the complete harness summary without inventing an independently collected process status."
+  },
+  "full_library": {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked"
+    ],
+    "attempt": 2,
+    "outcome": "incomplete_no_parent_summary",
+    "started_parent_tests": 5937,
+    "observed_failed_tests": 2,
+    "parent_passed": null,
+    "parent_failed": null,
+    "parent_ignored": null,
+    "process_exit_code": null,
+    "exit_receipt_present": false,
+    "prior_cargo_pid": 10207,
+    "prior_test_pid": 10463,
+    "observed_process_states": "both_defunct",
+    "exec_handle_result": "Unknown process id 34529",
+    "interruption_cause": "unknown",
+    "nested_summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered_out": 5936,
+      "is_parent_result": false
+    },
+    "last_output": "partial_enlargement::tests::both_modes_agree_with_the_dense_closure has been running for over 60 seconds",
+    "raw_log": "runs/full-library-attempt2.log",
+    "raw_log_bytes": 327961,
+    "raw_log_sha256": "dfbca3c06613af11c1b368c523735aca1144d612e42f40d71e2f95dbf10ad343",
+    "archive": "runs.tar.xz",
+    "archive_bytes": 54340,
+    "archive_sha256": "7175cf0ea9c7f2698677675f568c548a67a5c8c15d477df05e5c2759f5b371f1",
+    "failed_module_receipt": "../reap-failure-receipt.json",
+    "automatic_relaunch": false
+  },
+  "pr": {
+    "state": "open_conflicting",
+    "review_p1": "unresolved",
+    "auto_merge": "paused",
+    "exact_head_merge_checks": [],
+    "exact_head_total_checks": 2
+  },
+  "checkpoint_retry": false,
+  "scientific_jobs": 0,
+  "scientific_measurements": 0,
+  "performance_claim": null
+}

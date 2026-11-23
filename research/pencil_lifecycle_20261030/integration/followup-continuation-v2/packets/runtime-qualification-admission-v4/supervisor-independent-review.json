@@ -1,0 +1,30 @@
+{
+  "schema": "software.independent-source-review/v1",
+  "decision": "accept_scoped_owner_directory_correction",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "execution_allowance_approved": false,
+  "source_pins": {
+    "supervise.py": "d6587a8b2d7c169672d2d3dcbdc82a79bd4ee0ba38c324995c0e887a905d96b0",
+    "test_supervise.py": "80790d5a12a8b028997dacd57dbebb82404d3a31077b8e6bcf1c8589c3686b7c",
+    "PLAN.md": "bdc664d5aeaaa622898249a9a6a2814991535bd6d952de9d271c7cb02ef563b6"
+  },
+  "replay_receipt_sha256": "f36cafdda13f39920f99800bf29f8a560da67e40b87d1eb72d8f290c04da5555",
+  "tests_passed": 46,
+  "findings": [
+    "Full-owner qualifier-source and qualification-receipts names preserve legacy directories and distinguish subsequent owners. Existing source or receipts path rejects without overwrite; dangling receipt symlink rejected.",
+    "Qualification exec/shim/socket use eight-hex owner prefix. Prefix is not globally unique; existing directory/socket collision fails closed rather than reusing old bytes.",
+    "Qualification socket lengths71,93,99,99 and82bytes fit108byte sockaddr_un including terminator; assembly names remain unchanged.",
+    "Callback uses newly copied pinned source/binding and owner receipts path; endpoint source/receipt digest joins retained. Qualifier private_contract accepts canonical private socket paths and has no conflicting fixed d-q name.",
+    "46 controls passed once under115+5seconds/2GiB; no runtime operations."
+  ],
+  "limitations": [
+    "No live service/storage/daemon validation in this replay.",
+    "Same-prefix collision can leave newly created private client directory before rejecting; it preserves old evidence and does not authorize retry.",
+    "Reviewer supplied prior diagnosis and reviewed earlier sources; separate implementation author."
+  ],
+  "remaining": [
+    "Current failed-attempt disk custody derivative, exact final bindings and new budgeted/publication admission before successor.",
+    "Do not label retained assembled-image lineage as successful qualification; old failedreceipt remains immutable."
+  ]
+}

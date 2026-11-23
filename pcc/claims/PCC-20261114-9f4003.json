@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T16:55:14Z",
+ "id": "PCC-20261114-9f4003",
+ "kind": "theorem",
+ "producer": {
+  "commit": "c11739ba2966aa6d269822de35249d83e3254401",
+  "model": "",
+  "session": "orientation-degree-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5b56325b2b074d46a4dd2fdf320a2ff414555105e5fbba7def9d731f98d28922",
+   "kind": "lean",
+   "project": "research/prime_orientation_layers_20261114/degree/lean",
+   "theorem": "OrientationChartDegree.actual_degree_limited_profile"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact displayed source hypotheses, SAME actual auxiliary W/nonzero retained signed-grid crossing nodes. Constructed mixed H/Z grading, actual polynomial right grade-1, explicit trim above Z-degree k and actual finite matrix error. Right integral/natDegree<=k, all2^u*k labels, left weightw+b and residualw+k; general multiplicities/zero local jets retained; scaled-left integrality retainsw>=0 via parent. No full W/origin rank/original mode density/entry/coefficient bit/creation precision/recovery/recursion/public finder/extraction/expected cost claim. Sourcec11739ba2966aa6d269822de35249d83e3254401; unsigned, new shared audit/fresh pending at creation; parent pins/history preserved.",
+ "statement": "Exact source-bound declaration OrientationChartDegree.actual_degree_limited_profile: theorem actual_degree_limited_profile (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) : (\u2200 (x : Ports a) (rb : MomentLabels u k), Content (jetWeight a u i m+rb.2.val) (weightedLeft a u i k m x rb)) \u2227 (\u2200 (rb : MomentLabels u k) (y : Ports a),Content 0 (trimmedRight a u i k t m rb y)) \u2227 (\u2200 (rb : MomentLabels u k) (y : Ports a),(trimmedRight a u i k t m rb y).natDegree\u2264k) \u2227 (\u2200 x y : Ports a,Content (jetWeight a u i m+k) (nodeCrossingPolynomial a u i t m x y- (weightedLeft a u i k m*trimmedRight a u i k t m) x y)) \u2227 Fintype.card (MomentLabels u k)=2^u*k"
+}

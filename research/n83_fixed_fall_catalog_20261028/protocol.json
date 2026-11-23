@@ -1,0 +1,603 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FIXED-FALL-CATALOG-20261028",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_fixed_fall_catalog_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "DESIGN.md"
+  },
+  "question": "What exact FFD and bounded degree-two closure/LFD certificates hold for the saved fixed ell27 n83 PDP systems?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Explicit witnesses, coefficient minors and replayable degree-two closure certify the reported per-instance quantities only. Global LFD2 requires the additional upper certificate.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Elite-base selection, regularity reduction, universal FFD/LFD claims and ECDLP speedups remain outside this batch.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "koblitz",
+      "role": "reference",
+      "description": "koblitz public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "390f82a33ad189491bb9a5dc7a458c39e57591ac",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_fall_catalog_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "363fe79f88eaecd1a7099e294d78d6b509f7e116446f5fa89b716f8b2cc7111e",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      }
+    },
+    {
+      "id": "binary",
+      "role": "candidate",
+      "description": "binary public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "390f82a33ad189491bb9a5dc7a458c39e57591ac",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_fall_catalog_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "363fe79f88eaecd1a7099e294d78d6b509f7e116446f5fa89b716f8b2cc7111e",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      }
+    },
+    {
+      "id": "prime",
+      "role": "candidate",
+      "description": "prime public synthetic curve systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "390f82a33ad189491bb9a5dc7a458c39e57591ac",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_fall_catalog_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "363fe79f88eaecd1a7099e294d78d6b509f7e116446f5fa89b716f8b2cc7111e",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "seconds": 60,
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No extra experimental arm: native quadratic unit and affine-line controls pass, plus unchanged first-fall selfcheck; target planted witnesses remain in original inputs."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population claim: native nonlinear xy control must not certify LFD; tampered replay must fail."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "344dc9ef6ccc973b672b7af39bd596e60b6fb21ba68f65550048c3bf38a228bf",
+        "how": "Committed native closure/catalog source; unchanged first-fall executable also pinned in extensions"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "SplitMix64 family and m seed rule in PROTOCOL.md"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "fixed",
+        "how": "Same ell27 per-curve manifest for m2..9; every planted point checked against stored shard"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native processes"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing host after recorded EKS S3 permission failure; no timing claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Original inputs.json order; first-fall all48, catalog all48, closure/replay32"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parsing; no discretionary exclusion"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "8GiB virtual memory; 60s per closure/replay, 600s per batch catalog/first-fall, outer5400s; all failures retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact certificate admitted only after producer completion and successful replay; null for unavailable values"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Counted exact outputs; no timed comparison. Stable sharding makes reproduction explicit.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "One public planted sum and one independently rejection-lifted point per cell",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "48 original inputs; 48 FFD computations/replays, 32 Boolean closure attempts/replays; no statistical test or independent population claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 60,
+      "threads": 1,
+      "estimated_total_seconds": 5400,
+      "measured_on": "Four tiny native controls finish below timer resolution; 5400s is a budget, not n83 performance prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "last_fall_degree",
+        "name": "Certified last fall degree",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "2 only with explicit lower witness and unit/affine-space global upper certificate; otherwise null",
+        "source": "closure/<id>/result.json last_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "first_fall_degree",
+        "name": "first fall degree",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "First exact nonzero degree fall, otherwise null",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "first_fall_lower_bound",
+        "name": "first fall lower bound",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Proven per-input lower bound, not an estimate",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "closure_rank",
+        "name": "closure rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Rank of completed Boolean V2 normal-form closure",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "linear_rank",
+        "name": "linear rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Number of independent linear rows in V2",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "last_fall_degree",
+      "first_fall_degree",
+      "first_fall_lower_bound",
+      "closure_rank",
+      "linear_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 5400,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "48 first-fall certificates and fresh replays; 48 structural catalogs; 32 Boolean closure attempts and replay completed cases",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "60s per closure/replay plus5s grace; 600s first-fall/catalog; 8GiB virtual; no retries; outer5400s",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Hash mismatch, malformed input or failed replay invalidates a certificate",
+    "Closure plateau alone does not certify last fall degree",
+    "Resource limits imply no mathematical degree bound",
+    "Every elapsed time is diagnostic, wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report per-instance certificates/bounds and every unresolved or failed attempt; no scientific hypothesis promotion",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certified",
+      "bounded",
+      "resource_limit",
+      "error",
+      "unresolved"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "344dc9ef6ccc973b672b7af39bd596e60b6fb21ba68f65550048c3bf38a228bf"
+    },
+    "inputs": [
+      "original inputs.json and source systems",
+      "first-fall/*.json",
+      "closure/*/result.json",
+      "status/*.json"
+    ],
+    "outputs": [
+      "summary.json",
+      "catalog/index.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "24-cell FFD/LFD coverage grid"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial formulas and distinction between first fall and regularity",
+      "verified_by": "Read primary HTML and checked formulas with controls"
+    },
+    {
+      "ref": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "provenance": "internal",
+      "claim": "Standard bases and Hilbert functions; installed-version behavior checked by controls",
+      "verified_by": "Previously checked manual and installed4.3.1 controls; current manual fetch failed"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Definitions of bounded multiplication closure and last fall degree; distinction from regularity",
+      "verified_by": "Primary text checked before implementation; restricted upper certificate documented in DESIGN.md"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "detailed_design": "DESIGN.md",
+    "fixed_factor_base_index": {
+      "candidate_x_count_per_curve": 134217728,
+      "complete": true,
+      "ell": 27,
+      "families": [
+        {
+          "compressed_bytes": 1329389614,
+          "family": "koblitz",
+          "liftable_x": 67110393,
+          "manifest": "koblitz/manifest.json",
+          "manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+          "point_count": 134220785,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "compressed_bytes": 1329453079,
+          "family": "binary",
+          "liftable_x": 67113567,
+          "manifest": "binary/manifest.json",
+          "manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+          "point_count": 134227133,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "compressed_bytes": 1849491803,
+          "family": "prime",
+          "liftable_x": 67106828,
+          "manifest": "prime/manifest.json",
+          "manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5",
+          "point_count": 134213656,
+          "same_base_for_m": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "schema": "n83.shared-factor-bases/v1"
+    },
+    "backend_reason": "EKS shared-bucket access denied in prior run; existing-host fallback retains native solver and limits",
+    "factor_base_encoding": "Fixed candidate x-domain; saved point membership checked for planted target, candidate roots require lift/sign verification",
+    "input_index_sha256": "c9e5a0ff7e38e792c2cbfa196e6e6b7d5fc231bdc6d683784de8774f94afad4e",
+    "executables": {
+      "catalog": {
+        "sha256": "363fe79f88eaecd1a7099e294d78d6b509f7e116446f5fa89b716f8b2cc7111e",
+        "source_commit": "390f82a33ad189491bb9a5dc7a458c39e57591ac"
+      },
+      "first_fall": {
+        "sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+        "source_commit": "e691d32d84c539d8e8b252a477167c780d87e5e0",
+        "source": "research/n83_ic_degree_sweep_20261027/src/bin/fall.rs"
+      }
+    },
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-fixed-fall-catalog-20261028-r1/local/",
+    "file_layout": "FORMAT.json"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "ee0a5693e8302d1726012065d9bb59ef8bbf21e332c3c29b0db8612bab1d346c",
+    "commit": "390f82a33ad189491bb9a5dc7a458c39e57591ac",
+    "frozen_at": "2026-10-28T05:00:12Z",
+    "filed_before_affected_data": true
+  }
+}

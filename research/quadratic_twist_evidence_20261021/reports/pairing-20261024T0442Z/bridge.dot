@@ -1,0 +1,16 @@
+digraph pairing {
+  graph [rankdir=TB, bgcolor="white", pad=.2, nodesep=.4, ranksep=.45];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#29475b", fillcolor="#eef4f6", margin=.16];
+  edge [fontname="Helvetica", fontsize=10, color="#29475b"];
+  source [label="E/F43: y² = x³ + x\nicv1-fp6-t0-74779950\nP=(31,18), Q=(13,24)=7P, r=11"];
+  twist [label="Monic twist: Y² = X³ + 4X\nicv1-fp6-t0-c6a8a47c\nT=(35,12)"];
+  image [label="K=F43[u]/(u²−2)\nS=psi(T)=(39,3u), Frobenius(S)=−S\nActual Mathlib points / checked twist map"];
+  pairing [label="Explicit Miller function on E(K)\ng=e(P,S)=2+25u, h=e(Q,S)=11+19u\nLean checks all 121 generator pairs", fillcolor="#dcefed"];
+  target [label="Norm-one finite-field subgroup, order 11\nh=g^7; all 11 powers distinct\nLean checks exact logarithm transport", fillcolor="#dcefed"];
+  ic [label="Native finite-field index calculus\nAll 11 scalar logs recovered and independently verified\nNo timing comparison / no general Weil theorem", fillcolor="#fff2dc"];
+  twist -> image [label="(X,Y) ↦ (X/2,Y/(2u))"];
+  source -> pairing [label="P,Q", constraint=false];
+  image -> pairing [label="auxiliary point S"];
+  pairing -> target;
+  target -> ic;
+}

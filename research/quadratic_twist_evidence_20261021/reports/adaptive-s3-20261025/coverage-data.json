@@ -1,0 +1,16 @@
+{
+  "run": "adaptive-s3-20261025",
+  "source": "../../native/adaptive-s3-20261025/cases/index.json",
+  "reference": "../../native/reduced-s3-20261025/cases/p43-a1-b0-r11-size2-policy0.json",
+  "field": 43,
+  "subgroup_order": 11,
+  "first_target": 1,
+  "fixture": [
+    {"label": "Main original", "matrix_degree": 4, "expanded_peak": 6, "useful_rows": 0},
+    {"label": "Main reduced", "matrix_degree": 3, "expanded_peak": 3, "useful_rows": 0},
+    {"label": "Twist original", "matrix_degree": 4, "expanded_peak": 4, "useful_rows": 2},
+    {"label": "Twist reduced", "matrix_degree": 2, "expanded_peak": 2, "useful_rows": 2}
+  ],
+  "population": {"cases": 98, "comparisons": 188, "target_comparisons": 1384,
+    "joint_original": 0, "joint_reduced": 24, "main_recoveries": 11}
+}

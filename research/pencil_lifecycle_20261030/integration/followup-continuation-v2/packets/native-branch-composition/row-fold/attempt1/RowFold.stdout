@@ -1,0 +1,51 @@
+RowFold.lean:13:86: error: unsolved goals
+p a b : UInt64
+hp : 0 < p.toNat
+⊢ (add p a b).toNat < p.toNat
+RowFold.lean:14:1: error: unexpected identifier; expected command
+RowFold.lean:16:89: error: unsolved goals
+p a b : UInt64
+hp : p.toNat ≤ 2 ^ 32
+ha : a.toNat < p.toNat
+hb : b.toNat < p.toNat
+⊢ ↑(add p a b).toNat = ↑a.toNat + ↑b.toNat
+RowFold.lean:17:1: error: unexpected identifier; expected command
+RowFold.lean:22:121: error: unsolved goals
+p : UInt64
+m : Mat
+x : V
+i : Fin 4
+hp : 0 < p.toNat
+hb : p.toNat ≤ 2 ^ 32
+hm : ∀ (i j : Fin 4), (m i j).toNat < p.toNat
+hx : canonical p x
+js : List (Fin 4)
+v : UInt64
+hv : v.toNat < p.toNat
+⊢ let out := List.foldl (fun v j => step p m x i j v) v js;
+  out.toNat < p.toNat ∧ ↑out.toNat = ↑v.toNat + ↑(List.map (fun j => (m i j).toNat * (x j).toNat) js).sum
+RowFold.lean:23:1: error: unexpected identifier; expected command
+RowFold.lean:36:85: error: unsolved goals
+p : UInt64
+m : Mat
+x : V
+hp : 0 < p.toNat
+hb : p.toNat ≤ 2 ^ 32
+hm : ∀ (i j : Fin 4), (m i j).toNat < p.toNat
+hx : canonical p x
+⊢ canonical p (linear p m x)
+RowFold.lean:37:1: error: unexpected identifier; expected command
+RowFold.lean:40:25: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod p.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+RowFold.lean:40:71: error: unsolved goals
+p : UInt64
+m : Mat
+x : V
+hp : 0 < p.toNat
+hb : p.toNat ≤ 2 ^ 32
+hm : ∀ (i j : Fin 4), (m i j).toNat < p.toNat
+hx : canonical p x
+⊢ decode p (linear p m x) = sorry
+RowFold.lean:41:1: error: unexpected identifier; expected command

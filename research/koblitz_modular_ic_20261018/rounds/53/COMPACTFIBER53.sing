@@ -1,0 +1,25 @@
+// Resolve the retained nonzero compact-N prediction, not a coefficient search.
+proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc scan53(poly G,poly N,poly Q,string label,string header){
+ require53(G==Q^4 && N!=0 && subst(N,n,0)==N,"COMPACT53_SOURCE_SHAPE_"+label);
+ poly d=gcd(G,N);d=d/leadcoef(d);
+ matrix toGcd=lift(ideal(G,N),ideal(d));matrix fromGcd=lift(ideal(d),ideal(G,N));
+ require53(matrix(ideal(G,N))*toGcd==matrix(ideal(d)) && matrix(ideal(d))*fromGcd==matrix(ideal(G,N)),"COMPACT53_BOTH_IDEAL_PRODUCTS_"+label);
+ int exponent=0;int k;for(k=1;k<=4;k++){if(d==Q^k){exponent=k;}}
+ int dimension=vdim(std(ideal(G,N)));
+ link out="ASCII:w compact-"+label+"53.sing";
+ write(out,header+"poly G53="+string(G)+";poly N53="+string(N)+";poly Q53="+string(Q)+";poly gcd53="+string(d)+";int exponent53="+string(exponent)+";int dimension53="+string(dimension)+";matrix toGcd53[2][1];matrix fromGcd53[1][2];");
+ write(out,"toGcd53[1,1]="+string(toGcd[1,1])+";toGcd53[2,1]="+string(toGcd[2,1])+";fromGcd53[1,1]="+string(fromGcd[1,1])+";fromGcd53[1,2]="+string(fromGcd[1,2])+";");close(out);
+ print("COMPACT53_N_FACTORS "+label);print(factorize(N));
+ print("COMPACT53_RESULT label="+label+" gcd_Q_exponent="+string(exponent)+" quotient_vdim="+string(dimension));
+}
+execute(read("../supersingular53-01/supersingular-certificate53.sing"));
+scan53(G53,N53,quartic53,"generic","ring compactGenericCertificate53=(2,b),(n,l),lp;short=0;");
+execute(read("../../../51/runs/universal51-01/universal-polynomial51.sing"));
+ring actualCompact53=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;
+number bValue53=1+1/a;
+map actualMap53=universalPolynomialCertificate51,n,l,bValue53,1;
+poly G53=actualMap53(G51);poly N53=actualMap53(N51);
+poly Q53=l^4+bValue53*l+bValue53^2;
+scan53(G53,N53,Q53,"actual","ring compactActualCertificate53=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;");
+print("COMPACTFIBER53_ALL_CHECKS_PASS");quit;

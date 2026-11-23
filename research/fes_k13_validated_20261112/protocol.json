@@ -1,0 +1,303 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "FES-K13-VALIDATED-20261112",
+  "version": 1,
+  "created": "2026-11-12",
+  "status": "frozen 2026-11-12 by the main session at the commit that adds this file; spec.json sha256 in links.spec_sha256",
+  "repository": "crypto",
+  "study_dir": "research/fes_k13_validated_20261112",
+  "authors": [
+    "Claude (subagent of the main session; draft for the experiment-director card)"
+  ],
+  "links": {
+    "spec": "research/fes_k13_validated_20261112/spec.json",
+    "request": "research/fes_k13_validated_20261112/request.json",
+    "prose": "research/fes_k13_validated_20261112/README.md",
+    "predecessor": "research/inherited_f4_next_20261112/README.md",
+    "predecessor_sweep": "research/inherited_f4_next_20261112/sweeps/koblitz-n13.json",
+    "predecessor_results": "research/inherited_f4_next_20261112/RESULTS_E2E.md",
+    "instrument_harness": "taskq/deploy/eks-karpenter/run-ecbench",
+    "validation_gate": "docs/VALIDATION_GATE.md",
+    "spec_sha256": "327e0bb42228fcfd79121b59d35b5f57f7e68826b221dc4aeb6832da46a9d76c"
+  },
+  "question": "On the degree-13 Koblitz instance icv1-f2m13-t181-515ee569 (K_0 / F_(2^13), r = 2003), measured in one isolated L2 ecbench session, is the end-to-end S (total group-addition equivalents / sqrt(r)) of binary-subspace[dimension=7] + descent-algebraic[m=2] + fes-f2 + walk below that of the same pipeline with solver inherited-f4, across the AGENTS.md 5a band (0, 0.1, 1 GAE per unpriced native operation), and how far is each from the matched rho?",
+  "claims": [
+    {
+      "id": "H1",
+      "text": "S(ic-descent-fes-f2) < S(ic-descent-inherited-f4) on icv1-f2m13-t181-515ee569: the paired ops ratio fes/inherited from `ecbench compare --a ic-descent-inherited-f4 --b ic-descent-fes-f2` over the 48 (target, round) pairs has its 95 % interval entirely below 1, and the order holds at every band weight (0, 0.1, 1 GAE).",
+      "class": "comparative",
+      "decided_by": [
+        "C-fes-vs-inherited",
+        "C-band",
+        "C-pricing-basis",
+        "C-audit"
+      ],
+      "expectation_pre_stated": "Ratio about 0.77 (the local, unisolated Run 2 gave 94.7 / 123.1 = 0.77 [pcc:unverified]); interval below 1; order holds across the band.",
+      "if_supported": "A validated measured improvement of the best algebraic IC row at degree 13 (success criterion: iterative improvement over the index-calculus baseline), eligible for the leaderboard once VALIDATION.json passes; the distance remaining to rho is reported, not a pass/fail.",
+      "if_not_supported": "Falsified if the 95 % interval of the paired ratio includes or exceeds 1, if the fes-f2 arm's mean S is not below the inherited-f4 arm's at any band weight (order changes inside the band = unresolved, not a win), or if any measured IC run fails to verify. The local Run 2 gain is then not reproduced under isolation and is reported as such.",
+      "risk_noted_before_freeze": "ecbench band re-prices the pinned solver word XORs at w: at w = 0 the solver is free and the descent arms differ only by the group work of the targets tried (smoke ratio 0.97), so the w = 0 leg of H1 rests on trial counts, not on solver cost."
+    },
+    {
+      "id": "H2",
+      "text": "Both solvers are priced on the same basis in the session: decomposition.solver.priced_by is `pinned` (word XORs at the curve's pinned ns_per_word_xor ratio) on every record of both descent arms, and no `solver_*_uncharged` counter appears.",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-pricing-basis"
+      ],
+      "if_supported": "H1 compares like with like.",
+      "if_not_supported": "H1 is not evaluable (one arm's solver work would be removed from the total as unpriced); report the pricing defect, do not rank."
+    },
+    {
+      "id": "H3",
+      "text": "Distance remaining: each IC arm's mean S divided by the reference rho's mean S (rho.signed_frobenius_strong_v2, the strongest Koblitz reference) and by rho.negation's (the local 'matched rho' kind, S = 2.76 locally), each at 0, 0.1 and 1 GAE.",
+      "class": "descriptive",
+      "decided_by": [
+        "C-distance"
+      ],
+      "if_supported": "Reported as the gap to rho.",
+      "if_not_supported": "Not applicable (descriptive)."
+    },
+    {
+      "id": "H4",
+      "text": "No end-to-end wall-time speedup claim, no claim at other degrees, and no claim about the fes-then-inherited size rule (commit 4840612771, not in the measured source) is in scope.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-sfstrong-v2",
+      "role": "reference",
+      "description": "rho.signed_frobenius_strong_v2 (signed-Frobenius orbits, A = 2n): the strongest available Koblitz rho; first reference arm, paired with the A/A control by run-ecbench."
+    },
+    {
+      "id": "rho-negation",
+      "role": "baseline",
+      "description": "rho.negation (negation map, A = 2, look-ahead and cycle escape): the kind of the local 'matched rho' (S = 2.76)."
+    },
+    {
+      "id": "ic-pairtable-mitm2",
+      "role": "baseline",
+      "description": "ic.pipeline binary-subspace:dimension=7 + mitm:m=2 + walk, max_trials 2000000: the pair-table reference IC row."
+    },
+    {
+      "id": "ic-descent-inherited-f4",
+      "role": "baseline",
+      "description": "ic.pipeline binary-subspace:dimension=7 + descent-algebraic:m=2 + solver inherited-f4 + walk, max_trials 2000000, no solver wall budget."
+    },
+    {
+      "id": "ic-descent-fes-f2",
+      "role": "candidate",
+      "description": "As ic-descent-inherited-f4 with solver fes-f2 (Gray-code exhaustive search over F_2, two word XORs a point)."
+    },
+    {
+      "id": "rho-sfstrong-v2-aa",
+      "role": "control_aa",
+      "description": "Identical to rho-sfstrong-v2; A/A noise floor and position-bias control required by run-ecbench (wall.status admitted, aa_pairs >= 5)."
+    }
+  ],
+  "instrument": {
+    "harness": "ecbench run / verify --replay-all / compare inside the Iso Lab EKS pod (taskq/deploy/eks-karpenter/run-ecbench)",
+    "source_revision": "e9d5dbdccdeb55b6d8527ebae1113135b42b26bf (main; contains 43171a66c1 solver calibration keys and ca15f345e1 inherited-f4-next, the code of the local Run 2; does not contain 4840612771)",
+    "image": "PLACEHOLDER until the publish-only build: 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:<digest> with build.ecbench_sha256 <sha256>",
+    "threads": 1,
+    "cpus": 4,
+    "isolation_required": "L2",
+    "instance_type": "c8a.2xlarge (no SMT, contract default)"
+  },
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "ic-pairtable-mitm2",
+      "expected_detection": "The pair-table row reproduces its local S ordering (above both descent arms locally: 197.7) and every run verifies; it shows the harness charges the same factor base and target stream as the local sweep.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Counted S is deterministic given code, workload and seed; the paired design over 8 public targets x 6 rounds with the A/A arm is the noise model. No null population is sampled."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      "solver (inherited-f4 vs fes-f2)"
+    ],
+    "factors": [
+      {
+        "name": "factor_base",
+        "treatment": "fixed",
+        "how": "binary-subspace:dimension=7 on every IC arm"
+      },
+      {
+        "name": "oracle",
+        "treatment": "fixed",
+        "how": "descent-algebraic:m=2 on both descent arms; mitm:m=2 on the pair-table reference row"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "how": "8 public targets hashed to the subgroup from target_seed; the same targets for every arm"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "paired",
+        "how": "one derived seed per (workload, round), shared by every arm (ecbench plan)"
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "alternate_measured: spec order on even measured rounds, reversed on odd; 6 measured rounds balance it"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "one binary, one session, one pod; binary SHA-256 and image digest verified in the pod and by the launcher"
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "how": "one c8a.2xlarge Spot worker, L2 graded per execution; wall figures only inside the session"
+      },
+      {
+        "name": "solver_budget",
+        "treatment": "fixed",
+        "how": "solver_budget_seconds 0 (deterministic, replayable); the local run used 60 s with 0 budget hits"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "measured",
+        "how": "ordinary v1 job, zero retries; a preempted run is a failed attempt kept in the ledger and charged, never resumed into this session"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "decision rule frozen here; numbers come from ecbench compare/band and an independent jq recompute"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-fes-vs-inherited",
+        "arms": [
+          "ic-descent-inherited-f4",
+          "ic-descent-fes-f2"
+        ],
+        "differs_in": [
+          "solver"
+        ],
+        "design": "paired",
+        "threshold": "ops ratio fes/inherited 95 % interval below 1"
+      },
+      {
+        "id": "C-band",
+        "arms": [
+          "ic-descent-inherited-f4",
+          "ic-descent-fes-f2",
+          "rho-sfstrong-v2",
+          "rho-negation",
+          "ic-pairtable-mitm2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "band",
+        "threshold": "order at w = 0, 0.1 and 1 GAE (ecbench compare ops.band / ecbench band --ranks)"
+      },
+      {
+        "id": "C-pricing-basis",
+        "arms": [
+          "ic-descent-inherited-f4",
+          "ic-descent-fes-f2"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "priced_by == pinned on every record; no solver_*_uncharged"
+      },
+      {
+        "id": "C-audit",
+        "arms": [
+          "all"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "in-pod verify --replay-all reproduced on every replay; L2 gate accepted; then an independent replay on a different host class"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "rho-sfstrong-v2",
+          "rho-sfstrong-v2-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "threshold": "run-ecbench: wall.status admitted, pairs_below_level 0, aa_pairs >= 5, aa_ci95 present"
+      },
+      {
+        "id": "C-distance",
+        "arms": [
+          "ic-descent-fes-f2",
+          "ic-descent-inherited-f4",
+          "rho-sfstrong-v2",
+          "rho-negation"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "descriptive",
+        "threshold": "none"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "alternate_measured",
+    "seed_derivation": {
+      "method": "master seeds from sha256, per-(workload, round) seeds derived by ecbench (derive_u64 'ecbench.algorithm_seed' / 'ecbench.warmup_seed')",
+      "target_seed": "int(sha256('fes_k13_validated_20261112/a1/target_seed')[:12 hex], 16) = 24899570366495",
+      "measurement_seed": "int(sha256('fes_k13_validated_20261112/a1/measurement_seed')[:12 hex], 16) = 171474876352264"
+    }
+  },
+  "sample": {
+    "workloads": 8,
+    "warmup_rounds": 1,
+    "measured_rounds": 6,
+    "executions": 336,
+    "measured_pairs_per_comparison": 48,
+    "why_enough": "The local effect is 0.77x with non-overlapping 2-repeat ranges; 48 paired measured runs per arm give a paired-ratio interval far narrower than that gap if the per-run spread is like the local one (83.7-105.7 vs 117.8-128.4). Fixed N, no sequential stopping.",
+    "runtime_estimate": "Smoke: 36 executions in 3 s plus replay-all under 1 s locally; full spec 336 executions, about 30 s of ecbench run, replay-all well under a minute; pod total dominated by provisioning (2-5 min), the harness's fixed 60 s sleep and S3 upload. Deadline 1800 s."
+  },
+  "stopping_rule": "Fixed N: one session, the spec as frozen. No reruns to obtain a pass; a failed or censored run stays in the record. A Spot loss is a charged failed attempt; any re-submission is a new labelled attempt under the same protocol and budget.",
+  "execution": {
+    "backend": "Iso Lab EKS Spot, AWS launcher route (taskq/deploy/eks-karpenter/remote/launch-remote), ordinary isolab.eks.request/v1, not resumable",
+    "deadline_seconds": 1800,
+    "dollar_ceiling_usd": 5.0,
+    "checkpoint_policy": "none inside the job (minutes-long, fresh, non-resumable); .resume/RESUME.md via scripts/checkpoint.sh init before launch"
+  },
+  "analysis": {
+    "steps": "README.md 'After the run' (verify, independent replay, compare, band, validator recompute, VALIDATION.json)",
+    "script_sha256": "to be pinned when the analysis scripts are written and frozen"
+  },
+  "does_not_count": [
+    "Changing arms, rounds, targets, seeds, max_trials, solver budget or the decision rule after seeing data (a new labelled protocol version instead).",
+    "Dropping a failed, censored or below-L2 record.",
+    "Quoting the in-pod same-host replay alone as the independent replay certificate.",
+    "Comparing either IC arm with a rho priced on a different basis."
+  ],
+  "amendments_before_freeze": [
+    {
+      "date": "2026-11-12",
+      "preceded_data": true,
+      "text": "Local smoke (smoke/, reduced spec: 2 targets, 2 rounds) used the full spec's target_seed and measurement.seed, so 4 of the 48 measured pairs per arm (workloads W06626ec90423 and W36123866dc8d, rounds 1-2) were seen before the freeze: paired fes/inherited GAE ratios 0.75, 0.43, 0.73, 0.70; band order fes < inherited at w = 0, 0.1, 1 with w = 0 ratio 0.97. Counted S is deterministic, so these 4 pairs will recur identically in the isolated session. The full spec was not run locally. The main session may choose fresh seeds before freezing; that is a design choice recorded here, not a change after data."
+    },
+    {
+      "date": "2026-11-12",
+      "preceded_data": false,
+      "text": "Main session: fresh seeds for the frozen spec (target_seed 248600354536533 -> 24899570366495, measurement seed 51364757418560 -> 171474876352264, derived from the '/a1/' tags), so no measured pair was seen in the smoke. H1 keeps the repository rule (AGENTS.md \u00a75a): fes-f2 is ranked below inherited-f4 only if the order holds at w = 0, 0.1 and 1; at w = 0 the solver is free and the arms differ by targets tried only, so an order change there is reported as 'unresolved inside the band', not as a win or a loss. Reference rho is signed-Frobenius strong v2 (strongest Koblitz rho); negation-map rho is kept as a baseline that reproduces the local 2.76."
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "elliptic-picard-source-review/v1",
+  "sources": [
+    {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch7.pdf",
+      "local_path": "/workspace/scratch/galbraith-ch7-20261115.pdf",
+      "bytes": 281643,
+      "sha256": "c5b9a25eeb00c280f9e723b7290533d3f62ecfcc0995731e9e30e29503a6b942",
+      "scope": "Fresh fulltext PDF16\u201321; individual visual16,20,21. Definitions7.8.1/Theorems7.9.7\u20139; not whole chapter.",
+      "copyright_local_only": true
+    },
+    {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch8.pdf",
+      "local_path": "/workspace/scratch/picard-bridge-prior/ch8.pdf",
+      "bytes": 230683,
+      "sha256": "9580b1eda23b976137861405ac545559f75051dadcc0db657d564f98ba9ff8a4",
+      "scope": "Fresh fulltext and individual visualPDF17\u201318/19 printed161\u2013162; Theorems8.6.1,8.6.4/Cor8.6.5; not whole chapter.",
+      "copyright_local_only": true
+    }
+  ],
+  "prior_claims": [
+    "Existing full geometric principal-divisor finiteness/degree zero/constants and actual chord/vertical functions",
+    "Existing actual finite local-DVR integer lifts and valuations",
+    "Official Point.toClass injectivity/norm-degree-not-one/established finite-divisor reduction"
+  ],
+  "KB": {
+    "recorded_at": "2026-11-15T19:02:03.761991+00:00",
+    "MCP_relevant_tools": [],
+    "wrapper_calls": [
+      {
+        "args": [
+          "scripts/research-kb",
+          "status"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      },
+      {
+        "args": [
+          "scripts/research-kb",
+          "search",
+          "elliptic curve actual degree zero divisor Picard principal divisor point class group injective",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      },
+      {
+        "args": [
+          "scripts/research-kb",
+          "search",
+          "rational point divisor zero class simple pole infinity geometric Picard counterexample",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      },
+      {
+        "args": [
+          "scripts/research-kb",
+          "theorems",
+          "WeierstrassCurve Affine Point toClass_injective Picard degree zero divisor"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      }
+    ],
+    "observed_before_approach_code": true
+  },
+  "Conductor": {
+    "exit": 127,
+    "stderr": "bash: line 1: conductor: command not found\n"
+  },
+  "approach": "Denominator ideal plus weak Nullstellensatz and local integer lift; official norm-degree exclusion; actual chord relations reduce finite integer divisors. No genus or Picard equivalence premise.",
+  "novelty_claim": false,
+  "qualified_source_refuted": false
+}

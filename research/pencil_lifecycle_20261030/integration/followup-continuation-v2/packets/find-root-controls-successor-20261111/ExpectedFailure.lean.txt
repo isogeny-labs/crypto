@@ -1,0 +1,6 @@
+import Controls
+open FindRootCardinality FindRootCardinalityControls
+example (h : System.Platform.numBits = 64) :
+    (UnionSize.sizeAt sizes 1).toNat = (component rho 0).card := by
+  rw [component_has_three]
+  simp [UnionSize.sizeAt, sizes, USize.toNat_ofNat, USize.size, h]

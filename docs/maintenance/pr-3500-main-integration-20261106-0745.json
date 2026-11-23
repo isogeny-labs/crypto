@@ -1,0 +1,199 @@
+{
+  "schema": "maintenance.normal-main-integration/v1",
+  "pr": 3500,
+  "parents": [
+    "2a010ea6912864d640a2ae22bf56e59ed360f2e5",
+    "a2e8fbc1d08f3369ddcd647311a4a6faf408b986"
+  ],
+  "base": "a37d5a48447e7ba5100c792c05358a10f1b9a615",
+  "branch_leaves": 11,
+  "incoming_leaves": 245,
+  "overlaps": [
+    ".github/workflows/ecbench.yml",
+    "docs/session-logs/2026-11-05.md",
+    "docs/session-logs/2026-11-06.md"
+  ],
+  "controls": {
+    "schema": "maintenance.integration-controls/v1",
+    "base": "a37d5a48447e7ba5100c792c05358a10f1b9a615",
+    "head": "2a010ea6912864d640a2ae22bf56e59ed360f2e5",
+    "main": "a2e8fbc1d08f3369ddcd647311a4a6faf408b986",
+    "three_way_merge_exit": 0,
+    "all_other_workflow_bytes_and_jobs_exact_main": true,
+    "five_lane_job_exact_published_head": true,
+    "job_set_exact_main": true,
+    "groups": [
+      {
+        "lane": 0,
+        "shards": "4 15"
+      },
+      {
+        "lane": 1,
+        "shards": "1 13 10"
+      },
+      {
+        "lane": 2,
+        "shards": "14 9 5 7"
+      },
+      {
+        "lane": 3,
+        "shards": "8 12 6 0"
+      },
+      {
+        "lane": 4,
+        "shards": "2 11 3"
+      }
+    ],
+    "original_run_block_exact": true,
+    "job_timeout_minutes": 40,
+    "step_timeout_minutes": 30,
+    "controls": [
+      {
+        "failed_shard": null,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 0,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 1,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 2,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 3,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 4,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 5,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 6,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 7,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 8,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 9,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 10,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 11,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 12,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 13,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 14,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      },
+      {
+        "failed_shard": 15,
+        "all16calls_retained": true,
+        "only_owning_lane_fails": true
+      }
+    ],
+    "bash_syntax": "PASS",
+    "actionlint1.7.12_exit": 0,
+    "external_shellcheck_pyflakes_absent": true,
+    "scope": "Synthetic infrastructure routing controls only, fake auditor, no real local AWS/native/scientific run."
+  },
+  "journals": {
+    "2026-11-05": {
+      "head_bytes": 1059120,
+      "main_bytes": 282135,
+      "merged_bytes": 1341413,
+      "both_complete_parent_bytes_retained": true
+    },
+    "2026-11-06": {
+      "head_bytes": 18706,
+      "main_bytes": 55366,
+      "merged_bytes": 76856,
+      "both_complete_parent_bytes_retained": true
+    }
+  },
+  "pcc": {
+    "branch_equal_base": true,
+    "upstream_complete_old_prefix": true,
+    "old_bytes": 65045,
+    "new_bytes": 94508,
+    "old_sha256": "a81149cf1700482f14c2999f012c360acb68dda5666408bebb412bb6082abf2d",
+    "new_sha256": "87da95b739b5e5fd34bcbf595dbc016c54b4d9493cfd088ca298a6a32d835edf",
+    "all_prior_claim_objects_unchanged": true,
+    "incoming_paths": [
+      "pcc/claims/PCC-20261106-3e6fc4.json",
+      "pcc/ledger.jsonl"
+    ]
+  },
+  "new_head_ci": "PENDING; actual all5lanes/all16exits/allcontexts/budget<=30/reviews/CLEAN mandatory.",
+  "pcc_standing": "unverified producer assertion",
+  "science_custody_admission": false,
+  "prepublication_main_advance": {
+    "old_main": "1abb36a06402e679222a95b7b328a964d5e8c08d",
+    "new_main": "a2e8fbc1d08f3369ddcd647311a4a6faf408b986",
+    "paths": [
+      ".github/workflows/frozen-workflow-replays.yml",
+      "docs/session-logs/2026-11-06.md",
+      "pcc/ledger.jsonl"
+    ],
+    "guard_rejected_stale_publication_before_branch_update": true
+  },
+  "canonical_artifact_policy": {
+    "config_sha256": "fdbebcc590e8b71ccd4335f36fc1036992b85184984a8e5583eeaf5bd36af172",
+    "tool_sha256": "ebca27d94ae3c94099688621823105c7e8e624b14210ea1d62eb0917620762e9",
+    "unchanged_current_main_objects": true
+  },
+  "errors": [
+    {
+      "kind": "local packaging script SyntaxError",
+      "effect": "Parser stopped before commands/publication; packaging path quoting repaired only.",
+      "raw": "docs/maintenance/pr-3500-main-integration-20261106-0745/initial-packaging-syntax-error.log"
+    },
+    {
+      "kind": "local structural path-prefix error",
+      "effect": "Object spread discarded prefixes for newly added subtrees; detected in server-diff review BEFORE creating commit or updating branch; full walk fixed/repeated, obsolete unpublished tree1758ac787ed507871c0d63d988eb3bc79dee06f9 NEVER publish.",
+      "raw": "docs/maintenance/pr-3500-main-integration-20261106-0745/initial-structural-walk-error.json"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+digraph budget {
+ graph[rankdir=TB,bgcolor="white",pad="0.2"];
+ node[shape=box,style="rounded,filled",fillcolor="#edf4fb",fontname="Helvetica"];
+ A[label="Actual source nodes\nExact level count 2^(a-i)"];
+ Q[label="Actual slots and bit precision\nq_i=h(u-i); p_i=p+8h*2^(a-i)+8M(a+1)"];
+ B[label="Exact prescribed total capacity B\nSum over actual nodes = sum over active levels"];
+ O[label="Odd level alone\nB >= 8h^2*u*4^a",fillcolor="#d9f0dc"];
+ P[label="Source ceiling h*u >= 3M\nu*B >= 72M^2*4^a",fillcolor="#d9f0dc"];
+ S[label="Scope: simultaneous fixed-width slots\nStreaming/compression need separate accounting",fillcolor="#fff1d6"];
+ A->B;Q->B;B->O;O->P;P->S;
+}

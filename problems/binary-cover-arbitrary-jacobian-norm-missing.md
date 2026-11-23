@@ -1,20 +1,23 @@
 # Catalog-general binary-cover arbitrary-class norm is missing
 
-- **Status:** `open`
+- **Status:** `partially-resolved`
 - **Kind:** implementation-generalization and independent-verification gap
 - **Affected work:** the 160 `binary_cubic_pullback_v1` rows in the [cover catalog](../docs/curves/covers.json), their 134 linked EC1 representations in the [cover graph](../docs/curves/cover-links.yaml), the [binary transfer implementation](../src/binary_ecc/cover_transfer.rs), and the [catalog-wide transfer assessment](../docs/curves/cover-transfer-assessments.json)
 - **Next action owner:** binary hyperelliptic transfer workstream (unassigned)
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-10-31
 
 ## Problem
 
-The library can now push forward every valid reduced class for one exact
-synthetic genus-three fixture over `GF(8)`: polynomial basis
-`z^3+z+1`, target coefficients `a=1`, `b=3`, and cover parameter `d=7`.
-It does not yet provide that operation for any of the 160 catalogued binary
-maps; their field/model inputs receive a structured unsupported result.
-The retained aburan28/cryptanalysis parity receipt predates this fixed-fixture
-implementation, so a current mirror or integration there is also unverified.
+The library now implements the arbitrary reduced-class norm for every checked
+binary cubic-cover field/model.  It factors degree-at-most-three Mumford
+support and evaluates nonsplit closed points in their residue fields before
+summing the full base-field Frobenius orbit.  The prior exact `GF(8)`
+486-class presentation remains as an independent pointwise cross-check.
+
+Catalog-wide replay over all 160 rows, a second general divisor-map oracle,
+and the retained aburan28/cryptanalysis mirror are still unverified.  Those
+evidence gaps keep this record partially resolved even though the missing
+general implementation is now present.
 
 This blocks a general norm
 
@@ -64,7 +67,7 @@ the non-catalog fixed-`GF(8)` fixture do not fill this broader domain gap.
   fixed-`GF(8)` fixture, including irreducible/nonsplit support, repeated and
   shared support, ramified fibers, infinity, and the exceptional two-torsion
   fiber.
-- [ ] Generalize that implementation to the field/model population used by
+- [x] Generalize that implementation to the field/model population used by
   the 160 catalog binary rows, with explicit structured rejection of every
   genuinely excluded case.
 - [ ] Prove or independently check representative independence, identity,
@@ -112,7 +115,9 @@ linear algebra, decompose a solver target, or establish end-to-end advantage.
 
 ## Resolution and history
 
-Partially resolved on 2026-10-14 for the exact non-catalog fixed-`GF(8)`
-fixture. Catalog-general support and an independent divisor-map oracle remain
-open, and current cryptanalysis mirroring is not established, so the original
-catalog obligation is not closed.
+General implementation added on 2026-10-31 by the n=83 Jacobian-projector
+study.  The exhaustive fixed-`GF(8)` presentation is checked pointwise
+against the residue-field norm, and the pinned n=83 image exercises the
+general path.  Catalog-wide 160-row replay, a second general divisor-map
+oracle, and current cryptanalysis mirroring remain open, so the broader
+evidence obligation is not yet closed.

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:13:47Z",
+ "id": "PCC-20261113-101c39",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "8b0b5fcc3fbf2855254d72081874481e4654de55d57c31c8e99ae9d8cc382779",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/ModelTransport.lean",
+   "theorem": "G3ModelTransport.triangular_moore_transport_inverse"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem triangular_moore_transport_inverse {K : Type} [CommRing K] (s w0 w1 w2 v0 v1 v2 : K) (first : v0=w0) (second : v1=w1+s*w0) (third : v2=w2+2*s*w1+s^2*w0) : v0=w0 \u2227 v1-s*v0=w1 \u2227 v2-2*s*v1+s^2*v0=w2"
+}

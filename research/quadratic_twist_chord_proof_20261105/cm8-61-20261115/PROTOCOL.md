@@ -1,0 +1,19 @@
+# New actual curve/twist fixture preflight, before any new solver experiment
+
+The completed F49 cold study recovers the original scalar with the source partition but its auxiliary encoding reaches rank0. Change family, not its cap. This preflight tests a new finite CM8 parameter from the existing rational2-isogeny template; it is NOT an invention/novelty claim or a solving-degree/speed result. No new fixture/map has executed at this freeze. [pcc:unverified]
+
+Fixed candidate: prime fieldF61, E:y²=x³+21x+39, nonsquare candidateδ59, twistT:y²=x³+23x+54. Source kernel(1,0), target kernel(59,0). Candidate phi=(x+24/(x−1), y*(1−24/(x−1)²)); dual=(46*(x+35/(x−59)),23*y*(1−35/(x−59)²)). MapO and actual kernels toO. Odd subgroup candidate31, proposed inverseI=[16]dual. Exact tuples, no invented ICV1/EC1 aliases or generic rational main-to-twist isomorphism assumed. [pcc:unverified]
+
+Derivation antecedent: historical CM8ThirtySeven.lean633a6017, read at immutablec6fd52699. Shifting rational2-torsion to u=x−1 gives u³+3u²+24u; the usual2-isogeny formula predicts the stated coefficients. The template is a candidate in this new field UNTIL native checks. Current atlas metadata for transported yield/shared membership/solving degree reviewed, but bodies failUTF8; KB MCP absent/wrapper127. No absence/novelty or generic classification claim. ecdlp-surfaces workflow read; its fixed quartic-model CLI does not implement this different2-isogeny, so use separately versioned native actual-point instruments. [pcc:unverified]
+
+## Full finite criteria
+
+Independent C++/Rust prime-field and group arithmetic enumerate ALL E andT points includingO, require62each, nonsingularity andδ nonsquare, and check twist coefficients. Choose first nonidentity31-annihilated E point in x/y order as public generatorP, setU=phiP; do not select a favourable generator after data. [pcc:unverified]
+
+Check every point's map, curve equation, both compositions=doubling, ALL62² addition pairs on EACH curve, both exact two-point kernels, all31-annihilated points on BOTH curves and I/phi round trips, all31 public-generator scalar images. Explicit nonzero2-torsion source K must mapO but NOT be31-annihilated; global injectivity/inverse is false. Exhaust all60 nonzero field scalings and report their count, without silently inferring a generic isomorphism classification. [pcc:unverified]
+
+Emit full ordered source/target coordinates and images, not just booleans. Rust independently reconstructs every row/counter and repeats the full finite checks without sharing C++ arithmetic. Two receipt executions agree. Eight genuinely changed false payloads reject101/no receipt: source coefficient, phi coefficient, dual coefficient, inverse multiplier, wrong but actual target-curve generator image, wrong but actual target-curve point image, missing target row, false global-injectivity flag. No null controls. [pcc:unverified]
+
+Freeze native source/protocol/pins and thin file/process orchestration on SAME PR3560/branch before compilation. Immutable copied qualifier and distinct build/precall/postcall files. Existing LOCAL resources only, maximum2workers,600s stages and remaining20:24–21:24UTC focused window. Fresh outside-checkout outputs; retain any failure/source correction/newcheckpoint before replay. No paid/EKS/auth probes, raw asset upload, old-worktree edits or shared verifier changes. [pcc:unverified]
+
+If this finite fixture passes, it qualifies ONLY the map/domain for a NEW capped uniform-policy solver study: source coefficientF31 distinct from curveF61, all fixed size-three policy frontiers and matched/pulledback controls, actual unknown-Q input and original-source scalar recovery. Old F37/F49 hard-coded instruments are not reused with new inputs under a false coverage claim. No new Lean/IDC/signedPCC/global-proof/solver/gain/benchmark result is inferred from this preflight. [pcc:unverified]

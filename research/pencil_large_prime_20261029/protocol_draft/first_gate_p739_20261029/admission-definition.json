@@ -1,0 +1,25 @@
+{
+  "budget": {
+    "path": "budget-enforcement-review.json",
+    "sha256": "1604f6f6dd48fdb24d3054ac4dddd1be485cd6ef707225e4b251453e6859090d"
+  },
+  "independent_software_review": {
+    "path": "gate-independent-review.json",
+    "sha256": "8d53fd6fde1a9b2f30608620aa64b1e72901b4ce84a187d42755e8cca0f33140"
+  },
+  "post_commit_provenance": {
+    "path": "bindings.json",
+    "sha256": "e67340b8db20c6f6add62f2997fb9865c939b49b666c30b28c79edc461b55e6f"
+  },
+  "budget_definition": "Additive ACTIVE scientific computation/checkpoint/restore/native replay/fresh-L2 payload elapsed, including controls and warmups. Exclude verified idle predecessor supervisor allocation; record allocated Pod/instance lifetimes separately without a cost claim.",
+  "cap_seconds": 14400,
+  "absolute_deadline_utc": "2026-10-30T03:32:22Z",
+  "native_cumulative_counter": false,
+  "enforcement_basis": "Reviewed serial active payload phases and remaining original deadline, with prelaunch delay providing conservative grace allowance; retain actual submission and all attempt/Pod intervals for recomputation.",
+  "caveats": [
+    "No allocated-lifetime cap is established",
+    "No measured execution cost or dollar/vCPU budget is asserted",
+    "No deadline reset",
+    "Final absolute-stop review pending root confirmation"
+  ]
+}

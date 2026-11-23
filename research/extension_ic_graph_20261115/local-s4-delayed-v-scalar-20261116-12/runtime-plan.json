@@ -1,0 +1,49 @@
+{
+  "schema": "gaudry.cubic.s4-delayed-plan/v1",
+  "driver_kind": "s4-delayed-component",
+  "backend": "local_user_authorized",
+  "source_revision": "a633ce5a8aade471ef23685b43345697d3c9dccc",
+  "binary_sha256": "722724973336b8dafdb9fb360b20af4fcb56f2d6f450eda81ee74d27996050b7",
+  "primes": [
+    67,
+    127,
+    1039
+  ],
+  "seeds": [
+    83,
+    89,
+    97
+  ],
+  "residuals_per_instance": 4,
+  "batch_iterations": 8,
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "f4_max_degree": 24,
+  "f4_deadline_ms": 0,
+  "timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "aa_tolerance": 1.10,
+  "bootstrap_draws": 10000,
+  "bootstrap_seed": 20261115,
+  "purpose": "complete_coordinate_delayed_vs_scalar_graph_kernel_ablation",
+  "component_hashes": "validation/delayed-source.sha256",
+  "engine_environment": {
+    "F4_FP_THREAD_OPS": "0",
+    "F4_STAIR": "counter",
+    "F4_FP_NARROW": "2",
+    "F4_FP_SYMBOLIC_PAR": "1",
+    "F4_FP_PACKED": "1",
+    "F4_FP_GM": "1",
+    "F4_FP_DEFERRED_PAR": "1",
+    "F4_FP_FL": "1",
+    "F4_FP_FL_BLOCKED": "1",
+    "F4_FP_LINEAR_INTERREDUCE": "1",
+    "simd": "CPU automatic; all SIMD overrides cleared",
+    "debug_and_gaudry_environment": "cleared",
+    "RAYON_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "reference_kind": "scalar",
+  "pinned_cpu": "0"
+}

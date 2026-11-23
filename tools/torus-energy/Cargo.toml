@@ -1,0 +1,18 @@
+[package]
+name = "torus-energy"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+sha2 = "0.10"
+
+[dev-dependencies]
+num-rational = "0.4"
+torus-s4 = { path = "../torus-s4" }
+torus-s4-tree = { path = "../torus-s4-tree" }

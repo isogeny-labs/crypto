@@ -1,0 +1,73 @@
+# Study-wide cost ledger of the PKM fall-degree study. Owner decision 27 (2026-11-21): study ceiling US$600, study spend
+# guard US$595; the per-job cap is US$65 (owner decision 24). Maintained by the main session. One row per job on any
+# route. usd is the actual (or best measured or derived) cost when state is closed and the worst case when open. run.sh
+# adds and fetch.sh closes the rows of this route's pods (job = NAME/podid) and refuses a study launch when the sum plus
+# the new run's worst case (30.8 h at the catalog price) exceeds US$595, or when complete_as_of below is older than 24 h.
+# Tab-separated; usd has no currency sign. EKS rows are named JOB/eks; an EKS row's usd is a worst-case bound unless
+# ledger_SOURCES.md says recorded. RunPod rows named NAME/podid with source billing_v2_20261121.tsv carry the amount
+# RunPod billing reports for that pod (REST v2 GET /billing/pods, read 2026-11-21). Every amount is [pcc:unverified].
+# complete_as_of	2026-11-21T23:39:42Z
+job	route	authority	state	usd	source
+pfd-a-20261108/eks	eks_spot	requests_r2c (Amendments 1-9)	closed	3.6923	RESULTS.md:36
+pfd-c-20261108/eks	eks_spot	requests_r2c (Amendments 1-9)	closed	3.9398	RESULTS_STAGE_C.md:43
+pfd-g3c-20261109/eks	eks_spot	requests_r2e (Amendment 11)	closed	0.2535	RESULTS_STAGE_C.md:112
+pfd-b-20261108/eks	eks_spot	requests_r2e (Amendment 9 pin)	closed	0.5056	STAGE_B_LOST.md:9
+pfd-b-20261109-r1/eks	eks_spot	requests_r2f (Amendment 12); lost to Spot	closed	0.1900	receipts/BR/price-guard/check-20261109T2340Z.json:11
+pfd-x-t12-k0-c5-20261108/eks	eks_spot	requests_r2f (Amendment 12)	closed	0.2457	RESULTS_T12_BRACKET.md:28
+pfd-x-t12-k1-c5-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.2459	RESULTS_T12_BRACKET.md:28
+pfd-x-t12-k0-c6-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.7346	RESULTS_T12_BRACKET.md:28
+pfd-x-t12-k1-c6-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.7179	RESULTS_T12_BRACKET.md:28
+pfd-x-t13-k0-c5-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.2473	RESULTS_T13_BRACKET.md:33
+pfd-x-t13-k1-c5-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.2473	RESULTS_T13_BRACKET.md:34
+pfd-x-t13-k0-c6-20261108/eks	eks_spot	requests_r2g (Amendment 13); lost to Spot	closed	0.4102	SPOT_LOSSES.md:10
+pfd-x-t13-k0-c6-20261110-r1/eks	eks_spot	requests_r2g (owner decision 3 relaunch); lost to Spot	closed	0.5612	SPOT_LOSSES.md:11
+pfd-x-t13-k1-c6-20261108/eks	eks_spot	requests_r2h (Amendment 14)	closed	3.3627	RESULTS_T13_BRACKET.md:35
+pfd-x-t13-k0-c6-20261110-r2/eks	eks_spot	requests_r2h (owner decision 7); lost to Spot	closed	3.9784	SPOT_LOSSES.md:12
+pfd-b-rp/6m9ewd49m2ivbn	runpod_reserved	RunPod route of Amendments 16-30	closed	13.0428	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 16; runpod_capped/ledger_SOURCES.md)
+pkm-x-dev-smoke1/gwfmrulvmua8ye	runpod_capped	development check (this route)	closed	0.0141	runpod_capped/billing_v2_20261121.tsv (runpod_capped/smoke/receipts/fetch.log)
+iso-null/0a4ojqcmbcnylu	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1199	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:17)
+pfd-x-t14-k1-c7-rp2/1tvdt8uv14lpm9	runpod_reserved	RunPod route of Amendments 16-30	closed	2.1518	runpod_capped/billing_v2_20261121.tsv (docs/session-logs (cap 7 draws 0, 1 on pods ta5f081df7skpe and 1tvdt8uv14lpm9)); name inferred, see ledger_SOURCES.md
+pfd-m2c-t12-k1-rp/1ycqne8a92l9e3	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	31.744	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-m2c-t12-k1-rp/snapshot.json)
+x-t14-k1-c6/3tiytf1se17tyr	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1233	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:8)
+x-t14-k0-c6/4zmdwznfcmg2jd	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1238	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:7)
+pfd-m2c-t14-k0-rp/6m8yac6n96khdv	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	63.4019	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-m2c-t14-k0-rp/snapshot.json)
+m4n-t4-k0-c7/71z6xnadolwq0k	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1215	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:13)
+m4-t5-k0-c6/7bxwwcq0mvq5iv	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1222	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:11)
+iso-14/91y9xgsnne97pj	runpod_reserved	RunPod route of Amendments 16-30	closed	0.6775	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A19.md:9)
+pfd-x-t14-k0-c6-rp/a9hx0nkj55hpn5	runpod_reserved	RunPod route of Amendments 16-30	closed	0.6211	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A22.md:8)
+pfd-x-t14-k1-c7/aarqk8kswd3zry	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1586	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 30)
+pfd-b-rp-1/agyp0kbpguz1ss	runpod_reserved	RunPod route of Amendments 16-30	closed	6.5937	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A19.md:11)
+pkm-x-dev-smoke2/bpxojdig3u54d4	runpod_capped	development check (this route)	closed	0.0541	runpod_capped/billing_v2_20261121.tsv (runpod_capped/receipts_dev/pkm-x-dev-smoke2/)
+pfd-x-t14-k1-c6-rp/d7bp40nsag9wox	runpod_reserved	RunPod route of Amendments 16-30	closed	0.6209	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A22.md:9)
+m4n-t5-k0-c6/ldwkih715o9d1a	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1206	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:15)
+pfd-x-t14-k0-c7/mn2he0hsnc4uqo	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1591	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 30)
+pfd-m2c-t13-k1-rp/oja931ekqabneg	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	31.7443	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-m2c-t13-k1-rp/snapshot.json)
+m4n-t5-k1-c6/q6sj9qmo6dihh4	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1203	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:16)
+pfd-x-t13-k0-c6-rp/q7scp0zg6ic3oj	runpod_reserved	RunPod route of Amendments 16-30	closed	2.8483	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A19.md:10)
+unnamed-20261115/t0bqkj2h4g2dgo	runpod_reserved	RunPod route of Amendments 16-30	closed	3.4292	runpod_capped/billing_v2_20261121.tsv (results/RUNPOD_LOSSES_20261115.md:15); name inferred, see ledger_SOURCES.md
+pfd-x-t14-k0-c7-rp2/ta5f081df7skpe	runpod_reserved	RunPod route of Amendments 16-30	closed	2.152	runpod_capped/billing_v2_20261121.tsv (docs/session-logs (cap 7 draws 0, 1 on pods ta5f081df7skpe and 1tvdt8uv14lpm9)); name inferred, see ledger_SOURCES.md
+m4-t4-k0-c7/tcp3smbtx4g7lh	runpod_reserved	RunPod route of Amendments 16-30	closed	0.123	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:9)
+m4n-t4-k1-c7/ttz04yzpm25wjq	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1211	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:14)
+pfd-b-rp-2/ug0ohhn9h6pdv4	runpod_reserved	RunPod route of Amendments 16-30	closed	4.443	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A19.md:12)
+pfd-m2c-t12-k0-rp/vdacn7o6ldynpv	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	31.7438	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-m2c-t12-k0-rp/snapshot.json)
+pfd-b-g3b/vihzczpy35yduq	runpod_reserved	RunPod route of Amendments 16-30	closed	0.2893	runpod_capped/billing_v2_20261121.tsv (results/KUMMER/pfd-b-g3b/LAUNCH.md)
+pfd-x-t14-k1-c7-m112-rp/vj7gjatk8lm6le	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	63.4016	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-x-t14-k1-c7-m112-rp/snapshot.json)
+m4-t4-k1-c7/vtw1osl8yxfwdn	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1226	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:10)
+iso-a/w3ao0j8mfsiasz	runpod_reserved	RunPod route of Amendments 16-30	closed	2.0426	runpod_capped/billing_v2_20261121.tsv (results/ISO/iso-a/LAUNCH.md)
+pfd-m2c-t13-k0-rp/w9tqurfw60ccv9	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	31.7442	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-m2c-t13-k0-rp/snapshot.json)
+unnamed-20261115/y8dxu6qiiykumx	runpod_reserved	RunPod route of Amendments 16-30	closed	2.0218	runpod_capped/billing_v2_20261121.tsv (results/RUNPOD_LOSSES_20261115.md:15); name inferred, see ledger_SOURCES.md
+pfd-m2c-t14-k1-rp/yzyabb71rh7n5e	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	53.6615	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-m2c-t14-k1-rp/snapshot.json)
+pfd-x-t14-k0-c7-m112-rp/z8etqr6jgg6jlh	runpod_reserved	Amendment 31 batch (spend recorded in Amendment 32)	closed	63.4011	runpod_capped/billing_v2_20261121.tsv (PREREGISTRATION.md Amendment 32; results/SNAPSHOT_20261117/pfd-x-t14-k0-c7-m112-rp/snapshot.json)
+iso-null/zbt7oq1a34tqr0	runpod_reserved	RunPod route of Amendments 16-30	closed	1.3361	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A22.md:7)
+m4-t5-k1-c6/zn9yeoltjlyduk	runpod_reserved	RunPod route of Amendments 16-30	closed	0.1219	runpod_capped/billing_v2_20261121.tsv (results/LAUNCHES_20261115_A21.md:12)
+pkm-dense-rerun-20261115/bjs0g3ugkgvx3c	runpod_reserved	owner decision 27 (counted as this study)	closed	37.2565	runpod_capped/billing_v2_20261121.tsv (results/SNAPSHOT_20261117/pkm-dense-rerun-20261115/snapshot.json)
+a32-remainder/unitemised	runpod_reserved	PREREGISTRATION.md Amendment 32 ("About US$95 before Amendment 31")	closed	31.6714	Amendment 32 total minus the EKS rows and the billed pre-Amendment-31 RunPod rows above; stands in for the UNKNOWN items below (conservative)
+#
+# UNKNOWN items (not rows unless stated; no price recorded in the repository, none guessed):
+# UNKNOWN-1: isolab-experiment-launcher CodeBuild builds, one per EKS job launch: 15 launches, 4723.086 s summed (ledger_SOURCES.md); no CodeBuild price in the repository.
+# UNKNOWN-2: EKS control plane, EBS, S3, ECR, CloudWatch, data transfer: shared lab infrastructure, not attributable per job.
+# UNKNOWN-3: actual Spot node billing per EKS job (the +0.25 h margin of each bound stands in for it).
+# UNKNOWN-4: RunPod pods of this study whose ids are in no study file: the Amendment 30 m = 4 jobs (pfd-m4-t5-k{0,1}-c7-rp on 32 vCPU, pfd-m4-t6-k{0,1}-c6-rp), the Amendment 18 pfd-x-t14-k{0,1}-c6-m112-rp pods (possibly the two unnamed rows above), the 2-vCPU REST v2 smoke pod of Amendment 32, and the storage of network volume yuzuh9rmej. The row a32-remainder/unitemised stands in for them.
+# UNKNOWN-5 (attribution), settled by owner decision 27: pkm-dense-rerun-20261115 (bjs0g3ugkgvx3c, billed 37.2565) is a row above. bdr-growthlaw (es6cpobseelc9t, billed 35.7037) stays outside: another study (docs/session-logs/2026-11-15.md:4536 launched it under benchmark record 20261115T1952Z-growth-law-cells-rerun, review 4 M3).
+pkm-x-dev-smoke3/klogu58zoe2owr	runpod_capped	Amendment 33	closed	0.0896	receipts_dev/pkm-x-dev-smoke3/cost.json
+pkm-x-t14-k0-c7-d54/46duu2mnh5dyz6	runpod_capped	Amendment 33	closed	14.4404	receipts/pkm-x-t14-k0-c7-d54/cost.json

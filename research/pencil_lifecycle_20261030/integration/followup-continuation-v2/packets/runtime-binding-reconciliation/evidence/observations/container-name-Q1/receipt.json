@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+    "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+    "/usr/bin/docker",
+    "--host",
+    "unix:///var/run/docker.sock",
+    "container",
+    "inspect",
+    "--format",
+    "{\"Id\":{{json .Id}},\"Name\":{{json .Name}},\"Image\":{{json .Image}},\"State\":{{json .State.Status}},\"Pid\":{{json .State.Pid}},\"Owner\":{{json (index .Config.Labels \"isolab.runtime-qualification.owner\")}}}",
+    "isolab-runtime-q-0159ca8a-9eec-479a-9aa2-04d62b131f89"
+  ],
+  "exit": 1,
+  "observed_at": "2026-11-01T20:13:14.167561+00:00",
+  "timeout_seconds": 15
+}

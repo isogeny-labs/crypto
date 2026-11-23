@@ -1,0 +1,3 @@
+# Same-host timing replication
+
+The registered run completed. On genus four p=31 case 1 the original-to-signed median wall ratio was 10.518 and case 0 was 9.832. Freeze those observations and the raw first pass before a second complete execution of the unchanged binary. Report both ratios on the selected case, every threshold crossing and all per-genus ranges separately. Require identical CELL and COUNT records across executions and exact binary identity. Keep all 44 fixtures and the same seed schedule. This is a timing replication on identical targets, not an independent-source holdout. Do not pool timing samples. No additional attempts are part of this protocol.

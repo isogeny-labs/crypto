@@ -1,0 +1,5247 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": "validator subagent (review-adversarial policy), independent of the session that produced E19/E24; recompute in this stdlib script, which shares no code with examples/glv_invariant_experiment_tables.rs",
+ "date": "2026-10-21",
+ "row": "benchmarks/README.md, row 20261018-k4-v4-line",
+ "script": "validate.py",
+ "tolerance_rule": "a printed claim agrees when |claimed - recomputed| <= half a unit in its last printed digit (integers: 0.5); rel_tol = that half unit / max(|claimed|, |recomputed|), the gate's comparison. summary.json values are machine output: rel_tol 1e-9.",
+ "raw_data": [
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p101s1.json",
+   "sha256": "87c92013961300b98c65e4190050bccd886e7ee2a68019f847752d0b5e4065df"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p101s2.json",
+   "sha256": "975d8e0b16ae82a2e8363ec89c2bbe983f1d25995b28c0c2aafd1bffc778b891"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p149s1.json",
+   "sha256": "c8a9604e8949dbea9d08d8005bc7688834178b3db66cd46f363c42c50459796b"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p149s2.json",
+   "sha256": "df714b1d2ef879288cc912ac0befe902e197495c9c000f046dbf5fca8535c989"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p197s1.json",
+   "sha256": "6e60b454b5b1af323e75de6dfd85b33c37823434ebabc53585b567c986014a8e"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p197s2.json",
+   "sha256": "151649dbd5daef50ff126bd9642e965d5f41beaef0ebfcfa5ef81cec72fcf40c"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p269s1.json",
+   "sha256": "1665c4ff2f842f2a17fb8c2ff55c3fbcd39779c16da05396613711835e65d146"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p269s2.json",
+   "sha256": "e3ca5ea3708645b0e94705f33eb84caa4988d0a19ba7f85a49ca8bf055d458cc"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p53s1.json",
+   "sha256": "496fccf85793ad0519a5259166286af549f8a3cb1c2e291ebb0ac12e3596668e"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p53s2.json",
+   "sha256": "fc79faeb2361829bf0ccd428d44549dc40c6598caed55c333d2d8533feb0af29"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p101s1.json",
+   "sha256": "8b74a39be2c903ec98ff1f65ea22d83db5e8a9d293a8c4edfea197c8c1c8dedc"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p101s2.json",
+   "sha256": "2040d66fc4be2130c8b3c40b286579ed2b1802587789dba17b064ff8217ec090"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p149s1.json",
+   "sha256": "0e71ea84d34888ee7d99588a866a6e01e7c2ef8f929d2a4f0685880ddb6afaab"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p149s2.json",
+   "sha256": "8f7ada1c1ae1e58a30360cb87fb784385dc6986edce50544cfddcb155dd69fce"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p197s1.json",
+   "sha256": "fa85a9b61469fb4d2048257f739a84f9593ebc01089ad039dced4e50c339deed"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p197s2.json",
+   "sha256": "845c7aae63a681ec03257c542c6d796c45fa013866724d29d30340bfaef6ab57"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p269s1.json",
+   "sha256": "1a03816c5a11107c8f3273cd2931c82fbc5280a2ccf270102e3cd1ba3548e330"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p269s2.json",
+   "sha256": "57dacf5e26a09f7dac4e5d276e22ac976fb1d82c24b9cce3ec538a3a4ed4f0fc"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p397s1.json",
+   "sha256": "537200f9949cbd2798c6b9def634fbbc4cb45bdba613d3dab4586e89f646e457"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p397s2.json",
+   "sha256": "86a6c2d2d1ae73e075b6cb9b62a99c138caf2a653a3828e0fdd44ce607bd36ab"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p521s1.json",
+   "sha256": "daecb7981e72ff3b7c0e1768b6f3ae058b90a26ea5e35e1b3e58d3544931954f"
+  },
+  {
+   "path": "../../experiments/29_quartic_pipeline_v4/p521s2.json",
+   "sha256": "a9f5d7231f7965eb88c683635df7b3ccd34dd8e4fc0a80a5eaf7b7b84469f825"
+  },
+  {
+   "path": "../../research/glv_k4_pipeline_d4_20261017/summary.json",
+   "sha256": "369769457fdf565702317391c434464984a4653e8c243f45f7af0dac4a8800a2"
+  }
+ ],
+ "code_pins": [
+  {
+   "path": "../../src/cryptanalysis/klein_v4.rs",
+   "sha256": "caa8b550dfc9c42b47d7d1603f65a351c8c7cd872835ea398d2fb7980c2b0d07",
+   "why": "weights, equation degree and Macaulay bound the row states"
+  }
+ ],
+ "claim_text_pins": [
+  {
+   "path": "../../research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+   "sha256": "0968424c6ab60fba0d2ce83f2be9d42f130afeae745ac8b30d9125659beedd2b"
+  },
+  {
+   "path": "../../research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "sha256": "b119266e812f92a5e27e07189613ca48eb7debf73c6362864e3caefed60e86ea"
+  },
+  {
+   "path": "../../research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
+   "sha256": "b1c51cc1a8a8554d8d28c1b7bbf674b5fb9102c68f3b23c639b21aac4e4e5939"
+  },
+  {
+   "path": "../../research/glv_k4_pipeline_d4_20261017/README.md",
+   "sha256": "2d0b5cb63f07adda3f65a827d1d51b54bfb2abe316084d119d427a2b0a97e4a2"
+  },
+  {
+   "path": "../../research/glv_k4_pipeline_d4_20261017/summary.json",
+   "sha256": "369769457fdf565702317391c434464984a4653e8c243f45f7af0dac4a8800a2"
+  },
+  {
+   "path": "REPORT.pdf",
+   "sha256": "b1c51cc1a8a8554d8d28c1b7bbf674b5fb9102c68f3b23c639b21aac4e4e5939"
+  }
+ ],
+ "claim_text_note": "the claims were read from these files at these hashes. The note's §9.19 and the REPORT errata (REPORT.typ, both REPORT.pdf copies) were read from the working tree on 2026-10-21 and then committed unchanged in 911674b04 (same hashes); re-run this script if any of these files changes",
+ "superseded_claims": [
+  "E19 G2.12 measured/registered, p=53 seed 1",
+  "E24 p=521 seed=1 rho",
+  "E24 kept rows re-added to O",
+  "E19/E24 p=101 seed=2",
+  "E24 unsolved share per curve, most (percent)",
+  "E19 S_rho per sqrt n at p=53 (G2.12 note)"
+ ],
+ "status_rule": "pass iff every headline number agrees at its printed precision, every headline bound holds, and every check holds; explanatory remarks (numbers inside an explanation of a mechanism, not a reported result) are checked and listed but do not decide the status",
+ "headline_count": 391,
+ "headline_disagreements": 0,
+ "headline": [
+  {
+   "name": "E19 curves",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "number of E19 run records",
+   "class": "headline"
+  },
+  {
+   "name": "E19 smallest p",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "53",
+   "claimed": 53.0,
+   "recomputed": 53,
+   "rel_tol": 0.009433962264160378,
+   "agrees": true,
+   "definition": "min p over E19 records",
+   "class": "headline"
+  },
+  {
+   "name": "E19 largest p",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "269",
+   "claimed": 269.0,
+   "recomputed": 269,
+   "rel_tol": 0.0018587360594814128,
+   "agrees": true,
+   "definition": "max p over E19 records",
+   "class": "headline"
+  },
+  {
+   "name": "E24 curves",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "12",
+   "claimed": 12.0,
+   "recomputed": 12,
+   "rel_tol": 0.04166666666670833,
+   "agrees": true,
+   "definition": "number of E24 run records",
+   "class": "headline"
+  },
+  {
+   "name": "E24 smallest p",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "101",
+   "claimed": 101.0,
+   "recomputed": 101,
+   "rel_tol": 0.0049504950495099015,
+   "agrees": true,
+   "definition": "min p over E24 records",
+   "class": "headline"
+  },
+  {
+   "name": "E24 largest p",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "521",
+   "claimed": 521.0,
+   "recomputed": 521,
+   "rel_tol": 0.0009596928982735125,
+   "agrees": true,
+   "definition": "max p over E24 records",
+   "class": "headline"
+  },
+  {
+   "name": "negation walks per curve (min over runs)",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "count of fold = Negation walks in each run, minimum",
+   "class": "headline"
+  },
+  {
+   "name": "negation walks per curve (max over runs)",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "count of fold = Negation walks in each run, maximum",
+   "class": "headline"
+  },
+  {
+   "name": "E19 per-call C (median, largest)",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1411558115.0,
+   "rel_tol": 0.003542185013052049,
+   "agrees": true,
+   "definition": "max over E19 curves of the per-call C median (p = 269)",
+   "class": "headline"
+  },
+  {
+   "name": "E24 per-call C (median, largest)",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1664008.0,
+   "rel_tol": 0.0030047932461893215,
+   "agrees": true,
+   "definition": "max over E24 curves of the per-call C median (p = 521)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 S/rho min",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "2.6e6",
+   "claimed": 2600000.0,
+   "recomputed": 2572845.686102955,
+   "rel_tol": 0.019230769230788463,
+   "agrees": true,
+   "definition": "min over E19 curves of total_muls / rho_matched_muls (16 negation walks)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 S/rho max",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "8.8e6",
+   "claimed": 8800000.0,
+   "recomputed": 8751567.300605245,
+   "rel_tol": 0.005681818181823864,
+   "agrees": true,
+   "definition": "max over E19 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 S/rho min",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "1.3e4",
+   "claimed": 13000.0,
+   "recomputed": 13084.360337519933,
+   "rel_tol": 0.03821356085453638,
+   "agrees": true,
+   "definition": "min over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 S/rho max",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "1.7e5",
+   "claimed": 170000.0,
+   "recomputed": 169291.8079651629,
+   "rel_tol": 0.029411764705911767,
+   "agrees": true,
+   "definition": "max over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 at matched p, min",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "35",
+   "claimed": 35.0,
+   "recomputed": 35.17849398366469,
+   "rel_tol": 0.014213229259691379,
+   "agrees": true,
+   "definition": "min over matched (p, seed) of (E19 S/rho) / (E24 S/rho)",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 at matched p, max",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "240",
+   "claimed": 240.0,
+   "recomputed": 239.8069564750825,
+   "rel_tol": 0.0020833333333354167,
+   "agrees": true,
+   "definition": "max over matched (p, seed)",
+   "class": "headline"
+  },
+  {
+   "name": "E24 slope of S/rho in n",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "-0.25",
+   "claimed": -0.25,
+   "recomputed": -0.2532713806545276,
+   "rel_tol": 0.019741669931610643,
+   "agrees": true,
+   "definition": "least-squares slope of log2(S/rho) on log2 n, 12 E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19 handover log2 n*",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "116.7",
+   "claimed": 116.7,
+   "recomputed": 116.69252222125405,
+   "rel_tol": 0.000428449014567695,
+   "agrees": true,
+   "definition": "section 11.16 model from E19's own constants, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover log2 n*",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "90.1",
+   "claimed": 90.1,
+   "recomputed": 90.09033635777931,
+   "rel_tol": 0.0005549389567153165,
+   "agrees": true,
+   "definition": "section 11.16 model from E24's own constants, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 still slower than rho by at least",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "1.3e4",
+   "claimed": 13000.0,
+   "recomputed": 13084.360337519933,
+   "rel_tol": 0.03821356085453638,
+   "agrees": true,
+   "definition": "min E24 S/rho",
+   "class": "headline"
+  },
+  {
+   "name": "V4 solve weights (sorted, as one number 2211)",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "2211",
+   "claimed": 2211.0,
+   "recomputed": 2211,
+   "rel_tol": 0.00022614201718701947,
+   "agrees": true,
+   "definition": "klein_v4.rs WEIGHTS, digits in descending order",
+   "class": "headline"
+  },
+  {
+   "name": "V4 solve Macaulay degree",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "11",
+   "claimed": 11.0,
+   "recomputed": 11,
+   "rel_tol": 0.04545454545459091,
+   "agrees": true,
+   "definition": "sum of the four equations' weighted degrees - sum of weights + 1, from klein_v4.rs (EQUATION_WDEG, WEIGHTS)",
+   "class": "headline"
+  },
+  {
+   "name": "V4 solve quotient (weighted Bezout)",
+   "source": "benchmarks/README.md row 20261018-k4-v4-line",
+   "printed": "64",
+   "claimed": 64.0,
+   "recomputed": 64.0,
+   "rel_tol": 0.007812500000007813,
+   "agrees": true,
+   "definition": "EQUATION_WDEG^4 / prod(WEIGHTS), from klein_v4.rs",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "20.9",
+   "claimed": 20.9,
+   "recomputed": 20.911967568771967,
+   "rel_tol": 0.002390975398924942,
+   "agrees": true,
+   "definition": "E19 record p53s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "15",
+   "claimed": 15.0,
+   "recomputed": 15,
+   "rel_tol": 0.03333333333336667,
+   "agrees": true,
+   "definition": "E19 record p53s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1498",
+   "claimed": 1498.0,
+   "recomputed": 1498,
+   "rel_tol": 0.00033377837116188255,
+   "agrees": true,
+   "definition": "E19 record p53s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "93.6",
+   "claimed": 93.6,
+   "recomputed": 93.625,
+   "rel_tol": 0.0005340453938590121,
+   "agrees": true,
+   "definition": "E19 record p53s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2",
+   "claimed": 2.0,
+   "recomputed": 2,
+   "rel_tol": 0.25000000000025,
+   "agrees": true,
+   "definition": "E19 record p53s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.37e9",
+   "claimed": 1370000000.0,
+   "recomputed": 1373141362.0,
+   "rel_tol": 0.003641285695977018,
+   "agrees": true,
+   "definition": "E19 record p53s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2.41e12",
+   "claimed": 2410000000000.0,
+   "recomputed": 2407067766353,
+   "rel_tol": 0.0020746887966825727,
+   "agrees": true,
+   "definition": "E19 record p53s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.40e5",
+   "claimed": 340000.0,
+   "recomputed": 339829.0,
+   "rel_tol": 0.0014705882352955882,
+   "agrees": true,
+   "definition": "E19 record p53s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "7.08e6",
+   "claimed": 7080000.0,
+   "recomputed": 7083173.49712061,
+   "rel_tol": 0.000705898281615939,
+   "agrees": true,
+   "definition": "E19 record p53s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "20.9",
+   "claimed": 20.9,
+   "recomputed": 20.911660425821683,
+   "rel_tol": 0.0023910105167120107,
+   "agrees": true,
+   "definition": "E19 record p53s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "13",
+   "claimed": 13.0,
+   "recomputed": 13,
+   "rel_tol": 0.038461538461576926,
+   "agrees": true,
+   "definition": "E19 record p53s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1926",
+   "claimed": 1926.0,
+   "recomputed": 1926,
+   "rel_tol": 0.0002596053997925753,
+   "agrees": true,
+   "definition": "E19 record p53s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "137.6",
+   "claimed": 137.6,
+   "recomputed": 137.57142857142858,
+   "rel_tol": 0.0003633720930236193,
+   "agrees": true,
+   "definition": "E19 record p53s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "5",
+   "claimed": 5.0,
+   "recomputed": 5,
+   "rel_tol": 0.10000000000010001,
+   "agrees": true,
+   "definition": "E19 record p53s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.37e9",
+   "claimed": 1370000000.0,
+   "recomputed": 1371585124.0,
+   "rel_tol": 0.0036454171983313233,
+   "agrees": true,
+   "definition": "E19 record p53s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.00e12",
+   "claimed": 3000000000000.0,
+   "recomputed": 3000443671554,
+   "rel_tol": 0.001666420218918952,
+   "agrees": true,
+   "definition": "E19 record p53s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.43e5",
+   "claimed": 343000.0,
+   "recomputed": 342846.4375,
+   "rel_tol": 0.0014577259475233237,
+   "agrees": true,
+   "definition": "E19 record p53s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=53 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "8.75e6",
+   "claimed": 8750000.0,
+   "recomputed": 8751567.300605245,
+   "rel_tol": 0.0005713262354343328,
+   "agrees": true,
+   "definition": "E19 record p53s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "24.6",
+   "claimed": 24.6,
+   "recomputed": 24.63274570455578,
+   "rel_tol": 0.002029818380774442,
+   "agrees": true,
+   "definition": "E19 record p101s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "23",
+   "claimed": 23.0,
+   "recomputed": 23,
+   "rel_tol": 0.021739130434804348,
+   "agrees": true,
+   "definition": "E19 record p101s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2608",
+   "claimed": 2608.0,
+   "recomputed": 2608,
+   "rel_tol": 0.0001917177914112347,
+   "agrees": true,
+   "definition": "E19 record p101s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "108.7",
+   "claimed": 108.7,
+   "recomputed": 108.66666666666667,
+   "rel_tol": 0.0004599816007364306,
+   "agrees": true,
+   "definition": "E19 record p101s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p101s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.39e9",
+   "claimed": 1390000000.0,
+   "recomputed": 1394792949.0,
+   "rel_tol": 0.003584761454085183,
+   "agrees": true,
+   "definition": "E19 record p101s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.91e12",
+   "claimed": 3910000000000.0,
+   "recomputed": 3908781090118,
+   "rel_tol": 0.001278772378517903,
+   "agrees": true,
+   "definition": "E19 record p101s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "6.18e5",
+   "claimed": 618000.0,
+   "recomputed": 617568.75,
+   "rel_tol": 0.0008090614886739483,
+   "agrees": true,
+   "definition": "E19 record p101s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "6.33e6",
+   "claimed": 6330000.0,
+   "recomputed": 6329305.18281244,
+   "rel_tol": 0.0007898894154826225,
+   "agrees": true,
+   "definition": "E19 record p101s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "24.6",
+   "claimed": 24.6,
+   "recomputed": 24.632659960977925,
+   "rel_tol": 0.002029825446348791,
+   "agrees": true,
+   "definition": "E19 record p101s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "23",
+   "claimed": 23.0,
+   "recomputed": 23,
+   "rel_tol": 0.021739130434804348,
+   "agrees": true,
+   "definition": "E19 record p101s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2701",
+   "claimed": 2701.0,
+   "recomputed": 2701,
+   "rel_tol": 0.000185116623472973,
+   "agrees": true,
+   "definition": "E19 record p101s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "112.5",
+   "claimed": 112.5,
+   "recomputed": 112.54166666666667,
+   "rel_tol": 0.0004442798963351352,
+   "agrees": true,
+   "definition": "E19 record p101s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p101s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.39e9",
+   "claimed": 1390000000.0,
+   "recomputed": 1393690031.0,
+   "rel_tol": 0.0035875983100900864,
+   "agrees": true,
+   "definition": "E19 record p101s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "4.01e12",
+   "claimed": 4010000000000.0,
+   "recomputed": 4011456028895,
+   "rel_tol": 0.0012464302148619852,
+   "agrees": true,
+   "definition": "E19 record p101s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "6.86e5",
+   "claimed": 686000.0,
+   "recomputed": 686294.1875,
+   "rel_tol": 0.0007285505386864434,
+   "agrees": true,
+   "definition": "E19 record p101s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=101 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "5.85e6",
+   "claimed": 5850000.0,
+   "recomputed": 5845096.901531022,
+   "rel_tol": 0.0008547008547017095,
+   "agrees": true,
+   "definition": "E19 record p101s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "26.9",
+   "claimed": 26.9,
+   "recomputed": 26.876752907956035,
+   "rel_tol": 0.001858736059481413,
+   "agrees": true,
+   "definition": "E19 record p149s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "37",
+   "claimed": 37.0,
+   "recomputed": 37,
+   "rel_tol": 0.01351351351352703,
+   "agrees": true,
+   "definition": "E19 record p149s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3525",
+   "claimed": 3525.0,
+   "recomputed": 3525,
+   "rel_tol": 0.00014184397163134754,
+   "agrees": true,
+   "definition": "E19 record p149s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "92.8",
+   "claimed": 92.8,
+   "recomputed": 92.76315789473684,
+   "rel_tol": 0.0005387931034488147,
+   "agrees": true,
+   "definition": "E19 record p149s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p149s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.40e9",
+   "claimed": 1400000000.0,
+   "recomputed": 1403705473.0,
+   "rel_tol": 0.0035620007873296937,
+   "agrees": true,
+   "definition": "E19 record p149s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "5.26e12",
+   "claimed": 5260000000000.0,
+   "recomputed": 5264676237357,
+   "rel_tol": 0.0009497260181976786,
+   "agrees": true,
+   "definition": "E19 record p149s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.29e6",
+   "claimed": 1290000.0,
+   "recomputed": 1287447.6875,
+   "rel_tol": 0.003875968992251938,
+   "agrees": true,
+   "definition": "E19 record p149s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "4.09e6",
+   "claimed": 4090000.0,
+   "recomputed": 4089235.072207157,
+   "rel_tol": 0.0012224938875317849,
+   "agrees": true,
+   "definition": "E19 record p149s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "26.9",
+   "claimed": 26.9,
+   "recomputed": 26.876641611768132,
+   "rel_tol": 0.001858736059481413,
+   "agrees": true,
+   "definition": "E19 record p149s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "41",
+   "claimed": 41.0,
+   "recomputed": 41,
+   "rel_tol": 0.01219512195123171,
+   "agrees": true,
+   "definition": "E19 record p149s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2868",
+   "claimed": 2868.0,
+   "recomputed": 2868,
+   "rel_tol": 0.00017433751743392608,
+   "agrees": true,
+   "definition": "E19 record p149s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "68.3",
+   "claimed": 68.3,
+   "recomputed": 68.28571428571429,
+   "rel_tol": 0.0007320644216698391,
+   "agrees": true,
+   "definition": "E19 record p149s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p149s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.40e9",
+   "claimed": 1400000000.0,
+   "recomputed": 1403837551.0,
+   "rel_tol": 0.0035616656617023347,
+   "agrees": true,
+   "definition": "E19 record p149s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "4.30e12",
+   "claimed": 4300000000000.0,
+   "recomputed": 4299648656880,
+   "rel_tol": 0.0011627906976755815,
+   "agrees": true,
+   "definition": "E19 record p149s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.26e6",
+   "claimed": 1260000.0,
+   "recomputed": 1264778.6875,
+   "rel_tol": 0.003953260795284392,
+   "agrees": true,
+   "definition": "E19 record p149s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=149 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.40e6",
+   "claimed": 3400000.0,
+   "recomputed": 3399526.4937447803,
+   "rel_tol": 0.0014705882352955882,
+   "agrees": true,
+   "definition": "E19 record p149s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "28.5",
+   "claimed": 28.5,
+   "recomputed": 28.488137576239687,
+   "rel_tol": 0.0017543859649140352,
+   "agrees": true,
+   "definition": "E19 record p197s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "48",
+   "claimed": 48.0,
+   "recomputed": 48,
+   "rel_tol": 0.010416666666677083,
+   "agrees": true,
+   "definition": "E19 record p197s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "7061",
+   "claimed": 7061.0,
+   "recomputed": 7061,
+   "rel_tol": 7.081149978763631e-05,
+   "agrees": true,
+   "definition": "E19 record p197s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "144.1",
+   "claimed": 144.1,
+   "recomputed": 144.10204081632654,
+   "rel_tol": 0.000346976348959418,
+   "agrees": true,
+   "definition": "E19 record p197s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p197s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1407986558.0,
+   "rel_tol": 0.003546099290783688,
+   "agrees": true,
+   "definition": "E19 record p197s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.04e13",
+   "claimed": 10400000000000.0,
+   "recomputed": 10367983542993,
+   "rel_tol": 0.004807692307697116,
+   "agrees": true,
+   "definition": "E19 record p197s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2.11e6",
+   "claimed": 2110000.0,
+   "recomputed": 2112553.125,
+   "rel_tol": 0.0023668043850991914,
+   "agrees": true,
+   "definition": "E19 record p197s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "4.91e6",
+   "claimed": 4910000.0,
+   "recomputed": 4907797.782833508,
+   "rel_tol": 0.001018329938901222,
+   "agrees": true,
+   "definition": "E19 record p197s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "28.5",
+   "claimed": 28.5,
+   "recomputed": 28.48822088248491,
+   "rel_tol": 0.0017543859649140352,
+   "agrees": true,
+   "definition": "E19 record p197s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "53",
+   "claimed": 53.0,
+   "recomputed": 53,
+   "rel_tol": 0.009433962264160378,
+   "agrees": true,
+   "definition": "E19 record p197s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "4306",
+   "claimed": 4306.0,
+   "recomputed": 4306,
+   "rel_tol": 0.00011611704598246634,
+   "agrees": true,
+   "definition": "E19 record p197s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "79.7",
+   "claimed": 79.7,
+   "recomputed": 79.74074074074075,
+   "rel_tol": 0.0006270320483053182,
+   "agrees": true,
+   "definition": "E19 record p197s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p197s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1407640710.0,
+   "rel_tol": 0.003546099290783688,
+   "agrees": true,
+   "definition": "E19 record p197s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "6.29e12",
+   "claimed": 6290000000000.0,
+   "recomputed": 6286128911926,
+   "rel_tol": 0.000794912559619237,
+   "agrees": true,
+   "definition": "E19 record p197s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2.22e6",
+   "claimed": 2220000.0,
+   "recomputed": 2224313.375,
+   "rel_tol": 0.002247884698353262,
+   "agrees": true,
+   "definition": "E19 record p197s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=197 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2.83e6",
+   "claimed": 2830000.0,
+   "recomputed": 2826098.5985960723,
+   "rel_tol": 0.0017667844522985868,
+   "agrees": true,
+   "definition": "E19 record p197s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "30.3",
+   "claimed": 30.3,
+   "recomputed": 30.28587933999881,
+   "rel_tol": 0.0016501650165033006,
+   "agrees": true,
+   "definition": "E19 record p269s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "58",
+   "claimed": 58.0,
+   "recomputed": 58,
+   "rel_tol": 0.008620689655181035,
+   "agrees": true,
+   "definition": "E19 record p269s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "11975",
+   "claimed": 11975.0,
+   "recomputed": 11975,
+   "rel_tol": 4.175365344471817e-05,
+   "agrees": true,
+   "definition": "E19 record p269s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "203.0",
+   "claimed": 203.0,
+   "recomputed": 202.96610169491527,
+   "rel_tol": 0.0002463054187194582,
+   "agrees": true,
+   "definition": "E19 record p269s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p269s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1411216051.0,
+   "rel_tol": 0.003543043601624256,
+   "agrees": true,
+   "definition": "E19 record p269s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.74e13",
+   "claimed": 17400000000000.0,
+   "recomputed": 17447130005767,
+   "rel_tol": 0.0028658008499691887,
+   "agrees": true,
+   "definition": "E19 record p269s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.17e6",
+   "claimed": 3170000.0,
+   "recomputed": 3166678.625,
+   "rel_tol": 0.0015772870662476342,
+   "agrees": true,
+   "definition": "E19 record p269s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "5.51e6",
+   "claimed": 5510000.0,
+   "recomputed": 5509599.195834721,
+   "rel_tol": 0.0009074410163348457,
+   "agrees": true,
+   "definition": "E19 record p269s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "30.3",
+   "claimed": 30.3,
+   "recomputed": 30.285831087559643,
+   "rel_tol": 0.0016501650165033006,
+   "agrees": true,
+   "definition": "E19 record p269s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "67",
+   "claimed": 67.0,
+   "recomputed": 67,
+   "rel_tol": 0.007462686567171643,
+   "agrees": true,
+   "definition": "E19 record p269s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "6200",
+   "claimed": 6200.0,
+   "recomputed": 6200,
+   "rel_tol": 8.064516129040323e-05,
+   "agrees": true,
+   "definition": "E19 record p269s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "91.2",
+   "claimed": 91.2,
+   "recomputed": 91.17647058823529,
+   "rel_tol": 0.000548245614035636,
+   "agrees": true,
+   "definition": "E19 record p269s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E19 record p269s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1411558115.0,
+   "rel_tol": 0.003542185013052049,
+   "agrees": true,
+   "definition": "E19 record p269s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "9.01e12",
+   "claimed": 9010000000000.0,
+   "recomputed": 9005460641452,
+   "rel_tol": 0.0005549389567153164,
+   "agrees": true,
+   "definition": "E19 record p269s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "3.50e6",
+   "claimed": 3500000.0,
+   "recomputed": 3500194.625,
+   "rel_tol": 0.0014284919942144647,
+   "agrees": true,
+   "definition": "E19 record p269s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E19 p=269 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 table",
+   "printed": "2.57e6",
+   "claimed": 2570000.0,
+   "recomputed": 2572845.686102955,
+   "rel_tol": 0.0019433734510437793,
+   "agrees": true,
+   "definition": "E19 record p269s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E19 walks, all correct",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6",
+   "printed": "320",
+   "claimed": 320.0,
+   "recomputed": 320,
+   "rel_tol": 0.0015625000000015626,
+   "agrees": true,
+   "definition": "walks in the E19 records, every one correct (else -1)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 pooled y (G2.10)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.10",
+   "printed": "115.1",
+   "claimed": 115.1,
+   "recomputed": 115.12371134020619,
+   "rel_tol": 0.00043431539357077553,
+   "agrees": true,
+   "definition": "sum targets / sum relations over E19",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median, smallest (G2.11)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.11",
+   "printed": "1.37e9",
+   "claimed": 1370000000.0,
+   "recomputed": 1371585124.0,
+   "rel_tol": 0.0036454171983313233,
+   "agrees": true,
+   "definition": "min over E19 curves of per-call C median",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median, largest (G2.11)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.11",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1411558115.0,
+   "rel_tol": 0.003542185013052049,
+   "agrees": true,
+   "definition": "max over E19 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19 unsolved targets (G2.11)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.11",
+   "printed": "7",
+   "claimed": 7.0,
+   "recomputed": 7,
+   "rel_tol": 0.07142857142864285,
+   "agrees": true,
+   "definition": "sum unsolved over E19",
+   "class": "headline"
+  },
+  {
+   "name": "E19 targets (G2.11)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.11",
+   "printed": "44668",
+   "claimed": 44668.0,
+   "recomputed": 44668,
+   "rel_tol": 1.1193695710586999e-05,
+   "agrees": true,
+   "definition": "sum targets over E19",
+   "class": "headline"
+  },
+  {
+   "name": "E19 G2.12 measured/registered, mean at p=53",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "0.55",
+   "claimed": 0.55,
+   "recomputed": 0.5527142138299989,
+   "rel_tol": 0.009046266361340358,
+   "agrees": true,
+   "definition": "mean over the two curves of (S/rho) / (0.584 * 1.3e9 / p)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 G2.12 measured/registered, mean at p=101",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "0.81",
+   "claimed": 0.81,
+   "recomputed": 0.809809411563942,
+   "rel_tol": 0.006172839506179012,
+   "agrees": true,
+   "definition": "mean over the two curves of (S/rho) / (0.584 * 1.3e9 / p)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 G2.12 measured/registered, mean at p=149",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "0.73",
+   "claimed": 0.73,
+   "recomputed": 0.7348692527178864,
+   "rel_tol": 0.006803931422511811,
+   "agrees": true,
+   "definition": "mean over the two curves of (S/rho) / (0.584 * 1.3e9 / p)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 G2.12 measured/registered, mean at p=197",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "1.00",
+   "claimed": 1.0,
+   "recomputed": 1.00340989669496,
+   "rel_tol": 0.004983008455940133,
+   "agrees": true,
+   "definition": "mean over the two curves of (S/rho) / (0.584 * 1.3e9 / p)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 G2.12 measured/registered, mean at p=269",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "1.43",
+   "claimed": 1.43,
+   "recomputed": 1.4318872979723622,
+   "rel_tol": 0.0034918949327124404,
+   "agrees": true,
+   "definition": "mean over the two curves of (S/rho) / (0.584 * 1.3e9 / p)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 G2.12 measured/registered, p=53 seed 1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12 and research/glv_k4_pipeline_d4_20261017/REPORT.typ)",
+   "printed": "0.494",
+   "claimed": 0.494,
+   "recomputed": 0.49447865562090665,
+   "rel_tol": 0.0010111659913260773,
+   "agrees": true,
+   "definition": "(S/rho) / (0.584 * 1.3e9 / 53) for p53s1",
+   "superseded": {
+    "printed": "0.495",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record and the study REPORT.typ's errata section"
+   },
+   "class": "headline"
+  },
+  {
+   "name": "E19 slope of S/rho in n (G2.12)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "-0.13",
+   "claimed": -0.13,
+   "recomputed": -0.12927135718620705,
+   "rel_tol": 0.038461538461576926,
+   "agrees": true,
+   "definition": "least-squares slope, 10 E19 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19 non-solve share of S, largest (G2.12)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "0.001",
+   "claimed": 0.001,
+   "recomputed": 0.001248195809850472,
+   "rel_tol": 0.4005781753588788,
+   "agrees": true,
+   "definition": "max over E19 curves of 100 * (S - Weil - solves) / S, percent",
+   "class": "headline"
+  },
+  {
+   "name": "E19 handover log2 n* (G2.13)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.13",
+   "printed": "116.7",
+   "claimed": 116.7,
+   "recomputed": 116.69252222125405,
+   "rel_tol": 0.000428449014567695,
+   "agrees": true,
+   "definition": "every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E19 handover log2 n*, p=269 alone (G2.13)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.13",
+   "printed": "120.0",
+   "claimed": 120.0,
+   "recomputed": 119.99466645663249,
+   "rel_tol": 0.0004166666666670834,
+   "agrees": true,
+   "definition": "the two p = 269 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "24.6",
+   "claimed": 24.6,
+   "recomputed": 24.63278008929385,
+   "rel_tol": 0.0020298155473641205,
+   "agrees": true,
+   "definition": "E24 record p101s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "36",
+   "claimed": 36.0,
+   "recomputed": 36,
+   "rel_tol": 0.013888888888902778,
+   "agrees": true,
+   "definition": "E24 record p101s1: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "9",
+   "claimed": 9.0,
+   "recomputed": 9,
+   "rel_tol": 0.05555555555561111,
+   "agrees": true,
+   "definition": "E24 record p101s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "77960",
+   "claimed": 77960.0,
+   "recomputed": 77960,
+   "rel_tol": 6.413545407907901e-06,
+   "agrees": true,
+   "definition": "E24 record p101s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7796",
+   "claimed": 7796.0,
+   "recomputed": 7796.0,
+   "rel_tol": 6.413545407907902e-05,
+   "agrees": true,
+   "definition": "E24 record p101s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "9",
+   "claimed": 9.0,
+   "recomputed": 9,
+   "rel_tol": 0.05555555555561111,
+   "agrees": true,
+   "definition": "E24 record p101s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.62e6",
+   "claimed": 1620000.0,
+   "recomputed": 1616050.0,
+   "rel_tol": 0.003086419753089506,
+   "agrees": true,
+   "definition": "E24 record p101s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.5",
+   "claimed": 99.5,
+   "recomputed": 99.50644932615761,
+   "rel_tol": 0.0005024799933938185,
+   "agrees": true,
+   "definition": "E24 record p101s1: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.28e11",
+   "claimed": 128000000000.0,
+   "recomputed": 128204040747,
+   "rel_tol": 0.0039000330807607573,
+   "agrees": true,
+   "definition": "E24 record p101s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7.6e5",
+   "claimed": 760000.0,
+   "recomputed": 757296.1875,
+   "rel_tol": 0.006578947368427632,
+   "agrees": true,
+   "definition": "E24 record p101s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.69e5",
+   "claimed": 169000.0,
+   "recomputed": 169291.8079651629,
+   "rel_tol": 0.002953480183184001,
+   "agrees": true,
+   "definition": "E24 record p101s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "24.6",
+   "claimed": 24.6,
+   "recomputed": 24.632916510984987,
+   "rel_tol": 0.0020298043058666086,
+   "agrees": true,
+   "definition": "E24 record p101s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "52",
+   "claimed": 52.0,
+   "recomputed": 52,
+   "rel_tol": 0.009615384615394231,
+   "agrees": true,
+   "definition": "E24 record p101s2: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "13",
+   "claimed": 13.0,
+   "recomputed": 13,
+   "rel_tol": 0.038461538461576926,
+   "agrees": true,
+   "definition": "E24 record p101s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "15387",
+   "claimed": 15387.0,
+   "recomputed": 15387,
+   "rel_tol": 3.249496328072399e-05,
+   "agrees": true,
+   "definition": "E24 record p101s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1099",
+   "claimed": 1099.0,
+   "recomputed": 1099.0714285714287,
+   "rel_tol": 0.00045492948593013583,
+   "agrees": true,
+   "definition": "E24 record p101s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "5",
+   "claimed": 5.0,
+   "recomputed": 5,
+   "rel_tol": 0.10000000000010001,
+   "agrees": true,
+   "definition": "E24 record p101s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.62e6",
+   "claimed": 1620000.0,
+   "recomputed": 1618648.0,
+   "rel_tol": 0.003086419753089506,
+   "agrees": true,
+   "definition": "E24 record p101s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.5",
+   "claimed": 99.5,
+   "recomputed": 99.49467987769496,
+   "rel_tol": 0.0005025125628145729,
+   "agrees": true,
+   "definition": "E24 record p101s2: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.55e10",
+   "claimed": 25500000000.0,
+   "recomputed": 25529343540,
+   "rel_tol": 0.0019585305795939787,
+   "agrees": true,
+   "definition": "E24 record p101s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7.4e5",
+   "claimed": 740000.0,
+   "recomputed": 744347.75,
+   "rel_tol": 0.0067172904062718,
+   "agrees": true,
+   "definition": "E24 record p101s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=101 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "3.43e4",
+   "claimed": 34300.0,
+   "recomputed": 34297.60288789749,
+   "rel_tol": 0.0014577259475233237,
+   "agrees": true,
+   "definition": "E24 record p101s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "26.9",
+   "claimed": 26.9,
+   "recomputed": 26.876746773190938,
+   "rel_tol": 0.001858736059481413,
+   "agrees": true,
+   "definition": "E24 record p149s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "64",
+   "claimed": 64.0,
+   "recomputed": 64,
+   "rel_tol": 0.007812500000007813,
+   "agrees": true,
+   "definition": "E24 record p149s1: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "E24 record p149s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "31225",
+   "claimed": 31225.0,
+   "recomputed": 31225,
+   "rel_tol": 1.6012810248214573e-05,
+   "agrees": true,
+   "definition": "E24 record p149s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1837",
+   "claimed": 1837.0,
+   "recomputed": 1836.764705882353,
+   "rel_tol": 0.00027218290691371805,
+   "agrees": true,
+   "definition": "E24 record p149s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "4",
+   "claimed": 4.0,
+   "recomputed": 4,
+   "rel_tol": 0.125000000000125,
+   "agrees": true,
+   "definition": "E24 record p149s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.63e6",
+   "claimed": 1630000.0,
+   "recomputed": 1634480.0,
+   "rel_tol": 0.0030590768929598406,
+   "agrees": true,
+   "definition": "E24 record p149s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.5",
+   "claimed": 99.5,
+   "recomputed": 99.45478816766021,
+   "rel_tol": 0.0005025125628145729,
+   "agrees": true,
+   "definition": "E24 record p149s1: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "5.20e10",
+   "claimed": 52000000000.0,
+   "recomputed": 51973400831,
+   "rel_tol": 0.0009615384615394232,
+   "agrees": true,
+   "definition": "E24 record p149s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.37e6",
+   "claimed": 1370000.0,
+   "recomputed": 1367934.9375,
+   "rel_tol": 0.0036496350365,
+   "agrees": true,
+   "definition": "E24 record p149s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "3.80e4",
+   "claimed": 38000.0,
+   "recomputed": 37994.05907855906,
+   "rel_tol": 0.0013157894736855265,
+   "agrees": true,
+   "definition": "E24 record p149s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "26.9",
+   "claimed": 26.9,
+   "recomputed": 26.876723264154922,
+   "rel_tol": 0.001858736059481413,
+   "agrees": true,
+   "definition": "E24 record p149s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "60",
+   "claimed": 60.0,
+   "recomputed": 60,
+   "rel_tol": 0.008333333333341667,
+   "agrees": true,
+   "definition": "E24 record p149s2: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "15",
+   "claimed": 15.0,
+   "recomputed": 15,
+   "rel_tol": 0.03333333333336667,
+   "agrees": true,
+   "definition": "E24 record p149s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "45343",
+   "claimed": 45343.0,
+   "recomputed": 45343,
+   "rel_tol": 1.1027060406247934e-05,
+   "agrees": true,
+   "definition": "E24 record p149s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2834",
+   "claimed": 2834.0,
+   "recomputed": 2833.9375,
+   "rel_tol": 0.00017642907551182078,
+   "agrees": true,
+   "definition": "E24 record p149s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2",
+   "claimed": 2.0,
+   "recomputed": 2,
+   "rel_tol": 0.25000000000025,
+   "agrees": true,
+   "definition": "E24 record p149s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.63e6",
+   "claimed": 1630000.0,
+   "recomputed": 1632924.0,
+   "rel_tol": 0.0030619918624534884,
+   "agrees": true,
+   "definition": "E24 record p149s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.5",
+   "claimed": 99.5,
+   "recomputed": 99.45912723630568,
+   "rel_tol": 0.0005025125628145729,
+   "agrees": true,
+   "definition": "E24 record p149s2: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7.51e10",
+   "claimed": 75100000000.0,
+   "recomputed": 75127679424,
+   "rel_tol": 0.0006655336672634826,
+   "agrees": true,
+   "definition": "E24 record p149s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.36e6",
+   "claimed": 1360000.0,
+   "recomputed": 1355677.875,
+   "rel_tol": 0.003676470588238971,
+   "agrees": true,
+   "definition": "E24 record p149s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=149 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "5.54e4",
+   "claimed": 55400.0,
+   "recomputed": 55417.057996908006,
+   "rel_tol": 0.0009022492677767152,
+   "agrees": true,
+   "definition": "E24 record p149s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "28.5",
+   "claimed": 28.5,
+   "recomputed": 28.48817584667316,
+   "rel_tol": 0.0017543859649140352,
+   "agrees": true,
+   "definition": "E24 record p197s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "76",
+   "claimed": 76.0,
+   "recomputed": 76,
+   "rel_tol": 0.006578947368427632,
+   "agrees": true,
+   "definition": "E24 record p197s1: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "19",
+   "claimed": 19.0,
+   "recomputed": 19,
+   "rel_tol": 0.02631578947371053,
+   "agrees": true,
+   "definition": "E24 record p197s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "142361",
+   "claimed": 142361.0,
+   "recomputed": 142361,
+   "rel_tol": 3.5121978631823327e-06,
+   "agrees": true,
+   "definition": "E24 record p197s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7118",
+   "claimed": 7118.0,
+   "recomputed": 7118.05,
+   "rel_tol": 7.024395726364666e-05,
+   "agrees": true,
+   "definition": "E24 record p197s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "E24 record p197s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.65e6",
+   "claimed": 1650000.0,
+   "recomputed": 1645042.0,
+   "rel_tol": 0.003030303030306061,
+   "agrees": true,
+   "definition": "E24 record p197s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.4",
+   "claimed": 99.4,
+   "recomputed": 99.43220071752482,
+   "rel_tol": 0.0005028552082649173,
+   "agrees": true,
+   "definition": "E24 record p197s1: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.37e11",
+   "claimed": 237000000000.0,
+   "recomputed": 237298780852,
+   "rel_tol": 0.0021070483304014244,
+   "agrees": true,
+   "definition": "E24 record p197s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.70e6",
+   "claimed": 1700000.0,
+   "recomputed": 1700928.625,
+   "rel_tol": 0.0029395707300798705,
+   "agrees": true,
+   "definition": "E24 record p197s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.40e5",
+   "claimed": 140000.0,
+   "recomputed": 139511.31009509586,
+   "rel_tol": 0.003571428571432143,
+   "agrees": true,
+   "definition": "E24 record p197s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "28.5",
+   "claimed": 28.5,
+   "recomputed": 28.48819348720795,
+   "rel_tol": 0.0017543859649140352,
+   "agrees": true,
+   "definition": "E24 record p197s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "84",
+   "claimed": 84.0,
+   "recomputed": 84,
+   "rel_tol": 0.005952380952386905,
+   "agrees": true,
+   "definition": "E24 record p197s2: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "21",
+   "claimed": 21.0,
+   "recomputed": 21,
+   "rel_tol": 0.02380952380954762,
+   "agrees": true,
+   "definition": "E24 record p197s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "74345",
+   "claimed": 74345.0,
+   "recomputed": 74345,
+   "rel_tol": 6.725401842766831e-06,
+   "agrees": true,
+   "definition": "E24 record p197s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "3379",
+   "claimed": 3379.0,
+   "recomputed": 3379.318181818182,
+   "rel_tol": 0.00014795884054087026,
+   "agrees": true,
+   "definition": "E24 record p197s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7",
+   "claimed": 7.0,
+   "recomputed": 7,
+   "rel_tol": 0.07142857142864285,
+   "agrees": true,
+   "definition": "E24 record p197s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.64e6",
+   "claimed": 1640000.0,
+   "recomputed": 1644141.0,
+   "rel_tol": 0.0030411017060002765,
+   "agrees": true,
+   "definition": "E24 record p197s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.4",
+   "claimed": 99.4,
+   "recomputed": 99.43085496097882,
+   "rel_tol": 0.0005028620142074839,
+   "agrees": true,
+   "definition": "E24 record p197s2: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.24e11",
+   "claimed": 124000000000.0,
+   "recomputed": 123602929617,
+   "rel_tol": 0.004032258064520161,
+   "agrees": true,
+   "definition": "E24 record p197s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.27e6",
+   "claimed": 2270000.0,
+   "recomputed": 2272012.5625,
+   "rel_tol": 0.0022006920571351375,
+   "agrees": true,
+   "definition": "E24 record p197s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=197 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "5.44e4",
+   "claimed": 54400.0,
+   "recomputed": 54402.39708929866,
+   "rel_tol": 0.0009190771487141944,
+   "agrees": true,
+   "definition": "E24 record p197s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "30.3",
+   "claimed": 30.3,
+   "recomputed": 30.28582298691658,
+   "rel_tol": 0.0016501650165033006,
+   "agrees": true,
+   "definition": "E24 record p269s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "132",
+   "claimed": 132.0,
+   "recomputed": 132,
+   "rel_tol": 0.003787878787882576,
+   "agrees": true,
+   "definition": "E24 record p269s1: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "33",
+   "claimed": 33.0,
+   "recomputed": 33,
+   "rel_tol": 0.015151515151530305,
+   "agrees": true,
+   "definition": "E24 record p269s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "44281",
+   "claimed": 44281.0,
+   "recomputed": 44281,
+   "rel_tol": 1.1291524581660307e-05,
+   "agrees": true,
+   "definition": "E24 record p269s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1302",
+   "claimed": 1302.0,
+   "recomputed": 1302.3823529411766,
+   "rel_tol": 0.0003839118357764504,
+   "agrees": true,
+   "definition": "E24 record p269s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "E24 record p269s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.65e6",
+   "claimed": 1650000.0,
+   "recomputed": 1650417.0,
+   "rel_tol": 0.003029537383585482,
+   "agrees": true,
+   "definition": "E24 record p269s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.4",
+   "claimed": 99.4,
+   "recomputed": 99.38844481444416,
+   "rel_tol": 0.0005030181086524146,
+   "agrees": true,
+   "definition": "E24 record p269s1: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "7.38e10",
+   "claimed": 73800000000.0,
+   "recomputed": 73848388611,
+   "rel_tol": 0.0006770628437599018,
+   "agrees": true,
+   "definition": "E24 record p269s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "3.21e6",
+   "claimed": 3210000.0,
+   "recomputed": 3214273.25,
+   "rel_tol": 0.0015555615876792679,
+   "agrees": true,
+   "definition": "E24 record p269s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.30e4",
+   "claimed": 23000.0,
+   "recomputed": 22975.14332703357,
+   "rel_tol": 0.002173913043480435,
+   "agrees": true,
+   "definition": "E24 record p269s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "30.3",
+   "claimed": 30.3,
+   "recomputed": 30.285813424792845,
+   "rel_tol": 0.0016501650165033006,
+   "agrees": true,
+   "definition": "E24 record p269s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "148",
+   "claimed": 148.0,
+   "recomputed": 148,
+   "rel_tol": 0.0033783783783817574,
+   "agrees": true,
+   "definition": "E24 record p269s2: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "37",
+   "claimed": 37.0,
+   "recomputed": 37,
+   "rel_tol": 0.01351351351352703,
+   "agrees": true,
+   "definition": "E24 record p269s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "50040",
+   "claimed": 50040.0,
+   "recomputed": 50040,
+   "rel_tol": 9.992006394894087e-06,
+   "agrees": true,
+   "definition": "E24 record p269s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1317",
+   "claimed": 1317.0,
+   "recomputed": 1316.842105263158,
+   "rel_tol": 0.00037965072133675024,
+   "agrees": true,
+   "definition": "E24 record p269s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1",
+   "claimed": 1.0,
+   "recomputed": 1,
+   "rel_tol": 0.5000000000005,
+   "agrees": true,
+   "definition": "E24 record p269s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.65e6",
+   "claimed": 1650000.0,
+   "recomputed": 1651012.0,
+   "rel_tol": 0.003028445583681403,
+   "agrees": true,
+   "definition": "E24 record p269s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.4",
+   "claimed": 99.4,
+   "recomputed": 99.3877614350608,
+   "rel_tol": 0.0005030181086524146,
+   "agrees": true,
+   "definition": "E24 record p269s2: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "8.37e10",
+   "claimed": 83700000000.0,
+   "recomputed": 83696794084,
+   "rel_tol": 0.000597371565114098,
+   "agrees": true,
+   "definition": "E24 record p269s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "3.58e6",
+   "claimed": 3580000.0,
+   "recomputed": 3584383.0,
+   "rel_tol": 0.0013949402170485132,
+   "agrees": true,
+   "definition": "E24 record p269s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=269 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.34e4",
+   "claimed": 23400.0,
+   "recomputed": 23350.40482113658,
+   "rel_tol": 0.0021367521367542737,
+   "agrees": true,
+   "definition": "E24 record p269s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "32.5",
+   "claimed": 32.5,
+   "recomputed": 32.531983186208656,
+   "rel_tol": 0.0015369490299394536,
+   "agrees": true,
+   "definition": "E24 record p397s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "208",
+   "claimed": 208.0,
+   "recomputed": 208,
+   "rel_tol": 0.002403846153848558,
+   "agrees": true,
+   "definition": "E24 record p397s1: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "52",
+   "claimed": 52.0,
+   "recomputed": 52,
+   "rel_tol": 0.009615384615394231,
+   "agrees": true,
+   "definition": "E24 record p397s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "66981",
+   "claimed": 66981.0,
+   "recomputed": 66981,
+   "rel_tol": 7.464803451732582e-06,
+   "agrees": true,
+   "definition": "E24 record p397s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1264",
+   "claimed": 1264.0,
+   "recomputed": 1263.7924528301887,
+   "rel_tol": 0.0003955696202535602,
+   "agrees": true,
+   "definition": "E24 record p397s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1",
+   "claimed": 1.0,
+   "recomputed": 1,
+   "rel_tol": 0.5000000000005,
+   "agrees": true,
+   "definition": "E24 record p397s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1663036.0,
+   "rel_tol": 0.003006549467362703,
+   "agrees": true,
+   "definition": "E24 record p397s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.3",
+   "claimed": 99.3,
+   "recomputed": 99.34410774522225,
+   "rel_tol": 0.000503301113019002,
+   "agrees": true,
+   "definition": "E24 record p397s1: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.13e11",
+   "claimed": 113000000000.0,
+   "recomputed": 112657248598,
+   "rel_tol": 0.004424778761066372,
+   "agrees": true,
+   "definition": "E24 record p397s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "8.61e6",
+   "claimed": 8610000.0,
+   "recomputed": 8610069.25,
+   "rel_tol": 0.0005807154222371673,
+   "agrees": true,
+   "definition": "E24 record p397s1: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.31e4",
+   "claimed": 13100.0,
+   "recomputed": 13084.360337519933,
+   "rel_tol": 0.003816793893133588,
+   "agrees": true,
+   "definition": "E24 record p397s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "32.5",
+   "claimed": 32.5,
+   "recomputed": 32.53197505526317,
+   "rel_tol": 0.001536949414079942,
+   "agrees": true,
+   "definition": "E24 record p397s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "188",
+   "claimed": 188.0,
+   "recomputed": 188,
+   "rel_tol": 0.002659574468087766,
+   "agrees": true,
+   "definition": "E24 record p397s2: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "47",
+   "claimed": 47.0,
+   "recomputed": 47,
+   "rel_tol": 0.010638297872351064,
+   "agrees": true,
+   "definition": "E24 record p397s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "89424",
+   "claimed": 89424.0,
+   "recomputed": 89424,
+   "rel_tol": 5.591340132408526e-06,
+   "agrees": true,
+   "definition": "E24 record p397s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1863",
+   "claimed": 1863.0,
+   "recomputed": 1863.0,
+   "rel_tol": 0.00026838432635560924,
+   "agrees": true,
+   "definition": "E24 record p397s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2",
+   "claimed": 2.0,
+   "recomputed": 2,
+   "rel_tol": 0.25000000000025,
+   "agrees": true,
+   "definition": "E24 record p397s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1662646.0,
+   "rel_tol": 0.003007254701244282,
+   "agrees": true,
+   "definition": "E24 record p397s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.3",
+   "claimed": 99.3,
+   "recomputed": 99.34747454803842,
+   "rel_tol": 0.000503284056565253,
+   "agrees": true,
+   "definition": "E24 record p397s2: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.50e11",
+   "claimed": 150000000000.0,
+   "recomputed": 149957831692,
+   "rel_tol": 0.0033333333333366673,
+   "agrees": true,
+   "definition": "E24 record p397s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "9.48e6",
+   "claimed": 9480000.0,
+   "recomputed": 9481819.25,
+   "rel_tol": 0.0005273249645636306,
+   "agrees": true,
+   "definition": "E24 record p397s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=397 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.58e4",
+   "claimed": 15800.0,
+   "recomputed": 15815.30165658874,
+   "rel_tol": 0.003161495182687188,
+   "agrees": true,
+   "definition": "E24 record p397s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "34.1",
+   "claimed": 34.1,
+   "recomputed": 34.100553540447876,
+   "rel_tol": 0.0014662518583677309,
+   "agrees": true,
+   "definition": "E24 record p521s1: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "240",
+   "claimed": 240.0,
+   "recomputed": 240,
+   "rel_tol": 0.0020833333333354167,
+   "agrees": true,
+   "definition": "E24 record p521s1: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "60",
+   "claimed": 60.0,
+   "recomputed": 60,
+   "rel_tol": 0.008333333333341667,
+   "agrees": true,
+   "definition": "E24 record p521s1: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "131952",
+   "claimed": 131952.0,
+   "recomputed": 131952,
+   "rel_tol": 3.789256699409634e-06,
+   "agrees": true,
+   "definition": "E24 record p521s1: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2163",
+   "claimed": 2163.0,
+   "recomputed": 2163.1475409836066,
+   "rel_tol": 0.00023114465866398766,
+   "agrees": true,
+   "definition": "E24 record p521s1: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1",
+   "claimed": 1.0,
+   "recomputed": 1,
+   "rel_tol": 0.5000000000005,
+   "agrees": true,
+   "definition": "E24 record p521s1: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1664008.0,
+   "rel_tol": 0.0030047932461893215,
+   "agrees": true,
+   "definition": "E24 record p521s1: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.3",
+   "claimed": 99.3,
+   "recomputed": 99.31968744470241,
+   "rel_tol": 0.0005034248625468962,
+   "agrees": true,
+   "definition": "E24 record p521s1: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.21e11",
+   "claimed": 221000000000.0,
+   "recomputed": 221265446636,
+   "rel_tol": 0.002259729241968094,
+   "agrees": true,
+   "definition": "E24 record p521s1: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table)",
+   "printed": "1.17e7",
+   "claimed": 11700000.0,
+   "recomputed": 11748821.8125,
+   "rel_tol": 0.004255745878012481,
+   "agrees": true,
+   "definition": "E24 record p521s1: rho",
+   "superseded": {
+    "printed": "1.18e7",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record"
+   },
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=1 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.88e4",
+   "claimed": 18800.0,
+   "recomputed": 18832.99024933612,
+   "rel_tol": 0.002654915620837883,
+   "agrees": true,
+   "definition": "E24 record p521s1: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 log2n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "34.1",
+   "claimed": 34.1,
+   "recomputed": 34.10056171381955,
+   "rel_tol": 0.001466251506930077,
+   "agrees": true,
+   "definition": "E24 record p521s2: log2n",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "232",
+   "claimed": 232.0,
+   "recomputed": 232,
+   "rel_tol": 0.002155172413795259,
+   "agrees": true,
+   "definition": "E24 record p521s2: base",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 cols",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "58",
+   "claimed": 58.0,
+   "recomputed": 58,
+   "rel_tol": 0.008620689655181035,
+   "agrees": true,
+   "definition": "E24 record p521s2: cols",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "142487",
+   "claimed": 142487.0,
+   "recomputed": 142487,
+   "rel_tol": 3.509092057524546e-06,
+   "agrees": true,
+   "definition": "E24 record p521s2: targets",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 y",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2415",
+   "claimed": 2415.0,
+   "recomputed": 2415.0338983050847,
+   "rel_tol": 0.00020703643139394825,
+   "agrees": true,
+   "definition": "E24 record p521s2: y",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1",
+   "claimed": 1.0,
+   "recomputed": 1,
+   "rel_tol": 0.5000000000005,
+   "agrees": true,
+   "definition": "E24 record p521s2: unsolved",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 cmed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1663913.0,
+   "rel_tol": 0.0030049648028502695,
+   "agrees": true,
+   "definition": "E24 record p521s2: cmed",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 share",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "99.3",
+   "claimed": 99.3,
+   "recomputed": 99.32088645388714,
+   "rel_tol": 0.0005034187851642272,
+   "agrees": true,
+   "definition": "E24 record p521s2: share",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 S",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.39e11",
+   "claimed": 239000000000.0,
+   "recomputed": 238932284636,
+   "rel_tol": 0.002092050209207113,
+   "agrees": true,
+   "definition": "E24 record p521s2: S",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 rho",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "1.11e7",
+   "claimed": 11100000.0,
+   "recomputed": 11108759.1875,
+   "rel_tol": 0.004500952730734493,
+   "agrees": true,
+   "definition": "E24 record p521s2: rho",
+   "class": "headline"
+  },
+  {
+   "name": "E24 p=521 seed=2 ratio",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 table",
+   "printed": "2.15e4",
+   "claimed": 21500.0,
+   "recomputed": 21508.458379839194,
+   "rel_tol": 0.0023246668411585074,
+   "agrees": true,
+   "definition": "E24 record p521s2: ratio",
+   "class": "headline"
+  },
+  {
+   "name": "E24 kept rows re-added to O",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14)",
+   "printed": "392",
+   "claimed": 392.0,
+   "recomputed": 392,
+   "rel_tol": 0.0012755102040829082,
+   "agrees": true,
+   "definition": "sum of rows_readded over the 12 E24 records (rows_readd_failures = 0 on every record; rows_readded = folded.relations on every record)",
+   "superseded": {
+    "printed": "381",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record"
+   },
+   "class": "headline"
+  },
+  {
+   "name": "E24 walks, all correct",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "384",
+   "claimed": 384.0,
+   "recomputed": 384,
+   "rel_tol": 0.0013020833333346354,
+   "agrees": true,
+   "definition": "walks in the E24 records, every one correct (else -1)",
+   "class": "headline"
+  },
+  {
+   "name": "E24 unsolved per curve, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "min unsolved over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 unsolved per curve, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "max unsolved over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 slope of S/rho in n (G2.30)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.30",
+   "printed": "-0.25",
+   "claimed": -0.25,
+   "recomputed": -0.2532713806545276,
+   "rel_tol": 0.019741669931610643,
+   "agrees": true,
+   "definition": "least-squares slope, 12 E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 solves share, least (G2.30)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.30",
+   "printed": "99.3",
+   "claimed": 99.3,
+   "recomputed": 99.31968744470241,
+   "rel_tol": 0.0005034248625468962,
+   "agrees": true,
+   "definition": "min over E24 curves of the Weil + solve share of S, percent",
+   "class": "headline"
+  },
+  {
+   "name": "E24 solves share, most (G2.30)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.30",
+   "printed": "99.5",
+   "claimed": 99.5,
+   "recomputed": 99.50644932615761,
+   "rel_tol": 0.0005024799933938185,
+   "agrees": true,
+   "definition": "max over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median, smallest (G2.28)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.28",
+   "printed": "1.62e6",
+   "claimed": 1620000.0,
+   "recomputed": 1616050.0,
+   "rel_tol": 0.003086419753089506,
+   "agrees": true,
+   "definition": "min over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median, largest (G2.28)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.28",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1664008.0,
+   "rel_tol": 0.0030047932461893215,
+   "agrees": true,
+   "definition": "max over E24 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant y (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "2326",
+   "claimed": 2326.0,
+   "recomputed": 2325.984693877551,
+   "rel_tol": 0.00021496130696496132,
+   "agrees": true,
+   "definition": "section 11.16 model, every E24 curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant cols_p (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "0.114",
+   "claimed": 0.114,
+   "recomputed": 0.11375016734417659,
+   "rel_tol": 0.004385964912285088,
+   "agrees": true,
+   "definition": "section 11.16 model, every E24 curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant c (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1657389.0939312244,
+   "rel_tol": 0.003012048192774097,
+   "agrees": true,
+   "definition": "section 11.16 model, every E24 curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant s_rho (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "110.9",
+   "claimed": 110.9,
+   "recomputed": 110.86813616245263,
+   "rel_tol": 0.0004508566275928765,
+   "agrees": true,
+   "definition": "section 11.16 model, every E24 curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant r (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "0.072",
+   "claimed": 0.072,
+   "recomputed": 0.07163612197088877,
+   "rel_tol": 0.00694444444445139,
+   "agrees": true,
+   "definition": "section 11.16 model, every E24 curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant log2n (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "90.1",
+   "claimed": 90.1,
+   "recomputed": 90.09033635777931,
+   "rel_tol": 0.0005549389567153165,
+   "agrees": true,
+   "definition": "section 11.16 model, every E24 curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant s_rho (p=521 only)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "84.2",
+   "claimed": 84.2,
+   "recomputed": 84.20830616521835,
+   "rel_tol": 0.000593765654209325,
+   "agrees": true,
+   "definition": "section 11.16 model, the two p = 521 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant r (p=521 only)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "0.090",
+   "claimed": 0.09,
+   "recomputed": 0.08993514451006579,
+   "rel_tol": 0.005555555555561112,
+   "agrees": true,
+   "definition": "section 11.16 model, the two p = 521 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 handover constant log2n (p=521 only)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.31",
+   "printed": "91.7",
+   "claimed": 91.7,
+   "recomputed": 91.69721643219802,
+   "rel_tol": 0.0005452562704476555,
+   "agrees": true,
+   "definition": "section 11.16 model, the two p = 521 curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=101 seed=1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "37",
+   "claimed": 37.0,
+   "recomputed": 37.386954861483275,
+   "rel_tol": 0.01337364869251786,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=101 seed=2",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ)",
+   "printed": "170",
+   "claimed": 170.0,
+   "recomputed": 170.42289866833715,
+   "rel_tol": 0.002933878040494772,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "superseded": {
+    "printed": "171",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record and the study REPORT.typ's errata section"
+   },
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=149 seed=1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "108",
+   "claimed": 108.0,
+   "recomputed": 107.62827587734127,
+   "rel_tol": 0.004629629629634259,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=149 seed=2",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "61",
+   "claimed": 61.0,
+   "recomputed": 61.34440579531409,
+   "rel_tol": 0.008150702472672635,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=197 seed=1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "35",
+   "claimed": 35.0,
+   "recomputed": 35.17849398366469,
+   "rel_tol": 0.014213229259691379,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=197 seed=2",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "52",
+   "claimed": 52.0,
+   "recomputed": 51.948052839605225,
+   "rel_tol": 0.009615384615394231,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=269 seed=1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "240",
+   "claimed": 240.0,
+   "recomputed": 239.8069564750825,
+   "rel_tol": 0.0020833333333354167,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 p=269 seed=2",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29 and research/glv_k4_pipeline_d4_20261017/REPORT.typ",
+   "printed": "110",
+   "claimed": 110.0,
+   "recomputed": 110.1842004800721,
+   "rel_tol": 0.0045378556800521495,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho), same p and seed",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 by size p=101",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29",
+   "printed": "60",
+   "claimed": 60.0,
+   "recomputed": 59.798798146384314,
+   "rel_tol": 0.008333333333341667,
+   "agrees": true,
+   "definition": "mean E19 S/rho over the two curves / mean E24 S/rho over the two curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 by size p=149",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29",
+   "printed": "80",
+   "claimed": 80.0,
+   "recomputed": 80.16991767587737,
+   "rel_tol": 0.0062367533171478725,
+   "agrees": true,
+   "definition": "mean E19 S/rho over the two curves / mean E24 S/rho over the two curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 by size p=197",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29",
+   "printed": "40",
+   "claimed": 40.0,
+   "recomputed": 39.88318563821453,
+   "rel_tol": 0.012500000000012501,
+   "agrees": true,
+   "definition": "mean E19 S/rho over the two curves / mean E24 S/rho over the two curves",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 by size p=269",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 G2.29",
+   "printed": "174",
+   "claimed": 174.0,
+   "recomputed": 174.47057196358145,
+   "rel_tol": 0.00286581280942249,
+   "agrees": true,
+   "definition": "mean E19 S/rho over the two curves / mean E24 S/rho over the two curves",
+   "class": "headline"
+  },
+  {
+   "name": "E24 best row S/rho (p=397 seed 1)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "1.3e4",
+   "claimed": 13000.0,
+   "recomputed": 13084.360337519933,
+   "rel_tol": 0.03821356085453638,
+   "agrees": true,
+   "definition": "S/rho of p397s1, the minimum over E24",
+   "class": "headline"
+  },
+  {
+   "name": "E24 largest log2 n (scope)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "34.1",
+   "claimed": 34.1,
+   "recomputed": 34.10056171381955,
+   "rel_tol": 0.001466251506930077,
+   "agrees": true,
+   "definition": "max bits over E24",
+   "class": "headline"
+  },
+  {
+   "name": "E19 per-call C, 'What it says'",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "1.4e9",
+   "claimed": 1400000000.0,
+   "recomputed": 1411558115.0,
+   "rel_tol": 0.03542185013052049,
+   "agrees": true,
+   "definition": "max E19 per-call C median",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 p=521 seed 1 matched rho, four digits",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "1.1749e7",
+   "claimed": 11749000.0,
+   "recomputed": 11748821.8125,
+   "rel_tol": 4.255681334585923e-05,
+   "agrees": true,
+   "definition": "rho_matched_muls of p521s1",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 p=521 seed 1 S/rho (unchanged)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "1.88e4",
+   "claimed": 18800.0,
+   "recomputed": 18832.99024933612,
+   "rel_tol": 0.002654915620837883,
+   "agrees": true,
+   "definition": "ratio of p521s1",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: E19/E24 p=101 seed 2, one decimal",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "170.4",
+   "claimed": 170.4,
+   "recomputed": 170.42289866833715,
+   "rel_tol": 0.0002933878040494772,
+   "agrees": true,
+   "definition": "(E19 S/rho) / (E24 S/rho) at p101s2",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E19/E24 range at 0 GAE, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "35",
+   "claimed": 35.0,
+   "recomputed": 35.17849398366469,
+   "rel_tol": 0.014213229259691379,
+   "agrees": true,
+   "definition": "min over matched (p, seed), 0 GAE",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E19/E24 range at 0 GAE, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "240",
+   "claimed": 240.0,
+   "recomputed": 239.8069564750825,
+   "rel_tol": 0.0020833333333354167,
+   "agrees": true,
+   "definition": "max over matched (p, seed), 0 GAE",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 curves with rows re-added",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "12",
+   "claimed": 12.0,
+   "recomputed": 12,
+   "rel_tol": 0.04166666666670833,
+   "agrees": true,
+   "definition": "E24 records with rows re-added and no failure",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 rows re-add failures",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "sum of rows_readd_failures",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 p=101 seed 2 unsolved",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "5",
+   "claimed": 5.0,
+   "recomputed": 5,
+   "rel_tol": 0.10000000000010001,
+   "agrees": true,
+   "definition": "unsolved of p101s2",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 p=101 seed 2 targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "15387",
+   "claimed": 15387.0,
+   "recomputed": 15387,
+   "rel_tol": 3.249496328072399e-05,
+   "agrees": true,
+   "definition": "targets of p101s2",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 p=149 seed 1 unsolved share, percent",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "0.0128",
+   "claimed": 0.0128,
+   "recomputed": 0.012810248198558846,
+   "rel_tol": 0.003903125000003904,
+   "agrees": true,
+   "definition": "100 * unsolved / targets of p149s1",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 unsolved share pooled, percent",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "0.0047",
+   "claimed": 0.0047,
+   "recomputed": 0.004716018890397527,
+   "rel_tol": 0.010602162790708278,
+   "agrees": true,
+   "definition": "100 * sum unsolved / sum targets over E24",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: E19 G2.12 p=53 seed 1, five decimals",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "0.49448",
+   "claimed": 0.49448,
+   "recomputed": 0.49447865562090665,
+   "rel_tol": 1.0111632421948311e-05,
+   "agrees": true,
+   "definition": "(S/rho) / (0.584 * 1.3e9 / 53) for p53s1",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: GAE in F_p multiplications, least over records",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "97",
+   "claimed": 97.0,
+   "recomputed": 97.0,
+   "rel_tol": 0.005154639175262887,
+   "agrees": true,
+   "definition": "fp_muls_per_add, min over the 22 records",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: GAE in F_p multiplications, most over records",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "97",
+   "claimed": 97.0,
+   "recomputed": 97.0,
+   "rel_tol": 0.005154639175262887,
+   "agrees": true,
+   "definition": "fp_muls_per_add, max over the 22 records",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: E19/E24 at 0.1 GAE, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "19",
+   "claimed": 19.0,
+   "recomputed": 19.215725208316567,
+   "rel_tol": 0.026020355442223957,
+   "agrees": true,
+   "definition": "min over matched (p, seed) of (E19 S/rho) / (E24 S/rho), one GAE per Macaulay entry and per walk step at 0.1 GAE",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: E19/E24 at 0.1 GAE, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "132",
+   "claimed": 132.0,
+   "recomputed": 131.590835318352,
+   "rel_tol": 0.003787878787882576,
+   "agrees": true,
+   "definition": "max over matched (p, seed), 0.1 GAE",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: E19/E24 at 1 GAE, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "6.5",
+   "claimed": 6.5,
+   "recomputed": 6.474409295154595,
+   "rel_tol": 0.007692307692315385,
+   "agrees": true,
+   "definition": "min over matched (p, seed) of (E19 S/rho) / (E24 S/rho), one GAE per Macaulay entry and per walk step at 1 GAE",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19 and REPORT errata: E19/E24 at 1 GAE, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "45",
+   "claimed": 45.0,
+   "recomputed": 45.178794457603445,
+   "rel_tol": 0.011067139041740226,
+   "agrees": true,
+   "definition": "max over matched (p, seed), 1 GAE",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E19 runs replayed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "E19 records (every one replayed field-identical: replay-certificate.json)",
+   "class": "headline"
+  },
+  {
+   "name": "§9.19: E24 runs replayed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "12",
+   "claimed": 12.0,
+   "recomputed": 12,
+   "rel_tol": 0.04166666666670833,
+   "agrees": true,
+   "definition": "E24 records (every one replayed field-identical: replay-certificate.json)",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=101 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.39e9",
+   "claimed": 1390000000.0,
+   "recomputed": 1394792949.0,
+   "rel_tol": 0.003584761454085183,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=101 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.39e9",
+   "claimed": 1390000000.0,
+   "recomputed": 1393690031.0,
+   "rel_tol": 0.0035875983100900864,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=101 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.62e6",
+   "claimed": 1620000.0,
+   "recomputed": 1616050.0,
+   "rel_tol": 0.003086419753089506,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=101 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.62e6",
+   "claimed": 1620000.0,
+   "recomputed": 1618648.0,
+   "rel_tol": 0.003086419753089506,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=149 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.40e9",
+   "claimed": 1400000000.0,
+   "recomputed": 1403705473.0,
+   "rel_tol": 0.0035620007873296937,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=149 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.40e9",
+   "claimed": 1400000000.0,
+   "recomputed": 1403837551.0,
+   "rel_tol": 0.0035616656617023347,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=149 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.63e6",
+   "claimed": 1630000.0,
+   "recomputed": 1634480.0,
+   "rel_tol": 0.0030590768929598406,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=149 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.63e6",
+   "claimed": 1630000.0,
+   "recomputed": 1632924.0,
+   "rel_tol": 0.0030619918624534884,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=269 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1411216051.0,
+   "rel_tol": 0.003543043601624256,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=269 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1411558115.0,
+   "rel_tol": 0.003542185013052049,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=269 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.65e6",
+   "claimed": 1650000.0,
+   "recomputed": 1650417.0,
+   "rel_tol": 0.003029537383585482,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=269 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.65e6",
+   "claimed": 1650000.0,
+   "recomputed": 1651012.0,
+   "rel_tol": 0.003028445583681403,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=397 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1663036.0,
+   "rel_tol": 0.003006549467362703,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=397 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1662646.0,
+   "rel_tol": 0.003007254701244282,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=521 seed=1 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1664008.0,
+   "rel_tol": 0.0030047932461893215,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=521 seed=2 (REPORT per-p column)",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1663913.0,
+   "rel_tol": 0.0030049648028502695,
+   "agrees": true,
+   "definition": "per-call C median; the REPORT prints one value for both curves of p",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=197 (REPORT per-p column), seed 1",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1407986558.0,
+   "rel_tol": 0.003546099290783688,
+   "agrees": true,
+   "definition": "per-call C median",
+   "class": "headline"
+  },
+  {
+   "name": "E19 C median p=197 (REPORT per-p column), seed 2",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.41e9",
+   "claimed": 1410000000.0,
+   "recomputed": 1407640710.0,
+   "rel_tol": 0.003546099290783688,
+   "agrees": true,
+   "definition": "per-call C median",
+   "class": "headline"
+  },
+  {
+   "name": "E24 C median p=197 (REPORT per-p column), seed 1",
+   "source": "research/glv_k4_pipeline_d4_20261017/REPORT.typ table",
+   "printed": "1.65e6",
+   "claimed": 1650000.0,
+   "recomputed": 1645042.0,
+   "rel_tol": 0.003030303030306061,
+   "agrees": true,
+   "definition": "per-call C median (seed 2 is the note's 1.64e6)",
+   "class": "headline"
+  },
+  {
+   "name": "summary e19_curves",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "count",
+   "class": "headline"
+  },
+  {
+   "name": "summary e24_curves",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "12",
+   "claimed": 12.0,
+   "recomputed": 12,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "count",
+   "class": "headline"
+  },
+  {
+   "name": "summary e19_handover_log2_n",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "116.69252222125405",
+   "claimed": 116.69252222125405,
+   "recomputed": 116.69252222125405,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "handover, every E19 curve",
+   "class": "headline"
+  },
+  {
+   "name": "summary e24_handover_log2_n",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "90.09033635777931",
+   "claimed": 90.09033635777931,
+   "recomputed": 90.09033635777931,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "handover, every E24 curve",
+   "class": "headline"
+  },
+  {
+   "name": "summary e24_s_over_rho_all min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "13084.360337519933",
+   "claimed": 13084.360337519933,
+   "recomputed": 13084.360337519933,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min E24 S/rho",
+   "class": "headline"
+  },
+  {
+   "name": "summary e24_s_over_rho_all max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "169291.8079651629",
+   "claimed": 169291.8079651629,
+   "recomputed": 169291.8079651629,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max E24 S/rho",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=53 e19_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "7083173.49712061",
+   "claimed": 7083173.49712061,
+   "recomputed": 7083173.49712061,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=53 e19_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "8751567.300605245",
+   "claimed": 8751567.300605245,
+   "recomputed": 8751567.300605245,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=53 e19_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1371585124.0",
+   "claimed": 1371585124.0,
+   "recomputed": 1371585124.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=53 e19_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1373141362.0",
+   "claimed": 1373141362.0,
+   "recomputed": 1373141362.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e19_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "5845096.901531022",
+   "claimed": 5845096.901531022,
+   "recomputed": 5845096.901531022,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e19_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "6329305.18281244",
+   "claimed": 6329305.18281244,
+   "recomputed": 6329305.18281244,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e24_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "34297.60288789749",
+   "claimed": 34297.60288789749,
+   "recomputed": 34297.60288789749,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e24_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "169291.8079651629",
+   "claimed": 169291.8079651629,
+   "recomputed": 169291.8079651629,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e19_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1393690031.0",
+   "claimed": 1393690031.0,
+   "recomputed": 1393690031.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e19_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1394792949.0",
+   "claimed": 1394792949.0,
+   "recomputed": 1394792949.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e24_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1616050.0",
+   "claimed": 1616050.0,
+   "recomputed": 1616050.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e24_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1618648.0",
+   "claimed": 1618648.0,
+   "recomputed": 1618648.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e19_over_e24_by_seed min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "37.386954861483275",
+   "claimed": 37.386954861483275,
+   "recomputed": 37.386954861483275,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 e19_over_e24_by_seed max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "170.42289866833715",
+   "claimed": 170.42289866833715,
+   "recomputed": 170.42289866833715,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e19_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "3399526.4937447803",
+   "claimed": 3399526.4937447803,
+   "recomputed": 3399526.4937447803,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e19_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "4089235.072207157",
+   "claimed": 4089235.072207157,
+   "recomputed": 4089235.072207157,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e24_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "37994.05907855906",
+   "claimed": 37994.05907855906,
+   "recomputed": 37994.05907855906,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e24_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "55417.057996908006",
+   "claimed": 55417.057996908006,
+   "recomputed": 55417.057996908006,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e19_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1403705473.0",
+   "claimed": 1403705473.0,
+   "recomputed": 1403705473.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e19_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1403837551.0",
+   "claimed": 1403837551.0,
+   "recomputed": 1403837551.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e24_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1632924.0",
+   "claimed": 1632924.0,
+   "recomputed": 1632924.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e24_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1634480.0",
+   "claimed": 1634480.0,
+   "recomputed": 1634480.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e19_over_e24_by_seed min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "61.34440579531409",
+   "claimed": 61.34440579531409,
+   "recomputed": 61.34440579531409,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 e19_over_e24_by_seed max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "107.62827587734127",
+   "claimed": 107.62827587734127,
+   "recomputed": 107.62827587734127,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e19_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "2826098.5985960723",
+   "claimed": 2826098.5985960723,
+   "recomputed": 2826098.5985960723,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e19_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "4907797.782833508",
+   "claimed": 4907797.782833508,
+   "recomputed": 4907797.782833508,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e24_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "54402.39708929866",
+   "claimed": 54402.39708929866,
+   "recomputed": 54402.39708929866,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e24_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "139511.31009509586",
+   "claimed": 139511.31009509586,
+   "recomputed": 139511.31009509586,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e19_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1407640710.0",
+   "claimed": 1407640710.0,
+   "recomputed": 1407640710.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e19_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1407986558.0",
+   "claimed": 1407986558.0,
+   "recomputed": 1407986558.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e24_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1644141.0",
+   "claimed": 1644141.0,
+   "recomputed": 1644141.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e24_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1645042.0",
+   "claimed": 1645042.0,
+   "recomputed": 1645042.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e19_over_e24_by_seed min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "35.17849398366469",
+   "claimed": 35.17849398366469,
+   "recomputed": 35.17849398366469,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 e19_over_e24_by_seed max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "51.948052839605225",
+   "claimed": 51.948052839605225,
+   "recomputed": 51.948052839605225,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e19_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "2572845.686102955",
+   "claimed": 2572845.686102955,
+   "recomputed": 2572845.686102955,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e19_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "5509599.195834721",
+   "claimed": 5509599.195834721,
+   "recomputed": 5509599.195834721,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e24_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "22975.14332703357",
+   "claimed": 22975.14332703357,
+   "recomputed": 22975.14332703357,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e24_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "23350.40482113658",
+   "claimed": 23350.40482113658,
+   "recomputed": 23350.40482113658,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e19_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1411216051.0",
+   "claimed": 1411216051.0,
+   "recomputed": 1411216051.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e19_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1411558115.0",
+   "claimed": 1411558115.0,
+   "recomputed": 1411558115.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e19 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e24_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1650417.0",
+   "claimed": 1650417.0,
+   "recomputed": 1650417.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e24_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1651012.0",
+   "claimed": 1651012.0,
+   "recomputed": 1651012.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e19_over_e24_by_seed min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "110.1842004800721",
+   "claimed": 110.1842004800721,
+   "recomputed": 110.1842004800721,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 e19_over_e24_by_seed max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "239.8069564750825",
+   "claimed": 239.8069564750825,
+   "recomputed": 239.8069564750825,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "by seed",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 e24_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "13084.360337519933",
+   "claimed": 13084.360337519933,
+   "recomputed": 13084.360337519933,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 e24_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "15815.30165658874",
+   "claimed": 15815.30165658874,
+   "recomputed": 15815.30165658874,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 e24_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1662646.0",
+   "claimed": 1662646.0,
+   "recomputed": 1662646.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 e24_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1663036.0",
+   "claimed": 1663036.0,
+   "recomputed": 1663036.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=521 e24_s_over_rho min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "18832.99024933612",
+   "claimed": 18832.99024933612,
+   "recomputed": 18832.99024933612,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=521 e24_s_over_rho max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "21508.458379839194",
+   "claimed": 21508.458379839194,
+   "recomputed": 21508.458379839194,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=521 e24_c_median min",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1663913.0",
+   "claimed": 1663913.0,
+   "recomputed": 1663913.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "min over e24 curves at p",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=521 e24_c_median max",
+   "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "printed": "1664008.0",
+   "claimed": 1664008.0,
+   "recomputed": 1664008.0,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "max over e24 curves at p",
+   "class": "headline"
+  }
+ ],
+ "bounds": [
+  {
+   "name": "E19 band: largest S/rho change across 0..1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6",
+   "printed": "1.5",
+   "claimed": 1.5,
+   "recomputed": 1.5255475883084064,
+   "agrees": true,
+   "definition": "max over E19 curves of (S/rho at 1 GAE) / (S/rho at 0); the note says 'at most 1.5x'",
+   "bound": "recomputed <= claimed (+ half a printed unit)",
+   "class": "headline"
+  },
+  {
+   "name": "E24 unsolved share per curve, most (percent)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 and G2.28)",
+   "printed": "0.033",
+   "claimed": 0.033,
+   "recomputed": 0.03249496328069149,
+   "agrees": true,
+   "definition": "max over E24 curves of 100 * unsolved / targets; the note says '<= 0.012 %' per curve (pooled it is 0.0047 %)",
+   "superseded": {
+    "printed": "0.012",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14 and G2.28",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record"
+   },
+   "bound": "recomputed <= claimed (+ half a printed unit)",
+   "class": "headline"
+  },
+  {
+   "name": "E24 band: largest S/rho rise at 1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "7",
+   "claimed": 7.0,
+   "recomputed": 6.981155887583505,
+   "agrees": true,
+   "definition": "max over E24 curves of (S/rho at 1 GAE) / (S/rho at 0); the note says 'up to 7x'",
+   "bound": "recomputed <= claimed (+ half a printed unit)",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 any pairing, least (bound 20)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "20",
+   "claimed": 20.0,
+   "recomputed": 20.257128950116684,
+   "agrees": true,
+   "definition": "min over every E19 x E24 pair at the same p; the note says any pairing stays in [20, 240]",
+   "bound": "recomputed >= claimed (- half a printed unit)",
+   "class": "headline"
+  },
+  {
+   "name": "E19/E24 any pairing, most (bound 240)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.14",
+   "printed": "240",
+   "claimed": 240.0,
+   "recomputed": 239.8069564750825,
+   "agrees": true,
+   "definition": "max over every E19 x E24 pair at the same p",
+   "bound": "recomputed <= claimed (+ half a printed unit)",
+   "class": "headline"
+  }
+ ],
+ "explanatory": [
+  {
+   "name": "E19 S_rho per sqrt n at p=53 (G2.12 note)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12)",
+   "printed": "243",
+   "claimed": 243.0,
+   "recomputed": 243.02040817850843,
+   "rel_tol": 0.0020574403760906766,
+   "agrees": true,
+   "definition": "mean over the two p = 53 curves of rho_matched_muls / sqrt(n), the definition that gives the 92 at p = 269 (seed 1 alone is 241.9, but seed 1 alone at p = 269 is 87.5)",
+   "superseded": {
+    "printed": "242",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record"
+   },
+   "class": "explanatory"
+  },
+  {
+   "name": "E19 S_rho per sqrt n at p=269 (G2.12 note)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6 G2.12",
+   "printed": "92",
+   "claimed": 92.0,
+   "recomputed": 92.13336910616593,
+   "rel_tol": 0.0054269154037376675,
+   "agrees": true,
+   "definition": "mean over the two p = 269 curves of rho_matched_muls / sqrt(n)",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19 and REPORT errata: the written 171 from rounded inputs",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 and research/glv_k4_pipeline_d4_20261017/REPORT.typ errata",
+   "printed": "171",
+   "claimed": 171.0,
+   "recomputed": 170.55393586005832,
+   "rel_tol": 0.0029239766081900587,
+   "agrees": true,
+   "definition": "5.85e6 / 3.43e4, the two printed values the original 171 was divided from",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: E19 S_rho per sqrt n, p=53 seed 1 alone",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "241.9",
+   "claimed": 241.9,
+   "recomputed": 241.93331946088267,
+   "rel_tol": 0.00020666851557060674,
+   "agrees": true,
+   "definition": "rho_matched_muls / sqrt(n) of p53s1",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: E19 S_rho per sqrt n, p=269 seed 1 alone",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "87.5",
+   "claimed": 87.5,
+   "recomputed": 87.52355057359543,
+   "rel_tol": 0.000571274813148797,
+   "agrees": true,
+   "definition": "rho_matched_muls / sqrt(n) of p269s1",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: E19 S_rho per sqrt n, p=269 two-curve mean",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "92",
+   "claimed": 92.0,
+   "recomputed": 92.13336910616593,
+   "rel_tol": 0.0054269154037376675,
+   "agrees": true,
+   "definition": "mean over the two p = 269 curves",
+   "class": "explanatory"
+  }
+ ],
+ "checks": {
+  "every E19/E24 record: folded.solved and folded.correct (log equals planted d)": true,
+  "every E19/E24 walk correct": true,
+  "check_failures = 0, rows_readd_failures = 0, off_base = 0 on every record": true,
+  "rows_readded = folded.relations on every record": true,
+  "h = 4 on every record": true,
+  "E19/E24 any pairing within [20, 240]": true,
+  "rho below the index calculus on every curve at 0, 0.1 and 1 GAE": true,
+  "E24 below E19 at every matched (p, seed) at 0, 0.1 and 1 GAE": true,
+  "16 unfolded (fold = None) walks per record": true,
+  "rho_matched_muls equals the mean of the 16 negation walks' fp_muls on every record": true,
+  "ratio = total_muls / rho_matched_muls on every record": true,
+  "total_muls = sum of the charged phases on every record": true,
+  "la_fp_muls = 16 * folded.la_ops on every record": true
+ },
+ "disagreements": [],
+ "rho_reference_assessment": {
+  "kind": "negation",
+  "protocol": "note section 9.5 item 6 (E19) and section 9.13 (E24): the whole run priced in F_p multiplications against the matched negation walk on the same curve, 16 negation and 16 unfolded walks per curve; ratio = total_muls / mean fp_muls of the 16 negation walks (set-up included).",
+  "matches_protocol": "every record carries 16 negation and 16 unfolded walks, all correct; rho_matched_muls equals the mean of the negation walks' fp_muls and ratio = total_muls / rho_matched_muls on every record (checks above).",
+  "strongest_available": "on all 22 curves j(E) is outside F_{p^2} (independent Python check: j^(p^2) != j; the generators also reject j in F_{p^2}), so no Frobenius-type endomorphism is defined over F_{p^4} and Aut(E) = {+-1}: negation is the strongest fold. Negation walks take 0.71-1.16 sqrt(n) steps (16-walk means over the 22 curves), against sqrt(pi n / 4) = 0.886 sqrt(n).",
+  "same_unit_and_process": "the walks (rho4_folded) run in the same process after the index calculus (collect_and_solve), on the same instance, with the same Fp4/Curve4 counters.",
+  "unpriced_native_work": "Read from src/cryptanalysis/quartic_folds.rs, klein_v4.rs, d4_weighted_s5.rs and gaudry_quartic.rs: the index calculus charges F_p multiplications only (the Fp4 counter: an F_{p^4} multiplication 19, an inversion 40; the solve's F_p multiplications counted directly; the matrix at 16 per mod-n multiplication). Unpriced on the index calculus: the Macaulay matrices' entry traffic and additions (emitted: macaulay_entries, rows x cols at each call's last degree), the solve's F_p inversions (inv_mod per pivot or eigenvector; count not emitted, at most one per pivot row, far fewer than the entries), hash and table work in the lift-back, F_p additions. Unpriced on the walks: per step the hash-table lookup and insert, the partition hashes (two with the look-ahead) and the class comparisons, F_p additions (emitted: steps). The protocol's band prices one GAE per Macaulay entry and one per walk step, GAE = the curve's measured F_p multiplications per affine addition (fp_muls_per_add = 97.0 on every record). Native work is unpriced on both arms, so the 0, 0.1 and 1 GAE values differ.",
+  "limitations": [
+   "16 walks per curve: the matched-walk mean carries roughly 13 % sampling error (coefficient of variation about 0.5 / sqrt(16)); per-curve S/rho inherits it.",
+   "The walk's mean includes its set-up (32 random multiples), which dominates at small n (S_rho per sqrt n 243 at p = 53 against 92 at p = 269 for E19); this makes rho dearer at small n and the IC/rho ratio lower there.",
+   "The E19 -> E24 factor (35-240x) is the 0 GAE value; at 1 GAE per native operation it is 6.5-45x (E24's Macaulay entries per call weigh more against its smaller C); E24 stays below E19 at every matched (p, seed) at every price.",
+   "The handovers (2^116.7, 2^90.1) are section 11.16's model extrapolated with theory exponents from measured constants, not measured crossings."
+  ]
+ },
+ "preregistration": {
+  "E19 (G2.9-G2.13, note section 9.5)": "registered in 99e0a521b (2026-10-17 15:11 UTC) before the E19 code 4e5810598 (15:45 UTC)",
+  "E24 (G2.27-G2.31, note section 9.13)": "registered in 9896027ed (2026-10-18 00:39 UTC) before the E24 code 854acdbc6 (00:51 UTC)",
+  "how": "git log -S on the note for the prediction ids, read by the validator on 2026-10-21"
+ },
+ "gae_band_rows": [
+  {
+   "experiment": "e19",
+   "p": 53,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 26055232560,
+   "rho_steps_mean": 1236.0,
+   "ic": {
+    "0": 2407067766353.0,
+    "0.1": 2659803522185.0,
+    "1": 4934425324673.0
+   },
+   "rho": {
+    "0": 339829.0,
+    "0.1": 351818.2,
+    "1": 459721.0
+   },
+   "s_over_rho": {
+    "0": 7083173.49712061,
+    "0.1": 7560164.659432059,
+    "1": 10733521.689618269
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 53,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 33266375240,
+   "rho_steps_mean": 1274.0625,
+   "ic": {
+    "0": 3000443671554.0,
+    "0.1": 3323127511382.0,
+    "1": 6227282069834.0
+   },
+   "rho": {
+    "0": 342846.4375,
+    "0.1": 355204.84375,
+    "1": 466430.5
+   },
+   "s_over_rho": {
+    "0": 8751567.300605245,
+    "0.1": 9355524.199216384,
+    "1": 13350932.389357042
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 101,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 44381996400,
+   "rho_steps_mean": 3612.3125,
+   "ic": {
+    "0": 3908781090118.0,
+    "0.1": 4339286455198.0,
+    "1": 8213834740918.0
+   },
+   "rho": {
+    "0": 617568.75,
+    "0.1": 652608.18125,
+    "1": 967963.0625
+   },
+   "s_over_rho": {
+    "0": 6329305.18281244,
+    "0.1": 6649145.045786231,
+    "1": 8485690.26973382
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 101,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 45904288920,
+   "rho_steps_mean": 4315.0,
+   "ic": {
+    "0": 4011456028895.0,
+    "0.1": 4456727631419.0,
+    "1": 8464172054135.0
+   },
+   "rho": {
+    "0": 686294.1875,
+    "0.1": 728149.6875,
+    "1": 1104849.1875
+   },
+   "s_over_rho": {
+    "0": 5845096.901531022,
+    "0.1": 6120620.125129148,
+    "1": 7660929.79014387
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 149,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 59775844240,
+   "rho_steps_mean": 10060.4375,
+   "ic": {
+    "0": 5264676237357.0,
+    "0.1": 5844501926485.0,
+    "1": 11062933128637.0
+   },
+   "rho": {
+    "0": 1287447.6875,
+    "0.1": 1385033.93125,
+    "1": 2263310.125
+   },
+   "s_over_rho": {
+    "0": 4089235.072207157,
+    "0.1": 4219753.606476853,
+    "1": 4887943.992490645
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 149,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 48673889600,
+   "rho_steps_mean": 9857.625,
+   "ic": {
+    "0": 4299648656880.0,
+    "0.1": 4771785386000.0,
+    "1": 9021015948080.0
+   },
+   "rho": {
+    "0": 1264778.6875,
+    "0.1": 1360397.65,
+    "1": 2220968.3125
+   },
+   "s_over_rho": {
+    "0": 3399526.4937447803,
+    "0.1": 3507640.127134886,
+    "1": 4061749.0566200954
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 197,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 119155912960,
+   "rho_steps_mean": 18125.625,
+   "ic": {
+    "0": 10367983542993.0,
+    "0.1": 11523795898705.0,
+    "1": 21926107100113.0
+   },
+   "rho": {
+    "0": 2112553.125,
+    "0.1": 2288371.6875,
+    "1": 3870738.75
+   },
+   "s_over_rho": {
+    "0": 4907797.782833508,
+    "0.1": 5035806.01073356,
+    "1": 5664579.429472733
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 197,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 72609743360,
+   "rho_steps_mean": 19270.5625,
+   "ic": {
+    "0": 6286128911926.0,
+    "0.1": 6990443422518.0,
+    "1": 13329274017846.0
+   },
+   "rho": {
+    "0": 2224313.375,
+    "0.1": 2411237.83125,
+    "1": 4093557.9375
+   },
+   "s_over_rho": {
+    "0": 2826098.5985960723,
+    "0.1": 2899109.8812074102,
+    "1": 3256158.632992598
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 269,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 201740318920,
+   "rho_steps_mean": 28471.4375,
+   "ic": {
+    "0": 17447130005767.0,
+    "0.1": 19404011099291.0,
+    "1": 37015940941007.0
+   },
+   "rho": {
+    "0": 3166678.625,
+    "0.1": 3442851.56875,
+    "1": 5928408.0625
+   },
+   "s_over_rho": {
+    "0": 5509599.195834721,
+    "0.1": 5636028.946300475,
+    "1": 6243824.741948927
+   }
+  },
+  {
+   "experiment": "e19",
+   "p": 269,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 104304432400,
+   "rho_steps_mean": 31822.0,
+   "ic": {
+    "0": 9005460641452.0,
+    "0.1": 10017213635732.0,
+    "1": 19122990584252.0
+   },
+   "rho": {
+    "0": 3500194.625,
+    "0.1": 3808868.025,
+    "1": 6586928.625
+   },
+   "s_over_rho": {
+    "0": 2572845.686102955,
+    "0.1": 2629971.3116817693,
+    "1": 2903172.582085175
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 101,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 13827799104,
+   "rho_steps_mean": 5011.25,
+   "ic": {
+    "0": 128204040747.0,
+    "0.1": 262333692055.80002,
+    "1": 1469500553835.0
+   },
+   "rho": {
+    "0": 757296.1875,
+    "0.1": 805905.3125,
+    "1": 1243387.4375
+   },
+   "s_over_rho": {
+    "0": 169291.8079651629,
+    "0.1": 325514.2855951828,
+    "1": 1181852.501895653
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 101,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 2732253888,
+   "rho_steps_mean": 4883.9375,
+   "ic": {
+    "0": 25529343540.0,
+    "0.1": 52032206253.600006,
+    "1": 290557970676.0
+   },
+   "rho": {
+    "0": 744347.75,
+    "0.1": 791721.94375,
+    "1": 1218089.6875
+   },
+   "s_over_rho": {
+    "0": 34297.60288789749,
+    "0.1": 65720.30327610836,
+    "1": 238535.7775028368
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 149,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 5527945920,
+   "rho_steps_mean": 10873.3125,
+   "ic": {
+    "0": 51973400831.0,
+    "0.1": 105594476255.0,
+    "1": 588184155071.0
+   },
+   "rho": {
+    "0": 1367934.9375,
+    "0.1": 1473406.06875,
+    "1": 2422646.25
+   },
+   "s_over_rho": {
+    "0": 37994.05907855906,
+    "0.1": 71666.92094907933,
+    "1": 242785.8194612606
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 149,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 8026279296,
+   "rho_steps_mean": 10766.625,
+   "ic": {
+    "0": 75127679424.0,
+    "0.1": 152982588595.2,
+    "1": 853676771136.0
+   },
+   "rho": {
+    "0": 1355677.875,
+    "0.1": 1460114.1375,
+    "1": 2400040.5
+   },
+   "s_over_rho": {
+    "0": 55417.057996908006,
+    "0.1": 104774.40404565634,
+    "1": 355692.652326492
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 197,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 25165909440,
+   "rho_steps_mean": 14024.5,
+   "ic": {
+    "0": 237298780852.0,
+    "0.1": 481408102420.0,
+    "1": 2678391996532.0
+   },
+   "rho": {
+    "0": 1700928.625,
+    "0.1": 1836966.275,
+    "1": 3061305.125
+   },
+   "s_over_rho": {
+    "0": 139511.31009509586,
+    "0.1": 262066.9246744881,
+    "1": 874918.3394556268
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 197,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 13140833664,
+   "rho_steps_mean": 19744.9375,
+   "ic": {
+    "0": 123602929617.0,
+    "0.1": 251069016157.80002,
+    "1": 1398263795025.0
+   },
+   "rho": {
+    "0": 2272012.5625,
+    "0.1": 2463538.45625,
+    "1": 4187271.5
+   },
+   "s_over_rho": {
+    "0": 54402.39708929866,
+    "0.1": 101913.98292193802,
+    "1": 333931.96381581656
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 269,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 7819158144,
+   "rho_steps_mean": 28949.4375,
+   "ic": {
+    "0": 73848388611.0,
+    "0.1": 149694222607.8,
+    "1": 832306728579.0
+   },
+   "rho": {
+    "0": 3214273.25,
+    "0.1": 3495082.79375,
+    "1": 6022368.6875
+   },
+   "s_over_rho": {
+    "0": 22975.14332703357,
+    "0.1": 42829.95037356116,
+    "1": 138202.5531426749
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 269,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 8838002880,
+   "rho_steps_mean": 32673.0,
+   "ic": {
+    "0": 83696794084.0,
+    "0.1": 169425422020.0,
+    "1": 940983073444.0
+   },
+   "rho": {
+    "0": 3584383.0,
+    "0.1": 3901311.1,
+    "1": 6753664.0
+   },
+   "s_over_rho": {
+    "0": 23350.40482113658,
+    "0.1": 43427.81636153036,
+    "1": 139329.2697777088
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 397,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 11815957440,
+   "rho_steps_mean": 82650.875,
+   "ic": {
+    "0": 112657248598.0,
+    "0.1": 227272035766.0,
+    "1": 1258805120278.0
+   },
+   "rho": {
+    "0": 8610069.25,
+    "0.1": 9411782.7375,
+    "1": 16627204.125
+   },
+   "s_over_rho": {
+    "0": 13084.360337519933,
+    "0.1": 24147.607536717216,
+    "1": 75707.56399058763
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 397,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 15772964928,
+   "rho_steps_mean": 91356.6875,
+   "ic": {
+    "0": 149957831692.0,
+    "0.1": 302955591493.6,
+    "1": 1679935429708.0
+   },
+   "rho": {
+    "0": 9481819.25,
+    "0.1": 10367979.11875,
+    "1": 18343417.9375
+   },
+   "s_over_rho": {
+    "0": 15815.30165658874,
+    "0.1": 29220.312659167987,
+    "1": 91582.46491640239
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 521,
+   "seed": 1,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 23264497536,
+   "rho_steps_mean": 113831.0,
+   "ic": {
+    "0": 221265446636.0,
+    "0.1": 446931072735.2,
+    "1": 2477921707628.0
+   },
+   "rho": {
+    "0": 11748821.8125,
+    "0.1": 12852982.5125,
+    "1": 22790428.8125
+   },
+   "s_over_rho": {
+    "0": 18832.99024933612,
+    "0.1": 34772.55744342164,
+    "1": 108726.4187968644
+   }
+  },
+  {
+   "experiment": "e24",
+   "p": 521,
+   "seed": 2,
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 25129974912,
+   "rho_steps_mean": 107463.75,
+   "ic": {
+    "0": 238932284636.0,
+    "0.1": 482693041282.4,
+    "1": 2676539851100.0
+   },
+   "rho": {
+    "0": 11108759.1875,
+    "0.1": 12151157.5625,
+    "1": 21532742.9375
+   },
+   "s_over_rho": {
+    "0": 21508.458379839194,
+    "0.1": 39724.03771407355,
+    "1": 124300.92435825792
+   }
+  }
+ ],
+ "gae_band_e19_over_e24": [
+  {
+   "p": 101,
+   "seed": 1,
+   "e19_over_e24": {
+    "0": 37.386954861483275,
+    "0.1": 20.426584454284946,
+    "1": 7.179990951597638
+   }
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "e19_over_e24": {
+    "0": 170.42289866833715,
+    "0.1": 93.13134328389822,
+    "1": 32.116481101258536
+   }
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "e19_over_e24": {
+    "0": 107.62827587734127,
+    "0.1": 58.88007396711051,
+    "1": 20.1327408797472
+   }
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "e19_over_e24": {
+    "0": 61.34440579531409,
+    "0.1": 33.47802508718066,
+    "1": 11.419266127802372
+   }
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "e19_over_e24": {
+    "0": 35.17849398366469,
+    "0.1": 19.215725208316567,
+    "1": 6.474409295154595
+   }
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "e19_over_e24": {
+    "0": 51.948052839605225,
+    "0.1": 28.446635074874965,
+    "1": 9.750964225720436
+   }
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "e19_over_e24": {
+    "0": 239.8069564750825,
+    "0.1": 131.590835318352,
+    "1": 45.178794457603445
+   }
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "e19_over_e24": {
+    "0": 110.1842004800721,
+    "0.1": 60.55960285425439,
+    "1": 20.83677454648981
+   }
+  }
+ ],
+ "gae_band_summary": {
+  "what": "median over the 12 E24 curves of S_IC(g) and of the matched negation walk S_rho(g), F_p multiplications, g GAE per unpriced native operation",
+  "values": {
+   "0": {
+    "ic": 118130089107.5,
+    "rho": 2743142.90625
+   },
+   "0.1": {
+    "ic": 239170525961.90002,
+    "rho": 2979310.625
+   },
+   "1": {
+    "ic": 1328534457651.5,
+    "rho": 5104820.09375
+   }
+  }
+ }
+}

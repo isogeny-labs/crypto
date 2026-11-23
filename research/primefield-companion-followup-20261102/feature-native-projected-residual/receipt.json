@@ -1,0 +1,109 @@
+{
+  "recorded_at": "2026-11-07T01:51:41.765728+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-projected-residual/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "tests::projected_split_windows",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "limits",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "tests::limits_and_rejection",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "factors",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "source::transport::factor_tests::omitted_direct_factors",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "closure",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "source::transport::seed_tests::closure_and_mutation",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "subgroup",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "tests::subgroup_acceptance_matches_phase_and_affine",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "cache",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "source::transport::cache_tests::one_engine_and_binding",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "residual",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-projected-residual-20261107/tests",
+        "source::residual_tests::projected_residual_matches_full_ratio",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 24,
+  "binary_sha256": "37d87ce2d943884a9fd0ba19dc579a86feb878f20e9f93cd6c4f490318527a06",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

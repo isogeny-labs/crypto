@@ -1,0 +1,105 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T07:59:35+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09",
+        "root-paired",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/root-paired-results-7cb431bf0-01",
+        "research/relation_degree_trace_20261115/rust-consumer-development/capture-config-08.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T07:55:42+00:00",
+      "wall_s": 8.36
+    }
+  ],
+  "commit": "dc5a01c59cc84047453b06829b69cb3b84a9b3c0",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T07:55:25+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0755Z-actual-root-paired-confirmation-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "complete_matching_answers",
+      "note": "Warmup3 plus A/A42; main0 after registered rejection, no numeric speed comparison",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 45.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "main_blocks_run",
+      "note": "Both regeneration arms failed paid A/A gate; no replacement or retry",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 31100,
+      "path": "research/relation_degree_trace_20261115/root-paired-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b0/b0ab8dc55a50da993250fb9d682c930ddb074db23e91e752c16f1d09073b45f8",
+      "sha256": "b0ab8dc55a50da993250fb9d682c930ddb074db23e91e752c16f1d09073b45f8",
+      "uploaded": false
+    },
+    {
+      "bytes": 811326,
+      "path": "research/relation_degree_trace_20261115/root-paired-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/63/6342e90819f2c57b2fb1867646c79dada491af3691f38bd96d759769aa64d5b8",
+      "sha256": "6342e90819f2c57b2fb1867646c79dada491af3691f38bd96d759769aa64d5b8",
+      "uploaded": false
+    },
+    {
+      "bytes": 514,
+      "path": "research/relation_degree_trace_20261115/root-paired-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/81/812922eb0bc85be7975914ea9a29dc6041e930184c435bed94332a94026180b3",
+      "sha256": "812922eb0bc85be7975914ea9a29dc6041e930184c435bed94332a94026180b3",
+      "uploaded": false
+    },
+    {
+      "bytes": 267780,
+      "path": "research/relation_degree_trace_20261115/root-paired-01/reporter-executable.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d862e3da944129977937f13b1667e735eb2df88a0c25094781f1783502e4f4da",
+      "sha256": "d862e3da944129977937f13b1667e735eb2df88a0c25094781f1783502e4f4da",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/root-paired-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/root-paired-01/report-01/aa.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/root-paired-01/report-01/aa.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "actual-root-paired-confirmation-20261116",
+  "status": "measured",
+  "summary": "Frozen A/A rejection retained:45 complete matching answers, both regeneration paid intervals exclude1; main0, no speed comparison or fresh generation. PCCc272fa/0adb1a unsigned L0.",
+  "validation": null
+}

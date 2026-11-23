@@ -1,0 +1,111 @@
+{
+  "schema": "twist.followup-tracking/v2",
+  "date": "2026-10-25",
+  "report": "research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md",
+  "E26": {
+    "status": "partial",
+    "implemented_candidates": [
+      "direct-chain",
+      "frobenius-block",
+      "hybrid-eight",
+      "first-pair-invariant"
+    ],
+    "workloads": 90,
+    "distinct_fixture_target_pairs": 10,
+    "requested_cells": 631,
+    "by_arm": [
+      {
+        "arm": "bits-control",
+        "requested_cells": 90,
+        "certified_cells": 40,
+        "incomplete_cells": 50,
+        "native_finished_branches": 40,
+        "msolve_independently_certified_branches": 40,
+        "branches_not_started": 23
+      },
+      {
+        "arm": "direct-aa",
+        "requested_cells": 1,
+        "certified_cells": 1,
+        "incomplete_cells": 0,
+        "native_finished_branches": 1,
+        "msolve_independently_certified_branches": 1,
+        "branches_not_started": 0
+      },
+      {
+        "arm": "direct-chain",
+        "requested_cells": 90,
+        "certified_cells": 60,
+        "incomplete_cells": 30,
+        "native_finished_branches": 66,
+        "msolve_independently_certified_branches": 60,
+        "branches_not_started": 23
+      },
+      {
+        "arm": "factored-control",
+        "requested_cells": 90,
+        "certified_cells": 40,
+        "incomplete_cells": 50,
+        "native_finished_branches": 40,
+        "msolve_independently_certified_branches": 40,
+        "branches_not_started": 23
+      },
+      {
+        "arm": "first-pair-invariant",
+        "requested_cells": 90,
+        "certified_cells": 60,
+        "incomplete_cells": 30,
+        "native_finished_branches": 133,
+        "msolve_independently_certified_branches": 120,
+        "branches_not_started": 47
+      },
+      {
+        "arm": "frobenius-block",
+        "requested_cells": 90,
+        "certified_cells": 60,
+        "incomplete_cells": 30,
+        "native_finished_branches": 66,
+        "msolve_independently_certified_branches": 60,
+        "branches_not_started": 23
+      },
+      {
+        "arm": "hybrid-eight",
+        "requested_cells": 90,
+        "certified_cells": 67,
+        "incomplete_cells": 23,
+        "native_finished_branches": 536,
+        "msolve_independently_certified_branches": 536,
+        "branches_not_started": 184
+      },
+      {
+        "arm": "ordinary-prefix-order",
+        "requested_cells": 90,
+        "certified_cells": 60,
+        "incomplete_cells": 30,
+        "native_finished_branches": 66,
+        "msolve_independently_certified_branches": 60,
+        "branches_not_started": 23
+      }
+    ],
+    "matched_order_coefficient_checks": 90,
+    "signed_witness_checks": 18970,
+    "wrong_sign_checks": 18623,
+    "full_solver_or_IC_cost": false,
+    "missing": [
+      "broader training and heldout",
+      "production root/sign extraction",
+      "matrix nonzeros and complete primitive counters",
+      "complete costs"
+    ]
+  },
+  "genus_two": "earlier 24 toy transfers unchanged; full transfer/destination costs open",
+  "extension_helpers": "earlier matched projected rows unchanged",
+  "E30": "earlier 270 correctness cells unchanged; full solver-cost comparison unrun",
+  "E27": "original full accounting and cold 1,920-attempt replay unrun; E26 worker diagnostics are separate",
+  "E28": "unrun; final labels 32–63 unopened",
+  "cards": "all 16 blocked and unfunded",
+  "raw_artifacts": "research/twist_routes_1_3_20261021/execution-v2/block-20261025/RAW_ARTIFACTS.json",
+  "github_delivery": "Evidence/index pushed at 02e233a645e090f374aad0c7260ee7a91e46c4cb; PR title/body updated; current-head CI/review, main conflicts and historical size-policy hold remain",
+  "scientific_speedup_or_novelty_established": false,
+  "background_work_scheduled": false
+}

@@ -1,0 +1,10 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.25,ranksep=0.32];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=10];
+ a [label="Original F4Run model\nExact original modules imported\nAny field, variables and degree bound"];
+ b [label="Every output stays in the input ideal\nOriginal run_subset + ideal closure",fillcolor="#dcf1e2"];
+ c [label="I = (xy, x²-x, y²-y), saturation by x\ny has power-1 witness\nBut evaluation at (0,1) proves y not in I"];
+ d [label="Direct Lean disproof\nSaturated rows containing y cannot be\nordinary F4Run outputs from I",fillcolor="#fff1cf"];
+ e [label="Native records remain separate\nF101: ordinary matches; saturation unsupported\nF65537: ordinary crashes; saturation times out",fillcolor="#eeeeee"];
+ a -> b; c -> d; b -> d; d -> e [style=dashed,label="no execution theorem"];
+}

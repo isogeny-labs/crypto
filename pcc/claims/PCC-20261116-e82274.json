@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:56:28Z",
+ "id": "PCC-20261116-e82274",
+ "kind": "execution",
+ "producer": {
+  "commit": "f018e71f6ef1212b6a40e2c762a55123a5b71d27",
+  "model": "GPT-6",
+  "session": "compact-analysis-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/core-post-call-02.json",
+    "sha256": "3873235dd3e45ca5bd247001307292cbfb70d7083deef24895b208c485a5970d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/cli-post-call-02.json",
+    "sha256": "99cd524279b680790946139992d712e3a3c57b5b98526d33ab2c36755add20e6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/binary-post-call-02.json",
+    "sha256": "2aefe45e0b8e004dc87b6acc9823d116cbe504ca92eb533b8a070406c9a0be4b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/core-tests-02.log",
+    "sha256": "28c76a663096ed037bf3d4d7ce18da14f108cce8eb91c83594125eeafc4457c7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/cli-tests-02.log",
+    "sha256": "0f80d1cff7db724e0d4df254a852ea28eebc41593cdb5666c0253443cd1cd9d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/clippy-02.log",
+    "sha256": "526e257a19c8558e2e24cca0858f7030374fcbc5fbf61b6835179145b6add26f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Copied immutable analysis release qualifiers at f018e71f6 completed ten synthetic library and three synthetic CLI checks; all three executed binary hashes match pre/post records and strict all-target release clippy passed. No cryptographic timing, worker/CAS execution or fixture generation occurred."
+}

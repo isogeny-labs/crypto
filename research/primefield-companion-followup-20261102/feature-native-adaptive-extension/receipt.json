@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-11-05T18:00:44.373887+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-adaptive-extension/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-adaptive-extension-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-adaptive-extension-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 23,
+  "binary_sha256": "466da936d45aece56ae6a97a670b174b6203f69e8f7f7b9ef55f37e859aa93e4",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

@@ -1,0 +1,11 @@
+digraph recovery {
+ graph [rankdir=TB, bgcolor="white", pad="0.2"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fb", fontname="Helvetica", fontsize=12];
+ A [label="Actual cleared contraction F\nIntegral local chart; degree < total orders"];
+ B [label="Actual Hermite basis E_t\nIntegral local inverse; finite quotient buffers"];
+ C [label="Exact interpolation\nMatching jets + degree + uniqueness"];
+ D [label="Constructed modular quotients\nCanonical integer lifts at source precision"];
+ E [label="Explicit rational recovery sum\nIntegral output; correct target residue", fillcolor="#d9f0dc"];
+ O [label="Open: native refinement, fast jet construction,\ncoordinate lattice and uniform recursive bit cost",fillcolor="#fff1d6"];
+ A -> C; B -> C; A -> D; B -> D; C -> E; D -> E; E -> O [style=dashed];
+}

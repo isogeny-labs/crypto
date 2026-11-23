@@ -1,4 +1,5 @@
 use super::{
+    forecast,
     model::{emit, write_new, Request, Result},
     polynomials, shapes,
 };
@@ -207,20 +208,21 @@ pub fn run(request: &Request, dir: &Path) -> Result<Value> {
         "inventory",
         json!({"fb_id":dump.factor_base.fb_id,"columns":dump.factor_base.columns,"signed_points":dump.points.len(),"order_root":root_order(&dump)?}),
     )?;
+    let falls = forecast::affine_falls(&inst, &dump);
     match &inst {
         Instance::Prime(i)=>{
             if i.curve.p>1_000_000{return Err("direct prime root extraction requires p <=1000000; no implicit scaled substitute".into());}
             let points=dump.points.iter().map(|p|Ok(PrimePoint::affine(integer(&p.x)?,integer(&p.y)?))).collect::<Result<Vec<_>>>()?;
             if points.iter().any(|p|!i.curve.is_on_curve(*p)){return Err("off-curve inventory".into());}
             let xs:Vec<u64>=points.iter().map(|p|p.x).collect::<BTreeSet<_>>().into_iter().collect();
-            execute(request,dir,started,&dump,&i.curve,i.generator_point(),i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::prime(&i.curve,x,&xs),2,i.curve.p,|a|[a[0],a[1]])
+            execute(request,dir,started,&dump,&i.curve,i.generator_point(),i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::prime(&i.curve,x,&xs),2,i.curve.p,|a|[a[0],a[1]],falls)
         }
         Instance::Binary(i)=>{
             let basis=if let Some(b)=basis {b}else if dump.factor_base.family=="binary-subspace" {let dim=dump.factor_base.dimension.ok_or("missing subspace dimension")?; (0..dim).map(|j|1<<j).collect()}else{return Err("algebraic backend requires an explicit linear subspace; nonlinear inventory retained but not priced as its span".into());};
             let v=shapes::subspace(i,&basis);let points=dump.points.iter().map(|p|Ok(FastPoint::affine(integer(&p.x)?,integer(&p.y)?))).collect::<Result<Vec<_>>>()?;
             if points.iter().any(|p|!i.fast.is_on_curve(*p)){return Err("off-curve inventory".into());}
             let group=BinaryGroup(&i.fast);let vars=2*basis.len();
-            execute(request,dir,started,&dump,&group,i.generator,i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::binary(i,&v,x),vars,2,|a|{let mut x=[0,0];for k in 0..2{for(j,b)in basis.iter().enumerate(){if a[k*basis.len()+j]==1{x[k]^=b;}}}x})
+            execute(request,dir,started,&dump,&group,i.generator,i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::binary(i,&v,x),vars,2,|a|{let mut x=[0,0];for k in 0..2{for(j,b)in basis.iter().enumerate(){if a[k*basis.len()+j]==1{x[k]^=b;}}}x},falls)
         }
         _=>Err("this algebraic sweep backend supports native small prime/binary instances only; no implicit substitute".into()),
     }
@@ -264,10 +266,15 @@ fn execute<G: CountedGroup>(
     nvars: usize,
     p: u64,
     decode: impl Fn(&[u64]) -> [u64; 2],
+    falls: Option<u32>,
 ) -> Result<Value> {
     let mut setup = GroupOps::default();
     let positive = subgroup_positive_control(group, points, r, &xy, &mut setup)?;
     let mut rows = IncrementalGauss::new(dump.factor_base.columns as usize, r);
+    // Advisory degree-of-regularity forecast, updated after every solve and
+    // written beside the measurement.  It never shortens the candidate.
+    let mut forecaster = forecast::forecaster(req, dump, r, h, falls);
+    let mut admitted_rows = 0usize;
     let mut records = Vec::new();
     let mut total_ops = 0;
     let mut stats = BTreeMap::new();
@@ -304,6 +311,7 @@ fn execute<G: CountedGroup>(
                 })
             });
             let equations = encode(target_xy[0]);
+            forecaster.set_shape(forecast::shape(&equations, nvars, p));
             let system = json!({"schema":"factor_base_sweep.system/v1","phase":phase,"trial":j,"target":target_xy,"coefficient_modulus":p,"variables":nvars,"ordering":"grevlex","equations":equations,"constructor":req.candidate,"max_degree":req.plan.max_degree});
             let stem = format!("{phase}-{j:04}");
             write_new(&dir.join(format!("{stem}.system.json")), &system)?;
@@ -416,6 +424,8 @@ fn execute<G: CountedGroup>(
                     let rhs = (scalar as u128 * h as u128 % r as u128) as u64;
                     let rank_before = rows.rank();
                     rows.add_row(row.clone(), rhs);
+                    admitted_rows += 1;
+                    forecaster.observe_linear_algebra(admitted_rows, rows.row_ops);
                     if rows.inconsistent != 0 {
                         return Err(
                             "verified point relations produced an inconsistent projected matrix"
@@ -445,23 +455,31 @@ fn execute<G: CountedGroup>(
             record["certified_refutation_degree"] = Value::Null;
             record["negative_verdict_method"]=json!("degree-bounded F4 plus finite-field substitution/enumeration; the observed procedure degree is not an algebraic refutation certificate");
             record["summands"] = json!(2);
+            record["independent_rank"] = json!(rows.rank());
+            forecaster.set_relation_state(rows.columns(), rows.rank());
+            if let Some(observation) = forecast::observation(&record) {
+                forecaster.observe(observation);
+            }
+            let forecast_view = forecast::compact(&forecaster.forecast());
+            record["forecast"] = forecast_view.clone();
             write_new(&dir.join(format!("{stem}.result.json")), &record)?;
             records.push(record);
             emit(
                 "trial",
                 json!({"phase":phase,"trial":j+1,"total":count,"status":status,"verified":hits,"verified_yield":hits as f64/(j+1)as f64,"refuted":refutations,"exhausted":exhausted,"observed_solving_degree":root_degree,"verified_decompositions_per_second":rate,"rolling_verified_per_second":rolling_rate,"rolling_trials":rolling.len(),"rate_status":"provisional operational observation","rate_scope":"whole probe phase including independent finite-inventory census, system construction, solver, witness checks and incremental logging","relation_rows":if phase=="train"{hits}else{0},"independent_rank":rows.rank(),"independent_relations_per_second":if phase=="train"{Some(rows.rank()as f64/phase_start.elapsed().as_secs_f64().max(1e-9))}else{None},"columns":rows.columns(),"eta_seconds_provisional":((j+1)<count).then(||phase_start.elapsed().as_secs_f64()*(count-j-1)as f64/(j+1)as f64),"remaining_independent_relations":rows.columns().saturating_sub(rows.rank()),"rank_completion_eta_seconds_provisional":if phase=="train"&&rows.rank()>0{Some(phase_start.elapsed().as_secs_f64()*rows.columns().saturating_sub(rows.rank())as f64/rows.rank()as f64)}else{None},"eta_model":"constant observed throughput/independence yield; may stall; not end-to-end ETA","wall_time_status":"operational telemetry; not isolated speed evidence"}),
             )?;
+            emit("forecast", forecast_view)?;
             if phase == "positive_control" && witness.is_none() {
                 return Err("positive control did not finish with a verified point decomposition; candidate remains unqualified".into());
             }
         }
         stats.insert(phase,json!({"trials":count,"verified":hits,"exhausted":exhausted,"refuted":refutations,"observed_verified_per_second":hits as f64/phase_start.elapsed().as_secs_f64().max(1e-9)}));
     }
-    let result = json!({"schema":"factor_base_sweep.candidate_result/v1","candidate":req.candidate,"fb_id":dump.factor_base.fb_id,"phase_summary":stats,"positive_control_scope":"target-prime-subgroup","positive_control_subgroup_order":r,"best_observed_successful_solving_degree":best_degree,"certified_degree_of_regularity":null,"field_reduction_multiplications":total_ops,"training_independent_rank":rows.rank(),"relation_row_operations":rows.row_ops,"columns":rows.columns(),"trials":records,"setup_point_ops":setup,"unpriced_native_operations_complete":false,"missing_native_pricing":["system construction","root extraction","inventory construction and lookups","verification overhead"],"total_cost_winner":null,"full_pipeline_speedup":null,"elapsed_seconds_operational":started.elapsed().as_secs_f64()});
+    let result = json!({"schema":"factor_base_sweep.candidate_result/v1","candidate":req.candidate,"fb_id":dump.factor_base.fb_id,"phase_summary":stats,"positive_control_scope":"target-prime-subgroup","positive_control_subgroup_order":r,"best_observed_successful_solving_degree":best_degree,"certified_degree_of_regularity":null,"field_reduction_multiplications":total_ops,"training_independent_rank":rows.rank(),"relation_row_operations":rows.row_ops,"columns":rows.columns(),"trials":records,"degree_of_regularity_forecast":forecaster.forecast(),"setup_point_ops":setup,"unpriced_native_operations_complete":false,"missing_native_pricing":["system construction","root extraction","inventory construction and lookups","verification overhead"],"total_cost_winner":null,"full_pipeline_speedup":null,"elapsed_seconds_operational":started.elapsed().as_secs_f64()});
     write_new(&dir.join("result.json"), &result)?;
     emit(
         "candidate_complete",
-        json!({"best_observed_successful_solving_degree":best_degree,"training_rank":rows.rank()}),
+        json!({"best_observed_successful_solving_degree":best_degree,"training_rank":rows.rank(),"forecast":forecast::compact(&forecaster.forecast())}),
     )?;
     Ok(result)
 }

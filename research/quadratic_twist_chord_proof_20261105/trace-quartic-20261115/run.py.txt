@@ -1,0 +1,25 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,datetime,sys
+root=Path('/workspace/crypto-twist-chord-proof');study=root/'research/quadratic_twist_chord_proof_20261105';src=study/'trace-quartic-20261115';out=Path('/workspace/twist-trace-quartic-run01-20261115');out.mkdir();assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==sys.argv[1];assert not subprocess.check_output(['git','status','--porcelain'],cwd=root);pins=json.loads((src/'PINS.v2.json').read_text());assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in pins['files'].items());(out/'PINS.json').write_bytes((src/'PINS.v2.json').read_bytes());(out/'PROTOCOL.md').write_bytes((src/'PROTOCOL.md').read_bytes());(out/'TraceQuartic.lean.txt').write_bytes((study/'TraceQuartic.lean').read_bytes())
+env=dict(os.environ,PATH='/workspace/twist-lean-restore-20261115/lean-4.34.1-linux/bin:'+os.environ['PATH'],LEAN_NUM_THREADS='2',LEAN_GATE_TRUSTED='/workspace/twist-lean-restore-20261115/official/trusted-native.txt',CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup');env['LEAN_PATH']=subprocess.check_output(['lake','env','printenv','LEAN_PATH'],cwd=study,env=env,text=True).strip();stages=[]
+def run(name,args,expected=0):
+ (out/(name+'.command')).write_text(json.dumps(args)+'\n');r=subprocess.run(['timeout','--signal=TERM','--kill-after=10','600',*args],cwd=root,env=env,capture_output=True);(out/(name+'.stdout')).write_bytes(r.stdout);(out/(name+'.stderr')).write_bytes(r.stderr);(out/(name+'.exit')).write_text(str(r.returncode)+'\n');stages.append({'name':name,'exit':r.returncode});(out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n');assert r.returncode==expected,(name,r.returncode,r.stdout[-1800:],r.stderr[-1000:]);return r
+try:
+ (out/'started.txt').write_text(datetime.datetime.now(datetime.timezone.utc).isoformat()+'\n')
+ gate='/workspace/twist-lean-restore-20261115/official/proof-gate.sh';run('proof',['bash',gate,'--out',str(out/'proof'),str((study/'TraceQuartic.lean').relative_to(root))]);audit=next((out/'proof').rglob('audit.log')).read_text();assert 'audited 3 theorems' in audit and'0 failing, 0 trusted'in audit
+ neg=study/'kernel-20261115/.proof-controls/trace-quartic-run01';neg.mkdir(parents=True)
+ for name in ['real','quartic','curve']:
+  p=neg/('False_'+name+'.lean');p.write_bytes((src/'controls'/('False_'+name+'.lean.txt')).read_bytes());(out/('False_'+name+'.lean.txt')).write_bytes(p.read_bytes());run('reject-proof-'+name,['bash',gate,'--out',str(out/('reject-proof-'+name)),str(p.relative_to(root))],1);status=next((out/('reject-proof-'+name)).rglob('status')).read_text().strip();assert status=='FAIL_build';logs='\n'.join(x.read_text()for x in(out/('reject-proof-'+name)).rglob('build.log'));assert any(s in logs.lower()for s in['ring failed','unsolved goals','type mismatch','linear_combination'])
+ run('build-cpp',['g++','-std=c++20','-O2','-Wall','-Wextra',str(src/'quartic.cpp'),'-o',str(out/'producer')]);run('build-rust',['/workspace/twist-native-tooling/cargo/bin/rustc','+1.85.1','--edition=2021','-O',str(src/'audit.rs'),'-o',str(out/'auditor')]);r=run('produce',[str(out/'producer')]);(out/'cases.tsv').write_bytes(r.stdout)
+ for mode in ['A','B']:run('audit-'+mode,[str(out/'auditor'),str(out/'cases.tsv'),str(out/('audit-'+mode+'.json'))])
+ assert(out/'audit-A.json').read_bytes()==(out/'audit-B.json').read_bytes()
+ for name in ['delta','source','query','root','subfield','missing-query']:
+  lines=r.stdout.decode().splitlines();rows=[x.split()for x in lines]
+  if name in ['delta','source']:rows[0][3 if name=='delta'else 4]=str(int(rows[0][3 if name=='delta'else 4])+1)
+  elif name=='query':rows[2][1]=str(int(rows[2][1])+1)
+  elif name in ['root','subfield']:
+   idx=3 if name=='root'else 5;row=next(x for x in rows[1:]if int(x[idx])>0);vals=row[idx+1].split(',')[1:];row[idx]=str(len(vals));row[idx+1]=','.join(vals)if vals else'-'
+  else:rows.pop()
+  altered=('\n'.join(' '.join(x)for x in rows)+'\n').encode();assert altered!=r.stdout;p=out/('false-'+name+'.tsv');p.write_bytes(altered);receipt=out/('false-'+name+'-receipt.json');run('reject-'+name,[str(out/'auditor'),str(p),str(receipt)],101);assert not receipt.exists()
+ (out/'complete.txt').write_text('Whole preregistered proof/chart/control plan completed.\n')
+finally:(out/'finished.txt').write_text(datetime.datetime.now(datetime.timezone.utc).isoformat()+'\n')

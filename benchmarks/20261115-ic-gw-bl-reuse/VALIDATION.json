@@ -1,0 +1,38 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "e898e032dfc121ae72e51764944ef25b174c6b153f5b54fe2b819b9e9bfb4914"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "2512eb0ac116c3dd0e34f32285d715068742beaa99d648de1e464875482fa3d3"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "frozen N4 v2 grid negation-map rho (rho2::rho_neg) on the same GHS-weak E0 instances; k = 22 from the frozen supplement (research/quartic_n4v2_20261020/results/summary_supp.json), as that study does",
+  "unit": "cold F_q-multiplication equivalents (M-eq) with the frozen grid's per-size r_inv, r_lmul; hash/cmp at w*gae (section 5a)",
+  "binary_or_process": "N4 v2 driver. The IC arm is BLR1 (research/ic_gw_bl_reuse_20261115/amendment-1/src, sha256 e236855d7fef..., the guarded build; frozen BLR 13959249d43b... differs only in DL linear_algebra.lmul/ladd, at most 0.04%), whose counted output equals the previous configuration's except DL linear_algebra.lmul/ladd; its REF arm reproduces the frozen IC band values exactly (validator, rel. error 0). The rho reference is v3's rho2::rho_neg, which replays the frozen k = 22 negation-map run field for field (research/quartic_dl1_cd_sqrt_20261113/combo/validation/rho-replay-v3-k22-neg-seed2-run1.jsonl, 0 differences)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "strongest_available_note": "E0 has coefficients generic in K = F_{q^3} (built from u, u^q, u^{q^2}), so no Frobenius endomorphism; the negation map is the available symmetry. Plain rho at k = 22 for comparison: IC/rho 0.0024, 0.0026, 0.0032 at w = 0, 0.1, 1.",
+  "gae_band": {
+   "0": {
+    "ic": 844014769.0560999,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1014011904.4561,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2543986123.0560994,
+    "rho": 1492814000000.0
+   }
+  },
+  "order_holds_across_band": true,
+  "scope": "DL arm, c_D = 1.7 + square-root chain + fast relation stage + block Lanczos gram reuse, q = 4194271 (k = 22), mean cold M-eq over seeds 1-3, hash/cmp at w*gae; paired ratios against the previous configuration at k = 18..22, seeds 1-6, are in the validator report"
+ }
+}

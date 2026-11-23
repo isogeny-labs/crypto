@@ -1,0 +1,58 @@
+{
+  "schema": "research.source-audit-report/v1",
+  "task": "T-2100",
+  "source_audit_revision": "36a0004f7857e06f5e3a8357819986ad1a88621d",
+  "mode": "source_only_derived_report",
+  "new_experiments": 0,
+  "candidate_rho_ratio": null,
+  "wall_ratio": null,
+  "natural_duplicate_yield": null,
+  "source_json": "../gap-map.json",
+  "source_report": "../GAP_MAP.md",
+  "denominator": {
+    "targets": 1260,
+    "levels": [
+      16,
+      20,
+      24,
+      28,
+      32,
+      36,
+      40
+    ],
+    "models_per_level": 3,
+    "targets_per_model": 60,
+    "arms": [
+      "pencil",
+      "rho",
+      "rho_AA"
+    ],
+    "measured_streams_per_target": 5,
+    "warmups_per_target_arm": 1,
+    "execution_slots": 22680,
+    "measured_executions": 18900,
+    "warmup_executions": 3780,
+    "measured_candidate_reference_pairs": 6300,
+    "price_cells": 36,
+    "sm": [
+      0,
+      0.5,
+      1
+    ],
+    "im": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_gae": [
+      0,
+      0.1,
+      1
+    ],
+    "smaller_completion_scope_allowed": false,
+    "historical_543_plus_later_records_union_allowed": false,
+    "old_717_open_target_handoff_completes_current_instrument": false
+  },
+  "originals_modified": false
+}

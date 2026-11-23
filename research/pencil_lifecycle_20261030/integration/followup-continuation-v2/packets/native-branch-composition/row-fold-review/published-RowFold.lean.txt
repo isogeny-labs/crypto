@@ -1,0 +1,89 @@
+import WordComparator
+import Repair
+set_option autoImplicit false
+namespace RowFold
+open WordComparator
+abbrev Mat := Fin 4 → Fin 4 → UInt64
+def add (p a b : UInt64) := (a+b)%p
+def step (p : UInt64) (m : Mat) (x : V) (i j : Fin 4) (v : UInt64) := add p v (mul p (m i j) (x j))
+def linear (p : UInt64) (m : Mat) (x : V) : V := fun i =>
+ (List.finRange 4).foldl (fun v j => step p m x i j v) 0
+def dm (p : UInt64) (m : Mat) : RepairClosure.Mat (ZMod p.toNat) := fun i j => (m i j).toNat
+theorem add_bound (p a b : Nat) (hp:p≤2^32) (ha:a<p) (hb:b<p) : a+b<2^64 := by omega
+theorem add_canonical (p a b : UInt64) (hp:0<p.toNat) : (add p a b).toNat<p.toNat := by
+ rw [add,UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+theorem add_decode (p a b : UInt64) (hp:p.toNat≤2^32) (ha:a.toNat<p.toNat) (hb:b.toNat<p.toNat) :
+ ((add p a b).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)+(b.toNat : ZMod p.toNat) := by
+ simp only [add,UInt64.toNat_mod,UInt64.toNat_add,Nat.mod_eq_of_lt (add_bound _ _ _ hp ha hb),ZMod.natCast_mod,Nat.cast_add]
+theorem fold_contract (p : UInt64) (m : Mat) (x : V) (i : Fin 4)
+ (hp:0<p.toNat) (hb:p.toNat≤2^32) (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x)
+ (js:List (Fin 4)) (v:UInt64) (hv:v.toNat<p.toNat) :
+ let out:=js.foldl (fun v j=>step p m x i j v) v
+ out.toNat<p.toNat ∧ (out.toNat:ZMod p.toNat)=(v.toNat:ZMod p.toNat)+ (js.map (fun j=>(m i j).toNat*(x j).toNat)).sum := by
+ induction js generalizing v with
+ | nil => simpa using hv
+ | cons j js ih =>
+   have hc:=add_canonical p v (mul p (m i j) (x j)) hp
+   have hd:=add_decode p v (mul p (m i j) (x j)) hb hv (mul_canonical _ _ _ hp)
+   rw [mul_decode _ _ _ hb (hm i j) (hx j)] at hd
+   have ht:=ih (step p m x i j v) hc
+   refine ⟨ht.1, ?_⟩
+   simp only [List.foldl_cons,List.map_cons,List.sum_cons,Nat.cast_add,Nat.cast_mul]
+   rw [ht.2]
+   change ((add p v (mul p (m i j) (x j))).toNat:ZMod p.toNat)+_=_
+   rw [hd]; ring
+theorem linear_canonical (p:UInt64) (m:Mat) (x:V) (hp:0<p.toNat) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) : canonical p (linear p m x) := by
+ intro i; exact (fold_contract p m x i hp hb hm hx (List.finRange 4) 0 hp).1
+theorem linear_decode (p:UInt64) [Fact p.toNat.Prime] (m:Mat) (x:V) (hp:0<p.toNat) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) :
+ decode p (linear p m x)=RepairClosure.linear (dm p m) (decode p x) := by
+ funext i
+ have h:=(fold_contract p m x i hp hb hm hx (List.finRange 4) 0 hp).2
+ simpa [linear,decode,RepairClosure.linear,dm,List.finRange,List.ofFn_succ,add_assoc] using h
+def dot (m:Mat) (x:V) (i:Fin 4) : Nat :=
+ (m i 0).toNat*(x 0).toNat + (m i 1).toNat*(x 1).toNat + (m i 2).toNat*(x 2).toNat + (m i 3).toNat*(x 3).toNat
+theorem dot_bound (p:UInt64) (m:Mat) (x:V) (i:Fin 4) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) : dot m x i<2^66 := by
+ have h0:=product_bound _ _ _ hb (hm i 0) (hx 0)
+ have h1:=product_bound _ _ _ hb (hm i 1) (hx 1)
+ have h2:=product_bound _ _ _ hb (hm i 2) (hx 2)
+ have h3:=product_bound _ _ _ hb (hm i 3) (hx 3)
+ unfold dot; omega
+theorem dot_fits128 (p:UInt64) (m:Mat) (x:V) (i:Fin 4) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) : dot m x i<2^128 := by
+ have h:=dot_bound p m x i hb hm hx; omega
+theorem linear_dot (p:UInt64) [Fact p.toNat.Prime] (m:Mat) (x:V) (i:Fin 4) (hb:p.toNat≤2^32)
+ (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x) : (linear p m x i).toNat=dot m x i % p.toNat := by
+ have hp:0<p.toNat:=(Fact.out:p.toNat.Prime).pos
+ have h:=congrFun (linear_decode p m x hp hb hm hx) i
+ have he:((linear p m x i).toNat:ZMod p.toNat)=(dot m x i:Nat) := by
+  simpa [decode,RepairClosure.linear,dm,dot,Nat.cast_add,Nat.cast_mul] using h
+ have hv:=congrArg ZMod.val he
+ simpa only [ZMod.val_natCast_of_lt (linear_canonical p m x hp hb hm hx i),ZMod.val_natCast] using hv
+theorem linear_nonzero_iff (p:UInt64) [Fact p.toNat.Prime] (m:Mat) (x:V)
+ (hb:p.toNat≤2^32) (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x)
+ (c:ZMod p.toNat) (hc:c≠0) (hs:RepairClosure.squareScalar (dm p m) c) :
+ nonzeroB (linear p m x)=true ↔ nonzeroB x=true := by
+ have hp:0<p.toNat:=(Fact.out:p.toNat.Prime).pos
+ rw [nonzeroB_iff p _ (linear_canonical p m x hp hb hm hx),nonzeroB_iff p x hx,
+ linear_decode p m x hp hb hm hx]
+ exact RepairClosure.nonzero_iff _ c hc hs _
+theorem square_from_remainders (p:UInt64) [Fact p.toNat.Prime] (m:Mat) (c:UInt64)
+ (hs:∀ i j,dot m (fun k=>m k j) i % p.toNat = if i=j then c.toNat else 0) :
+ RepairClosure.squareScalar (dm p m) (c.toNat:ZMod p.toNat) := by
+ intro i j
+ have h:=congrArg (fun n:Nat=>(n:ZMod p.toNat)) (hs i j)
+ simpa [dot,dm,RepairClosure.mm,Nat.cast_add,Nat.cast_mul,ZMod.natCast_mod] using h
+theorem native_repair_nonzero (p:UInt64) [Fact p.toNat.Prime] (m:Mat) (x:V)
+ (hb:p.toNat≤2^32) (hm:∀ i j,(m i j).toNat<p.toNat) (hx:canonical p x)
+ (c:UInt64) (hc:c.toNat<p.toNat) (hn:c≠0)
+ (hs:∀ i j,dot m (fun k=>m k j) i % p.toNat = if i=j then c.toNat else 0) :
+ nonzeroB (linear p m x)=true ↔ nonzeroB x=true := by
+ have hz:(0:UInt64).toNat<p.toNat:=(Fact.out:p.toNat.Prime).pos
+ have hcn:(c.toNat:ZMod p.toNat)≠0 := by
+  intro h
+  apply hn
+  exact (canonical_eq p c 0 hc hz).mpr (by simpa using h)
+ exact linear_nonzero_iff p m x hb hm hx _ hcn (square_from_remainders p m c hs)
+end RowFold

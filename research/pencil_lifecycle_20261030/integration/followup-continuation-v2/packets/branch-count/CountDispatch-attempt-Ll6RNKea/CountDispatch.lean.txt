@@ -1,0 +1,59 @@
+import CountHelpers
+set_option autoImplicit false
+namespace BranchCount
+open SignedWord
+variable {n : Nat}
+def union (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot) : GraphSameRoot.Result UInt64 × Nat :=
+ match s.fixed child,s.fixed parent with
+ | some ab,some xy => let moved:=transportPair r p ab
+                     constraint r (GraphRingWord.sub r xy.1 moved.1) (GraphRingWord.sub r xy.2 moved.2)
+ | _,_ => (.none,0)
+theorem union_projection (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot) :
+ (union r s child parent p).1=UnionReturn.word r s child parent p := by
+ cases hc:s.fixed child <;> cases ht:s.fixed parent <;> simp [union,UnionReturn.word,constraint,hc,ht]
+theorem union_bound (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot) : (union r s child parent p).2≤1 := by
+ cases hc:s.fixed child with
+ | none => simp [union,hc]
+ | some ab =>
+   cases ht:s.fixed parent with
+   | none => simp [union,hc,ht]
+   | some xy => simpa only [union,hc,ht] using constraint_bound r (GraphRingWord.sub r xy.1 (transportPair r p ab).1) (GraphRingWord.sub r xy.2 (transportPair r p ab).2)
+structure Counts where
+ cycles : Nat
+ negative : Nat
+ zero : Nat
+ deriving DecidableEq
+def run (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) : EdgeDispatch.Output n × Counts :=
+ if ru=rv then
+   let cu:=su*pu.s
+   let cv:=sv*pv.s
+   let out:=same r ⟨w,s.fixed⟩ ru cu cv (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)
+   (⟨⟨out.1.1.graph,out.1.1.fixed⟩,sizes,out.1.2⟩,⟨1,if cu+cv=0 then 0 else 1,out.2⟩)
+ else
+   let forward:=UnionSize.forward sizes ru rv
+   let p:=reducedUnionPot r pu pv su sv a b
+   let out:=if forward then union r ⟨w,s.fixed⟩ ru rv p else union r ⟨w,s.fixed⟩ rv ru (reversePot r p)
+   (⟨branchWord r ⟨w,s.fixed⟩ ru rv p forward,UnionSize.update sizes (UnionSize.child sizes ru rv) (UnionSize.parent sizes ru rv),out.1⟩,⟨0,0,out.2⟩)
+theorem run_projection (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) :
+ (run r s w sizes ru rv pu pv su sv a b).1=EdgeDispatch.run r s w sizes ru rv pu pv su sv a b := by
+ by_cases hd:ru=rv
+ · simp only [run,EdgeDispatch.run,if_pos hd,same_projection,after]
+ · simp only [run,EdgeDispatch.run,if_neg hd]
+   cases h:UnionSize.forward sizes ru rv <;> simp [h,UnionReturn.branch,union_projection]
+theorem run_bounds (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) :
+ let d:=(run r s w sizes ru rv pu pv su sv a b).2
+ d.cycles≤1 ∧ d.negative≤d.cycles ∧ d.zero≤1 := by
+ unfold run
+ split
+ · dsimp only
+   refine ⟨by omega,?_,same_bound r ⟨w,s.fixed⟩ ru _ _ _ _⟩
+   split <;> omega
+ · dsimp only
+   refine ⟨by omega,by omega,?_⟩
+   cases h:UnionSize.forward sizes ru rv <;> simp only [h,Bool.false_eq_true,↓reduceIte]
+   · exact union_bound r ⟨w,s.fixed⟩ rv ru _
+   · exact union_bound r ⟨w,s.fixed⟩ ru rv _
+end BranchCount

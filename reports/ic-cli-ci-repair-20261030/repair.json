@@ -1,0 +1,26 @@
+{
+  "recorded_at": "2026-10-30T06:06:54.080152+00:00",
+  "base": "77f0eddecdf935ce0acbe21e9ff542d201b85f52",
+  "repair": "Build exact production ic first; explicitly bind selected-bin tests through IC_TEST_BINARY; run all existing framework/progress/tensor contracts; install native zlib when absent.",
+  "observed_main_failure": {
+    "run": 40988267343,
+    "job": 123844269087,
+    "step": "Parameter and synthetic pipeline checks",
+    "reason": "Integration-test mode builds unrelated icprog, whose native link reports unable to find library -lz."
+  },
+  "primary_source": "https://doc.rust-lang.org/cargo/reference/cargo-targets.html#tests",
+  "primary_finding": "Cargo automatically builds binary targets for integration tests; CARGO_BIN_EXE is provided for integration tests. The selected-bin unit harness instead receives the explicit production binary path.",
+  "preservation": {
+    "tests/ic_framework.rs": "All preexisting test bodies/assertions preserved; only executable lookup changed.",
+    "tests/ic_tensor.rs": "All preexisting test bodies/assertions preserved; only executable lookup changed.",
+    "production_cli": "Existing production ic.rs prefix byte-exact; only cfg(test) modules appended."
+  },
+  "local_validation": {
+    "rustfmt_touched_tests": "pass",
+    "actionlint_with_shellcheck": "pass",
+    "scoped_git_diff_check": "pass"
+  },
+  "hosted_validation": "Pending actual build and all selected-bin tests; expected counts are not observed results.",
+  "production_algorithms_changed": false,
+  "runner_trigger_timeout_concurrency_changed": false
+}

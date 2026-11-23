@@ -1,0 +1,89 @@
+--- a/src/neogb/hash.c
++++ b/src/neogb/hash.c
+@@ -406,7 +406,7 @@
+   for (i = 0; i < ndv; ++i) {
+     for (j = 0; j < bpv; ++j) {
+       if ((sdm_t)a[dv[i]] >= ht->dm[ctr]) {
+-        res |= 1 << ctr;
++        res |= 1U << ctr;
+       }
+       ctr++;
+     }
+@@ -1349,6 +1349,20 @@
+      *     printf("%d ", etmp[ii]);
+      * }
+      * printf("\n"); */
++    /* Degree-word audit: observations only, no algorithmic branch changes. */
++    if (evl == 3 && ebl == 0) {
++        static unsigned audit_lcm_count = 0;
++        if (audit_lcm_count < 1024) {
++            fprintf(stderr, "WORD_LCM %u %u %u %u %u %u %u %llu\n",
++                    (unsigned)ea[1], (unsigned)ea[2],
++                    (unsigned)eb[1], (unsigned)eb[2],
++                    (unsigned)etmp[1], (unsigned)etmp[2], (unsigned)etmp[0],
++                    (unsigned long long)etmp[1] + (unsigned long long)etmp[2]);
++        } else if (audit_lcm_count == 1024) {
++            fprintf(stderr, "WORD_LOG_CAP lcm\n");
++        }
++        ++audit_lcm_count;
++    }
+ #if PARALLEL_HASHING
+     return check_insert_in_hash_table(etmp, 0, ht2);
+ #else
+@@ -1395,6 +1409,26 @@
+     enlarge_hash_table(sht);
+   }
+   insert_multiplied_poly_in_hash_table(row, hm, em, poly, bht, sht);
++  if (sht->evl == 3 && sht->ebl == 0) {
++    static unsigned audit_row_count = 0;
++    if (audit_row_count < 1024) {
++      unsigned max_word = 0;
++      unsigned long long max_degree = 0;
++      for (len_t audit_j = OFFSET; audit_j < row[LENGTH] + OFFSET; ++audit_j) {
++        const exp_t *audit_e = sht->ev[row[audit_j]];
++        const unsigned long long audit_degree =
++            (unsigned long long)audit_e[1] + (unsigned long long)audit_e[2];
++        if ((unsigned)audit_e[0] > max_word) max_word = (unsigned)audit_e[0];
++        if (audit_degree > max_degree) max_degree = audit_degree;
++      }
++      fprintf(stderr, "WORD_ROW %u %u %llu %u\n",
++              (unsigned)sht->ev[row[OFFSET]][0], max_word, max_degree,
++              (unsigned)row[LENGTH]);
++    } else if (audit_row_count == 1024) {
++      fprintf(stderr, "WORD_LOG_CAP row\n");
++    }
++    ++audit_row_count;
++  }
+ 
+   return row;
+ }
+--- a/src/neogb/symbol.c
++++ b/src/neogb/symbol.c
+@@ -224,6 +224,16 @@
+     sort_r(ps, (unsigned long)psl->ld, sizeof(spair_t), spair_cmp, bht);
+     /* get minimal degree */
+     mdeg  = ps[0].deg;
++    {
++        static unsigned audit_select_count = 0;
++        if (audit_select_count < 1024) {
++            fprintf(stderr, "WORD_SELECT %u %u\n", (unsigned)mdeg,
++                    (unsigned)md->max_gb_degree);
++        } else if (audit_select_count == 1024) {
++            fprintf(stderr, "WORD_LOG_CAP select\n");
++        }
++        ++audit_select_count;
++    }
+ 
+     /* compute a truncated GB? Check maximal degree. */
+     if (md->max_gb_degree < mdeg) {
+--- a/src/neogb/la_ff_32.c
++++ b/src/neogb/la_ff_32.c
+@@ -363,7 +363,7 @@
+         dts   = pivs[i];
+         printf("found reducer %d\n", i);
+         if (i < ncl) {
+-            cfs   = bs->cf_32[dts[COEFFS]];
++            cfs   = mat->cf_32[dts[COEFFS]];
+             /* set corresponding bit of reducer in reducer bit array */
+             if (tr > 0) {
+                 rba[i/32] |= 1U << (i % 32);

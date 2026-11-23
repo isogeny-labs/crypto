@@ -1,0 +1,40 @@
+{
+  "replay_certificate": {
+    "path": "../../research/pdp_oracle_speedup_20261011/ps6_charge/validation/replay-certificate.json",
+    "sha256": "b4a91299f2223e7be98b76e901280c1ada6849733950f7cb3e05a410ddf49529"
+  },
+  "rho_reference": {
+    "binary_or_process": "one ecbench binary (SHA-256 in each session.json), every arm a fresh process of it inside one session, same workloads and algorithm seeds",
+    "gae_band": {
+      "0": {
+        "ic": 22.383890311978064,
+        "rho": 1.0898506509938222
+      },
+      "0.1": {
+        "ic": 1011.6381942364793,
+        "rho": 1.1908802160095584
+      },
+      "1": {
+        "ic": 9914.926929556992,
+        "rho": 2.100146301151185
+      }
+    },
+    "gae_band_basis": "rung n = 27: ic is the group-law kernel arm (its counted unpriced native operations per run dominated by the kernel's pairs) and rho the rho.negation arm (its canonicalisations), each unpriced native operation priced at w GAE; means over the rung's targets and rounds; every other rung and arm is in summary.json",
+    "kind": "negation",
+    "matches_protocol": true,
+    "order_holds_across_band": true,
+    "protocol": "PS-6 (protocols/PS-6.md): matched strong rho on the same one-target workloads; on a random binary curve the automorphism group is {+-1}, so rho.negation is the strongest single-target rho the harness has for these curves (no Frobenius structure).",
+    "same_binary_or_process": true,
+    "same_unit": true,
+    "strongest_available": true,
+    "unit": "S = group-addition equivalents / sqrt(r), cold, one target per run"
+  },
+  "rows": [
+    "20261031-pdp-ps6-charge"
+  ],
+  "schema": "validation-gate/v1",
+  "validator_report": {
+    "path": "../../research/pdp_oracle_speedup_20261011/ps6_charge/validation/validator-report.json",
+    "sha256": "e062cea17022a23611d2b8328a8ec80e70beb695e9eca26a0fddb61147256d7b"
+  }
+}

@@ -1,0 +1,9 @@
+# Unreleased successor validation proposal
+
+Keep the same9 theorem statements,4 controls,13named axiom readbacks and expected-false theorem. Do not weaken the actual-quintic, branch-selection or source-composition target. The previous110-second work window produced no first-module completion or diagnostics, so a longer finite window is a resource proposal, not evidence of expected success.
+
+Propose one300-second compiler phase:270seconds work, up to20seconds cleanup/receipt reserve, outer295second TERM plus5second KILL. Preserve8GiB address-space ceiling,3500MiB heap, one worker and existing stack/output limits. Include one independently bounded300-second full prehash and300-second posthash (290second work each) for an explicit900-second successor maximum, separate from earlier740-second envelope and diagnostics. Exact16,736-file list only. No repeated broad scans or automatic retries.
+
+Before release, freeze successor source and recipe, add native per-invocation wall start/end and wait-status, durable PID/process-group/start-time record before polling, and bounded process I/O/status snapshots while alive. Cleanup kill/wait exceptions must produce unresolved-state receipt fields, never erase primary failure. Observe later absence separately; no synthetic reap. Record preserved primary error and cleanup errors separately.
+
+Root review is required before execution. Current draft is not executable admission and has no phase3-recipe.json. Compiler-phase3.unreleased.py now implements durable process identity, bounded telemetry, separate primary/cleanup errors, remaining-group observation and required-receipt write failure status. Exact recipe876477d67d85759ca2069904f564060f5e288ee994dbb142dfdc19bbe88f793b was reviewed and one900-second sequence released by root, to begin only after archival commit. No invocation has occurred in this packet snapshot.

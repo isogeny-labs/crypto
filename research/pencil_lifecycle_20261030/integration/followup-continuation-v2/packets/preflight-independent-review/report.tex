@@ -1,0 +1,19 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Independent preflight source review}
+31 October 2026 UTC. Scope: four integrated diagnostic modules, ecbench CLI dispatch, and proposed full-host-digest correction.
+
+\textbf{Result.} The correction applies cleanly to a private snapshot. Independent source tracing found no new blocking discrepancy within the explicitly non-admitting software-validation scope. This review performs no Rust build; the parent owns release validation.
+
+\textbf{Host correction.} Before the patch, the host gate recomputed only the short environment ID, derived from the first 12 hex characters of the class digest. The supplied full digest was not compared. After the patch, the same canonical class function returns both fields and preflight checks both. Historical version selection and the public short-ID API remain unchanged. The mutation test changes the final digest character before reconstructing dependent hashes, isolating this check.
+
+\textbf{Inventory and joins.} Exact raw hashes bind all nine routes and four enrollment artifacts. Certificate joins preserve 1,260 workloads and 22,680 slots; the upper gate remains separate at 18 slots. Preparation requires the exact field set, clock flags, ordered offsets, duration consistency, and owner identity values. Session, plan, host, launch and preparation joins use exact bytes and the actual producer's identity formula. Child contexts are rebuilt by the producer metadata function, compared as complete envelopes, and checked as an ordered unique subset with exact generated leaves.
+
+\textbf{File and CLI boundary.} The same bounded byte buffer is hashed and parsed. Duplicate paths and device/inode identities, final-component symlinks, nonregular files and aggregate-cap overflow are rejected. Parent-directory symlinks and relative traversal are not prohibited: this is a bounded reader, not a filesystem sandbox. Clap's DiagnosticPreflight variant calls the reviewed file adapter and propagates failure.
+
+\textbf{Admission and custody.} Both stages retain scientific execution admission as false. Static inventory additionally leaves software bindings incomplete; actual success concerns only the supplied session subset. Owner authentication remains false and external verification is required. A self-supplied owner record does not authenticate provenance. Full host-digest consistency does not attest a live host. Later execution custody, resource enforcement, protocol approval, image and timing qualification remain external dependencies.
+
+\textbf{Evidence.} PLAN.md preceded source inspection. review.json binds before/after source hashes and patch hash. before/ and after/ preserve exact reviewed copies; correction.patch is unchanged. REVIEW.md records tracing and scope. No root edit, cohort, cloud action or scientific run occurred.
+\end{document}

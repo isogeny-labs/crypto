@@ -1,0 +1,1 @@
+Root verified exact79f11a6c recipe, all9sourcepins, sole explicitNontrivial witness, unchanged14names/ExpectedFailure, compiler/custody phasepaths only. Releasedone1200sequence/2callsmax/no theoremrecompile. Phase6 failure fullrawarchive and inspectedPDF preserved before invocation.

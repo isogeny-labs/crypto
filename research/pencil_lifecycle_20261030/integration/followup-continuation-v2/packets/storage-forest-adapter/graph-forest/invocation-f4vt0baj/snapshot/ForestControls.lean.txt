@@ -1,0 +1,42 @@
+import Composition
+import PriorControls
+set_option autoImplicit false
+namespace ForestControls
+open GraphForest GraphFind GraphUnion SignedGraphAlgebra UnionControls
+def rank (i : Fin 3) : Nat := if i=2 then 1 else 0
+theorem initial_forest : Forest g rank := by
+ intro i; fin_cases i <;> norm_num [g,rank]
+theorem distinct_attach : Forest (compress g 0 1 p) (bumped g rank 0 1) :=
+ attach_forest g rank 0 1 p initial_forest (by decide) (by decide)
+theorem later_find_terminates : ∃t r out,Run (compress g 0 1 p) 2 t r out :=
+ run_exists _ _ distinct_attach 2
+theorem same_component_cycle (r : Fin 3 → Nat) : ¬Forest (compress g 0 2 p) r := by
+ intro h
+ have h0:=h 0
+ have h2:=h 2
+ norm_num [compress,g] at h0 h2
+ omega
+theorem unsafe_parent_not_root : g.parent 2≠2 := by decide
+theorem nonroot_child_can_cut : Forest (compress g 2 1 ident) (bumped g rank 2 1) :=
+ attach_forest g rank 2 1 ident initial_forest (by decide) (by decide)
+def q : Potential ℚ := compose (g.pot 2) ident
+def t : GraphFind.State ℚ 3 := compress g 2 0 q
+theorem first_find : Run g 2 t 0 q := by
+ apply Run.step g g 2 0 ident
+ · decide
+ · change Run g 0 g 0 ident
+   exact Run.root g 0 (by decide)
+theorem second_find : Run t 1 t 1 ident := Run.root t 1 (by decide)
+theorem composed_either (f : Bool) :
+ ∃r, Forest (branch (lifted s t) 0 1 (reducedPotential q ident 1 1 11 0) f).graph r ∧
+ Valid (branch (lifted s t) 0 1 (reducedPotential q ident 1 1 11 0) f) v 2 := by
+ apply edge_after_two_finds s t t 2 1 0 1 q ident rank v 1 1 11 0 2
+ · exact initial_forest
+ · exact initial_valid
+ · exact first_find
+ · exact second_find
+ · decide
+ · norm_num [q,compose,g,ident]
+ · norm_num [ident]
+ · norm_num [v]
+end ForestControls

@@ -4,7 +4,7 @@
 - **Kind:** correctness/complexity validation, conditional external theorem
 - **Affected work:** [native implementation](../docs/hashed-ecdl.md)
 - **Next action owner:** unassigned independent reviewer
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-11-04
 
 ## Problem
 
@@ -40,6 +40,16 @@ Explicit work policies can terminate a run with an unknown result.
   not mathematical impossibility or evidence that the theorem is false.
 - No timing, sub-rho result, security conclusion or practical attack follows
   from these development tests.
+- Follow-up software controls add exact prefix sampling (including the
+  nonparsimonious 1:2 projection case) and nine direct-versus-forced recursive
+  comparisons retaining both taper levels. See the
+  [sampling audit](../docs/hashed-ecdl-audit-20261029/README.md).
+  These bounded checks leave the general obligations below open.
+- The follow-up source review makes the representation boundary explicit:
+  on a 64-bit build lambda is at most 64, so root_u=lambda/131072 is zero
+  for every publicly representable graph. Public calls therefore select a
+  finite-size fallback; only forced private controls enter the recursive
+  kernel. This is not a counterexample to the external asymptotic theorem.
 
 ## Obligations
 
@@ -68,6 +78,83 @@ the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
 
+2026-11-04 native ECBench continuation: explicit user authorization resumes
+the separate [native study](../research/hashed_ecdl_ecbench_20261030/resume-20261104/README.md).
+The target-validation accounting correction and optimization registry integration
+are producer development assertions, PCC-20261104-9bb71e and
+PCC-20261104-d06cd6, with unverified standing. The original fixed 1,728-attempt
+panel remains pre-data; frozen v1/v2 evidence stays unchanged. Current account
+and lane charged/reserved headroom and prices are unavailable, so no cloud build
+or scientific job has started. An existing authorized runner/connection name was
+requested, without requesting credentials. Acceptance requires a timestamped
+current budget readout within the finite USD10 study envelope, publication of
+the exact frozen source, actual fresh S3 checkpoint/readback, and authenticated
+admission of that exact native image. Retain original build/job IDs, zero
+automatic retries and every failed/interrupted outcome. This execution gap is
+separate from the independent general audit above. [pcc:unverified]
+
+2026-10-30 native ECBench integration: the
+[new study](../research/hashed_ecdl_ecbench_20261030/README.md) supplies an actual
+native source/selector/width/partial adapter, scoped prime-group/phase
+observation and exact success/exhaustion replay controls. The registered
+10/12/14/16-bit public-target plan remains pre-data. A main-only temporary-OIDC
+checkpoint/readback workflow is implemented; actual current-source S3 write,
+native image/execution admission and the scientific session remain unverified.
+The current local SDK reports NoCredentials; that does not establish the
+configured GitHub role's S3 authorization. Mock transport and development
+successes do not close this execution requirement or the general audit.
+The original frozen A/B/profiling, complete binary/schoolbook pipelines and
+both challenge scalar requirements remain open. No runtime gain is claimed.
+2026-10-30 program assessment and theorem-bridge source review: the
+[dated assessment](../research/hashed_ecdl_leads_20261030/README.md) and
+[interface map](../research/hashed_ecdl_leads_20261030/BRIDGE.md) distinguish
+fixed-width formal counting endpoints from the required general implicit
+tensor statement. The native packet representation has no nested parent
+evaluator callback; coefficient extraction, preparation, mode enumeration,
+retained data and aggregate bit costs remain general audit obligations.
+This is source inspection, without a Lean/kernel check, experiment, new
+theorem, smaller-packet proof or performance claim. Status stays open.
+
+2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
+through factor-base construction and replay, with an optional explicit fixed
+modulus permitted by source section 3. Official p/r/target and a 132-bit s pass
+preflight under the original two-million-step policy. Six targeted development
+controls cover the 65-bit boundary, missing proofs, limits and fixed-modulus
+replay. See [the additive report](../research/hashed_ecdl_hash_prime_20261030/README.md).
+The default uncertified >u64 AKS path, finite-size contraction guard, independent
+general audit and both challenge solve requirements remain open. This is a
+specific setup fix, without a general fast-primality or runtime claim.
+
+2026-10-30 Hexagon integration: the
+[subject review](../research/hexagon_cscc_20261030/README.md) adds a divisor-prefix
+factoring reduction and an exhaustive local-cost profile reference in both
+native tensor checkouts. The factoring reduction uses the existing OpenAI-based
+counter; the Hexagon authors instead re-prove the Anthropic engine. Their Lean
+statement, compilers and stronger conjecture are not local verification of this
+Rust implementation. The general audit above remains open. The weighted
+reference does not establish a recursive coefficient-algebra extension.
+
+2026-10-30 finite-size implementation follow-up: opt-in selector-domain
+witnesses and graphs, schoolbook encodings, checked exact cutsets/elimination,
+partial-relation provenance and binary XOR/Frobenius domains are implemented.
+See the [scoped receipt](../research/hashed_ecdl_finite_size_20261030/implementation/README.md).
+Local structural plan admission is not a smaller-parameter proof of the source
+packet transformation. Its packing, coefficient coverage, precision,
+reconstruction, shrink and cost obligations remain open; the original guards
+are unchanged. No new general theorem or Lean proof is claimed. Earlier S3
+upload/readback succeeded, superseding the historical upload blocker below;
+authenticated native image/execution and scientific measurement admission
+remain unverified. Neither challenge solve nor the independent audit is closed.
+
+2026-10-30 engineering follow-up: [native exact-primality and witness changes](../research/hashed_ecdl_speed_20261029/README.md)
+pass bounded correctness controls and preserve complete seeded certificates.
+Checked Pocklington input now validates ECCp-131 parameters within the original
+two-million-step policy. The functional leaf can avoid repeated prefix counts;
+count queries, full graph replay and source recursion guards are preserved.
+Profiling and the frozen baseline/candidate panel remain blocked by checkpoint/
+execution access, so no general performance conclusion follows. This does not
+close the independent audit or either published challenge solve requirement.
+
 2026-10-29, first reference: bounded generic reduction landed; missing compact
 encoder and backend were correctly recorded as an implementation gap.
 
@@ -88,4 +175,62 @@ compile consistently; default u_0=0 exact summation exceeds the configured
 replace it. Companion general ell, native parity, full soundness/complexity
 audit and both challenge solves remain open. Preserve the native implementation
 checkboxes above; these checks assert no speedup.
+
+
+- **Last updated:** 2026-10-30
+
+
+
+
+
+- The 2026-11-02 continuation independently mapped the source guards and major
+  recursive invariants to code and added a host-independent exact numeric
+  evaluator. At the first even nonzero-scale boundary `2^131071+2`, every D.4
+  numeric guard passes for degree two while the live graph representation is
+  unavailable. The concentrated remaining gaps are a typed predicate
+  description/evaluation-cost certificate and aggregate construction/space
+  accounting; arbitrary `FnPredicate` closures cannot supply either by type.
+
+
+
+
+The [November 15 native dimension continuation](../research/hashed_ecdl_dimensions_20261115/README.md)
+adds exact candidate/sample/jet expressions, a coarse root-only precision
+envelope and five bounded source-routine controls. It also distinguishes
+retained jet lengths from outer-vector capacities: interpolation followed by
+truncation retains the larger buffer. Claim PCC-20261115-907a94 remains
+unverified. The sharp D.11 taper, D.14–15 enumeration refinement and aggregate
+allocation/bit-space upper bounds remain open; the coarse precision envelope
+does not discharge the branching exponent. [pcc:unverified]
+
+The [2026-11-04 entry-cost source audit](../research/hashed_ecdl_entry_cost_20261104/README.md)
+and [structured map](../research/hashed_ecdl_entry_cost_20261104/audit-map.json)
+isolate target-row usage, positive incoming exponents, preparation before the
+zero-entry shortcut, coefficient-choice traversal and aggregate retained data.
+These are unverified observations in statement PCC-20261104-1df881; the next
+local task is the usage/row-budget invariant and its bit/space ledger, followed
+by the full path induction. The operation meter is not an independent bit-cost
+or peak-memory certificate. Status stays open. [pcc:unverified]
+
+
+
+2026-11-02 focused theorem/code continuation: the
+[requirement matrix and attack graph](../research/ic_weak_assumptions_20261102/FOLLOWUP.md)
+trace subdivision, degree admission, exact D.4 parameters, conditional-
+expectation packing, incidence, balance, child shrink, creation precision and
+Hermite shape checks into the implementation. The new
+[`admission` module](../crates/hashed-ecdl-tensor/src/admission.rs) independently
+mirrors numeric guards with `BigUint`; four boundary/fail-closed tests pass.
+This materially narrows but does not close the independent audit: mode and
+reconstruction correctness still lack a general formal proof, and the public
+predicate API has no enforceable uniform description/evaluation-cost
+certificate. No recursive performance result or ECDLP conclusion is claimed.
+
+
+
+
+
+
+
+
 

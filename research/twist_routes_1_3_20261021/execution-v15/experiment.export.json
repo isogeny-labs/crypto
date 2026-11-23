@@ -1,0 +1,234 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-input-original-with-rejected-reference",
+  "created": "2026-10-29T15:37:40.338Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "ab5fee28affd1298b0976827b757bb34e21ac018a6b073ead4533bf049fe141f",
+    "protocol_id": "twist-cold-inputs-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-cold-20261029",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "4a46570f358cf6c8184e4cae6c4fed5b57058fa2",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "5bc3e6ed7cb2df48cb2c452a315ad01600128447cd50112d9fe3ba95f54ce994",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "kernel": "Linux 4c3fcd62a9ba 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0",
+      "memory_bytes": null
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "f8f34febcd24efb11a1fa520ad02aa4a8c182d24ed08f38a0f4abd4aa95806ed",
+      "commit": "4a46570f358cf6c8184e4cae6c4fed5b57058fa2"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "4a46570f358cf6c8184e4cae6c4fed5b57058fa2"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "v15-native-producer",
+      "arm": "native",
+      "instance_id": "fixed-28-model-input-cohort",
+      "seed": "0",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "fixtures-verified": 28
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact verification or counted diagnostic; no admitted wall time."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Strict process/hash/independent finite verification"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/producer-transport.json",
+          "sha256": "3c3386562d2072663cf26319a6eab2eed8ced257e3401435014d79595d2a6102",
+          "bytes": 1419,
+          "kind": "receipt"
+        },
+        {
+          "path": "FIXTURES.json",
+          "sha256": "daff187e0a858843b30d927ef896637d496e08666db968f74f22368167e3a00f",
+          "bytes": 8360,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-10-29T15:29:59.212Z",
+      "finished_at": "2026-10-29T15:30:01.531Z",
+      "worker": "f8f34febcd24efb11a1fa520ad02aa4a8c182d24ed08f38a0f4abd4aa95806ed",
+      "backend_ref": "runs/inputs-v1"
+    },
+    {
+      "run_id": "v15-original-GP",
+      "arm": "pari",
+      "instance_id": "fixed-28-model-input-cohort",
+      "seed": "0",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact verification or counted diagnostic; no admitted wall time."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Strict rejection: ellj received an ellinit vector; all original errors retained."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "8eaeacde04c99d0462bec5b5a42bfc1ba65eaa76002460c7f27da57ff38e270f",
+          "bytes": 1320,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.stdout",
+          "sha256": "aa1f549487ef3de07835030a1d9296e5d533177274eb3cc56312f02183e676e3",
+          "bytes": 22,
+          "kind": "raw"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.stderr",
+          "sha256": "b25d1a0f38ae25f104d339e1b0b14131c825161bf52c0d5ef29abbf64efd805c",
+          "bytes": 1849,
+          "kind": "raw"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "dca8eb399af315354ac45ecde10c3ce7e07f39ee0f1af2a5ee9f736c195a5bd7",
+          "bytes": 823,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-29T15:37:40.295Z",
+      "finished_at": "2026-10-29T15:37:40.338Z",
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "a617e9b600b47e329d1a5a31da696792370e4b7e4b421ee9f36b97fa798a2418",
+      "bytes": 10832,
+      "kind": "protocol"
+    },
+    {
+      "path": "FROZEN.json",
+      "sha256": "3733cb77af649851bb4cc2af181c9b8ab376ce499912670fb1f2401b9cd6db05",
+      "bytes": 2985,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/cold_20261029/driver.rs",
+      "sha256": "c61bb9c91d7449f697f5f7100e881995ad7c75a062193d5d20296a9f9a08fb5a",
+      "bytes": 14946,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "dca8eb399af315354ac45ecde10c3ce7e07f39ee0f1af2a5ee9f736c195a5bd7",
+        "bytes": 823,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "operational export binding",
+      "text": "Native producer includes its resident GP. The original independent GP checker is rejected despite exit0/final marker; no independent input certificate is attributed to this failed reference."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

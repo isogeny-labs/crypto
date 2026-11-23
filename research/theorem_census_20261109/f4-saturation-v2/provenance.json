@@ -1,0 +1,47 @@
+{
+  "schema": "f4-saturation-provenance/v1",
+  "created": "2026-11-10T07:36:14.913877+00:00",
+  "msolve_source_commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+  "msolve_binary": {
+    "path": "/workspace/msolve-deps/build/msolve",
+    "sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708"
+  },
+  "reused_build_provenance": {
+    "path": "../../solver_multiplicity_audit_20261109/provenance.json",
+    "sha256": "d741580690ca661dcc4d639c8657e7a28b69ff8b0f7994936f052a7c7c6de6a1"
+  },
+  "analyzer": {
+    "source": "native/analyze.cpp",
+    "source_sha256": "bf448ad46980e63a2d1111d807b9f8ea528e26973b5c7bd41d9b5a6ca806870a",
+    "arithmetic_header": "native/polynomial.hpp",
+    "arithmetic_header_sha256": "6e299d2f8f1032d1bdb1f4459a46ec3e32cc1f88a30fa105f08b082607b9b59b",
+    "derived_from": "../../solver_multiplicity_audit_20261109/native/analyze.cpp",
+    "derived_from_sha256": "5c809337803de22ec66939d6838df18a722db4181c67a8fc8fe96d9a6af7e6d2",
+    "changes": "Widen coefficient products to int64; replace full field enumeration with four Boolean candidates; characteristic65537header. Same host/derived arithmetic, no independence.",
+    "binary_sha256": "05e8750406c27da988e10df1315e6dcd7dd7921f5820608afebbde7091690b6d",
+    "build": [
+      "g++",
+      "-std=c++17",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "native/analyze.cpp",
+      "-o",
+      "/workspace/scratch/f4-saturation-analyze-v2"
+    ]
+  },
+  "host": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "hostname": "762f5fc120c9",
+    "isolation": "none; shared local host"
+  },
+  "protocol_tool": {
+    "repository": "aburan28/crypto-autoresearcher",
+    "commit": "005a7d7758844f97980b90c7ccd41b5cdcf9e048",
+    "path": "tools/experiment_protocol.py",
+    "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4"
+  },
+  "paid_spend": 0,
+  "standing": "producer-local only; no independent host or signed execution backend"
+}

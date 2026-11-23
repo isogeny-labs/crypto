@@ -1,0 +1,47 @@
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/WeightedExtract.lean:23:1: error: No goals to be solved
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/WeightedExtract.lean:34:1: error: unsolved goals
+case refine_1
+K : Type u_1
+inst✝ : Field K
+a b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hk : ns a - ns b ≠ 0
+hkr : sourceK a b ≠ 0
+⊢ b.t * a.z ^ 5 * a.w - a.t * b.z ^ 5 * b.w =
+    b.t * a.z ^ 5 * a.w * b.z ^ 3 * b.w * a.s * (-(a.z ^ 3 * a.w * b.s) + b.z ^ 3 * b.w * a.s)⁻¹ -
+          b.t * a.z ^ 8 * a.w ^ 2 * b.s * (-(a.z ^ 3 * a.w * b.s) + b.z ^ 3 * b.w * a.s)⁻¹ +
+        a.z ^ 3 * a.w * a.t * b.z ^ 5 * b.w * b.s * (-(a.z ^ 3 * a.w * b.s) + b.z ^ 3 * b.w * a.s)⁻¹ -
+      a.t * b.z ^ 8 * b.w ^ 2 * a.s * (-(a.z ^ 3 * a.w * b.s) + b.z ^ 3 * b.w * a.s)⁻¹
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/WeightedExtract.lean:38:1: error: unsolved goals
+case refine_2
+K : Type u_1
+inst✝ : Field K
+a b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+hk : ns a - ns b ≠ 0
+hkr : sourceK a b ≠ 0
+⊢ a.s * b.t * a.z ^ 5 * a.w - a.z ^ 3 * a.w * a.t * b.z ^ 2 * b.s =
+    -(a.s * b.t * a.z ^ 8 * a.w ^ 2 * b.s * (a.s * b.z ^ 3 * b.w - a.z ^ 3 * a.w * b.s)⁻¹) +
+              a.s * a.z ^ 3 * a.w * a.t * b.z ^ 5 * b.w * b.s * (a.s * b.z ^ 3 * b.w - a.z ^ 3 * a.w * b.s)⁻¹ +
+            a.s * a.t * b.z ^ 5 * b.w +
+          a.s ^ 2 * b.t * a.z ^ 5 * a.w * b.z ^ 3 * b.w * (a.s * b.z ^ 3 * b.w - a.z ^ 3 * a.w * b.s)⁻¹ -
+        a.s ^ 2 * a.t * b.z ^ 8 * b.w ^ 2 * (a.s * b.z ^ 3 * b.w - a.z ^ 3 * a.w * b.s)⁻¹ -
+      a.z ^ 3 * a.w * a.t * b.z ^ 2 * b.s

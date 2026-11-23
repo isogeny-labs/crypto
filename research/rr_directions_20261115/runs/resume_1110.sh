@@ -1,0 +1,28 @@
+#!/bin/bash
+# Corrected resume (amendment 4). Supersedes resume_1105.sh, which was stopped after its
+# first command re-ran one recorded row (removed: first occurrence kept).
+cd /home/user/crypto/research/rr_directions_20261115
+P=/home/user/crypto/target/release/examples/rr_quadratic_panel
+A=/home/user/crypto/target/release/examples/rr_sat_amortise
+export RAYON_NUM_THREADS=1
+C="--planted 4 --unplanted 4 --budget-s 600 --seed 20261115"
+(
+ while kill -0 373 2>/dev/null; do sleep 20; done   # norm m=13 l=6 draws 6-7, already running
+ set -x
+ $P --out runs/f1_ladder_20261115 --m 17 --ell 7 --first-draw 1 --arms norm --solvers sat,f4 $C
+ $P --out runs/f1_ladder_20261115 --m 17 --ell 7 --first-draw 1 --arms rr4 --solvers sat $C
+ $P --out runs/f1_ladder_20261115 --m 17 --ell 7 --first-draw 4 --arms s4 --solvers sat $C
+ $A targets --out runs/f4_targets_20261115 --m 13 --targets 16 --draws 0,1,2,3 --budget-s 600 --seed 20261115
+ echo CHAIN_A_EXIT $?
+) > runs/resume_1110_A.log 2>&1 &
+(
+ set -x
+ $P --out runs/f3_norm4_20261115 --m 15 --ell 4 --first-draw 1 --arms norm4 --solvers sat,f4 $C
+ $P --out runs/f3_norm4_20261115 --m 17 --ell 4,5 --arms norm4 --solvers sat,f4 $C
+ for D in 4 5; do $P --out runs/f5_xl_d${D}_20261115 --m 7,9,11,13 --arms norm --solvers xl --xl-degree $D $C; done
+ echo CHAIN_B_EXIT $?
+) > runs/resume_1110_B.log 2>&1 &
+wait
+set -x
+F4_F2_MAX_MATRIX_WORDS=1073741824 $P --out runs/rust_panel_20261115_normf4 --m 13 --first-draw 7 --arms norm --solvers f4 $C
+echo SOLO_EXIT $?

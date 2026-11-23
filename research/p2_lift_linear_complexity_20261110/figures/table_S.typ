@@ -1,0 +1,5 @@
+#table(columns: 13, align: (left,) + (right,) * 12, stroke: 0.4pt, inset: 2.5pt,
+  text(size: 6.5pt)[*curve*], text(size: 6.5pt)[*p*], text(size: 6.5pt)[*r*], text(size: 6.5pt)[*m*], text(size: 6.5pt)[*N=(r-1)/m*], text(size: 6.5pt)[*O1 L/c*], text(size: 6.5pt)[*O6 L/c*], text(size: 6.5pt)[*O2 L/c*], text(size: 6.5pt)[*O3 L/c*], text(size: 6.5pt)[*c/N (all 4)*], text(size: 6.5pt)[*A/A*], text(size: 6.5pt)[*null c range (200)*], text(size: 6.5pt)[*log10 P_vanish*],
+  text(size: 6.5pt)[S_0], text(size: 6.5pt)[32693], text(size: 6.5pt)[5449], text(size: 6.5pt)[2], text(size: 6.5pt)[2724], text(size: 6.5pt)[5448/2724], text(size: 6.5pt)[5449/2724], text(size: 6.5pt)[5448/2724], text(size: 6.5pt)[5448/2724], text(size: 6.5pt)[1.0], text(size: 6.5pt)[pass], text(size: 6.5pt)[2724..2724], text(size: 6.5pt)[-5.59],
+  text(size: 6.5pt)[S_1], text(size: 6.5pt)[65171], text(size: 6.5pt)[5431], text(size: 6.5pt)[2], text(size: 6.5pt)[2715], text(size: 6.5pt)[5430/2715], text(size: 6.5pt)[5431/2715], text(size: 6.5pt)[5430/2715], text(size: 6.5pt)[5430/2715], text(size: 6.5pt)[1.0], text(size: 6.5pt)[pass], text(size: 6.5pt)[2715..2715], text(size: 6.5pt)[-6.19],
+)

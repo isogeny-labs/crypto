@@ -1,0 +1,79 @@
+{
+  "schema": "validator-findings/v1",
+  "study": "research/fes_then_batched_20261112",
+  "findings": [
+    {
+      "id": "F1", "severity": "info", "title": "The README table reproduces from the raw reports",
+      "text": "All 36 cells of the README table (rho S, pair table, inherited-f4, fes-then-inherited, fes-then-batched, ftb/inherited-f4 on six instances) recomputed from results/*.json agree within half a unit of the printed precision and round to the printed figure (36/36; largest relative difference 3.1e-3, a 2-significant-figure rho column). Every row's total_gae is rebuilt from its counts (group adds + doubles at 1 GAE, price_phase's ten native counters at ns_unit/ns_per_add, solver ops at ns_per_op/ns_per_add) to <= 3e-16 relative, and every phase's gae likewise; the four Koblitz reports' ratios equal the docs/ic/calibration.json rows K_0/GF(2^13), K_1/GF(2^17), K_1/GF(2^19), K_1/GF(2^23) to <= 7e-18. ftb/inherited-f4 is a ratio of means, as printed.",
+      "evidence": ["validation/headline.json", "validation/recompute.json"]
+    },
+    {
+      "id": "F2", "severity": "major", "title": "'Lowest index-calculus row on five of six' does not hold across the 5a band",
+      "text": "At each run's calibration point fes-then-batched is below the pair table on five instances (not random 21). Under the band (G - C + w (U + n_C)) / sqrt r the order flips on all six: at w = 0 the solver's word XORs are free and fes-then-batched is far below the pair table (e.g. Koblitz 23: 3.30 vs 3986.1), at w = 0.1 and 1 it is far above (139,358 vs 4,385; 1,393,547 vs 7,978). AGENTS.md 5a: rank only where the order holds at every weight; the pair-table vs fes-then-batched ranking is unresolved on every instance, including random 21 where the README ranks the pair table first.",
+      "evidence": ["validation/band.json orders.ftb_vs_pair", "validation/headline.json secondary.lowest_ic_row"]
+    },
+    {
+      "id": "F3", "severity": "major", "title": "fes-then-batched vs inherited-f4: a tie at w = 0 on five instances and a flip at degree 13",
+      "text": "Above 14 unknowns both arms make identical decisions (same targets tried, relations, rank and group operations; only solver ops differ), so at w = 0 their S is equal: the strict order does not hold across the band, the weak order (fes-then-batched <= inherited-f4) holds on random 15, Koblitz 17, 19, random 21 and Koblitz 23, with ftb/if4 = 1.000 at w = 0 and 0.816-0.888 at w = 0.1 and 1. At degree 13 fes-f2 tried more targets (mean 50.67 vs 47.33; group GAE 726.3 vs 703.0), so fes-then-batched is ABOVE inherited-f4 at w = 0 (S 16.229 vs 15.708, ratio 1.033) and below at w = 0.1 and 1 (0.701, 0.700): unresolved. The headline 0.74-0.89x is the ratio at the calibration point (word XORs at the pinned or measured ratio), a further point the band never replaces.",
+      "evidence": ["validation/band.json orders.ftb_vs_if4, ratio_ftb_over_if4"]
+    },
+    {
+      "id": "F4", "severity": "minor", "title": "At degree 13 the two solvers count different units",
+      "text": "fes-then-batched runs fes-f2 there, whose ops are 'word XORs (Gray-code steps)'; inherited-f4 counts 'word XORs (elimination, specialisation and linear elimination only)'. The repository prices both at one word-XOR ratio, which src/bin/ic/sweep/trial.rs (unit_key) calls right for pricing and wrong for ranking. Diagnostic: with the solver priced by its complete bitop/v1 tally (bitop_word_ops + hash probes + field operations) the order is the same (above at w = 0, below at w = 0.1 and 1) and the w > 0 gap is wider (S(0.1) 13,024 vs 37,566). Above 14 unknowns both arms report the same unit string.",
+      "evidence": ["validation/recompute.json arms.*.op_units, diag_bitop_band", "validation/band.json diagnostics"]
+    },
+    {
+      "id": "F5", "severity": "minor", "title": "Five of the six 'distance remaining' figures are off at their printed precision",
+      "text": "README line 77-78 quotes S(ftb)/S(rho) as 35.3x, 144x, 306x, 1,903x (Koblitz 13, 17, 19, 23) and 122x, 3,005x (random 15, 21). From the raw reports: 35.24x, 144.72x, 305.45x, 1,907.79x, 121.72x, 3,012.56x (RESULTS.md has the right values). The README figures equal the rounded table S divided by the rounded rho S (35.26, 144.34, 306.37, 1,902.61, 121.71, 3,004.92). The error is at most 0.4% and changes no conclusion; it is outside the headline table, so it is reported here and not in headline.",
+      "evidence": ["validation/headline.json secondary.distance_to_rho"]
+    },
+    {
+      "id": "F6", "severity": "minor", "title": "At degree 13 'the lowest algebraic row' is a tie",
+      "text": "fes-then-batched and fes-then-inherited run the same engine (fes-f2) at 14 unknowns and their rows are identical in every count (validation/recompute.json; control C2 below); the README bolds fes-then-batched alone.",
+      "evidence": ["validation/recompute.json koblitz-n13 arms"]
+    },
+    {
+      "id": "F7", "severity": "info", "title": "Every IC arm stays above the matched rho at every weight",
+      "text": "On all six instances the pair table, inherited-f4, fes-then-inherited and fes-then-batched are above the matched rho at w = 0, 0.1 and 1 (order holds). At w = 0, the most IC-favourable end, fes-then-batched is 2.96x (Koblitz 19) to 5.61x (Koblitz 13) rho; at w = 0.1 it is 1,288x to 158,790x; at w = 1 12,825x to 1,587,862x. The order also holds against rho charged k = 1 or n + 1 native operations per walk step (sensitivity rho_ext_*).",
+      "evidence": ["validation/band.json orders.*_vs_rho, ratio_ftb_over_rho, diagnostics.rho_ext_*"]
+    },
+    {
+      "id": "F8", "severity": "minor", "title": "The matched rho emits no unpriced counter (implementation gap)",
+      "text": "rho_reference.per_run carries planted, seed, s, s_walk, steps, steps_over_expected and verified only: no count of canonicalisations, distinguished-point tests, Frobenius maps or table operations, which AGENTS.md 5a says rho leaves unpriced. In the strict band U_rho = 0 and S_rho(w) = S_rho(0), a lower bound at w > 0. Because rho is below every IC arm at w = 0 and the IC arms only rise with w, the gap cannot change the IC-vs-rho order; a per-step charge (rho_ext_k1, rho_ext_kn1) confirms it. The missing emission should be fixed in ic bench's rho reference.",
+      "evidence": ["validation/counters.json rho", "validation/band.json diagnostics"]
+    },
+    {
+      "id": "F9", "severity": "info", "title": "Measured lookup price is 0.0 on the random instances",
+      "text": "On random 15 and 21 the host-measured ns_per_lookup is 0.0, so lookups and target-guard probes are free at those runs' calibration point (the pinned K_0/GF(2^23) row in docs/ic/calibration.json also has 0.0; it is not used here). Immaterial to S (a few hundred to ten thousand operations per run); the band charges them at w.",
+      "evidence": ["validation/recompute.json calibration_ratios"]
+    },
+    {
+      "id": "F10", "severity": "minor", "title": "Provenance of the producer's binary rests on the record, not on the reports",
+      "text": "Every report has software.git_commit = null and git_dirty = null. The binding of the measuring binary (sha256 1f566eed..., results/ic-sha256.txt, path /tmp/claude-0/.../scratchpad/ic-ftb, still present and hashing to that value) to commit 4900647bcd rests on the benchmark record (commit 4900647bcd, commit_dirty false at 20:09:33Z, binary mtime 20:09, run 20:09:38Z) and on the producer's README. The record's argv does not show IC_BIN. The record lists both raw entries as uploaded: false; the objects are in fact in s3://setec-astronomy-artifacts (store/sha256/15/15dbded3..., store/sha256/fa/fa200ed1...), and results.tar.gz is byte-identical to the committed results/*.json and ic-sha256.txt (its *.log members are byte-identical copies of the JSONs).",
+      "evidence": ["benchmarks/records/20261112T2009Z-fes-then-batched-e2e.json", "results/ic-sha256.txt", "results/.artifacts.json"]
+    },
+    {
+      "id": "F11", "severity": "info", "title": "The bitop/v1 diagnostic tally is not identical between configurations that run the same engine",
+      "text": "Above 14 unknowns fes-then-inherited and inherited-f4 have identical solver ops, targets and relations, but their bitop_hash_probes and bitop_word_ops differ slightly (Koblitz 17 repeat 1: 3,420,478 vs 3,402,246 probes; 301,031,725 vs 300,859,208 word ops), and this study's fes-then-batched and the batched study's inherited-f4-batched differ by 65 word ops at identical solver ops. src/cryptanalysis/bitop_tally.rs says every count is a deterministic function of the input; the tally appears to depend on in-process state (the order of configurations in one process). The replay, running the same sequence, reproduced every bitop counter exactly. It enters no S here (diagnostic band only).",
+      "evidence": ["results/koblitz-n17.json rows 3 and 6", "research/inherited_f4_batched_20261112/results_e2e/koblitz-n17.json"]
+    },
+    {
+      "id": "F12", "severity": "info", "title": "The pre-stated expectation, checked against the sibling studies' committed data",
+      "text": "Degree 13: fes-then-batched rows are identical to fes-then-inherited's in every count (C2). Koblitz 17, 19, 23 and both random instances: fes-then-batched solver ops equal the batched study's inherited-f4-batched ops run for run (research/inherited_f4_batched_20261112/results_e2e); on the Koblitz instances S agrees to the last float bit (e.g. 84.46324870999565 vs 84.46324870999564), on the random instances S differs only through the host-measured ratio, as the README says. inherited-f4's solver ops equal the batched study's on all six instances.",
+      "evidence": ["research/inherited_f4_batched_20261112/results_e2e/*.json", "research/size_rule_fold_20261112/results/*.json"]
+    },
+    {
+      "id": "F13", "severity": "info", "title": "Commit d81dc1241b repeats the unqualified ranking in source",
+      "text": "The doc comment of DEFAULT_DESCENT_SOLVER (src/cryptanalysis/ic_framework/solvers.rs, added in d81dc1241b) calls fes-then-batched 'the lowest algebraic row on every instance of the 2026-11-12 end-to-end ladder'. That holds at the calibration point; under the band it is a tie at w = 0 on five instances and unresolved at degree 13 (F3).",
+      "evidence": ["git show d81dc1241b -- src/cryptanalysis/ic_framework/solvers.rs"]
+    }
+  ],
+  "controls": [
+    {"id": "C1", "what": "fes-then-inherited = inherited-f4 above 14 unknowns (the size rule dispatches to inherited-f4)", "result": "identical targets, relations, rank, group ops, native counts, solver calls and solver ops on all 15 repeats of the five instances; only the diagnostic bitop tally differs (F11)"},
+    {"id": "C2", "what": "fes-then-batched = fes-then-inherited at 14 unknowns (both run fes-f2)", "result": "identical in every count on all 3 repeats"},
+    {"id": "C3", "what": "pair table: the reference IC row, priced in the same process", "result": "priced; its per-step table inserts (setup work_native.table_insert_attempts behind counted:table_insert_attempts) are charged at w per the 2026-11-08 reading"},
+    {"id": "C4", "what": "matched rho, same process, same seeds for both Koblitz walks", "result": "16 runs per walk, all verified; selected walk has the lower mean S (negation at Koblitz 13, 17, 19; signed-Frobenius at 23; negation only on random binary); seeds identical across candidates"},
+    {"id": "C5", "what": "known answer", "result": "all 72 IC rows recovered the planted logarithm recorded for their repeat; recovered in [1, r); r prime, cofactor <= 8, group order = 2^n + 1 - t; Koblitz traces recomputed from the Frobenius recurrence (validation/instance-check.json)"},
+    {"id": "C6", "what": "external fastest implementation (AGENTS.md 15)", "result": "not part of this study; the claim is an in-repository component comparison, not a fastest-implementation claim"}
+  ]
+}

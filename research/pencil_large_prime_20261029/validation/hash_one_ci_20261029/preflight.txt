@@ -1,0 +1,58 @@
+HEAD 7d7f5495c5b85ae426efdbcb721b6faf72c1be14
+STATUS
+ M research/pencil_large_prime_20261029/SESSION.md
+ M src/cryptanalysis/three_leads_rho_events.rs
+?? research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/
+?? research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/
+?? research/pencil_large_prime_20261029/validation/instrument_build_40938439022/
+DIFF
+diff --git a/src/cryptanalysis/three_leads_rho_events.rs b/src/cryptanalysis/three_leads_rho_events.rs
+index 5ab54ffbc..fdbf49480 100644
+--- a/src/cryptanalysis/three_leads_rho_events.rs
++++ b/src/cryptanalysis/three_leads_rho_events.rs
+@@ -158,11 +158,7 @@ mod tests {
+     fn exact_hash_and_table_semantics() {
+         let state = RandomState::new();
+         for x in [(0u64, 1u64), (u64::MAX, 123)] {
+-            let mut a = state.build_hasher();
+-            let mut b = state.build_hasher();
+-            x.hash(&mut a);
+-            Key(x).hash(&mut b);
+-            assert_eq!(a.finish(), b.finish());
++            assert_eq!(state.hash_one(x), state.hash_one(Key(x)));
+         }
+         let mut plain = HashMap::with_hasher(state.clone());
+         let mut observed = HashMap::with_hasher(state);
+SCRIPT
+#!/usr/bin/env bash
+# Strict lint for maintained code. Frozen measurement source remains byte-bound
+# and is compiled by rust-all-targets.yml, without current-style lint rewrites.
+set -euo pipefail
+
+repository_root=$(cd -- "$(dirname -- "$0")/.." && pwd)
+cd -- "$repository_root"
+metadata_file=$(mktemp "${TMPDIR:-/tmp}/clippy-metadata.XXXXXX")
+target_file=$(mktemp "${TMPDIR:-/tmp}/clippy-targets.XXXXXX")
+trap 'rm -f "$metadata_file" "$target_file"' EXIT
+
+cargo metadata --no-deps --format-version 1 > "$metadata_file"
+jq -r --arg root "$repository_root" '
+  .packages[] | select(.name == "crypto") | .targets[]
+  | select(.kind | index("example"))
+  | select(.src_path | startswith($root + "/examples/"))
+  | .name
+' "$metadata_file" > "$target_file"
+
+selected_examples=()
+while IFS= read -r target; do
+    selected_examples+=(--example "$target")
+done < "$target_file"
+if [ ${#selected_examples[@]} -eq 0 ]; then
+    echo "no maintained examples found in Cargo metadata" >&2
+    exit 1
+fi
+if [ "${1:-}" = "--print-targets" ]; then
+    cat "$target_file"
+    exit 0
+fi
+cargo clippy --keep-going --lib --bins --tests --benches "${selected_examples[@]}" -- -D warnings

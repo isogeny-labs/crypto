@@ -1,0 +1,51 @@
+map rrFromCandidate50=rationalCandidate50,l;
+poly rrA50=rrFromCandidate50(a50);poly rrB50=rrFromCandidate50(b50);
+poly rrC50=rrFromCandidate50(c50);poly rrD50=rrFromCandidate50(d50);
+poly rrN50=rrC50+rrD50*v;
+number rrLeadingInverse50=1/leadcoef(rrA50);
+ideal rrIdeal50=v^2+v+u^3+u,rrLeadingInverse50*(rrA50+rrB50*v);
+ideal rrStd50=std(rrIdeal50);
+if(vdim(rrStd50)!=32){ERROR("RR_FIELD50_ACTUAL_DIMENSION");quit;}
+print("RR_FIELD50_STAGE actual_quotient_degree=32 literal_numerators_begin=true");
+map rrEvaluate50=rrSections50,rrN50,l,v,u;
+ideal rrNumeratorValues50=rrEvaluate50(rrNumerators50);
+print("RR_FIELD50_STAGE literal_numerators_evaluated=68 section_checks_begin=true");
+number rrDenominator50=u^49*(u+1)^16;
+number rrInverse50=1/rrDenominator50;
+ideal rrValues50;
+link rrOutput50="ASCII:w rr-field50.sing";open(rrOutput50);
+write(rrOutput50,"ring rrFieldCertificate50=(2,u),(l,v),dp;short=0;ideal rrValues50;ideal rrProducts50;matrix rrColumns50[32][196];");
+int rrIndex50;int rrLeft50;int rrRight50;int rrRow50;intvec rrExponent50;
+poly rrValue50;poly rrRemainder50;poly rrReconstructed50;vector rrColumn50;
+for(rrIndex50=1;rrIndex50<=68;rrIndex50++){
+ rrValue50=reduce(rrInverse50*rrNumeratorValues50[rrIndex50],rrStd50);
+ if(reduce(rrDenominator50*rrValue50+rrNumeratorValues50[rrIndex50],rrStd50)!=0){ERROR("RR_FIELD50_SECTION_PRODUCT");quit;}
+ if(reduce(rrDenominator50*(rrValue50+1)+rrNumeratorValues50[rrIndex50],rrStd50)==0){ERROR("RR_FIELD50_CORRUPTION_ACCEPTED");quit;}
+ rrValues50[rrIndex50]=rrValue50;
+ write(rrOutput50,"rrValues50["+string(rrIndex50)+"]="+string(rrValue50)+";");
+ print("RR_FIELD50_SECTION index="+string(rrIndex50)+" denominator_product_checked=true");
+}
+for(rrIndex50=1;rrIndex50<=196;rrIndex50++){
+ rrLeft50=rrPairs50[rrIndex50,1];rrRight50=rrPairs50[rrIndex50,2];
+ rrValue50=reduce(rrValues50[rrLeft50]*rrValues50[rrRight50],rrStd50);
+ if(reduce(rrDenominator50^2*rrValue50+rrNumeratorValues50[rrLeft50]*rrNumeratorValues50[rrRight50],rrStd50)!=0){ERROR("RR_FIELD50_PRODUCT_RECONSTRUCTION");quit;}
+ rrRemainder50=rrValue50;rrColumn50=0;
+ while(rrRemainder50!=0){
+  rrExponent50=leadexp(rrRemainder50);
+  if(rrExponent50[1]>=16 || rrExponent50[2]>=2){ERROR("RR_FIELD50_NONSTANDARD_MONOMIAL");quit;}
+  rrRow50=rrExponent50[1]+16*rrExponent50[2]+1;
+  rrColumn50=rrColumn50+leadcoef(rrRemainder50)*gen(rrRow50);
+  rrRemainder50=rrRemainder50-lead(rrRemainder50);
+ }
+ rrReconstructed50=0;
+ for(rrRow50=1;rrRow50<=32;rrRow50++){
+  rrReconstructed50=rrReconstructed50+rrColumn50[rrRow50]*l^((rrRow50-1)%16)*v^((rrRow50-1) div 16);
+  write(rrOutput50,"rrColumns50["+string(rrRow50)+","+string(rrIndex50)+"]="+string(rrColumn50[rrRow50])+";");
+ }
+ if(rrReconstructed50!=rrValue50){ERROR("RR_FIELD50_FULL_COLUMN_RECONSTRUCTION");quit;}
+ write(rrOutput50,"rrProducts50["+string(rrIndex50)+"]="+string(rrValue50)+";");
+ print("RR_FIELD50_PRODUCT index="+string(rrIndex50)+" left="+string(rrLeft50)+" right="+string(rrRight50)+" full_column_checked=true");
+}
+close(rrOutput50);
+print("RR_FIELD50_RESULT source_degree=32 descended_sections=68 complete_space_products=196 columns=196 rows=32 coefficient_field=F2(u) module_normalization_not_yet_computed=true");
+print("RR_FIELD50_ALL_CHECKS_PASS");quit;

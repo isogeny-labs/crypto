@@ -1,0 +1,14 @@
+# m = 4 two-plus-two MITM scaling
+
+
+=== planted m=4 decomposition (table + query until hit) ===
+bits    |F|    pairs   adds/tgt      verified       ms
+  48    776   301476      150324.0    10/10    525.4
+  52   1351   913276      369013.0    10/10   1471.7
+
+planted solve exponent (log2 adds per target vs log2 p) = 0.324 (R^2 1.0000, 2 sizes)
+
+=== uniform m=4 relation (full scans until a decomposition) ===
+bits    |F|      adds/rel   verified       ms
+  40    256    20875915.0       true  11068.5
+  44    446  1080186802.0       true  595722.7

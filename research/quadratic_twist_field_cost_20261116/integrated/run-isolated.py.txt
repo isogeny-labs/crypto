@@ -1,0 +1,38 @@
+# Thin source/binary/file/process/isolation metadata, no research arithmetic.
+from pathlib import Path
+import subprocess,sys,json,hashlib,os,datetime,shutil
+root=Path('/workspace/crypto-twist-field-cost');scope=Path('research/quadratic_twist_field_cost_20261116/integrated');old=Path('/workspace/twist-integrated-run02-20261116');out=Path(sys.argv[1]);checkpoint=sys.argv[2];phase=sys.argv[3];helper=Path('/workspace/twist-field-cost-20261116/isolated_bench.py')
+assert phase in ['build','run'];assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==checkpoint;assert subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True)==''
+pins=json.loads((root/scope/'TIMING_PINS.json').read_text())
+for p,h in pins['inputs'].items():assert hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+for p,h in pins['official_helpers'].items():assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h
+assert hashlib.sha256((old/'casesC/index.json').read_bytes()).hexdigest()==pins['counted_preflight_index_sha256']
+if phase=='build':out.mkdir()
+else:assert(out/'build.json').exists()
+stages=[];started=datetime.datetime.now(datetime.timezone.utc).isoformat();deadline=datetime.datetime.fromisoformat('2026-11-16T03:09:00+00:00')
+env=dict(os.environ,CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup',CARGO_BUILD_JOBS='2',CARGO_TARGET_DIR='/workspace/twist-integrated-timing-build-20261116',RAYON_NUM_THREADS='1')
+def run(name,cmd,want=0):
+ remaining=int((deadline-datetime.datetime.now(datetime.timezone.utc)).total_seconds());assert remaining>0
+ with(out/(name+'.stdout')).open('wb')as a,(out/(name+'.stderr')).open('wb')as b:r=subprocess.run(['timeout',str(min(600,remaining)),*cmd],cwd=root,stdout=a,stderr=b,env=env)
+ stages.append(dict(name=name,command=cmd,exit=r.returncode,expected=want));(out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n');assert r.returncode==want,(name,r.returncode)
+try:
+ if phase=='build':
+  busy=[sys.executable,str(helper),'busy','--']
+  run('cpp',busy+['g++','-std=c++20','-O3','-march=native','-Wall','-Wextra','-I/workspace/twist-native-tooling/include',str(scope/'interleaved.cpp'),'-lcrypto','-o',str(out/'producer')])
+  run('rust',busy+['/workspace/twist-native-tooling/cargo/bin/cargo','+1.85.1','build','--offline','--locked','--release','--manifest-path',str(scope/'timing-audit/Cargo.toml')])
+  shutil.copyfile(Path(env['CARGO_TARGET_DIR'])/'release/twist-integrated-isolated-audit',out/'auditor');(out/'auditor').chmod(0o700)
+  (out/'build.json').write_text(json.dumps(dict(checkpoint=checkpoint,inputs=pins['inputs'],binaries={n:hashlib.sha256((out/n).read_bytes()).hexdigest()for n in ['producer','auditor']},commands=stages.copy()),indent=2)+'\n');sys.exit(0)
+ build=json.loads((out/'build.json').read_text());protocol=json.loads((root/scope/'timing-protocol.json').read_text());assert protocol['extensions']['binary_pins']==build['binaries']
+ assert protocol['freeze']['status']=='frozen' and protocol['freeze']['filed_before_affected_data'] is True
+ subprocess.run([sys.executable,'/workspace/canonical-protocol-20261115/tools/experiment_protocol.py','validate',str(root/scope/'timing-protocol.json')],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+ for n,h in build['binaries'].items():assert hashlib.sha256((out/n).read_bytes()).hexdigest()==h
+ (out/'precall.json').write_text(json.dumps(dict(started=started,checkpoint=checkpoint,build=build,protocol_sha256=hashlib.sha256((root/scope/'timing-protocol.json').read_bytes()).hexdigest()),indent=2)+'\n')
+ for tag in ['A','B']:run('isolated'+tag,[sys.executable,str(helper),'run','--cpus','0','--out',str(out/('isolation-'+tag+'.jsonl')),'--label','twist-integrated-'+tag,'--',str(out/'producer'),'produce',str(out/('cases'+tag)),tag])
+ run('audit',[str(out/'auditor'),str(old/'casesC'),str(out/'casesA'),str(out/'casesB'),str(out/'audit.json')])
+ for mode in pins['modes']:
+  false=old/('false-'+mode);receipt=out/('false-'+mode+'-receipt.json');run('reject-'+mode,[str(out/'auditor'),str(false),str(out/'casesA'),str(out/'casesB'),str(receipt)],101);assert not receipt.exists()
+ for mode,tag in [('phase','A'),('missing-policy','B'),('target','A')]:
+  false=out/('false-'+mode);receipt=out/('false-'+mode+'-receipt.json');run('mutate-'+mode,[str(old/'auditor'),'mutate',str(out/('cases'+tag)),str(false),mode]);assert(false/'index.json').read_bytes()!=(out/('cases'+tag)/'index.json').read_bytes();run('reject-timing-'+mode,[str(out/'auditor'),str(old/'casesC'),str(false)if tag=='A'else str(out/'casesA'),str(false)if tag=='B'else str(out/'casesB'),str(receipt)],101);assert not receipt.exists()
+ conditions={tag:json.loads((out/('isolation-'+tag+'.jsonl')).read_text())for tag in ['A','B']};(out/'admission.json').write_text(json.dumps(dict(conditions=conditions,all_uncontended=all(not v['run']['contended']for v in conditions.values())),indent=2)+'\n')
+finally:
+ (out/('build-stages.json'if phase=='build'else'data-stages.json')).write_text(json.dumps(stages,indent=2)+'\n');(out/('build-postcall.json'if phase=='build'else'postcall.json')).write_text(json.dumps(dict(checkpoint=checkpoint,started=started,finished=datetime.datetime.now(datetime.timezone.utc).isoformat(),stages=len(stages)),indent=2)+'\n')

@@ -1,0 +1,50 @@
+[2026-11-16T23:25:52Z] CMD: mkdir -p raw
+  exit=0
+[2026-11-16T23:25:52Z] CMD: (cd l06 && cargo build --release 2>&1) | tee raw/build.log
+  exit=0
+  sha256 a106b74d24cbf47aa248f7a1ec5f6b44f6dc0fdb7806de62cfe0fc776e1a3b11  raw/build.log
+[2026-11-16T23:25:52Z] CMD: (cd l06 && cargo test --release 2>&1) | tee raw/test.log
+  exit=0
+  sha256 2511ee7cfa1186a82b41df3e18eab2797b692a6ac1d21bd8d864c770b7eda1b5  raw/test.log
+[2026-11-16T23:25:52Z] CMD: ./l06/target/release/l06 lagr2 --out raw/l2_lagrangians.json
+  exit=0
+  sha256 354eedca32f4acd86d0f5dc3b917804e16c87541488ac9d8520f373e78f431ed  raw/l2_lagrangians.json
+[2026-11-16T23:25:58Z] CMD: ./l06/target/release/l06 gsp --samples 200000 --out raw/gsp_reference.json 2> raw/gsp.log
+  exit=0
+  sha256 054f7c007c654a8eeeee51157ebeb4ffe3a7bb3d00449d4351a1087d3be66c56  raw/gsp_reference.json
+  sha256 92e933653ce02fcb7514d4e098d1f2c5c51df5f937ded47c42e0fe2dc58a9fd4  raw/gsp.log
+[2026-11-16T23:26:51Z] CMD: ./l06/target/release/l06 gate-enum --p 101 --count 200 --out raw/gate_enum_p101.jsonl 2> raw/gate_enum_p101.log
+  exit=0
+  sha256 de6739126580b3348b0c02fc79d506b3cc846741e5d2d4c466bc7ef8fe604920  raw/gate_enum_p101.jsonl
+[2026-11-16T23:27:17Z] CMD: ./l06/target/release/l06 gate-enum --p 257 --count 40 --out raw/gate_enum_p257.jsonl 2> raw/gate_enum_p257.log
+  exit=0
+  sha256 1582a2f3501c071449b816144fca61971621491ed732f1658a7bf4bd6416577a  raw/gate_enum_p257.jsonl
+[2026-11-16T23:30:21Z] CMD: timeout 600 ./l06/target/release/l06 census --p 257 --u-count 3000 --prime-target 120 --draw-cap 40000 --out raw/census_p257.jsonl 2> raw/census_p257.log
+  exit=0
+  sha256 d99b7c2dad6304bc1ec331ecec2bdff1cf91240451ea462a4fe4336cd4d7128a  raw/census_p257.jsonl
+  sha256 16d4166a1d84f655507d2136bb0cb52d695e0ae257d02bbb653fe62e424422aa  raw/census_p257.log
+[2026-11-16T23:30:44Z] CMD: timeout 600 ./l06/target/release/l06 census --p 521 --u-count 3000 --prime-target 120 --draw-cap 40000 --out raw/census_p521.jsonl 2> raw/census_p521.log
+  exit=0
+  sha256 3b5932b1305ef0c194eaec903692a70dca6b4f94940ebb08d744cda76314fc3a  raw/census_p521.jsonl
+  sha256 6eb0aa7f2f6f61b283b71f801b161633f8e3b57a6b33dc25ab05b32c3fc7af8c  raw/census_p521.log
+[2026-11-16T23:31:24Z] CMD: timeout 600 ./l06/target/release/l06 census --p 1031 --u-count 3000 --prime-target 120 --draw-cap 40000 --out raw/census_p1031.jsonl 2> raw/census_p1031.log
+  exit=0
+  sha256 2a3c7aafc90e3a4b58b90672992a1eef8be4d44060b57c4e0be0ca1b79caefb3  raw/census_p1031.jsonl
+  sha256 66d8dc8d6c2de53a29b8e7c7d2e678de8c886b5533958a8c9063c5dda3e54af3  raw/census_p1031.log
+[2026-11-16T23:32:42Z] CMD: timeout 600 ./l06/target/release/l06 census --p 2053 --u-count 1000 --prime-target 120 --draw-cap 40000 --out raw/census_p2053.jsonl 2> raw/census_p2053.log
+  exit=0
+  sha256 b0a40cc266f925145e7b024fe77475114779c6cc2c39cdb6e9673dfa8f0b0ec3  raw/census_p2053.jsonl
+  sha256 cd065b1cbc0ecc9766c3ba0f6cbc8a0244a5bb6b9cccfe1ee1c3ec8acd8d1d59  raw/census_p2053.log
+[2026-11-16T23:34:12Z] CMD: timeout 600 ./l06/target/release/l06 census --p 4099 --u-count 1000 --prime-target 120 --draw-cap 40000 --out raw/census_p4099.jsonl 2> raw/census_p4099.log
+  exit=0
+  sha256 cb7d1fff2fc42d88162132cb7f5c1e002f768bc97684834fca44307359eeb819  raw/census_p4099.jsonl
+  sha256 e9f69492d04fd55bb4476075af0e1a13a6489f7f37d2cf7c1dcebb6bb2841332  raw/census_p4099.log
+[2026-11-16T23:37:51Z] CMD: python3 -I analyze.py raw > raw/summary.json
+  exit=0
+  sha256 ac70ed918cfdace9d31cc26e09363649773cffdfa3d79e854cac17a9f71a3698  raw/summary.json
+[2026-11-16T23:37:52Z] CMD: sha256sum raw/* > data.sha256
+  exit=0
+  sha256 e63b794223b2f472af7babb0c246f19f13a1c4b11663fec2f13f47da062987d3  data.sha256
+[2026-11-16T23:38:59Z] CMD: sha256sum raw/* > data.sha256 # final regeneration (data.sha256 entry for raw/COMMANDS.log predates this line)
+  exit=0
+  sha256 076b240df67d0acb5c6b3dd15b3dd71a415e29fbaf38b3bbf34c2d0611d9e60a  data.sha256

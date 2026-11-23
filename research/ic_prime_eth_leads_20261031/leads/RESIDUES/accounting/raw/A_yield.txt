@@ -1,0 +1,17 @@
+## Relations per conflict at fixed cutoff C (relation = SAT answer; censored charged C; CI = bootstrap over curves, 4000 draws)
+b | curves | targets | SAT-oracle | cutoff C | relations | answers(SAT+UNSAT) | conflicts charged | rel per 1k conflicts [95% CI] | answers per 1k conflicts [CI] | rel per 1M propagations [CI] | censored@C | mean T_enum | conflicts per relation
+6 | 10 | 160 | 91 | 10000 | 83 | 152 | 643682 | 0.129 [0.112,0.147] | 0.236 [0.209,0.271] | 0.507 [0.433,0.596] | 0/160 | 12 | 7755
+6 | 10 | 160 | 91 | 30000 | 83 | 152 | 643682 | 0.129 [0.113,0.147] | 0.236 [0.210,0.269] | 0.507 [0.437,0.596] | 0/160 | 12 | 7755
+6 | 10 | 160 | 91 | 100000 | 83 | 152 | 643682 | 0.129 [0.113,0.148] | 0.236 [0.211,0.271] | 0.507 [0.436,0.597] | 0/160 | 12 | 7755
+9 | 10 | 160 | 85 | 10000 | 0 | 0 | 1600000 | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 160/160 | 24 | nan
+9 | 10 | 160 | 85 | 30000 | 6 | 6 | 4774943 | 0.001 [0.000,0.003] | 0.001 [0.000,0.003] | 0.006 [0.000,0.013] | 154/160 | 24 | 795824
+9 | 10 | 160 | 85 | 100000 | 84 | 159 | 8173184 | 0.010 [0.009,0.012] | 0.019 [0.017,0.023] | 0.047 [0.043,0.051] | 1/160 | 24 | 97300
+12 | 10 | 160 | 94 | 10000 | 0 | 0 | 1600000 | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 160/160 | 112 | nan
+12 | 10 | 160 | 94 | 30000 | 0 | 0 | 4800000 | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 160/160 | 112 | nan
+12 | 10 | 160 | 94 | 100000 | 0 | 0 | 16000000 | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 0.000 [0.000,0.000] | 160/160 | 112 | nan
+
+verdict mix per b (kissat status): b=6: {'SAT': 83, 'UNSAT': 77}; b=9: {'SAT': 84, 'UNSAT': 75, 'UNKNOWN': 1}; b=12: {'UNKNOWN': 160}
+verifier verdicts non-ok: 8
+fb_xs by b: b=6: [3]; b=9: [4]; b=12: [8]
+
+descriptive: log2 ratio of conflicts-per-relation, C=100000: b6->b9: +3.65; b9->b12: undefined (zero relations at one size)  (positive = yield per conflict falls; b=12 is censored so its charge is a floor on cost, i.e. this is a lower bound on the drop)

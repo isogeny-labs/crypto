@@ -1,0 +1,66 @@
+{
+  "schema": "profile/v1",
+  "kind": "manifest",
+  "subcommand": "cpu",
+  "label": "Optimized v1 cold n131 d12 uniform, discovery only",
+  "status": "ok",
+  "reason": null,
+  "started_utc": "2026-11-15T22:34:46Z",
+  "wall_seconds": 2.321,
+  "cwd": "/workspace/crypto-trace",
+  "command": [
+    "/workspace/scratch/trace-fast-baseline-v1",
+    "one",
+    "research/trace_zero_linearized_20261115/workload.json",
+    "scale-n131-d12-uniform",
+    "candidate"
+  ],
+  "isolation": "none",
+  "binary": {
+    "path": "/workspace/scratch/trace-fast-baseline-v1",
+    "sha256": "15b6156c1e95c9220915ca7eb85883190b4c03791679f3195caab4b1cd7479ea",
+    "bytes": 12399352
+  },
+  "git": {
+    "commit": "a14a654255c7b9e237a88bdcf3bc91df27a8fcf3",
+    "dirty_tracked_files": 0
+  },
+  "tools": {
+    "valgrind": {
+      "path": "/workspace/scratch/trace-profile-tools/root/usr/bin/valgrind",
+      "version": "valgrind-3.24.0"
+    }
+  },
+  "host": {
+    "hostname": "b7595b31a984",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "avx512f",
+      "avx512ifma",
+      "bmi2",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.18.57",
+    "arch": "x86_64",
+    "logical_cpus": 1,
+    "mem_kib": 18440100,
+    "event_sources": [
+      "breakpoint",
+      "msr",
+      "software"
+    ],
+    "hardware_pmu": false,
+    "perf_event_paranoid": "2",
+    "kptr_restrict": "0",
+    "gpus": []
+  },
+  "hotspots_method": "callgrind",
+  "event": "Ir (instructions executed, simulated)"
+}

@@ -1,0 +1,512 @@
+{
+  "calibration": {
+    "abs_diff_lt_0.3": true,
+    "ci95": [
+      -0.12251075209736961,
+      0.673487656328996
+    ],
+    "diff": 0.2754884521158132,
+    "pass_interval_contains_0": true,
+    "per_seed_rhodp_mean": {
+      "1": 1.8277526957646304,
+      "2": 1.2508797970639447
+    },
+    "rho_e_mean": 1.2638277942984744,
+    "rho_e_n": 32,
+    "rho_e_sd": 0.5582914150357324,
+    "rhodp_mean": 1.5393162464142875,
+    "rhodp_n": 16,
+    "rhodp_sd": 0.6659298582824509,
+    "welch_df": 25.85052965240425
+  },
+  "failures": [],
+  "fits": [
+    {
+      "df": 24.0,
+      "intercept": 14.98673472629395,
+      "label": "derived (slope, intercept), model (p_star, line extrapolation)",
+      "line_at_new_primes": {
+        "1301": 0.9406199156045157,
+        "1451": 0.7481127557794854,
+        "1601": 0.6085718498857637
+      },
+      "n_points": 26,
+      "n_valid_boot": 20000,
+      "p_star": 1263.5958607950272,
+      "p_star_ci95_boot": [
+        1197.0001703865544,
+        1348.0525765742016
+      ],
+      "slope": -2.098477881476177,
+      "slope_ci95_boot": [
+        -2.233509923046022,
+        -1.976942438206004
+      ],
+      "slope_ci95_t": [
+        -2.208448176356014,
+        -1.9885075865963395
+      ],
+      "slope_se": 0.05327157833675311,
+      "variant": "A primary: measured rho wherever it exists (503, 1009 keep the pooled 1.344 assumption)"
+    },
+    {
+      "df": 24.0,
+      "intercept": 15.012142372719055,
+      "label": "derived (slope, intercept), model (p_star, line extrapolation)",
+      "line_at_new_primes": {
+        "1301": 0.9123905667861832,
+        "1451": 0.7250440491355421,
+        "1601": 0.5893540458278216
+      },
+      "n_points": 26,
+      "n_valid_boot": 20000,
+      "p_star": 1245.581686479714,
+      "p_star_ci95_boot": [
+        1181.2624922140096,
+        1327.9695692875284
+      ],
+      "slope": -2.1062703102278713,
+      "slope_ci95_boot": [
+        -2.2405447004777743,
+        -1.9835151326532736
+      ],
+      "slope_ci95_t": [
+        -2.2158585603258314,
+        -1.9966820601299111
+      ],
+      "slope_se": 0.053086509009184636,
+      "variant": "B: as A, with 503 and 1009 priced at the new-prime rhodp pooled mean"
+    },
+    {
+      "df": 18.0,
+      "intercept": 15.015666233744021,
+      "label": "derived (slope, intercept), model (p_star, line extrapolation)",
+      "line_at_new_primes": {
+        "1301": 0.9175460105503231,
+        "1451": 0.7291643148671686,
+        "1601": 0.5927203778844985
+      },
+      "n_points": 20,
+      "n_valid_boot": 20000,
+      "p_star": 1248.9111253481947,
+      "p_star_ci95_boot": [
+        1170.5244242333838,
+        1350.5989450458374
+      ],
+      "slope": -2.105975965400684,
+      "slope_ci95_boot": [
+        -2.2417605996597048,
+        -1.9771028510142081
+      ],
+      "slope_ci95_t": [
+        -2.2341424493682314,
+        -1.9778094814331368
+      ],
+      "slope_se": 0.061002610170179584,
+      "variant": "C: only points with measured rho (503 and 1009 dropped)"
+    },
+    {
+      "df": 7.0,
+      "intercept": 10.037959272068377,
+      "label": "derived (slope, intercept), model (p_star, line extrapolation)",
+      "line_at_new_primes": {
+        "1301": 0.8278086114796682,
+        "1451": 0.7085057887445374,
+        "1601": 0.6157602821086312
+      },
+      "n_points": 9,
+      "n_valid_boot": 18026,
+      "p_star": 1139.5454973531532,
+      "p_star_ci95_boot": [
+        210.81672363811148,
+        1352.0099172412336
+      ],
+      "slope": -1.426173702126921,
+      "slope_ci95_boot": [
+        -3.6389009632502773,
+        -0.16829071937605947
+      ],
+      "slope_ci95_t": [
+        -3.236563921435623,
+        0.3842165171817815
+      ],
+      "slope_se": 0.7654926931537853,
+      "variant": "D: new primes only, vs rhodp"
+    },
+    {
+      "df": 7.0,
+      "intercept": 13.945684443443195,
+      "label": "derived (slope, intercept), model (p_star, line extrapolation)",
+      "line_at_new_primes": {
+        "1301": 1.3356641900418664,
+        "1451": 1.0850442298371537,
+        "1601": 0.8996714020761564
+      },
+      "n_points": 9,
+      "n_valid_boot": 19033,
+      "p_star": 1514.5403021629531,
+      "p_star_ci95_boot": [
+        1396.7344021678505,
+        2553.149735466779
+      ],
+      "slope": -1.9044021944565945,
+      "slope_ci95_boot": [
+        -3.8774762973493435,
+        -0.2825929128755475
+      ],
+      "slope_ci95_t": [
+        -3.5932761567212905,
+        -0.21552823219189876
+      ],
+      "slope_se": 0.7141116119512455,
+      "variant": "E: new primes only, vs rhostrong"
+    },
+    {
+      "df": 24.0,
+      "intercept": 14.861695140367294,
+      "label": "derived (slope, intercept), model (p_star, line extrapolation)",
+      "line_at_new_primes": {
+        "1301": 0.9248618287389216,
+        "1451": 0.7367912166399367,
+        "1601": 0.6002519271608036
+      },
+      "n_points": 26,
+      "n_valid_boot": 20000,
+      "p_star": 1253.125833490338,
+      "p_star_ci95_boot": [
+        1186.529315610097,
+        1336.8964437551292
+      ],
+      "slope": -2.083396794148695,
+      "slope_ci95_boot": [
+        -2.216961287812236,
+        -1.960711813512297
+      ],
+      "slope_ci95_t": [
+        -2.1924032597359266,
+        -1.974390328561463
+      ],
+      "slope_se": 0.052804682183383723,
+      "variant": "F: as A, with every predecessor cover S multiplied by the reproduction ratio (new binary / predecessor binary at p = 1009 seed 1; a uniform-factor assumption)"
+    }
+  ],
+  "labels": "measured: cover S (total_muls/(c_add_e sqrt l)), rho samples; derived: ratios, intervals, fits; model: p*, fitted line, preregistered predictions",
+  "per_prime": [
+    {
+      "model_ratio": 1.0446185965436459,
+      "n_seeds": 3,
+      "p": 1301,
+      "rhodp": {
+        "ci95_boot": [
+          0.5867464578571523,
+          1.1191409426034038
+        ],
+        "n": 9,
+        "n_instances": 3,
+        "per_seed_ratio": [
+          0.9049535345272766,
+          0.8096172008358637,
+          0.6814031024483965
+        ],
+        "ratio_geo_mean": 0.7932986305168394,
+        "s_mean": 1.6509100170208972,
+        "s_sd": 0.7952603558751168,
+        "verdict": "not resolved"
+      },
+      "rhostrong": {
+        "ci95_boot": [
+          1.0850593841517744,
+          1.6991886348977845
+        ],
+        "n": 6,
+        "n_instances": 3,
+        "per_seed_ratio": [
+          1.5386993383592207,
+          1.3765982492141302,
+          1.1585948481221888
+        ],
+        "ratio_geo_mean": 1.3488516606934635,
+        "s_mean": 0.9709478764595157,
+        "s_sd": 0.34748925346936493,
+        "verdict": "above measured rho at p"
+      },
+      "rhostrong_s_tuned_mean": 0.40403808917355555,
+      "s_geo_mean": 1.3096646556092097,
+      "s_per_seed": [
+        1.4939968550895473,
+        1.336605146812347,
+        1.1249352074611745
+      ]
+    },
+    {
+      "model_ratio": 0.8352337125289202,
+      "n_seeds": 3,
+      "p": 1451,
+      "rhodp": {
+        "ci95_boot": [
+          0.6448314010257258,
+          0.970331260004336
+        ],
+        "n": 9,
+        "n_instances": 3,
+        "per_seed_ratio": [
+          0.7041442827869867,
+          0.7430658831613773,
+          0.8899384941067486
+        ],
+        "ratio_geo_mean": 0.7750855800796439,
+        "s_mean": 1.3947415562127494,
+        "s_sd": 0.6706700929317494,
+        "verdict": "below measured rho at p"
+      },
+      "rhostrong": {
+        "ci95_boot": [
+          0.8191032152370294,
+          1.4765651810338998
+        ],
+        "n": 6,
+        "n_instances": 3,
+        "per_seed_ratio": [
+          0.9655162869597074,
+          1.0188852341977261,
+          1.2202756330727695
+        ],
+        "ratio_geo_mean": 1.0627903536936012,
+        "s_mean": 1.0171752729983898,
+        "s_sd": 0.47681391776495785,
+        "verdict": "not resolved"
+      },
+      "rhostrong_s_tuned_mean": 0.4232750495962527,
+      "s_geo_mean": 1.0810440681583442,
+      "s_per_seed": [
+        0.9820992927726321,
+        1.0363848662491004,
+        1.2412342002040773
+      ]
+    },
+    {
+      "model_ratio": 0.6826906902725419,
+      "n_seeds": 3,
+      "p": 1601,
+      "rhodp": {
+        "ci95_boot": [
+          0.44793522553161724,
+          0.8110584227947709
+        ],
+        "n": 9,
+        "n_instances": 3,
+        "per_seed_ratio": [
+          0.8101409969466927,
+          0.5189098606268491,
+          0.4819959924380925
+        ],
+        "ratio_geo_mean": 0.5873522727984392,
+        "s_mean": 1.3805159210541875,
+        "s_sd": 0.3848694213107336,
+        "verdict": "below measured rho at p"
+      },
+      "rhostrong": {
+        "ci95_boot": [
+          0.6575121205131383,
+          1.3390451513936705
+        ],
+        "n": 6,
+        "n_instances": 3,
+        "per_seed_ratio": [
+          1.254523501354245,
+          0.8035448368793918,
+          0.7463827930583515
+        ],
+        "ratio_geo_mean": 0.9095296159267892,
+        "s_mean": 0.8915038605305573,
+        "s_sd": 0.3824839626607085,
+        "verdict": "not resolved"
+      },
+      "rhostrong_s_tuned_mean": 0.3709797783962816,
+      "s_geo_mean": 0.8108491638656076,
+      "s_per_seed": [
+        1.1184125445836213,
+        0.7163633241873747,
+        0.6654031414451005
+      ]
+    }
+  ],
+  "predecessor_pooled_rho_e": 1.3437081189498146,
+  "reproduction": {
+    "bit_identical": false,
+    "new": 429320392173,
+    "p": 1009.0,
+    "predecessor": 452313823812,
+    "ratio_new_over_predecessor": 0.9491648708739068,
+    "seed": 1
+  },
+  "rhodp_threads": {
+    "1301": [
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    "1451": [
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    "1601": [
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4
+    ]
+  },
+  "section_5a_one_sided": [
+    {
+      "arm": "rhodp",
+      "band": [
+        {
+          "S_over_rho_priced_cover_at_0": 0.7932986305168394,
+          "rho_S_priced": 1.6509100170208972,
+          "w": 0.0
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.7211811587131398,
+          "rho_S_priced": 1.8159995443393824,
+          "w": 0.1
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.3966510864508305,
+          "rho_S_priced": 3.301805290205748,
+          "w": 1.0
+        }
+      ],
+      "native_per_sqrt_l": 1.6508952731848507,
+      "p": 1301
+    },
+    {
+      "arm": "rhostrong",
+      "band": [
+        {
+          "S_over_rho_priced_cover_at_0": 1.3488516606934635,
+          "rho_S_priced": 0.9709478764595157,
+          "w": 0.0
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.5003493190965511,
+          "rho_S_priced": 2.617500625311108,
+          "w": 0.1
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.07511063034218067,
+          "rho_S_priced": 17.436475364975436,
+          "w": 1.0
+        }
+      ],
+      "native_per_sqrt_l": 16.46552748851592,
+      "p": 1301
+    },
+    {
+      "arm": "rhodp",
+      "band": [
+        {
+          "S_over_rho_priced_cover_at_0": 0.7750855800796439,
+          "rho_S_priced": 1.3947415562127494,
+          "w": 0.0
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.7046237185156925,
+          "rho_S_priced": 1.5342147017639296,
+          "w": 0.1
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.3875441933349283,
+          "rho_S_priced": 2.789473011724551,
+          "w": 1.0
+        }
+      ],
+      "native_per_sqrt_l": 1.3947314555118018,
+      "p": 1451
+    },
+    {
+      "arm": "rhostrong",
+      "band": [
+        {
+          "S_over_rho_priced_cover_at_0": 1.0627903536936012,
+          "rho_S_priced": 1.0171752729983898,
+          "w": 0.0
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.39423236816816165,
+          "rho_S_priced": 2.7421494414107057,
+          "w": 0.1
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.05918043371500016,
+          "rho_S_priced": 18.26691695712155,
+          "w": 1.0
+        }
+      ],
+      "native_per_sqrt_l": 17.24974168412316,
+      "p": 1451
+    },
+    {
+      "arm": "rhodp",
+      "band": [
+        {
+          "S_over_rho_priced_cover_at_0": 0.5873522727984392,
+          "rho_S_priced": 1.3805159210541875,
+          "w": 0.0
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.5339568333808,
+          "rho_S_priced": 1.5185668825167693,
+          "w": 0.1
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.2936768071816859,
+          "rho_S_priced": 2.7610255356800044,
+          "w": 1.0
+        }
+      ],
+      "native_per_sqrt_l": 1.3805096146258167,
+      "p": 1601
+    },
+    {
+      "arm": "rhostrong",
+      "band": [
+        {
+          "S_over_rho_priced_cover_at_0": 0.9095296159267892,
+          "rho_S_priced": 0.8915038605305573,
+          "w": 0.0
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.3373808578390913,
+          "rho_S_priced": 2.403364461929046,
+          "w": 0.1
+        },
+        {
+          "S_over_rho_priced_cover_at_0": 0.050646071152597165,
+          "rho_S_priced": 16.010109874515443,
+          "w": 1.0
+        }
+      ],
+      "native_per_sqrt_l": 15.118606013984886,
+      "p": 1601
+    }
+  ]
+}

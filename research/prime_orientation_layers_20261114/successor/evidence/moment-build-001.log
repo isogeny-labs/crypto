@@ -1,0 +1,9 @@
+../evidence/moment-draft-001.lean.txt:66:4: error: linarith failed to find a contradiction
+case h1
+u x y : ℕ
+q : ℚ
+hd : q - delta (rowResidue u x) y ≠ 0
+hs : ↑x = ↑(rowResidue u x) + 2 ^ u * ↑(rowQuotient u x)
+a✝ : 1 + 2 ^ u * ↑(rowQuotient u x) / (q - (↑y - ↑(rowResidue u x))) < (q - (↑y - ↑x)) / (q - (↑y - ↑(rowResidue u x)))
+⊢ False
+failed

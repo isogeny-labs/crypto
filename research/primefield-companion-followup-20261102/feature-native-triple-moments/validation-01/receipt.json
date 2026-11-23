@@ -1,0 +1,71 @@
+{
+  "scope": "third-sign moment software checks; no timing panel",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "source_hashes": {
+    "feature-native-triple-moments/lib.rs": "5012fbb6ac2e4d08b1035be7a263266450bb9dc23b8102cd9ed1b4db72e4b4fb"
+  },
+  "commands": [
+    {
+      "name": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--test",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-triple-moments/lib.rs",
+        "-o",
+        "/tmp/standalone-source-f9qd9a49/tests"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "test",
+      "argv": [
+        "/tmp/standalone-source-f9qd9a49/tests",
+        "triple_tests::",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout": 30,
+      "exit": 0,
+      "stdout_sha256": "3f996223000ed38ba0f8c20ae37de72877b29f2714a189a35f2c1318a8bf497b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "normal-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--crate-type=lib",
+        "--emit=metadata,dep-info=/tmp/standalone-source-f9qd9a49/production.d",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-triple-moments/lib.rs",
+        "-o",
+        "/tmp/standalone-source-f9qd9a49/production.rmeta"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "binary_hashes": {
+    "tests": "f7b9d602fcb23065a210a1edb659fc5e4dd3e40e9108813ac43d7435231b6872",
+    "production.rmeta": "d8ae42218797005af704b1ddeaa82d61a599d98bc27ee32344ea09aa8305875f"
+  },
+  "normal_dependency_exclusions": {
+    "feature-native-source/": true,
+    "feature-native-division/": true,
+    "feature-native-normalized-transport/": true,
+    "feature-native-half-gcd/transport.rs": true,
+    "feature-native-monomial-recovery/": true,
+    "feature-native-batch-reciprocals/": true
+  },
+  "sources_unchanged": true,
+  "passed": true
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T11:47:45Z",
+ "id": "PCC-20261112-8b6f8c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "92cc496cd5b371080ac3c0dbd3dfe01f208121df",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e60508bddc136f674af5dbf2ebd0a7fd51d5408eb796e33a9899de47321f3133",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+   "theorem": "QuarticGluing.sum_kernel_projection_injective"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful ring/structural consequences:h4duplication,injectivefactor kernelprojection,bijectionofkernels undercommutingsquare,and saturatedTate-lattice implications. Actual varieties,Picard,polarization,finitecardinality,Tate exactness/classification remain written;failed01 retained.",
+ "statement": "theorem sum_kernel_projection_injective {E F A : Type} [IntModule A] (e : E \u2192 A) (f : F \u2192 A) (hf : Function.Injective f) (p : E) (q r : F) (hq : e p+f q=0) (hr : e p+f r=0) : q=r"
+}

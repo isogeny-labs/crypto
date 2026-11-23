@@ -1,0 +1,40 @@
+{
+  "schema": "external-merge-retention/v1",
+  "merge": "3f50ddffe7504818c1fd44dfbf362d54e3f3348c",
+  "parents": [
+    "1dc3b7784d226976408d8473915549c8c33f8758",
+    "0312f470be421c5e2da66de996417538d65d9fed"
+  ],
+  "journal": [
+    {
+      "ref": "1dc3b7784d226976408d8473915549c8c33f8758",
+      "sha256": "d7014d0fc3054392a9cd11c6af7797b1124ccd9a980c0d4d3bd9b77b36af1c77",
+      "distinct_blocks": 12,
+      "missing": []
+    },
+    {
+      "ref": "0312f470be421c5e2da66de996417538d65d9fed",
+      "sha256": "30e048227720c7fa5895d12454cbea5a9f2e3fb721d45a464d1b2a3941c22fbf",
+      "distinct_blocks": 23,
+      "missing": []
+    }
+  ],
+  "ledger": [
+    {
+      "ref": "1dc3b7784d226976408d8473915549c8c33f8758",
+      "rows": 1182,
+      "sha256": "def49164126f653fbeedad58a1c9aaf3d0d68c26a400e49cdf342a7ccf7d3866",
+      "common_prefix_rows": 1179,
+      "full_prefix_preserved": false
+    },
+    {
+      "ref": "0312f470be421c5e2da66de996417538d65d9fed",
+      "rows": 1184,
+      "sha256": "d14b8e439cb3f7d906ec4ddd6ce0783c64329b08007f4ea601a5668b83c6bf1c",
+      "common_prefix_rows": 1184,
+      "full_prefix_preserved": true
+    }
+  ],
+  "merged_ledger_sha256": "02641c4bed6bfb27a5e7cf83988243c104ecd3f769a8e643019398006c007c0c",
+  "action": "Read-only audit; no external merge, published ledger or historical journal repaired."
+}

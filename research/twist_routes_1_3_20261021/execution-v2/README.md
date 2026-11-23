@@ -1,0 +1,193 @@
+# Follow-up execution, 2026-10-23
+
+[Current results and remaining requirements](../reports/followup-20261023/RESULTS.md)
+and [combined PDF](../reports/followup-20261023/RESULTS.pdf).
+[Native assessment](assessment-20261023-v3/ASSESSMENT.json),
+[tracking update](TRACKING_20261023.json), and
+[universal supporting certificates](identities-20261023-v1/SUMMARY.json).
+
+E18–E25 and E29 have bounded, locally verified partial evidence. E26 now
+has the separately frozen pilot described below; its full acceptance criteria
+remain open. E27 complete accounting and E28 final selection remain unrun;
+final target labels 32–63 have not been generated. The new E30 finite-incidence pilot completes its 270 correctness
+cells, including independent PARI replay, and finds no maximum-generator-degree
+reduction in its fixed grid. Its full solver/cost experiment remains open.
+All sixteen route/follow-up cards remain blocked and unfunded; no cairn lease,
+allocation or funding transaction was performed. Raw-artifact publication is
+now verified as described below.
+
+No calibrated IC speedup, novelty, independent-host replay or NIST DLP is
+established. Public P-521 work constructs torsion and explicit cover maps;
+it does not attempt a public-curve logarithm. BHLS degree-three geometry is
+prior art (arXiv:1403.6911, Algorithm 5.4 and Appendix A).
+
+## Evidence publication and extraction
+
+The full deterministic raw archive exceeds Git's 10 MiB limit. Its exact
+38,156,064 bytes are published in `s3://setec-astronomy-artifacts/store`, using
+the [study-local store index](../store/index.json). **A fresh remote download
+matches the archive SHA-256, and all 36,083 original file hashes verify after
+restoring the 104 separately tracked metadata files.** See
+[RAW_ARTIFACTS.json](RAW_ARTIFACTS.json), the
+[corrected publication report](../reports/publication-20261025-setec/REPORT.md),
+and [store reproduction instructions](../store/README.md).
+
+The 2026-10-23 missing-credential attempts remain in
+[checks/final-20261023/](checks/final-20261023/). The first 2026-10-25 denials
+used the wrong repository-default bucket, `crypto-autoresearcher`; that
+[historical report and unapplied policy](../reports/publication-20261025/REPORT.md)
+do not describe the intended destination's permissions. No IAM or bucket
+policy change was needed for the corrected upload. The
+[remaining merge hold](../../../problems/twist-followup-evidence-publication.md)
+concerns the twelve already committed oversized evidence blobs.
+
+Small `SUMMARY.json`, `ADJUDICATION.json` and `INVENTORY.json` files stay loose
+because the current report, geometry input manifest and assessment name them.
+The archive contains the remainder of `runs/`, including failed runs, native
+coordinate witnesses, CAS inputs/outputs, parsed bases and checker scripts.
+It does not contain duplicate copies of those loose metadata files. Original
+commands inside receipts are historical extraction/replay inputs; restore
+the complete tree before invoking a checker. The `/runs/` ignore rule prevents
+accidentally adding the large raw tree; the selected loose files are tracked
+explicitly. No committed historical tree was repacked.
+
+Fetch the verified bundle from the repository root:
+
+```sh
+CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store \
+CRYPTO_STORE_INDEX=research/twist_routes_1_3_20261021/store/index.json \
+ecbench store pull \
+  store:evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz \
+  --out research/twist_routes_1_3_20261021/execution-v2/runs.tar.xz
+```
+
+Then extract from this directory:
+
+```sh
+# From this directory, after verifying RAW_ARTIFACTS.json's exact digest:
+sha256sum -c runs.tar.xz.sha256
+tar -xJf runs.tar.xz
+```
+
+Repack the raw remainder with the exact command in `RAW_ARTIFACTS.json`.
+The archive uses sorted names, 2026-10-23 midnight UTC, uid/gid zero,
+normalized modes, GNU tar and single-threaded xz -6. A successful store
+upload and fresh verified pull now have a real study-local `store/index.json`
+entry. The repository's shared default and its unrelated index entries retain
+their existing destination. Do not split the blob or add a local-only store
+entry to evade the limit.
+
+## Existing oversized-file merge hold
+
+The full PR check against main `a53a7e2b` fails on twelve already committed
+execution-v1 evidence files: one 11,663,186-byte ecbench `records.jsonl` and
+eleven historical split solver archive parts. The exact paths and sizes are
+in [large-files.stdout](checks/final-20261023/large-files.stdout).
+The scoped follow-up check against preceding PR head `386dd5df` passes:
+[large-files-followup.stdout](checks/final-20261023/large-files-followup.stdout).
+No new follow-up Git blob exceeds the limit.
+
+AGENTS.md §13 requires an owner/reviewer-added `large-file-ok` exception for
+an oversized Git blob. Section 13a forbids repacking, compressing or moving
+committed evidence. Preserve those historical files and the failed full-PR
+check; no exception is self-applied and no history is rewritten. This is a
+separate merge hold from uploading the new raw bundle to the store.
+
+## E26 encoding pilot, 2026-10-25
+
+[Current E26 report](../reports/block-20261025/RESULTS.md) and
+[PDF](../reports/block-20261025/RESULTS.pdf) describe all four candidates,
+90 workloads on ten original fixture/target pairs, 90 exact matched-order
+checks, 18,970 independent signed-witness replays and 18,623 wrong-sign
+controls. The 631-cell bounded panel has 388 certified candidate cells;
+incomplete, truncated, timeout and global-cap omissions are retained.
+
+[Separate-worker instructions](runs/block-worker-cost-20261025-v1/COST.json)
+and [one-process-per-candidate instructions](runs/block-batch-cost-20261025-v1/COST.json)
+are distinct fixed-case diagnostics in simulated guest instructions Ir. They
+include worker startup/parse/solver/serialization and exclude construction,
+parent orchestration, certification, lifting and complete IC. No admitted
+time, GAE conversion, fastest-tool or calibrated speedup claim follows.
+The new [raw manifest](block-20261025/RAW_ARTIFACTS.json) and
+[reproduction instructions](block-20261025/README.md) cover this wave only;
+the earlier archive and committed evidence are unchanged. All 16 cards
+remain blocked and unfunded. GitHub initially returned 403/404; CLI access
+now succeeds and resolves the existing PR to isogeny-labs/crypto. The
+[delivery receipt](block-checks-20261025/DELIVERY.json) tracks the actual head
+and CI; the [access history](../../../problems/twist-github-repository-access.md)
+retains the earlier failures.
+
+## Source and protocol freezes
+
+Raw stdout/stderr remain byte-preserved, including tool-emitted trailing
+whitespace. Scoped Git attributes cover only those log extensions; source
+and documentation retain strict whitespace checks.
+
+Each command requires fresh output. The receipt records the exact source
+revision, pinned binary, argv, hashes, caps, thread count and isolation L0.
+No recorded wall time is admitted. Run the historical revision for replay.
+The mathematical drivers and statistical assessment are native Rust/CAS;
+JavaScript handles transport metadata, hashing and document rendering only.
+
+- [Gluing protocol and first correction](GLUING_PROTOCOL_V2.md): actual
+  three-torsion and necessary module filters. All four corrected torsion
+  replays pass; original malformed GP attempts remain.
+- [Divisor protocol](DIVISOR_PROTOCOL_V1.md) and
+  [chart/field correction](DIVISOR_AMENDMENT_V2.md): explicit BHLS transfer
+  and independent arbitrary-class replay. All original source points and
+  5,855 old divisor classes have accepted independent replay. Polarized graph
+  identification, second-map transfer and formal bridges remain open.
+- [Higher-prime protocol](HIGHER_TORSION_PROTOCOL_V1.md) and
+  [constructor branch correction](HIGHER_TORSION_AMENDMENT_V2.md): five
+  selected toy torsion/pairing/Frobenius/graph certificates pass; quotients
+  and maps at ell>=5 remain unconstructed.
+- [Coupled-component protocol](COUPLED_PROTOCOL_V1.md): image/fiber census,
+  identical projected-row controls and exact energy/random-base diagnostics.
+- [Projection/partial protocol](PROJECTION_PARTIAL_PROTOCOL_V1.md) and
+  [witness-retention correction](PARTIAL_AMENDMENT_V2.md): the original E23
+  filenames omitted arity. Preserve v1 as incomplete evidence. V2 and the
+  fresh native assessment replay 20,976 unique arm witnesses successfully.
+- [Homogeneous protocol](HOMOGENEOUS_PROTOCOL_V1.md), its
+  [declaration repair](HOMOGENEOUS_AMENDMENT_V2.md) and
+  [complete-basis alternative](HOMOGENEOUS_AMENDMENT_V3.md): applicable F4
+  affine outputs pass completeness; three full homogeneous checks remain
+  incomplete. Both signature modes fail every cell and the positive control.
+- [Assessment protocol](ASSESSMENT_PROTOCOL_V1.md) and
+  [streaming correction](ASSESSMENT_AMENDMENT_V3.md): v1 catches the E23
+  witness checksum bug; v2 exhausts the unchanged memory cap; v3 streams and
+  passes. Each earlier failure and partial output is retained.
+- [E30 incidence protocol](INCIDENCE_PROTOCOL_V1.md): all 270 fixed cells
+  and independent finite-grid projection checks pass; no degree reduction.
+- [Supporting identity protocol](IDENTITIES_PROTOCOL_V1.md): four IDC1
+  records, 32 issuer plus 64 extra checker points, false controls rejected.
+  These cover universal coordinate/interpolation steps over the schema's
+  Mersenne field, not the specific model identities in different fields.
+
+The manual E25 S-pair checker printed its 49-row summary but lost its JSON
+receipt when its mutable wrapper's receipt tail failed to parse. It is not
+given an invented successful receipt. The separately frozen leading-ideal
+replay has a complete successful receipt. See
+[FREEZE_CORRECTION_20261023.md](FREEZE_CORRECTION_20261023.md) for the earlier
+pre-freeze invocation error. Stack-warning gate amendments retain both the
+initial conservative rejections and subsequent exact-warning acceptance;
+real GP errors remain inadmissible.
+
+## Verification and reports
+
+Full root library tests pass 4,492 cases with 119 existing ignored tests.
+The standalone experiment suite passes its recorded 13/111/16-test binaries;
+the isolated supporting identity suite passes 22 cases. Logs retain the
+initial preserve-order/canonicalization test failure and its isolated replay.
+The [Lean v2 replay](../lean-v2/replay.sh) has durable build/axiom receipts in
+[lean-v2/receipts/resume-20261023-v1](../lean-v2/receipts/resume-20261023-v1/):
+17 exported theorems, zero failing and zero trusted/native_decide declarations.
+The concrete twist-group, odd-subgroup/projector and row-module formal bridges
+are still open.
+
+The report builder reads recorded native results and produces editable SVG,
+plot inputs, Markdown/HTML and PDFs. Chromium attempts failed in the managed
+runtime; their logs are retained, and the final renderer is Pandoc/XeLaTeX
+with Inkscape vector conversion. Every final PDF is inspected before commit.
+Existing scoreboard, timeline, curve-cover catalog and historical study graphs
+are unchanged: no performance value or complete typed transfer route is
+promoted. The new report's visual record describes this wave separately.

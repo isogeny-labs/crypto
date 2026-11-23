@@ -1,0 +1,62 @@
+import StoredFast
+import FastCallControls
+set_option autoImplicit false
+namespace StoredControls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput
+
+def paddedIdentity : Stored := ⟨0,#[1,7,8],#[9,10]⟩
+def pointZero : Stored := ⟨1,#[0,1,8],#[0,9]⟩
+def supportZero : Stored := ⟨2,#[0,0,1],#[0,0]⟩
+
+theorem degree_zero_padding : WellFormed 17 (X^5) paddedIdentity ∧
+ up paddedIdentity=[1] ∧ vp paddedIdentity=[] ∧ paddedIdentity≠identity := by
+ norm_num [WellFormed,paddedIdentity,up,vp,trimFuel,Stored.canonical,Canon,wordsPoly,listPoly,identity]
+
+theorem degree_one_trim : WellFormed 17 (X^5) pointZero ∧
+ up pointZero=[0,1] ∧ vp pointZero=[] := by
+ norm_num [WellFormed,pointZero,up,vp,trimFuel,Stored.canonical,Canon,wordsPoly,listPoly]
+
+theorem degree_two_trim : WellFormed 17 (X^5) supportZero ∧
+ up supportZero=[0,0,1] ∧ vp supportZero=[] := by
+ norm_num [WellFormed,supportZero,up,vp,trimFuel,Stored.canonical,Canon,wordsPoly,listPoly]
+ exact ⟨X^3,by ring⟩
+
+theorem malformed_storage :
+ ¬WellFormed 17 (X^5) ⟨2,#[0,1],#[0,0]⟩ ∧
+ ¬WellFormed 17 (X^5) ⟨2,#[0,0,0],#[0,0]⟩ ∧
+ ¬WellFormed 17 (X^5) ⟨3,#[0,0,1],#[0,0]⟩ := by
+ simp [WellFormed]
+
+def a : Stored := ⟨2,#[0,0,1],#[1,0]⟩
+def b : Stored := ⟨2,#[1,0,1],#[1,1]⟩
+
+theorem actual_extract : extract a b=FastPreludeControls.small ∧
+ FastPrelude.normWord 17 (extract a b)≠0 ∧ FastPrelude.s1Word 17 (extract a b)≠0 := by exact ⟨rfl,by decide,by decide⟩
+
+theorem actual_inputs_valid :
+ WellFormed 17 (wordsPoly 17 FastCallControls.fwords) a ∧
+ WellFormed 17 (wordsPoly 17 FastCallControls.fwords) b := by
+ constructor
+ · refine ⟨by decide,by decide,by decide,by unfold Stored.canonical Canon a;simp,by decide,?_⟩
+   refine ⟨X^3-X^2-X,?_⟩
+   rw [FastCallControls.fixture_decoding]
+   norm_num [a,up,vp,trimFuel,wordsPoly,listPoly,FastPayloadControls.curve]
+   ring
+ · refine ⟨by decide,by decide,by decide,by unfold Stored.canonical Canon b;simp,by decide,?_⟩
+   refine ⟨X^3-X^2-2*X,?_⟩
+   rw [FastCallControls.fixture_decoding]
+   norm_num [b,up,vp,trimFuel,wordsPoly,listPoly,FastPayloadControls.curve]
+   ring
+
+theorem actual_stored_fast :
+ ∃ q r, FallbackWord.exactDiv 17
+ (ResidualWord.residual 17 FastCallControls.fwords (FastCalls.v 17 (extract a b)))
+ (FastCalls.u 17 (extract a b))=some q ∧
+ MumfordValidity.Valid (wordsPoly 17 FastCallControls.fwords)
+ (wordsPoly 17 (FastCalls.scaled 17 (extract a b) q)) (wordsPoly 17 r) := by
+ obtain ⟨q,r,hq,_,_,_,_,_,_,_,_,hv⟩:= stored_fast_calls 17 FastCallControls.fwords a b
+  (by decide) (by decide) (by simp [Canon,FastCallControls.fwords])
+  (by rw [FastCallControls.fixture_decoding];exact FastPayloadControls.curve_degree)
+  actual_inputs_valid.1 actual_inputs_valid.2 (by rfl) (by rfl) actual_extract.2.1 actual_extract.2.2
+ exact ⟨q,r,hq,hv⟩
+end StoredControls

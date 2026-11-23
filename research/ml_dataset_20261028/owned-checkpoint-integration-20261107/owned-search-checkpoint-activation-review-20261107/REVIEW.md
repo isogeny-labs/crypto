@@ -1,0 +1,15 @@
+# Checkpoint activation composition review
+
+Reviewed the eight activated source files in `/home/ec2-user/crypto-ml-checkpoint-integration-20261107` against the four frozen proposals. Exact source hashes and byte-equality results are in SOURCE_BINDINGS.json. No new blocking composition defect was found in this read-only review.
+
+The activated diff contains 148 insertions and 24 deletions across eight source files. `git diff --check` completed with exit 0. The subsequent status listed exactly those eight modified source paths. This review did not edit the checkout, run Cargo, or execute cloud jobs.
+
+Cross-module checks:
+
+- Scheduler, search, and continuation hook signatures forward the same mutable parent owner and original absolute deadline. Search and continuation unwrap their admission bridges at the callback boundary, matching the owner's MatrixAdmission argument and the encoder's Budget parameter. Module paths resolve through the existing boolean_search parent; checkpoint_native is visible to that parent.
+- The sole owning-attempt initializer supplies checkpoint_control=None. The sole relevant Caps factory initializes the added optional cadence, and for_owner selects it only after matching the exact admitted request. All four EncodingSource initializers supply live; only checkpoint_native creates a live overlay.
+- The serialized policy enum and worker exhaustive dispatch both include ConservativeAffineEnvelopeCheckpointV1. Its cadence is one committed batch per hook, with sixteen hook attempts; the old policy remains hook-free. Sixteen does not bound all snapshots: existing initial, post-exclusion and final snapshots remain governed by unchanged global capture limits. No arithmetic cap or deadline is replenished.
+- The owner restores the shared checkpoint control and retained continuation before interpreting terminal failure. Exact publication Stop survives callback error erasure. Native and search attempts are installed before errors propagate. The live overlay checks active Running indices, absent installed child slots, and a coherent committed native batch; it serializes these borrowed children without constructing a false completed state.
+- Source searches found the relevant constructors and policy matches consistently updated. Existing unrelated Caps/OwnedAttempt types are separate types. The changed source does not activate the research-only strict-prefix parser, snapshot selector or historical export route; current report/export admission is unchanged.
+
+Evidence scope: source composition inspection plus byte equality to previously reviewed frozen components. Focused component and durable fixture tests remain their original evidence, including their documented identity, normalization, policy and controlled-filesystem seams. This is not a full assembled owner typecheck, a complete original-cell execution, or new validation of central export. The review found no source-level mismatch requiring a change before the separately controlled integration validation.

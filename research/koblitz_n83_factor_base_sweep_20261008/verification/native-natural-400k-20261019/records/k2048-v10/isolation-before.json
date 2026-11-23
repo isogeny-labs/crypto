@@ -1,0 +1,152 @@
+{
+  "eviction": {
+    "failed_kernel_threads": 64,
+    "failed_user_threads": 0,
+    "moved_count": 485
+  },
+  "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+  "plan": {
+    "node": 0,
+    "observed": [
+      14,
+      30
+    ],
+    "request": {
+      "explicit": [
+        14,
+        30
+      ]
+    },
+    "reserved": [
+      14,
+      30
+    ],
+    "run_cpu": 14,
+    "unreserved_siblings": []
+  },
+  "preflight": {
+    "after": {
+      "loadavg": [
+        10.34,
+        10.74,
+        10.64
+      ],
+      "psi_cpu_some_avg10": 0.0,
+      "psi_cpu_some_total_us": 401791236,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 1803537,
+      "reserved_ticks": {
+        "14": {
+          "busy": 403138,
+          "idle": 1006896,
+          "steal": 3
+        },
+        "30": {
+          "busy": 244933,
+          "idle": 1164992,
+          "steal": 3
+        }
+      },
+      "unix_ms": 1792441090719
+    },
+    "before": {
+      "loadavg": [
+        10.34,
+        10.74,
+        10.64
+      ],
+      "psi_cpu_some_avg10": 0.0,
+      "psi_cpu_some_total_us": 401790956,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 1803537,
+      "reserved_ticks": {
+        "14": {
+          "busy": 403136,
+          "idle": 1006698,
+          "steal": 3
+        },
+        "30": {
+          "busy": 244932,
+          "idle": 1164792,
+          "steal": 3
+        }
+      },
+      "unix_ms": 1792441088718
+    },
+    "quiet": true,
+    "reasons": [],
+    "reserved_busy_seconds": {
+      "14": 0.02,
+      "30": 0.01
+    },
+    "settle_seconds": 2.0
+  },
+  "preflight_samples": [
+    {
+      "after": {
+        "loadavg": [
+          10.34,
+          10.74,
+          10.64
+        ],
+        "psi_cpu_some_avg10": 0.0,
+        "psi_cpu_some_total_us": 401791236,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 1803537,
+        "reserved_ticks": {
+          "14": {
+            "busy": 403138,
+            "idle": 1006896,
+            "steal": 3
+          },
+          "30": {
+            "busy": 244933,
+            "idle": 1164992,
+            "steal": 3
+          }
+        },
+        "unix_ms": 1792441090719
+      },
+      "before": {
+        "loadavg": [
+          10.34,
+          10.74,
+          10.64
+        ],
+        "psi_cpu_some_avg10": 0.0,
+        "psi_cpu_some_total_us": 401790956,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 1803537,
+        "reserved_ticks": {
+          "14": {
+            "busy": 403136,
+            "idle": 1006698,
+            "steal": 3
+          },
+          "30": {
+            "busy": 244932,
+            "idle": 1164792,
+            "steal": 3
+          }
+        },
+        "unix_ms": 1792441088718
+      },
+      "quiet": true,
+      "reasons": [],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.01
+      },
+      "settle_seconds": 2.0
+    }
+  ],
+  "settings": {
+    "boost": null,
+    "governor": null,
+    "in_isolcpus": false,
+    "in_nohz_full": false,
+    "no_turbo": null,
+    "smt_control": "on"
+  },
+  "uid": 0
+}

@@ -1,0 +1,67 @@
+differential_twist.cpp: In function ‘int main(int, char**)’:
+differential_twist.cpp:82:5: error: inconsistent deduction for ‘auto’: ‘std::array<std::array<T24, 3>, 3>’ and then ‘Form’
+   82 |     auto B=read_matrix3(descent.at("change_of_coordinates")),transformed=transform_form(target.f,B);T24 lambda=transformed.c.begin()->second;auto differential=scaled3(B,determinant3(B)/lambda);
+      |     ^~~~
+In file included from /tmp/tmp.4XErsKyfI4/kernel_arithmetic.hpp:1,
+                 from /tmp/tmp.4XErsKyfI4/quotient_arithmetic.hpp:2,
+                 from /tmp/tmp.4XErsKyfI4/weil3_arithmetic.hpp:3,
+                 from /tmp/tmp.4XErsKyfI4/quotient_theta2_arithmetic.hpp:1,
+                 from /tmp/tmp.4XErsKyfI4/riemann_arithmetic.hpp:1,
+                 from /tmp/tmp.4XErsKyfI4/quartic_descent_arithmetic.hpp:1,
+                 from /tmp/tmp.4XErsKyfI4/target_weil_arithmetic.hpp:2,
+                 from differential_twist.cpp:1:
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:12: error: unnecessary parentheses in declaration of ‘cover_c’ [-Werror=parentheses]
+   28 | #define cc (cover_c())
+      |            ^~~~~~~~~~~
+differential_twist.cpp:85:100: note: in expansion of macro ‘cc’
+   85 |     std::array<Line,3> fc{lc[0],lc[1],lc[2]},fa{a.gradients[0],a.gradients[1],a.gradients[2]};auto cc=frame_coordinates(lc[3],fc),ca=frame_coordinates(a.gradients[3],fa);Matrix3<T24> LC{fc},M{};
+      |                                                                                                    ^~
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:12: note: remove parentheses
+   28 | #define cc (cover_c())
+      |            ^~~~~~~~~~~
+differential_twist.cpp:85:100: note: in expansion of macro ‘cc’
+   85 |     std::array<Line,3> fc{lc[0],lc[1],lc[2]},fa{a.gradients[0],a.gradients[1],a.gradients[2]};auto cc=frame_coordinates(lc[3],fc),ca=frame_coordinates(a.gradients[3],fa);Matrix3<T24> LC{fc},M{};
+      |                                                                                                    ^~
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:22: error: declaration of ‘auto cover_c()’ has ‘extern’ and is initialized [-Werror]
+   28 | #define cc (cover_c())
+      |                      ^
+differential_twist.cpp:85:100: note: in expansion of macro ‘cc’
+   85 |     std::array<Line,3> fc{lc[0],lc[1],lc[2]},fa{a.gradients[0],a.gradients[1],a.gradients[2]};auto cc=frame_coordinates(lc[3],fc),ca=frame_coordinates(a.gradients[3],fa);Matrix3<T24> LC{fc},M{};
+      |                                                                                                    ^~
+differential_twist.cpp: At global scope:
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:13: error: ambiguating new declaration of ‘auto cover_c()’
+   28 | #define cc (cover_c())
+      |             ^~~~~~~
+differential_twist.cpp:85:100: note: in expansion of macro ‘cc’
+   85 |     std::array<Line,3> fc{lc[0],lc[1],lc[2]},fa{a.gradients[0],a.gradients[1],a.gradients[2]};auto cc=frame_coordinates(lc[3],fc),ca=frame_coordinates(a.gradients[3],fa);Matrix3<T24> LC{fc},M{};
+      |                                                                                                    ^~
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:26:4: note: old declaration ‘F& cover_c()’
+   26 | F& cover_c(){static F value;return value;}
+      |    ^~~~~~~
+differential_twist.cpp: In function ‘int main(int, char**)’:
+differential_twist.cpp:85:120: error: invalid pure specifier (only ‘= 0’ is allowed) before ‘(’ token
+   85 |     std::array<Line,3> fc{lc[0],lc[1],lc[2]},fa{a.gradients[0],a.gradients[1],a.gradients[2]};auto cc=frame_coordinates(lc[3],fc),ca=frame_coordinates(a.gradients[3],fa);Matrix3<T24> LC{fc},M{};
+      |                                                                                                                        ^
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:13: error: function ‘auto cover_c()’ is initialized like a variable
+   28 | #define cc (cover_c())
+      |             ^~~~~~~
+differential_twist.cpp:85:100: note: in expansion of macro ‘cc’
+   85 |     std::array<Line,3> fc{lc[0],lc[1],lc[2]},fa{a.gradients[0],a.gradients[1],a.gradients[2]};auto cc=frame_coordinates(lc[3],fc),ca=frame_coordinates(a.gradients[3],fa);Matrix3<T24> LC{fc},M{};
+      |                                                                                                    ^~
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:20: error: invalid use of ‘auto’
+   28 | #define cc (cover_c())
+      |             ~~~~~~~^~
+differential_twist.cpp:86:64: note: in expansion of macro ‘cc’
+   86 |     for(int j=0;j<3;++j){Line rhs;for(int i=0;i<3;++i){require(cc[i]!=T24(0)&&ca[i]!=T24(0),"four-gradient frame");rhs[i]=ca[i]/cc[i]*fa[i][j];}auto column=solve3(LC,rhs);for(int i=0;i<3;++i)M[i][j]=column[i];}
+      |                                                                ^~
+differential_twist.cpp:86:79: error: ‘ca’ was not declared in this scope; did you mean ‘fa’?
+   86 |     for(int j=0;j<3;++j){Line rhs;for(int i=0;i<3;++i){require(cc[i]!=T24(0)&&ca[i]!=T24(0),"four-gradient frame");rhs[i]=ca[i]/cc[i]*fa[i][j];}auto column=solve3(LC,rhs);for(int i=0;i<3;++i)M[i][j]=column[i];}
+      |                                                                               ^~
+      |                                                                               fa
+/tmp/tmp.4XErsKyfI4/cover_arithmetic.hpp:28:20: error: invalid use of ‘auto’
+   28 | #define cc (cover_c())
+      |             ~~~~~~~^~
+differential_twist.cpp:86:129: note: in expansion of macro ‘cc’
+   86 |     for(int j=0;j<3;++j){Line rhs;for(int i=0;i<3;++i){require(cc[i]!=T24(0)&&ca[i]!=T24(0),"four-gradient frame");rhs[i]=ca[i]/cc[i]*fa[i][j];}auto column=solve3(LC,rhs);for(int i=0;i<3;++i)M[i][j]=column[i];}
+      |                                                                                                                                 ^~
+cc1plus: all warnings being treated as errors

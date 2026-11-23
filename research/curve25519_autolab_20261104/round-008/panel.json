@@ -1,0 +1,140 @@
+{
+  "created": "2026-11-04T04:25:45Z",
+  "round": 8,
+  "rules": {
+    "exploration_slots": 2,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "mitm3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "rfpairs3",
+      "rfsub2",
+      "sub2",
+      "mitmbatch",
+      "mitmblocked"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+            "family": "ksum4",
+            "n": 18,
+            "name": "ksum4-n18",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "incumbent neighbourhood: N = 0.85 x 21"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=25,scan_cap=400",
+            "family": "ksum4",
+            "n": 25,
+            "name": "ksum4-n25",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 21"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=60,scan_cap=960",
+            "family": "ksum3",
+            "n": 60,
+            "name": "ksum3-n60",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 0.85 x 70 (ksum3 from k = 20)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=84,scan_cap=1344",
+            "family": "ksum3",
+            "n": 84,
+            "name": "ksum3-n84",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 1.2 x 70 (ksum3 from k = 20)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=140,scan_cap=2240",
+            "family": "ksum3",
+            "n": 140,
+            "name": "ksum3-n140",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 2 x 70 (ksum3 from k = 20)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=30,scan_cap=480",
+            "family": "ksum3",
+            "n": 30,
+            "name": "ksum3-n30",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "alternative ksum3 (best S(0) 8.906 at N = 35): N = 0.85 x 35"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=42,scan_cap=672",
+            "family": "ksum3",
+            "n": 42,
+            "name": "ksum3-n42",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "alternative ksum3 (best S(0) 8.906 at N = 35): N = 1.2 x 35"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=102,scan_cap=1632",
+            "family": "mitm3",
+            "n": 102,
+            "name": "mitm3-n102",
+            "oracle": "mitm:m=3,negation_folded=1"
+          },
+          "reason": "exploration: family mitm3 untried at k = 28, N = 0.5 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=203,scan_cap=3248",
+            "family": "rfmitm2",
+            "n": 203,
+            "name": "rfmitm2-n203",
+            "oracle": "rootfind-mitm:m=2"
+          },
+          "reason": "exploration: family rfmitm2 untried at k = 28, N = 1 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=21,scan_cap=336",
+        "family": "ksum4",
+        "n": 21,
+        "name": "ksum4-n21",
+        "oracle": "ksum:m=4"
+      },
+      "incumbent_s": [
+        10.939468556478129,
+        11.226419802887582,
+        13.808981020572682
+      ],
+      "tried_before": 18
+    }
+  },
+  "track": "generic"
+}

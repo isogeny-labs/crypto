@@ -1,0 +1,88 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}\LARGE Binary S3: orientation and the $y/x$ hybrid\end{center}
+\textbf{2026-11-15. Mathematical-model correctness checks.}\\
+Claim \texttt{PCC-20261115-a65a43}: \textbf{unverified}. All outcomes are producer observations; no signed independent verdict. [pcc:unverified]
+
+Six native Rust tests pass, comparing explicit oriented and hybrid third-summation models with direct chord/tangent addition on 18 small ordinary binary curves. The library is unchanged. The resumed objective supplied no branch or formula, so the tested models are stated explicitly below. [pcc:unverified]
+
+\textbf{Domain:} $E:y^2+xy=x^3+ax^2+b$, characteristic two, $b\ne0$. All triples are finite; the hybrid requires every $x_i\ne0$.
+
+\begin{center}
+\fbox{\begin{minipage}[c][1in][c]{0.27\textwidth}\centering\textbf{Full finite points}\\[5pt]S3 + slope + incidence\\[5pt]Retain multiplicity\end{minipage}}
+$\to$
+\fbox{\begin{minipage}[c][1in][c]{0.27\textwidth}\centering\textbf{Anchored orientation}\\[5pt]Eliminate slope\\[5pt]Require $x_3\ne0$\end{minipage}}
+$\to$
+\fbox{\begin{minipage}[c][1in][c]{0.27\textwidth}\centering\textbf{Hybrid $(x,t=y/x)$}\\[5pt]Retain chart cubics\\[5pt]Require all $x_i\ne0$\end{minipage}}
+\end{center}
+At a zero chart denominator use the original oriented model. At infinity use an explicit group-law branch. Diagram source: \texttt{model.svg}; tests: \texttt{validation.rs}.
+
+\textbf{Recorded coverage.} Fields have degrees $2,3,4$, with moduli $z^2+z+1$, $z^3+z+1$, $z^4+z+1$. Each uses $a\in\{0,1,z\}$ and $b\in\{1,z\}$. Counts are ordered triples; exceptional-case counts overlap. [pcc:unverified]
+\begin{center}\begin{tabular}{lr}
+All affine triples &24,782\\
+Hybrid triples (all $x_i\ne0$)&19,664\\
+Repeated-abscissa triples&9,518\\
+Triples containing $x=0$&5,118\\
+Wrong-sign S3 roots rejected&1,560\\
+S3 roots without rational lifts&1,112\\
+Native tests passing&6/6
+\end{tabular}\end{center}
+
+\textbf{Failing shortcuts.} On $\mathbf F_8$, $a=0,b=1$:
+(1) the determinant vanishes at $P=Q=R=(1,0)$ but $3P\ne O$;
+(2) clearing the anchor denominator without $x_3\ne0$ accepts
+$P=(1,1),Q=(1,0),R=(0,1)$, while $P+Q=O$ and the triple sum is $R$.
+Both are negative controls in the native suite. [pcc:unverified]
+
+\textbf{Reproduce.} Rust 1.100.0, no external crate dependencies:
+\begin{verbatim}
+cargo test --release --manifest-path \
+  research/orientation_yx_validation_20261115/Cargo.toml \
+  -- --nocapture
+\end{verbatim}
+Raw output: \texttt{unit-tests.log}. Local unit tests are development checks; no experimental timing or solver-performance result is reported. IC scoreboards and cost graphs are unchanged.
+\newpage
+\begin{center}\Large Equations, derivation and limits\end{center}
+Set $s_1=x_1+x_2+x_3$, $\mu=x_1x_2+x_1x_3+x_2x_3$,
+$S_3=\mu^2+x_1x_2x_3+b$. The oriented system is
+\[
+S_3=0,\quad \lambda^2+\lambda+a=s_1,\quad y_i=\lambda x_i+\mu\ (i=1,2,3).
+\]
+Substitution into the curve gives
+\[
+X^3+(\lambda^2+\lambda+a)X^2+\mu X+\mu^2+b=\prod_{i=1}^3(X+x_i).
+\]
+Coefficient equality retains intersection multiplicities; the line divisor gives $P_1+P_2+P_3=O$. Repeated x forces the same point and $\mu=x^2$, hence the tangent. A repeated zero x contradicts $b\ne0$. Triple repetition enforces a flex. This written derivation uses the standard line-divisor group law; it is not a Lean proof. [pcc:unverified]
+
+For a supplied target with $x_3\ne0$, eliminate $\lambda=(y_3+\mu)/x_3$:
+\[
+S_3=0,\quad x_3y_i+y_3x_i+\mu(x_i+x_3)=0\ (i=1,2).
+\]
+With $C_3=y_3^2+x_3y_3+x_3^3+ax_3^2+b$, the formal identity
+\[
+(y_3+\mu)^2+x_3(y_3+\mu)+(s_1+a)x_3^2=C_3+S_3
+\]
+shows that the omitted slope equation follows on a valid target. A sparse-polynomial test checks this over a polynomial ring over $\mathbf F_2$, without finite-field reduction. [pcc:unverified]
+
+For $t_i=y_i/x_i$, retain
+\begin{align*}
+x_i^2(t_i^2+t_i+x_i+a)+b&=0 &&(i=1,2,3),\\
+S_3&=0,\\
+x_3x_i(t_i+t_3)+\mu(x_i+x_3)&=0 &&(i=1,2).
+\end{align*}
+Substitution $y_i=x_it_i$ identifies this with the anchor system for nonzero $x_i$. Negation sends $t_i$ to $t_i+1$. The t coordinate alone leaves a cubic in x; factor-base membership must be transported explicitly. [pcc:unverified]
+
+\textbf{Conventions and boundaries.} For $P_1+P_2=T$, supply $P_3=-T$, so $t_3=t_T+1$. S3 alone does not fix signs; rational lifts require $\operatorname{Tr}(s_1+a)=0$. The t chart omits x=0 because its equation reduces to $b=0$. For $T=O$ use $P_2=-P_1$. Chained links require compatible full-point orientations and branches for intermediate O. Higher-arity completeness is not established. [pcc:unverified]
+
+\textbf{Sources.} Base \texttt{f651965dba321339f0b7615769bfa3e46230df67}:
+\texttt{src/cryptanalysis/binary\_semaev.rs} (Vieta, trace, signs),
+\texttt{research/notes/index-calculus/RESEARCH\_EXOTIC\_COORDINATES.md} (coordinates versus tuple invariants).
+Kosters--Yeo, \emph{Notes on summation polynomials},
+\href{https://arxiv.org/html/1503.08001v2}{primary full text}, sections 2,4,5 (algebraic closure, trace, first-fall versus regularity).
+Semaev 2004/031 is a background pointer; its PDF was not read this session.
+KB unavailable: no MCP tools or fallback executable. No novelty/absence claim follows. See \texttt{README.md} for the full receipt, scope and limitations.
+\end{document}

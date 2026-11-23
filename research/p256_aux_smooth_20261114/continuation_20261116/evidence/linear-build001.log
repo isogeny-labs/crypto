@@ -1,0 +1,21 @@
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp: In function ‘std::string magma_poly2(const Poly&)’:
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp:107:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  107 |     if(p.terms.empty()) return "0"; std::string text;
+      |     ^~
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp:107:37: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  107 |     if(p.terms.empty()) return "0"; std::string text;
+      |                                     ^~~
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp:109:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  109 |         if(!text.empty()) text+=" + "; text+=c.get_str();
+      |         ^~
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp:109:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  109 |         if(!text.empty()) text+=" + "; text+=c.get_str();
+      |                                        ^~~~
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp: In function ‘std::string reduced_program(const Base&, unsigned int, const std::string&, const Reduced&)’:
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp:125:13: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  125 |             if(i) code+=","; code+="R!("+magma_poly2(reduced.residual.equations[i].second)+")";
+      |             ^~
+research/p256_aux_smooth_20261114/continuation_20261116/linear_reduce.cpp:125:30: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  125 |             if(i) code+=","; code+="R!("+magma_poly2(reduced.residual.equations[i].second)+")";
+      |                              ^~~~
+cc1plus: all warnings being treated as errors

@@ -1,0 +1,1 @@
+Restore .lean.txt suffixes and exact dependency paths. Compile FindCount, WordCounter, TwoFindCount, CountControls and CountReadback sequentially through check.sh. ExpectedFailure must fail. audit-readback.py checks the retained inventory; fresh review requires fresh pinned receipts. Render with render-report.py.

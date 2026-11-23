@@ -1,0 +1,63 @@
+{
+  "schema": "formal.technical-review/v1",
+  "joint": "C",
+  "reviewer": "/root/strict_storage_reviewer",
+  "producer_commit": "5937d99b29e5027d99b7fda1be35569e44f01836",
+  "plan_commit": "6d7317d5eab6f3a24847353d1ec5b7089cdf2ea2",
+  "machine_status": "passed",
+  "fidelity": "faithful_scoped",
+  "review_outcome": "validated_scoped",
+  "declarations": [
+    "FastBatch.guarded_product",
+    "FastBatch.field_batch",
+    "FastBatch.batch_decode"
+  ],
+  "fresh_modules": 5,
+  "producer_modules": 3,
+  "fresh_bridge_modules": [
+    "Wide",
+    "Inversion"
+  ],
+  "producer_controls": 7,
+  "producer_readbacks": 10,
+  "reviewer_controls": 3,
+  "reviewer_bridge_readbacks": 4,
+  "false_exit": 1,
+  "checker_reject_controls": 3,
+  "unexpected_lean_failures": [],
+  "harness_failures": [
+    {
+      "exit": 127,
+      "receipt": "checker-premature-invocation.json",
+      "resolved": "same compiler completed then checker passed"
+    }
+  ],
+  "bindings_unchanged": true,
+  "assumptions": [
+    "prime p",
+    "2<p<2^31",
+    "canonical nonzero norm and s1",
+    "native correspondence: tables absent and extension degree1"
+  ],
+  "dependency_boundary": "deeper helper and library binary caches reused; copied helpers, shared union caches content-bound; no independent kernel recheck",
+  "review_attestation": {
+    "joints_owned": [
+      "C"
+    ],
+    "sibling_reports_read": [],
+    "blind_rederivation": false,
+    "inherited_context": true,
+    "author_of_reviewed_component": false,
+    "verdict": "holds",
+    "sources_read": "REVIEW.md; mechanical source inventories separate"
+  },
+  "remaining_bridges": [
+    "coefficient prelude",
+    "S0/slope/inverse_lead",
+    "quotient/remainder payload",
+    "compiled native equivalence",
+    "runtime metrics"
+  ],
+  "scientific_execution": false,
+  "official_transition": false
+}

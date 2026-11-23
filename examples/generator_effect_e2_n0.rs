@@ -66,6 +66,8 @@ fn main() {
             r,
             cofactor: order / r,
             generator: (n("gx"), n("gy")),
+
+            representation: None,
         };
         assert_eq!(inst.curve.point_count(), order, "#E of p = {p}");
         let size = family_optimum_base(order as f64, 1.0, 1.0).ceil() as u64;

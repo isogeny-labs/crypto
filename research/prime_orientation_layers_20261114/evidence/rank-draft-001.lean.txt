@@ -1,0 +1,107 @@
+module
+public import OrientationLeading
+public import Mathlib.LinearAlgebra.Matrix.Rank
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationHierarchy
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+public section
+noncomputable section
+namespace OrientationRank
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationJet OrientationLeading
+
+theorem integral_prod {ι : Type*} (S : Finset ι) (f : ι → ℚ)
+    (hf : ∀ j ∈ S, VBound 0 (f j)) : VBound 0 (∏ j ∈ S,f j) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp [VBound]
+  | @insert j S hj ih =>
+    rw [prod_insert hj]
+    simpa only [add_zero] using (hf j (mem_insert_self _ _)).mul
+      (ih (by intro z hz; exact hf z (mem_insert_of_mem hz)))
+
+theorem prod_difference {ι : Type*} (S : Finset ι) (f g : ι → ℚ)
+    (hf : ∀ j ∈ S, VBound 0 (f j)) (hg : ∀ j ∈ S, VBound 0 (g j))
+    (hd : ∀ j ∈ S, VBound 1 (f j-g j)) :
+    VBound 1 ((∏ j ∈ S,f j)-(∏ j ∈ S,g j)) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp [VBound]
+  | @insert j S hj ih =>
+    have hs (z : ι) (hz : z ∈ S) : z ∈ insert j S := mem_insert_of_mem hz
+    have hp := integral_prod S f (by intro z hz; exact hf z (hs z hz))
+    have hi := ih (by intro z hz; exact hf z (hs z hz))
+      (by intro z hz; exact hg z (hs z hz)) (by intro z hz; exact hd z (hs z hz))
+    have h1 : VBound 1 ((f j-g j)*(∏ z ∈ S,f z)) := by
+      simpa only [add_zero] using (hd j (mem_insert_self _ _)).mul hp
+    have h2 : VBound 1 (g j*((∏ z ∈ S,f z)-(∏ z ∈ S,g z))) := by
+      simpa only [zero_add] using (hg j (mem_insert_self _ _)).mul hi
+    rw [prod_insert hj,prod_insert hj]
+    convert h1.add h2 using 1
+    ring
+
+theorem integer_integral (z : ℤ) : VBound 0 (z:ℚ) := by
+  right
+  rw [padicValRat.of_int]
+  exact Nat.cast_nonneg _
+
+theorem determinant_difference {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A B : Matrix ι ι ℚ) (hA : ∀ r s,VBound 0 (A r s))
+    (hB : ∀ r s,VBound 0 (B r s)) (h : ∀ r s,VBound 1 (A r s-B r s)) :
+    VBound 1 (A.det-B.det) := by
+  rw [Matrix.det_apply',Matrix.det_apply',← sum_sub_distrib]
+  apply VBound.sum
+  intro σ _
+  have hp := prod_difference univ (fun j => A (σ j) j) (fun j => B (σ j) j)
+    (by intro j _; exact hA _ _) (by intro j _; exact hB _ _)
+    (by intro j _; exact h _ _)
+  have hh : VBound 1 (((Equiv.Perm.sign σ:ℤ):ℚ)*
+      ((∏ j,A (σ j) j)-(∏ j,B (σ j) j))) := by
+    simpa only [zero_add] using (integer_integral (Equiv.Perm.sign σ)).mul hp
+  convert hh using 1
+  ring
+
+theorem identity_integral {ι : Type*} [DecidableEq ι] (r s : ι) :
+    VBound 0 ((1:Matrix ι ι ℚ) r s) := by
+  simp only [Matrix.one_apply]
+  split_ifs <;> simp [VBound]
+
+theorem near_identity_integral {ι : Type*} [DecidableEq ι]
+    (A : Matrix ι ι ℚ) (h : ∀ r s,VBound 1 (A r s-(1:Matrix ι ι ℚ) r s)) :
+    ∀ r s,VBound 0 (A r s) := by
+  intro r s
+  simpa only [sub_add_cancel] using ((h r s).mono (by decide)).add (identity_integral r s)
+
+theorem near_identity_det_nonzero {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℚ) (h : ∀ r s,VBound 1 (A r s-(1:Matrix ι ι ℚ) r s)) : A.det ≠ 0 := by
+  have hh := determinant_difference A 1 (near_identity_integral A h) identity_integral h
+  rw [Matrix.det_one] at hh
+  intro hz
+  rw [hz] at hh
+  norm_num [VBound,padicValRat.neg] at hh
+
+/-- One literal source port per retained residue class. -/
+def classPort (a u : ℕ) (hu : u ≤ a) (r : Labels u) : Ports a :=
+  ⟨r.val,lt_of_lt_of_le r.isLt (Nat.pow_le_pow_right (by decide) hu)⟩
+
+def classMatrix (a u i : ℕ) (hu : u ≤ a) (m : ℕ → ℕ) : Matrix (Labels u) (Labels u) ℚ :=
+  fun r s => normalizedCrossing a u i m (classPort a u hu r) (classPort a u hu s)
+
+theorem actual_class_identity (a u i : ℕ) (hu : u ≤ a) (m : ℕ → ℕ)
+    (hi : i < u) (hm : ∀ j < u,0 < m j) (r s : Labels u) :
+    VBound 1 (classMatrix a u i hu m r s-(1:Matrix (Labels u) (Labels u) ℚ) r s) := by
+  have h := actual_leading_factorization a u i m hi hu hm (classPort a u hu r) (classPort a u hu s)
+  rw [factor_entry] at h
+  simpa only [classMatrix,classPort,Nat.mod_eq_of_lt r.isLt,Nat.mod_eq_of_lt s.isLt,
+    Matrix.one_apply,Fin.val_inj] using h
+
+theorem actual_class_det_nonzero (a u i : ℕ) (hu : u ≤ a) (m : ℕ → ℕ)
+    (hi : i < u) (hm : ∀ j < u,0 < m j) : (classMatrix a u i hu m).det ≠ 0 :=
+  near_identity_det_nonzero _ (actual_class_identity a u i hu m hi hm)
+
+end OrientationRank

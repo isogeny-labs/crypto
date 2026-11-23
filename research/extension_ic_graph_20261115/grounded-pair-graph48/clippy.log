@@ -1,0 +1,26 @@
+error: usage of `bool::then` in `filter_map`
+  --> examples/../src/cryptanalysis/jv_quadratic_pair_graph.rs:76:10
+   |
+76 |           .filter_map(|(id, coefficient)| {
+   |  __________^
+77 | |             (coefficient != 0).then(|| {
+78 | |                 (
+79 | |                     id,
+...  |
+82 | |             })
+83 | |         })
+   | |__________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#filter_map_bool_then
+   = note: `-D clippy::filter-map-bool-then` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::filter_map_bool_then)]`
+help: use `filter` then `map` instead
+   |
+76 ~         .filter(|&(id, coefficient)| (coefficient != 0)).map(|(id, coefficient)| (
+77 +                     id,
+78 +                     i8::try_from(coefficient).expect("at most two signed anchor paths"),
+79 +                 ))
+   |
+
+error: aborting due to 1 previous error
+

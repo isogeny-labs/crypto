@@ -1,0 +1,428 @@
+﻿2026-11-05T23:02:55.4222173Z Current runner version: '2.338.2'
+2026-11-05T23:02:55.4243406Z ##[group]Runner Image Provisioner
+2026-11-05T23:02:55.4244209Z Hosted Compute Agent
+2026-11-05T23:02:55.4244847Z Version: 20261028.624
+2026-11-05T23:02:55.4245471Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-05T23:02:55.4246210Z Build Date: 2026-10-28T21:51:42Z
+2026-11-05T23:02:55.4246877Z Worker ID: {a1e8c154-6080-4f3c-9e15-6583a7e8b4ba}
+2026-11-05T23:02:55.4247528Z Region: westus2
+2026-11-05T23:02:55.4248146Z Cloud: Azure
+2026-11-05T23:02:55.4248672Z ##[endgroup]
+2026-11-05T23:02:55.4249915Z ##[group]Operating System
+2026-11-05T23:02:55.4250517Z Ubuntu
+2026-11-05T23:02:55.4251021Z 24.04.5
+2026-11-05T23:02:55.4251833Z LTS
+2026-11-05T23:02:55.4252341Z ##[endgroup]
+2026-11-05T23:02:55.4252932Z ##[group]Runner Image
+2026-11-05T23:02:55.4253534Z Image: ubuntu-24.04
+2026-11-05T23:02:55.4254108Z Version: 20261101.360.1
+2026-11-05T23:02:55.4255300Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-05T23:02:55.4256694Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-05T23:02:55.4257546Z ##[endgroup]
+2026-11-05T23:02:55.4258608Z ##[group]GITHUB_TOKEN Permissions
+2026-11-05T23:02:55.4260490Z Contents: read
+2026-11-05T23:02:55.4261176Z Metadata: read
+2026-11-05T23:02:55.4261975Z ##[endgroup]
+2026-11-05T23:02:55.4263813Z Secret source: Actions
+2026-11-05T23:02:55.4264760Z Cache mode: write
+2026-11-05T23:02:55.4265473Z Prepare workflow directory
+2026-11-05T23:02:55.4604872Z Prepare all required actions
+2026-11-05T23:02:55.4659422Z Getting action download info
+2026-11-05T23:02:55.7874154Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-05T23:02:55.9211820Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+2026-11-05T23:02:56.2572357Z Complete job name: evidence_audit_pr (3, 1 12 6 10 2 14)
+2026-11-05T23:02:56.3254578Z ##[group]Run actions/checkout@v4
+2026-11-05T23:02:56.3255287Z with:
+2026-11-05T23:02:56.3255654Z   fetch-depth: 1
+2026-11-05T23:02:56.3256027Z   filter: blob:none
+2026-11-05T23:02:56.3256433Z   sparse-checkout-cone-mode: false
+2026-11-05T23:02:56.3258195Z   sparse-checkout: /.github/scripts/
+/docs/ecbench/INCOMPLETE_SESSIONS.tsv
+/docs/ecbench/DEFECTIVE_SESSIONS.tsv
+/research/ecbench_*/
+/research/ghs_curve_comparison_20261009/
+/research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
+/research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+/tools/artifacts/
+/.artifacts/
+
+2026-11-05T23:02:56.3259934Z   repository: isogeny-labs/crypto
+2026-11-05T23:02:56.3263151Z   token: ***
+2026-11-05T23:02:56.3263523Z   ssh-strict: true
+2026-11-05T23:02:56.3263898Z   ssh-user: git
+2026-11-05T23:02:56.3264280Z   persist-credentials: true
+2026-11-05T23:02:56.3264685Z   clean: true
+2026-11-05T23:02:56.3265035Z   fetch-tags: false
+2026-11-05T23:02:56.3265408Z   show-progress: true
+2026-11-05T23:02:56.3265819Z   lfs: false
+2026-11-05T23:02:56.3266182Z   submodules: false
+2026-11-05T23:02:56.3266562Z   set-safe-directory: true
+2026-11-05T23:02:56.3266984Z   allow-unsafe-pr-checkout: false
+2026-11-05T23:02:56.3267651Z ##[endgroup]
+2026-11-05T23:02:56.6020596Z Syncing repository: isogeny-labs/crypto
+2026-11-05T23:02:56.6022944Z ##[group]Getting Git version info
+2026-11-05T23:02:56.6023814Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-05T23:02:56.6025136Z [command]/usr/bin/git version
+2026-11-05T23:02:56.6094746Z git version 2.56.0
+2026-11-05T23:02:56.6110905Z ##[endgroup]
+2026-11-05T23:02:56.6122620Z Temporarily overriding HOME='/home/runner/work/_temp/022b0959-8b11-45fc-83f3-1fc65b8b024d' before making global git config changes
+2026-11-05T23:02:56.6124407Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-05T23:02:56.6126393Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-05T23:02:56.6172517Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-05T23:02:56.6176463Z ##[group]Initializing the repository
+2026-11-05T23:02:56.6179423Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-05T23:02:56.6284846Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-05T23:02:56.6286124Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-05T23:02:56.6287322Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-05T23:02:56.6288255Z hint: call:
+2026-11-05T23:02:56.6288755Z hint:
+2026-11-05T23:02:56.6289399Z hint: 	git config --global init.defaultBranch <name>
+2026-11-05T23:02:56.6290182Z hint:
+2026-11-05T23:02:56.6290916Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-05T23:02:56.6292260Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-05T23:02:56.6293196Z hint:
+2026-11-05T23:02:56.6293734Z hint: 	git branch -m <name>
+2026-11-05T23:02:56.6294353Z hint:
+2026-11-05T23:02:56.6295230Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-05T23:02:56.6296569Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-05T23:02:56.6307495Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-05T23:02:56.6349310Z ##[endgroup]
+2026-11-05T23:02:56.6349982Z ##[group]Disabling automatic garbage collection
+2026-11-05T23:02:56.6352980Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-05T23:02:56.6383116Z ##[endgroup]
+2026-11-05T23:02:56.6383822Z ##[group]Setting up auth
+2026-11-05T23:02:56.6389754Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-05T23:02:56.6428412Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-05T23:02:56.7563548Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-05T23:02:56.7600934Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-05T23:02:56.7806653Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-05T23:02:56.7844693Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-05T23:02:56.8049819Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-05T23:02:56.8091467Z ##[endgroup]
+2026-11-05T23:02:56.8092322Z ##[group]Fetching the repository
+2026-11-05T23:02:56.8101102Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +eb9c88100eac7cec4ebf42da408099b1f3ade3a1:refs/remotes/pull/3500/merge
+2026-11-05T23:02:58.1264640Z From https://github.com/isogeny-labs/crypto
+2026-11-05T23:02:58.1266370Z  * [new ref]           eb9c88100eac7cec4ebf42da408099b1f3ade3a1 -> pull/3500/merge
+2026-11-05T23:02:58.1269948Z ##[endgroup]
+2026-11-05T23:02:58.1271620Z ##[group]Determining the checkout info
+2026-11-05T23:02:58.1273310Z ##[endgroup]
+2026-11-05T23:02:58.1274722Z ##[group]Setting up sparse checkout
+2026-11-05T23:02:58.1276764Z [command]/usr/bin/git config core.sparseCheckout true
+2026-11-05T23:02:58.1318113Z [command]/usr/bin/git rev-parse --git-path info/sparse-checkout
+2026-11-05T23:02:58.1344248Z .git/info/sparse-checkout
+2026-11-05T23:02:58.1350281Z ##[endgroup]
+2026-11-05T23:02:58.1351644Z ##[group]Checking out the ref
+2026-11-05T23:02:58.1354743Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/3500/merge
+2026-11-05T23:02:59.3085431Z Updating index flags:  67% (179568/267084)
+2026-11-05T23:02:59.3231678Z Updating index flags:  68% (181618/267084)
+2026-11-05T23:02:59.3393648Z Updating index flags:  69% (184288/267084)
+2026-11-05T23:02:59.3546171Z Updating index flags:  70% (186959/267084)
+2026-11-05T23:02:59.3703320Z Updating index flags:  71% (189630/267084)
+2026-11-05T23:02:59.3858520Z Updating index flags:  72% (192301/267084)
+2026-11-05T23:02:59.4012743Z Updating index flags:  73% (194972/267084)
+2026-11-05T23:02:59.4174548Z Updating index flags:  74% (197643/267084)
+2026-11-05T23:02:59.4357969Z Updating index flags:  75% (200313/267084)
+2026-11-05T23:02:59.4521494Z Updating index flags:  76% (202984/267084)
+2026-11-05T23:02:59.4675773Z Updating index flags:  77% (205655/267084)
+2026-11-05T23:02:59.4819735Z Updating index flags:  78% (208326/267084)
+2026-11-05T23:02:59.4958692Z Updating index flags:  79% (210997/267084)
+2026-11-05T23:02:59.5105213Z Updating index flags:  80% (213668/267084)
+2026-11-05T23:02:59.5245697Z Updating index flags:  81% (216339/267084)
+2026-11-05T23:02:59.5387525Z Updating index flags:  82% (219009/267084)
+2026-11-05T23:02:59.5533548Z Updating index flags:  83% (221680/267084)
+2026-11-05T23:02:59.5679826Z Updating index flags:  84% (224351/267084)
+2026-11-05T23:02:59.5826975Z Updating index flags:  85% (227022/267084)
+2026-11-05T23:02:59.5970002Z Updating index flags:  86% (229693/267084)
+2026-11-05T23:02:59.6113596Z Updating index flags:  87% (232364/267084)
+2026-11-05T23:02:59.6279502Z Updating index flags:  88% (235034/267084)
+2026-11-05T23:02:59.6440826Z Updating index flags:  89% (237705/267084)
+2026-11-05T23:02:59.6600054Z Updating index flags:  90% (240376/267084)
+2026-11-05T23:02:59.6756435Z Updating index flags:  91% (243047/267084)
+2026-11-05T23:02:59.6929475Z Updating index flags:  92% (245718/267084)
+2026-11-05T23:02:59.7084523Z Updating index flags:  93% (248389/267084)
+2026-11-05T23:02:59.7226683Z Updating index flags:  94% (251059/267084)
+2026-11-05T23:02:59.7368757Z Updating index flags:  95% (253730/267084)
+2026-11-05T23:02:59.7512010Z Updating index flags:  96% (256401/267084)
+2026-11-05T23:02:59.7654676Z Updating index flags:  97% (259072/267084)
+2026-11-05T23:02:59.7797642Z Updating index flags:  98% (261743/267084)
+2026-11-05T23:02:59.7935829Z Updating index flags:  99% (264414/267084)
+2026-11-05T23:02:59.7936229Z Updating index flags: 100% (267084/267084)
+2026-11-05T23:02:59.7936507Z Updating index flags: 100% (267084/267084), done.
+2026-11-05T23:03:07.7652464Z Updating files:   0% (1/4946)
+2026-11-05T23:03:07.7669255Z Updating files:   1% (50/4946)
+2026-11-05T23:03:07.7685814Z Updating files:   2% (99/4946)
+2026-11-05T23:03:07.7704768Z Updating files:   3% (149/4946)
+2026-11-05T23:03:07.7735159Z Updating files:   4% (198/4946)
+2026-11-05T23:03:07.7760235Z Updating files:   5% (248/4946)
+2026-11-05T23:03:07.7803152Z Updating files:   6% (297/4946)
+2026-11-05T23:03:07.7822269Z Updating files:   7% (347/4946)
+2026-11-05T23:03:07.7841104Z Updating files:   8% (396/4946)
+2026-11-05T23:03:07.8007152Z Updating files:   9% (446/4946)
+2026-11-05T23:03:07.8027077Z Updating files:   9% (477/4946)
+2026-11-05T23:03:07.8207407Z Updating files:  10% (495/4946)
+2026-11-05T23:03:07.8225411Z Updating files:  11% (545/4946)
+2026-11-05T23:03:07.8262155Z Updating files:  12% (594/4946)
+2026-11-05T23:03:07.8330892Z Updating files:  13% (643/4946)
+2026-11-05T23:03:07.8371958Z Updating files:  14% (693/4946)
+2026-11-05T23:03:07.8407917Z Updating files:  15% (742/4946)
+2026-11-05T23:03:07.8430580Z Updating files:  16% (792/4946)
+2026-11-05T23:03:07.8467422Z Updating files:  17% (841/4946)
+2026-11-05T23:03:07.8531808Z Updating files:  18% (891/4946)
+2026-11-05T23:03:07.8721100Z Updating files:  19% (940/4946)
+2026-11-05T23:03:07.8802575Z Updating files:  20% (990/4946)
+2026-11-05T23:03:07.8940692Z Updating files:  21% (1039/4946)
+2026-11-05T23:03:07.9027410Z Updating files:  22% (1089/4946)
+2026-11-05T23:03:07.9052161Z Updating files:  23% (1138/4946)
+2026-11-05T23:03:07.9066033Z Updating files:  24% (1188/4946)
+2026-11-05T23:03:07.9084325Z Updating files:  25% (1237/4946)
+2026-11-05T23:03:07.9131783Z Updating files:  26% (1286/4946)
+2026-11-05T23:03:07.9179785Z Updating files:  27% (1336/4946)
+2026-11-05T23:03:07.9332507Z Updating files:  28% (1385/4946)
+2026-11-05T23:03:07.9446773Z Updating files:  29% (1435/4946)
+2026-11-05T23:03:07.9463961Z Updating files:  30% (1484/4946)
+2026-11-05T23:03:07.9522587Z Updating files:  31% (1534/4946)
+2026-11-05T23:03:07.9566278Z Updating files:  32% (1583/4946)
+2026-11-05T23:03:07.9591384Z Updating files:  33% (1633/4946)
+2026-11-05T23:03:07.9614030Z Updating files:  34% (1682/4946)
+2026-11-05T23:03:07.9632224Z Updating files:  35% (1732/4946)
+2026-11-05T23:03:07.9659483Z Updating files:  36% (1781/4946)
+2026-11-05T23:03:07.9706177Z Updating files:  37% (1831/4946)
+2026-11-05T23:03:07.9738410Z Updating files:  38% (1880/4946)
+2026-11-05T23:03:07.9770346Z Updating files:  39% (1929/4946)
+2026-11-05T23:03:07.9790885Z Updating files:  40% (1979/4946)
+2026-11-05T23:03:07.9814378Z Updating files:  41% (2028/4946)
+2026-11-05T23:03:07.9834748Z Updating files:  42% (2078/4946)
+2026-11-05T23:03:07.9864509Z Updating files:  43% (2127/4946)
+2026-11-05T23:03:07.9886602Z Updating files:  44% (2177/4946)
+2026-11-05T23:03:07.9901752Z Updating files:  45% (2226/4946)
+2026-11-05T23:03:07.9917992Z Updating files:  46% (2276/4946)
+2026-11-05T23:03:07.9962759Z Updating files:  47% (2325/4946)
+2026-11-05T23:03:08.0248697Z Updating files:  48% (2375/4946)
+2026-11-05T23:03:08.0281791Z Updating files:  49% (2424/4946)
+2026-11-05T23:03:08.0338890Z Updating files:  50% (2473/4946)
+2026-11-05T23:03:08.0541869Z Updating files:  51% (2523/4946)
+2026-11-05T23:03:08.0647764Z Updating files:  52% (2572/4946)
+2026-11-05T23:03:08.0700690Z Updating files:  53% (2622/4946)
+2026-11-05T23:03:08.0829774Z Updating files:  54% (2671/4946)
+2026-11-05T23:03:08.1087083Z Updating files:  55% (2721/4946)
+2026-11-05T23:03:08.1241622Z Updating files:  56% (2770/4946)
+2026-11-05T23:03:08.1359729Z Updating files:  57% (2820/4946)
+2026-11-05T23:03:08.1389974Z Updating files:  58% (2869/4946)
+2026-11-05T23:03:08.1817882Z Updating files:  59% (2919/4946)
+2026-11-05T23:03:08.1904504Z Updating files:  60% (2968/4946)
+2026-11-05T23:03:08.1935505Z Updating files:  61% (3018/4946)
+2026-11-05T23:03:08.1971874Z Updating files:  62% (3067/4946)
+2026-11-05T23:03:08.1988464Z Updating files:  63% (3116/4946)
+2026-11-05T23:03:08.2001211Z Updating files:  64% (3166/4946)
+2026-11-05T23:03:08.2080953Z Updating files:  65% (3215/4946)
+2026-11-05T23:03:08.2102437Z Updating files:  66% (3265/4946)
+2026-11-05T23:03:08.2119052Z Updating files:  67% (3314/4946)
+2026-11-05T23:03:08.2142188Z Updating files:  68% (3364/4946)
+2026-11-05T23:03:08.2163428Z Updating files:  69% (3413/4946)
+2026-11-05T23:03:08.2181781Z Updating files:  70% (3463/4946)
+2026-11-05T23:03:08.2199034Z Updating files:  71% (3512/4946)
+2026-11-05T23:03:08.2217710Z Updating files:  72% (3562/4946)
+2026-11-05T23:03:08.2234687Z Updating files:  73% (3611/4946)
+2026-11-05T23:03:08.2254639Z Updating files:  74% (3661/4946)
+2026-11-05T23:03:08.2276783Z Updating files:  75% (3710/4946)
+2026-11-05T23:03:08.2323791Z Updating files:  76% (3759/4946)
+2026-11-05T23:03:08.2445777Z Updating files:  77% (3809/4946)
+2026-11-05T23:03:08.2480268Z Updating files:  78% (3858/4946)
+2026-11-05T23:03:08.2534022Z Updating files:  79% (3908/4946)
+2026-11-05T23:03:08.2584353Z Updating files:  80% (3957/4946)
+2026-11-05T23:03:08.2616762Z Updating files:  81% (4007/4946)
+2026-11-05T23:03:08.2701436Z Updating files:  82% (4056/4946)
+2026-11-05T23:03:08.2757184Z Updating files:  83% (4106/4946)
+2026-11-05T23:03:08.2925667Z Updating files:  84% (4155/4946)
+2026-11-05T23:03:08.2952551Z Updating files:  85% (4205/4946)
+2026-11-05T23:03:08.2996637Z Updating files:  86% (4254/4946)
+2026-11-05T23:03:08.3052996Z Updating files:  87% (4304/4946)
+2026-11-05T23:03:08.3105531Z Updating files:  88% (4353/4946)
+2026-11-05T23:03:08.3183826Z Updating files:  89% (4402/4946)
+2026-11-05T23:03:08.3233108Z Updating files:  90% (4452/4946)
+2026-11-05T23:03:08.3273411Z Updating files:  91% (4501/4946)
+2026-11-05T23:03:08.3314181Z Updating files:  92% (4551/4946)
+2026-11-05T23:03:08.3413993Z Updating files:  93% (4600/4946)
+2026-11-05T23:03:08.3477493Z Updating files:  94% (4650/4946)
+2026-11-05T23:03:08.3513554Z Updating files:  95% (4699/4946)
+2026-11-05T23:03:08.3551937Z Updating files:  96% (4749/4946)
+2026-11-05T23:03:08.3627043Z Updating files:  97% (4798/4946)
+2026-11-05T23:03:08.3656291Z Updating files:  98% (4848/4946)
+2026-11-05T23:03:08.3706669Z Updating files:  99% (4897/4946)
+2026-11-05T23:03:08.3706984Z Updating files: 100% (4946/4946)
+2026-11-05T23:03:08.3707247Z Updating files: 100% (4946/4946), done.
+2026-11-05T23:03:08.5774529Z Note: switching to 'refs/remotes/pull/3500/merge'.
+2026-11-05T23:03:08.5774882Z 
+2026-11-05T23:03:08.5775067Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-05T23:03:08.5775493Z changes and commit them, and you can discard any commits you make in this
+2026-11-05T23:03:08.5775885Z state without impacting any branches by switching back to a branch.
+2026-11-05T23:03:08.5776117Z 
+2026-11-05T23:03:08.5776295Z If you want to create a new branch to retain commits you create, you may
+2026-11-05T23:03:08.5776685Z do so (now or later) by using -c with the switch command. Example:
+2026-11-05T23:03:08.5776887Z 
+2026-11-05T23:03:08.5776995Z   git switch -c <new-branch-name>
+2026-11-05T23:03:08.5777138Z 
+2026-11-05T23:03:08.5777236Z Or undo this operation with:
+2026-11-05T23:03:08.5777386Z 
+2026-11-05T23:03:08.5777468Z   git switch -
+2026-11-05T23:03:08.5777584Z 
+2026-11-05T23:03:08.5777766Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-05T23:03:08.5778011Z 
+2026-11-05T23:03:08.5778292Z HEAD is now at eb9c8810 Merge 3831c875d8b7259850d9e629002a9c03c9f9afe2 into 180d8ea25b00083894ba794f1c593c0850da4c9b
+2026-11-05T23:03:08.5886050Z ##[endgroup]
+2026-11-05T23:03:08.5931509Z [command]/usr/bin/git log -1 --format=%H
+2026-11-05T23:03:08.5960794Z eb9c88100eac7cec4ebf42da408099b1f3ade3a1
+2026-11-05T23:03:08.6151869Z ##[group]Run list="$RUNNER_TEMP/ecbench-sessions.txt"
+2026-11-05T23:03:08.6152249Z [36;1mlist="$RUNNER_TEMP/ecbench-sessions.txt"[0m
+2026-11-05T23:03:08.6152675Z [36;1mmapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')[0m
+2026-11-05T23:03:08.6153146Z [36;1mtest "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }[0m
+2026-11-05T23:03:08.6153588Z [36;1mprintf '/%s/\n' "${candidates[@]}" | git sparse-checkout add --stdin[0m
+2026-11-05T23:03:08.6153887Z [36;1m: > "$list"[0m
+2026-11-05T23:03:08.6154078Z [36;1mfor d in "${candidates[@]}"; do[0m
+2026-11-05T23:03:08.6154434Z [36;1m  test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }[0m
+2026-11-05T23:03:08.6154863Z [36;1m  if jq -e '.schema == "ecbench.session/v1"' "$d/session.json" > /dev/null; then[0m
+2026-11-05T23:03:08.6155176Z [36;1m    echo "$d" >> "$list"[0m
+2026-11-05T23:03:08.6155412Z [36;1m  fi[0m
+2026-11-05T23:03:08.6155570Z [36;1mdone[0m
+2026-11-05T23:03:08.6155830Z [36;1mtest -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }[0m
+2026-11-05T23:03:08.6156303Z [36;1mecho "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"[0m
+2026-11-05T23:03:08.6177055Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-05T23:03:08.6177343Z ##[endgroup]
+2026-11-05T23:08:25.7783755Z 1435 committed ecbench sessions (by schema)
+2026-11-05T23:08:25.7855897Z ##[group]Run if ! command -v aws >/dev/null; then
+2026-11-05T23:08:25.7856218Z [36;1mif ! command -v aws >/dev/null; then[0m
+2026-11-05T23:08:25.7856512Z [36;1m  python3 -m venv "$RUNNER_TEMP/artifacts-awscli"[0m
+2026-11-05T23:08:25.7856853Z [36;1m  artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"[0m
+2026-11-05T23:08:25.7857216Z [36;1m  artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"[0m
+2026-11-05T23:08:25.7857552Z [36;1m  if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then[0m
+2026-11-05T23:08:25.7857905Z [36;1m    artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"[0m
+2026-11-05T23:08:25.7858467Z [36;1m    artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"[0m
+2026-11-05T23:08:25.7858753Z [36;1m  fi[0m
+2026-11-05T23:08:25.7859057Z [36;1m  "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2[0m
+2026-11-05T23:08:25.7859467Z [36;1m  export ARTIFACTS_AWS="$artifacts_cli_aws"[0m
+2026-11-05T23:08:25.7859706Z [36;1mfi[0m
+2026-11-05T23:08:25.7859962Z [36;1mmapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"[0m
+2026-11-05T23:08:25.7860278Z [36;1mtest "${#artifact_sessions[@]}" -gt 0[0m
+2026-11-05T23:08:25.7860630Z [36;1mpython3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"[0m
+2026-11-05T23:08:25.7878876Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-05T23:08:25.7879155Z env:
+2026-11-05T23:08:25.7879543Z   AWS_ACCESS_KEY_ID: ***
+2026-11-05T23:08:25.7879828Z   AWS_SECRET_ACCESS_KEY: ***
+2026-11-05T23:08:25.7880035Z   AWS_REGION: us-west-2
+2026-11-05T23:08:25.7880228Z ##[endgroup]
+2026-11-05T23:11:13.8052552Z hydrated 576 files (1,581.1 MB); 105 already present
+2026-11-05T23:11:13.8237970Z ##[group]Run actions/download-artifact@v4
+2026-11-05T23:11:13.8238233Z with:
+2026-11-05T23:11:13.8238411Z   name: ecbench-pr-audit-bin
+2026-11-05T23:11:13.8238623Z   path: target/release
+2026-11-05T23:11:13.8238812Z   merge-multiple: false
+2026-11-05T23:11:13.8239014Z   repository: isogeny-labs/crypto
+2026-11-05T23:11:13.8239220Z   run-id: 42122136071
+2026-11-05T23:11:13.8239401Z ##[endgroup]
+2026-11-05T23:11:13.9508219Z Downloading single artifact
+2026-11-05T23:11:13.9663256Z (node:19001) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-05T23:11:13.9663843Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-05T23:11:14.3483505Z Preparing to download the following artifacts:
+2026-11-05T23:11:14.3484384Z - ecbench-pr-audit-bin (ID: 13461975381, Size: 16582066, Expected Digest: sha256:7e9bf790c0d3c4f783524ddad28ecd26b2719f0c199fda5abff5c03ddc21901b)
+2026-11-05T23:11:14.6781649Z Redirecting to blob download url: https://productionresultssa2.blob.core.windows.net/actions-results/a4efd57d-cfb9-809f-8ade-1f8d479d2dd8/workflow-job-run-dea5ddc6-f1f2-5c4d-9963-06eb73b72809/artifacts/50546ebb4f35cd05eb5c7f675555e6ae455d53b4ebe3f83d07a4d280d308dc71.zip
+2026-11-05T23:11:14.6782688Z Starting download of artifact to: /home/runner/work/crypto/crypto/target/release
+2026-11-05T23:11:14.9707084Z (node:19001) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-11-05T23:11:16.1054587Z SHA256 digest of downloaded artifact is 7e9bf790c0d3c4f783524ddad28ecd26b2719f0c199fda5abff5c03ddc21901b
+2026-11-05T23:11:16.1055079Z Artifact download completed successfully.
+2026-11-05T23:11:16.1055347Z Total of 1 artifact(s) downloaded
+2026-11-05T23:11:16.1060573Z Download artifact has finished successfully
+2026-11-05T23:11:16.1252136Z ##[group]Run chmod +x target/release/ecbench
+2026-11-05T23:11:16.1252457Z [36;1mchmod +x target/release/ecbench[0m
+2026-11-05T23:11:16.1252690Z [36;1maudit_status=0[0m
+2026-11-05T23:11:16.1252904Z [36;1mfor shard in $AUDIT_SHARDS; do[0m
+2026-11-05T23:11:16.1253352Z [36;1m  if AUDIT_SHARD="$shard/16" bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"; then[0m
+2026-11-05T23:11:16.1253785Z [36;1m    :[0m
+2026-11-05T23:11:16.1253969Z [36;1m  else[0m
+2026-11-05T23:11:16.1254146Z [36;1m    audit_status=1[0m
+2026-11-05T23:11:16.1254343Z [36;1m  fi[0m
+2026-11-05T23:11:16.1254512Z [36;1mdone[0m
+2026-11-05T23:11:16.1254689Z [36;1mtest "$audit_status" -eq 0[0m
+2026-11-05T23:11:16.1255727Z [36;1mecho 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the manual exhaustive lane.' >> "$GITHUB_STEP_SUMMARY"[0m
+2026-11-05T23:11:16.1274403Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-05T23:11:16.1274681Z env:
+2026-11-05T23:11:16.1274862Z   AUDIT_SHARDS: 1 12 6 10 2 14
+2026-11-05T23:11:16.1275065Z ##[endgroup]
+2026-11-05T23:11:18.5848799Z ##[warning]research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20 is a hash-pinned defective session (problems: last_seq,record_count,status_counts,stop), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md
+2026-11-05T23:11:22.1427776Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m10 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:11:22.1439000Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m5 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:11:22.1452167Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m8 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:11:22.1599784Z ##[warning]research/gaudry_quartic_d4_cost_20261014/pilot/scratch-session is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:24:58.7315274Z ##[warning]3 ecbench sessions are unbound prefixes (records_bound=false), not integrity-passed
+2026-11-05T23:24:58.7324061Z shard 1/16: 3 accepted ecbench sessions are unbound prefixes, not integrity-passed (records_bound=false: no records hash binds records.jsonl; cite only as an interrupted, unbound prefix of the plan):
+2026-11-05T23:24:58.7325003Z - research/gaudry_k4_char2_crossover_20261015/sessions/e-m18-ic.attempt3-killed (interruption: never_finalised)
+2026-11-05T23:24:58.7325549Z - research/pdp_split_slots_20261012/sessions/A-n19 (interruption: never_finalised)
+2026-11-05T23:24:58.7326124Z - research/volcano_tall_layers_20261018/sessions/b2__spec_t60 (interruption: never_finalised)
+2026-11-05T23:24:58.7359116Z shard 1/16: 86 of 1430 committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); 3 accepted as unbound prefixes (records_bound=false), not integrity-passed; 4 hash-pinned scratch sessions remain incomplete; 1 hash-pinned defective sessions fail exactly as pinned, not integrity-passed
+2026-11-05T23:24:59.7085788Z ##[warning]research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20 is a hash-pinned defective session (problems: last_seq,record_count,status_counts,stop), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md
+2026-11-05T23:25:03.2874139Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m10 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:25:03.2885833Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m5 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:25:03.2899430Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m8 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:25:03.3048484Z ##[warning]research/gaudry_quartic_d4_cost_20261014/pilot/scratch-session is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:26:17.5598076Z ##[warning]2 ecbench sessions are unbound prefixes (records_bound=false), not integrity-passed
+2026-11-05T23:26:17.5606301Z shard 12/16: 2 accepted ecbench sessions are unbound prefixes, not integrity-passed (records_bound=false: no records hash binds records.jsonl; cite only as an interrupted, unbound prefix of the plan):
+2026-11-05T23:26:17.5607592Z - research/gaudry_k4_char2_crossover_20261015/sessions/e-m16.attempt2-killed (interruption: never_finalised)
+2026-11-05T23:26:17.5608746Z - research/pkm_tower_rootfind_20261018/interrupted/P8-worker-restart-20261019 (interruption: never_finalised)
+2026-11-05T23:26:17.5642043Z shard 12/16: 88 of 1430 committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); 2 accepted as unbound prefixes (records_bound=false), not integrity-passed; 4 hash-pinned scratch sessions remain incomplete; 1 hash-pinned defective sessions fail exactly as pinned, not integrity-passed
+2026-11-05T23:26:18.5060789Z ##[warning]research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20 is a hash-pinned defective session (problems: last_seq,record_count,status_counts,stop), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md
+2026-11-05T23:26:22.0638657Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m10 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:26:22.0649637Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m5 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:26:22.0662251Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m8 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:26:22.0810897Z ##[warning]research/gaudry_quartic_d4_cost_20261014/pilot/scratch-session is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:29:16.2503569Z ##[warning]2 ecbench sessions are unbound prefixes (records_bound=false), not integrity-passed
+2026-11-05T23:29:16.2509937Z shard 6/16: 2 accepted ecbench sessions are unbound prefixes, not integrity-passed (records_bound=false: no records hash binds records.jsonl; cite only as an interrupted, unbound prefix of the plan):
+2026-11-05T23:29:16.2510962Z - research/ecbench_sat_pdp_20261009/interrupted-counted-main-208 (interruption: never_finalised)
+2026-11-05T23:29:16.2511966Z - research/gaudry_k4_char2_crossover_20261015/sessions/e-m17-ic.attempt3-killed (interruption: never_finalised)
+2026-11-05T23:29:16.2547857Z shard 6/16: 87 of 1430 committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); 2 accepted as unbound prefixes (records_bound=false), not integrity-passed; 4 hash-pinned scratch sessions remain incomplete; 1 hash-pinned defective sessions fail exactly as pinned, not integrity-passed
+2026-11-05T23:29:17.2099126Z ##[warning]research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20 is a hash-pinned defective session (problems: last_seq,record_count,status_counts,stop), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md
+2026-11-05T23:29:20.8360737Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m10 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:29:20.8372536Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m5 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:29:20.8384735Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m8 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:29:20.8541695Z ##[warning]research/gaudry_quartic_d4_cost_20261014/pilot/scratch-session is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:30:49.2871210Z ##[warning]1 ecbench sessions are unbound prefixes (records_bound=false), not integrity-passed
+2026-11-05T23:30:49.2879472Z shard 10/16: 1 accepted ecbench sessions are unbound prefixes, not integrity-passed (records_bound=false: no records hash binds records.jsonl; cite only as an interrupted, unbound prefix of the plan):
+2026-11-05T23:30:49.2880279Z - research/volcano_tall_layers_20261018/sessions/b2__spec_t3 (interruption: never_finalised)
+2026-11-05T23:30:49.2914672Z shard 10/16: 89 of 1430 committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); 1 accepted as unbound prefixes (records_bound=false), not integrity-passed; 4 hash-pinned scratch sessions remain incomplete; 1 hash-pinned defective sessions fail exactly as pinned, not integrity-passed
+2026-11-05T23:30:50.2993974Z ##[warning]research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20 is a hash-pinned defective session (problems: last_seq,record_count,status_counts,stop), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md
+2026-11-05T23:30:53.9158656Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m10 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:30:53.9169324Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m5 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:30:53.9181970Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m8 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:30:53.9328919Z ##[warning]research/gaudry_quartic_d4_cost_20261014/pilot/scratch-session is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:39:13.8943416Z ##[warning]3 ecbench sessions are unbound prefixes (records_bound=false), not integrity-passed
+2026-11-05T23:39:13.8949819Z shard 2/16: 3 accepted ecbench sessions are unbound prefixes, not integrity-passed (records_bound=false: no records hash binds records.jsonl; cite only as an interrupted, unbound prefix of the plan):
+2026-11-05T23:39:13.8953903Z - research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted (interruption: never_finalised)
+2026-11-05T23:39:13.8954557Z - research/gaudry_k4_char2_crossover_20261015/sessions/d-m14.attempt3-killed (interruption: never_finalised)
+2026-11-05T23:39:13.8955147Z - research/gaudry_k4_char2_crossover_20261015/sessions/d-m14.attempt4-killed (interruption: never_finalised)
+2026-11-05T23:39:13.8985221Z shard 2/16: 86 of 1430 committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); 3 accepted as unbound prefixes (records_bound=false), not integrity-passed; 4 hash-pinned scratch sessions remain incomplete; 1 hash-pinned defective sessions fail exactly as pinned, not integrity-passed
+2026-11-05T23:39:14.8587841Z ##[warning]research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20 is a hash-pinned defective session (problems: last_seq,record_count,status_counts,stop), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md
+2026-11-05T23:39:18.5036984Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m10 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:39:18.5047984Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m5 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:39:18.5061035Z ##[warning]research/gaudry_quartic_d4_char2_20261015/pilot/scratch-session-m8 is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:39:18.5211227Z ##[warning]research/gaudry_quartic_d4_cost_20261014/pilot/scratch-session is hash-pinned incomplete scratch evidence (spec.json and host.json absent)
+2026-11-05T23:41:28.6421164Z ##[error]The action 'Validate committed evidence integrity on pull requests' has timed out after 30 minutes.
+2026-11-05T23:41:28.6568895Z Post job cleanup.
+2026-11-05T23:41:28.7532119Z [command]/usr/bin/git version
+2026-11-05T23:41:28.7572152Z git version 2.56.0
+2026-11-05T23:41:28.7642228Z Temporarily overriding HOME='/home/runner/work/_temp/99bc1035-5d50-41d1-8568-7d0e4d1066c5' before making global git config changes
+2026-11-05T23:41:28.7643284Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-05T23:41:28.7644147Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-05T23:41:28.7696918Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-05T23:41:28.7756677Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-05T23:41:29.1516043Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-05T23:41:29.1528099Z http.https://github.com/.extraheader
+2026-11-05T23:41:29.1543089Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-05T23:41:29.1616566Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-05T23:41:29.2542798Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-05T23:41:29.2545251Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-05T23:41:29.3340349Z Cleaning up orphan processes
+2026-11-05T23:41:29.3581165Z Terminate orphan process: pid (70458) (bash)
+2026-11-05T23:41:29.3598637Z Terminate orphan process: pid (77695) (xargs)
+2026-11-05T23:41:29.3615799Z Terminate orphan process: pid (78061) (bash)
+2026-11-05T23:41:29.3632337Z Terminate orphan process: pid (78062) (ecbench)
+2026-11-05T23:41:29.3648452Z Terminate orphan process: pid (80583) (bash)
+2026-11-05T23:41:29.3666122Z Terminate orphan process: pid (80584) (ecbench)
+2026-11-05T23:41:29.3723538Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,25 @@
+{
+  "materialized_at": "2026-10-27T20:46:06.258711+00:00",
+  "tracked_paths": [
+    "gpu/certicom/.gitignore",
+    "gpu/certicom/Makefile",
+    "gpu/certicom/README.md",
+    "gpu/certicom/arithmetic.h",
+    "gpu/certicom/cuda.cu",
+    "gpu/certicom/emulator.cpp",
+    "gpu/certicom/kernels.cu",
+    "gpu/certicom/kernels.metal",
+    "gpu/certicom/metal.mm",
+    "gpu/certicom/qualify.sh",
+    "gpu/certicom/test-cli.sh",
+    "gpu/certicom/wire.hpp"
+  ],
+  "no_tracked_source_content_changes": true,
+  "tool": [
+    "scripts/sparse-checkout.sh",
+    "add",
+    "--path",
+    "gpu/certicom"
+  ],
+  "scope": "required development test fixtures, CPU emulator only; no GPU provisioning or scientific campaign"
+}

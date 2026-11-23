@@ -1,0 +1,85 @@
+{
+  "main": "StaticHashCollisionAudit.static_hash_collision_certificate",
+  "binding": "be9c6e9f61b3fd7984f70666f38565d4b55df432cbeecdc75723d02c47859a1f",
+  "custom_imports": {
+    "CollisionCertificate": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+    "CollisionTails": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "PathAgreement": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+    "PostCollisionControl": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+    "Survival": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean"
+  },
+  "modules": [
+    {
+      "file": "Cylinder.lean",
+      "role": "Actual independent product law: arbitrary distinct finite query cylinder mass equals product label weights, via actual gates/Function.extend/product-of-sums."
+    },
+    {
+      "file": "PathAgreement.lean",
+      "role": "Actual state update/iteration and chronological word path; actual observation consistency equivalence, selfavoidance and derived query injectivity."
+    },
+    {
+      "file": "Survival.lean",
+      "role": "Disjoint chronological word-event decomposition gives exact static-hash survival=iid selfavoidance, plus genuine PMF equality."
+    },
+    {
+      "file": "CollisionTails.lean",
+      "role": "Unchanged actual leastrepeat iff prefix injectivity, actual tail probabilities and exact bounded tail-sum expectation on every nonzero Z/p."
+    },
+    {
+      "file": "PostCollisionControl.lean",
+      "role": "Actual primeZ3/inc1,2distinctnonzero/positiveuniformlabels: word0,1,1 impossible under static hash but iidmass1/8, direct unrestricted-history disproof."
+    },
+    {
+      "file": "CollisionCertificate.lean",
+      "role": "Full explicit finite-state/label-law/PMF/survival/leastrepeat/tail/expectation/actual-control main binding."
+    }
+  ],
+  "claims": [
+    {
+      "declaration": "cylinder_mass",
+      "hypotheses": "Arbitrary finite state/label/query types, normalized weights; actual query map injective",
+      "conclusion": "Actual product hash expectation of prescribed labels equals product weights."
+    },
+    {
+      "declaration": "observations_eq_iff / observed_selfAvoiding_iff",
+      "hypotheses": "Arbitrary deterministic state update and static label map",
+      "conclusion": "Chronological path/observation consistency and actual prefix injectivity identified."
+    },
+    {
+      "declaration": "static_survival_eq_iid / actual_survival_pmf",
+      "hypotheses": "Finite states/labels, normalized weights, actual PMF adds nonnegativity",
+      "conclusion": "Exact survival probability equality at every time, without treating a fixed hash as iid after revisits."
+    },
+    {
+      "declaration": "least_collision_tail_iff / first_collision_tail_mass",
+      "hypotheses": "Every nonzero modulus, actual unchanged least repeat",
+      "conclusion": "Firstcollision tail equals actual prefix injectivity, mass equals iid selfavoidance."
+    },
+    {
+      "declaration": "first_collision_expectation",
+      "hypotheses": "Every nonzero modulus, normalized actual label law and arbitrary update/start",
+      "conclusion": "Actual leastrepeat expectation equals finite sum over all times<p of iid selfavoidance probabilities."
+    },
+    {
+      "declaration": "unrestricted_word_mass_false",
+      "hypotheses": "Actual primeZ3, distinctnonzero increments1,2, strictlypositive uniform label law",
+      "conclusion": "Chronological word0,1,1 has staticmass0 vs iidmass1/8; deleting selfavoidance from word-mass identity is false."
+    }
+  ],
+  "gate_declarations": 37,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "not established",
+  "open": "Limiting random-increment-table collision penalty/constants, practical fixed/keyedhash refinement, native execution/compiler/cryptographic curve refinement. Known Bernstein–Lange higher-degree asymptotic correction credited, not proved here. No qualified source theorem refuted."
+}

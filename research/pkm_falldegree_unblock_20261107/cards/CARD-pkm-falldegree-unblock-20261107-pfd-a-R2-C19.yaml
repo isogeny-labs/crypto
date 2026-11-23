@@ -1,0 +1,196 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19
+experiment_id: pkm_falldegree_unblock_20261107
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.receipt.json
+binds:
+- path: research/prime_fall_degree_20261027/PREREGISTRATION.md
+  sha256: 63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8
+- path: research/pkm_falldegree_unblock_20261107/R2_READY.md
+  sha256: ef224e164cdb492fadf99d31b1c3da63591f70c51bdf95ce5c0f63eeba24aa55
+- path: research/pkm_falldegree_unblock_20261107/image/entry.sh
+  sha256: 4866aa7ec534a23cf1b7d146161c1e06c48345630f9d099e875eaee6d6500bde
+- path: research/pkm_falldegree_unblock_20261107/image/entry_r2.sh
+  sha256: 25b01841573334d1942de72e84aa55f60d4f238682fba33a41aa2bcd8962ea49
+- path: research/pkm_falldegree_unblock_20261107/image/binaries.sha256
+  sha256: c316f2ef8bf7736ee9259551d420d87417db52cd085b0ac480c8fe32173905f5
+- path: research/pkm_falldegree_unblock_20261107/image/build-info.json
+  sha256: 6992f6473212c5b6b89359a3a3a6134c169a9670b942c6c9468c9d3c1fb1a5d3
+- path: research/prime_fall_degree_20261027/run.sh
+  sha256: c35ea88e7007198b9e9a026812a9bcb0ce55bc4082ba3627564c67f0fbab6eeb
+- path: research/pkm_falldegree_unblock_20261107/requests/pfd-a.json
+  sha256: d7d2901c377a6a91b657149a45b9abb4bb568a063ff9fb38ffbf8ee1ff97639d
+- path: research/pkm_falldegree_unblock_20261107/image/image.json
+  sha256: 2caab79f30988bf49de34d01549df276443fe1ad5e9e048e48f02ab5bd115cd7
+- path: research/pkm_falldegree_unblock_20261107/validate_command_request.sh
+  sha256: 38a087a9a75bfa6bab99d35c6d19b36e42958f3d07f03180ceaebe754f3e8741
+- path: research/pkm_falldegree_unblock_20261107/cards/status_request.json
+  sha256: 22c0d0de04757db26c089a4755b85fdf15c826591818045fa696dd7c8dc9b3a8
+- path: research/pkm_falldegree_unblock_20261107/cards/wait_command_status.sh
+  sha256: 78c14129882014e011ce614549c76c9e78b56ac35946ec9abee893f17686f049
+- path: research/pkm_falldegree_unblock_20261107/cards/verify_results_nosums.sh
+  sha256: 5773a0de65825ed095fec93ba954f29a2d11a5ce4069a3ddf3db6f7cd0cf6d7a
+- path: scripts/checkpoint.sh
+  sha256: 6fc6b9311461111ecf55cdb70ae4dd52a408d0b0bf6b44fbe1177788756c12e8
+- path: tools/benchrec.py
+  sha256: a3c03754409cd88bce7faadc49a70da4cc0e239f45b7f2abdf08241cb3bd7bc0
+- path: tools/task_card.py
+  sha256: 9425ae71f4c855923d337fe8304dee0d630b6d7c81e9a7e81099ef4129caa812
+- path: taskq/deploy/eks-karpenter/remote/launch-remote-command
+  sha256: 7e1daae8dc70f8fcb813d9315daa73df3e18e7e5f72e2d47f34f9a3c85637416
+- path: taskq/deploy/eks-karpenter/remote/run-command
+  sha256: 1cdaa7447893fd5c2dc337d3903f8981107df1de6d77ca18cd8191cc8449ced2
+- path: taskq/deploy/eks-karpenter/remote/status-command
+  sha256: 435c9a2f35cace854534accf300402365a4f99f15babb0bbd187aa3e1ff92809
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+- path: taskq/deploy/eks-karpenter/remote/check-ready
+  sha256: 746440f29360983290eb9c22d435ccf8ca1d49ba66f84af8db2b7326a04f44ea
+- path: taskq/deploy/eks-karpenter/submit-job
+  sha256: def41b1a72b6e48dc4e6f8256455be44ccc5100a017f515d8bd2821558abcbce
+must_not_exist:
+- research/pkm_falldegree_unblock_20261107/receipts/R2/collect-19
+commands:
+- id: head-ancestor
+  argv:
+  - git
+  - merge-base
+  - --is-ancestor
+  - dfc7d74752f2f2e260075a98daa51006f10d74ff
+  - HEAD
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.head-ancestor.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.head-ancestor.stderr
+- id: head-paths-unchanged
+  argv:
+  - git
+  - diff
+  - --quiet
+  - dfc7d74752f2f2e260075a98daa51006f10d74ff
+  - HEAD
+  - --
+  - research/pkm_falldegree_unblock_20261107
+  - :(exclude)research/pkm_falldegree_unblock_20261107/cards
+  - taskq/
+  - tools/task_card.py
+  - tools/benchrec.py
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.head-paths-unchanged.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.head-paths-unchanged.stderr
+- id: request-protocol-identity
+  argv:
+  - jq
+  - -e
+  - --arg
+  - h
+  - 63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8
+  - .provenance.protocol_sha256 == $h
+  - research/pkm_falldegree_unblock_20261107/requests/pfd-a.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.request-protocol-identity.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.request-protocol-identity.stderr
+- id: launch-receipt-exists
+  argv:
+  - jq
+  - -e
+  - --arg
+  - job
+  - pfd-a-20261108
+  - .job_name == $job and (.job_uid | length) > 0 and (.state == "submitted" or .state == "active" or .state == "succeeded")
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/launch/result.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.launch-receipt-exists.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.launch-receipt-exists.stderr
+- id: status-once
+  argv:
+  - research/pkm_falldegree_unblock_20261107/cards/wait_command_status.sh
+  - research/pkm_falldegree_unblock_20261107/cards/status_request.json
+  - pfd-a-20261108
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/collect-19
+  - '1'
+  - '1'
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  timeout_seconds: 2400
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.status-once.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.status-once.stderr
+  outputs:
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/collect-19/final-status.json
+- id: download
+  argv:
+  - aws
+  - s3
+  - sync
+  - s3://isolab-results-104186811093-us-east-2/runs/pfd-a-20261108/
+  - research/pkm_falldegree_unblock_20261107/results/R2
+  - --exclude
+  - launcher/*
+  - --only-show-errors
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.download.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.download.stderr
+- id: verify
+  argv:
+  - research/pkm_falldegree_unblock_20261107/cards/verify_results_nosums.sh
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/collect-19/final-status.json
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/launch/result.json
+  - research/pkm_falldegree_unblock_20261107/results/R2
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/local-sha256-collect-19.txt
+  - binary.sha256
+  - f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot
+  - binary.sha256
+  - 7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools
+  - binary.sha256
+  - c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e  /usr/local/bin/hky_fp_tower_check
+  - binary.sha256
+  - 962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354  /usr/local/bin/pfd_grid_zeros
+  - host.txt
+  - 'argv: g1 hky-A g3 d-A cap-A'
+  - host.txt
+  - 4866aa7ec534a23cf1b7d146161c1e06c48345630f9d099e875eaee6d6500bde
+  - gates/g1.log
+  - 'G1: 6 cases pass'
+  - gates/g3.log
+  - ', 0 disagreements'
+  - progress.txt
+  - end g1 exit 0
+  - progress.txt
+  - end g3 exit 0
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.verify.stdout
+  stderr: research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-C19.verify.stderr
+  outputs:
+  - research/pkm_falldegree_unblock_20261107/receipts/R2/local-sha256-collect-19.txt
+bus_address: executor-mechanical-pkm-fd
+background: true
+write_scope:
+- research/pkm_falldegree_unblock_20261107/
+stop_when:
+- The `status-once` step exits 41; the Job has no terminal state yet, so return the tool output verbatim and run no later command. This is the expected result while the Job is running.
+- Any other command exits with a code outside its success_exit_codes or reaches its timeout; return the tool output verbatim and run no later command.
+- The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
+notes: 'Frozen EKS command Job pfd-a-20261108 (14 vCPU, 56Gi, 172800 s; no planned time, ceiling 172800 s), image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0d6b2ecd6df3f5f092fe4b6179986b041eb7d6be3b94e52d92809bdab2ff3ae8, request research/pkm_falldegree_unblock_20261107/requests/pfd-a.json. Collect card 19: it has no launch step, so it cannot submit anything. It needs research/pkm_falldegree_unblock_20261107/receipts/R2/launch/result.json from CARD-pkm-falldegree-unblock-20261107-pfd-a-R2-1. The `status-once` step makes one isolab.eks.command-status/v1 query and exits 41 when the Job is pending or active; the query itself takes about 1 to 3 minutes (not measured here) because it runs as a CodeBuild build. When the Job is succeeded or failed the card downloads s3://isolab-results-104186811093-us-east-2/runs/pfd-a-20261108/ (without launcher/) into research/pkm_falldegree_unblock_20261107/results/R2, an idempotent sync, and verifies it. A task card writes a receipt once, so each firing is a different numbered card; this card writes only under its own collect directory and its own stdout and stderr files. The card has no add-raw or upload-raw step: those rewrite the benchmark record, whose sha256 changes when R2-1 launches, so a final card binds the record hash it has then. The head-paths-unchanged step passes when no commit after the pinned commit changed the study directory (its cards subdirectory excepted), taskq/, tools/task_card.py or tools/benchrec.py; other commits are accepted. No commit field is set because task_card.py run refuses any HEAD other than the pinned one. Pinned commit dfc7d74752f2f2e260075a98daa51006f10d74ff. `verify` fails unless the Job succeeded with one pod and pod exit 0, its Job UID and name equal the launch receipt, the downloaded tree is one directory named by the Pod UID, and each listed file holds each listed string. This Job''s entry script writes no SHA256SUMS file, so `verify` writes the local sha256 of every downloaded file to the output file instead; there is no in-pod manifest to compare it with. The record stays open, and the card runs no close, report or analysis command.'

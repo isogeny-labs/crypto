@@ -1,0 +1,17 @@
+{
+  "action": "price every arm in a shared field-operation unit (field mul+sqr, inversions at a stated weight) and keep group operations only as a secondary reading; one Jacobian (Cantor) step is not one curve addition",
+  "created": "2026-11-15T06:19:58Z",
+  "evidence": [
+    "research/validation_20261114/REPORT.md",
+    "research/full_jacobian_ic_rp_20261114/PROTOCOL.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-measure",
+    "controlled-experiment",
+    "validator"
+  ],
+  "trigger": "comparing arms that work in different groups (e.g. genus-2 Jacobian IC vs rho on an elliptic curve)",
+  "why": "validator found a Cantor step costs ~4.3-5.7 E1 additions in time (~10x in field ops at w_inv=10), so group-op ratios understated the IC side"
+}

@@ -1,0 +1,92 @@
+{
+  "standing": "[pcc:unverified]",
+  "local_execution": "2026-11-15, standard-library CPython, producer-local, independent PCC/CI pending; original and Python -O stdout byte-identical",
+  "prime_order_cold": {
+    "file": "prime_signed_relation_pipeline.py",
+    "field_p": 1019,
+    "curve": [
+      46,
+      158
+    ],
+    "group_order": 977,
+    "group_order_prime": true,
+    "generator": [
+      944,
+      936
+    ],
+    "factor_base_size": 8,
+    "unknown_factor_base_logs": 8,
+    "cold_target_count": 977,
+    "all_recovered_and_point_checked": true,
+    "independent_relation_rank": 8,
+    "factor_base_support": 250,
+    "raw_relation_rows_before_rank8": 12,
+    "relation_trials_to_rank8": 45,
+    "mean_total_point_ops_signed": 430.87410440122824,
+    "mean_total_point_ops_bsgs": 64.60900716479017,
+    "point_ops_ratio_signed_over_bsgs": 6.668947927063035,
+    "signed_min_max": [
+      416,
+      444
+    ],
+    "bsgs_min_max": [
+      37,
+      84
+    ],
+    "all_per_target_records_sha256": "f92a201e7d0f99b54373e335c529582f6efdd93a22ea526a215cfdd39ea15ce1",
+    "script_sha256": "1b6db0641be38fa639f799448f4b7a34e6dbbd2b86465bba9a1bdb941f0d94ca",
+    "full_stdout_sha256": "4daa7fb7fb98f8b26f21365b3f8b4e087c5df1fdc7d8940bbedb4b6ec62598fb",
+    "limitations": "Not a PKM sparse Groebner oracle. Matrix arithmetic, generator/curve choice, memory, rho and field operation weighting are not charged; counting is a conservative point-op-only comparison in favor of signed method.",
+    "simple_rho_baseline": {
+      "file": "rho_prime_order_control.py",
+      "verified_targets": 977,
+      "mean_point_ops": 147.38178096212897,
+      "median_point_ops": 139,
+      "max_point_ops": 503,
+      "total_restarts": 3,
+      "max_restarts_per_target": 1,
+      "rho_mean_iterations": 35.80962128966223,
+      "point_ops_ratio_signed_over_rho": 2.923523529084949,
+      "not_optimized": true,
+      "script_sha256": "7b00509122535a7ed47bf3f91bfa7ffc3e88a2f56f0677597dc2582151b72129",
+      "full_stdout_sha256": "d05521b8fb35f3c16526c6d92ebef7f75a2c212fadea8e553073f86a3f14867e"
+    }
+  },
+  "smooth_order_positive_control": {
+    "file": "smooth_order_control.py",
+    "curve": [
+      1,
+      0
+    ],
+    "p31": {
+      "field_p": 2147483647,
+      "group_order": 2147483648,
+      "generator": [
+        3,
+        1531815459
+      ],
+      "sample_count": 16,
+      "all_sampled_logs_point_verified": true,
+      "binary_ph_mean_point_ops": 406.9375,
+      "bsgs_mean_point_ops": 57289.375,
+      "point_op_ratio_bsgs_over_ph": 140.78175395484564,
+      "nontrivial_group_order_factorization": "2^31"
+    },
+    "p61": {
+      "field_p": 2305843009213694000,
+      "group_order": 2305843009213694000,
+      "generator": [
+        6,
+        1985050517203801300
+      ],
+      "sample_count": 16,
+      "all_sampled_logs_point_verified": true,
+      "binary_ph_mean_point_ops": 1372.5625,
+      "bsgs_not_run": true,
+      "nontrivial_group_order_factorization": "2^61"
+    },
+    "script_sha256": "164b074cc80edc9fa94ece48a92d0d3c46c6cff6bd99db1f556c8152d0fa90d8",
+    "full_stdout_sha256": "a2737f32a00f671fe7d70ec092790c1fd41b9bcfe22363ed1fb3ee5abc704766",
+    "novelty": "none; standard Pohlig-Hellman on smooth group order, not applicable to secure prime-order groups"
+  }
+}

@@ -362,6 +362,7 @@ impl<F: ExtField> DecompositionOracle<ExtCurve<F>> for LineOracle<F> {
             solving_degree: Some(8),
             timed_out: false,
             extra: Default::default(),
+            ..Default::default()
         };
         self.totals.absorb(&self.shape.clone(), Some(&cost), false);
         if degenerate {

@@ -1,0 +1,129 @@
+{
+  "schema": "independent-code-review/v1",
+  "subject": "native_canonical_export",
+  "repository": "/home/ec2-user/crypto-pencil-signed-graph-20261029",
+  "reviewed_head": "08e8ab38d3de525779da57f27e14e7e9a81a2d21",
+  "mode": "read_only_repository_focused_software_reproduction",
+  "reviewed_source": {
+    "src/lib.rs": "d3d65afa7dffb96878490d370a407b6ed78654be22703b96fe042a683254ab2c",
+    "tests/contracts.rs": "97883e1f0d9f9cdec93d7b5c12b2f1e5dec2a1a2281de1e682a4c0a49c21df50",
+    "schemas/experiment-export.v1.json": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757"
+  },
+  "findings": [
+    {
+      "id": "NCX-01",
+      "severity": "high",
+      "title": "Missing planted-answer check is exported as verified",
+      "source": "src/lib.rs:473-477",
+      "status": "reproduced",
+      "reproducer": "review_reproducer_missing_planted_check_is_marked_verified",
+      "input_change": "Remove outcome.matches_planted from one otherwise verified record.",
+      "observed": "Packaging returned zero findings and emitted status=succeeded with verification.status=verified.",
+      "cause": "The verified predicate uses matches_planted != false, so missing and null values pass.",
+      "required_fix": "Require matches_planted == true for this known-answer cohort and add a negative test for missing, null, and false."
+    },
+    {
+      "id": "NCX-02",
+      "severity": "high",
+      "title": "Native analysis cost output and producer identity are not validated",
+      "source": "src/lib.rs:80-103,249-268",
+      "status": "source_and_existing_fixture_confirmed",
+      "reproducer": "The existing Fixture::refresh native output at tests/contracts.rs:73 omits aggregate_cells, streams, pair_rows, outcome_counts, qualified_ratios, analyzer binary identity, and analysis build receipt; complete_schema at tests/contracts.rs:88-105 still receives zero findings.",
+      "observed": "Only a schema string, manifest/count fields, three self-declared source hashes, and a mapping hash are checked. Most protocol-pinned analysis sources, analyzer binaries, and build receipt are not attached or verified.",
+      "impact": "An arbitrary or incomplete native summary can be attached as the canonical analysis output while copying expected hash strings, silently omitting or altering the cost results.",
+      "required_fix": "Validate a versioned native-output schema and all required 36-cell, stream, pair, outcome, null-qualification, plan, count, and missing-slot invariants; bind and attach the analyzer binary/build receipt and every applicable protocol source pin."
+    },
+    {
+      "id": "NCX-03",
+      "severity": "high",
+      "title": "All protocol-required warmups can be omitted without a finding",
+      "source": "src/lib.rs:319-325,525-536,549-596",
+      "status": "reproduced",
+      "reproducer": "review_reproducer_protocol_warmups_can_be_omitted_without_finding",
+      "input_change": "Remove all three warmup executions and records, update the plan receipt hash, history, and native expected/observed slots from 18 to 15 while leaving protocol warmups=1.",
+      "observed": "Packaging and check_export returned zero findings with 15 measured rows and no warmup rows.",
+      "cause": "The plan receipt is trusted after schema/passed/file-hash checks, and lint_rows derives completeness from measured rows only.",
+      "required_fix": "Validate exact per-workload/per-arm warmup and measured cells against the frozen protocol and prepared-plan contract, including missing warmup findings."
+    },
+    {
+      "id": "NCX-04",
+      "severity": "high",
+      "title": "check_export does not validate its backend_record integrity fields",
+      "source": "src/lib.rs:610-705; schemas/experiment-export.v1.json:207",
+      "status": "reproduced",
+      "reproducer": "review_reproducer_backend_record_can_be_rewritten_without_finding",
+      "input_change": "Change backend_record.qualified to true, expected_execution_slots to zero, replace missing_slots with a fabricated slot, delete diagnostics, and replace native_analysis_sha256 with zeros.",
+      "observed": "check_export returned zero findings.",
+      "cause": "The export schema permits an unconstrained backend_record object and check_export never validates the adapter-specific backend fields.",
+      "required_fix": "Bind a hash-bound packaging request or equivalent immutable inputs and reconstruct/compare the adapter-specific backend record, excluding only intentionally variable creation time."
+    },
+    {
+      "id": "NCX-05",
+      "severity": "high",
+      "title": "Counter values are neither required nor constrained to exact nonnegative integers",
+      "source": "src/lib.rs:214-220,487-507",
+      "status": "reproduced",
+      "reproducer": "review_reproducer_arbitrary_counter_string_is_accepted",
+      "input_change": "Set counters.actual to the string not-a-nonnegative-integer.",
+      "observed": "Packaging returned zero findings and copied the string into measurements.counters.native.actual.",
+      "cause": "Every JSON string is accepted as a counter token; an absent or non-object counters field also iterates as an empty set.",
+      "required_fix": "Require the counter object and the declared finite counter inventory; accept only nonnegative integer JSON tokens or canonical decimal strings, preserving arbitrary width."
+    },
+    {
+      "id": "NCX-06",
+      "severity": "medium",
+      "title": "Impossible restore metadata is accepted",
+      "source": "src/lib.rs:352-379,661-667",
+      "status": "reproduced",
+      "reproducer": "review_reproducer_impossible_restore_history_is_accepted",
+      "input_change": "Set attempts=1, resumed=2, generations_written=0, restored_from_generation=99.",
+      "observed": "Packaging returned zero findings and retained the impossible values.",
+      "cause": "The checks require nonnegative integers and a non-none policy but impose no protocol retry/restore bound or committed-generation relationship.",
+      "required_fix": "Do not assume each restore is a new logical attempt. Independently enforce applicable retry and max-restore limits, generations_written>=1 for a restore, restored generation within the committed range, and null restored generation when no restore occurred unless explicitly documented."
+    }
+  ],
+  "flow_assessment": {
+    "finding": false,
+    "note": "flow.planned and flow.attempted intentionally describe observed canonical rows, while unattempted plan slots are kept in backend_record.missing_slots. The counts are not a defect by themselves. NCX-03 and NCX-04 show that the separate missing-slot ledger and warmup contract were not protected by check_export."
+  },
+  "reproduction": {
+    "scratch_copy": "/tmp/native-canonical-export-review.0bCMzx",
+    "scratch_tests_sha256": "bb9f8e60ad80e5be55ec353594204fe91ed928fc53a91b1a0a1569e0d2c448d6",
+    "patch": "/tmp/native-canonical-export-independent-review-08e8ab38d-reproducers.patch",
+    "patch_sha256": "6c3426a8de62a47b76d2a010da8c5fa37fdb45aae57c538a5747051fa9bbe730",
+    "commands": [
+      "cargo +1.99.1 test --release --locked review_reproducer -- --nocapture",
+      "cargo +1.99.1 test --release --locked review_reproducer_backend_record_can_be_rewritten_without_finding -- --nocapture",
+      "cargo +1.99.1 test --release --locked review_reproducer_missing_planted_check_is_marked_verified -- --nocapture"
+    ],
+    "results": [
+      {
+        "log": "/tmp/native-canonical-export-review-repro.log",
+        "sha256": "d648e7db6ef7e24a0214a927160c0905643e4d2d4ae53380228f042d11dacd6a",
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "log": "/tmp/native-canonical-export-review-backend-repro.log",
+        "sha256": "1850e4c270fd42a23503091dcaa9df0c442f68d1352460b6e53dd1b71f4c7f70",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "log": "/tmp/native-canonical-export-review-planted-repro.log",
+        "sha256": "895866394e5ae463e10ccb15481df8cf46951bbfe62c70875c4e9d2f05732b78",
+        "passed": 1,
+        "failed": 0
+      }
+    ]
+  },
+  "boundaries": {
+    "repository_files_modified": false,
+    "experiments_executed": false,
+    "cohorts_executed": false,
+    "jobs_launched": false,
+    "research_status_changed": false,
+    "wall_clock_qualification_reviewed_as_defect": false,
+    "note": "The exporter intentionally forces wall_valid=false; this review does not treat absence of clock qualification as a hidden promise. Focused tests demonstrate current software behavior only and are not empirical research evidence."
+  }
+}

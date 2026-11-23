@@ -1,0 +1,25 @@
+{
+  "after_property": "0",
+  "before_property": "infinity",
+  "control_group": "/system.slice/docker-911633224cb76376ae4bc78b38c7df16e3292e9aba23709f13b9844853c8e7c1.scope",
+  "docker_id": "911633224cb76376ae4bc78b38c7df16e3292e9aba23709f13b9844853c8e7c1",
+  "dropin_contents": "# This is a drop-in unit file extension, created via \"systemctl set-property\"\n# or an equivalent operation. Do not edit.\n[Scope]\nMemorySwapMax=0\n",
+  "dropin_path": "/run/systemd/transient/docker-911633224cb76376ae4bc78b38c7df16e3292e9aba23709f13b9844853c8e7c1.scope.d/50-MemorySwapMax.conf",
+  "kernel_after": {
+    "cpu_max": "100000 100000",
+    "cpuset_cpus": "14",
+    "memory_max": "8589934592",
+    "memory_swap_max": "0"
+  },
+  "kernel_before": {
+    "cpu_max": "100000 100000",
+    "cpuset_cpus": "14",
+    "memory_max": "8589934592",
+    "memory_swap_max": "0"
+  },
+  "memory_limit_bytes": 8589934592,
+  "pid": 865093,
+  "schema": "n83.systemd-swap-sync/v1",
+  "unit": "docker-911633224cb76376ae4bc78b38c7df16e3292e9aba23709f13b9844853c8e7c1.scope",
+  "worker_held_until_sync": true
+}

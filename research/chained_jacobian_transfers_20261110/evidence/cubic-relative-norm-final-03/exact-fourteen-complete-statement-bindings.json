@@ -1,0 +1,142 @@
+[
+  {
+    "theorem": "CubicRelativeNorm22304.coefficient_embedding_zero_one",
+    "claim": "pcc/claims/PCC-20261116-a15596.json",
+    "normalized_statement": "theorem coefficient_embedding_zero_one {R : Type} [CommRing R] : (embed (0 : Fin 223) : R)=0 \u2227 (embed (1 : Fin 223) : R)=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.coefficient_embedding_zero_one",
+      "decl_sha256": "014b5b03dcf3ed3652e79110b45c44fc9751b6c9dc26b217187dc2c1822e6a84"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.coefficient_embedding_neg",
+    "claim": "pcc/claims/PCC-20261116-555da3.json",
+    "normalized_statement": "theorem coefficient_embedding_neg {R : Type} [CommRing R] [IsCharP R 223] (a : Fin 223) : (embed (-a) : R)= -embed a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.coefficient_embedding_neg",
+      "decl_sha256": "b8f983cf8dfa7980a290284c44fde1e8ee2bf889caf9a74a5508464147fa504b"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.coefficient_embedding_sub",
+    "claim": "pcc/claims/PCC-20261116-103c6d.json",
+    "normalized_statement": "theorem coefficient_embedding_sub {R : Type} [CommRing R] [IsCharP R 223] (a b : Fin 223) : (embed (a-b) : R)=embed a-embed b",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.coefficient_embedding_sub",
+      "decl_sha256": "aaff984f98f8ed5ee5b0fb011bcd2941947f6d8353125c84d5d1c0ae6ab2ae95"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.coefficient_embedding_three_nine",
+    "claim": "pcc/claims/PCC-20261116-7caeae.json",
+    "normalized_statement": "theorem coefficient_embedding_three_nine {R : Type} [CommRing R] : (embed (3 : Fin 223) : R)=3 \u2227 (embed (9 : Fin 223) : R)=9",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.coefficient_embedding_three_nine",
+      "decl_sha256": "18d91eebf74da887b2fbae0cd5d3d104ca4238e86a7a4f4794b02844ede87d8a"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.coefficient_product_encoding",
+    "claim": "pcc/claims/PCC-20261116-214163.json",
+    "normalized_statement": "theorem coefficient_product_encoding {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : encode z (coefficientProduct x y)=encode z x*encode z y",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.coefficient_product_encoding",
+      "decl_sha256": "f741dd0ac5e89e9162b3ab445eebf54f40da828ab0680f2992523a7b91ad992a"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.scalar_encoding",
+    "claim": "pcc/claims/PCC-20261116-4c0ddf.json",
+    "normalized_statement": "theorem scalar_encoding {R : Type} [CommRing R] [IsCharP R 223] (z : R) (s : Fin 223) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : encode z (scale s x)=(embed s : R)*encode z x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.scalar_encoding",
+      "decl_sha256": "58e67d4b06fcc6ab3667daa687363a0606cb467297d30ded17b7fb148dba0178"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.conjugate_cofactor",
+    "claim": "pcc/claims/PCC-20261116-c9dacc.json",
+    "normalized_statement": "theorem conjugate_cofactor {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : (encode z x)^223*((encode z x)^223)^223=encode z (cofactor x)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.conjugate_cofactor",
+      "decl_sha256": "61626f9e8442999006f57c67f5ee818634567a02e8b25b5c6c7808046efdb875"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.cofactor_identity",
+    "claim": "pcc/claims/PCC-20261116-e757cf.json",
+    "normalized_statement": "theorem cofactor_identity {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : encode z x*encode z (cofactor x)=(embed (coefficientNorm x) : R)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.cofactor_identity",
+      "decl_sha256": "63129e3ceabae7cdd7746bb844e53d1d18a43132e14809bb33e7bb2d618f4985"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.full_relative_norm",
+    "claim": "pcc/claims/PCC-20261116-18eae5.json",
+    "normalized_statement": "theorem full_relative_norm {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : encode z x*(encode z x)^223*((encode z x)^223)^223= (embed (coefficientNorm x) : R)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.full_relative_norm",
+      "decl_sha256": "2c03db164404da988bacff2b19db07cbd3780a4e282190f7511c49f65da84de0"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.full_relative_trace",
+    "claim": "pcc/claims/PCC-20261116-8f29fb.json",
+    "normalized_statement": "theorem full_relative_trace {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : encode z x+(encode z x)^223+((encode z x)^223)^223= (embed (3*x.1) : R)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.full_relative_trace",
+      "decl_sha256": "404c1ba0b6d03bbc3e82ee9167a09cfba95c7789b92f6ca7f70676c97e395aa0"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.coefficient_norm_multiplicative",
+    "claim": "pcc/claims/PCC-20261116-a9c34c.json",
+    "normalized_statement": "theorem coefficient_norm_multiplicative (x y : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : coefficientNorm (coefficientProduct x y)=coefficientNorm x*coefficientNorm y",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.coefficient_norm_multiplicative",
+      "decl_sha256": "d4d8b8fcf6eda2659daf59d0ee5b357cd9230e2174554a65a0e45f16c894e8a0"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.certified_norm_inverse",
+    "claim": "pcc/claims/PCC-20261116-efe59c.json",
+    "normalized_statement": "theorem certified_norm_inverse {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) (s : Fin 223) (hs : s*coefficientNorm x=1) : encode z x*encode z (scale s (cofactor x))=1 \u2227 encode z (scale s (cofactor x))*encode z x=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.certified_norm_inverse",
+      "decl_sha256": "386d9b7b576b63800aeaf247d583571291329c4f02445ea159da9a8f0e6d4136"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.norm_nonadditivity_control",
+    "claim": "pcc/claims/PCC-20261116-7a0413.json",
+    "normalized_statement": "theorem norm_nonadditivity_control : coefficientNorm (2,0,0)\u2260coefficientNorm (1,0,0)+coefficientNorm (1,0,0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.norm_nonadditivity_control",
+      "decl_sha256": "67d8073aa584c14ab4670ce119955fc2af26100d259422101439acb58450dc50"
+    }
+  },
+  {
+    "theorem": "CubicRelativeNorm22304.zero_norm_no_inverse_control",
+    "claim": "pcc/claims/PCC-20261116-ba9d4d.json",
+    "normalized_statement": "theorem zero_norm_no_inverse_control : coefficientNorm (0,0,0)=0 \u2227 \u00ac \u2203 s : Fin 223, s*coefficientNorm (0,0,0)=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+      "theorem": "CubicRelativeNorm22304.zero_norm_no_inverse_control",
+      "decl_sha256": "cef59e5807983312399cb472abd803c06a5a729585fb39359cb670ea0d8d95f6"
+    }
+  }
+]

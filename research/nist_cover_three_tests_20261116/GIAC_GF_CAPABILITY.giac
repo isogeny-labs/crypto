@@ -1,0 +1,10 @@
+purge(x,y,u,G);
+taskprime:=6277101735386680763835789423207666416083908700390324961279;
+G:=GF(taskprime,u^2+1,['u','G'],undef);
+fieldunit:=G(1);
+typed_basis:=gbasis([fieldunit*(x+y-3),fieldunit*(x*y-2)],[x,y],plex);
+print("TYPED_UNIT",fieldunit);
+print("TYPED_BASIS",typed_basis);
+print("TYPED_ROOT_1",normal(subst(typed_basis,[x,y],[2,1])));
+print("TYPED_ROOT_2",normal(subst(typed_basis,[x,y],[1,2])));
+print("TYPED_NONROOT",normal(subst(typed_basis,[x,y],[1,1])));

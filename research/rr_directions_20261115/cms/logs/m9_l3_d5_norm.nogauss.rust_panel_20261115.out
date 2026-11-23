@@ -1,0 +1,77 @@
+c GAUSSCONF max_num_matrices=0 autodisable=1 max_matrix_rows=2000 max_matrix_columns=1000 min_gauss_xor_clauses=2
+c -- header says num vars:            162
+c -- header says num clauses:         468
+c -- clauses added: 432
+c -- xor clauses added: 36
+c -- vars added 162
+c [find&init matx] performing matrix init
+c [gauss] XOR-encoding clauses are not detached, so no need to reattach them.
+c [xor-rem-unconnected] left with 35 xors from 35 non-empty xors T: 0.00
+c [xor-together] xored together: 0 orig xors: 35 new xors: 35 T: 0.00
+c [xor-rem-unconnected] left with 35 xors from 35 non-empty xors T: 0.00
+c [xor-clean-equiv] removed equivalent xors: 0 left with: 35
+c [matrix] unused xors from cleaning: 0
+c [matrix] UNused matrix        35 x  162  density:0.2145  xorlen avg: 34.74
+c [matrix] unused matrices: 1 of which too few rows: 0
+c [matrix] Using 0 matrices recovered from 0 xors T: 0.00 T-out: N
+c [branch] adjusting to: vsid (from: vsid) var_decay:0.95 descr: VSIDS
+c rst  geom  stb   vs     1   111     709  4719   299    3.96    3.84     6    51    54     0   13.89   13.89
+c rst  geom  stb   vs     2   234     709  4719   299    3.96    3.84    11    80   143     0   14.09   14.09
+c  res  pol bran  nres  conf freevar  IrrL  IrrB l/longC  l/allC RedL0 RedL1 RedL2  RedB l/longC  l/allC
+c rst  geom  stb   vs     3   369     709  4719   299    3.96    3.84    30   128   211     0   13.68   13.68
+c rst  geom  stb   vs     4   516     709  4719   299    3.96    3.84    36   185   295     0   14.59   14.59
+c rst  geom  stb   vs     5   677     709  4719   299    3.96    3.84    64   245   368     0   14.24   14.24
+c rst  geom  stb   vs     6   854     709  4719   299    3.96    3.84    73   277   504     0   13.97   13.97
+c rst  geom  stb   vs     7  1049     709  4719   299    3.96    3.84    83   352   614     0   13.74   13.74
+c rst  geom  stb   vs     8  1262     709  4719   299    3.96    3.84    93   416   753     0   13.71   13.71
+c rst  geom  stb   vs     9  1496     709  4719   299    3.96    3.84   109   523   864     0   13.14   13.14
+c rst  geom  stb   vs    10  1754     709  4719   299    3.96    3.84   127   666   961     0   12.58   12.58
+c rst  geom  stb   vs    11  2036     709  4719   299    3.96    3.84   164   805  1069     0   12.28   12.28
+c rst  geom  stb   vs    12  2346     709  4719   299    3.96    3.84   177   990  1181     0   12.27   12.27
+c rst  geom  stb   vs    13  2687     709  4719   299    3.96    3.84   199  1225  1265     0   11.90   11.90
+c rst  geom  stb   vs    14  3060     709  4719   299    3.96    3.84   224  1468  1369     1   11.75   11.75
+c rst  geom  stb   vs    15  3472     708  4719   299    3.96    3.84   303  1741  1418    13   11.65   11.61
+c rst  geom  stb   vs    16  3922     706  4719   299    3.96    3.84   382  2048  1472    22   11.53   11.48
+c rst  geom  stb   vs    17  4158     376  2460   421    3.61    3.38   112   205    24     6    7.70    7.60
+c ------- FINAL TOTAL SEARCH STATS ---------
+c UIP search time          : 0.07        (99.74     % time)
+c restarts                 : 17          (244.59    confls per restart)
+c blocked restarts         : 0           (0.00      per normal restart)
+c time                     : 0.07        
+c decisions                : 4768        (0.00      % random)
+c propagations             : 444K        (6261K     props/s)
+c decisions/conflicts      : 1.15        
+c conflicts                : 4158        
+c conf lits non-minim      : 86620       (20.83     lit/confl)
+c conf lits final          : 11.38       
+c red which0               : 473         (11.38     % of confl)
+c props/decision           : 0.00        
+c props/conflict           : 0.00        
+c 0-depth assigns          : 333         (46.97     % vars)
+c 0-depth assigns by CNF   : 0           (0.00      % vars)
+c reduceDB time            : 0.00        (0.00      % time)
+c OccSimplifier time       : 0.00        (0.00      % time)
+c [occur] 0.00 is overhead
+c [occur] link-in T: 0.00 cleanup T: 0.00
+c [occ-substr] long subBySub: 0 subByStr: 0 lits-rem-str: 0 T: 0.00
+c SCC time                 : 0.00        (0.00      % time)
+c [scc] new: 0 BP 0M  T: 0.00
+c vrep replace time        : 0.00        (0.00      % time)
+c vrep tree roots          : 0           
+c vrep trees' crown        : 0           (0.00      leafs/tree)
+c distill long time        : 0.00        (0.00      % time)
+c distill bin time         : 0.00        (0.00      % time)
+c strength cache-irred time: 0.00        (0.00      % time)
+c strength cache-red time  : 0.00        (0.00      % time)
+c avg cls in red 0         : 171.09      
+c avg cls in red 1         : 935.86      
+c avg cls in red 2         : 955.90      
+c Conflicts in UIP         : 4158        (58381.66  confl/time_this_thread)
+c Max Memory (rss) used    : 6416 kB     
+c Total time (this thread) : 0.07        
+c DRIVER conflicts: 4158
+c DRIVER decisions: 4768
+c DRIVER propagations: 444783
+c DRIVER solve_cpu_s: 0.072050
+c DRIVER solve_wall_s: 0.098622
+s UNSATISFIABLE

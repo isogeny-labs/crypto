@@ -1,0 +1,496 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "P2-isogeny-class-ic-yield-20261102",
+  "version": 1,
+  "created": "2026-11-02",
+  "repository": "crypto",
+  "study_dir": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues",
+  "authors": [
+    "P2 builder (PROTOCOL.md)",
+    "experiment-director (machine-readable record of PROTOCOL.md, no design change)"
+  ],
+  "links": {
+    "note": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/PROTOCOL.md is the narrative; this file records it. Route recorded here is the local fallback frozen by the director on 2026-11-02 because the isolab-eks route could not be used from the submitting host (see the director report and cards); an EKS run needs an amendment first (execution, rounds >= 5, a control arm in every cell, a curve-shard selector).",
+    "spec_generator": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/spec.rs",
+    "population": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json",
+    "runner": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/run_class.sh",
+    "parent_design": "research/isogeny_class_ic_yield_20261102/DESIGN.md"
+  },
+  "question": "Inside one isogeny class whose Frobenius order is the maximal order (conductor 1, one crater, one prime order n), do the index-calculus yield, relations-phase work and online time per decomposition attempt of the repository's prime-abscissa mitm pipeline differ between curves, beyond what the A/A, isomorphic-model and planted-20-percent controls show?",
+  "claims": [
+    {
+      "id": "C-null",
+      "text": "In each enumerated class (D, h, p, n) the yield of the prime-abscissa mitm pipeline at m and |F| = N has curve share of variance (ICC) at most U (95 percent two-level bootstrap bound), a max/min curve ratio R against an A/A spread S, and the detector finds a planted 20 percent curve effect with power P.",
+      "class": "comparative",
+      "decided_by": [
+        "C-pc"
+      ],
+      "if_supported": "null supported in that cell (closed lead for the pipeline on that scaled analogue); only when the planted-effect power is at least 0.9 in that cell",
+      "if_not_supported": "curve effect suspected when p < 0.0025 and the effect exceeds the isomorphic-model control, which triggers a follow-up protocol, not a claim; otherwise inconclusive with the numbers reported"
+    },
+    {
+      "id": "C-scope",
+      "text": "No result states anything about ECCp-131 (different trace, class number and size), security, speed, or an improvement over the index-calculus baseline; no rho reference or section 5a band applies because one method is compared across curves of one class.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H0",
+      "statement": "Within one isogeny class of conductor 1 the yield of the prime-abscissa mitm pipeline has no curve effect: the curve share of variance is indistinguishable from zero and the max/min curve ratio lies inside its permutation null.",
+      "mechanism": "Curves of one class share p, n and the factor-base size rule; only transport cost, automorphisms and the smallest-abscissa presentation can differ.",
+      "predictions": [
+        {
+          "id": "P-null",
+          "metric": "yield",
+          "direction": "equal_within",
+          "minimum_effect": "yield ICC permutation p >= 0.0025 (Bonferroni over 10 classes x 2 values of m), max |z| and max/min inside the permutation null q95, isomorphic-model RMS log ratio of the order of the A/A round-halves spread, and positive-control power >= 0.9 in the cell",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/smoke",
+                "measured": "24-bit class A harness check on 12 curves and 4 iso pairs at isolation L1; not data of this protocol"
+              },
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/calibration/calibration.md",
+                "measured": "one-curve timing and yield per size; used only to size attempt counts and cost"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "main",
+      "role": "reference",
+      "description": "ic.pipeline, factor_base prime-abscissa:size=N (N = min(N_y, 1448)), oracle mitm:m=2 or m=3, linalg incremental-gauss-full-rank, max_trials A (identical on every curve of a class)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ],
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N",
+        "oracle": "mitm:m=2|3",
+        "linalg": "incremental-gauss-full-rank",
+        "max_trials": "A = ceil(R / y_eff)",
+        "arm_name_in_spec": "m2-main | m3-main"
+      }
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "the identical method on the identical seeds; present at 24 and 28 bits, dropped at 32 bits and above (deterministic duplicate); counted-metric A/A at every size is the round-parity split of the main arm",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N",
+        "oracle": "mitm:m=2|3",
+        "arm_name_in_spec": "m2-aa | m3-aa"
+      },
+      "same_instrument_as": "main"
+    },
+    {
+      "id": "pc",
+      "role": "control_positive",
+      "description": "factor base N' = round(N * 1.2^(1/m)): expected yield 1.2 times main, a planted 20 percent effect on the same curves and seeds",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "ISOLATION": "L0"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=round(N*1.2^(1/m))",
+        "oracle": "mitm:m=2|3",
+        "arm_name_in_spec": "m2-pc | m3-pc"
+      },
+      "same_instrument_as": "main"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "pc",
+      "expected_detection": "p2tool analyze substitutes the pc cells of one curve at a time into the main data (200 random choices) and reports the fraction flagged at the 95th percentile of the unplanted permutation null by the ICC, max |z| and max/min detectors; a null is informative only if the power of every detector is at least 0.9 in that class and m",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "PROTOCOL.md section 4: the null distribution of every statistic is generated by permuting the cells of a class across its curves (2000 permutations, analysis seed 20261102, add-one resolution 1/2001 < 0.0025); no separate random-curve population exists by design because an unrelated curve of the same size has a different n and N and would add a factor, not remove one"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "curve",
+        "levels": [
+          "the h Hilbert-root curves of one class (h = 128 for class A, 300 for class B), plus 8 u-scaled isomorphic models per class"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one ecbench binary and one p2tool binary per run, SHA-256 recorded per row (binary_sha256) and in the card receipt",
+        "how": "card binds both hashes"
+      },
+      {
+        "name": "host_and_isolation",
+        "treatment": "measured",
+        "how": "isolation level, steal, PSI and run queue recorded per row; counted metrics do not depend on the level; the clock metric is descriptive unless the row is L2"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "crossed",
+        "how": "ecbench order alternate, 4 balanced rounds, 1 warm-up discarded"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "one seed per (workload, round) derived by ecbench from measurement.seed 103 and the workload id, shared by the arms of that round, different across rounds and targets"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "value": "4 targets per curve (8 for m = 3 at 24 bits), target_seed 20261102",
+        "how": "uniform_scalar_sha256_v1, identical across arms"
+      },
+      {
+        "name": "factor_base_size_and_attempts",
+        "treatment": "fixed",
+        "how": "N and A are functions of (n, m, cap) only and identical on every curve of a class; the pc arm differs on purpose"
+      },
+      {
+        "name": "size_D_h",
+        "treatment": "crossed",
+        "value": "sizes 24, 28, 32, 36, 40 bits; D fixed across sizes; class A (D = -84171, h = 128) and class B (D = -414651, h = 300)",
+        "how": "ten classes listed in classes.json"
+      },
+      {
+        "name": "m",
+        "treatment": "crossed",
+        "value": "2 and 3",
+        "how": "separate cells and separate tests"
+      },
+      {
+        "name": "model_presentation",
+        "treatment": "crossed",
+        "how": "8 curves per class re-presented by a seeded u-scaling; reported as the iso-model RMS log ratio"
+      },
+      {
+        "name": "relations_per_run_R",
+        "treatment": "fixed",
+        "value": "R = min(100, 0.6 N); at 40 bits R = 30 (reduced plan, --relations 30)",
+        "how": "spec generator rule; the 40-bit cells report their own measured power"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "main",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-pc",
+        "arms": [
+          "main",
+          "pc"
+        ],
+        "differs_in": [
+          "factor_base_size_and_attempts"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench derives one algorithm seed per (workload, round) from measurement.seed 103; target_seed 20261102; iso u from a seeded SHA-256 stream; analysis seed 20261102; no seed chosen after a look"
+    },
+    "instance_sampling": {
+      "rule": "every curve of the class (all h Hilbert roots), enumerated completely by construction, not by a walk or a sample",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "arm roles main, aa and pc are fixed by the protocol; the only arm contrast is the frozen pc substitution, so no free contrast exists to bias; analysis is the frozen p2tool binary with no hand selection of cells",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 444,
+    "replicates": 16,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.0025,
+      "tests_in_family": 20,
+      "correction": "bonferroni",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "instances = 444 curve models per m over the ten classes (5 sizes x (128 + 8 and 300 + 8)); replicates = 4 rounds x 4 targets per curve (m = 3 at 24 bits: 4 x 8); family = yield ICC permutation p over 10 classes x 2 values of m, Bonferroni 0.05/20; add-one permutation p resolution 1/2001 < 0.0025; power against a planted 20 percent effect is measured per cell by the pc substitution and a cell below 0.9 is reported as not informative at 20 percent, never as a null"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.17,
+      "per_sample_seconds": 22.5,
+      "threads": 1,
+      "estimated_total_seconds": 388800,
+      "measured_on": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/calibration/calibration.md and README.md cost table on the 4-core builder host under load average 5 to 7: fixed = harness overhead per run, per sample = the largest measured per-run process wall (40 bits, m = 2), total = about 40 CPU-hours (24 to 36 bits) plus 68 CPU-hours (40 bits, R = 30, T = 4)"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "yield",
+        "name": "yield per attempt",
+        "unit": "relations per attempt",
+        "kind": "counted",
+        "definition": "relations_found / targets_tried of one cell (curve, round, target); an attempt is one increment of targets_tried, a relation one increment of relations_found; every run is exactly A attempts",
+        "source": "session records.jsonl counters relations_found and targets_tried",
+        "aggregation": "mean",
+        "resolution": "1 relation per A attempts",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "rel_gae_per_attempt",
+        "name": "relations-phase GAE per attempt",
+        "unit": "ecbench.gae per attempt",
+        "kind": "counted",
+        "definition": "relations-phase GAE / attempts of one cell",
+        "source": "session records.jsonl phase.relations.gae and targets_tried",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "online_wall_ns_per_attempt",
+        "name": "online wall per attempt",
+        "unit": "ns per attempt",
+        "kind": "timed",
+        "definition": "online.wall_ns / attempts of one cell; descriptive unless the row is L2 and read only against the in-session A/A interval",
+        "source": "session records.jsonl online.wall_ns",
+        "aggregation": "mean",
+        "resolution": "1 ns",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "oracle_setup_gae",
+        "name": "oracle setup GAE per run",
+        "unit": "ecbench.gae",
+        "kind": "counted",
+        "definition": "oracle_setup phase GAE of one run, reported per curve and not tested",
+        "source": "session records.jsonl phase.oracle_setup.gae",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "targets_tried",
+      "relations_found",
+      "phase.relations.gae",
+      "phase.oracle_setup.gae"
+    ],
+    "record": [
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": "The primary metric is the counted yield, independent of the isolation level; the clock metric is secondary and descriptive unless a row is L2."
+  },
+  "execution": {
+    "backend": "local",
+    "timeout_seconds": 3600,
+    "measurement_class": "measurement",
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: every curve of each of the ten classes x m in {2, 3} x targets x (rounds + 1 warm-up) x arms, as written by p2tool spec with rounds 4; 40-bit cells use --relations 30 and --targets 4; then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "every run ends exhausted after exactly A attempts; outcome status exhausted is not a failure; a session whose in-session A/A relation counts are not identical is invalid; a cell that does not complete is reported as not run, never filled",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "an A/A pair of relation counts that is not identical invalidates the session",
+    "a clock of a preempted, resumed or non-L2 row is descriptive only; counted yield remains",
+    "a cell with planted-effect power below 0.9 is reported as not informative at 20 percent"
+  ],
+  "decision_rule": {
+    "text": "Null supported in a cell: yield ICC permutation p >= 0.0025 (bootstrap upper bound of the ICC reported), max |z| and max/min inside their null q95 (or p >= 0.0025), iso RMS log ratio of the order of the A/A spread, and positive-control power >= 0.9. Curve effect suspected: p < 0.0025 for the yield ICC (or max |z|) and the effect exceeds the iso control; it triggers a follow-up protocol (fresh seeds, then test n, smallest-abscissa structure or CM field), not a claim. Everything else: inconclusive, numbers reported.",
+    "comparison_ids": [
+      "C-pc"
+    ],
+    "threshold": "yield ICC permutation p < 0.0025 (Bonferroni 0.05/20); positive-control power >= 0.9",
+    "statistic": "unbalanced one-way random-effects ANOVA ICC of yield per class and m, with max/min of per-curve means and max |z| as companions",
+    "interval": "one-sided 95 percent percentile of a two-level bootstrap (curves with replacement, cells within drawn curves, 2000 resamples, clipped at 0); permutation p over 2000 cell permutations",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "ICC upper bound, max/min curve ratio against the A/A round-halves spread",
+    "verdict_vocabulary": [
+      "null_supported",
+      "curve_effect_suspected",
+      "inconclusive",
+      "not_informative_at_20_percent"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/src/analyze.rs",
+      "sha256": "f6cc7286daae471bc40e5860ed8673f1e1676b9fadce3199b8fe67ca8d167678"
+    },
+    "inputs": [
+      "runs/<cell>/session/records.jsonl",
+      "classes.json"
+    ],
+    "outputs": [
+      "runs/<cell>/analysis.json per class and m",
+      "runs/<cell>/audit.json (ecbench verify receipt)"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per class and m: per-curve yield with the A/A and iso bands",
+      "planted-effect power per detector and cell"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "reading any result as a statement about ECCp-131, security or speed",
+    "ranking curves of one class by a clock below L2",
+    "dropping or filling a cell that did not run",
+    "changing N, A, R, targets, rounds, thresholds or seeds after seeing results",
+    "treating a null from a cell with positive-control power below 0.9 as a null"
+  ],
+  "literature": [
+    {
+      "ref": "research/isogeny_class_difficulty_20261008",
+      "provenance": "internal",
+      "claim": "within an isogeny class only transport cost, automorphisms and model presentation can differ",
+      "verified_by": "repository review 2026-11-02"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "1cab21213fa7eb5562009d924039c7bf17b6c02161499fed8b11bef40c376e9e",
+    "commit": "4c43066b72c9e87aaba9c34cda5caa9266fde07f",
+    "frozen_at": "2026-11-02T03:59:01Z",
+    "filed_before_affected_data": true
+  }
+}

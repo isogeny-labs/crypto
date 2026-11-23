@@ -1,0 +1,28 @@
+{
+  "schema": "compact-release-cli-pre-call/v1",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "captured_utc": "2026-11-15T23:23:00.651393+00:00",
+  "class": "existing fixed-fixture CLI correctness; no clock-value comparison or scientific timing",
+  "executables": {
+    "worker": {
+      "path": "/workspace/relation-native-qualifiers/compact-release-worker-96f0c814d-01",
+      "sha256": "1e6523063d68820c9d1972f764a187b7b2900042758d19933b4867cc7014657d",
+      "bytes": 6897184
+    },
+    "cli": {
+      "path": "/workspace/relation-native-qualifiers/compact-release-cli-96f0c814d-01",
+      "sha256": "0ce25088e6749e4ca8e73f2a55729bc1568c87afc9e1c755c3fb8321be84cd6c",
+      "bytes": 1361376
+    }
+  },
+  "argv": [
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "environment": {
+    "RAYON_NUM_THREADS": "1",
+    "RELATION_ROOT_WORKER_BINARY": "/workspace/relation-native-qualifiers/compact-release-worker-96f0c814d-01"
+  },
+  "process_cap_seconds": 180,
+  "address_space_cap_kib": 2097152
+}

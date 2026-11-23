@@ -3,10 +3,10 @@
 # S_IC  = median_R1(setup_units)/sqrt(r) + mean_R1(ic_online_units)/sqrt(r)
 # S_ref = median_R1(rho_setup_units)/sqrt(r) + mean_R1(rho_online_units)/sqrt(r)
 # xref = S_IC/S_ref ; xfloor = S_IC / sqrt(pi/(4n))
-# a retry file replaces the contended attempt it retried (rule v7 selects one complete, uncontended attempt per run)
+# a retry file replaces the contended attempt it retried (rule v7 and later select one complete, uncontended attempt per run; Table A reads rule v9)
 # also: S_ref at the canonical step (rho_online repriced: steps*canonical_step_units) for the §5a/kernel check
 set -eu
-base=research/ic_tool_program/rule/v7/runs
+base=research/ic_tool_program/rule/v9/runs
 for d in $base/k*n*; do
   jq -s '
    def med: sort|if length%2==1 then .[length/2|floor] else (.[length/2-1]+.[length/2])/2 end;

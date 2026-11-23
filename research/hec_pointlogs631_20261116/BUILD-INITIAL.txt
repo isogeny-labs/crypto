@@ -1,0 +1,32 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-pointlogs631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_pointlogs631_20261116)
+error[E0753]: expected outer doc comment
+ --> ../hec_sparsecore13_20261115/sparse.rs:1:1
+  |
+1 | //! Scalar Lanczos on A^T D A, adapted from the repository N4v2 reference.
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: inner doc comments like this (starting with `//!` or `/*!`) can only appear before items
+help: you might have meant to write a regular comment
+  |
+1 - //! Scalar Lanczos on A^T D A, adapted from the repository N4v2 reference.
+1 + // Scalar Lanczos on A^T D A, adapted from the repository N4v2 reference.
+  |
+
+error[E0753]: expected outer doc comment
+ --> ../hec_sparsecore13_20261115/sparse.rs:2:1
+  |
+2 | //! Random diagonal preconditioning can fail; return only an exactly checked nonzero A-kernel.
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3 | use hec_native_ic::{fp::Fp,rng::Rng};
+  | ------------------------------------- the inner doc comment doesn't annotate this `use` import
+  |
+help: to annotate the `use` import, change the doc comment from inner to outer style
+  |
+2 - //! Random diagonal preconditioning can fail; return only an exactly checked nonzero A-kernel.
+2 + /// Random diagonal preconditioning can fail; return only an exactly checked nonzero A-kernel.
+  |
+
+For more information about this error, try `rustc --explain E0753`.
+error: could not compile `hec-pointlogs631` (bin "pointlogs631") due to 2 previous errors

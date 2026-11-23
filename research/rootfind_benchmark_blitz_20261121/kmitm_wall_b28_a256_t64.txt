@@ -1,0 +1,108 @@
+rootfind-kmitm vs ksum  bits=28 |Fx|=256 targets=64  [pcc:unverified]
+m= 3  split 2/1  kmitm build    5672650 ns  left 65527    right_pre 0       probe     9676.9 ns/tgt  lanes4     8646.3 ns/tgt (1.12x)  thr1/2/4     9049.9/    8900.5/    8656.8 (1.02x/1.05x) hits 4/4/4/4/4   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 4  split 3/1  kmitm build 2020063160 ns  left 10604658 right_pre 0       probe     5356.4 ns/tgt  lanes4     4178.5 ns/tgt (1.28x)  thr1/2/4     4780.8/   10227.9/    6968.1 (0.47x/0.69x) hits 64/64/64/64/64   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 5  skip m=5: estimated left table ~4294967296 over |Fx|=256 (host OOM guard)
+m= 6  skip m=6: estimated left table ~1099511627776 over |Fx|=256 (host OOM guard)
+m= 8  skip m=8: estimated left table ~72057594037927936 over |Fx|=256 (host OOM guard)
+m=10  skip m=10: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)
+m=12  skip m=12: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)
+{
+  "abscissae": 256,
+  "bits": 28,
+  "classification": "engineering",
+  "factor_base_size": 256,
+  "pcc": "unverified",
+  "rows": [
+    {
+      "abscissae": 256,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 5672650.0,
+      "kmitm_hits": 4,
+      "kmitm_hits_lanes4": 4,
+      "kmitm_hits_thr1": 4,
+      "kmitm_hits_thr2": 4,
+      "kmitm_hits_thr4": 4,
+      "kmitm_lanes4_speedup": 1.1191988593341418,
+      "kmitm_left_entries": 65527,
+      "kmitm_probe_ns_per_target": 9676.890625,
+      "kmitm_probe_ns_per_target_lanes4": 8646.265625,
+      "kmitm_probe_ns_per_target_thr1": 9049.859375,
+      "kmitm_probe_ns_per_target_thr2": 8900.546875,
+      "kmitm_probe_ns_per_target_thr4": 8656.78125,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 1.0167756545858313,
+      "kmitm_thr4_speedup": 1.0454069605836465,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 2,
+      "m": 3,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 256,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 2020063160.0,
+      "kmitm_hits": 64,
+      "kmitm_hits_lanes4": 64,
+      "kmitm_hits_thr1": 64,
+      "kmitm_hits_thr2": 64,
+      "kmitm_hits_thr4": 64,
+      "kmitm_lanes4_speedup": 1.281889434007419,
+      "kmitm_left_entries": 10604658,
+      "kmitm_probe_ns_per_target": 5356.375,
+      "kmitm_probe_ns_per_target_lanes4": 4178.5,
+      "kmitm_probe_ns_per_target_thr1": 4780.84375,
+      "kmitm_probe_ns_per_target_thr2": 10227.921875,
+      "kmitm_probe_ns_per_target_thr4": 6968.140625,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.467430608918295,
+      "kmitm_thr4_speedup": 0.6861003540668354,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 3,
+      "m": 4,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 256,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=5: estimated left table ~4294967296 over |Fx|=256 (host OOM guard)",
+      "m": 5
+    },
+    {
+      "abscissae": 256,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=6: estimated left table ~1099511627776 over |Fx|=256 (host OOM guard)",
+      "m": 6
+    },
+    {
+      "abscissae": 256,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=8: estimated left table ~72057594037927936 over |Fx|=256 (host OOM guard)",
+      "m": 8
+    },
+    {
+      "abscissae": 256,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=10: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)",
+      "m": 10
+    },
+    {
+      "abscissae": 256,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=12: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)",
+      "m": 12
+    }
+  ],
+  "targets": 64
+}

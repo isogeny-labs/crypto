@@ -1,0 +1,9 @@
+import FallbackReduced
+set_option autoImplicit false
+namespace ReductionWord
+
+theorem control_constant_stop : Run 17 [] [1] [] [1] [] := Run.stop _ _ (by decide)
+theorem control_quadratic_stop : Run 17 [] [1,0,1] [2,3] [1,0,1] [2,3] := Run.stop _ _ (by decide)
+theorem control_cubic_guard : 3<([1,0,0,1] : List UInt64).length := by decide
+theorem control_zero_negation : ResidualWord.pneg 17 [0]=[0] := by decide
+end ReductionWord

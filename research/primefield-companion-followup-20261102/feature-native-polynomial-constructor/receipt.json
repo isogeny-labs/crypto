@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-05T16:24:17.170570+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-polynomial-constructor/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "output_packet": "research/primefield-companion-followup-20261102/feature-native-polynomial-constructor/program.tsv",
+  "source_lock_entries": 18,
+  "overflow_checks": true,
+  "comparative_panel": false,
+  "binary_sha256": "9137ce3f35ad6c401cf9e72a464affbf06f6005d406fd2e1651764e610ea4b0a"
+}

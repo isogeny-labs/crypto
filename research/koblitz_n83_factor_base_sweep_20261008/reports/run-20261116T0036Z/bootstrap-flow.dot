@@ -1,0 +1,10 @@
+digraph bootstrap {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.45", ranksep="0.6", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#e8f0f6", color="#294b63", fontname="Helvetica", fontsize=13];
+  edge [color="#42586b", penwidth=1.6, fontname="Helvetica", fontsize=11];
+  input [label="Source 0f558a0f7998\nPinned ARM64 toolchain\n12 GiB, zero swap; 4 CPUs"];
+  result [label="Bootstrap: 1,446 s whole interval\nCargo build: 23 min 19 s\nARM64 producer: 5d7dea0a…13edb7\nExit 0; OOM false", fillcolor="#d8eddd", color="#1e7542"];
+  next [label="Charged build and K600 worker\nPENDING\nNo cold IC cost yet", style="rounded,dashed", fillcolor="white", color="#8b6236"];
+  input -> result;
+  result -> next [style=dashed, label="next gates"];
+}

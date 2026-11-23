@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:55:13Z",
+ "id": "PCC-20261116-005680",
+ "kind": "execution",
+ "producer": {
+  "commit": "cb31f711f6a8d04226dd6028a93ebf73b3b574c1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-chained-s3-admission/linux-validation.json",
+    "sha256": "18c0499938e9d498791ef08940160ce1ba5f401b04460476b2889540108bfe1b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Bounded Linux validation attempts did not reach test execution: retain OOM and reboot interruptions with exact image/source/log hashes. The 14 Linux-only cases remain unvalidated here; the separate Mac scoped controls are not pooled into a Linux pass."
+}

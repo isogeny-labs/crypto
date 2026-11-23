@@ -1,0 +1,51 @@
+// Full polynomial collision certificates, including A=0 good fibers.
+ring collisionSource51=(2,b,c),(t),dp;short=0;
+poly A51=1+c;poly delta51=b^3*(b+c*A51^3);
+poly psi2_51=A51*t+b;
+poly psi3_51=t^4+A51^2*t^3+A51*b*t^2+b^2*t+b^3;
+poly psi4_51=psi2_51*(A51^2*t^5+A51*b*t^4+A51*c*b^3*t+c*b^4);
+poly psi5_51=psi4_51*psi2_51^3+psi3_51^3;
+poly psi7_51=psi5_51*psi3_51^3+psi2_51*psi4_51^3;
+if(deg(psi7_51)!=24 || leadcoef(psi7_51)!=1 || psi7_51+psi2_51*psi4_51^3!=psi5_51*psi3_51^3){ERROR("COLLISION51_MONIC_RECURRENCE_IDENTITY");quit;}
+ideal factors51=psi2_51,psi4_51,psi7_51;intvec expected51=1,5,16;
+ideal baseStandard51=std(ideal(psi3_51));int case51;int col51;int row51;int position51;int total51=0;
+poly remainder51;poly reconstruction51;poly residual51;matrix quotient51;matrix M51[4][4];matrix M7_51[4][4];
+link out51="ASCII:w collision-certificate51.sing";open(out51);
+write(out51,"ring collisionCertificate51=(2,b,c),(t),dp;short=0;poly delta51="+string(delta51)+";poly psi3_51="+string(psi3_51)+";poly psi7_51="+string(psi7_51)+";ideal factors51="+string(factors51)+";ideal columnQuotients51;");
+for(case51=1;case51<=3;case51++){
+ matrix M51[4][4];write(out51,"matrix multiplication51_"+string(case51)+"[4][4];");
+ for(col51=1;col51<=4;col51++){
+  remainder51=reduce(factors51[case51]*t^(col51-1),baseStandard51);
+  while(remainder51!=0){position51=deg(lead(remainder51))+1;if(position51>4 || denominator(leadcoef(remainder51))!=1){ERROR("COLLISION51_NONINTEGRAL_MULTIPLICATION_ENTRY");quit;}M51[position51,col51]=leadcoef(remainder51);remainder51=remainder51-lead(remainder51);}
+  reconstruction51=0;for(row51=1;row51<=4;row51++){reconstruction51=reconstruction51+M51[row51,col51]*t^(row51-1);write(out51,"multiplication51_"+string(case51)+"["+string(row51)+","+string(col51)+"]="+string(M51[row51,col51])+";");}
+  residual51=factors51[case51]*t^(col51-1)+reconstruction51;quotient51=lift(ideal(psi3_51),ideal(residual51));
+  if(psi3_51*quotient51[1,1]!=residual51){ERROR("COLLISION51_FULL_MULTIPLICATION_COLUMN");quit;}
+  total51++;write(out51,"columnQuotients51["+string(total51)+"]="+string(quotient51[1,1])+";");
+ }
+ if(det(M51)!=delta51^expected51[case51]){ERROR("COLLISION51_EXACT_NORM");quit;}
+ print("COLLISION51_NORM factor_index="+string(case51)+" norm_equals_Delta_power="+string(expected51[case51])+" full_columns=4 coefficients_polynomial=true");
+ if(case51==3){M7_51=M51;}
+}
+matrix adjColumn51[4][1];matrix minor51[3][3];int minorRow51;int minorCol51;int skipped51;int rr51;int cc51;
+for(skipped51=1;skipped51<=4;skipped51++){
+ for(rr51=2;rr51<=4;rr51++){minorCol51=0;for(cc51=1;cc51<=4;cc51++){if(cc51!=skipped51){minorCol51++;minor51[rr51-1,minorCol51]=M7_51[rr51,cc51];}}}
+ adjColumn51[skipped51,1]=det(minor51);
+}
+matrix desired51[4][1];desired51[1,1]=delta51^16;
+if(M7_51*adjColumn51!=desired51){ERROR("COLLISION51_FULL_ADJUGATE_PRODUCT");quit;}
+poly V51=0;for(row51=1;row51<=4;row51++){V51=V51+adjColumn51[row51,1]*t^(row51-1);}
+residual51=psi7_51*V51+delta51^16;quotient51=lift(ideal(psi3_51),ideal(residual51));poly U51=quotient51[1,1];
+if(psi3_51*U51+psi7_51*V51!=delta51^16 || psi3_51*U51+psi7_51*(V51+1)==delta51^16){ERROR("COLLISION51_FULL_BEZOUT_OR_CORRUPTION");quit;}
+ideal coefficientCheck51=U51,V51;
+for(case51=1;case51<=2;case51++){remainder51=coefficientCheck51[case51];while(remainder51!=0){if(denominator(leadcoef(remainder51))!=1){ERROR("COLLISION51_BEZOUT_NOT_POLYNOMIAL");quit;}remainder51=remainder51-lead(remainder51);}}
+write(out51,"poly U51="+string(U51)+";poly V51="+string(V51)+";");close(out51);
+execute(read("collision-certificate51.sing"));
+poly reconstruction51;intvec powers51=1,5,16;total51=0;
+for(case51=1;case51<=3;case51++){
+ execute("matrix reloaded51=multiplication51_"+string(case51)+";");
+ if(det(reloaded51)!=delta51^powers51[case51]){ERROR("COLLISION51_RELOADED_NORM");quit;}
+ for(col51=1;col51<=4;col51++){reconstruction51=0;for(row51=1;row51<=4;row51++){reconstruction51=reconstruction51+reloaded51[row51,col51]*t^(row51-1);}total51++;if(factors51[case51]*t^(col51-1)+reconstruction51!=psi3_51*columnQuotients51[total51]){ERROR("COLLISION51_RELOADED_FULL_COLUMN");quit;}}
+}
+if(psi3_51*U51+psi7_51*V51!=delta51^16 || total51!=12){ERROR("COLLISION51_RELOADED_BEZOUT");quit;}
+print("COLLISION51_RESULT monic_psi7_degree=24 exact_norms=3 norm_exponents=1_5_16 full_multiplication_columns=12 full_adjugate_product=true full_polynomial_Bezout=true coefficient_denominators=1 corrupted_Bezout_rejected=true serialized_full_columns_and_norms_and_Bezout_rechecked=true collision_support_contained_in_Delta_zero=true no_A_inverse_used=true");
+print("COLLISION51_ALL_CHECKS_PASS");quit;

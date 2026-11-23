@@ -1,0 +1,530 @@
+module
+public import Mathlib.NumberTheory.Padics.RingHoms
+public import OrientationContent
+public import OrientationDegree
+public import OrientationRank
+public import OrientationFullChart
+import all OrientationDegree
+import all OrientationCompact
+import all OrientationHigher
+import all OrientationRank
+import all OrientationFullChart
+import all OrientationNode
+import all OrientationMoment
+import all OrientationContent
+public section
+noncomputable section
+namespace OrientationModeProfile
+open Polynomial Finset OrientationAnchor OrientationMoment OrientationNodePolynomial
+  OrientationNodeMoment OrientationGradedNode OrientationRefinement OrientationLeading
+  OrientationDiagonal OrientationJet OrientationResidue OrientationBivariate OrientationChartDegree
+
+def targetBit {u k : ℕ} (i : ℕ) (rb : MomentLabels u k) : Bool := rb.1.val.testBit i
+def sourceBit {u k : ℕ} (i : ℕ) (rb : MomentLabels u k) : Bool := !(rb.1.val.testBit i)
+def modeWeight {u k : ℕ} (w : ℤ) (rb : MomentLabels u k) : ℤ := w+rb.2.val
+
+theorem actual_left_support (a u i k : ℕ) (hiu : i<u) (x : Ports a) (rb : MomentLabels u k)
+    (hn : polyLeft a u k x rb ≠ 0) : x.val.testBit i=targetBit i rb := by
+  have he : rowResidue u x.val=rb.1.val := by
+    by_contra h
+    apply hn
+    simp only [polyLeft,momentLeft,h,ite_false,map_zero]
+  have hmod : x.val % 2^u=rb.1.val % 2^u := by
+    simpa only [rowResidue,Nat.mod_eq_of_lt rb.1.isLt] using he
+  exact matching_bits u x.val rb.1.val i hiu hmod
+
+theorem actual_weighted_left_support (a u i k : ℕ) (m : ℕ → ℕ) (hiu : i<u)
+    (x : Ports a) (rb : MomentLabels u k)
+    (hn : OrientationBivariate.weightedLeft a u i k m x rb ≠ 0) :
+    x.val.testBit i=targetBit i rb := by
+  have hL : polyLeft a u k x rb ≠ 0 := by
+    intro hz
+    apply hn
+    simp only [OrientationBivariate.weightedLeft,hz,mul_zero]
+  exact actual_left_support a u i k hiu x rb hL
+
+theorem actual_right_support (a u i k : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (rb : MomentLabels u k) (y : Ports a)
+    (hn : trimmedRight a u i k t m rb y ≠ 0) : (!(y.val.testBit i))=sourceBit i rb := by
+  have hc : rb.1.val.testBit i=y.val.testBit i := by
+    by_contra h
+    simp [trimmedRight,polyRight,h,trimZ] at hn
+  simp only [sourceBit,hc]
+
+theorem mode_sides_differ {u k : ℕ} (i : ℕ) (rb : MomentLabels u k) :
+    targetBit i rb ≠ sourceBit i rb := by
+  cases h : rb.1.val.testBit i <;> simp [targetBit,sourceBit,h]
+
+theorem mode_weight_nonnegative {u k : ℕ} (w : ℤ) (hw : 0≤w) (rb : MomentLabels u k) :
+    0 ≤ modeWeight w rb := by unfold modeWeight; omega
+
+theorem mode_weight_positive {u k : ℕ} (w : ℤ) (hw : 1≤w) (rb : MomentLabels u k) :
+    1 ≤ modeWeight w rb := by unfold modeWeight; omega
+
+theorem weight_fiber_count (u k : ℕ) (w z : ℤ) :
+    Fintype.card {rb : MomentLabels u k // modeWeight w rb=z}≤2^u := by
+  have hi : Function.Injective (fun rb : {rb : MomentLabels u k // modeWeight w rb=z} => rb.val.1) := by
+    intro r s he
+    apply Subtype.ext
+    apply Prod.ext he
+    apply Fin.ext
+    have hr := r.property
+    have hs := s.property
+    dsimp [modeWeight] at hr hs
+    omega
+  simpa only [Fintype.card_fin] using Fintype.card_le_of_injective _ hi
+
+theorem packet_weight_count {P : Type*} [Fintype P] (u k : ℕ) (w : P → ℤ) (z : ℤ) :
+    (∑ p : P,Fintype.card {rb : MomentLabels u k // modeWeight (w p) rb=z})≤
+      Fintype.card P*2^u := by
+  calc
+    _ ≤ ∑ _p : P,2^u := Finset.sum_le_sum (by intro p _; exact weight_fiber_count u k (w p) z)
+    _ = _ := by simp
+
+theorem packet_capacity_bound (P N L M u : ℕ) (hN : N≤P*2^u) (hP : P*L≤3*M) :
+    N*L≤(3*M)*2^u := by
+  calc
+    N*L≤(P*2^u)*L := Nat.mul_le_mul_right L hN
+    _ = (P*L)*2^u := by ring
+    _ ≤ (3*M)*2^u := Nat.mul_le_mul_right _ hP
+
+/-- Exact capacity comparison, not actual nonzero support or runtime. -/
+theorem declared_capacity_ratio (P u i : ℕ) (hi : i<u) :
+    P*2^u=(P*2^(i+1))*2^(u-i-1) := by
+  have he : (i+1)+(u-i-1)=u := by omega
+  rw [mul_assoc,← pow_add,he]
+
+theorem content_eval_one {k : ℤ} {P : ℚ[X]} (hP : Content k P) : VBound k (P.eval 1) := by
+  rw [eval_eq_sum,Polynomial.sum_def]
+  apply VBound.sum
+  intro n _
+  simpa only [one_pow,mul_one] using hP n
+
+/-- Negative-pole product family only; no integrality premises on proposed factors. -/
+theorem negative_pole_polynomial_width (a u i r : ℕ) (hu : u≤a) (m : ℕ → ℕ)
+    (hi : i<u) (hm : ∀ j<u,0 < m j)
+    (A : Matrix (Ports a) (Fin r) ℚ[X]) (B : Matrix (Fin r) (Ports a) ℚ[X])
+    (happrox : ∀ x y,Content 1
+      (OrientationFullChart.normalizedChartMatrix a u i m x y-(A*B) x y)) : 2^u≤r := by
+  let Ae : Matrix (Ports a) (Fin r) ℚ := fun x j => (A x j).eval 1
+  let Be : Matrix (Fin r) (Ports a) ℚ := fun j y => (B j y).eval 1
+  have he (x y : Ports a) : ((A*B) x y).eval 1=(Ae*Be) x y := by
+    change (∑ j : Fin r,A x j*B j y).eval 1 =
+      ∑ j : Fin r,(A x j).eval 1*(B j y).eval 1
+    rw [eval_finsetSum]
+    apply sum_congr rfl
+    intro j _
+    rw [eval_mul]
+  apply OrientationRank.actual_approximation_label_lower_bound a u i r hu m hi hm Ae Be
+  intro x y
+  have ha : VBound 1 ((OrientationFullChart.normalizedChartMatrix a u i m x y).eval 1-
+      (Ae*Be) x y) := by
+    simpa only [eval_sub,he] using content_eval_one (happrox x y)
+  have hb : VBound 1 ((OrientationFullChart.normalizedChartMatrix a u i m x y).eval 1-
+      normalizedCrossing a u i m x y) := by
+    simpa only [eval_sub,eval_mul,eval_C,eval_X,mul_one] using
+      content_eval_one (OrientationFullChart.actual_chart_to_first a u i m hi hu x y)
+  convert ha.add hb.neg using 1; ring
+
+end OrientationModeProfile
+
+#print axioms OrientationModeProfile.actual_weighted_left_support
+#print axioms OrientationModeProfile.actual_right_support
+#print axioms OrientationModeProfile.weight_fiber_count
+#print axioms OrientationModeProfile.negative_pole_polynomial_width
+
+namespace OrientationAbsolutePrecision
+open Polynomial Finset OrientationAnchor OrientationMoment OrientationLeading OrientationJet
+  OrientationDiagonal OrientationGradedNode OrientationBivariate OrientationChartDegree OrientationModeProfile
+
+def creationIndex (p : ℕ) (w : ℤ) : ℕ := Int.toNat ((p:ℤ)-w)
+abbrev LabelsAt (a u i p : ℕ) (m : ℕ → ℕ) := MomentLabels u (creationIndex p (jetWeight a u i m))
+
+theorem creation_index_covers (p : ℕ) (w : ℤ) : (p:ℤ)≤w+creationIndex p w := by
+  have h := Int.self_le_toNat ((p:ℤ)-w)
+  unfold creationIndex
+  omega
+
+theorem creation_index_le (p : ℕ) (w : ℤ) (hw : 0≤w) : creationIndex p w≤p := by
+  unfold creationIndex
+  exact Int.toNat_le.mpr (by omega)
+
+theorem actual_weight_positive (a u i : ℕ) (m : ℕ → ℕ)
+    (hiu : i<u) (hu : u≤a) (hG : 0 ≤ schedule u i m) : 2≤jetWeight a u i m := by
+  unfold jetWeight
+  omega
+
+def absoluteLeft (a u i p : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (LabelsAt a u i p m) ℚ[X] :=
+  OrientationBivariate.weightedLeft a u i (creationIndex p (jetWeight a u i m)) m
+
+def absoluteRight (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ) :
+    Matrix (LabelsAt a u i p m) (Ports a) ℚ[X] :=
+  trimmedRight a u i (creationIndex p (jetWeight a u i m)) t m
+
+theorem actual_absolute_polynomial_precision (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hiu : i<u) (hu : u≤a) (x y : Ports a) :
+    Content (p:ℤ) (nodeCrossingPolynomial a u i t m x y-
+      (absoluteLeft a u i p m*absoluteRight a u i p t m) x y) :=
+  (actual_degree_limited_weighted_precision a u i (creationIndex p (jetWeight a u i m)) t m
+    ht ht0 hi hiu hu x y).mono (creation_index_covers p (jetWeight a u i m))
+
+theorem actual_absolute_right_degree (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hiu : i<u) (hu : u≤a) (hG : 0 ≤ schedule u i m) (rb : LabelsAt a u i p m) (y : Ports a) :
+    (absoluteRight a u i p t m rb y).natDegree≤p := by
+  have hw := actual_weight_positive a u i m hiu hu hG
+  exact (trimmed_right_degree a u i (creationIndex p (jetWeight a u i m)) t m rb y).trans
+    (creation_index_le p _ (by omega))
+
+theorem actual_absolute_right_integral (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hiu : i<u) (hu : u≤a) (rb : LabelsAt a u i p m) (y : Ports a) :
+    Content 0 (absoluteRight a u i p t m rb y) :=
+  trimmed_right_integral a u i (creationIndex p (jetWeight a u i m)) t m ht ht0 hi hiu hu rb y
+
+theorem actual_absolute_left_weight (a u i p : ℕ) (m : ℕ → ℕ)
+    (hiu : i<u) (hu : u≤a) (x : Ports a) (rb : LabelsAt a u i p m) :
+    Content (jetWeight a u i m+rb.2.val) (absoluteLeft a u i p m x rb) :=
+  weighted_left_weight a u i (creationIndex p (jetWeight a u i m)) m hiu hu x rb
+
+theorem actual_absolute_label_bound (a u i p : ℕ) (m : ℕ → ℕ)
+    (hiu : i<u) (hu : u≤a) (hG : 0 ≤ schedule u i m) : Fintype.card (LabelsAt a u i p m)≤2^u*p := by
+  have hw := actual_weight_positive a u i m hiu hu hG
+  rw [moment_label_count]
+  exact Nat.mul_le_mul_left _ (creation_index_le p _ (by omega))
+
+theorem actual_absolute_mode_positive (a u i p : ℕ) (m : ℕ → ℕ)
+    (hiu : i<u) (hu : u≤a) (hG : 0 ≤ schedule u i m) (rb : LabelsAt a u i p m) :
+    1 ≤ modeWeight (jetWeight a u i m) rb :=
+  mode_weight_positive _ (by have h := actual_weight_positive a u i m hiu hu hG; omega) rb
+
+theorem content_eval_integral {k : ℤ} {P : ℚ[X]} (hP : Content k P) (z : ℚ) (hz : VBound 0 z) :
+    VBound k (P.eval z) := by
+  rw [eval_eq_sum,Polynomial.sum_def]
+  apply VBound.sum
+  intro n _
+  simpa only [add_zero] using (hP n).mul (integral_power hz n)
+
+def evalMatrix {R C : Type*} (z : ℚ) (A : Matrix R C ℚ[X]) : Matrix R C ℚ :=
+  fun r c => (A r c).eval z
+
+theorem eval_matrix_product {R C K : Type*} [Fintype K]
+    (A : Matrix R K ℚ[X]) (B : Matrix K C ℚ[X]) (z : ℚ) (x : R) (y : C) :
+    ((A*B) x y).eval z=(evalMatrix z A*evalMatrix z B) x y := by
+  change (∑ j : K,A x j*B j y).eval z = ∑ j : K,(A x j).eval z*(B j y).eval z
+  rw [eval_finsetSum]
+  apply sum_congr rfl
+  intro j _
+  rw [eval_mul]
+
+theorem actual_absolute_rational_precision (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hiu : i<u) (hu : u≤a) (z : ℚ) (hz : VBound 0 z) (x y : Ports a) :
+    VBound (p:ℤ) ((nodeCrossingPolynomial a u i t m x y).eval z-
+      (evalMatrix z (absoluteLeft a u i p m)*evalMatrix z (absoluteRight a u i p t m)) x y) := by
+  have he := content_eval_integral (actual_absolute_polynomial_precision a u i p t m ht ht0 hi hiu hu x y) z hz
+  simpa only [eval_sub,eval_matrix_product] using he
+
+theorem actual_absolute_rational_right (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hiu : i<u) (hu : u≤a) (z : ℚ) (hz : VBound 0 z) (rb : LabelsAt a u i p m) (y : Ports a) :
+    VBound 0 (evalMatrix z (absoluteRight a u i p t m) rb y) :=
+  content_eval_integral (actual_absolute_right_integral a u i p t m ht ht0 hi hiu hu rb y) z hz
+
+theorem actual_absolute_rational_left (a u i p : ℕ) (m : ℕ → ℕ)
+    (hiu : i<u) (hu : u≤a) (z : ℚ) (hz : VBound 0 z) (x : Ports a) (rb : LabelsAt a u i p m) :
+    VBound (jetWeight a u i m+rb.2.val) (evalMatrix z (absoluteLeft a u i p m) x rb) :=
+  content_eval_integral (actual_absolute_left_weight a u i p m hiu hu x rb) z hz
+
+theorem actual_absolute_rational_profile (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hiu : i<u) (hu : u≤a) (hG : 0 ≤ schedule u i m) (z : ℚ) (hz : VBound 0 z) :
+    (∀ (x : Ports a) (rb : LabelsAt a u i p m),
+      VBound (jetWeight a u i m+rb.2.val) (evalMatrix z (absoluteLeft a u i p m) x rb)) ∧
+    (∀ (rb : LabelsAt a u i p m) (y : Ports a),VBound 0 (evalMatrix z (absoluteRight a u i p t m) rb y)) ∧
+    (∀ (rb : LabelsAt a u i p m) (y : Ports a),(absoluteRight a u i p t m rb y).natDegree≤p) ∧
+    (∀ x y : Ports a,VBound (p:ℤ) ((nodeCrossingPolynomial a u i t m x y).eval z-
+      (evalMatrix z (absoluteLeft a u i p m)*evalMatrix z (absoluteRight a u i p t m)) x y)) ∧
+    Fintype.card (LabelsAt a u i p m)≤2^u*p := by
+  exact ⟨actual_absolute_rational_left a u i p m hiu hu z hz,
+    actual_absolute_rational_right a u i p t m ht ht0 hi hiu hu z hz,
+    actual_absolute_right_degree a u i p t m hiu hu hG,
+    actual_absolute_rational_precision a u i p t m ht ht0 hi hiu hu z hz,
+    actual_absolute_label_bound a u i p m hiu hu hG⟩
+
+end OrientationAbsolutePrecision
+
+#print axioms OrientationAbsolutePrecision.creation_index_covers
+#print axioms OrientationAbsolutePrecision.actual_absolute_polynomial_precision
+#print axioms OrientationAbsolutePrecision.actual_absolute_rational_precision
+#print axioms OrientationAbsolutePrecision.actual_absolute_rational_profile
+
+namespace OrientationCoefficientReduction
+open OrientationAnchor Polynomial
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+
+def integralRationals : Subring ℚ where
+  carrier := {q | VBound 0 q}
+  zero_mem' := VBound.zero 0
+  one_mem' := Or.inr (by simp)
+  add_mem' ha hb := ha.add hb
+  neg_mem' ha := ha.neg
+  mul_mem' ha hb := by simpa using ha.mul hb
+
+theorem norm_bound {q : ℚ} (n : ℕ) (h : VBound (n:ℤ) q) :
+    padicNorm 2 q ≤ (2:ℚ)^(-(n:ℤ)) := by
+  rcases h with rfl | h
+  · simp only [padicNorm.zero]
+    positivity
+  by_cases hq : q=0
+  · subst q
+    simp only [padicNorm.zero]
+    positivity
+  rw [padicNorm.eq_zpow_of_nonzero hq]
+  exact zpow_le_zpow_right₀ (by norm_num) (neg_le_neg h)
+
+theorem integral_norm {q : ℚ} (h : VBound 0 q) : padicNorm 2 q ≤ 1 := by
+  simpa using norm_bound 0 h
+
+def toPadic : integralRationals →+* ℤ_[2] where
+  toFun q := ⟨(q.val : ℚ_[2]), by
+    change ‖(q.val:ℚ_[2])‖ ≤ 1
+    rw [Padic.eq_padicNorm]
+    have H := (Rat.cast_le (K:=ℝ)).mpr (integral_norm q.property)
+    simpa only [Rat.cast_one] using H⟩
+  map_one' := by apply Subtype.ext; simp
+  map_zero' := by apply Subtype.ext; simp
+  map_add' a b := by
+    apply Subtype.ext
+    change (((a.val+b.val:ℚ)):ℚ_[2])=(a.val:ℚ_[2])+(b.val:ℚ_[2])
+    exact Rat.cast_add ..
+  map_mul' a b := by
+    apply Subtype.ext
+    change (((a.val*b.val:ℚ)):ℚ_[2])=(a.val:ℚ_[2])*(b.val:ℚ_[2])
+    exact Rat.cast_mul ..
+
+def reduce (p : ℕ) : integralRationals →+* ZMod (2^p) :=
+  (PadicInt.toZModPow p).comp toPadic
+
+theorem reduce_zero_of_bound (p : ℕ) (q : integralRationals)
+    (h : VBound (p:ℤ) q.val) : reduce p q=0 := by
+  change PadicInt.toZModPow p (toPadic q)=0
+  rw [← RingHom.mem_ker,PadicInt.ker_toZModPow,
+    ← PadicInt.norm_le_pow_iff_mem_span_pow]
+  change ‖(q.val:ℚ_[2])‖ ≤ (2:ℝ)^(-(p:ℤ))
+  rw [Padic.eq_padicNorm]
+  have H := (Rat.cast_le (K:=ℝ)).mpr (norm_bound p h)
+  simpa only [Rat.cast_zpow,Rat.cast_ofNat] using H
+
+theorem integral_den_valuation {q : ℚ} (h : VBound 0 q) : padicValNat 2 q.den=0 := by
+  by_cases hq : q=0
+  · subst q; simp
+  have hv := h.resolve_left hq
+  rcases Rat.num_or_den_zero_padicVal q (by decide : Nat.Prime 2) with hn | hd
+  · rw [padicValRat_def,hn] at hv
+    omega
+  · exact hd
+
+theorem integral_den_not_dvd {q : ℚ} (h : VBound 0 q) : ¬ 2 ∣ q.den := by
+  have hd := (padicValNat.eq_zero_iff).mp (integral_den_valuation h)
+  rcases hd with hd | hd | hd
+  · norm_num at hd
+  · exact (q.den_ne_zero hd).elim
+  · exact hd
+
+theorem integral_den_odd {q : ℚ} (h : VBound 0 q) : Odd q.den := by
+  exact Nat.not_even_iff_odd.mp (fun he => integral_den_not_dvd h he.two_dvd)
+
+theorem reduce_compatible (m n : ℕ) (hmn : m ≤ n) (q : integralRationals) :
+    ZMod.castHom (pow_dvd_pow 2 hmn) (ZMod (2^m)) (reduce n q)=reduce m q := by
+  exact DFunLike.congr_fun (PadicInt.zmod_cast_comp_toZModPow m n hmn) (toPadic q)
+
+
+theorem denominator_coprime (q : integralRationals) (p : ℕ) : q.val.den.Coprime (2^p) := by
+  have hc : q.val.den.Coprime 2 := Nat.coprime_comm.mpr
+    ((Nat.prime_two.coprime_iff_not_dvd).mpr (integral_den_not_dvd q.property))
+  exact hc.pow_right p
+
+theorem denominator_unit (q : integralRationals) (p : ℕ) :
+    IsUnit (q.val.den : ZMod (2^p)) :=
+  (ZMod.isUnit_iff_coprime _ _).mpr (denominator_coprime q p)
+
+theorem reduce_mul_den (q : integralRationals) (p : ℕ) :
+    reduce p q*(q.val.den : ZMod (2^p))=(q.val.num : ZMod (2^p)) := by
+  have H : q*(q.val.den : integralRationals)=(q.val.num : integralRationals) := by
+    apply Subtype.ext
+    exact Rat.mul_den_eq_num q.val
+  have h := congrArg (reduce p) H
+  simpa only [map_mul,map_natCast,map_intCast] using h
+
+theorem reduce_finite_formula (q : integralRationals) (p : ℕ) :
+    reduce p q=(q.val.num : ZMod (2^p))*(q.val.den : ZMod (2^p))⁻¹ := by
+  rw [← reduce_mul_den q p,mul_assoc,ZMod.mul_inv_of_unit _ (denominator_unit q p),mul_one]
+
+def reduceTo (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)] : integralRationals →+* R :=
+  (ZMod.castHom (dvd_refl (2^p)) R).comp (reduce p)
+
+theorem reduceTo_zero_of_bound (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (q : integralRationals) (h : VBound (p:ℤ) q.val) : reduceTo p R q=0 := by
+  change ZMod.castHom (dvd_refl (2^p)) R (reduce p q)=0
+  rw [reduce_zero_of_bound p q h,map_zero]
+
+def liftPoly (P : ℚ[X]) (hP : Content 0 P) : integralRationals[X] :=
+  Polynomial.ofFinsupp (AddMonoidAlgebra.ofCoeff (Finsupp.onFinset P.support (fun n => (⟨P.coeff n,hP n⟩ : integralRationals)) (by
+    intro n hn
+    apply mem_support_iff.mpr
+    intro hz
+    exact hn (Subtype.ext hz))))
+
+theorem liftPoly_coeff (P : ℚ[X]) (hP : Content 0 P) (n : ℕ) :
+    ((liftPoly P hP).coeff n).val=P.coeff n := by
+  unfold liftPoly
+  rfl
+
+theorem map_liftPoly (P : ℚ[X]) (hP : Content 0 P) :
+    (liftPoly P hP).map integralRationals.subtype=P := by
+  ext n
+  rw [coeff_map]
+  exact liftPoly_coeff P hP n
+
+theorem map_zero_of_content (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (P : integralRationals[X]) (hP : ∀ n,VBound (p:ℤ) (P.coeff n).val) :
+    P.map (reduceTo p R)=0 := by
+  ext n
+  rw [coeff_map,coeff_zero]
+  exact reduceTo_zero_of_bound p R (P.coeff n) (hP n)
+
+theorem liftPoly_map_zero (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (P : ℚ[X]) (hP : Content 0 P) (hp : Content (p:ℤ) P) :
+    (liftPoly P hP).map (reduceTo p R)=0 :=
+  map_zero_of_content p R _ (fun n => by simpa only [liftPoly_coeff] using hp n)
+
+theorem actual_integral_polynomial_product (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (W A B : ℚ[X]) (hW : Content 0 W) (hA : Content 0 A) (hB : Content 0 B)
+    (herr : Content (p:ℤ) (W-A*B)) :
+    (liftPoly W hW).map (reduceTo p R)=
+      (liftPoly A hA).map (reduceTo p R)*(liftPoly B hB).map (reduceTo p R) := by
+  let E := liftPoly W hW-liftPoly A hA*liftPoly B hB
+  have he : E.map integralRationals.subtype=W-A*B := by
+    simp only [E,Polynomial.map_sub,Polynomial.map_mul,map_liftPoly]
+  have hv : ∀ n,VBound (p:ℤ) (E.coeff n).val := by
+    intro n
+    have H := congrArg (fun P : ℚ[X] => P.coeff n) he
+    rw [coeff_map] at H
+    change VBound (p:ℤ) (integralRationals.subtype (E.coeff n))
+    rw [H]
+    exact herr n
+  have hz := map_zero_of_content p R E hv
+  simpa only [E,Polynomial.map_sub,Polynomial.map_mul,sub_eq_zero] using hz
+
+end OrientationCoefficientReduction
+#print axioms OrientationCoefficientReduction.reduce_zero_of_bound
+#print axioms OrientationCoefficientReduction.integral_den_odd
+#print axioms OrientationCoefficientReduction.reduce_compatible
+
+#print axioms OrientationCoefficientReduction.reduce_finite_formula
+#print axioms OrientationCoefficientReduction.actual_integral_polynomial_product
+
+namespace OrientationCoefficientReduction
+open Polynomial OrientationAnchor OrientationGradedNode Finset OrientationNodePolynomial OrientationAbsolutePrecision OrientationLeading
+  OrientationMoment OrientationJet
+
+def liftMatrix {I J : Type*} (A : Matrix I J ℚ[X])
+    (hA : ∀ x y,Content 0 (A x y)) : Matrix I J integralRationals[X] :=
+  fun x y => liftPoly (A x y) (hA x y)
+
+def mapPolys {I J R S : Type*} [CommRing R] [CommRing S]
+    (f : R →+* S) (A : Matrix I J R[X]) : Matrix I J S[X] :=
+  fun x y => (A x y).map f
+
+theorem liftMatrix_back {I J : Type*} (A : Matrix I J ℚ[X])
+    (hA : ∀ x y,Content 0 (A x y)) : mapPolys integralRationals.subtype (liftMatrix A hA)=A := by
+  apply Matrix.ext
+  intro x y
+  exact map_liftPoly (A x y) (hA x y)
+
+theorem mapPolys_mul {I J K R S : Type*} [Fintype K] [CommRing R] [CommRing S]
+    (f : R →+* S) (A : Matrix I K R[X]) (B : Matrix K J R[X]) :
+    mapPolys f (A*B)=mapPolys f A*mapPolys f B := by
+  apply Matrix.ext
+  intro x y
+  change (∑ j : K,A x j*B j y).map f=∑ j : K,(A x j).map f*(B j y).map f
+  rw [Polynomial.map_sum]
+  apply sum_congr rfl
+  intro j _
+  exact Polynomial.map_mul f
+
+theorem mapPolys_sub {I J R S : Type*} [CommRing R] [CommRing S]
+    (f : R →+* S) (A B : Matrix I J R[X]) :
+    mapPolys f (A-B)=mapPolys f A-mapPolys f B := by
+  apply Matrix.ext
+  intro x y
+  exact Polynomial.map_sub f
+
+theorem integral_matrix_product (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    {I J K : Type*} [Fintype K] (W : Matrix I J ℚ[X])
+    (A : Matrix I K ℚ[X]) (B : Matrix K J ℚ[X])
+    (hW : ∀ x y,Content 0 (W x y)) (hA : ∀ x y,Content 0 (A x y))
+    (hB : ∀ x y,Content 0 (B x y)) (herr : ∀ x y,Content (p:ℤ) ((W-A*B) x y)) :
+    mapPolys (reduceTo p R) (liftMatrix W hW)=
+      mapPolys (reduceTo p R) (liftMatrix A hA)*mapPolys (reduceTo p R) (liftMatrix B hB) := by
+  let E := liftMatrix W hW-liftMatrix A hA*liftMatrix B hB
+  have he : mapPolys integralRationals.subtype E=W-A*B := by
+    simp only [E,mapPolys_sub,mapPolys_mul,liftMatrix_back]
+  have hz : mapPolys (reduceTo p R) E=0 := by
+    apply Matrix.ext
+    intro x y
+    apply map_zero_of_content
+    intro n
+    have H := congrArg (fun M : Matrix I J ℚ[X] => (M x y).coeff n) he
+    change ((E x y).map integralRationals.subtype).coeff n=((W-A*B) x y).coeff n at H
+    rw [coeff_map] at H
+    change VBound (p:ℤ) (integralRationals.subtype ((E x y).coeff n))
+    rw [H]
+    exact herr x y n
+  simpa only [E,mapPolys_sub,mapPolys_mul,sub_eq_zero] using hz
+
+theorem integral_matrix_of_residual (p : ℕ) {I J K : Type*} [Fintype K]
+    (W : Matrix I J ℚ[X]) (A : Matrix I K ℚ[X]) (B : Matrix K J ℚ[X])
+    (hA : ∀ x y,Content 0 (A x y)) (hB : ∀ x y,Content 0 (B x y))
+    (herr : ∀ x y,Content (p:ℤ) ((W-A*B) x y)) : ∀ x y,Content 0 (W x y) := by
+  intro x y
+  have hp : Content 0 ((A*B) x y) := by
+    change Content 0 (∑ j : K,A x j*B j y)
+    apply content_sum
+    intro j _
+    simpa using (hA x j).mul (hB j y)
+  have h := ((herr x y).mono (by omega : (0:ℤ)≤p)).add hp
+  simpa only [Matrix.sub_apply,sub_add_cancel] using h
+
+theorem actual_reduced_absolute_factors (a u i p : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hiu : i<u) (hu : u≤a) (hG : 0 ≤ schedule u i m)
+    (R : Type*) [CommRing R] [CharP R (2^p)] :
+    ∃ (LW : Matrix (Ports a) (Ports a) integralRationals[X])
+      (LA : Matrix (Ports a) (LabelsAt a u i p m) integralRationals[X])
+      (LB : Matrix (LabelsAt a u i p m) (Ports a) integralRationals[X]),
+      mapPolys integralRationals.subtype LW=nodeCrossingPolynomial a u i t m ∧
+      mapPolys integralRationals.subtype LA=absoluteLeft a u i p m ∧
+      mapPolys integralRationals.subtype LB=absoluteRight a u i p t m ∧
+      mapPolys (reduceTo p R) LW=mapPolys (reduceTo p R) LA*mapPolys (reduceTo p R) LB := by
+  let W := nodeCrossingPolynomial a u i t m
+  let A := absoluteLeft a u i p m
+  let B := absoluteRight a u i p t m
+  have hw := actual_weight_positive a u i m hiu hu hG
+  have hA : ∀ x y,Content 0 (A x y) := by
+    intro x rb
+    exact (actual_absolute_left_weight a u i p m hiu hu x rb).mono (by omega)
+  have hB : ∀ x y,Content 0 (B x y) :=
+    actual_absolute_right_integral a u i p t m ht ht0 hi hiu hu
+  have herr : ∀ x y,Content (p:ℤ) ((W-A*B) x y) :=
+    actual_absolute_polynomial_precision a u i p t m ht ht0 hi hiu hu
+  have hW := integral_matrix_of_residual p W A B hA hB herr
+  refine ⟨liftMatrix W hW,liftMatrix A hA,liftMatrix B hB,
+    liftMatrix_back W hW,liftMatrix_back A hA,liftMatrix_back B hB,?_⟩
+  exact integral_matrix_product p R W A B hW hA hB herr
+
+end OrientationCoefficientReduction
+#print axioms OrientationCoefficientReduction.integral_matrix_product
+#print axioms OrientationCoefficientReduction.actual_reduced_absolute_factors
+

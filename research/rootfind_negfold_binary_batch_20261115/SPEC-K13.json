@@ -1,0 +1,27 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "K13 scalar versus batched negation-folded rootfinding",
+  "description": "Cold complete-solve comparison on fresh public Koblitz E0 n13 targets. m3 separates the added batched relation scan from the scalar engine; m2 isolates batched table construction. All phases, failed rows, and completed batch additions remain charged.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 0, "n": 13}],
+    "targets_per_curve": 8,
+    "target_seed": 202611151501,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong", "params": {"lanes": "32", "dp_bits": "4", "step_cap_factor": "2000"}}},
+    {"name": "scalar-m3", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-standard-subspace:dimension=5", "oracle": "pdp3-binary:m=3,engine=rootfind-negfold", "max_trials": "200000"}}},
+    {"name": "batch-m3", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-standard-subspace:dimension=5", "oracle": "pdp3-binary:m=3,engine=rootfind-negfold-batch", "max_trials": "200000"}}},
+    {"name": "scalar-m2", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-standard-subspace:dimension=5", "oracle": "pdp3-binary:m=2,engine=rootfind-negfold", "max_trials": "200000"}}},
+    {"name": "batch-m2", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-standard-subspace:dimension=5", "oracle": "pdp3-binary:m=2,engine=rootfind-negfold-batch", "max_trials": "200000"}}},
+    {"name": "scalar-m3-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-standard-subspace:dimension=5", "oracle": "pdp3-binary:m=3,engine=rootfind-negfold", "max_trials": "200000"}}}
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611151502,
+    "isolation_required": "L2",
+    "timeout_seconds": 120
+  }
+}

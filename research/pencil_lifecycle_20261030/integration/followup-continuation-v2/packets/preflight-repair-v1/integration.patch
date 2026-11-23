@@ -1,0 +1,842 @@
+--- /dev/null
++++ b/src/cryptanalysis/ecbench/diagnostic_binding_core.rs
+@@ -0,0 +1,443 @@
++//! Structural binding core, not execution or authenticated-custody admission.
++//! Caller must use actual owner observations from its separately verified custody path.
++use super::canonical::{reject_duplicate_keys, sha256_hex, short_id};
++use serde_json::{json, Value};
++use std::collections::BTreeSet;
++const RULE:&str="runner_id + '-preparation-sha256-' + lowercase SHA256 of exact session-preparation.json bytes; file deliberately omits clock_id to avoid a cycle";
++const BOUNDARY: &str =
++    "run_session entry before parsing; excludes CLI/process startup and input acquisition";
++pub struct Evidence<'a> {
++    pub preparation: &'a [u8],
++    pub session: &'a [u8],
++    pub host: &'a [u8],
++    pub plan: &'a [u8],
++    pub launch: &'a [u8],
++    /// Derived with the actual Spec::identity_view and canonical::short_id.
++    pub spec_id: &'a str,
++    pub spec_sha256: &'a str,
++    pub owner: &'a OwnerObservation,
++}
++/// Comparison input from the owner verifier; this struct cannot authenticate its own provenance.
++#[derive(Clone)]
++pub struct OwnerObservation {
++    pub session_sha256: String,
++    pub host_sha256: String,
++    pub preparation_sha256: String,
++    pub binary_sha256: String,
++    pub runner_pid: u64,
++    pub boot_id: String,
++    pub time_namespace: String,
++    pub time_namespace_offsets: String,
++    pub origin_ns: u64,
++}
++#[derive(Debug)]
++pub struct BoundSession {
++    pub session_id: String,
++    pub runner_id: String,
++    pub clock_id: String,
++}
++pub fn parse(raw: &[u8], cap: usize) -> Result<Value, String> {
++    if raw.len() > cap {
++        return Err("input cap".into());
++    }
++    let s = std::str::from_utf8(raw).map_err(|e| e.to_string())?;
++    reject_duplicate_keys(s)?;
++    serde_json::from_slice(raw).map_err(|e| e.to_string())
++}
++fn text<'a>(v: &'a Value, k: &str) -> Result<&'a str, String> {
++    v[k].as_str()
++        .filter(|x| !x.is_empty())
++        .ok_or_else(|| format!("missing {k}"))
++}
++fn u(v: &Value, k: &str) -> Result<u64, String> {
++    v[k].as_u64().ok_or_else(|| format!("missing integer {k}"))
++}
++fn require(ok: bool, msg: &str) -> Result<(), String> {
++    if ok {
++        Ok(())
++    } else {
++        Err(msg.into())
++    }
++}
++pub fn verify(e: Evidence<'_>) -> Result<BoundSession, String> {
++    let p = parse(e.preparation, 65536)?;
++    let s = parse(e.session, 4 * 1024 * 1024)?;
++    let h = parse(e.host, 4 * 1024 * 1024)?;
++    let plan = parse(e.plan, 32 * 1024 * 1024)?;
++    let l = parse(e.launch, 65536)?;
++    let allowed = [
++        "schema",
++        "clock_type",
++        "origin_ns",
++        "boot_id",
++        "time_namespace",
++        "time_namespace_offsets",
++        "origin_boundary",
++        "observations",
++        "preparation_wall_ns",
++        "lock_wait_wall_ns",
++        "lock_wait_is_subset_of_preparation",
++        "interval_kind",
++        "active_cpu_ns",
++        "active_worker_ns",
++        "external_alignment_supported",
++        "external_alignment_conditions",
++        "restore_alignment_supported",
++        "external_exit_observation",
++        "final_publication_tail_pending",
++        "session_id",
++        "runner_id",
++        "clock_identity_rule",
++        "launch_sha256",
++        "spec_sha256",
++        "plan_sha256",
++        "host_sha256",
++    ];
++    let obj = p.as_object().ok_or("preparation not object")?;
++    require(
++        obj.len() == allowed.len() && allowed.iter().all(|k| obj.contains_key(*k)),
++        "preparation fields",
++    )?;
++    require(
++        p["schema"] == "ecbench.session_preparation/v1"
++            && p["clock_type"] == "linux_CLOCK_MONOTONIC"
++            && p["clock_identity_rule"] == RULE
++            && p["origin_boundary"] == BOUNDARY,
++        "preparation schema/clock rule",
++    )?;
++    require(
++        p["lock_wait_is_subset_of_preparation"] == true
++            && p["interval_kind"] == "wall_only"
++            && p["external_alignment_supported"] == true
++            && p["restore_alignment_supported"] == false
++            && p["final_publication_tail_pending"] == true,
++        "preparation clock flags",
++    )?;
++    require(p["external_alignment_conditions"]=="same verified boot/time namespace and raw CLOCK_MONOTONIC; authenticated owner receipt required","alignment condition")?;
++    for k in [
++        "active_cpu_ns",
++        "active_worker_ns",
++        "external_exit_observation",
++    ] {
++        require(p[k].is_null(), "unknown metric must stay null")?;
++    }
++    let obs = p["observations"].as_object().ok_or("observations")?;
++    require(
++        obs.len() == 3
++            && [
++                "lock_wait_started_ns",
++                "lock_acquired_ns",
++                "execute_entry_ns",
++            ]
++            .iter()
++            .all(|k| obs.contains_key(*k)),
++        "observation fields",
++    )?;
++    for v in obs.values() {
++        require(
++            v.is_null() || v.as_u64().is_some(),
++            "observation numeric type",
++        )?;
++    }
++    require(
++        p["preparation_wall_ns"] == p["observations"]["execute_entry_ns"],
++        "preparation wall",
++    )?;
++    let wait = match (
++        p["observations"]["lock_wait_started_ns"].as_u64(),
++        p["observations"]["lock_acquired_ns"].as_u64(),
++    ) {
++        (Some(a), Some(b)) => json!(b.checked_sub(a).ok_or("lock time reversal")?),
++        _ => Value::Null,
++    };
++    require(p["lock_wait_wall_ns"] == wait, "lock wait wall")?;
++    for k in [
++        "session_id",
++        "runner_id",
++        "boot_id",
++        "time_namespace",
++        "time_namespace_offsets",
++    ] {
++        text(&p, k)?;
++    }
++    let ph = sha256_hex(e.plan);
++    let hh = sha256_hex(e.host);
++    let sh = sha256_hex(e.session);
++    let prep = sha256_hex(e.preparation);
++    require(
++        s["schema"] == "ecbench.session/v1" && plan["schema"] == "ecbench.plan/v1",
++        "session/plan schema",
++    )?;
++    require(
++        s["spec_id"] == e.spec_id
++            && plan["spec_id"] == e.spec_id
++            && s["spec_sha256"] == e.spec_sha256
++            && p["spec_sha256"] == e.spec_sha256
++            && l["expected_spec_sha256"] == e.spec_sha256,
++        "spec lineage",
++    )?;
++    require(
++        s["plan_sha256"] == ph
++            && p["plan_sha256"] == ph
++            && s["host_sha256"] == hh
++            && p["host_sha256"] == hh,
++        "plan/host join",
++    )?;
++    let started = u(&s, "started_unix_ms")?;
++    let sid=short_id("ECBS1",&json!({"spec_sha256":e.spec_sha256,"host_sha256":hh,"plan_sha256":ph,"started_unix_ms":started.to_string()}))?.0;
++    require(
++        s["session_id"] == sid && p["session_id"] == sid,
++        "derived ECBS1 identity",
++    )?;
++    let runner = format!("{sid}-runner-{}", e.owner.runner_pid);
++    require(
++        e.owner.runner_pid > 0 && p["runner_id"] == runner,
++        "owner runner PID",
++    )?;
++    require(
++        s["binary_sha256"] == l["binary_sha256"] && s["binary_sha256"] == e.owner.binary_sha256,
++        "binary join",
++    )?;
++    require(p["launch_sha256"] == sha256_hex(e.launch), "launch hash")?;
++    let opts = &s["options"]["diagnostic_launch"];
++    require(
++        opts["raw_json"].as_str() == std::str::from_utf8(e.launch).ok()
++            && opts["raw_sha256"] == sha256_hex(e.launch),
++        "session diagnostic launch",
++    )?;
++    let slots = plan["executions"]
++        .as_array()
++        .ok_or("plan executions")?
++        .len() as u64;
++    require(
++        u(&s, "executions_planned")? == slots && u(&s, "records_written")? <= slots,
++        "session execution counts",
++    )?;
++    require(
++        ["running", "complete", "interrupted"].contains(&text(&s, "status")?),
++        "session status",
++    )?;
++    if s["status"] == "complete" {
++        require(
++            s["records_written"] == slots && s["finished_unix_ms"].as_u64().is_some(),
++            "complete session bounds",
++        )?;
++    }
++    if s["status"] == "running" {
++        require(s["finished_unix_ms"].is_null(), "running session finished")?;
++    }
++    require(h.is_object(), "host object")?;
++    require(
++        e.owner.session_sha256 == sh
++            && e.owner.host_sha256 == hh
++            && e.owner.preparation_sha256 == prep,
++        "owner exact bytes",
++    )?;
++    require(
++        p["boot_id"] == e.owner.boot_id
++            && p["time_namespace"] == e.owner.time_namespace
++            && p["time_namespace_offsets"] == e.owner.time_namespace_offsets
++            && u(&p, "origin_ns")? == e.owner.origin_ns,
++        "owner clock observations",
++    )?;
++    Ok(BoundSession {
++        session_id: sid,
++        runner_id: runner.clone(),
++        clock_id: format!("{runner}-preparation-sha256-{prep}"),
++    })
++}
++/// Validate exactly the supplied actual ordered subset; does not require future contexts.
++pub fn context_keys(rows: &[(u64, u64, String)], planned: &[u64]) -> Result<(), String> {
++    require(!rows.is_empty(), "actual context subset empty")?;
++    let mut seen = BTreeSet::new();
++    let mut leaves = BTreeSet::new();
++    let mut prior = None;
++    for (seq, attempt, leaf) in rows {
++        let pos = planned
++            .iter()
++            .position(|v| v == seq)
++            .ok_or("context not enrolled")?;
++        require(prior.is_none_or(|x| pos > x), "context plan order")?;
++        prior = Some(pos);
++        require(
++            seen.insert(*seq) && leaves.insert(leaf.clone()),
++            "duplicate context",
++        )?;
++        require(
++            *leaf == format!("diagnostic-{seq:06}-attempt-{attempt}"),
++            "relative leaf mismatch",
++        )?;
++    }
++    Ok(())
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    struct Fixture {
++        p: Value,
++        s: Value,
++        h: Value,
++        plan: Value,
++        l: Value,
++    }
++    fn bytes(v: &Value) -> Vec<u8> {
++        serde_json::to_vec(v).unwrap()
++    }
++    fn fixture() -> Fixture {
++        let h = json!({"schema":"ecbench.host/v1","fixture":true});
++        let plan = json!({"schema":"ecbench.plan/v1","spec_id":"spec-fixture","executions":[{"seq":0},{"seq":1}]});
++        let l = json!({"expected_spec_sha256":"spec-hash","binary_sha256":"binary-hash"});
++        let hh = sha256_hex(&bytes(&h));
++        let ph = sha256_hex(&bytes(&plan));
++        let lb = bytes(&l);
++        let lh = sha256_hex(&lb);
++        let sid=short_id("ECBS1",&json!({"spec_sha256":"spec-hash","host_sha256":hh,"plan_sha256":ph,"started_unix_ms":"42"})).unwrap().0;
++        let p = json!({"schema":"ecbench.session_preparation/v1","clock_type":"linux_CLOCK_MONOTONIC","origin_ns":12,"boot_id":"fixture-boot","time_namespace":"fixture-ns","time_namespace_offsets":"monotonic 0 0\n","origin_boundary":BOUNDARY,"observations":{"lock_wait_started_ns":null,"lock_acquired_ns":null,"execute_entry_ns":null},"preparation_wall_ns":null,"lock_wait_wall_ns":null,"lock_wait_is_subset_of_preparation":true,"interval_kind":"wall_only","active_cpu_ns":null,"active_worker_ns":null,"external_alignment_supported":true,"external_alignment_conditions":"same verified boot/time namespace and raw CLOCK_MONOTONIC; authenticated owner receipt required","restore_alignment_supported":false,"external_exit_observation":null,"final_publication_tail_pending":true,"session_id":sid,"runner_id":format!("{sid}-runner-17"),"clock_identity_rule":RULE,"launch_sha256":lh,"spec_sha256":"spec-hash","plan_sha256":ph,"host_sha256":hh});
++        let s = json!({"schema":"ecbench.session/v1","session_id":sid,"spec_id":"spec-fixture","spec_sha256":"spec-hash","host_sha256":hh,"plan_sha256":ph,"binary_sha256":"binary-hash","started_unix_ms":42,"finished_unix_ms":null,"status":"running","executions_planned":2,"records_written":0,"options":{"diagnostic_launch":{"raw_json":String::from_utf8(lb).unwrap(),"raw_sha256":lh}}});
++        Fixture { p, s, h, plan, l }
++    }
++    impl Fixture {
++        fn check(&self) -> Result<BoundSession, String> {
++            let (pb, sb, hb, planb, lb) = (
++                bytes(&self.p),
++                bytes(&self.s),
++                bytes(&self.h),
++                bytes(&self.plan),
++                bytes(&self.l),
++            );
++            let owner = OwnerObservation {
++                session_sha256: sha256_hex(&sb),
++                host_sha256: sha256_hex(&hb),
++                preparation_sha256: sha256_hex(&pb),
++                binary_sha256: "binary-hash".into(),
++                runner_pid: 17,
++                boot_id: "fixture-boot".into(),
++                time_namespace: "fixture-ns".into(),
++                time_namespace_offsets: "monotonic 0 0\n".into(),
++                origin_ns: 12,
++            };
++            verify(Evidence {
++                preparation: &pb,
++                session: &sb,
++                host: &hb,
++                plan: &planb,
++                launch: &lb,
++                spec_id: "spec-fixture",
++                spec_sha256: "spec-hash",
++                owner: &owner,
++            })
++        }
++    }
++    #[test]
++    fn actual_stage_rejects_all_missing_and_minimal_prep() {
++        let f = fixture();
++        assert!(f.check().is_ok());
++        for v in [
++            json!({}),
++            json!({"session_id":f.p["session_id"],"runner_id":f.p["runner_id"],"plan_sha256":f.p["plan_sha256"],"launch_sha256":f.p["launch_sha256"]}),
++        ] {
++            let mut bad = fixture();
++            bad.p = v;
++            assert!(bad.check().is_err());
++        }
++    }
++    #[test]
++    fn preparation_mutations_fail_even_if_owner_byte_pins_updated() {
++        for k in [
++            "schema",
++            "clock_type",
++            "origin_boundary",
++            "clock_identity_rule",
++            "session_id",
++            "runner_id",
++            "spec_sha256",
++            "plan_sha256",
++            "host_sha256",
++            "launch_sha256",
++            "boot_id",
++            "time_namespace",
++            "time_namespace_offsets",
++            "external_alignment_conditions",
++        ] {
++            let mut f = fixture();
++            f.p[k] = json!("changed");
++            assert!(f.check().is_err(), "{k}");
++        }
++        for k in [
++            "active_worker_ns",
++            "active_cpu_ns",
++            "external_exit_observation",
++            "origin_ns",
++        ] {
++            let mut f = fixture();
++            f.p[k] = json!(999);
++            assert!(f.check().is_err(), "{k}");
++        }
++        let mut f = fixture();
++        f.p["clock_id"] = json!("manufactured");
++        assert!(f.check().is_err());
++    }
++    #[test]
++    fn session_host_plan_and_launch_mutations_fail() {
++        for k in [
++            "schema",
++            "session_id",
++            "spec_id",
++            "spec_sha256",
++            "host_sha256",
++            "plan_sha256",
++            "binary_sha256",
++            "status",
++        ] {
++            let mut f = fixture();
++            f.s[k] = json!("changed");
++            assert!(f.check().is_err(), "{k}");
++        }
++        for k in ["started_unix_ms", "executions_planned", "records_written"] {
++            let mut f = fixture();
++            f.s[k] = json!(999);
++            assert!(f.check().is_err(), "{k}");
++        }
++        let mut f = fixture();
++        f.h["changed"] = json!(true);
++        assert!(f.check().is_err());
++        let mut f = fixture();
++        f.l["binary_sha256"] = json!("changed");
++        assert!(f.check().is_err());
++        let mut f = fixture();
++        f.s["options"]["diagnostic_launch"]["raw_json"] = json!("{}");
++        assert!(f.check().is_err());
++    }
++    #[test]
++    fn self_consistent_changed_session_still_requires_derived_ecbs1() {
++        let mut f = fixture();
++        f.s["session_id"] = json!("fake");
++        f.p["session_id"] = json!("fake");
++        f.p["runner_id"] = json!("fake-runner-17");
++        assert!(f.check().is_err());
++    }
++    #[test]
++    fn leaf_order_and_subset_are_strict() {
++        let planned = [10, 11, 12];
++        assert!(context_keys(&[(11, 2, "diagnostic-000011-attempt-2".into())], &planned).is_ok());
++        assert!(context_keys(&[], &planned).is_err());
++        for rows in [
++            vec![(11, 2, "execution_11".into())],
++            vec![(13, 2, "diagnostic-000013-attempt-2".into())],
++            vec![
++                (11, 2, "diagnostic-000011-attempt-2".into()),
++                (11, 2, "diagnostic-000011-attempt-2".into()),
++            ],
++            vec![
++                (12, 2, "diagnostic-000012-attempt-2".into()),
++                (11, 2, "diagnostic-000011-attempt-2".into()),
++            ],
++        ] {
++            assert!(context_keys(&rows, &planned).is_err());
++        }
++    }
++    #[test]
++    fn duplicate_json_keys_rejected_before_value_parse() {
++        assert!(parse(br#"{"schema":1,"schema":2}"#, 65536).is_err());
++    }
++}
+--- /dev/null
++++ b/src/cryptanalysis/ecbench/diagnostic_inventory.rs
+@@ -0,0 +1,188 @@
++//! Reuse the immutable reviewed enrollment; never generate plans or approve execution.
++use super::{canonical::sha256_hex, diagnostic_binding_core::parse};
++use std::collections::BTreeSet;
++const ROUTES: &[(&str, &str, &str, &str, usize)] = &[
++    (
++        "gate-p739.json",
++        "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776",
++        "a2c25a203ad4c39aaea57287e1705dd4b3db394cd10507fff009980ec8634c18",
++        "ECS1h1bab8ffa33b6",
++        60,
++    ),
++    (
++        "cohort-16-remainder-plan.json",
++        "39b73d2a2ffbab3deec9dbdf9857af15a66607ca8843b8f29c64cd94c7d2d9c9",
++        "330c2017234961023a30675cf6056fb7bf4c1bee1c8dabbaa4610f6ca4ba63c9",
++        "ECS1h9a5aafd3a403",
++        120,
++    ),
++    (
++        "cohort-20.json",
++        "51a99e83c38b4d5d6b19f82337918b2f64f34b4934a5361298e84fc2f8bd432f",
++        "33104eb19ee7a8995bccb43a3768824643b6ec6dae45bca4da809f88503fb639",
++        "ECS1h2bd191253bbd",
++        180,
++    ),
++    (
++        "cohort-24.json",
++        "7d34d0ce87c5a167ee1e94fecb08bcac34c9b4339570deb6377effe75efc28c4",
++        "cbc91d501e44fb101a96ff0ce9a7d96cbd37d2761e910fa62cbd47dfd56ac315",
++        "ECS1heaff76e306f7",
++        180,
++    ),
++    (
++        "cohort-28.json",
++        "87760bc68b7598250c22976f15e4dbb36b5f2d738647de501222de1a8b27b001",
++        "04c87c844c9216993cfa90aecbb1606080338232ebfa6ab91f12b6881d4b477c",
++        "ECS1he4c8727d2fc2",
++        180,
++    ),
++    (
++        "cohort-32.json",
++        "a9aebbc3120b61380a6936408635ac0f0e60715b4b4918dc826fbab4b578ae96",
++        "0bcb2f5f8811a370997724bf0186330fba14a896346d9206d3f67d8368cb22a3",
++        "ECS1hdfe262979cdb",
++        180,
++    ),
++    (
++        "cohort-36.json",
++        "6bb162d846bfbfe68b1bf7ba330abbc1e11c403b003215c960e7e71d81be3aa2",
++        "39cac1b85cb9672e5e5f3418957c994a005b59432dd2b6ca74226bed60d832fe",
++        "ECS1hcd32ffa92b64",
++        180,
++    ),
++    (
++        "cohort-40.json",
++        "8f2ec73a139f84b660573bd67c54ebfc567626ce7068a135dcb52c61891b22d5",
++        "fee38c5c381107272d65a89daa8151f75aa249082d0e9c82f1014211fdee2587",
++        "ECS1hf76a63f60392",
++        180,
++    ),
++    (
++        "gate-p186379-target0.json",
++        "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf",
++        "d4ec180d5a2cf65617a5821b565ec0d4952435a77669da65ca77852d2723c32c",
++        "ECS1hea0daedd0dff",
++        1,
++    ),
++];
++const ARTIFACTS: &[(&str, &str)] = &[
++    (
++        "certificate",
++        "de0003271c4f49898dd38f261c279338bfe756779d405d0753d0401d58b83e72",
++    ),
++    (
++        "request",
++        "6b99db317edac83a401126ec1d427739b2e786591e4fbaffd0003ce882c846f2",
++    ),
++    (
++        "receipt",
++        "3a48cda05911f1274b467590a33bddf97e91976155b3c62e78a52948148072d3",
++    ),
++    (
++        "review",
++        "8e748e9bbcc34a6a8aa09e874df14972c3b67e60d074293a91d31b8113fb9b76",
++    ),
++];
++
++pub struct Input<'a> {
++    pub route: &'a str,
++    pub plan: &'a [u8],
++    pub spec: &'a [u8],
++}
++#[derive(Debug)]
++pub struct Inventory {
++    pub stage: &'static str,
++    pub software_bindings_complete: bool,
++    pub scientific_execution_admitted: bool,
++    pub workloads: usize,
++    pub slots: usize,
++}
++pub fn check(inputs: &[Input<'_>], artifacts: &[(&str, &[u8])]) -> Result<Inventory, String> {
++    if inputs.len() != 9 || artifacts.len() != ARTIFACTS.len() {
++        return Err("inventory incomplete".into());
++    }
++    let mut seen = BTreeSet::new();
++    for (name, raw) in artifacts {
++        if !seen.insert(*name) {
++            return Err("duplicate enrollment artifact".into());
++        }
++        let (_, h) = ARTIFACTS
++            .iter()
++            .find(|(n, _)| n == name)
++            .ok_or("unknown enrollment artifact")?;
++        if sha256_hex(raw) != *h {
++            return Err(format!("{name}: artifact hash"));
++        }
++    }
++    let cert = parse(
++        artifacts
++            .iter()
++            .find(|(n, _)| *n == "certificate")
++            .ok_or("certificate")?
++            .1,
++        1024 * 1024,
++    )?;
++    let enrolled = cert["enrolled_plans"]
++        .as_array()
++        .ok_or("certificate enrollment")?;
++    seen.clear();
++    let (mut targets, mut slots) = (0, 0);
++    for input in inputs {
++        if !seen.insert(input.route) {
++            return Err("duplicate route".into());
++        }
++        let (_, ph, sh, sid, n) = ROUTES
++            .iter()
++            .find(|(name, ..)| *name == input.route)
++            .ok_or("unknown route")?;
++        if sha256_hex(input.plan) != *ph || sha256_hex(input.spec) != *sh {
++            return Err("plan/spec hash".into());
++        }
++        let plan = parse(input.plan, 32 * 1024 * 1024)?;
++        let spec = parse(input.spec, 32 * 1024 * 1024)?;
++        if plan["schema"] != "ecbench.plan/v1" || plan["spec_id"] != *sid || !spec.is_object() {
++            return Err("plan/spec identity".into());
++        }
++        if plan["workloads"].as_array().ok_or("workloads")?.len() != *n
++            || plan["executions"].as_array().ok_or("executions")?.len() != n * 18
++        {
++            return Err("inventory count".into());
++        }
++        if input.route != "gate-p186379-target0.json" {
++            if enrolled
++                .iter()
++                .filter(|e| e["name"] == input.route && e["sha256"] == *ph && e["spec_id"] == *sid)
++                .count()
++                != 1
++            {
++                return Err("certificate route join".into());
++            }
++            targets += n;
++            slots += n * 18;
++        } else if enrolled.iter().any(|e| e["name"] == input.route) {
++            return Err("upper gate entered cohort".into());
++        }
++    }
++    if (targets, slots) != (1260, 22680) {
++        return Err("cohort denominator".into());
++    }
++    Ok(Inventory {
++        stage: "static_inventory_only",
++        software_bindings_complete: false,
++        scientific_execution_admitted: false,
++        workloads: targets,
++        slots,
++    })
++}
++/// Called by the actual-session adapter; it binds just this already-enrolled route.
++pub fn verify_route(route: &str, plan: &[u8], spec: &[u8]) -> Result<(), String> {
++    let (_, ph, sh, ..) = ROUTES
++        .iter()
++        .find(|(n, ..)| *n == route)
++        .ok_or("unknown route")?;
++    if sha256_hex(plan) != *ph || sha256_hex(spec) != *sh {
++        return Err("actual plan/spec not enrolled".into());
++    }
++    Ok(())
++}
+--- /dev/null
++++ b/src/cryptanalysis/ecbench/diagnostic_preflight.rs
+@@ -0,0 +1,181 @@
++//! Staged retained-plan validation. Neither stage admits scientific execution.
++use super::diagnostic_binding_core::{self as core, OwnerObservation};
++use super::diagnostic_inventory::{self as inventory, Input};
++use super::{
++    canonical::{sha256_hex, short_id},
++    diagnostic_launch::{ChildEnvelope, DiagnosticLaunch},
++    diagnostic_resources::{Identity, SessionResourceJournal},
++    host::HostCapsule,
++    runner::{prepare_lifecycle_child, resource_journal_capacity, PlanDoc, Session},
++    spec::Spec,
++};
++use serde::Serialize;
++
++#[derive(Debug, Serialize)]
++pub struct Report {
++    pub stage: &'static str,
++    pub software_bindings_complete: bool,
++    pub scientific_execution_admitted: bool,
++    pub cohort_workloads: usize,
++    pub cohort_slots: usize,
++    pub separate_gate_slots: usize,
++    pub route: Option<String>,
++    pub session_id: Option<String>,
++    pub clock_id: Option<String>,
++    pub actual_context_hashes: Vec<String>,
++    pub journal_upper_bound_bytes: Option<usize>,
++    pub external_admission_obligations: Vec<&'static str>,
++}
++fn report() -> Report {
++    Report {
++        stage: "static_inventory_only",
++        software_bindings_complete: false,
++        scientific_execution_admitted: false,
++        cohort_workloads: 1260,
++        cohort_slots: 22680,
++        separate_gate_slots: 18,
++        route: None,
++        session_id: None,
++        clock_id: None,
++        actual_context_hashes: vec![],
++        journal_upper_bound_bytes: None,
++        external_admission_obligations: vec![
++            "authenticated_owner_custody",
++            "budget_and_deadline_enforcement",
++            "prospective_protocol_review_and_freeze",
++            "image_qualification_and_publication",
++            "timing_qualification",
++            "prior_p739_reuse_applicability",
++        ],
++    }
++}
++/// Success means inventory checked, explicitly not complete actual bindings.
++pub fn check_inventory(
++    inputs: &[Input<'_>],
++    artifacts: &[(&str, &[u8])],
++) -> Result<Report, String> {
++    inventory::check(inputs, artifacts)?;
++    Ok(report())
++}
++pub struct ActualSession<'a> {
++    pub route: &'a str,
++    pub plan: &'a [u8],
++    pub spec: &'a [u8],
++    pub host: &'a [u8],
++    pub session: &'a [u8],
++    pub preparation: &'a [u8],
++    pub launch: &'a [u8],
++    pub actual_contexts: &'a [Vec<u8>],
++    pub owner_observation: &'a OwnerObservation,
++}
++/// Required non-optional input. Verify this actual prepared session and supplied ordered
++/// context subset; future contexts/sessions do not need to exist. This is not a launcher.
++pub fn check_actual_session(
++    inputs: &[Input<'_>],
++    artifacts: &[(&str, &[u8])],
++    a: ActualSession<'_>,
++) -> Result<Report, String> {
++    inventory::check(inputs, artifacts)?;
++    inventory::verify_route(a.route, a.plan, a.spec)?;
++    let launch = DiagnosticLaunch::from_bytes(a.launch)?;
++    let doc = launch.document()?;
++    let plan: PlanDoc = serde_json::from_value(core::parse(a.plan, 32 * 1024 * 1024)?)
++        .map_err(|e| e.to_string())?;
++    let _: Session = serde_json::from_value(core::parse(a.session, 4 * 1024 * 1024)?)
++        .map_err(|e| e.to_string())?;
++    let _: HostCapsule =
++        serde_json::from_value(core::parse(a.host, 4 * 1024 * 1024)?).map_err(|e| e.to_string())?;
++    core::parse(a.spec, 32 * 1024 * 1024)?; // reject duplicate keys before typed parsing
++    let spec = Spec::from_json(std::str::from_utf8(a.spec).map_err(|e| e.to_string())?)?;
++    let (spec_id, spec_sha) = short_id("ECS1", &spec.identity_view())?;
++    let bound = core::verify(core::Evidence {
++        preparation: a.preparation,
++        session: a.session,
++        host: a.host,
++        plan: a.plan,
++        launch: a.launch,
++        spec_id: &spec_id,
++        spec_sha256: &spec_sha,
++        owner: a.owner_observation,
++    })?;
++    // Validate every configured arm even when this observed subset contains only one arm.
++    if plan.arms.len() != doc.arms.len() {
++        return Err("launch arm count".into());
++    }
++    for (arm, b) in plan.arms.iter().zip(&doc.arms) {
++        if arm.name != b.name
++            || arm.role != b.role
++            || arm.method.id != b.method
++            || super::diagnostic_launch::resolved_method_binding(&arm.method)?
++                != b.method_config_sha256
++        {
++            return Err("launch arm/config binding".into());
++        }
++    }
++    let mut keys = vec![];
++    let mut hashes = vec![];
++    for raw in a.actual_contexts {
++        let c: ChildEnvelope =
++            serde_json::from_value(core::parse(raw, 65536)?).map_err(|e| e.to_string())?;
++        c.validate(&launch)?;
++        let seq = c.prefix.identity.execution;
++        let e = plan
++            .executions
++            .iter()
++            .find(|e| e.seq == seq)
++            .ok_or("context not in plan")?;
++        let arm = plan.arms.get(e.arm).ok_or("arm index")?;
++        let w = plan.workloads.get(e.workload).ok_or("workload index")?;
++        let expected = prepare_lifecycle_child(
++            &launch,
++            &bound.session_id,
++            e,
++            arm,
++            w,
++            std::path::Path::new("unused-metadata-only"),
++        )?;
++        if c != expected.envelope {
++            return Err("context differs from actual producer metadata".into());
++        }
++        keys.push((
++            seq,
++            c.prefix.identity.attempt,
++            c.prefix.relative_leaf.clone(),
++        ));
++        hashes.push(sha256_hex(raw));
++    }
++    core::context_keys(
++        &keys,
++        &plan.executions.iter().map(|e| e.seq).collect::<Vec<_>>(),
++    )?;
++    let journal = SessionResourceJournal::begin(
++        bound.session_id.clone(),
++        bound.runner_id.clone(),
++        bound.clock_id.clone(),
++        0,
++    )?;
++    let id = Identity {
++        session_id: bound.session_id.clone(),
++        runner_id: bound.runner_id,
++        clock_id: bound.clock_id.clone(),
++        scientific_run_id: doc.scientific_run_id,
++        attempt: doc.attempt,
++        seq: 0,
++        protocol_sha256: doc.protocol_sha256,
++        binary_sha256: doc.binary_sha256,
++        source_manifest_sha256: doc.source_receipt.source_manifest_sha256,
++    };
++    let mut out = report();
++    out.stage = "actual_session_subset_checked";
++    out.software_bindings_complete = true;
++    out.route = Some(a.route.into());
++    out.session_id = Some(bound.session_id);
++    out.clock_id = Some(bound.clock_id);
++    out.actual_context_hashes = hashes;
++    out.journal_upper_bound_bytes = Some(resource_journal_capacity(
++        &journal,
++        id,
++        plan.executions.len(),
++    )?);
++    Ok(out)
++}
+--- a/src/cryptanalysis/ecbench/mod.rs
++++ b/src/cryptanalysis/ecbench/mod.rs
+@@ -94,3 +94,7 @@
+ pub mod wordram_price;
+ pub mod work;
+ pub mod workload;
++
++pub mod diagnostic_binding_core;
++pub mod diagnostic_inventory;
++pub mod diagnostic_preflight;
+--- a/src/cryptanalysis/ecbench/runner.rs
++++ b/src/cryptanalysis/ecbench/runner.rs
+@@ -378,7 +378,7 @@
+ // Exact compact serialized upper bound: actual escaped identity strings,
+ // u64::MAX in every numeric tail field, empty-journal header plus commas.
+ // This is admission for one session, not an implicit cohort partition.
+-fn resource_journal_capacity(
++pub(crate) fn resource_journal_capacity(
+     journal: &super::diagnostic_resources::SessionResourceJournal,
+     mut identity: super::diagnostic_resources::Identity,
+     slots: usize,

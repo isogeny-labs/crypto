@@ -1,0 +1,44 @@
+{
+  "recorded_utc": "2026-11-05T15:12:59.380074+00:00",
+  "tested_head": "9089cf60c084ff0e487e016e2b078a815f0ca9d5",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "wrapper_exit": 0,
+  "passed": [
+    "PRdelta whitespace",
+    "size",
+    "artifacts",
+    "benchrec37current",
+    "localchain/d30prefix124"
+  ],
+  "captures": {
+    "artifacts.log": {
+      "raw_utf8": "artifacts check: no data files committed\n",
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+    },
+    "benchrec.log": {
+      "raw_utf8": "benchrec: OK, 37 record(s), progress report current\n",
+      "bytes": 52,
+      "sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8"
+    },
+    "pcc-d30-prefix.log": {
+      "raw_utf8": "ledger: 124 entries, chain ok\n",
+      "bytes": 30,
+      "sha256": "acb6c8cb9651ffb2cf18f0b8100350f637217ad0c3d72cedc8be8800af3c1298"
+    },
+    "size.log": {
+      "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n",
+      "bytes": 65,
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec"
+    },
+    "whitespace.log": {
+      "raw_utf8": "",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "body_lint": "separately observed exit0 before this record",
+  "body_sha256": "8ddf7a0f64da60a2e90ccd76e74026de20c4107d462ca36f6a16ea70cd64abb2",
+  "excludes": "currentmainprefix/globalPCC/failednativefullsuite/GitHubCI; no waiver",
+  "pcc_standing": "unverified producer observation"
+}

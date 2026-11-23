@@ -1,5 +1,156 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [native free-selector witness follow-up](verification/native-selector-export-20261019/RESULT.md)
+passes independent model/domain/group replay at 787 conflicts and 167.34 s
+worker wall within the unchanged 180 s cap. Initial propagation completes
+at 192.85 ms; XOR propagation records 167.10 s. This resolves the exact
+known-witness control gate. Natural yield/rank and full-cold base selection
+remain open; earlier audit and receipt-checker failures are preserved.
+
+The [approved 49 MB native bundle](verification/native-phase-publication-20261019/RESULT.md)
+is now published to `setec-astronomy-artifacts`: a fresh download verified
+the archive, manifest and all 308 payload files. Frozen earlier pending
+and rejected-publication records remain historical.
+
+The [19 October native continuation](verification/native-phase-20261019-v3/RESULT.md)
+completed matched retained K2048 and K4096 diagnostics at 1,000 conflicts,
+with zero models, relations and rank in each. Actual public-query replay,
+phase traces, resources and cleanup passed native audit. This resolves the
+bounded terminal-observability gate; full cold selection remains unknown.
+The original free-selector positive-control timeout and two wrong-policy
+launch failures are retained separately. The [visual report and inspected
+PDF](reports/run-20261019T0140Z/REPORT.md) document the controls and limits.
+The [approved raw ZIP publication](verification/raw-approved-publication-20261019/RESULT.md)
+also completed: all 224 entries verified after a fresh S3 download. It
+supersedes the pending-upload state recorded in older frozen reports.
+
+The [visual run report and inspected PDF](reports/run-20261018T2130Z/REPORT.md)
+qualify historical supervision tooling and separate frozen-source validation
+from post-merge native integration checks.
+
+The [restored native Docker continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+verified one CPU, 4 GiB, zero swap and networkless execution, mirrored K4096
+to `setec-astronomy-artifacts`, and passed both model-construction audits.
+K4096's installed model has 131,958 variables and 2,021,197 clauses. Both
+100,000-conflict attempts were outer-wall censored at 600 seconds. A separate
+1,000-conflict control returned a complete K2048 receipt with zero models,
+zero relations and rank zero; K4096's short control was wall-censored at
+180 seconds. Censored final counters remain unknown. The
+[K4096 observability gate](../../problems/n83-native-k4096-terminal-observability.md)
+was unresolved at that stage; the later native continuation above resolves
+its bounded scope. Full cold-runtime selection remains unresolved.
+
+The [user-selected S3 publication](verification/setec-publication-20261018/RESULT.md)
+uploaded the exact reconstructed primary K2048 archive and compact public
+receipts to `setec-astronomy-artifacts` in `us-east-2`. Fresh downloads matched
+SHA-256, archive BLAKE3, lengths and ETags; encryption and overwrite protection
+were verified. Storage access for this destination is resolved. At that
+publication stage the cloud daemon was unreachable and no guarded trial
+had run there; the later continuation above restored it and records its
+separately frozen native-worker observations.
+
+The [cloud resume input recovery](verification/cloud-input-reconstruction-20261018/RESULT.md)
+reconstructed the primary K2048 archive byte-for-byte and passed generic
+replay of all 339,968 points plus rejection of a forged orbit coefficient
+with recomputed hashes. This recovers the input despite current S3 denial;
+upstream then published the later Mac high-cap receipts. Their file hashes,
+source snapshots and original public query replay pass the recovery check.
+The original binary and live cleanup were not rechecked, and no new solver
+trial ran.
+The [remaining evidence/access gates](../../problems/n83-resume-evidence-and-execution-access.md)
+and unknown complete-runtime winner remain explicit.
+
+The [primary K4096 size-frontier candidate](verification/k4096-primary-20261018/RESULT.md)
+is now constructed, generically replayed and stored at a content-addressed
+S3 key. The frozen `a=0` hash-policy object contains 679,936 distinct points
+in 4,096 signed-Frobenius columns. A fresh S3 GET and independent full-row
+sign/Frobenius audit passed; a forged replay receipt was rejected. Its
+source-derived five-summand model prediction was 131,958 variables and
+2,021,197 clauses. The [follow-on guarded gate](verification/k4096-orbit-model-20261018/RESULT.md)
+confirmed those installed counts. Its first launch had a retained
+missing-corpus producer failure; the corrected model passed, and one public
+search returned `UNKNOWN_solver_cap` at 5,000 conflicts with zero models,
+relations and rank within the cap. No complete-runtime selection follows.
+
+The [approved K1182/K2048 mixed-orbit replication](verification/mixed-orbit-approved-20261018/RESULT.md)
+freshly reimported both exact S3 objects and repeated one frozen public
+three-small/two-residual trial. It again reached `UNKNOWN_search_cap` at
+5,000 conflicts with zero models in one call. The independent audit and a
+retained-copy audit passed; a forged conflict-count event was rejected.
+Its conservative **round** charge is 2,400 seconds. The protocol's
+12,600-second prior field is historical, so no current cumulative ledger or
+factor-base ranking is inferred from it.
+
+The [retained primary K2048 high-cap search](verification/k2048-natural-highcap-20261018/RESULT.md)
+used a fresh hash-verified GET of the exact S3 factor base and the frozen
+public `a=0` point. Its single five-summand orbit-phase SAT call reached
+`UNKNOWN_solver_cap` at 100,000 conflicts after 2,846.703 seconds of
+supervised wall time, with zero models, zero relations and rank zero.
+The original and retained-copy independent audits passed, including original
+group replay, container limits and cleanup; a forged success was rejected.
+The primary `selected_best_total_runtime` remains `null` because natural
+relation yield, useful rank and the full cold comparison are unresolved.
+
+The [retained primary K64 compact-root capacity probe](verification/compact-retained-k64-20261018/RESULT.md)
+made a fresh exact S3 GET, imported the replayed base under a hard 4-GiB
+cgroup, completed all 172,640 unordered index states, and returned `MISS`
+for one public point in 39.627 seconds of supervised wall time. Independent
+source, input, Docker-limit and raw-receipt audit plus a mutation-rejection
+control passed. This is one-query capacity evidence, not a relation-yield,
+rank, or complete-runtime comparison; `selected_best_total_runtime` remains
+`null`.
+
+The [retained K256 companion](verification/compact-retained-k256-20261018/RESULT.md)
+used the same exact S3-backed primary policy and frozen public-point query.
+It completed all 2,730,368 unordered states, returned a one-query `MISS`,
+and used 676.903 seconds of supervised wall time and 723,492,864 bytes of
+peak cgroup memory. Its independent input/source/container audit and a
+mutated-receipt rejection passed. These two capacity observations do not
+estimate repeated natural relation yield or select a total-runtime winner.
+
+The [first-pattern external XOR-SAT Gray/hash pair](verification/m6-external-natural-20261018/RESULT.md)
+reimported the exact primary K600 S3 bases and exported the same public
+six-summand query as the hosted native worker. Both XOR-DIMACS circuit shapes
+matched the hosted pre-solve counts, but CryptoMiniSat reached its outer
+630-second wall cap on each arm without a solver disposition or model.
+Independent local and S3 raw-archive audits passed, including two fresh S3
+GETs and a mutation-rejection control. The conservative incremental
+two-arm envelope is **1,920 seconds**, plus earlier work. These censored
+first-pattern observations do not rank bases or measure natural yield,
+rank, or cold IC runtime; `selected_best_total_runtime` remains `null`.
+
+The [hosted canonical six-summand 100,000-conflict pair](verification/hosted-m6-highcap-20261018/RESULT.md)
+completed on two distinct Linux ARM runners. Exact input and provider audits,
+both write-once raw-artifact S3 round trips, and the paired receipt audit
+passed. Gray-prefix and hash-derived K600 residual pools each made one
+same-public-target solver call and reached `UNKNOWN_search_cap` after 100,000
+conflicts with zero models. The full conservative two-job charge is **21,600
+seconds**. These censored one-pattern observations do not measure natural
+yield, useful rank, or complete cold IC runtime; the primary
+`selected_best_total_runtime` remains `null`.
+
+The [credential-free hosted K600 Gray/hash first pair](verification/hosted-paired-run-38983406418/RESULT.md)
+ran both natural searches on Linux ARM after reproducing the frozen S3 base
+bytes. Independent retained replay passed for all 51 artifact files, three
+archive hashes and signed-orbit partitions, clean Docker stages, and both
+solver receipts; fresh S3 GETs were byte identical to the regenerated
+archives. Gray retained 97 residual signed orbits after 503 shared with the
+base; hash retained 600 after zero shared. Each arm made one solver call and
+reached `UNKNOWN_search_cap` at 5,000 conflicts with zero models. The hosted
+conservative charge, including preparation, is **5,014 seconds**, separate
+from the earlier local charge below. These are censored first trials, with
+no observed natural relation yield, useful rank, or complete-runtime winner.
+
+The [hosted ordered fixed-witness control](verification/hosted-fixed-witness-run-39051579293/RESULT.md)
+recovered and independently replayed a valid K1182/K2048 known-answer model
+at 787 conflicts after fixing eight x-coordinate blocks. Circuit and domain
+construction reached their final markers by 82.098 ms; the one-CPU worker
+finished in 214.870 seconds. The 22-file raw artifact was retained under a
+content-addressed S3 evidence key, freshly downloaded and replayed to the
+same audit. This separately confirms fixed-witness encoding access on Linux
+ARM; it does not convert either natural K600 Gray/hash trial into a measured
+partial-relation yield. The full hosted job envelope of 2,400 seconds is
+charged separately from the paired trial and local ledger.
 The primary-curve [hosted K600 Gray/hash paired first trial](verification/hosted-pair-replay-20261024/README.md) was independently replayed from GitHub run `38983406418`'s exact retained artifact. Both 600-column arms imported successfully, exhausted 5,000 conflicts on the same public first trial, and produced zero models or completed relations. The three archive members matched fresh S3 downloads byte for byte on 2026-10-24. Its 4,800-second paired charge plus 214 seconds of charged preparation is recorded separately from the earlier local N83 ledger; this one-trial capped result does not establish relation yield, rank, complete runtime, or a selected base. The replay receipt binds provider job and artifact identities, pinned source blobs, every ZIP member, S3 downloads, signed-orbit overlap and raw worker receipts.
 
 The [bounded native known-witness stage control](verification/known-witness-stage-native-900-20261014/RESULT.md)
@@ -8,7 +159,8 @@ worker-verified model after 787 conflicts. Its copied raw receipts passed
 independent trace and fixture-algebra replay. This establishes satisfiability
 of that fixed public-witness encoding, while natural relation yield, useful
 rank, complete cold runtime and the best factor base remain unmeasured. The
-conservative local N83 charge is now **23,100 seconds**. The observed
+conservative local N83 charge was **23,100 seconds at that round**. Later
+gates have separate charges that require cumulative reconciliation. The observed
 329.129-second process wall time was recorded on a saturated host and is not
 an isolated throughput comparison.
 
@@ -28,6 +180,10 @@ of the 558 pairs admitted by the current residual-domain minimum has a
 nonvacuous five-summand single-query hit ceiling; the largest 3+2 ceiling is
 below 0.338. This bounds a fresh uniform nonidentity query, not the frozen
 public target or observed solver yield, and it adds no N83 search charge.
+The [later independently sourced whole-subgroup replication](verification/cross-stream-support-20261017/RESULT.md)
+recomputes all 648 pair recipes and four current-worker shapes from the
+second overlap audit. It corroborates the five-summand screening conclusion
+without adding a solver observation.
 
 A [conditional relation-query floor](verification/pilot-pair-rank-floor-20261014/RESULT.md)
 extends those exact counts to a stated goal of as many independent rows as
@@ -53,7 +209,7 @@ The [exact primary pilot overlap census](verification/pilot-overlap-census-20261
 
 The [post-19,800 control-input preflight](verification/control-v7-input-preflight-20261013/RESULT.md) retrieved the pinned K=1,182 archive from S3, verified it and the retained K=2,048 archive against compressed SHA-256/BLAKE3 and plain BLAKE3, rechecked the prior audit chain, and observed the required local Docker image. The separately authorized known-witness SAT control was later launched and independently audited as `VALIDATED_CENSORED` after 5,000 conflicts and zero models.
 
-The current [v4 paired-base design](PAIRED_FRONTIER_V4.md) addresses 26,939,278,080 declared cases, including 169,884 ordered cross-stream pair recipes; most addresses remain source dispositions rather than runs. The [cross-stream capacity census](verification/cross-stream-capacity-census-20261013/RESULT.md) evaluates the 17,424 signed-Frobenius pair recipes in four current-worker shapes and marks the other 152,460 as adapter-unavailable; all 648 primary pilot pairs fit the worker's variable and domain-clause caps even at zero overlap, but this is not a solver or runtime ranking. The [K=1,182/K=2,048](verification/mixed-orbit-search-15000-20261012/RESULT.md), [K=600/K=2,048](verification/k600-mixed-orbit-first-2400-20261012/RESULT.md), and [K600 hash/K600 sequential](verification/cross-stream-first-gate-source-20261013/RESULT.md) retained mixed-orbit trials used the same public target, first-trial coefficients, 3+2 shape and 5,000-conflict cap. All exact imports and independent audits passed; each bounded call reached `UNKNOWN_search_cap` with zero models. The cross-stream pair shares zero signed orbits, and its search stopped on the first identity pattern. The cross-stream gate charged 2,400 seconds. The separately authorized [post-19,800 known-answer control](verification/mixed-orbit-control-reuse-19800-20261013/RESULT.md) imported K1182/K2048, reached `UNKNOWN_search_cap` at 5,000 conflicts with zero models, and received the independent `VALIDATED_CENSORED` classification. That control brought the conservative local ledger to **21,000 seconds at that round**; the later ordered fixed-witness control raised the current charge to **22,200 of 22,200 authorized seconds**. Natural useful yield and complete-runtime comparison remain unresolved. The earlier [support screen](verification/mixed-orbit-support-screen-20261012/RESULT.md) found vacuous point-count ceilings; it supplied no solver or runtime ranking.
+The current [v4 paired-base design](PAIRED_FRONTIER_V4.md) addresses 26,939,278,080 declared cases, including 169,884 ordered cross-stream pair recipes; most addresses remain source dispositions rather than runs. The [cross-stream capacity census](verification/cross-stream-capacity-census-20261013/RESULT.md) evaluates the 17,424 signed-Frobenius pair recipes in four current-worker shapes and marks the other 152,460 as adapter-unavailable; all 648 primary pilot pairs fit the worker's variable and domain-clause caps even at zero overlap, but this is not a solver or runtime ranking. The [K=1,182/K=2,048](verification/mixed-orbit-search-15000-20261012/RESULT.md), [K=600/K=2,048](verification/k600-mixed-orbit-first-2400-20261012/RESULT.md), and [K600 hash/K600 sequential](verification/cross-stream-first-gate-source-20261013/RESULT.md) retained mixed-orbit trials used the same public target, first-trial coefficients, 3+2 shape and 5,000-conflict cap. All exact imports and independent audits passed; each bounded call reached `UNKNOWN_search_cap` with zero models. The cross-stream pair shares zero signed orbits, and its search stopped on the first identity pattern. The cross-stream gate charged 2,400 seconds. The separately authorized [post-19,800 known-answer control](verification/mixed-orbit-control-reuse-19800-20261013/RESULT.md) imported K1182/K2048, reached `UNKNOWN_search_cap` at 5,000 conflicts with zero models, and received the independent `VALIDATED_CENSORED` classification. That control brought the conservative local ledger to **21,000 seconds at that round**; the later ordered fixed-witness control raised it to **22,200 of 22,200 authorized seconds at that round**. Natural useful yield and complete-runtime comparison remain unresolved. The earlier [support screen](verification/mixed-orbit-support-screen-20261012/RESULT.md) found vacuous point-count ceilings; it supplied no solver or runtime ranking.
 
 Started 2026-10-08. Public known-answer research. The requested minimum **complete cold index-calculus runtime remains unresolved**. The finite design, native construction panel, arithmetic replay, bounded two-summand diagnostics and S3 storage are complete. The 2026-10-10 two-hour-total extension added a K=1,182 base with generic replay and a verified S3 round-trip; exact retained K=64/K=256 SAT model capacity, zero-trial preflights and two one-trial five-summand searches are separately receipted. Both search calls reached their fixed conflict cap without a model or relation. A six-summand attempt ended with a Docker producer failure, with no solver verdict. [The extension report](verification/two-hour-extension-20261010/REPORT.md) and [PDF](verification/two-hour-extension-20261010/REPORT.pdf) retain that round. The remaining-budget work measured K=1,182 m=5's 32,142,830 required domain clauses before a 12-million-clause cap, then constructed, replayed and stored a K=2,048 base; [K1182](verification/remaining-budget-k1182-20261010/RESULT.md) and [K2048](verification/remaining-budget-k2048-20261010/RESULT.md) retain the separate receipts. K=2,048's later read-only preflight required 55,017,910 five-summand domain clauses. A source-derived dimension-12 projected Frobenius closure was then [constructed, generically replayed and stored](verification/structured-d12-orbit-20261010/RESULT.md) as a distinct 2,001-column base. Its exact phase-aware five-summand SAT model [passed a capped Linux construction gate](verification/structured-orbit-capacity-20261010/RESULT.md), and the first [bounded import and one-trial search gate](verification/structured-orbit-search-gate-20261010/RESULT.md) returned `UNKNOWN_solver_cap` after 10,000 conflicts with zero models or relations. Three capped complete-pipeline checks of the separate 53-bit diagnostic arm returned `UNKNOWN_budget`. The subsequent [K=2,048 orbit-domain capacity gate](verification/k2048-orbit-capacity-20261011/RESULT.md) imported the retained primary base and constructed its five-summand SAT model: 111,478 variables, 1,140,557 clauses and 4,980 XOR rows under a 4 GiB cgroup. It stopped before solver search. An [ordered first-pair comparison](verification/ordered-first-pair-900s-20261011/RESULT.md) used that K=2,048 base in one source-matched ordered and one unrestricted five-summand trial. Both stopped at 1,000 conflicts with zero models, zero relations and rank zero. The later [matched K=1,182/K=2,048 search gate](verification/matched-k1182-k2048-900s-20261011/RESULT.md) used the same public point and 5,000-conflict cap for each retained base. Both returned `UNKNOWN_solver_cap` with zero models, relations and rank. That matched search brought the conservative local charge to 11,700 seconds; the subsequent import-only and first mixed-orbit search gates raised it to **15,000 of 15,000 seconds at that round**. The later K=600 gate raised it to 17,400 seconds, the first cross-stream gate to 19,800, and the censored known-answer v7 control to 21,000 seconds. There is no complete primary cold measurement.
 
@@ -64,21 +220,21 @@ Started 2026-10-08. Public known-answer research. The requested minimum **comple
 | Review repository prior art | Complete source/literature inventory in PRIOR_ART.md, with inspected main revision pinned |
 | Every combination | The 45,360,000 frozen v1 tuples, 11,664,000-case v2 size extension, 461,894,400-case v3 same-stream extension and 26,420,359,680-case v4 cross-stream extension have reproducible ordinals and dispositions: 26,939,278,080 declared cases total. Choices outside these finite grids and most adapter combinations remain unexecuted |
 | Splitting, symmetry, WDSat, Gray, FES, double large primes, Frobenius | Included in the design; all finite tuple dispositions are audited. Signed-Frobenius construction and Gray-prefix policies are executed. Retained N83 SAT construction gates pass for selected K=64/K=256 cells; most backend adapters and complete runtime remain unvalidated |
-| Empirical factor-base panel | 57 constructions complete, containing 45 distinct point sets; exact scan counts, all points and labels retained |
-| Arithmetic replay | PASS: 57 bases, 3,617,306 point-record entries and 21,791 representatives checked with generic multi-limb arithmetic on the same host/repository |
-| Relation-stage experiments | 1,728 fixed public two-summand probes on the original 54-object panel, 87,966,720 exact complement lookups, zero relations. A separate structured-orbit five-summand trial reached 10,000 SAT conflicts with zero models or relations and `UNKNOWN_solver_cap`. The K=2,048 v2 object has one ordered and one unrestricted five-summand trial, each capped at 1,000 conflicts with zero models or relations. The matched K=1,182/K=2,048 one-trial searches both reached 5,000 conflicts without a model or relation. The two retained nested 3+2 mixed-orbit trials, K=1,182 and K=600 inside K=2,048, and the first cross-stream K600 hash/sequential trial each reached 5,000 conflicts with zero models and `UNKNOWN_search_cap`. The cross-stream import found zero shared signed orbits. Useful natural yield remains unknown |
+| Empirical factor-base panel | 58 constructions complete, containing 46 distinct point sets; exact scan counts, all points and labels retained |
+| Arithmetic replay | PASS: 58 bases, 4,297,242 point-record entries and 25,887 representatives checked with generic multi-limb arithmetic on the same host/repository |
+| Relation-stage experiments | 1,728 fixed public two-summand probes on the original 54-object panel, 87,966,720 exact complement lookups, zero relations. A separate structured-orbit five-summand trial reached 10,000 SAT conflicts with zero models or relations and `UNKNOWN_solver_cap`. The K=2,048 v2 object has one ordered and one unrestricted five-summand trial, each capped at 1,000 conflicts with zero models or relations. The matched K=1,182/K=2,048 one-trial searches both reached 5,000 conflicts without a model or relation. A later exact-S3 K2048 one-trial search reached 100,000 conflicts with zero models or relations and `UNKNOWN_solver_cap`. The two retained nested 3+2 mixed-orbit trials, K=1,182 and K=600 inside K=2,048, and the first cross-stream K600 hash/sequential trial each reached 5,000 conflicts with zero models and `UNKNOWN_search_cap`. A fresh K1182/K2048 replication reached the same cap in one call; its round charge is 2,400 seconds and was independently audited. The cross-stream import found zero shared signed orbits. Useful natural yield remains unknown |
 | Exact support screen | 30 original-panel base-size/arity cases and a later six-cell K=1,182/K=2,048 mixed-orbit screen derived from audited point counts and subgroup order. Every later five/six-summand Markov ceiling is vacuous; no solver or fixed-fixture yield follows |
-| Size frontier extension | Exact v2 design has 57,024,000 addressable tuples, preserving all v1 ordinals and adding K=1,182/2,048/4,096/8,192/16,627; K=1,182 and K=2,048 objects constructed and stored, with no v2 runtime ranking |
+| Size frontier extension | Exact v2 design has 57,024,000 addressable tuples, preserving all v1 ordinals and adding K=1,182/2,048/4,096/8,192/16,627; K=1,182, K=2,048 and K=4,096 objects constructed and stored, with no v2 runtime ranking |
 | Paired frontier extension | Exact v3 design preserves v2 ordinals and appends 461,894,400 same-stream small/envelope cases with zero, one or two residual summands; only eight have a bounded partial worker, and no complete-runtime ranking follows |
 | Cross-stream frontier extension | Exact v4 design preserves every v3 ordinal and appends 26,420,359,680 solver-setting addresses across 169,884 ordered distinct-stream pairs. Only the first K600 hash/sequential pair has a retained exact import and bounded partial call; no complete-runtime ranking follows |
-| Larger-base producer path | The bounded one-object constructor, generic replay and hash-verified S3 publication path passed for primary a=0, hash-policy K=1,182 and K=2,048, seed 2026100801; larger v2 sizes remain unconstructed |
+| Larger-base producer path | The bounded one-object constructor, generic replay and hash-verified S3 publication path passed for primary a=0, hash-policy K=1,182, K=2,048 and K=4,096, seed 2026100801; K=8,192 and K=16,627 remain unconstructed |
 | Structured-orbit candidate | The versioned dimension-12 source closure produced 332,166 points in 2,001 signed-Frobenius columns; its historical set hash, generic source/point/label replay and S3 round-trip passed. The exact phase-aware five-summand SAT model built under the frozen 4 GiB cap: 111,008 variables, 1,120,347 clauses, 4,980 XOR rows and 189,661,184-byte cgroup peak. A separate compact-domain strategy passed degree-7 decomposition, rank and verified-target controls. The N83 archive import passed and one solver trial returned `UNKNOWN_solver_cap`; zero relations and rank 0 under that cap do not resolve natural yield or usable rank |
-| S3 storage | PASS: 57 compressed objects uploaded, downloaded and byte-hash matched; content-addressed receipts retained |
+| S3 storage | PASS: 58 compressed objects uploaded, downloaded and byte-hash matched; content-addressed receipts retained |
 | Primary base to generic solver adapter | PASS: replay-bound K=64 S3 object reconstructed as generic ordinary and signed Frobenius orbits; solver stage unexecuted |
 | Primary cold runner | K=64, m=2 exact-enumeration preflight PASS; one trial returned `UNKNOWN_trial_cap` with zero relations. K=64 m=3 and K=256 m=2 attempts reached `UNKNOWN_budget` caps. All retain null total runtime and winner |
-| Existing four-summand source transfer | Balanced-S5 SAT is admitted only through n=53; the upstream wide compact-orbit n=83 runner uses a different polynomial basis/base schema and u64 rank. The study-local adapter pins the study field. A primary compact probe accepts a replayed base, checks a state/cgroup cap, verifies any witness in the generic group and converts a hit to a full-width signed-orbit row. A new outer supervisor freezes compiled sources from a clean commit and classifies bounded probe outcomes; synthetic process tests pass, but no retained primary four-summand probe, natural rank or cold run followed; see `S5_CAPACITY.md` |
+| Existing four-summand source transfer | Balanced-S5 SAT is admitted only through n=53; the upstream wide compact-orbit n=83 runner uses a different polynomial basis/base schema and u64 rank. The study-local adapter pins the study field. A primary compact probe accepts a replayed base, checks a state/cgroup cap, verifies any witness in the generic group and converts a hit to a full-width signed-orbit row. Frozen primary K64 and K256 retained-base Docker probes each completed their exact index and returned a one-query `MISS` under live-inspected 4-GiB caps; both independent audits passed. Natural rank and a complete cold run remain unmeasured; see `S5_CAPACITY.md` and the K64/K256 results under `verification/` |
 | Compact Linux worker startup | Static x86-64 Linux worker rebuilt from source commit `2742a0989`; two guarded empty/invalid public-panel Docker starts retained expected producer-failure receipts. The second reached panel validation after cgroup and compiled-source checks; no retained base was imported. See `verification/compact-probe-linux-startup/` |
-| Best total runtime | Unresolved: full relation collection, rank, linear algebra and individual-log phases have not completed the comparison gate; the [22,200-second cumulative local allowance](verification/known-witness-ordered-sat-20261014/audit.json) is fully charged |
+| Best total runtime | Unresolved: full relation collection, rank, linear algebra and individual-log phases have not completed the comparison gate; the later [23,100-second cumulative local allowance](verification/known-witness-stage-native-900-20261014/RESULT.md) is fully charged |
 
 ## Exact revisions and instances
 

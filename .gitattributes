@@ -46,6 +46,7 @@ docs/browser/data.json linguist-generated=true
 docs/curves/registry.json linguist-generated=true
 docs/curves/covers.json linguist-generated=true
 docs/curves/cover-links.yaml linguist-generated=true
+docs/curves/odd-subgroup-transfer-certificates.json linguist-generated=true
 docs/ic/leaderboard.json linguist-generated=true
 src/cryptanalysis/curve_aliases.json linguist-generated=true
 benchmarks/20261015-conductor-gap-cm-orbits/**/*.svg linguist-generated=true
@@ -144,6 +145,9 @@ docs/curves/hyperelliptic-infrastructure.schema.json text eol=lf
 docs/curves/cover-transfer-assessments.json text eol=lf
 docs/curves/cover-transfer-assessment.schema.json text eol=lf
 docs/curves/fixed-f8-genus3-order-certificate.json text eol=lf
+docs/curves/odd-subgroup-transfer-certificates.json text eol=lf
+docs/curves/odd-subgroup-transfer-certificates.schema.json text eol=lf
+research/curve_transfer_infrastructure_20261118/fixed-gf8-rust198-e0ae0fe5.raw.log -diff text eol=lf
 src/bin/ecdlp_audit/fixed_f8_order.rs text eol=lf
 docs/curves/standards/** text eol=lf
 # The native catalog records hash these compile-time source strings. The
@@ -248,6 +252,16 @@ research/secg_small_x_20261014/graphs/*.svg -diff -whitespace
 benchmarks/20261014-secg-small-x-s3-cost/*.pdf binary
 benchmarks/20261014-secg-small-x-s3-cost/*.png binary
 benchmarks/20261014-secg-small-x-s3-cost/*.svg -diff -whitespace
+# Native ten-question ecbench campaign: generated media and raw logs.
+research/ecbench_open_questions_20261014/**/*.pdf binary
+benchmarks/20261014-ecbench-ten-questions/**/*.pdf binary
+research/ecbench_open_questions_20261014/*.log -whitespace
+
+# Follow-up: preserve raw logs and treat rendered reports as binary.
+research/ecbench_leads_20261015/*.log -whitespace
+research/ecbench_leads_20261015/**/*.pdf binary
+benchmarks/20261015-ecbench-leads/**/*.pdf binary
+
 research/ic_acct1_cover_bitop_20261021/*.pdf binary
 research/ic_acct1_cover_bitop_20261021/figures/*.png binary
 research/ic_acct1_cover_bitop_20261021/figures/*.svg -diff -whitespace
@@ -270,6 +284,50 @@ benchmarks/20261024-ghs-quadratic-controls/*.svg -diff -whitespace
 research/notes/index-calculus/reports/run-20261024T2112Z/*.pdf binary
 *.pdf binary
 *.png binary
+research/chained_jacobian_transfers_20261110/evidence/ct38-external-a30c63d1.md -whitespace
+research/chained_jacobian_transfers_20261110/evidence/ct39-external-a30c63d1.md -whitespace
+research/chained_jacobian_transfers_20261110/evidence/ct40-external-a30c63d1.md -whitespace
+research/chained_jacobian_transfers_20261110/reports/reverse-spectral/spectra.svg -whitespace
 research/five_leads_e2e_20261019/reports/**/*.svg -whitespace
 benchmarks/20261020-five-leads-followup-operations/*.svg -whitespace
 benchmarks/20261019-five-leads-choice2-costs/*.svg -whitespace
+
+# Preserve exact Matplotlib renderer bytes in the frozen G3 native report.
+research/chained_jacobian_transfers_20261110/reports/genus3-complete-native-01/counts.svg -whitespace
+
+research/chained_jacobian_transfers_20261110/evidence/genus3-root-fixture-diagnosis-01/native.log -whitespace
+
+research/chained_jacobian_transfers_20261110/evidence/genus3-source-publication-01/push.log -whitespace
+
+# Exact immutable PDF payload and original rejected binary diagnostic.
+research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-halving-handoff-16/whole-report-PDF.bin binary
+research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-halving16-handoff-governance-01/cached-whitespace.txt binary
+research/chained_jacobian_transfers_20261110/evidence/public-n4-census-nondual-publication-17/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-handoff17-settlement-governance-01/cached-whitespace.txt -whitespace
+
+# Preserve original whole publication18 push output including its final blank line.
+research/chained_jacobian_transfers_20261110/evidence/public-n4-model-third-publication-18/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-handoff18-settlement-governance-01/cached-whitespace.txt -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-exact-byte-transport20/rejected19-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-exact-byte-publication20/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-paired-fourth-publication-21/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-complete-chain-publication-22/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-original-prime-publication-23/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-publication-24/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-full-group-publication-25/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-induced-proof-full-CI-01/fresh-consumer-runs-api.json -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-model-IC-result-01/16-report.pdf binary
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-publication-26/normal-push.log -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-relation-character-result-01/consumer-exact-export/experiments/chained-transfer-public-target/reports/original-relation-character-result-01/report.pdf binary
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-relation-character-result-01/consumer-exact-export/experiments/chained-transfer-public-target/reports/original-relation-character-result-01/rank-and-known-log-separator.svg -whitespace
+research/chained_jacobian_transfers_20261110/evidence/public-n4-original-relation-rank-character-handoff-27/original-relation-character-result-01.pdf binary
+
+research/chained_jacobian_transfers_20261110/pcc-source-address-report-02/REPORT.pdf binary
+research/chained_jacobian_transfers_20261110/pcc-source-address-report-02/data-view.svg -whitespace
+research/chained_jacobian_transfers_20261110/evidence/post-norm-merge-queue-checkpoint-10/planned-consumer-body.md -whitespace
+research/chained_jacobian_transfers_20261110/evidence/post-norm-merge-queue-checkpoint-10/planned-queue-body.md -whitespace
+
+research/chained_jacobian_transfers_20261110/evidence/whole-guarded-source-original-object-12/first-actual-whole-Git-object.stderr -whitespace
+
+research/chained_jacobian_transfers_20261110/evidence/whole-source-PR-and-research-queue-21/exact-new-queue-body.md -whitespace
+research/prime31_ic_20261115/rr9/analytic_span_local_20261119/attempt-04/tests.stdout -whitespace

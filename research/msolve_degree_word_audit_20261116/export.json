@@ -1,0 +1,372 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "msolve-degree-word-20261116",
+  "created": "2026-11-16T16:02:54Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "e36c897190211f1824a1c3baebfb766660a0d82be55d5f6cb6f007daaaf95796",
+    "protocol_id": "msolve-degree-word-20261116",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "db5dfdb091f35aca5cb8c0c876816678e601097b",
+    "dirty": true
+  },
+  "backend": "manual",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "control",
+      "role": "control_positive",
+      "binary_sha256": "07c1a4d6b3e679b1aa8da8d4a3846f6df5e88c526b5c040a6833218c1171e4ea",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "boundary",
+      "role": "candidate",
+      "binary_sha256": "07c1a4d6b3e679b1aa8da8d4a3846f6df5e88c526b5c040a6833218c1171e4ea",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "control",
+      "arm": "control",
+      "instance_id": "fixed",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "accepted": 1.0,
+          "stored_bound": 3,
+          "lcm_records": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native Rust known-answer analyzer; not independent host/compiler/parser assurance"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/native/control.after-pins.json",
+          "bytes": 198,
+          "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.analyzer.exit",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.analyzer.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.analyzer.stdout",
+          "bytes": 161,
+          "sha256": "2ba6518e0d22cc5bc2ca98da5ddc6e13048e28915a607f53b8a9a61d53e6cb9b",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.argv.txt",
+          "bytes": 135,
+          "sha256": "67b503b06e145b1a3f7b81c4fc55b92cf23b9d4ebc8ed0e0854ba2a43fafa135",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.before-pins.json",
+          "bytes": 198,
+          "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.end.utc",
+          "bytes": 21,
+          "sha256": "45609e4d610c3b2ecc2fb5057b3f946837d56415d728bd5641fbf686a838d9ba",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.exit",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.out",
+          "bytes": 239,
+          "sha256": "2c31e448ac030c537ae6da25f7ef6235bb329b6b6bc8496bdee61943b468deaf",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.start.utc",
+          "bytes": 21,
+          "sha256": "45609e4d610c3b2ecc2fb5057b3f946837d56415d728bd5641fbf686a838d9ba",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.stderr",
+          "bytes": 193,
+          "sha256": "fd7b42916f18d05f046a4248ec3ca87c700c7fafc918eac4a1ef288e03a98233",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/control.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "log"
+        }
+      ],
+      "started_at": "2026-11-16T15:59:53Z",
+      "finished_at": "2026-11-16T15:59:53Z",
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "boundary",
+      "arm": "boundary",
+      "instance_id": "fixed",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "accepted": 0.0,
+          "stored_bound": 65535,
+          "lcm_records": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "Frozen native Rust known-answer analyzer; not independent host/compiler/parser assurance"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/native/boundary.after-pins.json",
+          "bytes": 198,
+          "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.analyzer.exit",
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.analyzer.stderr",
+          "bytes": 49,
+          "sha256": "f9bf37bda3c71428cd6becfcdc7f8de1f7da8138d8410647add611c50517091f",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.analyzer.stdout",
+          "bytes": 186,
+          "sha256": "bafae50998ec0653d2a28159a912a79efdcd5998d8ef7794c167dabd7dd2ecdc",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.argv.txt",
+          "bytes": 137,
+          "sha256": "99e4c4795c64a23952bb6c4ac40e6ddadb9cde2f88dbe18b405844cb2ec32d1d",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.before-pins.json",
+          "bytes": 198,
+          "sha256": "dcbcf45a645ad62632d279da2f997aba8fb6ec8fa3939f265697bcfb02cb5a91",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.end.utc",
+          "bytes": 21,
+          "sha256": "38ad80d5f1f6e22f76ce40fee990d78e9342982bcd7a436b7e3bf86fb1024ec3",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.exit",
+          "bytes": 4,
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.out",
+          "bytes": 243,
+          "sha256": "7849c96c1a5b6adc84878443525aa290fd9073974cf6206d30a052853dd5f430",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.start.utc",
+          "bytes": 21,
+          "sha256": "43e30e37764b9cb40fcaef09001a510f0814b210c6b5cd8987521653a09ba853",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.stderr",
+          "bytes": 273,
+          "sha256": "0b711c43dec9427a2dc464a6937f43e0771aa8e6b76eda9d4c076c50b1ba25c1",
+          "kind": "log"
+        },
+        {
+          "path": "evidence/native/boundary.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "log"
+        }
+      ],
+      "started_at": "2026-11-16T16:00:15Z",
+      "finished_at": "2026-11-16T16:00:45Z",
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 1,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "rows.jsonl",
+      "sha256": "a18ca4355a405b53bf447efe47c84f23972cccb3e0af1a7469e4bedc2685e872",
+      "bytes": 410,
+      "kind": "raw"
+    },
+    {
+      "path": "protocol.json",
+      "bytes": 18064,
+      "sha256": "089e3bf2612c9200c984b7818d545892fe5a22f8d3fda7a80d90fb8d23874e77",
+      "kind": "protocol"
+    },
+    {
+      "path": "native/degree-audit.patch",
+      "bytes": 3229,
+      "sha256": "0004e252ba059e1f7c54404049118f96fe91c479a37961966855d1f65d707686",
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/boundary.ms",
+      "bytes": 29,
+      "sha256": "8d775c7c17bce47b94c9a00d2b3174f77e666220dfa3464b27fe4672f311d931",
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/control.ms",
+      "bytes": 19,
+      "sha256": "f110d0d7eaa4e65caab0760b64563e0147d71906f3a601448cd761895bb8f07f",
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/analyze.rs",
+      "bytes": 7402,
+      "sha256": "61549e81f039698dfca0ce38498ccd49fdcf0a7c9c07bcd5aa750c2630b4d582",
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/native/boundary-analysis.json",
+        "bytes": 186,
+        "sha256": "bafae50998ec0653d2a28159a912a79efdcd5998d8ef7794c167dabd7dd2ecdc",
+        "kind": "analysis"
+      },
+      {
+        "path": "evidence/native/control-analysis.json",
+        "bytes": 161,
+        "sha256": "2ba6518e0d22cc5bc2ca98da5ddc6e13048e28915a607f53b8a9a61d53e6cb9b",
+        "kind": "analysis"
+      },
+      {
+        "path": "evidence/native/boundary-constants.lean.txt",
+        "bytes": 644,
+        "sha256": "dc2019734d67576d812c225faf73eb733af75bacd620f947cf54991026db8bbb",
+        "kind": "analysis"
+      },
+      {
+        "path": "evidence/native/control-constants.lean.txt",
+        "bytes": 542,
+        "sha256": "42ac1f7aa9053a23b3b3a8a675bce8d795ad79b9efca7f2a03ed85a1e515515d",
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Control exit0 and accepted. Boundary timeout124/acceptedfalse despite complete expected written basis and predicted wrapped LCM/row logs. No retry, no complete native-execution validation. Captured prefix only; no clock evidence.",
+      "by": "Codex actual native receipt"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

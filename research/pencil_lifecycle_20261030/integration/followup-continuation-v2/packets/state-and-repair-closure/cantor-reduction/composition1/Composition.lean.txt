@@ -1,0 +1,21 @@
+import Unique
+set_option autoImplicit false
+namespace CZeroCantor
+open Polynomial
+variable {K : Type*} [Field K]
+theorem full_cantor_numerator (f u1 u2 v1 v2 ell e1 e2 c1 c2 quotient : K[X]) (a : K)
+ (hb:e1*u1+e2*u2=1) (hc:c1+c2*(v1+v2)=1)
+ (h1:ell=v1-C a*u1) (h2:ell=v2-C a*u2)
+ (hq:f-ell^2=u1*u2*quotient) :
+ c1*e1*u1*v2+c1*e2*u2*v1+c2*(v1*v2+f)=
+ ell+u1*u2*(c1*C a*(e1+e2)+c2*(C a^2+quotient)) := by
+ have hcrt:=crt_numerator u1 u2 v1 v2 ell e1 e2 a hb h1 h2
+ have hv1 : v1=ell+C a*u1 := by rw [h1]; ring
+ have hv2 : v2=ell+C a*u2 := by rw [h2]; ring
+ have hf : f=ell^2+u1*u2*quotient := by rw [←hq]; ring
+ calc
+  _ = c1*(e1*u1*v2+e2*u2*v1)+c2*(v1*v2+f) := by ring
+  _ = c1*(ell+u1*u2*(C a*(e1+e2)))+c2*(v1*v2+f) := by rw [hcrt]
+  _ = (c1+c2*(v1+v2))*ell+u1*u2*(c1*C a*(e1+e2)+c2*(C a^2+quotient)) := by rw [hv1,hv2,hf]; ring
+  _ = _ := by rw [hc]; ring
+end CZeroCantor

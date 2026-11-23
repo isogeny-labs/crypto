@@ -1,0 +1,24 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\begin{document}
+\section*{Independent monic remainder review}
+Reviewer: /root/monic\_review. 2026-11-01. Producer head: \texttt{f2075e7b23}.
+
+\textbf{Result.} Fresh isolated replay passed for 19 main declarations, 16 producer controls and four reviewer controls. Separate axiom readbacks cover all 39 declarations and use only propext, Classical.choice and Quot.sound. The 124 bound producer inputs remained unchanged.
+
+\textbf{Mathematical fidelity: faithful at model scope.} Canonical residues convert zero field coefficients into zero words. A monic divisor cancels the final coefficient; trimming then strictly decreases remainder length. Input-list length supplies sufficient fuel. The normalized terminal remainder has smaller degree than its divisor, so divisibility forces zero and hence an empty list. Both directions of the empty-remainder criterion are proved. These are standard polynomial-division arguments specialized to bounded word arithmetic.
+
+\begin{center}\fbox{Canonical monic input}\quad$\longrightarrow$\quad\fbox{Strict descent}\quad$\longrightarrow$\quad\fbox{Empty iff divisible}\end{center}
+
+\textbf{Domain.} Prime $0<p<2^{31}$; canonical coefficient words; last divisor word one; fuel at least original input length. Source interpretation is the odd prime-field, extension degree one, diagnostic-tables-disabled branch. The theorem also admits characteristic two mathematically, without establishing native binary-field correspondence.
+
+\textbf{Native source: partial bridge.} Native remainder initialization, active-loop conditions, multiplier selection, indexed cancellation order and trimming agree with the model at the reviewed scope. Quotient allocation/writes, allocation and index safety, instrumentation, panic behavior, and compiled execution are excluded. Native Jacobian.valid does not enforce all arithmetic/canonicality premises. The residual multiplication/subtraction bridge remains separate.
+
+\textbf{Controls.} Producer controls cover insufficient fuel, nonmonic inputs, noncanonical zero encoding, non-normal zero lists, constant divisor and empty input. Reviewer controls additionally check internal-zero monic divisors, zero fuel for already-terminal input, characteristic-two model evaluation, and all-zero input trimming. All passed kernel evaluation.
+
+\textbf{Independence and limits.} Reviewer did not author producer proofs or read sibling verdicts. This is independent adversarial review, not blind re-derivation: inherited context disclosed producer claims. Existing imported helper binaries and Mathlib dependency unions retain the compiler/kernel trust boundary; no clean rebuild of all dependencies or independent kernel checker was performed. The pre-review plan was local, not precommitted. Repository remained read-only. Full independence-workflow validation and publication are coordinator obligations.
+
+Detailed source findings: REVIEW.md. Machine logs: receipts.json and module stdout/stderr. Structured results: status.json. Editable diagram: flow.svg. Primary reference inspected: pinned Mathlib Polynomial/Degree/Domain.lean, degree/divisibility lemmas at lines 63--69. No scientific trial, timing measurement or official transition was performed.
+\end{document}

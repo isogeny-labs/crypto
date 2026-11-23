@@ -1,0 +1,9 @@
+purge(x,y);
+taskprime:=6277101735386680763835789423207666416083908700390324961279;
+small_basis:=gbasis([x+y-3,x*y-2] % 109,[x,y],plex);
+large_basis:=gbasis([x+y-3,x*y-2] % taskprime,[x,y],plex);
+print("SMALL_ROOT_1",normal(subst(small_basis,[x,y],[2,1]) % 109));
+print("SMALL_ROOT_2",normal(subst(small_basis,[x,y],[1,2]) % 109));
+print("LARGE_ROOT_1",normal(subst(large_basis,[x,y],[2,1]) % taskprime));
+print("LARGE_ROOT_2",normal(subst(large_basis,[x,y],[1,2]) % taskprime));
+print("LARGE_BASIS",large_basis);

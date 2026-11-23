@@ -1,0 +1,50 @@
+[
+  {
+    "label": "published-branch",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "--repo",
+      "/workspace/courtois-review-20261115/cryptanalysis",
+      "ledger",
+      "verify",
+      "--base",
+      "1af49ed8489a8cf95ccae0ff3a4e1419b79c8bd5"
+    ],
+    "exit_status": 1,
+    "stdout": "ledger[143]: differs from the base branch (history rewritten)\nledger: 145 entries, BROKEN\n",
+    "stderr": ""
+  },
+  {
+    "label": "merge-main-parent",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "--repo",
+      "/workspace/courtois-review-20261115/cryptanalysis",
+      "ledger",
+      "verify",
+      "--base",
+      "58c86ef41974ae33aff4b1b6cbd2b7c31ee3592e"
+    ],
+    "exit_status": 0,
+    "stdout": "ledger: 145 entries, chain ok\n",
+    "stderr": ""
+  },
+  {
+    "label": "crypto-main",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "--repo",
+      "/workspace/courtois-review-20261115/crypto",
+      "ledger",
+      "verify",
+      "--base",
+      "bb70178877d9ad51c1433309b5ebb3e33b0f33df"
+    ],
+    "exit_status": 0,
+    "stdout": "ledger: 1094 entries, chain ok\n",
+    "stderr": ""
+  }
+]

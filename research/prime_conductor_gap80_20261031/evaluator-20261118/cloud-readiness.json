@@ -1,0 +1,21 @@
+{
+  "schema": "conductor-evaluator-cloud-readiness/v1",
+  "date": "2026-11-18",
+  "experiment_submitted": false,
+  "local_aws_cli": "absent",
+  "local_kubectl": "absent",
+  "eks_mcp_tools_exposed": false,
+  "environment_configured_secrets": [],
+  "environment_configured_outbound_identities": [],
+  "github_repository_access": "read and task-branch publication succeeded",
+  "github_workflow_reviewed": ".github/workflows/isolab-experiment.yml at main 9ec88b7637",
+  "github_worker_gap": "Current workflow builds ecbench/fresh-owner and the separate norm-branch command mode; it does not bundle this FLINT/PARI complete evaluator",
+  "existing_workflow_observation": {"run_id": 44235599081, "created_at": "2026-11-18T04:11:34Z", "conclusion": "failure", "failed_stage": "contracts / Pull store data this workflow reads (tools/artifacts)", "build": "skipped", "experiment": "skipped", "scope": "Existing main workflow, not this evaluator's run; no inference about budget or AWS permissions"},
+  "account_budget_remaining": null,
+  "lane_reserved_spend": null,
+  "live_capacity_readback": null,
+  "reason_no_trial": "No live spending/capacity readback or evaluator-specific pinned worker is established; repository COST_CONTROLS requires these before a paid build/job",
+  "target80_full_window_feasibility": "still unestablished",
+  "policy": "taskq/deploy/eks-karpenter/COST_CONTROLS.md",
+  "no_substitute_trial_launched": true
+}

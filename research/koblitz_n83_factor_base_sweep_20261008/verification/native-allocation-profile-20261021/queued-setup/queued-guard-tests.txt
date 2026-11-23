@@ -1,0 +1,59 @@
+   Compiling n83-sweep-runner v0.1.0 (/home/ec2-user/crypto-n83-resume/tools/n83-sweep-runner)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running unittests src/main.rs (/var/tmp/n83-profile-guard-target/debug/deps/n83_sweep_runner-65fb68174160f57b)
+
+running 38 tests
+test card::tests::scope_escape_rejected ... ok
+test card::tests::canonical_sha256 ... ok
+test live_memory_and_swap_must_both_match_frozen_limit ... ok
+test live_sample_gate_refuses_unlimited_swap_and_missing_limits ... ok
+test explicit_memory_extension_keeps_legacy_and_control_limits ... ok
+test longer_inspection_wait_does_not_extend_or_retry_mutations ... ok
+test memory_profile_refuses_escaping_or_nonunified_cgroups ... ok
+test native_isolation::tests::a_lone_sibling_and_every_cpu_are_refused ... ok
+test native_isolation::tests::auto_takes_a_whole_core_away_from_cpu0 ... ok
+test memory_profile::tests::accepts_reclaim_and_reports_sampled_peak_scope ... ok
+test native_isolation::tests::cpulists_parse ... ok
+test native_isolation::tests::benchmark_lock_preserves_inode_contents_and_exclusion ... ok
+test native_isolation::tests::placements_stay_inside_the_cpuset ... ok
+test native_isolation::tests::root_can_open_foreign_lock_in_sticky_directory ... ok
+test natural_budget_admits_1m_but_stays_bounded ... ok
+test natural_worker_declaration_matches_frozen_cgroup_bytes ... ok
+test reservation::tests::explicit_reservation_preserves_strict_requests ... ok
+test reservation::tests::lock_open_errors_are_not_queued ... ok
+test reservation::tests::lock_queue_is_explicit_and_bounded ... ok
+test storage_summary::tests::forged_capacity_and_partition_are_refused ... ok
+test storage_summary::tests::inventory_sums_and_worker_units_are_checked ... ok
+test storage_summary::tests::incomplete_component_and_sampling_coverage_is_refused ... ok
+test storage_summary::tests::prefix_comparison_refuses_changed_missing_or_duplicate_counters ... ok
+test storage_summary::tests::worker_status_requires_explicit_kib_units ... ok
+test sat_trace_distinguishes_censoring_and_rejects_forged_order ... ok
+test tests::external_conflict_parser_requires_exact_summary_label ... ok
+test systemd_scope::tests::scope_names_cannot_select_other_units_or_paths ... ok
+test memory_profile::tests::rejects_order_pid_path_limit_and_counter_corruption ... ok
+test systemd_scope::tests::released_worker_refuses_reconfiguration_before_live_metadata_or_commands ... ok
+test tests::isolation_forgery_rejected ... ok
+test tests::phase_regression_rejected ... ok
+test tests::retained_policy_preflight_rejects_wrong_or_ambiguous_rows ... ok
+test witness_and_external_budgets_keep_their_old_boundaries ... ok
+test tests::zero_relation_forgery_rejected ... ok
+test xor_summary::cms_internal_clock_is_not_process_time ... ok
+test xor_summary::passed_preflight_does_not_mislabel_docker_failure ... ok
+test tests::original_group_and_query_forgery ... ok
+test reservation::tests::contended_lock_times_out_then_acquires_after_release ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running tests/card_execution.rs (/var/tmp/n83-profile-guard-target/debug/deps/card_execution-37ad132556fab241)
+
+running 7 tests
+test card_report_preserves_original_float_bytes ... ok
+test altered_binding_refuses_before_execute ... ok
+test spawn_error_writes_stopped_receipt ... ok
+test native_card_capture_and_write_once ... ok
+test relay_verification_rejects_stream_edit ... ok
+test deadline_retains_failure_receipt ... ok
+test card_edit_during_execution_retains_original_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.08s
+

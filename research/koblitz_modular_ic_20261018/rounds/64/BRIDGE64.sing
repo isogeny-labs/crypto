@@ -1,0 +1,63 @@
+LIB "linalg.lib";
+proc require64(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../53/runs/discrim53-02/actual-source53.sing"));
+execute(read("../../../52/source-data/compact-pid51.sing"));
+matrix originalH64=matrix(basis51);matrix originalLift64=sourceLift51;poly originalD64=commonDenominator51;
+require64(originalH64*originalLift64==originalD64*unitmat(32),"BRIDGE64_ORIGINAL_SOURCE_MATRIX_IDENTITY");
+poly oldZ64=u;
+execute(read("../../../61/runs/field61-01/field-space61.sing"));
+ideal actualGB64=std(sourceIdeal61);
+require64(vdim(actualGB64)==32,"BRIDGE64_ACTUAL_FIELD_DEGREE");
+map oldToActual64=actualSourceCertificate53,l,v/u^2,1/u;
+ideal oldEquations64=oldToActual64(source53);
+require64(size(oldEquations64)==2,"BRIDGE64_OLD_SOURCE_EQUATIONS");
+require64(reduce(oldEquations64[1],actualGB64)==0 && reduce(oldEquations64[2],actualGB64)==0,"BRIDGE64_BOTH_OLD_SOURCE_EQUATIONS");
+map oldWrong64=actualSourceCertificate53,l,v/u^2+1/u,1/u;
+ideal wrongEquations64=oldWrong64(source53);
+require64(reduce(wrongEquations64[1],actualGB64)!=0,"BRIDGE64_CHANGED_QUADRATIC_COORDINATE_REJECTED");
+map oldCoefficient64=compactPid51,1/u;
+require64(oldCoefficient64(oldZ64)==1/u,"BRIDGE64_COEFFICIENT_INVERSION");
+matrix H64=oldCoefficient64(originalH64);
+poly D64=oldCoefficient64(originalD64);
+require64(nrows(H64)==32 && ncols(H64)==32 && D64!=0,"BRIDGE64_COMPACT_PID_BASIS_SHAPE");
+matrix powerLift64=oldCoefficient64(originalLift64);
+require64(H64*powerLift64==D64*unitmat(32),"BRIDGE64_ROW_ORIENTATION_SOURCE_IDENTITY");
+matrix imageColumns64[32][32];list imageFunctions64;
+int i64;int j64;int k64;intvec exponent64;poly image64;poly remainder64;poly term64;int row64;
+for(j64=1;j64<=32;j64++){
+ image64=0;
+ for(k64=1;k64<=32;k64++){
+  if(H64[k64,j64]!=0){image64=image64+H64[k64,j64]*l^((k64-1)%16)*(v/u^2)^((k64-1) div 16);}
+ }
+ image64=reduce(image64/D64,actualGB64);
+ imageFunctions64[j64]=image64;remainder64=image64;
+ while(remainder64!=0){
+  exponent64=leadexp(remainder64);require64(exponent64[1]<16 && exponent64[2]<2,"BRIDGE64_NONSTANDARD_IMAGE_MONOMIAL");
+  row64=exponent64[1]+16*exponent64[2]+1;
+  term64=lead(remainder64);imageColumns64[row64,j64]=imageColumns64[row64,j64]+leadcoef(remainder64);
+  remainder64=remainder64-term64;
+ }
+ require64(image64!=0,"BRIDGE64_NONZERO_BASIS_FUNCTION");
+ print("BRIDGE64_BASIS index="+string(j64)+" reduced=1");
+}
+require64(mat_rk(imageColumns64)==32,"BRIDGE64_ALL32_IMAGES_INDEPENDENT");
+matrix inverse64=lift(module(imageColumns64),module(unitmat(32)));
+require64(imageColumns64*inverse64==unitmat(32) && inverse64*imageColumns64==unitmat(32),"BRIDGE64_BOTH_IMAGE_INVERSE_PRODUCTS");
+matrix wrongColumns64=imageColumns64;wrongColumns64[1,1]=wrongColumns64[1,1]+1;
+require64(wrongColumns64*inverse64!=unitmat(32),"BRIDGE64_CHANGED_IMAGE_REJECTED");
+link out64="ASCII:w bridge-basis64.sing";open(out64);
+write(out64,"ring bridgeField64=(2,u),(l,v),dp;short=0;ideal bridgeSource64;");
+for(i64=1;i64<=size(sourceIdeal61);i64++){write(out64,"bridgeSource64["+string(i64)+"]="+string(sourceIdeal61[i64])+";");}
+write(out64,"ideal bridgeOldSource64;");
+for(i64=1;i64<=2;i64++){write(out64,"bridgeOldSource64["+string(i64)+"]="+string(oldEquations64[i64])+";");}
+write(out64,"ideal bridgeFunctions64;matrix bridgeColumns64[32][32];matrix bridgeInverse64[32][32];");
+for(j64=1;j64<=32;j64++){
+ write(out64,"bridgeFunctions64["+string(j64)+"]="+string(imageFunctions64[j64])+";");
+ for(i64=1;i64<=32;i64++){
+  if(imageColumns64[i64,j64]!=0){write(out64,"bridgeColumns64["+string(i64)+","+string(j64)+"]="+string(imageColumns64[i64,j64])+";");}
+  if(inverse64[i64,j64]!=0){write(out64,"bridgeInverse64["+string(i64)+","+string(j64)+"]="+string(inverse64[i64,j64])+";");}
+ }
+}
+close(out64);
+print("BRIDGE64_RESULT actual_degree=32 old_source_equations=2 old_basis_functions=32 image_rank=32 both_inverse_products=2 changed_quadratic_rejected=1 changed_image_rejected=1");
+print("BRIDGE64_ALL_CHECKS_PASS");quit;

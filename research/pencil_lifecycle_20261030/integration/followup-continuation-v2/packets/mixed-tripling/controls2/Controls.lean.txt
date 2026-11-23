@@ -1,0 +1,60 @@
+import Tripling
+open Polynomial MixedCancellation MixedTripling
+example : let a : WeightedAdd11.Input ℚ := ⟨0,64,2,2⟩
+ let b : D2 ℚ := ⟨0,0,-27,486,3,2⟩
+ (2:ℚ)≠0 ∧ a.y≠0 ∧ 8*(a.y*a.y)*a.y≠0 ∧
+ nq b= -2*WeightedAdd11.nx a ∧ nr b=(WeightedAdd11.nx a)^2 := by
+ apply repeated_ready (MixedGeneric.curve 1 (-1) 0 0)
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3-C (1/4),?_⟩
+   have hh : C (1/2:ℚ)*(2:ℚ[X])=1 := by
+    calc C (1/2:ℚ)*2 = C ((1/2:ℚ)*2) := by simp
+         _ = 1 := by norm_num
+   have hq : (C (1/2:ℚ))^2=C (1/4:ℚ) := by rw [←C_pow];norm_num
+   simp [MixedGeneric.curve]
+   ring_nf
+   simp only [mul_assoc,hh,hq,mul_one]
+ · norm_num [rawK]
+ · norm_num [rawW3,rawY3]
+ · norm_num [other]
+example : MixedCancellation.support (qout (0:ℚ) (-1/8)) (rout 0 0 (-1/2) (-1/8)) ∣
+ MixedGeneric.curve 1 (-1) 0 0 - (ordinate (257/512) (-63/64))^2 := by
+ have h := affine_tripling_valid (1:ℚ) (-1) 0 0 0 1 (by norm_num [WeightedDoubling.value]) (by norm_num)
+ norm_num [WeightedDoubling.deriv,halfSecond,qout,rout] at h ⊢
+ exact h
+example : classify (⟨0,0,1,1⟩:WeightedAdd11.Input ℚ) (⟨0,0,0,0,1,1⟩:D2 ℚ)=.cancellation := by
+ norm_num [classify,rawK,rawW3,rawY3]
+example : ¬ (X:ℚ[X]) ∣ MixedGeneric.curve 2 (-1) 0 0-1 := by
+ intro h;obtain ⟨q,hq⟩ := h
+ have hc := congrArg (fun f : ℚ[X]=>f.coeff 0) hq
+ norm_num [MixedGeneric.curve] at hc
+example : let a : WeightedAdd11.Input ℚ := ⟨0,64,2,2⟩
+ let b : D2 ℚ := ⟨0,0,-27,486,3,2⟩
+ classify a b=.positiveCoincidence ∧ (2:ℚ)≠0 ∧ a.y≠0 ∧
+ (rawOutput (-1) 0 0 a).z≠0 ∧ (rawOutput (-1) 0 0 a).w≠0 ∧
+ validTwo (MixedGeneric.curve 1 (-1) 0 0) (rawOutput (-1) 0 0 a) := by
+ apply source_repeated_preserves 1 (-1) 0 0
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3-C (1/4),?_⟩
+   have hh : C (1/2:ℚ)*(2:ℚ[X])=1 := by
+    calc C (1/2:ℚ)*2 = C ((1/2:ℚ)*2) := by simp
+         _ = 1 := by norm_num
+   have hq : (C (1/2:ℚ))^2=C (1/4:ℚ) := by rw [←C_pow];norm_num
+   simp [MixedGeneric.curve]
+   ring_nf
+   simp only [mul_assoc,hh,hq,mul_one]
+ · norm_num [rawK]
+ · norm_num [rawW3,rawY3]
+ · norm_num [other]

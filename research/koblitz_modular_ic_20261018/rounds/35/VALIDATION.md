@@ -1,0 +1,22 @@
+# R35 scoped validation
+
+Four native computations accepted underunchanged4GiBvirtual/1200s caps.
+All770basisinverse recombinations;154fullsourcejets andold9termregression;
+all52650products and46240inflationproducts checked in two arithmeticpaths;
+allselected/fullproductmembership coordinates/pivots. Allfailures,caps and
+attempts retained. SingularNewtonstage redeclarationcomments are nonfatal.
+
+PinnedLean4.34.1/mathlibd13f23b compilation andtransitiveaxiom-auditstatus
+is recorded literallyinresults.json,not inferredfromsourcepresence.
+Nativearrays/propergeometry notformalized. Noexternalindependentscience
+replay andnoICtiming/comparison/recoveryclaim.
+
+Pythonlexicalassemblers bytecheckacceptedR33/R34donorsbeforeinputassembly.
+Pythonpy_compile, shellbash-n, gitdiffcheck andreportPDFinspection are scoped
+softwarevalidation. Source/count exporterschangesreadcommittedgitstateonly.
+The fullrootcargo suite is NOT newlypassed; priorcapped/missingfixturelimits
+remain asR32/R34. Do not presentthese research-onlychecksasrootCI success.
+
+Rawarchive sealing andfreshGET/allmemberhash/deterministicrepackverification
+are byteintegrity checks separatefrom mathematicalreplay. Publication receipt
+inartifact-verification.json mustbeobservedbeforeclaimingremotebytesverified.

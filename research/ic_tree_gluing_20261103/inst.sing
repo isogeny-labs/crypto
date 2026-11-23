@@ -1,0 +1,157 @@
+// inst.sing -- planted instances for round 3 (m = 5, 6), native Singular.
+//
+// Usage:  Singular -q inst.sing        (SRCDIR env, default below)
+// Reads the curve line (p a b g) of SRCDIR/instances.txt and writes
+// SRCDIR/instances_r3.txt in the same record format, extended for m >= 5:
+//   m t k xR w_1..w_m cat_1..cat_(m-2) tree_1..tree_(m div 2) Y
+// where tree_c = x(P_(2c-1) + P_(2c)) and Y = x(P_1+P_2+P_3+P_4) (the sum of
+// the first two cherries). Summand abscissas are x_i = g*w_i, w_i in mu_(2^t),
+// distinct, with random signs. Randomness is a fixed-seed LCG (seed 0x7EE51103),
+// so the file is reproducible byte for byte.
+
+string SRCDIR = system("getenv", "SRCDIR");
+if (SRCDIR == "") { SRCDIR = "/home/user/crypto/research/ic_tree_gluing_20261103"; }
+short = 0;
+int P = 786433;
+
+proc die(string msg) { ERROR(msg); }
+
+// ---------------------------------------------------------------- curve line
+string IT = read(SRCDIR + "/instances.txt");
+string cur = ""; string chh; int ii; list LINES;
+for (ii = 1; ii <= size(IT); ii++)
+{
+  chh = IT[ii, 1];
+  if (chh == newline) { LINES[size(LINES) + 1] = cur; cur = ""; } else { cur = cur + chh; }
+}
+string CL = "";
+for (ii = 1; ii <= size(LINES); ii++)
+{
+  if (size(LINES[ii]) > 0) { if (LINES[ii][1, 1] != "#") { CL = LINES[ii]; break; } }
+}
+if (CL == "") { die("no curve line"); }
+list TOK; string tk = "";
+for (ii = 1; ii <= size(CL); ii++)
+{
+  chh = CL[ii, 1];
+  if (chh == " ") { if (tk != "") { TOK[size(TOK) + 1] = tk; tk = ""; } } else { tk = tk + chh; }
+}
+if (tk != "") { TOK[size(TOK) + 1] = tk; }
+if (size(TOK) != 4) { die("curve line must have 4 integers"); }
+execute("int CP = " + TOK[1] + ";"); execute("int CA = " + TOK[2] + ";");
+execute("int CB = " + TOK[3] + ";"); execute("int CG = " + TOK[4] + ";");
+if (CP != P) { die("prime mismatch"); }
+
+ring r = 786433, z, dp;
+number a = CA; number b = CB; number g = CG;
+
+proc nint(number n)          // representative in 0..p-1
+{
+  int v = int(n); if (v < 0) { v = v + 786433; } return(v);
+}
+proc issq(number c)          // nonzero square in F_p
+{
+  if (c == 0) { return(0); }
+  number e = c^393216;       // (p-1)/2
+  return(e == 1);
+}
+proc sqrtp(number c)         // a square root of a nonzero square, by factorization
+{
+  poly f = z^2 - c; list F = factorize(f); int i; poly h;
+  for (i = 1; i <= size(F[1]); i++)
+  {
+    h = F[1][i];
+    if (deg(h) == 1) { return(-number(jet(h, 0)) / leadcoef(h)); }
+  }
+  die("no square root");
+}
+proc padd(list Pp, list Qq)  // affine Weierstrass addition; list() is O
+{
+  if (size(Pp) == 0) { return(Qq); }
+  if (size(Qq) == 0) { return(Pp); }
+  number x1 = Pp[1]; number y1 = Pp[2]; number x2 = Qq[1]; number y2 = Qq[2]; number l;
+  if (x1 == x2)
+  {
+    if (y1 + y2 == 0) { return(list()); }
+    l = (3 * x1^2 + a) / (2 * y1);
+  }
+  else { l = (y2 - y1) / (x2 - x1); }
+  number x3 = l^2 - x1 - x2;
+  return(list(x3, l * (x1 - x3) - y1));
+}
+
+// ---------------------------------------------------------------- LCG
+bigint ST = 2128941315;      // 0x7EE51103
+proc lcg()
+{
+  ST = (ST * bigint(1103515245) + bigint(12345)) mod bigint(2147483648);
+  return(ST);
+}
+proc rnd(int n) { bigint v = lcg(); bigint q = v div bigint(65536); return(int(q mod bigint(n))); }
+
+// ---------------------------------------------------------------- generate
+string OUT = "# Round-3 planted instances (inst.sing, LCG seed 0x7EE51103). Format as instances.txt, plus Y for m >= 5." + newline
+  + "# Y = x(P_1+P_2+P_3+P_4), the sum of the first two cherries." + newline
+  + string(P) + " " + string(CA) + " " + string(CB) + " " + string(CG) + newline;
+int m; int t; int d; int h; number zt; int j; int tries; int ok; int i; int c; int nus;
+list US; list W; list PTS; list S; list Q; number x; number y; number rhs; string rec;
+list CELLS = list(list(5, 4), list(5, 5), list(6, 5), list(6, 6));
+for (ii = 1; ii <= size(CELLS); ii++)
+{
+  m = CELLS[ii][1]; t = CELLS[ii][2]; d = 2^t;
+  for (h = 2; h < 100; h++)
+  {
+    zt = number(h)^(786432 div d);
+    if (zt^(d div 2) != 1) { break; }
+  }
+  US = list();
+  for (j = 0; j < d; j++)
+  {
+    x = g * zt^j; rhs = x^3 + a * x + b;
+    if (issq(rhs)) { US[size(US) + 1] = j; }
+  }
+  nus = size(US);
+  if (nus < m) { die("too few usable abscissas at m=" + string(m) + " t=" + string(t)); }
+  ok = 0;
+  for (tries = 1; tries <= 500 and ok == 0; tries++)
+  {
+    // m distinct usable exponents
+    W = list(); intvec used; used[nus] = 0;
+    while (size(W) < m)
+    {
+      j = rnd(nus) + 1;
+      if (used[j] == 0) { used[j] = 1; W[size(W) + 1] = US[j]; }
+    }
+    kill used;
+    PTS = list();
+    for (i = 1; i <= m; i++)
+    {
+      x = g * zt^W[i]; y = sqrtp(x^3 + a * x + b);
+      if (rnd(2) == 1) { y = -y; }
+      PTS[i] = list(x, y);
+    }
+    // caterpillar partial sums, total, cherries, Y
+    S = list(); Q = PTS[1]; ok = 1;
+    for (i = 2; i <= m; i++) { Q = padd(Q, PTS[i]); if (size(Q) == 0) { ok = 0; } S[i] = Q; }
+    if (ok)
+    {
+      list CH; for (c = 1; c <= m div 2; c++) { CH[c] = padd(PTS[2 * c - 1], PTS[2 * c]); if (size(CH[c]) == 0) { ok = 0; } }
+      list YY = padd(CH[1], CH[2]); if (size(YY) == 0) { ok = 0; }
+    }
+    if (ok)
+    {
+      rec = string(m) + " " + string(t) + " 0 " + string(nint(S[m][1]));
+      for (i = 1; i <= m; i++) { rec = rec + " " + string(nint(zt^W[i])); }
+      for (i = 2; i <= m - 1; i++) { rec = rec + " " + string(nint(S[i][1])); }
+      for (c = 1; c <= m div 2; c++) { rec = rec + " " + string(nint(CH[c][1])); }
+      rec = rec + " " + string(nint(YY[1]));
+      OUT = OUT + rec + newline;
+      print("m=" + string(m) + " t=" + string(t) + ": usable " + string(nus) + ", tries " + string(tries));
+    }
+    if (defined(CH)) { kill CH; }
+    if (defined(YY)) { kill YY; }
+  }
+  if (ok == 0) { die("no plant at m=" + string(m) + " t=" + string(t)); }
+}
+write(":w " + SRCDIR + "/instances_r3.txt", OUT[1, size(OUT) - 1]);
+quit;

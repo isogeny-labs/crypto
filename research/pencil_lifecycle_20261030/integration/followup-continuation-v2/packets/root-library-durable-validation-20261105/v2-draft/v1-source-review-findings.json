@@ -1,0 +1,34 @@
+{
+  "schema": "source-review-findings/v1",
+  "reviewer": "reconcile_norm_proofs",
+  "scope": "read-only source review, no wrapper execution",
+  "reviewed_version": "v1 at ae96197a81",
+  "findings": [
+    {
+      "id": "R1",
+      "finding": "Duplicate output refusal can overwrite prior native receipts from finally",
+      "v2_disposition": "Successful mkdir ownership gates all receipt writes"
+    },
+    {
+      "id": "R2",
+      "finding": "Unit may start before supervisor captures identity; lease loss leaves unobserved payload",
+      "v2_disposition": "Worker waits for InvocationID and lease-bound expiring permit before work; supervisor preserves no-foreign-kill rule"
+    },
+    {
+      "id": "R3",
+      "finding": "Empty exact_tests admission skips intended positive controls",
+      "v2_disposition": "Ordered list and fixed recipe fields must equal bound proposal"
+    },
+    {
+      "id": "R4",
+      "finding": "Live growing log hash can include bytes appended after preceding fsync",
+      "v2_disposition": "Snapshot fixed prefix length, hash exact prefix, then fsync"
+    },
+    {
+      "id": "R5",
+      "finding": "Nonfinite and bool dollar ceiling accepted",
+      "v2_disposition": "Explicit finite numeric type checks and bound cost allocation receipt"
+    }
+  ],
+  "v2_runtime_result": null
+}

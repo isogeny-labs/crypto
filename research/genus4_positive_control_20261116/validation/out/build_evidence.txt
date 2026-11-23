@@ -1,0 +1,66 @@
+# Build driver log (build.sh 18:17-18:21 killed by the validator to avoid a triple compile; build2.sh; build3.sh 19:07-20:09; build2.sh from 20:10)
+=== build bce0eb2148 genus_ladder attempt 1 start 2026-11-16T18:21:28Z
+    yielded to a foreign crypto_lib compile at 2026-11-16T18:27:06Z
+=== build bce0eb2148 genus_ladder attempt 2 start 2026-11-16T18:41:37Z
+    yielded to a foreign crypto_lib compile at 2026-11-16T18:42:07Z
+Terminated
+---
+build2 chain stopped 2026-11-16T19:07:51Z; switching to build3.sh
+=== build bce0eb2148 genus_ladder attempt 1 start 2026-11-16T19:07:57Z avail=13200MB
+    yielded at 2026-11-16T19:14:45Z avail=7613MB
+=== build bce0eb2148 genus_ladder attempt 2 start 2026-11-16T19:29:47Z avail=15140MB
+/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/scripts/build3.sh: line 12: /proc/7251/cmdline: No such file or directory
+=== build bce0eb2148 genus_ladder rc=0 end 2026-11-16T19:42:44Z
+   Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148)
+2b58ab47c21ae9da8aea25a7c3a676a2260220dac917ca670246d738b0e937f2  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/genus_ladder.bce0eb2148
+=== build a99e7267f1 genus_ladder attempt 1 start 2026-11-16T19:42:44Z avail=15235MB
+    yielded at 2026-11-16T19:42:53Z avail=14177MB
+=== build a99e7267f1 genus_ladder attempt 2 start 2026-11-16T19:58:55Z avail=15116MB
+    yielded at 2026-11-16T19:59:20Z avail=13689MB
+Terminated
+build3 chain stopped 2026-11-16T20:09:53Z; switching to build4.sh (-j1)
+build4 not used (denied: would run beside another session's crypto_lib compile); back to build2.sh 2026-11-16T20:10:15Z
+=== build a99e7267f1 genus_ladder attempt 1 start 2026-11-16T20:14:16Z
+    yielded to a foreign crypto_lib compile at 2026-11-16T20:15:31Z
+=== build a99e7267f1 genus_ladder attempt 2 start 2026-11-16T20:30:47Z
+=== build a99e7267f1 genus_ladder rc=0 end 2026-11-16T20:43:32Z
+   Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_a99e7267f1)
+05bf91774cdff19873b4fe852970c50f201e49a18ff55246e7d0b65069b210a8  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/genus_ladder.a99e7267f1
+=== build a99e7267f1 val_g4dump attempt 1 start 2026-11-16T20:43:32Z
+=== build a99e7267f1 val_g4dump rc=0 end 2026-11-16T20:43:37Z
+   Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_a99e7267f1)
+626f494f48c15681273e9e37247359e4c09a268e3f884f8687e25527ff14bccc  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/val_g4dump.a99e7267f1
+=== build bce0eb2148_p2 genus_ladder attempt 1 start 2026-11-16T20:44:04Z
+=== build bce0eb2148_p2 genus_ladder rc=0 end 2026-11-16T20:57:00Z
+   Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148_p2)
+81408d2f295cab4937ccd744408de8248da7aecd59d3db86b3ab3820766e09ef  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/genus_ladder.bce0eb2148_p2
+
+# 'Compiling crypto' lines per build log (lesson L-ca1840e60dc0)
+/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/build_a99e7267f1_genus_ladder.log:
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_a99e7267f1)
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_a99e7267f1)
+  last:     Finished `release` profile [optimized] target(s) in 12m 40s
+/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/build_bce0eb2148_genus_ladder.log:
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148)
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148)
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148)
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148)
+  last:     Finished `release` profile [optimized] target(s) in 12m 54s
+/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/build_bce0eb2148_p2_genus_ladder.log:
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_bce0eb2148_p2)
+  last:     Finished `release` profile [optimized] target(s) in 12m 54s
+/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/build_a99e7267f1_val_g4dump.log:
+     Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/src_a99e7267f1)
+  last:     Finished `release` profile [optimized] target(s) in 1.48s
+
+# hashes
+05bf91774cdff19873b4fe852970c50f201e49a18ff55246e7d0b65069b210a8  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/genus_ladder.a99e7267f1
+2b58ab47c21ae9da8aea25a7c3a676a2260220dac917ca670246d738b0e937f2  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/genus_ladder.bce0eb2148
+81408d2f295cab4937ccd744408de8248da7aecd59d3db86b3ab3820766e09ef  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/genus_ladder.bce0eb2148_p2
+626f494f48c15681273e9e37247359e4c09a268e3f884f8687e25527ff14bccc  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/val_g4dump.a99e7267f1
+f560318ce040b4d633b2a3c16037640310cbb7f180d11f8e81350aab4b5bcf24  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/producer/genus_ladder.g4
+4b2574a39af8967b2c0b18cb706a520a3cc010851f0d1ad8e1ddb28965194858  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/g4val/bin/producer/genus_ladder.rhorefs
+
+# toolchain
+rustc 1.97.0 (2d8144b78 2026-07-07)
+cargo 1.97.0 (c980f4866 2026-06-30)

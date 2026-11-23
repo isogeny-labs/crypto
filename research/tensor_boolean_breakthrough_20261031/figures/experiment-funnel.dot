@@ -1,0 +1,28 @@
+digraph tensor_boolean_funnel {
+  graph [rankdir=LR, bgcolor="white", margin=0.12, nodesep=0.32, ranksep=0.58, fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#24445c", penwidth=1.2, fillcolor="#eaf3f8", margin="0.12,0.08"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#425b6b", penwidth=1.1, arrowsize=0.7];
+
+  e0 [label="E0  Canonical IR\nExact round trip + mutations", fillcolor="#dceff2"];
+  e1 [label="E1  Boundary rank census\nNatural vs rewired null", fillcolor="#cde8ee"];
+  e1s [label="E1S  SAT / BDD\nMechanism triangulation", style="rounded,filled,dashed", fillcolor="#f5f8fa", color="#607888"];
+  e2 [label="E2  Basis census\nFourier / partition rank", fillcolor="#c4e1eb"];
+  e3 [label="E3  Certified search\nRewrites + contraction order", fillcolor="#b8d8e6"];
+  e4 [label="E4  Exact engine\nHeld-out complete work", fillcolor="#a8cfe1"];
+  e5 [label="E5  Relation oracle\nEnd-to-end priced pipeline", fillcolor="#98c4da"];
+  stop [shape=octagon, label="STOP / CHANGE\nHYPOTHESIS", color="#8d3a3a", fillcolor="#f7dddd", fontcolor="#6f2424"];
+
+  e0 -> e1 [label="valid instrument"];
+  e1 -> e2 [label="rank gap"];
+  e1 -> e1s [label="same held-out pairs", style=dashed, color="#607888", constraint=false];
+  e1s -> e3 [label="solver nomination", style=dashed, color="#607888", constraint=false];
+  e2 -> e3 [label="composition certificate"];
+  e3 -> e4 [label="held-out ≥2×"];
+  e4 -> e5 [label="exact engine survives"];
+
+  e0 -> stop [label="semantic mismatch", color="#9a5555"];
+  e1 -> stop [label="null-like rank", color="#9a5555"];
+  e2 -> stop [label="no composition", color="#9a5555"];
+  e3 -> stop [label="search-only win", color="#9a5555"];
+  e4 -> stop [label="setup erases gain", color="#9a5555"];
+}

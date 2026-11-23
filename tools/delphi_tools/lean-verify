@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Delphi verifier tool: run the repository Lean proof gate on one target.
+# Argument: repo-relative Lean project directory or .lean file.
+# Exit 0 with a pcc.verdict/v1 object for gate exit 0 (pass) or 1 (fail).
+# Gate exit 3 (infrastructure) or anything else: nothing on stdout, exit 3,
+# which Delphi records as an invalid verdict.
+set -euo pipefail
+
+command -v jq >/dev/null || { echo "lean-verify: jq not on PATH" >&2; exit 3; }
+[ $# -eq 1 ] || { echo "usage: lean-verify <target>" >&2; exit 3; }
+target=$1
+if ! [[ $target =~ ^[A-Za-z0-9_./-]+$ ]] || [[ $target == -* ]]; then
+  echo "lean-verify: bad target argument" >&2
+  exit 3
+fi
+
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+cd "$root"
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+rc=0
+tools/lean/proof-gate.sh --out "$tmp/out" "$target" >"$tmp/log" 2>&1 || rc=$?
+cat "$tmp/log" >&2
+
+case "$rc" in
+  0) v=pass ;;
+  1) v=fail ;;
+  *) echo "lean-verify: proof gate infrastructure error (exit $rc)" >&2; exit 3 ;;
+esac
+
+art=""
+mapfile -t receipts < <(find "$tmp/out" -type f -name build.log 2>/dev/null | sort)
+if [ ${#receipts[@]} -eq 0 ]; then
+  mapfile -t receipts < <(find "$tmp/out" -type f 2>/dev/null | sort)
+fi
+if [ ${#receipts[@]} -gt 0 ]; then
+  art=$(sha256sum "${receipts[0]}" | cut -d ' ' -f 1)
+fi
+
+jq -cn --arg v "$v" --arg r "$(tail -n 3 "$tmp/log")" --arg a "$art" --arg c "${DELPHI_CLAIM_ID:-}" \
+  '{schema: "pcc.verdict/v1", verdict: $v}
+   + (if $c != "" then {claim_id: $c} else {} end)
+   + (if $a != "" then {artifact_sha256: $a} else {} end)
+   + {reason: $r}'

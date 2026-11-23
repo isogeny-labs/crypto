@@ -1,0 +1,176 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h36c0f0c618539c35",
+  "statement": {
+    "name": "Universal two-line norm factorization",
+    "source": "NormNonconstantControl.twoLineNorm; universal CommRing identity, separate from F17 control",
+    "variables": [
+      "f",
+      "L",
+      "M"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "f"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "L"
+                    },
+                    {
+                      "op": "var",
+                      "args": "M"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "f"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "L"
+                    },
+                    {
+                      "op": "var",
+                      "args": "M"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "f"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "L"
+                      },
+                      {
+                        "op": "var",
+                        "args": "M"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "L"
+                      },
+                      {
+                        "op": "var",
+                        "args": "M"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "f"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "L"
+                  },
+                  {
+                    "op": "var",
+                    "args": "L"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "f"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "M"
+                  },
+                  {
+                    "op": "var",
+                    "args": "M"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111305,
+  "value_digest": "7d0ad8669de47fe63d420ed594b54bf301da932a2345ada192bd4cd2cc70cbfe",
+  "independence": "Unsigned universal expression check; F17 control and matrix hypotheses checked separately in Lean",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormNonconstantControl.lean",
+    "sha256": "5a7a62f0b3160948a09354eb3a8fcf7d20630dc62d3934793fa1a2cd669d9683"
+  }
+}

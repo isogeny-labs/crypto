@@ -1,0 +1,11 @@
+Current source freeze:786a8af0f7f935f3e17e9be21b8930eaad113c61.
+All commands below start after both v14 measured arms completed.
+Working directory:/home/ec2-user/crypto-n83-resume.
+TMPDIR=/var/tmp/n83-800k-validation-tmp
+CARGO_TARGET_DIR=/var/tmp/n83-800k-validation-target
+CARGO_BUILD_JOBS=4
+cargo test --offline --release --lib -- --test-threads=1
+cargo test --offline --release --example koblitz_n83_factor_base_export
+cargo test --offline --release --example koblitz_n83_free_selector_export_control
+Exact outputs and exits:validation-*.log and validation-*.exit.
+The retained measured worker ELF is not rebuilt or overwritten by this new target.

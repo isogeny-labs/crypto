@@ -1,0 +1,9 @@
+digraph G {
+rankdir=LR; graph [bgcolor="transparent",nodesep=.3,ranksep=.35];
+node [shape=box,style="rounded,filled",fillcolor="#e8f0fa",fontname="Helvetica",fontsize=10];
+a [label="Word multiply / convolution\nactual Boolean calls"];
+b [label="Materialized evaluator\ncanonical coefficient"];
+c [label="Actual right numerator\nC*N + 6q + 5q^2"];
+d [label="OPEN: extract / inverse\nall preparation / bit time",style="rounded,dashed",fillcolor="white"];
+a->b; b->c; c->d [style=dashed];
+}

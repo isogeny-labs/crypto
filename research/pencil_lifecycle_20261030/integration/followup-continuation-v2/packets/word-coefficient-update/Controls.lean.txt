@@ -1,0 +1,41 @@
+import WordCoefficient
+set_option autoImplicit false
+namespace WordCoefficientControls
+open WordCoefficient
+instance : Fact (17:UInt64).toNat.Prime := ⟨by decide⟩
+
+theorem inverse_witness : InverseWitness 17 2 9 := by unfold InverseWitness; decide
+
+theorem certificate_decodes : (9:ZMod 17)=(2:ZMod 17)⁻¹ :=
+ inverse_witness_decode 17 2 9 (by decide) (by decide) inverse_witness
+
+theorem term_value : termWord 17 4 2 3 9 2 1=7 := by decide
+
+theorem updated_value : updateWord 17 10 4 2 3 9 2 1=0 := by decide
+
+theorem scalar_reference : (24:ℕ)%17=7 := by decide
+
+theorem choose_reduction : chooseCoeff 7 5 2=3 := by decide
+
+theorem zero_exponent : smallPow 17 0 0=1 := by decide
+
+theorem zero_base : smallPow 17 0 5=0 := by decide
+
+theorem negative_one_power : smallPow 17 16 5=16 := by decide
+
+theorem wrong_inverse_rejected : ¬InverseWitness 17 2 8 := by unfold InverseWitness; decide
+
+theorem zero_scale_rejected : ¬InverseWitness 17 0 0 := by unfold InverseWitness; decide
+
+theorem noncanonical_inverse_rejected : ¬InverseWitness 17 2 26 := by unfold InverseWitness; decide
+
+theorem noncanonical_product_alone_passes : ((2:UInt64)*26)%17=1 := by decide
+
+theorem invalid_index_rejected : ¬((2:Fin 6).val≤(1:Fin 6).val) := by decide
+
+theorem overflow_word_value : (((9223372036854775808:UInt64)*2)%5).toNat=0 := by decide
+
+theorem overflow_natural_value : (9223372036854775808*2:ℕ)%5=1 := by decide
+
+theorem overflow_input_excluded : ¬((9223372036854775808:UInt64).toNat<(5:UInt64).toNat) := by decide
+end WordCoefficientControls

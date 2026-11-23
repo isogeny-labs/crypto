@@ -1,0 +1,13 @@
+optlevel: muladd_u32     peak 1.693e+10 ops/s/core (muladd_u32@w512); all 4 cores 6.704e+10
+optlevel: muladd_u64     peak 7.358e+09 ops/s/core (muladd_u64@w512); all 4 cores 2.855e+10
+optlevel: mulwide_u64    peak 1.812e+09 ops/s/core (mulwide_u64@w512); all 4 cores 6.750e+09
+optlevel: modmuladd_p31  peak 2.040e+09 ops/s/core (modmuladd_p31@w512); all 4 cores 7.457e+09
+optlevel: modmuladd_p62  peak 6.606e+08 ops/s/core (modmuladd_p62@scalar); all 4 cores 2.564e+09
+optlevel: xor_u64        peak 9.439e+09 ops/s/core (xor_u64@w512); all 4 cores 3.620e+10
+optlevel: popcnt_u64     peak 8.164e+09 ops/s/core (popcnt_u64@w512); all 4 cores 2.572e+10
+optlevel: fma_f64        peak 4.076e+10 ops/s/core (fma_f64_reg@native); all 4 cores 1.499e+11
+optlevel: ptr_hop        peak 5.335e+08 ops/s/core (chase@scalar); all 4 cores 2.057e+09
+optlevel: bandwidth 1 core(s): 18.48 GB/s (xor_u64; triad 16.57, xor_u64 18.48, popcnt_u64 12.72)
+optlevel: bandwidth 2 core(s): 37.21 GB/s (xor_u64; triad 29.92, xor_u64 37.21, popcnt_u64 24.27)
+optlevel: bandwidth 4 core(s): 68.41 GB/s (xor_u64; triad 62.60, xor_u64 68.41, popcnt_u64 45.03)
+optlevel: wrote research/optlevel_rs_20261117/equiv/py.calibration.json (host 44113cdb2d87e834, flags ['VIRTUALIZED', 'CLOCK_UNSTABLE'])

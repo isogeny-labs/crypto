@@ -5,14 +5,26 @@ mod bench;
 mod boundary;
 #[path = "ic/corpus.rs"]
 mod corpus;
+#[path = "icx/cubic_external.rs"]
+mod cubic_external;
+#[path = "icx/cubic_route.rs"]
+mod cubic_route;
 #[path = "ic/descent.rs"]
 mod descent;
+#[path = "ic/ecc2k130.rs"]
+mod ecc2k130;
 #[path = "ic/experiment.rs"]
 mod experiment;
 #[path = "ic/fixed.rs"]
 mod fixed;
+#[path = "ic/install.rs"]
+mod install;
 #[path = "ic/large_prime.rs"]
 mod large_prime;
+#[path = "ic/log_store.rs"]
+mod log_store;
+#[path = "ic/oversample.rs"]
+mod oversample;
 #[path = "ic/params.rs"]
 mod params;
 #[path = "ic/plan.rs"]
@@ -21,14 +33,31 @@ mod plan;
 mod price;
 #[path = "ic/prime.rs"]
 mod prime;
+#[path = "icx/prime_external.rs"]
+mod prime_external;
+#[path = "ic/prime_orbit.rs"]
+mod prime_orbit;
 #[path = "ic/progress.rs"]
 mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
+#[path = "ic/summation_roots.rs"]
+mod summation_roots;
 #[path = "ic/sweep/mod.rs"]
 mod sweep;
+#[path = "ic/tensor.rs"]
+mod tensor;
+#[path = "ic/update.rs"]
+mod update;
 #[path = "ic/workflow.rs"]
 mod workflow;
+
+/// Release version embedded at build time. The release job sets
+/// `CRYPTO_CLI_VERSION`; a developer build falls back to the crate version.
+pub const VERSION: &str = match option_env!("CRYPTO_CLI_VERSION") {
+    Some(version) => version,
+    None => env!("CARGO_PKG_VERSION"),
+};
 
 use clap::{Args, Parser, Subcommand};
 use serde_json::{json, Value};
@@ -43,11 +72,11 @@ use std::{
 #[derive(Parser)]
 #[command(
     name = "ic",
-    version,
-    about = "Curve inspection and synthetic index-calculus research"
+    version = VERSION,
+    about = "Curve inspection and index-calculus research, including explicit public EC targets"
 )]
 #[command(
-    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run the toy index-calculus pipeline, compare factor-base candidates, or search for high-yield factor bases. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
+    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run index-calculus pipelines, compare factor-base candidates, or search for high-yield factor bases. Solve-prime and solve-cubic accept caller-supplied public EC targets. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -60,14 +89,27 @@ struct Cli {
     /// Print a machine-readable JSON report, without progress text.
     #[arg(long, global = true)]
     json: bool,
-    /// Trace index-calculus stages and individual trials as they finish (suppressed by --json).
-    #[arg(short, long, global = true)]
-    verbose: bool,
+    /// Live stages and relations; -vv adds point coordinates, -vvv includes unsuccessful attempts. Suppressed by --json.
+    #[arg(short, long, global = true, action = clap::ArgAction::Count)]
+    verbose: u8,
     /// Write the JSON report to a new file; existing files are never overwritten.
     #[arg(long, global = true)]
     out: Option<PathBuf>,
+    /// Publish --out through the configured artifact store under a new logical name.
+    #[arg(long, global = true, requires = "out")]
+    store_name: Option<String>,
+    /// GPU offload: off (default), auto (discover workers) or a worker executable. Every offloaded
+    /// result is re-verified on the CPU and a worker failure falls back to the CPU path.
+    #[arg(
+        long,
+        global = true,
+        value_name = "off|auto|WORKER",
+        default_value = "off"
+    )]
+    gpu: String,
 }
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum Action {
     /// List built-in inspection profiles.
     List,
@@ -89,6 +131,10 @@ enum Action {
     Workflow(workflow::WorkflowArgs),
     /// Persist and resume index calculus on fixed K_0 parameters through degree 131.
     Fixed(fixed::FixedArgs),
+    /// Watch ECC2K-130 relation collection with live progress and a JSONL export.
+    Ecc2k130(ecc2k130::Ecc2k130Args),
+    /// Check for or install a newer macOS `ic` + `crax` release bundle.
+    Update(update::UpdateArgs),
     /// Price every index-calculus variant of the prime, generic-binary and Koblitz regimes in one unit against the generic floor and a counted Pollard rho, with fitted exponents.
     Boundary(boundary::BoundaryArgs),
     /// Write a benchmark corpus of Weil-descended Semaev S4 instances (Magma, DIMACS+XOR, CNF, ANF) with certified labels and planted witnesses.
@@ -105,12 +151,31 @@ enum Action {
     Rho(rho::RhoArgs),
     /// Price the workflow's pipeline phase by phase: the same calls in memory on one thread, each phase on its own clock, converted at one batched addition measured in the same process, beside batch rho on the same targets with its step priced.
     Price(price::PriceArgs),
+    /// Measure relation oversampling in the logarithm precompute: one pool per seed past full rank, prefixes solved at each surplus fraction, paired rows.
+    Oversample(oversample::OversampleArgs),
     /// Import the ECBench binary-curve battery and run bounded exact
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
     /// Measure the exact pair-sum yield of a small-x factor base on a
-    /// prime-field curve (NIST P-192, or toy primes where hits are common).
+    /// prime-field curve (NIST P-192 or small prime fixtures with common hits).
     Prime(prime::PrimeArgs),
+    /// Run the scaled automorphism-orbit prime-field IC pipeline; relation
+    /// walks support affine or batched Jacobian coordinates.
+    PrimeOrbit(prime_orbit::PrimeArgs),
+    /// Find roots of point-origin prime-field Semaev specializations through signed curve sums.
+    SummationRoots(summation_roots::SummationRootsArgs),
+    /// Run bounded EC index calculus on an explicit prime-field public target.
+    SolvePrime(prime_external::PrimeArgs),
+    /// Run bounded prime-field EC index calculus from a checked JSON target artifact.
+    SolvePrimeFile(prime_external::PrimeFileArgs),
+    /// Generate bounded certified prime-field IW1 isogeny routes for a public target.
+    PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
+    /// Run bounded EC index calculus on an explicit cubic-field public target.
+    SolveCubic(cubic_external::CubicArgs),
+    /// Enumerate bounded rational j-neighbours over an exact cubic field.
+    CubicGraph(cubic_route::GraphArgs),
+    /// Generate a checked one-hop cubic Vélu route for a rational prime-order kernel.
+    CubicRouteGenerate(cubic_route::GenerateArgs),
     /// Search index-calculus configurations with an Optuna-style sweeper: a
     /// typed conditional space, a TPE sampler, median pruning over a ladder
     /// of sizes, and an append-only resumable store.  The objective is the
@@ -120,6 +185,10 @@ enum Action {
     /// record: the unit `ic sweep` optimises over.  The score is a function
     /// of operation counts alone.
     SweepTrial(sweep::trial::TrialArgs),
+    /// Toy index calculus with relations found by Boolean tensor contraction
+    /// (crates/ecdl-tensor-ic): gadget-network shape table, or a solved toy
+    /// instance. Exponential counters; no speedup is claimed.
+    Tensor(tensor::TensorArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -165,6 +234,16 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Solve(args)) => experiment::solve(args.clone(), cli.json),
         Some(Action::Workflow(args)) => workflow::run(args.clone(), cli.json),
         Some(Action::Fixed(args)) => fixed::run(args.clone()),
+        Some(Action::Ecc2k130(args)) => {
+            let mut args = args.clone();
+            // `ecc2k130` turns live progress on by default; the global JSON
+            // contract wins unless the user asks for a human report.
+            if cli.json {
+                args.quiet = true;
+            }
+            ecc2k130::run(args)
+        }
+        Some(Action::Update(args)) => update::run(args.clone()),
         Some(Action::Boundary(args)) => boundary::run(args.clone(), cli.json),
         Some(Action::Corpus(args)) => corpus::run(args.clone()),
         Some(Action::Descent(args)) => descent::run(args.clone(), cli.json),
@@ -173,10 +252,20 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
+        Some(Action::Oversample(args)) => oversample::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
+        Some(Action::SummationRoots(args)) => summation_roots::run(args.clone()),
+        Some(Action::SolvePrime(args)) => prime_external::solve(args),
+        Some(Action::SolvePrimeFile(args)) => prime_external::solve_file(args),
+        Some(Action::PrimeRouteGenerate(args)) => prime_external::generate_route(args),
+        Some(Action::SolveCubic(args)) => cubic_external::solve(args),
+        Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
+        Some(Action::CubicRouteGenerate(args)) => cubic_route::generate(args),
         Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
         Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
+        Some(Action::Tensor(args)) => tensor::run(args.clone(), cli.json),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
@@ -257,6 +346,7 @@ fn linear_algebra_summary(la: &Value) -> String {
 fn display(report: &Value) {
     match report["operation"].as_str() {
         Some("plan") => plan::display(report),
+        Some("tensor-scale" | "tensor-demo") => tensor::display(report),
         Some("inspect") => {
             println!(
                 "Curve: {}\nInspection: {}",
@@ -435,6 +525,70 @@ fn display(report: &Value) {
                 println!("Failure: {f}");
             }
         }
+        Some("fixed") => {
+            if report["status"] == "error" {
+                println!("Fixed campaign: error");
+                if let Some(stage) = report["stage"].as_str() {
+                    println!("  stage: {stage}");
+                }
+                if let Some(message) = report["message"].as_str() {
+                    println!("  message: {message}");
+                }
+                if let Some(hint) = report["hint"].as_str() {
+                    println!("  hint: {hint}");
+                }
+                return;
+            }
+            println!(
+                "Fixed campaign: {} (stage {})",
+                report["status"].as_str().unwrap_or("?"),
+                report["stage"].as_str().unwrap_or("?")
+            );
+            println!(
+                "  degree {}; {} orbit columns; {} signed base points; {} solver",
+                report["degree"],
+                report["orbit_columns"],
+                report["signed_base_points"],
+                report["solver"].as_str().unwrap_or("?")
+            );
+            println!(
+                "  relations saved: {}; attempts saved: {}; factor-base logs: {}",
+                report["relations_saved"],
+                report["attempts_saved"],
+                if report["logs_available"].as_bool().unwrap_or(false) {
+                    "available"
+                } else {
+                    "incomplete"
+                }
+            );
+            if let Some(path) = report["relations_out"].as_str() {
+                println!("  relation export: {path}");
+            }
+            for (name, target) in report["targets"].as_object().into_iter().flatten() {
+                println!(
+                    "  target {name}: {} (verified {})",
+                    target["status"].as_str().unwrap_or("?"),
+                    target["verified"]
+                );
+            }
+        }
+        Some("update") => {
+            println!(
+                "Update: {} (current {}, latest {})",
+                report["status"].as_str().unwrap_or("?"),
+                report["current"].as_str().unwrap_or("?"),
+                report["latest"].as_str().unwrap_or("?")
+            );
+            if let Some(asset) = report["asset"].as_str() {
+                println!("  asset: {asset}");
+            }
+            if let Some(dir) = report["install_dir"].as_str() {
+                println!("  install directory: {dir}");
+            }
+            if let Some(message) = report["message"].as_str() {
+                println!("  {message}");
+            }
+        }
         Some("boundary") => {
             println!(
                 "Boundary ledger: {}; {} instances, all verified: {}; {:.1} s",
@@ -514,6 +668,27 @@ fn display(report: &Value) {
                 println!("{name}");
             }
         }
+        Some("prime-orbit") => {
+            println!(
+                "Prime-orbit IC: {} ({}, {}-bit scaled field)",
+                report["status"].as_str().unwrap_or("?"),
+                report["curve_type"].as_str().unwrap_or("?"),
+                report["instance"]["field_bits"]
+            );
+            println!(
+                "  relation walk: {} coordinates, {} lane(s); {} relations in {} rounds",
+                report["configuration"]["relation_coordinates"],
+                report["configuration"]["relation_lanes"],
+                report["logs"]["relations"],
+                report["logs"]["collection_rounds"]
+            );
+            println!(
+                "  target: expected {}; recovered {}; verified {}",
+                report["result"]["expected"],
+                report["result"]["recovered"],
+                report["result"]["verified"]
+            );
+        }
         Some("prime") => {
             let r = &report["report"];
             let f = |k: &str| r[k].as_f64().unwrap_or(f64::NAN);
@@ -557,6 +732,34 @@ fn display(report: &Value) {
                 r["controls_detected"], r["controls"], r["controls_recovered"], r["controls"]
             );
         }
+        Some("summation-roots") => {
+            println!(
+                "Summation roots: {} ({})",
+                report["status"].as_str().unwrap_or("?"),
+                report["mode"].as_str().unwrap_or("?")
+            );
+            match report["mode"].as_str() {
+                Some("all") => println!(
+                    "  {} finite roots ({} distinct); infinity multiplicity {}",
+                    report["counts"]["finite_roots_with_multiplicity"],
+                    report["counts"]["distinct_finite_roots"],
+                    report["counts"]["infinity_multiplicity"]
+                ),
+                Some("one") => println!(
+                    "  sign mask {}; root {}",
+                    report["certificate"]["sign_mask"], report["root"]
+                ),
+                Some("target") => println!(
+                    "  found {}; left {} states; right {} stored of {} signed states; match {}",
+                    report["search"]["found"],
+                    report["search"]["left_states"],
+                    report["search"]["right_stored_states"],
+                    report["search"]["right_signed_states"],
+                    report["match"]
+                ),
+                _ => {}
+            }
+        }
         Some("large-prime") => {
             println!(
                 "Large-prime IC: {}; imported {} families",
@@ -585,8 +788,21 @@ fn display(report: &Value) {
 }
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    match crypto_lib::cryptanalysis::gpu_offload::GpuMode::parse(&cli.gpu) {
+        Ok(mode) => crypto_lib::cryptanalysis::gpu_offload::set_mode(mode),
+        Err(message) => {
+            eprintln!("ic: {message}");
+            return ExitCode::FAILURE;
+        }
+    }
     // Generated parameters stay directly importable even with a global -v.
-    progress::init(cli.verbose && !cli.json && !matches!(cli.command, Some(Action::Generate(_))));
+    progress::init(
+        if cli.json || matches!(cli.command, Some(Action::Generate(_))) {
+            0
+        } else {
+            cli.verbose
+        },
+    );
     progress::line(format_args!(
         "startup: capturing executable and source provenance"
     ));
@@ -600,6 +816,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
+    let mut publication_store = if let Some(name) = &cli.store_name {
+        if let Err(error) = crypto_lib::store::index::validate_name(name) {
+            eprintln!("ic: invalid store name: {error}");
+            return ExitCode::FAILURE;
+        }
+        match crypto_lib::store::Store::open_default() {
+            Ok(store) => {
+                if let Err(error) = store.remote() {
+                    eprintln!("ic: {error}");
+                    return ExitCode::FAILURE;
+                }
+                if store.index.get(name).is_some() {
+                    eprintln!("ic: store name already exists: {name}");
+                    return ExitCode::FAILURE;
+                }
+                Some(store)
+            }
+            Err(error) => {
+                eprintln!("ic: cannot open artifact store: {error}");
+                return ExitCode::FAILURE;
+            }
+        }
+    } else {
+        None
+    };
     let mut report = match execute(&cli) {
         Ok(v) => v,
         Err(message) => {
@@ -608,14 +849,26 @@ fn main() -> ExitCode {
     };
     // Generated parameter documents remain directly importable under their strict schema.
     if report.get("operation").is_some() {
-        report["software"] = json!({"version":env!("CARGO_PKG_VERSION"),"os":std::env::consts::OS,
+        report["software"] = json!({"version":VERSION,"os":std::env::consts::OS,
             "arch":std::env::consts::ARCH,"binary_blake3":binary_hash(),"git_commit":git_commit(),
             "git_dirty":crypto_lib::build_provenance::git_dirty(),
             "git_commit_source":crypto_lib::build_provenance::source()});
+        if let Some(gpu) = crypto_lib::cryptanalysis::gpu_offload::report() {
+            report["gpu"] = gpu;
+        }
     }
     let success = matches!(
         report["status"].as_str(),
-        Some("complete" | "checks_passed" | "stopped")
+        Some(
+            "complete"
+                | "checks_passed"
+                | "stopped"
+                | "up_to_date"
+                | "update_available"
+                | "installed"
+                | "dry_run"
+                | "cancelled"
+        )
     ) || report.get("operation").is_none();
     let text = serde_json::to_string_pretty(&report).expect("JSON serializable");
     if let Some(path) = &cli.out {
@@ -634,6 +887,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
+    if let (Some(name), Some(path), Some(store)) =
+        (&cli.store_name, &cli.out, &mut publication_store)
+    {
+        let meta = crypto_lib::store::PushMeta {
+            description: format!(
+                "ic {} report",
+                report["operation"].as_str().unwrap_or("run")
+            ),
+            provenance: format!(
+                "ic CLI, git commit {}",
+                git_commit().as_deref().unwrap_or("unknown")
+            ),
+            ..Default::default()
+        };
+        match store.push(name, path, meta) {
+            Ok(published) => eprintln!(
+                "ic: published store:{name} sha256:{} bytes={} uploaded={}",
+                published.sha256, published.bytes, published.uploaded
+            ),
+            Err(error) => {
+                eprintln!("ic: could not publish report {}: {error}", path.display());
+                return ExitCode::FAILURE;
+            }
+        }
+    }
     if cli.json || report.get("operation").is_none() {
         println!("{text}");
     } else {
@@ -648,3 +926,83 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn prime_orbit_parses_the_jacobian_relation_mode() {
+        let cli = Cli::try_parse_from([
+            "ic",
+            "prime-orbit",
+            "--type",
+            "j0",
+            "--bits",
+            "20",
+            "--relation-coordinates",
+            "jacobian",
+            "--no-rho",
+        ])
+        .unwrap();
+        let Some(Action::PrimeOrbit(args)) = cli.command else {
+            panic!("prime-orbit did not select its action");
+        };
+        assert_eq!(args.curve_type, Some(prime_orbit::TypeArg::J0));
+        assert_eq!(
+            args.relation_coordinates,
+            prime_orbit::RelationCoordinatesArg::Jacobian
+        );
+        assert!(args.no_rho);
+    }
+
+    #[test]
+    fn summation_roots_parses_product_tree_all_mode() {
+        let cli = Cli::try_parse_from([
+            "ic",
+            "summation-roots",
+            "--p",
+            "1009",
+            "--a",
+            "2",
+            "--b",
+            "3",
+            "--x",
+            "0,1,2",
+            "--coefficients",
+            "--coefficient-method",
+            "product-tree",
+        ])
+        .unwrap();
+        let Some(Action::SummationRoots(args)) = cli.command else {
+            panic!("summation-roots did not select its action");
+        };
+        assert_eq!(args.xs, [0, 1, 2]);
+        assert!(args.coefficients);
+        assert_eq!(
+            args.coefficient_method,
+            summation_roots::Coefficients::ProductTree
+        );
+    }
+
+    #[test]
+    fn every_listed_curve_is_inspectable() {
+        for name in params::names() {
+            params::named(name).unwrap_or_else(|error| panic!("{name}: {error}"));
+        }
+    }
+}
+
+// Keep the CLI's complete external contract suites available to a selected
+// binary test target. Cargo integration-test mode also builds unrelated bins.
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_framework.rs"]
+mod cli_framework_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_progress.rs"]
+mod cli_progress_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_tensor.rs"]
+mod cli_tensor_contract_tests;

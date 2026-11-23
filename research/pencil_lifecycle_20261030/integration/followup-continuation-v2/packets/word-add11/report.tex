@@ -1,0 +1,17 @@
+\documentclass[11pt]{article}
+\usepackage[margin=.8in]{geometry}\usepackage[T1]{fontenc}
+\begin{document}\section*{UInt64 weighted add11 correspondence}
+31 October 2026 UTC. Producer packet; independent review pending.
+
+The literal distinct-branch payload now has canonical-output and field-decoding proofs. Under prime $5\le p<2^{31}$ and eight canonical input words, all six returned $q,r,s,t,z,w$ words decode to the weighted field formula with source parenthesization.
+
+\textbf{Power loop.} The actual exponent-five path is $5\to2\to1\to0$: two accumulator products (including $1a$), two conditional squares, no final unused square. Its exact UInt64 unroll is proved by reflexivity. The expression induction composes modular multiply, add, negate, subtract and this power helper. Primitive products are below $2^{62}$ and additive intermediates below $2^{32}$.
+
+\textbf{Branch dispatch.} The model preserves inverse first, doubling second, then an equal-cross assertion failure. Nonzero decoded input z and distinct normalized x imply unequal actual cross words, hence the distinct branch. The payload theorem decodes the raw body separately from its reachability condition.
+
+\textbf{Validation.} Controls cover zero/nonzero powers mod7, nonunit weighted inputs, inverse precedence at zero y, doubling, invalid same-x assertion failure, unequal raw x encoding equal normalized x, a noncanonical input and an overflowing multiplication boundary. Final source, controls and separate axiom readback exit0. Only propext, Classical.choice and Quot.sound occur. Failed simplification, missing prime-instance and control-definition attempts remain with source snapshots and receipts.
+
+\textbf{Source scope.} Field.n=1, tables=None, odd-prime arithmetic and ordinary execution/counter headroom are external mapping conditions. This is a source model, not compiler equivalence. Expression trees prove values, not costs or evaluation sharing. Inverse/doubling payloads, normalized word-validity composition, counters, divisor-class addition and whole-walk closure remain separate obligations.
+
+No scientific trials or measurements; cost ratio is null. Frozen plan, source hashes, proof, controls, readback and failed attempts are retained. The prior field packet is unchanged.
+\end{document}

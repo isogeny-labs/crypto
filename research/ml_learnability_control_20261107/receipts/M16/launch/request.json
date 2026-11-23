@@ -1,0 +1,24 @@
+{
+  "job": {
+    "command": [
+      "/usr/local/bin/r2m16_entry.sh",
+      "16"
+    ],
+    "cpu": 4,
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:37c6a451e2917d2a2650705719eb9b83daaca6720d8702b9cfae4a00f38eed21",
+    "isolation_profile": "standard",
+    "job_name": "mllc-m16-20261108",
+    "memory": "16Gi",
+    "retries": 0,
+    "seconds": 14400,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "note": "r2m16 rerun of size 16 only after the PC-D harness crash. Amendment research/ml_learnability_control_20261107/AMENDMENT_R2_M16.md sha256 1f18ffbca485c76af74351ccaed91e53406910895123517bc87e126aedc266a9 (caps the PC-D sample at N_f-1). Image = a43ceee7 plus one layer (mllc_harness_r2m16.py sha256 1b1dd70268763953c9ec0ecf503f038ede85280b4aae9d017c0a7661223135c1, eks/r2m16_entry.sh sha256 8a911a9a7d7b61cf713cbfc8ae1be7fe285f9d5ecd955a505e1b2a04b35ef2c4, uncommitted at build). protocol_sha256 is the frozen hash of protocol.json, unchanged by the amendment. Not launched.",
+    "protocol_sha256": "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+    "source_revision": "5f72e0806c76d845da45ec65aa4f9179284e3a9e",
+    "study": "ml_learnability_control"
+  },
+  "schema": "isolab.eks.command-request/v1"
+}

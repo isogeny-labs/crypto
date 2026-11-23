@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R74-DEGREE-FIVE-LOCAL-FACTORS",
+  "version":2,
+  "goal":"split all six degree-five fiber branches and determine exact local lengths and ramification indices",
+  "claims":[{"id":"degree_five_local_factors74","class":"exact_computation","statement":"Complete 63-idempotent Boolean test and full 528-product operators determine all degree-five local factors"}],
+  "arms":{"reference":"R73 full F32 residue profile, R52 528-product table, R70 normality","candidate":"relative-fixed kernel, 30 absolute trace candidates, six-dimensional F2 fixed basis, all 63 idempotents and full local operators","positive":["complete R73 matrix identities","six-dimensional relative fixed kernel","all 30 absolute trace candidates","six independent absolute fixed columns","all 63 idempotents","complete Boolean primitive test","primitive orthogonality/unit sum","local length32 and residue multiset","odd ramification and different budget12"],"negative":[],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"complete deterministic finite fiber"}},
+  "variables":{"fixed":["full rank32 F32 fiber","all 528 source product slots","R73 degree profile","1200sec/4GiB","one Singular/FLINT thread","one math job"],"measured":["primitive masks","local ranks","residue degrees","ramification indices","exit/errors/UTC/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"complete 63 nonzero fixed vectors","seeds":[74]},
+  "blinding":{"method":"none","reason":"exact algebra"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["all 63 idempotents","six primitive local ranks","six residue degrees","six ramification indices"],
+  "execution":{"launcher":"REPLAY_CAS.sh degree-five-local74-02 DEGREE_FIVE_LOCAL74.sing DEGREE_FIVE_LOCAL74_ALL_CHECKS_PASS","backend":"original manually authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":74,"CPU_affinity":"not pinned","queue":"one math job at a time; R73 terminal and published","source_gate":"copied source/protocol/driver bytes match Git; all donor hashes","checkpoint":"existing checkpoint gate; immutable raw copies"},
+  "stopping":{"accept":"exit0/exact marker/no whitespace-question-mark errors and every assertion","failure":"retain raw attempt; freeze repair before fresh ID"},
+  "analysis":{"method":"complete absolute idempotent enumeration and full multiplication-operator decomposition","scope":"all finite fC local lengths and ramification; valuations/infinity separate"}
+}

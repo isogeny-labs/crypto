@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bind the rendered PDF's Subject to the report's exact coverage marker."""
+"""Bind the rendered PDF metadata to the report and rendering engine."""
 
 import argparse
 from pathlib import Path
@@ -29,8 +29,8 @@ writer.add_metadata(
         "/Title": "Catalog-wide curve-cover transfer assessment",
         "/Subject": subject,
         "/Creator": f"Pandoc, {args.pdf_engine}, pypdf {pypdf_version}",
-        "/CreationDate": "D:20261021000000Z",
-        "/ModDate": "D:20261021000000Z",
+        "/CreationDate": "D:20261118000000Z",
+        "/ModDate": "D:20261118000000Z",
     }
 )
 temp = PDF.with_suffix(".pdf.tmp")

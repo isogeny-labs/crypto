@@ -1,0 +1,203 @@
+{
+  "branch": "claude/ecstatic-thompson-0jpmjv",
+  "closed_utc": "2026-11-12T05:34:55+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "research/prime_ksum_pooled_20261029/validation/replay/run_replay.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "run before this record was opened (2026-11-12, this session); argv is the committed copy of the replay script (scratchpad paths inside it); exit and per-session elapsed from the 8 verify logs' `end rc=0` lines; the eight ecbench audits are pinned in replay-certificate.json",
+      "started_utc": "2026-11-12T04:13:17+00:00",
+      "wall_s": 530.0
+    }
+  ],
+  "commit": "67ca8efea29135f556095bdd1793b8c02426965e",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T05:34:01+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261030-prime-ksum-pooled"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0534Z-prime-ksum-pooled-validation",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_inc_sel_w0_p20",
+      "note": "paired ratio of summed S, validator recompute [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.6998
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_inc_sel_w0_p24",
+      "note": "paired ratio of summed S, validator recompute [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4464
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_inc_sel_w0_p28",
+      "note": "paired ratio of summed S, validator recompute [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.3243
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_inc_sel_w0_p32",
+      "note": "paired ratio of summed S, validator recompute [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.2171
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_rho_neg_w0_p20",
+      "note": "distance remaining to same-session rho.negation [pcc:unverified]",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 5.993
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_rho_neg_w0_p24",
+      "note": "distance remaining to same-session rho.negation [pcc:unverified]",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 5.816
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_rho_neg_w0_p28",
+      "note": "distance remaining to same-session rho.negation [pcc:unverified]",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 7.332
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 192,
+      "name": "ksum5_sel_over_rho_neg_w0_p32",
+      "note": "distance remaining to same-session rho.negation [pcc:unverified]",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 7.339
+    }
+  ],
+  "problem": "ic:prime-ksum-pooled-20-32",
+  "raw": [
+    {
+      "bytes": 14349428,
+      "path": "research/prime_ksum_pooled_20261029/sessions/holdout-P20/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d0406a9f46f8e438a2b66e49d948b40f96b11a08eae7a508feefe60e5a0a267",
+      "sha256": "4d0406a9f46f8e438a2b66e49d948b40f96b11a08eae7a508feefe60e5a0a267",
+      "uploaded": false
+    },
+    {
+      "bytes": 16905693,
+      "path": "research/prime_ksum_pooled_20261029/sessions/holdout-P24/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/72408ce5bc266ddd3d1e81cfc27f56de644a7aaf66c7e48c5a9aa0ae712fc0a6",
+      "sha256": "72408ce5bc266ddd3d1e81cfc27f56de644a7aaf66c7e48c5a9aa0ae712fc0a6",
+      "uploaded": false
+    },
+    {
+      "bytes": 17000511,
+      "path": "research/prime_ksum_pooled_20261029/sessions/holdout-P28/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d1b005cbf9ec2dac50bc1122ccf5a87c3dc27eed2f6df5f47cde15ec744b5516",
+      "sha256": "d1b005cbf9ec2dac50bc1122ccf5a87c3dc27eed2f6df5f47cde15ec744b5516",
+      "uploaded": false
+    },
+    {
+      "bytes": 17105674,
+      "path": "research/prime_ksum_pooled_20261029/sessions/holdout-P32/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fc/fc4c325893dd52ffec5c98a4b675a74b985cdbe66d16525357b3e8c1d08ff144",
+      "sha256": "fc4c325893dd52ffec5c98a4b675a74b985cdbe66d16525357b3e8c1d08ff144",
+      "uploaded": false
+    },
+    {
+      "bytes": 9854106,
+      "path": "research/prime_ksum_pooled_20261029/sessions/train-P20/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f6b450327de721c5ac02fe230b5479f4884dbf55712b423b2e4811684eb98a44",
+      "sha256": "f6b450327de721c5ac02fe230b5479f4884dbf55712b423b2e4811684eb98a44",
+      "uploaded": false
+    },
+    {
+      "bytes": 9920463,
+      "path": "research/prime_ksum_pooled_20261029/sessions/train-P24/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8f/8f94b334389b90b53e46db7a467fb11b304e420090d28aebbbd09b5ef8f6a738",
+      "sha256": "8f94b334389b90b53e46db7a467fb11b304e420090d28aebbbd09b5ef8f6a738",
+      "uploaded": false
+    },
+    {
+      "bytes": 9971890,
+      "path": "research/prime_ksum_pooled_20261029/sessions/train-P28/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/71b56035fd166590e67f9224eec5b86834bacfac3cd462f7cccfa08bae780a2f",
+      "sha256": "71b56035fd166590e67f9224eec5b86834bacfac3cd462f7cccfa08bae780a2f",
+      "uploaded": false
+    },
+    {
+      "bytes": 10037911,
+      "path": "research/prime_ksum_pooled_20261029/sessions/train-P32/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d4/d4e5539588c3f5a5199a58ab68d92bdd32f031a5dae2436fbb8ea57ffaaa07ef",
+      "sha256": "d4e5539588c3f5a5199a58ab68d92bdd32f031a5dae2436fbb8ea57ffaaa07ef",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_ksum_pooled_20261029/report.pdf",
+    "png": [],
+    "svg": [
+      "research/prime_ksum_pooled_20261029/ratio.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "prime-ksum-pooled-validation",
+  "status": "measured",
+  "summary": "Validation replay of the pooled k-sum study: 9,216/9,216 replays identical on a different host class and build; ksum5-sel 0.700/0.446/0.324/0.217 of the tuned incumbent at w=0, 5.8-7.3x rho-neg [pcc:unverified]",
+  "validation": "benchmarks/20261030-prime-ksum-pooled/VALIDATION.json"
+}

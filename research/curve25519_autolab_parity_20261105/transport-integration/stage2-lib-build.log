@@ -1,0 +1,19 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-curve25519-autolab-parity-20261105)
+error[E0433]: cannot find `exact_scalar` in `super`
+    --> src/cryptanalysis/ecbench/claim.rs:2520:25
+     |
+2520 |             Some(super::exact_scalar::ExactScalar::from(4242u64))
+     |                         ^^^^^^^^^^^^ could not find `exact_scalar` in `super`
+     |
+help: consider importing this struct
+     |
+2194 +     use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
+     |
+help: if you import `ExactScalar`, refer to it directly
+     |
+2520 -             Some(super::exact_scalar::ExactScalar::from(4242u64))
+2520 +             Some(ExactScalar::from(4242u64))
+     |
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `crypto` (lib test) due to 1 previous error

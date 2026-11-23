@@ -1,0 +1,12 @@
+{
+  "schema": "n83.radix-development-format/v1",
+  "scope": "Small development controls; no width27 census",
+  "controls.json": "One row per partition, characteristic and target degree; actual Gaussian ranks and predicted maximal ranks, with characteristic hypothesis recorded",
+  "parts": "Nondecreasing positive bit-width partition; radix is 2^part",
+  "degree": "Target degree of multiplication by L^2; source degree is degree-2",
+  "large_characteristic_hypothesis": "p exceeds sum(radix-1); only then maximal rank is asserted",
+  "nonmaximal_small_characteristic_maps": "Count of actual explicit_rank != maximal_rank; these are retained expected negative controls",
+  "replay": "Repeat native control generation into a fresh directory and compare controls.json byte-for-byte",
+  "r1_and_r2": "Both retained; r2 adds four invalid-argument rejection tests and is the accepted executable",
+  "custody_prefix": "s3://setec-astronomy-artifacts/runs/n83-radix-development-20261030/"
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "research.independent-source-review/v1",
+  "task": "T-2174",
+  "reviewer": "root/mode_source_review",
+  "recorded_utc": "2026-11-11T02:41:18.154879+00:00",
+  "subject": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/exporter-v4-qualification-v3-20261111",
+  "subject_manifest_sha256": "7d41b20ea9fb755c659f5775c96b9911c8995592bc5a29f6bdb71b14e81a7628",
+  "scope": "prospective source and artifact binding only; no native materialization/compiler/tests",
+  "status": "pass_source_review_pending_release_and_runtime",
+  "findings": [],
+  "checks": {
+    "semantic_files": 31,
+    "packet_input_hashes": 10,
+    "donor_cache_regular_file_modes": 2165,
+    "donor_cache_executable_modes": 82,
+    "cache_mode_inventory_sha256": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+    "overlay_archive_members_checked": 106,
+    "unchanged_donor_source_hashes_checked": 4394,
+    "expected_source_files": 4500,
+    "exact_test_definitions_and_command_bindings": 11,
+    "python_syntax": "ast.parse only, no import/execution",
+    "workspace_and_durable_output_absent": true,
+    "admission_released": false,
+    "accounting_unset": true,
+    "limits_seconds": [
+      1800,
+      600,
+      2400
+    ],
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "deadline": "2026-11-11T12:00:00Z"
+  },
+  "source_semantics": [
+    "All cache source paths are regular files with exact frozen bytes and modes; destination fchmod uses frozen mode before fsync and excludes special permission bits.",
+    "Source and destination descriptor/path modes are rechecked; completed staging reconciles all2165 modes again; worker checks inventorydigest and2165/82 receiptcounts before Cargo.",
+    "Copy input and output content hashes are checked. Immutable vendor/toolchain stays at existing read-only source; only cache requires copied executables for this command set.",
+    "29 donor source paths carry executable mode;26are Rust source and3are unrelated shell scripts. Root package has no build.rs and frozen qualification code does not execute those shell scripts. Rust sources are compiled as bytes; no mode inference is required for declared commands.",
+    "Ten exact adversarial controls and one full-file synthetic interrupted-session export remain wired through module; synthetic exporter asserts22680missing primary slots,6300null/ineligible triplets,0eligible pairs.",
+    "Worker is guarded by cgroup2CPU16GiB/zero swap, oneattempt and supervisor permit. No native unit, source copy, compiler or tests were invoked by this review."
+  ],
+  "remaining": [
+    "Current terminal ledger, exact live lease, source publication and all release receipts must be bound and independently checked at execution boundary.",
+    "No claim of runtime success or full-cohort scientific result follows from this review."
+  ],
+  "sources_checked": {
+    "repository_prior_review": "exporter-v4-qualification-v2-20261111/SESSION.md retains KB-unavailable parent review; current task audits concrete source repair, no new mathematical or novelty claim",
+    "implementation": [
+      "materialize.py",
+      "durable-worker.py",
+      "durable-launcher.py",
+      "durable_io.py",
+      "source-overlay.tar.gz"
+    ],
+    "observed_failure": "Combined v6 cached proc-macro2 build-script lost execute mode; current cache inventory independently read with lstat."
+  },
+  "pcc_standing": "unverified"
+}

@@ -1,0 +1,19 @@
+# Independent results audit: exact final-leaf substitution v5
+
+The v5 diagnostic passed its complete conditional root contract on all five frozen planted NIST charts. Every reported ordered residual-triple-plus-k set is exactly equal to frozen v4, including all repeated-root permutations: three ordered tuples per field, zero unresolved candidates. The source-bound worker independently reconstructs public norm coefficients, enumerates the entire original box with Fraction arithmetic, filters that full set by V=S², compares the native curved-point and complete ordered-root sets, replays each literal norm, and only then checks planted-witness inclusion. This is complete conditional-set evidence rather than planted membership alone. The reviewer audited source/result/raw identities and metadata without reexecuting finite-field or lattice arithmetic.
+
+| Field | v4 full traversal nodes / v5 independent nodes | v5 higher nodes | v5 final proposals | Final values removed |
+|---|---:|---:|---:|---:|
+| P-192 | 1102 | 39 | 1 | 1062 |
+| P-224 | 8564 | 92 | 1 | 8471 |
+| P-256 | 2168 | 50 | 1 | 2117 |
+| P-384 | 8521 | 49 | 1 | 8471 |
+| P-521 | 2154 | 36 | 1 | 2117 |
+
+The native traversal visits 271 total nodes, compared with the original 22509; the exact local equation removes 22238 reached final-level values. Every actual leaf branch is linear: 37/90/48/47/34 linear leaves respectively, with zero quadratic, constant-full or constant-empty leaves. The all-zero-polynomial fallback interval mass is zero on every actual chart. Thus these five controls demonstrate the zero-S-projection linear specialization; the generic quadratic and constant branches are exercised by the recorded 4375 direct integer helper checks, not by the five actual charts. Each chart retains exactly one curved lattice point. The independent full-box checker still visits the original 22509 total nodes.
+
+Raw native stderr confirms 4375 independent direct integer helper checks and the 12 tiny curved-box/root controls over 183738 brute-force four-box tuples. Compile, loader and native stages exit zero without timeout. All completion flags are true below the declared cap. Source/input hashes, pre-run pins, stdout/result equality and stdout hash, raw artifact identity, all raw/result field/count/metric correspondences and unchanged v4 final root sets were verified. The raw artifact SHA256 is 0085cfb4eed856425299cb19433ffab4ca487a5db4ca18df49448b4c4c845b88.
+
+The supervised worker lifetime is 3.167785001998709 seconds. Compilation costs 2.261452812999778 seconds and 193464 KiB peak process RSS; loader audit costs 0.005344402999980957 seconds and 13184 KiB; native controls and five enumerations cost 0.5845902790006221 seconds and 13184 KiB. These are one development run, including the independent full-box checker and reporting in total lifetime. Memory is wait4 process high water, not aggregate descendants; external contention isolation and repeated timing were not qualified. Previously paid prime/group producer setup is outside this worker lifetime. The different intermediate outputs and single noisy runs do not establish an end-to-end speed ratio.
+
+The result narrows the next bottleneck: compiler/setup, exact LLL and the retained full-box independent checker dominate after final proposals disappear; higher-level visits remain 266. Before any comparative claim, use a common final-output contract and preregistered source-independent positive/negative ladder, including larger supported S and exceptional fibers. A concrete next variant should replace the S<=4096 scan with the repository's independently checked exact integer-cubic isolation machinery, then measure a ladder near coefficient-width limits. Preserve complete multiplicities and all zero/linear/constant branches. No global original S3 roots, requested binary/extension coverage, novelty or genuine F4/F5/F6 speedup is established here.

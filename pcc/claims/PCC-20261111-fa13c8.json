@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T02:15:28Z",
+ "id": "PCC-20261111-fa13c8",
+ "kind": "measurement",
+ "producer": {
+  "commit": "2ad87dd980c5ad11779beeae269a84d6435f7573",
+  "model": "",
+  "session": "https://claude.ai/code/session_01TCbLH9FoRiHTPWAKdyQi2r"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "benchmarks/20261111-mt-fieldops-ic4/replay-certificate.json",
+   "sha256": "e17fa9d7431b324dacc44dae56a9f9c19daa7307f1526f55b0b772fd66343452"
+  },
+  {
+   "kind": "recompute",
+   "path": "benchmarks/20261111-mt-fieldops-ic4/validator-report.json",
+   "sha256": "77ad5e1a02bf5ee99b8e3e7133f93098006d8ee878d22e9de97d9e66b0aabe80"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/mt_fieldops_v2_20261111",
+ "statement": "On 33 fresh prime-order Weierstrass curves (2^22-2^26), 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: multi-target IC4 costs 0.91-0.95x per target of the cheapest of four pre-registered rho arms (rho, rho2, rho2x, rhoseq x 3 kappa) at T = 16384 (cheaper at every I/M and h, bootstrap 95% upper bound < 1); unranked at T = 4096; dearer at T = 1024 (1.05-1.19x); and 1.18-1.80x a paired BSGS everywhere."
+}

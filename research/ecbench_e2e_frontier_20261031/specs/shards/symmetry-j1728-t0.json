@@ -1,0 +1,74 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Prime j1728 symmetry frontier, target block 1/2",
+  "description": "Accounting-v2 quartic rho and its A/A control, with legacy quartic rho and current generic algorithms retained as matched baselines. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 2463541,
+        "a": 8,
+        "b": 0,
+        "group_order": 2460762,
+        "r": 136709,
+        "gx": 1664813,
+        "gy": 581781
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202610400100,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-quartic-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.quartic_v2"
+      }
+    },
+    {
+      "name": "rho-quartic-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.quartic_v2"
+      }
+    },
+    {
+      "name": "rho-quartic-legacy",
+      "role": "baseline",
+      "method": {
+        "id": "rho.quartic"
+      }
+    },
+    {
+      "name": "rho-neg-v2",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "bsgs-neg-v2",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation_v2"
+      }
+    },
+    {
+      "name": "kangaroo-v2",
+      "role": "candidate",
+      "method": {
+        "id": "kangaroo.vow_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610410100,
+    "isolation_required": "L2",
+    "timeout_seconds": 14
+  }
+}

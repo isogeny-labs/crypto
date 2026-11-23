@@ -1,0 +1,1 @@
+Primary installed util-linux2.37.4 losetup manual and runtime-readonly-reconciliation packet: JSON output applies to explicit --list. Actual retained attempt observed old argument form exit0empty versus explicit --list validemptyJSON. Reuse independently accepted strict parser approach. V2 source remains frozen; this successor changes only list-mode call and strict parser.

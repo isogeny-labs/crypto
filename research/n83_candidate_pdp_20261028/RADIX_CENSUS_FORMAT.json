@@ -1,0 +1,24 @@
+{
+  "schema": "n83.radix-census-format/v1",
+  "scope": "3010 unordered radix partitions of 27, original prime m2 natural input, identical candidate interval and point base",
+  "layout": {
+    "prepared/index.json": "Complete ordered input partition list, source validation and original input/source/base hashes; no measured Hilbert data",
+    "census/input.json,system.sing": "Byte-identical original input and original all-binary source",
+    "census/binding.json": "Full original source validation, base manifest identity and Lucas primality certificate",
+    "census/cases/NNNN.json": "One partition's radices, weights, domain bijection and compact equation presentation; exact arrays or explicitly bounded result",
+    "census/summary.json": "Complete per-partition index, hashes and exact/lower-bound fields",
+    "census/manifest.json": "Path, byte length and SHA256 of all native payloads except this manifest",
+    "instrument,source/": "Exact executable and source snapshots",
+    "protocol.json,host.txt": "Frozen contract and diagnostic host metadata",
+    "producer.log,replay.log": "Native outputs including unexpected failures",
+    "producer-status.json,replay-status.json,terminal.json": "Phase and worker completion/interruption statuses",
+    "manifest.sha256": "Final whole-worker payload hashes"
+  },
+  "degree_convention": "First zero Hilbert coefficient of this m2 highest-form quotient, not affine FFD/LFD or solving degree",
+  "exact_status": "exact_hilbert_under_large_characteristic_theorem: socle<=40, complete block Hilbert/rank and tensor quotient arrays retained",
+  "bounded_status": "rigorous_lower_bound_only: nonzero bidegree(socle,1) implies first vanishing>=socle+2; exact degree remains null",
+  "numeric_encoding": "Dimensions and Hilbert coefficients are exact JSON integers within u64; large field values, coordinate weights and candidate counts are decimal strings",
+  "source_semantics": "The original source is unchanged. Candidate equations are specified compactly by the per-digit product ranges and coordinate weights; expanded high-degree sources are not claimed to be materialized.",
+  "replay": "prime_radix_census verify OUTPUT recomputes every candidate and compares all native payload bytes. Frozen controller separately binds input index and instrument hashes.",
+  "publication_rule": "Partial directories and failed attempts remain preserved. A complete census requires all3010 records and successful native replay. No timing comparison."
+}

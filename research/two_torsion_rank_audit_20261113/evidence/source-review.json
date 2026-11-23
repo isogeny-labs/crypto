@@ -1,0 +1,69 @@
+{
+  "schema": "actual-two-torsion-source-review/v1",
+  "primary": {
+    "title": "On the Improbability That an Elliptic Curve Has Subexponential Discrete Log Problem under the Menezes-Okamoto-Vanstone Algorithm",
+    "authors": [
+      "R. Balasubramanian",
+      "N. Koblitz"
+    ],
+    "year": 1998,
+    "url": "https://link.springer.com/content/pdf/10.1007/s001459900040.pdf",
+    "pdf_bytes": 73656,
+    "pdf_sha256": "ac837b8edc47b346dbb341f787c41de0402c95371a159f9786b747bb2c987499"
+  },
+  "reread_scope": "Original BK1998 Theorem1/proof pp142-143: full l²points, rational nonzero point, prime-to-characteristic rank invoked only after cyclotomic divisibility forces l∤q; excluded q=1 modl Jordan case. No new full-paper read claim.",
+  "corpus": {
+    "path": "docs/ecdlp-hardness-corpus/lit-transfer.json",
+    "bytes": 123574,
+    "sha256": "99f4686b3ecb6f845fb98fc5c2db45696968e9c302b47b5873919202ddca8b9f",
+    "read_at_git_head": "e104fb41588c9d4141ae2e0c81cdcfe1d40c2318",
+    "node": {
+      "id": "THM-XT-BK-WEIL-SUFFICES",
+      "label": "Balasubramanian-Koblitz: E[r] lies in E(F_{q^k}) iff r | q^k - 1",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "Let r be a prime dividing #E(F_q) with r not dividing q - 1 and gcd(r,q) = 1. Then E[r] is contained in E(F_{q^k}) if and only if r divides q^k - 1.",
+      "scope": "So for r not dividing q-1 the Weil-pairing MOV attack can work in E(F_{q^k}) with k the embedding degree; the case r | q-1 is excluded.",
+      "assumptions": [
+        "r prime, r | #E(F_q)",
+        "r does not divide q-1",
+        "gcd(r,q) = 1"
+      ],
+      "source_refs": [
+        "S-XT-BK-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "embedding-degree",
+        "MOV"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Theorem 26.4.1, p. 584 (proof deferred to BK 1998)"
+      ],
+      "evidence_class": "theorem"
+    },
+    "effect": "Qualified node explicitly retains gcd(r,q)=1 and r notdividingq-1. Characteristic2example deletes coprimality only; neither qualified source nor qualified node is refuted. Short labels are not substituted for complete assumptions."
+  },
+  "formal_primary_sources": {
+    "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "read_scope": [
+      "Weierstrass.twoTorsionPolynomial and exact discriminant16Delta; unit/nonzero proofs",
+      "Affine.Point actual group/negation/X_eq_iff/isRoot_twoTorsionPolynomial_iff, including actual point/root construction",
+      "Cubic distinct-root/discriminant/cardinality proofs",
+      "Actual finite root-set/point coordinate encoding and group cardinality/order rules",
+      "IsAlgClosed root/power existence and actual AlgebraicClosure/GaloisField",
+      "Finite group/Finset cardinal and actual ZMod2coefficient reasoning"
+    ],
+    "external_reference_boundary": "Mathlib cites Silverman2009/Katz-Mazur/Deligne. External Silverman book was not available locally and is not marked read; no external generic rank theorem is assumed."
+  },
+  "method": "Actual subgroup killed by2 is equivalent to identity plus distinct roots of the actual cubic. Checked discriminant16Delta and splitting give finitecard4 in2!=0 after every algebraically closed scalar extension. Concrete binary basis derives from actual groupcard4 and actual multiplicationby2. In characteristic2, actual negation says2P=0 iff a1*x+a3=0; nonsingularity/a1zero gives no nonzero point, a1nonzero gives unique nonzero point whose existence over algebraic closure follows from actual curve equation. Constant ordinary and a1zero models haveDelta1, actualcard2/1. Actual F2pointcard4 derives from injective coordinate bound5, three distinct points and actual order2divisibility. Coordinatewise extension shows all geometric2torsion already rational for ordinary model; actual closure and binary fields bind characteristic/cyclotomic controls.",
+  "boundary": "Generic geometry at r2 is proved, with explicit binary basis and characteristic2cardinality boundary. Generic odd-prime torsion rank/Frobenius determinant/actual representation/descent, general supersingular Hasse/geometric classification and canonical pairings remain open. OrdinaryMap is used as an actual coordinatewise point map for field inclusion, not as a newly proved general Frobenius representation. No group-scheme formalization is claimed.",
+  "kb": "MCP absent; status/search/theorem wrapper127; bounded primary/formal/corpus/repository fallback before edits.",
+  "conductor": "No executable/service; research scope recorded before edits.",
+  "qualified_source_or_node_refuted": false,
+  "novelty_claim": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

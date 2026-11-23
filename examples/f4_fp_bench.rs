@@ -6,12 +6,14 @@
 //! engine can be compared for speed *and* for identical output.
 //!
 //! ```text
-//! cargo run --release --example f4_fp_bench -- [repeats] [large] [seed_xor_hex]
+//! cargo run --release --example f4_fp_bench -- [repeats] [large|xl] [seed_xor_hex]
 //! ```
 //!
 //! With `large`, the larger cases run after the standard ones: systems
 //! whose F4 takes from about a tenth of a second to several seconds, where
-//! the matrices are big enough for the elimination to dominate.
+//! the matrices are big enough for the elimination to dominate.  With `xl`,
+//! quad_n10, quad_n11 and cubic_n6 over F_65521 (the larger systems of
+//! `gb_cas_export`, same generator and seeds) run after the large ones.
 //! An optional hexadecimal seed XOR selects a fresh system; omitting it
 //! preserves the original fixed suite exactly.
 
@@ -68,7 +70,8 @@ fn main() {
         .nth(1)
         .map(|s| s.parse().expect("repeats"))
         .unwrap_or(3);
-    let large = std::env::args().nth(2).is_some_and(|a| a == "large");
+    let xl = std::env::args().nth(2).is_some_and(|a| a == "xl");
+    let large = xl || std::env::args().nth(2).is_some_and(|a| a == "large");
     let seed_xor = std::env::args()
         .nth(3)
         .map(|s| u64::from_str_radix(s.trim_start_matches("0x"), 16).expect("seed_xor_hex"))
@@ -91,7 +94,17 @@ fn main() {
         ("overdet_n10_m15_p65521", 10, 15, 2, 65521, 10, false),
         ("overdet_n12_m24_p65521", 12, 24, 2, 65521, 10, false),
     ];
-    let all = cases.iter().chain(large_cases.iter().filter(|_| large));
+    // `xl`: the larger systems of `gb_cas_export` (same generator and seeds),
+    // where a step takes tens of milliseconds to seconds
+    let xl_cases: &[(&str, usize, usize, u32, u64, u32, bool)] = &[
+        ("quad_n10_p65521", 10, 10, 2, 65521, 16, false),
+        ("quad_n11_p65521", 11, 11, 2, 65521, 16, false),
+        ("cubic_n6_p65521", 6, 6, 3, 65521, 18, false),
+    ];
+    let all = cases
+        .iter()
+        .chain(large_cases.iter().filter(|_| large))
+        .chain(xl_cases.iter().filter(|_| xl));
     for &(name, n, m, d, p, dmax, do_solve) in all {
         let sys = system(
             n,
@@ -103,21 +116,23 @@ fn main() {
         let opts = F4Options::new(Ordering::Grevlex, dmax);
         let mut times = Vec::new();
         let mut fp = String::new();
-        let mut shape = (0, 0, 0, 0);
+        let mut shape = (0, 0, 0, 0, 0);
         for _ in 0..repeats {
             let r = f4(&sys, n, p, &opts);
             times.push(r.ms);
             fp = fingerprint(&r.basis);
-            shape = (r.steps, r.max_rows, r.max_cols, r.basis.len());
+            shape = (r.steps, r.max_rows, r.max_cols, r.basis.len(), r.field_ops);
         }
         let mut line = json!({
             "case": name, "f4_ms": median(times), "basis_fp": fp,
             "steps": shape.0, "max_rows": shape.1, "max_cols": shape.2, "basis_len": shape.3,
+            "field_ops": shape.4,
         });
         if do_solve {
             let mut times = Vec::new();
             let mut sols = 0;
             let mut sfp = String::new();
+            let mut sops = 0u64;
             for _ in 0..repeats {
                 let s = solve(&sys, n, p, &opts);
                 times.push(s.ms);
@@ -125,10 +140,12 @@ fn main() {
                     sols = v.len();
                 }
                 sfp = fingerprint(&format!("{:?}", s.verdict));
+                sops = s.field_ops;
             }
             line["solve_ms"] = json!(median(times));
             line["solutions"] = json!(sols);
             line["solve_fp"] = json!(sfp);
+            line["solve_field_ops"] = json!(sops);
         }
         println!("{line}");
     }

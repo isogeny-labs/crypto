@@ -1,0 +1,205 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h86569c5b35f7",
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1hdf484e9fb96b",
+    "arm": "rho-quartic-reference",
+    "method_id": "ECM1h1edfbbfbf4d1",
+    "method": "rho.quartic_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 1.5845429983815074,
+    "mean_ratio_to_floor": 2.528564788673769,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 1.504120377064476,
+      "max_s": 2.156195685040405,
+      "max_over_median": 1.4335260115606938,
+      "top_run_share": 0.3401920438957476,
+      "top_run_id": "ECM1h1edfbbfbf4d1Wa7e2d3f59f1cR3",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 418,
+      "distinguished_point_table_inserts_uncharged": 33,
+      "distinguished_point_table_queries_uncharged": 37
+    }
+  },
+  "b": {
+    "session_id": "ECBS1hdf484e9fb96b",
+    "arm": "orbit-affine-o8-r1_5",
+    "method_id": "ECM1hc358c9da8f61",
+    "method": "ic.prime_orbit_relations_v1",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 9.17469958322132,
+    "mean_ratio_to_floor": 14.640702294913552,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 9.111665636783648,
+      "max_s": 9.485522146689847,
+      "max_over_median": 1.041030534351145,
+      "top_run_share": 0.2584695569770197,
+      "top_run_id": "ECM1hc358c9da8f61Wa7e2d3f59f1cR5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "factor_base_draws_uncharged": 58
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "Wa7e2d3f59f1c",
+      "slug": "icv1-fp16-t462-b5cb022f",
+      "r": 13229,
+      "floor_s": 0.6266570686577501,
+      "pairs": 4,
+      "a_mean_s": 1.5845429983815074,
+      "b_mean_s": 9.17469958322132,
+      "ratio_b_over_a": 5.790123456790123,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-fp16-t462-b5cb022f",
+      "log2_r": 13.69141638980041,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 5.790123456790123,
+      "ci95": [
+        3.8238324763716243,
+        8.767520505156403
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        4.807692307692307,
+        7.3031358885017434
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 5.790123456790123,
+    "ci95": [
+      3.8238324763716243,
+      8.767520505156403
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      4.807692307692307,
+      7.3031358885017434
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0,
+    "verified_only_ratio": 5.790123456790123,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        5.790123456790123,
+        5.434301877089226,
+        3.5160230073952343
+      ],
+      "order": "orbit-affine-o8-r1_5 > rho-quartic-reference at every weight",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 of 4 pairs did not reach L2",
+      "0 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L2",
+    "pairs": 4,
+    "pairs_below_level": 4,
+    "median_ratio": 2.0545656378926545,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.3512861238071084,
+    "ns_per_gae_a": 607.8600823045267,
+    "ns_per_gae_b": 213.53281212982705,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-quartic-reference",
+      "orbit-affine-o8-r1_5"
+    ],
+    "method_call_wall_ratio": 1.7330545245315587,
+    "method_call_wall_ci95": [
+      1.4298622969008057,
+      2.100536528244208
+    ],
+    "method_call_wall_ci95_bootstrap": [
+      1.604568176995754,
+      1.9387870205923294
+    ],
+    "process_wall_ratio": 1.1696660692230572,
+    "process_wall_ci95": [
+      0.8055403510464564,
+      1.6983863213238546
+    ],
+    "process_wall_ci95_bootstrap": [
+      0.9740665459994621,
+      1.4170238565052315
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.0,
+    "contention_observed_runs": 0,
+    "notes": [
+      "no admitted A/A interval; calibration bonus unavailable",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): orbit-affine-o8-r1_5 / rho-quartic-reference = 5.7901 [3.824, 8.768] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 5.7901, w=0.1: 5.4343, w=1: 3.5160): orbit-affine-o8-r1_5 > rho-quartic-reference at every weight; heavy tail in rho-quartic-reference: top run is 34% of the arm's total S (max/median 1.4); more runs needed; heavy tail in orbit-affine-o8-r1_5: top run is 26% of the arm's total S (max/median 1.0); more runs needed; wall: descriptive (ns/GAE 0.3513, not a result: 4 of 4 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-quartic-reference, orbit-affine-o8-r1_5 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1h9504e7855c2d",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

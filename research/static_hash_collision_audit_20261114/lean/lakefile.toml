@@ -1,0 +1,11 @@
+name = "static_hash_collision_audit"
+version = "0.1.0"
+defaultTargets = ["StaticHashCollisionAudit"]
+
+[[require]]
+name = "rho_collision_audit"
+path = "../../rho_collision_audit_20261110/lean"
+
+[[lean_lib]]
+name = "StaticHashCollisionAudit"
+roots = ["Cylinder", "PathAgreement", "Survival", "CollisionTails", "PostCollisionControl", "CollisionCertificate"]

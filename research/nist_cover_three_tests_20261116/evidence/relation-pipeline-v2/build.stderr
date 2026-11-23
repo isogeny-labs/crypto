@@ -1,0 +1,8 @@
+/workspace/crypto-relations-work/research/nist_cover_three_tests_20261116/evidence/relation-pipeline-v2/source/relation_pipeline.cpp: In function ‘void rp_pool(std::ostream&, const std::vector<BasePoint>&, const std::vector<Fiber>&)’:
+/workspace/crypto-relations-work/research/nist_cover_three_tests_20261116/evidence/relation-pipeline-v2/source/relation_pipeline.cpp:27:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   27 |         for(size_t j=0;j<fibers[i].support.size();++j)out<<(j?",":"")<<fibers[i].support[j];out<<"]}";}
+      |         ^~~
+/workspace/crypto-relations-work/research/nist_cover_three_tests_20261116/evidence/relation-pipeline-v2/source/relation_pipeline.cpp:27:93: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   27 |         for(size_t j=0;j<fibers[i].support.size();++j)out<<(j?",":"")<<fibers[i].support[j];out<<"]}";}
+      |                                                                                             ^~~
+cc1plus: all warnings being treated as errors

@@ -1,0 +1,19 @@
+digraph panel {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.28", ranksep="0.45"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+        color="#29445c", fillcolor="#edf4f8", margin="0.14,0.09"];
+  edge [color="#56738b", fontname="Helvetica", fontsize=10];
+  targets [label="8 registered E0 n13 targets\none base, six rounds + warmup"];
+  f456 [label="matrix F4 · matrix F5\ninherited F4 · F6-IC", fillcolor="#f5ecdc"];
+  batch [label="batch rootfinding m3\npaired x-only candidate", fillcolor="#e5f3e8"];
+  controls [label="scalar m3/m2 · batch m2\nmatched rho · batch m3 A/A", fillcolor="#e7e9fa"];
+  records [label="560 cold process records\nverification + L2 + phases"];
+  primary [label="complete wall ratios\n5 adjusted intervals + A/A", fillcolor="#e5f3e8"];
+  secondary [label="bitop/v1 + GAE band\nunpriced counts explicit", fillcolor="#fff0db"];
+  gate [label="review + second-host replay\nbefore claim", fillcolor="#f7e8e8"];
+  targets -> {f456 batch controls};
+  {f456 batch controls} -> records;
+  records -> {primary secondary};
+  primary -> gate;
+  secondary -> gate;
+}

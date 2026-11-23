@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+"""Plot recorded PS-7 values only (nothing is computed here; every plotted number is a field of
+ps7_cdcl/summary_rows.jsonl, written by `pdp_ps7 summarize --json`).
+
+  plot_ps7.py summary_rows.jsonl leaves.svg bitops.svg
+
+leaves.svg : per rung, per arm, the recorded `leaves_over_pairs` and `conflicts_over_pairs` of the refuted targets.
+bitops.svg : per rung, per arm, the recorded mean counted bit operations per refuted target, leaf and shell parts.
+"""
+import json
+import sys
+
+import matplotlib
+
+matplotlib.use("svg")
+import matplotlib.pyplot as plt
+
+rows = [json.loads(l) for l in open(sys.argv[1]) if l.strip()]
+rows = [r for r in rows if r["class"] == "refuted" and r["leaf"] == "group" and r["set"].startswith("l=")]
+rungs = sorted({r["set"] for r in rows}, key=lambda s: int(s[2:]))
+arms = ["a1", "a1u", "a2", "a2p", "a2l", "a3"]
+colors = dict(zip(arms, plt.rcParams["axes.prop_cycle"].by_key()["color"]))
+
+
+def get(rung, arm):
+    for r in rows:
+        if r["set"] == rung and r["arm"] == arm:
+            return r
+    return None
+
+
+# ── leaves and conflicts relative to the pair count ──
+fig, axes = plt.subplots(1, len(rungs), figsize=(9.2, 3.6), sharey=True)
+for ax, rung in zip(axes, rungs):
+    for i, arm in enumerate(arms):
+        r = get(rung, arm)
+        if r is None:
+            continue
+        ax.bar(i - 0.2, r["leaves_over_pairs"], 0.38, color=colors[arm], label="leaf visits / pairs" if i == 0 else None)
+        c = r.get("conflicts_over_pairs")
+        if c is not None:
+            ax.bar(i + 0.2, c, 0.38, color=colors[arm], alpha=0.45, hatch="//", label="conflicts / pairs" if i == 0 else None)
+    ax.set_xticks(range(len(arms)))
+    ax.set_xticklabels(arms, rotation=45, fontsize=8)
+    ax.set_title(f"{rung}  (n={3 * int(rung[2:])})", fontsize=9)
+    ax.grid(axis="y", alpha=0.3)
+axes[0].set_ylabel("mean over the refuted targets of the rung")
+axes[0].set_ylim(0, 1.35)
+axes[0].legend(fontsize=7, loc="upper left", ncol=1)
+fig.suptitle("PS-7: leaf visits (solid) and conflicts (hatched) per pair of the pair space; refuted targets", fontsize=9)
+fig.text(0.01, 0.01, "bars are recorded values; a1/a1u have no conflicts; a2p has none counted by the solver (library level-0 path)", fontsize=7)
+fig.tight_layout(rect=(0, 0.04, 1, 0.94))
+fig.savefig(sys.argv[2])
+fig.savefig(sys.argv[2].replace(".svg", ".png"), dpi=150)
+
+# ── counted bit operations ──
+fig, axes = plt.subplots(1, len(rungs), figsize=(9.2, 3.6), sharey=True)
+for ax, rung in zip(axes, rungs):
+    for i, arm in enumerate(arms):
+        r = get(rung, arm)
+        if r is None:
+            continue
+        leaf = r.get("mean_leaf_bitops", 0.0)
+        shell = r.get("mean_shell_bitops64", 0.0)
+        ax.bar(i, leaf, 0.7, color=colors[arm], label="leaf (PS-1 gate model)" if i == 0 else None)
+        ax.bar(i, shell, 0.7, bottom=leaf, color=colors[arm], alpha=0.45, hatch="//", label="shell (64 per counted step)" if i == 0 else None)
+    ax.set_yscale("log")
+    ax.set_xticks(range(len(arms)))
+    ax.set_xticklabels(arms, rotation=45, fontsize=8)
+    ax.set_title(f"{rung}  (n={3 * int(rung[2:])})", fontsize=9)
+    ax.grid(axis="y", alpha=0.3)
+axes[0].set_ylabel("counted bit operations per refuted target")
+axes[0].set_ylim(3e7, 3e11)
+axes[0].legend(fontsize=7, loc="upper left")
+fig.suptitle("PS-7: counted bit operations per refuted target, leaf part (solid) and shell part (hatched, stacked)", fontsize=9)
+fig.text(0.01, 0.01, "recorded means over the refuted targets of the rung; shell weight is a stated convention (64 bit operations per counted step)", fontsize=7)
+fig.tight_layout(rect=(0, 0.04, 1, 0.94))
+fig.savefig(sys.argv[3])
+fig.savefig(sys.argv[3].replace(".svg", ".png"), dpi=150)
+
+# ── wall note: per-round values of ns per target (all 16 targets of a rung), from the recorded timing rows ──
+if len(sys.argv) > 5:
+    import statistics
+
+    trows = [json.loads(l) for l in open(sys.argv[4]) if l.strip()]
+    tags = {}
+    for r in trows:
+        tags.setdefault(r["label"].rsplit("-l", 1)[0], []).append(r)
+    order = [t for t in ("a1", "a1b", "a1u", "a2", "a2l", "a3") if t in tags]
+    ls = sorted({r["l"] for r in trows})
+    fig, ax = plt.subplots(figsize=(7.4, 4.0))
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    for ti, tag in enumerate(order):
+        for i, l in enumerate(ls):
+            pts = [r for r in tags[tag] if r["l"] == l]
+            off = (ti - (len(order) - 1) / 2) * 0.13
+            ax.scatter([i + off] * len(pts), [r["ns_per_target"] for r in pts], s=18, color=colors[ti % 10], zorder=3, label=tag if i == 0 else None)
+            ax.hlines(statistics.median(r["ns_per_target"] for r in pts), i + off - 0.05, i + off + 0.05, color="black", lw=1.2, zorder=4)
+    ax.set_yscale("log")
+    ax.set_xticks(range(len(ls)))
+    ax.set_xticklabels([f"l={l}\n(n={3 * l})" for l in ls])
+    ax.set_ylabel("wall ns per target (16 targets of the rung)")
+    ax.set_title("PS-7 wall note: three rounds per arm, no accounting hooks", fontsize=9)
+    ax.grid(axis="y", alpha=0.3)
+    ax.legend(fontsize=7, ncol=2)
+    fig.text(0.01, 0.01, f"{len(trows)} recorded runs in one isolated_bench block; a1b = a1 again (A/A); black bars = median of the 3 rounds", fontsize=7)
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.savefig(sys.argv[5])

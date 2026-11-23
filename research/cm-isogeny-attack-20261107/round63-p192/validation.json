@@ -1,0 +1,49 @@
+{
+  "standing": "unverified producer evidence",
+  "qualification": "demonstrated_on_cases",
+  "fresh_outputs_and_receipts": [
+    {
+      "record": "response.json",
+      "sha256": "9b83ef2d2965020dec4695d101a4906a2476050fae09c73b9ac5e7798fbe0449",
+      "byte_identical": true
+    },
+    {
+      "record": "reference.json",
+      "sha256": "9b83ef2d2965020dec4695d101a4906a2476050fae09c73b9ac5e7798fbe0449",
+      "byte_identical": true
+    },
+    {
+      "record": "P192-blocks.json",
+      "sha256": "dc8ddbbc36ce3382cf5478a8325549464b73f07e1768cd02a00f12e22c5cf3dd",
+      "byte_identical": true
+    },
+    {
+      "record": "response.log",
+      "sha256": "153d01b6a41188b0bb0c1b7c9cb9c6ea341d9ef2235059936b3fac93a02f45e8",
+      "byte_identical": true
+    },
+    {
+      "record": "reference.log",
+      "sha256": "af729cf480aee5eb461f33241ff9663752a3f23048a3c57f9ff8d1e5b7998700",
+      "byte_identical": true
+    }
+  ],
+  "mutation_exits": {
+    "changed_B_exit": 101,
+    "changed_P192_B_exit": 101
+  },
+  "initial_build_exit": 101,
+  "corrected_build_exit": 0,
+  "science_exits": {
+    "response-exit.txt": 0,
+    "reference-exit.txt": 0,
+    "P192-exit.txt": 0
+  },
+  "legacy_library": {
+    "command": "CARGO_BUILD_JOBS=1 timeout120 cargo test --release --lib --manifest-path /home/ec2-user/crypto/Cargo.toml",
+    "exit": 124,
+    "scope": "legacy checkout compilation, not a publication-head pass"
+  },
+  "interrupted_handle": "30702 absent on2026-11-09; completed artifacts and terminal124 reconciled, no restart",
+  "cloud_submissions": 0
+}

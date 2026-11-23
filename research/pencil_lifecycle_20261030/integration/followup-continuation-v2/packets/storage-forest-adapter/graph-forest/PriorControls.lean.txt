@@ -1,0 +1,37 @@
+import Union
+set_option autoImplicit false
+namespace UnionControls
+open GraphUnion GraphFind SignedGraphAlgebra
+def g : GraphFind.State ℚ 3 := ⟨fun i=>if i=2 then 0 else i,
+ fun i=>if i=2 then ⟨-1,5,1⟩ else ident⟩
+def s : GraphUnion.State ℚ 3 := ⟨g,fun i=>if i=0 then some (1,1) else none⟩
+def v : Fin 3 → ℚ := fun i=>if i=0 then 3 else if i=1 then 7 else 4
+def p : Potential ℚ := ⟨-1,10,0⟩
+theorem initial_valid : Valid s v 2 := by
+ constructor
+ · intro i; fin_cases i <;> norm_num [Represents,s,g,v,ident,eval]
+ · intro i a b hi
+   fin_cases i <;> simp [s] at hi
+   rcases hi with ⟨rfl,rfl⟩; norm_num [v]
+theorem global_after : Valid (joined s 0 1 p) v 2 := by
+ apply join_preserves s 0 1 p v 2 initial_valid
+ · norm_num [p]
+ · norm_num [p,v,eval]
+theorem descendant_frame :
+ (joined s 0 1 p).graph.parent 2=0 ∧
+ eval ((joined s 0 1 p).graph.pot 2) (v ((joined s 0 1 p).graph.parent 2)) 2=4 := by
+ norm_num [joined,compress,s,g,p,v,eval]
+theorem transferred_anchor : (joined s 0 1 p).fixed 1=some (9,-1) := by
+ norm_num [joined,s,transport,p]
+theorem stale_child_anchor : (joined s 0 1 p).fixed 0=some (1,1) := by
+ norm_num [joined,s]
+def both : GraphUnion.State ℚ 3 := ⟨g,fun i=>if i=0 then some (1,1) else if i=1 then some (3,2) else none⟩
+theorem both_returns : result both 0 1 p=some 2 := by
+ norm_num [result,both,transport,p,constraint]
+theorem reverse_preserves : Valid (joined s 1 0 (reverse p)) v 2 := by
+ apply join_preserves s 1 0 (reverse p) v 2 initial_valid
+ · norm_num [p,reverse]
+ · norm_num [p,reverse,v,eval]
+theorem wrong_potential_breaks : ¬Represents (compress g 0 1 ident) v 2 := by
+ intro h; have hh:=h 0; norm_num [compress,ident,v,eval] at hh
+end UnionControls

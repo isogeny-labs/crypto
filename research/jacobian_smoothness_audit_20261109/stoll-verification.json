@@ -1,0 +1,65 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-09T23:01:29.297Z",
+  "source_commit": "327d3183d940556049731e9c4ea7838c974c92a4",
+  "source_plan_sha256": "607cc47d79096f710942b34c35caa4ffec21aa586137d70a4a3eb1b9c627d470",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "theorem": "MumfordStollCycleGroupAudit.stoll_cycle_audit_certificate",
+    "decl_sha256": "49d8de4ecf3e004c4cda593684b3a5c2f543a9398e5e3fa3c9a8ae123d0da511",
+    "statement": "theorem stoll_cycle_audit_certificate : Nat.Prime 5 ∧ (5:ℕ)≠3 ∧ addOrderOf (cycleMap 1)=5 ∧ (cycleMap 1).val.u=X ∧ (cycleMap 1).val.v=1 ∧ Fintype.card ReducedPair=10 ∧ Fintype.card {P : ReducedPair // P.u.Splits}=8 ∧ Fintype.card CyclePair=5 ∧ Fintype.card {P : CyclePair // P.val.u.Splits}=5 ∧ (¬ ∀ P : ReducedPair, ∃ Q : CyclePair, Q.val=P) ∧ (∀ P Q : CyclePair, ExplicitCantorStep P.val Q.val (P+Q).val) ∧ (∀ P Q : CyclePair, ∃ d U : K[X], d=gcd (gcd P.val.u Q.val.u) (P.val.v+Q.val.v) ∧ d.Monic ∧ U.Monic ∧ d^2*U=P.val.u*Q.val.u) ∧ cycleFraction=1 ∧ ambientFraction=4/5 ∧ cycleFraction≠ambientFraction",
+    "sources": [
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStoll.lean",
+        "sha256": "f33f37aa97450b83ddec77c38e8e46bbfc0b280b089ebee5f967723ac7e79e13",
+        "bytes": 14531
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollCantor.lean",
+        "sha256": "dd3d8df8d1ce55f3aa380b8f8950343678c82c5b8d3bd7da9d5b4a0101a526cf",
+        "bytes": 8134
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollCycleGroup.lean",
+        "sha256": "7ed577d0e275f1d690d423c85f483611a27a6819f436088319aff7475258f287",
+        "bytes": 7609
+      }
+    ],
+    "scope": "Complete ten-pair model and actual Cantor-matched five-pair cyclic arithmetic image; no full ten-pair ambient group or geometric Picard identification."
+  },
+  "gate": {
+    "path": "evidence/stoll-cycle-gate.log",
+    "declarations": 348,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "pcc": {
+    "claim_id": "PCC-20261109-d8b77b",
+    "local_verdict": "pass",
+    "checked_at": "2026-11-09T23:00:19Z",
+    "verifier_host": "762f5fc120c9",
+    "standing": "unverified",
+    "independent_signed_verdict": false
+  },
+  "identity": {
+    "id": "IDC1hb7102c15384f2648",
+    "bytes": 4117,
+    "sha256": "87063cc8050a4bc2c72abf191ad7b63d4046ff4921e217c254ec39462681054c",
+    "variables": 5,
+    "degree": 5,
+    "derived_points": 32,
+    "extra_points": 11,
+    "scope": "Only scalar x5-plus-one quadratic quotient/remainder identity; count, splitting, actual gcd, all25Cantorsteps, generation/order/proportion rest on Lean."
+  },
+  "report": {
+    "path": "reports/proof-20261109-stoll-cycle/report.pdf",
+    "bytes": 63028,
+    "sha256": "cba9b81fbbdf4c20209b41286483f4a558ba14d903782753f40d62ab78b199ce",
+    "pages": 2,
+    "visually_inspected_at": "2026-11-09T23:05:25.520Z",
+    "diagram_inspected": true
+  },
+  "paid_spend": 0
+}

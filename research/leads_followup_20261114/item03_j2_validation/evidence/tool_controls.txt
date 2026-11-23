@@ -1,0 +1,10 @@
+comparator on a real pair (producer vs replay): IDENTICAL
+control relations.mul + 1 -> ['rec#1 arm=D att=1 key=relations.mul: 165667532 vs 165667533']
+control k_found + 1 -> ['rec#2 arm=DL1 att=1 key=k_found: 1483201808580115546 vs 1483201808580115547']
+control linear_algebra.ladd - 1 -> ['rec#3 arm=DL att=1 key=linear_algebra.ladd: 833553571 vs 833553570']
+control dropped record -> ['record count 4 vs 3']
+control timing-only change must be ignored -> []
+certcheck true record: matched True tries 2 k_matches_record True logs_ok/checked 1 / 3 (expect 1/3: the +1 and xor logs are rejected)
+control wrong ell -> matched False
+control wrong order -> matched False
+control wrong planted k -> k_matches_record False

@@ -1,0 +1,19 @@
+-- Known-answer development probe, actual P256 field. Not a performance run.
+p := 115792089210356248762697446949407573530086143415290314195533631308867097853951;
+Fp := NewZZmod(p);
+assert(Characteristic(Fp) = p);
+assert(IsField(Fp));
+println "FIELD_CHARACTERISTIC ", Characteristic(Fp);
+use R ::= Fp[x,y,h];
+I := ideal(x^2-h^2,y^3-h^3);
+ri := reg(I);
+rq := reg(R/I);
+assert(ri = 4);
+assert(rq = 3);
+println "CI_IDEAL_REGULARITY ", ri;
+println "CI_QUOTIENT_REGULARITY ", rq;
+PrintBettiDiagram(I);
+L := ideal(x-h);
+assert(reg(L) = 1);
+assert(reg(R/L) = 0);
+println "END_P256_REGULARITY_CAPABILITY_OK";

@@ -1,0 +1,130 @@
+{
+  "branch": "aburan28/youthful-hopper-hfrwkd",
+  "closed_utc": "2026-11-15T06:59:40+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/runpod_kit_20261112/rp.sh",
+        "exec",
+        "rtn",
+        "cd rtn && nohup python3 run.py tune > tune.out 2>&1 &"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T06:30:34+00:00",
+      "wall_s": 0.575
+    },
+    {
+      "argv": [
+        "research/runpod_kit_20261112/rp.sh",
+        "exec",
+        "rtn",
+        "cd rtn && nohup python3 run.py holdout > holdout.out 2>&1 &"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T06:45:33+00:00",
+      "wall_s": 0.592
+    }
+  ],
+  "commit": "05c0deda0aee7a0584e41ff8df46fe32eb2e70fd",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T06:29:18+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0629Z-mt-ic-retune-2p32",
+  "metrics": [
+    {
+      "baseline": 0.3459,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_chosen_wall_t1024",
+      "note": "median over W32-4..7 of per-instance median of 3 repeats of ms_arm; baseline = IC-B k=4 mu=1.0; reference = best of 20 rho keys, same host; paired ratios in summary.json",
+      "reference": 0.2727,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.3075,
+        0.3167
+      ],
+      "unit": "wall_s",
+      "value": 0.3111
+    },
+    {
+      "baseline": 0.6883,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_chosen_wall_t4096",
+      "note": "median over W32-4..7 of per-instance median of 3 repeats of ms_arm; baseline = IC-B k=4 mu=1.0; reference = best of 20 rho keys, same host; paired ratios in summary.json",
+      "reference": 0.5647,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.6006,
+        0.623
+      ],
+      "unit": "wall_s",
+      "value": 0.6161
+    },
+    {
+      "baseline": 1.3704,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_chosen_wall_t16384",
+      "note": "median over W32-4..7 of per-instance median of 3 repeats of ms_arm; baseline = IC-B k=4 mu=1.0; reference = best of 20 rho keys, same host; paired ratios in summary.json",
+      "reference": 1.1711,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1.2234,
+        1.2996
+      ],
+      "unit": "wall_s",
+      "value": 1.2559
+    }
+  ],
+  "problem": "mt:ic-vs-rho-2p32",
+  "raw": [
+    {
+      "bytes": 696100,
+      "path": "research/mt_ic_retune_20261115/results/tune/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/95/95482218ff2f92ebe51f803304764494314aa171b44864feabf5b9beab281b4c",
+      "sha256": "95482218ff2f92ebe51f803304764494314aa171b44864feabf5b9beab281b4c",
+      "uploaded": false
+    },
+    {
+      "bytes": 573138,
+      "path": "research/mt_ic_retune_20261115/results/holdout/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1ee66b78d17ba8ac19791df7043c17f4456a56982defa6da02cf3dbeea7824ee",
+      "sha256": "1ee66b78d17ba8ac19791df7043c17f4456a56982defa6da02cf3dbeea7824ee",
+      "uploaded": false
+    },
+    {
+      "bytes": 3373,
+      "path": "research/mt_ic_retune_20261115/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bd2c30adc10359b1ada9e007950e6ad4e6a4eff6d972d3299e85bbac71c57c12",
+      "sha256": "bd2c30adc10359b1ada9e007950e6ad4e6a4eff6d972d3299e85bbac71c57c12",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/mt_ic_retune_20261115/REPORT.pdf",
+    "png": [
+      "research/mt_ic_retune_20261115/fig_retune.png"
+    ],
+    "svg": [
+      "research/mt_ic_retune_20261115/fig_retune.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "mt-ic-retune-2p32",
+  "status": "measured",
+  "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+  "validation": null
+}

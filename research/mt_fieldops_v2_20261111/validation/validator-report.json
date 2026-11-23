@@ -1,0 +1,1005 @@
+{
+ "schema": "validator.report/v1",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-11; code in the validator scratchpad, not the producer's",
+ "validated_commit": "dbbc139ef5b2d3c5660d4ca9b47f242fe59ea3fb",
+ "protocol_commit": "6b0ac6f192859544a30dc1422ccfa12e37776e6b",
+ "claim_scope": "IC4 vs the cheapest of the 12 pre-registered rho runs (rho, rho2, rho2x, rhoseq x kappa 0.5/0.7/1.0) per configuration and per (I/M, h), and vs bsgs2; cost per target in GAE incl. the verification constant; PROTOCOL.md decision rule",
+ "raw_data": [
+  {
+   "path": "../results/holdout/runs.json",
+   "sha256": "54583863e525805c79825b84c36e98e6b2f155674300332d2c4a0ec2349f5a3a"
+  }
+ ],
+ "supporting_data": [
+  {
+   "path": "../results/holdout/rows.jsonl",
+   "sha256": "cafb8c71c1b28e938c0f928e528b7266130c68295db2066c13539065a4997a7a",
+   "note": "full rows with phases and argv; replayed; must move to the artifact store under AGENTS.md section 13 (finding F6)"
+  },
+  {
+   "path": "../results/holdout/summary.json",
+   "sha256": "da6ae47bec25e2643ee3cb77189562325d85ddaab1773bc4907c32b95b846c2d"
+  },
+  {
+   "path": "replay-certificate.json",
+   "sha256": "e17fa9d7431b324dacc44dae56a9f9c19daa7307f1526f55b0b772fd66343452"
+  }
+ ],
+ "checks": {
+  "freeze_order": true,
+  "instances_valid": true,
+  "instances_fresh": true,
+  "grid_complete": true,
+  "replay_all_rows": true,
+  "runs_json_projection": true,
+  "scalars_verified": true,
+  "summary_json_recomputed": true,
+  "verdicts_agree": true,
+  "results_md_table": true,
+  "headline_within_tol": true,
+  "no_blocking_fairness_finding": true
+ },
+ "recompute": {
+  "method": "own script from runs.json: cost/target = [(cI I + M + S)/(cI + 3) + h (H + L)]/T; per configuration min over the 12 rho runs (rhobest) or 3 bsgs2 runs; median of 22 per-configuration ratios; own numpy bootstrap (B = 20000, seeds 0 and 12345, 2.5/97.5 percentiles) and a re-implementation of the frozen CI procedure (B = 4000, Python random seed 1)",
+  "summary_entries_compared": 324,
+  "max_rel_median_diff": 0.0,
+  "max_abs_ci_diff_frozen_procedure": 0.0,
+  "max_abs_ci_diff_validator_bootstrap": 0.0027889897090320748,
+  "verdict_disagreements": {},
+  "analysis_txt_entries_matching": "324/324",
+  "results_md_table_checks": "84/84",
+  "rhobest_winner_arm": {
+   "rho2x": 1122,
+   "rho2": 66
+  }
+ },
+ "sensitivity": {
+  "as_measured": {
+   "verdict_counts": {
+    "rhobest": {
+     "dearer": 6,
+     "unranked": 6,
+     "cheaper": 6
+    },
+    "bsgs2": {
+     "dearer": 18
+    }
+   },
+   "range_rhobest_T16384": [
+    0.9082641154804753,
+    0.9493862502010613
+   ],
+   "max_hi_rhobest_T16384": 0.9553163937333851,
+   "range_rhobest_T4096": [
+    0.9608936671813295,
+    1.038467926013528
+   ],
+   "range_rhobest_T1024": [
+    1.0532819503474362,
+    1.1880847830568553
+   ],
+   "range_bsgs2": [
+    1.175366086839605,
+    1.7970838924073282
+   ]
+  },
+  "no_verify": {
+   "verdict_counts": {
+    "rhobest": {
+     "dearer": 6,
+     "unranked": 6,
+     "cheaper": 6
+    },
+    "bsgs2": {
+     "dearer": 18
+    }
+   },
+   "range_rhobest_T16384": [
+    0.8396533986930321,
+    0.9286790143248731
+   ],
+   "max_hi_rhobest_T16384": 0.9369735262448664,
+   "range_rhobest_T4096": [
+    0.9406487535575818,
+    1.0446624595646894
+   ],
+   "range_rhobest_T1024": [
+    1.0778052343011653,
+    1.2086295670803668
+   ],
+   "range_bsgs2": [
+    1.4937718108748257,
+    2.0365692996703944
+   ]
+  },
+  "rho_no_start": {
+   "verdict_counts": {
+    "rhobest": {
+     "dearer": 10,
+     "unranked": 2,
+     "cheaper": 6
+    },
+    "bsgs2": {
+     "dearer": 18
+    }
+   },
+   "range_rhobest_T16384": [
+    0.932278068114972,
+    0.9780047564777767
+   ],
+   "max_hi_rhobest_T16384": 0.981561940376046,
+   "range_rhobest_T4096": [
+    0.9856731383682025,
+    1.0520417854146475
+   ],
+   "range_rhobest_T1024": [
+    1.0811960057209262,
+    1.2028031470549823
+   ],
+   "range_bsgs2": [
+    1.175366086839605,
+    1.7970838924073282
+   ]
+  },
+  "rho_no_start_no_verify": {
+   "verdict_counts": {
+    "rhobest": {
+     "dearer": 10,
+     "unranked": 2,
+     "cheaper": 6
+    },
+    "bsgs2": {
+     "dearer": 18
+    }
+   },
+   "range_rhobest_T16384": [
+    0.8815246748481069,
+    0.9535132776841136
+   ],
+   "max_hi_rhobest_T16384": 0.962085127316403,
+   "range_rhobest_T4096": [
+    0.9779609494189372,
+    1.06054933739434
+   ],
+   "range_rhobest_T1024": [
+    1.1200308801424632,
+    1.2252604988230642
+   ],
+   "range_bsgs2": [
+    1.4937718108748257,
+    2.0365692996703944
+   ]
+  }
+ },
+ "headline": [
+  {
+   "name": "median IC4/rhobest cI=10 22b T=1024 h=0",
+   "claimed": 1.0533734123040004,
+   "recomputed": 1.0533734123040004,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 22b T=1024 h=0.1",
+   "claimed": 1.0655693445584227,
+   "recomputed": 1.0655693445584227,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 22b T=1024 h=1",
+   "claimed": 1.1198660502503728,
+   "recomputed": 1.1198660502503728,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=1024 h=0",
+   "claimed": 1.1062996672997274,
+   "recomputed": 1.1062996672997274,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=1024 h=0.1",
+   "claimed": 1.121450084589853,
+   "recomputed": 1.121450084589853,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=1024 h=1",
+   "claimed": 1.1824635955959568,
+   "recomputed": 1.1824635955959568,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=4096 h=0",
+   "claimed": 0.9757116346475277,
+   "recomputed": 0.9757116346475277,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=4096 h=0.1",
+   "claimed": 0.9829869884811027,
+   "recomputed": 0.9829869884811027,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=4096 h=1",
+   "claimed": 1.0156828965826072,
+   "recomputed": 1.0156828965826072,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=16384 h=0",
+   "claimed": 0.9334369916844758,
+   "recomputed": 0.9334369916844758,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=16384 h=0.1",
+   "claimed": 0.9348872515946991,
+   "recomputed": 0.9348872515946991,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 24b T=16384 h=1",
+   "claimed": 0.9423684758173472,
+   "recomputed": 0.9423684758173472,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 25b T=4096 h=0",
+   "claimed": 0.9874649295918305,
+   "recomputed": 0.9874649295918305,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 25b T=4096 h=0.1",
+   "claimed": 0.9960903882768615,
+   "recomputed": 0.9960903882768615,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 25b T=4096 h=1",
+   "claimed": 1.0327030900069847,
+   "recomputed": 1.0327030900069847,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 25b T=16384 h=0",
+   "claimed": 0.925610538001103,
+   "recomputed": 0.925610538001103,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 25b T=16384 h=0.1",
+   "claimed": 0.9278204998172757,
+   "recomputed": 0.9278204998172757,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=10 25b T=16384 h=1",
+   "claimed": 0.9384345200623575,
+   "recomputed": 0.9384345200623575,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 22b T=1024 h=0",
+   "claimed": 1.0532819503474362,
+   "recomputed": 1.0532819503474362,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 22b T=1024 h=0.1",
+   "claimed": 1.0643581326785203,
+   "recomputed": 1.0643581326785203,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 22b T=1024 h=1",
+   "claimed": 1.116320003913914,
+   "recomputed": 1.116320003913914,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=1024 h=0",
+   "claimed": 1.0938504449732216,
+   "recomputed": 1.0938504449732216,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=1024 h=0.1",
+   "claimed": 1.108721095349287,
+   "recomputed": 1.108721095349287,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=1024 h=1",
+   "claimed": 1.1725105186543654,
+   "recomputed": 1.1725105186543654,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=4096 h=0",
+   "claimed": 0.9608936671813295,
+   "recomputed": 0.9608936671813295,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=4096 h=0.1",
+   "claimed": 0.9687273259057068,
+   "recomputed": 0.9687273259057068,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=4096 h=1",
+   "claimed": 1.0057898173842674,
+   "recomputed": 1.0057898173842674,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=16384 h=0",
+   "claimed": 0.9178831052305048,
+   "recomputed": 0.9178831052305048,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=16384 h=0.1",
+   "claimed": 0.9202030181286701,
+   "recomputed": 0.9202030181286701,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 24b T=16384 h=1",
+   "claimed": 0.9326374283880081,
+   "recomputed": 0.9326374283880081,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 25b T=4096 h=0",
+   "claimed": 0.9718008046279711,
+   "recomputed": 0.9718008046279711,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 25b T=4096 h=0.1",
+   "claimed": 0.9810256109342248,
+   "recomputed": 0.9810256109342248,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 25b T=4096 h=1",
+   "claimed": 1.0224945751041685,
+   "recomputed": 1.0224945751041685,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 25b T=16384 h=0",
+   "claimed": 0.9082641154804753,
+   "recomputed": 0.9082641154804753,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 25b T=16384 h=0.1",
+   "claimed": 0.9115537346842543,
+   "recomputed": 0.9115537346842543,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=3 25b T=16384 h=1",
+   "claimed": 0.9280786943954933,
+   "recomputed": 0.9280786943954933,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 22b T=1024 h=0",
+   "claimed": 1.0534295517458139,
+   "recomputed": 1.0534295517458139,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 22b T=1024 h=0.1",
+   "claimed": 1.0663013874425469,
+   "recomputed": 1.0663013874425469,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 22b T=1024 h=1",
+   "claimed": 1.1218682183830362,
+   "recomputed": 1.1218682183830362,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=1024 h=0",
+   "claimed": 1.1140749376434456,
+   "recomputed": 1.1140749376434456,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=1024 h=0.1",
+   "claimed": 1.1292440966631854,
+   "recomputed": 1.1292440966631854,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=1024 h=1",
+   "claimed": 1.1880847830568553,
+   "recomputed": 1.1880847830568553,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=4096 h=0",
+   "claimed": 0.9847901757382422,
+   "recomputed": 0.9847901757382422,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=4096 h=0.1",
+   "claimed": 0.9915956645915102,
+   "recomputed": 0.9915956645915102,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=4096 h=1",
+   "claimed": 1.0212688090325548,
+   "recomputed": 1.0212688090325548,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=16384 h=0",
+   "claimed": 0.9454737036055967,
+   "recomputed": 0.9454737036055967,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=16384 h=0.1",
+   "claimed": 0.9461216497371272,
+   "recomputed": 0.9461216497371272,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 24b T=16384 h=1",
+   "claimed": 0.9493862502010613,
+   "recomputed": 0.9493862502010613,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 25b T=4096 h=0",
+   "claimed": 0.9971560782477887,
+   "recomputed": 0.9971560782477887,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 25b T=4096 h=0.1",
+   "claimed": 1.005251392023224,
+   "recomputed": 1.005251392023224,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 25b T=4096 h=1",
+   "claimed": 1.038467926013528,
+   "recomputed": 1.038467926013528,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 25b T=16384 h=0",
+   "claimed": 0.9361261167523096,
+   "recomputed": 0.9361261167523096,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 25b T=16384 h=0.1",
+   "claimed": 0.9375622694236488,
+   "recomputed": 0.9375622694236488,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/rhobest cI=30 25b T=16384 h=1",
+   "claimed": 0.9442810350367952,
+   "recomputed": 0.9442810350367952,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 22b T=1024 h=0",
+   "claimed": 1.4532105466974636,
+   "recomputed": 1.4532105466974636,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 22b T=1024 h=0.1",
+   "claimed": 1.4788122795115468,
+   "recomputed": 1.4788122795115468,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 22b T=1024 h=1",
+   "claimed": 1.5970432559430108,
+   "recomputed": 1.5970432559430108,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=1024 h=0",
+   "claimed": 1.6449426146046795,
+   "recomputed": 1.6449426146046795,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=1024 h=0.1",
+   "claimed": 1.6703497550358333,
+   "recomputed": 1.6703497550358333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=1024 h=1",
+   "claimed": 1.7734299776002458,
+   "recomputed": 1.7734299776002458,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=4096 h=0",
+   "claimed": 1.3295557471900525,
+   "recomputed": 1.3295557471900525,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=4096 h=0.1",
+   "claimed": 1.351586096185243,
+   "recomputed": 1.351586096185243,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=4096 h=1",
+   "claimed": 1.4556671267904198,
+   "recomputed": 1.4556671267904198,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=16384 h=0",
+   "claimed": 1.184911965215254,
+   "recomputed": 1.184911965215254,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=16384 h=0.1",
+   "claimed": 1.2023964910278822,
+   "recomputed": 1.2023964910278822,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 24b T=16384 h=1",
+   "claimed": 1.300617634155723,
+   "recomputed": 1.300617634155723,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 25b T=4096 h=0",
+   "claimed": 1.3966228540738541,
+   "recomputed": 1.3966228540738541,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 25b T=4096 h=0.1",
+   "claimed": 1.4181987967018148,
+   "recomputed": 1.4181987967018148,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 25b T=4096 h=1",
+   "claimed": 1.5129932645778164,
+   "recomputed": 1.5129932645778164,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 25b T=16384 h=0",
+   "claimed": 1.2267532081148333,
+   "recomputed": 1.2267532081148333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 25b T=16384 h=0.1",
+   "claimed": 1.2459081505308705,
+   "recomputed": 1.2459081505308705,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=10 25b T=16384 h=1",
+   "claimed": 1.3455397570082201,
+   "recomputed": 1.3455397570082201,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 22b T=1024 h=0",
+   "claimed": 1.513465163769556,
+   "recomputed": 1.513465163769556,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 22b T=1024 h=0.1",
+   "claimed": 1.5326470092224156,
+   "recomputed": 1.5326470092224156,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 22b T=1024 h=1",
+   "claimed": 1.6240797912322917,
+   "recomputed": 1.6240797912322917,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=1024 h=0",
+   "claimed": 1.7041886300360845,
+   "recomputed": 1.7041886300360845,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=1024 h=0.1",
+   "claimed": 1.7220035904127764,
+   "recomputed": 1.7220035904127764,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=1024 h=1",
+   "claimed": 1.7970838924073282,
+   "recomputed": 1.7970838924073282,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=4096 h=0",
+   "claimed": 1.3627971848674099,
+   "recomputed": 1.3627971848674099,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=4096 h=0.1",
+   "claimed": 1.3809386389374971,
+   "recomputed": 1.3809386389374971,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=4096 h=1",
+   "claimed": 1.4693578591467198,
+   "recomputed": 1.4693578591467198,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=16384 h=0",
+   "claimed": 1.2016269543763434,
+   "recomputed": 1.2016269543763434,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=16384 h=0.1",
+   "claimed": 1.2172302398545702,
+   "recomputed": 1.2172302398545702,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 24b T=16384 h=1",
+   "claimed": 1.3068458965872534,
+   "recomputed": 1.3068458965872534,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 25b T=4096 h=0",
+   "claimed": 1.4356349884596344,
+   "recomputed": 1.4356349884596344,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 25b T=4096 h=0.1",
+   "claimed": 1.4525275341433015,
+   "recomputed": 1.4525275341433015,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 25b T=4096 h=1",
+   "claimed": 1.5288865724220317,
+   "recomputed": 1.5288865724220317,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 25b T=16384 h=0",
+   "claimed": 1.2473747019899601,
+   "recomputed": 1.2473747019899601,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 25b T=16384 h=0.1",
+   "claimed": 1.2641078955801919,
+   "recomputed": 1.2641078955801919,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=3 25b T=16384 h=1",
+   "claimed": 1.3534598627712615,
+   "recomputed": 1.3534598627712615,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 22b T=1024 h=0",
+   "claimed": 1.4185372253714303,
+   "recomputed": 1.4185372253714303,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 22b T=1024 h=0.1",
+   "claimed": 1.448103127025734,
+   "recomputed": 1.448103127025734,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 22b T=1024 h=1",
+   "claimed": 1.5824552875790414,
+   "recomputed": 1.5824552875790414,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=1024 h=0",
+   "claimed": 1.61062087266929,
+   "recomputed": 1.61062087266929,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=1024 h=0.1",
+   "claimed": 1.6407735736479823,
+   "recomputed": 1.6407735736479823,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=1024 h=1",
+   "claimed": 1.7605177814492818,
+   "recomputed": 1.7605177814492818,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=4096 h=0",
+   "claimed": 1.310513346794023,
+   "recomputed": 1.310513346794023,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=4096 h=0.1",
+   "claimed": 1.334915146289612,
+   "recomputed": 1.334915146289612,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=4096 h=1",
+   "claimed": 1.448179953752729,
+   "recomputed": 1.448179953752729,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=16384 h=0",
+   "claimed": 1.175366086839605,
+   "recomputed": 1.175366086839605,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=16384 h=0.1",
+   "claimed": 1.1939699175005671,
+   "recomputed": 1.1939699175005671,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 24b T=16384 h=1",
+   "claimed": 1.2971841413055654,
+   "recomputed": 1.2971841413055654,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 25b T=4096 h=0",
+   "claimed": 1.3740525065796505,
+   "recomputed": 1.3740525065796505,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 25b T=4096 h=0.1",
+   "claimed": 1.3985815485420758,
+   "recomputed": 1.3985815485420758,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 25b T=4096 h=1",
+   "claimed": 1.5042984006271367,
+   "recomputed": 1.5042984006271367,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 25b T=16384 h=0",
+   "claimed": 1.2149404137160418,
+   "recomputed": 1.2149404137160418,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 25b T=16384 h=0.1",
+   "claimed": 1.23555087225777,
+   "recomputed": 1.23555087225777,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "median IC4/bsgs2 cI=30 25b T=16384 h=1",
+   "claimed": 1.341123167276261,
+   "recomputed": 1.341123167276261,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "section-5a verdict count vs rhobest: cheaper (of 18 cell x cI)",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "section-5a verdict count vs rhobest: unranked (of 18 cell x cI)",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "section-5a verdict count vs rhobest: dearer (of 18 cell x cI)",
+   "claimed": 6,
+   "recomputed": 6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "section-5a verdict count vs bsgs2: cheaper (of 18 cell x cI)",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "section-5a verdict count vs bsgs2: unranked (of 18 cell x cI)",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "section-5a verdict count vs bsgs2: dearer (of 18 cell x cI)",
+   "claimed": 18,
+   "recomputed": 18,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "min IC4/rhobest T=16384 all cI, h",
+   "claimed": 0.9082641154804753,
+   "recomputed": 0.9082641154804753,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "max IC4/rhobest T=16384 all cI, h",
+   "claimed": 0.9493862502010613,
+   "recomputed": 0.9493862502010613,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "min IC4/rhobest T=1024 all cI, h",
+   "claimed": 1.0532819503474362,
+   "recomputed": 1.0532819503474362,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "max IC4/rhobest T=1024 all cI, h",
+   "claimed": 1.1880847830568553,
+   "recomputed": 1.1880847830568553,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "min IC4/rhobest T=4096 h=1 all cI",
+   "claimed": 1.0057898173842674,
+   "recomputed": 1.0057898173842674,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "max IC4/rhobest T=4096 h=1 all cI",
+   "claimed": 1.038467926013528,
+   "recomputed": 1.038467926013528,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "min IC4/bsgs2 all cells, cI, h",
+   "claimed": 1.175366086839605,
+   "recomputed": 1.175366086839605,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "max IC4/bsgs2 all cells, cI, h",
+   "claimed": 1.7970838924073282,
+   "recomputed": 1.7970838924073282,
+   "rel_tol": 1e-09
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "amendment",
+   "check": "5 fairness",
+   "finding": "Every rho arm (rho, rho2, rho2x, rhoseq) starts each target walk at Q plus two bank points (two counted affine additions) and repeats this at every 32-step restart in phase 2. IC4 and bsgs2 pay no per-target start because their trial progressions are shared. An anchored walk can start at Q itself, so this is avoidable overhead in the reference. An instrumented scratch build left the counters unchanged on all 2112 rows. It measured 1.07 to 2.07 starts per target at kappa 0.7: 2.1 to 4.1 GAE/target, or 2.5% to 3.2% of each rho run's total at I = 10M, h = 0. In a validator counterfactual that removes this cost from every rho run, IC4 is still cheaper at T = 16384 for every I/M and h: medians 0.932 to 0.978, largest 95% upper bound 0.982. T = 4096 becomes dearer at I = 10M and 30M and stays unranked at 3M; T = 1024 stays dearer. The headline holds against this overhead. The measured 5% to 9% margin narrows to 2% to 7%, and the T = 4096 'unranked' depends on it.",
+   "unquantified": "Phase-1 walk waste: rho2/rho2x store 1.64 to 1.87 x-classes per step, against an ideal of 2, and phase-1 restarts cost 1.2% to 2.5% of total. Sibling self-duplicates: when the step's arm equals the previous step's arm, x(prev - A) is the previous walk point. By the arm-draw probability this is about 4.6% of steps; it was estimated, not measured.",
+   "evidence": "VALIDATOR_REPORT.md section 5; validator scratch out/sens.json, out/replay_dbg.jsonl"
+  },
+  {
+   "id": "F2",
+   "severity": "amendment",
+   "check": "5 fairness / reporting",
+   "finding": "Every arm includes the counted double-and-add verification of every recovered log in I/M/S. It is identical across the 16 runs of every configuration (132/132) and costs 31.6 to 36.3 GAE/target at I = 10M. For IC4 at 24 b, T = 16384 that is 34.7 of 63.8 GAE/target. No attack pays this cost, and adding it to both arms pulls every ratio toward 1. RESULTS.md does not disclose it, although the v1 validator's amendment 4 asked for it. With verification removed from every arm, IC4/rhobest is 0.840 to 0.929 at T = 16384, 0.941 to 1.045 at T = 4096 and 1.078 to 1.209 at T = 1024; IC4/bsgs2 is 1.49 to 2.04. All section-5a verdicts are unchanged.",
+   "evidence": "VALIDATOR_REPORT.md sections 5 and 6"
+  },
+  {
+   "id": "F3",
+   "severity": "amendment",
+   "check": "reporting contract",
+   "finding": "RESULTS.md does not separate phases. They exist only in rows.jsonl, and v1 amendment 5 asked for them. The validator's phase table is in VALIDATOR_REPORT.md section 6.",
+   "evidence": "VALIDATOR_REPORT.md section 6"
+  },
+  {
+   "id": "F4",
+   "severity": "amendment",
+   "check": "6 recompute / wording",
+   "finding": "'Strongest rho' means the cheapest of the four pre-registered rho arms in this harness. It is not the strongest possible rho (F1), so the wording should say that. rho2x is the minimum in 51 of the 54 (cell, I/M, h) settings, in all 22 configurations of each. rho2 is the minimum in the other 3 (24 b, T = 16384, I = 30M). rho and rhoseq are never the minimum. The RESULTS spot check ('17 of the 18') agrees with this but should cite the full count. bsgs2 is a generic method in the same harness with the same shared-inversion lever, and IC4 is dearer than it everywhere (1.18x to 1.80x as measured). That disclosure must stay next to the rho ratio.",
+   "evidence": "validator scratch out/recompute.json (rhobest_winner_by_setting)"
+  },
+  {
+   "id": "F5",
+   "severity": "amendment",
+   "check": "6 recompute / wording",
+   "finding": "RESULTS says that at T = 4096 IC4 is 'cheaper at h = 0 and 0.1, dearer at h = 1'. That is inexact at 25 b. At I = 30M the h = 0.1 median is 1.005 [1.001, 1.011] and the h = 0 interval includes 1 [0.993, 1.003]; at I = 10M the h = 0.1 interval is [0.992, 1.002]. The 'unranked' verdict is correct.",
+   "evidence": "validator scratch out/recompute.json"
+  },
+  {
+   "id": "F6",
+   "severity": "process",
+   "check": "artifact policy (AGENTS.md section 13)",
+   "finding": "rows.jsonl (1,446,974 bytes, .jsonl) is committed to Git at the validated commit, against the artifact-store policy for data-suffixed files over 64 KiB. The bench record's raw entry says uploaded: false, with status open and validation null. The phase snapshots and argv that this validation replayed exist only in rows.jsonl. It must be uploaded and hash-verified (sha256 cafb8c71...4997a7a) before it leaves Git. runs.json carries totals only.",
+   "evidence": "benchmarks/records/20261111T0142Z-mt-fieldops-ic4-v2.json"
+  },
+  {
+   "id": "F7",
+   "severity": "note",
+   "check": "reproducibility bindings",
+   "finding": "Each row binds the commit (6b0ac6f192) and the binary SHA (bbcc68cc...). The rows have no dirty-tree flag and no toolchain. The bench record has commit_dirty false at init (01:42:08Z) and isolation 'unstated'. The run was on a local host, not isolab-eks; Limits discloses this. Counts are deterministic: a scratch build of the frozen source (rustc 1.97.0, rand 0.8.8, serde_json 1.0.151) reproduces all 2112 rows exactly. No wall-clock figure is used.",
+   "evidence": "VALIDATOR_REPORT.md section 3"
+  },
+  {
+   "id": "F8",
+   "severity": "process",
+   "check": "AGENTS.md section 12 (ecbench)",
+   "finding": "This is not an ecbench session: there is no ecbench.spec and no 'ecbench verify --replay' receipt. This certificate is an independent replay of the producer-written harness, not an ecbench receipt. RESULTS should name the section-12 deviation explicitly.",
+   "evidence": "study directory listing"
+  },
+  {
+   "id": "F9",
+   "severity": "note",
+   "check": "scope",
+   "finding": "The working tree moved during validation. HEAD advanced to 2ad87dd980 (01:49:53Z), which adds an IC-leaderboard section labelled 'not validated' plus benchmark figures. That commit is outside the validated artifact set: dbbc139ef5, read from a git-archive copy. Its table reads summary.json at I = 10M, which this validation reproduces exactly. Its builder change and rendered pages were not validated.",
+   "evidence": "git log; VALIDATOR_REPORT.md section 0"
+  },
+  {
+   "id": "F10",
+   "severity": "amendment",
+   "check": "reporting (AGENTS.md section 3)",
+   "finding": "'Where IC4 wins and why' is an explanation the experiment does not test, so it should be labelled as interpretation. RESULTS gives no section-3 class. The v1-to-v2 IC4 code change is an accounting correction: it adds a counted hash, which raises IC4's cost. The row is a cross-method comparison, not an improvement over an IC baseline.",
+   "evidence": "RESULTS.md; git diff 3434954e47 6b0ac6f192 -- examples/mt_fieldops.rs"
+  },
+  {
+   "id": "F11",
+   "severity": "note",
+   "check": "2 instances",
+   "finding": "The 33 instances are valid (p and n prime, by Miller-Rabin and by trial division; nonsingular; G on the curve; [n]G = O; n in the Hasse interval, so #E = n; fixture point = [known_log]G). They regenerate byte-identically from the declared command (gen_instances.py, blob 5a04d358, unchanged since 2026-11-06; seed mtfo-v2-20261111). The scan covered 119,742 JSON/JSONL files under research/ (30,652 distinct (p, a, b) curve records) and 20,886 records in docs/curves: no exact match, no isomorphic match (same p, j and n) and no same-j curve. One earlier curve has the same (p, n) and a different j, so it is isogenous, not the same curve: W22-9 vs research/ic_e222_m221_20261106/results/instances_scale/W22-6.json. W22-5 and W22-10 share (p, n) within the set, with different j. No instance has a = 0 or b = 0, so negation is the only automorphism and the x-only lookups are the strongest symmetry available to the rho arms.",
+   "evidence": "VALIDATOR_REPORT.md section 2"
+  },
+  {
+   "id": "F12",
+   "severity": "note",
+   "check": "5 fairness",
+   "finding": "No uncounted field or hash work was found in rho2x, rhoseq or the ic4 change. rho2x costs I + 3M + 2S per step, with the correct x-only sibling formula. A hit on a stored x-only sibling recomputes it with a counted padd, and the target-side sibling's y is recomputed with a counted padd. rhoseq's phase 1 costs one counted padd and one counted hash per entry; its phase 2 is identical to rho. The ic4 dedupe lookup is now counted, one f.hash per table hit in phase 1. The v1-to-v2 diff of mt_fieldops.rs is exactly these hunks plus comments, so rho, rho2 and bsgs2 are byte-identical to v1. Every arm leaves F_p additions, subtractions and negations and mod-n log arithmetic uncounted. The source header discloses this; RESULTS does not. Pricing the mod-n work would cost the rho arms more than IC4.",
+   "evidence": "examples/mt_fieldops.rs at 6b0ac6f192"
+  },
+  {
+   "id": "F13",
+   "severity": "note",
+   "check": "m=83 / ECC2K-130",
+   "finding": "Not engaged: these are prime-field toy curves and no ECC2K-130 transfer is claimed. The row text should say so in one line.",
+   "evidence": "RESULTS.md"
+  }
+ ]
+}

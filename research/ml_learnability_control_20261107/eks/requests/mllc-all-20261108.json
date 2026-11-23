@@ -1,0 +1,27 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "mllc-all-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:a43ceee769b62f514862d219dd447fc2112e30a085b13d90485919687a9ecadd",
+    "command": [
+      "/usr/local/bin/r2mllc_entry.sh",
+      "12",
+      "16",
+      "20",
+      "24"
+    ],
+    "cpu": 8,
+    "memory": "16Gi",
+    "seconds": 14400,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "ml_learnability_control",
+    "protocol_sha256": "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+    "note": "r2mllc round 2. Image built from f13a690df016 sources plus eks/r2mllc_entry.sh (uncommitted working tree at build). protocol_sha256 is the pre-freeze canonical hash of protocol.json (valid only if the freeze leaves it unchanged; recompute after the real freeze). Not launched."
+  }
+}

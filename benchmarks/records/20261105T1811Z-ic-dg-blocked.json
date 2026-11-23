@@ -1,0 +1,163 @@
+{
+  "branch": "claude/ic-stride-renew-prime-20261029",
+  "closed_utc": "2026-11-05T18:11:47+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "(isolab-eks launch of the frozen task card)"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "provenance": "Documentary launcher reference (isolab-eks, CodeBuild isolab-experiment-launcher); this import did not execute it. Binary: ecbench sha256 88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c (isolab image cf0dcc8b, source be2969ce); rho and IC arms in one counted session; replayed by the same binary on another",
+      "started_utc": null,
+      "wall_s": null
+    }
+  ],
+  "commit": "261dcf92de2af6246c55d87594373f12f4e0b239",
+  "commit_dirty": true,
+  "created_utc": "2026-11-05T18:11:46+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-ic-dg-blocked"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1811Z-ic-dg-blocked",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_ic_w0",
+      "note": "counted S at w=0 GAE per unpriced native op, copied from VALIDATION.json rho_reference.gae_band (rows icv1-fp28-t9805-a382b8a8, icv1-fp28-tm3463-6d2f5699) [pcc:unverified]",
+      "reference": 0.9661128713444103,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 21.050512493167396
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_ic_w1",
+      "note": "counted S at w=1 GAE per unpriced native op, copied from VALIDATION.json rho_reference.gae_band (rows icv1-fp28-t9805-a382b8a8, icv1-fp28-tm3463-6d2f5699) [pcc:unverified]",
+      "reference": 1.9025162642496,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 29.452569901487898
+    }
+  ],
+  "problem": "archive:ic-dg-blocked",
+  "provenance": {
+    "kind": "retrospective_metadata_index",
+    "note": "Record written after the 2026-10-29 EKS sessions; raw files are pinned by the validator report and their artifact-store manifests."
+  },
+  "raw": [
+    {
+      "bytes": 11889913,
+      "path": "research/ic_dg_blocked_20261029/P24/wall/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/29e301e840c4ed23818a3f547140df20880ce4452c4dbe9ece3f5afd17a13afc",
+      "sha256": "29e301e840c4ed23818a3f547140df20880ce4452c4dbe9ece3f5afd17a13afc",
+      "uploaded": true
+    },
+    {
+      "bytes": 3180,
+      "path": "research/ic_dg_blocked_20261029/P24/wall/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d7681937d7a7a51c75dca6d275a0a53c80743ecc5ecc3037e0e3256391375772",
+      "sha256": "d7681937d7a7a51c75dca6d275a0a53c80743ecc5ecc3037e0e3256391375772",
+      "uploaded": false
+    },
+    {
+      "bytes": 10046802,
+      "path": "research/ic_dg_blocked_20261029/P24/counted/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/92/926e52e3c479df016788b2b08e023fbf7add3b8de20d960f3edc78631287da63",
+      "sha256": "926e52e3c479df016788b2b08e023fbf7add3b8de20d960f3edc78631287da63",
+      "uploaded": true
+    },
+    {
+      "bytes": 3134,
+      "path": "research/ic_dg_blocked_20261029/P24/counted/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1e6de585248cab859d1d85c5487b10fdab274d3b69a4ded32f456a20b05995cf",
+      "sha256": "1e6de585248cab859d1d85c5487b10fdab274d3b69a4ded32f456a20b05995cf",
+      "uploaded": false
+    },
+    {
+      "bytes": 11965324,
+      "path": "research/ic_dg_blocked_20261029/P28/wall/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e8/e82139a40f9c9e0462b029824aad453882fa9b3c871a63454e7e7945799a7e07",
+      "sha256": "e82139a40f9c9e0462b029824aad453882fa9b3c871a63454e7e7945799a7e07",
+      "uploaded": true
+    },
+    {
+      "bytes": 3185,
+      "path": "research/ic_dg_blocked_20261029/P28/wall/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/454a4c60b9343e42635fe98ed4c6622dbc734e0ca5b8806f5e911748de025756",
+      "sha256": "454a4c60b9343e42635fe98ed4c6622dbc734e0ca5b8806f5e911748de025756",
+      "uploaded": false
+    },
+    {
+      "bytes": 10069906,
+      "path": "research/ic_dg_blocked_20261029/P28/counted/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5f/5fe7de6444939617d8672119750ed40087b6a22d0ad19d053af70a659339ebaf",
+      "sha256": "5fe7de6444939617d8672119750ed40087b6a22d0ad19d053af70a659339ebaf",
+      "uploaded": true
+    },
+    {
+      "bytes": 3140,
+      "path": "research/ic_dg_blocked_20261029/P28/counted/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/3891c23fa2aaf5791926c3a2fc4433570e58fbebc3cac799370ba0b3f3b12156",
+      "sha256": "3891c23fa2aaf5791926c3a2fc4433570e58fbebc3cac799370ba0b3f3b12156",
+      "uploaded": false
+    },
+    {
+      "bytes": 12065257,
+      "path": "research/ic_dg_blocked_20261029/P32/wall/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/65/6586e8d1c198acc4dc0a00bf35069105480574945dc4a8058f6c3ddbb88892d8",
+      "sha256": "6586e8d1c198acc4dc0a00bf35069105480574945dc4a8058f6c3ddbb88892d8",
+      "uploaded": true
+    },
+    {
+      "bytes": 3180,
+      "path": "research/ic_dg_blocked_20261029/P32/wall/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1d/1dd2a7caef1ade539edf054183bfbb266734035919f2a992ec20bf649fa88eef",
+      "sha256": "1dd2a7caef1ade539edf054183bfbb266734035919f2a992ec20bf649fa88eef",
+      "uploaded": false
+    },
+    {
+      "bytes": 10115220,
+      "path": "research/ic_dg_blocked_20261029/P32/counted/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/04/048d5a9a6091f942f7edd6f07450b1df12222abde6648b8f44b82b215daf7101",
+      "sha256": "048d5a9a6091f942f7edd6f07450b1df12222abde6648b8f44b82b215daf7101",
+      "uploaded": true
+    },
+    {
+      "bytes": 3142,
+      "path": "research/ic_dg_blocked_20261029/P32/counted/eks-results/session/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c7/c75597f97b7d4b1196b3166584676d6b856b5d1c44feaa99ee9e33ea0906efed",
+      "sha256": "c75597f97b7d4b1196b3166584676d6b856b5d1c44feaa99ee9e33ea0906efed",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261029-ic-dg-blocked/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261029-ic-dg-blocked/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-dg-blocked",
+  "status": "measured",
+  "summary": "Retrospective index of the 2026-10-29 ic-dg-blocked EKS sessions; validated row, see VALIDATION.json. [pcc:unverified]",
+  "validation": "benchmarks/20261029-ic-dg-blocked/VALIDATION.json"
+}

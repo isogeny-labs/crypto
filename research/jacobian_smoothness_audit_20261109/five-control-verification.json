@@ -1,0 +1,70 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "component": "Complete F5known-answer control before native calibration",
+  "source_commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464",
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "theorem": "MumfordFiveControlAudit.mumford_five_control_certificate",
+    "source": "research/jacobian_smoothness_audit_20261109/lean/MumfordFiveControl.lean",
+    "source_sha256": "019bb744e6d294593dc4d4b4932376dfb5566c22ae2fbb255c45a4db5f519aa7",
+    "decl_sha256": "64ddf402132efcff08422f96eb344c7b569d47f4b50db8c6fc5c41eb17984196",
+    "statement": "theorem mumford_five_control_certificate : curvePolynomial.Monic ∧ curvePolynomial.natDegree=5 ∧ curvePolynomial.Separable ∧ Fintype.card ReducedPair=16 ∧ Fintype.card {P : ReducedPair // P.u.Splits}=16 ∧ (∀ P : ReducedPair, P.v=0)",
+    "gate": {
+      "path": "evidence/five-control-gate.log",
+      "declarations": 240,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Complete F5reduced-polynomial-pair model only; geometric Picard/Jacobian identification remains open."
+  },
+  "pcc": {
+    "id": "PCC-20261109-e81718",
+    "full_local_check": "pass",
+    "checked_at": "2026-11-09T21:56:51Z",
+    "verifier_host": "762f5fc120c9",
+    "standing": "unverified",
+    "standing_command_exit": 2,
+    "signed_verdict": false
+  },
+  "identity": {
+    "id": "IDC1ha387b9e22b14b9cf",
+    "path": "five-control-identity-certificate.json",
+    "raw_bytes": 1556,
+    "sha256": "3d63b5f42dc88892605244e654cf72ca2eb3741c53b473ba37eb927ea426db8e",
+    "variables": 3,
+    "total_degree": 2,
+    "points": 32,
+    "extra_points": 11,
+    "seed_hex": "0x202611092120",
+    "extra_seed_hex": "0x5e4ae097",
+    "modulus_decimal": "2305843009213693951",
+    "issue_and_extra_check": "accept; native issuer exit0",
+    "scope": "Supplied-root quadratic scalar factorization only; counts and actual splitting rest on Lean."
+  },
+  "exact_kernel_counts": {
+    "candidates": 651,
+    "valid_pairs": 16,
+    "smooth_pairs": 16,
+    "every_v_zero": true
+  },
+  "report": {
+    "path": "reports/proof-20261109-five-control/report.pdf",
+    "pages": 2,
+    "bytes": 61281,
+    "sha256": "17250ab425411dcdd02d44ac0ab105712425042ae04be373f13d21cc0ec98537",
+    "visually_inspected_at": "2026-11-09T22:01:29Z",
+    "diagram_visually_inspected": true
+  },
+  "calibration": {
+    "protocol_id": "AUDIT-MUMFORD-CALIBRATION-20261109-v1",
+    "sha256": "f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6",
+    "frozen_at": "2026-11-09T21:52:34Z",
+    "filed_before_affected_data": true,
+    "source_commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464",
+    "status": "Frozen; must be committed before first affected call. No curve invocation yet."
+  },
+  "scope": "Complete actual F5polynomial-pair model only; geometric Picard/Jacobian, LeanF5Cantor and scaling/qualified asymptotics remain separate.",
+  "new_native_curve_population": false,
+  "paid_spend": 0
+}

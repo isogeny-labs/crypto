@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:47:53Z",
+ "id": "PCC-20261114-401e74",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e3f20752022a341a4612e6a72e8e5690f8c6baa",
+  "model": "",
+  "session": "norm-split-base-descent-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a7a3d17637785670ae6ea1a04963149e220dc6ddfc4bce1c6a9ae3ea6d0cf832",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormSplitBaseDescent.monicPairUnique"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration/context: Field L; prime p and CharP for Frobenius descent; explicitly fixed public abscissas and public square roots; actual monic norm divisor of public nodal polynomial; pole degree window proved, selected support and successful signs derived. Actual chart uses target outside base and computed support remainder0. DecidableEq on finite-set insertion helper, classically supplied by caller. General arbitrary-arity rigidity versus fixed degree5 actual specialization distinguished. No successful finder algorithm, coverage/retry, weighted closure/normal form or sub-exponential expected bit-cost theorem. Unsigned, fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormSplitBaseDescent.monicPairUnique: theorem monicPairUnique (f G A0 B0 A1 B1 : L[X]) (hG : G\u22600) (hA0 : A0.Monic) (hA1 : A1.Monic) (hn0 : A0^2-f*B0^2=G) (hn1 : A1^2-f*B1^2=G) (hcross : A0*B1-A1*B0=0) : A1=A0 \u2227 B1=B0"
+}

@@ -1,0 +1,12 @@
+# Results trees of this route. Owner decision 22 (no S3): the study names' trees (results/pkm-x-t14-k0-c7-d54*/, the h1-h3 retries included) are
+# committed and pushed; fetch.sh --delete REF deletes the pod only after the git gate finds every file in a pushed
+# commit. Development trees stay out of git (their manifests and admission lines are in receipts_dev/).
+/results/pkm-x-dev-*/
+# Re-include the receipts', results' and fixtures' .log files, which the local rule research/*_20261107/**/*.log in
+# .git/info/exclude would hide (run.log and fetch.log are receipts; the results' and fixture logs carry the pilot peak
+# lines).
+!/receipts/**/*.log
+!/receipts_dev/**/*.log
+!/results/pkm-x-t14-k0-c7-d54*/**/*.log
+!/tests/fixtures/**/*.log
+!/smoke/**/*.log

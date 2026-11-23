@@ -1,0 +1,15 @@
+# Independent owner-receipt base source review
+
+Read-only2026-10-30. Initial supervisor-owner-receipt.patch SHA ff53c2519ca156c172914c612633586bdbfae2ca27a2cb1a3e8fcabeb11d298c; owner_observation.rs SHA8e06c04307f6afc0ebdbc392d6c1128dc0017f4c27957b536dd1056b0dc03821. No application, build, tests, cloud or scientific execution. Enclosing-evidence closure increment remains separately pending.
+
+Required integration finding: existing checkpoint_completion independently waitpid-reaps the payload when completion races checkpoint. Owner.poll then gets ECHILD, losing the successful owner wait4/receipt path. The same owner observation must handle that reaper too, or emit explicit unavailable evidence without implying a receipt exists. Author acknowledged and is preparing an additive corrected patch; this original finding record is preserved.
+
+Other inspected paths: wait4 output/rusage is read only on the expected PID return; EINTR retries and no-reap remains unknown. Successful reap returns its actual exit code despite receipt publication failure. Deadline observation is nonblocking and may explicitly lack reap; it supplies no guaranteed final cleanup or extension. CPU usage is correctly scoped to direct-child OS accounting, not cumulative worker budget.
+
+Postexec identity observation checks PID starttime before and after hashing /proc/PID/exe against the requested executable. Fast completion before observation cannot become a confirmed identity. Initial attempt only is eligible; restored attempts remain unsupported for clock binding. Same-epoch checks include boot ID/time namespace/offsets and monotonic ordering. This is source logic, not a real exec/restore demonstration or proof that arbitrary later process behavior cannot change.
+
+Evidence reads traverse fixed directory components with openat O_NOFOLLOW, use O_NONBLOCK for the leaf, reject nonregular files, cap bytes before parsing and reject nested duplicate keys. Exact preparation SHA-derived clock identity is compared with journal and owner epoch. Current bind_files verifies file/clock association only, not the entire native journal or request/launch scientific lineage. It intentionally does not emit accepted closure.
+
+Receipt publication is exclusive0600 temporary plus hard-link/no overwrite and checked sync in the existing protected control directory. Post-link sync failure may leave visible bytes with uncertain durability; published=true prevents overwriting. Publication failure after reap can lose a retriable observation but is stderr-visible and does not turn exit success into a false receipt claim. Controller must bind exact Pod/request/attempt/runtime and retrieved bytes separately. Parent/root-owned path custody is a trust boundary, not established by receipt self-assertion.
+
+No further concrete source defect identified in the initial observation-only scope. No runtime, authenticity, active-worker, full-journal validity or scientific admission is certified. Required software cases and later closure semantics remain review/validation work.

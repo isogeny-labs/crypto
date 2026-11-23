@@ -1,0 +1,129 @@
+{
+  "schema": "theriault-iid-source-plan/v1",
+  "created": "2026-11-14T01:45:54.246024+00:00",
+  "formal": {
+    "project": "research/theriault_iid_audit_20261114/lean",
+    "theorem": "TheriaultIidAudit.actual_iid_collision_certificate",
+    "statement": "theorem actual_iid_collision_certificate : (∀ (α : Type) [Fintype α] [DecidableEq α] [Nonempty α], Function.Involutive (pairedNeg : α × Bool → α × Bool) ∧ (∀ p : α × Bool, pairedNeg p ≠ p) ∧ (∀ p q : α × Bool, p.1 = q.1 ↔ p = q ∨ p = pairedNeg q) ∧ (∀ s : ℕ, expectedRepeats α s = (s : ℚ) - Fintype.card α + Fintype.card α * (1-1/(Fintype.card α : ℚ))^s) ∧ (∀ s : ℕ, projectedExpectation α Bool s = TheriaultCollisionAudit.sourceClosedForm (Fintype.card (α × Bool) : ℚ) s) ∧ (∀ s : ℕ, projectedExpectation α Bool (s+1) = (1-2/(Fintype.card (α × Bool) : ℚ))*projectedExpectation α Bool s + 2*s/(Fintype.card (α × Bool) : ℚ)) ∧ (∀ s : ℕ, 3 ≤ s → (s : ℚ) ≤ (Fintype.card (α × Bool) : ℚ)/2 → 4*(s : ℚ)^2/(9*(Fintype.card (α × Bool) : ℚ)) ≤ projectedExpectation α Bool s ∧ projectedExpectation α Bool s ≤ (s : ℚ)^2/(Fintype.card (α × Bool) : ℚ))) ∧ (∀ t : ℕ, (3 : ℚ) < (Fintype.card (Fin (t+4) × Bool) : ℚ)/2 ∧ ¬ (2*(3 : ℚ)^2/(3*(Fintype.card (Fin (t+4) × Bool) : ℚ)) ≤ projectedExpectation (Fin (t+4)) Bool 3)) ∧ (∀ b : ℕ, ∃ t : ℕ, b < Fintype.card (Fin (t+4) × Bool)) ∧ projectedExpectation (Fin 4) Bool 3 = 11/16 ∧ expectedRepeats (Fin 8) 3 = 23/64",
+    "decl_sha256": "035eb0bb9f1f2a542ded17bb754cb52f07f544dcfb3eda14eb407631cad742ea",
+    "scope": "Actual generic finite uniform iid sampling proof, not assumed recurrence. All finite nonempty colors/all sample sizes: actual natural repeatcount s−card(image), complete uniform function sample average, avoid-a-color subtype count(m−1)^s, finite sum indicator interchange yields s−m+m(1−1/m)^s. Product-function equivalence transfers actual average to paired poolα×Bool; free involution/exact orbit semantics bound. Actual source closedform/zero/recurrence and direct repaired4s²/(9n)<=E<=s²/n for3<=s<=n/2. Unbounded actual even-pool counterfamily Fin(t+4)×Bool at s3 meets strict source domain and refutes original lower bound; poolcard unbounded. Paired8mean11/16 versus unpaired8mean23/64 control. Prior immutable recurrence module byte-equal; source reading/IDCscalar supplement retained. Generic paired iid bridge closed, not actual algorithm walks/Jacobian uniformity/rank/invertibility/runtime theorem. No fullpaperread/novelty/corpus promotion/native experiment/spend/upload.",
+    "sources": [
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/IidCertificate.lean",
+        "bytes": 1957,
+        "sha256": "a16fbcfbbd8798cabe15997f8b8b1d943b6f2747cabd381addb812dcb678234e"
+      },
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/PairedOccupancy.lean",
+        "bytes": 5590,
+        "sha256": "a2b3b48ab3ae9b2bd3b7615c35b3dc1ebfccf59268800eb527b8c6c408c1f4ad"
+      },
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/RecurrenceBounds.lean",
+        "bytes": 3311,
+        "sha256": "bd5f8956865bab0df2fee26da75996e1b546dd35498c5d5ee673452b1d0bb028"
+      },
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/UniformOccupancy.lean",
+        "bytes": 3275,
+        "sha256": "ff6394fa4316d43768096c6bd40d964962bd1a81e165cb5887349595105e3931"
+      },
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/lakefile.toml",
+        "bytes": 353,
+        "sha256": "8748c3490f8370128b9d20dfc067a1a6dc0f338e87423f2731d9eba66a517b0a"
+      },
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3240,
+        "sha256": "bed703cff4f9e0b55c9b78f7163e002a7760624746ece2e0cdcece8d82bc8189"
+      },
+      {
+        "path": "research/theriault_iid_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/theriault_iid_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 12714,
+      "sha256": "469f29aa2abb23eb45a10099bd05f7ee2c4ee4a6ef912624ac9673fe6114bdef"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/evidence/attempts.json",
+      "bytes": 10754,
+      "sha256": "d6a8e4400bb35b5becf77df6017b965dbfc83b8e64d714f89062938b0c0448fe"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1305,
+      "sha256": "4549bb5c2c6dd4de6d33bdb43e470cc7fc1c50bb8afe15c227eca6391b384613"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/evidence/gate.json",
+      "bytes": 1146,
+      "sha256": "d9df008522aff71a23c4da113219b9df07723debf514dd9f92bf86870aefd92a"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/evidence/source-review.json",
+      "bytes": 4950,
+      "sha256": "29388e1990cb0df04580f1bc46d48bef274f98aa7d2213ac6c454b0bd77e66b4"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/coverage.json",
+      "bytes": 661,
+      "sha256": "3a3e9e92840f81257484c2f8344713655a2bfaf25d13fd0e3f185d837cec4309"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/proof-map.json",
+      "bytes": 1260,
+      "sha256": "055286897e75687ff1cee2c8a7aac6ac595c39ed183480ee43f734337b5e22ef"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/render_report.py",
+      "bytes": 6246,
+      "sha256": "01059cafdc36e2e0df3d42096c36ad064c0f266d7b2fcd02fba9afc381d0f1b8"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/reports/iid-bridge.svg",
+      "bytes": 976,
+      "sha256": "97aada8423d4a11f1a16abc0679fa4d6dd179835ee5eae003c246550a20e1f77"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/reports/layout.json",
+      "bytes": 266,
+      "sha256": "f879583dcd57501f205d5ca9e82b3a3324307bbba6d00ced495660be4a647d58"
+    },
+    {
+      "path": "research/theriault_iid_audit_20261114/reports/report.pdf",
+      "bytes": 47284,
+      "sha256": "15a17cfeeee33e58b1ed04dc580d27da55c39c8ba9c846e63cb045b8b113a97e"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 32,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_paired_iid_recurrence_bridge_proved": true,
+    "unbounded_source_domain_counterfamily": true,
+    "general_source_runtime_refuted": false,
+    "full_paper_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,14 @@
+digraph remainder_review {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.25, ranksep=0.25];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, color="#526675", fillcolor="#edf3f7"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#526675"];
+  hit [label="Line hit: remove seven small Fp roots"];
+  split [label="Current: factor remainder U over Fp\nNonsplit U is refused"];
+  keep [label="Candidate: checked Mumford(U,V) over Fp²\nV = -A/C mod U",fillcolor="#fbf3dd"];
+  full [label="Full Fp relation"];
+  key [label="Canonical remainder class D or -D\nCancel between original rows",fillcolor="#fbf3dd"];
+  proof [label="Certificates + rank + actual target"];
+  hit -> split; hit -> keep;
+  split -> full; keep -> key;
+  full -> proof; key -> proof;
+}

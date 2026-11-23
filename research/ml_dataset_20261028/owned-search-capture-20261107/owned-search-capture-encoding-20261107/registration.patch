@@ -1,0 +1,10 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -4,6 +4,7 @@
+ use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
+ #[path="capture_projection.rs"] pub(in crate::ml_dataset::solvers) mod capture_projection;
++#[path="capture_encoding.rs"] pub(in crate::ml_dataset::solvers) mod capture_encoding;
+ #[path="original_boolean_search_policy.rs"] mod policy;
+ pub(in crate::ml_dataset::solvers) use policy::ProposedPolicy;
+ mod sparse {

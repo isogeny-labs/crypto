@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:07:23Z",
+ "id": "PCC-20261116-06f27b",
+ "kind": "statement",
+ "producer": {
+  "commit": "9c4a872a82d186f2d704820186ecc459b8ed6b57",
+  "model": "",
+  "session": "codex-20261116-nist-differential-test"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/target_weil.cpp",
+    "sha256": "055388fda865e8ccde89a42995892235212a3d51651bde3b04e418461e9009be"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-target-weil.sh",
+    "sha256": "539adaab41f32661fe1a265bdf1852b95c8334f413618219ff9d761f7a19ebc8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/TWIST_PROTOCOL.md",
+    "sha256": "62d2c4317eb2beda28c24628c60e60c9719b099ae327b3259748de2902d1d8e9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-weil-v3/result.json",
+    "sha256": "89898a1acaabd7ccd0239e5dbb326f96ec80f5451e1607d94d8563057412fa6e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-weil-v3/stderr.txt",
+    "sha256": "775a157319f18767a33a1fdaf37cfb804bb7f717a1bddd806ac5011e0d65b11d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-weil-v3/pre-call-manifest.sha256",
+    "sha256": "afcb64f9b1779a04190875c210c13d97b404e7dd5cee50c5c0b92c5943d683dd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-weil-v3/post-call-source-manifest.sha256",
+    "sha256": "325f1fd78f402a91ee52bf72634e2353c0370a5abd4d8bb3d9b34ca6a07a9ae5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "On the fixed actual P-192 kernel1 quartic candidate, the target Weil-function producer completes contact-divisor and exact conic residual arithmetic, four odd-function normalizations with diagonal and heldout torsion checks, and two corruption controls under address/undefined sanitizers. This is a target function-layer component; no Serre-twist verdict or source divisor map is supplied. Producer-unverified."
+}

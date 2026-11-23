@@ -1,0 +1,32 @@
+import WordGeneric
+open PencilWordRefinement Polynomial
+set_option maxRecDepth 6000
+set_option maxHeartbeats 1200000
+instance : Fact (UInt64.toNat (7:UInt64)).Prime := ⟨by decide⟩
+example : (genericWords 7 ⟨0,1,2,2⟩ ⟨0,4,0,0,3,2⟩ 0).k ≠ 0 := by decide
+example : (genericWords 7 ⟨0,1,2,2⟩ ⟨0,4,0,0,3,2⟩ 0).payload.canonical 7 := by unfold WeightedWord.canonical; decide
+example : genericWordDispatch 7 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩ 0 = none := by decide
+example : ¬ (⟨0,7,2,2⟩:WordD1).canonical 7 := by unfold WordD1.canonical; decide
+example : (genericWords 7 ⟨0,1,0,2⟩ ⟨0,4,0,0,3,2⟩ 0).k=0 := by decide
+example : let a : WordD1 := ⟨0,1,2,2⟩
+ let b : WeightedWord := ⟨0,4,0,0,3,2⟩
+ let c := (genericWords 7 a b 0).payload
+ genericWordDispatch 7 a b 0=some c ∧ c.canonical 7 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) (-1) 1 0) := by
+ apply generic_word_preserves
+ · decide
+ · decide
+ · unfold WordD1.canonical; decide
+ · unfold WeightedWord.canonical; decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny, show (7:UInt64).toNat=7 from rfl]
+   refine ⟨X^4+X-1,?_⟩
+   simp [MixedGeneric.curve]; ring
+ · norm_num [WeightedWord.normalizedValid, show (7:UInt64).toNat=7 from rfl]
+   refine ⟨X^3-X+1,?_⟩
+   simp [MixedGeneric.curve]; ring
+ · norm_num [MixedGeneric.genericK,WordD1.decode,WeightedWord.decodeTwo, show (7:UInt64).toNat=7 from rfl]

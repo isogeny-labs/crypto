@@ -1,0 +1,75 @@
+import Union
+set_option autoImplicit false
+namespace UnionReviewer
+open GraphUnion GraphFind SignedGraphAlgebra
+
+def g : GraphFind.State ℚ 4 :=
+ ⟨fun i=>if i=2 then 0 else if i=3 then 2 else i,
+ fun i=>if i=2 then ⟨-1,5,1⟩ else if i=3 then ⟨1,-2,2⟩ else ident⟩
+def s : GraphUnion.State ℚ 4 := ⟨g,fun i=>if i=0 then some (1,1) else if i=3 then some (2,2) else none⟩
+def vals : Fin 4→ℚ := fun i=>if i=0 then 3 else if i=1 then 7 else if i=2 then 4 else 6
+def p : Potential ℚ := unionPotential 1 (-1) (-8) 2
+
+theorem initial_valid : Valid s vals 2 := by
+ constructor
+ · intro i; fin_cases i <;> norm_num [Represents,s,g,vals,ident,eval]
+ · intro i a b h
+   fin_cases i <;> simp [s] at h
+   · rcases h with ⟨rfl,rfl⟩; norm_num [vals]
+   · rcases h with ⟨rfl,rfl⟩; norm_num [vals]
+
+theorem forward_global_check : Valid (joined s 0 1 p) vals 2 := by
+ apply forward_global s 0 1 1 (-1) (-8) 2 2 vals initial_valid
+ · norm_num
+ · norm_num
+ · norm_num [vals]
+
+theorem reverse_global_check : Valid (joined s 1 0 (reverse p)) vals 2 := by
+ apply backward_global s 0 1 1 (-1) (-8) 2 2 vals initial_valid
+ · norm_num
+ · norm_num
+ · norm_num [vals]
+
+theorem reverse_changes_offsets : (reverse p).s=1 ∧ (reverse p).a=8 ∧ (reverse p).b=(-2) := by
+ norm_num [p,unionPotential,reverse]
+
+theorem grandchild_unchanged : (joined s 0 1 p).graph.parent 3=2 ∧
+ eval ((joined s 0 1 p).graph.pot 3) (vals ((joined s 0 1 p).graph.parent 3)) 2=6 := by
+ norm_num [joined,compress,s,g,p,vals,eval]
+
+theorem all_stored_anchors : (joined s 0 1 p).fixed 0=some (1,1) ∧
+ (joined s 0 1 p).fixed 1=some (9,-1) ∧ (joined s 0 1 p).fixed 3=some (2,2) := by
+ norm_num [joined,s,p,unionPotential,transport]
+
+def both : GraphUnion.State ℚ 4 := ⟨g,fun i=>if i=0 then some (1,1) else if i=1 then some (3,2) else none⟩
+theorem both_valid : Valid both vals 2 := by
+ constructor
+ · exact initial_valid.1
+ · intro i a b h
+   fin_cases i <;> simp [both] at h
+   · rcases h with ⟨rfl,rfl⟩; norm_num [vals]
+   · rcases h with ⟨rfl,rfl⟩; norm_num [vals]
+
+theorem both_answer : result both 0 1 p=some 2 := by
+ norm_num [result,both,transport,p,unionPotential,constraint]
+
+def equalAnchors : GraphUnion.State ℚ 4 := ⟨g,fun i=>if i=0 then some (1,1) else if i=1 then some (9,-1) else none⟩
+theorem zero_consistent_result : result equalAnchors 0 1 p=none ∧
+ (9:ℚ)-(transport p (1,1)).1=0 ∧ (-1:ℚ)-(transport p (1,1)).2=0 := by
+ norm_num [result,equalAnchors,transport,p,unionPotential,constraint]
+
+def badAnchors : GraphUnion.State ℚ 4 := ⟨g,fun i=>if i=0 then some (1,1) else if i=1 then some (8,-1) else none⟩
+theorem inconsistent_prestate_rejected : ¬Valid badAnchors vals 2 := by
+ intro h
+ have he:=h.2 1 8 (-1) (by simp [badAnchors])
+ norm_num [vals] at he
+
+theorem invalid_zero_constraint_model_boundary : result badAnchors 0 1 p=none ∧
+ (8:ℚ)-(transport p (1,1)).1≠0 ∧ (-1:ℚ)-(transport p (1,1)).2=0 := by
+ norm_num [result,badAnchors,transport,p,unionPotential,constraint]
+
+theorem wrong_reverse_target_sign : ¬Represents (compress g 1 0 ⟨1,8,2⟩) vals 2 := by
+ intro h
+ have he:=h 1
+ norm_num [compress,vals,eval] at he
+end UnionReviewer

@@ -1,0 +1,2356 @@
+{
+  "admissible": true,
+  "coverage": {
+    "missing_development_methods": [],
+    "missing_development_nested_algorithms": [],
+    "required_method_count": 79,
+    "required_nested_algorithm_count": 24
+  },
+  "development": {
+    "method_count": 79,
+    "methods": [
+      "bsgs.interleaved",
+      "bsgs.interleaved_v2",
+      "bsgs.negation",
+      "bsgs.negation_table",
+      "bsgs.negation_v2",
+      "bsgs.textbook",
+      "bsgs.textbook_v2",
+      "claw.pair_table",
+      "claw.pair_table_v2",
+      "ic.aps_v1",
+      "ic.cm_folded_native_d43_v1",
+      "ic.cm_folded_native_d43_v2",
+      "ic.cm_folded_native_v1",
+      "ic.cm_folded_native_v2",
+      "ic.cm_folded_recurrence_v1",
+      "ic.cm_folded_recurrence_v2",
+      "ic.hyperelliptic",
+      "ic.hyperelliptic_thread",
+      "ic.hyperelliptic_v2",
+      "ic.k4_gaudry",
+      "ic.known_log_ksum_v1",
+      "ic.known_log_mitm2_v1",
+      "ic.koblitz_descent",
+      "ic.large_prime",
+      "ic.large_prime_v2",
+      "ic.pipeline",
+      "ic.pipeline_counted",
+      "ic.pipeline_full",
+      "ic.pipeline_wordram",
+      "ic.prime_orbit_relations_v1",
+      "ic.shared_rank",
+      "ic.tensor_contraction_v1",
+      "ic.three_leads_decomposition_v1",
+      "ic.three_leads_decomposition_v2",
+      "ic.three_leads_genus2_choice2_v1",
+      "ic.three_leads_genus2_pencil_symbolic_v2",
+      "ic.three_leads_genus2_projective_chart_v1",
+      "ic.three_leads_genus2_target_rank_v1",
+      "ic.three_leads_genus2_v1",
+      "ic.three_leads_genus2_v2",
+      "ic.trace_line_2lp",
+      "jacobian_image.bsgs",
+      "jacobian_image.bsgs_field_tally",
+      "jacobian_image.rho3",
+      "jacobian_image.rho3_field_tally",
+      "kangaroo.vow",
+      "kangaroo.vow_v2",
+      "rho.best2_model_v1",
+      "rho.cubic",
+      "rho.cubic_v2",
+      "rho.frobenius_orbit",
+      "rho.frozen_reference",
+      "rho.gls",
+      "rho.multitarget_pooled",
+      "rho.negation",
+      "rho.negation_strong",
+      "rho.negation_v2",
+      "rho.plain",
+      "rho.plus_model_v1",
+      "rho.preprocessing",
+      "rho.quartic",
+      "rho.quartic_v2",
+      "rho.signed_frobenius",
+      "rho.signed_frobenius_full",
+      "rho.signed_frobenius_strong",
+      "rho.signed_frobenius_strong_escape",
+      "rho.signed_frobenius_strong_full",
+      "rho.signed_frobenius_strong_legacy",
+      "rho.signed_frobenius_strong_v2",
+      "rho.signed_frobenius_strong_wordram",
+      "rho.signed_frobenius_v2",
+      "rho.signed_frobenius_wordram",
+      "rho.three_leads_jacobian_v1",
+      "rho.three_leads_negation_v1",
+      "rho.three_leads_plain_v1",
+      "transfer.ghs_cover",
+      "transfer.isogeny",
+      "transfer.quartic_cover",
+      "transfer.quartic_cover_v2"
+    ],
+    "nested_algorithm_count": 24,
+    "nested_algorithms": [
+      "pdp3_engine/f6-ic",
+      "pdp3_engine/f6-ic-pair",
+      "pdp3_engine/inherited-f4",
+      "pdp3_engine/matrix-f4",
+      "pdp3_engine/matrix-f5",
+      "pdp3_engine/rootfind",
+      "pdp3_engine/rootfind-negfold",
+      "pdp3_engine/rootfind-window",
+      "pdp3_engine/rootfind-window-negfold",
+      "pkm_tower_engine/enum",
+      "pkm_tower_engine/f4",
+      "pkm_tower_engine/f6",
+      "pkm_tower_engine/sig-f5",
+      "system_solver/buchberger-f2",
+      "system_solver/crossbred-f2",
+      "system_solver/exhaustive",
+      "system_solver/f4-f2",
+      "system_solver/fes-f2",
+      "system_solver/fes-f2-wide",
+      "system_solver/inherited-f4",
+      "system_solver/matrix-f4",
+      "system_solver/matrix-f5",
+      "system_solver/sat-cdcl",
+      "system_solver/xl-f2"
+    ],
+    "specs": [
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Binary n=11 large-prime-v2 implementation frontier, target block 1/2",
+        "measurement_seed": 202610470110,
+        "methods": [
+          "ic.large_prime_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/binary-large-prime-n11-t0.json",
+        "rounds": 6,
+        "target_seed": 202610460110,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Binary n=11 large-prime-v2 implementation frontier, target block 2/2",
+        "measurement_seed": 202610470111,
+        "methods": [
+          "ic.large_prime_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/binary-large-prime-n11-t1.json",
+        "rounds": 6,
+        "target_seed": 202610460111,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^10)^4) specialized IC/rho frontier, target block 1/2",
+        "measurement_seed": 202610450100,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation",
+          "rho.negation_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-m10-t0.json",
+        "rounds": 6,
+        "target_seed": 202610440100,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^10)^4) specialized IC/rho frontier, target block 2/2",
+        "measurement_seed": 202610450101,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation",
+          "rho.negation_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-m10-t1.json",
+        "rounds": 6,
+        "target_seed": 202610440101,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^12)^4) specialized IC/rho frontier, target block 1/2",
+        "measurement_seed": 202610450120,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation",
+          "rho.negation_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-m12-t0.json",
+        "rounds": 6,
+        "target_seed": 202610440120,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^12)^4) specialized IC/rho frontier, target block 2/2",
+        "measurement_seed": 202610450121,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation",
+          "rho.negation_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-m12-t1.json",
+        "rounds": 6,
+        "target_seed": 202610440121,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^15)^4) specialized IC/rho frontier, target block 1/2",
+        "measurement_seed": 202610450150,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation",
+          "rho.negation_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-m15-t0.json",
+        "rounds": 6,
+        "target_seed": 202610440150,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^15)^4) specialized IC/rho frontier, target block 2/2",
+        "measurement_seed": 202610450151,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation",
+          "rho.negation_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-m15-t1.json",
+        "rounds": 6,
+        "target_seed": 202610440151,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^16)^4) wide two-word implementation frontier, target block 1/2",
+        "measurement_seed": 202610450160,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-wide-m16-t0.json",
+        "rounds": 6,
+        "target_seed": 202610440160,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "F_((2^16)^4) wide two-word implementation frontier, target block 2/2",
+        "measurement_seed": 202610450161,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/f2m4-wide-m16-t1.json",
+        "rounds": 6,
+        "target_seed": 202610440161,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz a=1 n=29 one-column generator-orbit engineering frontier, target block 1/2",
+        "measurement_seed": 202610430290,
+        "methods": [
+          "ic.pipeline_full",
+          "rho.signed_frobenius_full",
+          "rho.signed_frobenius_strong_full"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/generator-orbit-a1-n29-t0.json",
+        "rounds": 6,
+        "target_seed": 202610420290,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz a=1 n=29 one-column generator-orbit engineering frontier, target block 2/2",
+        "measurement_seed": 202610430291,
+        "methods": [
+          "ic.pipeline_full",
+          "rho.signed_frobenius_full",
+          "rho.signed_frobenius_strong_full"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/generator-orbit-a1-n29-t1.json",
+        "rounds": 6,
+        "target_seed": 202610420291,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610352130,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-algebraic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340130,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610352131,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-algebraic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340131,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 pair-claw frontier, target block 1/2",
+        "measurement_seed": 202610353130,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-claw-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340130,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 pair-claw frontier, target block 2/2",
+        "measurement_seed": 202610353131,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-claw-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340131,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 rho frontier, target block 1/2",
+        "measurement_seed": 202610350130,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-rho-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340130,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 rho frontier, target block 2/2",
+        "measurement_seed": 202610350131,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-rho-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340131,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 root-finding frontier, target block 1/2",
+        "measurement_seed": 202610351130,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-rootfind-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340130,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=13 root-finding frontier, target block 2/2",
+        "measurement_seed": 202610351131,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n13-rootfind-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340131,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610352190,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-algebraic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340190,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610352191,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-algebraic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340191,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 pair-claw frontier, target block 1/2",
+        "measurement_seed": 202610353190,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-claw-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340190,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 pair-claw frontier, target block 2/2",
+        "measurement_seed": 202610353191,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-claw-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340191,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 rho frontier, target block 1/2",
+        "measurement_seed": 202610350190,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-rho-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340190,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 rho frontier, target block 2/2",
+        "measurement_seed": 202610350191,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-rho-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340191,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 root-finding frontier, target block 1/2",
+        "measurement_seed": 202610351190,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-rootfind-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340190,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=19 root-finding frontier, target block 2/2",
+        "measurement_seed": 202610351191,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n19-rootfind-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340191,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610352230,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-algebraic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340230,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610352231,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-algebraic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340231,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 pair-claw frontier, target block 1/2",
+        "measurement_seed": 202610353230,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-claw-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340230,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 pair-claw frontier, target block 2/2",
+        "measurement_seed": 202610353231,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-claw-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340231,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 rho frontier, target block 1/2",
+        "measurement_seed": 202610350230,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-rho-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340230,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 rho frontier, target block 2/2",
+        "measurement_seed": 202610350231,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-rho-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340231,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 root-finding frontier, target block 1/2",
+        "measurement_seed": 202610351230,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-rootfind-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340230,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=23 root-finding frontier, target block 2/2",
+        "measurement_seed": 202610351231,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n23-rootfind-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340231,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610352310,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-algebraic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340310,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610352311,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-algebraic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 pair-claw frontier, target block 1/2",
+        "measurement_seed": 202610353310,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-claw-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340310,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 pair-claw frontier, target block 2/2",
+        "measurement_seed": 202610353311,
+        "methods": [
+          "claw.pair_table_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-claw-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 rho frontier, target block 1/2",
+        "measurement_seed": 202610350310,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-rho-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340310,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 rho frontier, target block 2/2",
+        "measurement_seed": 202610350311,
+        "methods": [
+          "rho.negation_v2",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2",
+          "rho.signed_frobenius_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-rho-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 root-finding frontier, target block 1/2",
+        "measurement_seed": 202610351310,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-rootfind-t0.json",
+        "rounds": 6,
+        "target_seed": 202610340310,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz E0 n=31 root-finding frontier, target block 2/2",
+        "measurement_seed": 202610351311,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind",
+          "pdp3_engine/rootfind-negfold"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/koblitz-n31-rootfind-t1.json",
+        "rounds": 6,
+        "target_seed": 202610340311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 20-bit generic-algorithm frontier, target block 1/2",
+        "measurement_seed": 202610331200,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p20-generic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320200,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 20-bit generic-algorithm frontier, target block 2/2",
+        "measurement_seed": 202610331201,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p20-generic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320201,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 20-bit factor-base and root-finding frontier, target block 1/2",
+        "measurement_seed": 202610330200,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p20-ic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320200,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 20-bit factor-base and root-finding frontier, target block 2/2",
+        "measurement_seed": 202610330201,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p20-ic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320201,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 24-bit generic-algorithm frontier, target block 1/2",
+        "measurement_seed": 202610331240,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p24-generic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320240,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 24-bit generic-algorithm frontier, target block 2/2",
+        "measurement_seed": 202610331241,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p24-generic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320241,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 24-bit factor-base and root-finding frontier, target block 1/2",
+        "measurement_seed": 202610330240,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p24-ic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320240,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 24-bit factor-base and root-finding frontier, target block 2/2",
+        "measurement_seed": 202610330241,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p24-ic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320241,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 28-bit generic-algorithm frontier, target block 1/2",
+        "measurement_seed": 202610331280,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p28-generic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320280,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 28-bit generic-algorithm frontier, target block 2/2",
+        "measurement_seed": 202610331281,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p28-generic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320281,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 28-bit factor-base and root-finding frontier, target block 1/2",
+        "measurement_seed": 202610330280,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p28-ic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320280,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 28-bit factor-base and root-finding frontier, target block 2/2",
+        "measurement_seed": 202610330281,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p28-ic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320281,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 32-bit generic-algorithm frontier, target block 1/2",
+        "measurement_seed": 202610331320,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p32-generic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320320,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 32-bit generic-algorithm frontier, target block 2/2",
+        "measurement_seed": 202610331321,
+        "methods": [
+          "bsgs.interleaved_v2",
+          "bsgs.negation_v2",
+          "bsgs.textbook_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p32-generic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320321,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 32-bit factor-base and root-finding frontier, target block 1/2",
+        "measurement_seed": 202610330320,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p32-ic-t0.json",
+        "rounds": 6,
+        "target_seed": 202610320320,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime 32-bit factor-base and root-finding frontier, target block 2/2",
+        "measurement_seed": 202610330321,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/prime-p32-ic-t1.json",
+        "rounds": 6,
+        "target_seed": 202610320321,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=13 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610371130,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n13-inherited-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360130,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=13 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610371131,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n13-inherited-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360131,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=13 matrix F4/F5 frontier, target block 1/2",
+        "measurement_seed": 202610370130,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n13-matrix-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360130,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=13 matrix F4/F5 frontier, target block 2/2",
+        "measurement_seed": 202610370131,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n13-matrix-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360131,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=19 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610371190,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n19-inherited-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360190,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=19 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610371191,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n19-inherited-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360191,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=19 matrix F4/F5 frontier, target block 1/2",
+        "measurement_seed": 202610370190,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n19-matrix-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360190,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=19 matrix F4/F5 frontier, target block 2/2",
+        "measurement_seed": 202610370191,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n19-matrix-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360191,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=23 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610371230,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n23-inherited-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360230,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=23 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610371231,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n23-inherited-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360231,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=23 matrix F4/F5 frontier, target block 1/2",
+        "measurement_seed": 202610370230,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n23-matrix-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360230,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=23 matrix F4/F5 frontier, target block 2/2",
+        "measurement_seed": 202610370231,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n23-matrix-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360231,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=31 inherited-F4/F6 frontier, target block 1/2",
+        "measurement_seed": 202610371310,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n31-inherited-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360310,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=31 inherited-F4/F6 frontier, target block 2/2",
+        "measurement_seed": 202610371311,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n31-inherited-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=31 matrix F4/F5 frontier, target block 1/2",
+        "measurement_seed": 202610370310,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n31-matrix-t0.json",
+        "rounds": 6,
+        "target_seed": 202610360310,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Random-binary n=31 matrix F4/F5 frontier, target block 2/2",
+        "measurement_seed": 202610370311,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/matrix-f4",
+          "pdp3_engine/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/random-binary-n31-matrix-t1.json",
+        "rounds": 6,
+        "target_seed": 202610360311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 1-2, target block 1/2",
+        "measurement_seed": 202610390170,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/buchberger-f2",
+          "system_solver/f4-f2"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g0-t0.json",
+        "rounds": 6,
+        "target_seed": 202610380170,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 1-2, target block 2/2",
+        "measurement_seed": 202610390171,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/buchberger-f2",
+          "system_solver/f4-f2"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g0-t1.json",
+        "rounds": 6,
+        "target_seed": 202610380171,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 3-4, target block 1/2",
+        "measurement_seed": 202610390190,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/matrix-f4",
+          "system_solver/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g1-t0.json",
+        "rounds": 6,
+        "target_seed": 202610380170,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 3-4, target block 2/2",
+        "measurement_seed": 202610390191,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/matrix-f4",
+          "system_solver/matrix-f5"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g1-t1.json",
+        "rounds": 6,
+        "target_seed": 202610380171,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 5-6, target block 1/2",
+        "measurement_seed": 202610390210,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/crossbred-f2",
+          "system_solver/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g2-t0.json",
+        "rounds": 6,
+        "target_seed": 202610380170,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 5-6, target block 2/2",
+        "measurement_seed": 202610390211,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/crossbred-f2",
+          "system_solver/inherited-f4"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g2-t1.json",
+        "rounds": 6,
+        "target_seed": 202610380171,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 7-8, target block 1/2",
+        "measurement_seed": 202610390230,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/sat-cdcl",
+          "system_solver/xl-f2"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g3-t0.json",
+        "rounds": 6,
+        "target_seed": 202610380170,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 7-8, target block 2/2",
+        "measurement_seed": 202610390231,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/sat-cdcl",
+          "system_solver/xl-f2"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g3-t1.json",
+        "rounds": 6,
+        "target_seed": 202610380171,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 9-10, target block 1/2",
+        "measurement_seed": 202610390250,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/fes-f2",
+          "system_solver/fes-f2-wide"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g4-t0.json",
+        "rounds": 6,
+        "target_seed": 202610380170,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 9-10, target block 2/2",
+        "measurement_seed": 202610390251,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/fes-f2",
+          "system_solver/fes-f2-wide"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g4-t1.json",
+        "rounds": 6,
+        "target_seed": 202610380171,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 11-11, target block 1/2",
+        "measurement_seed": 202610390270,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/exhaustive"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g5-t0.json",
+        "rounds": 6,
+        "target_seed": 202610380170,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 2,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Koblitz n=17 algebraic solver backends 11-11, target block 2/2",
+        "measurement_seed": 202610390271,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_escape",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "system_solver/exhaustive"
+        ],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/solver-k17-g5-t1.json",
+        "rounds": 6,
+        "target_seed": 202610380171,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime j0 symmetry frontier, target block 1/2",
+        "measurement_seed": 202610410000,
+        "methods": [
+          "bsgs.negation_v2",
+          "kangaroo.vow_v2",
+          "rho.cubic",
+          "rho.cubic_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/symmetry-j0-t0.json",
+        "rounds": 6,
+        "target_seed": 202610400000,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime j0 symmetry frontier, target block 2/2",
+        "measurement_seed": 202610410001,
+        "methods": [
+          "bsgs.negation_v2",
+          "kangaroo.vow_v2",
+          "rho.cubic",
+          "rho.cubic_v2",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/symmetry-j0-t1.json",
+        "rounds": 6,
+        "target_seed": 202610400001,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime j1728 symmetry frontier, target block 1/2",
+        "measurement_seed": 202610410100,
+        "methods": [
+          "bsgs.negation_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2",
+          "rho.quartic",
+          "rho.quartic_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/symmetry-j1728-t0.json",
+        "rounds": 6,
+        "target_seed": 202610400100,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Prime j1728 symmetry frontier, target block 2/2",
+        "measurement_seed": 202610410101,
+        "methods": [
+          "bsgs.negation_v2",
+          "kangaroo.vow_v2",
+          "rho.negation_v2",
+          "rho.quartic",
+          "rho.quartic_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_e2e_frontier_20261031/specs/shards/symmetry-j1728-t1.json",
+        "rounds": 6,
+        "target_seed": 202610400101,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: binary large-prime and trace-line references",
+        "measurement_seed": 202611010302,
+        "methods": [
+          "ic.large_prime",
+          "ic.trace_line_2lp",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/binary-large-prime-and-trace.json",
+        "rounds": 4,
+        "target_seed": 202611010301,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: D=-19 external CM backends",
+        "measurement_seed": 202611010412,
+        "methods": [
+          "ic.cm_folded_native_v1",
+          "ic.cm_folded_native_v2",
+          "ic.cm_folded_recurrence_v1",
+          "ic.cm_folded_recurrence_v2",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/cm-d19-external.json",
+        "rounds": 4,
+        "target_seed": 202611010411,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: D=-43 external CM backend",
+        "measurement_seed": 202611010422,
+        "methods": [
+          "ic.cm_folded_native_d43_v1",
+          "ic.cm_folded_native_d43_v2",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/cm-d43-external.json",
+        "rounds": 4,
+        "target_seed": 202611010421,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: subfield Frobenius implementation",
+        "measurement_seed": 202611010314,
+        "methods": [
+          "rho.frobenius_orbit",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/extension-frobenius.json",
+        "rounds": 4,
+        "target_seed": 202611010313,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: GLS endomorphism implementation",
+        "measurement_seed": 202611010312,
+        "methods": [
+          "rho.gls",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/extension-gls.json",
+        "rounds": 4,
+        "target_seed": 202611010311,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: Gaudry k=4 implementation",
+        "measurement_seed": 202611010352,
+        "methods": [
+          "ic.k4_gaudry",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/fp4-gaudry.json",
+        "rounds": 4,
+        "target_seed": 202611010351,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: genus-2 index calculus accounting variants",
+        "measurement_seed": 202611010332,
+        "methods": [
+          "ic.hyperelliptic",
+          "ic.hyperelliptic_v2",
+          "rho.negation"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/genus2-index-calculus.json",
+        "rounds": 4,
+        "target_seed": 202611010331,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: GHS cover transfer",
+        "measurement_seed": 202611010362,
+        "methods": [
+          "rho.negation",
+          "transfer.ghs_cover"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/ghs-transfer.json",
+        "rounds": 4,
+        "target_seed": 202611010361,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: hyperelliptic thread index calculus",
+        "measurement_seed": 202611010342,
+        "methods": [
+          "ic.hyperelliptic_thread",
+          "rho.plain"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/hyperelliptic-thread.json",
+        "rounds": 4,
+        "target_seed": 202611010341,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: same-field Jacobian image implementations",
+        "measurement_seed": 202611010322,
+        "methods": [
+          "jacobian_image.bsgs",
+          "jacobian_image.bsgs_field_tally",
+          "jacobian_image.rho3",
+          "jacobian_image.rho3_field_tally",
+          "rho.signed_frobenius_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/jacobian-image.json",
+        "rounds": 4,
+        "target_seed": 202611010321,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: explicit Koblitz descent",
+        "measurement_seed": 202611010222,
+        "methods": [
+          "ic.koblitz_descent",
+          "rho.signed_frobenius_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/koblitz-descent.json",
+        "rounds": 4,
+        "target_seed": 202611010221,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: Koblitz legacy, priced, and windowed root finding",
+        "measurement_seed": 202611010202,
+        "methods": [
+          "claw.pair_table",
+          "ic.known_log_mitm2_v1",
+          "ic.pipeline_counted",
+          "ic.pipeline_wordram",
+          "rho.signed_frobenius",
+          "rho.signed_frobenius_strong",
+          "rho.signed_frobenius_strong_legacy",
+          "rho.signed_frobenius_strong_wordram",
+          "rho.signed_frobenius_wordram"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/rootfind-window",
+          "pdp3_engine/rootfind-window-negfold"
+        ],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/koblitz-legacy-and-rootfind.json",
+        "rounds": 4,
+        "target_seed": 202611010201,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: Koblitz reusable rank",
+        "measurement_seed": 202611010212,
+        "methods": [
+          "ic.shared_rank",
+          "rho.signed_frobenius_strong"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/koblitz-shared-rank.json",
+        "rounds": 4,
+        "target_seed": 202611010211,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L0",
+        "label": "Post-merge PDP3 F6 pair-index diagnostic",
+        "measurement_seed": 202611019613,
+        "methods": [
+          "ic.pipeline",
+          "rho.signed_frobenius_strong_v2"
+        ],
+        "nested_algorithms": [
+          "pdp3_engine/f6-ic",
+          "pdp3_engine/f6-ic-pair"
+        ],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/post-merge-pdp3-pair.json",
+        "rounds": 4,
+        "target_seed": 202611019513,
+        "warmup": 1,
+        "warnings": [
+          "development clocks are descriptive below L2; only deterministic counts may rank"
+        ]
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L0",
+        "label": "Post-merge prime PKM tower engine diagnostic",
+        "measurement_seed": 202611019617,
+        "methods": [
+          "ic.pipeline",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [
+          "pkm_tower_engine/enum",
+          "pkm_tower_engine/f4",
+          "pkm_tower_engine/f6",
+          "pkm_tower_engine/sig-f5"
+        ],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/post-merge-pkm-tower.json",
+        "rounds": 4,
+        "target_seed": 202611019517,
+        "warmup": 1,
+        "warnings": [
+          "development clocks are descriptive below L2; only deterministic counts may rank"
+        ]
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: generic prime implementations",
+        "measurement_seed": 202611010102,
+        "methods": [
+          "bsgs.interleaved",
+          "bsgs.negation",
+          "bsgs.negation_table",
+          "bsgs.textbook",
+          "ic.aps_v1",
+          "ic.known_log_ksum_v1",
+          "ic.tensor_contraction_v1",
+          "kangaroo.vow",
+          "rho.best2_model_v1",
+          "rho.frozen_reference",
+          "rho.multitarget_pooled",
+          "rho.negation",
+          "rho.plain",
+          "rho.plus_model_v1",
+          "rho.preprocessing",
+          "transfer.quartic_cover",
+          "transfer.quartic_cover_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/prime-generic.json",
+        "rounds": 4,
+        "target_seed": 202611010101,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: rational isogeny transfer",
+        "measurement_seed": 202611010112,
+        "methods": [
+          "rho.negation",
+          "transfer.isogeny"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/prime-isogeny.json",
+        "rounds": 4,
+        "target_seed": 202611010111,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: prime-orbit coordinate and factor-base grid",
+        "measurement_seed": 202611019102,
+        "methods": [
+          "ic.prime_orbit_relations_v1",
+          "rho.negation_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/prime-orbit-grid.json",
+        "rounds": 4,
+        "target_seed": 202611019101,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: prime-orbit j=0 cross-check",
+        "measurement_seed": 202611019202,
+        "methods": [
+          "ic.prime_orbit_relations_v1",
+          "rho.cubic_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/prime-orbit-j0-crosscheck.json",
+        "rounds": 4,
+        "target_seed": 202611019201,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: prime-orbit j=1728 cross-check",
+        "measurement_seed": 202611019302,
+        "methods": [
+          "ic.prime_orbit_relations_v1",
+          "rho.quartic_v2"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/prime-orbit-j1728-crosscheck.json",
+        "rounds": 4,
+        "target_seed": 202611019301,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: three-leads decomposition implementations",
+        "measurement_seed": 202611010404,
+        "methods": [
+          "ic.three_leads_decomposition_v1",
+          "ic.three_leads_decomposition_v2",
+          "rho.three_leads_negation_v1"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/three-leads-decomposition.json",
+        "rounds": 4,
+        "target_seed": 202611010403,
+        "warmup": 1,
+        "warnings": []
+      },
+      {
+        "aa_pairs": 1,
+        "errors": [],
+        "isolation_required": "L2",
+        "label": "Registry optimization development: three-leads implementations",
+        "measurement_seed": 202611010402,
+        "methods": [
+          "ic.three_leads_genus2_choice2_v1",
+          "ic.three_leads_genus2_pencil_symbolic_v2",
+          "ic.three_leads_genus2_projective_chart_v1",
+          "ic.three_leads_genus2_target_rank_v1",
+          "ic.three_leads_genus2_v1",
+          "ic.three_leads_genus2_v2",
+          "rho.three_leads_jacobian_v1",
+          "rho.three_leads_negation_v1",
+          "rho.three_leads_plain_v1"
+        ],
+        "nested_algorithms": [],
+        "path": "research/ecbench_registry_optimization_20261101/specs/development/three-leads.json",
+        "rounds": 4,
+        "target_seed": 202611010401,
+        "warmup": 1,
+        "warnings": []
+      }
+    ]
+  },
+  "holdout": {
+    "method_count": 0,
+    "methods": [],
+    "nested_algorithm_count": 0,
+    "nested_algorithms": [],
+    "specs": []
+  },
+  "interpretation": "admissible freezes campaign structure only; it is not a benchmark result or leaderboard promotion",
+  "leakage": {
+    "reused_measurement_seeds": [],
+    "reused_target_seeds": []
+  },
+  "require_all_development_coverage": true,
+  "schema": "ecbench.optimization-audit/v1"
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "research-reproduction/v1",
+  "working_directory": "/workspace/ecdlp_research",
+  "setup": [
+    "Use Linux with CPUs 0..4 available, Python 3.12, g++ with C++17. Sources currently contain absolute workspace paths; extract under the stated directory or update those paths explicitly.",
+    "Install requirements.txt; install python-flint also into math_vendor if needed by the explicit import paths. Native helpers compile from the supplied C++ source. Cargo/rustc were absent in the measured environment.",
+    "For independent trace source review, restore the original supplied PDF at its recorded attachment path or update trace_audit/review.py to its location; the original PDF is not redistributed in this bundle."
+  ],
+  "paper_pdf_sha256": "bf01081e0261633421a00577dbf35cf84864161e3758ad3c9abdc55327cc963c",
+  "audit_commands": [
+    "python trace_audit/audit.py",
+    "python pool_design/audit.py",
+    "python independent_pool_audit.py",
+    "python repo_controls/check_controls.py",
+    "python incidence/audit.py",
+    "python cross_check_results.py",
+    "python repo_controls/audit_incidence_and_memory.py"
+  ],
+  "timing_commands": [
+    "PYTHONPATH=/workspace/ecdlp_research python fast_trace/benchmark.py --max-degree 128 --repeats 3",
+    "PYTHONPATH=/workspace/ecdlp_research python fast_trace/benchmark_extra.py --suite large",
+    "PYTHONPATH=/workspace/ecdlp_research python fast_trace/benchmark_extra.py --suite paper",
+    "python incidence/benchmark.py --candidate /workspace/ecdlp_research/incidence/timed_candidate_primary.py",
+    "python repo_controls/benchmark_controls.py"
+  ],
+  "summary_commands": [
+    "python aggregate_results.py",
+    "python plot_trace.py"
+  ],
+  "result_preservation": "Rerunning benchmark commands replaces generated result files. Preserve the supplied archive before rerunning. The timing snapshot preserves the original incidence implementation; current candidate.py fixes continuation past uninformative witnesses and its audit proves all original fixtures unchanged.",
+  "cost_boundary": "Algorithm tables rebuild problem-specific state and charge public mixed-label generation separately per attempt. Interpreter/import/native-build startup is excluded from persistent-call timings and retained separately where measured. Do not treat these tables as literal fresh-process latency.",
+  "test_data": "*.validation.json files contain toy secrets and exact truth for audit only. Attack algorithms consume only public *.json fixture files specified in the manifest. Planted controls use test-only secret relabelling and are excluded from natural timing statistics.",
+  "scope": "Machine-word prime fields, growing B through 128 for incidence and divisor degree through 256 for trace. No direct 256-bit or binary-field implementation and no cryptographic-size ECDLP benchmark.",
+  "prior_art": "repo_controls/repository_assessment.json and source_provenance.json distinguish portable ports from exact upstream execution; original Rust binary was not replayed.",
+  "build_commands": [
+    "g++ -O3 -std=c++17 -Wall -Wextra repo_controls/pair_control.cpp -o repo_controls/pair_control"
+  ],
+  "supplement_commands": [
+    "python incidence/compose_panel.py",
+    "python incidence/edge_checks.py",
+    "python incidence/summarize.py"
+  ]
+}

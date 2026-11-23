@@ -3,44 +3,105 @@
   "id": "XP-20261029-twist-factor-base",
   "title": "Native quadratic-twist selection, exact finite base audits, and charged relation search",
   "created": "2026-10-29",
-  "authors": ["native twist factor-base lane"],
+  "authors": [
+    "native twist factor-base lane"
+  ],
   "status": "draft",
-  "status_note": "Native CLI and correctness fixtures are implemented. No scheduler submission, lease, new performance result, or cloud run is claimed. Freeze a merged source pin, checkpoint/recovery contract, and independent evidence/admission before scheduler-ready promotion.",
+  "status_note": "Legacy TR01-03 diagnostic card remains draft. The separate TR04 finite protocol is frozen before primary data; protocol.json is authoritative for its current version/source. Existing ARC EKS workflow and artifact transport are implemented and development-tested. Root validation/source publication and actual checkpoint/runner/store readiness remain pending. No TR04 primary result, scheduler lease/funding or card-ready promotion is implied.",
   "blocked_on": [],
   "links": {
     "lead": "tools/twist-relations/README.md",
-    "notes": ["backlog/XP-20261029-twist-factor-base/PROTOCOL.md", "backlog/XP-20261023-quartic-twist-image-base/README.md"],
+    "notes": [
+      "backlog/XP-20261029-twist-factor-base/PROTOCOL.md",
+      "backlog/XP-20261023-quartic-twist-image-base/README.md",
+      "research/twist_relations_tr04_20261029/PROTOCOL.md",
+      "research/twist_relations_tr04_20261029/protocol.json"
+    ],
     "prs": []
   },
   "question": "Can public quadratic-twist coordinate structure reduce complete original-curve relation and target-solving cost relative to matched ordinary bases?",
   "decision_value": "An exact coverage effect identifies which fixed-base heuristics deserve a cheaper public selector, but only lower complete native solving cost can promote an algorithmic improvement. Counterexamples, rank loss, failed samples and preprocessing regressions determine whether to change selection, relation arity or the useful-information criterion without declaring a universal obstruction.",
-  "protocol": {"path": "PROTOCOL.md", "blob": null},
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": null
+  },
   "code": {
     "repo": "crypto",
     "commit": null,
     "branch": "codex/twist-factor-base-experiments-20261029",
-    "build": [["cargo", "build", "--release", "--locked", "--manifest-path", "tools/twist-relations/Cargo.toml"]]
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "tools/twist-relations/Cargo.toml"
+      ]
+    ]
   },
   "resources": {
-    "cpus": 1, "ram_gb": 2, "disk_gb": 4, "gpu": null,
-    "est_core_hours": null, "est_wall_hours": null,
+    "cpus": 1,
+    "ram_gb": 2,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
     "notes": "Proposed caps, not measured estimates. Native executable deadline is enforced by the runner; benchmark attempt budget is 1000*n per solve. Exact default fields are in PROTOCOL.md. No funding or capacity reservation."
   },
   "run": {
-    "argv": ["tools/twist-relations/target/release/twist-relations", "--suite", "all", "--seeds", "30", "--output-dir", "{out}/diagnostics"],
-    "env": {}, "timeout_per_shard_s": 1800
+    "argv": [
+      "tools/twist-relations/target/release/twist-relations",
+      "--suite",
+      "all",
+      "--seeds",
+      "30",
+      "--output-dir",
+      "{out}/diagnostics"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1800
   },
-  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
-  "checkpoint": {"file": null, "resume_flag": null},
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
   "outputs": {
     "result_schema": "twist-relations/benchmark/v1",
-    "verify": ["tools/twist-relations/target/release/twist-relations", "verify", "{out}/diagnostics/benchmark.json"],
+    "verify": [
+      "tools/twist-relations/target/release/twist-relations",
+      "verify",
+      "{out}/diagnostics/benchmark.json"
+    ],
     "land": "research/twist_factor_base_diagnostics"
   },
   "cairn": {
-    "mode": "lab-task", "space": "TBD", "tasks": ["XP-20261029-twist-factor-base"], "ttl_s": 3600,
-    "env": {"name": "native-twist-factor-base", "recipe": "Build the locked native crate from the eventual merged source pin; no Python research runtime."},
-    "exec": {"cpus": 1, "memory_mb": 2048, "timeout_s": 1800, "sandbox": "auto", "publish": "runs/XP-20261029-twist-factor-base"},
-    "funding": {"units": 0, "rationale": "Unscheduled draft, not a funded repeat of historical diagnostics. Source pin, resumability and independent verification/admission remain open."}
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261029-twist-factor-base"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "native-twist-factor-base",
+      "recipe": "Build the locked native crate from the eventual merged source pin; no Python research runtime."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 2048,
+      "timeout_s": 1800,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261029-twist-factor-base"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unscheduled draft, not a funded repeat of historical diagnostics. Source pin, resumability and independent verification/admission remain open."
+    }
   }
 }

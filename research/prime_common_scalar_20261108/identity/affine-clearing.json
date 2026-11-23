@@ -1,0 +1,92 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1had86c2d70ea770ef",
+  "statement": {
+    "name": "Affine zero-output clearing rearrangement",
+    "source": "research/prime_common_scalar_20261108/lean/BooleanContraction.lean:affineFactorClearing; unit equation is separate",
+    "variables": [
+      "d",
+      "z",
+      "i"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "var",
+          "args": "d"
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "const",
+              "args": 1
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "z"
+                  },
+                  {
+                    "op": "var",
+                    "args": "i"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "var",
+          "args": "d"
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "z"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "d"
+                  },
+                  {
+                    "op": "var",
+                    "args": "i"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 539365641,
+  "value_digest": "bb1b6d240aa1d46d15844534b6ea65c0506c1c1e872380a3e7268be32223d27f",
+  "independence": "Unsigned producer issuance and replay using unchanged repository checker; no independent attestation",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_common_scalar_20261108/lean/BooleanContraction.lean",
+    "sha256": "4862ca7c1dcdc79f5053e8b48fb75ea3814da8c4e4244d6f456b995de888ca6e"
+  }
+}

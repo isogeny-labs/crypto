@@ -1,0 +1,108 @@
+{
+  "schema": "research.source-obligation-map/v1",
+  "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/projective_law_gate.rs",
+  "source_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "rows": [
+    {
+      "branch": "same_u_inverse",
+      "lines": "921-924",
+      "precedence": "equal q/r; inverse crossed s/t first",
+      "coverage": "Existing classifier/word prelude reflects guard; identity output polynomial-valid trivially. No canonical full returned-divisor or class-sum theorem located.",
+      "status": "formal_prelude_only"
+    },
+    {
+      "branch": "same_u_equal_double",
+      "lines": "925-928",
+      "precedence": "inverse false; equal crossed s/t",
+      "coverage": "Delegates double22; reviewed 1+1 doubling does not establish degree2 doubling.",
+      "status": "output_open"
+    },
+    {
+      "branch": "same_u_mixed_zero_slope_delta",
+      "lines": "930-933",
+      "precedence": "earlier inverse/equal false; k=0",
+      "coverage": "WeightedSameSupport + WordErrorExclusion exclude from valid canonical inputs in odd prime domain.",
+      "status": "reviewed_exclusion"
+    },
+    {
+      "branch": "same_u_mixed",
+      "lines": "935-958",
+      "precedence": "same support; inverse/equal false; k!=0",
+      "coverage": "Retained symbolic identities/written proof; fresh Lean extraction validity and doubled output composition remain. Non-Weierstrass argument needs smoothness for repeated support.",
+      "status": "formal_payload_open"
+    },
+    {
+      "branch": "shared_zero_q_delta",
+      "lines": "963-967",
+      "precedence": "distinct support; bb=0,dq=0",
+      "coverage": "InvariantBranches/RuntimeSemantics field exclusion. No new proof duplicated.",
+      "status": "field_exclusion"
+    },
+    {
+      "branch": "shared_cancellation",
+      "lines": "969-984",
+      "precedence": "bb=0,dq!=0; extracted common ordinates inverse",
+      "coverage": "Need both source-extracted points valid + branch reflection, then Add11 composition. Existing 1+2 cancellation proof does not cover this 2+2 extraction.",
+      "status": "formal_composition_open"
+    },
+    {
+      "branch": "shared_y_mismatch",
+      "lines": "985-987",
+      "precedence": "common-support noninverse; unequal ordinates",
+      "coverage": "Need exact extracted point validity and square equality; retained written argument only for this source path.",
+      "status": "formal_exclusion_open"
+    },
+    {
+      "branch": "shared_positive",
+      "lines": "988-997",
+      "precedence": "common-support same ordinate, noninverse",
+      "coverage": "Ordered dbl/add_point_to_result/add_point_to_result; requires extracted-point validity and nested coverage. Mixed/tripling lemmas are dependencies, not full 2+2 composition.",
+      "status": "formal_composition_open"
+    },
+    {
+      "branch": "c_zero_degree_one",
+      "lines": "999-1027",
+      "precedence": "bb!=0; cc=0",
+      "coverage": "Need literal normalization and output curve validity; retained symbolic/written source audit.",
+      "status": "formal_payload_open"
+    },
+    {
+      "branch": "common_degree_two",
+      "lines": "1029",
+      "precedence": "bb!=0; cc!=0",
+      "coverage": "Helper636-706 retests b/c; need value equivalence, nonzero output weights and Mumford validity.",
+      "status": "formal_payload_open"
+    },
+    {
+      "branch": "doubling_b_zero_identity",
+      "lines": "735-740",
+      "precedence": "nested equal arm, b=0,s=0",
+      "coverage": "NEW field exclusion from inverse-before-equal; validity/weights unnecessary. Direct helper identity arm remains possible.",
+      "status": "new_proof_pending_review"
+    },
+    {
+      "branch": "doubling_b_zero_point_double",
+      "lines": "741-757",
+      "precedence": "b=0,s!=0",
+      "coverage": "NEW proves s!=0 on nested b=0; extracted point validity and double output remain open.",
+      "status": "guard_only_new"
+    },
+    {
+      "branch": "doubling_c_zero_degree_one",
+      "lines": "779-797",
+      "precedence": "b!=0,c=0",
+      "coverage": "Exact degree2 doubling payload validity open in canonical Lean packet.",
+      "status": "formal_payload_open"
+    },
+    {
+      "branch": "doubling_common_degree_two",
+      "lines": "798-821",
+      "precedence": "b!=0,c!=0",
+      "coverage": "Exact payload and N6 W\u00b2 association must be preserved; formal payload proof open.",
+      "status": "formal_payload_open"
+    }
+  ],
+  "scope": "source-bound canonical Lean coverage audit; retained finite tests not promoted to universal proofs",
+  "counter_compiler_class_sum": "not established",
+  "full_cohort_cost_ratio": null
+}

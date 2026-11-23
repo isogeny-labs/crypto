@@ -1,0 +1,186 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"benchmark_node_pool\":\"cpu-l2-spot\",\"configured_vcpu_limit\":64,\"guidance\":\"Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.\",\"jobs\":[{\"created_at\":\"2026-10-28T06:08:41Z\",\"job_name\":\"ml-dataset-4c94f1d-pilot-002-20261028\",\"state\":\"failed\",\"status\":{\"conditions\":[{\"lastProbeTime\":\"2026-10-28T06:09:48Z\",\"lastTransitionTime\":\"2026-10-28T06:09:48Z\",\"message\":\"Job has reached the specified backoff limit\",\"reason\":\"BackoffLimitExceeded\",\"status\":\"True\",\"type\":\"FailureTarget\"},{\"lastProbeTime\":\"2026-10-28T06:09:48Z\",\"lastTransitionTime\":\"2026-10-28T06:09:48Z\",\"message\":\"Job has reached the specified backoff limit\",\"reason\":\"BackoffLimitExceeded\",\"status\":\"True\",\"type\":\"Failed\"}],\"failed\":1,\"ready\":0,\"startTime\":\"2026-10-28T06:08:41Z\",\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"641ed2d6-ce1b-4e86-a113-3874ccf176c7\"},{\"created_at\":\"2026-10-27T15:39:16Z\",\"job_name\":\"n83-degree-m2-m9-20261027-v2\",\"state\":\"succeeded\",\"status\":{\"completionTime\":\"2026-10-27T15:53:13Z\",\"conditions\":[{\"lastProbeTime\":\"2026-10-27T15:53:13Z\",\"lastTransitionTime\":\"2026-10-27T15:53:13Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"SuccessCriteriaMet\"},{\"lastProbeTime\":\"2026-10-27T15:53:13Z\",\"lastTransitionTime\":\"2026-10-27T15:53:13Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"Complete\"}],\"ready\":0,\"startTime\":\"2026-10-27T15:39:16Z\",\"succeeded\":1,\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"979c76f0-263e-4faa-bdc7-357a79a2f9fc\"},{\"created_at\":\"2026-10-27T16:51:21Z\",\"job_name\":\"n83-first-fall-m2-m9-20261027-r3\",\"state\":\"succeeded\",\"status\":{\"completionTime\":\"2026-10-27T16:52:59Z\",\"conditions\":[{\"lastProbeTime\":\"2026-10-27T16:52:59Z\",\"lastTransitionTime\":\"2026-10-27T16:52:59Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"SuccessCriteriaMet\"},{\"lastProbeTime\":\"2026-10-27T16:52:59Z\",\"lastTransitionTime\":\"2026-10-27T16:52:59Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"Complete\"}],\"ready\":0,\"startTime\":\"2026-10-27T16:51:21Z\",\"succeeded\":1,\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"f5e0e1df-fafa-4e35-894d-d325587fdca9\"},{\"created_at\":\"2026-10-28T02:04:54Z\",\"job_name\":\"n83-fixed-factor-base-e27-20261028-r3\",\"state\":\"failed\",\"status\":{\"conditions\":[{\"lastProbeTime\":\"2026-10-28T02:05:57Z\",\"lastTransitionTime\":\"2026-10-28T02:05:57Z\",\"message\":\"Job has reached the specified backoff limit\",\"reason\":\"BackoffLimitExceeded\",\"status\":\"True\",\"type\":\"FailureTarget\"},{\"lastProbeTime\":\"2026-10-28T02:05:57Z\",\"lastTransitionTime\":\"2026-10-28T02:05:57Z\",\"message\":\"Job has reached the specified backoff limit\",\"reason\":\"BackoffLimitExceeded\",\"status\":\"True\",\"type\":\"Failed\"}],\"failed\":1,\"ready\":0,\"startTime\":\"2026-10-28T02:04:54Z\",\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"c42cdb17-1cca-4a73-b0f2-3e36f2cddacc\"},{\"created_at\":\"2026-10-27T17:13:37Z\",\"job_name\":\"n83-prime-first-fall-m2-m9-20261027-r4\",\"state\":\"succeeded\",\"status\":{\"completionTime\":\"2026-10-27T17:14:40Z\",\"conditions\":[{\"lastProbeTime\":\"2026-10-27T17:14:40Z\",\"lastTransitionTime\":\"2026-10-27T17:14:40Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"SuccessCriteriaMet\"},{\"lastProbeTime\":\"2026-10-27T17:14:40Z\",\"lastTransitionTime\":\"2026-10-27T17:14:40Z\",\"message\":\"Reached expected number of succeeded pods\",\"reason\":\"CompletionsReached\",\"status\":\"True\",\"type\":\"Complete\"}],\"ready\":0,\"startTime\":\"2026-10-27T17:13:37Z\",\"succeeded\":1,\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"8a833a33-b125-4155-b8f6-604d96771563\"}],\"namespace\":\"isolab\",\"node_pool\":\"cpu-spot\",\"pool_limits\":{\"cpu-l2-spot\":{\"cpu\":32,\"memory\":\"128Gi\"},\"cpu-spot\":{\"cpu\":32,\"memory\":\"128Gi\"}}}"
+    }
+  ],
+  "structuredContent": {
+    "benchmark_node_pool": "cpu-l2-spot",
+    "configured_vcpu_limit": 64,
+    "guidance": "Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.",
+    "jobs": [
+      {
+        "created_at": "2026-10-28T06:08:41Z",
+        "job_name": "ml-dataset-4c94f1d-pilot-002-20261028",
+        "state": "failed",
+        "status": {
+          "conditions": [
+            {
+              "lastProbeTime": "2026-10-28T06:09:48Z",
+              "lastTransitionTime": "2026-10-28T06:09:48Z",
+              "message": "Job has reached the specified backoff limit",
+              "reason": "BackoffLimitExceeded",
+              "status": "True",
+              "type": "FailureTarget"
+            },
+            {
+              "lastProbeTime": "2026-10-28T06:09:48Z",
+              "lastTransitionTime": "2026-10-28T06:09:48Z",
+              "message": "Job has reached the specified backoff limit",
+              "reason": "BackoffLimitExceeded",
+              "status": "True",
+              "type": "Failed"
+            }
+          ],
+          "failed": 1,
+          "ready": 0,
+          "startTime": "2026-10-28T06:08:41Z",
+          "terminating": 0,
+          "uncountedTerminatedPods": {}
+        },
+        "uid": "641ed2d6-ce1b-4e86-a113-3874ccf176c7"
+      },
+      {
+        "created_at": "2026-10-27T15:39:16Z",
+        "job_name": "n83-degree-m2-m9-20261027-v2",
+        "state": "succeeded",
+        "status": {
+          "completionTime": "2026-10-27T15:53:13Z",
+          "conditions": [
+            {
+              "lastProbeTime": "2026-10-27T15:53:13Z",
+              "lastTransitionTime": "2026-10-27T15:53:13Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "SuccessCriteriaMet"
+            },
+            {
+              "lastProbeTime": "2026-10-27T15:53:13Z",
+              "lastTransitionTime": "2026-10-27T15:53:13Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "Complete"
+            }
+          ],
+          "ready": 0,
+          "startTime": "2026-10-27T15:39:16Z",
+          "succeeded": 1,
+          "terminating": 0,
+          "uncountedTerminatedPods": {}
+        },
+        "uid": "979c76f0-263e-4faa-bdc7-357a79a2f9fc"
+      },
+      {
+        "created_at": "2026-10-27T16:51:21Z",
+        "job_name": "n83-first-fall-m2-m9-20261027-r3",
+        "state": "succeeded",
+        "status": {
+          "completionTime": "2026-10-27T16:52:59Z",
+          "conditions": [
+            {
+              "lastProbeTime": "2026-10-27T16:52:59Z",
+              "lastTransitionTime": "2026-10-27T16:52:59Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "SuccessCriteriaMet"
+            },
+            {
+              "lastProbeTime": "2026-10-27T16:52:59Z",
+              "lastTransitionTime": "2026-10-27T16:52:59Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "Complete"
+            }
+          ],
+          "ready": 0,
+          "startTime": "2026-10-27T16:51:21Z",
+          "succeeded": 1,
+          "terminating": 0,
+          "uncountedTerminatedPods": {}
+        },
+        "uid": "f5e0e1df-fafa-4e35-894d-d325587fdca9"
+      },
+      {
+        "created_at": "2026-10-28T02:04:54Z",
+        "job_name": "n83-fixed-factor-base-e27-20261028-r3",
+        "state": "failed",
+        "status": {
+          "conditions": [
+            {
+              "lastProbeTime": "2026-10-28T02:05:57Z",
+              "lastTransitionTime": "2026-10-28T02:05:57Z",
+              "message": "Job has reached the specified backoff limit",
+              "reason": "BackoffLimitExceeded",
+              "status": "True",
+              "type": "FailureTarget"
+            },
+            {
+              "lastProbeTime": "2026-10-28T02:05:57Z",
+              "lastTransitionTime": "2026-10-28T02:05:57Z",
+              "message": "Job has reached the specified backoff limit",
+              "reason": "BackoffLimitExceeded",
+              "status": "True",
+              "type": "Failed"
+            }
+          ],
+          "failed": 1,
+          "ready": 0,
+          "startTime": "2026-10-28T02:04:54Z",
+          "terminating": 0,
+          "uncountedTerminatedPods": {}
+        },
+        "uid": "c42cdb17-1cca-4a73-b0f2-3e36f2cddacc"
+      },
+      {
+        "created_at": "2026-10-27T17:13:37Z",
+        "job_name": "n83-prime-first-fall-m2-m9-20261027-r4",
+        "state": "succeeded",
+        "status": {
+          "completionTime": "2026-10-27T17:14:40Z",
+          "conditions": [
+            {
+              "lastProbeTime": "2026-10-27T17:14:40Z",
+              "lastTransitionTime": "2026-10-27T17:14:40Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "SuccessCriteriaMet"
+            },
+            {
+              "lastProbeTime": "2026-10-27T17:14:40Z",
+              "lastTransitionTime": "2026-10-27T17:14:40Z",
+              "message": "Reached expected number of succeeded pods",
+              "reason": "CompletionsReached",
+              "status": "True",
+              "type": "Complete"
+            }
+          ],
+          "ready": 0,
+          "startTime": "2026-10-27T17:13:37Z",
+          "succeeded": 1,
+          "terminating": 0,
+          "uncountedTerminatedPods": {}
+        },
+        "uid": "8a833a33-b125-4155-b8f6-604d96771563"
+      }
+    ],
+    "namespace": "isolab",
+    "node_pool": "cpu-spot",
+    "pool_limits": {
+      "cpu-l2-spot": {
+        "cpu": 32,
+        "memory": "128Gi"
+      },
+      "cpu-spot": {
+        "cpu": 32,
+        "memory": "128Gi"
+      }
+    }
+  },
+  "isError": false
+}

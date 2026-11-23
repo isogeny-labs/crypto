@@ -1,0 +1,46 @@
+{
+  "namespace": "isolab",
+  "pool_limits": {
+    "cpu-l2-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    },
+    "cpu-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    }
+  },
+  "jobs": [
+    {
+      "created_at": "2026-10-30T00:21:50Z",
+      "job_name": "pencil-p739-20261030-a1-epoch-1",
+      "state": "failed",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-30T00:26:10Z",
+            "lastTransitionTime": "2026-10-30T00:26:10Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "FailureTarget"
+          },
+          {
+            "lastProbeTime": "2026-10-30T00:26:10Z",
+            "lastTransitionTime": "2026-10-30T00:26:10Z",
+            "message": "Job has reached the specified backoff limit",
+            "reason": "BackoffLimitExceeded",
+            "status": "True",
+            "type": "Failed"
+          }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-30T00:21:50Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "fd5e451b-46fa-42f8-9b0c-2e493db90b12"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T05:29:32Z",
+ "id": "PCC-20261117-c1a1e9",
+ "kind": "measurement",
+ "producer": {
+  "commit": "37e68a6bb5b35b466d511c710fd354b139a95e57",
+  "model": "Codex",
+  "session": "trace-runtime-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/measure_20261117/results/native-summary.json",
+    "sha256": "9adb23d713bacc18fb1ded74d4a59a3b3d96bca76fd33bc99aa98ac94ad0f6d6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/measure_20261117/results/report-data.json",
+    "sha256": "08dafd91822338030817bfbe6d026f302aa5aed434515cb0a420f4b4954d5a64"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/measure_20261117/results/LOCAL_CUSTODY.json",
+    "sha256": "2bcdee486f79ebadc29b4a505e61ff17386cf236c75f19eaabaf2008184c2b4d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/measure_20261117/results/pre-call-binary.sha256",
+    "sha256": "e2f75e6565c9ec02d7717621f09694e7f7831840f715ba72a706f6d1a3a72462"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/measure_20261117/results/post-call-binary.sha256",
+    "sha256": "e2f75e6565c9ec02d7717621f09694e7f7831840f715ba72a706f6d1a3a72462"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/measure_20261117/postprocess.cpp",
+    "sha256": "44cfe30973c7b4c98c5145886a43c6b7586e62eb435179f716a629d9d0bb3765"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/measure_20261117",
+ "statement": "Authorized local shared-CPU matrix completed with8346 raw rows (1391 warmups,6955 measured), all4320 target-round-arm units and no timed-row failure. Native postcheck replays3990 public scalars and agrees on2904 complete-support and7260 generation/existence comparisons; qualifier/dependency hashes are unchanged. AtB128 all60 target-round units complete: wall medians known1001.569ms, compose201.854ms, prior pairs13.393ms, new batched/Bloom first-witness2.493ms, rho0.835ms. Median paired wall improvement pairs/new is5.2655 and window-Horner/compose4.9883; new/rho is3.0599. Every preceding miss/setup/rejection/recovery is charged. Same-input outcomes agree. These are provisional local descriptive data, with repeated rounds not independent targets; no S3 custody, signed validation, fastest-tool or security-tier assertion."
+}

@@ -33,6 +33,7 @@ import argparse
 import base64
 import concurrent.futures as cf
 import fnmatch
+import gzip
 import hashlib
 import json
 import os
@@ -40,6 +41,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -144,10 +146,16 @@ def suffix(path: str) -> str:
     return os.path.splitext(name)[1]
 
 
+def control_filename(name: str) -> bool:
+    """Checkout metadata is never data, including common filesystem aliases."""
+    canonical = name.split(":", 1)[0].rstrip(" .").casefold()
+    return canonical in {".git", MANIFEST, ".gitignore", ".gitattributes"}
+
+
 def belongs_in_store(path: str, size: int, policy: dict) -> bool:
     """The policy: does a tracked file of this path and size belong in the store?"""
     name = path.rsplit("/", 1)[-1]
-    if name in (MANIFEST, ".gitignore", ".gitattributes") or path.startswith(".artifacts/"):
+    if control_filename(name) or path.startswith(".artifacts/"):
         return False
     if any(fnmatch.fnmatchcase(path, pat) for pat in policy.get("keep", [])):
         return False
@@ -163,24 +171,58 @@ def belongs_in_store(path: str, size: int, policy: dict) -> bool:
 # Manifests and the managed .gitignore block
 
 
+def staged_content(root: Path, relative: str, *, missing_ok: bool = False, output=None) -> bytes | None:
+    """Apply required filters, streaming payloads to output when supplied."""
+    spec = f":{relative}"
+    result = subprocess.run(["git", "-C", str(root), "cat-file", "--filters",
+                             f"--path={relative}", spec],
+                            stdout=subprocess.PIPE if output is None else output,
+                            stderr=subprocess.PIPE)
+    if result.returncode:
+        if missing_ok and "\n" not in spec:
+            request = spec.encode("utf-8", "surrogateescape")
+            probe = subprocess.run(["git", "-C", str(root), "cat-file", "--batch-check"],
+                                   input=request + b"\n", capture_output=True)
+            if (probe.returncode == 0 and not probe.stderr
+                    and probe.stdout == request + b" missing\n"):
+                return None
+        result.check_returncode()
+    return result.stdout
+
+
 def read_text_or_index(p: Path) -> str | None:
-    """A file's text, or its staged copy when a sparse checkout left it off disk."""
+    """A file's text, or filtered staged bytes when sparse checkout omitted it."""
     if p.exists():
         return p.read_text()
-    r = subprocess.run(["git", "-C", str(p.parent if p.parent.exists() else repo_root()), "show",
-                        f":{rel(repo_root(), p)}"], capture_output=True, text=True)
-    return r.stdout if r.returncode == 0 else None
+    root = repo_root()
+    data = staged_content(root, rel(root, p), missing_ok=True)
+    return None if data is None else data.decode("utf-8")
 
 
 def read_manifest(d: Path) -> dict[str, dict]:
     p = d / MANIFEST
+    if p.is_symlink():
+        die(f"{p}: invalid manifest entry source: symbolic link")
     text = read_text_or_index(p)
     if text is None:
         return {}
     data = json.loads(text)
-    if data.get("schema") != MANIFEST_SCHEMA:
-        die(f"{p}: unknown schema {data.get('schema')!r}")
-    return data["files"]
+    if not isinstance(data, dict) or data.get("schema") != MANIFEST_SCHEMA:
+        die(f"{p}: unknown manifest schema")
+    files = data.get("files")
+    if not isinstance(files, dict):
+        die(f"{p}: invalid manifest entry mapping")
+    for name, entry in files.items():
+        if (not isinstance(name, str) or name in ("", ".", "..") or Path(name).name != name
+                or any(c in name for c in ("/", "\\", "\0"))
+                or control_filename(name)
+                or not isinstance(entry, dict)
+                or not isinstance(entry.get("sha256"), str)
+                or len(entry["sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in entry["sha256"])
+                or type(entry.get("bytes")) is not int or entry["bytes"] < 0):
+            die(f"{p}: invalid manifest entry {name!r}")
+    return files
 
 
 def write_manifest(d: Path, files: dict[str, dict]) -> None:
@@ -240,6 +282,8 @@ def selected(root: Path, paths: list[Path]) -> list[tuple[Path, str, dict]]:
             die(f"{raw}: outside the repository")
     out = []
     for d in all_manifests(root):
+        if not d.resolve().is_relative_to(root.resolve()):
+            die(f"{d}: manifest directory outside the repository")
         drel = rel(root, d)
         # A manifest can only hold entries for a path at or below its directory,
         # or for a directory below a requested prefix.
@@ -313,8 +357,25 @@ class Remote:
                          "--metadata", f"sha256={digest}", "--no-progress", "--only-show-errors")
 
     def get_args(self, digest: str, dest: Path) -> list[str]:
-        return self._aws("s3", "cp", f"s3://{self.bucket}/{self.key(digest)}", str(dest),
-                         "--no-progress", "--only-show-errors")
+        # The object key is already exact. High-level `s3 cp` first issues a
+        # HEAD request, whose generic 403 hides S3's useful GetObject errors
+        # (notably AllAccessDisabled). Stream the object directly instead.
+        # ensure_cached still checks both SHA-256 and length before publishing.
+        return self._aws("s3api", "get-object", "--bucket", self.bucket,
+                         "--key", self.key(digest), str(dest))
+
+    def download_error(self, digest: str, stderr: str) -> str:
+        message = f"download {self.key(digest)} from {self.describe()}: {stderr.strip()}"
+        if "AllAccessDisabled" in stderr:
+            return message + ("; S3 has disabled access to this resource. The bucket owner must "
+                              "restore access or provide a verified replacement store "
+                              "(ARTIFACTS_REMOTE); changing IAM grants or retrying cannot repair it.")
+        if "NoSuchKey" in stderr or "(404)" in stderr:
+            return message + "; object is absent: restore the exact manifest SHA-256 bytes to the store."
+        if "AccessDenied" in stderr or "(403)" in stderr:
+            return message + ("; verify the remote and s3:GetObject permission. Without s3:ListBucket, "
+                              "S3 can also return 403 for a missing key; do not treat it as absence.")
+        return message
 
     def _run(self, argv: list[str]) -> subprocess.CompletedProcess:
         try:
@@ -397,18 +458,96 @@ class Remote:
         p = self._run(self.get_args(digest, dest))
         if p.returncode != 0:
             dest.unlink(missing_ok=True)
-            die(f"download {self.key(digest)}: {p.stderr.strip()}")
+            die(self.download_error(digest, p.stderr))
 
 
 # ---------------------------------------------------------------------------
 # Cache: verified, read-only objects shared with `crypto store`
 
 
+class GitHistory:
+    """Read an artifact's original bytes from the current commit's history.
+
+    Partial clones may fetch Git blobs from their existing promisor remote;
+    no artifact store or AWS credentials are used. A historical version is
+    accepted only when both its length and SHA-256 match the manifest.
+    """
+
+    def __init__(self, cfg: Config, source: Path, size: int):
+        self.cfg, self.source, self.size = cfg, rel(cfg.root, source), size
+
+    def get(self, digest: str, dest: Path) -> None:
+        recovery = self.cfg.root / ".artifacts/recovery"
+        index = recovery / "index.json"
+        if index.is_file():
+            catalog = json.loads(index.read_text())
+            if catalog.get("schema") != "artifacts.recovery/v1":
+                die("invalid artifact recovery index schema")
+            entry = catalog.get("objects", {}).get(digest)
+            if entry is not None:
+                if set(entry) == {"git_blob"}:
+                    oid = entry["git_blob"]
+                    if not isinstance(oid, str) or len(oid) not in (40, 64) or any(c not in "0123456789abcdef" for c in oid):
+                        die("invalid artifact recovery Git blob")
+                    with dest.open("wb") as output:
+                        result = subprocess.run(["git", "-C", str(self.cfg.root), "cat-file", "blob", oid],
+                                                stdout=output, stderr=subprocess.PIPE)
+                    if result.returncode:
+                        die("cannot read artifact recovery Git blob: " + result.stderr.decode(errors="replace").strip())
+                elif set(entry) == {"gzip"}:
+                    name = entry["gzip"]
+                    if not isinstance(name, str) or name != Path(name).name or name in ("", ".", "..") or "\\" in name:
+                        die("invalid artifact recovery bundle path")
+                    source = recovery / name
+                    if source.is_symlink():
+                        die("artifact recovery bundle must not be a symlink")
+                    with gzip.open(source, "rb") as payload, dest.open("wb") as output:
+                        # Bound decompression by the manifest size, including
+                        # one extra byte so oversized payloads fail validation.
+                        remaining = self.size + 1
+                        while remaining:
+                            block = payload.read(min(1 << 20, remaining))
+                            if not block:
+                                break
+                            output.write(block)
+                            remaining -= len(block)
+                else:
+                    die("invalid artifact recovery entry")
+                # The shared cache path performs the manifest hash/size check.
+                return
+        objects = git(self.cfg.root, "rev-list", "--full-history", "--objects", "--no-object-names",
+                      "HEAD", "--", self.source)
+        if objects:
+            metadata = git(self.cfg.root, "cat-file",
+                           "--batch-check=%(objectname) %(objecttype) %(objectsize)", input=objects)
+            for line in metadata.splitlines():
+                fields = line.split()
+                if len(fields) != 3 or fields[1] != b"blob" or fields[2] != str(self.size).encode():
+                    continue
+                # Stream potentially large blobs rather than buffering them.
+                with dest.open("wb") as output:
+                    result = subprocess.run(
+                        ["git", "-C", str(self.cfg.root), "cat-file", "blob", fields[0].decode()],
+                        stdout=output, stderr=subprocess.PIPE,
+                    )
+                if result.returncode:
+                    dest.unlink(missing_ok=True)
+                    die(f"cannot read historical Git blob for {self.source}: "
+                        + result.stderr.decode(errors="replace").strip())
+                if dest.stat().st_size == self.size and sha256_file(dest) == digest:
+                    return
+        dest.unlink(missing_ok=True)
+        die(f"{self.source}: no Git-history object matches manifest SHA-256 {digest} "
+            f"({self.size} bytes). S3 was not contacted. Use a full-history checkout "
+            "or populate the verified cache from an approved copy; data never committed "
+            "to Git still requires recovery from its original store.")
+
+
 def cache_path(cfg: Config, digest: str) -> Path:
     return cfg.cache / object_key(digest)
 
 
-def ensure_cached(cfg: Config, remote: Remote, digest: str, size: int) -> Path:
+def ensure_cached(cfg: Config, remote: Remote | GitHistory, digest: str, size: int) -> Path:
     c = cache_path(cfg, digest)
     if c.exists() and c.stat().st_size == size and sha256_file(c) == digest:
         return c
@@ -492,6 +631,10 @@ def cmd_plan(cfg: Config, args) -> int:
 
 
 def cmd_push(cfg: Config, args) -> int:
+    # Offloading removes index entries. Never let that operation silently
+    # resolve a merge by deleting its base/ours/theirs stages.
+    if git(cfg.root, "ls-files", "--unmerged", "-z"):
+        die("unresolved Git index conflicts; resolve them before offloading")
     remote = None if args.dry_run else Remote(cfg)
     targets: list[tuple[str, int]] = []
     for raw in args.paths:
@@ -521,14 +664,15 @@ def cmd_push(cfg: Config, args) -> int:
         f, size = item
         path = cfg.root / f
         tmp = None
-        if not path.exists():
-            # Tracked but not on disk (a sparse checkout): read the committed blob.
-            (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
-            fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
-            with os.fdopen(fd, "wb") as out:
-                subprocess.run(["git", "-C", str(cfg.root), "cat-file", "blob", f":{f}"], stdout=out, check=True)
-            path = Path(tmp)
         try:
+            if not path.exists():
+                # The worktree path and staged path must offload the same bytes.
+                (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
+                fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
+                with os.fdopen(fd, "wb") as out:
+                    staged_content(cfg.root, f, output=out)
+                path = Path(tmp)
+            size = path.stat().st_size
             digest = sha256_file(path)
             sent = remote.put(digest, path, size)
             cache_insert(cfg, path, digest)
@@ -564,8 +708,25 @@ def cmd_push(cfg: Config, args) -> int:
     return 0
 
 
+def git_path_key(path: str) -> str:
+    """Portable source ownership across case and canonical Unicode aliases."""
+    return unicodedata.normalize("NFC", path).casefold()
+
+
 def cmd_pull(cfg: Config, args) -> int:
     items = selected(cfg.root, [Path(p) for p in args.paths])
+    # A manifest may retain an old object after the path returns to Git.
+    # Git's index is authoritative, including for omitted sparse files and
+    # staged additions: hydration must never restore the historical object
+    # over it. Do not infer ownership from the working file's presence.
+    # Treat ambiguous portable spellings as owned even when an omitted source
+    # has no inode to compare. This also keeps behavior stable across hosts.
+    tracked = {git_path_key(path) for path in
+               git(cfg.root, "ls-files", "-z").decode(errors="surrogateescape").split("\0")}
+    preserved = [item for item in items if git_path_key(rel(cfg.root, item[0] / item[1])) in tracked]
+    items = [item for item in items if git_path_key(rel(cfg.root, item[0] / item[1])) not in tracked]
+    if preserved:
+        print(f"preserved {len(preserved)} tracked files with historical store entries", file=sys.stderr)
     todo = []
     for d, name, e in items:
         f = d / name
@@ -575,11 +736,19 @@ def cmd_pull(cfg: Config, args) -> int:
     if not todo:
         print(f"{len(items)} files already present", file=sys.stderr)
         return 0
-    remote = Remote(cfg)
+    # Temporary S3-free default while the configured bucket is disabled.
+    # File/HTTP remotes retain their normal behavior. Explicit remote reads
+    # remain available once the owner restores or replaces the store.
+    source = getattr(args, "source", "auto")
+    from_git = source == "git" or (source == "auto" and cfg.remote.startswith("s3://"))
+    remote = None if from_git else Remote(cfg)
+    if from_git:
+        print("using verified cache, Git recovery bundles and full Git history; no S3 reads", file=sys.stderr)
 
     def one(item):
         f, e = item
-        c = ensure_cached(cfg, remote, e["sha256"], e["bytes"])
+        reader = GitHistory(cfg, f, e["bytes"]) if from_git else remote
+        c = ensure_cached(cfg, reader, e["sha256"], e["bytes"])
         place_copy(c, f)
 
     with cf.ThreadPoolExecutor(args.jobs) as ex:
@@ -718,6 +887,9 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--jobs", type=int, default=16)
     s = sub.add_parser("pull", help="hydrate files from the store")
     s.add_argument("paths", nargs="*")
+    s.add_argument("--source", choices=("auto", "git", "remote"),
+                   default=os.environ.get("ARTIFACTS_PULL_SOURCE", "auto"),
+                   help="auto uses Git history for S3 remotes, otherwise the configured remote")
     s.add_argument("--jobs", type=int, default=16)
     s.add_argument("--fast", action="store_true", help="trust a present file of the right size")
     s = sub.add_parser("verify")

@@ -1,0 +1,18 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.3", ranksep="0.35", fontname="Helvetica"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fc", color="#365a7c", fontname="Helvetica", fontsize=11];
+ edge [fontname="Helvetica", fontsize=10, color="#365a7c"];
+ input [label="Actual symbolic norm / Dickson model\ne = 1 endpoint; Lean exact"];
+ family [label="Explicit pole-scaled target-completed family\nExact norm division; scaled curve equation"];
+ zero [label="e = 0 endpoint: U* and X^16 mod U*\nLean exact; coefficients 1..4 suffice"];
+ origin [label="Four remainder coefficients vanish\n=> U* divides X^16 => U* = X^5\n=> a1 = c0 = a2 = c1 = 0", fillcolor="#e7f2e7"];
+ source [label="Frozen four-variable reduced.ms\nExisting native 25-row source binding", fillcolor="#f2f2f2"];
+ weights [label="Proposed weighted initial-form binding\nWeights (4,2,3,1); exact map pending", fillcolor="#fff2d6", color="#a87926"];
+ solver [label="Missing weighted closure / normal-form bound\nPlus full expected bit-cost accounting", fillcolor="#fff2d6", color="#a87926"];
+ family -> input [label="specialize at 1"];
+ family -> zero [label="specialize at 0"];
+ zero -> origin [label="PCC-20261113-7b7707 (unsigned)"];
+ source -> weights [style=dashed, color="#a87926"];
+ weights -> zero [style=dashed, color="#a87926", label="not established by endpoint identities"];
+ origin -> solver [style=dashed, color="#a87926", label="does not supply an algorithm"];
+}

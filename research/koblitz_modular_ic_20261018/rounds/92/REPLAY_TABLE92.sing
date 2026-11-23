@@ -1,0 +1,38 @@
+proc require92r(int ok,string tag){if(!ok){print("REPLAY92_FATAL "+tag);exit;}}
+string saved92r=read("rr-pid50.sing");
+int start92r=find(saved92r,"ring inverseBaseCertificate50=");
+require92r(start92r>0,"PID_HEADER");
+execute(saved92r[start92r,size(saved92r)-start92r+1]);
+setring inverseBaseCertificate50;
+matrix B092r=matrix(basis50);poly F092r=commonDenominator50;
+ring replayField92=(2,u),(c),dp;
+map replayMap92=inverseBaseCertificate50,u;
+matrix Br92=replayMap92(B092r);poly Fr92=replayMap92(F092r);
+execute(read("multiplication92.sing"));
+require92r(size(pairA92)==528 && size(pairB92)==528,"PAIR_COUNT");
+matrix one92r[32][1];one92r[1,1]=1;
+require92r(Br92*unitC92==Fr92*one92r,"UNIT_FULL_PRODUCT");
+require92r(Br92*productC92==Fr92*productW92,"FULL_TABLE_PRODUCT");
+int a92r;int b92r;int p92r=0;int row92r;
+matrix colC92r[32][1];matrix colW92r[32][1];matrix bad92r[32][1];
+for(row92r=1;row92r<=32;row92r++){
+ require92r(unitC92[row92r,1]==leadcoef(unitC92[row92r,1]) && denominator(leadcoef(unitC92[row92r,1]))==1,"UNIT_NOT_POLYNOMIAL");
+}
+for(a92r=1;a92r<=32;a92r++){
+ for(b92r=a92r;b92r<=32;b92r++){
+  p92r=p92r+1;
+  require92r(pairA92[p92r]==a92r && pairB92[p92r]==b92r,"PAIR_INDEX_"+string(p92r));
+  for(row92r=1;row92r<=32;row92r++){
+   colC92r[row92r,1]=productC92[row92r,p92r];
+   colW92r[row92r,1]=productW92[row92r,p92r];
+   require92r(colC92r[row92r,1]==leadcoef(colC92r[row92r,1]) && denominator(leadcoef(colC92r[row92r,1]))==1,"NONPOLYNOMIAL_PAIR_"+string(p92r)+"_ROW_"+string(row92r));
+  }
+  require92r(Br92*colC92r==Fr92*colW92r,"COLUMN_PRODUCT_"+string(p92r));
+  bad92r=colC92r;bad92r[1,1]=bad92r[1,1]+1;
+  require92r(Br92*bad92r!=Fr92*colW92r,"CORRUPTION_PAIR_"+string(p92r));
+ }
+}
+require92r(p92r==528,"FINAL_COUNT");
+print("REPLAY92_TABLE unit=1 pairs=528 full_table=1 column_products=528 polynomial_coordinates=16896 corruptions=528");
+print("REPLAY92_TABLE_PASS");
+quit;

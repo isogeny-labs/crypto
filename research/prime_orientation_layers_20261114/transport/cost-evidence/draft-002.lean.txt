@@ -1,0 +1,134 @@
+module
+public import OrientationTransport
+public import Mathlib.NumberTheory.Height.NumberField
+import all OrientationAnchor
+import all OrientationMoment
+import all OrientationHigher
+public section
+noncomputable section
+namespace OrientationRationalSize
+open Finset Height OrientationAnchor OrientationMoment OrientationNodePolynomial
+
+def Bits (b : ℕ) (q : ℚ) : Prop := max q.num.natAbs q.den ≤ 2^b
+
+theorem bits_iff_height (b : ℕ) (q : ℚ) : Bits b q ↔ mulHeight₁ q ≤ (2:ℝ)^b := by
+  rw [Rat.mulHeight₁_eq_max]
+  unfold Bits
+  norm_cast
+
+theorem bits_zero : Bits 0 (0:ℚ) := by norm_num [Bits]
+theorem bits_one : Bits 0 (1:ℚ) := by norm_num [Bits]
+theorem bits_two : Bits 1 (2:ℚ) := by norm_num [Bits]
+
+theorem Bits.mono {b c : ℕ} {q : ℚ} (h : Bits b q) (hbc : b ≤ c) : Bits c q :=
+  h.trans (Nat.pow_le_pow_right (by decide) hbc)
+
+theorem Bits.neg {b : ℕ} {q : ℚ} (h : Bits b q) : Bits b (-q) := by
+  rw [bits_iff_height] at h ⊢
+  simpa only [mulHeight₁_neg] using h
+
+theorem Bits.inv {b : ℕ} {q : ℚ} (h : Bits b q) : Bits b q⁻¹ := by
+  rw [bits_iff_height] at h ⊢
+  simpa only [mulHeight₁_inv] using h
+
+theorem Bits.mul {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c) (q*r) := by
+  rw [bits_iff_height] at hq hr ⊢
+  calc
+    mulHeight₁ (q*r) ≤ mulHeight₁ q*mulHeight₁ r := mulHeight₁_mul_le q r
+    _ ≤ (2:ℝ)^b*2^c := mul_le_mul hq hr (by positivity) (by positivity)
+    _ = (2:ℝ)^(b+c) := (pow_add _ _ _).symm
+
+theorem Bits.div {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c) (q/r) := by simpa only [div_eq_mul_inv] using hq.mul hr.inv
+
+theorem Bits.add {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c+1) (q+r) := by
+  rw [bits_iff_height] at hq hr ⊢
+  have H : mulHeight₁ (q+r) ≤ 2*mulHeight₁ q*mulHeight₁ r := by
+    simpa only [NumberField.totalWeight_eq_finrank,Module.finrank_self,pow_one] using
+      mulHeight₁_add_le q r
+  calc
+    mulHeight₁ (q+r) ≤ 2*(mulHeight₁ q*mulHeight₁ r) := by simpa only [mul_assoc] using H
+    _ ≤ 2*((2:ℝ)^b*2^c) := mul_le_mul_of_nonneg_left
+      (mul_le_mul hq hr (by positivity) (by positivity)) (by norm_num)
+    _ = (2:ℝ)^(b+c+1) := by rw [pow_add,pow_add,pow_one]; ring
+
+theorem Bits.sub {b c : ℕ} {q r : ℚ} (hq : Bits b q) (hr : Bits c r) :
+    Bits (b+c+1) (q-r) := by simpa only [sub_eq_add_neg] using hq.add hr.neg
+
+theorem Bits.pow {b : ℕ} {q : ℚ} (h : Bits b q) (n : ℕ) : Bits (b*n) (q^n) := by
+  rw [bits_iff_height] at h ⊢
+  rw [mulHeight₁_pow,pow_mul]
+  exact pow_le_pow_left₀ (by positivity) h n
+
+theorem bits_int (b : ℕ) (z : ℤ) (hz : z.natAbs ≤ 2^b) : Bits b (z:ℚ) := by
+  unfold Bits
+  simp only [Rat.num_intCast,Rat.den_intCast]
+  exact max_le hz Nat.one_le_two_pow
+
+theorem bits_two_pow (n : ℕ) : Bits n ((2:ℚ)^n) := by
+  simpa only [one_mul] using bits_two.pow n
+
+theorem bits_prod {I : Type*} (S : Finset I) (q : I → ℚ) (b : I → ℕ)
+    (h : ∀ i ∈ S,Bits (b i) (q i)) : Bits (∑ i ∈ S,b i) (∏ i ∈ S,q i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using bits_one
+  | @insert i S hi ih =>
+    rw [sum_insert hi,prod_insert hi]
+    exact (h i (mem_insert_self _ _)).mul (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+
+theorem bits_sum {I : Type*} (S : Finset I) (q : I → ℚ) (b : I → ℕ)
+    (h : ∀ i ∈ S,Bits (b i) (q i)) : Bits (S.card+∑ i ∈ S,b i) (∑ i ∈ S,q i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using bits_zero
+  | @insert i S hi ih =>
+    have H := (h i (mem_insert_self _ _)).add (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+    rw [sum_insert hi]
+    convert H using 1
+    simp only [card_insert_of_notMem hi,sum_insert hi]
+    omega
+
+theorem grid_natAbs_bound (a : ℕ) (t : ℤ) (ht : (t:ℚ) ∈ grid a) : t.natAbs ≤ 2^a := by
+  rcases mem_image.mp ht with ⟨z,hz,he⟩
+  have hzt : z=t := by exact_mod_cast he
+  subst z
+  have h := mem_Ico.mp hz
+  have H : |t| ≤ (2:ℤ)^a := abs_le.mpr ⟨h.1,le_of_lt h.2⟩
+  have HC : (t.natAbs:ℤ) ≤ (2:ℤ)^a := by
+    simpa only [Int.natCast_natAbs] using H
+  exact_mod_cast HC
+
+theorem actual_grid_bits (a : ℕ) (t : ℤ) (ht : (t:ℚ) ∈ grid a) : Bits a (t:ℚ) :=
+  bits_int a t (grid_natAbs_bound a t ht)
+
+theorem actual_delta_bits (a r y : ℕ) (hr : r < 2^a) (hy : y < 2^a) : Bits a (delta r y) := by
+  have H : ((y:ℤ)-r).natAbs ≤ 2^a := by
+    have hrZ : (r:ℤ) < (2:ℤ)^a := by exact_mod_cast hr
+    have hyZ : (y:ℤ) < (2:ℤ)^a := by exact_mod_cast hy
+    have h : |(y:ℤ)-r| ≤ (2:ℤ)^a := abs_le.mpr ⟨by omega,by omega⟩
+    have HC : (((y:ℤ)-r).natAbs:ℤ) ≤ (2:ℤ)^a := by
+      simpa only [Int.natCast_natAbs] using h
+    exact_mod_cast HC
+  simpa only [Int.cast_sub,Int.cast_natCast,delta] using bits_int a ((y:ℤ)-r) H
+
+theorem actual_slope_bits (a u b x y : ℕ) (hu : u ≤ a) (hy : y < 2^a)
+    (q : ℚ) (hq : Bits b q) : Bits (u+(b+a+1)) (slope u (rowResidue u x) y q) := by
+  exact bits_two_pow u |>.div (hq.sub (actual_delta_bits a _ y (row_source_bound a u x hu) hy))
+
+theorem actual_chart_slope_bits (a u x y : ℕ) (t : ℤ) (hu : u ≤ a)
+    (hy : y < 2^a) (ht : (t:ℚ) ∈ grid a) : Bits ((a+1)+(a+a+1)) (chartSlope a u x y t) := by
+  exact (bits_two_pow (a+1)).div
+    ((actual_grid_bits a t ht).sub (actual_delta_bits a _ y (row_source_bound a u x hu) hy))
+
+theorem actual_anchor_slope_bits (a u j x y : ℕ) (hu : u ≤ a) (hy : y < 2^a) :
+    Bits (u+(j+a+1)) (slope u (rowResidue u x) y ((2:ℚ)^j)) :=
+  actual_slope_bits a u j x y hu hy _ (bits_two_pow j)
+
+end OrientationRationalSize
+#print axioms OrientationRationalSize.Bits.add
+#print axioms OrientationRationalSize.grid_natAbs_bound
+#print axioms OrientationRationalSize.actual_chart_slope_bits
+#print axioms OrientationRationalSize.actual_anchor_slope_bits

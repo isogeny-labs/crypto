@@ -1,0 +1,1004 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runner receipt.json",
+      "config bytes",
+      "clean-build receipt"
+    ],
+    "outputs": [
+      "exact terminal classification, native replay scope and counted counters; command-scoped elapsed nanoseconds are diagnostic only"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Four fixed ordinary binary n23 m2 sat cells, twist=false, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-sat-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "sat",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 sat cells, twist=true, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-sat-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "sat",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 f4 cells, twist=false, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-f4-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "f4",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 f4 cells, twist=true, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-f4-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "f4",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 f5 cells, twist=false, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-f5-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "f5",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 f5 cells, twist=true, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-f5-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "f5",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 weil cells, twist=false, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-weil-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "weil",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 weil cells, twist=true, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-weil-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "weil",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 double-large-prime cells, twist=false, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-double-large-prime-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "double-large-prime",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 double-large-prime cells, twist=true, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-double-large-prime-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "double-large-prime",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 bsgs cells, twist=false, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-bsgs-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "bsgs",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "baseline"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 bsgs cells, twist=true, crossed with two generators and two keys; other methods of the same twist share the same public instances.",
+      "id": "binary23-bsgs-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103102,
+        "shard_count": 48,
+        "shard_indices": "mixed-radix selected indices 0..47",
+        "solver": "bsgs",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "baseline"
+    }
+  ],
+  "authors": [
+    "ML dataset ordinary binary paired-method campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "Exactly 48 fixed native plan indices each have at most one solver attempt; all failure, timeout, interrupted and unsupported outcomes remain in the denominator."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "native-method-evidence",
+      "text": "Native SAT, Boolean F4/F5, Weil descent, double-large-prime and BSGS artifacts are retained; a method-specific assertion is made only to the extent supported by its independently replayed certificate and native verify result."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "ecdlp-recovery",
+      "text": "An ECDLP solve is labelled only when the solver independently recovered a scalar and native verify replays it against the declared public generator and target."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "custody",
+      "text": "Every terminal shard keeps native verify/report/export stage receipts and a restricted local archive with S3 PUT and fresh GET/hash receipts, or its exact failed stage is retained."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "excluded-inference",
+      "text": "No method speed ranking, novel SAT result, full Weil descent solver, PDP negative, whole-worker instruction count, first/last fall degree, or broader curve-matrix conclusion is inferred."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software coverage, replay and custody; no comparative performance claim or timing-effect inference.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact accounting of the fixed selected population; no detector false-positive or null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "The study accounts fixed native method cells and independently verified artifacts; it makes no detector sensitivity claim. BSGS replay is a same-instance scalar recovery control, not a comparative timing control.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts by method, twist and terminal status; native verified artifact counts, independently recovered ECDLP counts and S3 readback-complete counts",
+    "text": "Account all 48 fixed cells. Promote a method artifact only to its checked native scope. Promote a scalar solve only after independent recovery and replay. Retain all timeout, unsupported, partial and failed outcomes. Durable requires archive PUT and fresh GET hash match.",
+    "verdict_vocabulary": [
+      "verified_method_artifact_and_durable",
+      "verified_ecdlp_and_durable",
+      "verified_custody_pending",
+      "partial",
+      "unsupported",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_binary_methods": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "export_mapping": {
+        "arms": "solver by twist, 12 arms",
+        "instance_ids": [
+          "g0k0",
+          "g0k1",
+          "g1k0",
+          "g1k1"
+        ],
+        "rows_expected": 48,
+        "twist_identity_note": "Within a twist, methods share the same public generator and target; opposite twists are distinct curves."
+      },
+      "label_scope": "method-specific native evidence; scalar only on independent replay",
+      "no_cloud_worker_submission": true,
+      "output_filesystem": "xfs",
+      "output_root": "/mnt/spot-codex-state/tmp/ml-dataset-binary-methods-20261031",
+      "plan_axes": {
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "families": [
+          "binary"
+        ],
+        "generators": 2,
+        "keys": 2,
+        "m": [
+          2
+        ],
+        "n": [
+          23
+        ],
+        "seed": 2026103102,
+        "solvers": [
+          "sat",
+          "f4",
+          "f5",
+          "weil",
+          "double-large-prime",
+          "bsgs"
+        ],
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 20000
+      },
+      "planned_cells": 48,
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-binary-methods-20261031",
+      "schema": "ml-dataset.binary-methods-pilot/v1",
+      "selected_shards": "0..47 inclusive",
+      "shard_count": 48,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262"
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "5107deda69a7c61a41080fdd81f917effb66856180bdccf844fc8360874d5b9a",
+    "commit": "a3206d651b97cdb2752cd049377561f7e15bdc79",
+    "frozen_at": "2026-10-31T03:22:54Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an attempted shard",
+    "dropping failed, timed-out, interrupted or unsupported attempts",
+    "using restricted witness material as public ML features",
+    "calling a known-answer scalar an independently recovered ECDLP without native replay",
+    "promoting a bounded partial/UNSAT outcome to a full negative PDP result",
+    "promoting missing S3 readback as durable",
+    "claiming solver speedup from shared-host clocks",
+    "claiming complete SAT proof or Weil descent solve from trace emission"
+  ],
+  "invalidation_rules": [
+    "Binary, plan or protocol digest changes invalidate new admission.",
+    "Existing attempt marker or live worker blocks another attempt for that shard.",
+    "Missing or failed native verify prevents method certificate or solution promotion.",
+    "Missing fresh S3 GET and hash match prevents durability promotion.",
+    "Censored, unsupported or partial method artifacts retain their exact native outcome and no scalar label."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Native root capability and exact certificate scope",
+      "provenance": "internal",
+      "ref": "src/ml_dataset/solvers.rs:326-346,2510-2523 and src/ml_dataset/binary_roots.rs:1-21,68-89",
+      "verified_by": "current source inspection; distinct-root/group-lift replay is not ECDLP scalar recovery"
+    },
+    {
+      "claim": "Dataset generation, leakage boundaries and prior local-XFS custody",
+      "provenance": "internal",
+      "ref": "docs/ml-dataset/DESIGN.md; docs/ml-dataset/OPERATIONS.md; research/ml_dataset_local_generation_20261031/RESULT-01.md",
+      "verified_by": "current source and retained receipts"
+    },
+    {
+      "claim": "External method novelty or performance",
+      "provenance": "internal",
+      "ref": "not assessed for this software coverage protocol",
+      "verified_by": "no novelty or performance claim; external literature review remains outside this pilot"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt",
+      "method and twist",
+      "native counters and artifact roles",
+      "independent ECDLP scalar-recovery status"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Solver recovers scalar without witness and native verify replays scalar times declared generator equals target.",
+        "id": "independent-ecdlp-solve",
+        "kind": "exact",
+        "name": "Independent ECDLP solve",
+        "resolution": "1",
+        "source": "native solver outcome and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Restricted archive and pointer have successful S3 PUT and fresh GET byte-equality receipts.",
+        "id": "durable-cell",
+        "kind": "exact",
+        "name": "Restricted archive durable",
+        "resolution": "1",
+        "source": "per-shard custody and checkpoint receipts",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-BINARY23-METHODS-20261031",
+  "question": "Can every cell in a fixed 48-cell ordinary-binary n23 m2 method-by-twist population be attempted once, verified at its actual claim scope, and durably retained with exact terminal outcomes?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic mixed-radix plan order pairs all six methods on each public instance; no timing-effect or method advantage is estimated.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Four shared instance IDs g0k0,g0k1,g1k0,g1k1 in every solver-by-twist arm. Methods share exact public input within each twist; opposite twists are distinct curves. All fixed 48 cells retained without outcome selection."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed fixed before data; curve seed index0.",
+      "seeds": [
+        2026103102
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 4,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Four instance IDs per arm, 12 method-by-twist arms, exactly 48 native cells; no inferential effect or power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 340.0,
+      "fixed_seconds": 20.0,
+      "measured_on": "Per-arm planning allowance: four samples each80s plus20s fixed. Twelve arms imply up to4080s for48 cells, each under90s outer cap; not a measured performance estimate.",
+      "per_sample_seconds": 80.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All 48 plan indices0..47, one new solver attempt each; retain every outcome and no replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has30s inner and90s outer cap; finite verify/report/export/archive/PUT/GET stage caps. Stop on failed custody and resume finalization only; at least8GiB XFS free before each new attempt. Overall campaign12h admission ceiling."
+    }
+  ],
+  "study_dir": "research/ml_dataset_binary_methods_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "binary23-sat-untwisted",
+          "binary23-sat-twisted",
+          "binary23-f4-untwisted",
+          "binary23-f4-twisted",
+          "binary23-f5-untwisted",
+          "binary23-f5-twisted",
+          "binary23-weil-untwisted",
+          "binary23-weil-twisted",
+          "binary23-double-large-prime-untwisted",
+          "binary23-double-large-prime-twisted",
+          "binary23-bsgs-untwisted",
+          "binary23-bsgs-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All48 indices accounted; every promoted method/solve claim requires native replay, and durable custody requires restricted S3 archive and fresh readback."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Clean source c41bec15 and binary SHA b8e0881e pinned; preflight and per-attempt hash checks.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Native plan crosses six methods, two twists, two generators and two keys at ordinary binary n23,m2, one curve seed.",
+        "name": "curve-and-method",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one generate command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Shared host conditions recorded as operational context; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "30s inner worker and90s outer generate cap per shard.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All48 frozen indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "One predeclared output root on second local XFS, with8GiB free-space admission floor and restricted S3 per-cell custody.",
+        "name": "output-filesystem",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 1
+}

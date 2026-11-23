@@ -1,0 +1,1 @@
+Source bytes retained as .lean.txt; restore .lean and exact dependency paths for replay. Compiled caches and TeX aux omitted; logs encoded reversibly with original hashes. One-page PDF and control graph inspected. Independent fidelity review pending. SESSION.md preserves the scoped log while T-1351 reserves the shared dated log.

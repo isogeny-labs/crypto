@@ -1,0 +1,288 @@
+[
+    {
+        "Id": "eb0515e263357fe987e247e7c8b58055da1a7c40fe941fe77607471b735d2104",
+        "Created": "2026-10-19T05:36:13.159884065Z",
+        "Path": "/usr/bin/timeout",
+        "Args": [
+            "-s",
+            "TERM",
+            "-k",
+            "5",
+            "1800",
+            "/opt/worker",
+            "setup",
+            "prebuilt",
+            "/inputs/base",
+            "/out/worker.json"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-19T05:36:13.36669722Z",
+            "FinishedAt": "2026-10-19T05:36:17.297285301Z"
+        },
+        "Image": "sha256:24b8580b081b53113046267a47ad12858ad97752c9735e1125fcdb7a62d1d2c9",
+        "ResolvConfPath": "/var/lib/docker/containers/eb0515e263357fe987e247e7c8b58055da1a7c40fe941fe77607471b735d2104/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/eb0515e263357fe987e247e7c8b58055da1a7c40fe941fe77607471b735d2104/hostname",
+        "HostsPath": "/var/lib/docker/containers/eb0515e263357fe987e247e7c8b58055da1a7c40fe941fe77607471b735d2104/hosts",
+        "LogPath": "/var/lib/docker/containers/eb0515e263357fe987e247e7c8b58055da1a7c40fe941fe77607471b735d2104/eb0515e263357fe987e247e7c8b58055da1a7c40fe941fe77607471b735d2104-json.log",
+        "Name": "/n83-m23-setup-prebuilt",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,noexec,nosuid,nodev,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 4294967296,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "31",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 4294967296,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 256,
+            "Ulimits": [
+                {
+                    "Name": "nofile",
+                    "Hard": 65536,
+                    "Soft": 32768
+                }
+            ],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-d18-paired-20261019/target/release/examples/n83_prebuild_cost_m23",
+                    "Target": "/opt/worker",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/inputs/D",
+                    "Target": "/inputs/base",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/inputs/public/public-targets.json",
+                    "Target": "/inputs/public.json",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/home/ec2-user/n83-m23-20261019/runs/setup-prebuilt",
+                    "Target": "/out"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware",
+                "/sys/devices/virtual/powercap"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/bb0ee25118a1a6ae1bb4d8127979a5717115a5fc882dcf95afde5ad81ead03b5-init/diff:/var/lib/docker/overlay2/cc1ec6313c249a0eaedcde3ba035ec0ef4a0fa5660495124c1b755502adb9e8e/diff",
+                "MergedDir": "/var/lib/docker/overlay2/bb0ee25118a1a6ae1bb4d8127979a5717115a5fc882dcf95afde5ad81ead03b5/merged",
+                "UpperDir": "/var/lib/docker/overlay2/bb0ee25118a1a6ae1bb4d8127979a5717115a5fc882dcf95afde5ad81ead03b5/diff",
+                "WorkDir": "/var/lib/docker/overlay2/bb0ee25118a1a6ae1bb4d8127979a5717115a5fc882dcf95afde5ad81ead03b5/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-d18-paired-20261019/target/release/examples/n83_prebuild_cost_m23",
+                "Destination": "/opt/worker",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/inputs/D",
+                "Destination": "/inputs/base",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/inputs/public/public-targets.json",
+                "Destination": "/inputs/public.json",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/ec2-user/n83-m23-20261019/runs/setup-prebuilt",
+                "Destination": "/out",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "eb0515e26335",
+            "Domainname": "",
+            "User": "1000:1000",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/usr/bin/timeout",
+                "-s",
+                "TERM",
+                "-k",
+                "5",
+                "1800",
+                "/opt/worker",
+                "setup",
+                "prebuilt",
+                "/inputs/base",
+                "/out/worker.json"
+            ],
+            "Image": "amazonlinux@sha256:8ed3c0a996841537f75607e7d1de2114d8150391f75792e8da9268738547e73f",
+            "Volumes": null,
+            "WorkingDir": "/",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "d2dc446f6f1c20f41ae14d69363060f644cacafd366fcdfcf82f8f9e8d4c6940",
+            "SandboxKey": "/var/run/docker/netns/d2dc446f6f1c",
+            "Ports": {},
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "",
+                    "NetworkID": "a2ddb2b7e18c0818f057fc99735114577e95eff943267e29c6da0229d0da6174",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DriverOpts": null,
+                    "DNSNames": null
+                }
+            }
+        }
+    }
+]

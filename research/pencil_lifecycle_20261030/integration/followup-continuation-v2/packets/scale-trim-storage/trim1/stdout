@@ -1,0 +1,12 @@
+/var/tmp/pencil-scale-trim-20261031-v1/Trim.lean:40:74: warning: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+/var/tmp/pencil-scale-trim-20261031-v1/Trim.lean:53:56: error: Application type mismatch: The argument
+  Nat.sub_le xs.length 1
+has type
+  xs.length - 1 ≤ xs.length
+but is expected to have type
+  xs.dropLast.length ≤ xs.length
+in the application
+  le_trans h (Nat.sub_le xs.length 1)
+/var/tmp/pencil-scale-trim-20261031-v1/Trim.lean:60:22: error(lean.unknownIdentifier): Unknown constant `List.length_eq_zero.mp`

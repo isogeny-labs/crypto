@@ -1,0 +1,44 @@
+{
+  "schema": "twist.followup-run/v1",
+  "command": "adjudicate-cas",
+  "fixture_sha256": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+  "rows": [
+    {
+      "schema": "twist.native-cas-adjudication/v1",
+      "log_prefix": "research/twist_routes_1_3_20261021/execution-v2/receipts/geometry-icv1-fp10-tm21-b87c79a9-20261023-v1",
+      "transport_metadata": {
+        "schema": "twist.CAS-transport/v2",
+        "source_commit": "4d4218ec34107f4addf95fa5a4e20ef0bf5d5b91",
+        "tool": "PARI/GP 2.17.2",
+        "tool_binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "argv": [
+          "/tmp/twist-cas/root/usr/bin/gp",
+          "-f",
+          "-q",
+          "research/twist_routes_1_3_20261021/execution-v2/runs/geometry-input-20261023-v1/icv1-fp10-tm21-b87c79a9.gp"
+        ],
+        "script_sha256": "f7162c20eced3d4be1f567bbc9633b77dfed6c35c6e546be405b2fd8417b7fb7",
+        "started_utc": "2026-10-23T01:44:27Z",
+        "finished_utc": "2026-10-23T01:44:27.118Z",
+        "exit_code": 0,
+        "timeout_s": 3600,
+        "address_space_kib": 4194304,
+        "threads": 1,
+        "stdout_sha256": "f5cd383cd5526c0f32833687ed8ff88a3d9b2ce55bd48adac944b8b983f6b47a",
+        "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+        "scientific_acceptance": "requires-native-adjudication"
+      },
+      "completion_marker_present": true,
+      "raw_hashes_match": true,
+      "script_hash_matches": true,
+      "allowed_stack_warning_present": true,
+      "unaccepted_error_lines": [],
+      "accepted": true,
+      "status": "accepted-native-checked-CAS-replay",
+      "scope": "The GP script performs independent group/pairing/polynomial checks. This Rust gate rejects errors even when GP exits zero and prints a marker."
+    }
+  ],
+  "performance_claim": false,
+  "novelty_established": false,
+  "independent_host_replay": false
+}

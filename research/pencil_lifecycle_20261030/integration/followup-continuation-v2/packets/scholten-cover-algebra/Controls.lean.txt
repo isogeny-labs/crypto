@@ -1,0 +1,16 @@
+import CoverAlgebra
+set_option autoImplicit false
+namespace ScholtenCoverControls
+theorem cleared_chart :
+ (5*(3:ℚ)^6+7*3^4*2^2+11*3^2*2^4+13*2^6)/2^6 = 8329/64 := by norm_num
+
+theorem opposite_sign : ((-(2:ℚ))^2,3*(-2)^3) = (4,-24) := by norm_num
+
+theorem wrong_sign_rejected : ((-(2:ℚ))^2,3*(-2)^3) ≠ (4,24) := by norm_num
+
+theorem exceptional_root {K : Type*} [Field K] (i : K) (hi : i^2= -1)
+ (h2 : (2:K)≠0) : (ScholtenCover.A i (-1/2))^2+(ScholtenCover.B i (-1/2))^2=0 := by
+ rw [ScholtenCover.exceptional_fibre i (-1/2) hi]
+ field_simp
+ <;> ring
+end ScholtenCoverControls

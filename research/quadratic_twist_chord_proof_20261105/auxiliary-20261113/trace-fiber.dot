@@ -1,0 +1,16 @@
+digraph TraceFiber {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.3", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#EDF3FA", fontname="Helvetica", fontsize=12];
+  edge [fontname="Helvetica", fontsize=10];
+  Q [label="Actual unknown source point Q\nNo target-log label"];
+  C [label="Proposed target-dependent quartic\nd t^2 = Delta_Q(lambda)", fillcolor="#FFF1D6"];
+  R [label="Conjugate extension points R, sigma(R)\nTrace R = Q; keep tangent t=0"];
+  T [label="Auxiliary twist coordinate\nC = R - [h]Q; sigma(C) = -C"];
+  Rows [label="Project and deduplicate coefficient rows\nVerify scalar on ORIGINAL E/P"];
+  Control [label="Free fixed decorations: T determined by row\nNo extra useful rank from witness multiplicity", fillcolor="#F5E9F5"];
+  Test [label="Next: coverage audit, then bounded solver comparison\nSame lifted source baseline; all work charged", fillcolor="#E6F2E7"];
+  Q -> C; C -> R [label="hand-derived; NOT kernel checked"];
+  R -> T [label="explicit twist inverse obligation"];
+  T -> Rows [style=dashed, label="future relation solver"];
+  Rows -> Test; Control -> Test;
+}

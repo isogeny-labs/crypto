@@ -1,0 +1,36 @@
+scope: bounded local native DEVELOPMENT correctness; not scientific scaling or timing
+platform: Linux x86_64
+compiler: g++ (Debian 14.2.0-19) 14.2.0
+source: research/prime_one_shot_20261029/prototype/norm_tower.cpp
+source_sha256: 1b57c33c9d97ec1d933bc686106b22d95dd71abe49dce014f9287c6c32ef1ff6
+binary_sha256: 9548f02a43c6783bb43df3817cea0881c436a9e8e0612b64d0ffdf0ce45c130b
+binary_location: /tmp/norm-tower-development (not committed)
+
+build_command:
+g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror research/prime_one_shot_20261029/prototype/norm_tower.cpp -o /tmp/norm-tower-development
+build_exit: 0
+
+run_command:
+/tmp/norm-tower-development --selftest-export research/prime_one_shot_20261029/prototype/exports
+run_stdout: check.log
+run_exit: 0
+checks_passed: 162
+checks_failed: 0
+solver_runs: 0
+elapsed_timings: not collected
+
+repeat_command:
+/tmp/norm-tower-development --selftest-export /tmp/norm-tower-exports-repeat
+repeat_exit: 0
+export_comparison:
+diff -r research/prime_one_shot_20261029/prototype/exports /tmp/norm-tower-exports-repeat
+comparison_exit: 0
+stdout_comparison:
+cmp research/prime_one_shot_20261029/prototype/check.log /tmp/norm-tower-repeat.log
+stdout_comparison_exit: 0
+
+This receipt binds source and bounded correctness output. It is not a replay
+certificate for an ECDLP solver, independent proof, or performance admission.
+
+Final review: corrected a comment from all point pairs to each point inverse/order.
+Rebuilt with identical strict flags; all162 checks and all six exports unchanged.

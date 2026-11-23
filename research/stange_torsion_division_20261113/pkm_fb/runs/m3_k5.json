@@ -1,0 +1,34 @@
+{
+ "m": 3,
+ "k": 5,
+ "n": 32,
+ "p": 32801,
+ "arms": [
+  "D",
+  "T2"
+ ],
+ "reps": 1,
+ "targets": 1,
+ "failures": [],
+ "records": [
+  {
+   "target": 0,
+   "xR": null,
+   "brute_ordered_tuples": 0,
+   "relation_multisets_xcoord": 0,
+   "arms": {
+    "T2": {
+     "time_s": 606.9322,
+     "max_step_deg": 12,
+     "runs_ok": 1
+    },
+    "D": {
+     "time_s": 4.981,
+     "max_step_deg": 40,
+     "runs_ok": 1
+    }
+   }
+  }
+ ],
+ "partial": "Reconstructed from runs/m3_k5.err: the run (2 targets planned, --reps=1) was stopped after target 0 to stay inside the compute budget (T2 took 607 s per msolve run). Target 0 passed both assertions (dimension = brute force, basis vanishes on every brute-force tuple) before its line was printed; xR was not saved."
+}

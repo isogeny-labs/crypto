@@ -1,0 +1,164 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "f1-x07",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.7300648785815862,
+        1.797791166045103,
+        2.4073277532167467
+      ],
+      "charged_sum": 2565564.0,
+      "native_sum": 1004333,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 23928.1875
+      }
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "rho-neg",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.030817814463475,
+        1.1322267583020695,
+        2.04490725284942
+      ],
+      "charged_sum": 1528630.0,
+      "native_sum": 1503823,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "twcj-j16",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.4082012662874204,
+        1.408275443792501,
+        1.408943041338224
+      ],
+      "charged_sum": 2088263.0,
+      "native_sum": 1100,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 32175.875
+      }
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "twcj-j32",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.4722333116956485,
+        1.4723074892007286,
+        1.4729750867464517
+      ],
+      "charged_sum": 2183218.0,
+      "native_sum": 1100,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 33582.28125
+      }
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "log2_r": 29.00003688711981,
+      "arm": "twcj-j64",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.3489233246138883,
+        1.3489968952121085,
+        1.349659030596094
+      ],
+      "charged_sum": 2000358.0,
+      "native_sum": 1091,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 30577.21875
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "f1-x07",
+      "b": "rho-neg",
+      "verdict": "rho-neg < f1-x07"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "f1-x07",
+      "b": "twcj-j16",
+      "verdict": "twcj-j16 < f1-x07"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "f1-x07",
+      "b": "twcj-j32",
+      "verdict": "twcj-j32 < f1-x07"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "f1-x07",
+      "b": "twcj-j64",
+      "verdict": "twcj-j64 < f1-x07"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "rho-neg",
+      "b": "twcj-j16",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "rho-neg",
+      "b": "twcj-j32",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "rho-neg",
+      "b": "twcj-j64",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "twcj-j16",
+      "b": "twcj-j32",
+      "verdict": "twcj-j16 < twcj-j32"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "twcj-j16",
+      "b": "twcj-j64",
+      "verdict": "twcj-j64 < twcj-j16"
+    },
+    {
+      "curve": "icv1-fp32-tm109914-36f5bc82",
+      "a": "twcj-j32",
+      "b": "twcj-j64",
+      "verdict": "twcj-j64 < twcj-j32"
+    }
+  ]
+}

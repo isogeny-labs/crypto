@@ -1,0 +1,129 @@
+{
+  "candidate_id": "spike39",
+  "coordinate_bit": 39,
+  "factor_base": {
+    "bytes": 4575883253,
+    "candidate_x_count_per_family": 134217728,
+    "family_index_sha256": "3efdc9f650310f97ec12897aaa28e0146fd09cc15769093f0b3db680c1c50232",
+    "same_base_for_m": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "shards": 384,
+    "source_s3_index_sha256": "0baee0b147a21fb2921d3fb897598c5596ce3defdd61e6321984ad677f052b30",
+    "stage_path": "/home/ec2-user/n83-candidate-bases/r39-ffd-attempt-01/data"
+  },
+  "generation": {
+    "binary_sha256": "b8e00f73512977828497c4bb30f0ae08d319350688a90b15310aa4143308a3ca",
+    "command_file": "GENERATION-COMMAND.txt",
+    "fresh_output_required": true,
+    "matched_input_sha256": "f7325211302b4ca21f98ea9a7022d2dcc023b29ea2fad9329867e90b75a01c82",
+    "seed": 20261027,
+    "source_sha256": "8e23a7287dc82afc967ef3f50e20c486f3f01d1e4a5f1847b5891b24df3b7629"
+  },
+  "limits": {
+    "artifact_ceiling_usd": 0.25,
+    "attempts": 1,
+    "cpu_affinity": [
+      0
+    ],
+    "fall_outer_wall_seconds": 12850,
+    "fall_per_case_seconds": 60,
+    "generation_wall_seconds": 1200,
+    "max_total_usd": 3.15,
+    "memory_gib": 8,
+    "replay_per_case_seconds": 60,
+    "retries": 0,
+    "threads": 1,
+    "wall_valid": false
+  },
+  "planned_cases": 48,
+  "protocol_freeze_sha256": "50cd6f8213789de2dfd54a3b33a067ed87cc0def761b7c98769be3e19aee47a9",
+  "protocol_id": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2",
+  "protocol_source_commit": "52665c7a6e8308f86201e10c9305afa346fd134b",
+  "publication_files": [
+    {
+      "bytes": 4719,
+      "path": "prepare-inputs.sh",
+      "sha256": "5aac1a6b8504d3230932909575633d8b44164ef6457edda6e0b295f238925aab"
+    },
+    {
+      "bytes": 1141,
+      "path": "stage-r39-bases.py",
+      "sha256": "5c4d05aad4f576ed8eb7fa089e0e8e4061384a0eb378ab66c772eb5b0fb09beb"
+    },
+    {
+      "bytes": 98820,
+      "path": "protocol-pdp-factorbase-v2.json",
+      "sha256": "8a9143e9588ce1ec5c204362b734f790696de90569ce1de3c086e4645e605885"
+    },
+    {
+      "bytes": 89795,
+      "path": "protocol-top-factorbase-v2.json",
+      "sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5"
+    },
+    {
+      "bytes": 35349,
+      "path": "source-pdp.rs",
+      "sha256": "8e23a7287dc82afc967ef3f50e20c486f3f01d1e4a5f1847b5891b24df3b7629"
+    },
+    {
+      "bytes": 25150,
+      "path": "source-fall.rs",
+      "sha256": "f860a68fcd8c98585082965f3d4c1622d71add204c0afc5bc922ea243153ea85"
+    },
+    {
+      "bytes": 210,
+      "path": "Cargo.toml",
+      "sha256": "67bf2d622a3c3fe35babe46a3e17ae37693dee36a7330300b5fe57e473c71cdf"
+    },
+    {
+      "bytes": 7077,
+      "path": "Cargo.lock",
+      "sha256": "210fabaa277a42007115baea73429d5e68feb35e3b274eab7ef9c311270722c5"
+    },
+    {
+      "bytes": 330713,
+      "path": "r39-base-s3-file-index.json",
+      "sha256": "0baee0b147a21fb2921d3fb897598c5596ce3defdd61e6321984ad677f052b30"
+    },
+    {
+      "bytes": 1601,
+      "path": "r39-base-index.json",
+      "sha256": "3efdc9f650310f97ec12897aaa28e0146fd09cc15769093f0b3db680c1c50232"
+    },
+    {
+      "bytes": 1290088,
+      "path": "instruments/pdp",
+      "sha256": "b8e00f73512977828497c4bb30f0ae08d319350688a90b15310aa4143308a3ca"
+    },
+    {
+      "bytes": 860984,
+      "path": "instruments/fall",
+      "sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14"
+    },
+    {
+      "bytes": 273,
+      "path": "GENERATION-COMMAND.txt",
+      "sha256": "7428c070daf38943fba0a737f39fd1d59a8ae5cf173599c36439a98c4108a7b9"
+    }
+  ],
+  "s3": {
+    "capsule": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike39/attempt-01/capsule-v1/",
+    "fall_results": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike39/attempt-01/data-v1/",
+    "generated_inputs": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike39/attempt-01/inputs-v1/"
+  },
+  "schema": "n83.spike39-input-generation-binding/v1",
+  "source_system_protocol": {
+    "current_file_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "freeze_sha256": "3d852e474eb7b129e51f68bb564f379d9d997148dbe9c3727e529102a6ef47c6",
+    "id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2"
+  },
+  "status": "pre-generation; input manifest and generated systems will be created after the one-shot deterministic source-system generation and pushed before the fall panel"
+}

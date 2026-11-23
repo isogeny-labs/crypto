@@ -1,0 +1,608 @@
+{
+  "schema": "prime-field-trace-source-plan/v1",
+  "created": "2026-11-14T06:27:36.421084+00:00",
+  "formal": {
+    "project": "research/prime_field_trace_audit_20261114/lean",
+    "theorem": "PrimeFieldTraceAudit.prime_field_trace_certificate",
+    "statement": "theorem prime_field_trace_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K),W.Δ≠0 → (normalized W).Δ=W.Δ ∧ Nonempty ((normalized W).Point ≃+ W.Point) ∧ ((2:K)≠0 → (3:K)≠0 → normalized W=shortModel (normalized W).a₄ (normalized W).a₆)) ∧ (∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (W : WeierstrassCurve.Affine K),W.Δ≠0 → Nat.card W.Point=equationCount (normalized W) ∧ fieldTrace W=countedTrace (normalized W) ∧ (sourceSupersingular W ↔ countedSupersingular (normalized W))) ∧ (∀ W : WeierstrassCurve.Affine F5,W.Δ≠0 → (fieldTrace W)^2≤20 ∧ (sourceSupersingular W ↔ fieldTrace W=0) ∧ (sourceSupersingular W ↔ Nat.card W.Point=6) ∧ (sourceSupersingular W → ∀ r : ℕ,r∣Nat.card W.Point → Nat.Coprime r 5 ∧ orderOf (5:ZMod r)∣2 ∧ (2<r → orderOf (5:ZMod r)=2))) ∧ (∀ W : WeierstrassCurve.Affine F7,W.Δ≠0 → (fieldTrace W)^2≤28 ∧ (sourceSupersingular W ↔ fieldTrace W=0) ∧ (sourceSupersingular W ↔ Nat.card W.Point=8) ∧ (sourceSupersingular W → ∀ r : ℕ,r∣Nat.card W.Point → Nat.Coprime r 7 ∧ orderOf (7:ZMod r)∣2 ∧ (2<r → orderOf (7:ZMod r)=2))) ∧ (sixControl.Δ≠0 ∧ sourceSupersingular sixControl ∧ Nat.card sixControl.Point=6 ∧ addOrderOf sixPoint=6 ∧ orderOf (5:ZMod 6)=2 ∧ orderOf (5:ZMod 2)=1) ∧ (eightControl.Δ≠0 ∧ sourceSupersingular eightControl ∧ Nat.card eightControl.Point=8 ∧ addOrderOf eightPoint=8 ∧ orderOf (7:ZMod 8)=2 ∧ orderOf (7:ZMod 2)=1) ∧ (singularControl.Δ=0 ∧ Nat.card singularControl.Point=5 ∧ equationCount singularControl=6 ∧ ¬sourceSupersingular singularControl ∧ countedSupersingular singularControl) ∧ (¬∀ W : WeierstrassCurve.Affine F5,Nat.card W.Point=equationCount W)",
+    "decl_sha256": "59de648349f196f9d186cc1f60007ec5398d2f53840f1e81792bf2b0bdfbd169",
+    "scope": "Every actual nonsingular general Weierstrass model over F5/F7: actual Hasse, exact source gcd(trace,q)!=1 iff actual trace0 iff pointcard6/8. Explicit unit-u1 short normalization in any field with2,3nonzero, unchangedDelta, credited actual additivepoint equivalence, generic finitefield actual pointcount/trace/sourcepredicate transport. Closed kernel all25/49shortcoefficientpairtables plus actual equivalence cover allgeneralmodels; no general Hasse/classification premise. Every actual source-SS countdivisor coprime with q, modularorder divides2 and exact2if r>2, includingcomposites, with no prime premise. Named actual F5y²=x³+1/P(2,2)order6 and F7y²=x³+x/P(3,3)order8; modularorders2 andmod2orders1. F5curve/modelpriorart credited. SingularF5cuspDelta0actualnonsingularpointgroupcard5/rawcount6/sourcepredicatefalse/countedpredicatetrue; directuniversalnegationafterdeletingDelta. Sourcep>=5conditionpreserved, no qualifiedsource refutation. Generalprime/extensionfieldHasse/trace-geometric-Endrankidentifications, fielddegree/fulltorsionfield/otherBKprimes/fullallkp500/original14gapsremainopen. No novelty/corpuspromotion/fullpaper-bookread/nativeexperiment/spend/upload.",
+    "sources": [
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualCriterion.lean",
+        "bytes": 4882,
+        "sha256": "f3ba6212a416b534a4841417745ebe3d73ed1c02888abb8ed2cf2fea7a8ed2cd"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualFrobenius.lean",
+        "bytes": 2094,
+        "sha256": "7f19c4896dcb2f348fef4fb18de4d7764e97b76303101c22863d7e9d1edaaf5c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualMatrix.lean",
+        "bytes": 3338,
+        "sha256": "dc1118fec71e3e25a176da44e798721baba5385efc0e16aa14ad46edefca00f5"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+        "bytes": 2580,
+        "sha256": "15975255d4f4ac1d84be82f104c4f339c5e752923a1881b446766a883c1d464e"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+        "bytes": 1492,
+        "sha256": "0c146876e71121a4716165bce9e3125e65cce4e9de466ab72aa9bc129835aaa4"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/CharTwoAllFields.lean",
+        "bytes": 1398,
+        "sha256": "e2ffea650fdc3845003e0bbfa9f4de9a0281244710b6eefc6c7796df205c7b09"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/DirectSource.lean",
+        "bytes": 5061,
+        "sha256": "fc6893a1647abea211501d0eec3ce48d667d8d8a8baf64e28d8909638c9f2a8a"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/GeneralThreeBKCertificate.lean",
+        "bytes": 6082,
+        "sha256": "f6934ac0e1d3a99ff5ae357a2eb081504d0ae423860f146ff0db88c1d2196167"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftCoordinates.lean",
+        "bytes": 2923,
+        "sha256": "497e5d338b380a13392407438663a4e238f73c9de1ee81f86df8bcdf0353893c"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftDescent.lean",
+        "bytes": 6809,
+        "sha256": "d6889ff5327f3ad43d9bb72e522505178a3caa8b7afc7d5f3b256317f8c51dd3"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftPointGroup.lean",
+        "bytes": 5690,
+        "sha256": "35980d3f1169af1462f658b52193b64613c6d789d6411762add15a30454c27e2"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ThreeCountBridge.lean",
+        "bytes": 2355,
+        "sha256": "fdc6ea9d81c705bf70f9f097f9950e65fbb224dceb80bfd537d7179dfe018817"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ThreeNormalForm.lean",
+        "bytes": 2244,
+        "sha256": "64f11c4dffbc1520e3f21df243e1f8235748a37d5de7a66f0a5506fb2e3fb34d"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/FiveSeven.lean",
+        "bytes": 3100,
+        "sha256": "574e45cf705b8a29ea804ffb1765c5e31bef3f93679dc305ec0beba61397f427"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/PrimeFieldTraceCertificate.lean",
+        "bytes": 7006,
+        "sha256": "c86ddc8f3488cfd1810d4dd860e6393d275a81264c660a02d0745df6fa1eeff9"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/ShortNormalization.lean",
+        "bytes": 3772,
+        "sha256": "cf9235fd81674936fd181898a19614108c5d95fe9a1d07419a1eb3b426d039a0"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/CharThreeCoefficient.lean",
+        "bytes": 3046,
+        "sha256": "78bdda8fbbb9250f6d09d535c2794631743decbb23b17ff3738606269c3e3566"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/GeometricJ.lean",
+        "bytes": 5510,
+        "sha256": "01497d095d0c8fc6ee58335777465f9700e0a606991ba059ca5ffc1e3129e407"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/SmallCharacteristicCertificate.lean",
+        "bytes": 5030,
+        "sha256": "45f61fc3a6ed980f34ec57378f01cbd2cc56594aab66d91e583358247400f74e"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/EquationCount.lean",
+        "bytes": 3670,
+        "sha256": "04bf6f3bf4310ac73a2e184a689768646ab3b7e18011da9a5611b9cec6e3b163"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/SupersingularTraceClasses.lean",
+        "bytes": 7821,
+        "sha256": "6f50f299794aecf2e85e42ffa651001f4a7a69b3f7e0f7daf3a6f8ef5aaff275"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/GeneralCharThree.lean",
+        "bytes": 3178,
+        "sha256": "c0a51918922624288db9038f67f1205b4ac6dc5a88cf2b8d2cc1033796fcd51e"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/NormalFormCharThree.lean",
+        "bytes": 3791,
+        "sha256": "50ca726ca484ba04c2302cef8f88c1d6083d2a9d40c4c5d56b827b67b3775023"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/SourceThreeCriterion.lean",
+        "bytes": 5354,
+        "sha256": "a5973512b6a5fca625ab95e6bc1cb8baf8a2736afd635954a1b8ae88c7648f93"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterControls.lean",
+        "bytes": 7752,
+        "sha256": "e9cdcfe6993511dd3d84838cbfb20ee3ea2ff57684b9613880874127cc116dcd"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterFrobenius.lean",
+        "bytes": 4672,
+        "sha256": "31ce844af27e7fc15d473409b05d9974e6617ce8d0b4a5444fd6aebe77172357"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterModule.lean",
+        "bytes": 7522,
+        "sha256": "62e7974780d85bb57951cf47e64cbd6456c7e33a1b60f8da0a6e3c9fcd651b42"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterPoint.lean",
+        "bytes": 8681,
+        "sha256": "897bf21ecd85d70e6e65f1678de86df2610367e73a00f9a6acdbd78294b6f093"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterScalar.lean",
+        "bytes": 4757,
+        "sha256": "181b7e59dfcac10f50993b108e3d084cd2df4520dc9238aaaef807a3cff0dd6d"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+        "bytes": 2653,
+        "sha256": "187b01e8b72494449ceb9f2fd42cd33fd10b09f85b57d14a0d695688ec8b9550"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+        "bytes": 2734,
+        "sha256": "b91669f10694a42c73ea6712da413ae4ff2ed3fe9e5d84fd5c9189cfaa189a73"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+        "bytes": 5157,
+        "sha256": "44c162daf6bc9ea3bacb0a3e5b965d8572f4f097d60aaa215df81a452bfbbab3"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+        "bytes": 2400,
+        "sha256": "5caa1d00afe151a6259dc659c40295afcb128a3b3fc6234f7c27e68a8e926cd2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+        "bytes": 6143,
+        "sha256": "ae23e54b95ea98aa9f98d1a7f3a22d2c4fb0c4321330dd2dc36a4579e88c7f72"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+        "bytes": 4722,
+        "sha256": "f61099252ac9f05b6482e4f19559f02e9ef199fc7d44395dbb599c650bb0beb6"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+        "bytes": 2294,
+        "sha256": "139ff737ff154ca1f3952d82b4dab42512ddf382a977f76fc8e4ec301d4b2339"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+        "bytes": 3190,
+        "sha256": "c93226b190f59c494c6b01beaeaa71c9a01036edfea09d35ebabf64915bfc1dc"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+        "bytes": 2533,
+        "sha256": "32894b1a1e4f10e6a04d06ebf02324ff999442826f4cb3a8e548a4abddbb01b9"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+        "bytes": 3715,
+        "sha256": "1dadaec158b5091e91533cf53563a17ebb39c15638ebf86587d76b893e0bf471"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoCardinality.lean",
+        "bytes": 1677,
+        "sha256": "27aa487fde2820f78381e8033d59d5cf95e0511e15e9b3f81a5079df1eced85e"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoGeometry.lean",
+        "bytes": 3565,
+        "sha256": "aec6bce4be662854a1fda7a20b7248a4ef3da57e12e15bd97ea4ab85c00e16f7"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoModels.lean",
+        "bytes": 4074,
+        "sha256": "38fa13035c6b37fc443cafd3aea48b4211dd70bba7b0affe0e1b44bfab30867a"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/OddCardinality.lean",
+        "bytes": 3448,
+        "sha256": "9074d16dfeadb1cc900d93efe1d1b15edbe2225515aefef292310062a0ad0204"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/RootEquiv.lean",
+        "bytes": 3174,
+        "sha256": "664b7a1779ed8c0873aad0635229a5067b80c6bf53b0389707cfab2e96a3a7c2"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/lakefile.toml",
+        "bytes": 328,
+        "sha256": "6a749f92e57ae2c9bfe1b6bdfa3436110b39d762f9104f0e1356b913a5294c52"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/lake-manifest.json",
+        "bytes": 8767,
+        "sha256": "40ab7f7a80d88ee7c95bc47b3dd3fa12fb82b75c2e09c4c333d3b64ce722fb09"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/lakefile.toml",
+        "bytes": 353,
+        "sha256": "55d6a23b6ec75d27cdb047f54fb7dd4f08f00a5a1fd41680d7160f2c48d7dc65"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/lake-manifest.json",
+        "bytes": 7926,
+        "sha256": "aa8f2f0132ddbd267c9f62f81f9014f15d928bdc905ed3f4efea5ba10ce5da74"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/lakefile.toml",
+        "bytes": 340,
+        "sha256": "d781a42c7a470c2c7afd2820ea29f34b0e978d5b8a299cef99b22d9fa12f7c3f"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/lake-manifest.json",
+        "bytes": 7173,
+        "sha256": "e608e29a37c08ae2b9ce72651485bbdd709ee887d71b93f850e55d910b409c7c"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/lakefile.toml",
+        "bytes": 392,
+        "sha256": "df4308ff06eb65627194a0dbd23a9c40b4a586cb0bec4a74ee094767f28f2ddc"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/lake-manifest.json",
+        "bytes": 6481,
+        "sha256": "a8e99ab09620f78c5d36a89fc78a036beef83bb0cd0752cd9ec7f0271f5b5f19"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/lakefile.toml",
+        "bytes": 336,
+        "sha256": "516a5534ecbf74cac547d4650e79b089254bc4c6d616320ef9a00fc7ef047a5e"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5659,
+        "sha256": "613b91dd6351960909fee544cff4f7d9615b9ba0e793acc7c9bb3caac4d23802"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lakefile.toml",
+        "bytes": 395,
+        "sha256": "38f4ff5da23bd75c602f06ae62ff82a6404ca10cd3640f65f357fb2854441ad0"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5109,
+        "sha256": "36439b5916281050c33f7d50b635cb5ca8d7fdfcf1678b5a23052d019f8a1cee"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lakefile.toml",
+        "bytes": 420,
+        "sha256": "735b3aab39dd0d098d60c9ea782d6c853b3dd72e5e15d39f2e038e8ed75a5937"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4599,
+        "sha256": "318bc66aa76c02fb7cccccf4b6bf23c7a46f4c0292a6c94fe6969fae984ff1ae"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lakefile.toml",
+        "bytes": 519,
+        "sha256": "af999734bbc208c01f4a5d309c6794a74fefc4af4a759d0dc966bfc35f87687d"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4154,
+        "sha256": "7b264e6be03b8ef82293d0897a321bfdb3a244b4a301ca374dba1182b6a831cf"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lakefile.toml",
+        "bytes": 520,
+        "sha256": "75482bba02323d8372112c526c6ac31c5c9ab728dc2644d23b2bf39be8fa8f42"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "2cdb762e99019400e5f5792dd18fe8bbfd9056d528666fb0143f93088475213b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lakefile.toml",
+        "bytes": 282,
+        "sha256": "a8b213339113a23409463c0085eeb018856674ecb04338455d072c3d22a242d1"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3810,
+        "sha256": "eb1cf595e6547efb084a2f16644bdbd3d6a9ddd5752f9d1639396e94217bc2ea"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lakefile.toml",
+        "bytes": 421,
+        "sha256": "ab06a27f68c0ad83c5f5de173173ddda7194a66eaffbdfbba8be0659feaa8203"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3243,
+        "sha256": "a3c183cf78076c7fcde3e998b4527060d213addf37bc2106dfad04e157c219b2"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualCriterion",
+    "ActualFrobenius",
+    "ActualMatrix",
+    "CharThreeCoefficient",
+    "CharTwoAllFields",
+    "CharTwoCardinality",
+    "CharTwoGeometry",
+    "CharTwoModels",
+    "CharacteristicThree",
+    "DirectSource",
+    "DivisionQuartic",
+    "EquationCount",
+    "FiveSeven",
+    "FrobeniusFiniteExtension",
+    "FrobeniusPointDescent",
+    "GeneralBasis",
+    "GeneralCardinality",
+    "GeneralCharThree",
+    "GeneralRoots",
+    "GeneralThreeBKCertificate",
+    "GeneralTriplePoint",
+    "GenericFrobenius",
+    "GeometricCardinality",
+    "GeometricJ",
+    "NormalFormCharThree",
+    "OddCardinality",
+    "PrimeFieldTraceCertificate",
+    "QuarticRoots",
+    "RationalCounterexample",
+    "RationalTorsion",
+    "RootEquiv",
+    "S3Completion",
+    "S3Roots",
+    "ShiftCoordinates",
+    "ShiftDescent",
+    "ShiftPointGroup",
+    "ShortNormalization",
+    "SmallCharacteristicCertificate",
+    "SourceThreeCriterion",
+    "StructuralAudit",
+    "SupersingularTraceClasses",
+    "TernaryBasis",
+    "ThreeCharacterControls",
+    "ThreeCharacterFrobenius",
+    "ThreeCharacterModule",
+    "ThreeCharacterPoint",
+    "ThreeCharacterScalar",
+    "ThreeCountBridge",
+    "ThreeNormalForm",
+    "TorsionBoundaries",
+    "TriplePoint"
+  ],
+  "artifacts": [
+    {
+      "path": "research/prime_field_trace_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 32391,
+      "sha256": "62c20d2b2a7f377afa0f23b63042a2f497fa8725fe01a256fc563993b6d059d5"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/evidence/attempts.json",
+      "bytes": 10709,
+      "sha256": "b630165593bf4b6fc654522f20a75908be35dfb163535c633ceaa10f96542d01"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 4953,
+      "sha256": "b885b481fbdbb3cd695769099b7f51b42721b0d48c48b1e197086c8622f65076"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/evidence/gate.json",
+      "bytes": 1231,
+      "sha256": "a6adc7a390fa817cc5f10ab59a031d117732e5b96d73e4962e4a1125383b509f"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/evidence/source-review.json",
+      "bytes": 5102,
+      "sha256": "93ffd71cd6dbcd4a1b79c4d3b5107fa67003fcb5af0d59346b0e1c4c60f4489b"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/evidence/setup-incident.json",
+      "bytes": 809,
+      "sha256": "a3ff4f03537769c5b7d1a33b04a0494d4fbd3790814dd10fa4e919170fa663e6"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/proof-map.json",
+      "bytes": 6141,
+      "sha256": "e3062cb9f37de8a754fd03a1a912d4a5fb6fefecad26dd9206958872836cdd22"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/render_report.py",
+      "bytes": 6485,
+      "sha256": "a4efee3cd8a82f7eed744404c43b5123e2fe325f6863e92377632bb164ad96bb"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/restore_attempts.py",
+      "bytes": 1016,
+      "sha256": "f7f877a20ba801a14592f27377e5ec1d142d77fd91e8346130995731b8adfbe4"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/reports/layout.json",
+      "bytes": 264,
+      "sha256": "c7878b7737662926d57acecdde516714e51610be09c6f214ddfecef8edcb6d8d"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/reports/prime-field-trace.svg",
+      "bytes": 960,
+      "sha256": "9ad91009bf095254ed8ddfc7a4a832caacf70fe3553cf70c292839083711b0b5"
+    },
+    {
+      "path": "research/prime_field_trace_audit_20261114/reports/report.pdf",
+      "bytes": 47387,
+      "sha256": "b95bd7b181cbee546886069651c30e71c390965fe4a8b620239c08bb2e7af980"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 29,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_normalization_and_point_transport_proved": true,
+    "actual_all_general_models_F5_F7_Hasse_source_count_proved": true,
+    "all_count_divisors_including_composites_proved": true,
+    "all_count_divisors_realized_as_cyclic_points_claimed": false,
+    "explicit_actual_cyclic6_8_controls_proved": true,
+    "singular_hypothesis_deletion_universal_negation_proved": true,
+    "general_Hasse_geometric_Endrank_fielddegree_proved": false,
+    "qualified_source_refuted": false,
+    "full_paper_read": false,
+    "full_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

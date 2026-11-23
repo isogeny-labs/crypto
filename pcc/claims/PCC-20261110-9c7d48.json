@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-10T02:31:05Z",
+ "id": "PCC-20261110-9c7d48",
+ "kind": "theorem",
+ "producer": {
+  "commit": "c60c141ec8b0b2c159f20b6f8509243f995976d9",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "8ea7c208ce1f34eb39d74d1dd70a40c97fc48fb66435bb5f50542f9e544f4269",
+   "kind": "lean",
+   "project": "research/theorem_census_20261109/lean",
+   "theorem": "SupersingularTraceClassesAudit.trace_classification_audit_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual finite-field curve and prime divisor of actual point count, conditional on explicit integer trace-square classification: modular order in {1,2,3,4,6}, bound6, coprimality and actual prime-order point via Cauchy. Composite q289/N324/r81 control is arithmetic only; no actual curve/point81 claimed. Classification and modular-order/embedding-field identification remain open. No full geometric classification proof or composite curve/point81counterexample. No new native experiment, timing, source-status promotion beyond the documented original Waterhouse4.1read scope, or paid compute.",
+ "statement": "For every actual Weierstrass curve over a finite field K, write q=|K|, N=#E(K), t=q+1-N. If prime r divides N and the explicit trace-square classification t^2 in {0,q,2q,3q,4q} holds, then ord_r(q) is in {1,2,3,4,6}, is at most6, r is coprime to q, and an actual curve point has additive order r. The same combined kernel certificate checks the arithmetic-only composite control q289/N324/r81, coprime and satisfying the count/trace conditions, with modular order9>6."
+}

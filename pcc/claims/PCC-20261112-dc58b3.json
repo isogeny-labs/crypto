@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T17:44:28Z",
+ "id": "PCC-20261112-dc58b3",
+ "kind": "measurement",
+ "producer": {
+  "commit": "dd80a7c4d7deb4f6e64eeca849c6a4a877c8d86b",
+  "model": "",
+  "session": "https://claude.ai/code/session_01TCbLH9FoRiHTPWAKdyQi2r"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/mt_timed_runpod_20261112/validation/replay-certificate.json",
+   "sha256": "c88ee9466ee267bde3230551cfb3b69173892b469a63206cf13e2d524af0d995"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/mt_timed_runpod_20261112/validation/claim-report.json",
+   "sha256": "be45121d007035bf8bc4b1d1d239535c973ec4ebd0c8f1c755bb8acd53c54a53"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/mt_timed_runpod_20261112",
+ "statement": "On one pinned CPU of a RunPod Secure Cloud cpu5c pod (AMD EPYC 9575F; a shared cloud host, so the seconds are diagnostic), in this harness's implementation, 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds (std HashMap with SipHash; a fast multiplicative hasher, with identical counted operations), every target verified: per (size, T) cell, the median over its 4 configurations of the solve-phase wall time of the fastest of four multi-target index-calculus variants divided by that of the fastest of ten multi-target rho runs is 0.70-0.88 (std) and 0.71-0.89 (fast) at 2^24 and 0.79-0.95 and 0.74-0.94 at 2^28 (faster in all 3 cells and in 12 of 12 configurations at each size and build; single configurations 0.70-0.99), and 1.05-1.18 at 2^32 in the std build (slower in all 3 cells; 12 of 12 configurations above 1) and 1.01-1.15 in the fast build (slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of a median of 4 equals their range). By cell median, the fast hasher cuts the solve time of the fastest IC by 4-11% and of the fastest rho by up to 15% (0.3% slower in the 2^32, T = 1024 cell), and the IC takes 1.41-1.62x the time of a paired BSGS; the A/A control drifted (the first of three interleaved rounds about 3% slower), disclosed."
+}

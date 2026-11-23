@@ -1,0 +1,204 @@
+diff --git a/crates/hashed-ecdl-tensor/src/lib.rs b/crates/hashed-ecdl-tensor/src/lib.rs
+index c32138e53d..dec11dbcf4 100644
+--- a/crates/hashed-ecdl-tensor/src/lib.rs
++++ b/crates/hashed-ecdl-tensor/src/lib.rs
+@@ -24,6 +24,7 @@ pub mod encoding;
+ pub mod factoring;
+ pub mod finite;
+ pub mod joint;
++pub mod metrics;
+ pub mod network;
+ pub mod partial;
+ pub mod prepared;
+diff --git a/src/cryptanalysis/ecbench/workload.rs b/src/cryptanalysis/ecbench/workload.rs
+index 1a12e717a8..b0c5b8ae6b 100644
+--- a/src/cryptanalysis/ecbench/workload.rs
++++ b/src/cryptanalysis/ecbench/workload.rs
+@@ -1636,7 +1636,6 @@ impl Instance {
+                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
+                     }
+                 }
+-                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {
+                 Instance::Wide(_)
+                 | Instance::Fp4(_)
+                 | Instance::ThreeLeads(_)
+diff --git a/src/cryptanalysis/f4_fp/certified.rs b/src/cryptanalysis/f4_fp/certified.rs
+index 5e4667709c..6bbf975e1c 100644
+--- a/src/cryptanalysis/f4_fp/certified.rs
++++ b/src/cryptanalysis/f4_fp/certified.rs
+@@ -7,9 +7,163 @@ use super::{normalise, F4Options, Ordering, Poly, TraceStats};
+ use ::certified_relations as algebra;
+ pub use algebra::quotient::compact::{Certificate as CompactCertificate, Info as CompactInfo};
+ pub use algebra::quotient::Info as QuotientInfo;
++pub use algebra::replay::NativeKernels as ReplayKernels;
+ pub use algebra::Row as CertificateRow;
+ pub use relation_replay_checker::{Checked as ReplayChecked, Stats as ReplayCheckStats};
+ 
++/// Explicit wire families; the existing vector replay API remains v1-only.
++#[derive(Clone, Copy)]
++pub enum ReplayForm {
++    CompactSparse,
++    CompactDag,
++}
++
++/// Accepted only after independent wire replay and the native representation check.
++/// The serialized originals and proof remain available for separate execution.
++pub struct PackedReplayBasis {
++    pub basis: Vec<Poly>,
++    pub original_json: Vec<u8>,
++    pub witness_json: Vec<u8>,
++    pub replay_stats: ReplayCheckStats,
++    pub native_checks: TraceStats,
++    pub observed_solving_degree: Option<u32>,
++    prime: u64,
++    variables: usize,
++    form: ReplayForm,
++}
++
++fn replay_system(original: &[algebra::Poly], n: usize, p: u64) -> algebra::System {
++    algebra::System {
++        prime: p,
++        variables: (0..n).map(|i| format!("x{i}")).collect(),
++        polynomials: original
++            .iter()
++            .map(|f| {
++                f.iter()
++                    .map(|(m, c)| algebra::Term {
++                        exponents: m.clone(),
++                        coefficient: *c as i64,
++                    })
++                    .collect()
++            })
++            .collect(),
++    }
++}
++fn packed_check(
++    original: &[u8],
++    witness: &[u8],
++    form: ReplayForm,
++) -> Result<ReplayChecked, String> {
++    match form {
++        ReplayForm::CompactSparse => {
++            relation_replay_checker::packed::verify_json(original, witness)
++        }
++        ReplayForm::CompactDag => {
++            relation_replay_checker::packed::verify_dag_json(original, witness)
++        }
++    }
++}
++fn export_replayed(checked: &ReplayChecked, p: u64) -> Result<Vec<Poly>, String> {
++    checked
++        .basis
++        .iter()
++        .map(|f| {
++            let poly: algebra::Poly = f.iter().cloned().collect();
++            native_polynomial(&poly, p)
++        })
++        .collect()
++}
++
++/// Full native-owned construction, serialization, independent p31/p53 replay,
++/// conversion and native F4-boundary checking in one call. No F4 solve is run;
++/// this does not extend the regular F4 solver's documented small-prime scope.
++pub fn try_packed_replay_basis(
++    input: &[Poly],
++    n: usize,
++    p: u64,
++    form: ReplayForm,
++    kernels: ReplayKernels,
++) -> Result<PackedReplayBasis, String> {
++    let original = canonical_input(input, n, p)?;
++    let system = replay_system(&original, n, p);
++    let original_json = serde_json::to_vec(&system).map_err(|e| e.to_string())?;
++    let (witness_json, _) = match form {
++        ReplayForm::CompactSparse => {
++            algebra::replay::produce_native_for_packed(&system, "compact-sparse", kernels)?
++        }
++        ReplayForm::CompactDag => {
++            algebra::replay::produce_compact_dag_for_packed(&system, kernels)?
++        }
++    };
++    let checked = packed_check(&original_json, &witness_json, form)?;
++    let basis = export_replayed(&checked, p)?;
++    let native_input = original
++        .iter()
++        .map(|f| native_polynomial(f, p))
++        .collect::<Result<Vec<_>, _>>()?;
++    let mut native_checks = TraceStats::default();
++    if !super::reuse::certify(
++        &native_input,
++        &basis,
++        p,
++        &F4Options::new(Ordering::Grevlex, 8),
++        &mut native_checks,
++    ) {
++        return Err("packed replay basis failed native F4 representation checks".into());
++    }
++    Ok(PackedReplayBasis {
++        basis,
++        original_json,
++        witness_json,
++        replay_stats: checked.stats,
++        native_checks,
++        observed_solving_degree: None,
++        prime: p,
++        variables: n,
++        form,
++    })
++}
++
++/// Recheck public proof, original, basis and receipt mutations from the input.
++pub fn verify_packed_replay_basis(report: &PackedReplayBasis, input: &[Poly]) -> bool {
++    let Ok(original) = canonical_input(input, report.variables, report.prime) else {
++        return false;
++    };
++    let Ok(bytes) = serde_json::to_vec(&replay_system(&original, report.variables, report.prime))
++    else {
++        return false;
++    };
++    if bytes != report.original_json || report.observed_solving_degree.is_some() {
++        return false;
++    }
++    let Ok(checked) = packed_check(&bytes, &report.witness_json, report.form) else {
++        return false;
++    };
++    let Ok(basis) = export_replayed(&checked, report.prime) else {
++        return false;
++    };
++    if basis != report.basis
++        || serde_json::to_value(&checked.stats).ok()
++            != serde_json::to_value(&report.replay_stats).ok()
++    {
++        return false;
++    }
++    let Ok(native_input) = original
++        .iter()
++        .map(|f| native_polynomial(f, report.prime))
++        .collect::<Result<Vec<_>, _>>()
++    else {
++        return false;
++    };
++    super::reuse::certify(
++        &native_input,
++        &basis,
++        report.prime,
++        &F4Options::new(Ordering::Grevlex, 8),
++        &mut TraceStats::default(),
++    )
++}
++
+ /// Exact bounded replay of a serialized original system and certificate using
+ /// separate arithmetic, without invoking a basis solver or external process.
+ /// Currently p=2^31-1 and3..16 variables; parsing and every acceptance check are
+diff --git a/src/cryptanalysis/koblitz_bench.rs b/src/cryptanalysis/koblitz_bench.rs
+index 5986e5c6cb..454157f621 100644
+--- a/src/cryptanalysis/koblitz_bench.rs
++++ b/src/cryptanalysis/koblitz_bench.rs
+@@ -2481,6 +2481,7 @@ mod tests {
+             }
+         }
+         assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");
++    }
+     /// The Artin–Schreier chain walk counts exactly what the scan counts.
+     #[test]
+     fn fast_chained_count_matches_the_reference() {

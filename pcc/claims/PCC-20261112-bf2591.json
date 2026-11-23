@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:27:16Z",
+ "id": "PCC-20261112-bf2591",
+ "kind": "statement",
+ "producer": {
+  "commit": "8487859d7aa48d13b0defe7928d915d67352c01f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-failed-27/native.txt",
+    "sha256": "e04317e4401b4558cbdd6c65142bed1c6fb8be6ded327a07e4638aa926004f6c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-failed-27/clippy.txt",
+    "sha256": "95579959c715ed292dcfd6539a2dfd04de5892e810667f004f49c8f26050830c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-failed-27/source.rs",
+    "sha256": "33c34f7bf57d8712ae99ee144ab41f82b4e0c596d500790471d65d6a44080cec"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-failed-27/source.sha256",
+    "sha256": "4926dffa602d60ef50e065f81566de6db38c7ebec1361a1b79314c9aeddd6330"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned independent T2 replay27 strictClippy passes but native has3pass/1fail:both original T1 certificates and T2E113 pass;T2E109 fails the assumed square root for a geometric pole in F101^6. All preceding coefficient/domain/infinity checks reached,not full geometric acceptance. Preserve exact failed checker/fixtures/output. Next28 uses existing FpR degree4 for that pole fibre and explicitly requires every pole to have Frobenius orbit4;retain all four geometric poles and all original finite/identity controls,no field-descent or full-pass inference."
+}

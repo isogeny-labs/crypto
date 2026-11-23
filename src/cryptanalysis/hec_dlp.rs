@@ -5,19 +5,15 @@
 //! [`crate::cryptanalysis::binary_hyperelliptic_index_calculus`] does the
 //! same over `F_{2^m}`.  This module adds the two things a *tool* needs on
 //! top of those engines:
-//!
 //! - a [`HecGroup`] abstraction so that order finding, baby-step giant-step
 //!   and Pohlig–Hellman are written once and run on both field families;
 //! - Pohlig–Hellman over an arbitrary composite subgroup order, using
 //!   index calculus only in the prime-order components that are large
 //!   enough to need it and baby-step giant-step in the small ones.
-//!
 //! Nothing here changes the underlying solves.  It composes them, verifies
 //! every recovered scalar by scalar multiplication, and reports which
 //! method produced each residue.
-//!
 //! ## Scope
-//!
 //! - Prime-field curves: odd characteristic, `deg f = 2g+1`, `p` at most
 //!   64 bits (the arithmetic substrate's checked range).
 //! - Binary-field curves: `deg f = 2g+1`, `deg h <= g`, any `m` the field
@@ -46,7 +42,6 @@ use crate::cryptanalysis::curve_traits::arith::is_prime;
 use crate::cryptanalysis::hyperelliptic_index_calculus::{
     hec_index_calculus_dlp, HecIndexCalculusParams, HecIndexCalculusReport, RelationSearch,
     SmoothnessTest,
-};
 use crate::cryptanalysis::pohlig_hellman::crt_combine;
 use crate::prime_hyperelliptic::{HyperellipticCurveP, MumfordDivisorP};
 
@@ -86,10 +81,8 @@ impl Default for HecSolveConfig {
             threads: 1,
         }
     }
-}
 
 /// One prime-order solve attempted by the driver.
-#[derive(Clone, Debug)]
 pub struct HecPrimeCall {
     pub order: BigUint,
     /// `"bsgs"` or `"index-calculus"`.
@@ -97,19 +90,15 @@ pub struct HecPrimeCall {
     pub scalar: Option<BigUint>,
     pub bsgs_steps: Option<usize>,
     pub index_calculus: Option<HecIndexCalculusReport>,
-}
 
 /// The pieces of a full discrete-logarithm result.
-#[derive(Clone, Debug)]
 pub struct HecSolveReport {
-    pub order: BigUint,
     pub factors: Vec<(BigUint, u32)>,
     pub factorisation_complete: bool,
     pub residues: Vec<(BigUint, BigUint)>,
     pub prime_calls: Vec<HecPrimeCall>,
     pub verified: bool,
     pub notes: Vec<String>,
-}
 
 /// The group operations the generic driver needs.
 ///
@@ -139,7 +128,6 @@ pub trait HecGroup {
         order: &BigUint,
         cfg: &HecSolveConfig,
     ) -> HecPrimeCall;
-}
 
 impl HecGroup for HyperellipticCurveP {
     type Elem = MumfordDivisorP;
@@ -147,52 +135,37 @@ impl HecGroup for HyperellipticCurveP {
 
     fn identity(&self) -> Self::Elem {
         MumfordDivisorP::identity(self.p.clone())
-    }
 
     fn add(&self, a: &Self::Elem, b: &Self::Elem) -> Self::Elem {
         a.add_fast(b, self)
-    }
 
     fn neg(&self, a: &Self::Elem) -> Self::Elem {
         a.neg_fast(self)
-    }
 
     fn scalar_mul(&self, a: &Self::Elem, k: &BigUint) -> Self::Elem {
         a.scalar_mul_fast(k, self)
-    }
 
     fn is_identity(&self, a: &Self::Elem) -> bool {
         a.is_identity()
-    }
 
     fn same(&self, a: &Self::Elem, b: &Self::Elem) -> bool {
         a == b
-    }
 
     fn key(&self, a: &Self::Elem) -> Self::Key {
         (
             a.u.coeffs.iter().map(|c| c.to_u32_digits()).collect(),
             a.v.coeffs.iter().map(|c| c.to_u32_digits()).collect(),
         )
-    }
 
     fn describe(&self) -> String {
         format!("Jac(y^2=f(x)) over F_p, p={}, genus={}", self.p, self.genus)
-    }
 
     fn elem_json(&self, a: &Self::Elem) -> serde_json::Value {
         serde_json::json!({
             "u": a.u.coeffs.iter().map(|c| c.to_string()).collect::<Vec<_>>(),
             "v": a.v.coeffs.iter().map(|c| c.to_string()).collect::<Vec<_>>(),
         })
-    }
 
-    fn solve_prime_order(
-        &self,
-        base: &Self::Elem,
-        target: &Self::Elem,
-        order: &BigUint,
-        cfg: &HecSolveConfig,
     ) -> HecPrimeCall {
         let params = HecIndexCalculusParams {
             fb_size: if cfg.fb_size == 0 {
@@ -216,96 +189,41 @@ impl HecGroup for HyperellipticCurveP {
             scalar,
             bsgs_steps: None,
             index_calculus: Some(report),
-        }
-    }
-}
 
 impl HecGroup for HyperellipticCurve {
     type Elem = MumfordDivisor;
     type Key = (Vec<Vec<u8>>, Vec<Vec<u8>>);
 
-    fn identity(&self) -> Self::Elem {
         MumfordDivisor::identity(self.m)
-    }
 
-    fn add(&self, a: &Self::Elem, b: &Self::Elem) -> Self::Elem {
-        a.add_fast(b, self)
-    }
 
-    fn neg(&self, a: &Self::Elem) -> Self::Elem {
-        a.neg_fast(self)
-    }
 
-    fn scalar_mul(&self, a: &Self::Elem, k: &BigUint) -> Self::Elem {
-        a.scalar_mul_fast(k, self)
-    }
 
-    fn is_identity(&self, a: &Self::Elem) -> bool {
-        a.is_identity()
-    }
 
-    fn same(&self, a: &Self::Elem, b: &Self::Elem) -> bool {
-        a == b
-    }
 
-    fn key(&self, a: &Self::Elem) -> Self::Key {
-        (
             a.u.coeffs
                 .iter()
                 .map(|c| c.to_biguint().to_bytes_be())
                 .collect(),
             a.v.coeffs
-                .iter()
-                .map(|c| c.to_biguint().to_bytes_be())
-                .collect(),
-        )
-    }
 
-    fn describe(&self) -> String {
         format!(
             "Jac(y^2+h(x)y=f(x)) over F_2^{}, genus={}",
             self.m, self.genus
-        )
-    }
 
-    fn elem_json(&self, a: &Self::Elem) -> serde_json::Value {
         let hex = |p: &F2mPoly| -> Vec<String> {
             p.coeffs
-                .iter()
                 .map(|c| format!("{:x}", c.to_biguint()))
                 .collect()
-        };
         serde_json::json!({"u": hex(&a.u), "v": hex(&a.v)})
-    }
 
-    fn solve_prime_order(
-        &self,
-        base: &Self::Elem,
-        target: &Self::Elem,
-        order: &BigUint,
-        cfg: &HecSolveConfig,
-    ) -> HecPrimeCall {
         let params = BhecIndexCalculusParams {
             fb_size: cfg.fb_size,
-            extra_relations: cfg.extra_relations,
-            max_trials: cfg.max_trials,
-            seed: cfg.seed,
             threads: cfg.threads,
             ..Default::default()
-        };
         let (scalar, report) = binary_hec_index_calculus_dlp(self, base, target, order, &params);
-        HecPrimeCall {
-            order: order.clone(),
-            method: "index-calculus",
-            scalar,
-            bsgs_steps: None,
-            index_calculus: Some(report),
-        }
-    }
-}
 
 /// Baby-step giant-step for `target = k · base` in a group of known order.
-///
 /// Returns `(k, table_entries)`; `None` when the table would exceed
 /// [`HecSolveConfig::bsgs_max_steps`] or the answer fails verification.
 pub fn bsgs<G: HecGroup>(
@@ -317,25 +235,20 @@ pub fn bsgs<G: HecGroup>(
 ) -> Option<(BigUint, usize)> {
     if order.is_zero() {
         return None;
-    }
     if order.is_one() {
         return g.is_identity(target).then(|| (BigUint::zero(), 0));
-    }
     let steps = order.sqrt() + BigUint::one();
     let steps_u = match steps.to_u64_digits().as_slice() {
         [v] => *v as usize,
         _ => return None,
     };
     if steps_u > max_steps {
-        return None;
-    }
 
     let mut table: HashMap<G::Key, usize> = HashMap::with_capacity(steps_u);
     let mut acc = g.identity();
     for j in 0..steps_u {
         table.entry(g.key(&acc)).or_insert(j);
         acc = g.add(&acc, base);
-    }
     let stride = g.scalar_mul(base, &BigUint::from(steps_u));
     let neg_stride = g.neg(&stride);
     let mut cur = target.clone();
@@ -345,21 +258,13 @@ pub fn bsgs<G: HecGroup>(
             if &k < order && g.same(&g.scalar_mul(base, &k), target) {
                 return Some((k, steps_u));
             }
-        }
         cur = g.add(&cur, &neg_stride);
-    }
     None
-}
 
 /// Solve a DLP of arbitrary composite order by Pohlig–Hellman.
-///
 /// `factors` may be supplied by the caller; when it is `None` the order is
 /// factored with a budgeted trial division plus Pollard rho.
 pub fn pohlig_hellman<G: HecGroup>(
-    g: &G,
-    base: &G::Elem,
-    target: &G::Elem,
-    order: &BigUint,
     factors: Option<Vec<(BigUint, u32)>>,
     cfg: &HecSolveConfig,
 ) -> (Option<BigUint>, HecSolveReport) {
@@ -371,39 +276,27 @@ pub fn pohlig_hellman<G: HecGroup>(
         prime_calls: Vec::new(),
         verified: false,
         notes: Vec::new(),
-    };
-    if order.is_zero() {
         report.notes.push("order is zero".into());
         return (None, report);
-    }
-    if order.is_one() {
         let ok = g.is_identity(target);
         report.verified = ok;
         return (ok.then(BigUint::zero), report);
-    }
 
     let (factors, complete) = match factors {
         Some(f) => (normalise_factors(f), true),
         None => factor_order(order, cfg.trial_factor_bound, cfg.seed),
-    };
     report.factors = factors.clone();
     report.factorisation_complete = complete;
     if !complete {
         report
             .notes
             .push("order factorisation is incomplete; pass a known factorisation".into());
-        return (None, report);
-    }
     let product = factors
         .iter()
         .map(|(q, e)| q.pow(*e))
         .fold(BigUint::one(), |acc, v| acc * v);
     if &product != order {
-        report
-            .notes
             .push("the supplied factors do not multiply to the stated order".into());
-        return (None, report);
-    }
 
     let mut residues = Vec::new();
     let mut all_ok = true;
@@ -415,34 +308,26 @@ pub fn pohlig_hellman<G: HecGroup>(
                 .push(format!("factor {q}^{e} does not divide the stated order"));
             all_ok = false;
             break;
-        }
         let cofactor = order / &qe;
         let base_i = g.scalar_mul(base, &cofactor);
         let target_i = g.scalar_mul(target, &cofactor);
         if g.is_identity(&base_i) {
             if g.is_identity(&target_i) {
                 residues.push((qe, BigUint::zero()));
-            } else {
                 report
                     .notes
                     .push(format!("base has no component of order {q}^{e}"));
                 all_ok = false;
                 break;
-            }
             continue;
-        }
 
         let d = if *e == 1 {
             let call = if fits_u64(q).is_some_and(|v| v <= cfg.small_prime_bound) {
                 bsgs_call(g, &base_i, &target_i, q, cfg)
-            } else {
                 g.solve_prime_order(&base_i, &target_i, q, cfg)
             };
             let Some(k) = call.scalar.clone() else {
                 report.prime_calls.push(call);
-                all_ok = false;
-                break;
-            };
             report.prime_calls.push(call);
             k
         } else {
@@ -465,62 +350,36 @@ pub fn pohlig_hellman<G: HecGroup>(
                     report.prime_calls.push(call);
                     ok = false;
                     break;
-                };
-                report.prime_calls.push(call);
                 d += &c * &qpow;
                 qpow *= q;
                 let _ = j;
-            }
             if !ok {
-                all_ok = false;
-                break;
-            }
             d % &qe
-        };
         residues.push((qe, d));
-    }
 
     report.residues = residues.clone();
     if !all_ok {
-        return (None, report);
-    }
     let Some(k) = crt_combine(&residues) else {
         report.notes.push("CRT reconstruction failed".into());
-        return (None, report);
-    };
     if &k < order && g.same(&g.scalar_mul(base, &k), target) {
         report.verified = true;
         (Some(k), report)
     } else {
-        report
-            .notes
             .push("recovered scalar failed [k]P = Q verification".into());
         (None, report)
-    }
-}
 
 fn bsgs_call<G: HecGroup>(
-    g: &G,
-    base: &G::Elem,
-    target: &G::Elem,
-    order: &BigUint,
-    cfg: &HecSolveConfig,
 ) -> HecPrimeCall {
     let (scalar, steps) = match bsgs(g, base, target, order, cfg.bsgs_max_steps) {
         Some((k, steps)) => (Some(k), Some(steps)),
         None => (None, None),
-    };
     HecPrimeCall {
-        order: order.clone(),
         method: "bsgs",
         scalar,
         bsgs_steps: steps,
         index_calculus: None,
-    }
-}
 
 /// Factor an order by trial division and Pollard rho.
-///
 /// Returns `(factors, complete)`.  A false `complete` means the remaining
 /// cofactor could not be split within the budget; it is still returned as
 /// a pseudo-factor so the caller can report it.
@@ -534,12 +393,9 @@ pub fn factor_order(n: &BigUint, trial_bound: u64, seed: u64) -> (Vec<(BigUint, 
         while (&rest % &d).is_zero() {
             rest /= &d;
             e += 1;
-        }
         if e > 0 {
             out.push((d.clone(), e));
-        }
         d += 1u32;
-    }
     let mut complete = true;
     if rest > BigUint::one() {
         let mut rng = StdRng::seed_from_u64(seed ^ 0xf00d_1e5b_a11e_900d);
@@ -551,14 +407,8 @@ pub fn factor_order(n: &BigUint, trial_bound: u64, seed: u64) -> (Vec<(BigUint, 
                 complete = false;
                 out.push((value, 1));
                 continue;
-            }
             if value.is_one() {
-                continue;
-            }
             if is_prime(&value) {
-                out.push((value, 1));
-                continue;
-            }
             match pollard_rho(&value, &mut rng, 24) {
                 Some(factor) => {
                     stack.push(factor.clone());
@@ -567,13 +417,8 @@ pub fn factor_order(n: &BigUint, trial_bound: u64, seed: u64) -> (Vec<(BigUint, 
                 None => {
                     complete = false;
                     out.push((value, 1));
-                }
-            }
-        }
-    }
     combine_factors(&mut out);
     (out, complete)
-}
 
 fn combine_factors(factors: &mut Vec<(BigUint, u32)>) {
     factors.sort_by(|a, b| a.0.cmp(&b.0));
@@ -582,69 +427,47 @@ fn combine_factors(factors: &mut Vec<(BigUint, u32)>) {
         if let Some(last) = out.last_mut() {
             if last.0 == q {
                 last.1 += e;
-                continue;
-            }
-        }
         out.push((q, e));
-    }
     *factors = out;
-}
 
 fn normalise_factors(mut factors: Vec<(BigUint, u32)>) -> Vec<(BigUint, u32)> {
     combine_factors(&mut factors);
     factors
-}
 
 fn pollard_rho(n: &BigUint, rng: &mut StdRng, attempts: usize) -> Option<BigUint> {
     let one = BigUint::one();
     let two = BigUint::from(2u32);
     if (n % &two).is_zero() {
         return Some(two);
-    }
     if n <= &one {
-        return None;
-    }
     for _ in 0..attempts {
         let c = rand_below(rng, n) % (n - &one) + &one;
         let mut x = rand_below(rng, n);
         if x.is_zero() {
             x = two.clone();
-        }
         let mut y = x.clone();
         for _ in 0..1_000_000usize {
             x = (&x * &x + &c) % n;
-            y = (&y * &y + &c) % n;
             y = (&y * &y + &c) % n;
             let diff = if x >= y { &x - &y } else { &y - &x };
             let d = diff.gcd(n);
             if d > one && &d < n {
                 return Some(d);
-            }
             if d == *n {
-                break;
-            }
-        }
-    }
-    None
-}
 
 fn fits_u64(n: &BigUint) -> Option<u64> {
     match n.to_u64_digits().as_slice() {
         [] => Some(0),
         [v] => Some(*v),
         _ => None,
-    }
-}
 
 fn rand_below(rng: &mut StdRng, n: &BigUint) -> BigUint {
     if n.is_zero() {
         return BigUint::zero();
-    }
     let bytes = (n.bits() as usize).div_ceil(8) + 8;
     let mut buf = vec![0u8; bytes];
     rng.fill_bytes(&mut buf);
     BigUint::from_bytes_be(&buf) % n
-}
 
 #[cfg(test)]
 mod tests {
@@ -658,16 +481,13 @@ mod tests {
         let f = FpPoly::from_coeffs(
             vec![
                 BigUint::one(),
-                BigUint::one(),
                 BigUint::from(2u32),
                 BigUint::from(3u32),
                 BigUint::zero(),
-                BigUint::one(),
             ],
             p.clone(),
         );
         HyperellipticCurveP::new(p, f, 2)
-    }
 
     #[test]
     fn crt_and_factor_order_round_trip() {
@@ -676,7 +496,6 @@ mod tests {
         assert!(complete);
         assert_eq!(
             factors,
-            vec![
                 (BigUint::from(2u32), 1),
                 (BigUint::from(3u32), 1),
                 (BigUint::from(5u32), 1),
@@ -684,14 +503,10 @@ mod tests {
                 (BigUint::from(11u32), 1),
                 (BigUint::from(13u32), 1),
             ]
-        );
-    }
 
-    #[test]
     fn pohlig_hellman_recovers_a_prime_curve_scalar() {
         use crate::cryptanalysis::hyperelliptic_index_calculus::{
             build_factor_base, divisor_order_bsgs,
-        };
         let curve = prime_toy_curve(41);
         let fb = build_factor_base(&curve, 8);
         let base = fb.entries[0].divisor.clone();
@@ -700,11 +515,57 @@ mod tests {
         let target = base.scalar_mul_fast(&k, &curve);
         let cfg = HecSolveConfig {
             bsgs_max_steps: 10_000,
-            small_prime_bound: 1 << 20,
-            ..Default::default()
-        };
         let (answer, report) = pohlig_hellman(&curve, &base, &target, &order, None, &cfg);
         assert_eq!(answer, Some(k), "report: {report:?}");
         assert!(report.verified);
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    while d <= bound && &d * &d <= rest {
+
+
+
+
+
+
+
+
+

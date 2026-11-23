@@ -1,0 +1,11 @@
+name = "small_characteristic_j_audit"
+version = "0.1.0"
+defaultTargets = ["SmallCharacteristicJAudit"]
+
+[[require]]
+name = "bk_small_prime_source_audit"
+path = "../../bk_small_prime_source_audit_20261114/lean"
+
+[[lean_lib]]
+name = "SmallCharacteristicJAudit"
+roots = ["CharThreeCoefficient", "GeometricJ", "SmallCharacteristicCertificate"]

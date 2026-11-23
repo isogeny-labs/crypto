@@ -1,0 +1,12 @@
+{
+  "kind": "test-environment-failure",
+  "command": "cargo test --locked --release --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bins",
+  "exit_code": 101,
+  "reason": "prime_centered_witness unit tests require N83_CENTERED_TEST_OUTPUT",
+  "observed_failures": [
+    "exhaustive_pointwise_terminal_identity_and_degrees: persistent test output: NotPresent",
+    "fixture_replay_rejects_coefficient_mutation: set a fresh persistent test output directory: NotPresent"
+  ],
+  "generated_outputs_before_failure": 0,
+  "handling": "preserved this failure record; rerun uses a new output path and exports all generated fixtures"
+}

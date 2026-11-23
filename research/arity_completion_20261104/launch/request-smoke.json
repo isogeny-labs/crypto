@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "arity-smoke-20261104b",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+    "cpu": 2,
+    "memory": "2Gi",
+    "seconds": 900,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 900,
+    "command": [
+      "/bin/bash",
+      "-c",
+      "source /opt/study/launch/job-lib.sh; preamble; RAYON_NUM_THREADS=1 timeout 120 /usr/local/bin/n83_msweep_cell cell 2 union:2 chain-s3 4 8609517 10000 public k0n23 > $OUT/control-m2-chain-s3.json; python3 -c \"import json,sys; d=json.load(open(sys.argv[1])); print(d[\\\"outcomes\\\"], d[\\\"status\\\"])\" $OUT/control-m2-chain-s3.json > $OUT/python.txt; /usr/bin/time -v true 2> $OUT/time.txt; echo 6*7 | bc > $OUT/bc.txt; prlimit --as=8589934592 true && echo prlimit-ok > $OUT/prlimit.txt; id > $OUT/id.txt"
+    ]
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "source_revision": "4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+    "study": "arity_completion_20261104",
+    "note": "infrastructure smoke of the command-Job route and the study image; not evidence"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "draw": "research/ic_tool_program/validation/REPLAY_SEED.md",
+  "host": "Darwin 27.2.0 arm64",
+  "identical": 4,
+  "per_directory": 4,
+  "replayed": 4,
+  "replays": [
+    {
+      "binary": "ic-candidate",
+      "binary_rebuilt": {
+        "built_from": "efc6336d55c59cceb92cb82de73598ebe15ff3ca",
+        "note": "rebuilt from the recorded commit with --locked; the bytes differ (a build embeds its paths)",
+        "recorded_sha256": "9919fc8eba7f835b29de9588d9e4833c2b81f078d2d3a0067e5304e26313b15e"
+      },
+      "binary_sha256": "707d8fcb41a8a1ca616bc94c0cdae722b0eaec154670d09f09cd57a189ebb741",
+      "differing": [],
+      "evidence": "../../../../private/tmp/r13-validation-06dc5880",
+      "ok": true,
+      "record": "runs/compare/cand/icv1-f2m47-t22705043-f4e44623/M3-T06/r1-retry1.price.json",
+      "replay_scalars_verified": true,
+      "scalars": {
+        "ic": "4970001490",
+        "rho": "4970001490"
+      },
+      "seconds": 2.15
+    },
+    {
+      "binary": "ic-base-aa-copy",
+      "binary_sha256": "707d8fcb41a8a1ca616bc94c0cdae722b0eaec154670d09f09cd57a189ebb741",
+      "differing": [],
+      "evidence": "../../../../private/tmp/r13-validation-06dc5880",
+      "ok": true,
+      "record": "runs/aa/A2/icv1-f2m41-tm2308219-7f48b14a/M1-T01/r2.price.json",
+      "replay_scalars_verified": true,
+      "scalars": {
+        "ic": "291928610698",
+        "rho": "291928610698"
+      },
+      "seconds": 1.63
+    },
+    {
+      "binary": "ic-base",
+      "binary_rebuilt": {
+        "built_from": "261482646ee89b332dca69e2f296b0774c25d2c2",
+        "note": "rebuilt from the recorded commit with --locked; the bytes differ (a build embeds its paths)",
+        "recorded_sha256": "31bbdd987cfc3d13c8b110319ccfe8a3204f03f095d9d43d11d105fa414754cd"
+      },
+      "binary_sha256": "707d8fcb41a8a1ca616bc94c0cdae722b0eaec154670d09f09cd57a189ebb741",
+      "differing": [],
+      "evidence": "../../../../private/tmp/r13-validation-06dc5880",
+      "ok": true,
+      "record": "runs/compare/base/icv1-f2m23-tm5197-1f85e9e1/M1-T02/r5.price.json",
+      "replay_scalars_verified": true,
+      "scalars": {
+        "ic": "1294498",
+        "rho": "1294498"
+      },
+      "seconds": 1.09
+    },
+    {
+      "binary": "ic-candidate",
+      "binary_rebuilt": {
+        "built_from": "efc6336d55c59cceb92cb82de73598ebe15ff3ca",
+        "note": "rebuilt from the recorded commit with --locked; the bytes differ (a build embeds its paths)",
+        "recorded_sha256": "9919fc8eba7f835b29de9588d9e4833c2b81f078d2d3a0067e5304e26313b15e"
+      },
+      "binary_sha256": "707d8fcb41a8a1ca616bc94c0cdae722b0eaec154670d09f09cd57a189ebb741",
+      "differing": [],
+      "evidence": "../../../../private/tmp/r13-validation-06dc5880",
+      "ok": true,
+      "record": "runs/compare/cand/icv1-f2m53-tm56619371-dac20a85/M1-T01/r3.price.json",
+      "replay_scalars_verified": true,
+      "scalars": {
+        "ic": "518509155375",
+        "rho": "518509155375"
+      },
+      "seconds": 3.08
+    }
+  ],
+  "schema": "ic-tool-programme-native-replay/v2",
+  "seed": "77767620d255d08ba58c8cadde0823c4",
+  "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+}

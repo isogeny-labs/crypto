@@ -1,0 +1,22 @@
+{
+  "schema": "pencil.campaign-authorization-normalized/v1",
+  "campaign_id": "pencil-continuation-20261110",
+  "absolute_deadline": "2026-11-11T12:00:00Z",
+  "worker_seconds": 129600,
+  "max_active_payloads": 1,
+  "automatic_retry": false,
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261110/authorization-confirmed.json",
+    "sha256": "e7528c379ccef5e44bf41f63d8007ae8625618de5b5db4362ccc330f2c4926d8"
+  },
+  "field_mapping": {
+    "deadline_utc": "absolute_deadline",
+    "ceiling_seconds": "worker_seconds"
+  },
+  "unchanged_values": {
+    "deadline_utc": "2026-11-11T12:00:00Z",
+    "ceiling_seconds": 129600
+  },
+  "execution_admitted": false,
+  "meaning": "Schema-normalized view of the owner-confirmed campaign record; it does not add or modify authorization."
+}

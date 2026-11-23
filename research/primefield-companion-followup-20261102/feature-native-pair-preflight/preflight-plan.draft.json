@@ -1,0 +1,45 @@
+{
+  "schema": "primefield-preflight-plan/v1",
+  "status": "draft_not_admitted",
+  "purpose": "runtime planning for PF-native-homogeneous-seed-counts-20261103",
+  "arms": [
+    "baseline",
+    "candidate",
+    "aa"
+  ],
+  "calls_per_arm": 1,
+  "concurrency": 1,
+  "target": {
+    "p": 509,
+    "r": 479,
+    "Q": [
+      235,
+      254
+    ],
+    "expected_scalar_checker_only": 173
+  },
+  "execution_argv": [
+    "preflight",
+    "--run-admitted-preflight",
+    "ARM",
+    "CONTRACT_SHA256"
+  ],
+  "retries": 0,
+  "cpu": 1,
+  "memory": "512MiB",
+  "deadline_utc": null,
+  "shared_budget_reservation": null,
+  "binary_sha256": "829f97bb0e7e0e5c8ca25683eb5b623678c71048f10616a101a63a870b757ee0",
+  "source_commit": "0e93b56c9f3bdeaf0d7539150ff71fb27691964f",
+  "timings_are_comparative_data": false,
+  "must_preserve": [
+    "stdout",
+    "stderr",
+    "exit_status",
+    "process_wall_time",
+    "job_uid",
+    "source_binary_contract_identity"
+  ],
+  "stopping": "Any failed or incomplete arm stops the preflight; no automatic retry.",
+  "admission": "Quota and charged/reserved allowance plus pinned delivery required; existing USD1 panel ceiling is not increased or treated as a separate preflight allowance."
+}

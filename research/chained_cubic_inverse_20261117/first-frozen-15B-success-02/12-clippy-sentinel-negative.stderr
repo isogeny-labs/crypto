@@ -1,0 +1,11 @@
+error: equal expressions as operands to `==`
+ --> /dev/shm/ct783-first-cubic15B/source/clippy-sentinel-negative.rs:1:49
+  |
+1 | fn main() { let a = 1_u64; std::hint::black_box(a == a); }
+  |                                                 ^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#eq_op
+  = note: requested on the command line with `-D clippy::eq-op`
+
+error: aborting due to 1 previous error
+

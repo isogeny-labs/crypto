@@ -1,0 +1,58 @@
+{
+  "schema": "source.review/v1",
+  "reviewer": "/root/renew_norm",
+  "task": "T-1956",
+  "recorded_utc": "2026-11-09T17:19:58.435716+00:00",
+  "scope": "Materializer current-host campaign source/config/launch delta; static inspection only",
+  "runtime_executed": false,
+  "tests_executed": false,
+  "launch_authorized": false,
+  "verdict": "amendments_required_before_admission",
+  "reviewed_files": {
+    "materialize.py": "6bfc278cdfb8cd5f2adad13f5e920a2baee131be9f7dedc4b472329f2f0da4f7",
+    "materialize_safety.py": "2d506f0e676ff1db54036adc061680dd7f911b809b4519630fc02ff1606f9507",
+    "qualification-plan.json": "dd0e6bb09cf500e0e6a60bf19c001dc95bcd0a8156d860d1c98d7a57debac724",
+    "preparation.json": "d2884e41e132a11e4560637a5ca19bb5f10f0b5a5914a34932a65e14b9e7e25c",
+    "launch.json": "f1f95468629c6d85887b7c835a68dbe46d78e8e914512f1a2d42ecdc4ddffa5a",
+    "input-bindings.json": "0a32d63e971c916e56272092f0e91afcdb14094ddfd09d61256cbc002391d182",
+    "budget.json": "f46109aa322d16e527fc530741e099c5d1eea841b26b448074f8b5442fc905b3",
+    "OPERATE.md": "ec03a3b5955b9cc53142cfdb5b578e0189be419560eb9c2bfd5738151e6725cd",
+    "manifest.json": "8405545ac6b9ab0721c1536980bb615ff3cf59b4e4b0305394702b920e47675d",
+    "source.patch": "f02cb93724a22e4b2e6af23b88c13fdc28c999ebced780253bf5129c46468cfd"
+  },
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "blocking_before_release",
+      "finding": "materialize.py retains campaign_remaining_worker_seconds<=46500, above renewed43200 ceiling. Tighten to43200 and regenerate all source/harness pins."
+    },
+    {
+      "id": "M2",
+      "severity": "blocking_before_release",
+      "finding": "Admission proposes120s qualification and11 fixed cases plus AA/pointer-count controls; prepared harness proposes60s and10 different cases. Align frozen plan/case scope/budget to exact reviewed harness before release; do not claim uncovered controls."
+    },
+    {
+      "id": "M3",
+      "severity": "supported_source",
+      "finding": "At reviewed snapshot source differs from historical085234 only by absolute-deadline literal; helper byte-identical; all14 preparation input pins match present files."
+    },
+    {
+      "id": "M4",
+      "severity": "supported_source",
+      "finding": "Launch command preserves2CPU/4GiB/zeroSwap/512tasks; worker880, unit885+5stop, payload895+5kill,parent900; no automatic retry. Root procedure captures exact invocation/cgroup within5s and preserves failures."
+    },
+    {
+      "id": "M5",
+      "severity": "pending_admission",
+      "finding": "published_github_commit=null and reviewed=false correctly reject execution. New release requires exact publication/review, actual campaign reservations/debits, current lease and no-overlap checks; source-preparation lease not execution admission."
+    }
+  ],
+  "sources": [
+    "../materializer-source-successor-20261107/materialize.py",
+    "../materializer-source-successor-review-20261107/review.json",
+    "../materializer-journal-reader-review-20261107/review.json",
+    "../root-materializer-admission-20261105/OPERATE.md",
+    "../campaign-renewal-20261109/authorization.json"
+  ],
+  "kb": "Unavailable; no exposed KB tool and scripts/research-kb absent. Exact prior sources reviewed."
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "n83.native-continuation-validation/v1",
+  "status": "PASS_FINAL_CHECKS",
+  "lib": {
+    "passed": 4091,
+    "ignored": 117,
+    "failed": 0,
+    "seconds": 324.65
+  },
+  "example": {
+    "passed": 19,
+    "failed": 0,
+    "seconds": 1.14
+  },
+  "n83_python": {
+    "passed": 63,
+    "failed": 0
+  },
+  "boundary_python": {
+    "passed": 46,
+    "failed": 0
+  },
+  "independent_stage_audits_passed": 6,
+  "final_forgery_rejections_passed": 6,
+  "runtime_source_unchanged": true,
+  "raw_validation_files_local": [
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/validation/boundary-python.log",
+      "bytes": 145,
+      "sha256": "d16d2903754673bf421542587683df1d57c3afad9fc21f68d931ccdd211673a1"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/validation/lib-and-example.log",
+      "bytes": 351885,
+      "sha256": "458eb8ea63d737e34a73595767da3716e2c1c7c72e6741c4c2fce9791f470d17"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/validation/n83-python.log",
+      "bytes": 163,
+      "sha256": "6003d252929f7c064edfd4c0e18b50cd0d45b11e0157abec21deee31ac07014a"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/validation/negative-controls-default-client-failure.log",
+      "bytes": 1143,
+      "sha256": "4d3fa0f92705bbecebdec1da1bc880c57686470d1741b1f212ebed99d048a0dc"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/validation/negative-controls.log",
+      "bytes": 3582,
+      "sha256": "d8bd8968ec7a00630f17d4f6c1ec12aa339c56db4c662250365df3004c0d467b"
+    }
+  ],
+  "raw_transfer_status": "broad raw ZIP upload blocked by automatic approval review; raw logs remain local",
+  "initial_harness_issues": [
+    "K4096 historical-template rank-history width corrected before intended forgery check",
+    "Short-control report filename collision corrected; prior reports preserved",
+    "Final control replay initially omitted the task-local Docker wrapper; default socket denied; failure log preserved and wrapper-enabled replay passed"
+  ]
+}

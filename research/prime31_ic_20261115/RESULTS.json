@@ -1,0 +1,203 @@
+{
+  "standing": "[pcc:unverified]",
+  "result": "All 9 complete prime-order factor-base index-calculus solves verified; no faster cold solve",
+  "field_prime": 2147483647,
+  "curve_a": 847514846,
+  "curve_b": 2087444724,
+  "prime_order": 2147446831,
+  "generator": [
+    625037715,
+    2100627251
+  ],
+  "factor_base_sizes": [
+    384,
+    640,
+    1024
+  ],
+  "seeds": [
+    20261114,
+    20261115,
+    20261116
+  ],
+  "source_sha256": "ecbacee0bab979e6106656d6ec51f4dbc01159c2723e9504d27d0983335f95d8",
+  "runs_sha256": "972fc034744449464a91c7cc47bf98de84082b91f5e561ab9001e23015c09106",
+  "source_git_blob_sha": "ce3a7d5ef2da568606fd1147ca55a9b455584f55",
+  "raw_git_blob_sha": "e7c9ceeefc8db7ec1aa5257f496ee03ee65bc902",
+  "validation": "producer-local all factor-base logs and each target [d]G=Q; separate Python arithmetic confirms target points",
+  "compiler": "g++ 14.2.0 -O3 -std=c++17 -DNDEBUG",
+  "host": "x86_64 Linux-6.18.57",
+  "memory_peak_kib_1024": 90240,
+  "includes": "Factor-base construction, precomputed 2-sums, natural random relation attempts including fails, modular elimination, individual logs and final verification",
+  "excludes": "Curve provisioning and external independent PCC and paid compute",
+  "controls": "Same C++ arithmetic BSGS and unoptimized 16-partition Floyd rho",
+  "data": {
+    "384": {
+      "ic_additions": {
+        "mean": 20477630.333,
+        "minimum": 18489291,
+        "maximum": 22365181
+      },
+      "bsgs_additions": {
+        "mean": 60524,
+        "minimum": 55184,
+        "maximum": 70491
+      },
+      "rho_additions": {
+        "mean": 183586,
+        "minimum": 75599,
+        "maximum": 291491
+      },
+      "ic_ms": {
+        "mean": 4128,
+        "minimum": 3846,
+        "maximum": 4431
+      },
+      "bsgs_ms": {
+        "mean": 13.333,
+        "minimum": 10,
+        "maximum": 17
+      },
+      "rho_ms": {
+        "mean": 16.667,
+        "minimum": 7,
+        "maximum": 27
+      },
+      "trials": {
+        "mean": 25374.667,
+        "minimum": 22818,
+        "maximum": 27769
+      },
+      "positive_relations": {
+        "mean": 867.333,
+        "minimum": 746,
+        "maximum": 973
+      },
+      "dependent_relations": {
+        "mean": 483.333,
+        "minimum": 362,
+        "maximum": 589
+      },
+      "individual_target_shifts": {
+        "mean": 29,
+        "minimum": 2,
+        "maximum": 54
+      },
+      "ratio_of_mean_adds_ic_to_bsgs": 338.3390115160928,
+      "ratio_of_mean_adds_ic_to_rho": 111.54243969039034,
+      "mean_of_per_target_ratio_ic_to_bsgs": 340.15801718155717,
+      "mean_of_per_target_ratio_ic_to_rho": 144.44626790680653
+    },
+    "640": {
+      "ic_additions": {
+        "mean": 11483962.333,
+        "minimum": 11032420,
+        "maximum": 12260585
+      },
+      "bsgs_additions": {
+        "mean": 60524,
+        "minimum": 55184,
+        "maximum": 70491
+      },
+      "rho_additions": {
+        "mean": 183586,
+        "minimum": 75599,
+        "maximum": 291491
+      },
+      "ic_ms": {
+        "mean": 4047.667,
+        "minimum": 3722,
+        "maximum": 4324
+      },
+      "bsgs_ms": {
+        "mean": 13.333,
+        "minimum": 10,
+        "maximum": 18
+      },
+      "rho_ms": {
+        "mean": 15.667,
+        "minimum": 6,
+        "maximum": 25
+      },
+      "trials": {
+        "mean": 8985.333,
+        "minimum": 8648,
+        "maximum": 9598
+      },
+      "positive_relations": {
+        "mean": 1319.333,
+        "minimum": 1270,
+        "maximum": 1363
+      },
+      "dependent_relations": {
+        "mean": 679.333,
+        "minimum": 630,
+        "maximum": 723
+      },
+      "individual_target_shifts": {
+        "mean": 4,
+        "minimum": 2,
+        "maximum": 6
+      },
+      "ratio_of_mean_adds_ic_to_bsgs": 189.7422895545569,
+      "ratio_of_mean_adds_ic_to_rho": 62.55358433104921,
+      "mean_of_per_target_ratio_ic_to_bsgs": 192.61639660981186,
+      "mean_of_per_target_ratio_ic_to_rho": 86.84282089582013
+    },
+    "1024": {
+      "ic_additions": {
+        "mean": 9170260,
+        "minimum": 8422950,
+        "maximum": 10273504
+      },
+      "bsgs_additions": {
+        "mean": 60524,
+        "minimum": 55184,
+        "maximum": 70491
+      },
+      "rho_additions": {
+        "mean": 183586,
+        "minimum": 75599,
+        "maximum": 291491
+      },
+      "ic_ms": {
+        "mean": 4043,
+        "minimum": 3549,
+        "maximum": 4650
+      },
+      "bsgs_ms": {
+        "mean": 16.667,
+        "minimum": 13,
+        "maximum": 21
+      },
+      "rho_ms": {
+        "mean": 18,
+        "minimum": 6,
+        "maximum": 26
+      },
+      "trials": {
+        "mean": 5318,
+        "minimum": 4758,
+        "maximum": 6170
+      },
+      "positive_relations": {
+        "mean": 2576.333,
+        "minimum": 2316,
+        "maximum": 3001
+      },
+      "dependent_relations": {
+        "mean": 1552.333,
+        "minimum": 1292,
+        "maximum": 1977
+      },
+      "individual_target_shifts": {
+        "mean": 1.667,
+        "minimum": 1,
+        "maximum": 2
+      },
+      "ratio_of_mean_adds_ic_to_bsgs": 151.5144405525081,
+      "ratio_of_mean_adds_ic_to_rho": 49.950758772455416,
+      "mean_of_per_target_ratio_ic_to_bsgs": 154.33643854878355,
+      "mean_of_per_target_ratio_ic_to_rho": 67.14147760454163
+    }
+  }
+}

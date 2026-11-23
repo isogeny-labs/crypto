@@ -1,0 +1,52 @@
+import Inverse
+set_option autoImplicit false
+namespace NormalizationMultiplicity
+open Polynomial MumfordNormalization MumfordValidity NormalizationInverse
+variable {K : Type*} [Field K]
+
+theorem dvd_forward (n m : ℕ) (a b : K) (ha : a≠0) (u f : K[X]) (h : u∣f) :
+ T n a b u ∣ T m a b f := by
+ obtain ⟨q,rfl⟩ := h
+ refine ⟨C (a^n/a^m)*q.comp (affine a b),?_⟩
+ have hc : (a^n)⁻¹*(a^n/a^m)=(a^m)⁻¹ := by field_simp
+ simp only [T,mul_comp]
+ rw [scaled_mul,hc]
+
+theorem dvd_iff (n m : ℕ) (a b : K) (ha : a≠0) (u f : K[X]) :
+ T n a b u ∣ T m a b f ↔ u∣f := by
+ constructor
+ · intro h
+   have ht := dvd_forward n m a⁻¹ (-b/a) (inv_ne_zero ha) _ _ h
+   simpa only [inverse_left _ a b ha] using ht
+ · exact dvd_forward n m a b ha u f
+
+theorem power_compatible (n k : ℕ) (a b : K) (u : K[X]) :
+ (T n a b u)^k=T (n*k) a b (u^k) := by
+ simp only [T,mul_pow,← map_pow,pow_comp,← inv_pow,← pow_mul]
+
+theorem power_dvd_iff (n m k : ℕ) (a b : K) (ha : a≠0) (u f : K[X]) :
+ (T n a b u)^k ∣ T m a b f ↔ u^k∣f := by
+ rw [power_compatible]
+ exact dvd_iff (n*k) m a b ha (u^k) f
+
+theorem linear_factor (a b r : K) (ha : a≠0) :
+ T 1 a b (X-C r)=X-C ((r-b)/a) := by
+ simp only [T,pow_one,sub_comp,X_comp,C_comp,affine,mul_sub,mul_add,← map_mul]
+ rw [inv_mul_cancel₀ ha,map_one,one_mul]
+ have h : a⁻¹*b-a⁻¹*r = -((r-b)/a) := by field_simp; ring
+ rw [← map_sub,h,map_neg]
+ ring
+
+theorem linear_power_dvd_iff (m k : ℕ) (a b r : K) (ha : a≠0) (f : K[X]) :
+ (X-C ((r-b)/a))^k ∣ T m a b f ↔ (X-C r)^k∣f := by
+ rw [← linear_factor a b r ha]
+ exact power_dvd_iff 1 m k a b ha (X-C r) f
+
+def exactMultiplicity (r : K) (k : ℕ) (f : K[X]) : Prop :=
+ (X-C r)^k∣f ∧ ¬(X-C r)^(k+1)∣f
+
+theorem exact_multiplicity_iff (m k : ℕ) (a b r : K) (ha : a≠0) (f : K[X]) :
+ exactMultiplicity ((r-b)/a) k (T m a b f) ↔ exactMultiplicity r k f := by
+ unfold exactMultiplicity
+ rw [linear_power_dvd_iff m k a b r ha,linear_power_dvd_iff m (k+1) a b r ha]
+end NormalizationMultiplicity

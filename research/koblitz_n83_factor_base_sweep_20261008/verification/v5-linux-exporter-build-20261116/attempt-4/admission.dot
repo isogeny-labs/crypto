@@ -1,0 +1,11 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="N83 V5 Linux exporter | attempt 4", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", color="#344054", fillcolor="#eef2f6"];
+  input [label="Pinned source + dereferenced\noffline registry", fillcolor="#dcfce7"];
+  compile [label="Cargo compiled library\n18 min 27 s observed", fillcolor="#dbeafe"];
+  floor [label="SSD990-2: 1,893,556 KiB\n< 2,097,152 KiB floor", fillcolor="#fee2e2", color="#b42318"];
+  stop [label="Watcher stopped container\nexit 137; OOMKilled=false", fillcolor="#fee2e2", color="#b42318"];
+  binary [label="Exporter binary and\nIC timing: not reached", fillcolor="#f3f4f6", color="#98a2b3"];
+  input -> compile -> floor -> stop [color="#b42318"];
+  compile -> binary [style=dashed, color="#98a2b3", label="only after build"];
+}

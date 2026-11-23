@@ -1,0 +1,81 @@
+execute(read("../../source-data/evaluation-prefix60.sing"));
+execute(read("../../../58/runs/space58-01/complete-space58.sing"));
+setring spaceJets58;
+matrix K60=imap(completeSpace58,kernel58);
+matrix S60=imap(completeSpace58,sigmaRestricted58);
+matrix controls60=imap(completeSpace58,smallControls58);
+matrix regular60=imap(completeSpace58,jets58)*K60;
+intvec caps60=56,8,14,2;intvec offsets60=0,224,256,312;
+intvec selected60=0,0,0,0;
+matrix profile60[320][100];matrix C60[64][100];
+int chartid60;int point60;int ii60;int jj60;int kk60;int ee60;int ci60;int ram60;
+list chart60;list coords60;list cache60;list old60;list vals60;list sig60;list products60;list f60;list v60;list sum60;list supp60;
+number q60;
+for(chartid60=1;chartid60<=20;chartid60++){
+ chart60=charts[chartid60];coords60=chart60[1];ram60=chart60[4];ci60=chart60[5];point60=0;
+ if(ci60==1 && coords60[2][2]==-4*ram60){if(ram60==7){point60=1;}if(ram60==1){point60=2;}}
+ if(ci60==4 && coords60[2][2]==-ram60){if(ram60==7){point60=3;}if(ram60==1){point60=4;}}
+ if(point60!=0){
+  selected60[point60]=selected60[point60]+1;cache60=cache58(coords60,chart60[2],chart60[3]);old60=list();vals60=list();sig60=list();products60=list();f60=list();
+  for(jj60=1;jj60<=68;jj60++){old60[jj60]=eval58(terms58[jj60],cache60);}
+  for(jj60=1;jj60<=68;jj60++){
+   v60=lc(0);supp60=sigmaSupports58[jj60];
+   for(kk60=1;kk60<=size(supp60);kk60++){v60=la(v60,old60[supp60[kk60]]);}
+   vals60[jj60]=la(v60,scale58(la(old60[jj60],v60),a));
+  }
+  for(jj60=1;jj60<=196;jj60++){products60[jj60]=lm(vals60[pairs58[jj60,1]],vals60[pairs58[jj60,2]]);}
+  for(jj60=1;jj60<=100;jj60++){
+   sum60=lc(0);
+   for(kk60=1;kk60<=196;kk60++){if(K60[kk60,jj60]!=0){require58(K60[kk60,jj60]==1,"MIXED60_SOURCE_KERNEL_BINARY");sum60=la(sum60,products60[kk60]);}}
+   require58(sum60[3]>caps60[point60] && (sum60[1]==0 || sum60[2]>=-caps60[point60]),"MIXED60_ACTUAL_INFINITY_BOUND_PRECISION");
+   f60[jj60]=sum60;
+   for(ee60=-caps60[point60];ee60<caps60[point60];ee60++){
+    q60=coefficient58(sum60,ee60);ii60=offsets60[point60]+2*(ee60+caps60[point60])+1;
+    profile60[ii60,jj60]=real58(q60);profile60[ii60+1,jj60]=imag58(q60);
+   }
+  }
+  print("MIXED60_POINT label="+string(point60)+" chart="+string(chartid60)+" cusp="+string(ci60)+" ramification="+string(ram60)+" bound="+string(caps60[point60])+" actual_sections=100");
+ }
+}
+for(ii60=1;ii60<=4;ii60++){require58(selected60[ii60]==1,"MIXED60_FOUR_UNIQUE_CHARTS");}
+for(ii60=1;ii60<=64;ii60++){for(jj60=1;jj60<=100;jj60++){C60[ii60,jj60]=profile60[ii60,jj60];}}
+matrix Kmix60=matrix(syz(module(C60)));int dim60=ncols(Kmix60);int rank60=mat_rk(C60);
+require58(dim60==100-rank60 && mat_rk(Kmix60)==dim60,"MIXED60_FULL_KERNEL_RANK");
+matrix Rmix60=transpose(lift(module(transpose(Kmix60)),module(unitmat(dim60))));
+matrix residual60=unitmat(100)+Kmix60*Rmix60;
+matrix Hmix60=transpose(lift(module(transpose(C60)),module(transpose(residual60))));
+matrix zero60[64][dim60];require58(C60*Kmix60==zero60 && Rmix60*Kmix60==unitmat(dim60) && Kmix60*Rmix60+Hmix60*C60==unitmat(100),"MIXED60_COMPLETE_SPLITTING");
+matrix Smix60=Rmix60*S60*Kmix60;
+require58(S60*Kmix60==Kmix60*Smix60 && Smix60*Smix60==unitmat(dim60),"MIXED60_RESTRICTED_INVOLUTION");
+matrix Nmix60=Smix60+unitmat(dim60);
+matrix Fmix60=matrix(syz(module(Nmix60)));int fixed60=ncols(Fmix60);int trace60=mat_rk(Nmix60);
+require58(fixed60==dim60-trace60 && mat_rk(Fmix60)==fixed60,"MIXED60_FIXED_COMPLETE");
+matrix Rfix60=transpose(lift(module(transpose(Fmix60)),module(unitmat(fixed60))));
+matrix Hfix60=transpose(lift(module(transpose(Nmix60)),module(transpose(unitmat(dim60)+Fmix60*Rfix60))));
+matrix zfix60[dim60][fixed60];require58(Nmix60*Fmix60==zfix60 && Rfix60*Fmix60==unitmat(fixed60) && Fmix60*Rfix60+Hfix60*Nmix60==unitmat(dim60),"MIXED60_FIXED_SPLITTING");
+matrix one10060[100][1];for(ii60=1;ii60<=100;ii60++){one10060[ii60,1]=controls60[ii60,1];}
+matrix one60=Rmix60*one10060;require58(Kmix60*one60==one10060,"MIXED60_ONE_POSITIVE_CONTROL");
+int odd60=0;matrix traceAug60[dim60][dim60+1];
+for(ii60=1;ii60<=dim60;ii60++){for(jj60=1;jj60<=dim60;jj60++){traceAug60[ii60,jj60]=Nmix60[ii60,jj60];}traceAug60[ii60,dim60+1]=one60[ii60,1];}
+matrix particular60[dim60][1];matrix separator60[1][dim60];
+if(mat_rk(traceAug60)==trace60){
+ odd60=1;particular60=lift(module(Nmix60),module(one60));require58(Nmix60*particular60==one60,"MIXED60_ODD_PARTICULAR");
+}else{
+ matrix annih60=transpose(matrix(syz(module(transpose(Nmix60)))));matrix values60=annih60*one60;int witness60=0;
+ for(ii60=1;ii60<=nrows(annih60);ii60++){if(values60[ii60,1]==1 && witness60==0){witness60=ii60;}}
+ require58(witness60!=0,"MIXED60_TRACE_SEPARATOR_EXISTS");
+ for(jj60=1;jj60<=dim60;jj60++){separator60[1,jj60]=annih60[witness60,jj60];}
+ matrix zsep60[1][dim60];require58(separator60*Nmix60==zsep60 && separator60*one60==unitmat(1),"MIXED60_TRACE_SEPARATOR");
+}
+matrix fixedProfiles60=profile60*Kmix60*Fmix60;int imzero60=1;
+for(ii60=2;ii60<=320;ii60=ii60+2){for(jj60=1;jj60<=fixed60;jj60++){if(fixedProfiles60[ii60,jj60]!=0){imzero60=0;}}}
+// Keep actual imaginary-coefficient outcome; charts need not have sigma acting as coefficient conjugation.
+require58(mat_rk(regular60)==100,"MIXED60_REGULAR_INJECTION");
+matrix regularLeft60=transpose(lift(module(transpose(regular60)),module(unitmat(100))));
+require58(regularLeft60*regular60==unitmat(100),"MIXED60_REGULAR_LEFT_INVERSE");
+matrix changed60=regular60;changed60[1,1]=changed60[1,1]+1;
+require58(changed60!=regular60,"MIXED60_CHANGED_PROFILE_REJECTED");
+link out60="ASCII:w mixed-space60.sing";open(out60);write(out60,"ring mixedSpace60=2,(w),dp;short=0;");
+dump58(out60,"profile60",profile60);dump58(out60,"regular60",regular60);dump58(out60,"regularLeft60",regularLeft60);dump58(out60,"C60",C60);dump58(out60,"Kmix60",Kmix60);dump58(out60,"Rmix60",Rmix60);dump58(out60,"Hmix60",Hmix60);dump58(out60,"Smix60",Smix60);dump58(out60,"Nmix60",Nmix60);dump58(out60,"Fmix60",Fmix60);dump58(out60,"Rfix60",Rfix60);dump58(out60,"Hfix60",Hfix60);dump58(out60,"one60",one60);dump58(out60,"particular60",particular60);dump58(out60,"separator60",separator60);close(out60);
+print("MIXED60_RESULT source_dimension=100 constraint_rows=64 constraint_rank="+string(rank60)+" mixed_dimension="+string(dim60)+" fixed_dimension="+string(fixed60)+" trace_rank="+string(trace60)+" odd_trace_feasible="+string(odd60)+" fixed_profiles_imaginary_zero="+string(imzero60)+" source_points=4 profile_rows=320 complete_splittings=2");
+print("MIXED60_ALL_CHECKS_PASS");quit;

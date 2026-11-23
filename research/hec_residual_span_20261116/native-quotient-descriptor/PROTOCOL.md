@@ -1,0 +1,17 @@
+# First-rho1 quotient descriptor qualification and component counts
+
+[pcc:unverified]. Basedon GROUNDED-RELATION-SATURATION/GROUNDED-DUAL-SCREEN and exactnative-nullity-window22fixtureavailability. This is a descriptor/structural gate, NOT anintegratedcandidateperformance measurement. No new interpolationcollector orsource/targetconstraints added. Staticforest/original512anchor schedule unchanged.
+
+## Descriptor
+
+AtFIRSTrawprefix with small.rank=m and kNone (smalln=m+1), targetlastcoordinate is the only free smallcolumn. Backsubstitute existingnormalizedsmallbasis to get S0,w with S0_k=0,w_k=1. Smallbasisrows for everyothercolumn mustexist/pivot1. Readforestexpressions recursively WITHOUTpathcompression/stateupdates; assignallungroundedrootparameters0 toextendS0,w toa fullpoint/targetsolutionline. Groundedentries areindependentofthatrootassignment. Forallretainedrawrows require r*a=rhs andr*b=0, includingcurrenttriggerrow. Targetlasta0/b1. Emitgroundedpointalpha/beta, admittedprefix, rawcheckedcount andrank ofgroundedtwo-columnmatrix, with explicit2x2minorwitness whenrank2. Recordbeta-zero separately; rank1isnotunconditionallycalledobstructedwithoutnonzeroellcomponentpremise.
+
+Algebra: rank2impliestruegroundedlambda=a+k*b cannotbezero andbnotproportionallambda, hencefullprincipalrelationexistence theorem applies. Rank1withbeta_nonzero needsindependentnonzeroellcomponentcertificatetocallscaleobstructed; rank0/beta0 impliesnofinishingdirection onthissupport. This gate doesnotconstructlowdegreeprincipalrelations orcompute pointlogs. Expectedk staysdriver-only, notusedinextractor.
+
+## Fixed execution
+
+Same11initialmixedterm models/all22samepublicfixtures/source1/17/RNG, two fresh AUDITcompletecalls each=44. Alloriginalpencilnorm/roottruth/unknownimage/principalnativeidentity andfirst128/determiningnativeFastprefixchecks stillrun. Eachfinalscalar nativeverified, finalReport normalizeddense_audits0 mustequalretainedstaticforest Report; descriptors/everyemittedalpha/beta/countvector mustrepeatexactly. Missingfirst-rho1descriptor onfixedpanel is retainedfailure, notreplacement.
+
+Core/arithmeticqualificationrunswithcountersDISABLED, as arepostdescriptorraw-equationchecks. ONLYdescriptorextraction(backsubstitution,reading/composingforestexpressions,projectinglabels,andrankminorsearch)resets/enablescounters; snapshotthenDISABLEbeforecontinuingoriginalauditcore. Noattempttorestore/manipulatehiddenoldcounts orpasscomponentcountsascompletecost. Allparentcomposition/allpointlineconstructioncounted, includingungroundedentries usedforfullrawchecks. Reportall16primitives/moduli; diagnosticvalidationfieldchecksoutsidekernelcounts explicit. Integer/maps/printing/allocationcostsunpriced, notruntime. Thisimplementation isread-onlyonoriginalsolverstate, no semanticearlystop/reorderingchange.
+
+No new negativecollectorcampaign: staticalgorithmnegativecontrolsretainedpreviously; extractordoesnotpublishananswer. No claimnewnegativevalidationorindependentarithmeticreview. One600CPUprocess aftersource/import/native/protocol/priorraw/binaryGitfreeze/push, preservefailures/partials/no unchangedrerun. Fullgenus2+10xgoalactive; no S3/cloud/merge/auto-merge.

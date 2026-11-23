@@ -1,0 +1,54 @@
+1c1,3
+< """EXP-PFDR-2d36f9: growth ladder of pair-sum coincidences, window and rank-d GAP bases.
+---
+> """EXP-PFDR-2d36f9-R2 (rerun of EXP-PFDR-2d36f9 with two pre-registered design corrections, see ../PROTOCOL.md).
+> 
+> Original docstring: growth ladder of pair-sum coincidences, window and rank-d GAP bases.
+42c44
+< EXP = "EXP-PFDR-2d36f9"
+---
+> EXP = "EXP-PFDR-2d36f9-R2"
+52c54,55
+< SEED_BLOCK = {"pilot": 6_000_000, "main": 6_100_000, "rep": 6_200_000, "selftest": 6_900_000}
+---
+> SEED_BLOCK = {"pilot": 7_000_000, "main": 7_100_000, "rep": 7_200_000, "selftest": 7_900_000}
+> SAFETY = 1.5  # R2 correction 1: was 1.1 (M reached 2333 < 2500 at 16 bits in the original run)
+62c65,69
+< CAL_SD_LO, CAL_SD_HI, CAL_MEAN_ABS = 0.70, 1.30, 0.40
+---
+> # R2 correction 2: the 30 structured cells share their null replicates across d (identical null lists for d = 1, 2, 3),
+> # so they carry 10 independent z_cal values (5 rungs x 2 thetas), not 30. Gates for n = 10 iid N(0,1) (95% two-sided):
+> # |mean| <= 1.96/sqrt(10) = 0.62 and sample sd in [sqrt(chi2_{.025,9}/9), sqrt(chi2_{.975,9}/9)] = [0.548, 1.454].
+> CAL_SD_LO, CAL_SD_HI, CAL_MEAN_ABS = 0.548, 1.454, 0.62
+> ORIG_CAL_SD_LO, ORIG_CAL_SD_HI, ORIG_CAL_MEAN_ABS = 0.70, 1.30, 0.40
+506c513
+<               "rule": f"n = clamp(ceil(1.1*{TARGET_COINC}/mean_null), {N_MIN}, {N_MAX}); "
+---
+>               "rule": f"n = clamp(ceil({SAFETY}*{TARGET_COINC}/mean_null), {N_MIN}, {N_MAX}); "
+519c526
+<         n = N_MAX if mn <= 0 else min(N_MAX, max(N_MIN, math.ceil(1.1 * TARGET_COINC / mn)))
+---
+>         n = N_MAX if mn <= 0 else min(N_MAX, max(N_MIN, math.ceil(SAFETY * TARGET_COINC / mn)))
+628c635,637
+<     zcal = [r["z_cal"] for r in cells if "z_cal" in r]
+---
+>     # R2: one z_cal per independent null set (d == 1 cells; d = 2, 3 reuse the same nulls), sample sd, n = 10 gates.
+>     zcal = [r["z_cal"] for r in cells if "z_cal" in r and r["d"] == 1]
+>     zcal_all = [r["z_cal"] for r in cells if "z_cal" in r]
+631,632c640,642
+<            "sd": statistics.pstdev(zcal) if len(zcal) > 1 else None}
+<     cal["pass"] = bool(zcal) and cal["sd"] is not None \
+---
+>            "sd": statistics.stdev(zcal) if len(zcal) > 1 else None,
+>            "rule": "d == 1 cells only (independent null sets), sample sd; gates for n = 10 iid N(0,1)"}
+>     cal["pass"] = bool(zcal) and len(zcal) == len(BITS) * len(THETAS) and cal["sd"] is not None \
+633a644,648
+>     cal["original_rule_reported_only"] = {
+>         "n": len(zcal_all),
+>         "mean": statistics.fmean(zcal_all) if zcal_all else None,
+>         "sd": statistics.pstdev(zcal_all) if len(zcal_all) > 1 else None,
+>         "bands": [ORIG_CAL_SD_LO, ORIG_CAL_SD_HI, ORIG_CAL_MEAN_ABS]}
+679c694
+<           "sd_band": [CAL_SD_LO, CAL_SD_HI], "mean_band_abs": CAL_MEAN_ABS,
+---
+>           "sd_band": [CAL_SD_LO, CAL_SD_HI], "mean_band_abs": CAL_MEAN_ABS, "n": cal["n"],

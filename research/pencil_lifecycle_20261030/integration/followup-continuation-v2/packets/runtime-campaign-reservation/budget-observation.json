@@ -1,0 +1,47 @@
+{
+  "schema": "cloud.budget-observation/v1",
+  "recorded_utc": "2026-11-03T18:52:56.971282+00:00",
+  "command": [
+    "timeout",
+    "25s",
+    "aws",
+    "budgets",
+    "describe-budgets",
+    "--account-id",
+    "104186811093",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--query",
+    "Budgets[].{Name:BudgetName,Limit:BudgetLimit,Unit:TimeUnit,Period:TimePeriod,Spent:CalculatedSpend,Updated:LastUpdatedTime}"
+  ],
+  "exit": 0,
+  "representation": "Selected parsed fields from successful command output; not original stdout bytes.",
+  "budgets": [
+    {
+      "name": "isolab-daily-cost-100",
+      "limit_usd": "200.0",
+      "actual_usd": "131.13",
+      "unit": "DAILY",
+      "updated": "2026-11-03T17:40:31.244000+00:00"
+    },
+    {
+      "name": "spot-experiments-daily-25",
+      "limit_usd": "200.0",
+      "actual_usd": "48.79",
+      "unit": "DAILY",
+      "updated": "2026-11-03T17:41:15.347000+00:00"
+    },
+    {
+      "name": "isolab-monthly-account-cost",
+      "limit_usd": "1000.0",
+      "actual_usd": "320.369",
+      "unit": "MONTHLY",
+      "updated": "2026-11-03T11:06:36.959000+00:00"
+    }
+  ],
+  "interpretation": "Daily thresholds are nonadditive. Readings are delayed, not a reservation ledger or hard spending stop."
+}

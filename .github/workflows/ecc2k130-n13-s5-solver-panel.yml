@@ -20,4 +20,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Reconstruct 32 exact queries and check frozen source bytes
-        run: python3 research/notes/ecc2k130/n13_s5_solver_panel_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n13_s5_solver_panel_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n13_s5_solver_panel_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

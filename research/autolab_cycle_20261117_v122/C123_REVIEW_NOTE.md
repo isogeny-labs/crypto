@@ -1,0 +1,3 @@
+# Prepared verifier control isolation
+
+The unexecuted C123prototype appends product-verification gates to the same mutable Circuit object referenced by its returned old control. This does not change predicate semantics, but a raw control nodecount would include unused candidate gates. Before any preregistered scientific run, create a FRESHvariant that clones or separately prunes the control with its declared recovery outputs. Never compare raw lengths of that shared mutated object or silently edit the frozen prototype. Preserve the C122published bytes and record the corrected variant's hashes. The exact coefficient-comparison proof remains a hypothesis until independent set/recovery oracles pass.

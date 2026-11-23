@@ -1,0 +1,75 @@
+{
+  "schema": "pencil.formal-gate-repair/v1",
+  "math_sources_unchanged": {
+    "Find.lean": "339c3470af00bc9a24c862ef57f95ca980d25f4a370962e1b825a8c9ce7000ae",
+    "Controls.lean": "b38684ea357fd1242f6ba4b6866e93cdf849493310103b9fa3edee33de2f8fe2",
+    "Readback.lean": "b0f725788703d224f2f4b708493ce5e6d91df0fbe663c07b8a299af19b2d7455"
+  },
+  "invocations": [
+    {
+      "modules": [
+        {
+          "module": "Find",
+          "command": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M4096",
+            "-o",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch/snapshot/Find.olean",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch/snapshot/Find.lean"
+          ],
+          "native_exit": 0
+        },
+        {
+          "module": "Controls",
+          "command": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M4096",
+            "-o",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch/snapshot/Controls.olean",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch/snapshot/Controls.lean"
+          ],
+          "native_exit": 0
+        },
+        {
+          "module": "Readback",
+          "command": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M4096",
+            "-o",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch/snapshot/Readback.olean",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch/snapshot/Readback.lean"
+          ],
+          "native_exit": 0
+        }
+      ],
+      "gate_exit": 0,
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/graph-find-gate-repair-20261101/invocation-uen86kch"
+    },
+    {
+      "modules": [
+        {
+          "module": "ExpectedFailure",
+          "command": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M4096",
+            "-o",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-7q4kbdxy/snapshot/ExpectedFailure.olean",
+            "/var/tmp/graph-find-gate-repair-20261101/invocation-7q4kbdxy/snapshot/ExpectedFailure.lean"
+          ],
+          "native_exit": 1
+        }
+      ],
+      "gate_exit": 1,
+      "bindings_unchanged": true,
+      "directory": "/var/tmp/graph-find-gate-repair-20261101/invocation-7q4kbdxy"
+    }
+  ],
+  "scientific_execution": false,
+  "independent_review": "pending",
+  "historical_wrappers": "old shell success not sufficient; individual native receipts/readbacks authoritative"
+}

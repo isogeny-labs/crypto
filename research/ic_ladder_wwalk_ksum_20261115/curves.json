@@ -1,0 +1,11 @@
+{
+ "schema": "ic_ladder_wwalk_ksum.curves/v1",
+ "note": "prime_fast::find_a3_curve rungs (largest p = 3 mod 4 below 2^bits, smallest b giving prime order), copied from research/prime_ksum_k5_20261028/base-specs/spec-P{36,40,44,48}.json (examples/ic_frontier_prime_curves.rs --bits ...). Prime order, cofactor 1. Never exposed to the curve25519 autolab (its curves are k = 20..32 Curve25519-family miniatures).",
+ "ladder": {
+  "36": {"kind": "prime_explicit", "p": 68719476731, "a": 68719476728, "b": 33, "group_order": 68719022539, "r": 68719022539, "gx": 2, "gy": 51741851039},
+  "40": {"kind": "prime_explicit", "p": 1099511627563, "a": 1099511627560, "b": 56, "group_order": 1099512551701, "r": 1099512551701, "gx": 1, "gy": 15267301451},
+  "44": {"kind": "prime_explicit", "p": 17592186044399, "a": 17592186044396, "b": 95, "group_order": 17592192476281, "r": 17592192476281, "gx": 1, "gy": 8379642404149},
+  "48": {"kind": "prime_explicit", "p": 281474976710591, "a": 281474976710588, "b": 9, "group_order": 281474991897067, "r": 281474991897067, "gx": 1, "gy": 111984877719828}
+ },
+ "positive_control_k32": {"kind": "prime_explicit", "a": 1173263412, "b": 337904346, "group_order": 4295077112, "gx": 1431665017, "gy": 592057774, "p": 4294967197, "r": 536884639, "note": "the autolab re-baseline curve of research/curve25519_autolab_20261104/rebaseline-seedrun/specs/rebase-k32.json (cofactor 8)"}
+}

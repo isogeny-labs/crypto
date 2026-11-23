@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-10T17:50:04Z",
+ "id": "PCC-20261110-9f17a1",
+ "kind": "theorem",
+ "producer": {
+  "commit": "78222deeb621291d918d7dd625c4315f7ec2adef",
+  "model": "Codex",
+  "session": "fourteen-target-20261110"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "f34238c8a4d123f21036b88d47b3c5620ddde4b8d7b15ba5e17e176b43486a4c",
+   "kind": "lean",
+   "project": "research/msolve_reindex_lean_audit_20261110/lean",
+   "theorem": "MsolveReindexAudit.reindex_audit_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Operational finite-table copy semantics of the observed snapshot. For every possible coefficient type/content, matrix lookup preserves copied coefficients; rewritten basis lookup3 is outside live prefix3, and in-range slot2 can denote a different source. Direct universal reindex invariant negation; signed32/unsigned-bit representability arithmetic. Native trace authenticity, C parser, pointer/allocation semantics and wholeF4Run refinement are not proved.",
+ "statement": "For the observed coefficient-index snapshot old[0,2,0] copied to new[2,3,4] with livebasis3, three operational table updates preserve every original coefficient through matrixlookup. Rewritten basislookup3 disagrees for every coefficient content, and an in-range newindex2 can denote a different coefficient; Lean directly negates the universal wrong-table invariant. Exact signed32/unsigned-bit representability is included. Native trace authenticity and Cpointer/fullF4Run refinement are not claimed."
+}

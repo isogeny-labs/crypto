@@ -1,0 +1,29 @@
+print("solver_ms "+string(rtimer-solve_start));
+print("basis_size "+string(size(G)));
+if (size(G)==1 && deg(G[1])==0) {
+  print("UNIT");
+  if (certificate_mode) {
+    poly replay=0;
+    int terms=0; int max_degree=0; poly w;
+    for (int index=1;index<=size(I);index++) {
+      w=T[index,1]/leadcoef(G[1]);
+      replay=replay+w*I[index];
+      terms=terms+size(w);
+      if (deg(w)>max_degree) { max_degree=deg(w); }
+      print("W"+string(index)+" "+string(w));
+    }
+    if (replay!=1) { ERROR("identity did not replay"); }
+    print("witness_terms "+string(terms));
+    print("witness_degree "+string(max_degree));
+  }
+}
+else {
+  if (size(G)==nvars(basering)) {
+    for (int index=1;index<=nvars(basering);index++) {
+      poly value=reduce(var(index),G);
+      if (deg(value)>0) { ERROR("nonconstant normal form"); }
+      print("VALUE"+string(index)+" "+string(value));
+    }
+    print("POINT");
+  } else { print("UNDECIDED"); }
+}

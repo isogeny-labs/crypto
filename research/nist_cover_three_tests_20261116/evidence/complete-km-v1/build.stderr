@@ -1,0 +1,8 @@
+/workspace/crypto-pr-work/research/nist_cover_three_tests_20261116/evidence/complete-km-v1/source/complete_km.cpp: In constructor ‘CMAdapter::CMAdapter(QuarticKM&, EBPoly, const Json&)’:
+/workspace/crypto-pr-work/research/nist_cover_three_tests_20261116/evidence/complete-km-v1/source/complete_km.cpp:6:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+    6 |         for(auto& i:formal.at("seed_indices").arr)reference.push_back(i.integer());require(reference.size()==3,"complete KM reference triple");CFPoly t{Z(0),Z(1)};std::vector<Z> modc(13,Z(0));modc[12]=Z(1);CFPoly modulus(modc);
+      |         ^~~
+/workspace/crypto-pr-work/research/nist_cover_three_tests_20261116/evidence/complete-km-v1/source/complete_km.cpp:6:84: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+    6 |         for(auto& i:formal.at("seed_indices").arr)reference.push_back(i.integer());require(reference.size()==3,"complete KM reference triple");CFPoly t{Z(0),Z(1)};std::vector<Z> modc(13,Z(0));modc[12]=Z(1);CFPoly modulus(modc);
+      |                                                                                    ^~~~~~~
+cc1plus: all warnings being treated as errors

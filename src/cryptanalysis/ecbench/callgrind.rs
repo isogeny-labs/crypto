@@ -181,6 +181,14 @@ fn online_from_solve(complete: SolveIr) -> Result<OnlineIr, String> {
 /// Read `<prefix>.1`, `<prefix>.2`, ... in numeric order. The terminal
 /// `<prefix>` file is deliberately excluded because it follows the solve.
 pub fn solve_ir(prefix: &Path) -> Result<SolveIr, String> {
+    summarize(read_parts(prefix)?)
+}
+
+/// Every numbered part `<prefix>.1`, `<prefix>.2`, ... of a Callgrind run
+/// with its trigger label and `Ir`, in order, for harnesses that bracket
+/// their own intervals (`examples/jv_cover_audit_ir.rs`).  Gaps and
+/// duplicates in the numbering are errors.
+pub fn read_parts(prefix: &Path) -> Result<Vec<Part>, String> {
     let dir = prefix
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
@@ -221,21 +229,37 @@ pub fn solve_ir(prefix: &Path) -> Result<SolveIr, String> {
             return Err("missing Callgrind part number".into());
         }
     }
-    let parts = numbered
+    numbered
         .into_iter()
         .map(|(_, path)| {
             let content =
                 std::fs::read_to_string(&path).map_err(|e| format!("{}: {e}", path.display()))?;
             parse_part(&path, &content)
         })
-        .collect::<Result<Vec<_>, _>>()?;
-    summarize(parts)
+        .collect::<Result<Vec<_>, _>>()
 }
 
 /// Extract the one-target online interval from a complete solve profile.
 /// Missing, duplicate, reversed or out-of-solve markers are errors.
 pub fn online_ir(prefix: &Path) -> Result<OnlineIr, String> {
     online_from_solve(solve_ir(prefix)?)
+}
+
+/// Parse already pinned parts in caller-validated numeric order, without
+/// directory discovery or filesystem reads. Useful for a bounded independent
+/// exporter that must reject escaping symlinks before it reads any profile.
+pub fn solve_ir_from_parts(parts: &[(String, String)]) -> Result<SolveIr, String> {
+    summarize(
+        parts
+            .iter()
+            .map(|(name, body)| parse_part(Path::new(name), body))
+            .collect::<Result<_, _>>()?,
+    )
+}
+
+/// Optional nested online frame from the same pinned complete-method parts.
+pub fn online_ir_from_parts(parts: &[(String, String)]) -> Result<OnlineIr, String> {
+    online_from_solve(solve_ir_from_parts(parts)?)
 }
 
 #[cfg(test)]

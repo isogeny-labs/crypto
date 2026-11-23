@@ -1,0 +1,13 @@
+card_id: CARD-prime-medium-tier-rho-20261107-4
+relay_verbatim: not_applicable
+outcome: impeded
+stopped_at_step: launch-j2
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "no cards/CARD-...-4.receipt.json exists: the tool did not finish, it was killed (the executor's background limit of 600 s), so there is no tool summary to relay or check"
+  - "on disk: stdout and stderr of commands 1-11 (checkpoint-gate, protocol-check, protocol-frozen-hash, validate-j1..j6, receipt-identity, build-identity) written at 21:36; no launch-j2 stdout file"
+  - "launch-j2 had already started a build before the kill: receipts/J2/start-request.json and build-start.json exist; CodeBuild build isolab-experiment-launcher:41fdaba3-acec-49e1-a5e4-f16bfc2c6ea4 started 21:36:09Z; read by the director at about 21:47Z it was IN_PROGRESS, phase BUILD, with no objects under runs/prime-medium-rho-20261107-j2/ in S3; receipts/J2/build.json was last written 21:45:57Z (the client polled until the kill); receipts/J2/result.json does not exist"
+  - "receipts/J2/request.json is byte-identical to requests/final/J2.request.json; no client process (launch-remote, benchrec, task_card) was running at that time"
+  - "the benchmark record has 2 command entries (both J1 launches); benchrec appends an entry only when its child returns, so the J2 launch is not recorded there"
+  - "recommendation is a card that does not resubmit J2 (PROTOCOL.md section 10, fixed N): it finishes the already-started build and continues with J3..J6; the cause is the executor host's tool limit, not the card or spec"
+interpretation: not_assessed

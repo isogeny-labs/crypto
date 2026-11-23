@@ -1,0 +1,12 @@
+import GraphRing
+open GraphRingWord
+theorem zero_neg : neg 17 0=0 := by decide
+theorem canonical_last_neg : neg 17 16=1 := by decide
+theorem maximal_bound_add : add 9223372036854775808 9223372036854775807 9223372036854775807=9223372036854775806 := by decide
+theorem outside_bound_wrap : add 9223372036854775809 9223372036854775808 9223372036854775808=0 := by decide
+theorem outside_bound_expected : (9223372036854775808+9223372036854775808 : Nat)%9223372036854775809=9223372036854775807 := by decide
+theorem noncanonical_neg_differs : neg 17 18≠PencilWordRefinement.wordNeg 17 18 := by decide
+theorem wide_product : mul 17 9223372036854775808 2=1 := by decide
+theorem narrow_product : ((9223372036854775808 : UInt64)*2)%17=0 := by decide
+theorem invalid_sign_zero : signed 17 0 1=16 := by decide
+theorem literal_sub : sub 17 1 16=2 := by decide

@@ -1,0 +1,13 @@
+[package]
+name = "genus3-cold-audit-check"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# This evidence checker deliberately does not use the producer's arithmetic.
+[workspace]
+
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+tar = "0.4"

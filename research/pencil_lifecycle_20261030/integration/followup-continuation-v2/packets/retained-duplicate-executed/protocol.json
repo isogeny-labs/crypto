@@ -1,0 +1,76 @@
+{
+  "schema": "deterministic.reanalysis.protocol/v1",
+  "status": "frozen_candidate_not_admitted",
+  "claim": "within-target retained-fixture duplicate coefficient dispositions",
+  "study_type": "deterministic archival correctness audit",
+  "inputs": {
+    "archive": "archive.jsonl",
+    "sha256": "2ebe38227ee9b2bd8cfcc460dfa0766804e650a962972a2b5054cfb74c4ef54a",
+    "full_records": 180,
+    "predicate": "p == 739",
+    "selected_records": 60,
+    "selected_cases": 420,
+    "order": "physical archive row then case index",
+    "index": "input-index.jsonl"
+  },
+  "arms": [
+    "unchanged reviewed duplicate helper on original archived signed labels"
+  ],
+  "controls": "external sealed eight-control producer and independent replay; not rerun",
+  "randomization": "none; retained original order and seeds",
+  "blinding": "none; public known answers used only for reference validation",
+  "sample_size": "entire fixed selected archive; no extrapolation",
+  "stopping": {
+    "all_dispositions": 420,
+    "native_seconds": 120,
+    "grace_seconds": 5,
+    "graph_stop": "first verified terminal per target",
+    "duplicate_comparisons": "continue all retained cases as diagnostic",
+    "case_panic": "poison partition, emit remaining cases",
+    "global_failure": "retain incomplete output and failure"
+  },
+  "analysis": {
+    "counts": [
+      "logical eligible ingests",
+      "unique first occurrences",
+      "redundant duplicates",
+      "informative verified duplicates",
+      "invariant errors",
+      "candidate rejections",
+      "ineligible cases",
+      "invalid labels/divisors",
+      "partition failures",
+      "post-terminal diagnostic cases"
+    ],
+    "group_by": [
+      "target identity",
+      "fixture provenance"
+    ],
+    "complete_requires": "exact420 unique source identities matching frozen index",
+    "cost_boundary": "instrumented audit phases only; no timings/complete costs",
+    "missing_or_failed": "retain every row; report incomplete if missing",
+    "archival_failure_statuses": [
+      "partition_binding_failed",
+      "partition_poisoned",
+      "native_case_panic",
+      "invalid_label_or_divisor"
+    ],
+    "nested_adapter_failure_statuses": [
+      "invariant_error",
+      "candidate_rejected",
+      "noncanonical_label"
+    ],
+    "setup_accounting": "Nonadditive repeated row metadata; per-target ledger keyed physical archive_row; exact-copy consistency required; aggregate once only",
+    "audit_pass": "complete and no failed dispositions or setup consistency errors"
+  },
+  "prohibited": [
+    "new trajectory",
+    "new seed",
+    "relabel using planted scalar",
+    "cross-target pooling",
+    "natural yield estimate",
+    "performance ratio"
+  ],
+  "natural_arm": "inventory_only_not_admitted",
+  "revision": 2
+}

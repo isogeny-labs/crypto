@@ -1,0 +1,108 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-15T05:56:57+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gw_nrm_lz_20261115/run-local.sh",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/bin",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/nrmlz_runs"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T05:39:53+00:00",
+      "wall_s": 978.97
+    }
+  ],
+  "commit": "851b8da629837ffa6e27fdb318fddcd1cadb4f9d",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T05:39:50+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-ic-gw-nrm-lz"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0539Z-ic-gw-nrm-lz",
+  "metrics": [
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "dl_meq_ratio_both_wadd0_k22",
+      "note": "BOTH/REF DL cold M-eq geomean over seeds 1-6, w_add=0, w_h=0; max 95.70; L0, pcc:unverified; frozen rule: improvement",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 95.69
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "dl_meq_ratio_both_wadd1_k22",
+      "note": "BOTH/REF DL, w_add=1; max 98.72; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 98.71
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "dl1_meq_ratio_both_wadd0_k22",
+      "note": "BOTH/REF DL1, w_add=0; max 83.86; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 83.82
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 6,
+      "name": "dl1_meq_ratio_both_wadd1_k22",
+      "note": "BOTH/REF DL1, w_add=1; max 94.43; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 94.35
+    }
+  ],
+  "problem": "ic:quartic-dl-ghs-weak",
+  "raw": [
+    {
+      "bytes": 101643,
+      "path": "research/ic_gw_nrm_lz_20261115/runs-nrmlz-20261115.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b5/b59649528e51bd55408a6e3f70ec234c7b7c7182aa7591d89a01b190365de182",
+      "sha256": "b59649528e51bd55408a6e3f70ec234c7b7c7182aa7591d89a01b190365de182",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-ic-gw-nrm-lz/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-ic-gw-nrm-lz/nrmlz.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-ic-gw-nrm-lz/nrmlz.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gw-nrm-lz",
+  "status": "measured",
+  "summary": "NRM (normalised points) + LZ_REUSE (scalar Lanczos dots) vs BLR1: BOTH DL cold M-eq ratio 0.957-0.962 (w_add 0), 0.987 (w_add 1); DL1 0.835-0.850 / 0.939-0.944; D 0.971-0.978; gates G0-G3 pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+  "validation": null
+}

@@ -1,0 +1,117 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "wide batching ladder, 20-bit prime curve",
+ "description": "lead ICP-prime-ic-constant-engineering: two-level target batching, widths 16..1024",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 20,
+    "seed": 59291
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "walk",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "fast",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-fast"
+    }
+   }
+  },
+  {
+   "name": "batch-16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  },
+  {
+   "name": "batch-64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-64"
+    }
+   }
+  },
+  {
+   "name": "batch-256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-256"
+    }
+   }
+  },
+  {
+   "name": "batch-1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "serial-1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-serial-1024"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 1800
+ }
+}

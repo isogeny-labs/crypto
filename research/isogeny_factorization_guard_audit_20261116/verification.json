@@ -1,0 +1,108 @@
+{
+  "schema": "isogeny-guard-verification/v1",
+  "source_commit": "981452efdc597e82e81e83982143ce613c261be1",
+  "claim_id": "PCC-20261116-bc1b4e",
+  "declaration_sha256": "aa3cc46970752b0e498ea28e956816cea287f5920a3904fa2dced71ed034d996",
+  "all_source_and_artifact_pins_match": true,
+  "preservation_entries": 6385,
+  "initial_plans": 52,
+  "formal_source_files": 255,
+  "artifact_pins": 20,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-bc1b4e",
+    "claim_sha256": "4508f10ed301887e0eef03adca241056d7ce55802a34944bc817998c25851621",
+    "commit": "981452efdc597e82e81e83982143ce613c261be1",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/isogeny_factorization_guard_audit_20261116/lean (FactorizationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T17:08:35Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-bc1b4e",
+    "claim_sha256": "4508f10ed301887e0eef03adca241056d7ce55802a34944bc817998c25851621",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "known_author_erratum": true,
+  "Scheme_isogeny_API_comparison": false,
+  "corrected_general_factorization_proved": false,
+  "assurance": {
+    "schema": "isogeny-guard-preflight/v1",
+    "build_snapshots": 10,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08"
+    ],
+    "successful_states": [
+      "09",
+      "10"
+    ],
+    "published_preservation_entries": 6339,
+    "additional_dependency_entries": 46,
+    "all_checked_entries": 6385,
+    "frozen_plans": 52,
+    "manifest_packages": 25,
+    "copied_import_modules": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "registered_roots_from01": true,
+    "known_author_erratum": true,
+    "actual_finite_field_Frobenius": true,
+    "actual_coordinate_and_field_localization": true,
+    "actual_infinity_parameter_no_qth_root": true,
+    "actual_image_purely_inseparable_and_nonseparable": true,
+    "actual_geometric_points_bijective_kernel_zero": true,
+    "actual_identity_separable": true,
+    "actual_genericpoint_coordinate_naturality": true,
+    "arbitrary_ring_map_factorization_impossible": true,
+    "actual_binary_ternary_controls": true,
+    "healthy_identity_and_iterate_controls": true,
+    "corrected_general_factorization_proved": false,
+    "general_Weil_nondegeneracy_proved": false,
+    "Scheme_isogeny_API_comparison": false,
+    "geometric_kernels_not_scheme_kernels": true,
+    "novelty_claim": false,
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "native_experiments": 0,
+    "gate_declarations": 23,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_source_modules": 204,
+    "actually_imported_custom_modules": 186,
+    "actually_imported_frozen_modules": 180,
+    "additional_frozen_pinned_modules": 18,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "new_source_warnings": 0
+  }
+}

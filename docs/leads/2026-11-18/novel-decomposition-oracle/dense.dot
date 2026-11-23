@@ -1,0 +1,18 @@
+digraph dense_constraints {
+    graph [bgcolor="transparent", rankdir=TB, nodesep=0.35, ranksep=0.29, pad=0.10]
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.09", color="#A1B5C1", fillcolor="#F0F6F9", fontcolor="#17313F"]
+    edge [color="#5F7885", arrowsize=0.62]
+    raw [label="Nearly fixed raw product"]
+    signed [label="Signed tuple constraints"]
+    factor [label="Polynomial factorization\nBoth operand masks"]
+    rr [label="Riemann–Roch condition\nExact signed tuple test"]
+    orbit [label="Negation-orbit count\nFew imbalanced orbits"]
+    dense [label="Carry and modular quotient\nIntermediate constraints remain open", fillcolor="#FAF0DF", color="#BC9D62"]
+    search [label="Exact signed search\nArbitrary imbalance remains open", fillcolor="#FAF0DF", color="#BC9D62"]
+    raw -> factor -> dense
+    signed -> rr -> search
+    signed -> orbit -> search
+    {rank=same; raw; signed}
+    {rank=same; factor; rr; orbit}
+    {rank=same; dense; search}
+}

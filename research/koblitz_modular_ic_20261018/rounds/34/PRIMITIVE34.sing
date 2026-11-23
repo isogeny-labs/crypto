@@ -1,0 +1,42 @@
+number plantedFactor34=u^5+u^2+1;
+if(gcd(plantedFactor34^2,plantedFactor34)!=plantedFactor34){ERROR("PRIMITIVE34_COEFFICIENT_GCD_CONTROL");}
+vector planted34=[plantedFactor34*(n+l)/u^2,plantedFactor34*(v+1)/(u+1),0,plantedFactor34/u];
+proc coefficientContent34(vector vv){
+ number ans=0;int i;int k;poly pp;
+ for(i=1;i<=4;i++){pp=vv[i];for(k=1;k<=size(pp);k++){
+  if(denominator(leadcoef(pp[k]))!=1){ERROR("PRIMITIVE34_COEFFICIENT_DENOMINATOR");}
+  ans=gcd(ans,numerator(leadcoef(pp[k])));
+ }}return(ans);
+}
+vector controlPrimitive34=cleardenom(planted34);
+if(coefficientContent34(controlPrimitive34)!=1){ERROR("PRIMITIVE34_PLANTED_CONTENT_NOT_REMOVED");}
+int primitiveCols34=ncols(rationalSyzygies33);matrix primitiveS34[4][primitiveCols34];list primitiveScale34;
+module oldModule34=module(rationalSyzygies33);vector oldVector34;vector newVector34;int iPrimitive34;int jPrimitive34;number scalePrimitive34;int scaleFound34;
+matrix beforeZero34[1][primitiveCols34];if(matrix(rationalSource33)*rationalSyzygies33!=beforeZero34){ERROR("PRIMITIVE34_ORIGINAL_SYZYGY");}
+for(jPrimitive34=1;jPrimitive34<=primitiveCols34;jPrimitive34++){
+ oldVector34=oldModule34[jPrimitive34];newVector34=cleardenom(oldVector34);scaleFound34=0;
+ for(iPrimitive34=1;iPrimitive34<=4;iPrimitive34++){
+  if(newVector34[iPrimitive34]!=0 && scaleFound34==0){scalePrimitive34=leadcoef(oldVector34[iPrimitive34])/leadcoef(newVector34[iPrimitive34]);scaleFound34=1;}
+  primitiveS34[iPrimitive34,jPrimitive34]=newVector34[iPrimitive34];
+ }
+ if(scaleFound34!=1 || oldVector34!=scalePrimitive34*newVector34){ERROR("PRIMITIVE34_NOT_SCALAR_PROPORTIONAL");}
+ if(coefficientContent34(newVector34)!=1){ERROR("PRIMITIVE34_CONTENT_NOT_ONE");}
+ primitiveScale34[jPrimitive34]=scalePrimitive34;
+}
+if(matrix(rationalSource33)*primitiveS34!=beforeZero34){ERROR("PRIMITIVE34_NEW_SYZYGY");}
+matrix badPrimitive34=primitiveS34;badPrimitive34[4,1]=badPrimitive34[4,1]+1;
+if(matrix(rationalSource33)*badPrimitive34==beforeZero34){ERROR("PRIMITIVE34_CORRUPTION_ACCEPTED");}
+short=0;link outPrimitive34="ASCII:w primitive-family.sing";open(outPrimitive34);
+write(outPrimitive34,"ring primitiveFamily34=(2,u),(n,l,v),dp;ideal rationalSource33;matrix rationalJacobian33[4][3];poly rationalH33;poly rationalDenominator33;matrix rationalSyzygies33[4][17];list primitiveScale34;");
+write(outPrimitive34,"rationalH33="+string(rationalH33)+";rationalDenominator33="+string(rationalDenominator33)+";");
+for(iPrimitive34=1;iPrimitive34<=4;iPrimitive34++){
+ write(outPrimitive34,"rationalSource33["+string(iPrimitive34)+"]="+string(rationalSource33[iPrimitive34])+";");
+ for(jPrimitive34=1;jPrimitive34<=3;jPrimitive34++){write(outPrimitive34,"rationalJacobian33["+string(iPrimitive34)+","+string(jPrimitive34)+"]="+string(rationalJacobian33[iPrimitive34,jPrimitive34])+";");}
+ for(jPrimitive34=1;jPrimitive34<=primitiveCols34;jPrimitive34++){write(outPrimitive34,"rationalSyzygies33["+string(iPrimitive34)+","+string(jPrimitive34)+"]="+string(primitiveS34[iPrimitive34,jPrimitive34])+";");}
+}
+for(jPrimitive34=1;jPrimitive34<=primitiveCols34;jPrimitive34++){write(outPrimitive34,"primitiveScale34["+string(jPrimitive34)+"]="+string(primitiveScale34[jPrimitive34])+";");}
+close(outPrimitive34);
+execute(read("primitive-family.sing"));matrix roundS34=imap(rationalFamily33,primitiveS34);ideal roundJ34=imap(rationalFamily33,rationalSource33);
+if(roundS34!=rationalSyzygies33 || matrix(roundJ34)!=matrix(rationalSource33)){ERROR("PRIMITIVE34_SERIALIZATION_ROUNDTRIP");}
+matrix primitiveReadZero34[1][primitiveCols34];if(matrix(rationalSource33)*rationalSyzygies33!=primitiveReadZero34){ERROR("PRIMITIVE34_RELOADED_SYZYGY");}
+print("PRIMITIVE34_RESULT columns="+string(primitiveCols34)+" coefficient_content=1 coefficient_denominators=1 scalar_proportionality=all identities=all");print("PRIMITIVE34_ALL_CHECKS_PASS");quit;

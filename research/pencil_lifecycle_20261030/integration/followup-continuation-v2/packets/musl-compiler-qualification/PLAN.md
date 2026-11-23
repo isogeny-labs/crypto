@@ -1,0 +1,11 @@
+# Frozen isolated musl compiler prerequisite build
+
+Scope: build official musl1.2.6 release using existing /usr/bin/gcc11.5.0 and make, install only /var/tmp/pencil-musl-private-20261031/prefix, then compile/run a fixed static hello program. No system-package changes, ecbench build, cloud, image or scientific jobs.
+
+Primary sources checked: https://musl.libc.org/ identifies1.2.6 as latest release; releases.html supplies detached signature and project key fingerprint836489290BB6B70F99FFDA0556BCDB593020450F. Maintainer announcement https://www.openwall.com/lists/musl/2026/03/20/1 agrees on release URLs. manual.html refers to official1.1.24 build manual, marked partly outdated; inspect downloaded release INSTALL/configure before building. Initial download.html/how.html requests failed404; official root/releases/manual retrieval succeeded. Preserve those failures in report.
+
+Before executing source: download only exact official HTTPS release tar.gz, .asc and musl.pub, plus official docs. Retain HTTP headers, status and SHA256; import key into private GNUPGHOME; require exact published primary fingerprint and valid detached signature. A local SHA256 alone does not authenticate source. Key and fingerprint delivered by same official HTTPS site provide TLS/site trust, not independent offline identity verification. Pin actual verified tar digest in source receipt before extraction/build; no fallback to mirror/unverified source.
+
+Build resource cap: one configure/make/install sequence under timeout -k5s600s, make-j2, fixed private prefix and syslibdir under that prefix, disable shared libc. Retain exit statuses/logs/tool versions/source manifest. Inspect tar member paths before extraction. Static smoke: tiny C program prints exact pencil-musl-smoke-ok, compiled with private musl-gcc -static; boundcompile30s, run5s. Require ELF x86-64, no INTERP/no dynamic NEEDED, exit0 and exact output; retain SHA256/build receipt. No performance claim.
+
+Official root lists advisories affecting release1.2.6 regcomp/iconv and32-bit qsort. This pinned release build is a compiler prerequisite/controlled hello qualification, not patched production-runtime approval; no untrusted regex/iconv input enters smoke. Preserve this known source scope for any later runtime review rather than silently claiming security-qualified libc.

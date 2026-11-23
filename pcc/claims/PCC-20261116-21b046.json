@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:54:21Z",
+ "id": "PCC-20261116-21b046",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/quartic_km.cpp",
+    "sha256": "90c823a636776402afec873277ac63d5c74b8dcd7f73a0aca86b6757652937c5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-km-v2/stderr.txt",
+    "sha256": "28cd4dfa0e6ba77bddb1c9835adf8fba953e74645102c0733bac31127f392c18"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/target-km-v2/pre-call-manifest.sha256",
+    "sha256": "ff15684fd03e2a889ff43ba5bda1898785e5bd042812685210a6963a11dd0c7a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Initial target KM development run rejects its point/zero screen before addflip execution. The attempted W_D intersection L(D0) zero shortcut is unsuitable for the explicitly constructed representatives sharing support with D0. This is retained failure evidence, not successful target Jacobian arithmetic; use the general Riemann-Roch equality algorithm for the correction."
+}

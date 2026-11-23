@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T10:51:28Z",
+ "id": "PCC-20261116-28bc06",
+ "kind": "measurement",
+ "producer": {
+  "commit": "ff17f77dd28bb90f60fbf62bc0fd82a7fdad913b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/update-development/paired-reports-qualification-26.json",
+    "sha256": "2c926cba345ea0e6339b82c3f5fde6b1eaf02a90034acc057b1a0c3f03090a15"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/update-development/paired-report-tests-26.log",
+    "sha256": "35f7185d2c72ea36b5fa328417a5411b5769a4272464989de3842046d8c2f01b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/update-development/paired-reports-clippy-26.log",
+    "sha256": "8c947d47e3d298111eed18a8fee43e4fb0e4a2942ab50959e5372a87adebcdb5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Updated read-only paired/rejection reporters accept both new update-mode names, pass the focused guard test and strict lint, exactly reproduce old108-answer statistics and old45-answer rejection audit, and reject the wrong new-mode request before output. Calculator/costs/gates unchanged; no native rerun."
+}

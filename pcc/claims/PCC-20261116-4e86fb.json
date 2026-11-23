@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T02:23:50Z",
+ "id": "PCC-20261116-4e86fb",
+ "kind": "statement",
+ "producer": {
+  "commit": "4c59c865bcf8e3a49f9650e951c7549c33a656d4",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/publication-v1/ERRATA.md",
+    "sha256": "1d4160eed90bd7debac1fdc10e39e9f7524f4347e3102140be203193f52506b8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/publication-v1/SOURCES.sha256",
+    "sha256": "12a577d84a452b67f1892229e26256c7d66e2c2f525555c641a026185edcb795"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/publication-v1/source-check.log",
+    "sha256": "29aa64593b0fec1fdd85e543b2e03551732b80dc3c482c92ffe1e84435729ae1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/publication-v1/all-targets.log",
+    "sha256": "5aace9a94d01d9a5c348fc9d7e0f2c801511ed9c50565d322d5586f92dda936b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/publication-v1/clippy-pass.log",
+    "sha256": "765f1396d07f30f3a451cd3f9d9cad4e83c92c8e0aecf955ffc09061a6cf1e02"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/publication-v1/source-v4-post-checks.tar.gz",
+    "sha256": "79ef471f7bb3e99106daea31b07860a52bab0329ad23b10e0aff97e844f32237"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-torus-energy-software-correction",
+ "statement": "Explicit correction to PCC-20261116-b62ddf: its pinned source manifest and source-check log contain32 entries, comprising30 inputs inside the three standalone crate directories and two imported root source modules, not30 total. The earlier record remains unchanged. Current-source release all-target software checks pass four library, two identity-certificate and two scaling-model cases; formatting and strict Clippy pass. Test logs, source-v4 post-check archive and hashes are preserved. This is a producer software/byte-check record, not independent signed execution, measured performance or an actual attack-complexity result."
+}

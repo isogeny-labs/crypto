@@ -1,0 +1,20 @@
+{
+  "schema": "private.qualifier.mock-tests/v1",
+  "command": "timeout 60s bash -c 'ulimit -v 524288; python3 -B -m unittest -v test_private'",
+  "exit_code": 0,
+  "tests": 12,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "66f95bee2065a43605476b4d4c8452617e72429f99621132b3038712f35433bd",
+  "source_hashes": {
+    "supervise.py": "45898413c06dcd82727c617e0fb6a3b83781c109ff7f6f1858b64d30c4d83aec",
+    "private_contract.py": "5bc6f06e48c7912df1fe636bdc7e466ae420cdd46ede5a94de092c7ba56a9e80",
+    "gate.c": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc",
+    "head_contract.py": "832f72588d276f9b35c2dc8904e7cb34eabe8508722c6bbaca64ca8dea6ab749",
+    "test_private.py": "14b6c6bb9edadce8649f1ac919ae7663f63695dadf409bbf6c2ed66721f7eda2"
+  },
+  "gate_compiled": false,
+  "native_gate_controls_executed": false,
+  "runtime_invoked": false,
+  "pdf_pages": 1,
+  "pdf_visually_inspected": true
+}

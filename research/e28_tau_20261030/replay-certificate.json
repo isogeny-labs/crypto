@@ -1,0 +1,710 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-10-31",
+ "row": "E28 (GLV note §9.26/§9.30), the measured parts: Stage 0 (40 curves), Stage A (10 curves x {tau, tau-psi} arms on one exact-oracle stream, 3 registered solve-cost control calls and 64 walks per curve) and the supplementary control (30 calls on decomposable targets); evidence directory research/e28_tau_20261030. Stage A2 is a model and is not a run: it is recomputed in validator-report.json, not replayed",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E28: fresh builds from exports of the recorded binary commits in a fresh target directory, fresh runs, own comparison (validate_e28.rs compare)",
+ "recorded_binary": "789dc2ff62a8a6d9497a93542e3e59e07cf2c862 for Stage 0, Stage A and the registered control (experiments/33_tau_stage_a/binary_commit.txt); 0e4fccce1ad1baf7ace18a550483771f02315838 for the supplementary control (--stage c exists only from that commit, §9.30)",
+ "local_replay_note": "Replayed locally in the validator's 4-vCPU container, not on isolab-eks: the replay admits operation counts only; no wall time is compared or claimed (wall_ms and ms are listed, not compared).",
+ "build": {
+  "schema": "e2x-validator-build/v1",
+  "repository_head_at_start": "f23c53871 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+  "source": "git archive <commit> of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, crates/, tools/, isogeny_algos/, benches/, research/pencil_large_prime_20261029, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, and the 58 include_str!/include_bytes! targets of the library present at the commit (under docs/, research/, tests/). Every exported file was checked equal to its blob at the commit (git hash-object): 789dc2ff6 tree 4,591 files, 0e4fccce1 tree 4,594 files, 0 mismatches each.",
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+  "flags": "CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline",
+  "recorded_binary_commits": {
+   "stage_0_stage_a_registered_control": "789dc2ff62a8a6d9497a93542e3e59e07cf2c862",
+   "supplementary_control": "0e4fccce1ad1baf7ace18a550483771f02315838"
+  },
+  "builds": [
+   {
+    "commit": "789dc2ff62a8a6d9497a93542e3e59e07cf2c862",
+    "tree": "/dev/shm/val-tree-789",
+    "target_dir": "/dev/shm/val-target: a fresh, empty target directory on tmpfs",
+    "command": "cd /dev/shm/val-tree-789 && CARGO_TARGET_DIR=/dev/shm/val-target CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau",
+    "attempts": [
+     "2026-10-31T07:23:59Z-07:35:39Z: first attempt, `Finished release profile [optimized] target(s) in 11m 44s`"
+    ],
+    "binaries": [
+     {
+      "name": "e28_tau (789dc2ff6)",
+      "sha256": "8514e21fb31d316d2de796ac67f7b5ef435959583f4fc5f14ede61e99abab6f3",
+      "bytes": 5814904
+     }
+    ],
+    "extra": "After e28_tau was built and hashed, examples/val_e28_dump_params.rs (= research/e28_tau_20261030/replay/dump_params.rs) was added to the tree and built against the same library (1.5 s) only to dump the 40 curves' coefficients for replay/curve_check.rs; it is not a replay binary."
+   },
+   {
+    "commit": "0e4fccce1ad1baf7ace18a550483771f02315838",
+    "tree": "/dev/shm/val-tree-0e4 (re-exported after the restart, 2026-10-31T14:04Z; 4,594 files equal to their blobs)",
+    "target_dir": "/dev/shm/val-target-0e4: a fresh, empty target directory on tmpfs (the root filesystem has ~0.5 GB free); nothing reused from the producer's target/",
+    "command": "cd /dev/shm/val-tree-0e4 && CARGO_TARGET_DIR=/dev/shm/val-target-0e4 CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau --example e29_twist --example e30_audit --example quartic_pipeline_gls",
+    "attempts": [
+     "2026-10-31T07:36:44Z attempt 1: shared target directory with the 789dc2ff6 build. VOID: cargo hashes the workspace's own path package by its relative path and judged the 789dc2ff6 library fresh by mtime (the exported files carry the commits' older mtimes), so the 0e4fccce1 examples failed to compile against it (unresolved E29/E30 imports). No binary of this attempt was used.",
+     "2026-10-31T07:37:25Z attempt 2: fresh target directory /dev/shm/val-target-0e4; lost when the container restarted (~14:00Z wiped /dev/shm) before its binaries were used.",
+     "2026-10-31 attempt 3: 2026-10-31T14:17:06Z Finished `release` profile [optimized] target(s) in 12m 20s (started 2026-10-31T14:04:35Z); fresh target dir /dev/shm/val-target-0e4"
+    ],
+    "binaries": [
+     {
+      "name": "e28_tau (0e4fccce1)",
+      "sha256": "b0b188fb43874ff94027859998fe6fc6f4fe5fb03e9625426ae4bccc131a7843",
+      "bytes": 5855304
+     }
+    ]
+   }
+  ],
+  "run_command": "BIN_789=<e28_tau 789dc2ff6> research/e28_tau_20261030/replay/replay.sh (Stage 0 + Stage A, 2026-10-31T07:36:41Z-07:43:03Z), then BIN_789=... BIN_0E4=<e28_tau 0e4fccce1> replay.sh (supplementary control only; the rest is skipped as present)",
+  "environment": "Stage 0: RAYON_NUM_THREADS=4 exported by the script after Stage 0 (Stage 0 is serial). Stage A and the control: RAYON_NUM_THREADS=4 as in run_stage_a.sh (each 64-target batch is drawn sequentially and collected in order).",
+  "concurrency": "The Stage A replay shared the 4 vCPUs with the 0e4fccce1 build; only wall-clock fields (wall_ms, ms) are affected, and they are listed, not compared."
+ },
+ "build_record": {
+  "path": "replay/build.json",
+  "sha256": "6bc2e16dacf0afceb853062493eeae7a7f246d3a8c0c466f07285bae16c4450d"
+ },
+ "comparison": {
+  "path": "replay/replay_comparison.json",
+  "sha256": "ecaea01da21d198d10d5a0c805fe3a527e7e86c4ca2c6a4837e20e3fb36e17bc",
+  "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form; integers compared exactly as i128), strings and booleans exactly; wall_ms (Stage A) and ms (each solve-cost control call) are wall-clock and listed, not compared"
+ },
+ "runs_total": 12,
+ "runs_matched": 12,
+ "fields_compared": 8690,
+ "fields_identical": 8690,
+ "coverage": "full: every recorded run replayed (Stage 0's one run over 40 curves, all ten Stage A runs, the supplementary control's one run over 10 curves); no sampling",
+ "scalar_verification": "Every replayed walk (640) reports correct = true, which the binary sets only when the collision-recovered logarithm equals the planted d and [d]G = Q is checked on the curve, and recovers the same d as both index-calculus arms of its curve; every arm (20) reports solved and correct (Wiedemann logarithm checked against the planted d in the binary). Stage 0's psi, lambda, T and line checks are true on all 40 replayed curves. Every one of the 30 supplementary control calls is solved and returns exactly the oracle's decomposition set.",
+ "runs": [
+  {
+   "run": "stage0",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage0.json",
+    "sha256": "52e1fb5111d9fde3442935f6f847f1edfc6181ba87fcf7542907eeeeb6f6a4b5"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage0.json",
+    "sha256": "52e1fb5111d9fde3442935f6f847f1edfc6181ba87fcf7542907eeeeb6f6a4b5"
+   },
+   "fields_compared": 680,
+   "fields_identical": 680,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "curves": 40,
+    "all_psi_and_line_checks_true": true
+   }
+  },
+  {
+   "run": "stage_a_p53s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p53s1.json",
+    "sha256": "30033c65edc84d95ce3a40ddbcf464d0ebf469bbb16ac62f47b9048a2c8f48fb"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p53s1.json",
+    "sha256": "7a3894504575eb368dc3a474e925797021f4338657306925f2856f0b23c11919"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 48026,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 870.629773,
+     "replay": 890.7982880000001
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 697.067455,
+     "replay": 715.601494
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 810.737226,
+     "replay": 780.799754
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 3871.814552,
+     "replay": 3549.8672559999995
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p53s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p53s2.json",
+    "sha256": "91f4e8b4ecf2b6fca541949e4985795a02fabeb11cdb762c41f546f133a8a0bf"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p53s2.json",
+    "sha256": "2794b5811fb931d0926f42527ee2d1107dc087ef52841a248d12faf63ec64506"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 714931,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 2126.374859,
+     "replay": 1874.6142479999999
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 864.166392,
+     "replay": 823.090966
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 838.60062,
+     "replay": 780.9413910000001
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 4627.397665,
+     "replay": 4226.8113920000005
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p101s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p101s1.json",
+    "sha256": "c8a60cc1d6029510fab295516838cb2dfe85b5401a5ae85a23687bed815007cb"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p101s1.json",
+    "sha256": "5e2a0e42cad8ab2b50e2997515138b873bd3c5957f2849dc5f052350538b38cc"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 17446142,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 867.682061,
+     "replay": 755.240554
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 900.4847689999999,
+     "replay": 903.2542550000001
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 714.53494,
+     "replay": 681.72385
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 7251.6978930000005,
+     "replay": 6083.322338
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p101s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p101s2.json",
+    "sha256": "70d43f1bcb88cc5632a90b8b98b664fd84d09e69401b2f37d44573b896867898"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p101s2.json",
+    "sha256": "c7a426e4161f8e8fc00171efb777dc94187be44f174d1fa805e8792d62f0f197"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 13900721,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 801.214851,
+     "replay": 681.8283469999999
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 750.624779,
+     "replay": 702.255962
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 719.5520720000001,
+     "replay": 794.15037
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 6327.831181,
+     "replay": 5704.357996
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p149s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p149s1.json",
+    "sha256": "edab042b735f1bbe25031c0666dffcd06e6b62d34a4f21a40d092ad4014148aa"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p149s1.json",
+    "sha256": "ae92d65f5b6930a3bec472b8153a5f5014029596ec6e992e8a0183fd01ed0a4c"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 72634176,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 916.424923,
+     "replay": 834.554115
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 818.099462,
+     "replay": 694.2519
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 828.948398,
+     "replay": 702.3270590000001
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 19059.507651,
+     "replay": 18420.248303
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p149s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p149s2.json",
+    "sha256": "4d588d77a6f5bbb30a98894b63d887851d1029f0e9880f557c839dbc06ef4340"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p149s2.json",
+    "sha256": "a1c3934e670750c68a892c4998f26c285dbb6febc22c5cec89b837f2c971ed2f"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 40183489,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 862.697764,
+     "replay": 763.8747340000001
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 921.914042,
+     "replay": 907.571142
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 889.0017449999999,
+     "replay": 883.5903969999999
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 13831.445676,
+     "replay": 13870.918216
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p197s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p197s1.json",
+    "sha256": "8238b908e0602355fad084574a0f6624f77e8d4da344e455beb79a3b94db6f1b"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p197s1.json",
+    "sha256": "03b61733cb9b5e8216900f1589a80d0a7ff48a8bf6bbcb8c992463983f64976d"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 370933638,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 710.067504,
+     "replay": 1259.835425
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 677.867824,
+     "replay": 922.997827
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 816.163914,
+     "replay": 1326.692786
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 48495.386747,
+     "replay": 58591.313037
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p197s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p197s2.json",
+    "sha256": "6964caa50a20383ff9cf176a2064764ea1a6224cac56e1275b455e3c8effd642"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p197s2.json",
+    "sha256": "7e1c1ee866a06fed5cb6c8e38ad2d3638b9f0bb2c10fef2e8f9b547ebea6b9ea"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 189646397,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 783.654313,
+     "replay": 878.7068139999999
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 804.8046840000001,
+     "replay": 970.172334
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 844.0574819999999,
+     "replay": 1183.073629
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 37187.715621,
+     "replay": 43826.251284
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p269s1",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p269s1.json",
+    "sha256": "30bdf423eec2f3219fa6a7f10a4722de4f9fa7741950838a41a0815d350dbee3"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p269s1.json",
+    "sha256": "df8a484af101e025885989dc07cd1851b7ef715b8705a68eda3c83af0d63be02"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 747702865,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 719.2534619999999,
+     "replay": 994.973117
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 633.594287,
+     "replay": 913.505865
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 860.467353,
+     "replay": 1268.077192
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 66426.400092,
+     "replay": 87147.714348
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p269s2",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/stage_a_p269s2.json",
+    "sha256": "2f135549359478c20392033233caa7e15e46be29cddf100451aa94eda6a6e751"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/stage_a_p269s2.json",
+    "sha256": "6824fa84b9faf3740d9e574cad7901f761204ee3502481fb3e0693cbbeb4fd35"
+   },
+   "fields_compared": 777,
+   "fields_identical": 777,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "log": 1185793031,
+    "tau_solved_correct": true,
+    "tau_psi_solved_correct": true,
+    "walks_correct_and_equal_to_log": 64,
+    "walks": 64
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].control_calls[0].ms",
+     "committed": 734.408208,
+     "replay": 1272.463194
+    },
+    {
+     "path": "$[0].control_calls[1].ms",
+     "committed": 728.2582629999999,
+     "replay": 1537.713103
+    },
+    {
+     "path": "$[0].control_calls[2].ms",
+     "committed": 1896.393921,
+     "replay": 2375.813038
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 110324.170603,
+     "replay": 139617.43980599998
+    }
+   ]
+  },
+  {
+   "run": "control_decomposed",
+   "committed": {
+    "path": "experiments/33_tau_stage_a/control_decomposed.json",
+    "sha256": "e99734142f86c421452a3f60bc284ed4620f48477eca470d811eca1ce8896e39"
+   },
+   "replay_output": {
+    "path": "research/e28_tau_20261030/replay/control_decomposed.json",
+    "sha256": "6811a5dae8cbbe3b2fcdf43406801097d6e19c5a7ddf6c664036ad4fe3699c5a"
+   },
+   "fields_compared": 240,
+   "fields_identical": 240,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "calls": 30,
+    "all_solved_and_equal_to_oracle": true
+   },
+   "timing_not_compared": [
+    {
+     "path": "$[0].calls[0].ms",
+     "committed": 773.593265,
+     "replay": 734.065158
+    },
+    {
+     "path": "$[0].calls[1].ms",
+     "committed": 821.111124,
+     "replay": 845.160405
+    },
+    {
+     "path": "$[0].calls[2].ms",
+     "committed": 815.216112,
+     "replay": 690.497807
+    },
+    {
+     "path": "$[1].calls[0].ms",
+     "committed": 796.8679950000001,
+     "replay": 620.812466
+    },
+    {
+     "path": "$[1].calls[1].ms",
+     "committed": 659.949805,
+     "replay": 665.7813209999999
+    },
+    {
+     "path": "$[1].calls[2].ms",
+     "committed": 671.70381,
+     "replay": 789.357315
+    },
+    {
+     "path": "$[2].calls[0].ms",
+     "committed": 726.602707,
+     "replay": 871.406982
+    },
+    {
+     "path": "$[2].calls[1].ms",
+     "committed": 701.471218,
+     "replay": 839.958859
+    },
+    {
+     "path": "$[2].calls[2].ms",
+     "committed": 896.556765,
+     "replay": 942.999546
+    },
+    {
+     "path": "$[3].calls[0].ms",
+     "committed": 835.2769890000001,
+     "replay": 784.4189289999999
+    },
+    {
+     "path": "$[3].calls[1].ms",
+     "committed": 742.799121,
+     "replay": 673.005391
+    },
+    {
+     "path": "$[3].calls[2].ms",
+     "committed": 842.8428369999999,
+     "replay": 683.290516
+    },
+    {
+     "path": "$[4].calls[0].ms",
+     "committed": 773.555077,
+     "replay": 719.826648
+    },
+    {
+     "path": "$[4].calls[1].ms",
+     "committed": 828.497582,
+     "replay": 752.909799
+    },
+    {
+     "path": "$[4].calls[2].ms",
+     "committed": 754.979631,
+     "replay": 660.108287
+    },
+    {
+     "path": "$[5].calls[0].ms",
+     "committed": 903.5432460000001,
+     "replay": 728.9970089999999
+    },
+    {
+     "path": "$[5].calls[1].ms",
+     "committed": 812.4913230000001,
+     "replay": 552.975662
+    },
+    {
+     "path": "$[5].calls[2].ms",
+     "committed": 672.032346,
+     "replay": 579.585291
+    },
+    {
+     "path": "$[6].calls[0].ms",
+     "committed": 825.843455,
+     "replay": 838.367982
+    },
+    {
+     "path": "$[6].calls[1].ms",
+     "committed": 866.3876270000001,
+     "replay": 784.6921500000001
+    },
+    {
+     "path": "$[6].calls[2].ms",
+     "committed": 821.4149520000001,
+     "replay": 869.939464
+    },
+    {
+     "path": "$[7].calls[0].ms",
+     "committed": 1714.090398,
+     "replay": 2052.96681
+    },
+    {
+     "path": "$[7].calls[1].ms",
+     "committed": 848.392594,
+     "replay": 747.726997
+    },
+    {
+     "path": "$[7].calls[2].ms",
+     "committed": 628.826734,
+     "replay": 874.727224
+    },
+    {
+     "path": "$[8].calls[0].ms",
+     "committed": 680.267563,
+     "replay": 828.24775
+    },
+    {
+     "path": "$[8].calls[1].ms",
+     "committed": 667.8259330000001,
+     "replay": 922.3225170000001
+    },
+    {
+     "path": "$[8].calls[2].ms",
+     "committed": 705.393582,
+     "replay": 735.154318
+    },
+    {
+     "path": "$[9].calls[0].ms",
+     "committed": 762.500992,
+     "replay": 818.782778
+    },
+    {
+     "path": "$[9].calls[1].ms",
+     "committed": 791.921451,
+     "replay": 873.270388
+    },
+    {
+     "path": "$[9].calls[2].ms",
+     "committed": 688.124861,
+     "replay": 820.061382
+    }
+   ]
+  }
+ ]
+}

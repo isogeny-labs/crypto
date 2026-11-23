@@ -1,0 +1,163 @@
+{
+ "correctness": {
+  "executions": 792,
+  "failed_or_unverified": 0
+ },
+ "choice": {
+  "k": 4,
+  "mu": 0.85,
+  "key": "ic:4:0.85",
+  "score": 0.8850281739530139,
+  "configs_at_or_below_default": 12,
+  "n_configs": 12,
+  "mu_on_grid_edge": false,
+  "rule": "argmin over the 21 grid keys of the geometric mean over the 12 tune configurations of ms_arm(key) / ms_arm(k=4, mu=1.0); ties by key name"
+ },
+ "cells": {
+  "1024": {
+   "instances": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "chosen_over_default": {
+    "median": 0.899299429680511,
+    "per_instance": [
+     0.9051774287376381,
+     0.893421430623384,
+     0.8632790567097137,
+     0.9949732956330505
+    ]
+   },
+   "chosen_over_best_rho": {
+    "median": 1.1512528116336245,
+    "per_instance": [
+     1.1428571428571428,
+     1.0993283845881938,
+     1.1992979719188768,
+     1.1596484804101062
+    ]
+   },
+   "default_over_best_rho": {
+    "median": 1.2465240848579588,
+    "per_instance": [
+     1.2625780389276533,
+     1.2304701307882646,
+     1.389235569422777,
+     1.1655071402416697
+    ]
+   },
+   "best_rho_key": {
+    "4": "rho2xksp:0.05",
+    "5": "rhodpup:0.0:1",
+    "6": "rho2xksp:0.1",
+    "7": "rhodpup:0.0:-1"
+   },
+   "lower_4_of_4": true,
+   "not_lower_4_of_4": false,
+   "chosen_ahead_of_rho_4_of_4": false,
+   "chosen_behind_rho_4_of_4": true
+  },
+  "4096": {
+   "instances": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "chosen_over_default": {
+    "median": 0.8908119588900093,
+    "per_instance": [
+     0.912553097993262,
+     0.9084671532846714,
+     0.8731567644953472,
+     0.868421052631579
+    ]
+   },
+   "chosen_over_best_rho": {
+    "median": 1.0827410916902322,
+    "per_instance": [
+     1.1099233921254232,
+     1.0858488919909264,
+     1.0735785953177257,
+     1.0796332913895381
+    ]
+   },
+   "default_over_best_rho": {
+    "median": 1.2229103403147312,
+    "per_instance": [
+     1.2162836272937825,
+     1.1952538823939975,
+     1.2295370533356802,
+     1.2432140931152258
+    ]
+   },
+   "best_rho_key": {
+    "4": "rhodpup:0.0:0",
+    "5": "rhodpup:0.0:0",
+    "6": "rhodpup:0.0:0",
+    "7": "rhodpup:0.0:0"
+   },
+   "lower_4_of_4": true,
+   "not_lower_4_of_4": false,
+   "chosen_ahead_of_rho_4_of_4": false,
+   "chosen_behind_rho_4_of_4": true
+  },
+  "16384": {
+   "instances": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "chosen_over_default": {
+    "median": 0.9166008035214959,
+    "per_instance": [
+     0.8628253050285634,
+     0.9363877040741285,
+     0.8968139029688631,
+     0.9586191635317547
+    ]
+   },
+   "chosen_over_best_rho": {
+    "median": 1.0639609111439552,
+    "per_instance": [
+     1.0568417415342088,
+     1.0710800807537013,
+     1.0560197817189632,
+     1.111434191396562
+    ]
+   },
+   "default_over_best_rho": {
+    "median": 1.1684677441372149,
+    "per_instance": [
+     1.2248617829993091,
+     1.143842530282638,
+     1.1775238744884038,
+     1.159411613786026
+    ]
+   },
+   "best_rho_key": {
+    "4": "rhodpup:0.0:0",
+    "5": "rhodpup:0.0:1",
+    "6": "rhodpu:0.0:-1",
+    "7": "rhodpup:0.0:0"
+   },
+   "lower_4_of_4": true,
+   "not_lower_4_of_4": false,
+   "chosen_ahead_of_rho_4_of_4": false,
+   "chosen_behind_rho_4_of_4": true
+  }
+ },
+ "gates": {
+  "correctness": "pass",
+  "primary": "lower",
+  "distance_to_rho": {
+   "1024": 1.1512528116336245,
+   "4096": 1.0827410916902322,
+   "16384": 1.0639609111439552
+  },
+  "ic_ahead_of_rho_cells": 0
+ }
+}

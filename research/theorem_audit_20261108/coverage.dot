@@ -1,0 +1,11 @@
+digraph audit {
+ graph [rankdir=LR, bgcolor="white", fontname="DejaVu Sans", label="Fourteen-target audit: proof components and open obligations", labelloc=t];
+ node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11];
+ request [label="Original request\nAll 14 items + Lean", fillcolor="#e7eef7"];
+ source [label="Exact source hypotheses\nBK excludes r | q-1\nDiem changes projection\nNIST screens special curves", fillcolor="#eef4f9"];
+ lean [label="Local Lean components\nS3 existence equivalence\nFrobenius / branch / subgroup lemmas\nKnown degree-3 control", fillcolor="#e2f1e5"];
+ tests [label="Development checks\nActual Rust routines: 3 tests\nSeparate C++ fixture\nTransitive axiom gate", fillcolor="#e2f1e5"];
+ open [label="Remaining requested work\nCensuses, pairings, Jacobians\nmsolve runs, Smart / rho tests\nFull structural proof bridges", fillcolor="#fff0d7"];
+ gates [label="Concrete execution dependencies\nCheckpoint upload unavailable\nNo second selected host\nIndependent signed review pending", fillcolor="#f8e2e2"];
+ request->source;source->lean;lean->tests;source->open;gates->open [style=dashed,label="blocks experiments / replay"];
+}

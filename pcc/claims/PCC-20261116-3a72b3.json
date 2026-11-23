@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T17:51:28Z",
+ "id": "PCC-20261116-3a72b3",
+ "kind": "execution",
+ "producer": {
+  "commit": "efed5397ec6d9f9ed94a28259fd4a69b04d34367",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-full-library-diagnostics/receipt.json",
+    "sha256": "818bc4e7749945070c5b2a95c252ed6e94ff2804b442e3bc2e58163c288c6de3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The pre-admission-fix full Rust library diagnostic completed with6415 passed,16 failed and135 ignored; the earlier two-thread attempt is censored, isolated S3 failure reproduces and isolated deadline control passes. Linux-specific validation remains pending. These are unsigned software controls, not scientific measurements."
+}

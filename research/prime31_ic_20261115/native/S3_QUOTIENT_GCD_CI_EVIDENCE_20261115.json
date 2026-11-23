@@ -1,0 +1,92 @@
+{
+  "schema": "prime31-experimental-s3-quotient-gcd-ci/v1",
+  "standing": "[pcc:unverified]",
+  "record_date": "2026-11-15",
+  "source_commit": "afdc9e50699f2dad882dbe354238741528103910",
+  "source_branch": "research/norm-branch-rank-pilot-20261115",
+  "workflow": "Prime31 algebraic IC development tests",
+  "workflow_run_id": 43741710811,
+  "workflow_job_id": 132896091678,
+  "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/43741710811",
+  "workflow_conclusion": "success",
+  "tests": {
+    "prime31_s3_quotient_gcd": "1 passed, 0 failed",
+    "rust_release_example": "PASS",
+    "broader_development_job": "PASS"
+  },
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "exact_quotient_algebraic_extraction": {
+    "kind": "single target-dependent S3 relation-oracle stage",
+    "uses_source_ordinates_during_polynomial_discovery": false,
+    "uses_known_point_group_sum_during_polynomial_discovery": false,
+    "post_candidate_group_verification": true,
+    "B31": {
+      "positive_1": {
+        "gcd_degree": 2,
+        "candidate_pairs": 2,
+        "signed_rows": 1
+      },
+      "positive_diagonal": {
+        "gcd_degree": 1,
+        "candidate_pairs": 1,
+        "signed_rows": 1
+      },
+      "positive_2": {
+        "gcd_degree": 2,
+        "candidate_pairs": 2,
+        "signed_rows": 1
+      },
+      "public_scalar_fixture_misses": 4
+    }
+  },
+  "same_host_unpaired_single_run_stage_timing": {
+    "B31": {
+      "positive": {
+        "gcd_stage_ns": 485900,
+        "gcd_rows": 1,
+        "old_F4_stage_ns": 3079562,
+        "old_F4_status": "undetermined_f4",
+        "old_F4_partial_muladds": 252732
+      },
+      "public": {
+        "gcd_stage_ns": 446576,
+        "gcd_rows": 0,
+        "old_F4_stage_ns": 2425976,
+        "old_F4_status": "undetermined_f4",
+        "old_F4_partial_muladds": 252732
+      }
+    },
+    "B135": {
+      "positive": {
+        "gcd_stage_ns": 29476025,
+        "signed_rows": 1,
+        "candidate_pairs": 2,
+        "gcd_degree": 2
+      },
+      "public": {
+        "gcd_stage_ns": 28549258,
+        "signed_rows": 0,
+        "candidate_pairs": 0,
+        "gcd_degree": 0
+      }
+    }
+  },
+  "limits": [
+    "single unpaired development run (not benchmark CI, no statistics/variance calibration)",
+    "F4 stopped undetermined at 15000 dense entries and cannot be ranked as a completed competitor",
+    "fixed-base construction excluded from stage intervals",
+    "no fresh natural-positive rank accumulation or complete prime31 scalar recovery",
+    "no full cold index-calculus cost or rho/BSGS comparator",
+    "producer-local CI only, no independent PCC certification",
+    "root release-lib suite not executed at this head"
+  ]
+}

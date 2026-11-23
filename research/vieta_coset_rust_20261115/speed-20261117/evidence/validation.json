@@ -1,0 +1,44 @@
+{
+  "schema": "vieta-speed-validation/v1",
+  "created_utc": "2026-11-17T06:04:29.492760+00:00",
+  "measured_source": "27bc4bf511cda40f904324901895a246f40a9c75",
+  "matrix_calls": 504,
+  "calibration_calls": 72,
+  "successful": 504,
+  "failed": 0,
+  "primary_replay": {
+    "checked": 504,
+    "distinct_inputs": 84,
+    "method": "separate-process BigUint scalar complete-set replay; producer-owned, no independent signed standing",
+    "preserved_failed_rows": 0,
+    "schema": "vieta-speed-replay/v1"
+  },
+  "calibration_replay": {
+    "checked": 72,
+    "distinct_inputs": 12,
+    "method": "separate-process BigUint scalar complete-set replay; producer-owned, no independent signed standing",
+    "preserved_failed_rows": 0,
+    "schema": "vieta-speed-replay/v1"
+  },
+  "manifest_entries_pass": 10,
+  "count_controls_groups_pass": 12,
+  "local_positive_clock_controls_groups_pass": 12,
+  "clock_admission_L2": false,
+  "canonical_exports": {
+    "main": "FAIL360 actual-vs-registered seed mismatches only",
+    "preflight": "FAIL60 actual-vs-registered seed mismatches only",
+    "strict_protocol_qualification": false
+  },
+  "published_config_provenance": "PASS26 file hashes/576 cell scopes/96 input scopes; does not replace failed canonical checks",
+  "native_qualified_tests": "PASS before timing; unchanged measured source/binary",
+  "metadata_final_fmt_clippy": "PASS",
+  "focused_lean_gate": "PASS21/0trusted, arbitrary tower NF instance unfinished",
+  "independent_signed_standing": false,
+  "pdf_pages_visually_reviewed": {
+    "main": 4,
+    "calibration": 2
+  },
+  "local_s3_operation": false,
+  "full_root_suite_pass_claim": false,
+  "scope": "Descriptive local/count observations, censored/unverified. See REGISTRATION_ERRATA.md."
+}

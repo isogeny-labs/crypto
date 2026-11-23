@@ -1,0 +1,13 @@
+# Canonical word-array cancellation traversal
+
+T-1192; 2026-10-31. Producer proof packet; independent source-fidelity review pending.
+
+The exact word update wordSub(p,r,(c*x)%p) decodes to r-c*x in ZMod(p) and returns a canonical word when inputs are canonical and 0<p<2^31. An array update preserves size and canonicality, changes the selected decoded coefficient by that product, and leaves other coefficients unchanged. Over an arbitrary finite event list, each coefficient decodes to its initial value minus the sum of contributions targeting its index. Repeated indices are included in the invariant. A separate arithmetic lemma bounds shifted source index j+k when j+m<=length and k<m.
+
+The source correspondence is scoped to the native prime-field branch (extension degree one, odd modulus) with diagnostic multiplication tables disabled. Field.sub delegates to add and neg, matching the existing wordSub expression; Field.mul selects the modular product in this branch. Instrumentation counters are not modeled. The algebraic word lemmas themselves need the positive modulus and size bound, not primality; any downstream field theorem retains its own prime premise.
+
+Four main declarations and eight fixed controls cover modular product wrap, subtraction wrap, single and full updates, repeated index, empty trace, zero multiplier and an excluded index overrun. At modulus17, starting array[1,2,3] and multiplier2, operand sequence[(0,1),(1,2),(2,1)] yields[16,15,1]. Two subtractions of2*4 at index1 yield[1,3,3]. These are kernel-evaluated controls, not performance measurements.
+
+Events currently contain a bounded index and a supplied operand. The next connection must generate those events from the native divisor slice, prove that each source coefficient is used at j+k, and identify the per-index contribution sum with multiplication by a shifted polynomial. Native trimming and empty-vector decoding then connect this traversal to the preceding remainder-trace soundness theorem. This packet does not claim complete pdiv correctness, loop termination or compiled-code equivalence.
+
+Sources: exact three_leads.rs field operations and pdiv excerpts; existing WordClassifier/WordAdd11 subtraction, UInt64Residue multiplication and coefficient-array traversal proofs. No new compiled dependencies. Three final native checks passed with unchanged input bindings. The 12 named readbacks use only propext and Quot.sound (one control is axiom-free). Outcomes are in status.json. First compilation required qualification of the ambiguous read identifier and an explicit empty-list proof; failed attempt retained. Existing compiled upstream dependencies remain within the trust boundary. No scientific execution or cost ratio.

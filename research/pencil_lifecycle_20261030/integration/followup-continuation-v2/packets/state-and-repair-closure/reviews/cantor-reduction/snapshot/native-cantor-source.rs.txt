@@ -1,0 +1,98 @@
+900: fn pegcd(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly, Poly) {
+901:     let (mut r0, mut r1, mut s0, mut s1, mut t0, mut t1) = (
+902:         geometry_events::copied(a),
+903:         geometry_events::copied(b),
+904:         geometry_events::initialized(vec![1]),
+905:         vec![],
+906:         vec![],
+907:         geometry_events::initialized(vec![1]),
+908:     );
+909:     while !r1.is_empty() {
+910:         let (q, r) = pdiv(f, &r0, &r1);
+911:         r0 = r1;
+912:         r1 = r;
+913:         let s = psub(f, &s0, &pmul(f, &q, &s1));
+914:         s0 = s1;
+915:         s1 = s;
+916:         let t = psub(f, &t0, &pmul(f, &q, &t1));
+917:         t0 = t1;
+918:         t1 = t;
+919:     }
+920:     let inv = f.inv(*geometry_events::last(&r0).unwrap());
+921:     (
+922:         pscale(f, &r0, inv),
+923:         pscale(f, &s0, inv),
+924:         pscale(f, &t0, inv),
+925:     )
+926: }
+990:     fn reduce(&self, mut u: Poly, mut v: Poly) -> Divisor {
+991:         let f = &self.f;
+992:         u = pmonic(f, &u);
+993:         v = prem(f, &v, &u);
+994:         while u.len() > 3 {
+995:             let new_u = pmonic(
+996:                 f,
+997:                 &pexact(f, &psub(f, &self.polynomial, &pmul(f, &v, &v)), &u),
+998:             );
+999:             v = prem(f, &pneg(f, &v), &new_u);
+1000:             u = new_u;
+1001:         }
+1002:         Divisor::from(&u, &v)
+1003:     }
+1004:     pub fn add(&self, a: Divisor, b: Divisor) -> Divisor {
+1005:         self.f.count(|c| c.jac_adds += 1);
+1006:         if a.degree == 0 {
+1007:             return b;
+1008:         }
+1009:         if b.degree == 0 {
+1010:             return a;
+1011:         }
+1012:         let f = &self.f;
+1013:         let (ua, ub, va, vb) = (a.up(), b.up(), a.vp(), b.vp());
+1014:         if a.degree == 2 && b.degree == 2 {
+1015:             let aa = f.sub(a.u[1], b.u[1]);
+1016:             let bb = f.sub(a.u[0], b.u[0]);
+1017:             let cc = f.sub(b.v[1], a.v[1]);
+1018:             let dd = f.sub(b.v[0], a.v[0]);
+1019:             let norm = f.add(
+1020:                 f.sub(f.sq(bb), f.mul(f.mul(aa, bb), b.u[1])),
+1021:                 f.mul(f.sq(aa), b.u[0]),
+1022:             );
+1023:             let s1 = f.sub(f.mul(cc, bb), f.mul(aa, dd));
+1024:             if norm != 0 && s1 != 0 {
+1025:                 // CRT composition and reduction, with the two variable
+1026:                 // denominators batched into one inversion. Exceptional inputs
+1027:                 // fall through to complete Cantor addition below.
+1028:                 let both = f.inv(f.mul(norm, s1));
+1029:                 let ni = f.mul(both, s1);
+1030:                 let si = f.mul(both, norm);
+1031:                 let s0 = f.add(
+1032:                     f.mul(dd, f.sub(bb, f.mul(aa, b.u[1]))),
+1033:                     f.mul(f.mul(aa, cc), b.u[0]),
+1034:                 );
+1035:                 let slope = geometry_events::initialized(vec![f.mul(s0, ni), f.mul(s1, ni)]);
+1036:                 let v = padd(f, &va, &pmul(f, &slope, &ua));
+1037:                 let u = pmul(f, &ua, &ub);
+1038:                 let quotient = pexact(f, &psub(f, &self.polynomial, &pmul(f, &v, &v)), &u);
+1039:                 let inverse_lead = f.neg(f.sq(f.mul(norm, si)));
+1040:                 let out_u = pscale(f, &quotient, inverse_lead);
+1041:                 assert!(geometry_events::last_is(&out_u, 1));
+1042:                 return Divisor::from(&out_u, &prem(f, &pneg(f, &v), &out_u));
+1043:             }
+1044:         }
+1045:         let (d1, e1, e2) = pegcd(f, &ua, &ub);
+1046:         let (d, c1, c2) = pegcd(f, &d1, &padd(f, &va, &vb));
+1047:         let s1 = pmul(f, &c1, &e1);
+1048:         let s2 = pmul(f, &c1, &e2);
+1049:         let u = pexact(f, &pmul(f, &ua, &ub), &pmul(f, &d, &d));
+1050:         let vnum = padd(
+1051:             f,
+1052:             &padd(
+1053:                 f,
+1054:                 &pmul(f, &pmul(f, &s1, &ua), &vb),
+1055:                 &pmul(f, &pmul(f, &s2, &ub), &va),
+1056:             ),
+1057:             &pmul(f, &c2, &padd(f, &pmul(f, &va, &vb), &self.polynomial)),
+1058:         );
+1059:         let v = prem(f, &pexact(f, &vnum, &d), &u);
+1060:         self.reduce(u, v)

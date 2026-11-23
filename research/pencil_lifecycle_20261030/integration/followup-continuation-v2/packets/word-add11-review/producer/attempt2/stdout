@@ -1,0 +1,24 @@
+/var/tmp/pencil-add11-word-composition-20261031-v1/WordAdd11.lean:111:19: error: Type mismatch: After simplification, term
+  hm.right
+ has type
+  @Eq (ZMod p.toNat) (↑(wordAdd p (word p a) (word p b)).toNat) (field p a + field p b)
+but is expected to have type
+  @Eq (ZMod p.toNat) (↑(word p (a.add b)).toNat) (field p a + field p b)
+/var/tmp/pencil-add11-word-composition-20261031-v1/WordAdd11.lean:116:19: error: Type mismatch: After simplification, term
+  hm.right
+ has type
+  @Eq (ZMod p.toNat) (↑(wordSub p (word p a) (word p b)).toNat) (field p a - field p b)
+but is expected to have type
+  @Eq (ZMod p.toNat) (↑(word p (a.sub b)).toNat) (field p a - field p b)
+/var/tmp/pencil-add11-word-composition-20261031-v1/WordAdd11.lean:120:19: error: Type mismatch: After simplification, term
+  hm.right
+ has type
+  @Eq (ZMod p.toNat) (↑(wordNeg p (word p a)).toNat) (-field p a)
+but is expected to have type
+  @Eq (ZMod p.toNat) (↑(word p a.neg).toNat) (-field p a)
+/var/tmp/pencil-add11-word-composition-20261031-v1/WordAdd11.lean:124:19: error: Type mismatch: After simplification, term
+  hm.right
+ has type
+  @Eq (ZMod p.toNat) (↑(wordPow5 p (word p a)).toNat) (field p a ^ 5)
+but is expected to have type
+  @Eq (ZMod p.toNat) (↑(word p a.pow5).toNat) (field p a ^ 5)

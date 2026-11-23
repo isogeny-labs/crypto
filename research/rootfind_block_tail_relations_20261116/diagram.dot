@@ -1,0 +1,17 @@
+digraph block_tail {
+  rankdir=LR;
+  graph [fontname="Helvetica Neue", bgcolor="white", pad="0.2"];
+  node [fontname="Helvetica Neue", shape=box, style="rounded,filled", fillcolor="#eef5f8", color="#456274"];
+  edge [color="#456274"];
+  residual [label="R = Q + [a]G"];
+  block [label="Compute complete block\n1 torsion, then up to 8 points"];
+  probe [label="Probe in order\nfirst valid triple"];
+  first [label="A: return first row", fillcolor="#dcebf1"];
+  tail [label="B: probe block tail\nreturn its valid rows", fillcolor="#dcefe5"];
+  all [label="C: scan all blocks\nsecondary ceiling", fillcolor="#f5e9db"];
+  rank [label="Reduce rows mod r\ncheck scalar 641"];
+  residual -> block -> probe;
+  probe -> first -> rank;
+  probe -> tail -> rank;
+  probe -> all -> rank;
+}

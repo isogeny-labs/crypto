@@ -1,0 +1,14 @@
+{
+  "action": "build target/release/ecbench at that exact commit and run ecbench plan on the specs before freezing; main 3b0840b6f2 did not compile (retained_chain_study.rs missed the new PrimeInstance.representation field) and no PR check caught it",
+  "created": "2026-11-17T15:36:26Z",
+  "evidence": [
+    "src/bin/ecbench/retained_chain_study.rs"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "binding an ecbench instrument commit for a frozen protocol or queue registration",
+  "why": ""
+}

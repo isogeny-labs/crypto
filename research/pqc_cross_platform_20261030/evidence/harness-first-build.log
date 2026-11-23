@@ -1,0 +1,42 @@
+    Updating crates.io index
+     Locking 22 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+      Adding rand v0.8.8 (available: v0.10.3)
+ Downloading crates ...
+  Downloaded zeroize v1.9.1
+  Downloaded unicode-ident v1.0.27
+  Downloaded zerocopy v0.8.63
+  Downloaded libc v0.2.191
+   Compiling libc v0.2.191
+   Compiling proc-macro2 v1.0.107
+   Compiling zerocopy v0.8.63
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling syn v2.0.119
+   Compiling num-integer v0.1.47
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling hex v0.4.3
+   Compiling subtle v2.6.1
+   Compiling zeroize_derive v1.5.0
+   Compiling zeroize v1.9.1
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling num-bigint v0.4.8
+   Compiling pqc-portable-checks v0.1.0 (/workspace/crypto/verification/pqc-portable)
+error[E0583]: file not found for module `avx2`
+   --> ../../src/pqc/fast/ml_kem.rs:340:1
+    |
+340 | mod avx2;
+    | ^^^^^^^^^
+    |
+    = help: to create the module `avx2`, create file "../../src/pqc/fast/avx2.rs" or "../../src/pqc/fast/avx2/mod.rs"
+    = note: if there is a `mod avx2` elsewhere in the crate already, import it with `use crate::...` instead
+
+For more information about this error, try `rustc --explain E0583`.
+error: could not compile `pqc-portable-checks` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,79 @@
+{
+  "schema": "crypto.full-library-diagnostic/v1",
+  "code_commit": "053141fbd815de1c48ce706901be01fbf8cd129c",
+  "before_binary_sha256": "52697856dec1d5bf2cb389c6a41279f2f8210cf57f379ce2380031dfd517df18",
+  "before_koblitz_source_sha256": "6f0d8af209a59b790cd0c371ae37e60b89a2c123471daffcf9fafe8624b3d952",
+  "platform": "aarch64-apple-darwin; rustc1.99.1",
+  "censored_attempt": {
+    "test_threads": 2,
+    "bound_seconds": 900,
+    "elapsed_seconds": 900.04,
+    "exit_code": -15,
+    "status": "censored_timeout; not a pass"
+  },
+  "completed_attempt": {
+    "test_threads": 8,
+    "passed": 6415,
+    "failed": 16,
+    "ignored": 135,
+    "elapsed_seconds": 625.48,
+    "status": "FAILED",
+    "failures": [
+      "cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve",
+      "ml_dataset::report::tests::checked_actual_worker_seal_verify_and_report_use_mock_counters",
+      "ml_dataset::report::tests::checked_corrupt_partial_is_unpromoted_and_sealed_corruption_is_rejected",
+      "ml_dataset::report::tests::checked_registryless_start_only_survives_seal_verify_and_report",
+      "ml_dataset::report::tests::empty_source_is_partial_and_oversized_json_is_rejected_before_parsing",
+      "ml_dataset::report::tests::partial_report_preserves_claims_pmu_and_attempts_without_fabricating_rows",
+      "ml_dataset::report::tests::symlinks_and_overlapping_destinations_fail_without_creating_source_files",
+      "ml_dataset::report::tests::tampering_and_snapshot_changes_never_replace_report_outputs",
+      "ml_dataset::restore::tests::cross_host_roundtrip_replays_solved_cells_and_preserves_binding",
+      "ml_dataset::restore::tests::oversized_remote_object_is_rejected_before_download_and_existing_hash_audit_remains",
+      "ml_dataset::restore::tests::refuses_symlink_output_and_preserves_incomplete_local_attempt",
+      "ml_dataset::restore::tests::rejects_receipt_substitution_disallowed_remote_and_different_run_caps",
+      "ml_dataset::restore::tests::remote_corruption_retains_attempt_without_activating_manifest_then_retry_succeeds",
+      "ml_dataset::solvers::tests::wide_frozen_m13_m15_boundary_retains_terminal_on_both_twists",
+      "ml_dataset::tests::wide_prime_f4_central_replay_and_rehashed_tamper_both_twists",
+      "ml_dataset::tests::wide_prime_m3_central_rehashed_tamper_and_censoring"
+    ]
+  },
+  "diagnostic_categories": {
+    "Linux_only_process_provenance": {
+      "count": 14,
+      "validation_on_Linux": "pending; no tests changed or skipped"
+    },
+    "concurrent_solver_deadline": {
+      "count": 1,
+      "same_binary_isolated_result": "PASS in5.37seconds; consistent with resource contention, not proof of a universal timing bound"
+    },
+    "chained_S3_preflight": {
+      "count": 1,
+      "same_binary_isolated_result": "FAIL; default zero caps consume16trials, expected0; original assertion preserved",
+      "source_history": "4895f909a1388ad5c8f279dc1a02070071f9358f introduced an outer !5..6 condition which bypasses hard limits for m5/m6"
+    }
+  },
+  "scientific_measurement": false,
+  "original_artifacts_changed": false,
+  "logs": {
+    "ecbench-full-lib-compatibility-20261116.log": {
+      "raw_sha256": "937e6bb7fd7dcf5562d5f837e78f481f487af20a7e332c16566a2099f3375142",
+      "raw_bytes": 284191,
+      "gzip_sha256": "b97cda212ef29167a8257f47d1ea5e7b970e73787bd715b330ceb6bf6e6f4770"
+    },
+    "ecbench-full-lib-parallel-20261116.log": {
+      "raw_sha256": "8b957a9f7298ba964e636d47c7df4b96eee458c4a7cdbcb9544952197a68a2b1",
+      "raw_bytes": 604435,
+      "gzip_sha256": "08b8e9248b330eb6f1f0301b984a6e673500c74476f27e2481294e2fc5f9e852"
+    },
+    "ecbench-full-lib-isolated-failure-20261116.log": {
+      "raw_sha256": "6f5f50abb1a20cb3c931739e74a0a31b9b0fd510c3524455f1105bf201269e6e",
+      "raw_bytes": 716,
+      "gzip_sha256": "398693b2f5c9c1ce28cc389efbbca66f61bb9e9afba1de11fd64c23e9cd5008f"
+    },
+    "ecbench-wide-boundary-isolated-20261116.log": {
+      "raw_sha256": "65ce84688c3df2be3aefb01a4e57631e996cc2a2a3c2c405b940b804a68d0476",
+      "raw_bytes": 216,
+      "gzip_sha256": "17ac44c8a799043b9dd2f8fcdcd635f6222d09601829b2803849c247e401da61"
+    }
+  }
+}

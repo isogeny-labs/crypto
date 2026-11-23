@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T01:28:43Z",
+ "id": "PCC-20261114-8d052a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "model": "",
+  "session": "norm-target-fiber-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5be3e22c6e83e0c2ecb0948592eac4cb94833e9c98b28c5f98d7f65acab79a90",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetFiber.masterAtScaledTarget"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual declaration/context hypotheses: CommRing, Nontrivial ring where needed, and Field for field specializations/factor removal. Curve equation, d>=3, bounded remainder and e!=0 premises are explicit. Actual computed norm/division/remainder and base change only; no weighted-degree29, low closure, finder or sub-exponential claim. Unsigned source-bound evidence.",
+ "statement": "Exact source-bound theorem NormTargetFiber.masterAtScaledTarget: theorem masterAtScaledTarget (e r : R) (n : \u2115) : (master e n).eval (e^2*r)=e^(2^(n+1))*(NormMembershipElimination.master (2 : R) n).eval r"
+}

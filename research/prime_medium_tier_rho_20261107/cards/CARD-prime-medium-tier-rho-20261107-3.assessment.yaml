@@ -1,0 +1,13 @@
+card_id: CARD-prime-medium-tier-rho-20261107-3
+relay_verbatim: false
+outcome: executor_deviated
+stopped_at_step: launch-j1
+recommendation: escalate
+reasons:
+  - "relay: the receipt's validate-j1 stdout_tail and the file cards/CARD-...-3.validate-j1.stdout (sha256 5751d7a1ce8c..., equal to the receipt's stdout_sha256) both read '\"seed\": 107516164087790,'; the executor's relayed copy, as quoted by the main session, read '\"seed\": 20751616408779 0,' (digits moved). check-relay could not be run: no executor report file was supplied. The receipt and files on disk are intact; the deviation is in the relayed text only, and the rule makes any non-verbatim relay executor_deviated"
+  - "execution itself: receipt status 'stopped at command 12'; commands 1-11 exit 0; launch-j1 exit 26 after 369.742 s, not timed out; stderr empty; only the card's argv ran, in order"
+  - "launcher result (receipts/J1/result.json, identical to the launch-j1 stdout tail): state failed, exit_code 23, job_uid 81ceb5ce-b43e-4f8e-a3aa-3bf31bca2a63, pod_uid empty, request_sha256 5751d7a1..., build equals the frozen image/source/ecbench values"
+  - "S3 checked by the director (s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j1/56afc57e-277a-469b-8264-03c95633e371/): job-exit.json exit_code 42, node ip-10-84-84-69; audit.stderr 'audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems'; audit.json ok, records_bound, regraded, session_status complete, planned_executions 1680, records 1680, verified_records 1680, problems []; audit.json sha256 equals its SHA256SUMS entry; l2-gate.json executions 1680, invalid_outcomes [], below_l2 one entry (seq 1295, rho-neg-v2, L1: solve 861.9 us under the 1.0 ms minimum), grades L1 1 / L2 1679, accepted false; run.stderr ends 'session ECBS1h881c1908f874 complete (1680 records: verified 1680)'; run-summary.json 0 bytes; launcher status.json lists exactly one pod, 56afc57e-277a-469b-8264-03c95633e371, phase Failed, Job uid equal to result.json"
+  - "no control-comparison.json is in the pod prefix: run-ecbench exits 42 before the wall A/A comparison, so the A/A wall status of J1 is unknown"
+  - "the stop at launch-j1 follows from the card (success_exit_codes [0]); per PROTOCOL.md section 10 the J1 session is complete with a passing audit and is admitted for counts, so the recommendation to rerun J1 does not apply; recommendation is escalate only because of the non-verbatim relay"
+interpretation: not_assessed

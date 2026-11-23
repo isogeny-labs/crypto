@@ -1,0 +1,147 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 72,
+  "runs": [
+    {
+      "attempt": "rational-local72-01",
+      "source_revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "kind": "Singular",
+      "status": "accepted",
+      "native_exit": 0,
+      "marker": "RATIONAL_LOCAL72_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "result_lines": [
+        "LOCAL72_RESULT fiber=0 algebra_dimension=32 reduced_dimension=4 branches=2 nonzero_idempotents=3 primitive_count=2 local_length_sum=32 ramification_sum=16",
+        "LOCAL72_RESULT fiber=1 algebra_dimension=32 reduced_dimension=8 branches=4 nonzero_idempotents=15 primitive_count=4 local_length_sum=32 ramification_sum=16"
+      ],
+      "factor_lines": [
+        "LOCAL72_FACTOR fiber=0 mask=1 residue_degree=2 local_length=28 ramification=14",
+        "LOCAL72_FACTOR fiber=0 mask=3 residue_degree=2 local_length=4 ramification=2",
+        "LOCAL72_FACTOR fiber=1 mask=6 residue_degree=2 local_length=2 ramification=1",
+        "LOCAL72_FACTOR fiber=1 mask=7 residue_degree=2 local_length=14 ramification=7",
+        "LOCAL72_FACTOR fiber=1 mask=8 residue_degree=2 local_length=2 ramification=1",
+        "LOCAL72_FACTOR fiber=1 mask=10 residue_degree=2 local_length=14 ramification=7"
+      ],
+      "started_utc": "2026-11-02T19:36:34Z",
+      "finished_utc": "2026-11-02T19:36:39Z",
+      "native_wall_seconds": 5.0,
+      "artifacts": [
+        {
+          "path": "runs/rational-local72-01/PROTOCOL.md",
+          "sha256": "9e777aebf071fa0350b042e4c836178b9a9988be8e1aac65221bbc249a26fb9e",
+          "bytes": 2123
+        },
+        {
+          "path": "runs/rational-local72-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/rational-local72-01/donors.json",
+          "sha256": "fd8ca3a73654685b40760f355e1086ae3782fa2b9106219a356857d3b05f8391",
+          "bytes": 1193
+        },
+        {
+          "path": "runs/rational-local72-01/driver.sh",
+          "sha256": "deb3bbd14d7a6948175cc1296407f3c95b150f32ebcd24f12036787a16aa37d8",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/rational-local72-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/rational-local72-01/finished-utc.txt",
+          "sha256": "8a9eb4a8cae2a0242457baf0ad33e70bfe9369cb9be48176b9dcb814e230b11f",
+          "bytes": 21
+        },
+        {
+          "path": "runs/rational-local72-01/gate.log",
+          "sha256": "f941a4f6932713fd8e8953dfb77a79a0b460856beb1deb324e69bd3e3e3588e3",
+          "bytes": 164
+        },
+        {
+          "path": "runs/rational-local72-01/input.sing",
+          "sha256": "43ae845c86ba52397adf98789b48d74cb26db13be5de391a5bd8520030cb50c5",
+          "bytes": 7107
+        },
+        {
+          "path": "runs/rational-local72-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/rational-local72-01/native.log",
+          "sha256": "f1d8a28b825e97ca1ebf4453cd5ccbdfc351966d12c9524cd94d3cf37db0d2a8",
+          "bytes": 17617
+        },
+        {
+          "path": "runs/rational-local72-01/protocol.json",
+          "sha256": "d374a99d56bc0cd8542150fea97f4fc7db750519e6a97d599dc431afbf4d10ce",
+          "bytes": 2527
+        },
+        {
+          "path": "runs/rational-local72-01/rational-local72.sing",
+          "sha256": "a958c966b0e02141939fbacabacc30f62e358acae8e2328967c41c387f7c9e46",
+          "bytes": 31058
+        },
+        {
+          "path": "runs/rational-local72-01/source-revision.txt",
+          "sha256": "133cf1db1c5009e19ad11beafa7de452aeb36f331c1972e6b1ff8b952893403b",
+          "bytes": 41
+        },
+        {
+          "path": "runs/rational-local72-01/source.sha256",
+          "sha256": "5bd77ab7a79e5111b5d7adb718db08e895b008f01fc60faaeee81d6dbd6b905c",
+          "bytes": 467
+        },
+        {
+          "path": "runs/rational-local72-01/started-utc.txt",
+          "sha256": "559201a88eef480c332ebcf5e3b2498da5ff9ec2bfcb3c8d8d22ff2ab68fd8eb",
+          "bytes": 21
+        }
+      ]
+    }
+  ],
+  "input_pins": [
+    {
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/72/RATIONAL_LOCAL72.sing",
+      "revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "sha256": "43ae845c86ba52397adf98789b48d74cb26db13be5de391a5bd8520030cb50c5"
+    },
+    {
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/72/NATIVE_DRIVER.sh",
+      "revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "sha256": "deb3bbd14d7a6948175cc1296407f3c95b150f32ebcd24f12036787a16aa37d8"
+    },
+    {
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/72/REPLAY_CAS.sh",
+      "revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/72/PROTOCOL.md",
+      "revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "sha256": "9e777aebf071fa0350b042e4c836178b9a9988be8e1aac65221bbc249a26fb9e"
+    },
+    {
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/72/protocol.json",
+      "revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "sha256": "d374a99d56bc0cd8542150fea97f4fc7db750519e6a97d599dc431afbf4d10ce"
+    },
+    {
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/72/donors.json",
+      "revision": "374f92a76360241ab4f0654b3d852eee432f69d7",
+      "sha256": "fd8ca3a73654685b40760f355e1086ae3782fa2b9106219a356857d3b05f8391"
+    }
+  ],
+  "donors_checked": 8
+}

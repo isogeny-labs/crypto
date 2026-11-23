@@ -1,0 +1,22 @@
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp:71:6: error: ‘optional’ in namespace ‘std’ does not name a template type
+   71 | std::optional<Setup> simulate(int p,std::uint64_t seed,bool filter,std::ostream&events){
+      |      ^~~~~~~~
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp:5:1: note: ‘std::optional’ is defined in header ‘<optional>’; this is probably fixable by adding ‘#include <optional>’
+    4 | #include <random>
+  +++ |+#include <optional>
+    5 | #include <memory>
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp:127:6: error: ‘optional’ in namespace ‘std’ does not name a template type
+  127 | std::optional<Setup> setup_replay(const std::filesystem::path&root,int status){
+      |      ^~~~~~~~
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp:127:1: note: ‘std::optional’ is defined in header ‘<optional>’; this is probably fixable by adding ‘#include <optional>’
+  127 | std::optional<Setup> setup_replay(const std::filesystem::path&root,int status){
+      | ^~~
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp: In function ‘int main(int, char**)’:
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp:170:20: error: ‘setup_replay’ is not a member of ‘audit’; did you mean ‘census_replay’?
+  170 |             audit::setup_replay(argv[2],number(argv[3]));return 0;
+      |                    ^~~~~~~~~~~~
+      |                    census_replay
+/workspace/scratch/auxiliary-halving-setup/research/auxiliary_halving_setup_20261115/replay.cpp:173:37: error: ‘setup_replay’ is not a member of ‘audit’; did you mean ‘census_replay’?
+  173 |             const auto setup=audit::setup_replay(argv[2],0);audit::require(bool(setup)&&setup->p==19,"cold setup binding");
+      |                                     ^~~~~~~~~~~~
+      |                                     census_replay

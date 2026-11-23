@@ -1,0 +1,5 @@
+The first cache command did not execute because its stdout redirection used
+../../validation/yield-20261024 from the lean directory rather than
+../validation/yield-20261024. Shell exit1 before Lake execution:
+/bin/bash: ../../validation/yield-20261024/cache-setup.log: No such file or directory
+The corrected invocation and its actual output are retained separately.

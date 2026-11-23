@@ -1,0 +1,6 @@
+# Shared semilinear actions and output-aware states
+The exact trace proof is C82 PROOF.md. For fixed H,P,j define columns C_l=P^l modH. The map sigma^j(a)=sum_l a_l^(2^j) C_l applies to both T and P in a doubling step. Construct these columns once, then apply two twisted coefficient vectors to them. Associativity/distributivity prove equality to separate Horner compositions over the same possibly nonreduced quotient. Reusing columns adds no invertibility or rank assumption; the matrix can be singular and no elimination occurs.
+
+At the top even block only T_k is requested, so omit computing P_k. At the top odd block P_(k-1) is necessary to append the last trace term, but P_k itself is unused and its final square can be omitted. Internal P states remain intact. This is demand-based evaluation of the same recurrence, not a discarded branch.
+
+Work remains O(m^3 log k) in a coarse bound, with extra O(m^2) field elements for a shared power table. Field-Frobenius setup is fully charged anew in every profiled call. Falsifiable prediction on exposed calibration panel: sharing should reduce field work for degree5/k83/GF83 versus C82, but degree12 and short traces may still lose to strong sequential squaring. This is not a claim of generalized rootfinding novelty, full original-family completion, a hard-instance result or qualified timing gain.

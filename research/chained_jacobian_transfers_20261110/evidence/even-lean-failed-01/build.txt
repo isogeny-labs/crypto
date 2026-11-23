@@ -1,0 +1,31 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean:23:62: error: `grind` failed
+case grind
+M : Type
+inst : IntModule M
+s oldBase newBase : M
+d : Int
+h : ¬s - d • newBase = s - d • oldBase - d • (newBase - oldBase)
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] ¬s - d • newBase = s - d • oldBase - d • (newBase - oldBase)
+  [eqc] False propositions
+    [prop] s - d • newBase = s - d • oldBase - d • (newBase - oldBase)
+  [linarith] Linarith assignment for `M`
+    [assign] s := 0
+    [assign] oldBase := 2
+    [assign] newBase := 3
+[grind] Issues
+  [issue] `grind linarith` term with unexpected instance
+        d • newBase
+  [issue] `grind linarith` term with unexpected instance
+        d • oldBase
+  [issue] `grind linarith` term with unexpected instance
+        d • (newBase - oldBase)
+'EvenJacobian.nonmonic_infinity_square' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EvenJacobian.degree_two_basepoint_cancels' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EvenJacobian.degree_one_omission_detected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EvenJacobian.frobenius_basepoint_rebasing' depends on axioms: [sorryAx]
+'EvenJacobian.public_unbalanced_norm_inverses' does not depend on any axioms
+'EvenJacobian.uniform_mutant_coordinates' depends on axioms: [propext]
+toolchain pin: leanprover/lean4:v4.35.0

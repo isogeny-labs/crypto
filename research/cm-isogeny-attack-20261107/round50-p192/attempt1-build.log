@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/research/cm-isogeny-attack-20261107/round50-p192/build.py", line 10, in <module>
+    basis=[[1,0,x],[0,1,x*x%r],[0,0,r]];red=fmpz_mat(basis).lll();vectors=[[int(v) for v in red[i]] for i in range(3)]
+  File "/home/ec2-user/research/cm-isogeny-attack-20261107/round50-p192/build.py", line 10, in <listcomp>
+    basis=[[1,0,x],[0,1,x*x%r],[0,0,r]];red=fmpz_mat(basis).lll();vectors=[[int(v) for v in red[i]] for i in range(3)]
+  File "src/flint/types/fmpz_mat.pyx", line 164, in flint.types.fmpz_mat.fmpz_mat.__getitem__
+TypeError: 'int' object is not iterable

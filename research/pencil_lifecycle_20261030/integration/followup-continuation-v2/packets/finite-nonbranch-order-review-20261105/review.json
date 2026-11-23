@@ -1,0 +1,99 @@
+{
+  "schema": "formal.source-review/v1",
+  "task": "T-1620",
+  "reviewer": "/root/reconcile_publication",
+  "created_utc": "2026-11-05T16:31:43.199333+00:00",
+  "producer_commit": "1b7c04cd5f5ad6de6f662b84f24035ed756f6b5d",
+  "producer_source_sha256": "eaf3957bc766e9da64e7ba27efb6ef74b34c57705020d0ad2514dbe86bd75c1a",
+  "machine_status": "not_verified",
+  "fidelity": "faithful_scoped",
+  "outcome": "inconclusive",
+  "scope": "Independent source-level mathematical comparison only; declared APIs checked in local dependency source. No compilation or transitive kernel audit.",
+  "claims": [
+    {
+      "declaration": "affine_selected_ne_zero",
+      "machine_status": "not_verified",
+      "fidelity": "faithful_scoped",
+      "finding": "Conjugate point evaluates actual affine function to 2*b*y0; all three nonzero premises explicit."
+    },
+    {
+      "declaration": "germ_selected_ne_zero",
+      "machine_status": "not_verified",
+      "fidelity": "faithful_scoped",
+      "finding": "Separable actual quotient is a domain; AtPrime FaithfulSMul instance gives injective localization; actual point-ring equivalence transports nonzero."
+    },
+    {
+      "declaration": "finite_sum_toNat",
+      "machine_status": "not_verified",
+      "fidelity": "faithful_scoped",
+      "finding": "Finite total excludes infinity in every summand before two ENat.toNat_add applications."
+    },
+    {
+      "declaration": "actual_norm_order_nat",
+      "machine_status": "not_verified",
+      "fidelity": "faithful_scoped",
+      "finding": "DVR and domain derived from actual separable quintic/nonbranch hypotheses; addVal_eq_top_iff converts nonzero to finite; existing norm-order identity supplies equality."
+    },
+    {
+      "declaration": "source_actual_norm_order_nat",
+      "machine_status": "not_verified",
+      "fidelity": "faithful_scoped",
+      "finding": "Actual coefficientData numerator/residual/supports are substituted; source_norm_identity derives polynomial identity from supplied Mumford divisibilities; no valuation equality assumed."
+    }
+  ],
+  "substantive_counterexample_to_stated_claim": null,
+  "boundary_attacks": "DERIVATION.md; hand-derived only, not machine checked",
+  "generic_nonvacuity": {
+    "field": "Q",
+    "f": "X^5+1",
+    "P": [
+      "0",
+      "1"
+    ],
+    "b": "1",
+    "n": "1",
+    "u1": "X",
+    "u2": "X",
+    "U": "-X^3",
+    "identity": "1 - X*X*(-X^3) = X^5+1",
+    "separability": "gcd(X^5+1,5X^4)=1"
+  },
+  "unresolved": [
+    "No fresh compiler result, elaborated type or axiom readback for this new source.",
+    "No complete immutable import resolution/dependency closure audit; import Nonbranch must bind ef72bcbf source in the eventual build.",
+    "Boundary attacks are paper derivations, not checked Lean controls.",
+    "Rational nonbranch local result does not cover arbitrary closed points, branch points, infinity or a global divisor identity."
+  ],
+  "independence": {
+    "author_of_subject": false,
+    "blind": false,
+    "strategy_disclosed_before_review": true,
+    "sibling_reports_read": false,
+    "prior_exposure": "Earlier publication summaries for local norm component; no prior producer finite-order source access before plan."
+  },
+  "scientific_trials": 0,
+  "compiler_invocations": 0,
+  "status_promotion": false,
+  "source_specific_nonvacuity": {
+    "origin": "coordinator supplied after initial plan; not blind",
+    "checked_by": "hand substitution into actual coefficientData source",
+    "coefficientData": [
+      "-9",
+      "0",
+      "0",
+      "-81",
+      "0"
+    ],
+    "f": "X^5-5X^3+4X+1",
+    "supports": [
+      "X^2-1",
+      "X^2-4"
+    ],
+    "v1_v2": "1",
+    "P": [
+      "1",
+      "1"
+    ],
+    "formal_check": false
+  }
+}

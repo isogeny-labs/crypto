@@ -4,17 +4,24 @@
 //!
 //! ```text
 //! cargo run --release --example jv_cover -- --exp ccov --sizes 53,101,251,503,1009 --seeds 2 --residuals 200 --constructed 40 --max-degree 24 --budget 300 --json experiments/30_jv_cover_ccov.json
-//! cargo run --release --example jv_cover -- --exp dlp --sizes 53,101,251 --seeds 2 --rho-runs 16 --check-every 64 --json experiments/30_jv_cover_dlp.json
+//! cargo run --release --example jv_cover -- --exp dlp --stop full --sizes 53,101,251 --seeds 2 --rho-runs 16 --check-every 64 --json experiments/30_jv_cover_dlp.json
 //! cargo run --release --example jv_cover -- --exp ccov --stop 64 --sizes 53,61,71 --seeds 2 --residuals 300 --constructed 60 --oracle-base 45 --json experiments/31_jv_cover_stop_ccov_oracle.json
-//! cargo run --release --example jv_cover -- --exp dlp --sizes 503 --seeds 1 --rho-runs 0 --rho-ref <pooled S_rho of the smaller sizes> --json experiments/30_jv_cover_dlp_503.json
+//! cargo run --release --example jv_cover -- --exp dlp --stop full --sizes 503 --seeds 1 --rho-runs 0 --rho-ref <pooled S_rho of the smaller sizes> --json experiments/30_jv_cover_dlp_503.json
 //! cargo run --release --example jv_cover -- --exp sieve --stop 64 --sizes 251,503 --seeds 2 --rho-runs 4 --json experiments/32_jv_cover_sieve_dlp.json
 //! ```
 
 use std::env;
 use std::fs;
 
+/// jemalloc is the global allocator under the default `jemalloc` feature: F4's
+/// per-term allocations go to jemalloc instead of glibc (1.256x on `--exp dlp`;
+/// see the feature in Cargo.toml). `--no-default-features` restores glibc.
+#[cfg(feature = "jemalloc")]
+#[global_allocator]
+static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
 use crypto_lib::cryptanalysis::jv_cover::{
-    run_cover_ccov_mode, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    run_cover_ccov_mode, run_cover_dlp_mode, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
     StopMode,
 };
 use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
@@ -33,6 +40,88 @@ enum Row {
     Strong(StrongRun),
 }
 
+/// `JV_SIEVE_EMIT=<path>` (LEAD-C-jv-sieve-emit-price): run the sieve route
+/// with the `jv_bitops` counters on and write the emitted operation counts
+/// per phase to `<path>`.  The route's own report is returned unchanged.
+#[allow(clippy::too_many_arguments)]
+fn sieve_emit(
+    path: &str,
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    rho_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+) -> SieveDlpReport {
+    use crypto_lib::cryptanalysis::f4_fp;
+    use crypto_lib::cryptanalysis::jv_bitops::{self, Kind, Phase};
+    use crypto_lib::cryptanalysis::jv_cover::generate_spec;
+    use crypto_lib::cryptanalysis::jv_sieve::run_cover_sieve_dlp_on;
+    jv_bitops::enable(true);
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .expect("pool");
+    pool.install(|| {
+        jv_bitops::claim();
+        let spec = {
+            let _g = jv_bitops::enter(Phase::Instance);
+            generate_spec(p, seed)
+        };
+        jv_bitops::set_moduli(p, spec.l);
+        let other0 = jv_bitops::snapshot_other();
+        let before = jv_bitops::snapshot();
+        let norm0 = f4_fp::norm_ops_total();
+        let f4_0 = f4_fp::field_ops_total();
+        let r = run_cover_sieve_dlp_on(
+            &spec, seed, rho_runs, rho_ref, stop, margin, m_override, trace,
+        );
+        let t = jv_bitops::snapshot().since(&before);
+        let other1 = jv_bitops::snapshot_other();
+        let mut phases = serde_json::Map::new();
+        for ph in Phase::ALL {
+            let o = t.phase(ph);
+            let mut c = serde_json::Map::new();
+            for k in Kind::ALL {
+                c.insert(
+                    jv_bitops::kind_name(k).to_string(),
+                    serde_json::json!(o.get(k)),
+                );
+            }
+            c.insert("rng_words".into(), serde_json::json!(o.rng_words));
+            c.insert(
+                "other_modulus".into(),
+                serde_json::json!(other1[ph as usize] - other0[ph as usize]),
+            );
+            phases.insert(ph.name().to_string(), serde_json::Value::Object(c));
+        }
+        let vm_hwm_kb = fs::read_to_string("/proc/self/status").ok().and_then(|s| {
+            s.lines().find(|l| l.starts_with("VmHWM:")).and_then(|l| {
+                l.split_whitespace()
+                    .nth(1)
+                    .and_then(|v| v.parse::<u64>().ok())
+            })
+        });
+        let side = serde_json::json!({
+            "schema": "jv_sieve_emit/v1",
+            "p": p,
+            "seed": seed,
+            "l": spec.l,
+            "phases": phases,
+            "f4_row_ops": f4_fp::field_ops_total() - f4_0,
+            "f4_norm_ops": f4_fp::norm_ops_total() - norm0,
+            "foreign_hook_calls": jv_bitops::foreign(),
+            "vm_hwm_kb": vm_hwm_kb,
+            "total_muls": r.total_muls,
+            "descent_f4_muls": r.descent_f4_muls,
+        });
+        fs::write(path, serde_json::to_string_pretty(&side).unwrap()).expect("write emit json");
+        r
+    })
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let mut exp = "ccov".to_string();
@@ -48,8 +137,12 @@ fn main() {
     let mut oracle_base = 40usize;
     let mut rho_ref = 1.3f64;
     let mut stop = 0usize;
-    // `--stop hilbert` or `--stop hilbert:N`: the Hilbert rule, N pairs per step (default 1)
-    let mut hilbert: Option<usize> = None;
+    // `--stop hilbert` or `--stop hilbert:N`: the Hilbert rule, N pairs per step
+    // (`hilbert` alone: 1).  The default since 2026-11-21 is `hilbert:16`
+    // (benchmarks/20261029-jv-cover-hilbert-stop: S 1.85x lower, identical
+    // relations); `--stop full` (or `--stop 0`) runs F4 to the certified basis
+    // as before, `--stop K` stops at K standard monomials.
+    let mut hilbert: Option<usize> = Some(16);
     let mut margin = 1.25f64;
     let mut m_override = 0usize;
     let mut trace = false;
@@ -92,7 +185,14 @@ fn main() {
                                 .map_or(1, |c| c.parse().expect("--stop hilbert:N")),
                         )
                     }
-                    None => stop = v.parse().expect("--stop"),
+                    None if v == "full" => {
+                        hilbert = None;
+                        stop = 0;
+                    }
+                    None => {
+                        hilbert = None;
+                        stop = v.parse().expect("--stop K | full | hilbert[:N]");
+                    }
                 }
             }
             "--margin" => margin = next(&mut i).parse().expect("--margin"),
@@ -174,13 +274,18 @@ fn main() {
                     rows.push(Row::Ccov(r));
                 }
                 "dlp" => {
-                    let r = run_cover_dlp(
+                    let dlp_mode = match (hilbert, stop) {
+                        (Some(c), _) => StopMode::Hilbert(c),
+                        (None, 0) => StopMode::Full,
+                        (None, k) => StopMode::Staircase(k),
+                    };
+                    let r = run_cover_dlp_mode(
                         p,
                         seed,
                         rho_runs,
                         check_every,
                         rho_ref,
-                        (stop > 0).then_some(stop),
+                        dlp_mode,
                         trace,
                     );
                     println!(
@@ -195,16 +300,33 @@ fn main() {
                     rows.push(Row::Dlp(r));
                 }
                 "sieve" => {
-                    let r = run_cover_sieve_dlp(
-                        p,
-                        seed,
-                        rho_runs,
-                        rho_ref,
-                        (stop > 0).then_some(stop),
-                        margin,
-                        (m_override > 0).then_some(m_override),
-                        trace,
-                    );
+                    // Opt-in `JV_SIEVE_EMIT=<path>`: the same run with the
+                    // `jv_bitops` counters on, in a one-thread pool that owns
+                    // the tally, and a sidecar JSON of the emitted operations
+                    // per phase (unset: the plain call, unchanged).
+                    let r = match env::var("JV_SIEVE_EMIT") {
+                        Ok(path) if !path.is_empty() => sieve_emit(
+                            &path,
+                            p,
+                            seed,
+                            rho_runs,
+                            rho_ref,
+                            (stop > 0).then_some(stop),
+                            margin,
+                            (m_override > 0).then_some(m_override),
+                            trace,
+                        ),
+                        _ => run_cover_sieve_dlp(
+                            p,
+                            seed,
+                            rho_runs,
+                            rho_ref,
+                            (stop > 0).then_some(stop),
+                            margin,
+                            (m_override > 0).then_some(m_override),
+                            trace,
+                        ),
+                    };
                     println!(
                         "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} m {} (rule {}, {:.0} available) | B's {} lines {} steps {} (base {}) roots {} hits {} false {} | relations {} ({:.3e}/line vs p/m! {:.3e}: ratio {:.2}) verified {} failed {} duplicates {} per-m {:?} | C_rel {:.3e} = enum {:.3e} + sieve {:.3e} + extract {:.3e} + verify {:.3e} (per relation) | adds {:.3e} lookups {:.3e} | descent: residuals {} successes {} ({:.0}/success) C_cov {:.3e} muls {:.3e} stopped {} incomplete {} timed out {} trace {} (replayed {} mismatches {}) | unknowns {} (filtered {}) row {:.1} LA attempts {} ops {} | solved {} correct {} exhausted {} | S {:.3e} S+ {:.3e} | rho S {:.3} ± {:.3} ({} runs) | S/rho {:.4} (S+/rho {:.4}) = relation {:.4} + descent {:.4} + la {:.4} | {:.0} s",
                         r.p, r.seed, r.bits, r.base, r.c_add_e, r.c_add_j, r.m_final, r.m_rule, r.relations_available,

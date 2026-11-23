@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-05T08:45:05Z",
+ "id": "PCC-20261105-ac1e93",
+ "kind": "statement",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "codex",
+  "session": "aps3453-pcc-type-repair"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_leads_20261105/certificates/line-chart.json",
+    "sha256": "12fb28f8a865c9445c3c44d115a5040e5c6a1d53e21f3f13721981ea394b0762"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_leads_20261105/certificates/frontier-count.json",
+    "sha256": "68a461493f985abd5499b0d7adeed9ac6f69ab633e09a53dda6066fd0b1c8ce6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/aps_leads_20261105 identity records only; mathematical chart lifting and frontier-set interpretation remain conditional producer derivations",
+ "statement": "The APS lead identity wrapper compiled against the unchanged native identity_certificate and SHA-256 modules, then issued and producer-replayed IDC1h9e131e5cd24a395f and IDC1ha14548fc2b5ce5c3 with 32 certificate points and 32 extra producer points each over 2^61-1. For each, adding 1 to the RHS was refused and changing its digest was refused. This is an unverified producer assertion about identity-record validation, not independent verification, a chart-completeness proof, an APS correctness/performance experiment or a speedup."
+}

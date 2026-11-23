@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:52:40Z",
+ "id": "PCC-20261116-61549b",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v2-109/result.json",
+    "sha256": "c06619bf4d982c8e1efd30f9057ca29ed345cefa262d0a35af670148b78b892c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v2-1009/result.json",
+    "sha256": "acdb0c2f141e22c61b758059d32fc02ac267c5b701abffdde01dfcde472de1bc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v2-109/public-witness.json",
+    "sha256": "415aab042697519182ab77d3629df6e9c08f38700006f5cbb0c5899e78123cee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v2-1009/public-witness.json",
+    "sha256": "c9054ee86c3caf71026551f57cd53b8f52228ffe7297152336c78947f3eae7c2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v2-109/openssl-check.txt",
+    "sha256": "152b6faa2372bb27aea4e7257525da11ed8a971b8845f4b5957aa88d28f65c25"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v2-1009/openssl-check.txt",
+    "sha256": "e9dc71d988ca626f8598f54364b3c509c51f36ecc0afac501e47f11f547da9a0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/historical-source/toy_ic_v2.cpp.txt",
+    "sha256": "3a722e25a2161614ef26fea1f1667d4149c1a7ddbb31ee879abe7162c0c743f2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/openssl_toy_check.cpp",
+    "sha256": "2110b4eab5b6cbaeec4375577e7c9dcadc78a11fd11db5a53fe7a4521ea395ad"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The native public Hesse-k2 F109 and F1009 v2 index-calculus correctness fixtures completed. Prime subgroup orders are11 and109. Actual mixed3 quotient image kernels use extensions6 and9. The respective projected bases have10 and108 distinct nonzero points;10 and144 verified principal relations give ranks10 and108; all11 and109 subgroup targets created after setup were recovered by a solver receiving no scalar witness and verified on source. The separate OpenSSL checker accepts all base logs, principal supports, projected row coefficients/ranks and recovered source answers, and rejects a changed-row canary. These are small full-base correctness controls, not plane-quartic Diem, a P-192 solve, comparative timing or evidence of a speed advantage."
+}

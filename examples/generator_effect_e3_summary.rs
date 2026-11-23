@@ -70,7 +70,7 @@ fn reduce(rec: &Record) -> Cost {
             *native.entry(k.clone()).or_insert(0.0) += *v as f64;
         }
     }
-    let r = rec.workload.curve.r as f64;
+    let r = rec.workload.curve.r.to_f64();
     Cost {
         target: rec.workload.target_index,
         g: rec.cost.total_gae.unwrap_or(f64::NAN) - c_gae,
@@ -155,7 +155,7 @@ fn main() {
             } => *p,
             _ => panic!("E3 runs on explicit prime curves"),
         };
-        let r = recs[0].workload.curve.r as f64;
+        let r = recs[0].workload.curve.r.to_f64();
         let mut arms: BTreeMap<String, Vec<Cost>> = BTreeMap::new();
         for rec in recs.iter().filter(|r| !r.warmup) {
             arms.entry(rec.arm.clone()).or_default().push(reduce(rec));

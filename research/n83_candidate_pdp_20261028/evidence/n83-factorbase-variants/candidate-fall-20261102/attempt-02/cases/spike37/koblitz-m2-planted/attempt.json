@@ -1,0 +1,50 @@
+{
+  "candidate_id": "spike37",
+  "certificate_sha256": "f7cff5f5bb95ddf8107ff8cec7fc2846d824ae3fc015c8eaae609b35202b118e",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/koblitz-m2-planted/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/koblitz-m2-planted/output"
+  ],
+  "elapsed_seconds": 0.982,
+  "family": "koblitz",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "koblitz-m2-planted",
+  "input_row_sha256": "57b77aef38b45b7e3b64e680b3f1ea9bb0296464418e0c2c45e60eadf19e0a03",
+  "m": 2,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/koblitz-m2-planted/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/koblitz-m2-planted/output/koblitz-m2-planted.json"
+    ],
+    "elapsed_seconds": 0.046,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"koblitz-m2-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_certificate_prefix": "s3://setec-astronomy-artifacts/runs/n83-ffd-lfd-factorbase-panel-20261102/v2/attempt-02/spike37/first-fall-attempt-01/certificates/koblitz-m2-planted.json",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"koblitz-m2-planted\",\"status\":\"certified\"}\n",
+  "system_bytes": 391263,
+  "system_sha256": "08733d2ac51d9a9fac6b232e37e4e7b50dade853545f6ee52dcb593638e83d30",
+  "target_kind": "planted"
+}

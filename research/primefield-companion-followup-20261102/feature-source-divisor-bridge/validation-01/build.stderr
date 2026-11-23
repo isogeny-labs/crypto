@@ -1,0 +1,42 @@
+error[E0308]: mismatched types
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:43:465
+   |
+43 | ....x,v.y]).unwrap().value;assert_eq!(evaluate(&m,p,a,b,[v.x,v.y],q),pow(raw,(p-1)/q,p),"r={r}, i={i}");}t=c.plus(t,Some(base));}ass...
+   |                                       --------                    ^ expected `u64`, found `i128`
+   |                                       |
+   |                                       arguments to this function are incorrect
+   |
+note: function defined here
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:32:4
+   |
+32 | fn evaluate(m:&M,p:u64,a:u64,b:u64,point:[u64;2],q:u64)->u64{
+   |    ^^^^^^^^                                      -----
+help: you can convert an `i128` to a `u64` and panic if the converted value doesn't fit
+   |
+43 |  #[test]fn actual_source_values(){for(p,a,b,r,base,q)in[(5,2,1,7,[0,1],4),(7,0,3,13,[1,2],2),(509,2,10,479,[3,68],4)]{let m=projected_program(r,q);let c=ec::Curve::new(p,a,b);let base=ec::Point{x:base[0],y:base[1]};let source=original::Source::new(p,a,b,r,[base.x,base.y]).unwrap();let mut t=Some(base);for i in 1..r{let v=t.unwrap();if r<20||[1,2,3,7,16,64,239,478].contains(&i){let raw=source.raw([v.x,v.y]).unwrap().value;assert_eq!(evaluate(&m,p,a,b,[v.x,v.y],q.try_into().unwrap()),pow(raw,(p-1)/q,p),"r={r}, i={i}");}t=c.plus(t,Some(base));}assert_eq!(t,None);}}
+   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ++++++++++++++++++++
+
+error[E0308]: mismatched types
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:43:482
+   |
+43 | ...eq!(evaluate(&m,p,a,b,[v.x,v.y],q),pow(raw,(p-1)/q,p),"r={r}, i={i}");}t=c.plus(t,Some(base));}assert_eq!(t,None);}}
+   |                                                     ^ expected `u64`, found `i128`
+
+error[E0277]: cannot divide `u64` by `i128`
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-source-divisor-bridge/bridge.rs:43:481
+   |
+43 | ...!(evaluate(&m,p,a,b,[v.x,v.y],q),pow(raw,(p-1)/q,p),"r={r}, i={i}");}t=c.plus(t,Some(base));}assert_eq!(t,None);}}
+   |                                                  ^ no implementation for `u64 / i128`
+   |
+   = help: the trait `Div<i128>` is not implemented for `u64`
+   = help: the following other types implement trait `Div<Rhs>`:
+             `&u64` implements `Div<u64>`
+             `&u64` implements `Div`
+             `u64` implements `Div<&u64>`
+             `u64` implements `Div<NonZero<u64>>`
+             `u64` implements `Div`
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.

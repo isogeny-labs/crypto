@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T21:22:53Z",
+ "id": "PCC-20261117-d15adc",
+ "kind": "statement",
+ "producer": {
+  "commit": "48649d18a470ee5fcd5bc47f79ccf45c6083ad31",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/leads/2026-11-17/synthetic-coverage-rank/extension/rank.txt",
+    "sha256": "0d38d909efd6ad8004326b6fd1acec5b3568642f0b2792c7aa93b955193a451d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/leads/2026-11-17/synthetic-coverage-rank/extension/rank_incremental.cpp",
+    "sha256": "0f40fcd7049812795adda5735ff90c1d8dc93fa5e402e197ac01b1d1f5e61947"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "docs/leads/2026-11-17/synthetic-coverage-rank/extension",
+ "statement": "On the frozen synthetic streams both incremental rank implementations agree with batch rank at 388 prefixes. The F101 reordered pair reaches full primary rank after 74 and 106 charged fixture work units, with matching total rank throughout."
+}

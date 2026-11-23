@@ -1,0 +1,2998 @@
+{
+ "runs": [
+  {
+   "unit": "201_amd1_REF_4194271_4_b4.jsonl",
+   "idx": 201,
+   "role": "amd1",
+   "arm": "REF",
+   "q": 4194271,
+   "seed": 4,
+   "block": 4,
+   "command": "<REF> ic 4194271 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:14:20Z",
+   "loadavg_before": "0.71 1.69 1.89 5/113 9680",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs committed amendment REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "202_amd1_BLR1_4194271_4_b4.jsonl",
+   "idx": 202,
+   "role": "amd1",
+   "arm": "BLR1",
+   "q": 4194271,
+   "seed": 4,
+   "block": 4,
+   "command": "<BLR1> ic 4194271 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:14:20Z",
+   "loadavg_before": "0.71 1.69 1.89 5/114 9682",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "203_amd1_AUD1_4194271_4_b4.jsonl",
+   "idx": 203,
+   "role": "amd1",
+   "arm": "AUD1",
+   "q": 4194271,
+   "seed": 4,
+   "block": 4,
+   "command": "<AUD1> ic 4194271 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:14:20Z",
+   "loadavg_before": "0.71 1.69 1.89 6/114 9682",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 869,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 868,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      870,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 96632848,
+    "skipped_minus_recurrence_lmul": 96632848,
+    "ref_minus_blr_ladd": 96618960,
+    "skipped_minus_recurrence_ladd": 96618960,
+    "exact": true,
+    "ref_source": "replayed REF"
+   },
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs replayed BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "204_amd1_REF_524287_2_b4.jsonl",
+   "idx": 204,
+   "role": "amd1",
+   "arm": "REF",
+   "q": 524287,
+   "seed": 2,
+   "block": 4,
+   "command": "<REF> ic 524287 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:14:57Z",
+   "loadavg_before": "1.73 1.84 1.94 3/117 9806",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs committed amendment REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs committed fasthash p1_COMBO (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs committed fasthash p2_COMBO (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "205_amd1_BLR1_524287_2_b4.jsonl",
+   "idx": 205,
+   "role": "amd1",
+   "arm": "BLR1",
+   "q": 524287,
+   "seed": 2,
+   "block": 4,
+   "command": "<BLR1> ic 524287 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:14:58Z",
+   "loadavg_before": "1.73 1.84 1.94 4/116 9813",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "206_amd1_AUD1_524287_2_b4.jsonl",
+   "idx": 206,
+   "role": "amd1",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 2,
+   "block": 4,
+   "command": "<AUD1> ic 524287 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:14:58Z",
+   "loadavg_before": "1.73 1.84 1.94 3/116 9820",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 307,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 305,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      308,
+      false,
+      [
+       307
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 12005064,
+    "skipped_minus_recurrence_lmul": 12005064,
+    "ref_minus_blr_ladd": 12000184,
+    "skipped_minus_recurrence_ladd": 12000184,
+    "exact": true,
+    "ref_source": "replayed REF"
+   },
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs replayed BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "207_amd1_REF_2097091_10_b4.jsonl",
+   "idx": 207,
+   "role": "amd1",
+   "arm": "REF",
+   "q": 2097091,
+   "seed": 10,
+   "block": 4,
+   "command": "<REF> ic 2097091 10 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:15:13Z",
+   "loadavg_before": "2.08 1.91 1.96 3/118 9829",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true
+  },
+  {
+   "unit": "208_amd1_BLR1_2097091_10_b4.jsonl",
+   "idx": 208,
+   "role": "amd1",
+   "arm": "BLR1",
+   "q": 2097091,
+   "seed": 10,
+   "block": 4,
+   "command": "<BLR1> ic 2097091 10 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:15:13Z",
+   "loadavg_before": "2.08 1.91 1.96 3/118 9836",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "209_amd1_AUD1_2097091_10_b4.jsonl",
+   "idx": 209,
+   "role": "amd1",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 10,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 10 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:15:14Z",
+   "loadavg_before": "2.08 1.91 1.96 3/118 9843",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "replayed REF"
+   },
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs replayed BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "210_amd1_REF_2097091_8_b4.jsonl",
+   "idx": 210,
+   "role": "amd1",
+   "arm": "REF",
+   "q": 2097091,
+   "seed": 8,
+   "block": 4,
+   "command": "<REF> ic 2097091 8 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:15:34Z",
+   "loadavg_before": "2.41 2.00 1.99 3/117 9908",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true
+  },
+  {
+   "unit": "211_amd1_BLR1_2097091_8_b4.jsonl",
+   "idx": 211,
+   "role": "amd1",
+   "arm": "BLR1",
+   "q": 2097091,
+   "seed": 8,
+   "block": 4,
+   "command": "<BLR1> ic 2097091 8 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:15:34Z",
+   "loadavg_before": "2.41 2.00 1.99 3/117 9915",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "212_amd1_AUD1_2097091_8_b4.jsonl",
+   "idx": 212,
+   "role": "amd1",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 8,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 8 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:15:35Z",
+   "loadavg_before": "2.45 2.02 1.99 3/117 9922",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "replayed REF"
+   },
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs replayed BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "213_amd1_REF_524287_2_b8.jsonl",
+   "idx": 213,
+   "role": "amd1",
+   "arm": "REF",
+   "q": 524287,
+   "seed": 2,
+   "block": 8,
+   "command": "<REF> ic 524287 2 D 3.0 1.7 4.0 8",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:12Z",
+   "loadavg_before": "2.70 2.13 2.03 3/114 9932",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true
+  },
+  {
+   "unit": "214_amd1_BLR1_524287_2_b8.jsonl",
+   "idx": 214,
+   "role": "amd1",
+   "arm": "BLR1",
+   "q": 524287,
+   "seed": 2,
+   "block": 8,
+   "command": "<BLR1> ic 524287 2 D 3.0 1.7 4.0 8",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:12Z",
+   "loadavg_before": "2.70 2.13 2.03 3/114 9939",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "215_amd1_AUD1_524287_2_b8.jsonl",
+   "idx": 215,
+   "role": "amd1",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 2,
+   "block": 8,
+   "command": "<AUD1> ic 524287 2 D 3.0 1.7 4.0 8",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:13Z",
+   "loadavg_before": "2.70 2.13 2.03 3/114 9946",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 153,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 151,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      154,
+      false,
+      [
+       153
+      ],
+      [
+       [
+        8,
+        6
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 23776016,
+    "skipped_minus_recurrence_lmul": 23776016,
+    "ref_minus_blr_ladd": 23766352,
+    "skipped_minus_recurrence_ladd": 23766352,
+    "exact": true,
+    "ref_source": "replayed REF"
+   },
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs replayed BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "216_amd1_REF_524287_5_b2.jsonl",
+   "idx": 216,
+   "role": "amd1",
+   "arm": "REF",
+   "q": 524287,
+   "seed": 5,
+   "block": 2,
+   "command": "<REF> ic 524287 5 D 3.0 1.7 4.0 2",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:28Z",
+   "loadavg_before": "2.76 2.17 2.05 3/117 9957",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true
+  },
+  {
+   "unit": "217_amd1_BLR1_524287_5_b2.jsonl",
+   "idx": 217,
+   "role": "amd1",
+   "arm": "BLR1",
+   "q": 524287,
+   "seed": 5,
+   "block": 2,
+   "command": "<BLR1> ic 524287 5 D 3.0 1.7 4.0 2",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:28Z",
+   "loadavg_before": "2.76 2.17 2.05 3/117 9964",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "218_amd1_AUD1_524287_5_b2.jsonl",
+   "idx": 218,
+   "role": "amd1",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 5,
+   "block": 2,
+   "command": "<AUD1> ic 524287 5 D 3.0 1.7 4.0 2",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:29Z",
+   "loadavg_before": "2.76 2.17 2.05 3/117 9971",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 614,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      615,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 6031940,
+    "skipped_minus_recurrence_lmul": 6031940,
+    "ref_minus_blr_ladd": 6029488,
+    "skipped_minus_recurrence_ladd": 6029488,
+    "exact": true,
+    "ref_source": "replayed REF"
+   },
+   "checks": [
+    {
+     "against": "vs replayed REF (all counted fields except DL LA lmul/ladd)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "vs replayed BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "219_amd1aud30_AUD1_4194271_1_b4.jsonl",
+   "idx": 219,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 4194271,
+   "seed": 1,
+   "block": 4,
+   "command": "<AUD1> ic 4194271 1 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:32Z",
+   "loadavg_before": "2.78 2.18 2.05 3/117 9978",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 870,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 868,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      871,
+      false,
+      [
+       870
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 96674568,
+    "skipped_minus_recurrence_lmul": 96674568,
+    "ref_minus_blr_ladd": 96660680,
+    "skipped_minus_recurrence_ladd": 96660680,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "220_amd1aud30_AUD1_4194271_2_b4.jsonl",
+   "idx": 220,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 4194271,
+   "seed": 2,
+   "block": 4,
+   "command": "<AUD1> ic 4194271 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:32Z",
+   "loadavg_before": "2.78 2.18 2.05 3/117 9985",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 870,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 868,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      871,
+      false,
+      [
+       870
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 96674568,
+    "skipped_minus_recurrence_lmul": 96674568,
+    "ref_minus_blr_ladd": 96660680,
+    "skipped_minus_recurrence_ladd": 96660680,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "221_amd1aud30_AUD1_4194271_3_b4.jsonl",
+   "idx": 221,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 4194271,
+   "seed": 3,
+   "block": 4,
+   "command": "<AUD1> ic 4194271 3 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:16:34Z",
+   "loadavg_before": "2.78 2.18 2.05 3/114 9992",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 870,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 868,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      871,
+      false,
+      [
+       870
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 96674568,
+    "skipped_minus_recurrence_lmul": 96674568,
+    "ref_minus_blr_ladd": 96660680,
+    "skipped_minus_recurrence_ladd": 96660680,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "222_amd1aud30_AUD1_4194271_5_b4.jsonl",
+   "idx": 222,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 4194271,
+   "seed": 5,
+   "block": 4,
+   "command": "<AUD1> ic 4194271 5 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:17:10Z",
+   "loadavg_before": "2.88 2.28 2.09 3/114 10106",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 870,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 868,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      871,
+      false,
+      [
+       870
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 96674568,
+    "skipped_minus_recurrence_lmul": 96674568,
+    "ref_minus_blr_ladd": 96660680,
+    "skipped_minus_recurrence_ladd": 96660680,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "223_amd1aud30_AUD1_4194271_6_b4.jsonl",
+   "idx": 223,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 4194271,
+   "seed": 6,
+   "block": 4,
+   "command": "<AUD1> ic 4194271 6 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:17:11Z",
+   "loadavg_before": "2.89 2.29 2.10 4/113 10113",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 870,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 868,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      871,
+      false,
+      [
+       870
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 96674568,
+    "skipped_minus_recurrence_lmul": 96674568,
+    "ref_minus_blr_ladd": 96660680,
+    "skipped_minus_recurrence_ladd": 96660680,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "224_amd1aud30_AUD1_2097091_1_b4.jsonl",
+   "idx": 224,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 1,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 1 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:17:36Z",
+   "loadavg_before": "2.93 2.35 2.12 3/115 10129",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "225_amd1aud30_AUD1_2097091_2_b4.jsonl",
+   "idx": 225,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 2,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:17:53Z",
+   "loadavg_before": "2.94 2.38 2.14 3/118 10142",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "226_amd1aud30_AUD1_2097091_3_b4.jsonl",
+   "idx": 226,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 3,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 3 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:02Z",
+   "loadavg_before": "2.95 2.40 2.14 3/118 10151",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "227_amd1aud30_AUD1_2097091_4_b4.jsonl",
+   "idx": 227,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 4,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:19Z",
+   "loadavg_before": "2.96 2.43 2.16 3/115 10161",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "228_amd1aud30_AUD1_2097091_5_b4.jsonl",
+   "idx": 228,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 5,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 5 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:24Z",
+   "loadavg_before": "2.97 2.44 2.16 3/118 10171",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "229_amd1aud30_AUD1_2097091_6_b4.jsonl",
+   "idx": 229,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 2097091,
+   "seed": 6,
+   "block": 4,
+   "command": "<AUD1> ic 2097091 6 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:36Z",
+   "loadavg_before": "2.98 2.47 2.18 3/115 10180",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 615,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 613,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      616,
+      false,
+      [
+       615
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 48265368,
+    "skipped_minus_recurrence_lmul": 48265368,
+    "ref_minus_blr_ladd": 48255560,
+    "skipped_minus_recurrence_ladd": 48255560,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "230_amd1aud30_AUD1_1048507_1_b4.jsonl",
+   "idx": 230,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 1048507,
+   "seed": 1,
+   "block": 4,
+   "command": "<AUD1> ic 1048507 1 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:40Z",
+   "loadavg_before": "2.98 2.47 2.18 3/115 10187",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 434,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 433,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      435,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 24095728,
+    "skipped_minus_recurrence_lmul": 24095728,
+    "ref_minus_blr_ladd": 24088800,
+    "skipped_minus_recurrence_ladd": 24088800,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "231_amd1aud30_AUD1_1048507_2_b4.jsonl",
+   "idx": 231,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 1048507,
+   "seed": 2,
+   "block": 4,
+   "command": "<AUD1> ic 1048507 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:46Z",
+   "loadavg_before": "2.98 2.49 2.19 3/114 10196",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 434,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 433,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      435,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 24095728,
+    "skipped_minus_recurrence_lmul": 24095728,
+    "ref_minus_blr_ladd": 24088800,
+    "skipped_minus_recurrence_ladd": 24088800,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "232_amd1aud30_AUD1_1048507_3_b4.jsonl",
+   "idx": 232,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 1048507,
+   "seed": 3,
+   "block": 4,
+   "command": "<AUD1> ic 1048507 3 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:52Z",
+   "loadavg_before": "2.98 2.50 2.19 3/118 10207",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 434,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 433,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      435,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 24095728,
+    "skipped_minus_recurrence_lmul": 24095728,
+    "ref_minus_blr_ladd": 24088800,
+    "skipped_minus_recurrence_ladd": 24088800,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "233_amd1aud30_AUD1_1048507_4_b4.jsonl",
+   "idx": 233,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 1048507,
+   "seed": 4,
+   "block": 4,
+   "command": "<AUD1> ic 1048507 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:18:58Z",
+   "loadavg_before": "2.98 2.50 2.20 3/118 10214",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 434,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 433,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      435,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 24095728,
+    "skipped_minus_recurrence_lmul": 24095728,
+    "ref_minus_blr_ladd": 24088800,
+    "skipped_minus_recurrence_ladd": 24088800,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "234_amd1aud30_AUD1_1048507_5_b4.jsonl",
+   "idx": 234,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 1048507,
+   "seed": 5,
+   "block": 4,
+   "command": "<AUD1> ic 1048507 5 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:03Z",
+   "loadavg_before": "3.06 2.53 2.21 3/114 10223",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 434,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 433,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      435,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 24095728,
+    "skipped_minus_recurrence_lmul": 24095728,
+    "ref_minus_blr_ladd": 24088800,
+    "skipped_minus_recurrence_ladd": 24088800,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "235_amd1aud30_AUD1_1048507_6_b4.jsonl",
+   "idx": 235,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 1048507,
+   "seed": 6,
+   "block": 4,
+   "command": "<AUD1> ic 1048507 6 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:06Z",
+   "loadavg_before": "3.06 2.54 2.21 3/114 10230",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 434,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 433,
+    "id2_bad": 0,
+    "id2_direct": 2,
+    "narrowing": [
+     [
+      435,
+      false,
+      [],
+      []
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 24095728,
+    "skipped_minus_recurrence_lmul": 24095728,
+    "ref_minus_blr_ladd": 24088800,
+    "skipped_minus_recurrence_ladd": 24088800,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "236_amd1aud30_AUD1_524287_1_b4.jsonl",
+   "idx": 236,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 1,
+   "block": 4,
+   "command": "<AUD1> ic 524287 1 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:13Z",
+   "loadavg_before": "3.05 2.54 2.22 3/114 10240",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 307,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 305,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      308,
+      false,
+      [
+       307
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 12005064,
+    "skipped_minus_recurrence_lmul": 12005064,
+    "ref_minus_blr_ladd": 12000184,
+    "skipped_minus_recurrence_ladd": 12000184,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "237_amd1aud30_AUD1_524287_3_b4.jsonl",
+   "idx": 237,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 3,
+   "block": 4,
+   "command": "<AUD1> ic 524287 3 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:14Z",
+   "loadavg_before": "3.05 2.54 2.22 3/114 10247",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 307,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 305,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      308,
+      false,
+      [
+       307
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 12005064,
+    "skipped_minus_recurrence_lmul": 12005064,
+    "ref_minus_blr_ladd": 12000184,
+    "skipped_minus_recurrence_ladd": 12000184,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "238_amd1aud30_AUD1_524287_4_b4.jsonl",
+   "idx": 238,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 4,
+   "block": 4,
+   "command": "<AUD1> ic 524287 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:21Z",
+   "loadavg_before": "3.05 2.56 2.22 3/114 10254",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 307,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 305,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      308,
+      false,
+      [
+       307
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 11990360,
+    "skipped_minus_recurrence_lmul": 11990360,
+    "ref_minus_blr_ladd": 11985480,
+    "skipped_minus_recurrence_ladd": 11985480,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "239_amd1aud30_AUD1_524287_5_b4.jsonl",
+   "idx": 239,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 5,
+   "block": 4,
+   "command": "<AUD1> ic 524287 5 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:22Z",
+   "loadavg_before": "3.05 2.56 2.22 3/114 10261",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 307,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 305,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      308,
+      false,
+      [
+       307
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 12005064,
+    "skipped_minus_recurrence_lmul": 12005064,
+    "ref_minus_blr_ladd": 12000184,
+    "skipped_minus_recurrence_ladd": 12000184,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "240_amd1aud30_AUD1_524287_6_b4.jsonl",
+   "idx": 240,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 524287,
+   "seed": 6,
+   "block": 4,
+   "command": "<AUD1> ic 524287 6 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:23Z",
+   "loadavg_before": "3.05 2.56 2.22 3/118 10272",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 307,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 305,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      308,
+      false,
+      [
+       307
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 12005064,
+    "skipped_minus_recurrence_lmul": 12005064,
+    "ref_minus_blr_ladd": 12000184,
+    "skipped_minus_recurrence_ladd": 12000184,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "241_amd1aud30_AUD1_262111_1_b4.jsonl",
+   "idx": 241,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 262111,
+   "seed": 1,
+   "block": 4,
+   "command": "<AUD1> ic 262111 1 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:26Z",
+   "loadavg_before": "3.04 2.57 2.23 3/118 10279",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 217,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 215,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      218,
+      false,
+      [
+       217
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 5985864,
+    "skipped_minus_recurrence_lmul": 5985864,
+    "ref_minus_blr_ladd": 5982424,
+    "skipped_minus_recurrence_ladd": 5982424,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "242_amd1aud30_AUD1_262111_2_b4.jsonl",
+   "idx": 242,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 262111,
+   "seed": 2,
+   "block": 4,
+   "command": "<AUD1> ic 262111 2 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:27Z",
+   "loadavg_before": "3.04 2.57 2.23 3/118 10286",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 217,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 215,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      218,
+      false,
+      [
+       217
+      ],
+      [
+       [
+        4,
+        1
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 5975480,
+    "skipped_minus_recurrence_lmul": 5975480,
+    "ref_minus_blr_ladd": 5972040,
+    "skipped_minus_recurrence_ladd": 5972040,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "243_amd1aud30_AUD1_262111_3_b4.jsonl",
+   "idx": 243,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 262111,
+   "seed": 3,
+   "block": 4,
+   "command": "<AUD1> ic 262111 3 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:28Z",
+   "loadavg_before": "3.04 2.57 2.23 3/118 10295",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 217,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 215,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      218,
+      false,
+      [
+       217
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 5985864,
+    "skipped_minus_recurrence_lmul": 5985864,
+    "ref_minus_blr_ladd": 5982424,
+    "skipped_minus_recurrence_ladd": 5982424,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "244_amd1aud30_AUD1_262111_4_b4.jsonl",
+   "idx": 244,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 262111,
+   "seed": 4,
+   "block": 4,
+   "command": "<AUD1> ic 262111 4 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:29Z",
+   "loadavg_before": "3.04 2.57 2.23 3/118 10302",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 217,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 215,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      218,
+      false,
+      [
+       217
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 5985864,
+    "skipped_minus_recurrence_lmul": 5985864,
+    "ref_minus_blr_ladd": 5982424,
+    "skipped_minus_recurrence_ladd": 5982424,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "245_amd1aud30_AUD1_262111_5_b4.jsonl",
+   "idx": 245,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 262111,
+   "seed": 5,
+   "block": 4,
+   "command": "<AUD1> ic 262111 5 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:30Z",
+   "loadavg_before": "3.04 2.57 2.23 3/118 10309",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 217,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 215,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      218,
+      false,
+      [
+       217
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 5985864,
+    "skipped_minus_recurrence_lmul": 5985864,
+    "ref_minus_blr_ladd": 5982424,
+    "skipped_minus_recurrence_ladd": 5982424,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  },
+  {
+   "unit": "246_amd1aud30_AUD1_262111_6_b4.jsonl",
+   "idx": 246,
+   "role": "amd1aud30",
+   "arm": "AUD1",
+   "q": 262111,
+   "seed": 6,
+   "block": 4,
+   "command": "<AUD1> ic 262111 6 D 3.0 1.7",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T05:19:33Z",
+   "loadavg_before": "3.04 2.58 2.23 3/118 10316",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "oracle": {
+    "calls": 1,
+    "id1_used": 217,
+    "id1_bad": 0,
+    "id1_direct_fallback": 0,
+    "id2_used": 215,
+    "id2_bad": 0,
+    "id2_direct": 3,
+    "narrowing": [
+     [
+      218,
+      false,
+      [
+       217
+      ],
+      [
+       [
+        4,
+        2
+       ]
+      ]
+     ]
+    ],
+    "id2_reuse_after_a_narrowing": 0
+   },
+   "reconciliation": {
+    "ref_minus_blr_lmul": 5985864,
+    "skipped_minus_recurrence_lmul": 5985864,
+    "ref_minus_blr_ladd": 5982424,
+    "skipped_minus_recurrence_ladd": 5982424,
+    "exact": true,
+    "ref_source": "committed REF"
+   },
+   "checks": [
+    {
+     "against": "vs committed amendment BLR1 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true
+  }
+ ],
+ "total_mismatches_non_negative_roles": 0,
+ "fields_compared_non_negative_roles": 15444,
+ "replayed_ratios": [
+  {
+   "q": 4194271,
+   "seed": 4,
+   "block": 4,
+   "DL_meq_ratio": {
+    "0.0": 0.8124442315038779,
+    "0.5": 0.8679814991537022,
+    "1.0": 0.8897831191502099
+   },
+   "DL_meq_ratio_wh": {
+    "0.1": 0.8388682432265253,
+    "1.0": 0.92895348207535
+   },
+   "D_DL1_ratio_all_1": true,
+   "la_lmul_ratio": 0.7286383331912586,
+   "bl_iters": [
+    870
+   ],
+   "bl_narrowed": [
+    0
+   ]
+  },
+  {
+   "q": 524287,
+   "seed": 2,
+   "block": 4,
+   "DL_meq_ratio": {
+    "0.0": 0.8109286214101735,
+    "0.5": 0.8622293096747918,
+    "1.0": 0.883592641122829
+   },
+   "DL_meq_ratio_wh": {
+    "0.1": 0.8363051206985419,
+    "1.0": 0.9258610981323362
+   },
+   "D_DL1_ratio_all_1": true,
+   "la_lmul_ratio": 0.7348111083179847,
+   "bl_iters": [
+    308
+   ],
+   "bl_narrowed": [
+    1
+   ]
+  },
+  {
+   "q": 2097091,
+   "seed": 10,
+   "block": 4,
+   "DL_meq_ratio": {
+    "0.0": 0.8190294775540045,
+    "0.5": 0.8688210093404608,
+    "1.0": 0.8892256859832073
+   },
+   "DL_meq_ratio_wh": {
+    "0.1": 0.8434062426692907,
+    "1.0": 0.9292168189155453
+   },
+   "D_DL1_ratio_all_1": true,
+   "la_lmul_ratio": 0.7297422170285541,
+   "bl_iters": [
+    616
+   ],
+   "bl_narrowed": [
+    1
+   ]
+  },
+  {
+   "q": 2097091,
+   "seed": 8,
+   "block": 4,
+   "DL_meq_ratio": {
+    "0.0": 0.8189860551183384,
+    "0.5": 0.8687547798940322,
+    "1.0": 0.8891577269918696
+   },
+   "DL_meq_ratio_wh": {
+    "0.1": 0.8433714736039001,
+    "1.0": 0.929205564566458
+   },
+   "D_DL1_ratio_all_1": true,
+   "la_lmul_ratio": 0.7301078353708484,
+   "bl_iters": [
+    616
+   ],
+   "bl_narrowed": [
+    1
+   ]
+  },
+  {
+   "q": 524287,
+   "seed": 2,
+   "block": 8,
+   "DL_meq_ratio": {
+    "0.0": 0.7758456955611449,
+    "0.5": 0.8168082753157683,
+    "1.0": 0.8369605492246861
+   },
+   "DL_meq_ratio_wh": {
+    "0.1": 0.7948805735567525,
+    "1.0": 0.8837367919411035
+   },
+   "D_DL1_ratio_all_1": true,
+   "la_lmul_ratio": 0.7293407909062938,
+   "bl_iters": [
+    154
+   ],
+   "bl_narrowed": [
+    1
+   ]
+  },
+  {
+   "q": 524287,
+   "seed": 5,
+   "block": 2,
+   "DL_meq_ratio": {
+    "0.0": 0.8553445641436379,
+    "0.5": 0.9069068643751824,
+    "1.0": 0.9249911438728056
+   },
+   "DL_meq_ratio_wh": {
+    "0.1": 0.8829503066670032,
+    "1.0": 0.9569280900644199
+   },
+   "D_DL1_ratio_all_1": true,
+   "la_lmul_ratio": 0.7499338553543665,
+   "bl_iters": [
+    615
+   ],
+   "bl_narrowed": [
+    0
+   ]
+  }
+ ]
+}

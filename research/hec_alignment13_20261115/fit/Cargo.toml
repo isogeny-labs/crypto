@@ -1,0 +1,13 @@
+[package]
+name="hec-kummer-alignment13"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../../crates/hec-native-ic"}
+num-bigint="0.4"
+[[bin]]
+name="alignment13"
+path="main.rs"
+[profile.release]
+debug=1

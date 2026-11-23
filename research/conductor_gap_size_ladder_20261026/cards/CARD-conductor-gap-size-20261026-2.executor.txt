@@ -1,0 +1,20 @@
+card: CARD-conductor-gap-size-20261026-2 (sha256 f40b34146d2625fb84f7e2d026807859760beff37a0c02b3fb27e3cfe9809562)
+commit: 834cc5015d221c9bac774bd9eb278db624db4d85
+receipt: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-2.receipt.json sha256 481bfdd4578d44e9a5b0361908a951dab9af9f1770a96488e95607a02c390449
+status: completed
+command 1 (self-test): ["target/conductor-gap-size-plan-v2", "--self-test"] exit 0 (0.002 s) succeeded
+  stdout sha256 53f99bbe60562de8387557469d6692911e1bfc93ccb1c3debc6da73b91a26806; last 1 lines:
+    Native primality, Pocklington, integer bounds and planning controls passed
+command 2 (search): ["target/conductor-gap-size-plan-v2", "--complete-v2", "research/conductor_gap_crater_design_20261025/design.json", "research/conductor_gap_size_ladder_20261026/results/candidates.csv", "research/conductor_gap_size_ladder_20261026/results-v2"] exit 0 (0.264 s) succeeded
+  stdout sha256 2b453053920202f07b92e916dfe37bbf573603a20e1d54a4ebb75a87d54f7fa0; last 1 lines:
+    Parameter candidates retained: 134; complete cells: 22/22; ECDLP solves: 0; explicit models: 0
+  stderr last 3 lines:
+    upper bits=112 d=67 accepted=1 candidates=862
+    upper bits=160 d=67 accepted=1 candidates=17203
+    upper bits=256 d=67 accepted=1 candidates=98565
+  output research/conductor_gap_size_ladder_20261026/results-v2/candidates.csv: 1f7a8c3789c8acb46fe5407e3a23e6f227026c34d82513b42bc28951167d7f5f
+  output research/conductor_gap_size_ladder_20261026/results-v2/design.json: f93d9cb951afda2fa37cbf072268233ecbc08a260035c1c9c53d0412e1c0cf71
+command 3 (verify): ["target/conductor-gap-size-verify-v2", "research/conductor_gap_size_ladder_20261026/results-v2/candidates.csv", "research/conductor_gap_size_ladder_20261026/results-v2/verification.json"] exit 0 (0.014 s) succeeded
+  stdout sha256 fd8e753de35127c03892762f55cf4fb85319d978cd48a2411f7eb875933e2caa; last 1 lines:
+    Verified 128 native and 6 upper parameter classes; 22 complete cells; no model/map/solve claim
+  output research/conductor_gap_size_ladder_20261026/results-v2/verification.json: 8a554733a867352643c14e2438ce05071c1d5cb10b9606149d9cfc21d3d775fb

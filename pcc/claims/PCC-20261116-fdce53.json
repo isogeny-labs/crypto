@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:34:14Z",
+ "id": "PCC-20261116-fdce53",
+ "kind": "statement",
+ "producer": {
+  "commit": "a9fa59faf5e11b223efdbff47eb55408a8f150fb",
+  "model": "",
+  "session": "rootfind-pair-collision-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k13.json",
+    "sha256": "b90950bf46394dd82bdc87d6da6ea597825b63b5e17a2146046cc37e7d050aa1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k19.json",
+    "sha256": "55e434b0dcba675f951b98a78adbf690d92e1ecfdd876f3166bf8b069d1f5dda"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k23.json",
+    "sha256": "950460e945919b65bcbdeb0d48f9fe42e6355639ee5d07a56a08578c96823b35"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k13.replay-rank.txt",
+    "sha256": "d41d8d23dba2cc5ea40b743884ac36b5aa88059c92e718b1010b5c61dedca1d6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k19.replay-rank.txt",
+    "sha256": "e795ab58a9f0e28c81cc9c61f4c73ebb4096cbb9c32008f996fcca41e4c3f6fd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k23.replay-rank.txt",
+    "sha256": "e5764f11d03c916354e199ba8d246927b98c2e4329cce3dd121bd417081d283e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/integration-check-20261116T0734Z/stdout.txt",
+    "sha256": "dec1e715bf9adfa18ed2c36c8474304b1e37ca08c0f3d3043dffdb5b887fcf23"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/integration-check-20261116T0734Z/stderr.txt",
+    "sha256": "acdbc3c4d3a2e1b676813968e664b83e01516e034880e22b8c8f533b7e1ceafa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Fixed binary Koblitz standard-subspace bases and one K13 known-answer development target; signed independent verification and EKS performance measurement absent",
+ "statement": "On the fixed K13/d5, K19/d7, and K23/d8 public Koblitz bases, the producer collision census and a separate dense row-rank replay recorded 27, 99, and 201 checked nonzero pair-sum rows with ranks 5, 11, and 23; a source-pinned ecbench development suite passed 21 tests with one ignored, including same-target K13 scalar verification under old and opt-in harvest engines. This is producer development evidence, not a verified performance or ECDLP cost claim."
+}

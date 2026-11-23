@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T10:12:20Z",
+ "id": "PCC-20261112-fe086f",
+ "kind": "theorem",
+ "producer": {
+  "commit": "b351d6857776e1883c56d05fb10427936aa64e00",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a2ba5f8771f6e79d3a1bfb99d0132a442bc43501feb643ef6953df8466653096",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/IndependentMapChart.lean",
+   "theorem": "IndependentMapChart.ordinate_chart_homogenization"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful denominator-cleared support/ordinate chart formulas and7-torsion omitted-map norm4 control. Actual projective curves,divisors,fields,Cantor correctness/Picard maps and actual norm4 realization remain written dependencies;whole-map native acceptance separate.",
+ "statement": "theorem ordinate_chart_homogenization {K : Type} [CommRing K] (x a l w y z v0 v1 v2 v3 : K) (hc : (x-a)*w=l) (hy : y=v3*x^3+v2*x^2+v1*x+v0) (hz : l*z=y*w^3) : l*z=v3*(a*w+l)^3+v2*w*(a*w+l)^2+v1*w^2*(a*w+l)+v0*w^3"
+}

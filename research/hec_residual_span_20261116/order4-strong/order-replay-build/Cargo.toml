@@ -1,0 +1,13 @@
+[package]
+name="hec-order-certificate-replay"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="order-certificate-replay"
+path="../order-replay.rs"
+[[bin]]
+name="source-certificate-replay"
+path="../source-replay.rs"

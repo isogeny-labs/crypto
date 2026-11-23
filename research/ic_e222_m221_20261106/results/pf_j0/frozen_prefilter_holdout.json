@@ -1,0 +1,15 @@
+{
+  "frozen_before_run": "2026-11-14",
+  "commit_of_code": "b5a7480004 (prime_fast_j0_sym.rs with default prefilter, summands>=3)",
+  "tuning": "CSKIP=150, 6 instances x 2 curves, c in {0.4,0.5,0.6,0.7,0.8,1.0} for ic_solve 3 summands, B per size from 4 values; rows in results/pf_j0/prefilter/t_*.jsonl",
+  "frozen_parameters": {
+    "28": {"B": 116, "baseline_c": 0.7},
+    "30": {"B": 184, "baseline_c": 0.8},
+    "32": {"B": 292, "baseline_c": 0.5}
+  },
+  "holdout_command": "CSKIP=600 C3=<baseline_c> NOPLAIN2=1 target/release/examples/prime_fast_j0_sym out.jsonl <bits> <B> 8 40 3",
+  "holdout": "CSKIP=600 (two curves per size), 8 instances per curve, 16 rows per size, wall clock, one host, no isolation",
+  "prediction": "pooled sum(plain3_ms)/sum(sym_ms) with tuned baseline c: 28 bits >= 3.2, 30 bits >= 3.5, 32 bits >= 3.7 (tuning gave 3.47, 3.89, 4.07)",
+  "abandon_rule": "if any pooled size ratio < 3.0 or any solve fails verification, the 'about 4x over ic_solve' claim is withdrawn and recorded as such",
+  "known_limits": "one twist group per size may repeat tuning group; no isolation; no A/A interval; no section 5a band; unmatched rho"
+}

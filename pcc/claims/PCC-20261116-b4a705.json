@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:09:28Z",
+ "id": "PCC-20261116-b4a705",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/weil_chart.cpp",
+    "sha256": "693be88315145d3e0063aba9db7a24ddd513bf1f1d5f289d296a8b2dbea7146e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/weil_chart.hpp",
+    "sha256": "6f0ebcd66870a728ee5b92e9acf702be31dd64005e9d00f6d3914faf8bd6f6b6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/chart_receipt_check.cpp",
+    "sha256": "8637ddf06d74ea699c2778b81fde8c11c6954ceb254141ed45c494a7d1dd8001"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/WEIL_CHART_PROTOCOL.md",
+    "sha256": "9e695134a4a7ae48f93808243a0775be03c3c58c5985568f4872b3d65056ac62"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/weil-chart-v1/result.json",
+    "sha256": "ae00fdfedaa46e8dc84bb1e9de3dca6cddbe42a43152f0aa86e00c1cba5bf287"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/weil-chart-v1/checker.txt",
+    "sha256": "d3949829c0064cddbf793a47f1c2f2a8cdeae1e6ab1816704c8871c0f9d298fe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/weil-chart-v1/checker-canary.stderr",
+    "sha256": "a61b0b97836d6b8e8483930e593b5ff824518378b05ac2a36d6b1bd10de68ed0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native precision24 formal-arc evaluation on the actual P192 d7 kernel1 matches81 regular evaluations and supplies52 previously colliding evaluations at all26 nonidentity kernel classes. A receipt checker confirms26 nonzero symmetry equations and rejects an altered value; the producer rejects a stationary zero-denominator arc. Unsigned producer function-layer evidence, not an independent Jacobian verifier or target quartic."
+}

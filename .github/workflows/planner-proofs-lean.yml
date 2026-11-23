@@ -9,6 +9,7 @@ name: Planner-study Lean proofs
 # certificates.json, and re-checks the environment with leanchecker.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/planner-proofs-lean.yml'
       - 'research/ic_planner_exhaustive_20261026/lean/**'
@@ -33,6 +34,7 @@ concurrency:
 
 jobs:
   lean:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 60 }}
     env:

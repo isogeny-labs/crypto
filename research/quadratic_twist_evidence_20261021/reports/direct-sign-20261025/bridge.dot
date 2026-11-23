@@ -1,0 +1,10 @@
+digraph direct_sign {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",label="Three methods, identical ordered operands and source answers",labelloc=t];
+ node [shape=box,style="rounded,filled",fillcolor="#eef2f6",fontname="Helvetica",fontsize=11];
+ a [label="Same base columns\nSame complete S3 solver"];
+ b [label="Binary / cached / direct\nCharge reads in all arms"];
+ c [label="Same tested point sums\nHash rejected tests too"];
+ d [label="Same rows and shifts\nSame base logs"];
+ e [label="Actual source map\nAll 1200 scalars pass"];
+ a->b->c->d->e;
+}

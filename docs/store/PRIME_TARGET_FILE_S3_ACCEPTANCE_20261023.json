@@ -1,0 +1,158 @@
+{
+  "bytes": 95,
+  "checks": {
+    "digest_reference": true,
+    "fresh_cache_ic_and_icx_with_route": true,
+    "head_digest_and_length": true,
+    "missing_name_rejected": true,
+    "oversized_input_rejected": true,
+    "pull_byte_equality": true,
+    "remote_download_verify": true,
+    "unknown_input_rejected": true
+  },
+  "cleanup": {
+    "delete_exit": 0,
+    "head_after_delete_404": true
+  },
+  "date_utc": "2026-10-23T01:13:15.386848+00:00",
+  "name": "targets/prime271/prime-target-20261023T011315Z-adc8dadd/input.json",
+  "object_key": "ic/v1/acceptance/prime-target-20261023T011315Z-adc8dadd/sha256/53/53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+  "push": {
+    "bytes": 95,
+    "cached": true,
+    "name": "targets/prime271/prime-target-20261023T011315Z-adc8dadd/input.json",
+    "replaced": false,
+    "sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+    "uploaded": true
+  },
+  "region": "us-east-2",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/prime-target-20261023T011315Z-adc8dadd",
+  "run_id": "prime-target-20261023T011315Z-adc8dadd",
+  "runs": [
+    {
+      "binary": "ic",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 11,
+        "trials_per_relation_median": 3.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 77
+      },
+      "route": false,
+      "route_receipt": null,
+      "scalar": "190",
+      "store_input_replay": true
+    },
+    {
+      "binary": "ic",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 10,
+        "trials_per_relation_median": 2.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 81
+      },
+      "route": true,
+      "route_receipt": {
+        "counted_curve_order": 281,
+        "destination": {
+          "a": 268,
+          "b": 85,
+          "generator": [
+            23,
+            114
+          ],
+          "target": [
+            3,
+            118
+          ]
+        },
+        "edges_verified": 2,
+        "homomorphism_checks": 2,
+        "hops": 1,
+        "nodes_verified": 3,
+        "route_file_sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+        "route_id": "IW1E11h1h1a619f4ab250",
+        "subgroup_verified": true
+      },
+      "scalar": "190",
+      "store_input_replay": true
+    },
+    {
+      "binary": "icx",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 11,
+        "trials_per_relation_median": 3.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 77
+      },
+      "route": false,
+      "route_receipt": null,
+      "scalar": "190",
+      "store_input_replay": true
+    },
+    {
+      "binary": "icx",
+      "relation_counts": {
+        "factor_base_size": 8,
+        "relation_attempts_exhausted": 0,
+        "relations_collected": 24,
+        "trials_per_relation_max": 10,
+        "trials_per_relation_median": 2.0,
+        "trials_per_relation_min": 1,
+        "trials_total": 81
+      },
+      "route": true,
+      "route_receipt": {
+        "counted_curve_order": 281,
+        "destination": {
+          "a": 268,
+          "b": 85,
+          "generator": [
+            23,
+            114
+          ],
+          "target": [
+            3,
+            118
+          ]
+        },
+        "edges_verified": 2,
+        "homomorphism_checks": 2,
+        "hops": 1,
+        "nodes_verified": 3,
+        "route_file_sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+        "route_id": "IW1E11h1h1a619f4ab250",
+        "subgroup_verified": true
+      },
+      "scalar": "190",
+      "store_input_replay": true
+    }
+  ],
+  "schema": "crypto.prime-target-file-s3-acceptance/v1",
+  "sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+  "source_parent_commit": "878d167ec80e6a5d3ee795cf59d7406ccd42f4fb",
+  "validation": {
+    "cover_transfer_generator_check": true,
+    "git_diff_check": true,
+    "json_parse_check": true,
+    "release_binary_tests": {
+      "failed": 0,
+      "ic_passed": 34,
+      "icx_passed": 21
+    },
+    "release_library_tests": {
+      "failed": 0,
+      "ignored": 119,
+      "passed": 4488
+    },
+    "rustfmt_check": true
+  }
+}

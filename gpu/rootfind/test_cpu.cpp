@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <random>
+#include <algorithm>
 #include <set>
 #include <tuple>
 
@@ -78,12 +79,17 @@ static void test_fp64(uint64_t p, std::mt19937_64 &rng) {
         if (a) {
             uint64_t inv = fp64_inv(f, am);
             CHECK(fp64_mul(f, inv, am) == f.one, "inv*a == 1 for a=%llu", (unsigned long long)a);
+            if (it < 256)
+                CHECK(fp64_from_mont(f, inv) == ref_powmod(a, p - 2, p),
+                      "host EEA vs independent Fermat p=%llu a=%llu",
+                      (unsigned long long)p, (unsigned long long)a);
         }
     }
     /* edge values */
     uint64_t pm1 = fp64_to_mont(f, p - 1);
     CHECK(fp64_from_mont(f, fp64_mul(f, pm1, pm1)) == 1, "(p-1)^2 == 1");
     CHECK(fp64_inv(f, 0) == 0, "inv(0) == 0");
+    fp64_batch_inv(f, nullptr, 0, nullptr);  /* empty batch must not dereference */
     /* batch inversion */
     for (int n : {1, 2, 7, 16, 32, 64}) {
         std::vector<uint64_t> x(n), s(n), orig(n);
@@ -156,6 +162,18 @@ static U256x64 rand256_below(std::mt19937_64 &rng, const U256x64 &p) {
     }
 }
 
+/* Independent frozen pre-optimization exponentiation reference. */
+static U256x64 fp256_inv_bitwise_reference(const Fp256Ctx &f, const U256x64 &a) {
+    U256x64 e = f.p;
+    e.v[0] -= 2;
+    U256x64 acc = f.one;
+    for (int i = 255; i >= 0; --i) {
+        acc = fp256_sqr(f, acc);
+        if ((e.v[i >> 6] >> (i & 63)) & 1) acc = fp256_mul(f, acc, a);
+    }
+    return acc;
+}
+
 static void test_fp256(std::mt19937_64 &rng) {
     Fp256Ctx f = fp256_ctx_p256();
     /* constants: R mod p and R^2 mod p from the canonical definition */
@@ -182,17 +200,34 @@ static void test_fp256(std::mt19937_64 &rng) {
         if (!u256_is_zero(a)) {
             U256x64 inv = fp256_inv(f, am);
             CHECK(u256_eq(fp256_mul(f, inv, am), f.one), "p256 inv it=%d", it);
+            CHECK(u256_eq(inv, fp256_inv_bitwise_reference(f, am)),
+                  "p256 sparse exponent vs reference it=%d", it);
         }
     }
     /* p-1 squared is 1 */
     U256x64 pm1 = f.p; pm1.v[0] -= 1;
     U256x64 pm1m = fp256_to_mont(f, pm1);
     CHECK(u256_eq(fp256_from_mont(f, fp256_mul(f, pm1m, pm1m)), one), "(p-1)^2 == 1 (p256)");
-    for (int n : {1, 5, 16}) {
+    U256x64 zero = {{0, 0, 0, 0}};
+    CHECK(u256_eq(fp256_inv(f, zero), zero), "p256 zero inverse convention");
+    U256x64 sentinel[1] = {f.one}, scratch0[1] = {f.one};
+    fp256_batch_inv(f, sentinel, 0, scratch0);
+    CHECK(u256_eq(sentinel[0], f.one) && u256_eq(scratch0[0], f.one),
+          "p256 empty batch no-op");
+    for (int n : {1, 2, 5, 16, 32}) {
         std::vector<U256x64> x(n), s(n), orig(n);
-        for (int i = 0; i < n; i++) { x[i] = fp256_to_mont(f, rand256_below(rng, f.p)); orig[i] = x[i]; }
+        for (int i = 0; i < n; i++) {
+            U256x64 a = rand256_below(rng, f.p);
+            if (u256_is_zero(a)) a = one;
+            x[i] = fp256_to_mont(f, a);
+            orig[i] = x[i];
+        }
         fp256_batch_inv(f, x.data(), n, s.data());
-        for (int i = 0; i < n; i++) CHECK(u256_eq(fp256_mul(f, x[i], orig[i]), f.one), "p256 batch_inv n=%d", n);
+        for (int i = 0; i < n; i++) {
+            CHECK(u256_eq(fp256_mul(f, x[i], orig[i]), f.one), "p256 batch_inv n=%d", n);
+            CHECK(u256_eq(x[i], fp256_inv_bitwise_reference(f, orig[i])),
+                  "p256 batch vs bitwise reference n=%d i=%d", n, i);
+        }
     }
 }
 
@@ -432,18 +467,122 @@ static void test_oracle_p256(std::mt19937_64 &rng) {
     std::printf("  p256 oracle: %zu controls found (sorted + hash)\n", ctls.size());
 }
 
+/* The table primitives under the compiled lookup flags (RF_SORTED_EYT,
+ * RF_HASH_PACKED, RF_PROBE_PAIR): sorted begin() equals std::lower_bound and
+ * begin2() equals two begin() calls, for table sizes that are mostly not
+ * 2^h - 1 (partial bottom level of the Eytzinger tree) and keys below,
+ * inside and above the stored range; the hash table returns every stored
+ * index of a key (extra tag-only candidates allowed), and begin2() equals
+ * two begin() calls. */
+static void test_lookup_primitives(std::mt19937_64 &rng) {
+    long checks = 0;
+    for (int trial = 0; trial < 400; trial++) {
+        const uint32_t n = 1 + (uint32_t)(rng() % 400);
+        std::vector<uint64_t> keys(n);
+        for (auto &k : keys) k = rng() % (4ull * n) * 7;   /* duplicates possible */
+        std::sort(keys.begin(), keys.end());
+        rf::SortedTableHost st;
+        st.keys = keys;
+        st.idx.resize(n);
+        for (uint32_t i = 0; i < n; i++) st.idx[i] = i;
+        rf::eytzinger_fill(st.keys, st.eyt, st.eyt_rank);
+        const SortedTable t = st.view();
+        for (int q = 0; q < 40; q++) {
+            const uint64_t k0 = rng() % (4ull * n * 7 + 20), k1 = rng() % (4ull * n * 7 + 20);
+            const uint32_t want0 = (uint32_t)(std::lower_bound(keys.begin(), keys.end(), k0) - keys.begin());
+            const uint32_t want1 = (uint32_t)(std::lower_bound(keys.begin(), keys.end(), k1) - keys.begin());
+            uint32_t p0 = 0, p1 = 0;
+            t.begin2(k0, k1, p0, p1);
+            CHECK(t.begin(k0) == want0 && p0 == want0 && p1 == want1,
+                  "sorted lookup n=%u k0=%llu: begin %u begin2 %u/%u want %u/%u", n,
+                  (unsigned long long)k0, t.begin(k0), p0, p1, want0, want1);
+            checks++;
+        }
+    }
+    for (int trial = 0; trial < 200; trial++) {
+        const uint32_t n = 1 + (uint32_t)(rng() % 300);
+        const uint32_t cap = rf::hash_capacity_for(n);
+        rf::HashTableHost h;
+        h.mask = cap - 1;
+        h.keys.assign(cap, 0);
+        h.vals.assign(cap, RF_NO_INDEX);
+        std::vector<uint64_t> stored(n);
+        for (uint32_t i = 0; i < n; i++) {
+            /* keys sharing their low word (tag collisions) on purpose */
+            stored[i] = (rng() % 8 == 0 && i) ? (stored[i - 1] ^ (1ull << 40)) : rng();
+            uint32_t slot = rf_hash64(stored[i], h.mask);
+            while (h.vals[slot] != RF_NO_INDEX) slot = (slot + 1) & h.mask;
+            h.keys[slot] = stored[i];
+            h.vals[slot] = i;
+        }
+        h.slots.resize(cap);
+        for (uint32_t k = 0; k < cap; k++) h.slots[k] = ((uint64_t)HashTable::tag(h.keys[k]) << 32) | h.vals[k];
+        const HashTable t = h.view();
+        for (uint32_t i = 0; i < n; i++) {
+            const uint64_t key = stored[i], other = stored[(i * 7 + 3) % n] + 1;
+            std::set<uint32_t> got;
+            for (uint32_t pos = t.begin(key); t.valid(pos, key); pos = t.next(pos, key)) got.insert(t.index(pos));
+            CHECK(got.count(i) == 1, "hash lookup lost index %u (n=%u)", i, n);
+            uint32_t p0 = 0, p1 = 0;
+            t.begin2(key, other, p0, p1);
+            CHECK(p0 == t.begin(key) && p1 == t.begin(other), "hash begin2 differs (n=%u)", n);
+            checks++;
+        }
+    }
+    std::printf("  lookup primitives (EYT=%d PACKED=%d PAIR=%d): %ld checks\n", RF_SORTED_EYT, RF_HASH_PACKED,
+                RF_PROBE_PAIR, checks);
+}
+
+/* rf_pair_run (the device pair-table build's batched runs) against rf_pair_x, cell by cell:
+ * rows not a multiple of RF_PAIR_CHUNK, a doubling on every diagonal, both signs, and a
+ * duplicated abscissa (zero denominator -> the per-cell fallback). */
+static void test_pair_runs(uint64_t p, std::mt19937_64 &rng) {
+    Fp64Ctx f = fp64_ctx_new(p);
+    const uint64_t a_m = fp64_to_mont(f, rng() % p);
+    for (uint32_t n : {1u, 15u, 16u, 17u, 37u, 50u}) {
+        std::vector<uint64_t> x(n), y(n);
+        for (uint32_t i = 0; i < n; i++) {
+            x[i] = fp64_to_mont(f, rng() % p);
+            uint64_t yc; do { yc = rng() % p; } while (yc == 0);
+            y[i] = fp64_to_mont(f, yc);
+        }
+        if (n > 5) x[5] = x[2];   /* duplicate abscissa */
+        std::vector<uint64_t> keys((size_t)n * (n + 1), 0);
+        for (uint32_t ai = 0; ai < n; ai++)
+            for (uint32_t b0 = ai; b0 < n; b0 += RF_PAIR_CHUNK) rf_pair_run(f, a_m, x.data(), y.data(), n, ai, b0, keys.data());
+        uint64_t b = 0, filled = 0;
+        for (uint32_t ai = 0; ai < n; ai++)
+            for (uint32_t bi = ai; bi < n; bi++)
+                for (int sg = 0; sg < 2; sg++, b++) {
+                    uint64_t xk = 0;
+                    const int ok = rf_pair_x(f, a_m, x.data(), y.data(), ai, bi, sg, &xk);
+                    const uint64_t want = ok ? xk : RF_PAIR_EMPTY;
+                    CHECK(keys[b] == want, "pair run p=%llu n=%u (%u,%u,%d)", (unsigned long long)p, n, ai, bi, sg);
+                    filled += keys[b] != RF_PAIR_EMPTY;
+                }
+        CHECK(b == keys.size(), "pair run index covers n(n+1)");
+        CHECK(n == 1 || filled > 0, "pair run filled keys");
+    }
+}
+
 int main() {
     std::mt19937_64 rng(0x5EED);
     /* primes: a 61-bit p = 3 mod 4, a 40-bit one, and a tiny one */
     uint64_t p61 = (1ull << 61) - 1;   /* Mersenne prime, = 3 mod 4 */
     uint64_t p40 = (1ull << 40) - 1; while (!(p40 % 4 == 3 && is_prime_u64(p40))) p40--;
     uint64_t p20 = (1ull << 20) - 1; while (!(p20 % 4 == 3 && is_prime_u64(p20))) p20--;
-    CHECK(is_prime_u64(p61), "p61 prime");
+    uint64_t p56 = 72057594037927931ull;
+    uint64_t p62 = 4611686018427387847ull;
+    CHECK(is_prime_u64(p61) && is_prime_u64(p56) && is_prime_u64(p62), "large test primes");
 
     std::printf("=== fp64 ===\n");
-    for (uint64_t p : {p61, p40, p20, (uint64_t)1000003}) test_fp64(p, rng);
+    for (uint64_t p : {p62, p61, p56, p40, p20, (uint64_t)1000003}) test_fp64(p, rng);
     std::printf("=== fp256 (P-256) ===\n");
     test_fp256(rng);
+    std::printf("=== lookup primitives ===\n");
+    test_lookup_primitives(rng);
+    std::printf("=== pair-table runs ===\n");
+    for (uint64_t p : {p61, p40, p20}) test_pair_runs(p, rng);
     std::printf("=== oracle (synthetic a=-3 curves) ===\n");
     for (uint64_t p : {p61, p40}) test_oracle(p, rng);
     std::printf("=== oracle (P-256 positive controls) ===\n");

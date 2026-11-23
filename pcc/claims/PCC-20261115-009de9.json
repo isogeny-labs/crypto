@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T21:23:20Z",
+ "id": "PCC-20261115-009de9",
+ "kind": "statement",
+ "producer": {
+  "commit": "5181b305c62eb8032b7f0ea5e0b81a6d6a14eb31",
+  "model": "Codex",
+  "session": "nist-cover-log-20261115"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_separator_20261115/data/scores.csv",
+    "sha256": "9535ccac67fbc9ec237b9424cc3cc75541f0c6899abb0c753727aa0da446edc2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_separator_20261115/data/cover-metrics.csv",
+    "sha256": "d65139b8b1c5f57e276df708587ad02586e23aa9ab859937618311c15bcc63f5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_separator_20261115/data/search-summary.json",
+    "sha256": "5b590f2fc1f2359a9b0ceab120c4811bdbc43e1e33491b36d659cfcd0a2a559f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_separator_20261115",
+ "statement": "Imported historical producer observations report that the common d=0..7 hyperelliptic-cover full-3-torsion-field-degree sum ranks every published candidate below every eligible skip within each of four controlled seed streams. This is a post hoc finite-pool ranking, with no signed independent verification or historical-selector attribution."
+}

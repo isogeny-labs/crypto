@@ -1,0 +1,823 @@
+{
+  "schema": "bench.record/v1",
+  "id": "20261117-hec-pencil-cold",
+  "status": "measured",
+  "created_utc": "2026-11-17T03:55:04Z",
+  "protocol": "research/hec_residual_span_20261116/pencil-cost/PROTOCOL.md",
+  "custody": {
+    "kind": "git",
+    "s3_available": false,
+    "uploaded": false
+  },
+  "validation": {
+    "calls": 7200,
+    "correct": true,
+    "spread_pass": false,
+    "aa_pass": false,
+    "numerical_tenfold": false,
+    "local_qualified": false,
+    "admitted": false,
+    "independent_replay": false,
+    "primary_operation_counts": false
+  },
+  "summary": "All7200 scalars verify, but spread and nativeAA gates fail; timings unqualified and cannot establish speedup. Retain once-only run without rerun.",
+  "closed_utc": "2026-11-17T03:56:17Z",
+  "commit": "545f32c721e67f6a510cc68b67d611323edd1a34",
+  "commit_dirty": false,
+  "metrics": [
+    {
+      "workload": 0,
+      "arm": "pencil",
+      "median_batch_ns": 38849.0,
+      "min_batch_ns": 37760.375,
+      "max_batch_ns": 51072.938,
+      "spread": 1.352554
+    },
+    {
+      "workload": 0,
+      "arm": "folded",
+      "median_batch_ns": 52645.875,
+      "min_batch_ns": 51958.25,
+      "max_batch_ns": 62679.625,
+      "spread": 1.206346
+    },
+    {
+      "workload": 0,
+      "arm": "expanded",
+      "median_batch_ns": 81374.812,
+      "min_batch_ns": 80807.312,
+      "max_batch_ns": 125723.812,
+      "spread": 1.555847
+    },
+    {
+      "workload": 0,
+      "arm": "native",
+      "median_batch_ns": 137387.938,
+      "min_batch_ns": 136375.062,
+      "max_batch_ns": 156948.062,
+      "spread": 1.150856
+    },
+    {
+      "workload": 0,
+      "arm": "native_aa",
+      "median_batch_ns": 134898.375,
+      "min_batch_ns": 133955.688,
+      "max_batch_ns": 153453.125,
+      "spread": 1.145551
+    },
+    {
+      "workload": 1,
+      "arm": "pencil",
+      "median_batch_ns": 47669.375,
+      "min_batch_ns": 46156.312,
+      "max_batch_ns": 74286.375,
+      "spread": 1.609452
+    },
+    {
+      "workload": 1,
+      "arm": "folded",
+      "median_batch_ns": 55161.438,
+      "min_batch_ns": 54388.125,
+      "max_batch_ns": 85903.5,
+      "spread": 1.579453
+    },
+    {
+      "workload": 1,
+      "arm": "expanded",
+      "median_batch_ns": 82567.438,
+      "min_batch_ns": 79468.625,
+      "max_batch_ns": 145586.125,
+      "spread": 1.831995
+    },
+    {
+      "workload": 1,
+      "arm": "native",
+      "median_batch_ns": 120153.75,
+      "min_batch_ns": 118838.625,
+      "max_batch_ns": 181054.75,
+      "spread": 1.523535
+    },
+    {
+      "workload": 1,
+      "arm": "native_aa",
+      "median_batch_ns": 117598.875,
+      "min_batch_ns": 116822.938,
+      "max_batch_ns": 179523.625,
+      "spread": 1.536716
+    },
+    {
+      "workload": 2,
+      "arm": "pencil",
+      "median_batch_ns": 50721.438,
+      "min_batch_ns": 45036.562,
+      "max_batch_ns": 153507.875,
+      "spread": 3.408517
+    },
+    {
+      "workload": 2,
+      "arm": "folded",
+      "median_batch_ns": 64455.75,
+      "min_batch_ns": 61020.812,
+      "max_batch_ns": 125484.312,
+      "spread": 2.056418
+    },
+    {
+      "workload": 2,
+      "arm": "expanded",
+      "median_batch_ns": 97145.688,
+      "min_batch_ns": 86911.25,
+      "max_batch_ns": 2063195.25,
+      "spread": 23.739105
+    },
+    {
+      "workload": 2,
+      "arm": "native",
+      "median_batch_ns": 158122.5,
+      "min_batch_ns": 150619.75,
+      "max_batch_ns": 322684.875,
+      "spread": 2.142381
+    },
+    {
+      "workload": 2,
+      "arm": "native_aa",
+      "median_batch_ns": 164677.125,
+      "min_batch_ns": 148426.812,
+      "max_batch_ns": 347291.688,
+      "spread": 2.339818
+    },
+    {
+      "workload": 3,
+      "arm": "pencil",
+      "median_batch_ns": 42911.5,
+      "min_batch_ns": 38986.938,
+      "max_batch_ns": 140176.938,
+      "spread": 3.595485
+    },
+    {
+      "workload": 3,
+      "arm": "folded",
+      "median_batch_ns": 66963.562,
+      "min_batch_ns": 49656.25,
+      "max_batch_ns": 370062.438,
+      "spread": 7.452485
+    },
+    {
+      "workload": 3,
+      "arm": "expanded",
+      "median_batch_ns": 84229.062,
+      "min_batch_ns": 77653.562,
+      "max_batch_ns": 195658.938,
+      "spread": 2.519639
+    },
+    {
+      "workload": 3,
+      "arm": "native",
+      "median_batch_ns": 148622.375,
+      "min_batch_ns": 141554.625,
+      "max_batch_ns": 944265.625,
+      "spread": 6.67068
+    },
+    {
+      "workload": 3,
+      "arm": "native_aa",
+      "median_batch_ns": 256419.375,
+      "min_batch_ns": 139862.125,
+      "max_batch_ns": 610820.25,
+      "spread": 4.367303
+    },
+    {
+      "workload": 4,
+      "arm": "pencil",
+      "median_batch_ns": 46440.125,
+      "min_batch_ns": 44609.312,
+      "max_batch_ns": 70807.125,
+      "spread": 1.587272
+    },
+    {
+      "workload": 4,
+      "arm": "folded",
+      "median_batch_ns": 61182.188,
+      "min_batch_ns": 59679.625,
+      "max_batch_ns": 63385.562,
+      "spread": 1.062097
+    },
+    {
+      "workload": 4,
+      "arm": "expanded",
+      "median_batch_ns": 87494.812,
+      "min_batch_ns": 85187.625,
+      "max_batch_ns": 94796.812,
+      "spread": 1.1128
+    },
+    {
+      "workload": 4,
+      "arm": "native",
+      "median_batch_ns": 143638.062,
+      "min_batch_ns": 141138.312,
+      "max_batch_ns": 170273.562,
+      "spread": 1.20643
+    },
+    {
+      "workload": 4,
+      "arm": "native_aa",
+      "median_batch_ns": 141713.5,
+      "min_batch_ns": 138950.5,
+      "max_batch_ns": 1092773.375,
+      "spread": 7.86448
+    },
+    {
+      "workload": 5,
+      "arm": "pencil",
+      "median_batch_ns": 55981.75,
+      "min_batch_ns": 48867.25,
+      "max_batch_ns": 78971.312,
+      "spread": 1.616038
+    },
+    {
+      "workload": 5,
+      "arm": "folded",
+      "median_batch_ns": 53231.938,
+      "min_batch_ns": 49984.125,
+      "max_batch_ns": 74036.438,
+      "spread": 1.481199
+    },
+    {
+      "workload": 5,
+      "arm": "expanded",
+      "median_batch_ns": 79901.062,
+      "min_batch_ns": 71317.688,
+      "max_batch_ns": 405158.938,
+      "spread": 5.681044
+    },
+    {
+      "workload": 5,
+      "arm": "native",
+      "median_batch_ns": 126979.125,
+      "min_batch_ns": 120380.188,
+      "max_batch_ns": 762229.25,
+      "spread": 6.33185
+    },
+    {
+      "workload": 5,
+      "arm": "native_aa",
+      "median_batch_ns": 124463.562,
+      "min_batch_ns": 119398.562,
+      "max_batch_ns": 1429903.625,
+      "spread": 11.975886
+    },
+    {
+      "workload": 6,
+      "arm": "pencil",
+      "median_batch_ns": 73291.688,
+      "min_batch_ns": 70752.625,
+      "max_batch_ns": 404971.375,
+      "spread": 5.723765
+    },
+    {
+      "workload": 6,
+      "arm": "folded",
+      "median_batch_ns": 175450.562,
+      "min_batch_ns": 173843.875,
+      "max_batch_ns": 229182.312,
+      "spread": 1.318323
+    },
+    {
+      "workload": 6,
+      "arm": "expanded",
+      "median_batch_ns": 207294.188,
+      "min_batch_ns": 203749.875,
+      "max_batch_ns": 301963.562,
+      "spread": 1.482031
+    },
+    {
+      "workload": 6,
+      "arm": "native",
+      "median_batch_ns": 1085377.562,
+      "min_batch_ns": 1082843.75,
+      "max_batch_ns": 2026721.375,
+      "spread": 1.871666
+    },
+    {
+      "workload": 6,
+      "arm": "native_aa",
+      "median_batch_ns": 2515419.312,
+      "min_batch_ns": 1080288.938,
+      "max_batch_ns": 4703310.062,
+      "spread": 4.353752
+    },
+    {
+      "workload": 7,
+      "arm": "pencil",
+      "median_batch_ns": 142960.938,
+      "min_batch_ns": 78463.562,
+      "max_batch_ns": 729046.938,
+      "spread": 9.291535
+    },
+    {
+      "workload": 7,
+      "arm": "folded",
+      "median_batch_ns": 278578.125,
+      "min_batch_ns": 191398.438,
+      "max_batch_ns": 791338.625,
+      "spread": 4.134509
+    },
+    {
+      "workload": 7,
+      "arm": "expanded",
+      "median_batch_ns": 425554.812,
+      "min_batch_ns": 240536.438,
+      "max_batch_ns": 1200226.438,
+      "spread": 4.989791
+    },
+    {
+      "workload": 7,
+      "arm": "native",
+      "median_batch_ns": 1642763.188,
+      "min_batch_ns": 925578.125,
+      "max_batch_ns": 3072906.438,
+      "spread": 3.319986
+    },
+    {
+      "workload": 7,
+      "arm": "native_aa",
+      "median_batch_ns": 2379856.812,
+      "min_batch_ns": 924557.438,
+      "max_batch_ns": 4907635.5,
+      "spread": 5.308092
+    },
+    {
+      "workload": 8,
+      "arm": "pencil",
+      "median_batch_ns": 102999.938,
+      "min_batch_ns": 81627.75,
+      "max_batch_ns": 1078263.25,
+      "spread": 13.209518
+    },
+    {
+      "workload": 8,
+      "arm": "folded",
+      "median_batch_ns": 140317.625,
+      "min_batch_ns": 139406.125,
+      "max_batch_ns": 274364.625,
+      "spread": 1.968096
+    },
+    {
+      "workload": 8,
+      "arm": "expanded",
+      "median_batch_ns": 179265.688,
+      "min_batch_ns": 176447.812,
+      "max_batch_ns": 208020.812,
+      "spread": 1.178937
+    },
+    {
+      "workload": 8,
+      "arm": "native",
+      "median_batch_ns": 1229781.312,
+      "min_batch_ns": 778403.625,
+      "max_batch_ns": 5355283.812,
+      "spread": 6.879829
+    },
+    {
+      "workload": 8,
+      "arm": "native_aa",
+      "median_batch_ns": 776177.062,
+      "min_batch_ns": 773270.875,
+      "max_batch_ns": 875794.312,
+      "spread": 1.132584
+    },
+    {
+      "workload": 9,
+      "arm": "pencil",
+      "median_batch_ns": 96744.812,
+      "min_batch_ns": 68729.25,
+      "max_batch_ns": 149169.312,
+      "spread": 2.170391
+    },
+    {
+      "workload": 9,
+      "arm": "folded",
+      "median_batch_ns": 756270.562,
+      "min_batch_ns": 304367.125,
+      "max_batch_ns": 6664549.5,
+      "spread": 21.896417
+    },
+    {
+      "workload": 9,
+      "arm": "expanded",
+      "median_batch_ns": 479158.812,
+      "min_batch_ns": 354164.062,
+      "max_batch_ns": 5654388.062,
+      "spread": 15.965448
+    },
+    {
+      "workload": 9,
+      "arm": "native",
+      "median_batch_ns": 2163210.938,
+      "min_batch_ns": 1059551.875,
+      "max_batch_ns": 2476000.0,
+      "spread": 2.336837
+    },
+    {
+      "workload": 9,
+      "arm": "native_aa",
+      "median_batch_ns": 1868049.5,
+      "min_batch_ns": 1057966.188,
+      "max_batch_ns": 3756937.438,
+      "spread": 3.551094
+    },
+    {
+      "workload": 10,
+      "arm": "pencil",
+      "median_batch_ns": 86698.0,
+      "min_batch_ns": 79359.438,
+      "max_batch_ns": 198263.062,
+      "spread": 2.498292
+    },
+    {
+      "workload": 10,
+      "arm": "folded",
+      "median_batch_ns": 293937.562,
+      "min_batch_ns": 184554.625,
+      "max_batch_ns": 552536.562,
+      "spread": 2.993892
+    },
+    {
+      "workload": 10,
+      "arm": "expanded",
+      "median_batch_ns": 292234.312,
+      "min_batch_ns": 211958.375,
+      "max_batch_ns": 1018546.938,
+      "spread": 4.80541
+    },
+    {
+      "workload": 10,
+      "arm": "native",
+      "median_batch_ns": 1367604.25,
+      "min_batch_ns": 817486.875,
+      "max_batch_ns": 1584190.062,
+      "spread": 1.937878
+    },
+    {
+      "workload": 10,
+      "arm": "native_aa",
+      "median_batch_ns": 1000221.375,
+      "min_batch_ns": 815721.375,
+      "max_batch_ns": 2113005.125,
+      "spread": 2.590352
+    },
+    {
+      "workload": 11,
+      "arm": "pencil",
+      "median_batch_ns": 101203.125,
+      "min_batch_ns": 87414.062,
+      "max_batch_ns": 1818148.438,
+      "spread": 20.799267
+    },
+    {
+      "workload": 11,
+      "arm": "folded",
+      "median_batch_ns": 207127.688,
+      "min_batch_ns": 175794.25,
+      "max_batch_ns": 499794.312,
+      "spread": 2.843064
+    },
+    {
+      "workload": 11,
+      "arm": "expanded",
+      "median_batch_ns": 235872.562,
+      "min_batch_ns": 213742.125,
+      "max_batch_ns": 1853934.938,
+      "spread": 8.673699
+    },
+    {
+      "workload": 11,
+      "arm": "native",
+      "median_batch_ns": 1621323.062,
+      "min_batch_ns": 1435630.125,
+      "max_batch_ns": 3154661.375,
+      "spread": 2.197405
+    },
+    {
+      "workload": 11,
+      "arm": "native_aa",
+      "median_batch_ns": 1749711.0,
+      "min_batch_ns": 1317364.688,
+      "max_batch_ns": 11135330.75,
+      "spread": 8.452732
+    },
+    {
+      "workload": 12,
+      "arm": "pencil",
+      "median_batch_ns": 108041.688,
+      "min_batch_ns": 93940.0,
+      "max_batch_ns": 619351.812,
+      "spread": 6.593057
+    },
+    {
+      "workload": 12,
+      "arm": "folded",
+      "median_batch_ns": 302567.812,
+      "min_batch_ns": 268622.312,
+      "max_batch_ns": 3864648.375,
+      "spread": 14.386922
+    },
+    {
+      "workload": 12,
+      "arm": "expanded",
+      "median_batch_ns": 389101.625,
+      "min_batch_ns": 357007.688,
+      "max_batch_ns": 1266096.312,
+      "spread": 3.546412
+    },
+    {
+      "workload": 12,
+      "arm": "native",
+      "median_batch_ns": 2562221.25,
+      "min_batch_ns": 2220471.375,
+      "max_batch_ns": 7888296.812,
+      "spread": 3.552533
+    },
+    {
+      "workload": 12,
+      "arm": "native_aa",
+      "median_batch_ns": 3976312.625,
+      "min_batch_ns": 2263838.5,
+      "max_batch_ns": 7930893.312,
+      "spread": 3.503295
+    },
+    {
+      "workload": 13,
+      "arm": "pencil",
+      "median_batch_ns": 125981.688,
+      "min_batch_ns": 116890.562,
+      "max_batch_ns": 499049.562,
+      "spread": 4.269374
+    },
+    {
+      "workload": 13,
+      "arm": "folded",
+      "median_batch_ns": 314052.0,
+      "min_batch_ns": 235814.938,
+      "max_batch_ns": 1073635.25,
+      "spread": 4.552872
+    },
+    {
+      "workload": 13,
+      "arm": "expanded",
+      "median_batch_ns": 360361.938,
+      "min_batch_ns": 315541.562,
+      "max_batch_ns": 1178817.875,
+      "spread": 3.735856
+    },
+    {
+      "workload": 13,
+      "arm": "native",
+      "median_batch_ns": 3620197.812,
+      "min_batch_ns": 2285377.562,
+      "max_batch_ns": 9570880.125,
+      "spread": 4.187877
+    },
+    {
+      "workload": 13,
+      "arm": "native_aa",
+      "median_batch_ns": 3713963.5,
+      "min_batch_ns": 2281963.688,
+      "max_batch_ns": 5749559.812,
+      "spread": 2.519567
+    },
+    {
+      "workload": 14,
+      "arm": "pencil",
+      "median_batch_ns": 131562.688,
+      "min_batch_ns": 125750.125,
+      "max_batch_ns": 139536.312,
+      "spread": 1.109632
+    },
+    {
+      "workload": 14,
+      "arm": "folded",
+      "median_batch_ns": 216393.188,
+      "min_batch_ns": 197893.375,
+      "max_batch_ns": 416101.438,
+      "spread": 2.102655
+    },
+    {
+      "workload": 14,
+      "arm": "expanded",
+      "median_batch_ns": 292460.812,
+      "min_batch_ns": 259302.0,
+      "max_batch_ns": 487218.562,
+      "spread": 1.878962
+    },
+    {
+      "workload": 14,
+      "arm": "native",
+      "median_batch_ns": 3186367.125,
+      "min_batch_ns": 2355052.062,
+      "max_batch_ns": 5199156.125,
+      "spread": 2.207661
+    },
+    {
+      "workload": 14,
+      "arm": "native_aa",
+      "median_batch_ns": 2426393.25,
+      "min_batch_ns": 2168289.125,
+      "max_batch_ns": 7112387.812,
+      "spread": 3.280184
+    },
+    {
+      "workload": 15,
+      "arm": "pencil",
+      "median_batch_ns": 187541.75,
+      "min_batch_ns": 111002.438,
+      "max_batch_ns": 299570.25,
+      "spread": 2.698772
+    },
+    {
+      "workload": 15,
+      "arm": "folded",
+      "median_batch_ns": 260979.312,
+      "min_batch_ns": 224197.938,
+      "max_batch_ns": 395862.062,
+      "spread": 1.765681
+    },
+    {
+      "workload": 15,
+      "arm": "expanded",
+      "median_batch_ns": 510177.188,
+      "min_batch_ns": 296177.125,
+      "max_batch_ns": 674896.062,
+      "spread": 2.278691
+    },
+    {
+      "workload": 15,
+      "arm": "native",
+      "median_batch_ns": 2313314.938,
+      "min_batch_ns": 1989021.0,
+      "max_batch_ns": 3210627.625,
+      "spread": 1.614175
+    },
+    {
+      "workload": 15,
+      "arm": "native_aa",
+      "median_batch_ns": 4560987.125,
+      "min_batch_ns": 2023823.0,
+      "max_batch_ns": 11998705.75,
+      "spread": 5.928733
+    },
+    {
+      "workload": 16,
+      "arm": "pencil",
+      "median_batch_ns": 126140.5,
+      "min_batch_ns": 114302.125,
+      "max_batch_ns": 203861.938,
+      "spread": 1.783536
+    },
+    {
+      "workload": 16,
+      "arm": "folded",
+      "median_batch_ns": 256815.188,
+      "min_batch_ns": 244234.375,
+      "max_batch_ns": 458067.75,
+      "spread": 1.875525
+    },
+    {
+      "workload": 16,
+      "arm": "expanded",
+      "median_batch_ns": 422054.688,
+      "min_batch_ns": 301723.938,
+      "max_batch_ns": 1106375.062,
+      "spread": 3.666846
+    },
+    {
+      "workload": 16,
+      "arm": "native",
+      "median_batch_ns": 3179768.312,
+      "min_batch_ns": 2727203.062,
+      "max_batch_ns": 6999276.062,
+      "spread": 2.566467
+    },
+    {
+      "workload": 16,
+      "arm": "native_aa",
+      "median_batch_ns": 4715291.625,
+      "min_batch_ns": 2490942.562,
+      "max_batch_ns": 13986453.188,
+      "spread": 5.614924
+    },
+    {
+      "workload": 17,
+      "arm": "pencil",
+      "median_batch_ns": 123192.75,
+      "min_batch_ns": 113310.0,
+      "max_batch_ns": 4276492.125,
+      "spread": 37.741524
+    },
+    {
+      "workload": 17,
+      "arm": "folded",
+      "median_batch_ns": 437198.062,
+      "min_batch_ns": 276442.812,
+      "max_batch_ns": 1902856.812,
+      "spread": 6.883365
+    },
+    {
+      "workload": 17,
+      "arm": "expanded",
+      "median_batch_ns": 707312.562,
+      "min_batch_ns": 404416.688,
+      "max_batch_ns": 1735955.812,
+      "spread": 4.292493
+    },
+    {
+      "workload": 17,
+      "arm": "native",
+      "median_batch_ns": 5467958.312,
+      "min_batch_ns": 2255520.688,
+      "max_batch_ns": 10993263.0,
+      "spread": 4.873936
+    },
+    {
+      "workload": 17,
+      "arm": "native_aa",
+      "median_batch_ns": 4106486.938,
+      "min_batch_ns": 2433945.312,
+      "max_batch_ns": 7797796.562,
+      "spread": 3.203768
+    }
+  ],
+  "raw": [
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/CONTROL.tsv",
+      "sha256": "0aaf7687fc1c6f0b5fc07a2f13b3e06bf0977454a39235141de8fc09c9b281d7",
+      "bytes": 224358,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/CONTROL.stderr",
+      "sha256": "e08f256de8b96a06dd147019c1d59c3a865c0e34249c977344cc4a6c7236b368",
+      "bytes": 8008,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/FIXTURES.tsv",
+      "sha256": "fd994738c55ce90a878d02de7f69f58a20337cdef9fd61bcb47f14b8c0d63ec8",
+      "bytes": 235,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/WORKLOADS.tsv",
+      "sha256": "612350f4d56fadd09c6281af7dcef627a342ce68be08d967b452695c34156510",
+      "bytes": 506,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/RUN.txt",
+      "sha256": "5e82dd690508544e7cfe6a419a3afc1ccaf4e616e2ab12c19c0b3a20a6bf5c66",
+      "bytes": 182,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/EXIT.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/OUTPUT.sha256",
+      "sha256": "b4123c84e10c3106c3ba5c2cd4aff9f8d310003c47aae184aa12c32b267ab8f6",
+      "bytes": 755,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/SUMMARY.tsv",
+      "sha256": "57321eef949ceca5902fc5bfe0edc5f1b8eee24a558305c3469112510e9443ff",
+      "bytes": 4821,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/pencil-cost/SUMMARY.stderr",
+      "sha256": "d0ad5accad4f6cbd44f8763e06404ac6d44b01a64b254b432996820feb09c6b5",
+      "bytes": 2678,
+      "uploaded": false,
+      "s3_uri": null,
+      "custody": "git"
+    }
+  ]
+}

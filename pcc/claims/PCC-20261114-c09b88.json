@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:54:55Z",
+ "id": "PCC-20261114-c09b88",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0a12a195c66785b5b8b4b4409ab0cc02ee991f64",
+  "model": "",
+  "session": "norm-growing-input-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "0ce8181d3571f76c7c9fecd9ac97707475568814e6155dc83a0ed4a8714fcd74",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormGrowingInput.A_budget"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration context. Generic coefficient-support budget and actual Mathlib computed monic division over CommRing; actual growing chart over Field K, a=h+2 covers all a>=2. Literal multivariate variables have consecutive weights via explicit bijection. Actual norm/support/remainder, monicity/degrees, coefficient weightedTotalDegree <=2*degree(P)-2*j. Exact norm multiplication requires stated target-curve premise. Four-variable source binding is a polynomial-ring renaming equivalence, not finite-field value comparison. No degree29 normalized-row, full closure, public finder, coverage, extraction/retries or expected bit-cost claim. Unsigned; gate/fresh pending at creation.",
+ "statement": "Exact source-bound declaration NormGrowingInput.A_budget: theorem A_budget (h : \u2115) (r z : K) : NormInputBudget.Budget (weights h) 2 (A h r z) (2*h+4)"
+}

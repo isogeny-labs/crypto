@@ -1,0 +1,57 @@
+   Compiling trace-zero-relation-check v0.1.0 (/workspace/crypto-trace/research/trace_zero_relation_check_20261109/native)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s
+     Running unittests src/lib.rs (research/trace_zero_relation_check_20261109/native/target/debug/deps/trace_zero_relation_check-0a92d34f400cbd4b)
+
+running 22 tests
+test checks::exact_trace_coordinate_elimination_and_chained_layouts ... LAYOUT n=31 m=2 ell=17 naive_bits=34 summand_trace_bits=32 also_affine_intermediates_bits=32 S3_component_rows=31 degree_bound=2 field_trace_support=[0]
+LAYOUT n=31 m=3 ell=17 naive_bits=82 summand_trace_bits=79 also_affine_intermediates_bits=78 S3_component_rows=62 degree_bound=3 field_trace_support=[0]
+LAYOUT n=31 m=5 ell=17 naive_bits=178 summand_trace_bits=173 also_affine_intermediates_bits=170 S3_component_rows=124 degree_bound=3 field_trace_support=[0]
+LAYOUT n=53 m=2 ell=17 naive_bits=34 summand_trace_bits=32 also_affine_intermediates_bits=32 S3_component_rows=53 degree_bound=2 field_trace_support=[0, 47, 51]
+LAYOUT n=53 m=3 ell=17 naive_bits=104 summand_trace_bits=101 also_affine_intermediates_bits=100 S3_component_rows=106 degree_bound=3 field_trace_support=[0, 47, 51]
+LAYOUT n=53 m=5 ell=17 naive_bits=244 summand_trace_bits=239 also_affine_intermediates_bits=236 S3_component_rows=212 degree_bound=3 field_trace_support=[0, 47, 51]
+LAYOUT n=83 m=2 ell=17 naive_bits=34 summand_trace_bits=32 also_affine_intermediates_bits=32 S3_component_rows=83 degree_bound=2 field_trace_support=[0, 81]
+LAYOUT n=83 m=3 ell=17 naive_bits=134 summand_trace_bits=131 also_affine_intermediates_bits=130 S3_component_rows=166 degree_bound=3 field_trace_support=[0, 81]
+LAYOUT n=83 m=5 ell=17 naive_bits=334 summand_trace_bits=329 also_affine_intermediates_bits=326 S3_component_rows=332 degree_bound=3 field_trace_support=[0, 81]
+LAYOUT n=131 m=2 ell=17 naive_bits=34 summand_trace_bits=32 also_affine_intermediates_bits=32 S3_component_rows=131 degree_bound=2 field_trace_support=[0, 129]
+LAYOUT n=131 m=3 ell=17 naive_bits=182 summand_trace_bits=179 also_affine_intermediates_bits=178 S3_component_rows=262 degree_bound=3 field_trace_support=[0, 129]
+LAYOUT n=131 m=5 ell=17 naive_bits=478 summand_trace_bits=473 also_affine_intermediates_bits=470 S3_component_rows=524 degree_bound=3 field_trace_support=[0, 129]
+ok
+test checks::fixed_two_bit_factor_base_cannot_be_assumed_large_at_q_two ... GM q=2 n=131 summands=130 variables=260 equations=261 max_affine_base=8 max_unordered_multisets=153802846692 subgroup_order=680564733841876926932320129493409985129 uniform_success_upper_bound_below_2^-90=true
+ok
+test checks::point_trace_and_field_trace_are_different_and_same_base_is_retained ... TOY n=3 group_points=4 point_trace_kernel=1 field_trace_kernel=2 same_prime_trace_base_points=0
+TOY n=5 group_points=44 point_trace_kernel=11 field_trace_kernel=22 same_prime_trace_base_points=4
+TOY n=7 group_points=116 point_trace_kernel=29 field_trace_kernel=58 same_prime_trace_base_points=0
+TOY n=9 group_points=508 point_trace_kernel=127 field_trace_kernel=254 same_prime_trace_base_points=4
+ok
+test checks::tau_norm_and_cofactor_projection_are_exact ... RING n=31 ord_n(2)=5 dim_Res=31 dim_trace_zero=30 N_S=536893589
+RING n=53 ord_n(2)=52 dim_Res=53 dim_trace_zero=52 N_S=2251799827840091
+RING n=83 ord_n(2)=82 dim_Res=83 dim_trace_zero=82 N_S=2417851639230796216685689
+RING n=131 ord_n(2)=130 dim_Res=131 dim_trace_zero=130 N_S=680564733841876926932320129493409985129
+ok
+test field::tests::add_is_xor ... ok
+test field::tests::debug_output_is_unchanged ... ok
+test field::tests::flt_inverse_deg16_sanity ... ok
+test field::tests::flt_inverse_of_zero_is_none ... ok
+test field::tests::flt_inverse_roundtrip ... ok
+test field::tests::frobenius_endomorphism ... ok
+test field::tests::inline_and_heap_storage_agree_across_the_boundary ... ok
+test field::tests::inverse_roundtrip_all_fields ... ok
+test field::tests::mul_by_one_is_identity ... ok
+test field::tests::mul_commutes ... ok
+test field::tests::operation_tally_counts_batched_squares_and_inversion_internals ... ok
+test field::tests::reduce_words_matches_bitwise_reduction ... ok
+test field::tests::reduction_works_at_boundary ... ok
+test field::tests::schoolbook_and_karatsuba_agree ... ok
+test field::tests::soft_clmul_matches_shift_xor ... ok
+test field::tests::trace_and_half_trace_tables_match_definitions ... ok
+test field::tests::word_mul_matches_bitwise_reference ... ok
+test field::tests::word_square_matches_mul ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+
+   Doc-tests trace_zero_relation_check
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

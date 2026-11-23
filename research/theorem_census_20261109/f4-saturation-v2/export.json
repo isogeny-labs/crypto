@@ -1,0 +1,499 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "f4-saturation-boundary-20261110-v2",
+  "created": "2026-11-10T07:38:49.070591+00:00",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "e0d22db89b467cb39d7382a624091eb550a04b5f8138ff66776cab2c04305772",
+    "protocol_id": "f4-saturation-boundary-20261110",
+    "version": 2
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "608f40db67a2464eaee56ae7f056c42b397b1de5",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "provenance.json",
+    "sha256": "5109bfb15bafd468cff51ecf52754d5e10882defcc0ea044f0921edfad58d535",
+    "class_id": "local-shared-f4-audit",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "ordinary",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "saturation",
+      "role": "candidate",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "ordinary",
+      "arm": "ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Native ordinary exit139/segmentation fault, emptybasis; frozen analyzer not_validated."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/ordinary.argv",
+          "sha256": "171385afd277ef5753a659c076a8e9f7606a26c3efec73dc75ad53cc83fe5f6e",
+          "bytes": 113,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/ordinary.end",
+          "sha256": "3e39e0bb1d21ef2b657a7e1ea5d7b4b6938e61663bdc3eb82fd1a91bc114dda0",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/ordinary.exit",
+          "sha256": "690e07064753123c967bbac0180f32da6a753a5bd8b79a47644cef58e776d9f0",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/ordinary.start",
+          "sha256": "29c536078f767550c12ca39997810b633197ffeb9ef20849c23c9adb5ac6580a",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/ordinary.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T07:37:08Z",
+      "finished_at": "2026-11-10T07:37:09Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "saturation",
+      "arm": "saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Native saturation timeout60s/exit124, emptybasis; frozen analyzer not_validated."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/saturation.argv",
+          "sha256": "ce2b8d9dfa62956110ee6cbc0b9e0af0db9c655b8a4167d276e5a5612871c4be",
+          "bytes": 120,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/saturation.end",
+          "sha256": "49f58c85ef977074ad2585214474b15cd30df9e9a55da8aba41375f9025436fb",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/saturation.start",
+          "sha256": "3e39e0bb1d21ef2b657a7e1ea5d7b4b6938e61663bdc3eb82fd1a91bc114dda0",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T07:37:09Z",
+      "finished_at": "2026-11-10T07:38:09Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/saturation"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 1,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "evidence/analysis.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.jsonl",
+      "sha256": "315cfbeae39640bfb686c5669b35686c7b6bda79a6819558d90fb480494eba42",
+      "bytes": 92,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.stderr",
+      "sha256": "4e8f16700c95d25acdd10e43c80b54130cda59284bf17fea54cfc1e0de190caa",
+      "bytes": 102,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build-02.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build-02.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.jsonl",
+      "sha256": "66354c704bba13f25a49e544741278300aa90c81320629e92cd11a08dfe914be",
+      "bytes": 61,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.json",
+      "sha256": "c6fde35236a6efd4d22ec8f3d3a79334de3c55fb4cbe6e3f61df2d15997f801b",
+      "bytes": 247,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation.log",
+      "sha256": "ca06ffb3afb4ab9043503c5ae6ce1ee37e23b2bd6aa221861710c8099d61efd9",
+      "bytes": 106,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.log",
+      "sha256": "e9666904331252c05ae1585db948325b101e8f90f813fe7a93c737137ce1042b",
+      "bytes": 363,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.argv",
+      "sha256": "171385afd277ef5753a659c076a8e9f7606a26c3efec73dc75ad53cc83fe5f6e",
+      "bytes": 113,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.end",
+      "sha256": "3e39e0bb1d21ef2b657a7e1ea5d7b4b6938e61663bdc3eb82fd1a91bc114dda0",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.exit",
+      "sha256": "690e07064753123c967bbac0180f32da6a753a5bd8b79a47644cef58e776d9f0",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.start",
+      "sha256": "29c536078f767550c12ca39997810b633197ffeb9ef20849c23c9adb5ac6580a",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.argv",
+      "sha256": "ce2b8d9dfa62956110ee6cbc0b9e0af0db9c655b8a4167d276e5a5612871c4be",
+      "bytes": 120,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.end",
+      "sha256": "49f58c85ef977074ad2585214474b15cd30df9e9a55da8aba41375f9025436fb",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.start",
+      "sha256": "3e39e0bb1d21ef2b657a7e1ea5d7b4b6938e61663bdc3eb82fd1a91bc114dda0",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "e4d98c69f767646b1ad015dcac6fd61b6ffe76e48548e7feb86627ed545190be",
+      "bytes": 500,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/ordinary.ms",
+      "sha256": "940be6ee58679144408ba008d350282f4b68a0ba7477bbdc1bec0d64068e131a",
+      "bytes": 28,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/saturation.ms",
+      "sha256": "5ecba116ff9e4bbd08cd59cba53fe4c7a346f0468476fd29f00f3b383e5647d0",
+      "bytes": 31,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "bf448ad46980e63a2d1111d807b9f8ea528e26973b5c7bd41d9b5a6ca806870a",
+      "bytes": 3166,
+      "kind": "raw"
+    },
+    {
+      "path": "native/polynomial.hpp",
+      "sha256": "6e299d2f8f1032d1bdb1f4459a46ec3e32cc1f88a30fa105f08b082607b9b59b",
+      "bytes": 5491,
+      "kind": "raw"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "db0b647e47b4333d79b36ba82fa9f0638892aba685cf9b53a0e5d934c14bfea3",
+      "bytes": 16021,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "5109bfb15bafd468cff51ecf52754d5e10882defcc0ea044f0921edfad58d535",
+      "bytes": 1986,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "3cc5a0dc7efdf5edd8874f7cd76bd86a29010fa1eebe3db39b11acc8190c65cc",
+      "bytes": 1664,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "bf448ad46980e63a2d1111d807b9f8ea528e26973b5c7bd41d9b5a6ca806870a",
+      "bytes": 3166,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/analysis.jsonl",
+        "sha256": "315cfbeae39640bfb686c5669b35686c7b6bda79a6819558d90fb480494eba42",
+        "bytes": 92,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/analysis.stderr",
+        "sha256": "4e8f16700c95d25acdd10e43c80b54130cda59284bf17fea54cfc1e0de190caa",
+        "bytes": 102,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "All frozen source/input/binary checks passed before2calls. Ordinary exited139 with segmentationfault; saturation reached60second timeout and exited124. Both outputfiles empty; frozen analyzer emitted2not_validated rows.",
+      "by": "producer"
+    },
+    {
+      "kind": "observation",
+      "text": "V1ordinary101callpassed; v1saturation101dispatchrejected; v1samplemetadata/check-exportfailure retained separately. V2frozen before its data; no retries or parser/output changes.",
+      "by": "producer"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

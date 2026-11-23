@@ -1,0 +1,2 @@
+# R47exact11order implication, before proof data
+After observed cofactor witness outcomes: isolated class nonprincipal,11timesclass principal, independent3721/61²expressions equal. Prove the conditional additive-group implication nonzero+11annihilation gives additive order11, using kernel-checked prime11and pinned Mathliborder lemma. No native_decide/newaxioms; pinned4.34.1/mathlibd13f23b,-j1-M4096/1200s compile/audit. Native arrays and proper/Picard witness interpretation remain unformalized. Retain any proof failure. No selected target map or character statement.

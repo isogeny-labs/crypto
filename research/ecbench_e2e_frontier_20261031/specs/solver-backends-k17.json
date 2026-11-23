@@ -1,0 +1,184 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "E2E frontier refresh: all algebraic solver backends on Koblitz n=17",
+  "description": "Same factor base, target stream, linear algebra, and relation cap across every live solver backend. Native units remain backend-local; verified L2 cold E2E wall and complete common accounting are the only cross-backend comparisons.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610315017,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "solver-f4-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-buchberger-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "buchberger-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-matrix-f4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "matrix-f4",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-matrix-f5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "matrix-f5",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-inherited-f4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "inherited-f4",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-crossbred-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "crossbred-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-xl-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "xl-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-sat-cdcl",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "sat-cdcl:sat_conflict_budget=20000,sat_xor_encoding=cnf",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-fes-f2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "fes-f2",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-fes-f2-wide",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "fes-f2-wide",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "solver-exhaustive",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "exhaustive",
+          "max_trials": "20000"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610316017,
+    "isolation_required": "L2",
+    "timeout_seconds": 3600
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "research-followup-packet/v1",
+  "published_producer_commit": "09e64fca55",
+  "scientific_execution": false,
+  "runtime_qualification": false,
+  "target_scope": 1260,
+  "new_cost_ratio": null,
+  "full_research_goal_complete": false,
+  "components": {
+    "quotient_storage": {
+      "main": 15,
+      "producer_controls": 13,
+      "reviewer_controls": 8,
+      "named_readbacks": 36,
+      "review": "quotient-storage-review/status.json",
+      "native_verification": "quotient-storage-review/native-verification/status.json"
+    },
+    "graph_forest": {
+      "main": 10,
+      "producer_controls": 9,
+      "reviewer_controls": 15,
+      "named_readbacks": 34,
+      "review": "graph-forest-review/status.json",
+      "native_verification": "graph-forest-review/native-verification/status-correction.json"
+    },
+    "native_matrix": {
+      "rows": 105,
+      "models": 21,
+      "bindings": 133,
+      "source_pins": 12,
+      "producer_controls": 10,
+      "reviewer_controls": 8,
+      "cli_corruption_rejections": 2,
+      "review": "native-matrix-review/status.json"
+    },
+    "runtime_adapter": {
+      "producer_controls": 58,
+      "reviewer_controls": 32,
+      "review": "runtime-adapter-review/status.json"
+    }
+  },
+  "historical_python_formal_verifier_violation": "preserved; fresh native paths replayed"
+}

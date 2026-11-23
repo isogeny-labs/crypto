@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#536479"/></marker></defs>
+<rect width="1000" height="620" fill="#f7f9fc"/>
+<g font-family="DejaVu Sans, sans-serif" fill="#172a42">
+<text x="30" y="38" font-size="23" font-weight="bold">Full group-trace kernel → exact rational-point model</text>
+<text x="30" y="65" font-size="15">E₀/F₂: y²+xy=x³+1 · odd n ≤ 131 · local producer checks, unsigned</text>
+<rect x="30" y="92" width="940" height="96" rx="10" fill="#dfeaf9"/>
+<text x="50" y="120" font-size="19">Global A = ker(Res(E₀) → E₀), geometric dimension n−1</text>
+<text x="50" y="147" font-size="16">After algebraic closure: A ≅ E₀ⁿ⁻¹ via (P₁,…,Pₙ₋₁) ↦ (P₁,…,Pₙ₋₁,−ΣPᵢ)</text>
+<text x="50" y="173" font-size="15">At n=131: dim(A)=130; |A(F₂)|=680564733841876926932320129493409985129</text>
+<path d="M500 190V218" stroke="#536479" stroke-width="2" marker-end="url(#a)"/>
+<rect x="30" y="228" width="940" height="89" rx="10" fill="#ddf0e9"/>
+<text x="50" y="257" font-size="19">A(F₂) = {O} ∪ {curve points with Tr(x)=0, Tr(y+xH(x))=0}</text>
+<text x="50" y="284" font-size="16">Exact Boolean affine equations + separate identity; not an arbitrary-algebra chart</text>
+<text x="50" y="307" font-size="14">(0,1) passes the x trace but fails full membership. Full kernel = 4E₀ for odd n.</text>
+<path d="M500 320V345" stroke="#536479" stroke-width="2" marker-end="url(#a)"/>
+<g font-size="16">
+<rect x="30" y="354" width="294" height="134" rx="8" fill="#edf0f6"/>
+<text x="48" y="381" font-weight="bold">Raw, n=131</text>
+<text x="48" y="408">262 variables · 133 rows</text>
+<text x="48" y="433">Degree 2 · 100717 terms</text>
+<text x="48" y="458">25676 AND auxiliaries</text>
+<rect x="352" y="354" width="294" height="134" rx="8" fill="#fff0d8"/>
+<text x="370" y="381" font-weight="bold">Compact, n=131</text>
+<text x="370" y="408">260 variables · 131 rows</text>
+<text x="370" y="433">Degree 3 · 117552 terms</text>
+<text x="370" y="458">43517 AND auxiliaries</text>
+<rect x="676" y="354" width="294" height="134" rx="8" fill="#e6e4f6"/>
+<text x="694" y="381" font-weight="bold">Factored, n=131</text>
+<text x="694" y="408">261 variables · 132 rows</text>
+<text x="694" y="433">Degree 2 · 99684 terms</text>
+<text x="694" y="458">25415 AND auxiliaries</text>
+</g>
+<text x="30" y="524" font-size="17">Factor-base intersection → all S3 identity patterns → original group replay</text>
+<text x="30" y="552" font-size="15">Fully pinned n131 witness: SAT. Bounded x-only n83 control: UNKNOWN.</text>
+<text x="30" y="578" font-size="14">Counts: one constructed model per mode; no timing or measured solver gain.</text>
+<text x="30" y="602" font-size="13">Source: full_trace_zero_variety_20261109/checks/native-tests.txt · 2026-11-09</text>
+</g></svg>

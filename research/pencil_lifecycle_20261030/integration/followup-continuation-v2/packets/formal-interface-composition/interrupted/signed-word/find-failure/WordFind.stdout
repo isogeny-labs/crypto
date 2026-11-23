@@ -1,0 +1,39 @@
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:23:15: error: Tactic `rfl` failed: The left-hand side
+  decPot r
+    ({ parent := fun i => if i = x then root else s.parent i, pot := fun i => if i = x then p else s.pot i }.pot i)
+is not definitionally equal to the right-hand side
+  decPot r p
+
+case pos
+n : ℕ
+r : UInt64
+s : State n
+x root : Fin n
+p : Pot
+i : Fin n
+h✝ : i = x
+⊢ decPot r
+      ({ parent := fun i => if i = x then root else s.parent i, pot := fun i => if i = x then p else s.pot i }.pot i) =
+    decPot r p
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:23:15: error: Tactic `rfl` failed: The left-hand side
+  decPot r
+    ({ parent := fun i => if i = x then root else s.parent i, pot := fun i => if i = x then p else s.pot i }.pot i)
+is not definitionally equal to the right-hand side
+  { parent := s.parent, pot := fun i => decPot r (s.pot i) }.pot i
+
+case neg
+n : ℕ
+r : UInt64
+s : State n
+x root : Fin n
+p : Pot
+i : Fin n
+h✝ : ¬i = x
+⊢ decPot r
+      ({ parent := fun i => if i = x then root else s.parent i, pot := fun i => if i = x then p else s.pot i }.pot i) =
+    { parent := s.parent, pot := fun i => decPot r (s.pot i) }.pot i
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:33:1: error: Too many variable names provided at alternative `root`: 3 provided, but 2 expected
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:36:32: error(lean.unknownIdentifier): Unknown identifier `he`
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:37:1: error: Too many variable names provided at alternative `step`: 8 provided, but 7 expected
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:38:22: error(lean.unknownIdentifier): Unknown identifier `ih`
+/var/tmp/pencil-signed-word-formal-20261101-v1/find1/snapshot/WordFind.lean:38:10: error: Tactic `rcases` failed: `x✝ : ?m.63` is not an inductive datatype

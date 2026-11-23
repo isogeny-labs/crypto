@@ -1,0 +1,14 @@
+digraph transport {
+  graph [rankdir=LR,bgcolor="white",pad="0.1",nodesep="0.2",ranksep="0.35"];
+  node [shape=box,style="rounded,filled",fillcolor="#eef4fb",fontname="Helvetica",fontsize=11,margin="0.12,0.08"];
+  edge [fontname="Helvetica",fontsize=10,color="#496078"];
+  source [label="P-256 E(Fp), subgroup order n\nG and Q=kG"];
+  raw [label="Prior i_lambda\ncoefficients (1,-lambda)\nNative producer checks retained",fillcolor="#e7f4ea"];
+  short [label="New phi_(a,b) source\nQ(a,b)=n; a>0>b\nNative qualification pending",style="rounded,dashed,filled",fillcolor="#fff1d9"];
+  image [label="Same finite eigenline in J(C3)\nphi(P)=[a] i_lambda(P)\nSame unknown scalar k"];
+  bound [label="Integer-basis norm bound\nQ >= n; conditional d=2Q >= 2n\nKernel-checked integer endpoint",fillcolor="#e7f4ea"];
+  source -> raw -> image;
+  source -> short [style=dashed];
+  short -> image [style=dashed,label="written relation"];
+  short -> bound [label="not a runtime bound"];
+}

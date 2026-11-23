@@ -1,0 +1,49 @@
+== 20261116T0122Z-ic-positive-control-lucas: schema bench.record/v1 status measured commit 4feb188f47 commit_dirty True validation None
+   instrument at record commit: ic_control=b41bc798cab0 bin=d74c9aefc3b0
+   command: target/release/ic_positive_control run --primes 128,256,512,1024,2048,4096,8192,16384,32768,65536 --curves 5 --curves-map 4099=3,8209=3,16411=2,32771=2,65537=1 --seeds 4 --arms CLMR --threads 3 --json research/ic_positive_control_lucas_20261116/run.json | started 2026-11-16T01:22:42+00:00 wall 583.12 exit 0
+   raw research/ic_positive_control_lucas_20261116/run.json: sha256 OK bytes 557670 uploaded False
+   raw research/ic_positive_control_lucas_20261116/run.log: sha256 OK bytes 54154 uploaded False
+   metric rel_mul_l_over_c_p32771 = 0.454 spread [0.45, 0.457] n 8 baseline None
+   metric rel_mul_m_over_c_p32771 = 0.196 spread [0.194, 0.197] n 8 baseline None
+   metric m_over_rho_w01_p32771 = 3.69 spread [2.08, 7.12] n 8 baseline 7.44
+   metric m_over_rho_w1_p32771 = 19.57 spread [11.02, 37.84] n 8 baseline 40.24
+   metric l_over_rho_w01_p65537 = 3.97 spread [2.62, 6.38] n 4 baseline 5.82
+   host: {'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'cpus_online': 4, 'hostname': 'vm', 'isolation': 'unstated', 'platform': 'Linux-6.18.44-fc-v470-x86_64-with-glibc2.39'}
+== 20261116T0636Z-ic-positive-control-la: schema bench.record/v1 status measured commit caae5eca9f commit_dirty False validation None
+   instrument at record commit: ic_control=f1e6b6cac88c bin=eda42040ca3f
+   command: research/ic_positive_control_la_20261116/train.sh | started 2026-11-16T06:36:20+00:00 wall 910.73 exit 0
+   command: research/ic_positive_control_la_20261116/test.sh | started 2026-11-16T06:51:53+00:00 wall 1007.457 exit 0
+   raw research/ic_positive_control_la_20261116/run.json: sha256 OK bytes 566802 uploaded False
+   raw research/ic_positive_control_la_20261116/run.log: sha256 OK bytes 54528 uploaded False
+   raw research/ic_positive_control_la_20261116/train_cc0.7.json: sha256 OK bytes 23618 uploaded False
+   raw research/ic_positive_control_la_20261116/train_cc1.0.json: sha256 OK bytes 23654 uploaded False
+   raw research/ic_positive_control_la_20261116/train_cc1.4.json: sha256 OK bytes 23650 uploaded False
+   raw research/ic_positive_control_la_20261116/train_cc2.0.json: sha256 OK bytes 23705 uploaded False
+   metric la_mul_s_over_m_p32771 = 0.328 spread [0.325, 0.331] n 8 baseline None
+   metric la_mul_n_over_m_p32771 = 0.667 spread [0.662, 0.673] n 8 baseline None
+   metric s_over_rho_w01_p32771 = 1.92 spread [1.08, 3.71] n 8 baseline 3.69
+   metric s_over_rho_w1_p32771 = 9.85 spread [5.55, 19.04] n 8 baseline 19.57
+   host: {'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'cpus_online': 4, 'hostname': 'vm', 'isolation': 'unstated', 'platform': 'Linux-6.18.44-fc-v470-x86_64-with-glibc2.39'}
+== 20261116T0751Z-ic-positive-control-unit-t: schema bench.record/v1 status measured commit be5e426df1 commit_dirty False validation None
+   instrument at record commit: ic_control=1b99e0a25bdd bin=b5b41e9fff84
+   command: research/ic_positive_control_unit_t_20261116/test.sh | started 2026-11-16T07:52:04+00:00 wall 5845.361 exit 0
+   raw research/ic_positive_control_unit_t_20261116/run.json: sha256 OK bytes 588955 uploaded False
+   raw research/ic_positive_control_unit_t_20261116/run.log: sha256 OK bytes 56384 uploaded False
+   metric la_mul_u_over_s_p32771 = 0.772 spread [0.761, 0.782] n 8 baseline None
+   metric rel_per_trial_v_over_s_p65537 = 0.823 spread [0.822, 0.825] n 4 baseline None
+   metric u_over_rho_w01_p32771 = 1.72 spread [0.97, 3.32] n 8 baseline 1.92
+   metric u_over_rho_w01_p131101 = 1.78 spread [1.15, 4.52] n 4 baseline 1.97
+   host: {'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'cpus_online': 4, 'hostname': 'vm', 'isolation': 'unstated', 'platform': 'Linux-6.18.44-fc-v470-x86_64-with-glibc2.39'}
+== 20261116T1001Z-ic-positive-control-capped: schema bench.record/v1 status measured commit fcc5fc5e87 commit_dirty False validation None
+   instrument at record commit: ic_control=79c5a3f8faa3 bin=43ddd2127db4
+   command: research/ic_positive_control_capped_20261116/test.sh | started 2026-11-16T10:01:06+00:00 wall 5755.632 exit 0
+   raw research/ic_positive_control_capped_20261116/run_w.json: sha256 OK bytes 175291 uploaded False
+   raw research/ic_positive_control_capped_20261116/run_w.log: sha256 OK bytes 18195 uploaded False
+   raw research/ic_positive_control_capped_20261116/run_sr.json: sha256 OK bytes 207318 uploaded False
+   raw research/ic_positive_control_capped_20261116/run_sr.log: sha256 OK bytes 25238 uploaded False
+   metric total_w_over_s_w01_p32771 = 0.895 spread [0.89, 0.901] n 8 baseline None
+   metric total_w_over_s_w01_p65537 = 0.821 spread [0.815, 0.827] n 4 baseline None
+   metric w_over_rho_w01_p32771 = 1.72 spread [0.95, 3.32] n 8 baseline 7.44
+   metric w_over_rho_w1_p32771 = 8.75 spread [4.82, 16.94] n 8 baseline 40.24
+   metric w_over_rho_w01_p131101 = 1.78 spread [1.15, 4.53] n 4 baseline None
+   host: {'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'cpus_online': 4, 'hostname': 'vm', 'isolation': 'unstated', 'platform': 'Linux-6.18.44-fc-v470-x86_64-with-glibc2.39'}

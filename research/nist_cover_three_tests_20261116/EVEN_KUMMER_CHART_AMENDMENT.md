@@ -1,0 +1,7 @@
+# Vertical contact algebra amendment
+
+2026-11-16, before v3 arithmetic. The v2 execution rejects the finite bitangent Y-coefficient assumption. Its source and raw failure remain retained. Actual labelled bitangent63 is X=0 and cannot be represented as two distinct X-coordinates. This changes no label path, point selection, count, rank or acceptance condition in EVEN_KUMMER_PROTOCOL.md.
+
+Represent each finite bitangent's contact divisor in its quadratic parameter algebra: parameter X when the line has nonzero Y coefficient, otherwise parameter Y. Require the restricted quartic to be a nonzero scalar times a square of a squarefree monic quadratic; check the contact algebra lies on both the curve and line. Restrict conics in that algebra when forming conditions. For elimination in X, multiply the known-support factor by the quadratic norm of X minus the contact-algebra X-coordinate (including a repeated X-factor for a vertical line). Verify every known conic restriction and the full residual intersection factorization.
+
+The resulting residual divisor still uses the original monic cubic X-chart with squarefree support and exact curve checks. Retain failures for any further unsupported chart, with no silent sample replacement. Run the same full matching contract plus checks on all27 finite bitangent contacts, explicitly retaining the vertical case count. Preserve pinned target_weil.cpp unchanged.

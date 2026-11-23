@@ -1,0 +1,95 @@
+read 415 rows from 46 files
+# per-cell D on the random targets (draw 0); '.' = not measured (status in brackets)
+cell n=17 l=4 m=3
+  arm           a draw 0 D: 7 7 7 7 7 7 7 7
+  arm           a draw 1 D: 7 7 7 7 7 7 7 7
+  arm          d0 draw 0 D: 5 5 5 5 5 5 5 5
+  arm           d draw 0 D: 5 5 5 5 5 5 5 5
+  arm           c draw 0 D: 7 7 7 7 7 7 7 7
+  arm           e draw 0 D: 4 4 4 4 4 4 4 4
+  arm           b draw 0 D: 3 3 3 3 3 3 3 3
+  arm    a-linear draw 0 D: 7 7 7 7 .[absent] .[absent] .[absent] .[absent]
+  arm a-nonlinear draw 0 D: 10 10 10 10 .[absent] .[absent] .[absent] .[absent]
+  planted           a: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted          d0: complete+sound+planted-in 4/4  measured 4  D: 5 5 5 5
+  planted           d: complete+sound+planted-in 4/4  measured 4  D: 5 5 5 5
+  planted           c: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted           e: complete+sound+planted-in 4/4  measured 4  D: 4 4 4 4
+  planted           b: complete+sound+planted-in 4/4  measured 4  D: 3 3 3 3
+  planted    a-linear: complete+sound+planted-in 2/2  measured 2  D: 7 7
+  planted a-nonlinear: complete+sound+planted-in 2/2  measured 2  D: 10 10
+cell n=19 l=4 m=3
+  arm           a draw 0 D: 7 7 7 7 7 7 7 7
+  arm           a draw 1 D: 7 7 7 7 7 7 7 7
+  arm          d0 draw 0 D: 5 5 5 5 5 5 5 5
+  arm           d draw 0 D: 5 5 5 5 5 5 5 5
+  arm           c draw 0 D: 7 7 7 7 7 7 7 7
+  arm           e draw 0 D: 4 4 4 4 4 4 4 4
+  arm           b draw 0 D: 3 3 >=3[timelimit] .[absent] 3 3 >=3[timelimit] .[absent]
+  arm    a-linear draw 0 D: 7 7 7 7 .[absent] .[absent] .[absent] .[absent]
+  arm a-nonlinear draw 0 D: 10 10 10 10 .[absent] .[absent] .[absent] .[absent]
+  planted           a: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted          d0: complete+sound+planted-in 4/4  measured 4  D: 5 5 5 5
+  planted           d: complete+sound+planted-in 4/4  measured 4  D: 5 5 5 5
+  planted           c: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted           e: complete+sound+planted-in 4/4  measured 4  D: 4 4 4 4
+  planted           b: complete+sound+planted-in 2/2  measured 0  D: .[not-reached] .[not-reached]
+  planted    a-linear: complete+sound+planted-in 2/2  measured 2  D: 7 7
+  planted a-nonlinear: complete+sound+planted-in 2/2  measured 2  D: 10 10
+cell n=13 l=3 m=4
+  arm           a draw 0 D: 11 10 11 11 11 11 11 11
+  arm           a draw 1 D: 11 11 11 11 10 11 10 11
+  arm          d0 draw 0 D: 7 8 8 7 7 7 7 7
+  arm           d draw 0 D: 7 8 8 7 7 7 7 7
+  arm           c draw 0 D: 10 10 11 11 11 11 11 11
+  arm           e draw 0 D: 4 4 4 4 4 4 4 4
+  arm           b draw 0 D: >=4[not-reached] >=4[not-reached] >=4[not-reached] >=3[timelimit] >=4[not-reached] >=4[not-reached] >=4[not-reached] >=3[timelimit]
+  arm    a-linear draw 0 D: 11 10 11 11 .[absent] .[absent] .[absent] .[absent]
+  arm a-nonlinear draw 0 D: 11 11 12 11 .[absent] .[absent] .[absent] .[absent]
+  planted           a: complete+sound+planted-in 4/4  measured 4  D: 12 11 11 11
+  planted          d0: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted           d: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted           c: complete+sound+planted-in 4/4  measured 4  D: 11 11 11 10
+  planted           e: complete+sound+planted-in 4/4  measured 4  D: 4 4 4 4
+  planted           b: complete+sound+planted-in 2/2  measured 0  D: .[not-reached] .[not-reached]
+  planted    a-linear: complete+sound+planted-in 2/2  measured 2  D: 12 11
+  planted a-nonlinear: complete+sound+planted-in 2/2  measured 2  D: 12 11
+cell n=15 l=3 m=4
+  arm           a draw 0 D: 10 10 10 10 10 10 10 10
+  arm           a draw 1 D: 11 10 11 10 10 10 12 10
+  arm          d0 draw 0 D: 7 7 7 7 7 7 7 7
+  arm           d draw 0 D: 7 7 7 7 7 7 7 7
+  arm           c draw 0 D: 10 10 10 10 10 10 10 10
+  arm           e draw 0 D: 4 4 4 4 4 4 4 4
+  arm           b draw 0 D: >=4[not-reached] >=4[not-reached] >=4[not-reached] >=4[not-reached] >=4[not-reached] >=4[not-reached] >=4[not-reached] >=4[not-reached]
+  arm    a-linear draw 0 D: 10 10 10 10 .[absent] .[absent] .[absent] .[absent]
+  arm a-nonlinear draw 0 D: 11 11 11 11 .[absent] .[absent] .[absent] .[absent]
+  planted           a: complete+sound+planted-in 4/4  measured 4  D: 10 11 10 10
+  planted          d0: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted           d: complete+sound+planted-in 4/4  measured 4  D: 7 7 7 7
+  planted           c: complete+sound+planted-in 4/4  measured 4  D: 10 10 10 10
+  planted           e: complete+sound+planted-in 2/2  measured 2  D: 4 4
+  planted           b: complete+sound+planted-in 2/2  measured 0  D: .[not-reached] .[not-reached]
+  planted    a-linear: complete+sound+planted-in 2/2  measured 2  D: 10 11
+  planted a-nonlinear: complete+sound+planted-in 2/2  measured 2  D: 11 11
+cell n=17 l=4 m=4
+  arm           a draw 0 D: >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached]
+  arm           a draw 1 D: >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached]
+  arm          d0 draw 0 D: 10 10 10 10 10 10 10 10
+  arm           d draw 0 D: 10 10 10 10 10 10 10 10
+  arm           c draw 0 D: >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached] >=13[not-reached]
+  arm           e draw 0 D: >=4[memcap] .[absent] .[absent] .[absent] .[absent] .[absent] .[absent] .[absent]
+  planted           a: complete+sound+planted-in 4/4  measured 0  D: .[not-reached] .[not-reached] .[not-reached] .[not-reached]
+  planted          d0: complete+sound+planted-in 4/4  measured 4  D: 10 10 10 10
+  planted           d: complete+sound+planted-in 4/4  measured 4  D: 10 10 10 10
+  planted           c: complete+sound+planted-in 4/4  measured 0  D: .[not-reached] .[not-reached] .[not-reached] .[not-reached]
+
+# frozen rule: an arm LOWERS D on a cell if all 8 random targets of the arm are measured exactly and of the incumbent measured (exactly, or by the certified lower bound D >= last saturated degree + 1), median(arm) <= median(a) - 1 and max(arm) <= max(a) - 1, and every random and planted run of the arm on the cell is complete, sound and contains its planted decomposition
+A/A control (a on draw 1 against a on draw 0): lowers on 0 of 4 measured cells
+arm  b (candidate): lowers D on 1 of 5 cells, raises on 0, unmeasured cells 4, gated cells 1; also lowers D below arm e on 1 cells; reading MIXED-OR-SAME
+arm  c (candidate): lowers D on 0 of 5 cells, raises on 0, unmeasured cells 1, gated cells 4; also lowers D below arm e on 0 cells; reading MIXED-OR-SAME
+arm  d (candidate): lowers D on 5 of 5 cells, raises on 0, unmeasured cells 0, gated cells 5; also lowers D below arm e on 0 cells; reading LOWER
+arm d0 (diagnostic): lowers D on 5 of 5 cells, raises on 0, unmeasured cells 0, gated cells 5; also lowers D below arm e on 0 cells; reading LOWER
+arm  e (reference): lowers D on 4 of 5 cells, raises on 0, unmeasured cells 1, gated cells 4; also lowers D below arm e on 0 cells; reading LOWER
+VERDICT BY THE FROZEN RULE: ADVANCES (primitive) by arm(s) d
+wrote summary-r2.tsv

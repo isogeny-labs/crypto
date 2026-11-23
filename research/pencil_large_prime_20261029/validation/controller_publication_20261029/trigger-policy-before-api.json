@@ -1,0 +1,39 @@
+{
+    "RoleName": "isolab-remote-launcher-GitHubRole-FaCZneVBkF6D",
+    "PolicyName": "isolab-recovery-trigger",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": [
+                    "codebuild:StartBuild",
+                    "codebuild:BatchGetBuilds",
+                    "codebuild:StopBuild"
+                ],
+                "Resource": [
+                    "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+                    "arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*"
+                ],
+                "Effect": "Allow"
+            },
+            {
+                "Action": "s3:PutObject",
+                "Resource": "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*",
+                "Effect": "Allow"
+            },
+            {
+                "Action": [
+                    "s3:GetObject",
+                    "s3:GetObjectVersion"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*",
+                    "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json",
+                    "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json",
+                    "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json"
+                ],
+                "Effect": "Allow"
+            }
+        ]
+    }
+}

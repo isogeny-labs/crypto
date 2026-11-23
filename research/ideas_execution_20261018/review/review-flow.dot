@@ -1,0 +1,11 @@
+digraph Review {
+ graph [rankdir=LR,bgcolor=white,fontname="DejaVu Sans",ranksep=0.4];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f1fb",color="#416786",fontname="DejaVu Sans",fontsize=10];
+ edge [color="#5f788d"];
+ frozen [label="Frozen originals\n79 certificates / 999 targets"];
+ gap [label="Internal review\n2 source/verification defects",fillcolor="#fff1dc"];
+ amended [label="Additive verifier v2\n79 pass; 9 adversarial rejects",fillcolor="#e6f4e8"];
+ replica [label="Corrected Fp2 replication\n24 identical accepted identities\n23 hits; 24 rho answers",fillcolor="#e6f4e8"];
+ limits [label="Original cohorts preserved\nNo IC speedup / D / c claim"];
+ frozen -> gap;gap -> amended;gap -> replica;amended -> limits;replica -> limits;
+}

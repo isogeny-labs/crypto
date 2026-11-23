@@ -1,0 +1,26 @@
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:55:55: warning: `dif_pos` has been deprecated: Use `dite_eq_left` instead
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:56:1: error: No goals to be solved
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:85:20: error: unexpected token ':='; expected term
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:85:11: error: Application type mismatch: The argument
+  (↑e).2
+has type
+  ℕ
+of sort `Type` but is expected to have type
+  Type ?u.30
+of sort `Type (?u.30 + 1)` in the application
+  @PrincipalSeg (↑e).2
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:85:6: error: Missing cases:
+/var/tmp/pencil-traversal-polynomial-20261031-v1/Identify.lean:80:36: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+c : ℕ → K
+a b s : K
+n i : ℕ
+hi : n ≤ i
+e : Event n
+he : e ∈ schedule n
+hv :
+  (term (↑e).1 (↑e).2 (c (↑e).1) a b s).coeff i ∈
+    List.map (fun a_1 => (term (↑a_1).1 (↑a_1).2 (c (↑a_1).1) a b s).coeff i) (schedule n)
+hj : PrincipalSeg (fun x1 x2 => sorry) fun x1 x2 => sorry
+⊢ (term (↑e).1 (↑e).2 (c (↑e).1) a b s).coeff i = 0

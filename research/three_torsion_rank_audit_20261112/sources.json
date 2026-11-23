@@ -1,0 +1,141 @@
+{
+  "schema": "general-three-torsion-source-plan/v1",
+  "created": "2026-11-12T23:25:10.040171+00:00",
+  "formal": {
+    "project": "research/three_torsion_rank_audit_20261112/lean",
+    "theorem": "ThreeTorsionRankAudit.geometric_three_torsion_cardinality",
+    "statement": "theorem geometric_three_torsion_cardinality [IsAlgClosed K] (a b : K) (hd : 4*a^3+27*b^2≠0) (h2 : (2:K)≠0) (h3 : (3:K)≠0) : Nat.card (geometricTorsion a b)=9",
+    "decl_sha256": "bc2b6a00543ebea346b7104d0f7ae8b394f450e7644277c7d8c960e168630793",
+    "sources": [
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/ActualTorsion.lean",
+        "bytes": 3428,
+        "sha256": "2219c9455c4abfe0f087a8456d3c8a3aba8f82c36556651352c44d0f5a8e106b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/GeometricCardinality.lean",
+        "bytes": 2969,
+        "sha256": "78064d83b97715888a0fe9665b7b6779420ede16f33137949f33c536d456da19"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/QuarticRoots.lean",
+        "bytes": 2524,
+        "sha256": "cd22c5dda5d05d15f0f9003600d9d66469eaf1aff2f0a2f720781a8eb6547971"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lake-manifest.json",
+        "bytes": 3819,
+        "sha256": "e8b97409bd1aff9d12b3d184c53712a4bbd9b2ea93bf745253383d4a95ffdfb2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lakefile.toml",
+        "bytes": 285,
+        "sha256": "5f4264d079b43d11acf3cf999d7d942799e7614094d2c587d0ccbe7eb2655152"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "Every shortWeierstrass y²=x³+ax+b over an algebraically closed field with2ne0/3ne0 and4a³+27b²ne0 has exactlynine actual Mathlib points killedby3, via an explicit identity-plus-rootfibres equivalence. No generic rank/basis/Hasse/pairing premise. All-prime rank, Frobenius determinant, fullBK and p500census remain open."
+  },
+  "artifacts": [
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/attempts.tar.gz",
+      "bytes": 11690,
+      "sha256": "43af86e232988bf0884d4810faef6a74c00f7ad97f136624f1ab11b4d3d8b16d"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/attempts.json",
+      "bytes": 3642,
+      "sha256": "e2df318f05f1fedce343bb8b4b416f750cacc9606462cfdd8ab1bd58fbd1c2e9"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/gate.tar.gz",
+      "bytes": 1768,
+      "sha256": "9576e471dc7890b22f94140861adcf987c7f177dd598586352641bdd53ab3e9b"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/gate.json",
+      "bytes": 1179,
+      "sha256": "722bc4f646e0f546a0c979de2143b4f9d4148522f97261fbb6d78e63bcf35ba1"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/source-review.json",
+      "bytes": 931,
+      "sha256": "917a1cd5eafb7c9d69e86c8af93e492bf3ff2854e26f0f4aa397467f71885ef0"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/kb-status.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/kb-status.stderr",
+      "bytes": 81,
+      "sha256": "c6469ac928dfdb446054c9d34486cd5d7a3243e7c20444e8da1bf1b0dbd77238"
+    },
+    {
+      "path": "research/three_torsion_rank_audit_20261112/evidence/kb-status.exit",
+      "bytes": 4,
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe"
+    }
+  ],
+  "gate": {
+    "archive": "research/three_torsion_rank_audit_20261112/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 20,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/three_torsion_rank_audit_20261112/evidence/attempts.tar.gz",
+    "files": 22,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "assumed_rank_or_basis": false,
+    "native_experiment": false,
+    "paid_compute": 0,
+    "lean4checker": "Unavailable; actual kernel and transitive axiom gate."
+  }
+}

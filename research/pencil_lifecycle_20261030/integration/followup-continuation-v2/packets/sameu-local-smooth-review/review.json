@@ -1,0 +1,43 @@
+{
+  "schema": "research.formal-component-review/v1",
+  "status": "validated_scoped",
+  "producer_manifest_sha256": "dcdfb251c504701897649d1867d08160c68163b3d63895c94c57e83b658d99f5",
+  "producer_source_sha256": "4e14545f26abe2e084e40aeef213efbcb0222eca5f83017c386b4d27aeddf681",
+  "bindings_checked": 53,
+  "fresh_checks": {
+    "main": 0,
+    "producer_controls": 0,
+    "readback": 0,
+    "reviewer_controls": 0
+  },
+  "axiom_declarations": 4,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "claims": [
+    "zero extracted ordinate implies square factor",
+    "square factor implies quintic value/explicit derivative zero",
+    "explicit local nonsingularity implies nonzero ordinate",
+    "literal weighted extraction then doubling yields nonzero weights and validity"
+  ],
+  "premise_boundaries": [
+    "2!=0 for final doubling",
+    "normalized mixed guards",
+    "original input validity",
+    "four nonzero weights",
+    "explicit local condition at extracted root"
+  ],
+  "reviewer_authorship": "Authored imported extraction and Doubling, separately independently reviewed; not this bridge.",
+  "reviewer_failure_retained": "reviewer1 polynomial C numeral normalization failed, reviewer2 passed",
+  "exclusions": [
+    "global squarefree bridge",
+    "UInt64/raw guards",
+    "class sum",
+    "compiler/counters",
+    "walk"
+  ],
+  "scientific_execution": false,
+  "cost_ratio": null
+}

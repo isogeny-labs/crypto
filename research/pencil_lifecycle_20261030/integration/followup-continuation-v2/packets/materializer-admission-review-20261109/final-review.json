@@ -1,0 +1,55 @@
+{
+  "schema": "source.review/v1",
+  "reviewer": "/root/renew_norm",
+  "task": "T-1956",
+  "recorded_utc": "2026-11-09T17:21:24.544935+00:00",
+  "verdict": "binding_source_supported_runtime_unqualified",
+  "execution_approved": false,
+  "tests_run": false,
+  "snapshot_directory": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-admission-review-20261109/snapshot-final",
+  "reviewed_files": {
+    "materializer-qualification-20261109/qualify.py": "efe039f547b2eaf0b590c0ff236b7932f12fcf0158b4dc6d845712c322c64d56",
+    "materializer-qualification-20261109/PLAN.md": "62a8b4d74c9e594e611176a4d7b9777d2ad08865ada75c2f6f37a7a70c60eff1",
+    "materializer-qualification-20261109/SESSION.md": "e67bc2c86dc477c59b5c2b1b9ae9a96cb6b90a186f754658be98523b6d66e352",
+    "materializer-qualification-20261109/manifest.json": "d2bd35efc9294e5c6342040b0883c37c640e08033df0ff789b6184e390d245af",
+    "materializer-admission-20261109/coordination-claim.json": "7654fdc1bfd9af0a26395e4f0bccbd4d1d9bcf3b515b3ee67c9e9b4b60e18d8b",
+    "materializer-admission-20261109/materialize.py": "6bfc278cdfb8cd5f2adad13f5e920a2baee131be9f7dedc4b472329f2f0da4f7",
+    "materializer-admission-20261109/materialize_safety.py": "2d506f0e676ff1db54036adc061680dd7f911b809b4519630fc02ff1606f9507",
+    "materializer-admission-20261109/dependency-presence.json": "559c1b96925bf45a833153401915a8e0e72fc6f6efbd8bb8b2d499154887e854",
+    "materializer-admission-20261109/qualification-plan.json": "39f23690365b99bbc615b7ef5efa9d0bc7e6114f4c16fcbbe9920ee12a6ea53c",
+    "materializer-admission-20261109/preparation.json": "d2884e41e132a11e4560637a5ca19bb5f10f0b5a5914a34932a65e14b9e7e25c",
+    "materializer-admission-20261109/launch.json": "f1f95468629c6d85887b7c835a68dbe46d78e8e914512f1a2d42ecdc4ddffa5a",
+    "materializer-admission-20261109/input-bindings.json": "0a32d63e971c916e56272092f0e91afcdb14094ddfd09d61256cbc002391d182",
+    "materializer-admission-20261109/budget.json": "f46109aa322d16e527fc530741e099c5d1eea841b26b448074f8b5442fc905b3",
+    "materializer-admission-20261109/OPERATE.md": "ec03a3b5955b9cc53142cfdb5b578e0189be419560eb9c2bfd5738151e6725cd",
+    "materializer-admission-20261109/manifest.json": "632b8cc12e79d3450ff6e90a347935bdbf9ac7e415c55f4b98ce03409c68b76a",
+    "materializer-admission-20261109/source.patch": "f02cb93724a22e4b2e6af23b88c13fdc28c999ebced780253bf5129c46468cfd"
+  },
+  "resolved_findings": {
+    "M1": "Candidate6bfc tightens remaining upper bound to43200; source delta exactly deadline and budget bound.",
+    "M2": "Qualification60s and proposed total2760 consistent; final15case plan/harness bound. Original11case draft explicitly superseded by independent PLAN."
+  },
+  "checks": [
+    "All14 preparation input hashes match current source artifacts.",
+    "Packet manifest hashes/bytecounts match immutable review snapshot.",
+    "Helper2d506 byte-identical to prior reviewed helper.",
+    "Candidate record_cleanup and checkpoint are unchanged by two-literal source delta; qualification extracts only these functions and checks exact AST equality with reviewed085234 source.",
+    "Harness15case candidate6bfc and reader021215 pins match; first/subsequent fsync, write/short/flush, checkpoint replace/directoryfsync, synthetic interrupted boundaries, positive/repeat and two corruption controls are present.",
+    "WorkDeadline BaseException escapes per-case Exception catch; external55s timeout plus5s kill remains required.",
+    "Launch preserves2CPU/4GiB/zeroSwap/512tasks,880worker/885unit+5stop/895timeout+5kill/900parent, one attempt, serial no overlap."
+  ],
+  "limitations": [
+    "Static source review only; no fixture or payload executed.",
+    "A/A is repeated deterministic assertions; no timing comparison or explicit cross-directory record comparison.",
+    "Synthetic storage states do not establish actual OS interruption, physical durability, process cleanup semantics or terminal custody.",
+    "Final preparation currently publication=null/reviewed=false; root must publish exact finalized bindings and authenticate live lease, serial ownership and charged/reserved balance before separate release.",
+    "Changing preparation publication/accounting/lease requires updated packet manifest and readback; this review does not authenticate future field values."
+  ],
+  "sources": [
+    "../materializer-source-successor-review-20261107/review.json",
+    "../materializer-journal-reader-review-20261107/review.json",
+    "../root-materializer-admission-20261105/OPERATE.md",
+    "../campaign-renewal-20261109/authorization.json"
+  ],
+  "kb": "Unavailable; exact prior repository source/reviews used."
+}

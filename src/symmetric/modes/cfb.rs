@@ -23,7 +23,7 @@
 use super::cipher::BlockCipher;
 
 /// **CFB encrypt** with full-block feedback, arbitrary plaintext length.
-pub fn cfb_encrypt<C: BlockCipher<N>, const N: usize>(
+pub fn cfb_encrypt<C: BlockCipher<N> + ?Sized, const N: usize>(
     cipher: &C,
     iv: &[u8; N],
     plaintext: &[u8],
@@ -48,7 +48,7 @@ pub fn cfb_encrypt<C: BlockCipher<N>, const N: usize>(
 }
 
 /// **CFB decrypt** — uses the cipher's `encrypt` direction.
-pub fn cfb_decrypt<C: BlockCipher<N>, const N: usize>(
+pub fn cfb_decrypt<C: BlockCipher<N> + ?Sized, const N: usize>(
     cipher: &C,
     iv: &[u8; N],
     ciphertext: &[u8],

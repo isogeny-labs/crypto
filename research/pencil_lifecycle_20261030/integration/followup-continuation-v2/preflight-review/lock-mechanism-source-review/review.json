@@ -1,0 +1,22 @@
+{
+  "schema": "software.source-receipt-review/v1",
+  "reviewer": "root",
+  "producer": "invariants_branches",
+  "reviewed_utc": "2026-10-31T00:54:24.832564+00:00",
+  "producer_manifest_sha256": "1c6c45cea42f1120e60fd11f7a62c929436e26e27c3f6ac7396fc3dc943a9905",
+  "files_verified": 9,
+  "preexecution_bindings_verified": 2,
+  "review_mode": "source and native receipt inspection; no independent replay",
+  "observations": [
+    "Parent waits for child confirmation before closing original descriptor and attempting fresh flock.",
+    "Child release is barred until after failed probe; waitpid confirms exit before successful probe.",
+    "No-child baseline and exact errno are recorded.",
+    "FD_CLOEXEC does not prevent fork inheritance; no exec operation is exercised."
+  ],
+  "finding": "Retained deterministic check supports inherited-descriptor mechanism on this host.",
+  "limitations": [
+    "Does not reconstruct original Rust test interleaving or identify its failed flock errno.",
+    "Native Python mechanism check is not a production BenchLock fix or formal runtime refinement."
+  ],
+  "scientific_execution_admitted": false
+}

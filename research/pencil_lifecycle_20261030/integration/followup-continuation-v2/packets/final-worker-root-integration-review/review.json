@@ -1,0 +1,65 @@
+{
+  "schema": "prospective.worker-build-root-test-review/v1",
+  "task": "T-1563",
+  "reviewer": "assembler_independent_review_v2",
+  "producer_commit": "5ea0e1e75a93ef025fb6f25645a7936ad06ccb9d",
+  "decision": "accepted_as_preparation_only",
+  "execution_authorized": false,
+  "disclosure": "Reviewer authored FD recurrence/progress integration, not T1558 build plan. Nonblind source context; no independent derivation of own recurrence claimed.",
+  "exact_inputs": {
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/final-fd-candidate-build-plan/PLAN.md": "64f0b8a9dbd09e0d23ac55d7772a29a410b0bc28bd834cc79f1d6af0ef16c103",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/final-fd-candidate-build-plan/commands.json": "2da7499f50e5712769fd40e9a73ab0d7aa1b25d985dc994af0458086bb96a301",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/final-fd-candidate-build-plan/cache-plan.json": "7432c4789df3910c9b64cabae4344b7ea3296df96542eb5a4b87de59ff1d3cf9",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/final-fd-candidate-build-plan/budget-plan.json": "5978537d66eba9e1edcc136e1d159083ee677b89a396b1b3dcb9ab39182aab84",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/final-fd-candidate-build-plan/source-observations.json": "f089033855ca065918231fd7cb2732c4659fde0cd8af1e4ba218bbdedba08575",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/final-fd-candidate-build-plan/REPORT.md": "371b21a3fe1283b78f88fc2d46639a2d843a5d589f3e86cc4bf861f341f4ffae",
+    "AGENTS.md": "22e5d9db7422446a0bb9c3a635bc4ae1ac8cb0468e8c8bec84c8446d5faf1519",
+    "Cargo.toml": "84d25b3715bc7476271955f5a20d2b1508d847c16382bd951f0e4bcc1c533c0c",
+    "Cargo.lock": "cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6",
+    "src/cryptanalysis/ecbench/three_leads.rs": "6d3572b5fdaf97b48989b21c1d1d5bef9351e295d3d51fe19c3aafa417700a9c",
+    "src/cryptanalysis/ecbench/pencil.rs": "481f94cc389a1e79880fc168c3a98b5bb37e9411694d424632d4f8f389e5ed00",
+    "src/cryptanalysis/ecbench/pencil_progress_native.rs": "87f3581cbbeadb826e878cc80887de8e9d0980cb65262058ca54b50aae86a0ae",
+    "src/cryptanalysis/ecbench/pencil_progress_sink.rs": "6587e873f5de575ea31999c2b026c9e4989718137ba28c9a3ad4d14a8dc3fb6d",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/target-stream-implementation/summary.json": "43cc83949e36d8c4a858b3b90fe9d8162a1f38b55a1f2f0a6133dc7939ba1ea6"
+  },
+  "minimal_existing_root_tests": [
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations"
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "Worker binary build does not compile/execute libtest; full root test success is separate."
+    },
+    {
+      "id": "F2",
+      "finding": "Existing three root adapter tests check fake dispatch/shared meter, ownership unwind, ledger hashing; they do not call solve_with_progress."
+    },
+    {
+      "id": "F3",
+      "finding": "Default-feature cargo test --release --lib includes redis-native-tls; planned musl worker omits defaults. Neither configuration substitutes for the other."
+    },
+    {
+      "id": "F4",
+      "finding": "Old 8GiB compiler allocation failure and unchanged-source16GiB/600s compilation timeout executed zero tests; not a source/test assertion failure."
+    },
+    {
+      "id": "F5",
+      "finding": "T1558 source-observations retains preapplication progress SHA01468d...; commands separately correctly bind87f358...; refresh exact final closure rather than reusing planning observations."
+    },
+    {
+      "id": "F6",
+      "finding": "Aggregate2CPU/8GiB enforcement, cache manifests/compatibility, final source/protocol identities, funded reservation and wrapper remain explicitly unresolved. AS8GiB/job1 alone do not establish aggregate limits."
+    }
+  ],
+  "not_repeated": [
+    "standalone6398pair suite",
+    "prior exporter controls",
+    "pricing nine-category review"
+  ],
+  "references": [
+    "https://doc.rust-lang.org/cargo/commands/cargo-test.html",
+    "https://doc.rust-lang.org/cargo/commands/cargo-rustc.html"
+  ]
+}

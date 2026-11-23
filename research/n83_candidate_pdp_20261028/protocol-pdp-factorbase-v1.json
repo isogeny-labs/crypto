@@ -1,0 +1,3947 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031",
+  "version": 1,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "PDP_PLAN.md"
+  },
+  "question": "What source-bound first-fall certificates and degree-two closure LFD bounds or exact values are obtained for every generated N83 candidate factor-base PDP presentation across coordinate bits 27..39?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "For each of 624 candidate PDP systems, report the first-fall certificate or explicit unresolved outcome; for each binary/Koblitz system, report degree-two closure LFD only when an admissible global upper certificate verifies, otherwise retain a bound or unresolved status.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "First fall and last fall are not the top-form degree of regularity, solving degree, universal heuristic, or ECDLP recovery result. The companion top-form Dreg panel is frozen separately.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "Coordinate-bit comparisons are finite-panel exact comparisons only; no factor-base ranking is promoted until the candidate-held-out model protocol passes.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "spike27-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike27 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike27-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike27 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike27-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike27 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike28-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike28 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike28-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike28 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike28-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike28 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          28
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike29-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike29 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike29-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike29 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike29-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike29 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          29
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike30-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike30 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike30-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike30 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike30-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike30 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          30
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike31-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike31 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike31-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike31 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike31-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike31 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          31
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike32-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike32 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike32-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike32 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike32-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike32 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          32
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike33-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike33 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike33-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike33 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike33-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike33 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          33
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike34-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike34 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike34",
+        "coordinate_bit": 34,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike34-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike34 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike34",
+        "coordinate_bit": 34,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike34-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike34 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike34",
+        "coordinate_bit": 34,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          34
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike35-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike35 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike35",
+        "coordinate_bit": 35,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike35-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike35 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike35",
+        "coordinate_bit": 35,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike35-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike35 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike35",
+        "coordinate_bit": 35,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          35
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike36-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike36 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike36",
+        "coordinate_bit": 36,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike36-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike36 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike36",
+        "coordinate_bit": 36,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike36-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike36 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike36",
+        "coordinate_bit": 36,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          36
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike37-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike37 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike37",
+        "coordinate_bit": 37,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike37-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike37 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike37",
+        "coordinate_bit": 37,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike37-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike37 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike37",
+        "coordinate_bit": 37,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          37
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike38-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike38 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike38",
+        "coordinate_bit": 38,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike38-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike38 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike38",
+        "coordinate_bit": 38,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike38-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike38 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike38",
+        "coordinate_bit": 38,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          38
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike39-koblitz",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike39 koblitz input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "koblitz",
+        "candidate_id": "spike39",
+        "coordinate_bit": 39,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike39-binary",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike39 binary input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "binary",
+        "candidate_id": "spike39",
+        "coordinate_bit": 39,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "degree_two_closure"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": 60,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    },
+    {
+      "id": "spike39-prime",
+      "role": "candidate",
+      "description": "First-fall and admissible degree-two closure measurements for spike39 prime input presentations.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "pdp",
+            "--bin",
+            "fall",
+            "--bin",
+            "compare"
+          ]
+        ],
+        "binary_sha256": {
+          "pdp": "036fa9274b8bb9a2dbbdc800afc50bafcfb86272c5e403dea0c3d96f32652284",
+          "fall": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14",
+          "compare": "8801ffcb2397466657888bf141c87a7c06c1f638521ef37cb41d24052f8316b9"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "family": "prime",
+        "candidate_id": "spike39",
+        "coordinate_bit": 39,
+        "coordinate_positions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          39
+        ],
+        "candidate_x_count": 134217728,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "first_fall",
+          "closure_not_supported"
+        ],
+        "first_fall_seconds": 60,
+        "closure_seconds": null,
+        "systems_per_family": 16,
+        "factor_base_manifest_binding": "complete candidate S3 file-index and family manifest SHA-256; all 384 shard joins required before measurement"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Existing exact native controls verify planted equations, membership and replay; each planted case carries an explicit witness checked by pdp generation."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Existing tampered replay and nonlinear-control tests reject invalid certificates; all failures remain retained."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "coordinate_bit",
+        "levels": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_binaries",
+        "treatment": "fixed",
+        "how": "pdp, fall and compare source/binary hashes pinned per arm."
+      },
+      {
+        "name": "coordinate_bit",
+        "treatment": "crossed",
+        "how": "All13 complete fixed coordinate domains r=27..39; no omitted bit."
+      },
+      {
+        "name": "family",
+        "treatment": "crossed",
+        "how": "All three curve families; prime degree-two closure marked unsupported."
+      },
+      {
+        "name": "m",
+        "treatment": "crossed",
+        "how": "All m=2..9 retained."
+      },
+      {
+        "name": "target_kind",
+        "treatment": "crossed",
+        "how": "Shared deterministic planted tuple and original natural targets across candidate coordinate bits."
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "Candidate system generator source."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native process."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record host, kernel, Spot identity and memory; no timing comparison."
+      },
+      {
+        "name": "budgets",
+        "treatment": "fixed",
+        "value": 60,
+        "how": "Per-case cap for first-fall and binary closure; preserve timeouts and incomplete cases."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Ascending bit, family, m and target kind; deterministic."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "baseline-koblitz",
+          "baseline-binary",
+          "baseline-prime",
+          "spike40-koblitz",
+          "spike40-binary",
+          "spike40-prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Accept exact per-input certificate only after completion and successful replay; unsupported and failed values remain null."
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exhaustive deterministic cases; no timing or population comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix family/m rule in frozen pdp source; planted tuple uses common low-26 support."
+    },
+    "instance_sampling": {
+      "rule": "All624 candidate presentations; 416 binary closure attempts; 208 prime closures are explicitly unsupported.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic source-bound certificate computation.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 624,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "624 fixed presentations in an exhaustive finite panel; no inferential population test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 60,
+      "threads": 1,
+      "estimated_total_seconds": 86400,
+      "measured_on": "One-day cap includes bounded first-fall and binary closure attempts plus replay; not a runtime estimate."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "first_fall_lower_bound",
+        "name": "Certified first-fall lower bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Per-input lower bound from exact first-fall procedure; a cap or timeout contributes no extra degree bound.",
+        "source": "first-fall result and replay JSON",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "certificate_bound"
+      },
+      {
+        "id": "last_fall_interval",
+        "name": "Degree-two closure LFD interval or exact value",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "LFD exact only with explicit lower witness and admissible global upper certificate; otherwise keep separate lower and upper bounds or null.",
+        "source": "closure result and replay JSON",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "certificate_interval"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "first_fall_exact",
+        "name": "Exact first-fall degree when certified",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "First exact nonzero degree fall if established; otherwise null.",
+        "source": "first-fall replay",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "closure_rank",
+        "name": "Degree-two closure rank",
+        "unit": "rank",
+        "kind": "counted",
+        "definition": "Completed Boolean V2 normal-form closure rank; a plateau is not a global LFD upper.",
+        "source": "closure summary",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "closure_status",
+        "name": "Closure status",
+        "unit": "enum",
+        "kind": "counted",
+        "definition": "Exact, bounded, resource_limit, error, unsupported or incomplete per native replay.",
+        "source": "closure summary",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "first_fall_lower_bound",
+      "first_fall_exact",
+      "last_fall_lower_bound",
+      "last_fall_upper_bound",
+      "closure_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 86400,
+    "checkpoint": {
+      "policy": "atomic-per-case-and-per-candidate-bundle",
+      "interval_seconds": 60,
+      "grace_seconds": 5,
+      "restore_validation": "verify SHA-256 then fresh-process replay; retain original failed attempt and use fresh prefix for infrastructure retry",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Run first-fall for all624 cases; run degree-two closure for all416 Koblitz/general-binary cases; preserve 208 prime closure cases as explicitly unsupported; replay every completed certificate and retain all partial/error rows.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Maximum60 seconds per first-fall/closure case, one thread,8GiB,86400-second outer cap; interruption produces a preserved partial export and fresh-attempt key only.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Hash mismatch, malformed input or failed replay invalidates a certificate",
+    "Closure plateau alone does not certify last fall degree",
+    "Resource limits imply no mathematical degree bound",
+    "Every elapsed time is diagnostic, wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report per-input certificate values, intervals and unresolved outcomes. Exact LFD requires the original admissible global upper certificate; do not infer it from closure plateau.",
+    "comparison_ids": [
+      "C1"
+    ],
+    "statistic": "Per-input exact/bounded certificate fields",
+    "interval": "Certificate bounds only",
+    "multiple_comparison_correction": "none; finite-panel descriptive results",
+    "effect_size_measure": "Matched exact degree differences only for same family,m,target kind",
+    "verdict_vocabulary": [
+      "certified",
+      "bounded",
+      "resource_limit",
+      "unsupported",
+      "error",
+      "unresolved",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/compare.rs",
+      "sha256": "d89b32a614239f9762ce76a4408ba42a2f7e575e8227b1089d07ef1c1481c366"
+    },
+    "inputs": [
+      "candidate input indices and system.sing sources produced under protocol-top-factorbase-v1.json"
+    ],
+    "outputs": [
+      "624 first-fall case rows and fresh replays",
+      "416 binary closure case rows and fresh replays",
+      "candidate-base-pdp-panel.json",
+      "S3_PERSISTENCE_INDEX.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Paired FFD/LFD and closure-rank grid, unknowns explicit"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Summation polynomial formulas and distinction between first fall and regularity",
+      "verified_by": "Read primary HTML and checked formulas with controls"
+    },
+    {
+      "ref": "https://www.singular.uni-kl.de/index.php/singular.pdf",
+      "provenance": "internal",
+      "claim": "Standard bases and Hilbert functions; installed-version behavior checked by controls",
+      "verified_by": "Previously checked manual and installed4.3.1 controls; current manual fetch failed"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Definitions of bounded multiplication closure and last fall degree; distinction from regularity",
+      "verified_by": "Primary text checked before implementation; restricted upper certificate documented in DESIGN.md"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "source_system_protocol": "protocol-top-factorbase-v1.json",
+    "source_system_protocol_sha256": "acf03636ae2e8038b2c5da0077f402ec70823cbcb67150dbb80db79eb6c46bdd",
+    "pdp_source_sha256": "6af1e892f07b5566750229627393478b06fceb727324bdb84dc75988a1735128",
+    "fall_source_sha256": "f860a68fcd8c98585082965f3d4c1622d71add204c0afc5bc922ea243153ea85",
+    "compare_source_sha256": "d89b32a614239f9762ce76a4408ba42a2f7e575e8227b1089d07ef1c1481c366",
+    "factor_base_generation_protocol_sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+    "systems_per_candidate": 48,
+    "candidate_bits": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "same_base_reuse": "Every candidate point base is fixed for all m=2..9.",
+    "candidate_ids": [
+      "spike27",
+      "spike28",
+      "spike29",
+      "spike30",
+      "spike31",
+      "spike32",
+      "spike33",
+      "spike34",
+      "spike35",
+      "spike36",
+      "spike37",
+      "spike38",
+      "spike39"
+    ],
+    "family_count": 3,
+    "planned_first_fall_cases": 624,
+    "planned_binary_closure_cases": 416,
+    "planned_prime_closure_cases": 208
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "176096917e688b6e7100747bc3b94e59ab189fc19ec5e2e687f7f3831220bb8c",
+    "commit": "4768ffd61881d27bbe9d43f1a8f98f2cfc13da72",
+    "frozen_at": "2026-10-31T10:23:38Z",
+    "filed_before_affected_data": true
+  }
+}

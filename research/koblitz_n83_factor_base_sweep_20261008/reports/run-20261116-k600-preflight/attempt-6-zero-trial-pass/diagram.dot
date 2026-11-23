@@ -1,0 +1,14 @@
+digraph preflight {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", pad="0.25", nodesep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fa", color="#275478", fontname="Helvetica", fontsize=11];
+  edge [color="#56738a", penwidth=1.4];
+  lock [label="Frozen H2 lock\na30e6749; parent C\n7 source hashes verified"];
+  s3 [label="Fresh K600 S3 GET\n3,025,798 bytes\nSHA-256 3e85c9e4…"];
+  run [label="One CPU; 4 GiB; no network\nLinux exporter + Mac supervisor\n4.040 s native outer wall", fillcolor="#dcedfb"];
+  receipt [label="PREFLIGHT_ONLY\n0 trials; 0 relations; 0 SAT calls\npeak cgroup 105,897,984 B", fillcolor="#e1f4e5", color="#2b6b3e"];
+  pending [label="Constructed and natural-query arms\nCold one-target S and matched rho\nPending", fillcolor="#fff3dc", color="#976b1d"];
+  lock -> run;
+  s3 -> run;
+  run -> receipt;
+  receipt -> pending;
+}

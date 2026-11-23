@@ -1,0 +1,1110 @@
+{
+ "schema": "replay-certificate/v1",
+ "item": "BLINDSPOT-14",
+ "evidence_directory": "benchmarks/20261018-blindspots-prime-m4-cells",
+ "status": "verified",
+ "independent": true,
+ "independence_basis": "Fresh build (rustc, per card, same build argv as the original cards) and fresh run on 2026-10-22 by executor sessions other than the one that produced the recorded 2026-10-18 rows, as stated in the assessment dispatch; cards written by the experiment-director lane. Same instrument source (sha256 pinned below, also the sha256 of examples/blindspots_14_prime_m4.rs at the recorded commit 397d5ade...). Same host class is not claimed to be a different machine; neither the receipts nor this script can show the executor identity, which rests on the dispatch statement.",
+ "scalars_verified": true,
+ "scalars_scope": "All 968 compared rows. Part 1 (281 rows, runs 1-3, the existing certificate copied): All 281 compared rows (selftest lines counted as rows): the sample in replay/PLAN.md: matched rho, arm (a) T_dec and full IC at 16 and 28 bits (design cells bx = 8 and bx = 63) and 16-bit bx = 3; arm (b) T_dec at 16-bit bx = 3, 4, 5; arm (b) full IC at 16-bit bx = 3 and bx = 4 runs 0-1; arm (b) 28-bit design-cell T_dec run to the nonzero cap; arm (b) 16-bit design-cell T_dec target 0 (cell, setup and target-0 rows); the deep selftest text. Every key but `ms` compared exactly, with no tolerance. Not replayed (see replay/PLAN.md 'What was dropped, and why'): 20 and 24 bits, 16-bit ladder bx = 6, 7, arm (b) T_dec bx = 8 targets 1-4 and planted targets, arm (b) full IC bx = 4 runs 2-15, arms (c) and (d) (`reuse-pkm`, `reach`). Timing fields (`ms`, selftest timing text, receipt seconds) are descriptive and excluded. Part 2 (run 4, card-r01 vs card-n01, 687 rows): the rho-neg cells at 16, 20, 24 and 28 bits (16 rows each, jsonl and stdout), the 8 continuity runs (cont-rho-b* and cont-fullic-a-b* at 16, 20, 24, 28 bits, 16 rows each, jsonl and stdout) and the 47-line deep selftest text, all replay vs original; plus the 8 replay continuity files and the 8 original continuity files each against the recorded raw/rho-b*.jsonl and raw/fullic-a-b*.jsonl (256 rows); every `.stderr.log`, build.stdout.log and build.stderr.log empty in both (30 files). Every key but `ms` compared exactly, with no tolerance. Timing fields (`ms`, selftest timing text, receipt seconds) are descriptive and excluded. The run-4 comparison covers the rho-neg instrument blindspots_14_prime_m4_neg.rs only; it does not extend run-1-3 coverage to anything those runs did not replay.",
+ "comparison_rule": "research/blindspots_20261018/14-prime-m4-cells/replay/PLAN.md, 'What must match exactly': drop `ms` from each row; exact equality row by row in file order of every key (the PLAN.md-listed keys, and any other key); partial replays compare the corresponding subset; selftest line-equal after stripping timing text with last line SELFTEST OK; every receipt command exit 0; receipt card sha256 equals the card file. Run 4: research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/PLAN.md, 'Replay r01 (validation gate)': selftest line-equal after stripping timing text; every jsonl and run stdout equal as parsed JSON minus `ms`, row by row in file order, 16 rows each; stderr and build logs size 0; replay cont-* also equal the recorded raw/rho-b* and raw/fullic-a-b*; receipt status completed, every command exit 0, receipt card sha256 equals the card file, receipt output digests equal the files.",
+ "existing_certificate": {
+  "path": "benchmarks/20261018-blindspots-prime-m4-cells/replay-certificate.json",
+  "sha256": "a34fc36873db18a757d6559461ed98fd74c5c0b2702e563ff1c87be9ef229924",
+  "status": "verified",
+  "total_rows_compared": 281,
+  "total_mismatches": 0,
+  "compare_script_rerun": {
+   "path": "research/blindspots_20261018/14-prime-m4-cells/replay/compare_replay.py",
+   "exit_status": 0,
+   "verdict_line": "VERIFIED",
+   "rows_compared": 281,
+   "mismatches": 0
+  }
+ },
+ "compare_scripts": [
+  {
+   "path": "research/blindspots_20261018/14-prime-m4-cells/replay/compare_replay.py",
+   "sha256": "b4df3670c966cac0485e2e67be49fa583aeab6f2d8e92be81896db6df85b8944",
+   "covers_runs": [
+    "CARD-BLINDSPOT-14-R01",
+    "CARD-BLINDSPOT-14-R02",
+    "CARD-BLINDSPOT-14-R03"
+   ]
+  },
+  {
+   "path": "research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/compare_replay_rhoneg.py",
+   "sha256": "600ac9c4ff4030eda0d57c562093121a0c617998a578b05ed2fe838728bd3503",
+   "covers_runs": [
+    "CARD-BLINDSPOT-14-RHONEG-R01"
+   ]
+  }
+ ],
+ "instruments": [
+  {
+   "path": "research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs",
+   "sha256": "f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376"
+  },
+  {
+   "path": "research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs",
+   "sha256": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e"
+  }
+ ],
+ "total_rows_compared": 968,
+ "total_mismatches": 0,
+ "mismatches": [],
+ "failures": [],
+ "runs": [
+  {
+   "card_id": "CARD-BLINDSPOT-14-R01",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r01.yaml",
+   "card_sha256": "8694e98fe44b2b4c12b556ceb84298fae7b1b1a4429f704336fa6f8f3a7c51a1",
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r01.json",
+   "receipt_sha256": "d8f8911143148c4c775399117327f7b94cecb2afd777171e5de1c8045d2393fd",
+   "commit": "e59a91a29ca9321d6efa976b7813ac36735ddf6c",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "selftest",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-a-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-a-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-a-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-a-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-a-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-a-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-selftest.stdout.log",
+     "replay_sha256": "4ed3c1e88b5c5b8b85fbb115eb804b8df3e999e28b7e119cae6c4e790db381de",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/card-01-selftest.stdout.log",
+     "recorded_sha256": "26b2dee1c6dc4e98b62a26896aa7981f180045b1149e24934eef9a886d2a213b",
+     "comparison": "line-equal after stripping timing text; last line SELFTEST OK",
+     "lines_recorded": 36,
+     "lines_replayed": 36,
+     "rows_compared": 36,
+     "last_line_replay": "SELFTEST OK (19.4s)",
+     "last_line_recorded": "SELFTEST OK (21.7s)",
+     "mismatches": [],
+     "command_id": "selftest"
+    },
+    {
+     "command_id": "rho-b16",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl",
+     "replay_sha256": "0ccb27d777c4c2c49ffb2bd0a6229b64a3963c73c99596f7c9112ff08d762f71",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+     "recorded_sha256": "82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46",
+     "plan_rows": "16 rho rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 160,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-b28",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl",
+     "replay_sha256": "75486f28f1b9c08b4249675ed2d53019271d16e4f701a27ba2cda65108f27e17",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+     "recorded_sha256": "9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc",
+     "plan_rows": "16 rho rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 160,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-a-b16",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl",
+     "replay_sha256": "657f50cd5ce16426cf5771189143ad45173aa15f467cabb828fc601554d7a586",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16.jsonl",
+     "recorded_sha256": "3f7a10de292c5c26a6a9e288b8c45d8082b1e51e9b839e3bb0af2a2c81488eb3",
+     "plan_rows": "cell, setup, 16 random + 4 planted tdec",
+     "rows_expected_by_plan": 22,
+     "rows_recorded_total": 22,
+     "rows_replayed_total": 22,
+     "rows_recorded_selected": 22,
+     "rows_replayed_selected": 22,
+     "listed_key_values_compared": 234,
+     "rows_compared": 22,
+     "rows_equal": 22,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-a-b28",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl",
+     "replay_sha256": "ac0b26532f2a84302cbdb420e7928d3e99354c2c9f11d61852817261602e3468",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b28.jsonl",
+     "recorded_sha256": "58017ad73cc398326542e78648c174e0f0a3637b251dd614cc6a46d61e3651b1",
+     "plan_rows": "cell, setup, 16 random + 4 planted tdec",
+     "rows_expected_by_plan": 22,
+     "rows_recorded_total": 22,
+     "rows_replayed_total": 22,
+     "rows_recorded_selected": 22,
+     "rows_replayed_selected": 22,
+     "listed_key_values_compared": 234,
+     "rows_compared": 22,
+     "rows_equal": 22,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-a-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl",
+     "replay_sha256": "2787237b02d28bc2bf7faf73c5b8ff2c764ca8cfd8bd3a7321c1bd625a6f08da",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx3.jsonl",
+     "recorded_sha256": "65aa3cca6f0b90ede018f1c621cf22d6abd5f4aedd0639f6f81d1eb01ccaaf23",
+     "plan_rows": "cell, setup, 16 random + 4 planted tdec",
+     "rows_expected_by_plan": 22,
+     "rows_recorded_total": 22,
+     "rows_replayed_total": 22,
+     "rows_recorded_selected": 22,
+     "rows_replayed_selected": 22,
+     "listed_key_values_compared": 234,
+     "rows_compared": 22,
+     "rows_equal": 22,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-a-b16",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl",
+     "replay_sha256": "fbfdfedb785ba777f3e66296cd5a4dd4c5cdd7f1922425e99e1f333bc7419693",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+     "recorded_sha256": "017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-a-b28",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl",
+     "replay_sha256": "eae6b1c4ad1f354225db6771b1b2122388d0f9864fa4042852422ebec67f20d3",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+     "recorded_sha256": "6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-a-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl",
+     "replay_sha256": "be3bde1384918f4606473f436794f6cccaf9b1c71628c78245212956f0016b5f",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx3.jsonl",
+     "recorded_sha256": "d2ca21b8012e87398abd2ff49ae9c51fed8fd0fde138c3017d51cb4f0d40ac67",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    }
+   ],
+   "rows_compared": 182,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-14-R02",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r02.yaml",
+   "card_sha256": "34c3d0434815886b1552687b782429dc91a6fcf8c5b8939a505aa1dce9adc6f0",
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r02.json",
+   "receipt_sha256": "3cf3c63fad458ab165c6bab70ce829ece61c0528a2128d6d223c7b0a5a447faa",
+   "commit": "44578da212c808280f071d2fb0c45bc47ed905e2",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx4",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx5",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-b-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-b-b16-bx4-r00-02",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "command_id": "tdec-b-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx3.jsonl",
+     "replay_sha256": "9746f862c8ff63e29b9e10a2ffb4387aa172fbc9ac7227ac12aea8be7b369d73",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx3.jsonl",
+     "recorded_sha256": "c29f8cacad14b7dcd203c36670e65a05e929189219f6e79b3234a1a66e0c3a17",
+     "plan_rows": "cell, setup, 16 random + 2 planted tdec",
+     "rows_expected_by_plan": 20,
+     "rows_recorded_total": 20,
+     "rows_replayed_total": 20,
+     "rows_recorded_selected": 20,
+     "rows_replayed_selected": 20,
+     "listed_key_values_compared": 263,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-b-b16-bx4",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx4.jsonl",
+     "replay_sha256": "aa268d5db1cfb46ede8ad5723f363f6c50a321274bb78612dde5afab8d62b76a",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx4.jsonl",
+     "recorded_sha256": "23cc29cc019f7ce7e9ce1743a0daf524f0b49e17614490efa573cbbc452aada9",
+     "plan_rows": "cell, setup, 16 random + 2 planted tdec",
+     "rows_expected_by_plan": 20,
+     "rows_recorded_total": 20,
+     "rows_replayed_total": 20,
+     "rows_recorded_selected": 20,
+     "rows_replayed_selected": 20,
+     "listed_key_values_compared": 263,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-b-b16-bx5",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx5.jsonl",
+     "replay_sha256": "4247596de5aaa6451668e228fe5f8e1f79a23ca6cebbe24b789eee2139cc989e",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx5.jsonl",
+     "recorded_sha256": "17ed214ab54cb403a76ad45b13aed036c027977811fd7cceb5ca0c7880901b7d",
+     "plan_rows": "cell, setup, 16 random + 2 planted tdec",
+     "rows_expected_by_plan": 20,
+     "rows_recorded_total": 20,
+     "rows_replayed_total": 20,
+     "rows_recorded_selected": 20,
+     "rows_replayed_selected": 20,
+     "listed_key_values_compared": 263,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-b-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-b-b16-bx3.jsonl",
+     "replay_sha256": "a43fa5a778fb7740e3d9ad9406327de812b01aefb3a7334df77def773e720b66",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx3.jsonl",
+     "recorded_sha256": "6169acdaa182e92ca4c576275d00a99b227a8404e59ba357ebb256f9257a0947",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-b-b16-bx4-r00-02",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-b-b16-bx4-r00-02.jsonl",
+     "replay_sha256": "c9cce4d70f23933982cb24bf527ba6f6b00e920192087faa188d9cda4a6bd404",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl",
+     "recorded_sha256": "f69a9ca2081a58d4cca531755715ee9feb210ab77761cd9912df9cf5b9d47596",
+     "plan_rows": "first two rows (run 0, 1) of the recorded r00-06 file",
+     "rows_expected_by_plan": 2,
+     "rows_recorded_total": 6,
+     "rows_replayed_total": 2,
+     "rows_recorded_selected": 2,
+     "rows_replayed_selected": 2,
+     "listed_key_values_compared": 36,
+     "rows_compared": 2,
+     "rows_equal": 2,
+     "mismatches": [],
+     "comparison": "subset: first two rows (run 0, 1) of the recorded r00-06 file"
+    }
+   ],
+   "rows_compared": 78,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-14-R03",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r03.yaml",
+   "card_sha256": "1022f9c7a2dacd7c0e7343e3274ff3567967cc7f27ba7f7779d37c43785d2993",
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r03.json",
+   "receipt_sha256": "43a56b52b6e60023216e4a98d804e1b3332b2169277db63161794027ab22d894",
+   "commit": "e5559cb2704e5a545eef1ca7a3ebf562e33b5a00",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b28-bx63",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx8-t00-01",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "command_id": "tdec-b-b28-bx63",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b28-bx63.jsonl",
+     "replay_sha256": "77f176bb413a64e3896173936c8f365691ea8b0c8dca29c5703ad9d3f484ed55",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx63.jsonl",
+     "recorded_sha256": "76c85ec21b16baba2d21aca6e68adfe1c857453818f33aefc1285ce51babc3d2",
+     "plan_rows": "cell, setup, 16 random tdec",
+     "rows_expected_by_plan": 18,
+     "rows_recorded_total": 18,
+     "rows_replayed_total": 18,
+     "rows_recorded_selected": 18,
+     "rows_replayed_selected": 18,
+     "listed_key_values_compared": 235,
+     "rows_compared": 18,
+     "rows_equal": 18,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-b-b16-bx8-t00-01",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx8-t00-01.jsonl",
+     "replay_sha256": "a87ec39dae16b4c14534550d8cb0f42a6219d6cf827d59c09c1cb839b1001c0a",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t00-05.jsonl",
+     "recorded_sha256": "b4759c68e67cf5385be6ca21628a1f7f3d8cb9bf7c88c3f496cc144e2d01cbce",
+     "plan_rows": "cell, setup, tdec target 0 of the recorded t00-05 file",
+     "rows_expected_by_plan": 3,
+     "rows_recorded_total": 7,
+     "rows_replayed_total": 3,
+     "rows_recorded_selected": 3,
+     "rows_replayed_selected": 3,
+     "listed_key_values_compared": 25,
+     "rows_compared": 3,
+     "rows_equal": 3,
+     "mismatches": [],
+     "comparison": "subset: cell, setup, tdec target 0 of the recorded t00-05 file"
+    }
+   ],
+   "rows_compared": 21,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-14-RHONEG-R01",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/card-r01.yaml",
+   "card_sha256": "daa5641a047aee4c0649852c1b1c980bbe9be6015603a9a7be8c38a795757f94",
+   "replays_card": {
+    "card_id": "CARD-BLINDSPOT-14-RHONEG-01",
+    "card": "research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/card-n01.yaml",
+    "card_sha256": "a8aa5e6871bbb65578910a7661d05ccdc23c282420373cf63e39b93eaccba596",
+    "receipt": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/receipt-n01.json",
+    "receipt_sha256": "3e966efdc2c444926f914c9ec3b4c98acb639fd36dab25890addff5d6905e6ae",
+    "commit": "84e5b2c8592a97fffe0245602d18139fc140c45b",
+    "status": "completed",
+    "commands": [
+     {
+      "id": "make-dirs",
+      "exit_code": 0
+     },
+     {
+      "id": "build",
+      "exit_code": 0
+     },
+     {
+      "id": "selftest",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-rho-b16",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-rho-b20",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-rho-b24",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-rho-b28",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-fullic-a-b16",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-fullic-a-b20",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-fullic-a-b24",
+      "exit_code": 0
+     },
+     {
+      "id": "cont-fullic-a-b28",
+      "exit_code": 0
+     },
+     {
+      "id": "rho-neg-b16",
+      "exit_code": 0
+     },
+     {
+      "id": "rho-neg-b20",
+      "exit_code": 0
+     },
+     {
+      "id": "rho-neg-b24",
+      "exit_code": 0
+     },
+     {
+      "id": "rho-neg-b28",
+      "exit_code": 0
+     },
+     {
+      "id": "remove-bin",
+      "exit_code": 0
+     },
+     {
+      "id": "remove-bin-dir",
+      "exit_code": 0
+     }
+    ]
+   },
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/receipt-r01.json",
+   "receipt_sha256": "6c3057006ee559743b720f9becec3a75b5b9b5d84b33f2497e44ded91b79d289",
+   "commit": "d63dea4372e0c9115bebf35b522c3f3927b5d2c4",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "selftest",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-rho-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-rho-b20",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-rho-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-rho-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-fullic-a-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-fullic-a-b20",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-fullic-a-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "cont-fullic-a-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-neg-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-neg-b20",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-neg-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-neg-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "instrument": {
+    "path": "research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs",
+    "sha256": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e",
+    "sha256_on_disk": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e",
+    "sha256_at_replay_commit": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e",
+    "sha256_at_n01_commit": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e"
+   },
+   "comparison": "rho-neg-cards/PLAN.md 'Replay r01 (validation gate)': replay raw/rho-neg-replay/ vs original raw/rho-neg/",
+   "comparison_script": {
+    "path": "research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/compare_replay_rhoneg.py",
+    "sha256": "600ac9c4ff4030eda0d57c562093121a0c617998a578b05ed2fe838728bd3503"
+   },
+   "rows_compared_replay_vs_n01": 431,
+   "rows_compared_continuity_vs_recorded": 256,
+   "rows_compared": 687,
+   "empty_logs_checked": 30,
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/selftest.stdout.log",
+     "replay_sha256": "0905cf98db6b567379886921d13ed0aa112b1f9a1765cae18a3b6c90173353f9",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stdout.log",
+     "n01_sha256": "0c02c1cd537dc2c62fd30bfb5653b4bf0da5ba95b04a39eaa70c579e435b7972",
+     "comparison": "line-equal after stripping timing text; last line SELFTEST OK",
+     "lines_n01": 47,
+     "lines_replay": 47,
+     "rows_compared": 47,
+     "last_line_replay": "SELFTEST OK (19.6s)",
+     "last_line_n01": "SELFTEST OK (19.7s)",
+     "mismatches": [],
+     "command_id": "selftest"
+    },
+    {
+     "command_id": "cont-rho-b16",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b16.jsonl",
+     "replay_sha256": "b373e3c2a6a041186fa3cf1313d1f64a5630125f02e7352ea8e3a617196eac4d",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl",
+     "n01_sha256": "4500d4d2d7ef12d7a954df42ab6a3bbb7567ef08570aef6514b535b9120fd308",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b16",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b16.stdout.log",
+     "replay_sha256": "b373e3c2a6a041186fa3cf1313d1f64a5630125f02e7352ea8e3a617196eac4d",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stdout.log",
+     "n01_sha256": "4500d4d2d7ef12d7a954df42ab6a3bbb7567ef08570aef6514b535b9120fd308",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b20",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b20.jsonl",
+     "replay_sha256": "877a14741a0d2e787a878a47fa1c4f017106262e3d585c6f144097633581c5d7",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl",
+     "n01_sha256": "877a14741a0d2e787a878a47fa1c4f017106262e3d585c6f144097633581c5d7",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b20",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b20.stdout.log",
+     "replay_sha256": "877a14741a0d2e787a878a47fa1c4f017106262e3d585c6f144097633581c5d7",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stdout.log",
+     "n01_sha256": "877a14741a0d2e787a878a47fa1c4f017106262e3d585c6f144097633581c5d7",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b24",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b24.jsonl",
+     "replay_sha256": "56e31248fe7e05491c0910d98ca7c0bb5fc82b5466adc72ff33807cefac1ed73",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl",
+     "n01_sha256": "6084f24df5b96bd614699d9f3e5323ea3f6552004e4413dc58cdd29771371046",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b24",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b24.stdout.log",
+     "replay_sha256": "56e31248fe7e05491c0910d98ca7c0bb5fc82b5466adc72ff33807cefac1ed73",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stdout.log",
+     "n01_sha256": "6084f24df5b96bd614699d9f3e5323ea3f6552004e4413dc58cdd29771371046",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b28",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b28.jsonl",
+     "replay_sha256": "7072a5f2cb2af32827c39a43bbbb468a094abdc3baf0c2bc751f3ab3c7af1918",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl",
+     "n01_sha256": "a95c928779cf9f2899011c79bd9698de882fd924888a69ad5da5370808b31272",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b28",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b28.stdout.log",
+     "replay_sha256": "7072a5f2cb2af32827c39a43bbbb468a094abdc3baf0c2bc751f3ab3c7af1918",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stdout.log",
+     "n01_sha256": "a95c928779cf9f2899011c79bd9698de882fd924888a69ad5da5370808b31272",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b16",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b16.jsonl",
+     "replay_sha256": "4d664e9dede5597d8d61d61c7a48ee211ae7817fdd9750117175578ac365fc29",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl",
+     "n01_sha256": "9087848d11467d60af31556cd70fa3ea6982e33668316b864683a5fc50c8222a",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b16",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b16.stdout.log",
+     "replay_sha256": "4d664e9dede5597d8d61d61c7a48ee211ae7817fdd9750117175578ac365fc29",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stdout.log",
+     "n01_sha256": "9087848d11467d60af31556cd70fa3ea6982e33668316b864683a5fc50c8222a",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b20",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b20.jsonl",
+     "replay_sha256": "e07e2312f6d8031d17ceb385d614fff8ee4f99ae79c9e6a9e575f074b9d38c89",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl",
+     "n01_sha256": "590ab471ab1c537bff31cf8d7b8d7c226f095628ca06209b31b1fb0de2573872",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b20",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b20.stdout.log",
+     "replay_sha256": "e07e2312f6d8031d17ceb385d614fff8ee4f99ae79c9e6a9e575f074b9d38c89",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stdout.log",
+     "n01_sha256": "590ab471ab1c537bff31cf8d7b8d7c226f095628ca06209b31b1fb0de2573872",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b24",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b24.jsonl",
+     "replay_sha256": "fcac854ba8741d8a00e58c1dce76a8d56345cc3679351c366a4d8b63dffd9794",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl",
+     "n01_sha256": "2e53686e0e3becb0145cac0348ff91a7f4f284faf6b418a2b10a8ebed9ff44a9",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b24",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b24.stdout.log",
+     "replay_sha256": "fcac854ba8741d8a00e58c1dce76a8d56345cc3679351c366a4d8b63dffd9794",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stdout.log",
+     "n01_sha256": "2e53686e0e3becb0145cac0348ff91a7f4f284faf6b418a2b10a8ebed9ff44a9",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b28",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b28.jsonl",
+     "replay_sha256": "dc44c23868d18ae878507cf40f1abb6d235f9887de6416d37e5e70485c1cdf57",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl",
+     "n01_sha256": "5328687969cc3b604db4871938524d9f81ac78da2bb8376cf8cc08f002eebba7",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b28",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b28.stdout.log",
+     "replay_sha256": "dc44c23868d18ae878507cf40f1abb6d235f9887de6416d37e5e70485c1cdf57",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stdout.log",
+     "n01_sha256": "5328687969cc3b604db4871938524d9f81ac78da2bb8376cf8cc08f002eebba7",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b16",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b16.jsonl",
+     "replay_sha256": "cb8a13decae78290eaa9c0cdc8ee38b0e1bcd0f9c8b67e7848aa334a8dda606d",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.jsonl",
+     "n01_sha256": "4b4886dfcc80c28890d85368b0e59aefdaecde5e28d017cc233a55bd9f798ba3",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b16",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b16.stdout.log",
+     "replay_sha256": "cb8a13decae78290eaa9c0cdc8ee38b0e1bcd0f9c8b67e7848aa334a8dda606d",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stdout.log",
+     "n01_sha256": "4b4886dfcc80c28890d85368b0e59aefdaecde5e28d017cc233a55bd9f798ba3",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b20",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b20.jsonl",
+     "replay_sha256": "21e4974ccbe66cbbc7baeaa72e259c11696f89bc99f0947affad083c56b88718",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.jsonl",
+     "n01_sha256": "8e0e60e4084a831f673bbdf4cd7d3e2da1f43599ab3762d1902ee94ec6f8fd2a",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b20",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b20.stdout.log",
+     "replay_sha256": "21e4974ccbe66cbbc7baeaa72e259c11696f89bc99f0947affad083c56b88718",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stdout.log",
+     "n01_sha256": "8e0e60e4084a831f673bbdf4cd7d3e2da1f43599ab3762d1902ee94ec6f8fd2a",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b24",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b24.jsonl",
+     "replay_sha256": "6d6087b87b6cb904f876a6438b50f463f0246d3287bd71484a398a12051b179d",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.jsonl",
+     "n01_sha256": "54707f92c51a527ff5627f33aa993d086ca86de63a67fe457ff3bf740b837dc6",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b24",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b24.stdout.log",
+     "replay_sha256": "6d6087b87b6cb904f876a6438b50f463f0246d3287bd71484a398a12051b179d",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stdout.log",
+     "n01_sha256": "54707f92c51a527ff5627f33aa993d086ca86de63a67fe457ff3bf740b837dc6",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b28",
+     "file_kind": "jsonl",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b28.jsonl",
+     "replay_sha256": "b1edc3786b6ae267c77a0e8c398a5288fe3a77d6427b017e2b322bb1cbbf225a",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.jsonl",
+     "n01_sha256": "7389e1343687b1ca2ba3b0a9245f625a26aa5d59a2c714ea370b9efc80578a65",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-neg-b28",
+     "file_kind": "stdout",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/rho-neg-b28.stdout.log",
+     "replay_sha256": "b1edc3786b6ae267c77a0e8c398a5288fe3a77d6427b017e2b322bb1cbbf225a",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stdout.log",
+     "n01_sha256": "7389e1343687b1ca2ba3b0a9245f625a26aa5d59a2c714ea370b9efc80578a65",
+     "rows_replay": 16,
+     "rows_n01": 16,
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b16",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b16.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+     "recorded_sha256": "82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b16",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+     "recorded_sha256": "82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b16",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b16.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+     "recorded_sha256": "017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b16",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+     "recorded_sha256": "017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b20",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b20.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl",
+     "recorded_sha256": "acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b20",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl",
+     "recorded_sha256": "acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b20",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b20.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl",
+     "recorded_sha256": "61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b20",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl",
+     "recorded_sha256": "61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b24",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b24.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl",
+     "recorded_sha256": "126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b24",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl",
+     "recorded_sha256": "126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b24",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b24.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl",
+     "recorded_sha256": "49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b24",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl",
+     "recorded_sha256": "49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b28",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-rho-b28.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+     "recorded_sha256": "9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-rho-b28",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+     "recorded_sha256": "9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b28",
+     "file_kind": "continuity-replay-vs-recorded",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg-replay/cont-fullic-a-b28.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+     "recorded_sha256": "6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd",
+     "rows_compared": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "cont-fullic-a-b28",
+     "file_kind": "continuity-n01-vs-recorded",
+     "n01_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl",
+     "recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+     "recorded_sha256": "6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd",
+     "rows_compared": 16,
+     "mismatches": []
+    }
+   ],
+   "mismatches": []
+  }
+ ]
+}

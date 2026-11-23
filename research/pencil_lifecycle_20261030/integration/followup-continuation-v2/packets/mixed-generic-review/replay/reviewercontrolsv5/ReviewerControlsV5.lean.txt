@@ -1,0 +1,25 @@
+import MixedGeneric
+import Mathlib.Algebra.Field.ZMod
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+open Polynomial MixedCancellation MixedGeneric
+example : let a : WeightedAdd11.Input (ZMod 2) := ⟨0,1,1,1⟩
+ let b : D2 (ZMod 2) := ⟨0,1,0,0,1,1⟩
+ (output a b 0).z ≠ 0 ∧ (output a b 0).w ≠ 0 ∧ validTwo (curve 1 (-1) 1 0) (output a b 0) := by
+ apply weighted_generic_preserves
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [genericK]
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4+X-1,?_⟩
+   simp [curve]; ring_nf; norm_num
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3-X+1,?_⟩
+   simp [curve]; ring_nf; norm_num
+example : (outputWith (1:ℚ) 1 ⟨0,1,0,1⟩ ⟨0,1,0,0,1,1⟩ 0).z = 0 := by norm_num [outputWith]
+#print axioms MixedGeneric.disjoint_product_dvd
+#print axioms MixedGeneric.residual_degree
+#print axioms MixedGeneric.genericK_same
+#print axioms MixedGeneric.slope_decode
+#print MixedGeneric.weighted_generic_preserves

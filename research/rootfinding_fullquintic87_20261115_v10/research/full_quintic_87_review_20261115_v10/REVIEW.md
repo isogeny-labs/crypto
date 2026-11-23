@@ -1,0 +1,13 @@
+# Independent any-fixed-k87 compiler admission
+
+Read final worker/proof/rules/closure and full transitive code bodies before pins: frozen v9compiler, ore/rb/quartic helpers and BinaryField polynomial/gcd/arithmetic runtime. No candidate algorithm, compilation, worker import or scientific test was executed by this reviewer.
+
+The any-fixed-k map is correct: first the exact e2 AS preimage, then v3=e3 inW3 and w=h^-1(v3+C3+zr²+kr), s=w+zr. The direction formulas include the REQUIRED k*dr term and the e4 k*dw term; deltae5=z*dw². Nonprefix product spans and any tiny e5 constraint remain. h0 returnsunsupported, not empty. Odd halftrace/even complete AS solve are inherited unchanged.
+
+This is a complete injective affine coordinate map for the e2/e3 spans. Only e4/e5 border rows remain. On the actual exposed input the existing exact dimension73 forces rho1/87coordinates/rank14 if equivalence is right; the worker recomputes those values, preserves mapped complete families and checks mutual kernel/coset equality. No root-support search or73-bit enumeration occurs. Five-distinct/rank4 candidates remain admitted without claiming an actual rank4 root.
+
+Tiny controls exhaust every r/s over GF4/GF8/GF16 for every nonzero h and k0,1,q-1. They compare literal norm, all fixed-k normal identities and EVERY coefficient-span membership. Additional synthetic AS preimage branches are separately labeled. The generic gcd derivative is correct: H'=H1+H3*X²+X4, so repeated-H observations are counted.
+
+The three arms retain the strongest166 compiler, call frozen104 compiler unchanged and add new87. All share the SAME paid field/fixture/span setup, mapped literal particular/kernel verification and output serialization. The common verifier now caches H(0,0) once perarm for all methods; this is fair, but historical v9 wall times must not be multiplied or treated as directly matched comparisons. Three rotating same-process repetitions lack cold/A-A/qualified isolation or genuine F4/F5/F6 contracts. Full worker wall additionally pays cross-arm checks/rawgzip/report. Individual lifetime RSS is not per-arm or aggregate memory.
+
+Exclusive exact raw.json.gz,512KiBraw/40KiBgzip and24KiBcompact six-key stdout caps. Errors/raw omission/late84s report clear equivalent-family/dimension/ratios; no original root counts exist.80swork/88sprint and outer90s bound startup/final output. ADMIT the single source-pinned controls/profile run,4GiB/onecore, then independent recorded-family reconstruction. Source-only exact representation compression proves neither novelty nor qualified speedup; original all-roots/outer/support/odd-field obligations remain open.

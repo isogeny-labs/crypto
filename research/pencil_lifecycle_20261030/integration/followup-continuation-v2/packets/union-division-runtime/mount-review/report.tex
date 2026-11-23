@@ -1,0 +1,20 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{lmodern,hyperref}
+\title{Independent review: exact mount-diff proposal}\date{1 November 2026}\begin{document}\maketitle
+The published pure parser passed 43 independent fixed cases: seven accepted inputs (six orderings plus the retained native diff), and 36 rejected malformed or incorrectly typed inputs. Every accepted result keeps writer attribution null and the no-writes claim false.
+\section*{Exact proposed contract}
+Only three unique added entries are accepted: \texttt{/fixtures}, \texttt{/qualification}, and \texttt{/qualification/exec-gate}. Input must be exact bytes, ASCII, at most 1,024 bytes, with exactly one final newline. Changed/deleted entries, malformed framing, path normalization variants, duplicates and extras are rejected.
+\section*{Retained qualification remains failed}
+The v5 receipt records Q0 passed and Q1 stopped on an unexpected writable-layer change; cleanup completed, qualification did not. Its native diff has the proposed three additions. Accepting those historical bytes under a different rule is a prospective amendment, not a passing reinterpretation of v5.
+
+The retained Q1 create/terminal metadata have matching full identity, image, name, two expected read-only binds and read-only rootfs. This is consistency of retained metadata, not a current daemon observation. The original supervisor still requires an empty diff and does not call this parser.
+\section*{Required amendment and adapter review}
+Version the new contract and bind parser, supervisor, review, image, gate, binaries and fixtures. Apply the revised predicate only after the existing exact identity, read-only mount, privilege, namespace and resource checks. Require successful diff transport, complete bounded raw bytes, parser success and exact-ID cleanup. Test the composed adapter against invalid identity/mounts and transport/parser failures; pure parser acceptance cannot replace prerequisites.
+
+Retain Q0--Q4 requirements and the 300-second total, 30-second cleanup reserve and 20-second active-case bounds if execution is later admitted. This review supplies no deployment, runtime authorization or admission. The detailed amendment list is in \texttt{AMENDMENT\_REQUIREMENTS.md}.
+\section*{Evidence and interpretation}
+Controls cover ordering, incorrect types, missing/extra/duplicate changes, C/D operations, path variants, whitespace, NUL/non-ASCII and size limits. Source and retained receipt bindings were checked unchanged. No supervisor, Docker, container, solver or scientific workload was run.
+
+\href{https://docs.docker.com/reference/cli/docker/container/diff/}{Docker's primary CLI reference} describes changes since creation and A/C/D status, not the writer or cause. Diff acceptance cannot establish absence of all writes; bound mounts and tmpfs need separate evidence. Historical pre-exec PID observations retain their stated temporal scope.
+
+Source: PR3056 commit \texttt{05fc018e64e948fbe91d5463036e55d4c97d13f1}. Review was source-first, not blind; the reviewer did not author the parser. \texttt{status.json}, control receipts and hashes preserve the scoped result.
+\end{document}

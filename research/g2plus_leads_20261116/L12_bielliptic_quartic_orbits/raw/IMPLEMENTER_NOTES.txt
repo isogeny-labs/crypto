@@ -1,0 +1,8 @@
+Questions met while implementing (SPEC says: take the literal reading and record).
+1. SPEC 8.2 stop rule "every column covered" (>= 1 kept row) does not imply a unique LA solution; see DEVIATIONS.md D1.
+2. SPEC 7.4 / 8.2: a "zero_row" is counted per split section; a "duplicate_row" is a repeated nonzero key within the run.
+   `relations` = number of distinct nonzero rows kept.
+3. SPEC 8.6 `R`, `N`, `W`, `rows_used` are recorded at the end of the run (the last attempt's matrix).
+4. SPEC 9.3: degree-0 residual cannot occur for the quartic; the branch exists as specified and counts as split.
+5. SPEC 5: `r_small` is also used when n_E has no prime factor (n_E = 1); never occurred.
+6. Arm N reps: `reps[t]` is the point of `perm[2t]` as specified; certification therefore compares against that point only.

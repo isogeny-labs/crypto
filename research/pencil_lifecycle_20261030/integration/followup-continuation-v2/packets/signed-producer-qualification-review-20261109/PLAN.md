@@ -1,0 +1,1 @@
+Independently review fixed panel bounds, actual native observer calls, full Outcome equality, Trace write/flush poisoning, label controls and prospective resource envelope. Source inspection only; no compiler or test execution.

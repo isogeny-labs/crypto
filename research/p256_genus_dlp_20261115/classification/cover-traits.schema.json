@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/isogeny-labs/crypto/p256-cover-traits/v1",
+  "title": "A finite cover of the fixed P-256 curve, or a related non-cover object",
+  "type": "object",
+  "required": ["schema", "id", "object_kind", "base_field", "source", "target", "representation", "traits", "evidence"],
+  "properties": {
+    "schema": {"const": "p256-cover-traits/v1"},
+    "id": {"type": "string", "minLength": 1},
+    "object_kind": {"enum": ["finite_cover", "companion_curve", "abelian_factor", "parameter_family"]},
+    "base_field": {"type": "object", "required": ["characteristic", "absolute_degree"], "properties": {"characteristic": {"$ref": "#/$defs/positive"}, "absolute_degree": {"$ref": "#/$defs/positive"}, "constant_field_verified": {"type": ["boolean", "null"]}}},
+    "source": {"type": "object", "required": ["equation", "genus", "geometry"], "properties": {"equation": {"type": "string"}, "genus": {"$ref": "#/$defs/quantity"}, "geometry": {"enum": ["elliptic", "hyperelliptic", "nonhyperelliptic", "unknown", "not_a_curve"]}, "normalization_required": {"type": "boolean"}, "rational_infinity_points": {"anyOf": [{"$ref": "#/$defs/quantity"}, {"type": "null"}]}}},
+    "target": {"type": "string"},
+    "representation": {"type": "object", "properties": {"extension_polynomial": {"type": ["string", "null"]}, "rational_map": {"type": ["string", "null"]}, "equivalence": {"enum": ["isomorphism_over_fixed_E", "curve_isomorphism", "abelian_isogeny", "family"]}, "quadratic_squareclass": {"type": ["string", "null"]}}},
+    "traits": {
+      "type": "object",
+      "required": ["degree", "ramification", "galois", "jacobian", "transfer", "smith", "implementation"],
+      "properties": {
+        "degree": {"type": "object", "required": ["total", "separable", "inseparable_exponent"], "properties": {"total": {"anyOf": [{"$ref": "#/$defs/positive"}, {"type": "null"}]}, "separable": {"anyOf": [{"$ref": "#/$defs/positive"}, {"type": "null"}]}, "inseparable_exponent": {"anyOf": [{"$ref": "#/$defs/quantity"}, {"type": "null"}]}}},
+        "ramification": {"type": "object", "properties": {"type": {"enum": ["etale", "tame", "wild", "mixed", "purely_inseparable", "unknown", "not_applicable"]}, "different_degree": {"anyOf": [{"$ref": "#/$defs/quantity"}, {"type": "null"}]}, "geometric_branch_points": {"anyOf": [{"$ref": "#/$defs/quantity"}, {"type": "null"}]}, "inertia_and_jumps": {"type": ["array", "null"]}}},
+        "galois": {"type": "object", "properties": {"over_base": {"type": ["boolean", "null"]}, "geometric": {"type": ["boolean", "null"]}, "known_base_deck_group": {"type": ["string", "null"]}, "known_geometric_deck_group": {"type": ["string", "null"]}, "arithmetic_monodromy": {"type": ["string", "null"]}}},
+        "jacobian": {"type": "object", "properties": {"dimension": {"$ref": "#/$defs/quantity"}, "known_isogeny_factors": {"type": "array", "items": {"type": "string"}}, "polarization": {"type": ["string", "null"]}, "p_rank": {"type": ["object", "null"]}, "frobenius_polynomial": {"type": ["object", "null"]}, "exact_point_order": {"type": ["string", "null"]}}},
+        "transfer": {"type": "object", "properties": {"map_kind": {"enum": ["cover_pullback", "jacobian_isogeny", "correspondence", "not_established", "not_applicable"]}, "subgroup_order": {"type": ["string", "null"]}, "kernel_intersection": {"type": ["string", "null"]}, "degree_coprime": {"type": ["boolean", "null"]}, "inverse_on_image": {"type": ["string", "null"]}, "status": {"$ref": "#/$defs/status"}}},
+        "smith": {"type": "object", "required": ["input_gate", "status"], "properties": {"input_gate": {"enum": ["genus3_hyperelliptic", "wrong_genus", "already_nonhyperelliptic", "unknown", "not_a_curve"]}, "status": {"$ref": "#/$defs/status"}, "weierstrass_cycle_type": {"type": ["array", "null"], "items": {"type": "integer", "minimum": 1}}, "stable_pair_kernels": {"anyOf": [{"$ref": "#/$defs/quantity"}, {"type": "null"}]}, "stable_non_pair_kernels": {"anyOf": [{"$ref": "#/$defs/quantity"}, {"type": "null"}]}, "obligation": {"type": "string"}}},
+        "implementation": {"type": "object", "required": ["geometry", "pullback", "norm", "arithmetic", "solver"], "properties": {"geometry": {"$ref": "#/$defs/status"}, "pullback": {"$ref": "#/$defs/status"}, "norm": {"$ref": "#/$defs/status"}, "arithmetic": {"$ref": "#/$defs/status"}, "solver": {"$ref": "#/$defs/status"}}},
+        "known_automorphisms": {"type": "array", "items": {"type": "string"}},
+        "full_automorphism_group": {"type": ["string", "null"]},
+        "gonality": {"type": ["object", "null"]}
+      }
+    },
+    "evidence": {"type": "object", "required": ["standing", "sources", "scope"], "properties": {"standing": {"enum": ["producer_assertion", "source_only", "independently_signed"]}, "sources": {"type": "array", "items": {"type": "string"}}, "scope": {"type": "string"}, "claim_id": {"type": ["string", "null"]}}}
+  },
+  "$defs": {
+    "quantity": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"},
+    "positive": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+    "status": {"enum": ["theoretical", "implemented_producer_checked", "source_only", "conditional", "not_implemented", "not_computed", "not_applicable", "direct_smith_excluded", "needs_independent_verification"]}
+  },
+  "description": "Quantities are decimal strings to avoid precision loss. The schema describes records; schema conformance is not evidence of an extension being a field, a source being smooth, or a transfer being implemented. Ramification/different data describe the separable stage. Every referenced proof needs its own standing."
+}

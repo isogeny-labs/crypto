@@ -1,0 +1,104 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-14T23:45:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/ic_gpu_rootfind_ic_20261114/analyze.py",
+        "/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/ricres"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T23:45:21+00:00",
+      "wall_s": 0.062
+    }
+  ],
+  "commit": "a95274095fec4846dd1b8b0bb26525d778398fd3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T22:58:07+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T2258Z-ic-gpu-rootfind-ic",
+  "metrics": [
+    {
+      "baseline": 27.911,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_relations_s_r31_f4096",
+      "note": "relation-phase wall, rootfind-subtract-gpu vs rootfind-subtract (CPU, 1 thread) at log2 r=31.3, |F_x|=4096; identical S (26010, 22986x matched rho mean S 1.132); A100",
+      "reference": 1.132,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.246
+    },
+    {
+      "baseline": 28.011,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_solve_s_r31_f4096",
+      "note": "complete solve wall, same pair; GPU solve includes ~0.3 s worker/CUDA start; 72/72 verified, 72 replays reproduced",
+      "reference": 1.132,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.643
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "rootfind_eyt_prefetch_d5_sorted_c16_ratio",
+      "note": "negative: best prefetch variant on the sorted path at |F|=65536, kernel time vs default; all variants 1.21-1.92x slower; default stays off; A/A 0.12%",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.312
+    },
+    {
+      "baseline": 26009.6,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_s_r31_f4096",
+      "note": "counted S identical on both arms in all 24 pairs (the GPU does not change S); 22986x the matched rho",
+      "reference": 1.132,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 26009.6
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 113398,
+      "path": "research/ic_gpu_rootfind_ic_20261114/raw/out_ric.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8a/8ab256652ca6f2a1bb4fe1f90b4e9e37dad70a086b56e022d42de84c8dc543f4",
+      "sha256": "8ab256652ca6f2a1bb4fe1f90b4e9e37dad70a086b56e022d42de84c8dc543f4",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_ic_20261114/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_ic_20261114/fig_ic.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-ic",
+  "status": "measured",
+  "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+  "validation": null
+}

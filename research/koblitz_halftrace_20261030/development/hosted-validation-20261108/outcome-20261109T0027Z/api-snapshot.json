@@ -1,0 +1,469 @@
+{
+  "run": {
+    "id": 42529489383,
+    "name": "Rust all targets compile",
+    "node_id": "WFR_kwLOSMdswM8AAAAJ5vSB5w",
+    "head_branch": "codex/koblitz-halftrace-native",
+    "head_sha": "cda1e5810f41550a2b929cbdb6fe4ff242865617",
+    "path": ".github/workflows/rust-all-targets.yml",
+    "display_title": "Rust all targets compile",
+    "run_number": 13835,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "failure",
+    "workflow_id": 361883252,
+    "check_suite_id": 115200841722,
+    "check_suite_node_id": "CS_kwDOSMdswM8AAAAa0oFX-g",
+    "url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/42529489383",
+    "html_url": "https://github.com/isogeny-labs/crypto/actions/runs/42529489383",
+    "pull_requests": [
+      {
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/pulls/2955",
+        "id": 5080674881,
+        "number": 2955,
+        "head": {
+          "ref": "codex/koblitz-halftrace-native",
+          "sha": "0ec0605149f9fdb9c503f5d13cb1beb456f4f6a4",
+          "repo": {
+            "id": 1221029056,
+            "url": "https://api.github.com/repos/isogeny-labs/crypto",
+            "name": "crypto"
+          }
+        },
+        "base": {
+          "ref": "main",
+          "sha": "e75e1637f819eed701d95eb17bbeb83d2c2dcda6",
+          "repo": {
+            "id": 1221029056,
+            "url": "https://api.github.com/repos/isogeny-labs/crypto",
+            "name": "crypto"
+          }
+        }
+      }
+    ],
+    "created_at": "2026-11-08T22:17:25Z",
+    "updated_at": "2026-11-08T23:28:52Z",
+    "actor": {
+      "login": "aburan28",
+      "id": 1086874,
+      "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aburan28",
+      "html_url": "https://github.com/aburan28",
+      "followers_url": "https://api.github.com/users/aburan28/followers",
+      "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+      "organizations_url": "https://api.github.com/users/aburan28/orgs",
+      "repos_url": "https://api.github.com/users/aburan28/repos",
+      "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aburan28/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "run_attempt": 1,
+    "referenced_workflows": [],
+    "run_started_at": "2026-11-08T22:17:25Z",
+    "triggering_actor": {
+      "login": "aburan28",
+      "id": 1086874,
+      "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aburan28",
+      "html_url": "https://github.com/aburan28",
+      "followers_url": "https://api.github.com/users/aburan28/followers",
+      "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+      "organizations_url": "https://api.github.com/users/aburan28/orgs",
+      "repos_url": "https://api.github.com/users/aburan28/repos",
+      "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aburan28/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "jobs_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/42529489383/jobs",
+    "logs_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/42529489383/logs",
+    "check_suite_url": "https://api.github.com/repos/isogeny-labs/crypto/check-suites/115200841722",
+    "artifacts_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/42529489383/artifacts",
+    "cancel_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/42529489383/cancel",
+    "rerun_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/42529489383/rerun",
+    "previous_attempt_url": null,
+    "workflow_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/workflows/361883252",
+    "head_commit": {
+      "id": "cda1e5810f41550a2b929cbdb6fe4ff242865617",
+      "tree_id": "2a4cea36611846bb6f42b359c2c774a70df29b4c",
+      "message": "Add opt-in supported-host native library validation with parent receipts",
+      "timestamp": "2026-11-08T22:16:52Z",
+      "author": {
+        "name": "Adam Buran",
+        "email": "adam@isogenylabs.io"
+      },
+      "committer": {
+        "name": "Adam Buran",
+        "email": "adam@isogenylabs.io"
+      }
+    },
+    "repository": {
+      "id": 1221029056,
+      "node_id": "R_kgDOSMdswA",
+      "name": "crypto",
+      "full_name": "isogeny-labs/crypto",
+      "private": false,
+      "owner": {
+        "login": "isogeny-labs",
+        "id": 347052081,
+        "node_id": "O_kgDOFK-YMQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/347052081?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/isogeny-labs",
+        "html_url": "https://github.com/isogeny-labs",
+        "followers_url": "https://api.github.com/users/isogeny-labs/followers",
+        "following_url": "https://api.github.com/users/isogeny-labs/following{/other_user}",
+        "gists_url": "https://api.github.com/users/isogeny-labs/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/isogeny-labs/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/isogeny-labs/subscriptions",
+        "organizations_url": "https://api.github.com/users/isogeny-labs/orgs",
+        "repos_url": "https://api.github.com/users/isogeny-labs/repos",
+        "events_url": "https://api.github.com/users/isogeny-labs/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/isogeny-labs/received_events",
+        "type": "Organization",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/isogeny-labs/crypto",
+      "description": null,
+      "fork": false,
+      "url": "https://api.github.com/repos/isogeny-labs/crypto",
+      "forks_url": "https://api.github.com/repos/isogeny-labs/crypto/forks",
+      "keys_url": "https://api.github.com/repos/isogeny-labs/crypto/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/isogeny-labs/crypto/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/isogeny-labs/crypto/teams",
+      "hooks_url": "https://api.github.com/repos/isogeny-labs/crypto/hooks",
+      "issue_events_url": "https://api.github.com/repos/isogeny-labs/crypto/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/isogeny-labs/crypto/events",
+      "assignees_url": "https://api.github.com/repos/isogeny-labs/crypto/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/isogeny-labs/crypto/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/isogeny-labs/crypto/tags",
+      "blobs_url": "https://api.github.com/repos/isogeny-labs/crypto/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/isogeny-labs/crypto/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/isogeny-labs/crypto/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/isogeny-labs/crypto/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/isogeny-labs/crypto/languages",
+      "stargazers_url": "https://api.github.com/repos/isogeny-labs/crypto/stargazers",
+      "contributors_url": "https://api.github.com/repos/isogeny-labs/crypto/contributors",
+      "subscribers_url": "https://api.github.com/repos/isogeny-labs/crypto/subscribers",
+      "subscription_url": "https://api.github.com/repos/isogeny-labs/crypto/subscription",
+      "commits_url": "https://api.github.com/repos/isogeny-labs/crypto/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/isogeny-labs/crypto/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/isogeny-labs/crypto/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/isogeny-labs/crypto/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/isogeny-labs/crypto/merges",
+      "archive_url": "https://api.github.com/repos/isogeny-labs/crypto/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/isogeny-labs/crypto/downloads",
+      "issues_url": "https://api.github.com/repos/isogeny-labs/crypto/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/isogeny-labs/crypto/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/isogeny-labs/crypto/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/isogeny-labs/crypto/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/isogeny-labs/crypto/labels{/name}",
+      "releases_url": "https://api.github.com/repos/isogeny-labs/crypto/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/isogeny-labs/crypto/deployments"
+    },
+    "head_repository": {
+      "id": 1221029056,
+      "node_id": "R_kgDOSMdswA",
+      "name": "crypto",
+      "full_name": "isogeny-labs/crypto",
+      "private": false,
+      "owner": {
+        "login": "isogeny-labs",
+        "id": 347052081,
+        "node_id": "O_kgDOFK-YMQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/347052081?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/isogeny-labs",
+        "html_url": "https://github.com/isogeny-labs",
+        "followers_url": "https://api.github.com/users/isogeny-labs/followers",
+        "following_url": "https://api.github.com/users/isogeny-labs/following{/other_user}",
+        "gists_url": "https://api.github.com/users/isogeny-labs/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/isogeny-labs/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/isogeny-labs/subscriptions",
+        "organizations_url": "https://api.github.com/users/isogeny-labs/orgs",
+        "repos_url": "https://api.github.com/users/isogeny-labs/repos",
+        "events_url": "https://api.github.com/users/isogeny-labs/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/isogeny-labs/received_events",
+        "type": "Organization",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/isogeny-labs/crypto",
+      "description": null,
+      "fork": false,
+      "url": "https://api.github.com/repos/isogeny-labs/crypto",
+      "forks_url": "https://api.github.com/repos/isogeny-labs/crypto/forks",
+      "keys_url": "https://api.github.com/repos/isogeny-labs/crypto/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/isogeny-labs/crypto/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/isogeny-labs/crypto/teams",
+      "hooks_url": "https://api.github.com/repos/isogeny-labs/crypto/hooks",
+      "issue_events_url": "https://api.github.com/repos/isogeny-labs/crypto/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/isogeny-labs/crypto/events",
+      "assignees_url": "https://api.github.com/repos/isogeny-labs/crypto/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/isogeny-labs/crypto/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/isogeny-labs/crypto/tags",
+      "blobs_url": "https://api.github.com/repos/isogeny-labs/crypto/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/isogeny-labs/crypto/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/isogeny-labs/crypto/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/isogeny-labs/crypto/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/isogeny-labs/crypto/languages",
+      "stargazers_url": "https://api.github.com/repos/isogeny-labs/crypto/stargazers",
+      "contributors_url": "https://api.github.com/repos/isogeny-labs/crypto/contributors",
+      "subscribers_url": "https://api.github.com/repos/isogeny-labs/crypto/subscribers",
+      "subscription_url": "https://api.github.com/repos/isogeny-labs/crypto/subscription",
+      "commits_url": "https://api.github.com/repos/isogeny-labs/crypto/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/isogeny-labs/crypto/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/isogeny-labs/crypto/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/isogeny-labs/crypto/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/isogeny-labs/crypto/merges",
+      "archive_url": "https://api.github.com/repos/isogeny-labs/crypto/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/isogeny-labs/crypto/downloads",
+      "issues_url": "https://api.github.com/repos/isogeny-labs/crypto/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/isogeny-labs/crypto/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/isogeny-labs/crypto/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/isogeny-labs/crypto/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/isogeny-labs/crypto/labels{/name}",
+      "releases_url": "https://api.github.com/repos/isogeny-labs/crypto/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/isogeny-labs/crypto/deployments"
+    }
+  },
+  "jobs": {
+    "jobs": [
+      {
+        "id": 128880307278,
+        "name": "scope",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42529489383,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run node .github/scripts/ci-scope.mjs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          }
+        ]
+      },
+      {
+        "id": 128880307287,
+        "name": "Native full library (manual)",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_id": 42529489383,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Admit the source and required Linux interfaces",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Check out the immutable source and tracked test fixtures",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Bind the checkout and toolchain",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Build the complete release library test executable",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Run every non-ignored library test and retain the parent status",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 6
+          },
+          {
+            "name": "Retain checksums and post-run source state",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Upload development receipts and complete logs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Post Check out the immutable source and tracked test fixtures",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17
+          }
+        ]
+      },
+      {
+        "id": 128880359995,
+        "name": "check",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 42529489383,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Require successful scope classification",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 2
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Materialize compile-time inputs without research archives",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@stable",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Run Swatinem/rust-cache@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Run RUSTFLAGS=-Awarnings cargo check --workspace --all-targets",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Run RUSTFLAGS=-Awarnings cargo check --lib --tests --features wide-vars",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Run cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Post Run Swatinem/rust-cache@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 18
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 19
+          }
+        ]
+      }
+    ]
+  },
+  "artifacts": {
+    "artifacts": [
+      {
+        "id": 13638049715,
+        "name": "native-library-42529489383-1",
+        "size_in_bytes": 123058,
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/actions/artifacts/13638049715",
+        "archive_download_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/artifacts/13638049715/zip",
+        "expired": false,
+        "created_at": "2026-11-08T23:28:49Z",
+        "expires_at": "2026-11-22T23:28:48Z",
+        "updated_at": "2026-11-08T23:28:49Z",
+        "digest": "sha256:a158b153347ae6fd01e0caae377997f83656c79b1c161f40837caa71cd59f3e8",
+        "workflow_run": {
+          "id": 42529489383,
+          "repository_id": 1221029056,
+          "head_repository_id": 1221029056,
+          "head_branch": "codex/koblitz-halftrace-native",
+          "head_sha": "cda1e5810f41550a2b929cbdb6fe4ff242865617"
+        }
+      }
+    ]
+  }
+}

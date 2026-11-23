@@ -1,0 +1,5 @@
+# Control-driver compatibility amendment, before execution
+
+Initial controls build failed: the historical table pipeline calls solve_for_lastwithfivearguments, while currentnativeAPIrequires dense_cols. No scientific control execution started. Preserve BUILD-CONTROLS-INITIAL.txt. A shell sequence continued after failed shasum, so fa522c7811recorded a partial manifest missing the binary; that initial receipt is INVALIDfor execution custody and retained asFREEZE-CONTROLS-INITIAL.sha256. Correct subsequent shell commands usefailfast and requirethebinarybeforehashing.
+
+Use a local pipeline_compat.rsclone of the immutable historical source with exactly one argument addition: pass&stepsbeforestats. This matches currentnativeic.rs. For thesecontrolsFastdoesnotusehotcolumns, Hybridstillcallsitsseparateimplementationasbefore; no row/oracle/walk/pivotchange. Keep originalpipelineunchanged. Freeze original+compat+newbinarysourcehashes and checkpoint successfully beforeonce-only78controlgate. No original scientific case/limit or expected outcome is revised.

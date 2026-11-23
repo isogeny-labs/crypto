@@ -1,0 +1,982 @@
+{
+  "eviction": {
+    "failed_kernel_threads": 64,
+    "failed_user_threads": 0,
+    "moved_count": 520
+  },
+  "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+  "plan": {
+    "node": 0,
+    "observed": [
+      14,
+      30
+    ],
+    "request": {
+      "explicit": [
+        14,
+        30
+      ]
+    },
+    "reserved": [
+      14,
+      30
+    ],
+    "run_cpu": 14,
+    "unreserved_siblings": []
+  },
+  "preflight": {
+    "after": {
+      "loadavg": [
+        33.67,
+        14.45,
+        8.54
+      ],
+      "psi_cpu_some_avg10": 34.59,
+      "psi_cpu_some_total_us": 191592480,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 840059,
+      "reserved_ticks": {
+        "14": {
+          "busy": 1258939,
+          "idle": 4168092,
+          "steal": 26
+        },
+        "30": {
+          "busy": 136510,
+          "idle": 5289408,
+          "steal": 20
+        }
+      },
+      "unix_ms": 1792511283282
+    },
+    "before": {
+      "loadavg": [
+        33.67,
+        14.45,
+        8.54
+      ],
+      "psi_cpu_some_avg10": 35.6,
+      "psi_cpu_some_total_us": 190964214,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 840059,
+      "reserved_ticks": {
+        "14": {
+          "busy": 1258937,
+          "idle": 4167897,
+          "steal": 26
+        },
+        "30": {
+          "busy": 136509,
+          "idle": 5289214,
+          "steal": 20
+        }
+      },
+      "unix_ms": 1792511281282
+    },
+    "quiet": false,
+    "reasons": [
+      "PSI cpu some avg10 34.59 > 5.00"
+    ],
+    "reserved_busy_seconds": {
+      "14": 0.02,
+      "30": 0.01
+    },
+    "settle_seconds": 2.0
+  },
+  "preflight_samples": [
+    {
+      "after": {
+        "loadavg": [
+          21.7,
+          10.46,
+          7.1
+        ],
+        "psi_cpu_some_avg10": 20.51,
+        "psi_cpu_some_total_us": 180023230,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258912,
+            "idle": 4165375,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136480,
+            "idle": 5286690,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511255277
+      },
+      "before": {
+        "loadavg": [
+          21.7,
+          10.46,
+          7.1
+        ],
+        "psi_cpu_some_avg10": 15.1,
+        "psi_cpu_some_total_us": 179042493,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258906,
+            "idle": 4165192,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136478,
+            "idle": 5286506,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511253277
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 20.51 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.06,
+        "30": 0.02
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          25.25,
+          11.38,
+          7.42
+        ],
+        "psi_cpu_some_avg10": 28.03,
+        "psi_cpu_some_total_us": 181258562,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258915,
+            "idle": 4165569,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136480,
+            "idle": 5286884,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511257278
+      },
+      "before": {
+        "loadavg": [
+          21.7,
+          10.46,
+          7.1
+        ],
+        "psi_cpu_some_avg10": 20.51,
+        "psi_cpu_some_total_us": 180023230,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258912,
+            "idle": 4165375,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136480,
+            "idle": 5286690,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511255278
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 28.03 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.03,
+        "30": 0.0
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          25.25,
+          11.38,
+          7.42
+        ],
+        "psi_cpu_some_avg10": 33.28,
+        "psi_cpu_some_total_us": 182370066,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258917,
+            "idle": 4165762,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136482,
+            "idle": 5287077,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511259278
+      },
+      "before": {
+        "loadavg": [
+          25.25,
+          11.38,
+          7.42
+        ],
+        "psi_cpu_some_avg10": 28.03,
+        "psi_cpu_some_total_us": 181258562,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258915,
+            "idle": 4165569,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136480,
+            "idle": 5286884,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511257278
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 33.28 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.02
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          27.23,
+          12.02,
+          7.65
+        ],
+        "psi_cpu_some_avg10": 36.67,
+        "psi_cpu_some_total_us": 183431979,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258922,
+            "idle": 4165955,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136485,
+            "idle": 5287270,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511261278
+      },
+      "before": {
+        "loadavg": [
+          25.25,
+          11.38,
+          7.42
+        ],
+        "psi_cpu_some_avg10": 33.28,
+        "psi_cpu_some_total_us": 182370066,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258917,
+            "idle": 4165762,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136482,
+            "idle": 5287077,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511259278
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 36.67 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.05,
+        "30": 0.03
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          27.23,
+          12.02,
+          7.65
+        ],
+        "psi_cpu_some_avg10": 39.44,
+        "psi_cpu_some_total_us": 184332335,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258924,
+            "idle": 4166149,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136485,
+            "idle": 5287465,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511263279
+      },
+      "before": {
+        "loadavg": [
+          27.23,
+          12.02,
+          7.65
+        ],
+        "psi_cpu_some_avg10": 36.67,
+        "psi_cpu_some_total_us": 183431979,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258922,
+            "idle": 4165955,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136485,
+            "idle": 5287270,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511261279
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 39.44 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.0
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          27.23,
+          12.02,
+          7.65
+        ],
+        "psi_cpu_some_avg10": 39.36,
+        "psi_cpu_some_total_us": 185137697,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258925,
+            "idle": 4166343,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136491,
+            "idle": 5287659,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511265279
+      },
+      "before": {
+        "loadavg": [
+          27.23,
+          12.02,
+          7.65
+        ],
+        "psi_cpu_some_avg10": 39.44,
+        "psi_cpu_some_total_us": 184332335,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258924,
+            "idle": 4166149,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136485,
+            "idle": 5287465,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511263279
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 39.36 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.01,
+        "30": 0.06
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          28.65,
+          12.57,
+          7.85
+        ],
+        "psi_cpu_some_avg10": 39.48,
+        "psi_cpu_some_total_us": 185972103,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258927,
+            "idle": 4166537,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136493,
+            "idle": 5287852,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511267279
+      },
+      "before": {
+        "loadavg": [
+          27.23,
+          12.02,
+          7.65
+        ],
+        "psi_cpu_some_avg10": 39.36,
+        "psi_cpu_some_total_us": 185137697,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258925,
+            "idle": 4166343,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136491,
+            "idle": 5287659,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511265279
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 39.48 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.02
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          28.65,
+          12.57,
+          7.85
+        ],
+        "psi_cpu_some_avg10": 39.39,
+        "psi_cpu_some_total_us": 186789908,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258927,
+            "idle": 4166732,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136495,
+            "idle": 5288047,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511269280
+      },
+      "before": {
+        "loadavg": [
+          28.65,
+          12.57,
+          7.85
+        ],
+        "psi_cpu_some_avg10": 39.48,
+        "psi_cpu_some_total_us": 185972103,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258927,
+            "idle": 4166537,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136493,
+            "idle": 5287853,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511267280
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 39.39 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.0,
+        "30": 0.02
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          29.96,
+          13.11,
+          8.05
+        ],
+        "psi_cpu_some_avg10": 40.04,
+        "psi_cpu_some_total_us": 187587142,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258928,
+            "idle": 4166927,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136498,
+            "idle": 5288242,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511271280
+      },
+      "before": {
+        "loadavg": [
+          28.65,
+          12.57,
+          7.85
+        ],
+        "psi_cpu_some_avg10": 39.39,
+        "psi_cpu_some_total_us": 186789908,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258927,
+            "idle": 4166732,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136495,
+            "idle": 5288047,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511269280
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 40.04 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.01,
+        "30": 0.03
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          29.96,
+          13.11,
+          8.05
+        ],
+        "psi_cpu_some_avg10": 39.85,
+        "psi_cpu_some_total_us": 188432473,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258929,
+            "idle": 4167121,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136499,
+            "idle": 5288436,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511273280
+      },
+      "before": {
+        "loadavg": [
+          29.96,
+          13.11,
+          8.05
+        ],
+        "psi_cpu_some_avg10": 40.04,
+        "psi_cpu_some_total_us": 187587142,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258928,
+            "idle": 4166927,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136498,
+            "idle": 5288242,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511271280
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 39.85 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.01,
+        "30": 0.01
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          29.96,
+          13.11,
+          8.05
+        ],
+        "psi_cpu_some_avg10": 39.7,
+        "psi_cpu_some_total_us": 189143818,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258932,
+            "idle": 4167315,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136500,
+            "idle": 5288630,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511275281
+      },
+      "before": {
+        "loadavg": [
+          29.96,
+          13.11,
+          8.05
+        ],
+        "psi_cpu_some_avg10": 39.85,
+        "psi_cpu_some_total_us": 188432473,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258929,
+            "idle": 4167121,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136499,
+            "idle": 5288436,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511273281
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 39.70 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.03,
+        "30": 0.01
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          31.81,
+          13.77,
+          8.29
+        ],
+        "psi_cpu_some_avg10": 37.94,
+        "psi_cpu_some_total_us": 189706231,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258934,
+            "idle": 4167509,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136503,
+            "idle": 5288825,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511277281
+      },
+      "before": {
+        "loadavg": [
+          29.96,
+          13.11,
+          8.05
+        ],
+        "psi_cpu_some_avg10": 39.7,
+        "psi_cpu_some_total_us": 189143818,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258932,
+            "idle": 4167315,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136500,
+            "idle": 5288630,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511275281
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 37.94 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.03
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          31.81,
+          13.77,
+          8.29
+        ],
+        "psi_cpu_some_avg10": 35.96,
+        "psi_cpu_some_total_us": 190308289,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258935,
+            "idle": 4167704,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136506,
+            "idle": 5289019,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511279281
+      },
+      "before": {
+        "loadavg": [
+          31.81,
+          13.77,
+          8.29
+        ],
+        "psi_cpu_some_avg10": 37.94,
+        "psi_cpu_some_total_us": 189706231,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258934,
+            "idle": 4167509,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136503,
+            "idle": 5288825,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511277281
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 35.96 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.01,
+        "30": 0.03
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          33.67,
+          14.45,
+          8.54
+        ],
+        "psi_cpu_some_avg10": 35.6,
+        "psi_cpu_some_total_us": 190964214,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258937,
+            "idle": 4167897,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136509,
+            "idle": 5289214,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511281282
+      },
+      "before": {
+        "loadavg": [
+          31.81,
+          13.77,
+          8.29
+        ],
+        "psi_cpu_some_avg10": 35.96,
+        "psi_cpu_some_total_us": 190308289,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258935,
+            "idle": 4167704,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136506,
+            "idle": 5289019,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511279282
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 35.60 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.03
+      },
+      "settle_seconds": 2.0
+    },
+    {
+      "after": {
+        "loadavg": [
+          33.67,
+          14.45,
+          8.54
+        ],
+        "psi_cpu_some_avg10": 34.59,
+        "psi_cpu_some_total_us": 191592480,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258939,
+            "idle": 4168092,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136510,
+            "idle": 5289408,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511283282
+      },
+      "before": {
+        "loadavg": [
+          33.67,
+          14.45,
+          8.54
+        ],
+        "psi_cpu_some_avg10": 35.6,
+        "psi_cpu_some_total_us": 190964214,
+        "psi_memory_some_avg10": 0.0,
+        "psi_memory_some_total_us": 840059,
+        "reserved_ticks": {
+          "14": {
+            "busy": 1258937,
+            "idle": 4167897,
+            "steal": 26
+          },
+          "30": {
+            "busy": 136509,
+            "idle": 5289214,
+            "steal": 20
+          }
+        },
+        "unix_ms": 1792511281282
+      },
+      "quiet": false,
+      "reasons": [
+        "PSI cpu some avg10 34.59 > 5.00"
+      ],
+      "reserved_busy_seconds": {
+        "14": 0.02,
+        "30": 0.01
+      },
+      "settle_seconds": 2.0
+    }
+  ],
+  "settings": {
+    "boost": null,
+    "governor": null,
+    "in_isolcpus": false,
+    "in_nohz_full": false,
+    "no_turbo": null,
+    "smt_control": "on"
+  },
+  "uid": 0
+}

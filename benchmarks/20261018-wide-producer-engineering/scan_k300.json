@@ -1,0 +1,316 @@
+{
+ "mode": "scan",
+ "spec": "construct:73:1:300",
+ "repeats": 5,
+ "states_cap": 20000,
+ "threads": 4,
+ "metric": "ns_per_probe",
+ "summary": {
+  "control": {
+   "n": 5,
+   "median": 614.454,
+   "min": 559.287,
+   "max": 684.566,
+   "all": [
+    614.454,
+    567.168,
+    559.287,
+    684.566,
+    650.937
+   ]
+  },
+  "lazy_canon": {
+   "n": 5,
+   "median": 366.982,
+   "min": 349.307,
+   "max": 416.867,
+   "all": [
+    362.165,
+    349.307,
+    409.035,
+    366.982,
+    416.867
+   ]
+  },
+  "blocked_bloom": {
+   "n": 5,
+   "median": 575.973,
+   "min": 525.784,
+   "max": 598.693,
+   "all": [
+    593.458,
+    574.244,
+    525.784,
+    598.693,
+    575.973
+   ]
+  },
+  "prefetch": {
+   "n": 5,
+   "median": 434.748,
+   "min": 386.822,
+   "max": 485.768,
+   "all": [
+    403.087,
+    442.244,
+    386.822,
+    485.768,
+    434.748
+   ]
+  },
+  "all_three": {
+   "n": 5,
+   "median": 225.573,
+   "min": 216.695,
+   "max": 250.483,
+   "all": [
+    216.695,
+    225.573,
+    238.859,
+    223.464,
+    250.483
+   ]
+  }
+ },
+ "runs": {
+  "control": [
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.588414,
+    "ns_per_probe": 614.454,
+    "process_wall_s": 26.794139862060547
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.31226,
+    "ns_per_probe": 567.168,
+    "process_wall_s": 27.53557538986206
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.266237,
+    "ns_per_probe": 559.287,
+    "process_wall_s": 26.53219962120056
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.997867,
+    "ns_per_probe": 684.566,
+    "process_wall_s": 28.150497674942017
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.801472,
+    "ns_per_probe": 650.937,
+    "process_wall_s": 27.14838194847107
+   }
+  ],
+  "lazy_canon": [
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.115045,
+    "ns_per_probe": 362.165,
+    "process_wall_s": 25.064748764038086
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.039953,
+    "ns_per_probe": 349.307,
+    "process_wall_s": 26.868200302124023
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.388762,
+    "ns_per_probe": 409.035,
+    "process_wall_s": 24.509400844573975
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.143178,
+    "ns_per_probe": 366.982,
+    "process_wall_s": 26.77555823326111
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.434506,
+    "ns_per_probe": 416.867,
+    "process_wall_s": 26.041479110717773
+   }
+  ],
+  "blocked_bloom": [
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.465794,
+    "ns_per_probe": 593.458,
+    "process_wall_s": 27.6055691242218
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.353585,
+    "ns_per_probe": 574.244,
+    "process_wall_s": 27.161676168441772
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.070581,
+    "ns_per_probe": 525.784,
+    "process_wall_s": 26.6485116481781
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.496365,
+    "ns_per_probe": 598.693,
+    "process_wall_s": 26.377615690231323
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 3.363683,
+    "ns_per_probe": 575.973,
+    "process_wall_s": 25.868475437164307
+   }
+  ],
+  "prefetch": [
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.354026,
+    "ns_per_probe": 403.087,
+    "process_wall_s": 26.324058771133423
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.582705,
+    "ns_per_probe": 442.244,
+    "process_wall_s": 27.199618339538574
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.259041,
+    "ns_per_probe": 386.822,
+    "process_wall_s": 26.619906425476074
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.836885,
+    "ns_per_probe": 485.768,
+    "process_wall_s": 26.27677321434021
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 2.538928,
+    "ns_per_probe": 434.748,
+    "process_wall_s": 24.699925661087036
+   }
+  ],
+  "all_three": [
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 1.2655,
+    "ns_per_probe": 216.695,
+    "process_wall_s": 28.049110412597656
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 1.317348,
+    "ns_per_probe": 225.573,
+    "process_wall_s": 25.694969415664673
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 1.394938,
+    "ns_per_probe": 238.859,
+    "process_wall_s": 25.52782392501831
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 1.305032,
+    "ns_per_probe": 223.464,
+    "process_wall_s": 24.919379472732544
+   },
+   {
+    "probes": 5840000,
+    "hits": 0,
+    "relations": 0,
+    "index_states": 6570000,
+    "scan_s": 1.462822,
+    "ns_per_probe": 250.483,
+    "process_wall_s": 24.350892305374146
+   }
+  ]
+ },
+ "host": {
+  "nproc": 4,
+  "uname": "6.18.44-fc-v139"
+ }
+}

@@ -1,0 +1,273 @@
+{
+  "branch": "aburan28/laughing-darwin-3qdnk2",
+  "closed_utc": "2026-11-13T01:11:27+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=/dev/shm/blab/ic",
+        "ARMS=/home/user/crypto/research/ic_tool_program/explorations/build-pairing-lookahead-20261112/ab/runs/arms-a1.sha256",
+        "ISO=/tmp/claude-0/rulev9/bin/isolated_bench",
+        "bash",
+        "research/ic_tool_program/explorations/build-pairing-lookahead-20261112/ab/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T00:52:17+00:00",
+      "wall_s": 1004.519
+    }
+  ],
+  "commit": "62f1f0a778d839437f846b21d9d2b061a70fbe74",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T23:21:48+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261113-ic-build-pairing-lookahead"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "build_unpaired_over_paired_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0284536634517394,
+        1.0647328227507056
+      ],
+      "unit": "ratio",
+      "value": 1.044896409924537
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "setup_unpaired_over_paired_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9896854970683377,
+        1.0280329430982231
+      ],
+      "unit": "ratio",
+      "value": 1.016192657270163
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "collect_la32_over_la64_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9786002301460801,
+        1.0157933778755721
+      ],
+      "unit": "ratio",
+      "value": 0.9978112341257943
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "setup_la32_over_la64_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9738293051509679,
+        1.0134259107626358
+      ],
+      "unit": "ratio",
+      "value": 1.0026708206089747
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "build_aa_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9923266591823625,
+        1.0298320487629378
+      ],
+      "unit": "ratio",
+      "value": 1.0046336259609188
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "collect_aa_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9776723814936331,
+        1.0095494710147337
+      ],
+      "unit": "ratio",
+      "value": 1.0017417845180656
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "setup_aa_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9973302569509708,
+        1.0140452484867244
+      ],
+      "unit": "ratio",
+      "value": 1.0050488198854794
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "build_unpaired_over_paired_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9915158056755455,
+        1.0683916493306336
+      ],
+      "unit": "ratio",
+      "value": 1.036497063439326
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "setup_unpaired_over_paired_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9682506908269128,
+        1.0216832511041
+      ],
+      "unit": "ratio",
+      "value": 0.9957773313797067
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "collect_la32_over_la64_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9655549219765979,
+        1.0546359216707835
+      ],
+      "unit": "ratio",
+      "value": 0.9970134563004148
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "setup_la32_over_la64_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9724384177921293,
+        1.0447218133239395
+      ],
+      "unit": "ratio",
+      "value": 0.9933476562814012
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "build_aa_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9931782211587079,
+        1.0192027265696417
+      ],
+      "unit": "ratio",
+      "value": 1.0067590450435402
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "collect_aa_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9828549073736471,
+        1.0098073409592576
+      ],
+      "unit": "ratio",
+      "value": 1.000568372750849
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 44,
+      "name": "setup_aa_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9867398709995208,
+        1.0180165957886522
+      ],
+      "unit": "ratio",
+      "value": 1.0032154840727214
+    }
+  ],
+  "problem": "ic:koblitz_setup_phase",
+  "raw": [
+    {
+      "bytes": 408548,
+      "path": "/dev/shm/blab/runs.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fc/fc6fd5aebf758c41c3bdbab580c952be333d06fd7fd5b5a4bbd1624e64dee7c4",
+      "sha256": "fc6fd5aebf758c41c3bdbab580c952be333d06fd7fd5b5a4bbd1624e64dee7c4",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261113-ic-build-pairing-lookahead/report.pdf",
+    "png": [
+      "benchmarks/20261113-ic-build-pairing-lookahead/ab.png"
+    ],
+    "svg": [
+      "benchmarks/20261113-ic-build-pairing-lookahead/ab.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-build-pairing-lookahead-ab",
+  "status": "measured",
+  "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+  "validation": null
+}

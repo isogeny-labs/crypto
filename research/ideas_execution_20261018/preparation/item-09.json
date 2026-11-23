@@ -1,0 +1,43 @@
+{
+  "item": 9,
+  "title": "Learned F4 column / pivot policy",
+  "original_requirement": "Train F4 column and pivot policies with trace transfer per shape, on Boolean systems at memory frontier.",
+  "acceptance_criteria": [
+    "Only correctness-preserving choices exposed; deterministic inexpensive heuristics are controls.",
+    "Heldout targets and shapes, explicit transfer tests; full cost/inference/fallback and peak memory.",
+    "Independent row-space/result certificates and total cost rather than in-sample reward."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/pq_f4_f2.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/sparse_macaulay.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/matrix_f5_f2.rs"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-RELN-715aa1/specification.yaml"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "RELN715aa1 approves Stage0 derivation only and is not authority to run learned solver trials.",
+    "Need policy hook, trace exporter, action legality/certificates and heldout training/evaluation implementation; no such complete adapter bound."
+  ],
+  "dependencies": [
+    5,
+    6,
+    7
+  ],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Learned F4 column and pivot policy, with per-shape trace transfer. The gbrl work did PPO on toy Buchberger over F_p and never touched F4, Boolean systems, or the memory wall. The roadmap item never became a hypothesis."
+}

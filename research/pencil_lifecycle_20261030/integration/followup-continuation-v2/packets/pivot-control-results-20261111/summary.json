@@ -1,0 +1,84 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "pivot-control-operational-v1-20261111",
+  "status": "passed",
+  "caller_exit_code": 0,
+  "native_pre_status": "passed",
+  "native_post_status": "passed",
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "pre_post_hash_maps_equal": true,
+  "runtime_maps_equal": true,
+  "compiler_invocations": 5,
+  "command_results": [
+    {
+      "module": "EliminationField",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 22.951828683027998
+    },
+    {
+      "module": "PivotSwap",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 15.262841606978327
+    },
+    {
+      "module": "Controls",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 16.214095796982292
+    },
+    {
+      "module": "Readback",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 13.954192503995728
+    },
+    {
+      "module": "ExpectedFailure",
+      "exit": 1,
+      "expected_exit": 1,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 14.770706239971332
+    }
+  ],
+  "unattempted_modules": [],
+  "all_phase_owners_terminal": true,
+  "readback_names": 17,
+  "allowed_axioms_only": true,
+  "false_control_rejected": true,
+  "compiled_artifacts": {
+    "EliminationField.olean": "f5f98dc6e28104d422f5538d9314d6ad5301066afd9f1b66a2c5929c5af92d15",
+    "PivotSwap.olean": "e9cb8e4f34c33eb58cffd484715e50962c308811c0c2e90214a9ef2602f11d6a",
+    "Readback.olean": "425f1691e9fd45c09d0479b81baa78853e464ddaed61018fd00e9b408531f844",
+    "Controls.olean": "8f96716b1e6734b157a486a6afc515f5cdbe1ed3cc4e2d46538539bd429382d8"
+  },
+  "elapsed_seconds": {
+    "native_pre": 43.208808976982255,
+    "native_compiler": 83.96393600699957,
+    "native_post": 34.731055647018366,
+    "outer_completion": 162.77386296796612,
+    "caller": 162.87421057501342
+  },
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 20580,
+  "campaign_remaining_seconds": 109020,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "raw_files": 64,
+  "reporter_self_checks": true,
+  "independent_result_review": false,
+  "independent_kernel_recheck_complete": false,
+  "custody_limit": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes.",
+  "dollar_cost": null,
+  "scientific_cost_ratio": null
+}

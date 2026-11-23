@@ -1,0 +1,373 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-curve25519-autolab-parity-20261105)
+error[E0308]: mismatched types
+  --> src/cryptanalysis/ecbench/aps/tests.rs:75:35
+   |
+75 |         assert_eq!(rep.recovered, Some(37));
+   |                                   ^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+   |
+   = note: expected enum `Option<exact_scalar::ExactScalar>`
+              found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ecbench/aps/tests.rs:256:31
+    |
+256 |     assert_eq!(rep.recovered, Some(37));
+    |                               ^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+    |
+    = note: expected enum `Option<exact_scalar::ExactScalar>`
+               found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/claim.rs:2518:35
+     |
+2518 |         assert_eq!(rep.recovered, Some(4242));
+     |                                   ^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/hyper_ic.rs:1193:25
+     |
+1193 |                         Some(planted),
+     |                         ^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/hyper_ic.rs:1237:35
+     |
+1237 |         assert_eq!(rep.recovered, Some(planted));
+     |                                   ^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7154:35
+     |
+7154 |         assert_eq!(rep.recovered, Some(1_234));
+     |                                   ^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7185:38
+     |
+7185 |         assert_eq!(narrow.recovered, Some(1_234));
+     |                                      ^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7186:36
+     |
+7186 |         assert_eq!(wide.recovered, Some(1_234));
+     |                                    ^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7260:35
+     |
+7260 |         assert_eq!(rep.recovered, Some(u128::from(777_777 % bi.r)));
+     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7357:38
+     |
+7357 |         assert_eq!(report.recovered, Some(u128::from(113 % binary.r)));
+     |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7609:42
+     |
+7609 |             assert_eq!(report.recovered, Some(u128::from(scalar)));
+     |                                          ^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7668:41
+     |
+7668 |                 assert_eq!(a.recovered, w.planted);
+     |                                         ^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:7797:43
+     |
+7797 |                 assert_eq!(rep.recovered, w.planted, "record target");
+     |                                           ^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8020:35
+     |
+8020 |         assert_eq!(rep.recovered, Some(4321));
+     |                                   ^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8066:35
+     |
+8066 |         assert_eq!(rep.recovered, Some(97));
+     |                                   ^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8100:35
+     |
+8100 |         assert_eq!(rep.recovered, Some(u128::from(113 % binary.r)));
+     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8147:34
+     |
+8147 |         assert_eq!(f4.recovered, Some(1234));
+     |                                  ^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<{integer}>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<{integer}>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8221:35
+     |
+8221 |         assert_eq!(sub.recovered, Some(4099 % u128::from(prime.r)));
+     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8325:35
+     |
+8325 |         assert_eq!(rep.recovered, Some(77_777 % u128::from(prime.r)));
+     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8555:35
+     |
+8555 |         assert_eq!(rep.recovered, Some(4242 % facts.r));
+     |                                   ^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8653:39
+     |
+8653 |             assert_eq!(rep.recovered, Some(k % facts.r));
+     |                                       ^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8677:42
+     |
+8677 |             assert_eq!(frozen.recovered, Some(k));
+     |                                          ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8678:38
+     |
+8678 |             assert_eq!(v2.recovered, Some(k));
+     |                                      ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:8781:47
+     |
+8781 |                     assert_eq!(rep.recovered, Some(k), "{id} on {} k={k}", facts.slug);
+     |                                               ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9052:41
+     |
+9052 |                 assert_eq!(v.recovered, Some(k % facts.r));
+     |                                         ^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9189:37
+     |
+9189 |             assert_eq!(a.recovered, Some(k));
+     |                                     ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9190:37
+     |
+9190 |             assert_eq!(b.recovered, Some(k));
+     |                                     ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9267:44
+     |
+9267 |             assert_eq!(measured.recovered, Some(k));
+     |                                            ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9397:39
+     |
+9397 |             assert_eq!(rep.recovered, Some(4242 % facts.r), "{id}");
+     |                                       ^^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9411:39
+     |
+9411 |             assert_eq!(rep.recovered, Some(k), "{id}");
+     |                                       ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9414:39
+     |
+9414 |             assert_eq!(rep.recovered, Some(k), "{v2}");
+     |                                       ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9558:37
+     |
+9558 |             assert_eq!(a.recovered, w.planted);
+     |                                     ^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0605]: non-primitive cast: `exact_scalar::ExactScalar` as `u64`
+    --> src/cryptanalysis/ecbench/methods.rs:9602:21
+     |
+9602 |             let k = a.recovered.unwrap() as u64;
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9635:33
+     |
+9635 |         assert_eq!(a.recovered, w.planted);
+     |                                 ^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9856:41
+     |
+9856 |                 assert_eq!(a.recovered, Some(k), "m = {m}, seed {seed}");
+     |                                         ^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9897:66
+     |
+9897 |         assert!(rep.recovered.is_none() || rep.recovered == Some(k));
+     |                                                             ---- ^ expected `ExactScalar`, found `u128`
+     |                                                             |
+     |                                                             arguments to this enum variant are incorrect
+     |
+help: the type constructed contains `u128` due to the type of the argument passed
+    --> src/cryptanalysis/ecbench/methods.rs:9897:61
+     |
+9897 |         assert!(rep.recovered.is_none() || rep.recovered == Some(k));
+     |                                                             ^^^^^-^
+     |                                                                  |
+     |                                                                  this argument influences the type of `Some`
+note: tuple variant defined here
+    --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/option.rs:606:4
+help: call `Into::into` on this expression to convert `u128` into `exact_scalar::ExactScalar`
+     |
+9897 |         assert!(rep.recovered.is_none() || rep.recovered == Some(k.into()));
+     |                                                                   +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:9954:39
+     |
+9954 |             assert_eq!(rep.recovered, Some(u128::from(k)));
+     |                                       ^^^^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<exact_scalar::ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ecbench/prime_orbit.rs:265:42
+    |
+265 |             assert_eq!(report.recovered, workload.planted, "{coordinates}");
+    |                                          ^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+    |
+    = note: expected enum `Option<exact_scalar::ExactScalar>`
+               found enum `Option<u128>`
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ecbench_large_prime/trace_line_tests.rs:163:35
+    |
+163 |         assert_eq!(out.recovered, workload.planted);
+    |                                   ^^^^^^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+    |
+    = note: expected enum `Option<exact_scalar::ExactScalar>`
+               found enum `Option<u128>`
+
+error: couldn't read `src/bin/../../docs/curves/cover-links.yaml`: No such file or directory (os error 2)
+   --> src/bin/hyperelliptic_cover.rs:899:39
+    |
+899 |     const CURRENT_COVER_GRAPH: &str = include_str!("../../docs/curves/cover-links.yaml");
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `crypto` (bin "hyperelliptic-cover" test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+Some errors have detailed explanations: E0308, E0605.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `crypto` (lib test) due to 39 previous errors

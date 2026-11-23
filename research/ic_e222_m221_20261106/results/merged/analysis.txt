@@ -1,0 +1,15 @@
+frozen {'A': 8, 'Eh': 256, 'D': 32, 'Dw': 24} | rows 480 recovered 480 | missing timings 0
+binary 3b3786f80d29 commit 0ea02a380e | IC_ env seen: {'{"IC_HOIST_SWEEP": "1"}', '{}', '{"IC_SUM_TABLE": "1", "IC_WALK": "1"}', '{"IC_SUM_TABLE": "1"}'}
+pairs 120 instances 60
+A shipped default (sweep, extra 64)  fb 8 | solver ms median 304.96 | process ms median 327.3 | trials 17909
+Eh hoisted sweep, extra 2             fb 256 | solver ms median 22.21 | process ms median 45.1 | trials 263
+D pair-sum table, extra 2            fb 32 | solver ms median 1.50 | process ms median 26.2 | trials 543
+Dw table + restarted walk, extra 2    fb 24 | solver ms median 0.59 | process ms median 24.0 | trials 661
+paired ratios, median [bootstrap 95% by instance]  solver | process | wins(solver)
+  D/Eh: 0.066 [0.058,0.072] | 0.546 [0.466,0.595] | 120/120
+  Dw/Eh: 0.026 [0.022,0.029] | 0.534 [0.458,0.577] | 120/120
+  Dw/D: 0.374 [0.345,0.429] | 0.939 [0.920,0.975] | 120/120
+  Eh/A: 0.077 [0.074,0.083] | 0.146 [0.131,0.161] | 120/120
+  D/A: 0.005 [0.005,0.006] | 0.082 [0.062,0.095] | 120/120
+  Dw/A: 0.002 [0.002,0.002] | 0.080 [0.061,0.091] | 120/120
+by size (Dw/Eh, D/Eh solver): {14: (0.041, 0.082), 15: (0.031, 0.072), 16: (0.019, 0.058), 17: (0.014, 0.046)}

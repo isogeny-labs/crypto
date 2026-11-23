@@ -1,0 +1,154 @@
+{
+  "branch": "claude/hyperelliptic-index-calculus-td1fdn",
+  "closed_utc": "2026-11-16T11:37:51+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_positive_control_capped_20261116/test.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T10:01:06+00:00",
+      "wall_s": 5755.632
+    }
+  ],
+  "commit": "fcc5fc5e878677d0b99e56ab68f23db37e26fdac",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T10:01:00+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-ic-positive-control-capped"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T1001Z-ic-positive-control-capped",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "total_w_over_s_w01_p32771",
+      "note": "paired on instances; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.89,
+        0.901
+      ],
+      "unit": "ratio",
+      "value": 0.895
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "total_w_over_s_w01_p65537",
+      "note": "[pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.815,
+        0.827
+      ],
+      "unit": "ratio",
+      "value": 0.821
+    },
+    {
+      "baseline": 7.44,
+      "better": "lower",
+      "n": 8,
+      "name": "w_over_rho_w01_p32771",
+      "note": "baseline = original control arm C; S 1.92; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.95,
+        3.32
+      ],
+      "unit": "ratio",
+      "value": 1.72
+    },
+    {
+      "baseline": 40.24,
+      "better": "lower",
+      "n": 8,
+      "name": "w_over_rho_w1_p32771",
+      "note": "baseline = original control arm C; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.82,
+        16.94
+      ],
+      "unit": "ratio",
+      "value": 8.75
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "w_over_rho_w01_p131101",
+      "note": "[pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.15,
+        4.53
+      ],
+      "unit": "ratio",
+      "value": 1.78
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 175291,
+      "path": "research/ic_positive_control_capped_20261116/run_w.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9a/9ad614ee8ca196f5de6b6f42c4f3a281eebb7d59acbdfab47e8fa27100c82259",
+      "sha256": "9ad614ee8ca196f5de6b6f42c4f3a281eebb7d59acbdfab47e8fa27100c82259",
+      "uploaded": false
+    },
+    {
+      "bytes": 18195,
+      "path": "research/ic_positive_control_capped_20261116/run_w.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f2afce4e55292bcb8768cf23ee4f80e8e24c8d37284b5d4a1e2a3a1924ab380",
+      "sha256": "1f2afce4e55292bcb8768cf23ee4f80e8e24c8d37284b5d4a1e2a3a1924ab380",
+      "uploaded": false
+    },
+    {
+      "bytes": 207318,
+      "path": "research/ic_positive_control_capped_20261116/run_sr.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9ffa369210657f75d84859e1d2a93ac4cc69b79b37c066f8a526c08b8f3e54b8",
+      "sha256": "9ffa369210657f75d84859e1d2a93ac4cc69b79b37c066f8a526c08b8f3e54b8",
+      "uploaded": false
+    },
+    {
+      "bytes": 25238,
+      "path": "research/ic_positive_control_capped_20261116/run_sr.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b0/b08df030fb4a43e8af48b14c43c9ca2b69f77298ecfdf8875e1cc5b732081a0c",
+      "sha256": "b08df030fb4a43e8af48b14c43c9ca2b69f77298ecfdf8875e1cc5b732081a0c",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261116-ic-positive-control-capped/REPORT.pdf",
+    "png": [
+      "benchmarks/20261116-ic-positive-control-capped/figure.png"
+    ],
+    "svg": [
+      "benchmarks/20261116-ic-positive-control-capped/figure.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-positive-control-capped",
+  "status": "measured",
+  "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
+  "validation": null
+}

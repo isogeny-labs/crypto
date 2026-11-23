@@ -1,0 +1,484 @@
+// CM22 exact unchanged CM17 circuit; native Singular backend
+option(redSB);
+ring r=2,(n,l,b,c),dp;
+ideal nn; ideal dd; poly gg;
+nn[1]=b;dd[1]=1;gg=gcd(nn[1],dd[1]);nn[1]=nn[1]/gg;dd[1]=dd[1]/gg;
+nn[2]=c;dd[2]=1;gg=gcd(nn[2],dd[2]);nn[2]=nn[2]/gg;dd[2]=dd[2]/gg;
+nn[3]=l;dd[3]=1;gg=gcd(nn[3],dd[3]);nn[3]=nn[3]/gg;dd[3]=dd[3]/gg;
+nn[4]=n;dd[4]=1;gg=gcd(nn[4],dd[4]);nn[4]=nn[4]/gg;dd[4]=dd[4]/gg;
+nn[5]=1;dd[5]=1;gg=gcd(nn[5],dd[5]);nn[5]=nn[5]/gg;dd[5]=dd[5]/gg;
+nn[6]=nn[2]*dd[5]+nn[5]*dd[2];dd[6]=dd[2]*dd[5];gg=gcd(nn[6],dd[6]);nn[6]=nn[6]/gg;dd[6]=dd[6]/gg;
+nn[7]=nn[6]*nn[6];dd[7]=dd[6]*dd[6];gg=gcd(nn[7],dd[7]);nn[7]=nn[7]/gg;dd[7]=dd[7]/gg;
+nn[8]=nn[1]*nn[1];dd[8]=dd[1]*dd[1];gg=gcd(nn[8],dd[8]);nn[8]=nn[8]/gg;dd[8]=dd[8]/gg;
+nn[9]=nn[2]*nn[6];dd[9]=dd[2]*dd[6];gg=gcd(nn[9],dd[9]);nn[9]=nn[9]/gg;dd[9]=dd[9]/gg;
+nn[10]=nn[6]*nn[7];dd[10]=dd[6]*dd[7];gg=gcd(nn[10],dd[10]);nn[10]=nn[10]/gg;dd[10]=dd[10]/gg;
+nn[11]=nn[2]*nn[10];dd[11]=dd[2]*dd[10];gg=gcd(nn[11],dd[11]);nn[11]=nn[11]/gg;dd[11]=dd[11]/gg;
+nn[12]=nn[1]*dd[11]+nn[11]*dd[1];dd[12]=dd[1]*dd[11];gg=gcd(nn[12],dd[12]);nn[12]=nn[12]/gg;dd[12]=dd[12]/gg;
+nn[13]=dd[1];dd[13]=nn[1];gg=gcd(nn[13],dd[13]);nn[13]=nn[13]/gg;dd[13]=dd[13]/gg;
+nn[14]=dd[12];dd[14]=nn[12];gg=gcd(nn[14],dd[14]);nn[14]=nn[14]/gg;dd[14]=dd[14]/gg;
+nn[15]=dd[2];dd[15]=nn[2];gg=gcd(nn[15],dd[15]);nn[15]=nn[15]/gg;dd[15]=dd[15]/gg;
+nn[16]=nn[1]*nn[15];dd[16]=dd[1]*dd[15];gg=gcd(nn[16],dd[16]);nn[16]=nn[16]/gg;dd[16]=dd[16]/gg;
+nn[17]=nn[16]*nn[16];dd[17]=dd[16]*dd[16];gg=gcd(nn[17],dd[17]);nn[17]=nn[17]/gg;dd[17]=dd[17]/gg;
+nn[18]=nn[6]*nn[16];dd[18]=dd[6]*dd[16];gg=gcd(nn[18],dd[18]);nn[18]=nn[18]/gg;dd[18]=dd[18]/gg;
+nn[19]=nn[17]*dd[18]+nn[18]*dd[17];dd[19]=dd[17]*dd[18];gg=gcd(nn[19],dd[19]);nn[19]=nn[19]/gg;dd[19]=dd[19]/gg;
+nn[20]=nn[1]*dd[19]+nn[19]*dd[1];dd[20]=dd[1]*dd[19];gg=gcd(nn[20],dd[20]);nn[20]=nn[20]/gg;dd[20]=dd[20]/gg;
+nn[21]=nn[1]*dd[20]+nn[20]*dd[1];dd[21]=dd[1]*dd[20];gg=gcd(nn[21],dd[21]);nn[21]=nn[21]/gg;dd[21]=dd[21]/gg;
+nn[22]=nn[16]*nn[21];dd[22]=dd[16]*dd[21];gg=gcd(nn[22],dd[22]);nn[22]=nn[22]/gg;dd[22]=dd[22]/gg;
+nn[23]=dd[20];dd[23]=nn[20];gg=gcd(nn[23],dd[23]);nn[23]=nn[23]/gg;dd[23]=dd[23]/gg;
+nn[24]=nn[22]*nn[23];dd[24]=dd[22]*dd[23];gg=gcd(nn[24],dd[24]);nn[24]=nn[24]/gg;dd[24]=dd[24]/gg;
+nn[25]=nn[24]*nn[24];dd[25]=dd[24]*dd[24];gg=gcd(nn[25],dd[25]);nn[25]=nn[25]/gg;dd[25]=dd[25]/gg;
+nn[26]=nn[6]*nn[24];dd[26]=dd[6]*dd[24];gg=gcd(nn[26],dd[26]);nn[26]=nn[26]/gg;dd[26]=dd[26]/gg;
+nn[27]=nn[25]*dd[26]+nn[26]*dd[25];dd[27]=dd[25]*dd[26];gg=gcd(nn[27],dd[27]);nn[27]=nn[27]/gg;dd[27]=dd[27]/gg;
+nn[28]=nn[1]*dd[27]+nn[27]*dd[1];dd[28]=dd[1]*dd[27];gg=gcd(nn[28],dd[28]);nn[28]=nn[28]/gg;dd[28]=dd[28]/gg;
+nn[29]=nn[20]*dd[28]+nn[28]*dd[20];dd[29]=dd[20]*dd[28];gg=gcd(nn[29],dd[29]);nn[29]=nn[29]/gg;dd[29]=dd[29]/gg;
+nn[30]=nn[6]*dd[24]+nn[24]*dd[6];dd[30]=dd[6]*dd[24];gg=gcd(nn[30],dd[30]);nn[30]=nn[30]/gg;dd[30]=dd[30]/gg;
+nn[31]=nn[29]*nn[30];dd[31]=dd[29]*dd[30];gg=gcd(nn[31],dd[31]);nn[31]=nn[31]/gg;dd[31]=dd[31]/gg;
+nn[32]=nn[1]*dd[31]+nn[31]*dd[1];dd[32]=dd[1]*dd[31];gg=gcd(nn[32],dd[32]);nn[32]=nn[32]/gg;dd[32]=dd[32]/gg;
+nn[33]=nn[2]*nn[2];dd[33]=dd[2]*dd[2];gg=gcd(nn[33],dd[33]);nn[33]=nn[33]/gg;dd[33]=dd[33]/gg;
+nn[34]=nn[1]*dd[2]+nn[2]*dd[1];dd[34]=dd[1]*dd[2];gg=gcd(nn[34],dd[34]);nn[34]=nn[34]/gg;dd[34]=dd[34]/gg;
+nn[35]=nn[6]*nn[34];dd[35]=dd[6]*dd[34];gg=gcd(nn[35],dd[35]);nn[35]=nn[35]/gg;dd[35]=dd[35]/gg;
+nn[36]=nn[33]*dd[35]+nn[35]*dd[33];dd[36]=dd[33]*dd[35];gg=gcd(nn[36],dd[36]);nn[36]=nn[36]/gg;dd[36]=dd[36]/gg;
+nn[37]=nn[1]*dd[9]+nn[9]*dd[1];dd[37]=dd[1]*dd[9];gg=gcd(nn[37],dd[37]);nn[37]=nn[37]/gg;dd[37]=dd[37]/gg;
+nn[38]=dd[37];dd[38]=nn[37];gg=gcd(nn[38],dd[38]);nn[38]=nn[38]/gg;dd[38]=dd[38]/gg;
+nn[39]=nn[36]*nn[38];dd[39]=dd[36]*dd[38];gg=gcd(nn[39],dd[39]);nn[39]=nn[39]/gg;dd[39]=dd[39]/gg;
+nn[40]=nn[39]*nn[39];dd[40]=dd[39]*dd[39];gg=gcd(nn[40],dd[40]);nn[40]=nn[40]/gg;dd[40]=dd[40]/gg;
+nn[41]=nn[6]*nn[39];dd[41]=dd[6]*dd[39];gg=gcd(nn[41],dd[41]);nn[41]=nn[41]/gg;dd[41]=dd[41]/gg;
+nn[42]=nn[40]*dd[41]+nn[41]*dd[40];dd[42]=dd[40]*dd[41];gg=gcd(nn[42],dd[42]);nn[42]=nn[42]/gg;dd[42]=dd[42]/gg;
+nn[43]=nn[1]*dd[42]+nn[42]*dd[1];dd[43]=dd[1]*dd[42];gg=gcd(nn[43],dd[43]);nn[43]=nn[43]/gg;dd[43]=dd[43]/gg;
+nn[44]=nn[6]*dd[39]+nn[39]*dd[6];dd[44]=dd[6]*dd[39];gg=gcd(nn[44],dd[44]);nn[44]=nn[44]/gg;dd[44]=dd[44]/gg;
+nn[45]=nn[43]*nn[44];dd[45]=dd[43]*dd[44];gg=gcd(nn[45],dd[45]);nn[45]=nn[45]/gg;dd[45]=dd[45]/gg;
+nn[46]=nn[2]*nn[39];dd[46]=dd[2]*dd[39];gg=gcd(nn[46],dd[46]);nn[46]=nn[46]/gg;dd[46]=dd[46]/gg;
+nn[47]=nn[2]*dd[45]+nn[45]*dd[2];dd[47]=dd[2]*dd[45];gg=gcd(nn[47],dd[47]);nn[47]=nn[47]/gg;dd[47]=dd[47]/gg;
+nn[48]=nn[46]*dd[47]+nn[47]*dd[46];dd[48]=dd[46]*dd[47];gg=gcd(nn[48],dd[48]);nn[48]=nn[48]/gg;dd[48]=dd[48]/gg;
+nn[49]=nn[29]*dd[43]+nn[43]*dd[29];dd[49]=dd[29]*dd[43];gg=gcd(nn[49],dd[49]);nn[49]=nn[49]/gg;dd[49]=dd[49]/gg;
+nn[50]=nn[32]*dd[48]+nn[48]*dd[32];dd[50]=dd[32]*dd[48];gg=gcd(nn[50],dd[50]);nn[50]=nn[50]/gg;dd[50]=dd[50]/gg;
+nn[51]=nn[6]*nn[29];dd[51]=dd[6]*dd[29];gg=gcd(nn[51],dd[51]);nn[51]=nn[51]/gg;dd[51]=dd[51]/gg;
+nn[52]=nn[50]*dd[51]+nn[51]*dd[50];dd[52]=dd[50]*dd[51];gg=gcd(nn[52],dd[52]);nn[52]=nn[52]/gg;dd[52]=dd[52]/gg;
+nn[53]=nn[1]*dd[52]+nn[52]*dd[1];dd[53]=dd[1]*dd[52];gg=gcd(nn[53],dd[53]);nn[53]=nn[53]/gg;dd[53]=dd[53]/gg;
+nn[54]=nn[3]*nn[3];dd[54]=dd[3]*dd[3];gg=gcd(nn[54],dd[54]);nn[54]=nn[54]/gg;dd[54]=dd[54]/gg;
+nn[55]=nn[3]*nn[6];dd[55]=dd[3]*dd[6];gg=gcd(nn[55],dd[55]);nn[55]=nn[55]/gg;dd[55]=dd[55]/gg;
+nn[56]=nn[1]*dd[54]+nn[54]*dd[1];dd[56]=dd[1]*dd[54];gg=gcd(nn[56],dd[56]);nn[56]=nn[56]/gg;dd[56]=dd[56]/gg;
+nn[57]=nn[55]*dd[56]+nn[56]*dd[55];dd[57]=dd[55]*dd[56];gg=gcd(nn[57],dd[57]);nn[57]=nn[57]/gg;dd[57]=dd[57]/gg;
+nn[58]=nn[4]*nn[6];dd[58]=dd[4]*dd[6];gg=gcd(nn[58],dd[58]);nn[58]=nn[58]/gg;dd[58]=dd[58]/gg;
+nn[59]=nn[1]*nn[3];dd[59]=dd[1]*dd[3];gg=gcd(nn[59],dd[59]);nn[59]=nn[59]/gg;dd[59]=dd[59]/gg;
+nn[60]=nn[58]*dd[59]+nn[59]*dd[58];dd[60]=dd[58]*dd[59];gg=gcd(nn[60],dd[60]);nn[60]=nn[60]/gg;dd[60]=dd[60]/gg;
+nn[61]=nn[4]*nn[4];dd[61]=dd[4]*dd[4];gg=gcd(nn[61],dd[61]);nn[61]=nn[61]/gg;dd[61]=dd[61]/gg;
+nn[62]=nn[1]*nn[4];dd[62]=dd[1]*dd[4];gg=gcd(nn[62],dd[62]);nn[62]=nn[62]/gg;dd[62]=dd[62]/gg;
+nn[63]=nn[61]*dd[62]+nn[62]*dd[61];dd[63]=dd[61]*dd[62];gg=gcd(nn[63],dd[63]);nn[63]=nn[63]/gg;dd[63]=dd[63]/gg;
+nn[64]=nn[57]*nn[60];dd[64]=dd[57]*dd[60];gg=gcd(nn[64],dd[64]);nn[64]=nn[64]/gg;dd[64]=dd[64]/gg;
+nn[65]=nn[63]*dd[64]+nn[64]*dd[63];dd[65]=dd[63]*dd[64];gg=gcd(nn[65],dd[65]);nn[65]=nn[65]/gg;dd[65]=dd[65]/gg;
+nn[66]=dd[65];dd[66]=nn[65];gg=gcd(nn[66],dd[66]);nn[66]=nn[66]/gg;dd[66]=dd[66]/gg;
+nn[67]=nn[1]*nn[8];dd[67]=dd[1]*dd[8];gg=gcd(nn[67],dd[67]);nn[67]=nn[67]/gg;dd[67]=dd[67]/gg;
+nn[68]=nn[6]*nn[8];dd[68]=dd[6]*dd[8];gg=gcd(nn[68],dd[68]);nn[68]=nn[68]/gg;dd[68]=dd[68]/gg;
+nn[69]=nn[57]*nn[68];dd[69]=dd[57]*dd[68];gg=gcd(nn[69],dd[69]);nn[69]=nn[69]/gg;dd[69]=dd[69]/gg;
+nn[70]=nn[1]*nn[7];dd[70]=dd[1]*dd[7];gg=gcd(nn[70],dd[70]);nn[70]=nn[70]/gg;dd[70]=dd[70]/gg;
+nn[71]=nn[60]*nn[70];dd[71]=dd[60]*dd[70];gg=gcd(nn[71],dd[71]);nn[71]=nn[71]/gg;dd[71]=dd[71]/gg;
+nn[72]=nn[10]*nn[63];dd[72]=dd[10]*dd[63];gg=gcd(nn[72],dd[72]);nn[72]=nn[72]/gg;dd[72]=dd[72]/gg;
+nn[73]=nn[67]*dd[69]+nn[69]*dd[67];dd[73]=dd[67]*dd[69];gg=gcd(nn[73],dd[73]);nn[73]=nn[73]/gg;dd[73]=dd[73]/gg;
+nn[74]=nn[71]*dd[73]+nn[73]*dd[71];dd[74]=dd[71]*dd[73];gg=gcd(nn[74],dd[74]);nn[74]=nn[74]/gg;dd[74]=dd[74]/gg;
+nn[75]=nn[72]*dd[74]+nn[74]*dd[72];dd[75]=dd[72]*dd[74];gg=gcd(nn[75],dd[75]);nn[75]=nn[75]/gg;dd[75]=dd[75]/gg;
+nn[76]=dd[75];dd[76]=nn[75];gg=gcd(nn[76],dd[76]);nn[76]=nn[76]/gg;dd[76]=dd[76]/gg;
+nn[77]=0;dd[77]=1;gg=gcd(nn[77],dd[77]);nn[77]=nn[77]/gg;dd[77]=dd[77]/gg;
+nn[78]=nn[58]*nn[58];dd[78]=dd[58]*dd[58];gg=gcd(nn[78],dd[78]);nn[78]=nn[78]/gg;dd[78]=dd[78]/gg;
+nn[79]=nn[77]*dd[78]+nn[78]*dd[77];dd[79]=dd[77]*dd[78];gg=gcd(nn[79],dd[79]);nn[79]=nn[79]/gg;dd[79]=dd[79]/gg;
+nn[80]=nn[55]*nn[58];dd[80]=dd[55]*dd[58];gg=gcd(nn[80],dd[80]);nn[80]=nn[80]/gg;dd[80]=dd[80]/gg;
+nn[81]=nn[77]*dd[80]+nn[80]*dd[77];dd[81]=dd[77]*dd[80];gg=gcd(nn[81],dd[81]);nn[81]=nn[81]/gg;dd[81]=dd[81]/gg;
+nn[82]=nn[5]*nn[58];dd[82]=dd[5]*dd[58];gg=gcd(nn[82],dd[82]);nn[82]=nn[82]/gg;dd[82]=dd[82]/gg;
+nn[83]=nn[77]*dd[82]+nn[82]*dd[77];dd[83]=dd[77]*dd[82];gg=gcd(nn[83],dd[83]);nn[83]=nn[83]/gg;dd[83]=dd[83]/gg;
+nn[84]=nn[80]*dd[81]+nn[81]*dd[80];dd[84]=dd[80]*dd[81];gg=gcd(nn[84],dd[84]);nn[84]=nn[84]/gg;dd[84]=dd[84]/gg;
+nn[85]=nn[55]*nn[55];dd[85]=dd[55]*dd[55];gg=gcd(nn[85],dd[85]);nn[85]=nn[85]/gg;dd[85]=dd[85]/gg;
+nn[86]=nn[83]*dd[85]+nn[85]*dd[83];dd[86]=dd[83]*dd[85];gg=gcd(nn[86],dd[86]);nn[86]=nn[86]/gg;dd[86]=dd[86]/gg;
+nn[87]=nn[5]*nn[55];dd[87]=dd[5]*dd[55];gg=gcd(nn[87],dd[87]);nn[87]=nn[87]/gg;dd[87]=dd[87]/gg;
+nn[88]=nn[77]*dd[87]+nn[87]*dd[77];dd[88]=dd[77]*dd[87];gg=gcd(nn[88],dd[88]);nn[88]=nn[88]/gg;dd[88]=dd[88]/gg;
+nn[89]=nn[82]*dd[86]+nn[86]*dd[82];dd[89]=dd[82]*dd[86];gg=gcd(nn[89],dd[89]);nn[89]=nn[89]/gg;dd[89]=dd[89]/gg;
+nn[90]=nn[87]*dd[88]+nn[88]*dd[87];dd[90]=dd[87]*dd[88];gg=gcd(nn[90],dd[90]);nn[90]=nn[90]/gg;dd[90]=dd[90]/gg;
+nn[91]=nn[5]*nn[5];dd[91]=dd[5]*dd[5];gg=gcd(nn[91],dd[91]);nn[91]=nn[91]/gg;dd[91]=dd[91]/gg;
+nn[92]=nn[77]*dd[91]+nn[91]*dd[77];dd[92]=dd[77]*dd[91];gg=gcd(nn[92],dd[92]);nn[92]=nn[92]/gg;dd[92]=dd[92]/gg;
+nn[93]=nn[1]*nn[58];dd[93]=dd[1]*dd[58];gg=gcd(nn[93],dd[93]);nn[93]=nn[93]/gg;dd[93]=dd[93]/gg;
+nn[94]=nn[77]*dd[93]+nn[93]*dd[77];dd[94]=dd[77]*dd[93];gg=gcd(nn[94],dd[94]);nn[94]=nn[94]/gg;dd[94]=dd[94]/gg;
+nn[95]=nn[6]*nn[58];dd[95]=dd[6]*dd[58];gg=gcd(nn[95],dd[95]);nn[95]=nn[95]/gg;dd[95]=dd[95]/gg;
+nn[96]=nn[77]*dd[95]+nn[95]*dd[77];dd[96]=dd[77]*dd[95];gg=gcd(nn[96],dd[96]);nn[96]=nn[96]/gg;dd[96]=dd[96]/gg;
+nn[97]=nn[1]*nn[55];dd[97]=dd[1]*dd[55];gg=gcd(nn[97],dd[97]);nn[97]=nn[97]/gg;dd[97]=dd[97]/gg;
+nn[98]=nn[96]*dd[97]+nn[97]*dd[96];dd[98]=dd[96]*dd[97];gg=gcd(nn[98],dd[98]);nn[98]=nn[98]/gg;dd[98]=dd[98]/gg;
+nn[99]=nn[6]*nn[55];dd[99]=dd[6]*dd[55];gg=gcd(nn[99],dd[99]);nn[99]=nn[99]/gg;dd[99]=dd[99]/gg;
+nn[100]=nn[77]*dd[99]+nn[99]*dd[77];dd[100]=dd[77]*dd[99];gg=gcd(nn[100],dd[100]);nn[100]=nn[100]/gg;dd[100]=dd[100]/gg;
+nn[101]=nn[1]*nn[5];dd[101]=dd[1]*dd[5];gg=gcd(nn[101],dd[101]);nn[101]=nn[101]/gg;dd[101]=dd[101]/gg;
+nn[102]=nn[100]*dd[101]+nn[101]*dd[100];dd[102]=dd[100]*dd[101];gg=gcd(nn[102],dd[102]);nn[102]=nn[102]/gg;dd[102]=dd[102]/gg;
+nn[103]=nn[5]*nn[6];dd[103]=dd[5]*dd[6];gg=gcd(nn[103],dd[103]);nn[103]=nn[103]/gg;dd[103]=dd[103]/gg;
+nn[104]=nn[77]*dd[103]+nn[103]*dd[77];dd[104]=dd[77]*dd[103];gg=gcd(nn[104],dd[104]);nn[104]=nn[104]/gg;dd[104]=dd[104]/gg;
+nn[105]=nn[6]*nn[94];dd[105]=dd[6]*dd[94];gg=gcd(nn[105],dd[105]);nn[105]=nn[105]/gg;dd[105]=dd[105]/gg;
+nn[106]=nn[6]*nn[98];dd[106]=dd[6]*dd[98];gg=gcd(nn[106],dd[106]);nn[106]=nn[106]/gg;dd[106]=dd[106]/gg;
+nn[107]=nn[6]*nn[102];dd[107]=dd[6]*dd[102];gg=gcd(nn[107],dd[107]);nn[107]=nn[107]/gg;dd[107]=dd[107]/gg;
+nn[108]=nn[6]*nn[104];dd[108]=dd[6]*dd[104];gg=gcd(nn[108],dd[108]);nn[108]=nn[108]/gg;dd[108]=dd[108]/gg;
+nn[109]=nn[8]*dd[77]+nn[77]*dd[8];dd[109]=dd[8]*dd[77];gg=gcd(nn[109],dd[109]);nn[109]=nn[109]/gg;dd[109]=dd[109]/gg;
+nn[110]=nn[1]*nn[6];dd[110]=dd[1]*dd[6];gg=gcd(nn[110],dd[110]);nn[110]=nn[110]/gg;dd[110]=dd[110]/gg;
+nn[111]=nn[77]*dd[110]+nn[110]*dd[77];dd[111]=dd[77]*dd[110];gg=gcd(nn[111],dd[111]);nn[111]=nn[111]/gg;dd[111]=dd[111]/gg;
+nn[112]=nn[110]*dd[111]+nn[111]*dd[110];dd[112]=dd[110]*dd[111];gg=gcd(nn[112],dd[112]);nn[112]=nn[112]/gg;dd[112]=dd[112]/gg;
+nn[113]=nn[7]*dd[77]+nn[77]*dd[7];dd[113]=dd[7]*dd[77];gg=gcd(nn[113],dd[113]);nn[113]=nn[113]/gg;dd[113]=dd[113]/gg;
+nn[114]=nn[1]*nn[109];dd[114]=dd[1]*dd[109];gg=gcd(nn[114],dd[114]);nn[114]=nn[114]/gg;dd[114]=dd[114]/gg;
+nn[115]=nn[1]*nn[112];dd[115]=dd[1]*dd[112];gg=gcd(nn[115],dd[115]);nn[115]=nn[115]/gg;dd[115]=dd[115]/gg;
+nn[116]=nn[1]*nn[113];dd[116]=dd[1]*dd[113];gg=gcd(nn[116],dd[116]);nn[116]=nn[116]/gg;dd[116]=dd[116]/gg;
+nn[117]=nn[79]*dd[105]+nn[105]*dd[79];dd[117]=dd[79]*dd[105];gg=gcd(nn[117],dd[117]);nn[117]=nn[117]/gg;dd[117]=dd[117]/gg;
+nn[118]=nn[84]*dd[106]+nn[106]*dd[84];dd[118]=dd[84]*dd[106];gg=gcd(nn[118],dd[118]);nn[118]=nn[118]/gg;dd[118]=dd[118]/gg;
+nn[119]=nn[89]*dd[107]+nn[107]*dd[89];dd[119]=dd[89]*dd[107];gg=gcd(nn[119],dd[119]);nn[119]=nn[119]/gg;dd[119]=dd[119]/gg;
+nn[120]=nn[90]*dd[108]+nn[108]*dd[90];dd[120]=dd[90]*dd[108];gg=gcd(nn[120],dd[120]);nn[120]=nn[120]/gg;dd[120]=dd[120]/gg;
+nn[121]=nn[77]*dd[92]+nn[92]*dd[77];dd[121]=dd[77]*dd[92];gg=gcd(nn[121],dd[121]);nn[121]=nn[121]/gg;dd[121]=dd[121]/gg;
+nn[122]=nn[114]*dd[117]+nn[117]*dd[114];dd[122]=dd[114]*dd[117];gg=gcd(nn[122],dd[122]);nn[122]=nn[122]/gg;dd[122]=dd[122]/gg;
+nn[123]=nn[115]*dd[118]+nn[118]*dd[115];dd[123]=dd[115]*dd[118];gg=gcd(nn[123],dd[123]);nn[123]=nn[123]/gg;dd[123]=dd[123]/gg;
+nn[124]=nn[116]*dd[119]+nn[119]*dd[116];dd[124]=dd[116]*dd[119];gg=gcd(nn[124],dd[124]);nn[124]=nn[124]/gg;dd[124]=dd[124]/gg;
+nn[125]=nn[77]*dd[120]+nn[120]*dd[77];dd[125]=dd[77]*dd[120];gg=gcd(nn[125],dd[125]);nn[125]=nn[125]/gg;dd[125]=dd[125]/gg;
+nn[126]=nn[77]*dd[121]+nn[121]*dd[77];dd[126]=dd[77]*dd[121];gg=gcd(nn[126],dd[126]);nn[126]=nn[126]/gg;dd[126]=dd[126]/gg;
+nn[127]=nn[3]*dd[6]+nn[6]*dd[3];dd[127]=dd[3]*dd[6];gg=gcd(nn[127],dd[127]);nn[127]=nn[127]/gg;dd[127]=dd[127]/gg;
+nn[128]=nn[1]*nn[127];dd[128]=dd[1]*dd[127];gg=gcd(nn[128],dd[128]);nn[128]=nn[128]/gg;dd[128]=dd[128]/gg;
+nn[129]=nn[6]*nn[127];dd[129]=dd[6]*dd[127];gg=gcd(nn[129],dd[129]);nn[129]=nn[129]/gg;dd[129]=dd[129]/gg;
+nn[130]=nn[58]*dd[128]+nn[128]*dd[58];dd[130]=dd[58]*dd[128];gg=gcd(nn[130],dd[130]);nn[130]=nn[130]/gg;dd[130]=dd[130]/gg;
+nn[131]=nn[55]*dd[129]+nn[129]*dd[55];dd[131]=dd[55]*dd[129];gg=gcd(nn[131],dd[131]);nn[131]=nn[131]/gg;dd[131]=dd[131]/gg;
+nn[132]=nn[5]*dd[77]+nn[77]*dd[5];dd[132]=dd[5]*dd[77];gg=gcd(nn[132],dd[132]);nn[132]=nn[132]/gg;dd[132]=dd[132]/gg;
+nn[133]=nn[122]*nn[130];dd[133]=dd[122]*dd[130];gg=gcd(nn[133],dd[133]);nn[133]=nn[133]/gg;dd[133]=dd[133]/gg;
+nn[134]=nn[77]*dd[133]+nn[133]*dd[77];dd[134]=dd[77]*dd[133];gg=gcd(nn[134],dd[134]);nn[134]=nn[134]/gg;dd[134]=dd[134]/gg;
+nn[135]=nn[123]*nn[130];dd[135]=dd[123]*dd[130];gg=gcd(nn[135],dd[135]);nn[135]=nn[135]/gg;dd[135]=dd[135]/gg;
+nn[136]=nn[77]*dd[135]+nn[135]*dd[77];dd[136]=dd[77]*dd[135];gg=gcd(nn[136],dd[136]);nn[136]=nn[136]/gg;dd[136]=dd[136]/gg;
+nn[137]=nn[124]*nn[130];dd[137]=dd[124]*dd[130];gg=gcd(nn[137],dd[137]);nn[137]=nn[137]/gg;dd[137]=dd[137]/gg;
+nn[138]=nn[77]*dd[137]+nn[137]*dd[77];dd[138]=dd[77]*dd[137];gg=gcd(nn[138],dd[138]);nn[138]=nn[138]/gg;dd[138]=dd[138]/gg;
+nn[139]=nn[125]*nn[130];dd[139]=dd[125]*dd[130];gg=gcd(nn[139],dd[139]);nn[139]=nn[139]/gg;dd[139]=dd[139]/gg;
+nn[140]=nn[77]*dd[139]+nn[139]*dd[77];dd[140]=dd[77]*dd[139];gg=gcd(nn[140],dd[140]);nn[140]=nn[140]/gg;dd[140]=dd[140]/gg;
+nn[141]=nn[126]*nn[130];dd[141]=dd[126]*dd[130];gg=gcd(nn[141],dd[141]);nn[141]=nn[141]/gg;dd[141]=dd[141]/gg;
+nn[142]=nn[77]*dd[141]+nn[141]*dd[77];dd[142]=dd[77]*dd[141];gg=gcd(nn[142],dd[142]);nn[142]=nn[142]/gg;dd[142]=dd[142]/gg;
+nn[143]=nn[122]*nn[131];dd[143]=dd[122]*dd[131];gg=gcd(nn[143],dd[143]);nn[143]=nn[143]/gg;dd[143]=dd[143]/gg;
+nn[144]=nn[136]*dd[143]+nn[143]*dd[136];dd[144]=dd[136]*dd[143];gg=gcd(nn[144],dd[144]);nn[144]=nn[144]/gg;dd[144]=dd[144]/gg;
+nn[145]=nn[123]*nn[131];dd[145]=dd[123]*dd[131];gg=gcd(nn[145],dd[145]);nn[145]=nn[145]/gg;dd[145]=dd[145]/gg;
+nn[146]=nn[138]*dd[145]+nn[145]*dd[138];dd[146]=dd[138]*dd[145];gg=gcd(nn[146],dd[146]);nn[146]=nn[146]/gg;dd[146]=dd[146]/gg;
+nn[147]=nn[124]*nn[131];dd[147]=dd[124]*dd[131];gg=gcd(nn[147],dd[147]);nn[147]=nn[147]/gg;dd[147]=dd[147]/gg;
+nn[148]=nn[140]*dd[147]+nn[147]*dd[140];dd[148]=dd[140]*dd[147];gg=gcd(nn[148],dd[148]);nn[148]=nn[148]/gg;dd[148]=dd[148]/gg;
+nn[149]=nn[125]*nn[131];dd[149]=dd[125]*dd[131];gg=gcd(nn[149],dd[149]);nn[149]=nn[149]/gg;dd[149]=dd[149]/gg;
+nn[150]=nn[142]*dd[149]+nn[149]*dd[142];dd[150]=dd[142]*dd[149];gg=gcd(nn[150],dd[150]);nn[150]=nn[150]/gg;dd[150]=dd[150]/gg;
+nn[151]=nn[126]*nn[131];dd[151]=dd[126]*dd[131];gg=gcd(nn[151],dd[151]);nn[151]=nn[151]/gg;dd[151]=dd[151]/gg;
+nn[152]=nn[77]*dd[151]+nn[151]*dd[77];dd[152]=dd[77]*dd[151];gg=gcd(nn[152],dd[152]);nn[152]=nn[152]/gg;dd[152]=dd[152]/gg;
+nn[153]=nn[122]*nn[132];dd[153]=dd[122]*dd[132];gg=gcd(nn[153],dd[153]);nn[153]=nn[153]/gg;dd[153]=dd[153]/gg;
+nn[154]=nn[146]*dd[153]+nn[153]*dd[146];dd[154]=dd[146]*dd[153];gg=gcd(nn[154],dd[154]);nn[154]=nn[154]/gg;dd[154]=dd[154]/gg;
+nn[155]=nn[123]*nn[132];dd[155]=dd[123]*dd[132];gg=gcd(nn[155],dd[155]);nn[155]=nn[155]/gg;dd[155]=dd[155]/gg;
+nn[156]=nn[148]*dd[155]+nn[155]*dd[148];dd[156]=dd[148]*dd[155];gg=gcd(nn[156],dd[156]);nn[156]=nn[156]/gg;dd[156]=dd[156]/gg;
+nn[157]=nn[124]*nn[132];dd[157]=dd[124]*dd[132];gg=gcd(nn[157],dd[157]);nn[157]=nn[157]/gg;dd[157]=dd[157]/gg;
+nn[158]=nn[150]*dd[157]+nn[157]*dd[150];dd[158]=dd[150]*dd[157];gg=gcd(nn[158],dd[158]);nn[158]=nn[158]/gg;dd[158]=dd[158]/gg;
+nn[159]=nn[125]*nn[132];dd[159]=dd[125]*dd[132];gg=gcd(nn[159],dd[159]);nn[159]=nn[159]/gg;dd[159]=dd[159]/gg;
+nn[160]=nn[152]*dd[159]+nn[159]*dd[152];dd[160]=dd[152]*dd[159];gg=gcd(nn[160],dd[160]);nn[160]=nn[160]/gg;dd[160]=dd[160]/gg;
+nn[161]=nn[126]*nn[132];dd[161]=dd[126]*dd[132];gg=gcd(nn[161],dd[161]);nn[161]=nn[161]/gg;dd[161]=dd[161]/gg;
+nn[162]=nn[77]*dd[161]+nn[161]*dd[77];dd[162]=dd[77]*dd[161];gg=gcd(nn[162],dd[162]);nn[162]=nn[162]/gg;dd[162]=dd[162]/gg;
+nn[163]=nn[60]*nn[77];dd[163]=dd[60]*dd[77];gg=gcd(nn[163],dd[163]);nn[163]=nn[163]/gg;dd[163]=dd[163]/gg;
+nn[164]=nn[77]*dd[163]+nn[163]*dd[77];dd[164]=dd[77]*dd[163];gg=gcd(nn[164],dd[164]);nn[164]=nn[164]/gg;dd[164]=dd[164]/gg;
+nn[165]=nn[60]*nn[109];dd[165]=dd[60]*dd[109];gg=gcd(nn[165],dd[165]);nn[165]=nn[165]/gg;dd[165]=dd[165]/gg;
+nn[166]=nn[77]*dd[165]+nn[165]*dd[77];dd[166]=dd[77]*dd[165];gg=gcd(nn[166],dd[166]);nn[166]=nn[166]/gg;dd[166]=dd[166]/gg;
+nn[167]=nn[60]*nn[112];dd[167]=dd[60]*dd[112];gg=gcd(nn[167],dd[167]);nn[167]=nn[167]/gg;dd[167]=dd[167]/gg;
+nn[168]=nn[77]*dd[167]+nn[167]*dd[77];dd[168]=dd[77]*dd[167];gg=gcd(nn[168],dd[168]);nn[168]=nn[168]/gg;dd[168]=dd[168]/gg;
+nn[169]=nn[60]*nn[113];dd[169]=dd[60]*dd[113];gg=gcd(nn[169],dd[169]);nn[169]=nn[169]/gg;dd[169]=dd[169]/gg;
+nn[170]=nn[77]*dd[169]+nn[169]*dd[77];dd[170]=dd[77]*dd[169];gg=gcd(nn[170],dd[170]);nn[170]=nn[170]/gg;dd[170]=dd[170]/gg;
+nn[171]=nn[77]*nn[77];dd[171]=dd[77]*dd[77];gg=gcd(nn[171],dd[171]);nn[171]=nn[171]/gg;dd[171]=dd[171]/gg;
+nn[172]=nn[166]*dd[171]+nn[171]*dd[166];dd[172]=dd[166]*dd[171];gg=gcd(nn[172],dd[172]);nn[172]=nn[172]/gg;dd[172]=dd[172]/gg;
+nn[173]=nn[77]*nn[109];dd[173]=dd[77]*dd[109];gg=gcd(nn[173],dd[173]);nn[173]=nn[173]/gg;dd[173]=dd[173]/gg;
+nn[174]=nn[168]*dd[173]+nn[173]*dd[168];dd[174]=dd[168]*dd[173];gg=gcd(nn[174],dd[174]);nn[174]=nn[174]/gg;dd[174]=dd[174]/gg;
+nn[175]=nn[77]*nn[112];dd[175]=dd[77]*dd[112];gg=gcd(nn[175],dd[175]);nn[175]=nn[175]/gg;dd[175]=dd[175]/gg;
+nn[176]=nn[170]*dd[175]+nn[175]*dd[170];dd[176]=dd[170]*dd[175];gg=gcd(nn[176],dd[176]);nn[176]=nn[176]/gg;dd[176]=dd[176]/gg;
+nn[177]=nn[77]*nn[113];dd[177]=dd[77]*dd[113];gg=gcd(nn[177],dd[177]);nn[177]=nn[177]/gg;dd[177]=dd[177]/gg;
+nn[178]=nn[77]*dd[177]+nn[177]*dd[77];dd[178]=dd[77]*dd[177];gg=gcd(nn[178],dd[178]);nn[178]=nn[178]/gg;dd[178]=dd[178]/gg;
+nn[179]=nn[77]*nn[132];dd[179]=dd[77]*dd[132];gg=gcd(nn[179],dd[179]);nn[179]=nn[179]/gg;dd[179]=dd[179]/gg;
+nn[180]=nn[174]*dd[179]+nn[179]*dd[174];dd[180]=dd[174]*dd[179];gg=gcd(nn[180],dd[180]);nn[180]=nn[180]/gg;dd[180]=dd[180]/gg;
+nn[181]=nn[109]*nn[132];dd[181]=dd[109]*dd[132];gg=gcd(nn[181],dd[181]);nn[181]=nn[181]/gg;dd[181]=dd[181]/gg;
+nn[182]=nn[176]*dd[181]+nn[181]*dd[176];dd[182]=dd[176]*dd[181];gg=gcd(nn[182],dd[182]);nn[182]=nn[182]/gg;dd[182]=dd[182]/gg;
+nn[183]=nn[112]*nn[132];dd[183]=dd[112]*dd[132];gg=gcd(nn[183],dd[183]);nn[183]=nn[183]/gg;dd[183]=dd[183]/gg;
+nn[184]=nn[178]*dd[183]+nn[183]*dd[178];dd[184]=dd[178]*dd[183];gg=gcd(nn[184],dd[184]);nn[184]=nn[184]/gg;dd[184]=dd[184]/gg;
+nn[185]=nn[113]*nn[132];dd[185]=dd[113]*dd[132];gg=gcd(nn[185],dd[185]);nn[185]=nn[185]/gg;dd[185]=dd[185]/gg;
+nn[186]=nn[77]*dd[185]+nn[185]*dd[77];dd[186]=dd[77]*dd[185];gg=gcd(nn[186],dd[186]);nn[186]=nn[186]/gg;dd[186]=dd[186]/gg;
+nn[187]=nn[77]*dd[114]+nn[114]*dd[77];dd[187]=dd[77]*dd[114];gg=gcd(nn[187],dd[187]);nn[187]=nn[187]/gg;dd[187]=dd[187]/gg;
+nn[188]=nn[6]*nn[109];dd[188]=dd[6]*dd[109];gg=gcd(nn[188],dd[188]);nn[188]=nn[188]/gg;dd[188]=dd[188]/gg;
+nn[189]=nn[77]*dd[188]+nn[188]*dd[77];dd[189]=dd[77]*dd[188];gg=gcd(nn[189],dd[189]);nn[189]=nn[189]/gg;dd[189]=dd[189]/gg;
+nn[190]=nn[115]*dd[189]+nn[189]*dd[115];dd[190]=dd[115]*dd[189];gg=gcd(nn[190],dd[190]);nn[190]=nn[190]/gg;dd[190]=dd[190]/gg;
+nn[191]=nn[6]*nn[112];dd[191]=dd[6]*dd[112];gg=gcd(nn[191],dd[191]);nn[191]=nn[191]/gg;dd[191]=dd[191]/gg;
+nn[192]=nn[77]*dd[191]+nn[191]*dd[77];dd[192]=dd[77]*dd[191];gg=gcd(nn[192],dd[192]);nn[192]=nn[192]/gg;dd[192]=dd[192]/gg;
+nn[193]=nn[116]*dd[192]+nn[192]*dd[116];dd[193]=dd[116]*dd[192];gg=gcd(nn[193],dd[193]);nn[193]=nn[193]/gg;dd[193]=dd[193]/gg;
+nn[194]=nn[6]*nn[113];dd[194]=dd[6]*dd[113];gg=gcd(nn[194],dd[194]);nn[194]=nn[194]/gg;dd[194]=dd[194]/gg;
+nn[195]=nn[77]*dd[194]+nn[194]*dd[77];dd[195]=dd[77]*dd[194];gg=gcd(nn[195],dd[195]);nn[195]=nn[195]/gg;dd[195]=dd[195]/gg;
+nn[196]=nn[1]*nn[187];dd[196]=dd[1]*dd[187];gg=gcd(nn[196],dd[196]);nn[196]=nn[196]/gg;dd[196]=dd[196]/gg;
+nn[197]=nn[1]*nn[190];dd[197]=dd[1]*dd[190];gg=gcd(nn[197],dd[197]);nn[197]=nn[197]/gg;dd[197]=dd[197]/gg;
+nn[198]=nn[1]*nn[193];dd[198]=dd[1]*dd[193];gg=gcd(nn[198],dd[198]);nn[198]=nn[198]/gg;dd[198]=dd[198]/gg;
+nn[199]=nn[1]*nn[195];dd[199]=dd[1]*dd[195];gg=gcd(nn[199],dd[199]);nn[199]=nn[199]/gg;dd[199]=dd[199]/gg;
+nn[200]=nn[134]*dd[164]+nn[164]*dd[134];dd[200]=dd[134]*dd[164];gg=gcd(nn[200],dd[200]);nn[200]=nn[200]/gg;dd[200]=dd[200]/gg;
+nn[201]=nn[144]*dd[172]+nn[172]*dd[144];dd[201]=dd[144]*dd[172];gg=gcd(nn[201],dd[201]);nn[201]=nn[201]/gg;dd[201]=dd[201]/gg;
+nn[202]=nn[154]*dd[180]+nn[180]*dd[154];dd[202]=dd[154]*dd[180];gg=gcd(nn[202],dd[202]);nn[202]=nn[202]/gg;dd[202]=dd[202]/gg;
+nn[203]=nn[156]*dd[182]+nn[182]*dd[156];dd[203]=dd[156]*dd[182];gg=gcd(nn[203],dd[203]);nn[203]=nn[203]/gg;dd[203]=dd[203]/gg;
+nn[204]=nn[158]*dd[184]+nn[184]*dd[158];dd[204]=dd[158]*dd[184];gg=gcd(nn[204],dd[204]);nn[204]=nn[204]/gg;dd[204]=dd[204]/gg;
+nn[205]=nn[160]*dd[186]+nn[186]*dd[160];dd[205]=dd[160]*dd[186];gg=gcd(nn[205],dd[205]);nn[205]=nn[205]/gg;dd[205]=dd[205]/gg;
+nn[206]=nn[77]*dd[162]+nn[162]*dd[77];dd[206]=dd[77]*dd[162];gg=gcd(nn[206],dd[206]);nn[206]=nn[206]/gg;dd[206]=dd[206]/gg;
+nn[207]=nn[196]*dd[200]+nn[200]*dd[196];dd[207]=dd[196]*dd[200];gg=gcd(nn[207],dd[207]);nn[207]=nn[207]/gg;dd[207]=dd[207]/gg;
+nn[208]=nn[197]*dd[201]+nn[201]*dd[197];dd[208]=dd[197]*dd[201];gg=gcd(nn[208],dd[208]);nn[208]=nn[208]/gg;dd[208]=dd[208]/gg;
+nn[209]=nn[198]*dd[202]+nn[202]*dd[198];dd[209]=dd[198]*dd[202];gg=gcd(nn[209],dd[209]);nn[209]=nn[209]/gg;dd[209]=dd[209]/gg;
+nn[210]=nn[199]*dd[203]+nn[203]*dd[199];dd[210]=dd[199]*dd[203];gg=gcd(nn[210],dd[210]);nn[210]=nn[210]/gg;dd[210]=dd[210]/gg;
+nn[211]=nn[77]*dd[204]+nn[204]*dd[77];dd[211]=dd[77]*dd[204];gg=gcd(nn[211],dd[211]);nn[211]=nn[211]/gg;dd[211]=dd[211]/gg;
+nn[212]=nn[77]*dd[205]+nn[205]*dd[77];dd[212]=dd[77]*dd[205];gg=gcd(nn[212],dd[212]);nn[212]=nn[212]/gg;dd[212]=dd[212]/gg;
+nn[213]=nn[77]*dd[206]+nn[206]*dd[77];dd[213]=dd[77]*dd[206];gg=gcd(nn[213],dd[213]);nn[213]=nn[213]/gg;dd[213]=dd[213]/gg;
+nn[214]=nn[63]*nn[213];dd[214]=dd[63]*dd[213];gg=gcd(nn[214],dd[214]);nn[214]=nn[214]/gg;dd[214]=dd[214]/gg;
+nn[215]=nn[210]*dd[214]+nn[214]*dd[210];dd[215]=dd[210]*dd[214];gg=gcd(nn[215],dd[215]);nn[215]=nn[215]/gg;dd[215]=dd[215]/gg;
+nn[216]=nn[60]*nn[213];dd[216]=dd[60]*dd[213];gg=gcd(nn[216],dd[216]);nn[216]=nn[216]/gg;dd[216]=dd[216]/gg;
+nn[217]=nn[211]*dd[216]+nn[216]*dd[211];dd[217]=dd[211]*dd[216];gg=gcd(nn[217],dd[217]);nn[217]=nn[217]/gg;dd[217]=dd[217]/gg;
+nn[218]=nn[57]*nn[213];dd[218]=dd[57]*dd[213];gg=gcd(nn[218],dd[218]);nn[218]=nn[218]/gg;dd[218]=dd[218]/gg;
+nn[219]=nn[212]*dd[218]+nn[218]*dd[212];dd[219]=dd[212]*dd[218];gg=gcd(nn[219],dd[219]);nn[219]=nn[219]/gg;dd[219]=dd[219]/gg;
+nn[220]=nn[5]*nn[213];dd[220]=dd[5]*dd[213];gg=gcd(nn[220],dd[220]);nn[220]=nn[220]/gg;dd[220]=dd[220]/gg;
+nn[221]=nn[213]*dd[220]+nn[220]*dd[213];dd[221]=dd[213]*dd[220];gg=gcd(nn[221],dd[221]);nn[221]=nn[221]/gg;dd[221]=dd[221]/gg;
+nn[222]=nn[63]*nn[219];dd[222]=dd[63]*dd[219];gg=gcd(nn[222],dd[222]);nn[222]=nn[222]/gg;dd[222]=dd[222]/gg;
+nn[223]=nn[209]*dd[222]+nn[222]*dd[209];dd[223]=dd[209]*dd[222];gg=gcd(nn[223],dd[223]);nn[223]=nn[223]/gg;dd[223]=dd[223]/gg;
+nn[224]=nn[60]*nn[219];dd[224]=dd[60]*dd[219];gg=gcd(nn[224],dd[224]);nn[224]=nn[224]/gg;dd[224]=dd[224]/gg;
+nn[225]=nn[215]*dd[224]+nn[224]*dd[215];dd[225]=dd[215]*dd[224];gg=gcd(nn[225],dd[225]);nn[225]=nn[225]/gg;dd[225]=dd[225]/gg;
+nn[226]=nn[57]*nn[219];dd[226]=dd[57]*dd[219];gg=gcd(nn[226],dd[226]);nn[226]=nn[226]/gg;dd[226]=dd[226]/gg;
+nn[227]=nn[217]*dd[226]+nn[226]*dd[217];dd[227]=dd[217]*dd[226];gg=gcd(nn[227],dd[227]);nn[227]=nn[227]/gg;dd[227]=dd[227]/gg;
+nn[228]=nn[5]*nn[219];dd[228]=dd[5]*dd[219];gg=gcd(nn[228],dd[228]);nn[228]=nn[228]/gg;dd[228]=dd[228]/gg;
+nn[229]=nn[219]*dd[228]+nn[228]*dd[219];dd[229]=dd[219]*dd[228];gg=gcd(nn[229],dd[229]);nn[229]=nn[229]/gg;dd[229]=dd[229]/gg;
+nn[230]=nn[63]*nn[227];dd[230]=dd[63]*dd[227];gg=gcd(nn[230],dd[230]);nn[230]=nn[230]/gg;dd[230]=dd[230]/gg;
+nn[231]=nn[208]*dd[230]+nn[230]*dd[208];dd[231]=dd[208]*dd[230];gg=gcd(nn[231],dd[231]);nn[231]=nn[231]/gg;dd[231]=dd[231]/gg;
+nn[232]=nn[60]*nn[227];dd[232]=dd[60]*dd[227];gg=gcd(nn[232],dd[232]);nn[232]=nn[232]/gg;dd[232]=dd[232]/gg;
+nn[233]=nn[223]*dd[232]+nn[232]*dd[223];dd[233]=dd[223]*dd[232];gg=gcd(nn[233],dd[233]);nn[233]=nn[233]/gg;dd[233]=dd[233]/gg;
+nn[234]=nn[57]*nn[227];dd[234]=dd[57]*dd[227];gg=gcd(nn[234],dd[234]);nn[234]=nn[234]/gg;dd[234]=dd[234]/gg;
+nn[235]=nn[225]*dd[234]+nn[234]*dd[225];dd[235]=dd[225]*dd[234];gg=gcd(nn[235],dd[235]);nn[235]=nn[235]/gg;dd[235]=dd[235]/gg;
+nn[236]=nn[5]*nn[227];dd[236]=dd[5]*dd[227];gg=gcd(nn[236],dd[236]);nn[236]=nn[236]/gg;dd[236]=dd[236]/gg;
+nn[237]=nn[227]*dd[236]+nn[236]*dd[227];dd[237]=dd[227]*dd[236];gg=gcd(nn[237],dd[237]);nn[237]=nn[237]/gg;dd[237]=dd[237]/gg;
+nn[238]=nn[63]*nn[235];dd[238]=dd[63]*dd[235];gg=gcd(nn[238],dd[238]);nn[238]=nn[238]/gg;dd[238]=dd[238]/gg;
+nn[239]=nn[207]*dd[238]+nn[238]*dd[207];dd[239]=dd[207]*dd[238];gg=gcd(nn[239],dd[239]);nn[239]=nn[239]/gg;dd[239]=dd[239]/gg;
+nn[240]=nn[60]*nn[235];dd[240]=dd[60]*dd[235];gg=gcd(nn[240],dd[240]);nn[240]=nn[240]/gg;dd[240]=dd[240]/gg;
+nn[241]=nn[231]*dd[240]+nn[240]*dd[231];dd[241]=dd[231]*dd[240];gg=gcd(nn[241],dd[241]);nn[241]=nn[241]/gg;dd[241]=dd[241]/gg;
+nn[242]=nn[57]*nn[235];dd[242]=dd[57]*dd[235];gg=gcd(nn[242],dd[242]);nn[242]=nn[242]/gg;dd[242]=dd[242]/gg;
+nn[243]=nn[233]*dd[242]+nn[242]*dd[233];dd[243]=dd[233]*dd[242];gg=gcd(nn[243],dd[243]);nn[243]=nn[243]/gg;dd[243]=dd[243]/gg;
+nn[244]=nn[5]*nn[235];dd[244]=dd[5]*dd[235];gg=gcd(nn[244],dd[244]);nn[244]=nn[244]/gg;dd[244]=dd[244]/gg;
+nn[245]=nn[235]*dd[244]+nn[244]*dd[235];dd[245]=dd[235]*dd[244];gg=gcd(nn[245],dd[245]);nn[245]=nn[245]/gg;dd[245]=dd[245]/gg;
+poly nuEquation=(b4c2+b4+b3c6+b3c5+b3c2+b3c)*n+(c3+c2+c+1)*l14+(c4+1)*l13+(bc3+bc+c5+c4+c+1)*l12+(c6+c4+c2+1)*l11+(b2c3+b2c2+bc5+bc+c7+c6+c5+c4+c3+c2+c+1)*l10+(b2c4+b2c2+c8+1)*l9+(b3c3+bc7+bc5+bc3+bc+c9+c8+c+1)*l8+(c10+c8+c2+1)*l7+(b4c3+b4c2+b4c+b4+b3c3+b3c+b2c7+b2c6+b2c3+b2c2+bc9+bc)*l6+(b4c4+b4+b3c4+b3c3+b3c2+b3c+b2c8+b2c6+b2c4+b2c2)*l5+(b5c3+b5c+b4c5+b4c4+b4c3+b4c2+b4c+b4+b3c7+b3c5+b3c3+b3c)*l4+(b4c6+b4c4+b4c2+b4+b3c6+b3c5+b3c2+b3c)*l3+(b6c3+b6c2+b5c5+b5c3+b5c+b4c5+b4c4+b4c+b4+b3c7+b3c5+b3c3+b3c)*l2+(b6c4+b6c2+b5c4+b5c3+b5c+b5+b4c5+b4c4+b4c+b4+b3c8+b3c7+b3c6+b3c5+b3c4+b3c3+b3c2+b3c)*l+(b7c3+b6c3+b6c2+b6c+b6+b4c7+b4c6+b4c5+b4c4+b4c3+b4c2+b4c+b4+b3c9+b3c);
+poly nuCoefficient=diff(nuEquation,n);
+if(nuCoefficient!=(1+c)^2*b^3*(b+c*(1+c)^3)){ERROR("nu coefficient mismatch");}
+ideal original=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal registered=nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75];
+// In the original binary polynomial source ring, before changing rings.
+list encoded44;intvec bounds44=0,0,0,0;int encI44;int encJ44;int encV44;poly encP44;list terms44;intvec ex44;
+for(encI44=1;encI44<=13;encI44++){
+ if(encI44<=5){encP44=original[encI44];}else{encP44=registered[encI44-5];}
+ terms44=list();poly rebuilt44=0;
+ for(encJ44=1;encJ44<=size(encP44);encJ44++){
+  if(leadcoef(encP44[encJ44])!=1){ERROR("ENC44_NONBINARY");}
+  ex44=leadexp(encP44[encJ44]);terms44[encJ44]=ex44;
+  rebuilt44=rebuilt44+n^ex44[1]*l^ex44[2]*b^ex44[3]*c^ex44[4];
+  for(encV44=1;encV44<=4;encV44++){if(ex44[encV44]>bounds44[encV44]){bounds44[encV44]=ex44[encV44];}}
+ }
+ if(rebuilt44!=encP44){ERROR("ENC44_SOURCE_RECONSTRUCTION");}encoded44[encI44]=terms44;
+}
+
+
+ring pairedImage0=(2,beta),(T,Z,X),lp;
+minpoly=(beta^436+beta^434+beta^431+beta^429+beta^427+beta^426+beta^425+beta^424+beta^419+beta^418+beta^417+beta^415+beta^414+beta^411+beta^409+beta^405+beta^404+beta^402+beta^401+beta^400+beta^399+beta^396+beta^395+beta^394+beta^393+beta^392+beta^391+beta^390+beta^389+beta^386+beta^385+beta^384+beta^383+beta^379+beta^378+beta^374+beta^373+beta^371+beta^370+beta^368+beta^367+beta^366+beta^363+beta^361+beta^360+beta^358+beta^351+beta^350+beta^346+beta^341+beta^340+beta^339+beta^336+beta^335+beta^332+beta^330+beta^328+beta^327+beta^326+beta^324+beta^321+beta^320+beta^319+beta^317+beta^315+beta^314+beta^313+beta^311+beta^308+beta^305+beta^303+beta^302+beta^301+beta^298+beta^296+beta^294+beta^283+beta^282+beta^281+beta^278+beta^277+beta^275+beta^273+beta^272+beta^271+beta^270+beta^266+beta^265+beta^264+beta^260+beta^259+beta^255+beta^254+beta^252+beta^250+beta^249+beta^247+beta^246+beta^245+beta^243+beta^242+beta^240+beta^239+beta^238+beta^236+beta^232+beta^231+beta^228+beta^227+beta^226+beta^225+beta^224+beta^220+beta^219+beta^217+beta^214+beta^213+beta^211+beta^209+beta^206+beta^201+beta^199+beta^198+beta^197+beta^196+beta^195+beta^192+beta^188+beta^187+beta^186+beta^183+beta^182+beta^181+beta^178+beta^177+beta^176+beta^174+beta^172+beta^170+beta^163+beta^161+beta^159+beta^156+beta^154+beta^148+beta^145+beta^144+beta^143+beta^141+beta^138+beta^135+beta^133+beta^131+beta^129+beta^127+beta^126+beta^125+beta^124+beta^123+beta^121+beta^120+beta^119+beta^117+beta^114+beta^113+beta^112+beta^111+beta^110+beta^107+beta^105+beta^104+beta^102+beta^101+beta^100+beta^99+beta^97+beta^93+beta^91+beta^88+beta^86+beta^82+beta^78+beta^77+beta^76+beta^75+beta^73+beta^68+beta^67+beta^66+beta^65+beta^61+beta^59+beta^57+beta^55+beta^54+beta^53+beta^49+beta^44+beta^42+beta^41+beta^37+beta^36+beta^35+beta^34+beta^25+beta^23+beta^22+beta^21+beta^19+beta^14+beta^12+beta^5+1);
+number firstX=(beta);
+number firstY=(beta^435+beta^434+beta^433+beta^432+beta^431+beta^429+beta^428+beta^427+beta^425+beta^421+beta^415+beta^410+beta^407+beta^406+beta^404+beta^400+beta^399+beta^397+beta^395+beta^394+beta^392+beta^391+beta^390+beta^389+beta^387+beta^385+beta^384+beta^383+beta^382+beta^379+beta^378+beta^375+beta^374+beta^369+beta^367+beta^365+beta^364+beta^362+beta^361+beta^360+beta^359+beta^356+beta^355+beta^353+beta^351+beta^350+beta^349+beta^348+beta^347+beta^346+beta^345+beta^343+beta^341+beta^338+beta^337+beta^334+beta^332+beta^331+beta^330+beta^328+beta^321+beta^319+beta^317+beta^315+beta^314+beta^311+beta^309+beta^307+beta^303+beta^302+beta^301+beta^300+beta^299+beta^296+beta^294+beta^293+beta^290+beta^289+beta^285+beta^284+beta^273+beta^272+beta^270+beta^269+beta^268+beta^264+beta^261+beta^258+beta^257+beta^256+beta^255+beta^253+beta^252+beta^248+beta^247+beta^245+beta^244+beta^242+beta^241+beta^240+beta^236+beta^235+beta^234+beta^231+beta^230+beta^229+beta^228+beta^227+beta^225+beta^224+beta^221+beta^219+beta^216+beta^215+beta^210+beta^209+beta^208+beta^207+beta^204+beta^202+beta^201+beta^200+beta^199+beta^198+beta^195+beta^193+beta^190+beta^187+beta^186+beta^182+beta^181+beta^180+beta^179+beta^178+beta^177+beta^172+beta^170+beta^164+beta^163+beta^161+beta^159+beta^156+beta^154+beta^153+beta^151+beta^149+beta^148+beta^147+beta^146+beta^145+beta^144+beta^140+beta^139+beta^138+beta^137+beta^130+beta^129+beta^128+beta^127+beta^126+beta^124+beta^122+beta^115+beta^111+beta^108+beta^106+beta^105+beta^104+beta^102+beta^101+beta^100+beta^99+beta^97+beta^96+beta^92+beta^91+beta^89+beta^86+beta^84+beta^79+beta^78+beta^74+beta^73+beta^72+beta^67+beta^66+beta^65+beta^64+beta^62+beta^61+beta^59+beta^58+beta^56+beta^51+beta^48+beta^46+beta^44+beta^43+beta^42+beta^41+beta^39+beta^37+beta^35+beta^34+beta^29+beta^27+beta^26+beta^25+beta^23+beta^17+beta^13+beta^10+beta^9+beta^7+beta^3);
+number secondX=(beta^433+beta^427+beta^422+beta^420+beta^418+beta^417+beta^414+beta^409+beta^407+beta^406+beta^404+beta^402+beta^401+beta^399+beta^398+beta^396+beta^395+beta^394+beta^393+beta^391+beta^389+beta^387+beta^386+beta^385+beta^384+beta^378+beta^375+beta^374+beta^373+beta^372+beta^369+beta^368+beta^366+beta^365+beta^363+beta^362+beta^359+beta^358+beta^355+beta^354+beta^352+beta^350+beta^348+beta^347+beta^345+beta^341+beta^338+beta^336+beta^327+beta^318+beta^316+beta^315+beta^314+beta^312+beta^308+beta^307+beta^306+beta^302+beta^299+beta^298+beta^296+beta^294+beta^293+beta^290+beta^289+beta^288+beta^287+beta^284+beta^281+beta^279+beta^278+beta^275+beta^271+beta^270+beta^268+beta^266+beta^264+beta^262+beta^261+beta^257+beta^256+beta^255+beta^253+beta^250+beta^248+beta^246+beta^245+beta^243+beta^235+beta^234+beta^233+beta^232+beta^230+beta^229+beta^226+beta^225+beta^221+beta^220+beta^219+beta^218+beta^217+beta^215+beta^213+beta^209+beta^203+beta^199+beta^198+beta^197+beta^196+beta^194+beta^193+beta^191+beta^188+beta^187+beta^185+beta^184+beta^183+beta^181+beta^180+beta^178+beta^177+beta^176+beta^174+beta^173+beta^172+beta^171+beta^169+beta^168+beta^165+beta^164+beta^163+beta^162+beta^161+beta^160+beta^158+beta^157+beta^156+beta^154+beta^151+beta^150+beta^148+beta^145+beta^144+beta^143+beta^141+beta^139+beta^136+beta^134+beta^129+beta^127+beta^126+beta^125+beta^120+beta^119+beta^117+beta^115+beta^112+beta^111+beta^110+beta^105+beta^102+beta^101+beta^99+beta^96+beta^93+beta^92+beta^91+beta^86+beta^85+beta^84+beta^83+beta^80+beta^77+beta^76+beta^74+beta^71+beta^70+beta^68+beta^63+beta^62+beta^61+beta^60+beta^58+beta^57+beta^55+beta^52+beta^46+beta^45+beta^44+beta^41+beta^40+beta^39+beta^38+beta^37+beta^36+beta^35+beta^34+beta^33+beta^32+beta^29+beta^28+beta^26+beta^24+beta^22+beta^21+beta^20+beta^18+beta^17+beta^16+beta^14+beta^12+beta^11+beta^10+beta^8+beta^6+beta^2+beta+1);
+number secondY=(beta^435+beta^434+beta^429+beta^428+beta^427+beta^425+beta^423+beta^422+beta^421+beta^419+beta^417+beta^416+beta^415+beta^414+beta^413+beta^412+beta^409+beta^407+beta^404+beta^403+beta^402+beta^398+beta^396+beta^395+beta^394+beta^393+beta^391+beta^390+beta^389+beta^385+beta^384+beta^382+beta^381+beta^377+beta^375+beta^373+beta^371+beta^370+beta^368+beta^367+beta^366+beta^365+beta^364+beta^362+beta^361+beta^359+beta^358+beta^357+beta^356+beta^354+beta^353+beta^351+beta^349+beta^348+beta^345+beta^343+beta^342+beta^341+beta^338+beta^337+beta^336+beta^334+beta^331+beta^330+beta^329+beta^328+beta^325+beta^324+beta^322+beta^320+beta^319+beta^318+beta^316+beta^311+beta^307+beta^304+beta^303+beta^300+beta^298+beta^296+beta^295+beta^294+beta^292+beta^291+beta^289+beta^287+beta^286+beta^285+beta^283+beta^277+beta^272+beta^269+beta^268+beta^265+beta^263+beta^261+beta^259+beta^256+beta^253+beta^251+beta^250+beta^249+beta^248+beta^245+beta^244+beta^243+beta^241+beta^238+beta^237+beta^236+beta^235+beta^230+beta^229+beta^227+beta^224+beta^222+beta^221+beta^220+beta^219+beta^217+beta^214+beta^213+beta^212+beta^209+beta^207+beta^206+beta^205+beta^204+beta^202+beta^201+beta^198+beta^197+beta^196+beta^193+beta^191+beta^190+beta^189+beta^187+beta^186+beta^182+beta^180+beta^179+beta^177+beta^173+beta^172+beta^170+beta^162+beta^159+beta^158+beta^157+beta^156+beta^155+beta^153+beta^151+beta^150+beta^149+beta^148+beta^147+beta^146+beta^145+beta^143+beta^141+beta^140+beta^139+beta^137+beta^136+beta^134+beta^132+beta^130+beta^128+beta^127+beta^126+beta^124+beta^122+beta^121+beta^119+beta^118+beta^117+beta^116+beta^114+beta^113+beta^112+beta^111+beta^110+beta^109+beta^108+beta^104+beta^103+beta^101+beta^100+beta^99+beta^96+beta^95+beta^90+beta^88+beta^87+beta^84+beta^81+beta^80+beta^79+beta^76+beta^75+beta^73+beta^72+beta^67+beta^65+beta^63+beta^62+beta^55+beta^45+beta^44+beta^43+beta^41+beta^39+beta^38+beta^37+beta^34+beta^32+beta^31+beta^30+beta^28+beta^26+beta^21+beta^20+beta^19+beta^18+beta^16+beta^14+beta^13+beta^12+beta^11+beta^10+beta^8+beta^7+beta^5+beta^2+beta);
+int sourceResidueDegree=436;
+int secondImageDegree=436;
+
+int sourceDegree30=436;
+
+// Actual selected pair in coefficient field F_(2^sourceDegree30), variables X,Z.
+proc checkPoint30(number xx,number yy){
+ if(yy^2+xx*yy+xx^3+xx^2+1!=0){ERROR("actual selected point off E49");}
+}
+proc triple30(number xx,number yy){
+ checkPoint30(xx,yy);
+ number eta30=(xx^2+xx+1)*yy+xx+1;
+ if(eta30==0){ERROR("actual pair meets exceptional eta denominator");}
+ number t30=xx^4/eta30;number a30=(t30^2+t30+1)^4;number b30=(eta30^2+eta30+1)^4;
+ if(a30/t30!=b30/eta30^7){ERROR("source actual7 triple identity failed");}
+ return(list(a30/t30^7,a30/t30,b30/eta30));
+}
+proc linearRoots30(poly ff){
+ list factors30=factorize(ff);poly product30=1;list roots30;int ii30;
+ for(ii30=1;ii30<=size(factors30[1]);ii30++){
+  poly factor30=factors30[1][ii30];product30=product30*factor30^factors30[2][ii30];
+  if(deg(factor30)==1){roots30[size(roots30)+1]=number(subst(factor30,X,0)/leadcoef(factor30));}
+ }
+ if(product30!=ff){ERROR("common polynomial factor product mismatch");}
+ return(roots30);
+}
+proc common30(number jj,number kk){return(linearRoots30(gcd(phi30(jj),phi30(kk))));}
+proc parameters30(number jj,number kk){return(linearRoots30(gcd(X^8+X^4+1+jj*X^7,X^8+X^4+1+kk*X)));}
+proc inverse30(poly aa30,poly pp30){
+ ideal generators30=pp30,aa30;
+ if(std(generators30)[1]!=1){ERROR("nonunit kernelLocal44 denominator");return(poly(0));}
+ matrix witness30=lift(generators30,ideal(1));poly answer30=reduce(witness30[2,1],std(ideal(pp30)));
+ if(reduce(aa30*answer30+1,std(ideal(pp30)))!=0){ERROR("kernelLocal44 inverse witness failed");}
+ return(answer30);
+}
+proc division30(number bb30,int ell30){
+ list dd30;dd30[1]=poly(1);dd30[2]=X;dd30[3]=X^4+X^3+bb30;dd30[4]=X^6+bb30*X^2;
+ int jj30;int mm30;
+ for(jj30=5;jj30<=ell30;jj30++){
+  mm30=jj30 div 2;
+  if(jj30%2==1){dd30[jj30]=dd30[mm30+2]*dd30[mm30]^3+dd30[mm30-1]*dd30[mm30+1]^3;}
+  else{dd30[jj30]=(dd30[mm30]*(dd30[mm30+2]*dd30[mm30-1]^2+dd30[mm30-2]*dd30[mm30+1]^2))/X;}
+ }
+ return(poly(dd30[ell30]));
+}
+proc quotientB30(number bb30,poly gg30){
+ int ss30=deg(gg30);poly cc30=jet(gg30,ss30-1)-jet(gg30,ss30-2);
+ number coefficient30=number(cc30/X^(ss30-1));return(bb30+coefficient30+coefficient30^2);
+}
+proc kernels30(number bb30,int ell30){
+ poly dp30=division30(bb30,ell30);int ss30=(ell30-1) div 2;
+ if(deg(dp30)!=(ell30*ell30-1) div 2 || gcd(dp30,diff(dp30,X))!=1){ERROR("division polynomial degree or separability failed");}
+ list factors30=factorize(dp30);poly product30=1;list candidates30;int ii30;int jj30;
+ for(ii30=1;ii30<=size(factors30[1]);ii30++){
+  poly ff30=factors30[1][ii30];product30=product30*ff30^factors30[2][ii30];
+  if(deg(ff30)==ss30){candidates30[size(candidates30)+1]=ff30/leadcoef(ff30);}
+  if(deg(ff30)==1){
+   number root30=number(subst(ff30,X,0)/leadcoef(ff30));number start30=root30;poly kernel30=1;
+   for(jj30=0;jj30<ss30;jj30++){if(root30==0){ERROR("zero odd-torsion abscissa");}kernel30=kernel30*(X+root30);root30=root30^2+bb30/root30^2;}
+   if(root30==start30){candidates30[size(candidates30)+1]=kernel30;}
+  }
+ }
+ if(product30!=dp30){ERROR("division factor product failed");}
+ list answer30;int duplicate30;
+ for(ii30=1;ii30<=size(candidates30);ii30++){
+  poly gg30=candidates30[ii30];ideal ig30=std(ideal(gg30));
+  if(reduce(dp30,ig30)==0){
+   poly doubling30=reduce(X^2+bb30*inverse30(X^2,gg30),ig30);
+   if(reduce(subst(gg30,X,doubling30),ig30)==0){
+    duplicate30=0;for(jj30=1;jj30<=size(answer30);jj30++){if(answer30[jj30]==gg30){duplicate30=1;}}
+    if(duplicate30==0){answer30[size(answer30)+1]=gg30;}
+   }
+  }
+ }
+ print("COLOR30_RATIONAL_KERNEL_COUNT ell="+string(ell30)+" count="+string(size(answer30)));
+ return(answer30);
+}
+proc choose30(number bb30,list kernels30,number targetJ30){
+ poly found30;int count30;int ii30;
+ for(ii30=1;ii30<=size(kernels30);ii30++){if(quotientB30(bb30,kernels30[ii30])==1/targetJ30){found30=kernels30[ii30];count30++;}}
+ if(count30!=1){ERROR("requested cyclic kernelLocal44 not uniquely identified");}return(found30);
+}
+proc velux30(poly kernel30,poly modulus30){
+ ideal ig30=std(ideal(modulus30));poly z30=reduce(diff(kernel30,X)*inverse30(kernel30,modulus30),ig30);
+ return(reduce(X+X*z30+X^2*z30^2,ig30));
+}
+proc normpoly30(poly image30,poly modulus30){
+ poly nn30=resultant(modulus30,Z+image30,X);nn30=subst(nn30,Z,X);
+ if(deg(nn30)!=deg(modulus30) || leadcoef(nn30)!=1){ERROR("transported kernelLocal44 norm degree/monic failed");}
+ return(nn30);
+}
+proc transport30(number bb30,number b730,poly k730,poly k4930,poly k1130){
+ number b030=quotientB30(bb30,k1130);
+ poly tk730=normpoly30(velux30(k1130,k730),k730);
+ poly tk1130=normpoly30(velux30(k730,k1130),k1130);
+ number b7030=quotientB30(b730,tk1130);number b7130=quotientB30(b030,tk730);
+ if(b7030!=b7130){ERROR("actual7/11commuting square failed");}
+ poly tk4930=normpoly30(velux30(tk1130,k4930),k4930);
+ number b4930=quotientB30(b7030,tk4930);
+ return(list(1/b030,1/b7030,1/b4930));
+}
+proc scalarColor30(number bb30,poly kernel30){
+ ideal ig30=std(ideal(kernel30));poly qx30=X;int ii30;
+ for(ii30=0;ii30<sourceDegree30;ii30++){qx30=reduce(qx30^2,ig30);}
+ poly doubling30=reduce(X^2+bb30*inverse30(X^2,kernel30),ig30);
+ poly scalar30=X;int offset30=-1;int count30;int corruptCount30;
+ for(ii30=0;ii30<5;ii30++){
+  if(scalar30==qx30){offset30=ii30;count30++;}
+  if(scalar30==reduce(qx30+1,ig30)){corruptCount30++;}
+  scalar30=reduce(subst(scalar30,X,doubling30),ig30);
+ }
+ if(scalar30!=X || count30!=1 || corruptCount30!=0){ERROR("scalarC5 Frobenius/control failed");}
+ print("COLOR30_KERNEL offset_2_mod_sign="+string(offset30)+" fiber_orbit_degree="+string(1+4*(offset30!=0)));
+ print("COLOR30_KERNEL_POLYNOMIAL");kernel30;
+ return(offset30);
+}
+
+proc invOld44(poly a,ideal q){ideal g=q,a;if(std(g)[1]!=1){ERROR("POINT44_NONUNIT");}matrix w=lift(g,ideal(1));poly ans=reduce(w[nrows(w),1],q);if(reduce(a*ans+1,q)!=0){ERROR("POINT44_INVERSE");}return(ans);}
+int compareOld44;int matrixInverseCalls44;
+proc inv44(poly value,ideal q){
+ ideal kb44=kbase(q);int dim44=vdim(q);if(dim44<=0 || size(kb44)!=dim44){ERROR("MATRIX44_FINITE_BASIS");}
+ matrix aug44[dim44][dim44+1];int row44;int col44;int term44;int hit44;poly val44;poly mon44;
+ for(row44=1;row44<=dim44;row44++){if(kb44[row44]==1){aug44[row44,dim44+1]=1;}}
+ for(col44=1;col44<=dim44;col44++){val44=reduce(value*kb44[col44],q);for(term44=1;term44<=size(val44);term44++){mon44=leadmonom(val44[term44]);hit44=0;for(row44=1;row44<=dim44;row44++){if(mon44==kb44[row44]){aug44[row44,col44]=aug44[row44,col44]+leadcoef(val44[term44]);hit44++;}}if(hit44!=1){ERROR("MATRIX44_COORDINATE");}}}
+ matrix originalMatrix44=aug44;int pivot44;int k44;number inversePivot44;number factor44;poly tmp44;
+ for(k44=1;k44<=dim44;k44++){
+  pivot44=0;for(row44=k44;row44<=dim44;row44++){if(pivot44==0 && aug44[row44,k44]!=0){pivot44=row44;}}
+  if(pivot44==0){ERROR("MATRIX44_NONUNIT");}
+  if(pivot44!=k44){for(col44=1;col44<=dim44+1;col44++){tmp44=aug44[k44,col44];aug44[k44,col44]=aug44[pivot44,col44];aug44[pivot44,col44]=tmp44;}}
+  inversePivot44=1/leadcoef(aug44[k44,k44]);for(col44=k44;col44<=dim44+1;col44++){aug44[k44,col44]=aug44[k44,col44]*inversePivot44;}
+  for(row44=1;row44<=dim44;row44++){if(row44!=k44){factor44=leadcoef(aug44[row44,k44]);if(factor44!=0){for(col44=k44;col44<=dim44+1;col44++){aug44[row44,col44]=aug44[row44,col44]+factor44*aug44[k44,col44];}}}}
+ }
+ poly ans44=0;for(col44=1;col44<=dim44;col44++){ans44=ans44+aug44[col44,dim44+1]*kb44[col44];}
+ for(row44=1;row44<=dim44;row44++){val44=originalMatrix44[row44,dim44+1];for(col44=1;col44<=dim44;col44++){val44=val44+originalMatrix44[row44,col44]*aug44[col44,dim44+1];}if(val44!=0){ERROR("MATRIX44_ORIGINAL_ROW");}}
+ if(reduce(value*ans44+1,q)!=0){ERROR("MATRIX44_INVERSE_PRODUCT");}
+ if(compareOld44==1){poly old44=invOld44(value,q);if(reduce(ans44+old44,q)!=0){ERROR("MATRIX44_REFERENCE_MISMATCH");}}
+ matrixInverseCalls44++;return(reduce(ans44,q));
+}
+
+compareOld44=0;
+proc same44(list p,list q,ideal rel){int i;for(i=1;i<=4;i++){if(reduce(p[i]+q[i],rel)!=0){return(0);}}return(1);}
+proc square44(list p,ideal q){list ans;int i;for(i=1;i<=4;i++){ans[i]=reduce(p[i]^2,q);}return(ans);}
+proc source44(list p,ideal q){map ev=r,p[4],p[3],p[1],p[2];ideal residual=ev(original);ideal units=ev(registered);int i;for(i=1;i<=5;i++){if(reduce(residual[i],q)!=0){ERROR("POINT44_SOURCE_"+string(i));}}for(i=1;i<=8;i++){poly unused=inv44(units[i],q);}return(1);}
+proc deck44(list p,ideal q){poly b=p[1];poly c=p[2];poly l=p[3];poly n=p[4];poly a=1+c;poly s=reduce(b*inv44(c,q)+a,q);poly v=reduce(s*(a+s),q);poly iu=inv44(reduce(b*c*inv44(v,q),q),q);return(list(reduce(v*iu^2,q),reduce(1+a*iu,q),reduce((l+s)*iu,q),reduce((l*b+n+b*c)*iu^3,q)));}
+proc add44(list p,list q,poly b,poly a,ideal rel){if(size(p)==0){return(q);}if(size(q)==0){return(p);}poly x=p[1];poly y=p[2];poly z=q[1];poly w=q[2];poly slope;poly den;
+ if(x==z){if(y!=w && reduce(y+w+a*x+b,rel)==0){return(list());}if(y!=w){ERROR("POINT44_EQUAL_X");}den=reduce(a*x+b,rel);if(den==0){return(list());}slope=reduce((x^2+a*y)*inv44(den,rel),rel);}else{slope=reduce((y+w)*inv44(x+z,rel),rel);}
+ poly rx=reduce(slope^2+a*slope+b+x+z,rel);poly ry=reduce((slope+a)*rx+y+slope*x+b,rel);
+ if(reduce(ry^2+a*rx*ry+b*ry+rx^3+b*rx^2,rel)!=0){ERROR("POINT44_GROUP_CURVE");}return(list(rx,ry));
+}
+proc modularValues44(list p,ideal q){
+ list images=list(p[4],p[3],p[1],p[2]);list powers;list row;int v;int k;int i;int j;list terms;intvec ex;poly ans;poly term;ideal result;
+ for(v=1;v<=4;v++){row=list(poly(1));for(k=1;k<=bounds44[v];k++){row[k+1]=reduce(poly(row[k])*poly(images[v]),q);}powers[v]=row;}
+ for(i=1;i<=13;i++){ans=0;terms=encoded44[i];for(j=1;j<=size(terms);j++){ex=terms[j];term=1;for(v=1;v<=4;v++){if(ex[v]>0){row=powers[v];term=reduce(term*poly(row[ex[v]+1]),q);}}ans=ans+term;}result[i]=reduce(ans,q);}
+ return(result);
+}
+proc sourceFast44(list p,ideal q){ideal values=modularValues44(p,q);int i;poly unused;for(i=1;i<=5;i++){if(values[i]!=0){ERROR("FAST44_SOURCE_"+string(i));}}for(i=6;i<=13;i++){unused=inv44(values[i],q);}return(1);}
+
+proc baseTuplePeriod44(poly bb,poly cc,poly kpoly,int d){
+ ideal baseRel44=std(ideal(kpoly,Z,T));int n44=5*d;intvec primes44;
+ if(d==12){primes44=2,3,5;}else{if(d==436){primes44=2,5,109;}else{ERROR("PERIOD44_UNREGISTERED_DEGREE");}}
+ poly bf44=bb;poly cf44=cc;int k44;int i44;intvec hits44;int remaining44=n44;int prime44;int trial44;for(i44=1;i44<=size(primes44);i44++){prime44=primes44[i44];if(prime44<2){ERROR("PERIOD44_BAD_PRIME");}for(trial44=2;trial44*trial44<=prime44;trial44++){if(prime44%trial44==0){ERROR("PERIOD44_COMPOSITE_DIVISOR");}}while(remaining44%prime44==0){remaining44=remaining44 div prime44;}}if(remaining44!=1){ERROR("PERIOD44_INCOMPLETE_DIVISORS");}
+
+ for(k44=1;k44<=n44;k44++){bf44=reduce(bf44^2,baseRel44);cf44=reduce(cf44^2,baseRel44);for(i44=1;i44<=size(primes44);i44++){if(k44==n44 div primes44[i44]){if(bf44==bb && cf44==cc){ERROR("PERIOD44_NOT_GENERATING_BASE");}hits44[i44]=1;}}}
+ if(bf44!=bb || cf44!=cc){ERROR("PERIOD44_BASE_RETURN");}for(i44=1;i44<=size(primes44);i44++){if(hits44[i44]!=1){ERROR("PERIOD44_MISSING_DIVISOR");}}
+ return(n44);
+}
+
+proc passage44(int caseid,number mx,number my,poly kernelLocal44,int d){
+ if(deg(kernelLocal44)!=5 || leadcoef(kernelLocal44)!=1 || gcd(kernelLocal44,diff(kernelLocal44,X))!=1){ERROR("POINT44_KERNEL_SHAPE");}
+ ideal base=std(ideal(kernelLocal44,Z,T));if(vdim(base)!=5){ERROR("POINT44_BASE_DIM");}
+ poly xf=X;poly fd;int k;for(k=1;k<=5*d;k++){xf=reduce(xf^2,base);if(k==d){fd=xf;}}if(xf!=X || gcd(fd-X,kernelLocal44)!=1){ERROR("POINT44_KERNEL_RABIN");}
+ list triple=triple30(mx,my);number B=1/triple[1];list k7s=kernels30(B,7);poly k7=choose30(B,k7s,triple[2]);
+ number c2=number((jet(k7,2)+jet(k7,1))/X^2);number c1=number((jet(k7,1)+jet(k7,0))/X);number c0=number(subst(k7,X,0));
+ poly rr=X;poly x2=reduce(rr^2+B*inv44(rr^2,base),base);poly v=reduce(rr+x2,base);poly u=reduce(rr*inv44(v,base),base);poly iu=inv44(u,base);
+ poly bb=reduce(v^3*inv44(rr^2,base),base);poly cc=reduce(x2*inv44(rr,base),base);poly aa=reduce(1+cc,base);
+ if(reduce(u*aa+1,base)!=0 || reduce(bb*u^3+rr,base)!=0){ERROR("POINT44_NORMALIZATION");}
+ poly g2=reduce((rr+c2)*iu^2,base);poly g1=reduce((rr^2+c1)*iu^4,base);poly g0=reduce((rr^3+c2*rr^2+c1*rr+c0)*iu^6,base);
+ list sumLocal44;list P=list(poly(0),poly(0));for(k=1;k<=11;k++){sumLocal44=add44(sumLocal44,P,bb,aa,base);if(k<11 && size(sumLocal44)==0){ERROR("POINT44_EARLY_ORDER");}}if(size(sumLocal44)!=0){ERROR("POINT44_ORDER11");}
+ int twist;int unused;int step;int j;int matches;int matched;int period;poly L;poly traceLocal44;poly term;poly nv;ideal q;ideal physical;list p;list ph;list deck;list cur;list fp;list sign;list bad;
+ for(twist=0;twist<=1;twist++){
+  L=Z^2+aa*Z+bb+g2+twist*aa^2;q=std(ideal(kernelLocal44,L,T));physical=std(ideal(kernelLocal44,L,T^2+T+1));
+  if(vdim(q)!=10 || vdim(physical)!=20){ERROR("POINT44_SOURCE_DIM");}
+  nv=reduce((g1+bb*Z)*inv44(aa,base),q);p=list(bb,cc,poly(Z),nv);ph=list(bb,cc,Z+twist*aa*T,nv+twist*bb*T);
+  if(reduce(ph[4]^2+bb*ph[4]+g0,physical)!=0){ERROR("POINT44_QR_CONSTANT");}
+  cur=ph;deck=list(p);for(step=0;step<10;step++){
+   unused=sourceFast44(cur,physical);
+   if(step==5){sign=list(bb,cc,ph[3]+aa,ph[4]+bb);if(same44(cur,sign,physical)==0){ERROR("POINT44_SIGN");}}
+   if(step>0){list desc=list(cur[1],cur[2],reduce(cur[3]+twist*(1+cur[2])*T,physical),reduce(cur[4]+twist*cur[1]*T,physical));
+    for(j=1;j<=4;j++){if(reduce(desc[j]+subst(desc[j],T,0),physical)!=0){ERROR("POINT44_DESCENT_T");}desc[j]=reduce(subst(desc[j],T,0),q);}deck[step+1]=desc;
+   }
+   cur=deck44(cur,physical);
+  }if(same44(cur,ph,physical)==0){ERROR("POINT44_DECK_PERIOD");}
+  bad=list(ph[1],ph[2],ph[3],ph[4]+1);map corrupt=r,bad[4],bad[3],bad[1],bad[2];ideal cr=corrupt(original);int rejected=0;for(j=1;j<=5;j++){if(reduce(cr[j],physical)!=0){rejected=1;}}if(rejected==0){ERROR("POINT44_CORRUPT_ACCEPTED");}
+  term=reduce((bb+g2+twist*aa^2)*inv44(aa^2,base),base);traceLocal44=0;for(k=0;k<5*d;k++){traceLocal44=reduce(traceLocal44+term,base);term=reduce(term^2,base);}if(traceLocal44!=0 && traceLocal44!=1){ERROR("POINT44_AS_TRACE");}
+  fp=p;for(k=1;k<=d;k++){fp=square44(fp,q);}matches=0;matched=-1;for(step=0;step<10;step++){if(same44(fp,deck[step+1],q)==1){matches++;matched=step;}}
+  if(matches!=1){ERROR("POINT44_FROB_DECK_MATCH");}
+  poly zf44=Z;for(k=1;k<=5*d;k++){zf44=reduce(zf44^2,q);}
+  fp=list(bb,cc,zf44,reduce(subst(nv,Z,zf44),q));sign=list(bb,cc,Z+aa*traceLocal44,nv+bb*traceLocal44);if(same44(fp,sign,q)==0){ERROR("POINT44_FROB_TRACE_SIGN");}
+  if(traceLocal44==1){int basePeriod44=baseTuplePeriod44(bb,cc,kernelLocal44,d);period=2*basePeriod44;}else{
+   fp=p;period=0;for(k=1;k<=10*d;k++){fp=square44(fp,q);if(same44(fp,p,q)==1){period=k;break;}}if(period==0){ERROR("POINT44_ABSOLUTE_PERIOD");}
+  }
+  print("POINT44_RESULT case="+string(caseid)+" base_degree="+string(d)+" twist="+string(twist)+" kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace="+string(traceLocal44)+" Frobenius_d_deck_step="+string(matched)+" source_tuple_period="+string(period)+" period_method=base_field_generation_plus_AS_irreducibility"+" all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11");
+  print("POINT44_KERNEL");kernelLocal44;print("POINT44_ORIENTATION");L;print("POINT44_b");bb;print("POINT44_c");cc;print("POINT44_lambda");Z;print("POINT44_nu");nv;
+ }
+ return(1);
+}
+
+passage44(1,number((beta^435+beta^432+beta^431+beta^429+beta^427+beta^425+beta^423+beta^420+beta^418+beta^417+beta^415+beta^413+beta^408+beta^405+beta^404+beta^403+beta^401+beta^398+beta^397+beta^396+beta^395+beta^393+beta^392+beta^391+beta^390+beta^389+beta^388+beta^387+beta^385+beta^384+beta^380+beta^376+beta^374+beta^373+beta^371+beta^370+beta^369+beta^368+beta^365+beta^364+beta^362+beta^360+beta^359+beta^357+beta^354+beta^352+beta^351+beta^349+beta^348+beta^345+beta^343+beta^342+beta^339+beta^334+beta^333+beta^328+beta^327+beta^326+beta^325+beta^324+beta^323+beta^322+beta^317+beta^316+beta^315+beta^313+beta^309+beta^307+beta^306+beta^305+beta^304+beta^302+beta^298+beta^297+beta^296+beta^293+beta^292+beta^288+beta^287+beta^283+beta^282+beta^280+beta^276+beta^275+beta^273+beta^270+beta^267+beta^265+beta^264+beta^263+beta^262+beta^258+beta^254+beta^253+beta^252+beta^249+beta^246+beta^244+beta^243+beta^242+beta^237+beta^236+beta^235+beta^230+beta^229+beta^228+beta^221+beta^220+beta^219+beta^217+beta^214+beta^213+beta^212+beta^211+beta^209+beta^208+beta^206+beta^205+beta^204+beta^203+beta^202+beta^199+beta^194+beta^192+beta^191+beta^190+beta^185+beta^181+beta^179+beta^175+beta^174+beta^169+beta^167+beta^166+beta^164+beta^163+beta^161+beta^160+beta^158+beta^157+beta^153+beta^151+beta^148+beta^142+beta^140+beta^137+beta^136+beta^135+beta^133+beta^132+beta^130+beta^125+beta^123+beta^118+beta^115+beta^113+beta^103+beta^102+beta^98+beta^95+beta^92+beta^90+beta^86+beta^85+beta^84+beta^83+beta^82+beta^80+beta^75+beta^71+beta^70+beta^67+beta^66+beta^65+beta^64+beta^62+beta^61+beta^60+beta^59+beta^57+beta^55+beta^52+beta^51+beta^49+beta^47+beta^46+beta^43+beta^40+beta^39+beta^36+beta^33+beta^32+beta^28+beta^26+beta^25+beta^23+beta^19+beta^16+beta^15+beta^13+beta^12+beta^7+beta^4+beta^2)),number((beta^435+beta^428+beta^426+beta^423+beta^422+beta^420+beta^419+beta^418+beta^417+beta^416+beta^415+beta^413+beta^412+beta^410+beta^409+beta^407+beta^405+beta^404+beta^399+beta^397+beta^394+beta^393+beta^391+beta^390+beta^389+beta^388+beta^387+beta^381+beta^380+beta^379+beta^377+beta^375+beta^373+beta^367+beta^366+beta^364+beta^363+beta^362+beta^360+beta^359+beta^354+beta^353+beta^352+beta^351+beta^347+beta^345+beta^342+beta^340+beta^338+beta^337+beta^336+beta^335+beta^333+beta^332+beta^329+beta^327+beta^326+beta^324+beta^323+beta^321+beta^317+beta^316+beta^314+beta^312+beta^310+beta^307+beta^305+beta^304+beta^298+beta^296+beta^295+beta^294+beta^292+beta^286+beta^283+beta^276+beta^274+beta^273+beta^268+beta^267+beta^264+beta^262+beta^260+beta^257+beta^255+beta^253+beta^251+beta^250+beta^249+beta^246+beta^245+beta^244+beta^243+beta^242+beta^239+beta^238+beta^237+beta^233+beta^231+beta^230+beta^229+beta^226+beta^224+beta^223+beta^220+beta^218+beta^215+beta^213+beta^212+beta^211+beta^210+beta^206+beta^205+beta^204+beta^202+beta^201+beta^196+beta^195+beta^191+beta^189+beta^188+beta^185+beta^183+beta^180+beta^173+beta^172+beta^171+beta^170+beta^169+beta^168+beta^167+beta^166+beta^164+beta^160+beta^158+beta^157+beta^156+beta^155+beta^153+beta^150+beta^149+beta^148+beta^146+beta^145+beta^144+beta^143+beta^141+beta^139+beta^138+beta^137+beta^136+beta^133+beta^131+beta^130+beta^129+beta^127+beta^126+beta^125+beta^124+beta^123+beta^121+beta^120+beta^117+beta^116+beta^111+beta^108+beta^104+beta^102+beta^101+beta^100+beta^99+beta^98+beta^95+beta^93+beta^92+beta^91+beta^89+beta^86+beta^85+beta^84+beta^83+beta^82+beta^79+beta^78+beta^75+beta^72+beta^69+beta^67+beta^64+beta^63+beta^61+beta^58+beta^57+beta^52+beta^51+beta^50+beta^48+beta^47+beta^45+beta^44+beta^42+beta^41+beta^39+beta^36+beta^35+beta^34+beta^33+beta^29+beta^24+beta^21+beta^16+beta^15+beta^13+beta^11+beta^5+beta^4+beta^2+beta)),poly(X^5+(beta^431+beta^430+beta^429+beta^427+beta^423+beta^422+beta^421+beta^420+beta^415+beta^414+beta^413+beta^412+beta^411+beta^405+beta^404+beta^403+beta^402+beta^400+beta^397+beta^396+beta^395+beta^389+beta^388+beta^387+beta^385+beta^384+beta^383+beta^381+beta^380+beta^379+beta^378+beta^377+beta^375+beta^371+beta^370+beta^367+beta^366+beta^365+beta^364+beta^363+beta^362+beta^361+beta^359+beta^357+beta^356+beta^353+beta^352+beta^351+beta^350+beta^348+beta^345+beta^344+beta^343+beta^337+beta^330+beta^327+beta^326+beta^325+beta^324+beta^322+beta^320+beta^317+beta^316+beta^315+beta^311+beta^310+beta^307+beta^306+beta^303+beta^302+beta^300+beta^299+beta^297+beta^295+beta^294+beta^293+beta^292+beta^290+beta^289+beta^286+beta^283+beta^279+beta^276+beta^274+beta^273+beta^272+beta^271+beta^267+beta^265+beta^264+beta^260+beta^259+beta^258+beta^257+beta^255+beta^254+beta^250+beta^249+beta^248+beta^247+beta^246+beta^244+beta^243+beta^242+beta^240+beta^238+beta^235+beta^234+beta^233+beta^232+beta^231+beta^227+beta^223+beta^221+beta^218+beta^216+beta^214+beta^212+beta^208+beta^205+beta^202+beta^201+beta^197+beta^196+beta^195+beta^191+beta^190+beta^187+beta^186+beta^184+beta^183+beta^182+beta^181+beta^178+beta^175+beta^173+beta^171+beta^170+beta^165+beta^164+beta^162+beta^161+beta^159+beta^158+beta^157+beta^154+beta^153+beta^148+beta^144+beta^142+beta^140+beta^139+beta^137+beta^136+beta^135+beta^134+beta^130+beta^129+beta^128+beta^126+beta^125+beta^124+beta^123+beta^122+beta^121+beta^113+beta^112+beta^111+beta^110+beta^108+beta^107+beta^106+beta^105+beta^103+beta^102+beta^100+beta^98+beta^97+beta^96+beta^94+beta^93+beta^92+beta^91+beta^89+beta^87+beta^86+beta^85+beta^82+beta^81+beta^80+beta^76+beta^73+beta^68+beta^67+beta^66+beta^64+beta^63+beta^62+beta^60+beta^59+beta^58+beta^55+beta^50+beta^49+beta^45+beta^42+beta^41+beta^39+beta^37+beta^35+beta^34+beta^31+beta^28+beta^27+beta^26+beta^24+beta^22+beta^21+beta^20+beta^19+beta^17+beta^16+beta^13+beta^12+beta^10+beta^9+beta^6+beta^2+beta)*X^4+(beta^433+beta^431+beta^429+beta^425+beta^423+beta^421+beta^418+beta^417+beta^415+beta^414+beta^412+beta^411+beta^409+beta^408+beta^407+beta^406+beta^405+beta^404+beta^403+beta^402+beta^401+beta^400+beta^398+beta^395+beta^393+beta^390+beta^389+beta^388+beta^387+beta^385+beta^384+beta^383+beta^380+beta^379+beta^378+beta^377+beta^376+beta^371+beta^370+beta^369+beta^360+beta^359+beta^355+beta^354+beta^352+beta^349+beta^348+beta^347+beta^346+beta^345+beta^341+beta^340+beta^338+beta^337+beta^336+beta^335+beta^334+beta^330+beta^326+beta^322+beta^320+beta^316+beta^315+beta^314+beta^311+beta^308+beta^307+beta^304+beta^303+beta^302+beta^301+beta^300+beta^299+beta^298+beta^297+beta^296+beta^295+beta^294+beta^293+beta^292+beta^289+beta^287+beta^286+beta^280+beta^275+beta^273+beta^272+beta^271+beta^270+beta^266+beta^265+beta^264+beta^263+beta^262+beta^260+beta^258+beta^257+beta^253+beta^250+beta^248+beta^247+beta^243+beta^239+beta^238+beta^237+beta^236+beta^234+beta^233+beta^229+beta^227+beta^225+beta^221+beta^220+beta^219+beta^218+beta^217+beta^213+beta^212+beta^211+beta^210+beta^208+beta^205+beta^202+beta^199+beta^198+beta^196+beta^189+beta^188+beta^186+beta^185+beta^184+beta^183+beta^182+beta^180+beta^179+beta^178+beta^175+beta^171+beta^169+beta^167+beta^166+beta^165+beta^161+beta^160+beta^158+beta^157+beta^153+beta^151+beta^150+beta^148+beta^147+beta^144+beta^143+beta^142+beta^139+beta^137+beta^136+beta^135+beta^134+beta^132+beta^131+beta^127+beta^126+beta^119+beta^117+beta^116+beta^115+beta^112+beta^111+beta^108+beta^106+beta^105+beta^104+beta^99+beta^98+beta^96+beta^90+beta^88+beta^86+beta^85+beta^84+beta^80+beta^79+beta^76+beta^74+beta^73+beta^71+beta^69+beta^68+beta^63+beta^60+beta^59+beta^57+beta^55+beta^54+beta^53+beta^51+beta^50+beta^48+beta^47+beta^45+beta^44+beta^43+beta^42+beta^37+beta^36+beta^33+beta^31+beta^30+beta^26+beta^24+beta^23+beta^19+beta^17+beta^16+beta^15+beta^13+beta^12+beta^8+beta^7+beta^4+beta^3+beta^2+beta)*X^3+(beta^435+beta^433+beta^432+beta^431+beta^430+beta^429+beta^426+beta^422+beta^421+beta^419+beta^415+beta^414+beta^412+beta^410+beta^409+beta^406+beta^405+beta^403+beta^402+beta^399+beta^397+beta^396+beta^393+beta^390+beta^387+beta^385+beta^384+beta^383+beta^382+beta^381+beta^379+beta^376+beta^372+beta^369+beta^368+beta^367+beta^365+beta^362+beta^360+beta^357+beta^355+beta^353+beta^348+beta^347+beta^346+beta^340+beta^336+beta^334+beta^330+beta^328+beta^326+beta^321+beta^319+beta^318+beta^317+beta^315+beta^314+beta^311+beta^308+beta^307+beta^303+beta^302+beta^300+beta^299+beta^295+beta^294+beta^293+beta^291+beta^290+beta^289+beta^284+beta^280+beta^277+beta^274+beta^271+beta^270+beta^267+beta^266+beta^265+beta^263+beta^260+beta^257+beta^256+beta^254+beta^253+beta^252+beta^250+beta^246+beta^245+beta^244+beta^243+beta^239+beta^236+beta^232+beta^231+beta^230+beta^228+beta^227+beta^225+beta^223+beta^222+beta^221+beta^220+beta^219+beta^213+beta^212+beta^210+beta^208+beta^207+beta^205+beta^204+beta^202+beta^200+beta^199+beta^196+beta^193+beta^188+beta^187+beta^185+beta^183+beta^176+beta^174+beta^172+beta^169+beta^163+beta^162+beta^160+beta^159+beta^157+beta^155+beta^154+beta^150+beta^149+beta^148+beta^147+beta^143+beta^140+beta^139+beta^138+beta^133+beta^130+beta^128+beta^126+beta^125+beta^124+beta^123+beta^122+beta^121+beta^119+beta^118+beta^117+beta^106+beta^104+beta^103+beta^101+beta^100+beta^96+beta^94+beta^90+beta^88+beta^87+beta^85+beta^84+beta^83+beta^80+beta^78+beta^77+beta^76+beta^74+beta^72+beta^69+beta^66+beta^65+beta^64+beta^63+beta^60+beta^59+beta^58+beta^57+beta^54+beta^53+beta^52+beta^51+beta^50+beta^49+beta^48+beta^45+beta^44+beta^43+beta^40+beta^39+beta^35+beta^32+beta^31+beta^30+beta^28+beta^27+beta^25+beta^24+beta^22+beta^20+beta^19+beta^18+beta^17+beta^14+beta^13+beta^11+beta^10+beta^9+beta^8+beta^7+beta^6+beta^5+beta^4+beta^3)*X^2+(beta^435+beta^432+beta^430+beta^429+beta^428+beta^427+beta^426+beta^425+beta^424+beta^423+beta^422+beta^421+beta^419+beta^418+beta^415+beta^414+beta^413+beta^412+beta^411+beta^409+beta^407+beta^406+beta^405+beta^404+beta^402+beta^401+beta^398+beta^393+beta^392+beta^391+beta^390+beta^389+beta^388+beta^384+beta^383+beta^381+beta^380+beta^378+beta^377+beta^375+beta^374+beta^372+beta^370+beta^369+beta^365+beta^364+beta^363+beta^359+beta^358+beta^355+beta^354+beta^351+beta^348+beta^345+beta^344+beta^343+beta^341+beta^340+beta^335+beta^334+beta^331+beta^330+beta^329+beta^326+beta^325+beta^321+beta^317+beta^316+beta^315+beta^314+beta^313+beta^312+beta^310+beta^309+beta^308+beta^305+beta^304+beta^299+beta^295+beta^294+beta^289+beta^288+beta^286+beta^283+beta^281+beta^279+beta^278+beta^277+beta^276+beta^275+beta^274+beta^272+beta^270+beta^269+beta^268+beta^266+beta^265+beta^264+beta^263+beta^262+beta^251+beta^249+beta^243+beta^242+beta^241+beta^240+beta^239+beta^238+beta^235+beta^231+beta^230+beta^229+beta^228+beta^227+beta^225+beta^221+beta^218+beta^217+beta^216+beta^214+beta^212+beta^211+beta^210+beta^209+beta^202+beta^201+beta^199+beta^194+beta^192+beta^184+beta^183+beta^178+beta^177+beta^175+beta^172+beta^170+beta^168+beta^167+beta^165+beta^164+beta^163+beta^162+beta^160+beta^159+beta^157+beta^155+beta^154+beta^152+beta^150+beta^149+beta^146+beta^145+beta^144+beta^143+beta^141+beta^139+beta^138+beta^136+beta^134+beta^133+beta^132+beta^131+beta^130+beta^129+beta^122+beta^121+beta^120+beta^118+beta^117+beta^115+beta^113+beta^111+beta^107+beta^103+beta^102+beta^101+beta^100+beta^99+beta^94+beta^92+beta^90+beta^88+beta^86+beta^85+beta^84+beta^82+beta^78+beta^77+beta^76+beta^74+beta^72+beta^71+beta^67+beta^66+beta^64+beta^63+beta^62+beta^58+beta^57+beta^56+beta^55+beta^54+beta^52+beta^50+beta^49+beta^48+beta^45+beta^44+beta^43+beta^42+beta^40+beta^39+beta^38+beta^37+beta^36+beta^35+beta^34+beta^33+beta^32+beta^29+beta^25+beta^23+beta^22+beta^19+beta^17+beta^15+beta^14+beta^13+beta^12+beta^11+beta^9+beta^8+beta^7+beta^5+beta^3)*X+(beta^434+beta^433+beta^432+beta^426+beta^425+beta^424+beta^421+beta^419+beta^418+beta^416+beta^415+beta^413+beta^411+beta^410+beta^405+beta^404+beta^403+beta^401+beta^400+beta^399+beta^394+beta^393+beta^389+beta^386+beta^381+beta^378+beta^377+beta^375+beta^373+beta^371+beta^370+beta^369+beta^363+beta^362+beta^361+beta^359+beta^358+beta^356+beta^355+beta^352+beta^349+beta^348+beta^345+beta^344+beta^341+beta^340+beta^339+beta^338+beta^337+beta^336+beta^334+beta^333+beta^330+beta^329+beta^327+beta^326+beta^325+beta^323+beta^321+beta^317+beta^309+beta^307+beta^303+beta^296+beta^294+beta^290+beta^289+beta^287+beta^286+beta^285+beta^284+beta^280+beta^279+beta^277+beta^276+beta^275+beta^272+beta^271+beta^267+beta^265+beta^262+beta^259+beta^247+beta^245+beta^243+beta^238+beta^237+beta^236+beta^235+beta^234+beta^232+beta^230+beta^229+beta^228+beta^224+beta^223+beta^222+beta^221+beta^220+beta^213+beta^212+beta^211+beta^209+beta^206+beta^205+beta^201+beta^200+beta^199+beta^197+beta^194+beta^193+beta^189+beta^188+beta^186+beta^183+beta^182+beta^178+beta^177+beta^176+beta^174+beta^173+beta^172+beta^171+beta^169+beta^168+beta^166+beta^165+beta^162+beta^157+beta^154+beta^152+beta^151+beta^150+beta^149+beta^148+beta^146+beta^145+beta^139+beta^138+beta^137+beta^136+beta^133+beta^132+beta^129+beta^128+beta^124+beta^121+beta^120+beta^119+beta^115+beta^113+beta^112+beta^110+beta^108+beta^106+beta^102+beta^101+beta^100+beta^96+beta^92+beta^88+beta^87+beta^85+beta^80+beta^78+beta^77+beta^76+beta^73+beta^72+beta^69+beta^63+beta^62+beta^60+beta^57+beta^56+beta^55+beta^54+beta^52+beta^50+beta^49+beta^48+beta^46+beta^44+beta^41+beta^36+beta^35+beta^33+beta^31+beta^28+beta^27+beta^26+beta^25+beta^24+beta^22+beta^21+beta^19+beta^15+beta^14+beta^13+beta^12+beta^11+beta^10+beta^9+beta^4+beta^2+beta+1)),436);
+print("POINT44_ALL_CHECKS_PASS");quit;

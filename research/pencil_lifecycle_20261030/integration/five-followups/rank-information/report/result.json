@@ -1,0 +1,136 @@
+{
+  "schema": "pencil.target_information_diagnostic/v1",
+  "claim_status": "derived linear algebra with native synthetic correctness checks; independent source review pending",
+  "equation": "A*x + b*k + c = 0 over prime scalar field",
+  "consistent_iff": "rank([A b c]) = rank([A b])",
+  "target_unique_iff_consistent": "rank([A b]) = rank(A)+1",
+  "existing_source_observation": "GraphSolver::relation already checks the target pivot after Independent admission; total rank is not its stopping criterion",
+  "implementation": "offline diagnostic reuses residual::Basis",
+  "counter_caveat": "Basis calls change thread-local counters; diagnostic must stay outside measured producer",
+  "fixtures": [
+    {
+      "fixture": "nuisance_only",
+      "modulus": 7,
+      "nuisance_columns": 1,
+      "rows": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "rank_a": 1,
+      "rank_ab": 1,
+      "rank_abc": 1,
+      "consistent": true,
+      "target_determined": false,
+      "scientific_trial": false,
+      "cost_ratio": null
+    },
+    {
+      "fixture": "target_only",
+      "modulus": 7,
+      "nuisance_columns": 1,
+      "rows": [
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "rank_a": 0,
+      "rank_ab": 1,
+      "rank_abc": 1,
+      "consistent": true,
+      "target_determined": true,
+      "scientific_trial": false,
+      "cost_ratio": null
+    },
+    {
+      "fixture": "two_nuisances",
+      "modulus": 7,
+      "nuisance_columns": 2,
+      "rows": [
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ]
+      ],
+      "rank_a": 2,
+      "rank_ab": 2,
+      "rank_abc": 2,
+      "consistent": true,
+      "target_determined": false,
+      "scientific_trial": false,
+      "cost_ratio": null
+    },
+    {
+      "fixture": "target_after_elimination",
+      "modulus": 7,
+      "nuisance_columns": 2,
+      "rows": [
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          3
+        ]
+      ],
+      "rank_a": 2,
+      "rank_ab": 3,
+      "rank_abc": 3,
+      "consistent": true,
+      "target_determined": true,
+      "scientific_trial": false,
+      "cost_ratio": null
+    },
+    {
+      "fixture": "inconsistent",
+      "modulus": 7,
+      "nuisance_columns": 1,
+      "rows": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "rank_a": 0,
+      "rank_ab": 1,
+      "rank_abc": 2,
+      "consistent": false,
+      "target_determined": false,
+      "scientific_trial": false,
+      "cost_ratio": null
+    }
+  ],
+  "new_scientific_targets": 0,
+  "cost_ratios": null,
+  "historical_per_row_target_information": "not established by this packet",
+  "next_step": "independent review; identify retained full relation stream or preregister instrumentation before policy experiment"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "crypto.isolab-queue/v1",
+  "id": "EXP-NIST-FILTER-001",
+  "status": "blocked",
+  "note": "The definition is in PR #2668. Publish the R06/R08 checkpoint inputs, build and hash an Isolab-compatible task image, and file an explicit prospective EKS/storage/budget amendment and committed approval before ready promotion. The existing local nonpreemptible protocol is not silently converted to Spot.",
+  "record": "experiments/specs/EXP-NIST-FILTER-001.yaml",
+  "protocol": {
+    "path": "backlog/XP-20261026-nist-p256-checkpoint-filter/protocol.json",
+    "sha256": ""
+  },
+  "source_commit": "",
+  "trial": "first-filter-pair",
+  "kind": "command",
+  "image": {"uri": "", "source_commit": ""},
+  "outputs": ["export.json"],
+  "cpu": 2,
+  "memory": "16Gi",
+  "seconds": 1800
+}

@@ -1,0 +1,25 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,hyperref}
+\title{Independent review: weighted C0 branch}
+\date{1 November 2026}
+\begin{document}\maketitle
+Fresh isolated Lean replay passed eight modules: fourteen main declarations, seven producer controls and six independent controls. All 27 axiom readbacks use only propext, Classical.choice and Quot.sound. The scoped field formulas agree with the inspected native source.
+\section*{Formula correspondence}
+Native \texttt{projective\_law\_gate.rs}, normalize lines 533--566, decodes degree-one coordinates as $x/z^2$ and $y/(z^5w)$. The weighted addition branch, lines 899--1023, crosses the other input's weights. With $Z=z_1z_2$ and $W=w_1w_2$, the checked scaling is
+\[B_c=Z^8B,\quad A_c=Z^9WA,\quad C_c=Z^7WC.\]
+The literal output obeys
+\[x_o=Z^{18}W^2x_n,\quad y_o=Z^{45}W^5y_n,\quad z_o=Z^9WB,\quad w_o=1.\]
+Decoding cancels the weights. Reconstruction covers arbitrary stored inputs with nonzero weights, and the B/C guard equivalences retain their explicit nonzero-factor assumptions.
+\section*{Conditional curve membership}
+Composition requires a field, four nonzero input weights, $B\ne0$, $C=0$, a monic degree-five polynomial with coefficient four zero, and both input Mumford residual divisibilities. It concludes nonzero output weights and $y^2=f(x)$. Divisor-class addition, native caller validity, machine words, counters, scheduling and compiler correctness remain separate bridges.
+\section*{Independent boundary controls}
+The six independent controls cover mixed-sign nonunit weights with decoded $(10,291)$; output $z=20\cdot21^9$; missing-$w$ normalization failure; zero-$w$ singular output; arbitrary raw reconstruction; and nonzero $C$. They use kernel tactics rather than native evaluation. A reviewer initially expected factor 10 instead of 20 in the output-$z$ control. That failed attempt is preserved; only the reviewer's expectation changed. No producer repair occurred.
+\section*{Evidence and process}
+\texttt{run.sh}, module receipts, \texttt{before.sha256}, \texttt{after.txt} and \texttt{reviewed-source.sha256} bind the local replay. Retained dependency binaries remain a trust boundary; there was no complete dependency rebuild or independent kernel binary check.
+
+The reviewer read native source and producer status/plan before writing a local source-first plan, then inspected proof bodies. This was not fully blind or precommitted. Review dispatch preceded producer publication; T-1225 records that sequencing deviation and publication binding. Workflow completion is not asserted.
+
+\texttt{REVIEW.md} and \texttt{status.json} provide source references, assumptions, failures and scope. No scientific run or new measurement was performed; no cost ratio is inferred.
+\end{document}

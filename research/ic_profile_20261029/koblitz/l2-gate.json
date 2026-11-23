@@ -1,0 +1,89 @@
+{
+  "required": "L2",
+  "executions": 288,
+  "invalid_outcomes": [],
+  "below_l2": [
+    {
+      "seq": 42,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 64.8 preemptions per second",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 4869
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1793329379906,
+          "loadavg": [
+            0.63,
+            0.25,
+            0.09
+          ],
+          "psi_cpu_some_avg10": 0.13,
+          "psi_cpu_some_total_us": 25871674,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 2173,
+              "idle": 8466,
+              "steal": 0
+            }
+          }
+        },
+        "after": {
+          "unix_ms": 1793329379922,
+          "loadavg": [
+            0.63,
+            0.25,
+            0.09
+          ],
+          "psi_cpu_some_avg10": 0.13,
+          "psi_cpu_some_total_us": 25871677,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 2175,
+              "idle": 8466,
+              "steal": 0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "grades": [
+    {
+      "level": "L1",
+      "count": 1
+    },
+    {
+      "level": "L2",
+      "count": 287
+    }
+  ],
+  "accepted": false
+}

@@ -1,0 +1,113 @@
+--- a/src/ml_dataset/owned_search_central.rs
++++ b/src/ml_dataset/owned_search_central.rs
+@@ -9,6 +9,7 @@
+ #[path="../cryptanalysis/boolean_identity_bqi.rs"] mod bqi;
+ #[path="owned_search_wire_decode.rs"] pub(super) mod wire;
+ #[path="owned_search_semantic_check.rs"] mod semantic;
++#[path="owned_search_original_descent.rs"] mod descent;
+ const ROLE:&str="boolean-original-owned-search-snapshot-chunk-v1";
+ const MAX_SNAPSHOTS:usize=4096;
+ const MAX_CHUNKS:usize=65536;
+@@ -18,7 +19,7 @@
+  frame:Frame,context:Option<OriginalContext>,verdict:Verdict,
+  run_raw:Vec<u8>,plan_raw:Vec<u8>,protocol_raw:Vec<u8>,plan:Option<crate::ml_dataset::DatasetPlan>,run_value:Option<Value>,execution_raw:Vec<u8>,manifest_raw:Vec<u8>,manifest:Option<crate::ml_dataset::CellManifest>,
+  capsule:Option<owned_identity::Capsule>,map_ack:Option<capture::CommittedEventPosition>,
+- snapshots:Vec<Snapshot>,recheck_raw:Vec<u8>,projected:bool,incomplete:bool,
++ descent:Option<descent::Audit>,snapshots:Vec<Snapshot>,recheck_raw:Vec<u8>,projected:bool,incomplete:bool,
+ }
+ struct Chunk{artifact:Artifact,raw:Vec<u8>,checked_raw:Vec<u8>,checked:bool,ack:capture::CommittedEventPosition}
+ struct Snapshot{index:u64,chunks:Vec<Chunk>,joined:Vec<u8>,decoded:Option<wire::Attempt>,audit:Option<semantic::Audit>}
+@@ -27,7 +28,7 @@
+  fn check(&mut self)->Result<(),()>{DecodeBudget::check(self,Instant::now()).map_err(|_|())}
+ }
+ pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy)->Custody{
+- let mut c=Custody{frame:new_frame(policy,None,None),context:None,verdict:Verdict::Rejected,run_raw:Vec::new(),plan_raw:Vec::new(),protocol_raw:Vec::new(),plan:None,run_value:None,execution_raw:Vec::new(),manifest_raw:Vec::new(),manifest:None,capsule:None,map_ack:None,snapshots:Vec::new(),recheck_raw:Vec::new(),projected:false,incomplete:false};
++ let mut c=Custody{frame:new_frame(policy,None,None),context:None,verdict:Verdict::Rejected,run_raw:Vec::new(),plan_raw:Vec::new(),protocol_raw:Vec::new(),plan:None,run_value:None,execution_raw:Vec::new(),manifest_raw:Vec::new(),manifest:None,capsule:None,map_ack:None,descent:None,snapshots:Vec::new(),recheck_raw:Vec::new(),projected:false,incomplete:false};
+  // Failure before admission retains the empty frame without diagnostic allocation.
+  if c.frame.budget.reserve_checking(65536,65536,Instant::now()).is_err(){return c}
+  let result=c.run(dir,config,outcome,artifacts);
+@@ -41,6 +42,8 @@
+  }}c
+ }
+ impl Custody{
++ fn authenticated_map(&self)->Option<&provenance::CheckedMap>{self.descent.as_ref().map(|a|a.source()).or(self.frame.map.as_ref())}
++
+  pub(in crate::ml_dataset::solvers) fn usage(&self)->(u64,u64){self.frame.usage()}
+  pub(in crate::ml_dataset::solvers) fn charged(&self)->(u64,u64){self.usage()}
+  pub(in crate::ml_dataset::solvers) fn retained_slot_bytes(&self)->u64{self.frame.budget.bytes}
+@@ -61,7 +64,7 @@
+   // Identity and all inputs are checked again before any successful scope exists.
+   self.revalidate_inner(dir,config,outcome,artifacts)?;
+   let Some(a)=self.snapshots.last().and_then(|s|s.audit.as_ref())else{return Ok(Verdict::Incomplete)};
+-  if a.result.is_ok()&&!a.rows.is_empty()&&self.frame.head.as_ref().is_some_and(|h|h.stop.is_none()){Ok(Verdict::CheckedScope)}else{Ok(Verdict::Incomplete)}
++  if self.descent.as_ref().is_some_and(|d|d.original_descent_verified())&&a.result.is_ok()&&!a.rows.is_empty()&&self.frame.head.as_ref().is_some_and(|h|h.stop.is_none()){Ok(Verdict::CheckedScope)}else{Ok(Verdict::Incomplete)}
+  }
+  fn read_identity(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact])->Result<(),String>{
+   let f=&mut self.frame;
+@@ -183,7 +186,7 @@
+   if c.checked_raw!=c.raw{return Err("chunk changed during capture".into())}
+   let v=capture::verify_replay_payload_bytes(a,&c.checked_raw)?;c.checked=true;Ok(capture::OwnedReplayReply::Payload(v))
+  }
+- fn decode_snapshots(&mut self,_config:&CaseConfig)->Result<(),String>{
++ fn decode_snapshots(&mut self,config:&CaseConfig)->Result<(),String>{
+   for i in 0..self.snapshots.len(){
+    let total=self.snapshots[i].chunks.iter().try_fold(0usize,|n,c|n.checked_add(c.raw.len()).ok_or("snapshot bytes overflow"))?;
+    self.pay((total as u64).checked_mul(2).ok_or("snapshot copy work overflow")?,total as u64+64)?;
+@@ -208,9 +211,23 @@
+   let s=self.snapshots.last_mut().ok_or("snapshot absent")?;let root=s.decoded.as_ref().and_then(|d|d.value.as_ref()).ok_or("decoded snapshot absent")?;
+   let Some(n)=root.get("expansion").and_then(|v|v.get("variables")).and_then(wire::Value::as_u64).and_then(|n|u32::try_from(n).ok())else{return Ok(())};
+   if n!=f.map.as_ref().ok_or("map absent")?.variables(){return Err("captured variable count differs from checked map".into())}
++  let map=f.map.take().ok_or("original descent map already consumed")?;
++  let descent_work=work.min(4_000_000);let descent_bytes=bytes.min(8_000_000);
++  let limits=descent::Limits{expansion:provenance::boolean_equations::Limits{variables:4096,generators:4096,terms:4096,degree:(config.degree_bound as usize).min(64),work:descent_work,bytes:descent_bytes},work:descent_work,bytes:descent_bytes};
++  // The authentic map and all failed expansion prefixes move into retained custody.
++  self.descent=Some(descent::verify(map,root,limits,f.budget.policy.deadline,&mut f.budget));
++  if let Err(e)=self.descent.as_ref().unwrap().result{
++   self.incomplete=matches!(e,descent::Failure::Owner|descent::Failure::Deadline|descent::Failure::Cap|descent::Failure::Overflow|descent::Failure::Allocation|descent::Failure::Missing|descent::Failure::Incomplete|descent::Failure::Expansion(provenance::boolean_equations::Failure::Unknown(_)));
++   return Err("owned original equation descent did not complete".into())
++  }
++  let work=f.budget.policy.work.checked_sub(f.budget.work).ok_or("semantic work exhausted after descent")?;
++  let bytes=f.budget.policy.bytes.checked_sub(f.budget.bytes).ok_or("semantic bytes exhausted after descent")?;
+   s.audit=Some(semantic::verify(root,n,semantic::Limits::conservative(work,bytes),f.budget.policy.deadline,&mut f.budget));
+   if let Err(e)=s.audit.as_ref().unwrap().result{
+    self.incomplete=matches!(e,semantic::Failure::Cap|semantic::Failure::Owner|semantic::Failure::Deadline|semantic::Failure::Overflow|semantic::Failure::Allocation|semantic::Failure::Unavailable|semantic::Failure::Certificate(bridge::Failure::Cap|bridge::Failure::Owner|bridge::Failure::Deadline|bridge::Failure::Overflow|bridge::Failure::Allocation));
++   if e==semantic::Failure::Certificate(bridge::Failure::Checker){
++    self.incomplete=s.audit.as_ref().and_then(|a|a.rows.last()).is_some_and(|r|checker_exhausted(&r.certificate));
++   }
+    return Err("owned semantic replay did not complete".into())
+   }
+   Ok(())
+@@ -242,7 +259,7 @@
+    if &self.recheck_raw!=expected{return Err("owned raw source/context changed".into())}
+   }
+   // Verify all admitted payloads afresh, retaining the latest read on refusal.
+-  let pattern=self.frame.map.as_ref().ok_or("checked map absent")?.pattern();
++  let pattern=self.authenticated_map().ok_or("checked map absent")?.pattern();
+   self.recheck_raw=read(dir,&format!("live/payloads/sat-original-pattern-{pattern}.gate.json"),self.frame.map_bytes.len() as u64,&mut self.frame.budget,&mut self.frame.pending_read)?;
+   if self.recheck_raw!=self.frame.map_bytes{return Err("owned raw map changed".into())}
+   for s in &self.snapshots{for c in &s.chunks{
+@@ -269,14 +286,14 @@
+   result
+  }
+  fn project_inner(&mut self)->Result<Value,String>{
+-  if self.verdict!=Verdict::CheckedScope||self.projected{return Err("owned projection not admitted or consumed".into())}
++  if self.verdict!=Verdict::CheckedScope||self.projected||!self.descent.as_ref().is_some_and(|d|d.original_descent_verified()){return Err("owned projection not admitted or consumed".into())}
+   self.projected=true;
+   let rows=self.snapshots.last().and_then(|s|s.audit.as_ref()).ok_or("semantic audit absent")?.rows.len();
+   self.pay((rows as u64).checked_mul(8192).and_then(|x|x.checked_add(65536)).ok_or("projection work overflow")?,(rows as u64).checked_mul(16384).and_then(|x|x.checked_add(262144)).ok_or("projection memory overflow")?)?;
+   let s=self.snapshots.last().unwrap();let audit=s.audit.as_ref().unwrap();let ack=&s.chunks.last().unwrap().ack;
+   let mut labels=Vec::new();labels.try_reserve_exact(rows).map_err(|_|"projection allocation")?;
+   for r in &audit.rows{labels.push(serde_json::json!({"partition":r.partition,"node":r.node,"basis_row":r.row,"identity_verified_relative_captured_equations":true}));}
+-  let value=serde_json::json!({"schema":"crypto.ml-dataset.owned-search-restricted-rows/v1","visibility":"restricted","status":"verified_selected_rows","snapshot":s.index,"pattern":self.frame.map.as_ref().unwrap().pattern(),"capture_head_event_count":ack.event_count,"capture_head_sha256":ack.last_event_sha256,"identity_capsule":self.capsule,"rows":labels,"verified_rows":rows,"original_public_factor_and_map_verified":true,"report_capture_join_verified":true,"original_descent_verified":false,"solver_completed":false,"scalar_recovered":false,"all_patterns_negative":false,"first_fall_degree":null,"last_fall_degree":null,"degree_of_regularity":null,"producer_counters_verified":false,"producer_lift_classifications_verified":false,"public_features":null});
++  let value=serde_json::json!({"schema":"crypto.ml-dataset.owned-search-restricted-rows/v1","visibility":"restricted","status":"verified_selected_rows","snapshot":s.index,"pattern":self.authenticated_map().ok_or("owned source absent")?.pattern(),"capture_head_event_count":ack.event_count,"capture_head_sha256":ack.last_event_sha256,"identity_capsule":self.capsule,"rows":labels,"verified_rows":rows,"original_public_factor_and_map_verified":true,"report_capture_join_verified":true,"original_descent_verified":self.descent.as_ref().is_some_and(|a|a.original_descent_verified()),"descent_scope":"authenticated-pattern-auxiliary-boolean-gate-equations","solver_completed":false,"scalar_recovered":false,"all_patterns_negative":false,"first_fall_degree":null,"last_fall_degree":null,"degree_of_regularity":null,"producer_counters_verified":false,"producer_lift_classifications_verified":false,"public_features":null});
+   if DecodeBudget::check(&mut self.frame.budget,Instant::now()).is_err(){self.verdict=Verdict::Rejected;return Err("owned projection deadline".into())}Ok(value)
+  }
+ }
+@@ -322,3 +339,7 @@
+  let mut matches=artifacts.iter().filter(|a|a.path==path);let a=matches.next().ok_or("manifest omits owned capture evidence")?;
+  if matches.next().is_some()||a.bytes!=bytes||a.sha256!=sha{return Err("owned capture manifest descriptor mismatch".into())}Ok(())
+ }
++
++fn checker_exhausted(c:&bridge::Certificate)->bool{
++ matches!(c.result,Err(bridge::Failure::Checker))&&c.audit.as_ref().is_some_and(|a|matches!(a.result,Err(bqi::Failure::Unknown(_))))
++}

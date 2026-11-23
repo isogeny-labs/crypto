@@ -1,0 +1,31 @@
+{
+  "schema": "trace-incidence-development-check/v1",
+  "command": "bash research/trace_incidence_20261116/check-native.sh",
+  "compiler_flags": [
+    "-O3",
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "exit_code": 0,
+  "fixture_count": 90,
+  "scope": "Native development correctness; no timing result extracted; producer assertion, unsigned",
+  "pair_source_sha256": "60d500c5e0b9d9985148d89e8865c7c7ce591fd3f1dc01e4449d05c863533790",
+  "check_script_sha256": "83d318d48d62c4a0a480ebc6ff861174cf86ecd655b315a7ba834d78118d026d",
+  "rust_checks": [
+    {
+      "command": "cargo test --release --lib",
+      "status": "could not start",
+      "exit_code": 127,
+      "reason": "cargo absent"
+    },
+    {
+      "command": "cargo test --release --example trace_incidence_rho",
+      "status": "could not start",
+      "exit_code": 127,
+      "reason": "cargo absent"
+    }
+  ],
+  "scientific_benchmark_submitted": false
+}

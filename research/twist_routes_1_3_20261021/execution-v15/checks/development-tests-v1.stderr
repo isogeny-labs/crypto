@@ -1,0 +1,22 @@
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+warning: unused import: `PathBuf`
+ --> src/bin/../cold_20261029/driver.rs:3:26
+  |
+3 | use std::{fs,path::{Path,PathBuf}};
+  |                          ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: variable does not need to be mutable
+  --> src/bin/../cold_20261029/engine.rs:49:6
+   |
+49 |  let mut unsupported=wants_alpha&&alpha.is_none();
+   |      ----^^^^^^^^^^^
+   |      |
+   |      help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` on by default
+
+warning: `twist-route-experiments` (bin "twist-cold-pipeline" test) generated 2 warnings (run `cargo fix --bin "twist-cold-pipeline" --tests` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 3.38s
+     Running unittests src/bin/twist-cold-pipeline.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_cold_pipeline-45f194f887c4b2cd)

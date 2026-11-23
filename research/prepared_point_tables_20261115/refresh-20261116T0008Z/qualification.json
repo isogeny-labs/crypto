@@ -1,0 +1,134 @@
+{
+  "schema": "native-point-tables.merge-refresh/v2",
+  "at": "2026-11-16T00:15:57.092241+00:00",
+  "merge": {
+    "first_parent": "2615f313a6fb95cdeb441efeb6051c874be7ecca",
+    "second_parent": "556ea9b79af1b2092efa5c245afdd7b725604a89",
+    "conflicts": [
+      "docs/session-logs/2026-11-15.md",
+      "problems/README.md"
+    ],
+    "ledger_equals_incoming_main": true,
+    "old_ledger_remains_complete_byte_prefix": true
+  },
+  "native_source_manifest": {
+    "path": "native-source.sha256",
+    "sha256": "4b40d64f90ec0ad82978e381e8b171e6a10ea61ce92148d4453469dc0e0f36cd",
+    "entries": 65,
+    "scope": "Every native Rust source/test/example, JSON fixture, native manifest/lock and API document. Adds coverage of the already-tracked Rust hash-preparation example."
+  },
+  "main_native_changes": [
+    "src/admission.rs",
+    "src/admission/dimensions.rs",
+    "src/contraction/recursive.rs",
+    "src/contraction/dimension_controls.rs"
+  ],
+  "feature_algorithm_byte_identical_to_previous_head": true,
+  "main_audit_files_byte_identical_to_incoming_main": true,
+  "all_target_passing_cases": 167,
+  "checks": [
+    {
+      "check": "tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/crypto-point-tables",
+      "at": "2026-11-16T00:12:38.708616+00:00",
+      "exit_code": 0,
+      "stdout": "parent.tests.stdout.log",
+      "stdout_sha256": "6897b25ad860d31efd96c729a162ef6af2d2b2021423c62bb92c892d7c80749b",
+      "stderr": "parent.tests.stderr.log",
+      "stderr_sha256": "de0368e46344c08b4efdc82c7ec6bb79583e1b31129b6c406cf1a8fd3d61b705",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/point-tables-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "cwd": "/workspace/crypto-point-tables",
+      "at": "2026-11-16T00:12:39.070401+00:00",
+      "exit_code": 0,
+      "stdout": "parent.fmt.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "parent.fmt.stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/point-tables-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/workspace/crypto-point-tables",
+      "at": "2026-11-16T00:12:41.778212+00:00",
+      "exit_code": 0,
+      "stdout": "parent.clippy.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "parent.clippy.stderr.log",
+      "stderr_sha256": "3d6c752fd30c763a687331f35ea6ee99b95585e520e293a2575ba9d22b377e7e",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/point-tables-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    },
+    {
+      "check": "msrv",
+      "argv": [
+        "cargo",
+        "+1.78.0",
+        "check",
+        "--locked",
+        "--manifest-path",
+        "crates/hashed-ecdl-tensor/Cargo.toml",
+        "--all-targets"
+      ],
+      "cwd": "/workspace/crypto-point-tables",
+      "at": "2026-11-16T00:12:44.577923+00:00",
+      "exit_code": 0,
+      "stdout": "parent.msrv.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "parent.msrv.stderr.log",
+      "stderr_sha256": "482d6044291e8cc7810ec6739c29e1cce46cbdf71d2d9cb749610a612632cec1",
+      "nonsecret_env": {
+        "CARGO_TARGET_DIR": "/workspace/.task-cache/point-tables-crypto",
+        "PATH_prefix": "/home/agent/.cargo/bin"
+      }
+    }
+  ],
+  "archive": {
+    "path": "development.tar.xz",
+    "sha256": "7987b08170f61ba9666acfc7b0e5fd969c9cc0e5286b06d6f1a6bd004baf4fb4",
+    "bytes": 15396,
+    "check": "Extract to fresh directory; cd development; sha256sum -c SHA256SUMS"
+  },
+  "standing": "Producer development/source/retention observations only, not signed execution, performance or general audit",
+  "scientific_runs": 0,
+  "hosted_new_head_checks": "Pending upload/current-head inspection; old hosted statuses are historical observations",
+  "merge_dependency": "Existing unrelated open genus-ladder record; auto-merge remains off under all applicable checks/review"
+}

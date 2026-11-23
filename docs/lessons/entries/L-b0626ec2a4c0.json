@@ -1,0 +1,14 @@
+{
+  "action": "wait until no other rustc --crate-name crypto_lib is running; two concurrent builds are OOM-killed",
+  "created": "2026-11-16T16:25:59Z",
+  "evidence": [
+    "research/ic_positive_control_capped_20261116/validation/validator-report.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "starting a release build of crypto_lib on the shared 16 GB VM",
+  "why": ""
+}

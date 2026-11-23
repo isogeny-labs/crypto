@@ -1,0 +1,45 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.145
+   Compiling ryu v1.0.23
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling hex v0.4.3
+   Compiling syn v3.0.9
+   Compiling serde_derive v1.0.229
+   Compiling orientation-anchor-certificate v0.1.0 (/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/certificate)
+    Finished `release` profile [optimized] target(s) in 6.09s
+     Running unittests src/lib.rs (research/prime_orientation_anchor_20261114/certificate/target/release/deps/orientation_anchor_certificate-1ef766f19700375d)
+
+running 25 tests
+test hash_sha256::tests::sha224_abc ... ok
+test hash_sha256::tests::sha224_empty ... ok
+test hash_sha256::tests::sha256_block_boundary_55 ... ok
+test hash_sha256::tests::sha256_abc ... ok
+test hash_sha256::tests::sha256_fips180_112byte ... ok
+test hash_sha256::tests::sha256_empty ... ok
+test hash_sha256::tests::sha256_fips180_56byte ... ok
+test hash_sha256::tests::sha256_hello_world ... ok
+test hash_sha256::tests::sha256_two_blocks_64 ... ok
+test hash_sha256::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test hash_sha256::tests::streaming_million_a ... ok
+test identity::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test hash_sha256::tests::streaming_matches_one_shot_at_every_split ... ok
+test identity::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity::tests::tampering_with_the_digest_is_detected ... ok
+test tests::dropped_subtraction_is_rejected ... ok
+test tests::rearrangement_accepts_and_extra_points_accept ... ok
+test identity::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test tests::understated_degree_is_rejected ... ok
+test identity::tests::schoenhage_identity_certifies_and_checks ... ok
+test hash_sha256::tests::sha256_million_a ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

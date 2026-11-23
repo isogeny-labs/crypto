@@ -1,0 +1,10 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11];
+ a [label="Earlier combined-sanitizer cells\nStop at signed1<<31; preserved"];
+ b [label="Separately frozen address-only build\nUnchanged source;4cells;5s each"];
+ c [label="LA1ordinary exact PASS\nBoth saturation cells timeout124",fillcolor="#fff1d5"];
+ d [label="LA2ordinary: exit134\nASAN READ SEGV la_ff_32.c543",fillcolor="#fbe3df"];
+ e [label="Concrete fault site, not full root cause\nPrior undefined shift remains uninstrumented\nCrefinement and signed execution remain open",fillcolor="#fff1d5"];
+ a -> b; b -> c; b -> d; c -> e; d -> e;
+}

@@ -4,7 +4,7 @@
 - **Kind:** implementation gap and independent-verification gap
 - **Affected work:** the 1,940 `prime_quadratic_pullback_v1` map rows in the [cover catalog](../docs/curves/covers.json), their exact HC1/CV1 joins in the [cover graph](../docs/curves/cover-links.yaml), the [catalog-wide transfer assessment](../docs/curves/cover-transfer-assessments.json), and the [hyperelliptic infrastructure contract](../docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md)
 - **Next action owner:** hyperelliptic infrastructure workstream (unassigned)
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-11-11
 
 ## Problem
 
@@ -41,6 +41,7 @@ but would not resolve the catalog-wide obligation.
   requires a monic polynomial of degree `2g+1` and one rational infinity;
   [`hyperelliptic-cover`](../src/bin/hyperelliptic_cover.rs) reports the
   constructed even sextic's arithmetic boundary as unsupported.
+  [pcc:unverified]
 - **Derived or proved:** for this fixed family, the monic sextic source has two
   base-field-rational points at infinity. Consequently, applying the existing
   one-infinity representation without a proved conversion would change the
@@ -58,6 +59,19 @@ but would not resolve the catalog-wide obligation.
   subgroup preservation, solver, or computational advantage.
 
 ## What would unblock it
+
+The Chained Transfers continuation now has a **bounded development prototype**
+at cryptanalysis28ba661017cdba4b132c2dcbc1615a3fd92a2a48, not production or
+catalog-wide coverage. It accepts monic smooth split sextics at checked
+primes5..101. Both10,404-class original/translated controls match an existing
+odd-chart engine, and the E109/F101 cover has arbitrary-class norm and all
+source scalar/norm[2] checks. The complete guarded suite passes native25 and
+reference37 tests,1 old benchmark ignored (PCC cryptanalysis8b7ca0, unsigned).
+Six structural Lean lemmas do not construct Picard geometry. See
+[checkpoint](../research/chained_jacobian_transfers_20261110/BALANCED_CHECKPOINT.md).
+Large primes, extension fields, nonmonic/inert models, normalized targets,
+exact catalog replay and production integration remain unsupported. The
+problem and the catalog-wide checkboxes below remain open. [pcc:unverified]
 
 - [ ] Implement a canonical balanced divisor representation for each claimed
   field family, with checked validity, reduction, equality, addition,
@@ -79,6 +93,7 @@ cover family. They would not by themselves prove the 530 catalog generators'
 exact orders, certify kernel intersection and image order for each EC1 record,
 or provide a Jacobian index-calculus solver; those remain separate
 obligations.
+[pcc:unverified]
 
 ## Next discriminating step
 

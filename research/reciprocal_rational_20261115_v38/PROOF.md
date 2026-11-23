@@ -1,0 +1,13 @@
+# Prepared bounded reciprocal-pair query via rational reconstruction
+
+Unexecuted, unregistered prototype. No new timing, pair-solver admission or novelty claim.
+
+Let M irreducible degree n and nonzero source polynomials a,b have degree<d. The field reciprocal sum t=1/a+1/b is the reduced rational function N/D=(a+b)/(ab), with degN<=d-1 and degD<=2d-2. If 3d-3<n, two such bounded fractions equal modulo M only when they are the identical rational function: ND'+N'D has degree<=3d-3<n and is divisible by M. For n83,d18 the bounds are17,34 and51<83. This degree fact is independent of the sparse modulus shape.
+
+Extended Euclid on (M,t), retaining r_i=s_i*t modM, stops at first remainder degree<=A=d-1. If degs_i<=B=2d-2, it gives the unique reduced bounded fraction. If degs_i>B, no bounded fraction exists. Proof: degs_i=n-degr_(i-1), while degs_(i-1)<degs_i. Any candidate N,D with bounds gives Nrcoef_(i-1)+D r_(i-1) divisible by M. Both terms have degree<n because degr_(i-1)>A and degs_i>B. It must vanish; consecutive Euclid determinants equal M, so r_(i-1),s_(i-1) are coprime (M irreducible). This would force the reduced numerator degree>A, contradiction. The t0 case is separate.
+
+For t!=0 and its primitive fraction N/D, original pairs satisfy D(a+b)=Nab as an exact polynomial identity by the degreebound. Equivalently (Na+D)(Nb+D)=D². Enumerate monic divisors U of D² and V=D²/U; retain only U+D and V+D divisible by N, with a=(U+D)/N,b=(V+D)/N nonzero and degree<d. This bijects every ordered pair with a divisor U. In characteristic2 all nonzero leading units are1. For t0, exactly the diagonal a=b remains. Multiplicities and divisor repetitions must be handled exactly.
+
+Potential effect: query the entire low18 factor base for a reciprocal pair without storing2^36pairs. It does not make the remaining2^54triple queries tractable, nor prove a smaller whole-cell search. Divisor enumeration can be large; explicit factorization/work/output caps and unresolved fallbacks are mandatory. This is established rational reconstruction and divisor algebra; novelty needs primary-source review.
+
+Next freeze independent small complete pair maps and an independent binary linear-system rational oracle. Include diagonal/zero numerator, reducible/invalid modulus refusal, rational cancellations, repeated factors, degree-bound failure and pairs outside the domain. Then actualGF83 planted pairs and random triple-target queries; compare with direct small-domain pair enumeration and prove completeness before timing. The prepared file implements only the fraction stage and assumes an irreducible caller-certified modulus. No factorization/enumeration or originalallroots result yet.

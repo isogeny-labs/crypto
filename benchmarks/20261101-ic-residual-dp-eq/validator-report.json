@@ -1,0 +1,1362 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "date": "2026-11-01T02:38Z",
+ "verifier": "Validator subagent (Sonnet 5.5); recompute from records.jsonl with own code (no producer analysis script, summary.json, comparisons/*.json or band-*.json read)",
+ "subject": "research/ic_residual_dp_eq_20261101 (E-p36, E-p37)",
+ "verdict_note": "PASS means: the ten producer headline numbers recompute from raw records under the harness's band pricing (src/cryptanalysis/ecbench/band.rs) within rel_tol 5e-3, the receipt is admissible and replays. It does NOT mean the w>0 candidate/baseline ratios measure operation-count savings: see findings F1 (a byte counter is priced as operations) and F2. Only the w=0 claims are insensitive to F1.",
+ "raw_data": [
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p36/records.jsonl",
+   "sha256": "12a1fc4ba79db69092c6a2c7deae733ca7e074ae107399947760ebd668f4dd33"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p37/records.jsonl",
+   "sha256": "87810fe7057b33917897ee9e1682ca3e35af955423c556b7c2e6ca0195aa6a1b"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p36/session.json",
+   "sha256": "4fc66222308aea94fbc36ce2de50edbc9442fcc7a1fd4a5ab7c1e5aef6ceff2f"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p37/session.json",
+   "sha256": "4de26bef04386d35b7e0bd72a752ed4d182bd5dfd84c265148c626be8c32a2cd"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p36/spec.json",
+   "sha256": "00c76b36bad50248115b17e5529e7b7edee588de2db286145a7e7be5f00d543a"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p37/spec.json",
+   "sha256": "a20bf2f3cc201c9707efb321db8eaf96794bda663764fb19db80de7c23459bfb"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p36/.artifacts.json",
+   "sha256": "2d1a733d84e8cda546ec72209c45f825e54712d419a3949124cf20df700cdf52"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/sessions/E-p37/.artifacts.json",
+   "sha256": "b6984bf42830a59d7f24d4b8b49ce02b3a10e2c990a848ae99265397aea498d9"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/PROTOCOL.md",
+   "sha256": "2c42fe3bc86bd563f38cad2bec59c24d1c50823e63f7e377ba2ad569a8d8efd1"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/protocol.json",
+   "sha256": "bd736d8abdf3146e6a75dec2ea8327b5e1a573df50cf1cf0329ff98fd6f268d6"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/specs-local/E-p36.json",
+   "sha256": "00c76b36bad50248115b17e5529e7b7edee588de2db286145a7e7be5f00d543a"
+  },
+  {
+   "path": "../../research/ic_residual_dp_eq_20261101/specs-local/E-p37.json",
+   "sha256": "a20bf2f3cc201c9707efb321db8eaf96794bda663764fb19db80de7c23459bfb"
+  }
+ ],
+ "code_read": [
+  {
+   "path": "../../src/cryptanalysis/ecbench/band.rs",
+   "sha256": "3f51c1bd0548c687430c11f5ad42a770af9c960856a5204499810888fa0dfd78"
+  },
+  {
+   "path": "../../src/cryptanalysis/ecbench/compare.rs",
+   "sha256": "6781fd6efa9f24edb18e62068d0701828141d096d4fa2368cad69c6cc76b57ab"
+  },
+  {
+   "path": "../../src/cryptanalysis/ic_framework/residual.rs",
+   "sha256": "07eac14ebf7e2ea11bad20ad403111a8b151516457860fd923e338d246c6fa6d"
+  },
+  {
+   "path": "../../src/cryptanalysis/ic_boundary.rs",
+   "sha256": "8801af22b9b9bcad17ba51495ac53efffc043861591487afa65cd38dd7019cec"
+  },
+  {
+   "path": "../../src/cryptanalysis/ecbench/work.rs",
+   "sha256": "ddda56b5e62fd6a60fac819d642c7967ab7630cff5e0d92ac85065ef6b7cd58c"
+  },
+  {
+   "path": "../../docs/VALIDATION_GATE.md",
+   "sha256": "c4d2038bf6cd42dd42921b5081055242d016fc8072d592b2cd354adbaad93a42"
+  },
+  {
+   "path": "../../scripts/validation_gate.py",
+   "sha256": "377bdb5e3b7f840f508ebfc171d1e5ca1dee0f871d122e8d315f5f1c273cf723"
+  }
+ ],
+ "recompute_method": {
+  "cost_at_weight_w": "total_gae + w * sum(unpriced counts), exactly band.rs: for each name in cost.unpriced take counters[name] if present, else the sum over phases of native[name] or native[name without _uncharged]; no record has detail.calibration_pinned_units, so no calibration term; no unpriced counter lacks a count",
+  "note_on_task_wording": "the unpriced counts are taken from top-level counters first (rho's canonicalisations_uncharged lives there; phases' native maps are empty for rho) and from the phases' native maps for every IC arm",
+  "pairing": "measured (warmup == false) verified records, key (workload_id, round), 48 pairs per arm pair per session (16 targets x rounds 1..3)",
+  "ratio": "sum over pairs of b / sum over pairs of a, in raw cost (same ratio as in S units: common sqrt(r) per curve)",
+  "distance_to_rho": "arm b = the IC arm, arm a = 'rho' (rho.negation, 'reference' role in the same session and binary)"
+ },
+ "headline": [
+  {
+   "name": "p36 res1eq vs res1 at w=0 (ratio_b_over_a)",
+   "claimed": 0.639,
+   "recomputed": 0.6385422236923235,
+   "rel_tol": 0.005,
+   "rel_diff": 0.0007163948476940785,
+   "pairs": 48,
+   "session": "E-p36",
+   "a_arm": "res1",
+   "b_arm": "res1eq",
+   "weight": 0.0
+  },
+  {
+   "name": "p36 res1eq vs res1 at w=1",
+   "claimed": 0.158,
+   "recomputed": 0.157906447355805,
+   "rel_tol": 0.005,
+   "rel_diff": 0.0005921053430063269,
+   "pairs": 48,
+   "session": "E-p36",
+   "a_arm": "res1",
+   "b_arm": "res1eq",
+   "weight": 1.0
+  },
+  {
+   "name": "p36 res4dp vs res4 at w=0.1",
+   "claimed": 0.279,
+   "recomputed": 0.2785481249250607,
+   "rel_tol": 0.005,
+   "rel_diff": 0.0016196239245137023,
+   "pairs": 48,
+   "session": "E-p36",
+   "a_arm": "res4",
+   "b_arm": "res4dp",
+   "weight": 0.1
+  },
+  {
+   "name": "p37 res1dp vs res1 at w=0",
+   "claimed": 0.816,
+   "recomputed": 0.8159265757215298,
+   "rel_tol": 0.005,
+   "rel_diff": 8.998073341927017e-05,
+   "pairs": 48,
+   "session": "E-p37",
+   "a_arm": "res1",
+   "b_arm": "res1dp",
+   "weight": 0.0
+  },
+  {
+   "name": "p37 res2eq vs res2 at w=1",
+   "claimed": 0.129,
+   "recomputed": 0.12903824615013673,
+   "rel_tol": 0.005,
+   "rel_diff": 0.0002963939086108513,
+   "pairs": 48,
+   "session": "E-p37",
+   "a_arm": "res2",
+   "b_arm": "res2eq",
+   "weight": 1.0
+  },
+  {
+   "name": "p37 res4eq vs res4 at w=0.1",
+   "claimed": 0.235,
+   "recomputed": 0.23539302789802988,
+   "rel_tol": 0.005,
+   "rel_diff": 0.001669666691233297,
+   "pairs": 48,
+   "session": "E-p37",
+   "a_arm": "res4",
+   "b_arm": "res4eq",
+   "weight": 0.1
+  },
+  {
+   "name": "p36 distance to rho: res1eq/rho at w=0",
+   "claimed": 1.54,
+   "recomputed": 1.5423073966667233,
+   "rel_tol": 0.005,
+   "rel_diff": 0.0014960679509870168,
+   "pairs": 48,
+   "session": "E-p36",
+   "a_arm": "rho",
+   "b_arm": "res1eq",
+   "weight": 0.0
+  },
+  {
+   "name": "p36 distance to rho: res1dp/rho at w=1",
+   "claimed": 2.22,
+   "recomputed": 2.2190538048755752,
+   "rel_tol": 0.005,
+   "rel_diff": 0.00042621402001124023,
+   "pairs": 48,
+   "session": "E-p36",
+   "a_arm": "rho",
+   "b_arm": "res1dp",
+   "weight": 1.0
+  },
+  {
+   "name": "p37 distance to rho: res1eq/rho at w=0",
+   "claimed": 1.64,
+   "recomputed": 1.6399244590300424,
+   "rel_tol": 0.005,
+   "rel_diff": 4.60615670472828e-05,
+   "pairs": 48,
+   "session": "E-p37",
+   "a_arm": "rho",
+   "b_arm": "res1eq",
+   "weight": 0.0
+  },
+  {
+   "name": "p36 distance to rho: res4/rho at w=1",
+   "claimed": 51.57,
+   "recomputed": 51.567368871220566,
+   "rel_tol": 0.005,
+   "rel_diff": 5.10205309178646e-05,
+   "pairs": 48,
+   "session": "E-p36",
+   "a_arm": "rho",
+   "b_arm": "res4",
+   "weight": 1.0
+  }
+ ],
+ "max_rel_diff": 0.001669666691233297,
+ "controls": {
+  "aa_res2aa_vs_res2": {
+   "E-p36 w=0.0": {
+    "ratio_res2aa_over_res2": 1.0,
+    "abs_dev_from_1": 0.0,
+    "pairs": 48
+   },
+   "E-p36 w=0.1": {
+    "ratio_res2aa_over_res2": 1.0,
+    "abs_dev_from_1": 0.0,
+    "pairs": 48
+   },
+   "E-p36 w=1.0": {
+    "ratio_res2aa_over_res2": 1.0,
+    "abs_dev_from_1": 0.0,
+    "pairs": 48
+   },
+   "E-p37 w=0.0": {
+    "ratio_res2aa_over_res2": 1.0,
+    "abs_dev_from_1": 0.0,
+    "pairs": 48
+   },
+   "E-p37 w=0.1": {
+    "ratio_res2aa_over_res2": 1.0,
+    "abs_dev_from_1": 0.0,
+    "pairs": 48
+   },
+   "E-p37 w=1.0": {
+    "ratio_res2aa_over_res2": 1.0,
+    "abs_dev_from_1": 0.0,
+    "pairs": 48
+   }
+  },
+  "aa_note": "identical to 1.0 because counts are deterministic and res2aa is a copy of res2: the control proves the harness is order/position independent in counts, it cannot show anything about noise",
+  "positive_control": "every verified record has recovered == planted and matches_planted/matches_target true; 16 targets per curve satisfy Q = [planted]G in the validator's own affine arithmetic; replay certificate attached"
+ },
+ "record_integrity": {
+  "E-p36": {
+   "records": 704,
+   "status_counts": {
+    "verified": 704
+   },
+   "verified_with_matches_planted_false": 0,
+   "verified_with_recovered_ne_planted": 0,
+   "non_verified_or_censored_records_any_arm": 0,
+   "measured_records_per_arm": {
+    "res1": 48,
+    "res1dp": 48,
+    "res1eq": 48,
+    "res2": 48,
+    "res2aa": 48,
+    "res2dp": 48,
+    "res2eq": 48,
+    "res4": 48,
+    "res4dp": 48,
+    "res4eq": 48,
+    "rho": 48
+   },
+   "warmup_records": 176,
+   "targets": 16
+  },
+  "E-p37": {
+   "records": 704,
+   "status_counts": {
+    "verified": 704
+   },
+   "verified_with_matches_planted_false": 0,
+   "verified_with_recovered_ne_planted": 0,
+   "non_verified_or_censored_records_any_arm": 0,
+   "measured_records_per_arm": {
+    "res1": 48,
+    "res1dp": 48,
+    "res1eq": 48,
+    "res2": 48,
+    "res2aa": 48,
+    "res2dp": 48,
+    "res2eq": 48,
+    "res4": 48,
+    "res4dp": 48,
+    "res4eq": 48,
+    "rho": 48
+   },
+   "warmup_records": 176,
+   "targets": 16
+  }
+ },
+ "pairing_check": {
+  "cells_per_session": 64,
+  "arms_per_cell": 11,
+  "all_arms_cover_identical_(workload_id,round)_cells": true,
+  "algorithm_seed_equal_across_arms_in_each_cell": true,
+  "algorithm_seed_distinct_across_rounds_for_a_target": true,
+  "consequence": "each (arm_a, arm_b) pair set is the same 48 cells; the three-way rho / baseline / candidate pairing is 1:1:1 on (target, round) with a shared algorithm_seed; rounds are distinct draws, so the 48 pairs are 16 independent targets x 3 draws (cluster = target)"
+ },
+ "protocol_vs_run": {
+  "protocol_commits": "git log --follow PROTOCOL.md: one commit, 0fb916d99fae2110c5ebb74ad1dcb993ca11ba43 (2026-11-01 01:13:52Z); git diff 0fb916d99f HEAD over PROTOCOL.md, protocol.json, specs/, specs-local/ is empty",
+  "sessions_started_utc": "E-p36 01:13:58Z (started_unix_ms 1793495638123), E-p37 01:19:15Z (1793495955078): both after the freeze commit (6 s for the first); session git_commit = freeze commit, git_dirty false",
+  "spec_equals_frozen": "sessions/*/spec.json sha256 equals specs-local/*.json sha256 (both curves)",
+  "design_matches_protocol": "16 targets/curve, target_seed 20261601, measure seed 20261602, 3 rounds + 1 warm-up, alternate_measured, 11 arms (rho, res{1,2,4}, res{1,2,4}{dp,eq}, res2aa) -> 11*16*4 = 704 records per session",
+  "route_deviation": "protocol states local L0 run because the isolab-eks route was unavailable; counts only, no wall-clock claim",
+  "tally_inconsistency": "PROTOCOL.md says '12 cells per curve pair, 24 cells in all' and README.md says 'eq 12/12 cells hold; dp 9/12'; summary.json has 12 (curve, B, candidate) cells, 6 per candidate, 36 cell-weights; the README tallies match none of these counts (the qualitative verdict, C1 not met, is unaffected)"
+ },
+ "c1_interval_check_validator": {
+  "method": "validator's own target-clustered percentile bootstrap (16 clusters, 4000 resamples, seed 7) and linearised-t (t_15=2.1314); cell = (curve, B, candidate), required: upper limit < 1 at w=0, 0.1 and 1; harness pricing",
+  "cells": {
+   "E-p36 res1dp": {
+    "below_1_bootstrap": false,
+    "below_1_linearised_t": false,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.8801027916105202,
+      "bootstrap95": [
+       0.7613456212819643,
+       1.0102514384928614
+      ],
+      "linearised_t95": [
+       0.7417154043176333,
+       1.018490178903407
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.42498753457846533,
+      "bootstrap95": [
+       0.36763118235612047,
+       0.4879356836215935
+      ],
+      "linearised_t95": [
+       0.35809991914308753,
+       0.49187515001384313
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.13153124649011452,
+      "bootstrap95": [
+       0.11378103205923099,
+       0.15105251672252265
+      ],
+      "linearised_t95": [
+       0.11081219120103478,
+       0.15225030177919427
+      ]
+     }
+    }
+   },
+   "E-p36 res1eq": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.6385422236923235,
+      "bootstrap95": [
+       0.5688207780603877,
+       0.7224825658114478
+      ],
+      "linearised_t95": [
+       0.5557177255137593,
+       0.7213667218708877
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.34632610044786943,
+      "bootstrap95": [
+       0.3083928285622432,
+       0.39196962764245813
+      ],
+      "linearised_t95": [
+       0.3012292066324622,
+       0.39142299426327665
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.157906447355805,
+      "bootstrap95": [
+       0.14042142895137666,
+       0.17887098550813763
+      ],
+      "linearised_t95": [
+       0.13717803896423186,
+       0.17863485574737814
+      ]
+     }
+    }
+   },
+   "E-p36 res2dp": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.8384057140125121,
+      "bootstrap95": [
+       0.7853205341934483,
+       0.8988279652645248
+      ],
+      "linearised_t95": [
+       0.7749133574342754,
+       0.9018980705907488
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.3458103841211687,
+      "bootstrap95": [
+       0.32387990609072936,
+       0.37078109234795154
+      ],
+      "linearised_t95": [
+       0.31957886113219897,
+       0.37204190711013846
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.09889561134003955,
+      "bootstrap95": [
+       0.09261602355163467,
+       0.1060666971330491
+      ],
+      "linearised_t95": [
+       0.09137582211519764,
+       0.10641540056488145
+      ]
+     }
+    }
+   },
+   "E-p36 res2eq": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.6540346692432218,
+      "bootstrap95": [
+       0.5923160972606146,
+       0.7179512297717904
+      ],
+      "linearised_t95": [
+       0.5839111882038339,
+       0.7241581502826098
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.30282884568982366,
+      "bootstrap95": [
+       0.2741161264163903,
+       0.332597486667977
+      ],
+      "linearised_t95": [
+       0.27016428461262526,
+       0.33549340676702205
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.1267859543753142,
+      "bootstrap95": [
+       0.11463383217769216,
+       0.13942937078636464
+      ],
+      "linearised_t95": [
+       0.11290451657086079,
+       0.14066739217976762
+      ]
+     }
+    }
+   },
+   "E-p36 res4dp": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.8705776225699651,
+      "bootstrap95": [
+       0.8011301236022266,
+       0.9602155700676367
+      ],
+      "linearised_t95": [
+       0.7819094809835863,
+       0.9592457641563439
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.2785481249250607,
+      "bootstrap95": [
+       0.2563033092272025,
+       0.30728719891444195
+      ],
+      "linearised_t95": [
+       0.25014500873163664,
+       0.30695124111848476
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.07315903041386163,
+      "bootstrap95": [
+       0.0673079643404105,
+       0.08074613613114201
+      ],
+      "linearised_t95": [
+       0.06568737437378394,
+       0.08063068645393931
+      ]
+     }
+    }
+   },
+   "E-p36 res4eq": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.6788126232093736,
+      "bootstrap95": [
+       0.6202740084040068,
+       0.743324009473143
+      ],
+      "linearised_t95": [
+       0.608955700649587,
+       0.7486695457691602
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.24339930420868833,
+      "bootstrap95": [
+       0.22235759964638777,
+       0.2666498634915001
+      ],
+      "linearised_t95": [
+       0.21824357971954533,
+       0.2685550286978313
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.09234408198848454,
+      "bootstrap95": [
+       0.08429373987738306,
+       0.10123392032538284
+      ],
+      "linearised_t95": [
+       0.08271453648312768,
+       0.1019736274938414
+      ]
+     }
+    }
+   },
+   "E-p37 res1dp": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.8159265757215298,
+      "bootstrap95": [
+       0.6944522047088417,
+       0.9567474978956306
+      ],
+      "linearised_t95": [
+       0.6663024695173492,
+       0.9655506819257105
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.39235480795795113,
+      "bootstrap95": [
+       0.33387844411630774,
+       0.46016430211633463
+      ],
+      "linearised_t95": [
+       0.3203202977916121,
+       0.4643893181242902
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.11932382140382111,
+      "bootstrap95": [
+       0.1015087295149035,
+       0.13997592240059514
+      ],
+      "linearised_t95": [
+       0.09738742871946487,
+       0.14126021408817735
+      ]
+     }
+    }
+   },
+   "E-p37 res1eq": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.6596932408035229,
+      "bootstrap95": [
+       0.5691525223466866,
+       0.7676765023154438
+      ],
+      "linearised_t95": [
+       0.5524433582556282,
+       0.7669431233514176
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.35752238057808744,
+      "bootstrap95": [
+       0.30830692180532515,
+       0.41615725819582194
+      ],
+      "linearised_t95": [
+       0.2992031995129577,
+       0.4158415616432172
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.16274545172170016,
+      "bootstrap95": [
+       0.1402416766247133,
+       0.18961106022169585
+      ],
+      "linearised_t95": [
+       0.13601890389533752,
+       0.1894719995480628
+      ]
+     }
+    }
+   },
+   "E-p37 res2dp": {
+    "below_1_bootstrap": false,
+    "below_1_linearised_t": false,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.9413109710199041,
+      "bootstrap95": [
+       0.834609459071974,
+       1.0695615342180853
+      ],
+      "linearised_t95": [
+       0.8126863470922107,
+       1.0699355949475977
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.386165609355509,
+      "bootstrap95": [
+       0.34234468875069096,
+       0.43884013033010943
+      ],
+      "linearised_t95": [
+       0.3333426534329536,
+       0.43898856527806435
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.10790350983894052,
+      "bootstrap95": [
+       0.09564333530422293,
+       0.12264640591414691
+      ],
+      "linearised_t95": [
+       0.0931282086829551,
+       0.12267881099492595
+      ]
+     }
+    }
+   },
+   "E-p37 res2eq": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.6714916014000911,
+      "bootstrap95": [
+       0.5701597866269195,
+       0.7866761725401942
+      ],
+      "linearised_t95": [
+       0.5522256536683757,
+       0.7907575491318065
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.3101551866053695,
+      "bootstrap95": [
+       0.26314490557810166,
+       0.3634955209540154
+      ],
+      "linearised_t95": [
+       0.25480755243402003,
+       0.365502820776719
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.12903824615013673,
+      "bootstrap95": [
+       0.10926502855995929,
+       0.15144896096097596
+      ],
+      "linearised_t95": [
+       0.10576019866532245,
+       0.15231629363495103
+      ]
+     }
+    }
+   },
+   "E-p37 res4dp": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.8952146514499231,
+      "bootstrap95": [
+       0.8095932770688403,
+       0.9933186840589481
+      ],
+      "linearised_t95": [
+       0.7943067077045165,
+       0.9961225951953296
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.28406829782150206,
+      "bootstrap95": [
+       0.25685928400291586,
+       0.3152282667399413
+      ],
+      "linearised_t95": [
+       0.25202267976337067,
+       0.31611391587963344
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.0720874502576494,
+      "bootstrap95": [
+       0.06518570174385462,
+       0.0800031055061016
+      ],
+      "linearised_t95": [
+       0.06395524936814363,
+       0.08021965114715517
+      ]
+     }
+    }
+   },
+   "E-p37 res4eq": {
+    "below_1_bootstrap": true,
+    "below_1_linearised_t": true,
+    "by_weight": {
+     "w=0.0": {
+      "ratio": 0.6595055498973408,
+      "bootstrap95": [
+       0.5992122065761704,
+       0.7278954704846009
+      ],
+      "linearised_t95": [
+       0.5862277803294278,
+       0.7327833194652538
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.23539302789802988,
+      "bootstrap95": [
+       0.21378843337166517,
+       0.2598649046075555
+      ],
+      "linearised_t95": [
+       0.2091411057022791,
+       0.2616449500937807
+      ]
+     },
+     "w=1.0": {
+      "ratio": 0.08828631386448958,
+      "bootstrap95": [
+       0.08011673371002699,
+       0.09753165289312848
+      ],
+      "linearised_t95": [
+       0.07836518719433101,
+       0.09820744053464815
+      ]
+     }
+    }
+   }
+  },
+  "summary": {
+   "dp": {
+    "cells": 6,
+    "hold_bootstrap": 4,
+    "hold_linearised_t": 4
+   },
+   "eq": {
+    "cells": 6,
+    "hold_bootstrap": 6,
+    "hold_linearised_t": 6
+   }
+  }
+ },
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "high",
+   "scope": "all w > 0 candidate-vs-baseline ratios and baseline distance-to-rho at w > 0",
+   "finding": "`residual_table_bytes_uncharged` (residual.rs:493-496, table.len()*(16+8*d_col) bytes) is named *_uncharged, so it enters cost.unpriced and band.rs sums it as if it were an operation count at weight w. For the baseline arms it is the dominant w>0 term (bytes counter share of priced cost at w=1: see bytes_counter_share). work.rs classes the analogous native_table_bytes_uncharged as `Shape` (not work). Candidates store only distinguished points, so their byte counter is about 150-210x smaller (e.g. p36 res1 7.04M vs res1dp 47.5k vs res1eq 33.4k bytes on average); the w>0 candidate/baseline advantage is largely this memory reduction priced at 1 GAE per byte (AGENTS.md section 6: a ratio improved by changing the unit does not count).",
+   "effect_on_headline": "excluding the byte counter: p36 res1eq vs res1 at w=1 is 1.075 (claimed 0.158), p36 res4dp vs res4 at w=0.1 is 0.870 (claimed 0.279), p37 res2eq vs res2 at w=1 is 1.140 (claimed 0.129), p37 res4eq vs res4 at w=0.1 is 0.743 (claimed 0.235); eq is >= baseline at w=1 in all six (curve,B) cells (1.075-1.140); w=0 headlines unchanged",
+   "recommendation": "state w>0 figures as 'band as built, includes table bytes priced as operations'; report the byte-excluded band beside it; do not claim eq beats baseline at w=1 as an operation-count improvement; fix by renaming the counter (e.g. residual_table_bytes) so it is a shape counter, in a new study, not by editing these records"
+  },
+  {
+   "id": "F2",
+   "severity": "medium",
+   "scope": "distance to rho at w > 0",
+   "finding": "rho's per-step native work other than canonicalisation (cycle-window scan, jump index, distinguished-point test) is not in its counters, while candidates are charged a DP test (and eq an orientation read and 0.5 negation) per step; rho is the more incomplete lower bound, so the distance to rho at w > 0 is overstated for candidates",
+   "effect": "charging rho one DP test per step (counters.steps) gives p36 res1eq 1.54/1.61/1.80 and res1dp 2.13/1.97/1.50 at w = 0/0.1/1 (harness: 1.54/1.75/2.66 and 2.13/2.14/2.22); the ordering rho ahead of every arm at w=0 is unaffected, at w=1 res1dp stays above rho (1.50)"
+  },
+  {
+   "id": "F3",
+   "severity": "low",
+   "scope": "A/A control",
+   "finding": "res2aa equals res2 to the last bit because counts are deterministic; the control cannot detect noise or bias in counts, only that arm label and run order do not matter"
+  },
+  {
+   "id": "F4",
+   "severity": "low",
+   "scope": "C1 tally",
+   "finding": "validator intervals (bootstrap and linearised t) find dp failing at w=0 in 2 of 6 cells (p36 res1dp, p37 res2dp); the harness-recorded intervals used by the producer add p37 res4dp (upper limit 1.002). Verdict 'C1 not met' holds either way; eq holds in 6/6 cells at harness pricing and fails at w=1 in all 6 once the byte counter is excluded (F1)"
+  }
+ ],
+ "bytes_counter_share": {
+  "E-p36 res1": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.856942136828646,
+   "bytes_counter_share_at_w=0.1": 0.521002225380656
+  },
+  "E-p36 res2": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.8887550540110157,
+   "bytes_counter_share_at_w=0.1": 0.5920089359712968
+  },
+  "E-p36 res4": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.9229902594856625,
+   "bytes_counter_share_at_w=0.1": 0.6852579874980715
+  },
+  "E-p36 res1eq": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.02574537904287021,
+   "bytes_counter_share_at_w=0.1": 0.007136775086186889
+  },
+  "E-p36 res4eq": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.049885953511702046,
+   "bytes_counter_share_at_w=0.1": 0.01405157488185111
+  },
+  "E-p37 res1": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.8569631190254281,
+   "bytes_counter_share_at_w=0.1": 0.5210794545153912
+  },
+  "E-p37 res2": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.8887564453145679,
+   "bytes_counter_share_at_w=0.1": 0.5920141602363037
+  },
+  "E-p37 res4": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.9229980135082406,
+   "bytes_counter_share_at_w=0.1": 0.6852973265186418
+  },
+  "E-p37 res1eq": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.01299014232451837,
+   "bytes_counter_share_at_w=0.1": 0.0035955170640178456
+  },
+  "E-p37 res4eq": {
+   "bytes_counter_share_of_priced_cost_at_w=1": 0.025655076406778568,
+   "bytes_counter_share_at_w=0.1": 0.007144163296636909
+  }
+ },
+ "sensitivity_candidate_vs_baseline_ratio_b_over_a": {
+  "E-p36 res1dp vs res1": {
+   "w=0.0": {
+    "harness_pricing": 0.8801027916105202,
+    "bytes_counter_excluded": 0.8801027916105202
+   },
+   "w=0.1": {
+    "harness_pricing": 0.4249875345784654,
+    "bytes_counter_excluded": 0.8798986446008799
+   },
+   "w=1.0": {
+    "harness_pricing": 0.13153124649011452,
+    "bytes_counter_excluded": 0.878978505864862
+   }
+  },
+  "E-p36 res1eq vs res1": {
+   "w=0.0": {
+    "harness_pricing": 0.6385422236923235,
+    "bytes_counter_excluded": 0.6385422236923235
+   },
+   "w=0.1": {
+    "harness_pricing": 0.34632610044786966,
+    "bytes_counter_excluded": 0.7178623099778606
+   },
+   "w=1.0": {
+    "harness_pricing": 0.157906447355805,
+    "bytes_counter_excluded": 1.0753766525300787
+   }
+  },
+  "E-p36 res2dp vs res2": {
+   "w=0.0": {
+    "harness_pricing": 0.8384057140125121,
+    "bytes_counter_excluded": 0.8384057140125121
+   },
+   "w=0.1": {
+    "harness_pricing": 0.34581038412116877,
+    "bytes_counter_excluded": 0.8382102111701846
+   },
+   "w=1.0": {
+    "harness_pricing": 0.09889561134003955,
+    "bytes_counter_excluded": 0.837329305165292
+   }
+  },
+  "E-p36 res2eq vs res2": {
+   "w=0.0": {
+    "harness_pricing": 0.6540346692432218,
+    "bytes_counter_excluded": 0.6540346692432218
+   },
+   "w=0.1": {
+    "harness_pricing": 0.3028288456898236,
+    "bytes_counter_excluded": 0.7352635446929278
+   },
+   "w=1.0": {
+    "harness_pricing": 0.1267859543753142,
+    "bytes_counter_excluded": 1.1012684748641246
+   }
+  },
+  "E-p36 res4dp vs res4": {
+   "w=0.0": {
+    "harness_pricing": 0.8705776225699651,
+    "bytes_counter_excluded": 0.8705776225699651
+   },
+   "w=0.1": {
+    "harness_pricing": 0.27854812492506054,
+    "bytes_counter_excluded": 0.8703893134920163
+   },
+   "w=1.0": {
+    "harness_pricing": 0.07315903041386163,
+    "bytes_counter_excluded": 0.8695409936380915
+   }
+  },
+  "E-p36 res4eq vs res4": {
+   "w=0.0": {
+    "harness_pricing": 0.6788126232093736,
+    "bytes_counter_excluded": 0.6788126232093736
+   },
+   "w=0.1": {
+    "harness_pricing": 0.2433993042086881,
+    "bytes_counter_excluded": 0.7624630685677493
+   },
+   "w=1.0": {
+    "harness_pricing": 0.09234408198848454,
+    "bytes_counter_excluded": 1.1393027534093751
+   }
+  },
+  "E-p37 res1dp vs res1": {
+   "w=0.0": {
+    "harness_pricing": 0.8159265757215298,
+    "bytes_counter_excluded": 0.8159265757215298
+   },
+   "w=0.1": {
+    "harness_pricing": 0.392354807957951,
+    "bytes_counter_excluded": 0.81580324736887
+   },
+   "w=1.0": {
+    "harness_pricing": 0.11932382140382111,
+    "bytes_counter_excluded": 0.8152474713136035
+   }
+  },
+  "E-p37 res1eq vs res1": {
+   "w=0.0": {
+    "harness_pricing": 0.6596932408035229,
+    "bytes_counter_excluded": 0.6596932408035229
+   },
+   "w=0.1": {
+    "harness_pricing": 0.3575223805780874,
+    "bytes_counter_excluded": 0.7438329930019657
+   },
+   "w=1.0": {
+    "harness_pricing": 0.16274545172170016,
+    "bytes_counter_excluded": 1.1230066263100575
+   }
+  },
+  "E-p37 res2dp vs res2": {
+   "w=0.0": {
+    "harness_pricing": 0.9413109710199041,
+    "bytes_counter_excluded": 0.9413109710199041
+   },
+   "w=0.1": {
+    "harness_pricing": 0.3861656093555089,
+    "bytes_counter_excluded": 0.9412111460361111
+   },
+   "w=1.0": {
+    "harness_pricing": 0.10790350983894052,
+    "bytes_counter_excluded": 0.9407613540302108
+   }
+  },
+  "E-p37 res2eq vs res2": {
+   "w=0.0": {
+    "harness_pricing": 0.6714916014000911,
+    "bytes_counter_excluded": 0.6714916014000911
+   },
+   "w=0.1": {
+    "harness_pricing": 0.3101551866053695,
+    "bytes_counter_excluded": 0.7566216542878256
+   },
+   "w=1.0": {
+    "harness_pricing": 0.12903824615013673,
+    "bytes_counter_excluded": 1.140201153086405
+   }
+  },
+  "E-p37 res4dp vs res4": {
+   "w=0.0": {
+    "harness_pricing": 0.8952146514499231,
+    "bytes_counter_excluded": 0.8952146514499231
+   },
+   "w=0.1": {
+    "harness_pricing": 0.28406829782150206,
+    "bytes_counter_excluded": 0.8951119258802134
+   },
+   "w=1.0": {
+    "harness_pricing": 0.0720874502576494,
+    "bytes_counter_excluded": 0.8946491954840835
+   }
+  },
+  "E-p37 res4eq vs res4": {
+   "w=0.0": {
+    "harness_pricing": 0.6595055498973408,
+    "bytes_counter_excluded": 0.6595055498973408
+   },
+   "w=0.1": {
+    "harness_pricing": 0.23539302789802993,
+    "bytes_counter_excluded": 0.742641742068584
+   },
+   "w=1.0": {
+    "harness_pricing": 0.08828631386448958,
+    "bytes_counter_excluded": 1.1171312021389102
+   }
+  }
+ },
+ "sensitivity_distance_to_rho_arm_over_rho": {
+  "E-p36 res1 / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.4153569481254413,
+    "bytes_counter_excluded": 2.4153569481254413,
+    "rho_also_charged_one_dp_test_per_step": 2.4153569481254413
+   },
+   "w=0.1": {
+    "harness_pricing": 5.0418249150990135,
+    "bytes_counter_excluded": 2.415022914352791,
+    "rho_also_charged_one_dp_test_per_step": 4.635791982218586
+   },
+   "w=1.0": {
+    "harness_pricing": 16.870925077429053,
+    "bytes_counter_excluded": 2.4135184913010113,
+    "rho_also_charged_one_dp_test_per_step": 11.383435335122844
+   }
+  },
+  "E-p36 res1dp / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.125762392781067,
+    "bytes_counter_excluded": 2.125762392781067,
+    "rho_also_charged_one_dp_test_per_step": 2.125762392781067
+   },
+   "w=0.1": {
+    "harness_pricing": 2.1427127404442103,
+    "bytes_counter_excluded": 2.1249753890190877,
+    "rho_also_charged_one_dp_test_per_step": 1.9701538053416938
+   },
+   "w=1.0": {
+    "harness_pricing": 2.2190538048755752,
+    "bytes_counter_excluded": 2.121430877360979,
+    "rho_also_charged_one_dp_test_per_step": 1.497277438968322
+   }
+  },
+  "E-p36 res1eq / rho": {
+   "w=0.0": {
+    "harness_pricing": 1.5423073966667233,
+    "bytes_counter_excluded": 1.5423073966667233,
+    "rho_also_charged_one_dp_test_per_step": 1.5423073966667233
+   },
+   "w=0.1": {
+    "harness_pricing": 1.7461155619871527,
+    "bytes_counter_excluded": 1.7336539279467595,
+    "rho_also_charged_one_dp_test_per_step": 1.6054957596892625
+   },
+   "w=1.0": {
+    "harness_pricing": 2.6640278425827812,
+    "bytes_counter_excluded": 2.5954414359947275,
+    "rho_also_charged_one_dp_test_per_step": 1.7975178324737857
+   }
+  },
+  "E-p36 res2 / rho": {
+   "w=0.0": {
+    "harness_pricing": 3.120695862941031,
+    "bytes_counter_excluded": 3.120695862941031,
+    "rho_also_charged_one_dp_test_per_step": 3.120695862941031
+   },
+   "w=0.1": {
+    "harness_pricing": 7.648301973311286,
+    "bytes_counter_excluded": 3.120438860104102,
+    "rho_also_charged_one_dp_test_per_step": 7.032361805996341
+   },
+   "w=1.0": {
+    "harness_pricing": 28.039758046107217,
+    "bytes_counter_excluded": 3.119281369383385,
+    "rho_also_charged_one_dp_test_per_step": 18.919458836159617
+   }
+  },
+  "E-p36 res2dp / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.6164092431849677,
+    "bytes_counter_excluded": 2.6164092431849677,
+    "rho_also_charged_one_dp_test_per_step": 2.6164092431849677
+   },
+   "w=0.1": {
+    "harness_pricing": 2.644862243265469,
+    "bytes_counter_excluded": 2.6155837158715096,
+    "rho_also_charged_one_dp_test_per_step": 2.4318637374106307
+   },
+   "w=1.0": {
+    "harness_pricing": 2.773009013796566,
+    "bytes_counter_excluded": 2.6118657016408307,
+    "rho_also_charged_one_dp_test_per_step": 1.8710514478247184
+   }
+  },
+  "E-p36 res2eq / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.041043286527328,
+    "bytes_counter_excluded": 2.041043286527328,
+    "rho_also_charged_one_dp_test_per_step": 2.041043286527328
+   },
+   "w=0.1": {
+    "harness_pricing": 2.3161264580650567,
+    "bytes_counter_excluded": 2.294344937277701,
+    "rho_also_charged_one_dp_test_per_step": 2.1296020081830753
+   },
+   "w=1.0": {
+    "harness_pricing": 3.555047484328599,
+    "bytes_counter_excluded": 3.4351662363329187,
+    "rho_also_charged_one_dp_test_per_step": 2.3987216448069684
+   }
+  },
+  "E-p36 res4 / rho": {
+   "w=0.0": {
+    "harness_pricing": 3.9721844467896803,
+    "bytes_counter_excluded": 3.9721844467896803,
+    "rho_also_charged_one_dp_test_per_step": 3.9721844467896803
+   },
+   "w=0.1": {
+    "harness_pricing": 12.619871355722646,
+    "bytes_counter_excluded": 3.9720037080155857,
+    "rho_also_charged_one_dp_test_per_step": 11.603556139422214
+   },
+   "w=1.0": {
+    "harness_pricing": 51.567368871220566,
+    "bytes_counter_excluded": 3.97118969577982,
+    "rho_also_charged_one_dp_test_per_step": 34.794405538159175
+   }
+  },
+  "E-p36 res4dp / rho": {
+   "w=0.0": {
+    "harness_pricing": 3.4580948920955517,
+    "bytes_counter_excluded": 3.4580948920955517,
+    "rho_also_charged_one_dp_test_per_step": 3.4580948920955517
+   },
+   "w=0.1": {
+    "harness_pricing": 3.515241502932025,
+    "bytes_counter_excluded": 3.4571895806074293,
+    "rho_also_charged_one_dp_test_per_step": 3.232148805098732
+   },
+   "w=1.0": {
+    "harness_pricing": 3.772618707612447,
+    "bytes_counter_excluded": 3.4531122339937346,
+    "rho_also_charged_one_dp_test_per_step": 2.5455249729984226
+   }
+  },
+  "E-p36 res4eq / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.6963689441967773,
+    "bytes_counter_excluded": 2.6963689441967773,
+    "rho_also_charged_one_dp_test_per_step": 2.6963689441967773
+   },
+   "w=0.1": {
+    "harness_pricing": 3.0716679071860455,
+    "bytes_counter_excluded": 3.0285061355760416,
+    "rho_also_charged_one_dp_test_per_step": 2.824297490681818
+   },
+   "w=1.0": {
+    "harness_pricing": 4.761941338974418,
+    "bytes_counter_excluded": 4.524387354712887,
+    "rho_also_charged_one_dp_test_per_step": 3.213057437756351
+   }
+  },
+  "E-p37 res1 / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.4858894370852935,
+    "bytes_counter_excluded": 2.4858894370852935,
+    "rho_also_charged_one_dp_test_per_step": 2.4858894370852935
+   },
+   "w=0.1": {
+    "harness_pricing": 5.1899847466270606,
+    "bytes_counter_excluded": 2.485590325911431,
+    "rho_also_charged_one_dp_test_per_step": 4.772012399663648
+   },
+   "w=1.0": {
+    "harness_pricing": 17.367851317521833,
+    "bytes_counter_excluded": 2.484243281688432,
+    "rho_also_charged_one_dp_test_per_step": 11.718871953620264
+   }
+  },
+  "E-p37 res1dp / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.028303256023325,
+    "bytes_counter_excluded": 2.028303256023325,
+    "rho_also_charged_one_dp_test_per_step": 2.028303256023325
+   },
+   "w=0.1": {
+    "harness_pricing": 2.0363154685675555,
+    "bytes_counter_excluded": 2.0277526595071933,
+    "rho_also_charged_one_dp_test_per_step": 1.8723220086429917
+   },
+   "w=1.0": {
+    "harness_pricing": 2.0723983887800945,
+    "bytes_counter_excluded": 2.025273053524302,
+    "rho_also_charged_one_dp_test_per_step": 1.3983405840480325
+   }
+  },
+  "E-p37 res1eq / rho": {
+   "w=0.0": {
+    "harness_pricing": 1.6399244590300424,
+    "bytes_counter_excluded": 1.6399244590300424,
+    "rho_also_charged_one_dp_test_per_step": 1.6399244590300424
+   },
+   "w=0.1": {
+    "harness_pricing": 1.8555357017780683,
+    "bytes_counter_excluded": 1.8488640914994308,
+    "rho_also_charged_one_dp_test_per_step": 1.7061012332758987
+   },
+   "w=1.0": {
+    "harness_pricing": 2.8265388081054157,
+    "bytes_counter_excluded": 2.789821666702352,
+    "rho_also_charged_one_dp_test_per_step": 1.9071931097606925
+   }
+  },
+  "E-p37 res2 / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.902110291446203,
+    "bytes_counter_excluded": 2.902110291446203,
+    "rho_also_charged_one_dp_test_per_step": 2.902110291446203
+   },
+   "w=0.1": {
+    "harness_pricing": 7.11259800204827,
+    "bytes_counter_excluded": 2.9018392687672523,
+    "rho_also_charged_one_dp_test_per_step": 6.539789135537546
+   },
+   "w=1.0": {
+    "harness_pricing": 26.07448790185108,
+    "bytes_counter_excluded": 2.9006187208042076,
+    "rho_also_charged_one_dp_test_per_step": 17.59363201536282
+   }
+  },
+  "E-p37 res2dp / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.731788256448082,
+    "bytes_counter_excluded": 2.731788256448082,
+    "rho_also_charged_one_dp_test_per_step": 2.731788256448082
+   },
+   "w=0.1": {
+    "harness_pricing": 2.7466407415617455,
+    "bytes_counter_excluded": 2.731243463769016,
+    "rho_also_charged_one_dp_test_per_step": 2.5254416565813935
+   },
+   "w=1.0": {
+    "harness_pricing": 2.813528761862724,
+    "bytes_counter_excluded": 2.7287899953091443,
+    "rho_also_charged_one_dp_test_per_step": 1.8984146452724013
+   }
+  },
+  "E-p37 res2eq / rho": {
+   "w=0.0": {
+    "harness_pricing": 1.948742687042896,
+    "bytes_counter_excluded": 1.948742687042896,
+    "rho_also_charged_one_dp_test_per_step": 1.948742687042896
+   },
+   "w=0.1": {
+    "harness_pricing": 2.2060091605742596,
+    "bytes_counter_excluded": 2.1955944280120523,
+    "rho_also_charged_one_dp_test_per_step": 2.0283495196924157
+   },
+   "w=1.0": {
+    "harness_pricing": 3.364606188117822,
+    "bytes_counter_excluded": 3.30728881012497,
+    "rho_also_charged_one_dp_test_per_step": 2.270251418673314
+   }
+  },
+  "E-p37 res4 / rho": {
+   "w=0.0": {
+    "harness_pricing": 3.9990705495230965,
+    "bytes_counter_excluded": 3.9990705495230965,
+    "rho_also_charged_one_dp_test_per_step": 3.9990705495230965
+   },
+   "w=0.1": {
+    "harness_pricing": 12.706923600531354,
+    "bytes_counter_excluded": 3.998902828810582,
+    "rho_also_charged_one_dp_test_per_step": 11.683579036089128
+   },
+   "w=1.0": {
+    "harness_pricing": 51.92265397806286,
+    "bytes_counter_excluded": 3.998147500235092,
+    "rho_also_charged_one_dp_test_per_step": 35.03455449593703
+   }
+  },
+  "E-p37 res4dp / rho": {
+   "w=0.0": {
+    "harness_pricing": 3.580026548114971,
+    "bytes_counter_excluded": 3.580026548114971,
+    "rho_also_charged_one_dp_test_per_step": 3.580026548114971
+   },
+   "w=0.1": {
+    "harness_pricing": 3.609634157750814,
+    "bytes_counter_excluded": 3.5794656125044737,
+    "rho_also_charged_one_dp_test_per_step": 3.3189344092448247
+   },
+   "w=1.0": {
+    "harness_pricing": 3.7429717358887475,
+    "bytes_counter_excluded": 3.5769394445120244,
+    "rho_also_charged_one_dp_test_per_step": 2.5255517045247675
+   }
+  },
+  "E-p37 res4eq / rho": {
+   "w=0.0": {
+    "harness_pricing": 2.6374092218414904,
+    "bytes_counter_excluded": 2.6374092218414904,
+    "rho_also_charged_one_dp_test_per_step": 2.6374092218414904
+   },
+   "w=0.1": {
+    "harness_pricing": 2.9911212215980116,
+    "bytes_counter_excluded": 2.9697521631508796,
+    "rho_also_charged_one_dp_test_per_step": 2.750233045990966
+   },
+   "w=1.0": {
+    "harness_pricing": 4.584059725784546,
+    "bytes_counter_excluded": 4.466455323266307,
+    "rho_also_charged_one_dp_test_per_step": 3.093071674330861
+   }
+  }
+ },
+ "limitations": [
+  "Recompute is of the harness's own definition of cost (band.rs); it verifies arithmetic and pairing, not that band pricing is a fair price of native work (F1, F2).",
+  "Candidate/baseline intervals were checked with the validator's own bootstrap and linearised t, not by reading the harness comparison files; the 95% intervals are not part of the headline list.",
+  "Counts only; no wall-clock claim was checked or is certified. L0 local run, isolab-eks route not used (documented in PROTOCOL.md).",
+  "p36/p37 are 36-37 bit curves with r ~ 2^36; nothing transfers to cryptographic sizes without a separate scaling study (the producer's scale study is a different directory and was not reviewed).",
+  "Binary reproduced from the session record, not rebuilt from the freeze commit; current branch head has source changes in ecbench/ic_framework since the freeze (replay on head not run)."
+ ]
+}

@@ -1,0 +1,13 @@
+digraph closure {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",nodesep="0.3",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=10,color="#567187",margin="0.12"];
+ edge [color="#567187",arrowsize=0.7];
+ input [label="Original norm\nequations"];
+ pc [label="Degree-bounded\npivot closure"];
+ dag [label="Local derivation\nDAG"];
+ checker [label="Separate checker\nidentities + completion"];
+ extract [label="Quotient points\noriginal-equation lift"];
+ cold [label="Relations + kernel\nscalar recovery"];
+ replay [label="OpenSSL replay\n[7]P = Q",fillcolor="#e6f3e9"];
+ input -> pc -> dag -> checker -> extract -> cold -> replay;
+}

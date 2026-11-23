@@ -1,0 +1,92 @@
+{
+  "schema": "native-guard-successor-post-advice-headroom-v1",
+  "observed_at": "2026-10-27T00:58:13.117Z",
+  "H_bytes": "9264652288",
+  "required_H_bytes": "12884901888",
+  "headroom_sufficient": false,
+  "headroom_rule": "conservative minimum across all recorded post-advice host/enclosing/container snapshots; intentionally8GiB empty worker excluded",
+  "visible_levels": [
+    {
+      "name": "container",
+      "raw_max": "17179869184",
+      "current": "3325952",
+      "headroom": "17176543232",
+      "raw_swap_max": "0",
+      "raw_swap_current": "0"
+    },
+    {
+      "name": "delegated",
+      "raw_max": "max",
+      "current": "0",
+      "headroom": null,
+      "raw_swap_max": "max",
+      "raw_swap_current": "0"
+    },
+    {
+      "name": "container_after_probe",
+      "raw_max": "17179869184",
+      "current": "6258688",
+      "headroom": "17173610496",
+      "raw_swap_max": "0",
+      "raw_swap_current": "0"
+    },
+    {
+      "name": "outer-before-probe/0",
+      "mapping": "/sys/fs/cgroup",
+      "raw_max": "17179869184",
+      "current": "7727624192",
+      "headroom": "9452244992",
+      "raw_swap_max": "max",
+      "raw_swap_current": "0"
+    },
+    {
+      "name": "outer-after-probe/0",
+      "mapping": "/sys/fs/cgroup",
+      "raw_max": "17179869184",
+      "current": "7915216896",
+      "headroom": "9264652288",
+      "raw_swap_max": "max",
+      "raw_swap_current": "0"
+    }
+  ],
+  "host_samples": [
+    {
+      "path": "experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/post-advice-headroom-1/outer-before-probe/host-meminfo",
+      "MemAvailable_bytes": "17801670656"
+    },
+    {
+      "path": "experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/post-advice-headroom-1/outer-after-probe/host-meminfo",
+      "MemAvailable_bytes": "17803603968"
+    },
+    {
+      "path": "experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/post-advice-headroom-1/records/meminfo-before",
+      "MemAvailable_bytes": "17808289792"
+    },
+    {
+      "path": "experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/post-advice-headroom-1/records/meminfo-after",
+      "MemAvailable_bytes": "17805168640"
+    }
+  ],
+  "worker_cap_probe": {
+    "memory_max": "8589934592",
+    "memory_current": "0",
+    "cgroup_procs": "",
+    "raw_swap_max": "max",
+    "raw_swap_current": "0",
+    "effective_swap_max": "0 via observed container parent; child raw max retained",
+    "excluded_from_headroom": true,
+    "empty_group_removed": true,
+    "worker_launches": 0,
+    "allocator_launches": 0
+  },
+  "hidden_ancestors": "unobserved",
+  "Q4_followup_state": "infrastructure_not_started",
+  "Q4_allocator_authorized": false,
+  "advice_passes": 1,
+  "advice_candidates": 375,
+  "advice_accepted": 375,
+  "advice_excluded": 0,
+  "advice_failures": 0,
+  "Q3_followup_runs": 0,
+  "scientific_calls": 0
+}

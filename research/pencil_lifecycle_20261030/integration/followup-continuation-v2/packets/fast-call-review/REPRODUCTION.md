@@ -1,0 +1,1 @@
+Hydrate with tools/artifacts/artifacts.py pull before checking publication-manifest.json. Restore .lean.txt as .lean in a fresh private tree and adapt source-host paths while preserving exact compiler/helper inputs. Target caches and native checker executables are omitted; source and raw outputs are retained. Original readback/source bindings refer to original names.

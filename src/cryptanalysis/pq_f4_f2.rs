@@ -51,20 +51,30 @@
 //!
 //! ## What is counted
 //!
-//! `word_xors`: 64-bit XORs in the eliminations — the forward pass of
-//! every step and of the initial echelon, and the backward pass of the
-//! final inter-reduction — counting only the words between a pivot's
-//! lead and its last non-zero word, which is the work the row-by-row
-//! elimination performs.  A large step reduces by the leading block's
-//! pivots through lookup tables instead (below), which performs fewer:
-//! it still adds to `word_xors` exactly what the row-by-row loop would,
-//! so the unit means the same on every revision, and reports the words
-//! it actually XORed, table construction included, as
-//! `word_xors_performed`.  The
+//! `word_xors`: logical 64-bit XORs in the selected elimination — the
+//! forward pass of every step and of the initial echelon, and the backward
+//! pass of the final inter-reduction.  On the full-width path it counts the
+//! words between a pivot's lead and its last non-zero word.  The FL path
+//! counts its compact `B'` and free-column XORs.  A large full-width step can
+//! reduce by lookup tables instead (below), which performs fewer physical
+//! XORs; `word_xors_performed` reports those actual table-path XORs,
+//! construction included.  The
 //! construction of the matrices (the products, the column map, the
 //! packing) is **not** in that count; its wall time is reported beside
 //! it as `build_ns`, so a reader can see what share of the run the unit
 //! covers.  Solution extraction counts its monomial tests separately.
+//!
+//! ## Faugère–Lachartre reducer/free-column split
+//!
+//! Symbolic preprocessing puts reducers `[A | B]` first, with one distinct
+//! leading column per row, followed by the critical-pair rows `[C | D]`.
+//! On sufficiently large matrices [`echelon_fl`] reduces the triangular
+//! reducer block once to `[I | B']`, forms `D + C B'`, and sends only that
+//! free-column block to the packed echelon kernel.  Thus pair rows do not
+//! carry reducer columns through the dense elimination and do not replay the
+//! reducer cascade.  `F4_F2_FL=0` retains the full-width path as a control;
+//! small shapes fall back automatically.  Both forms span the same row space
+//! and return the same new pivots in the original column space.
 //!
 //! ## The leading block by tables
 //!
@@ -109,6 +119,8 @@
 //!   Math. Dokl. 11 (1970).
 //! - M. Albrecht, G. Bard, W. Hart, *Algorithm 898: Efficient
 //!   multiplication of dense matrices over GF(2)*, ACM TOMS 37 (2010).
+//! - J.-C. Faugère, S. Lachartre, *Parallel Gaussian Elimination for
+//!   Gröbner Bases Computations in Finite Fields*, PASCO 2010.
 //! - M. Brickenstein, *Boolean Gröbner bases*, PhD thesis, TU
 //!   Kaiserslautern 2010 — the boolean ring and its field pairs.
 
@@ -120,7 +132,7 @@ use rayon::prelude::*;
 use crate::cryptanalysis::bitop_tally as tally;
 use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
 use crate::cryptanalysis::pq_groebner_f2::{
-    bit, cmp_mono, mono_key, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
+    bit, cmp_mono, mono_key, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask, MASK_BITS,
 };
 
 /// What one F4 run cost, and how far it got.
@@ -163,7 +175,7 @@ pub struct F4Stats {
     pub matrix_rows_max: u64,
     pub matrix_cols_max: u64,
     pub matrix_rows_sum: u64,
-    /// The unit: 64-bit XORs the row-by-row eliminations perform.
+    /// The unit: logical 64-bit XORs in the selected elimination schedule.
     pub word_xors: u64,
     /// 64-bit XORs actually performed, reducing by the leading block
     /// through tables where a step is large enough (their construction
@@ -192,6 +204,12 @@ pub struct F4Stats {
     pub full_m4ri_matrices: u64,
     pub full_m4ri_blocks: u64,
     pub full_m4ri_table_word_xors: u64,
+    /// Matrices reduced in Faugère–Lachartre form, with their reducer,
+    /// pair-row and free-column totals.
+    pub fl_matrices: u64,
+    pub fl_reducer_rows: u64,
+    pub fl_pair_rows: u64,
+    pub fl_free_cols: u64,
     /// Wall time spent building matrices (products, columns, packing)
     /// and eliminating them.
     pub build_ns: u64,
@@ -202,15 +220,425 @@ pub struct F4Stats {
     /// A matrix would have exceeded [`MAX_MATRIX_WORDS`].
     pub oversize: bool,
     pub pairs_left: u64,
+    /// [`groebner_basis_f4_until`] stopped once the basis's degree-1
+    /// elements left at most its `max_free` variables unpinned; the
+    /// returned set is then not a Gröbner basis.
+    pub early_stopped: bool,
+    /// Variables no degree-1 element pinned when the run ended.
+    pub free_at_stop: u64,
+    /// [`F4Skeleton`] counters (all zero without a skeleton).  `1` when
+    /// this call found the skeleton built for another shape and cleared it.
+    pub skeleton_shape_rebuilds: u64,
+    /// Steps whose key (degree and active leading monomials) was new to the
+    /// skeleton and was stored.
+    pub skeleton_steps_built: u64,
+    /// Steps whose key the skeleton already held (the stored divisor
+    /// candidates and columns were consulted).
+    pub skeleton_steps_replayed: u64,
+    /// Monomials whose reducer came from a stored candidate list.
+    pub skeleton_candidate_hits: u64,
+    /// Monomials looked up in a stored step and not found (scanned in full,
+    /// and stored).
+    pub skeleton_candidate_misses: u64,
+    /// Divisor tests made on stored candidate lists (part of
+    /// `divisor_tests`).
+    pub skeleton_candidate_tests: u64,
+    /// Steps whose stored column map matched the step's monomial set and
+    /// was used instead of a new sort and index.
+    pub skeleton_columns_reused: u64,
+    /// Steps of a stored key whose column map did not match (rebuilt).
+    pub skeleton_columns_rebuilt: u64,
+    /// Steps not stored because the skeleton was at its byte cap.
+    pub skeleton_store_refused: u64,
+    /// Bytes the skeleton holds after this call (charged as memory).
+    pub skeleton_bytes: u64,
+    /// [`F4PairTrace`] counters (all zero without a trace).  A run recorded
+    /// a trace for its shape (the plain run plus its provenance pass).
+    pub trace_records: u64,
+    /// A stored trace of the system's shape was replayed.
+    pub trace_replays: u64,
+    /// The replay was accepted (verified, or it derived `1`).
+    pub trace_hits: u64,
+    /// The replay was discarded and the plain computation run as well.
+    pub trace_fallbacks: u64,
+    /// Of the fallbacks: the replay stopped early because a step's new
+    /// leading monomials differed from the recorded ones.
+    pub trace_mismatches: u64,
+    /// Replay steps whose new leading monomials matched the recorded ones
+    /// (before a mismatch, or all of them).
+    pub trace_steps_matched: u64,
+    /// Verification passes run, and those that found the replayed basis
+    /// incomplete (a fallback each).
+    pub trace_verifications: u64,
+    pub trace_verify_failures: u64,
+    /// Work of the verification passes (already inside `word_xors`,
+    /// `divisor_tests` and `pairs_reduced`/`field_pairs_reduced`).
+    pub trace_verify_word_xors: u64,
+    pub trace_verify_divisor_tests: u64,
+    pub trace_verify_pairs: u64,
+    /// Word XORs of the recording's provenance pass (inside `word_xors`).
+    pub trace_record_xors: u64,
+    /// Pairs a replay discarded unreduced because the trace did not list
+    /// them.
+    pub trace_pairs_dropped: u64,
+    /// Bytes the trace store holds after this call (charged as memory).
+    pub trace_bytes: u64,
 }
 
-/// The largest matrix a step may build, in 64-bit words (1 GiB).
+impl F4Stats {
+    /// Add the work of a second run on the same system (a replay, its
+    /// verification, a fallback) to this one: counts summed, maxima kept.
+    /// The outcome fields (`degree_reached`, `solving_degree`, `basis_len`,
+    /// `timed_out`, `oversize`, `pairs_left`, `early_stopped`,
+    /// `free_at_stop`, `wall_ns`) are left to the caller.
+    fn absorb(&mut self, o: &F4Stats) {
+        macro_rules! sum {
+            ($($f:ident),*) => { $( self.$f = self.$f.saturating_add(o.$f); )* };
+        }
+        macro_rules! max {
+            ($($f:ident),*) => { $( self.$f = self.$f.max(o.$f); )* };
+        }
+        sum!(
+            steps,
+            pairs_reduced,
+            field_pairs_reduced,
+            pairs_product_skipped,
+            pairs_chain_skipped,
+            pair_dense_select_calls,
+            pair_quadratic_select_calls,
+            pair_candidate_visits,
+            pair_lcm_groups,
+            pair_cover_lookups,
+            reducer_rows,
+            matrix_rows_sum,
+            word_xors,
+            word_xors_performed,
+            divisor_tests,
+            new_elements,
+            full_m4ri_matrices,
+            full_m4ri_blocks,
+            full_m4ri_table_word_xors,
+            fl_matrices,
+            fl_reducer_rows,
+            fl_pair_rows,
+            fl_free_cols,
+            build_ns,
+            eliminate_ns,
+            matrix_profile_unbinned_eliminate_ns,
+            matrix_profile_unbinned_logical_xors,
+            matrix_profile_unbinned_performed_xors,
+            trace_records,
+            trace_replays,
+            trace_hits,
+            trace_fallbacks,
+            trace_mismatches,
+            trace_steps_matched,
+            trace_verifications,
+            trace_verify_failures,
+            trace_verify_word_xors,
+            trace_verify_divisor_tests,
+            trace_verify_pairs,
+            trace_record_xors,
+            trace_pairs_dropped
+        );
+        max!(
+            pair_dense_scratch_bytes_max,
+            inner_build_parallel_disabled_calls,
+            matrix_rows_max,
+            matrix_cols_max,
+            max_poly_degree,
+            peak_matrix_bytes,
+            peak_table_bytes
+        );
+        for b in 0..MATRIX_PROFILE_BINS {
+            self.matrix_profile_counts[b] += o.matrix_profile_counts[b];
+            self.matrix_profile_rows_sum[b] += o.matrix_profile_rows_sum[b];
+            self.matrix_profile_cols_sum[b] += o.matrix_profile_cols_sum[b];
+            self.matrix_profile_eliminate_ns[b] += o.matrix_profile_eliminate_ns[b];
+            self.matrix_profile_logical_xors[b] += o.matrix_profile_logical_xors[b];
+            self.matrix_profile_performed_xors[b] += o.matrix_profile_performed_xors[b];
+            self.matrix_profile_full_m4ri_counts[b] += o.matrix_profile_full_m4ri_counts[b];
+        }
+    }
+
+    /// Take the outcome of the run whose basis is returned.
+    fn take_outcome(&mut self, o: &F4Stats) {
+        self.degree_reached = o.degree_reached;
+        self.solving_degree = o.solving_degree;
+        self.basis_len = o.basis_len;
+        self.timed_out = o.timed_out;
+        self.oversize = o.oversize;
+        self.pairs_left = o.pairs_left;
+        self.early_stopped = o.early_stopped;
+        self.free_at_stop = o.free_at_stop;
+    }
+}
+
+/// **Symbolic preprocessing shared across the systems of one run**
+/// (`docs/ic/GROEBNER_PERF_LEVERS_20261111.md`, lever 2a).
+///
+/// The symbolic phase of an F4 step reads the basis only through two
+/// things: which active element's leading monomial divides each monomial
+/// met (the *divisor candidates*; the reducer is the shortest of them),
+/// and the sorted set of monomials the step's rows touch (the *columns*).
+/// The first is a function of the active leading monomials alone, so the
+/// systems of one cell, which mostly walk the same leading-monomial
+/// staircase with different tails, look the same monomials up against the
+/// same divisors again and again.  The skeleton stores, per step key
+/// `(degree, active leading monomials in basis order)`:
+///
+/// - for each monomial looked up, the positions of its divisors among the
+///   active elements, so a later step of the same key tests only those
+///   (the shortest-first, first-on-tie choice is remade on the current
+///   term counts, so the reducer is exactly the one a full scan picks);
+/// - the step's sorted column list and its index, reused only when the
+///   new step's monomial set equals it (verified: equal size and every
+///   stored monomial present), otherwise rebuilt and replaced.
+///
+/// Results are therefore identical with or without the skeleton.  What a
+/// replay still pays is charged where it happens: forming and comparing
+/// the key, a hash probe per lookup, the candidate tests, the column
+/// verification; misses pay the full scan plus the store.  The skeleton
+/// lives on one solver instance (one run, one target) and is never
+/// written to disk.
+#[derive(Default)]
+pub struct F4Skeleton {
+    shape: Option<(usize, u32)>,
+    steps: FxMap<(u32, Box<[Mask]>), SkeletonStep>,
+    bytes: u64,
+    cap_bytes: u64,
+}
+
+#[derive(Default)]
+struct SkeletonStep {
+    candidates: FxMap<Mask, Box<[u32]>>,
+    columns: Option<Columns>,
+}
+
+/// Default byte cap of an [`F4Skeleton`].
+pub const SKELETON_DEFAULT_CAP_BYTES: u64 = 256 << 20;
+
+impl F4Skeleton {
+    /// An empty skeleton that stops storing new steps past `cap_bytes`.
+    pub fn with_cap(cap_bytes: u64) -> Self {
+        Self {
+            cap_bytes,
+            ..Self::default()
+        }
+    }
+
+    /// Bytes held.
+    pub fn bytes(&self) -> u64 {
+        self.bytes
+    }
+
+    /// Steps held.
+    pub fn len(&self) -> usize {
+        self.steps.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.steps.is_empty()
+    }
+
+    fn columns_bytes(c: &Columns) -> u64 {
+        (c.monos.capacity() * std::mem::size_of::<Mask>()) as u64
+            + match &c.index {
+                ColumnIndex::Dense(at) => (at.capacity() * 4) as u64,
+                ColumnIndex::Hashed(map) => (map.capacity() * 24) as u64,
+            }
+    }
+}
+
+/// **Gröbner trace across the systems of one run** (Traverso 1988;
+/// `docs/ic/GROEBNER_PERF_LEVERS_20261111.md`, lever 2).
+///
+/// *Record.*  The first system of a shape — key `(unknowns, input degree,
+/// sorted input monomial support)` — runs the plain computation, and each
+/// step additionally passes its matrix once through a sequential
+/// elimination with row provenance (charged: its XORs go into
+/// `word_xors`, and `trace_record_xors` shows them).  A row is
+/// *productive* when it is independent of the rows above it and, for a
+/// pair half, either left its own leading column (it was reduced there:
+/// the second half of a pair, or a row an earlier one met) or was used as
+/// a pivot by a row of another leading column; a field product is
+/// productive when independent.  A pair is *useful* when one of its rows
+/// is productive; the others reduced to zero, or only cancelled their own
+/// partner.  The trace keeps, per step, the degree, the useful pairs (by
+/// basis indices) and the new leading monomials.
+///
+/// *Replay.*  A later system of the same shape reduces, at step `k`, only
+/// the queued pairs of the recorded degree that the trace lists, and
+/// drops the other pairs of that degree unreduced.  As soon as a step's
+/// new leading monomials differ from the recorded ones the replay stops
+/// (`trace_mismatches`); after the last recorded step the queue is
+/// dropped.  The active elements are then interreduced to `G`.
+///
+/// *Verification* (one F4 pass, charged in full).  Every row of every
+/// matrix is an `F_2`-combination of monomial multiples of ideal elements,
+/// so `G ⊆ I`, and `G = {1}` is a certificate on its own.  Otherwise a
+/// fresh run starts from `G` (no initial echelon), installs its pairs by
+/// the same Gebauer–Möller `UPDATE` plus the field pairs, and reduces in
+/// **one** matrix every surviving pair of every degree *together with
+/// every input polynomial*; it passes iff no row ends on a column no
+/// leading monomial of `G` divides.  Symbolic preprocessing gives every
+/// divisible column a row that is a monomial multiple of an element of
+/// `G` leading there (a reducer, or a pair half on an lcm column), so a
+/// pass means every row of the span — each S-polynomial, each field
+/// product `v·g`, each input — top-reduces to zero by `G`.  For the
+/// inputs that is `I ⊆ ⟨G⟩`; for the pairs it is the Buchberger criterion
+/// with Gebauer–Möller deletions and Brickenstein's field pairs — the
+/// criterion the plain run itself terminates on.  So `G` is a Gröbner
+/// basis of `I` in `F_2[v]/(v² − v)`, and, being interreduced, *the*
+/// reduced one: the plain path's basis.  The check does not depend on the
+/// replay having followed the trace, nor on the Gebauer–Möller bookkeeping
+/// of the replay (whose dropped pairs void it).
+///
+/// *Fallback.*  A mismatch, a failed verification, or a verification out
+/// of budget discards the replay and runs the plain computation, which
+/// records the trace afresh; everything executed is charged.  The store
+/// lives on one solver instance and is never written to disk.
+#[derive(Default)]
+pub struct F4PairTrace {
+    traces: FxMap<TraceShape, Vec<TraceStep>>,
+    bytes: u64,
+    cap_bytes: u64,
+}
+
+type TraceShape = (usize, u32, Box<[Mask]>);
+
+struct TraceStep {
+    deg: u32,
+    useful: FxSet<PairKind>,
+    /// New leading monomials of the step, in insertion order.
+    fresh: Box<[Mask]>,
+}
+
+/// Default byte cap of an [`F4PairTrace`].
+pub const TRACE_DEFAULT_CAP_BYTES: u64 = 64 << 20;
+
+impl F4PairTrace {
+    /// An empty store that stops storing new traces past `cap_bytes`.
+    pub fn with_cap(cap_bytes: u64) -> Self {
+        Self {
+            cap_bytes,
+            ..Self::default()
+        }
+    }
+
+    /// Bytes held.
+    pub fn bytes(&self) -> u64 {
+        self.bytes
+    }
+
+    /// Shapes held.
+    pub fn len(&self) -> usize {
+        self.traces.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.traces.is_empty()
+    }
+
+    fn shape_bytes(key: &TraceShape, steps: &[TraceStep]) -> u64 {
+        48 + 8 * key.2.len() as u64
+            + steps
+                .iter()
+                .map(|t| 48 + 32 * t.useful.capacity() as u64 + 8 * t.fresh.len() as u64)
+                .sum::<u64>()
+    }
+}
+
+/// What [`groebner_basis_f4_inner`] does besides the plain computation.
+enum TraceMode<'a> {
+    Off,
+    /// Run plainly and append each step's trace.
+    Record(&'a mut Vec<TraceStep>),
+    /// Reduce only the pairs the trace lists.
+    Replay(&'a [TraceStep]),
+    /// `initial` is an interreduced basis `G`: one step reducing all its
+    /// pairs and these polynomials; the stats say whether a row was new.
+    Verify(&'a [F2BoolPoly]),
+}
+
+/// Sequential elimination of a step matrix for the trace record (rows are
+/// the reducers, with distinct leads, then the S-rows).  Returns, per
+/// S-row, whether it is productive (see [`F4PairTrace`]; a row that is
+/// not a pair half, `is_half[k] == false`, is productive when independent),
+/// and adds its XORs to `xors` and its other word operations to `ops`.
+fn productive_rows(
+    rows: &[Row],
+    n_reducers: usize,
+    is_half: &[bool],
+    n_cols: usize,
+    xors: &mut u64,
+    ops: &mut u64,
+) -> Vec<bool> {
+    // pivot rows, with the row (matrix position) each came from
+    let mut pivots: Vec<(Row, usize)> = Vec::new();
+    let mut pivot_of = vec![NONE; n_cols];
+    *ops += (n_cols as u64).div_ceil(2);
+    let n = rows.len();
+    let mut orig_lead = vec![usize::MAX; n];
+    let mut final_lead = vec![usize::MAX; n];
+    let mut used_foreign = vec![false; n];
+    for (i, row) in rows.iter().enumerate() {
+        let mut r = row.clone();
+        *ops += (r.end - r.start) as u64;
+        let Some(first) = r.lead_counted(ops) else {
+            continue;
+        };
+        orig_lead[i] = first;
+        let mut lead = Some(first);
+        while let Some(c) = lead {
+            let p = pivot_of[c];
+            if p == NONE {
+                break;
+            }
+            let (prow, owner) = &pivots[p as usize];
+            if orig_lead[*owner] != first {
+                used_foreign[*owner] = true;
+            }
+            for w in prow.start..prow.end {
+                r.bits[w] ^= prow.bits[w];
+            }
+            *xors += (prow.end - prow.start) as u64;
+            r.end = r.end.max(prow.end);
+            lead = r.lead_counted(ops);
+        }
+        if let Some(c) = lead {
+            debug_assert!(i >= n_reducers || c == first, "reducer leads are distinct");
+            final_lead[i] = c;
+            pivot_of[c] = pivots.len() as u32;
+            pivots.push((r, i));
+        }
+    }
+    (n_reducers..n)
+        .map(|i| {
+            final_lead[i] != usize::MAX
+                && (!is_half[i - n_reducers] || final_lead[i] != orig_lead[i] || used_foreign[i])
+        })
+        .collect()
+}
+
+/// The largest matrix a step may build, in 64-bit words (1 GiB), unless
+/// `F4_F2_MAX_MATRIX_WORDS` raises or lowers it for one run.
 pub const MAX_MATRIX_WORDS: u64 = 1 << 27;
+
+fn max_matrix_words() -> u64 {
+    static CAP: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
+    *CAP.get_or_init(|| {
+        std::env::var("F4_F2_MAX_MATRIX_WORDS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(MAX_MATRIX_WORDS)
+    })
+}
 
 const NONE: u32 = u32::MAX;
 pub const MATRIX_PROFILE_BINS: usize = 6;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 enum PairKind {
     /// The S-polynomial of basis elements `i` and `j`.
     Critical(usize, usize),
@@ -229,7 +657,7 @@ struct Pair {
 }
 
 /// A bit-packed row.  Words outside `[start, end)` are zero.
-#[derive(Default)]
+#[derive(Clone, Default)]
 struct Row {
     bits: Vec<u64>,
     start: usize,
@@ -380,6 +808,13 @@ impl MonomialSeen {
         }
     }
 
+    fn len(&self) -> usize {
+        match self {
+            Self::Bitmap { values, .. } => values.len(),
+            Self::Hashed(set) => set.len(),
+        }
+    }
+
     fn into_values(self) -> Vec<Mask> {
         match self {
             Self::Bitmap { values, .. } => values,
@@ -463,7 +898,6 @@ impl Columns {
     }
 
     fn unpack(&self, row: &Row, n_vars: usize) -> F2BoolPoly {
-        let mut monos = Vec::new();
         // one test a word, one extraction a set bit, then the canonical
         // rebuild of the term list
         let set: u32 = row.bits[row.start..row.end]
@@ -473,6 +907,8 @@ impl Columns {
         tally::word_ops(
             (row.end - row.start) as u64 + u64::from(set) + tally::poly::from_monos(set as usize),
         );
+        // exactly `set` terms: one allocation, no regrowth
+        let mut monos = Vec::with_capacity(set as usize);
         for w in row.start..row.end {
             let mut word = row.bits[w];
             while word != 0 {
@@ -554,11 +990,27 @@ fn echelon_full_m4ri(
     st: &mut F4Stats,
     deadline: Option<Instant>,
 ) -> Option<Vec<(usize, Row)>> {
+    echelon_full_m4ri_with_expiry(rows, n_cols, st, || {
+        deadline.is_some_and(|limit| Instant::now() >= limit)
+    })
+}
+
+fn echelon_full_m4ri_with_expiry(
+    rows: Vec<Row>,
+    n_cols: usize,
+    st: &mut F4Stats,
+    mut deadline_expired: impl FnMut() -> bool,
+) -> Option<Vec<(usize, Row)>> {
     let n_rows = rows.len();
     let words = n_cols.div_ceil(64).max(1);
     let mut row_ends: Vec<usize> = rows.iter().map(|row| row.end).collect();
     let mut matrix: Vec<Vec<u64>> = rows.into_iter().map(|row| row.bits).collect();
-    FULL_M4RI_SCRATCH.with(|scratch| {
+    let mut logical_xors = 0u64;
+    let mut performed_xors = 0u64;
+    let mut preparation_xors = 0u64;
+    let mut blocks = 0u64;
+    let mut aux = 0u64;
+    let result = FULL_M4RI_SCRATCH.with(|scratch| {
         let mut scratch = scratch.borrow_mut();
         scratch.pivot_columns.resize(FULL_M4RI_BLOCK, 0);
         scratch.pivot_ends.resize(FULL_M4RI_BLOCK, 0);
@@ -589,17 +1041,12 @@ fn echelon_full_m4ri(
         let mut all_pivots = Vec::with_capacity(n_rows.min(n_cols));
         let mut pivot_row = 0usize;
         let mut column = 0usize;
-        let mut logical_xors = 0u64;
-        let mut performed_xors = 0u64;
-        let mut preparation_xors = 0u64;
-        let mut blocks = 0u64;
         // Word operations besides the XORs: every bit test of the pivot
         // search and of the pattern a row carries on a block, the copy of
         // each pivot into the block, one a pivot row read back.
-        let mut aux = 0u64;
 
         while pivot_row < n_rows && column < n_cols {
-            if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            if deadline_expired() {
                 return None;
             }
             let block_start = pivot_row;
@@ -611,7 +1058,7 @@ fn echelon_full_m4ri(
                 for row in next_pivot..n_rows {
                     if row > next_pivot
                         && (row - next_pivot).is_multiple_of(128)
-                        && deadline.is_some_and(|limit| Instant::now() >= limit)
+                        && deadline_expired()
                     {
                         return None;
                     }
@@ -716,7 +1163,7 @@ fn echelon_full_m4ri(
             for row in block_start + block_rows..n_rows {
                 if row > block_start + block_rows
                     && (row - block_start - block_rows).is_multiple_of(128)
-                    && deadline.is_some_and(|limit| Instant::now() >= limit)
+                    && deadline_expired()
                 {
                     return None;
                 }
@@ -773,14 +1220,16 @@ fn echelon_full_m4ri(
                 },
             ));
         }
-        st.word_xors += logical_xors;
-        st.word_xors_performed += performed_xors;
-        st.full_m4ri_matrices += 1;
-        st.full_m4ri_blocks += blocks;
-        st.full_m4ri_table_word_xors += preparation_xors;
-        tally::word_ops(aux + pivots.len() as u64);
+        aux += pivots.len() as u64;
         Some(pivots)
-    })
+    });
+    st.word_xors += logical_xors;
+    st.word_xors_performed += performed_xors;
+    st.full_m4ri_matrices += u64::from(result.is_some());
+    st.full_m4ri_blocks += blocks;
+    st.full_m4ri_table_word_xors += preparation_xors;
+    tally::word_ops(aux);
+    result
 }
 
 /// Forward elimination: each row in turn is reduced by the pivots found
@@ -800,223 +1249,227 @@ fn echelon_block_tables(
     st: &mut F4Stats,
     deadline: Option<Instant>,
 ) -> Option<Vec<(usize, Row)>> {
-    let mut pivot_of = vec![NONE; n_cols];
-    let mut pivots: Vec<(usize, Row)> = Vec::with_capacity(rows.len());
-    // Word operations besides the XORs: clearing the pivot index (two
-    // `u32` slots a word), every lead scan (`Row::lead_counted`), one
-    // pivot-index lookup a reduction step and one pattern extraction a
-    // table reduction.  Charged to this thread at the end.
     let mut aux = (n_cols as u64).div_ceil(2);
-    // the leading block: rows until the first repeated lead (zero rows
-    // are skipped by the serial loop too)
-    let mut fixed = 0usize;
-    while fixed < rows.len() {
-        match rows[fixed].lead_counted(&mut aux) {
-            Some(lead) if pivot_of[lead] != NONE => break,
-            Some(lead) => pivot_of[lead] = 0,
-            None => {}
-        }
-        fixed += 1;
-    }
-    let rest = rows.split_off(fixed);
-    for mut row in rows {
-        if let Some(lead) = row.lead_counted(&mut aux) {
-            pivot_of[lead] = pivots.len() as u32;
-            pivots.push((lead, row));
-        }
-    }
-    let words = n_cols.div_ceil(64).max(1);
-    let expired = std::sync::atomic::AtomicBool::new(false);
-    // The leading block's tables, where enough rows follow it to pay and
-    // they take no more words than the matrix; later pivots join them
-    // within twice that.
-    let matrix_words = (pivots.len() + rest.len()) * words;
-    let budget = matrix_words * TABLE_INITIAL_BUDGET_MULT;
-    let mut tables = (rest.len() >= TABLE_ROWS && pivots.len() >= TABLE_ROWS)
-        .then(|| BlockTables::build(&pivot_of, &pivots, budget))
-        .flatten();
-    if let Some(t) = &tables {
-        st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
-    }
     let mut xors = 0u64;
     let mut performed = 0u64;
-    if let Some(t) = &tables {
-        performed += t.built_words;
-        // the scan of the pivot index for runs
-        aux += n_cols as u64;
-    }
-    // One reduction at `lead`, which has pivot `p`: by the table when the
-    // lead is on a tabled block, else by the pivot.  Returns the words the
-    // row-by-row loop would XOR and the words XORed.
-    let step = |row: &mut Row,
-                lead: usize,
-                p: u32,
-                pivots: &[(usize, Row)],
-                tables: Option<&BlockTables>|
-     -> (u64, u64) {
-        if let Some((xors, done)) = tables.and_then(|t| t.reduce(row, lead)) {
-            return (xors, done);
+    let run = || {
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut pivots: Vec<(usize, Row)> = Vec::with_capacity(rows.len());
+        // Word operations besides the XORs: clearing the pivot index (two
+        // `u32` slots a word), every lead scan (`Row::lead_counted`), one
+        // pivot-index lookup a reduction step and one pattern extraction a
+        // table reduction.  Charged to this thread at the end.
+        // the leading block: rows until the first repeated lead (zero rows
+        // are skipped by the serial loop too)
+        let mut fixed = 0usize;
+        while fixed < rows.len() {
+            match rows[fixed].lead_counted(&mut aux) {
+                Some(lead) if pivot_of[lead] != NONE => break,
+                Some(lead) => pivot_of[lead] = 0,
+                None => {}
+            }
+            fixed += 1;
         }
-        let pivot = &pivots[p as usize].1;
-        let (from, to) = (lead / 64, pivot.end);
-        for (a, b) in row.bits[from..to].iter_mut().zip(&pivot.bits[from..to]) {
-            *a ^= *b;
+        let rest = rows.split_off(fixed);
+        for mut row in rows {
+            if let Some(lead) = row.lead_counted(&mut aux) {
+                pivot_of[lead] = pivots.len() as u32;
+                pivots.push((lead, row));
+            }
         }
-        row.end = row.end.max(to);
-        ((to - from) as u64, (to - from) as u64)
-    };
-    // Reduce each of `rows` by the pivots already in the table for as long
-    // as its lead has one; stop at the first lead without.  Pivot rows
-    // never change once made, so these are exactly the reductions the
-    // one-row-at-a-time loop would apply first, in the same order.  The
-    // rows go a range of columns at a time: every row is taken as far as
-    // the range allows before any goes further, so the tables and pivots
-    // of a range are read from cache by all of them, not fetched again
-    // for each.  The ranges are taken in column order and a row stops for
-    // good at a lead without a pivot, so each row's reductions and their
-    // order are unchanged.
-    let by_known = |rows: &mut [Row],
-                    pivot_of: &[u32],
+        let words = n_cols.div_ceil(64).max(1);
+        let expired = std::sync::atomic::AtomicBool::new(false);
+        // The leading block's tables, where enough rows follow it to pay and
+        // they take no more words than the matrix; later pivots join them
+        // within twice that.
+        let matrix_words = (pivots.len() + rest.len()) * words;
+        let budget = matrix_words * TABLE_INITIAL_BUDGET_MULT;
+        let mut tables = (rest.len() >= TABLE_ROWS && pivots.len() >= TABLE_ROWS)
+            .then(|| BlockTables::build(&pivot_of, &pivots, budget))
+            .flatten();
+        if let Some(t) = &tables {
+            st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
+        }
+        if let Some(t) = &tables {
+            performed += t.built_words;
+            // the scan of the pivot index for runs
+            aux += n_cols as u64;
+        }
+        // One reduction at `lead`, which has pivot `p`: by the table when the
+        // lead is on a tabled block, else by the pivot.  Returns the words the
+        // row-by-row loop would XOR and the words XORed.
+        let step = |row: &mut Row,
+                    lead: usize,
+                    p: u32,
                     pivots: &[(usize, Row)],
                     tables: Option<&BlockTables>|
-     -> (u64, u64, u64) {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            expired.store(true, std::sync::atomic::Ordering::Relaxed);
-            return (0, 0, 0);
-        }
-        let (mut xors, mut done, mut ops) = (0u64, 0u64, 0u64);
-        let mut live: Vec<usize> = (0..rows.len()).collect();
-        while !live.is_empty() {
-            let from = live
-                .iter()
-                .filter_map(|&i| rows[i].lead_counted(&mut ops))
-                .min()
-                .unwrap_or(usize::MAX);
-            let to = from.saturating_add(TILE_COLUMNS);
-            live.retain(|&i| {
-                let row = &mut rows[i];
-                loop {
-                    match row.lead_counted(&mut ops) {
-                        Some(lead) if lead < to => {
-                            let p = pivot_of[lead];
-                            // the pivot lookup, and the table lookup (with
-                            // the pattern it extracts) when tables exist
-                            ops += 1 + 2 * u64::from(tables.is_some());
-                            if p == NONE {
-                                return false;
-                            }
-                            let (x, d) = step(row, lead, p, pivots, tables);
-                            xors += x;
-                            done += d;
-                        }
-                        Some(_) => return true,
-                        None => return false,
-                    }
-                }
-            });
-        }
-        (xors, done, ops)
-    };
-    let mut rest = rest;
-    // The rows after the leading block go in batches.  Each batch is first
-    // reduced — in parallel, a share of its rows to a thread — by the
-    // pivots that exist before it — the leading block's, then every
-    // earlier batch's — and then finished in order: a row resumes where it stopped, against the pivots its
-    // predecessors in the batch have just made, and becomes a pivot if
-    // anything survives.  Every row sees the reductions, the order and
-    // the pivot table the serial loop would give it, so the pivots and
-    // the XOR count are identical to it; only the first phase is shared
-    // out.  The first batch is the whole remainder against the leading
-    // block, whose reductions are the bulk of a symbolic-preprocessing
-    // matrix, so the whole remainder takes that pass together before the
-    // batches start.
-    let mut done = 0usize;
-    let mut first = true;
-    // On one thread, or on a remainder too small to share out, without
-    // tables, reading each batch twice only costs: finish it serially
-    // instead, as the loop always did.  With tables the batches and their
-    // first phase stay, for the cache reuse of `by_known` and so that each
-    // batch's pivots can join the tables for the next.
-    // (Size first: asking rayon its thread count starts its pool.)
-    let batched = rest.len() * words > PAR_WORDS && rayon::current_num_threads() > 1;
-    let batch_rows = (ELIMINATION_BATCH_WORDS / words).clamp(32, 1024);
-    while done < rest.len() {
-        if deadline.is_some_and(|d| Instant::now() >= d) {
-            return None;
-        }
-        let end = if first || !(batched || tables.is_some()) {
-            rest.len()
-        } else {
-            (done + batch_rows).min(rest.len())
+         -> (u64, u64) {
+            if let Some((xors, done)) = tables.and_then(|t| t.reduce(row, lead)) {
+                return (xors, done);
+            }
+            let pivot = &pivots[p as usize].1;
+            let (from, to) = (lead / 64, pivot.end);
+            for (a, b) in row.bits[from..to].iter_mut().zip(&pivot.bits[from..to]) {
+                *a ^= *b;
+            }
+            row.end = row.end.max(to);
+            ((to - from) as u64, (to - from) as u64)
         };
-        let made = pivots.len();
-        let chunk = &mut rest[done..end];
-        if first || batched || tables.is_some() {
-            let (pivot_of, known, tables) = (&pivot_of[..], &pivots[..], tables.as_ref());
-            let threshold = if first { PAR_WORDS } else { PAR_BATCH_WORDS };
-            let (x, d, o) = if chunk.len() > 1 && chunk.len() * words > threshold {
-                let share = chunk.len().div_ceil(rayon::current_num_threads()).max(1);
-                chunk
-                    .par_chunks_mut(share)
-                    .map(|rows| by_known(rows, pivot_of, known, tables))
-                    .reduce(|| (0, 0, 0), |a, b| (a.0 + b.0, a.1 + b.1, a.2 + b.2))
-            } else {
-                by_known(chunk, pivot_of, known, tables)
-            };
-            xors += x;
-            performed += d;
-            aux += o;
-        }
-        if expired.load(std::sync::atomic::Ordering::Relaxed) {
-            return None;
-        }
-        if first {
-            // Only the leading block's reductions: every row has now
-            // stopped at a lead no leading row covers.
-            first = false;
-            continue;
-        }
-        for (k, row) in chunk.iter_mut().enumerate() {
-            if k > 0 && k % 128 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+        // Reduce each of `rows` by the pivots already in the table for as long
+        // as its lead has one; stop at the first lead without.  Pivot rows
+        // never change once made, so these are exactly the reductions the
+        // one-row-at-a-time loop would apply first, in the same order.  The
+        // rows go a range of columns at a time: every row is taken as far as
+        // the range allows before any goes further, so the tables and pivots
+        // of a range are read from cache by all of them, not fetched again
+        // for each.  The ranges are taken in column order and a row stops for
+        // good at a lead without a pivot, so each row's reductions and their
+        // order are unchanged.
+        let by_known = |rows: &mut [Row],
+                        pivot_of: &[u32],
+                        pivots: &[(usize, Row)],
+                        tables: Option<&BlockTables>|
+         -> (u64, u64, u64) {
+            if deadline.is_some_and(|d| Instant::now() >= d) {
+                expired.store(true, std::sync::atomic::Ordering::Relaxed);
+                return (0, 0, 0);
+            }
+            let (mut xors, mut done, mut ops) = (0u64, 0u64, 0u64);
+            let mut live: Vec<usize> = (0..rows.len()).collect();
+            while !live.is_empty() {
+                let from = live
+                    .iter()
+                    .filter_map(|&i| rows[i].lead_counted(&mut ops))
+                    .min()
+                    .unwrap_or(usize::MAX);
+                let to = from.saturating_add(TILE_COLUMNS);
+                live.retain(|&i| {
+                    let row = &mut rows[i];
+                    loop {
+                        match row.lead_counted(&mut ops) {
+                            Some(lead) if lead < to => {
+                                let p = pivot_of[lead];
+                                // the pivot lookup, and the table lookup (with
+                                // the pattern it extracts) when tables exist
+                                ops += 1 + 2 * u64::from(tables.is_some());
+                                if p == NONE {
+                                    return false;
+                                }
+                                let (x, d) = step(row, lead, p, pivots, tables);
+                                xors += x;
+                                done += d;
+                            }
+                            Some(_) => return true,
+                            None => return false,
+                        }
+                    }
+                });
+            }
+            (xors, done, ops)
+        };
+        let mut rest = rest;
+        // The rows after the leading block go in batches.  Each batch is first
+        // reduced — in parallel, a share of its rows to a thread — by the
+        // pivots that exist before it — the leading block's, then every
+        // earlier batch's — and then finished in order: a row resumes where it stopped, against the pivots its
+        // predecessors in the batch have just made, and becomes a pivot if
+        // anything survives.  Every row sees the reductions, the order and
+        // the pivot table the serial loop would give it, so the pivots and
+        // the XOR count are identical to it; only the first phase is shared
+        // out.  The first batch is the whole remainder against the leading
+        // block, whose reductions are the bulk of a symbolic-preprocessing
+        // matrix, so the whole remainder takes that pass together before the
+        // batches start.
+        let mut done = 0usize;
+        let mut first = true;
+        // On one thread, or on a remainder too small to share out, without
+        // tables, reading each batch twice only costs: finish it serially
+        // instead, as the loop always did.  With tables the batches and their
+        // first phase stay, for the cache reuse of `by_known` and so that each
+        // batch's pivots can join the tables for the next.
+        // (Size first: asking rayon its thread count starts its pool.)
+        let batched = rest.len() * words > PAR_WORDS && rayon::current_num_threads() > 1;
+        let batch_rows = (ELIMINATION_BATCH_WORDS / words).clamp(32, 1024);
+        while done < rest.len() {
+            if deadline.is_some_and(|d| Instant::now() >= d) {
                 return None;
             }
-            let mut row = std::mem::take(row);
-            while let Some(lead) = row.lead_counted(&mut aux) {
-                aux += 1 + 2 * u64::from(tables.is_some());
-                match pivot_of[lead] {
-                    NONE => {
-                        pivot_of[lead] = pivots.len() as u32;
-                        pivots.push((lead, row));
-                        break;
-                    }
-                    p => {
-                        let (x, d) = step(&mut row, lead, p, &pivots, tables.as_ref());
-                        xors += x;
-                        performed += d;
+            let end = if first || !(batched || tables.is_some()) {
+                rest.len()
+            } else {
+                (done + batch_rows).min(rest.len())
+            };
+            let made = pivots.len();
+            let chunk = &mut rest[done..end];
+            if first || batched || tables.is_some() {
+                let (pivot_of, known, tables) = (&pivot_of[..], &pivots[..], tables.as_ref());
+                let threshold = if first { PAR_WORDS } else { PAR_BATCH_WORDS };
+                let (x, d, o) = if chunk.len() > 1 && chunk.len() * words > threshold {
+                    let share = chunk.len().div_ceil(rayon::current_num_threads()).max(1);
+                    chunk
+                        .par_chunks_mut(share)
+                        .map(|rows| by_known(rows, pivot_of, known, tables))
+                        .reduce(|| (0, 0, 0), |a, b| (a.0 + b.0, a.1 + b.1, a.2 + b.2))
+                } else {
+                    by_known(chunk, pivot_of, known, tables)
+                };
+                xors += x;
+                performed += d;
+                aux += o;
+            }
+            if expired.load(std::sync::atomic::Ordering::Relaxed) {
+                return None;
+            }
+            if first {
+                // Only the leading block's reductions: every row has now
+                // stopped at a lead no leading row covers.
+                first = false;
+                continue;
+            }
+            for (k, row) in chunk.iter_mut().enumerate() {
+                if k > 0 && k % 128 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+                    return None;
+                }
+                let mut row = std::mem::take(row);
+                while let Some(lead) = row.lead_counted(&mut aux) {
+                    aux += 1 + 2 * u64::from(tables.is_some());
+                    match pivot_of[lead] {
+                        NONE => {
+                            pivot_of[lead] = pivots.len() as u32;
+                            pivots.push((lead, row));
+                            break;
+                        }
+                        p => {
+                            let (x, d) = step(&mut row, lead, p, &pivots, tables.as_ref());
+                            xors += x;
+                            performed += d;
+                        }
                     }
                 }
             }
-        }
-        done = end;
-        if let Some(t) = &mut tables {
-            if rest.len() - done >= TABLE_ROWS && pivots.len() > made {
-                // the new pivots' groups, sorted, and their columns scanned
-                aux += tally::sort_cost(pivots.len() - made)
-                    + (TABLE_BLOCK * (pivots.len() - made)) as u64;
-                performed += t.extend(
-                    &pivot_of,
-                    &pivots,
-                    &pivots[made..],
-                    matrix_words * TABLE_EXTENDED_BUDGET_MULT,
-                );
-                st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
+            done = end;
+            if let Some(t) = &mut tables {
+                if rest.len() - done >= TABLE_ROWS && pivots.len() > made {
+                    // the new pivots' groups, sorted, and their columns scanned
+                    aux += tally::sort_cost(pivots.len() - made)
+                        + (TABLE_BLOCK * (pivots.len() - made)) as u64;
+                    performed += t.extend(
+                        &pivot_of,
+                        &pivots,
+                        &pivots[made..],
+                        matrix_words * TABLE_EXTENDED_BUDGET_MULT,
+                    );
+                    st.peak_table_bytes = st.peak_table_bytes.max((t.held_words * 8) as u64);
+                }
             }
         }
-    }
+        Some(pivots)
+    };
+    let result = run();
     st.word_xors += xors;
     st.word_xors_performed += performed;
     tally::word_ops(aux);
-    Some(pivots)
+    result
 }
 
 fn echelon(
@@ -1053,6 +1506,245 @@ fn echelon(
     st.matrix_profile_performed_xors[bin] = st.matrix_profile_performed_xors[bin]
         .saturating_add(st.word_xors_performed.saturating_sub(performed_before));
     st.matrix_profile_full_m4ri_counts[bin] += u64::from(use_full_m4ri);
+    result
+}
+
+/// Minimum full-matrix width for the Boolean Faugère–Lachartre split.
+const FL_MIN_COLS: usize = 256;
+/// The reducer block and pair block must both be large enough to amortise
+/// splitting and compressing the rows.
+const FL_MIN_ROWS: usize = 32;
+
+/// `F4_F2_FL=0` retains the full-width reducer cascade as a same-binary
+/// control.
+fn fl_enabled() -> bool {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("F4_F2_FL").as_deref() != Ok("0"))
+}
+
+fn fl_shape(allow_fl: bool, reducers: usize, pair_rows: usize, n_cols: usize) -> bool {
+    if !allow_fl
+        || n_cols < FL_MIN_COLS
+        || reducers < FL_MIN_ROWS
+        || pair_rows < FL_MIN_ROWS
+        || reducers >= n_cols
+    {
+        return false;
+    }
+    let free_words = (n_cols - reducers).div_ceil(64);
+    // Bound the compact reducer and pair blocks by the same allocation cap
+    // as a normal F4 matrix.
+    (reducers + pair_rows).saturating_mul(free_words) <= max_matrix_words() as usize
+}
+
+/// Split one packed row into its reducer-column coefficients and its packed
+/// free-column part.  `pivot_of[c] == NONE` marks a free column.
+fn split_fl_row(
+    row: &Row,
+    pivot_of: &[u32],
+    free_index: &[u32],
+    free_words: usize,
+) -> (Row, Vec<usize>, u64) {
+    let mut bits = vec![0u64; free_words];
+    let mut dependencies = Vec::new();
+    let mut inspected = 0u64;
+    let mut end = 0usize;
+    for (word_index, &packed) in row.bits[..row.end].iter().enumerate() {
+        let mut word = packed;
+        while word != 0 {
+            let column = word_index * 64 + word.trailing_zeros() as usize;
+            word &= word - 1;
+            inspected += 1;
+            let pivot = pivot_of[column];
+            if pivot == NONE {
+                let free = free_index[column] as usize;
+                bits[free / 64] |= 1u64 << (free % 64);
+                end = end.max(free / 64 + 1);
+            } else {
+                dependencies.push(pivot as usize);
+            }
+        }
+    }
+    (
+        Row {
+            bits,
+            start: 0,
+            end,
+        },
+        dependencies,
+        inspected,
+    )
+}
+
+fn xor_fl_row(row: &mut Row, reducer: &Row) -> u64 {
+    for (target, source) in row.bits[..reducer.end]
+        .iter_mut()
+        .zip(&reducer.bits[..reducer.end])
+    {
+        *target ^= *source;
+    }
+    row.end = row.end.max(reducer.end);
+    while row.end > 0 && row.bits[row.end - 1] == 0 {
+        row.end -= 1;
+    }
+    reducer.end as u64
+}
+
+/// Faugère–Lachartre elimination over `F_2`.
+///
+/// Symbolic preprocessing orders the rows as reducers `[A | B]` followed by
+/// pair rows `[C | D]`; reducer leading columns are distinct and every tail
+/// column is to the right of its lead.  Reduce the triangular reducer block
+/// once to `[I | B']`, form the compact Schur complement `D + C B'`, and run
+/// the existing packed echelon kernel only on free columns.  Returned rows are
+/// expanded with zero reducer columns so the caller's polynomial readback is
+/// unchanged.
+fn echelon_fl(
+    rows: Vec<Row>,
+    n_cols: usize,
+    reducer_count: usize,
+    st: &mut F4Stats,
+    deadline: Option<Instant>,
+) -> Option<Vec<(usize, Row)>> {
+    echelon_fl_with_expiry(rows, n_cols, reducer_count, st, deadline, || {
+        deadline.is_some_and(|limit| Instant::now() >= limit)
+    })
+}
+
+// The production wrapper supplies the original deadline predicate. A private
+// stop control permits deterministic interrupted-prefix accounting tests.
+fn echelon_fl_with_expiry(
+    mut rows: Vec<Row>,
+    n_cols: usize,
+    reducer_count: usize,
+    st: &mut F4Stats,
+    deadline: Option<Instant>,
+    mut deadline_expired: impl FnMut() -> bool,
+) -> Option<Vec<(usize, Row)>> {
+    let mut aux = (n_cols as u64).div_ceil(2);
+    let mut xors = 0u64;
+    let run = || {
+        debug_assert!(reducer_count <= rows.len());
+        let pair_rows = rows.split_off(reducer_count);
+        let reducer_rows = rows;
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut leads = Vec::with_capacity(reducer_count);
+        for (index, mut row) in reducer_rows.iter().cloned().enumerate() {
+            let lead = row.lead_counted(&mut aux)?;
+            debug_assert_eq!(pivot_of[lead], NONE, "reducer leads are distinct");
+            pivot_of[lead] = index as u32;
+            leads.push(lead);
+        }
+        let free_cols: Vec<usize> = (0..n_cols).filter(|&c| pivot_of[c] == NONE).collect();
+        let n_free = free_cols.len();
+        let free_words = n_free.div_ceil(64);
+        // While B' is built, the original packed matrix is still live.  Charge
+        // both so the solver's peak-memory report does not hide the FL scratch
+        // matrix behind the already-recorded full-width allocation.
+        let full_words = n_cols.div_ceil(64) as u64;
+        let original_words = (reducer_count + pair_rows.len()) as u64 * full_words;
+        let bprime_words = reducer_count as u64 * free_words as u64;
+        st.peak_matrix_bytes = st.peak_matrix_bytes.max(
+            original_words
+                .saturating_add(bprime_words)
+                .saturating_mul(8),
+        );
+        let mut free_index = vec![NONE; n_cols];
+        for (index, &column) in free_cols.iter().enumerate() {
+            free_index[column] = index as u32;
+        }
+
+        let mut order: Vec<usize> = (0..reducer_count).collect();
+        order.sort_unstable_by_key(|&index| std::cmp::Reverse(leads[index]));
+        let mut bprime: Vec<Row> = (0..reducer_count)
+            .map(|_| Row {
+                bits: vec![0; free_words],
+                start: 0,
+                end: 0,
+            })
+            .collect();
+        for (position, &index) in order.iter().enumerate() {
+            if position.is_multiple_of(64) && deadline_expired() {
+                return None;
+            }
+            let (mut free, dependencies, inspected) =
+                split_fl_row(&reducer_rows[index], &pivot_of, &free_index, free_words);
+            aux += inspected;
+            for dependency in dependencies {
+                if dependency == index {
+                    continue;
+                }
+                debug_assert!(leads[dependency] > leads[index]);
+                xors += xor_fl_row(&mut free, &bprime[dependency]);
+            }
+            bprime[index] = free;
+        }
+        drop(reducer_rows);
+
+        let reduce_pair = |row: Row| {
+            let (mut free, dependencies, inspected) =
+                split_fl_row(&row, &pivot_of, &free_index, free_words);
+            let mut row_xors = 0u64;
+            for dependency in dependencies {
+                row_xors += xor_fl_row(&mut free, &bprime[dependency]);
+            }
+            (free, row_xors, inspected)
+        };
+        let parallel = pair_rows.len() > 1
+            && pair_rows.len().saturating_mul(free_words) > PAR_WORDS
+            && inner_build_parallel_enabled()
+            && rayon::current_num_threads() > 1;
+        let reduced: Vec<(Row, u64, u64)> = if parallel {
+            pair_rows.into_par_iter().map(reduce_pair).collect()
+        } else {
+            pair_rows.into_iter().map(reduce_pair).collect()
+        };
+        let mut compact = Vec::with_capacity(reduced.len());
+        for (row, row_xors, inspected) in reduced {
+            compact.push(row);
+            xors += row_xors;
+            aux += inspected;
+        }
+        st.fl_matrices += 1;
+        st.fl_reducer_rows += reducer_count as u64;
+        st.fl_pair_rows += compact.len() as u64;
+        st.fl_free_cols += n_free as u64;
+
+        if n_free == 0 {
+            return Some(Vec::new());
+        }
+        let compact_pivots = echelon(compact, n_free, st, deadline)?;
+        let full_words = n_cols.div_ceil(64).max(1);
+        let mut expanded = Vec::with_capacity(compact_pivots.len());
+        for (lead, row) in compact_pivots {
+            let mut bits = vec![0u64; full_words];
+            let mut end = 0usize;
+            for word_index in row.start..row.end {
+                let mut word = row.bits[word_index];
+                while word != 0 {
+                    let free = word_index * 64 + word.trailing_zeros() as usize;
+                    word &= word - 1;
+                    let column = free_cols[free];
+                    bits[column / 64] |= 1u64 << (column % 64);
+                    end = end.max(column / 64 + 1);
+                }
+            }
+            let full_lead = free_cols[lead];
+            expanded.push((
+                full_lead,
+                Row {
+                    bits,
+                    start: full_lead / 64,
+                    end,
+                },
+            ));
+        }
+        Some(expanded)
+    };
+    let result = run();
+    st.word_xors += xors;
+    st.word_xors_performed += xors;
+    tally::word_ops(aux);
     result
 }
 
@@ -1380,6 +2072,10 @@ struct State {
 #[derive(Default)]
 struct PairSelectScratch {
     dense: Option<DensePairSelectScratch>,
+    /// The active basis indices of one `insert_core`, rebuilt per call
+    /// and kept for its allocation (not part of the dense scratch's
+    /// reported bytes).
+    active: Vec<usize>,
 }
 
 struct DensePairSelectScratch {
@@ -1628,7 +2324,9 @@ impl State {
         }
 
         // New pairs (h, g): keep one per minimal lcm (chain criterion).
-        let active: Vec<usize> = (0..h).filter(|&g| self.active[g]).collect();
+        let mut active = std::mem::take(&mut self.pair_select_scratch.active);
+        active.clear();
+        active.extend((0..h).filter(|&g| self.active[g]));
         let selected = if dense_pair_select_enabled() && self.n_vars <= 20 {
             select_new_pairs_dense(
                 self.n_vars,
@@ -1641,6 +2339,7 @@ impl State {
         } else {
             select_new_pairs_quadratic(lh, &self.lm, &active, st)
         };
+        self.pair_select_scratch.active = active;
         // Old pairs whose lcm `h` divides strictly on both sides.
         if immediate_filter {
             self.filter_pairs_since(h, st);
@@ -1689,11 +2388,282 @@ pub fn groebner_basis_f4(
     n_vars: usize,
     budget: Option<Duration>,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        None,
+        max_matrix_words(),
+        EARLY_GUARD,
+        fl_enabled(),
+    )
+}
+
+/// [`groebner_basis_f4`] with the Faugère–Lachartre split disabled.
+///
+/// This is the exact, same-binary control used by benchmark adapters.  It
+/// avoids process-global environment state, so the split and full-width
+/// arms remain independently selectable in one test process.
+pub fn groebner_basis_f4_full_width(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        None,
+        max_matrix_words(),
+        EARLY_GUARD,
+        false,
+    )
+}
+
+/// [`groebner_basis_f4`] reading and extending a [`F4Skeleton`] shared
+/// with the earlier systems of the run.  The basis and every decision are
+/// those of [`groebner_basis_f4`]; only the symbolic work differs, and the
+/// stats count what was done.
+pub fn groebner_basis_f4_skeleton(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    skeleton: &mut F4Skeleton,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    let (basis, mut st) = groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        None,
+        max_matrix_words(),
+        EARLY_GUARD,
+        Some(&mut *skeleton),
+        TraceMode::Off,
+    );
+    st.skeleton_bytes = skeleton.bytes;
+    (basis, st)
+}
+
+/// The shape key of a trace: the unknowns, the inputs' degree and their
+/// sorted monomial support (charged: a word operation a term, the sort,
+/// the hash probe of the lookup).
+fn trace_shape(inputs: &[F2BoolPoly], n_vars: usize) -> TraceShape {
+    let mut support: Vec<Mask> = inputs
+        .iter()
+        .flat_map(|p| p.terms.iter().map(|t| t.mask))
+        .collect();
+    let n_terms = support.len();
+    support.sort_unstable();
+    support.dedup();
+    tally::word_ops(2 * n_terms as u64 + tally::sort_cost(n_terms));
+    tally::hash_probes(1);
+    (
+        n_vars,
+        inputs.iter().map(degree).max().unwrap_or(0),
+        support.into_boxed_slice(),
+    )
+}
+
+/// [`groebner_basis_f4`] through a [`F4PairTrace`] shared with the earlier
+/// systems of the run: replay the trace of the system's shape when there
+/// is one, verify, and fall back to the plain computation (which records
+/// the trace) when there is none or the replay fails.  The basis is the
+/// plain path's; the stats sum the work of every run made — replay,
+/// verification and fallback — and their outcome fields are those of the
+/// run whose basis is returned.
+pub fn groebner_basis_f4_traced(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    store: &mut F4PairTrace,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    let started = Instant::now();
+    let remaining = || budget.map(|b| b.saturating_sub(started.elapsed()));
+    let run = |eqs: Vec<F2BoolPoly>, mode: TraceMode<'_>, budget: Option<Duration>| {
+        groebner_basis_f4_inner(
+            eqs,
+            n_vars,
+            budget,
+            None,
+            max_matrix_words(),
+            EARLY_GUARD,
+            None,
+            mode,
+        )
+    };
+    let inputs: Vec<F2BoolPoly> = initial.into_iter().filter(|p| !p.is_zero()).collect();
+    if inputs.is_empty() {
+        return run(inputs, TraceMode::Off, budget);
+    }
+    let key = trace_shape(&inputs, n_vars);
+    // the copies of the inputs a replay and its verification take
+    let copy_cost = || tally::word_ops(inputs.iter().map(|p| p.terms.len() as u64).sum());
+
+    let mut total = F4Stats::default();
+    if let Some(steps) = store.traces.get(&key) {
+        total.trace_replays = 1;
+        copy_cost();
+        let (basis, st) = run(inputs.clone(), TraceMode::Replay(steps), remaining());
+        total.absorb(&st);
+        if st.timed_out || st.oversize {
+            // the budget or the size guard ended the replay: a plain run
+            // would meet it too
+            total.take_outcome(&st);
+            total.wall_ns = started.elapsed().as_nanos() as u64;
+            total.trace_bytes = store.bytes;
+            return (basis, total);
+        }
+        let accepted = if st.trace_mismatches != 0 {
+            false
+        } else if basis.len() == 1 && is_one(&basis[0]) {
+            // `1` lies in the ideal: a certificate on its own
+            true
+        } else {
+            total.trace_verifications = 1;
+            copy_cost();
+            let (_, vst) = run(basis.clone(), TraceMode::Verify(&inputs), remaining());
+            total.absorb(&vst);
+            total.trace_verify_word_xors += vst.word_xors;
+            total.trace_verify_divisor_tests += vst.divisor_tests;
+            total.trace_verify_pairs += vst.pairs_reduced + vst.field_pairs_reduced;
+            let ok = vst.trace_verify_failures == 0 && !vst.timed_out && !vst.oversize;
+            total.trace_verify_failures = u64::from(!ok);
+            ok
+        };
+        if accepted {
+            total.trace_hits = 1;
+            total.take_outcome(&st);
+            total.wall_ns = started.elapsed().as_nanos() as u64;
+            total.trace_bytes = store.bytes;
+            return (basis, total);
+        }
+        total.trace_fallbacks = 1;
+    }
+    // The plain computation, recording the shape's trace.
+    let mut steps = Vec::new();
+    let (basis, st) = run(inputs, TraceMode::Record(&mut steps), remaining());
+    total.absorb(&st);
+    total.take_outcome(&st);
+    if !st.timed_out && !st.oversize {
+        let added = F4PairTrace::shape_bytes(&key, &steps);
+        let removed = store
+            .traces
+            .get(&key)
+            .map_or(0, |old| F4PairTrace::shape_bytes(&key, old));
+        let after = store.bytes.saturating_sub(removed).saturating_add(added);
+        if after <= store.cap_bytes {
+            total.trace_records = 1;
+            store.bytes = after;
+            store.traces.insert(key, steps);
+        } else if removed > 0 {
+            // a failed trace that cannot be replaced is dropped
+            store.bytes = store.bytes.saturating_sub(removed);
+            store.traces.remove(&key);
+        }
+    }
+    total.wall_ns = started.elapsed().as_nanos() as u64;
+    total.trace_bytes = store.bytes;
+    (basis, total)
+}
+
+/// The variables the degree-1 elements of `polys` pin: one bit per
+/// distinct leading variable.  Under a degree ordering an element whose
+/// leading monomial is a variable is affine, so each such element fixes
+/// its leading variable once the smaller ones are fixed.
+fn pinned_variables(lm: &[Mask], active: &[bool]) -> Mask {
+    lm.iter()
+        .zip(active)
+        .filter(|(m, a)| **a && m.count_ones() == 1)
+        .fold(0 as Mask, |acc, (m, _)| acc | m)
+}
+
+/// [`groebner_basis_f4`], stopping after the first step at which the
+/// degree-1 elements of the basis leave at most `max_free` variables
+/// unpinned (`None` never stops early).  The ideal is unchanged, so its
+/// solutions all lie on the affine space those elements cut out; a
+/// caller enumerates `2^free` points there and checks each against the
+/// original equations ([`solutions_from_linear_part`]).
+pub fn groebner_basis_f4_until(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    max_free: Option<usize>,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        max_free,
+        max_matrix_words(),
+        EARLY_GUARD,
+        None,
+        TraceMode::Off,
+        fl_enabled(),
+    )
+}
+
+/// Tuning of the early size guard; tests shrink it to reach the guarded
+/// path on small systems.
+#[derive(Clone, Copy)]
+struct EarlyGuard {
+    /// Source terms of a step (the sparse terms its S-rows start from)
+    /// above which the dimension pre-pass runs before any row is stored.
+    terms: usize,
+    /// Rows or monomials handled between two checks of the deadline and
+    /// of the size bound in the pre-pass.
+    slab: usize,
+    /// Deadline of the pre-pass (default: the budget's deadline).
+    deadline: Option<Instant>,
+}
+
+/// 8 bytes a term: 64 MiB of sparse S-row terms.
+const EARLY_GUARD: EarlyGuard = EarlyGuard {
+    terms: 1 << 23,
+    slab: 256,
+    deadline: None,
+};
+
+/// Dense words of a `rows × cols` bit matrix.
+#[inline]
+fn dense_words(rows: usize, cols: usize) -> u64 {
+    cols.div_ceil(64).max(1) as u64 * rows as u64
+}
+
+/// [`groebner_basis_f4_until`] with the dense-matrix guard at `max_words`.
+///
+/// **Early refusal.**  The guard used to be consulted only after every
+/// sparse row of a step existed (8 bytes a term, several times the dense
+/// matrix), so an oversized step was OOM-killed before it could be
+/// refused, and the budget was checked only in the elimination.  For a
+/// step whose S-rows start from more than [`EarlyGuard::terms`] terms, a
+/// *dimension pre-pass* now runs first: it forms the S-rows and the
+/// reducers one slab at a time, keeps only the set of monomials examined
+/// and a row count (memory proportional to the columns), checks the
+/// deadline between slabs, stops as soon as the rows counted so far times
+/// the columns so far (both lower bounds that only grow) exceed
+/// `max_words`, and at its end holds the step's exact rows and columns,
+/// the very ones the late check computes.  A step that fits is therefore
+/// never refused, and it is then built exactly as before: the pre-pass is
+/// uncounted (no `bitop` charge) and changes no result.  The late check
+/// stays as the exact one for steps below the threshold.  A refusal sets
+/// `oversize` (or `timed_out`), the flags callers already handle.
+fn groebner_basis_f4_inner(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    max_free: Option<usize>,
+    max_words: u64,
+    guard: EarlyGuard,
+    mut skel: Option<&mut F4Skeleton>,
+    mut trace: TraceMode<'_>,
+    allow_fl: bool,
+) -> (Vec<F2BoolPoly>, F4Stats) {
     static BATCH_INSERTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let batch_inserts =
         *BATCH_INSERTS.get_or_init(|| std::env::var("F4_F2_BATCH_INSERTS").as_deref() != Ok("0"));
     let started = Instant::now();
     let deadline = budget.map(|b| started + b);
+    let pre_deadline = guard.deadline.or(deadline);
     let mut st = F4Stats {
         inner_build_parallel_disabled_calls: u64::from(!inner_build_parallel_enabled()),
         ..F4Stats::default()
@@ -1733,21 +2703,39 @@ pub fn groebner_basis_f4(
     for p in &inputs {
         st.max_poly_degree = st.max_poly_degree.max(degree(p));
     }
+    if let Some(k) = skel.as_deref_mut().filter(|_| !inputs.is_empty()) {
+        // the shape key: the unknowns and the inputs' largest degree (the
+        // degree scan is the one above), compared with the stored one
+        let shape = (n_vars, inputs.iter().map(degree).max().unwrap_or(0));
+        tally::word_ops(2);
+        if k.shape != Some(shape) {
+            st.skeleton_shape_rebuilds = u64::from(k.shape.is_some());
+            k.steps.clear();
+            k.bytes = 0;
+            k.shape = Some(shape);
+        }
+    }
 
-    // The initial echelon: distinct leading monomials to start from.
-    let t = Instant::now();
-    let cols = Columns::from_monomials(inputs.iter().flat_map(|p| p.terms.iter().map(|t| t.mask)));
-    let rows: Vec<Row> = inputs.iter().map(|p| cols.pack(p)).collect();
-    cols.charge_pack(&inputs);
-    st.build_ns += t.elapsed().as_nanos() as u64;
-    let t = Instant::now();
-    let Some(pivots) = echelon(rows, cols.monos.len(), &mut st, deadline) else {
-        st.timed_out = true;
+    // The initial echelon: distinct leading monomials to start from.  A
+    // verification starts from the interreduced basis itself.
+    let mut start: Vec<F2BoolPoly> = if matches!(trace, TraceMode::Verify(_)) {
+        inputs.clone()
+    } else {
+        let t = Instant::now();
+        let cols =
+            Columns::from_monomials(inputs.iter().flat_map(|p| p.terms.iter().map(|t| t.mask)));
+        let rows: Vec<Row> = inputs.iter().map(|p| cols.pack(p)).collect();
+        cols.charge_pack(&inputs);
+        st.build_ns += t.elapsed().as_nanos() as u64;
+        let t = Instant::now();
+        let Some(pivots) = echelon(rows, cols.monos.len(), &mut st, deadline) else {
+            st.timed_out = true;
+            st.eliminate_ns += t.elapsed().as_nanos() as u64;
+            return finish(inputs, st);
+        };
         st.eliminate_ns += t.elapsed().as_nanos() as u64;
-        return finish(inputs, st);
+        pivots.iter().map(|(_, r)| cols.unpack(r, n_vars)).collect()
     };
-    st.eliminate_ns += t.elapsed().as_nanos() as u64;
-    let mut start: Vec<F2BoolPoly> = pivots.iter().map(|(_, r)| cols.unpack(r, n_vars)).collect();
     if start.iter().any(is_one) {
         return finish(one(), st);
     }
@@ -1770,16 +2758,89 @@ pub fn groebner_basis_f4(
         }
     }
 
-    while !s.pairs.is_empty() {
+    // Per-step buffers, emptied at the top of every step and reused, so a
+    // step allocates them only when it outgrows an earlier one.  Their
+    // contents are each step's own; `lcm_columns` is read only by
+    // membership and through `examined`, whose values `Columns` sorts, so
+    // a reused set's iteration order changes nothing.
+    let mut selected: Vec<Pair> = Vec::new();
+    let mut seen_rows: FxSet<(Mask, usize)> = FxSet::default();
+    let mut half_keys: Vec<(Mask, usize)> = Vec::new();
+    let mut field_keys: Vec<(Mask, usize)> = Vec::new();
+    let mut lcm_columns: FxSet<Mask> = FxSet::default();
+    let mut active: Vec<usize> = Vec::new();
+    // The trace step a replay is at; a verification's single step.
+    let mut trace_at = 0usize;
+    let mut verify_pending = matches!(trace, TraceMode::Verify(_));
+    let replay_steps: Option<&[TraceStep]> = match &trace {
+        TraceMode::Replay(steps) => Some(*steps),
+        _ => None,
+    };
+    'steps: while !s.pairs.is_empty() || verify_pending {
         if deadline.is_some_and(|d| Instant::now() >= d) {
             st.timed_out = true;
             break;
         }
         // the scan for the lowest degree and the partition, one a pair
         tally::word_ops(2 * s.pairs.len() as u64);
-        let d = s.pairs.iter().map(|p| p.deg).min().unwrap();
-        let (selected, rest): (Vec<Pair>, Vec<Pair>) = s.pairs.drain(..).partition(|p| p.deg == d);
-        s.pairs = rest;
+        selected.clear();
+        let mut replay_step: Option<&TraceStep> = None;
+        let d = match (&trace, replay_steps) {
+            (TraceMode::Verify(_), _) => {
+                // every pair of every degree, in one matrix
+                verify_pending = false;
+                selected.append(&mut s.pairs);
+                selected.iter().map(|p| p.deg).max().unwrap_or(0)
+            }
+            (_, Some(steps)) => {
+                let Some(ts) = steps.get(trace_at) else {
+                    // past the trace: the rest is left to the verification
+                    st.trace_pairs_dropped += s.pairs.len() as u64;
+                    s.pairs.clear();
+                    break 'steps;
+                };
+                trace_at += 1;
+                replay_step = Some(ts);
+                let d = ts.deg;
+                let (mut probes, mut dropped) = (0u64, 0u64);
+                s.pairs.retain(|p| {
+                    if p.deg == d {
+                        probes += 1;
+                        if ts.useful.contains(&p.kind) {
+                            selected.push(*p);
+                        } else {
+                            dropped += 1;
+                        }
+                        false
+                    } else {
+                        true
+                    }
+                });
+                tally::hash_probes(probes);
+                st.trace_pairs_dropped += dropped;
+                if selected.is_empty() {
+                    if !ts.fresh.is_empty() {
+                        st.trace_mismatches = 1;
+                        return finish(Vec::new(), st);
+                    }
+                    continue 'steps;
+                }
+                d
+            }
+            _ => {
+                let d = s.pairs.iter().map(|p| p.deg).min().unwrap();
+                // the partition in place: both sides keep their order
+                s.pairs.retain(|p| {
+                    if p.deg == d {
+                        selected.push(*p);
+                        false
+                    } else {
+                        true
+                    }
+                });
+                d
+            }
+        };
         st.steps += 1;
         st.degree_reached = st.degree_reached.max(d);
 
@@ -1787,10 +2848,10 @@ pub fn groebner_basis_f4(
         // The rows the step reduces: both halves of every critical pair
         // (their common leading monomial is the lcm, which one half will
         // pivot and the other lose), and every field product.
-        let mut seen_rows: FxSet<(Mask, usize)> = FxSet::default();
-        let mut half_keys: Vec<(Mask, usize)> = Vec::new();
-        let mut field_keys: Vec<(Mask, usize)> = Vec::new();
-        let mut lcm_columns: FxSet<Mask> = FxSet::default();
+        seen_rows.clear();
+        half_keys.clear();
+        field_keys.clear();
+        lcm_columns.clear();
         // the multipliers (an AND-NOT each) and the hashed row and lcm sets
         for p in &selected {
             match p.kind {
@@ -1842,6 +2903,88 @@ pub fn groebner_basis_f4(
                 keys.iter().map(product).collect()
             }
         };
+        // The dimension pre-pass (see `groebner_basis_f4_inner`).
+        let src_terms: usize = half_keys
+            .iter()
+            .chain(&field_keys)
+            .map(|&(_, g)| s.polys[g].terms.len())
+            .sum();
+        if src_terms > guard.terms {
+            let act: Vec<usize> = (0..s.polys.len()).filter(|&g| s.active[g]).collect();
+            // 1 = oversize, 2 = timed out
+            let verdict: u8 = 'pre: {
+                let mut rows_n = 0usize;
+                let mut srow_monos: FxSet<Mask> = FxSet::default();
+                for keys in [&half_keys, &field_keys] {
+                    for slab in keys.chunks(guard.slab) {
+                        for p in products(slab) {
+                            if !p.is_zero() {
+                                rows_n += 1;
+                                srow_monos.extend(p.terms.iter().map(|t| t.mask));
+                            }
+                        }
+                        if dense_words(rows_n, srow_monos.len()) > max_words {
+                            break 'pre 1;
+                        }
+                        if pre_deadline.is_some_and(|d| Instant::now() >= d) {
+                            break 'pre 2;
+                        }
+                    }
+                }
+                let mut examined: FxSet<Mask> = lcm_columns.iter().copied().collect();
+                let mut frontier: Vec<Mask> = srow_monos
+                    .into_iter()
+                    .filter(|m| !lcm_columns.contains(m))
+                    .collect();
+                examined.extend(frontier.iter().copied());
+                while !frontier.is_empty() {
+                    let mut next: Vec<Mask> = Vec::new();
+                    for slab in frontier.chunks(guard.slab) {
+                        // a reducer's monomials after its lead (its lead is `m`)
+                        let tails = |&m: &Mask| -> Option<Vec<Mask>> {
+                            s.reducer_among(m, &act).map(|g| {
+                                let r = s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g]));
+                                r.terms[1..].iter().map(|t| t.mask).collect()
+                            })
+                        };
+                        let found: Vec<Option<Vec<Mask>>> = if slab.len() >= PAR_REDUCERS
+                            && inner_build_parallel_enabled()
+                            && rayon::current_num_threads() > 1
+                        {
+                            slab.par_iter().map(tails).collect()
+                        } else {
+                            slab.iter().map(tails).collect()
+                        };
+                        for tail in found.into_iter().flatten() {
+                            rows_n += 1;
+                            for m in tail {
+                                if examined.insert(m) {
+                                    next.push(m);
+                                }
+                            }
+                        }
+                        if dense_words(rows_n, examined.len()) > max_words {
+                            break 'pre 1;
+                        }
+                        if pre_deadline.is_some_and(|d| Instant::now() >= d) {
+                            break 'pre 2;
+                        }
+                    }
+                    frontier = next;
+                }
+                0
+            };
+            if verdict != 0 {
+                if verdict == 1 {
+                    st.oversize = true;
+                } else {
+                    st.timed_out = true;
+                }
+                st.build_ns += t.elapsed().as_nanos() as u64;
+                s.pairs.extend_from_slice(&selected);
+                break 'steps;
+            }
+        }
         let half_rows = products(&half_keys);
         let mut field_rows = products(&field_keys);
         tally::word_ops(
@@ -1852,12 +2995,62 @@ pub fn groebner_basis_f4(
                 .sum::<u64>()
                 + field_rows.len() as u64,
         );
+        if matches!(trace, TraceMode::Record(_)) {
+            // keep the keys beside their rows for the provenance
+            let mut k = 0;
+            field_keys.retain(|_| {
+                k += 1;
+                !field_rows[k - 1].is_zero()
+            });
+        }
         field_rows.retain(|p| !p.is_zero());
+        if let TraceMode::Verify(extra) = &trace {
+            // the inputs, each a row of its own
+            tally::word_ops(extra.iter().map(|p| p.terms.len() as u64).sum());
+            field_rows.extend(extra.iter().filter(|p| !p.is_zero()).cloned());
+        }
 
         // Symbolic preprocessing.  Every monomial other than an S-pair's
         // lcm is examined once; a divisible one gets a reducer led by it.
-        let active: Vec<usize> = (0..s.polys.len()).filter(|&g| s.active[g]).collect();
+        active.clear();
+        active.extend((0..s.polys.len()).filter(|&g| s.active[g]));
         tally::word_ops(s.polys.len() as u64);
+        // The skeleton's entry for this step: the key is formed (a word
+        // operation a leading monomial), hashed (one more each) and, on a
+        // hit, compared (one more each).
+        let mut skel_added = 0u64;
+        type StepRefs<'k> = (Option<&'k mut SkeletonStep>, Option<&'k mut u64>, bool);
+        let (mut entry, mut skel_bytes, recording): StepRefs<'_> = match skel.as_deref_mut() {
+            None => (None, None, false),
+            Some(k) => {
+                let F4Skeleton {
+                    steps,
+                    bytes,
+                    cap_bytes,
+                    ..
+                } = k;
+                let key: (u32, Box<[Mask]>) = (d, active.iter().map(|&g| s.lm[g]).collect());
+                tally::word_ops(2 * active.len() as u64 + 1);
+                tally::hash_probes(1);
+                let recording = *bytes < *cap_bytes;
+                if steps.contains_key(&key) {
+                    tally::word_ops(active.len() as u64 + 1);
+                    st.skeleton_steps_replayed += 1;
+                    (steps.get_mut(&key), Some(bytes), recording)
+                } else if recording {
+                    st.skeleton_steps_built += 1;
+                    tally::hash_probes(1);
+                    skel_added += 32 + 8 * active.len() as u64;
+                    (Some(steps.entry(key).or_default()), Some(bytes), true)
+                } else {
+                    st.skeleton_store_refused += 1;
+                    (None, None, false)
+                }
+            }
+        };
+        let replaying = entry
+            .as_deref()
+            .is_some_and(|e| !e.candidates.is_empty() || e.columns.is_some());
         let mut no_divisor = MonomialSeen::new(n_vars);
         // The first level: every monomial of the S-rows but the lcms.
         let s_terms: usize = half_rows
@@ -1915,10 +3108,8 @@ pub fn groebner_basis_f4(
         // order of examination — a monomial's reducer depends only on the
         // monomial — and a large level's lookups, products and membership
         // tests are independent of one another, so they run in parallel.
-        let reducer_row = |m: Mask| {
-            s.reducer_among(m, &active)
-                .map(|g| s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g])))
-        };
+        let product_of =
+            |m: Mask, g: usize| s.polys[g].mul_mono(F2BoolMono::from_mask(m & !s.lm[g]));
         // the terms a reducer row carries, on average, to price a level
         let mean_terms = active
             .iter()
@@ -1928,17 +3119,77 @@ pub fn groebner_basis_f4(
         tally::word_ops(active.len() as u64);
         let mut frontier = queue;
         while !frontier.is_empty() {
-            st.divisor_tests += (active.len() * frontier.len()) as u64;
             // (sizes first: asking rayon its thread count starts its pool)
             let parallel = frontier.len() >= PAR_REDUCERS
                 && frontier.len() * mean_terms >= PAR_PRODUCT_TERMS
                 && inner_build_parallel_enabled()
                 && rayon::current_num_threads() > 1;
-            let rows: Vec<Option<F2BoolPoly>> = if parallel {
-                frontier.par_iter().map(|&m| reducer_row(m)).collect()
-            } else {
-                frontier.iter().map(|&m| reducer_row(m)).collect()
+            // A monomial's reducer: from the stored divisor positions when
+            // the skeleton has them (only those tested), else by a scan of
+            // every active element (recording the divisors when storing).
+            // Either way the shortest divisor, the first on a tie, in basis
+            // order: the reducer [`State::reducer_among`] picks.
+            let candidates = entry.as_deref().map(|e| &e.candidates);
+            let lookup = |m: Mask| -> (Option<F2BoolPoly>, Option<Box<[u32]>>, bool) {
+                let shortest = |positions: &mut dyn Iterator<Item = usize>| {
+                    let mut best: Option<usize> = None;
+                    for p in positions {
+                        let g = active[p];
+                        if best.is_none_or(|b| s.polys[g].terms.len() < s.polys[b].terms.len()) {
+                            best = Some(g);
+                        }
+                    }
+                    best
+                };
+                if let Some(c) = candidates.and_then(|c| c.get(&m)) {
+                    let g = shortest(&mut c.iter().map(|&p| p as usize));
+                    (g.map(|g| product_of(m, g)), None, true)
+                } else if recording {
+                    let found: Box<[u32]> = (0..active.len())
+                        .filter(|&p| s.lm[active[p]] & !m == 0)
+                        .map(|p| p as u32)
+                        .collect();
+                    let g = shortest(&mut found.iter().map(|&p| p as usize));
+                    (g.map(|g| product_of(m, g)), Some(found), false)
+                } else {
+                    let g = s.reducer_among(m, &active);
+                    (g.map(|g| product_of(m, g)), None, false)
+                }
             };
+            let looked: Vec<(Option<F2BoolPoly>, Option<Box<[u32]>>, bool)> = if parallel {
+                frontier.par_iter().map(|&m| lookup(m)).collect()
+            } else {
+                frontier.iter().map(|&m| lookup(m)).collect()
+            };
+            let mut rows: Vec<Option<F2BoolPoly>> = Vec::with_capacity(looked.len());
+            let mut fresh_candidates: Vec<(Mask, Box<[u32]>)> = Vec::new();
+            for (&m, (row, found, hit)) in frontier.iter().zip(looked) {
+                if hit {
+                    let c = candidates.and_then(|c| c.get(&m)).map_or(0, |c| c.len());
+                    st.skeleton_candidate_hits += 1;
+                    st.skeleton_candidate_tests += c as u64;
+                    st.divisor_tests += c as u64;
+                    // the lookup
+                    tally::hash_probes(1);
+                } else {
+                    st.divisor_tests += active.len() as u64;
+                    if let Some(found) = found {
+                        if replaying {
+                            st.skeleton_candidate_misses += 1;
+                        }
+                        // the failed lookup (when there was a stored map to
+                        // look in), the store, and the positions copied
+                        tally::hash_probes(1 + u64::from(candidates.is_some()));
+                        tally::word_ops(found.len() as u64);
+                        skel_added += 24 + 4 * found.len() as u64;
+                        fresh_candidates.push((m, found));
+                    }
+                }
+                rows.push(row);
+            }
+            if let Some(e) = entry.as_deref_mut() {
+                e.candidates.extend(fresh_candidates);
+            }
             // a reducer leads with its monomial, already examined
             let unseen = |r: &F2BoolPoly| -> Vec<Mask> {
                 debug_assert!(r.lt().is_some_and(|t| examined.contains(&t.mask)));
@@ -1994,13 +3245,37 @@ pub fn groebner_basis_f4(
         }
         st.reducer_rows += reducers.len() as u64;
 
+        if let Some(b) = skel_bytes.as_deref_mut() {
+            *b = b.saturating_add(std::mem::take(&mut skel_added));
+        }
         let n_rows = reducers.len() + half_rows.len() + field_rows.len();
-        let cols = Columns::from_monomials(examined.into_values());
+        // The column map: the stored one when the step's monomial set is
+        // exactly its set (equal size, every stored monomial examined:
+        // a membership test each), else a new sort and index.
+        let stored = entry.as_deref_mut().and_then(|e| e.columns.take());
+        let stored_bytes = stored.as_ref().map_or(0, F4Skeleton::columns_bytes);
+        let cols = match stored {
+            Some(c) => {
+                let same = c.monos.len() == examined.len() && {
+                    examined.charge(c.monos.len() as u64);
+                    c.monos.iter().all(|m| examined.contains(m))
+                };
+                tally::word_ops(1);
+                if same {
+                    st.skeleton_columns_reused += 1;
+                    c
+                } else {
+                    st.skeleton_columns_rebuilt += 1;
+                    Columns::from_monomials(examined.into_values())
+                }
+            }
+            None => Columns::from_monomials(examined.into_values()),
+        };
         let words = cols.words() as u64;
-        if words * n_rows as u64 > MAX_MATRIX_WORDS {
+        if words * n_rows as u64 > max_words {
             st.oversize = true;
             st.build_ns += t.elapsed().as_nanos() as u64;
-            s.pairs.extend(selected);
+            s.pairs.extend_from_slice(&selected);
             break;
         }
         st.matrix_rows_max = st.matrix_rows_max.max(n_rows as u64);
@@ -2009,11 +3284,20 @@ pub fn groebner_basis_f4(
         st.peak_matrix_bytes = st.peak_matrix_bytes.max(words * n_rows as u64 * 8);
         // Reducers first, each on a column of its own; then the S-rows by
         // leading monomial, so the second half of a pair meets the first.
-        let mut s_rows: Vec<&F2BoolPoly> = half_rows.iter().chain(field_rows.iter()).collect();
+        let n_half = half_rows.len();
+        let s_at = |i: usize| -> &F2BoolPoly {
+            if i < n_half {
+                &half_rows[i]
+            } else {
+                &field_rows[i - n_half]
+            }
+        };
+        let mut s_order: Vec<usize> = (0..n_half + field_rows.len()).collect();
         // the keys, the sort, and the degree scan of every row below
-        tally::word_ops(s_rows.len() as u64 + tally::sort_cost(s_rows.len()) + n_rows as u64);
+        tally::word_ops(s_order.len() as u64 + tally::sort_cost(s_order.len()) + n_rows as u64);
         // stable: rows sharing a leading monomial keep their order
-        s_rows.sort_by_cached_key(|p| std::cmp::Reverse(mono_key(p.lt().unwrap())));
+        s_order.sort_by_cached_key(|&i| std::cmp::Reverse(mono_key(s_at(i).lt().unwrap())));
+        let s_rows: Vec<&F2BoolPoly> = s_order.iter().map(|&i| s_at(i)).collect();
         // Every row is a monomial multiple, canonical, so its degree is its
         // leading term's.
         for p in reducers.iter().chain(s_rows.iter().copied()) {
@@ -2034,8 +3318,41 @@ pub fn groebner_basis_f4(
         cols.charge_pack(all.iter().copied());
         st.build_ns += t.elapsed().as_nanos() as u64;
 
+        // The trace record: which S-rows were productive, by their index
+        // in `half_rows ++ field_rows` (a pass of its own, charged).
+        let productive: Option<Vec<bool>> = if matches!(trace, TraceMode::Record(_)) {
+            let is_half: Vec<bool> = s_order.iter().map(|&i| i < n_half).collect();
+            let (mut xors, mut ops) = (0u64, 0u64);
+            let by_pos = productive_rows(
+                &rows,
+                reducers.len(),
+                &is_half,
+                cols.monos.len(),
+                &mut xors,
+                &mut ops,
+            );
+            st.peak_matrix_bytes = st.peak_matrix_bytes.max(2 * words * n_rows as u64 * 8);
+            st.word_xors += xors;
+            st.word_xors_performed += xors;
+            st.trace_record_xors += xors;
+            tally::word_ops(ops + by_pos.len() as u64);
+            let mut by_index = vec![false; by_pos.len()];
+            for (pos, &i) in s_order.iter().enumerate() {
+                by_index[i] = by_pos[pos];
+            }
+            Some(by_index)
+        } else {
+            None
+        };
+
         let t = Instant::now();
-        let Some(pivots) = echelon(rows, cols.monos.len(), &mut st, deadline) else {
+        let pair_row_count = all.len() - reducers.len();
+        let Some(pivots) = (if fl_shape(allow_fl, reducers.len(), pair_row_count, cols.monos.len())
+        {
+            echelon_fl(rows, cols.monos.len(), reducers.len(), &mut st, deadline)
+        } else {
+            echelon(rows, cols.monos.len(), &mut st, deadline)
+        }) else {
             st.timed_out = true;
             st.eliminate_ns += t.elapsed().as_nanos() as u64;
             break;
@@ -2048,20 +3365,91 @@ pub fn groebner_basis_f4(
             .filter(|(lead, _)| no_divisor.contains(&cols.monos[*lead]))
             .map(|(_, r)| cols.unpack(r, n_vars))
             .collect();
+        // Keep the column map for the next system's step of this key (a
+        // move, no copy), and account the skeleton's growth.
+        let mut skel_removed = 0u64;
+        if let Some(e) = entry {
+            skel_added += F4Skeleton::columns_bytes(&cols);
+            skel_removed = stored_bytes;
+            e.columns = Some(cols);
+        }
+        if let Some(b) = skel_bytes {
+            *b = b.saturating_add(skel_added).saturating_sub(skel_removed);
+        }
         tally::word_ops(fresh.len() as u64 + tally::sort_cost(fresh.len()));
+        if matches!(trace, TraceMode::Verify(_)) {
+            // the verdict: a new row means `G` was not a Gröbner basis of
+            // the inputs' ideal
+            st.trace_verify_failures = u64::from(!fresh.is_empty());
+            return finish(Vec::new(), st);
+        }
+        fresh.sort_by(|a, b| cmp_mono(a.lt().unwrap(), b.lt().unwrap()));
+        if let (TraceMode::Record(steps), Some(productive)) = (&mut trace, &productive) {
+            // a pair is useful when one of its rows was productive
+            let mut row_of: FxMap<(Mask, usize), usize> = FxMap::default();
+            for (i, &key) in half_keys.iter().chain(&field_keys).enumerate() {
+                row_of.insert(key, i);
+            }
+            let mut probes = half_keys.len() + field_keys.len();
+            let useful: FxSet<PairKind> = selected
+                .iter()
+                .filter(|p| {
+                    let keys: &[(Mask, usize)] = &match p.kind {
+                        PairKind::Critical(i, j) => {
+                            vec![(p.lcm & !s.lm[i], i), (p.lcm & !s.lm[j], j)]
+                        }
+                        PairKind::Field(g, v) => vec![(bit(v), g)],
+                    };
+                    probes += keys.len();
+                    keys.iter()
+                        .any(|k| row_of.get(k).is_some_and(|&r| productive[r]))
+                })
+                .map(|p| p.kind)
+                .collect();
+            tally::hash_probes((probes + useful.len()) as u64);
+            tally::word_ops(fresh.len() as u64);
+            steps.push(TraceStep {
+                deg: d,
+                useful,
+                fresh: fresh.iter().map(|p| p.lt().unwrap().mask).collect(),
+            });
+        }
         if fresh.iter().any(is_one) {
             return finish(one(), st);
+        }
+        if let Some(ts) = replay_step {
+            // the step must lead where the recorded one led
+            tally::word_ops(1 + fresh.len() as u64);
+            if ts.fresh.len() != fresh.len()
+                || ts
+                    .fresh
+                    .iter()
+                    .zip(&fresh)
+                    .any(|(&m, p)| p.lt().unwrap().mask != m)
+            {
+                st.trace_mismatches = 1;
+                return finish(Vec::new(), st);
+            }
+            st.trace_steps_matched += 1;
         }
         if !fresh.is_empty() {
             st.solving_degree = st.solving_degree.max(d);
         }
-        fresh.sort_by(|a, b| cmp_mono(a.lt().unwrap(), b.lt().unwrap()));
         st.new_elements += fresh.len() as u64;
         if batch_inserts {
             s.insert_batch(fresh, &mut st);
         } else {
             for p in fresh {
                 s.insert(p, &mut st);
+            }
+        }
+        if let Some(k) = max_free {
+            let pinned = pinned_variables(&s.lm, &s.active);
+            let free = n_vars as u64 - u64::from(pinned.count_ones());
+            if free <= k as u64 {
+                st.early_stopped = true;
+                st.free_at_stop = free;
+                break;
             }
         }
     }
@@ -2078,6 +3466,13 @@ pub fn groebner_basis_f4(
             })
             .sum(),
     );
+    if st.early_stopped && !st.timed_out && !st.oversize {
+        let basis: Vec<F2BoolPoly> = (0..s.polys.len())
+            .filter(|&g| s.active[g])
+            .map(|g| s.polys[g].clone())
+            .collect();
+        return finish(basis, st);
+    }
     if st.timed_out || st.oversize {
         let basis: Vec<F2BoolPoly> = (0..s.polys.len())
             .filter(|&g| s.active[g])
@@ -2270,9 +3665,148 @@ pub fn solutions_from_reduced_basis(
     Some(out)
 }
 
+/// Every solution of `equations` on the affine space the degree-1
+/// elements of `basis` cut out, `basis` any generating set of the same
+/// ideal (an early-stopped F4 run): Gauss–Jordan on the affine elements,
+/// then each of the `2^free` points checked against `equations`.
+/// Returns `None` above `max_free` free variables.  Sound and complete:
+/// every zero of the ideal satisfies the affine elements, and every point
+/// returned satisfies `equations`.
+///
+/// `tests` counts monomial tests, one per term evaluated; `xors` counts
+/// the word XORs of the elimination.
+pub fn solutions_from_linear_part(
+    basis: &[F2BoolPoly],
+    equations: &[F2BoolPoly],
+    n_vars: usize,
+    max_free: usize,
+    tests: &mut u64,
+    xors: &mut u64,
+) -> Option<Vec<Mask>> {
+    if basis.iter().any(is_one) {
+        return Some(Vec::new());
+    }
+    if n_vars > MASK_BITS {
+        return None;
+    }
+    // Rows: (variable mask, constant).  Reduce to one pivot per variable.
+    let mut rows: Vec<(Mask, u64)> = Vec::new();
+    for g in basis {
+        if degree(g) > 1 {
+            continue;
+        }
+        let mut mask = 0 as Mask;
+        let mut c = 0u64;
+        for t in &g.terms {
+            if t.mask == 0 {
+                c ^= 1;
+            } else {
+                mask ^= t.mask;
+            }
+        }
+        rows.push((mask, c));
+    }
+    let mut pivots: Vec<(usize, Mask, u64)> = Vec::new();
+    for (mut mask, mut c) in rows {
+        for &(v, pm, pc) in &pivots {
+            if (mask >> v) & 1 == 1 {
+                mask ^= pm;
+                c ^= pc;
+                *xors += 1;
+            }
+        }
+        if mask == 0 {
+            if c == 1 {
+                return Some(Vec::new());
+            }
+            continue;
+        }
+        let v = mask.trailing_zeros() as usize;
+        for p in pivots.iter_mut() {
+            if (p.1 >> v) & 1 == 1 {
+                p.1 ^= mask;
+                p.2 ^= c;
+                *xors += 1;
+            }
+        }
+        pivots.push((v, mask, c));
+    }
+    let pinned = pivots
+        .iter()
+        .fold(0 as Mask, |acc, p| acc | bit(p.0 as u32));
+    let free: Vec<usize> = (0..n_vars).filter(|&v| (pinned >> v) & 1 == 0).collect();
+    if free.len() > max_free {
+        return None;
+    }
+    let mut out = Vec::new();
+    let assignments = 1u64.checked_shl(free.len().try_into().ok()?)?;
+    for a in 0u64..assignments {
+        let mut point = 0 as Mask;
+        for (offset, &v) in free.iter().enumerate() {
+            if (a >> offset) & 1 == 1 {
+                point |= bit(v as u32);
+            }
+        }
+        // Each pivot row is v + (free variables) + c, fully reduced.
+        for &(v, m, c) in &pivots {
+            *tests += 1;
+            let rest = m & !bit(v as u32);
+            if ((point & rest).count_ones() as u64 + c) & 1 == 1 {
+                point |= bit(v as u32);
+            }
+        }
+        let mut ok = true;
+        for e in equations {
+            *tests += e.terms.len() as u64;
+            if e.eval(point) != 0 {
+                ok = false;
+                break;
+            }
+        }
+        if ok {
+            out.push(point);
+        }
+    }
+    Some(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn affine_enumeration_refuses_an_unrepresentable_assignment_count() {
+        let mut tests = 0;
+        let mut xors = 0;
+        assert!(solutions_from_linear_part(&[], &[], 64, 64, &mut tests, &mut xors).is_none());
+    }
+
+    #[cfg(feature = "wide-vars")]
+    #[test]
+    fn affine_roots_and_pinned_variables_preserve_coordinates_above_sixty_four() {
+        let n = 96;
+        let free = 80;
+        let basis: Vec<_> = (0..n)
+            .filter(|&v| v != free)
+            .map(|v| {
+                let mut terms = vec![F2BoolMono::from_mask(bit(v as u32))];
+                if v == 95 {
+                    terms.push(F2BoolMono::from_mask(0));
+                }
+                F2BoolPoly::from_monos(terms, n)
+            })
+            .collect();
+        let (mut tests, mut xors) = (0, 0);
+        assert_eq!(
+            solutions_from_linear_part(&basis, &basis, n, 1, &mut tests, &mut xors),
+            Some(vec![bit(95), bit(95) | bit(free as u32)])
+        );
+        assert_eq!(
+            pinned_variables(&[bit(95), bit(1)], &[true, true]),
+            bit(95) | bit(1)
+        );
+    }
+
     #[allow(unused_imports)]
     use crate::cryptanalysis::pq_groebner_f2::{
         bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
@@ -2280,6 +3814,70 @@ mod tests {
     use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2, reduce, spoly};
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
+
+    /// **Stopping early and enumerating the affine part finds the full
+    /// run's solutions**: on random dense quadratic systems with planted
+    /// and without planted solutions, for every stopping threshold.
+    #[test]
+    fn early_stopped_f4_finds_the_full_runs_solutions() {
+        let mut rng = StdRng::seed_from_u64(29);
+        for case in 0..40 {
+            let n = 8 + case % 7;
+            let planted = (case % 3 != 0).then(|| rng.gen::<u64>() & ((1u64 << n) - 1));
+            let m = n + 2 + case % 4;
+            let eqs: Vec<F2BoolPoly> = (0..m)
+                .map(|_| {
+                    let mut masks = Vec::new();
+                    for a in 0..n {
+                        for b in a..n {
+                            if rng.gen_bool(0.5) {
+                                masks.push((1u64 << a) | (1u64 << b));
+                            }
+                        }
+                    }
+                    if rng.gen_bool(0.5) {
+                        masks.push(0);
+                    }
+                    let mut p = F2BoolPoly::from_monos(
+                        masks
+                            .iter()
+                            .map(|&m| F2BoolMono::from_mask(mask_from64(m)))
+                            .collect(),
+                        n,
+                    );
+                    if let Some(x) = planted {
+                        if p.eval(mask_from64(x)) == 1 {
+                            p = p.add(&F2BoolPoly::one(n));
+                        }
+                    }
+                    p
+                })
+                .collect();
+            let (gb, _) = groebner_basis_f4(eqs.clone(), n, None);
+            let mut t = 0;
+            let mut full = solutions_from_reduced_basis(&gb, n, 24, &mut t).unwrap();
+            full.retain(|&v| eqs.iter().all(|e| e.eval(v) == 0));
+            full.sort_unstable();
+            if let Some(x) = planted {
+                assert!(
+                    full.contains(&mask_from64(x)),
+                    "case {case}: the planted point solves"
+                );
+            }
+            for k in [0usize, 2, 5, 8] {
+                let (part, st) = groebner_basis_f4_until(eqs.clone(), n, None, Some(k));
+                let (mut tests, mut xors) = (0, 0);
+                let mut got = solutions_from_linear_part(&part, &eqs, n, 24, &mut tests, &mut xors)
+                    .expect("at most 24 free variables");
+                got.sort_unstable();
+                assert_eq!(
+                    got, full,
+                    "case {case}, free {k}, early {}",
+                    st.early_stopped
+                );
+            }
+        }
+    }
 
     #[test]
     fn monomial_bitmap_matches_hash_set() {
@@ -2435,6 +4033,88 @@ mod tests {
             assert!(stats.full_m4ri_table_word_xors > 0);
             assert!(stats.word_xors > 0);
             assert!(stats.word_xors_performed > 0);
+        }
+    }
+
+    #[test]
+    fn faugere_lachartre_split_matches_the_full_width_cascade() {
+        let mut rng = StdRng::seed_from_u64(0xf4a6_1ac4_2026_1117);
+        for &(n_cols, reducer_count, pair_count) in &[(159usize, 47usize, 83usize), (257, 79, 131)]
+        {
+            let words = n_cols.div_ceil(64);
+            let make_row = |bits: Vec<u64>| {
+                let start = bits.iter().position(|&word| word != 0).unwrap_or(0);
+                let end = bits
+                    .iter()
+                    .rposition(|&word| word != 0)
+                    .map_or(0, |index| index + 1);
+                Row { bits, start, end }
+            };
+            let mut rows = Vec::new();
+            // A triangular reducer block: every tail column lies strictly
+            // right of its distinct leading column, exactly as symbolic
+            // preprocessing orders Boolean F4 reducers.
+            // Interleave pivot and free columns instead of making the
+            // reducer block a contiguous prefix.  Symbolic preprocessing
+            // only guarantees distinct leads and rightward tails.
+            let reducer_leads: Vec<usize> = (0..reducer_count).map(|index| index * 2).collect();
+            for &lead in &reducer_leads {
+                let mut bits = vec![0u64; words];
+                bits[lead / 64] |= 1u64 << (lead % 64);
+                for column in lead + 1..n_cols {
+                    if rng.gen_ratio(1, 5) {
+                        bits[column / 64] |= 1u64 << (column % 64);
+                    }
+                }
+                rows.push(make_row(bits));
+            }
+            for _ in 0..pair_count {
+                let mut bits = vec![0u64; words];
+                for column in 0..n_cols {
+                    if rng.gen_ratio(1, 3) {
+                        bits[column / 64] |= 1u64 << (column % 64);
+                    }
+                }
+                rows.push(make_row(bits));
+            }
+
+            let reducer_space: Vec<Vec<u64>> = rows[..reducer_count]
+                .iter()
+                .map(|row| row.bits.clone())
+                .collect();
+            let mut reference_stats = F4Stats::default();
+            let reference =
+                echelon_block_tables(rows.clone(), n_cols, &mut reference_stats, None).unwrap();
+            let reference_new_leads: Vec<usize> = reference
+                .iter()
+                .filter(|(lead, _)| reducer_leads.binary_search(lead).is_err())
+                .map(|(lead, _)| *lead)
+                .collect();
+            let reference_space: Vec<Vec<u64>> =
+                reference.into_iter().map(|(_, row)| row.bits).collect();
+
+            let mut candidate_stats = F4Stats::default();
+            let candidate =
+                echelon_fl(rows, n_cols, reducer_count, &mut candidate_stats, None).unwrap();
+            let candidate_new_leads: Vec<usize> = candidate.iter().map(|(lead, _)| *lead).collect();
+            let mut candidate_space = reducer_space;
+            candidate_space.extend(candidate.into_iter().map(|(_, row)| row.bits));
+            assert_eq!(
+                candidate_new_leads, reference_new_leads,
+                "new pivots for shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
+            );
+            assert_eq!(
+                canonical_rref(candidate_space, n_cols),
+                canonical_rref(reference_space, n_cols),
+                "row space for shape reducers={reducer_count} pairs={pair_count} cols={n_cols}"
+            );
+            assert_eq!(candidate_stats.fl_matrices, 1);
+            assert_eq!(candidate_stats.fl_reducer_rows, reducer_count as u64);
+            assert_eq!(candidate_stats.fl_pair_rows, pair_count as u64);
+            assert_eq!(
+                candidate_stats.fl_free_cols,
+                (n_cols - reducer_count) as u64
+            );
         }
     }
 
@@ -2706,7 +4386,12 @@ mod tests {
             let mut tests = 0;
             let mut got = solutions_from_reduced_basis(&gb, n, 24, &mut tests).unwrap();
             got.sort_unstable();
-            assert_eq!(masks_low64(&got), sols, "trial {trial}: extraction");
+            assert_eq!(
+                crate::cryptanalysis::pq_groebner_f2::masks_to_words_checked(&got)
+                    .expect("bounded one-word fixture returned unexpected high mask bits"),
+                sols,
+                "trial {trial}: extraction"
+            );
             // Every generator lies in the ideal the basis generates.
             for e in &eqs {
                 assert!(
@@ -2827,5 +4512,641 @@ mod tests {
         let eqs = random_quadratic(18, 17, &mut rng);
         let (_, st) = groebner_basis_f4(eqs, 18, Some(Duration::from_nanos(1)));
         assert!(st.timed_out);
+    }
+
+    fn counted(
+        eqs: Vec<F2BoolPoly>,
+        n: usize,
+        max_words: u64,
+        guard: EarlyGuard,
+    ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
+        let before = tally::snapshot();
+        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, true);
+        (gb, st, tally::snapshot().since(before))
+    }
+
+    const EAGER: EarlyGuard = EarlyGuard {
+        terms: 0,
+        slab: 1,
+        deadline: None,
+    };
+
+    /// The early guard refuses exactly what the late guard refuses: the
+    /// smallest cap at which a run is not oversize is the same with the
+    /// pre-pass on every step (`EAGER`) as with it off, and at that cap the
+    /// guarded run reproduces the basis, the stats and the counted
+    /// operations; one word lower both refuse.
+    #[test]
+    fn the_early_guard_keeps_fitting_steps_identical() {
+        const OFF: EarlyGuard = EarlyGuard {
+            terms: usize::MAX,
+            slab: 256,
+            deadline: None,
+        };
+        for seed in 0..3u64 {
+            let mut rng = StdRng::seed_from_u64(100 + seed);
+            let eqs = random_quadratic(11, 10, &mut rng);
+            let (gb0, st0, _) = counted(eqs.clone(), 11, MAX_MATRIX_WORDS, OFF);
+            assert!(!st0.oversize && !st0.timed_out);
+            // smallest fitting cap under the late guard alone
+            let (mut lo, mut hi) = (0u64, st0.peak_matrix_bytes / 8);
+            while lo + 1 < hi {
+                let mid = (lo + hi) / 2;
+                if counted(eqs.clone(), 11, mid, OFF).1.oversize {
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            let cap = hi;
+            let (gb_l, st_l, t_l) = counted(eqs.clone(), 11, cap, OFF);
+            let (gb_e, st_e, t_e) = counted(eqs.clone(), 11, cap, EAGER);
+            assert!(!st_l.oversize && !st_e.oversize);
+            assert_eq!(gb0, gb_e);
+            assert_eq!(gb_l, gb_e);
+            assert_eq!(t_l, t_e, "counted operations must not change");
+            assert_eq!(st_l.word_xors, st_e.word_xors);
+            assert_eq!(st_l.steps, st_e.steps);
+            assert_eq!(st_l.reducer_rows, st_e.reducer_rows);
+            assert_eq!(st_l.divisor_tests, st_e.divisor_tests);
+            if cap > 1 {
+                let (_, a, _) = counted(eqs.clone(), 11, cap - 1, OFF);
+                let (_, b, _) = counted(eqs, 11, cap - 1, EAGER);
+                assert!(a.oversize && b.oversize && !b.timed_out);
+            }
+        }
+    }
+
+    /// An oversized step is refused before any sparse row is stored: the refusal arrives with `oversize` set and the
+    /// step's pairs put back, whatever the cap.
+    #[test]
+    fn an_oversized_step_is_refused_while_building() {
+        let mut rng = StdRng::seed_from_u64(7);
+        let eqs = random_quadratic(14, 14, &mut rng);
+        for cap in [1u64, 8, 64] {
+            let (_, st, _) = counted(eqs.clone(), 14, cap, EAGER);
+            assert!(st.oversize, "cap {cap}");
+            assert!(st.pairs_left > 0);
+            // refused before any matrix of the step was recorded
+            assert!(st.matrix_rows_max == 0 || st.peak_matrix_bytes / 8 <= cap);
+        }
+        // the public entry point keeps the 1 GiB guard and is unchanged
+        let (_, st) = groebner_basis_f4(eqs, 14, None);
+        assert!(!st.oversize);
+    }
+
+    /// The deadline is honoured while building rows, not only in the
+    /// elimination: a build deadline already past stops the first step
+    /// that reaches row building.
+    #[test]
+    fn the_budget_is_honoured_while_building_rows() {
+        let mut rng = StdRng::seed_from_u64(9);
+        let eqs = random_quadratic(14, 14, &mut rng);
+        let guard = EarlyGuard {
+            deadline: Some(Instant::now()),
+            ..EAGER
+        };
+        let (_, st, _) = counted(eqs, 14, MAX_MATRIX_WORDS, guard);
+        assert!(st.timed_out && !st.oversize);
+        assert_eq!(st.matrix_rows_max, 0, "no matrix of the step was built");
+        assert!(st.pairs_left > 0);
+    }
+
+    /// Same-shape systems: one template support, each system keeping a
+    /// random subset of its terms (the target-dependent bits of a cell).
+    fn same_shape_batch(
+        n: usize,
+        m: usize,
+        count: usize,
+        keep: f64,
+        rng: &mut StdRng,
+    ) -> Vec<Vec<F2BoolPoly>> {
+        let template = random_quadratic(n, m, rng);
+        (0..count)
+            .map(|_| {
+                template
+                    .iter()
+                    .map(|p| {
+                        let kept: Vec<u64> = p
+                            .terms
+                            .iter()
+                            .map(|t| mask_low64(t.mask))
+                            .filter(|_| rng.gen_bool(keep))
+                            .collect();
+                        poly(&kept, n)
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    fn assert_same_run(a: &(Vec<F2BoolPoly>, F4Stats), b: &(Vec<F2BoolPoly>, F4Stats), what: &str) {
+        assert_eq!(a.0, b.0, "{what}: bases differ");
+        let (x, y) = (&a.1, &b.1);
+        assert_eq!(
+            (
+                x.steps,
+                x.new_elements,
+                x.reducer_rows,
+                x.matrix_rows_sum,
+                x.matrix_cols_max,
+                x.word_xors,
+                x.solving_degree,
+                x.degree_reached,
+                x.pairs_reduced,
+                x.field_pairs_reduced,
+            ),
+            (
+                y.steps,
+                y.new_elements,
+                y.reducer_rows,
+                y.matrix_rows_sum,
+                y.matrix_cols_max,
+                y.word_xors,
+                y.solving_degree,
+                y.degree_reached,
+                y.pairs_reduced,
+                y.field_pairs_reduced,
+            ),
+            "{what}: the runs differ"
+        );
+    }
+
+    /// **The skeleton changes no basis and no decision.**  Over a batch of
+    /// random same-shape systems, with degenerate members (an inconsistent
+    /// one, a rank-one one, an all-zero one, a member of another shape
+    /// that forces a rebuild, and a different template that misses the
+    /// stored steps), the basis and every structural count of the skeleton
+    /// path equal the plain path's, the skeleton is replayed, and its
+    /// divisor tests are fewer.
+    #[test]
+    fn skeleton_matches_the_plain_path_on_same_shape_systems() {
+        let mut rng = StdRng::seed_from_u64(0x5ce1_2026_1118);
+        let n = 10;
+        let mut batch = same_shape_batch(n, 10, 24, 0.9, &mut rng);
+        // degenerate members, in the middle of the batch
+        let mut inconsistent = batch[0].clone();
+        inconsistent.push(poly(&[0], n));
+        batch.insert(5, inconsistent);
+        let rank_one = vec![batch[1][0].clone(); 10];
+        batch.insert(9, rank_one);
+        batch.insert(12, vec![F2BoolPoly::zero(n); 10]);
+        // another template of the same shape: every stored step misses
+        let other = same_shape_batch(n, 10, 3, 0.9, &mut rng);
+        batch.splice(14..14, other);
+        let mut skeleton = F4Skeleton::with_cap(SKELETON_DEFAULT_CAP_BYTES);
+        let (mut plain_tests, mut skel_tests) = (0u64, 0u64);
+        let mut total = F4Stats::default();
+        for (k, eqs) in batch.iter().enumerate() {
+            let plain = groebner_basis_f4(eqs.clone(), n, None);
+            let skel = groebner_basis_f4_skeleton(eqs.clone(), n, None, &mut skeleton);
+            assert_same_run(&plain, &skel, &format!("system {k}"));
+            plain_tests += plain.1.divisor_tests;
+            skel_tests += skel.1.divisor_tests;
+            let s = &skel.1;
+            total.skeleton_steps_built += s.skeleton_steps_built;
+            total.skeleton_steps_replayed += s.skeleton_steps_replayed;
+            total.skeleton_candidate_hits += s.skeleton_candidate_hits;
+            total.skeleton_candidate_misses += s.skeleton_candidate_misses;
+            total.skeleton_columns_reused += s.skeleton_columns_reused;
+            total.skeleton_columns_rebuilt += s.skeleton_columns_rebuilt;
+            total.skeleton_shape_rebuilds += s.skeleton_shape_rebuilds;
+        }
+        // a system of another shape (one more unknown) clears the skeleton
+        let wider = same_shape_batch(n + 1, 10, 1, 0.9, &mut rng).remove(0);
+        let plain = groebner_basis_f4(wider.clone(), n + 1, None);
+        let skel = groebner_basis_f4_skeleton(wider, n + 1, None, &mut skeleton);
+        assert_same_run(&plain, &skel, "wider system");
+        assert_eq!(skel.1.skeleton_shape_rebuilds, 1);
+        assert_eq!(skel.1.skeleton_steps_replayed, 0);
+        // and the first system again, after the rebuild, is still exact
+        let plain = groebner_basis_f4(batch[0].clone(), n, None);
+        let skel = groebner_basis_f4_skeleton(batch[0].clone(), n, None, &mut skeleton);
+        assert_same_run(&plain, &skel, "after rebuild");
+        eprintln!(
+            "skeleton: divisor tests {skel_tests} vs plain {plain_tests}; built {} replayed {} \
+             hits {} misses {} columns reused {} rebuilt {} shape rebuilds {}; bytes {}",
+            total.skeleton_steps_built,
+            total.skeleton_steps_replayed,
+            total.skeleton_candidate_hits,
+            total.skeleton_candidate_misses,
+            total.skeleton_columns_reused,
+            total.skeleton_columns_rebuilt,
+            total.skeleton_shape_rebuilds,
+            skeleton.bytes(),
+        );
+        assert!(total.skeleton_steps_replayed > 0);
+        assert!(total.skeleton_candidate_hits > 0);
+        assert!(total.skeleton_candidate_misses + total.skeleton_columns_rebuilt > 0);
+        assert!(skel_tests < plain_tests, "{skel_tests} >= {plain_tests}");
+    }
+
+    /// At a zero byte cap nothing is stored, and the run is the plain one.
+    #[test]
+    fn skeleton_at_zero_cap_stores_nothing() {
+        let mut rng = StdRng::seed_from_u64(0x5ce1_0);
+        let batch = same_shape_batch(8, 8, 4, 0.9, &mut rng);
+        let mut skeleton = F4Skeleton::with_cap(0);
+        for eqs in &batch {
+            let plain = groebner_basis_f4(eqs.clone(), 8, None);
+            let skel = groebner_basis_f4_skeleton(eqs.clone(), 8, None, &mut skeleton);
+            assert_same_run(&plain, &skel, "cap 0");
+            assert_eq!(skel.1.divisor_tests, plain.1.divisor_tests);
+            assert_eq!(skel.1.skeleton_steps_replayed, 0);
+        }
+        assert!(skeleton.is_empty());
+        assert_eq!(skeleton.bytes(), 0);
+    }
+
+    /// The plain run and the traced run return the same basis, and the
+    /// traced run's verdict counters are consistent.
+    fn check_traced(eqs: &[F2BoolPoly], n: usize, store: &mut F4PairTrace, what: &str) -> F4Stats {
+        let plain = groebner_basis_f4(eqs.to_vec(), n, None);
+        let traced = groebner_basis_f4_traced(eqs.to_vec(), n, None, store);
+        assert_eq!(traced.0, plain.0, "{what}: bases differ");
+        let t = &traced.1;
+        assert!(!t.timed_out && !t.oversize, "{what}");
+        assert_eq!(t.trace_hits + t.trace_fallbacks, t.trace_replays, "{what}");
+        assert!(
+            t.trace_hits + t.trace_records <= 1 + t.trace_fallbacks,
+            "{what}"
+        );
+        assert_eq!(t.basis_len, plain.1.basis_len, "{what}");
+        if t.trace_replays == 0 {
+            // a recording run is the plain run plus its provenance pass
+            assert_eq!(
+                t.word_xors,
+                plain.1.word_xors + t.trace_record_xors,
+                "{what}"
+            );
+            assert_eq!(t.pairs_reduced, plain.1.pairs_reduced, "{what}");
+            assert_eq!(t.solving_degree, plain.1.solving_degree, "{what}");
+        }
+        traced.1
+    }
+
+    /// Same-shape systems that differ only in their affine part: one
+    /// quadratic template, each system adding random linear and constant
+    /// terms (the way a target enters a descent system).
+    fn affine_variation_batch(
+        n: usize,
+        m: usize,
+        count: usize,
+        rng: &mut StdRng,
+    ) -> Vec<Vec<F2BoolPoly>> {
+        let template = random_quadratic(n, m, rng);
+        (0..count)
+            .map(|_| {
+                template
+                    .iter()
+                    .map(|p| {
+                        let mut kept: Vec<u64> = p
+                            .terms
+                            .iter()
+                            .map(|t| mask_low64(t.mask))
+                            .filter(|&m| m.count_ones() >= 2)
+                            .collect();
+                        kept.extend((0..n).map(|i| 1u64 << i).filter(|_| rng.gen_bool(0.5)));
+                        if rng.gen_bool(0.5) {
+                            kept.push(0);
+                        }
+                        poly(&kept, n)
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// **The trace changes no basis** over many random same-shape systems
+    /// — one template support, each system keeping a random 80% of the
+    /// terms of each equation (the union support, the shape key, is mostly
+    /// the template's), or each system varying only its affine part — and
+    /// a system replaying its own trace is accepted.
+    #[test]
+    fn trace_matches_the_plain_path_on_same_shape_systems() {
+        let mut total = F4Stats::default();
+        let mut self_hits = 0;
+        for (seed, n, m, affine) in [
+            (1u64, 8usize, 8usize, false),
+            (2, 9, 9, false),
+            (3, 10, 12, false),
+            (4, 7, 5, false),
+            (5, 8, 8, true),
+            (6, 10, 10, true),
+            (7, 9, 12, true),
+        ] {
+            let mut rng = StdRng::seed_from_u64(0x7ace_0 + seed);
+            let batch = if affine {
+                affine_variation_batch(n, m, 24, &mut rng)
+            } else {
+                same_shape_batch(n, m, 24, 0.8, &mut rng)
+            };
+            let mut store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+            // the recorded system itself replays without a fallback
+            check_traced(&batch[0], n, &mut store, "record");
+            let again = check_traced(&batch[0], n, &mut store, "self replay");
+            assert_eq!(again.trace_replays, 1);
+            assert_eq!(again.trace_mismatches, 0, "n={n}: self replay mismatched");
+            self_hits += again.trace_hits;
+            for (k, eqs) in batch.iter().enumerate() {
+                let st = check_traced(eqs, n, &mut store, &format!("n={n} system {k}"));
+                total.absorb(&st);
+            }
+            assert!(store.bytes() > 0 && !store.is_empty());
+        }
+        eprintln!(
+            "random same-shape: records {} replays {} hits {} fallbacks {} (mismatches {}, \
+             verify failures {}), verify xors {}, pairs dropped {}",
+            total.trace_records,
+            total.trace_replays,
+            total.trace_hits,
+            total.trace_fallbacks,
+            total.trace_mismatches,
+            total.trace_verify_failures,
+            total.trace_verify_word_xors,
+            total.trace_pairs_dropped,
+        );
+        assert!(total.trace_replays > 0);
+        assert_eq!(self_hits, 7, "a self replay failed its verification");
+    }
+
+    /// **A wrong trace is caught.**  A trace recorded on one system is
+    /// stored under the key of systems it does not fit — other random
+    /// systems, inconsistent ones, degenerate ones, ones with extra linear
+    /// equations — and an empty trace (no pair reduced at all) is tried on
+    /// every one: the basis is always the plain one, the verification or
+    /// the mismatch check refuses the replays that would be wrong, and an
+    /// empty trace is accepted only where the inputs' echelon already is
+    /// the basis.
+    #[test]
+    fn a_wrong_trace_falls_back_to_the_plain_path() {
+        let n = 8;
+        let mut rng = StdRng::seed_from_u64(0xfa11);
+        let donor = random_quadratic(n, 8, &mut rng);
+        let mut donor_store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+        check_traced(&donor, n, &mut donor_store, "donor");
+        let donor_steps: Vec<&TraceStep> =
+            donor_store.traces.values().next().unwrap().iter().collect();
+        assert!(!donor_steps.is_empty());
+        let clone_steps = || -> Vec<TraceStep> {
+            donor_steps
+                .iter()
+                .map(|t| TraceStep {
+                    deg: t.deg,
+                    useful: t.useful.clone(),
+                    fresh: t.fresh.clone(),
+                })
+                .collect()
+        };
+        let mut targets: Vec<(String, Vec<F2BoolPoly>)> = Vec::new();
+        for k in 0..12 {
+            targets.push((format!("random {k}"), random_quadratic(n, 8, &mut rng)));
+        }
+        // inconsistent: v0 = 0 and v0 = 1 among quadrics
+        let mut bad = random_quadratic(n, 6, &mut rng);
+        bad.push(poly(&[1], n));
+        bad.push(poly(&[1, 0], n));
+        targets.push(("inconsistent".into(), bad));
+        // degenerate: one equation, many solutions; or a single product
+        targets.push(("one equation".into(), random_quadratic(n, 1, &mut rng)));
+        targets.push(("monomial".into(), vec![poly(&[0b11], n)]));
+        // linear system: its echelon is already the reduced basis
+        targets.push((
+            "linear".into(),
+            (0..n).map(|i| poly(&[1u64 << i, 0], n)).collect(),
+        ));
+        // more equations than the donor, with linear ones
+        let mut wide = random_quadratic(n, 8, &mut rng);
+        wide.extend((0..3).map(|i| poly(&[1u64 << i, 1u64 << (i + 3)], n)));
+        targets.push(("with linear".into(), wide));
+        // the donor with one equation dropped and one term changed
+        let mut near = donor.clone();
+        near.pop();
+        near[0] = near[0].add(&poly(&[0b101], n));
+        targets.push(("near donor".into(), near));
+
+        let (mut fallbacks, mut verify_failures, mut empty_hits) = (0, 0, 0);
+        for (what, eqs) in &targets {
+            let inputs: Vec<F2BoolPoly> = eqs.iter().filter(|p| !p.is_zero()).cloned().collect();
+            let key = trace_shape(&inputs, n);
+            for (label, steps) in [("donor trace", clone_steps()), ("empty trace", Vec::new())] {
+                let mut store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+                store.traces.insert(key.clone(), steps);
+                let st = check_traced(eqs, n, &mut store, &format!("{what}, {label}"));
+                assert_eq!(st.trace_replays, 1, "{what}, {label}");
+                fallbacks += st.trace_fallbacks;
+                verify_failures += st.trace_verify_failures;
+                if label == "empty trace" && st.trace_hits == 1 {
+                    empty_hits += 1;
+                }
+                if st.trace_fallbacks == 1 {
+                    // the fallback re-records the shape
+                    assert_eq!(st.trace_records, 1, "{what}, {label}");
+                }
+            }
+        }
+        eprintln!(
+            "wrong traces: {} replays, {fallbacks} fallbacks ({verify_failures} by \
+             verification), {empty_hits} empty traces accepted",
+            2 * targets.len()
+        );
+        assert!(fallbacks >= targets.len() as u64);
+        assert!(verify_failures > 0);
+        // the linear system and the single monomial need no pair
+        assert!(empty_hits >= 1);
+    }
+
+    /// **The verification alone refuses an incomplete basis.**  Run the
+    /// verification directly on the inputs' interreduced echelon (what an
+    /// empty replay leaves) for systems whose basis needs pairs: every one
+    /// fails; on the plain run's own reduced basis every one passes.
+    #[test]
+    fn the_verification_pass_decides_the_groebner_property() {
+        let n = 8;
+        let mut rng = StdRng::seed_from_u64(0x7e51);
+        for k in 0..16 {
+            let eqs = random_quadratic(n, 6 + k % 4, &mut rng);
+            let (gb, _) = groebner_basis_f4(eqs.clone(), n, None);
+            if gb.len() == 1 && is_one(&gb[0]) {
+                continue;
+            }
+            let (_, ok) = groebner_basis_f4_inner(
+                gb.clone(),
+                n,
+                None,
+                None,
+                max_matrix_words(),
+                EARLY_GUARD,
+                None,
+                TraceMode::Verify(&eqs),
+            );
+            assert_eq!(ok.trace_verify_failures, 0, "system {k}: the basis fails");
+            assert_eq!(ok.steps, 1);
+            let mut st = F4Stats::default();
+            let nonzero: Vec<F2BoolPoly> = eqs.iter().filter(|p| !p.is_zero()).cloned().collect();
+            let partial = interreduce(nonzero, n, &mut st);
+            if partial == gb {
+                continue;
+            }
+            let (_, bad) = groebner_basis_f4_inner(
+                partial,
+                n,
+                None,
+                None,
+                max_matrix_words(),
+                EARLY_GUARD,
+                None,
+                TraceMode::Verify(&eqs),
+            );
+            assert_eq!(
+                bad.trace_verify_failures, 1,
+                "system {k}: a partial basis passes"
+            );
+            // the reduced basis of a proper sub-ideal also fails: the inputs
+            // are not all in it
+            let (sub, _) = groebner_basis_f4(eqs[..eqs.len() - 1].to_vec(), n, None);
+            if sub != gb {
+                let (_, bad) = groebner_basis_f4_inner(
+                    sub,
+                    n,
+                    None,
+                    None,
+                    max_matrix_words(),
+                    EARLY_GUARD,
+                    None,
+                    TraceMode::Verify(&eqs),
+                );
+                assert_eq!(
+                    bad.trace_verify_failures, 1,
+                    "system {k}: a sub-ideal passes"
+                );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod interrupted_elimination_accounting {
+    use super::*;
+
+    #[test]
+    fn fl_interruption_retains_the_completed_xor_prefix() {
+        let n_cols = 257usize;
+        let reducer_count = 128usize;
+        let mut rows = Vec::new();
+        // Distinct reducer leads and strictly rightward tails satisfy the
+        // actual symbolic-preprocessing contract. Descending substitution
+        // alternates three-word and one-word XORs before the stop.
+        for lead in 0..reducer_count {
+            let mut bits = vec![0u64; n_cols.div_ceil(64)];
+            for column in [lead, lead + 1, 256] {
+                bits[column / 64] |= 1u64 << (column % 64);
+            }
+            rows.push(Row {
+                bits,
+                start: lead / 64,
+                end: 5,
+            });
+        }
+        for free in 128..160 {
+            let mut bits = vec![0u64; n_cols.div_ceil(64)];
+            bits[free / 64] |= 1u64 << (free % 64);
+            rows.push(Row {
+                bits,
+                start: free / 64,
+                end: free / 64 + 1,
+            });
+        }
+        let mut checks = 0usize;
+        let mut stats = F4Stats::default();
+        let result = echelon_fl_with_expiry(rows, n_cols, reducer_count, &mut stats, None, || {
+            checks += 1;
+            checks > 1
+        });
+        assert!(result.is_none());
+        assert_eq!(checks, 2);
+        // The 63 completed substitutions perform 32*3 + 31*1 word XORs.
+        assert_eq!(stats.word_xors, 127);
+        assert_eq!(stats.word_xors_performed, 127);
+    }
+}
+
+#[cfg(test)]
+mod interrupted_table_accounting {
+    use super::*;
+
+    #[test]
+    fn full_m4ri_interruption_retains_completed_table_preparation() {
+        let n_cols = 257usize;
+        let mut rows = Vec::new();
+        for lead in 0..2 * FULL_M4RI_BLOCK + 1 {
+            let mut bits = vec![0u64; n_cols.div_ceil(64)];
+            bits[lead / 64] |= 1u64 << (lead % 64);
+            bits[4] |= 1;
+            rows.push(Row {
+                bits,
+                start: lead / 64,
+                end: 5,
+            });
+        }
+        let mut checks = 0usize;
+        let mut stats = F4Stats::default();
+        let result = echelon_full_m4ri_with_expiry(rows, n_cols, &mut stats, || {
+            checks += 1;
+            checks > 1
+        });
+        assert!(result.is_none());
+        assert_eq!(checks, 2);
+        let prepared = ((1u64 << FULL_M4RI_BLOCK) - 1) * 5;
+        assert_eq!(stats.word_xors, 0);
+        assert_eq!(stats.word_xors_performed, prepared);
+        assert_eq!(stats.full_m4ri_table_word_xors, prepared);
+        assert_eq!(stats.full_m4ri_blocks, 1);
+    }
+
+    #[test]
+    fn block_table_expiry_retains_prepared_lookup_words() {
+        let n_cols = 512usize;
+        let words = n_cols.div_ceil(64);
+        let mut rows = Vec::new();
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut pivots = Vec::new();
+        for lead in 0..TABLE_ROWS {
+            let mut bits = vec![0u64; words];
+            bits[lead / 64] |= 1u64 << (lead % 64);
+            bits[7] |= 1u64 << 63;
+            let row = Row {
+                bits,
+                start: lead / 64,
+                end: 8,
+            };
+            pivot_of[lead] = lead as u32;
+            pivots.push((lead, row.clone()));
+            rows.push(row);
+        }
+        for index in 0..4 * TABLE_ROWS {
+            let mut bits = vec![0u64; words];
+            bits[0] |= 1;
+            let free = 256 + index % 255;
+            bits[free / 64] |= 1u64 << (free % 64);
+            rows.push(Row {
+                bits,
+                start: 0,
+                end: free / 64 + 1,
+            });
+        }
+        let expected = BlockTables::build(
+            &pivot_of,
+            &pivots,
+            rows.len() * words * TABLE_INITIAL_BUDGET_MULT,
+        )
+        .unwrap()
+        .built_words;
+        assert!(expected > 0);
+        let mut stats = F4Stats::default();
+        let result = echelon_block_tables(rows, n_cols, &mut stats, Some(Instant::now()));
+        assert!(result.is_none());
+        assert_eq!(stats.word_xors, 0);
+        assert_eq!(stats.word_xors_performed, expected);
     }
 }

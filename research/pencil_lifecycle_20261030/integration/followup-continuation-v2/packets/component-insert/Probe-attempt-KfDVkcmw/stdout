@@ -1,0 +1,20 @@
+Array.getElem_push.{u_1} {α : Type u_1} {xs : Array α} {x : α} {i : ℕ} (h : i < (xs.push x).size) :
+  (xs.push x)[i] = if h : i < xs.size then xs[i] else x
+Array.getElem_push_lt.{u_1} {α : Type u_1} {xs : Array α} {x : α} {i : ℕ} (h : i < xs.size) :
+  have this := ⋯;
+  (xs.push x)[i] = xs[i]
+Array.getElem_push_eq.{u_1} {α : Type u_1} {xs : Array α} {x : α} : (xs.push x)[xs.size] = x
+GraphFind.State.{u_2} (K : Type u_2) (n : ℕ) : Type u_2
+def GraphFind.Forest.{u_1} : {K : Type u_1} → {n : ℕ} → GraphFind.State K n → (Fin n → ℕ) → Prop :=
+fun {K} {n} s rank => ∀ (x : Fin n), s.parent x = x ∨ rank (s.parent x) < rank x
+/var/tmp/pencil-component-insert-20261101-v1/Probe.lean:7:7: error(lean.unknownIdentifier): Unknown constant `GraphFind.Good`
+structure GraphFind.State.{u_2} (K : Type u_2) (n : ℕ) : Type u_2
+number of parameters: 2
+fields:
+  GraphFind.State.parent : Fin n → Fin n
+  GraphFind.State.pot : Fin n → SignedGraphAlgebra.Potential K
+constructor:
+  GraphFind.State.mk.{u_2} {K : Type u_2} {n : ℕ} (parent : Fin n → Fin n)
+    (pot : Fin n → SignedGraphAlgebra.Potential K) : GraphFind.State K n
+Fin.castSucc_ne_last {n : ℕ} (i : Fin n) : i.castSucc ≠ Fin.last n
+/var/tmp/pencil-component-insert-20261101-v1/Probe.lean:10:7: error(lean.unknownIdentifier): Unknown constant `Fin.last_ne_castSucc`

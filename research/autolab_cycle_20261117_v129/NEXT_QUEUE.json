@@ -1,0 +1,28 @@
+[
+  {
+    "id": "C130-ordered-ZDD-oracles",
+    "status": "prepared_static_only",
+    "budget": "90s4GiBCPU0",
+    "protocol": "small truth tables and original-coordinate monomial equality under natural/reverse/frequency orders;invalid permutations,caps,immutability"
+  },
+  {
+    "id": "C130-ordered-correction-profiles",
+    "status": "depends_on_oracles",
+    "caps": {
+      "nodes": 100000,
+      "cache": 500000,
+      "recursive_work": 2000000
+    },
+    "protocol": "fixed1/2/4/8wires;all orders retained;rank-labelled artifact includes explicit permutation;caps are unknown"
+  },
+  {
+    "id": "C130-live-intermediate-audit",
+    "status": "specified",
+    "protocol": "measure source-cone fanout liveness and reachable-output nodes only after completion;any collection/remapping clears obsolete operation caches and must preserve exact semantics"
+  },
+  {
+    "id": "original-broadfields-baselines",
+    "status": "active_independent",
+    "required": "all source/U/ghost/outer roots;GF2^83,binary/Koblitz,odd,NIST5;20hardcompletedmatchedF4/F5/F6;3coldrepeats,RSS,isolation"
+  }
+]

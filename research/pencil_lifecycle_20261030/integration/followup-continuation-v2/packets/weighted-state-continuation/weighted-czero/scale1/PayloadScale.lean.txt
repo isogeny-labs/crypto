@@ -1,0 +1,40 @@
+import WeightedCZero
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace WeightedCZero
+open CZeroInterpolation
+variable {K : Type*} [Field K]
+def xn (q1 q2 b a : K) := (q1+q2)*b^2+a^2
+def yn (q1 r1 s1 t1 q2 b a : K) :=
+ (a*(q1*b^2+xn q1 q2 b a)-s1*(b*b^2))*xn q1 q2 b a+(a*r1-t1*b)*(b^2*b^2)
+theorem payload_scale (q1 r1 s1 t1 q2 r2 s2 t2 z1 w1 z2 w2 : K) :
+ payload (weight q1 r1 s1 t1 z1 w1) (weight q2 r2 s2 t2 z2 w2) =
+ let b:=bnum q1 r1 q2 r2
+ let a:=anum q1 r1 s1 t1 q2 r2 s2 t2
+ let z:=z1*z2
+ let w:=w1*w2
+ (⟨xn q1 q2 b a*z^18*w^2,yn q1 r1 s1 t1 q2 b a*z^45*w^5,b*z^9*w,1⟩ : D1 K) := by
+ unfold payload
+ rw [cross_weight,cross_weight]
+ simp only [mul_comm z2 z1,mul_comm w2 w1,weight]
+ rw [b_scale,a_scale]
+ simp only [D1.mk.injEq,xn,yn]
+ constructor; ring
+ constructor; ring
+ constructor; ring
+ trivial
+
+theorem scalar_x_decode (q1 q2 b a : K) (hb:b≠0) :
+ xn q1 q2 b a/b^2=q1+q2+(a/b)^2 := by
+ unfold xn
+ field_simp
+ <;> ring
+
+theorem scalar_y_decode (q1 r1 s1 t1 q2 b a : K) (hb:b≠0) :
+ yn q1 r1 s1 t1 q2 b a/b^5 =
+ (a/b)*((q1+(q1+q2+(a/b)^2))*(q1+q2+(a/b)^2)+r1)
+ -s1*(q1+q2+(a/b)^2)-t1 := by
+ unfold yn xn
+ field_simp
+ <;> ring
+end WeightedCZero

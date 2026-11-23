@@ -1,0 +1,717 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ROOTFIND-F456-PAIRED-K13-20261115",
+  "version": 2,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/rootfind_f456_paired_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "spec": "SPEC-K13.json",
+    "spec_sha256": "f5fa85c7ce29ff9475c30f8ffbc861ba6bcddaa6625d1ea2f5c072964889beb2",
+    "conductor": "T-6333",
+    "protocol_v1": "protocol-v1.json"
+  },
+  "question": "On eight fresh public Koblitz E0 n13 targets, is complete cold rootfind-negfold m3 bitop/v1 cost below matrix F4, matrix F5, inherited F4 and F6-IC using the identical standard-subspace base?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "All reported complete runs return a scalar that verifies against their public target.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Rootfind-negfold m3 uses fewer complete cold bitop/v1 units than each F4, F5 and F6-IC arm on all eight fixed K13 targets.",
+      "class": "comparative",
+      "decided_by": [
+        "C-matrix-f4",
+        "C-matrix-f5",
+        "C-inherited-f4",
+        "C-f6"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Rootfind-negfold m2 is a separate whole-algorithm alternative and its complete bitop/v1 cost is reported on the same targets.",
+      "class": "comparative",
+      "decided_by": [
+        "C-m2"
+      ]
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "A negation-folded pair table makes relation decomposition cheap enough to offset its cold setup on this small Koblitz curve.",
+      "mechanism": "A precomputed pair sum replaces repeated Boolean polynomial elimination; the table and all later phases are paid by each one-target solve.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "bitop_total",
+          "direction": "lower",
+          "minimum_effect": "rootfind-m3 < each of four Groebner arms on every target and measured repeat",
+          "provenance": {
+            "written_at": "2026-11-15",
+            "data_seen": [
+              {
+                "path": "crypto:research/f4_f5_f6_cross_family_20261011/RESULT.md",
+                "measured": "earlier F4/F5/F6 targets and relation costs"
+              },
+              {
+                "path": "crypto:research/ecbench_rootfind_faster_20261014/README.md",
+                "measured": "earlier rootfind and inherited F4 targets"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-strong",
+      "role": "reference",
+      "description": "strong signed-Frobenius rho; same public targets",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "rho.signed_frobenius_strong",
+        "lanes": 32,
+        "dp_bits": 4
+      }
+    },
+    {
+      "id": "matrix-f4",
+      "role": "baseline",
+      "description": "matrix F4 m3 d5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "matrix-f4",
+        "m": 3,
+        "d": 5
+      },
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "id": "matrix-f5",
+      "role": "candidate",
+      "description": "matrix F5 m3 d5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "matrix-f5",
+        "m": 3,
+        "d": 5
+      },
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "id": "inherited-f4",
+      "role": "baseline",
+      "description": "inherited F4 m3 d5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "inherited-f4",
+        "m": 3,
+        "d": 5
+      },
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "id": "f6-ic",
+      "role": "candidate",
+      "description": "F6-IC m3 d5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "f6-ic",
+        "m": 3,
+        "d": 5
+      },
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "id": "rootfind-m3",
+      "role": "candidate",
+      "description": "negation-folded pair-table rootfinding m3 d5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "rootfind-negfold",
+        "m": 3,
+        "d": 5
+      },
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "id": "rootfind-m2",
+      "role": "candidate",
+      "description": "negation-folded pair-table rootfinding m2 d5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "rootfind-negfold",
+        "m": 2,
+        "d": 5
+      },
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "id": "rootfind-m3-aa",
+      "role": "control_aa",
+      "description": "rootfind m3 repeat for wall noise",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "engine": "rootfind-negfold",
+        "m": 3,
+        "d": 5
+      },
+      "same_instrument_as": "rootfind-m3"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each public target has a planted scalar; ecbench checks [k]G=Q on every arm and independent replay checks the answer."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "A fixed-instance method-cost comparison makes no claim about a null population."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "solver_choice",
+        "levels": [
+          "matrix-f4",
+          "matrix-f5",
+          "inherited-f4",
+          "f6-ic",
+          "rootfind-negfold m3",
+          "rootfind-negfold m2"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_binary_and_flags",
+        "treatment": "fixed",
+        "how": "one source revision and one release ecbench binary; SHA-256 in every record"
+      },
+      {
+        "name": "curve_factor_base_and_targets",
+        "treatment": "fixed",
+        "how": "registered E0 n13, d5, public target_seed 202611151301 shared by all arms"
+      },
+      {
+        "name": "trial_and_node_caps",
+        "treatment": "fixed",
+        "how": "200000 trials on each IC arm; Groebner node budget 8192; per-exec 1800-second cap"
+      },
+      {
+        "name": "arm_order_and_algorithm_seed",
+        "treatment": "randomized",
+        "how": "ecbench alternates arms; measurement seed 202611151302 and per-execution seeds recorded"
+      },
+      {
+        "name": "host_and_interference",
+        "treatment": "measured",
+        "how": "Iso Lab L2 capsule, foreign load, PSI, CPU and RSS per execution"
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "fresh child process for each execution"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "measured",
+        "how": "interrupted and censored rows retained; no measurement retry"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "decision rule and native commands frozen before data; arm labels visible"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-matrix-f4",
+        "arms": [
+          "matrix-f4",
+          "rootfind-m3"
+        ],
+        "differs_in": [
+          "solver_choice"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-matrix-f5",
+        "arms": [
+          "matrix-f5",
+          "rootfind-m3"
+        ],
+        "differs_in": [
+          "solver_choice"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-inherited-f4",
+        "arms": [
+          "inherited-f4",
+          "rootfind-m3"
+        ],
+        "differs_in": [
+          "solver_choice"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-f6",
+        "arms": [
+          "f6-ic",
+          "rootfind-m3"
+        ],
+        "differs_in": [
+          "solver_choice"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-m2",
+        "arms": [
+          "rootfind-m3",
+          "rootfind-m2"
+        ],
+        "differs_in": [
+          "solver_choice"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "rootfind-m3",
+          "rootfind-m3-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench derives and records per-execution algorithm seeds from the frozen measurement seed"
+    },
+    "instance_sampling": {
+      "rule": "eight public uniform_scalar_sha256_v1 targets from target_seed 202611151301",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "method-specific primitive counters make labels apparent; all thresholds and commands are frozen before data",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 8,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "bonferroni",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Primary all-eight-target bitop ordering is a deterministic fixed-instance rule; no population p-value. Six repeats and an A/A arm support a secondary L2 wall-noise check."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 300,
+      "per_sample_seconds": 7.0,
+      "threads": 1,
+      "estimated_total_seconds": 3450,
+      "measured_on": "crypto:research/f4_f5_f6_cross_family_20261011/RESULT.md; matrix F4/F5 relation medians ~30/26 seconds each on older Linux host; about 56 executions each including warmups"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "bitop_total",
+        "name": "complete cold bitop/v1 cost",
+        "unit": "bitop/v1 gates",
+        "kind": "counted",
+        "definition": "all cold single-target phases including setup, relation collection, linear algebra, descent and verification; accept only work.complete=true",
+        "source": "records.jsonl work.total",
+        "aggregation": "paired_ratio",
+        "resolution": "1 model gate",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "s_band",
+        "name": "GAE pricing band",
+        "unit": "S at w=0,0.1,1",
+        "kind": "counted",
+        "definition": "same native-operation weight on every arm, including matched rho; unknown counts censor ranking",
+        "source": "ecbench band",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE/sqrt(r)",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "wall",
+        "name": "cold solve wall time",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "process start through verified answer, all phases",
+        "source": "records.jsonl time",
+        "aggregation": "paired_ratio",
+        "resolution": "1 microsecond",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "work.total",
+      "work.complete",
+      "work.phase",
+      "solver.bitop_*",
+      "cost.unpriced",
+      "peak_rss"
+    ],
+    "record": [
+      "binary_sha256",
+      "source_commit",
+      "isolation.level",
+      "isolation.blockers",
+      "cpu_model",
+      "run_cpu",
+      "psi",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "8 arms x 8 targets x (1 warmup + 6 measured rounds) = 448 executions, then stop; no adaptive extension",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "each execution has a 1800-second cap; preserve every timeout, wrong answer and interruption",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "No incomplete work.total enters a decisive cost ratio",
+    "A wrong answer or timeout remains in the export and censors its pair",
+    "Wall time below L2 or after a restore is descriptive only",
+    "No cross-session pairing with earlier target seeds"
+  ],
+  "decision_rule": {
+    "text": "C2 holds on this fixed panel only if rootfind-m3 work.complete is true and bitop total is strictly below each of the four Groebner arms on every one of eight matched targets and every measured repeat; otherwise report each ratio and failed/censored pair. C3 uses the same completeness rule and reports m2 versus m3 separately. Wall time is secondary and requires L2, a paired 95% interval below one and a difference outside A/A spread; familywise alpha 0.0125 for any inferential language.",
+    "comparison_ids": [
+      "C-matrix-f4",
+      "C-matrix-f5",
+      "C-inherited-f4",
+      "C-f6",
+      "C-m2"
+    ],
+    "threshold": "strictly below on all fixed target-repeat pairs",
+    "statistic": "paired ratio of summed complete bitop totals and target-wise range",
+    "interval": "none for deterministic primary; secondary wall bootstrap 95%",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "paired total bitop ratio, separately per baseline; no cross-size pool",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "not_supported_on_fixed_panel",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "sessions/K13/records.jsonl"
+    ],
+    "outputs": [
+      "ecbench verify --replay-all",
+      "ecbench work --summary",
+      "ecbench compare",
+      "ecbench band",
+      "ecbench table"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "complete bitop cost by arm and target",
+      "cold wall time with A/A interval"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "changing target seed, sample count, metric, engine parameters or cost unit after seeing data",
+    "treating relation-phase time as a complete-solve result",
+    "using older sessions with different targets as pairs",
+    "extrapolating this K13 cell to larger curves or an asymptotic exponent",
+    "presenting a producer's PCC record as an independently verified speed claim"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:research/f4_f5_f6_cross_family_20261011/RESULT.md",
+      "provenance": "internal",
+      "claim": "earlier four-engine K13 panel and runtime estimate",
+      "verified_by": "Codex 2026-11-15"
+    },
+    {
+      "ref": "crypto:research/ecbench_rootfind_faster_20261014/README.md",
+      "provenance": "internal",
+      "claim": "earlier K13 rootfinding and inherited F4 panel",
+      "verified_by": "Codex 2026-11-15"
+    },
+    {
+      "ref": "crypto:docs/units/BITOPS.md",
+      "provenance": "internal",
+      "claim": "bitop/v1 cost convention",
+      "verified_by": "Codex 2026-11-15"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "The Iso Lab L2 benchmark launcher sets RAYON_NUM_THREADS and OMP_NUM_THREADS to its four requested CPUs; v1 declared one thread although no run had started.",
+      "changes": [
+        "All arm instrument environments and thread counts now match the existing four-CPU EKS job; spec, target law, metric and decision rule are unchanged."
+      ],
+      "supersedes_fields": [
+        "arms[*].instrument.env",
+        "arms[*].instrument.threads"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "ec7bd6f5aa67b90215c7660f6cc772a4f00ab60905edb4cf639f96283d955e51",
+    "commit": "59cb9e14af4e4396bf4737db64a41aece667747f",
+    "frozen_at": "2026-11-15T22:10:18Z",
+    "filed_before_affected_data": true
+  }
+}

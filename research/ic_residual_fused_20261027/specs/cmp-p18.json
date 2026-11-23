@@ -1,0 +1,64 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "cmp-p18 local L0: rho, res2, res2-fused",
+  "description": "research/ic_residual_fused_20261027/README.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 212099,
+        "a": 188885,
+        "b": 173081,
+        "group_order": 212437,
+        "r": 212437,
+        "gx": 174945,
+        "gy": 10250
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "res2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual"
+        }
+      }
+    },
+    {
+      "name": "res2f",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "residual-fused"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

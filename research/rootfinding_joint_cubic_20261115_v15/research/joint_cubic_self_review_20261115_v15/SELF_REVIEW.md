@@ -1,0 +1,5 @@
+# Sole-model preparation code review
+
+Root authored and read the complete newworker plus importedactualhelperbodies: rootfinderBinaryField, quartic_cell literalnorm, gold_projectionv14 linear routines. No external reviewer is claimed. Only ASTparse beforefreeze. Checked69preimage composition, homogeneous literalnorm differences, fixedcentroid, e-indexes, genericNewtonrecurrence, Booleanmaskunion and Frobeniusidempotence. Productdegreebounds are1/2/3; no 2^69enumeration occurs.
+
+Joint249bitprojection uses all153pairgenerators. Higherdegree-coefficient annihilators are exact, their zero-polynomial redundancies handled by rank differences. The complete affineconsequence system is retained. All ANFs are defined by the recordedfinite operators/inputs, not substitutedbysampled hashes. IndependentNewton/source-sum/truthtable/mixednorm controls crosscheck separate formulations. Checked 80/84/88 deadlines,90parentlimit,4GiB1core andcompactexclusiveartifact/six-keyoutput. Diagnostic completion is distinct from root-solving/release completion. External review remains required for solver integration.

@@ -1,0 +1,125 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "find-root-cardinality-renewal-20261111",
+  "status": "failed",
+  "caller_exit_code": 1,
+  "native_pre_status": "passed",
+  "native_post_status": "passed",
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "pre_post_hash_maps_equal": true,
+  "runtime_maps_equal": true,
+  "compiler_invocations": 9,
+  "command_results": [
+    {
+      "module": "GraphAlgebra",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 17.934920505969785
+    },
+    {
+      "module": "Find",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 12.839610179013107
+    },
+    {
+      "module": "Cycles",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 12.361257470038254
+    },
+    {
+      "module": "Union",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 13.801450936007313
+    },
+    {
+      "module": "Forest",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 12.608463315002155
+    },
+    {
+      "module": "Composition",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 14.188219157978892
+    },
+    {
+      "module": "UnionSize",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 12.992933467030525
+    },
+    {
+      "module": "FindRootCardinality",
+      "exit": 0,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 14.920264170970768
+    },
+    {
+      "module": "Controls",
+      "exit": 1,
+      "expected_exit": 0,
+      "reaped": true,
+      "remaining_group": [],
+      "elapsed_seconds": 15.260447244974785
+    }
+  ],
+  "unattempted_modules": [
+    "Readback",
+    "ExpectedFailure"
+  ],
+  "all_phase_owners_terminal": true,
+  "readback_names": 0,
+  "planned_readback_names": 14,
+  "allowed_axioms_only": null,
+  "false_control_rejected": null,
+  "failure": "Controls failed Decidable synthesis for RootMap chain rho, RootMap compressed rho, negated RootMap and Forest.",
+  "compiled_artifacts": {
+    "Cycles.olean": "2c7bbdda04c25f32bd1e4594bccce4746645c2f0ddf6e5074970ff0c99ca4883",
+    "Forest.olean": "5f5697a4084e685072e483579285f2c6828a1600a8587e2305f02dc128c67aa7",
+    "Union.olean": "4c68d54cfa3592b95cb02d6d2f188ec1f72e9a766df689a1d2aa5d609f74416b",
+    "FindRootCardinality.olean": "84c7b3f819866862fb5bb4abbb012cae3c104572b30da0f4432db5189ec1767a",
+    "Find.olean": "8b5331b6e3ac45bd6141219d06b84a950e1446286c8cf29b2bf5d355d097cd88",
+    "Composition.olean": "8401937988e84959b48e8de0549fb2a7bf0303245f89d8e8eca9b41e2cd2b21c",
+    "UnionSize.olean": "d2041ada0c292af21cfdb52da36befb8657d73bc79d7846c0d4d801fbc595f1c",
+    "GraphAlgebra.olean": "27cdcf4c922067b16d4fe0509c77d9474e7aa79dd2d7633b4d11376aaad31ce0"
+  },
+  "elapsed_seconds": {
+    "native_pre": 41.07910194201395,
+    "native_compiler": 127.74785981001332,
+    "native_post": 33.885974995966535,
+    "outer_completion": 203.60704139602603,
+    "caller": 203.73919529898558
+  },
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 22980,
+  "campaign_remaining_seconds": 106620,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "raw_files": 80,
+  "reporter_self_checks": true,
+  "independent_result_review": false,
+  "independent_kernel_recheck_complete": false,
+  "custody_limit": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes.",
+  "dollar_cost": null,
+  "scientific_cost_ratio": null
+}

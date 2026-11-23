@@ -1,0 +1,118 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1he970a46be821e787",
+  "statement": {
+    "name": "Matched quadratic pullback support, denominator clearing",
+    "source": "SevenJacobian.support_cleared_identity; UV=b and VW=1 imply U=bW",
+    "variables": [
+      "u",
+      "v",
+      "b",
+      "w"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "u"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "b"
+                  },
+                  {
+                    "op": "var",
+                    "args": "w"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "v"
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "u"
+            },
+            {
+              "op": "var",
+              "args": "v"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "var",
+            "args": "b"
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "b"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 1
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "v"
+                      },
+                      {
+                        "op": "var",
+                        "args": "w"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557823160877106,
+  "value_digest": "c0195eb015eac0ef40b24ee1a1b9744124edf74c40bfd4a33f9629738f10513e",
+  "independence": "Producer issued/replayed with the unchanged native checker and16 extra checker-seed points;Lean gate executed separately;no signed independence claimed",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+    "sha256": "2fc2d9d619897332bf8ab3a2d840713a21353b44cb49f5759d5405f32de51da1"
+  }
+}

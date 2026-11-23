@@ -1,0 +1,208 @@
+{
+  "schema": "research.component-overview/v1",
+  "captured_utc": "2026-10-31T01:16:45.255924+00:00",
+  "link_base": "followup-continuation-v2/report-branch-completion",
+  "components": [
+    {
+      "id": "weighted-add11-field",
+      "title": "Weighted Add11: field",
+      "result": "Nonzero output weights, four normalized coefficient identities and Mumford divisibility; independent fresh compilation and readback pass.",
+      "assumptions_and_limits": "Field; four nonzero weights, distinct normalized x, two input divisibilities over common f. Polynomial validity, not class-sum.",
+      "evidence": [
+        "../packets/weighted-add11/REPORT.md",
+        "../packets/weighted-add11-review/REVIEW.md"
+      ],
+      "new_full_cohort_cost_ratio": null,
+      "timing_ratio": null,
+      "ranking": null
+    },
+    {
+      "id": "weighted-add11-word",
+      "title": "Weighted Add11: UInt64",
+      "result": "Exact exponent-five value model, six canonical decoded payload coordinates and conditional distinct guard; independent checks pass.",
+      "assumptions_and_limits": "Prime 5<=p<2^31; eight canonical inputs; Field n=1, tables=None and normal counter execution. Not compiler or counter equivalence.",
+      "evidence": [
+        "../packets/word-add11/REPORT.md",
+        "../packets/word-add11-review/REVIEW.md"
+      ],
+      "new_full_cohort_cost_ratio": null,
+      "timing_ratio": null,
+      "ranking": null
+    },
+    {
+      "id": "weighted-add11-validity",
+      "title": "Weighted Add11: composed validity",
+      "result": "Conditional theorem combines distinct guard, canonical outputs, nonzero word weights and normalized Mumford validity; full-premise control and independent replay pass.",
+      "assumptions_and_limits": "Previous word bounds; four nonzero weights, common input validity and distinct normalized x. F7 f=X² control is polynomial algebra, not a smooth genus-2 fixture.",
+      "evidence": [
+        "../packets/word-add11-validity/REPORT.md",
+        "../packets/word-add11-validity-review/REVIEW.md"
+      ],
+      "new_full_cohort_cost_ratio": null,
+      "timing_ratio": null,
+      "ranking": null
+    },
+    {
+      "id": "weighted-doubling-field",
+      "title": "Degree-one doubling: field",
+      "result": "Tangent quotient proves normalized validity; zero derivative is allowed. Self-add nonzero-y doubling and y=0 inverse precedence checked and independently reviewed.",
+      "assumptions_and_limits": "Monic quintic with zero X4 coefficient; nonzero z,w,y,2 and normalized point equation. No global nonsingularity required for this polynomial claim.",
+      "evidence": [
+        "../packets/weighted-doubling/REPORT.md",
+        "../packets/weighted-doubling-review/REPORT.md"
+      ],
+      "new_full_cohort_cost_ratio": null,
+      "timing_ratio": null,
+      "ranking": null
+    },
+    {
+      "id": "weighted-doubling-word",
+      "title": "Degree-one doubling: UInt64",
+      "result": "Literal-5 reduction bridge includes p=5; six canonical decoded outputs and conditional normalized validity. Self-add word guards and independent boundary controls pass.",
+      "assumptions_and_limits": "Prime 5<=p<2^31; four canonical coefficients plus four canonical input words. Nonzero decoded z,w,y,2 and point equation. p5 f=X5+1 fixture is nonsmooth; preprocessing is not proved.",
+      "evidence": [
+        "../packets/word-doubling/REPORT.md",
+        "../packets/word-doubling-review/REPORT.md"
+      ],
+      "new_full_cohort_cost_ratio": null,
+      "timing_ratio": null,
+      "ranking": null
+    },
+    {
+      "id": "kummer-duplicate-helper",
+      "title": "Kummer signed-duplicate helper",
+      "result": "Eight native controls and root independent replay pass; two deliberately planted candidates verify 31124. Each case retains one graph edge and zero cycles.",
+      "assumptions_and_limits": "Target-local helper with valid signed divisor labels and Q in <G> as caller premises. Alternate labels use known k. No natural duplicate yield, new trajectory or production integration.",
+      "evidence": [
+        "../packets/kummer-duplicate-adapter/REPORT.md",
+        "../packets/kummer-duplicate-review/review.json",
+        "../packets/kummer-duplicate-review/replay-result.json"
+      ],
+      "new_full_cohort_cost_ratio": null,
+      "timing_ratio": null,
+      "ranking": null
+    }
+  ],
+  "evidence_bindings": [
+    {
+      "component": "weighted-add11-field",
+      "link": "../packets/weighted-add11/REPORT.md",
+      "sha256": "a5618fb1b71f264ea2f3244fa5105f9e2339d04fb2e26c5b475bcf025fd97212"
+    },
+    {
+      "component": "weighted-add11-field",
+      "link": "../packets/weighted-add11-review/REVIEW.md",
+      "sha256": "6cc460e0d5c82a23b4ec35ec33e8e104e060b5ec98b7f9fa5c482f1845bcdceb"
+    },
+    {
+      "component": "weighted-add11-word",
+      "link": "../packets/word-add11/REPORT.md",
+      "sha256": "be81bba6efbc5cb48511819f0d2066e9c98c7e13c7cdd1cb01d447d60786def3"
+    },
+    {
+      "component": "weighted-add11-word",
+      "link": "../packets/word-add11-review/REVIEW.md",
+      "sha256": "084a0d49068a6cada661dfee5e953d87eaa6916f445ef647f0774dcb753d6b2f"
+    },
+    {
+      "component": "weighted-add11-validity",
+      "link": "../packets/word-add11-validity/REPORT.md",
+      "sha256": "0be21935b56363db459f2c4d98696be14533aab3fe4990f0ad6a897d73459932"
+    },
+    {
+      "component": "weighted-add11-validity",
+      "link": "../packets/word-add11-validity-review/REVIEW.md",
+      "sha256": "d1198ac53a7f3822711ac397c3e93ef6a259aec72a71988f104e43e21caf08f3"
+    },
+    {
+      "component": "weighted-doubling-field",
+      "link": "../packets/weighted-doubling/REPORT.md",
+      "sha256": "faebd15eb9743947d6e97bb01d56561291717b8b26ac584f1b1d3921f05bdf69"
+    },
+    {
+      "component": "weighted-doubling-field",
+      "link": "../packets/weighted-doubling-review/REPORT.md",
+      "sha256": "6cff1cef9b38f2ed8962c50808080becc8f1b444e0f022add1da61c0da1862a9"
+    },
+    {
+      "component": "weighted-doubling-word",
+      "link": "../packets/word-doubling/REPORT.md",
+      "sha256": "3c7ba7fad146b7b6cf91f4c832a900d22753c926f3b2a695524932896170898f"
+    },
+    {
+      "component": "weighted-doubling-word",
+      "link": "../packets/word-doubling-review/REPORT.md",
+      "sha256": "d6c042440314ae1666e009a5356a1e3a460aa81ca0f29feb90269f82df550e6e"
+    },
+    {
+      "component": "kummer-duplicate-helper",
+      "link": "../packets/kummer-duplicate-adapter/REPORT.md",
+      "sha256": "0ae20f391c5922815ba5a2b9ee995c2cbe8774132465b6cd78475e108840164a"
+    },
+    {
+      "component": "kummer-duplicate-helper",
+      "link": "../packets/kummer-duplicate-review/review.json",
+      "sha256": "ebc0aa6eccd5ae2f075261dffdc60b081edb2357805b233404fadc8654be77a9"
+    },
+    {
+      "component": "kummer-duplicate-helper",
+      "link": "../packets/kummer-duplicate-review/replay-result.json",
+      "sha256": "6d345c74dbd9188612f347492fe184003ba7d91483217c48ddf97a9b6ce50ad3"
+    },
+    {
+      "component": "preserved-scope",
+      "link": "../report-complete/index.json",
+      "sha256": "3292b1bb3c41d50aa1084d8790125cbbb4876a65582313c4cf30f24035b02904"
+    },
+    {
+      "component": "preserved-scope",
+      "link": "../../four-lead-inventory/README.md",
+      "sha256": "7cd4f2cae47320bf734a49e00e37aebe6662e3fbf3faec134c27a0d93e81608c"
+    },
+    {
+      "component": "preserved-scope",
+      "link": "../../five-followups/README.md",
+      "sha256": "653de558cf4c21cc853f6f79766bdc24d8057327537f15776386928071480261"
+    },
+    {
+      "component": "preserved-scope",
+      "link": "../packets/software-validation-snapshot/snapshot.json",
+      "sha256": "db5d039b6efe720e35745a0bfa8eedbf21a7ff7bc4e54ed9b265bf2e3fe1c85d"
+    }
+  ],
+  "previous_overview": "../report-complete/index.json",
+  "new_full_1260_cohort_completed": false,
+  "new_matched_cost_ratios": null,
+  "scientific_execution_authorized_by_this_report": false,
+  "software_validation": {
+    "status": "pending snapshot retained; no new current aggregate assertion",
+    "prior_snapshot": "../packets/software-validation-snapshot/snapshot.json",
+    "native_checks_directory": "../preflight-review/final-software-checks/",
+    "historical_full_suite": {
+      "passed": 5792,
+      "failed": 1,
+      "ignored": 128
+    },
+    "historical_isolated_capsule_replay": "passed",
+    "later_results": "Require a separately bound terminal update; not inferred here."
+  },
+  "preserved_completion_criteria": {
+    "four_leads": {
+      "factor_base_graph": "Preserve archived matched cohorts; new partial-relation graph-policy changes need prospective arm and complete accounting.",
+      "weighted_genus2_law": "Preserve archived cohorts; remaining compiled-law/exceptional branches and geometric group interpretation are not discharged by these local polynomial proofs.",
+      "pencil": "Full1260 target requirement, paired controls, complete costing, qualified clocks and terminal independent review remain; prior incomplete/capped outcomes and costs retained.",
+      "kummer": "Preserve prior cohort and recovery-family separation; new helper has no natural recurrence yield or full matched cohort evidence."
+    },
+    "five_followups": [
+      "word correspondence",
+      "collector invariant preservation",
+      "exceptional branch coverage",
+      "Kummer signed transition correctness",
+      "target-information/source relation correspondence"
+    ],
+    "full_scope": "No original target, arm, control, failure, budget, cost category, review or timing requirement is reduced by this component report. Existing completed historical cohorts are not rerun or reclassified.",
+    "full_cohort_size": 1260,
+    "separate_upper_gate_slots": 18,
+    "extra_scope": "Branch results do not imply global class-sum, compiler, counter or whole-walk correctness."
+  }
+}

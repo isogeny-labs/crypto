@@ -1,0 +1,55 @@
+warning: method `fpm` is never used
+ --> src/fp.rs:8:12
+  |
+7 | impl Cnt {
+  | -------- method in this implementation
+8 |     pub fn fpm(&self) -> u64 {
+  |            ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `fpm` is never used
+  --> src/fp.rs:12:8
+   |
+12 | pub fn fpm(c: &Cnt) -> u64 {
+   |        ^^^
+
+warning: method `mul_u` is never used
+  --> src/fp.rs:30:12
+   |
+20 | impl Fp {
+   | ------- method in this implementation
+...
+30 |     pub fn mul_u(&self, a: u64, b: u64) -> u64 {
+   |            ^^^^^
+
+warning: fields `n_cols` and `rows_target` are never read
+  --> src/lines.rs:57:9
+   |
+52 | pub struct SearchResult {
+   |            ------------ fields in this struct
+...
+57 |     pub n_cols: usize,
+   |         ^^^^^^
+58 |     pub rows_target: usize,
+   |         ^^^^^^^^^^^
+
+warning: `l10` (bin "l10") generated 4 warnings
+    Finished `release` profile [optimized] target(s) in 0.00s
+     Running tests/unit.rs (target/release/deps/unit-d7b99d646a958e71)
+
+running 11 tests
+test u10_t5_p31 ... ok
+test u11_family_q ... ok
+test u1_eval_counts ... ok
+test u2_zeta_and_lambda ... ok
+test u3_jac ... ok
+test u4_line_trials ... ok
+test u5_krylov ... ok
+test u6_bm_fib ... ok
+test u7_identity_quotient ... ok
+test u8_keys ... ok
+test u9_enum_p13 ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+

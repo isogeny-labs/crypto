@@ -111,6 +111,13 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
       (§10) did suffice. The 3-set is structurally an ℓ = 7 system, and the
       pattern fits `m·(ℓ−7)+1` guesses (105 at ℓ = 33, m = 4): a reading, not
       a result. No row moves.
+11. **The three-guess failure is the ℓ = 7 rise (§12).**
+    - The unspecialised (22, 7) system, same N = 43 and 136,698 columns as the
+      3-set, does not refute at degree 4 on 4 of 4 draws; 12 of 12 unspecialised
+      ℓ = 7 draws do not refute over surplus −2, 0, +1.
+    - The pattern fits `m·(ℓ−7)+1` guesses: 4 at ℓ = 8, 105 at the priced
+      m = 4, ℓ = 33 cell, against a break-even of 6. An extrapolation from ℓ = 7
+      and 8. No row moves.
 
 ## 1. What is measured
 
@@ -540,6 +547,26 @@ draws (N = 43, 136,698 columns), 8 branches per draw.
   k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.
 - **No row moves** and none beats rho.
 
+## 12. The matched null at (22, 7) (2026-10-28)
+
+`research/dreg_closure_null22_7_20261028/` measured the unspecialised
+m = 3, (n, ℓ) = (22, 7) system: the same N = 43, 44 equations and 136,698
+columns as the three-guess set of §11, on four unsatisfiable draws (surplus +1).
+
+- **It does not refute at degree 4 on 4 of 4 draws** (registered verdict: the
+  pure ℓ = 7 reading). Identity, dimension-6 positive and satisfiable soundness
+  controls are valid.
+- **So the earlier ℓ = 7 failure is not a surplus artefact:** 12 of 12
+  unspecialised ℓ = 7 draws fail over surplus −2, 0, +1.
+- **What follows (derived).** Fixing the top coordinate of each summand takes
+  ℓ = 8 to ℓ = 7, and ℓ = 7 is where degree 4 stops refuting, so the guess count
+  is about `m·(ℓ−7)` plus the one that ℓ = 7 itself needs: 4 at ℓ = 8, which is
+  what §10 and §11 measured. Linear extrapolation gives 4·(33−7)+1 = 105 guesses
+  at the priced m = 4, ℓ = 33 cell, far above the break-even k ≤ 6, so the
+  hybrid does not beat degree 5 there. It rests on ℓ = 7 and ℓ = 8.
+- **Not measured:** a 3-set leaving one summand at dimension 8 (the reading
+  predicts failure); degree 5 at ℓ = 7. No row moves, and none beats rho.
+
 ## Scope and disclosures
 
 - **System.** `m = 3`, the chained `S₃`, with `b = 1`.
@@ -649,6 +676,82 @@ closure degree.
 - **What it is not.** No row moves: the guess count at ℓ = 33 is still
   extrapolated far above the break-even of 6.
 - **Next.** Two invariant guesses on the pair, ℓ = 9, and m = 4.
+
+## A second invariant guess (2026-10-29): not a substitute for the raw guess on x₃
+
+`research/dreg_invariant_pair_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with a second invariant coordinate of the
+pair, `a₆ + b₆`, on the same 12 draws.
+
+- **Result.** The new arm suffices on 2 of 12 draws, against S3's 7 of 12.
+  - All 5 discordant draws favour S3. The registered two-sided sign test gives
+    p = 0.0625, so the verdict is no detected difference.
+  - It is never better on any draw.
+- **What it means.** One invariant guess per summand pair is the useful part,
+  and the raw guess on the third summand still carries weight.
+- **What it is not.** No row moves.
+
+## An invariant guess on the second link (2026-11-05): as good as the raw guess on x₃
+
+`research/dreg_second_link_guess_20261105/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with coordinate 20 of the second link's
+swap invariant `e₁ + x₃`, on the same 12 draws. Unverified assertion until a
+pcc verdict exists.
+
+- **Result.** The new arm suffices on 6 of 12 draws, against S3's 7 of 12.
+  - One discordant draw (27), which favours S3. The registered two-sided sign
+    test gives p = 1.0, so the verdict is no detected difference.
+  - The arms agree on 11 of 12 draws.
+- **What it means.** Unlike a second invariant guess on the first link, an
+  invariant guess on the second link does not lose. One invariant guess per
+  link is a rule that extends along the chain, and m = 4 is its test.
+- **What it is not.** Not shown to be better than S3. No row moves.
+
+## One invariant guess per link at m = 4, degree 3 (2026-11-06): no detected difference
+
+`research/dreg_m4_link_guess_d3_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`). Every m = 4 cell this host can hold refutes at degree 4 with
+no guess, so the per-link rule was tested at degree 3 with k = 10 guesses at
+ℓ = 5 (n = 11, 12), on all 1024 branches of 8 unsatisfiable draws.
+Unverified assertion until a pcc verdict exists.
+
+- **Result.** Invariant placement (four sums on `x₁ + x₂`, three guesses on
+  `e₁ + x₃`, three on `e₂ + x₄`) refutes on 1,888 of 8,192 branches; raw
+  placement in the same places on 1,312.
+  - By draw it is ahead on 4 and behind on 3. The registered two-sided sign
+    test gives p = 1.0: no detected difference.
+- **What it means.** The per-link rule is not established at m = 4 in the
+  regime this host reaches. The degree-4 three-guess regime at m = 4 needs a
+  larger host.
+- **What it is not.** A test of the m = 3 degree-4 regime. No row moves.
+
+## Which guesses decide refutation at m = 4 (2026-11-06): links 2 and 3, never link 1
+
+`research/dreg_m4_guess_bits_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) reruns the ten-guess m = 4 design and reads, per arm and draw,
+the guesses whose value changes degree-3 refutation. Unverified assertion until
+a pcc verdict exists.
+
+- **Result.** No link-1 guess (pair sums or raw x₂) is essential on any of 16
+  arm-draws; essential guesses sit on link 3 (34) and link 2 (18). Guessing
+  only the essential set keeps every refutation on 7 of 13 tested arm-draws,
+  all with one to three guesses.
+- **What it means.** At m = 4, degree 3, guesses on the last links do the work,
+  the opposite of m = 3 at degree 4. A guess budget should go to links 2 and 3
+  first.
+- **What it is not.** A complete guess-and-determine. No row moves.
+
+## Two guesses at (22, 8) (2026-11-07): enough on 1 of 12 draws
+
+`research/dreg_two_guess_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) drops `e₁[0]` from S3 and L3. Unverified assertion until a pcc
+verdict exists.
+
+- **Result.** Both two-guess sets suffice at degree 4 on draw 6 only and fail
+  at their first branch on the other 11; they never disagree.
+- **What it means.** Three guesses stay the floor for these guess kinds on 11
+  of 12 draws at ℓ = 8; there is no general halving of the branch count.
+- **What it is not.** A test of two-guess pairs that keep `e₁[0]`. No row moves.
 
 ## Reproducing
 

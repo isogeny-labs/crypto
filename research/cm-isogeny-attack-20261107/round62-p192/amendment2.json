@@ -1,0 +1,10 @@
+{
+ "date":"2026-11-08","task":"T-1942","before_affected_B_only_data":true,
+ "reason":"Remove a separate normalization-constant construction from the proposed B-only interface through one public zero-input calibration. The uncalibrated B-only mode was published/built but not run.",
+ "formula":"Bcal=B_Q(P,P); Bcal*y(P)=c_Q*y((1-pi)P). For shifts P+iG, y(P+jG+iG)=Bcal*y(P)/B_i. This uses no C or c_Q input. One calibration is reusable for all U at the same target.",
+ "native_panel":"Same49 cases and seven shifts. Exactly7 calibration queries plus343 shifted queries; all output receipts include calibration. Direct c_Q product is retained only as an explicit consistency reference and charged additional work. Native roots enumerate211^2 field elements per original and mutated transcript.",
+ "guards":"p>3, prime r>6,r!=p,Q nonzero and not+/-G,2P nonrational,finite inputs. Original transverse-coefficient oracle construction remains a charged dependency.",
+ "controls":"Calibrated and direct-normalized y values must agree. Streaming and prefix/suffix outputs must agree. A changed y0 transcript is reprocessed through the actual root decoder and must have no survivor. Original three transport outputs must remain byte-identical.",
+ "bounds":{"seconds_per_command":120,"native_processes":1,"cloud_jobs":0,"new_generators":0},
+ "claim_class":"derived algorithmic reduction plus exact declared-case qualification, no speedup or full P192 coefficient evaluation"
+}

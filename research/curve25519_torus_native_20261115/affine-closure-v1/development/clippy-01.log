@@ -1,0 +1,42 @@
+    Checking typenum v1.20.1
+    Checking cfg-if v1.0.5
+    Checking serde_core v1.0.229
+    Checking num-traits v0.2.19
+    Checking zmij v1.0.23
+    Checking memchr v2.8.3
+    Checking num-integer v0.1.47
+    Checking itoa v1.0.19
+    Checking cpufeatures v0.2.17
+    Checking num-bigint v0.4.8
+    Checking adler2 v2.0.1
+    Checking simd-adler32 v0.3.10
+    Checking generic-array v0.14.7
+    Checking miniz_oxide v0.9.1
+    Checking crc32fast v1.5.5
+    Checking hex v0.4.3
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking flate2 v1.1.11
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking serde_json v1.0.154
+    Checking serde v1.0.229
+    Checking torus-s4 v0.1.0 (/workspace/isogeny-labs/crypto-worklist-20261116/tools/torus-s4)
+    Checking torus-s4-tree v0.1.0 (/workspace/isogeny-labs/crypto-worklist-20261116/tools/torus-s4-tree)
+    Checking torus-coset-circuit v0.1.0 (/workspace/isogeny-labs/crypto-worklist-20261116/tools/torus-coset-circuit)
+    Checking torus-indexed-circuit v0.1.0 (/workspace/isogeny-labs/crypto-worklist-20261116/tools/torus-indexed-circuit)
+    Checking torus-worklist-solver v0.1.0 (/workspace/isogeny-labs/crypto-worklist-20261116/tools/torus-worklist-solver)
+    Checking torus-affine-closure v0.1.0 (/workspace/isogeny-labs/crypto-worklist-20261116/tools/torus-affine-closure)
+error: usage of `bool::then` in `filter_map`
+   --> src/lib.rs:323:14
+    |
+323 |             .filter_map(|m| (m.len() == 1 && !protected_set.contains(&m[0])).then(|| m[0]))
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use `filter` then `map` instead: `filter(|&m| (m.len() == 1 && !protected_set.contains(&m[0]))).map(|m| m[0])`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#filter_map_bool_then
+    = note: `-D clippy::filter-map-bool-then` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::filter_map_bool_then)]`
+
+error: could not compile `torus-affine-closure` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-affine-closure` (lib) due to 1 previous error

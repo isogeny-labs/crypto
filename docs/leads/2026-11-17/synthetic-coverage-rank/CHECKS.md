@@ -1,0 +1,10 @@
+# Fixed synthetic replay scope
+
+The fixtures check two proposed diagnostics for index-calculus studies. All inputs are synthetic. The fixed replay is a finite exact calculation with a second counting path on small instances. It has no workload sampling, performance measurement, or clock metric.
+
+- Coverage uses ordered pairs from one set, with repeats allowed, added modulo 19 or 23. Check the four disclosed examples in the source. Count multiplicities directly and independently compute each count as the size of the intersection of the set with its translate under subtraction from the residual. Check the inverse-multiplicity weights by exact integer arithmetic on every planted pair.
+- Quantify the ambiguity of the first two moments on a fresh finite domain by enumerating all 330 four-element subsets of the residues modulo 11. Bin by squared multiplicity sum, since every set supplies 16 ordered pairs, and record the minimum and maximum support in each bin. Include every subset once. The four disclosed fixtures were found during design and are replay controls.
+- Rank uses the five oriented edges `01, 12, 23, 30, 02` and signs `--+++` and `+-++-`. Check prefix rank over the fields of orders 2, 3, and 101. Enumerate all ten assignments with exactly two negative signs. Run both fixed auxiliary-elimination matrices in the source over the same fields. Independently enumerate solutions for the fields of orders 2 and 3 on the signed and auxiliary fixtures to check measured nullities. Check sign histograms for each row and column before field reduction.
+- A mismatch, unset assertion, build error, or incomplete census prevents reporting that replay as a pass. The finite outcomes establish scope-limited fixture facts. Practical relation collection and timing questions require a separate study.
+
+Build from this directory with `g++ -std=c++17 -Wall -Wextra -Werror -pedantic -O2 replay.cpp -o /tmp/ic-synthetic-replay`. Run `/tmp/ic-synthetic-replay coverage` and `/tmp/ic-synthetic-replay rank`. Compare each output bytewise with the corresponding committed text receipt.

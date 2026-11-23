@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "8512de5facdd5499b68f96c05d2d8222643ca002c7383942685894a21b961a81"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "19ba1d7a8299f124e2038174c511de8ebbb4ddca9137cbdf7fceeb12e937a0b3"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "Named by §9.28: E27's matched rho on E25's ten GLS curves (validated, research/e27_walk_20261030), re-priced by the same audit: the <±psi> walk (iii) (Karatsuba F_p4 products, norm inversions of a 16-walk pool batched by Montgomery's trick), E25's seeds 1000*seed + k (k < 16), the [d]G = Q check excluded, minus the walk audit's mean saving (0-1.1 F_p multiplications per walk). Strongest available: on E25's curves j is in F_p2 but not in F_p (E25's validator; E27's validation), so <±psi> is the largest fold and (iii) the cheapest arithmetic built. IC side: E27's solver-A pipeline with Karatsuba products, S = total_muls - ic_trivial_product_savings (the audited S). Unpriced native work (AGENTS.md §5a): IC Macaulay entries (emitted as macaulay_entries), walk steps (emitted as steps); band S(w) = F_p multiplications + w * 97 * native operations. gae_band values: medians over the ten curves of arm B (E25's GLS-fold benchmark arm, the convention of E27's validation); over all 20 rows the IC/rho ratio is 6372-4.043e+05 (0), 2.123e+04-1.393e+06 (0.1), 9.066e+04-6.636e+06 (1 GAE), so rho < IC on every row at every weight.",
+  "unit": "F_p multiplications, both arms counted by the same Fp4 counters: an F_p4 product 13 (Karatsuba) on both sides; the IC side's trivial products re-priced by the audit (0 for an operand 0 or 1, 4 for an operand in F_p); the solve's F_p multiplications counted directly, Wiedemann at 16 per multiplication mod n; walk set-up included, the walk's [d]G = Q check excluded (E25's convention)",
+  "binary_or_process": "IC side: quartic_pipeline_gls --solver chain --karatsuba --audit from binary 0e4fccce1 (validator rebuild; one process per (p, seed), arm A then arm B). Its records equal E27's (binary af2504ef1) on every leaf except the new counter (12,100 of 12,100 compared leaves), including the 48 in-process walks per arm, which E27's validation showed equal walk (ii) record for record; e30_audit from the same 0e4fccce1 build reproduces E27's walk (ii) means exactly on all 20 pools; walk (iii) differs from (ii) only by the price of the recorded F_p inversions (E27's validation, 20 of 20 pools). same_binary_or_process is asserted on that basis, as for E27.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 19057012459.5,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 69383180088.3,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 522318688747.5,
+    "rho": 1206197.8125
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

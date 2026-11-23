@@ -1,0 +1,22 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "content": "splitIndex.maxPercentChange::\n\tWhen the split index feature is used, this specifies the\n\tpercent of entries the split index can contain compared to the\n\ttotal number of entries in both the split index and the shared\n\tindex before a new shared index is written.\n\tThe value should be between 0 and 100. If the value is 0, then\n\ta new shared index is always written; if it is 100, a new\n\tshared index is never written.\n\tBy default, the value is 20, so a new shared index is written\n\tif the number of entries in the split index would be greater\n\tthan 20 percent of the total number of entries.\n\tSee linkgit:git-update-index[1].\n\nsplitIndex.sharedIndexExpire::\n\tWhen the split index feature is used, shared index files that\n\twere not modified since the time this variable specifies will\n\tbe removed when a new shared index file is created. The value\n\t\"now\" expires all entries immediately, and \"never\" suppresses\n\texpiration altogether.\n\tThe default value is \"2.weeks.ago\".\n\tNote that a shared index file is considered modified (for the\n\tpurpose of expiration) each time a new split-index file is\n\teither created based on it or read from it.\n\tSee linkgit:git-update-index[1].\n",
+    "title": "splitindex.adoc",
+    "modified_date": "2025-01-21T20:56:06Z",
+    "url": "https://github.com/git/git/blob/v2.52.0/Documentation/config/splitindex.adoc",
+    "display_url": "https://github.com/git/git/blob/v2.52.0/Documentation/config/splitindex.adoc",
+    "display_title": "splitindex.adoc",
+    "structuredContent": {
+      "title": "splitindex.adoc",
+      "content": "splitIndex.maxPercentChange::\n\tWhen the split index feature is used, this specifies the\n\tpercent of entries the split index can contain compared to the\n\ttotal number of entries in both the split index and the shared\n\tindex before a new shared index is written.\n\tThe value should be between 0 and 100. If the value is 0, then\n\ta new shared index is always written; if it is 100, a new\n\tshared index is never written.\n\tBy default, the value is 20, so a new shared index is written\n\tif the number of entries in the split index would be greater\n\tthan 20 percent of the total number of entries.\n\tSee linkgit:git-update-index[1].\n\nsplitIndex.sharedIndexExpire::\n\tWhen the split index feature is used, shared index files that\n\twere not modified since the time this variable specifies will\n\tbe removed when a new shared index file is created. The value\n\t\"now\" expires all entries immediately, and \"never\" suppresses\n\texpiration altogether.\n\tThe default value is \"2.weeks.ago\".\n\tNote that a shared index file is considered modified (for the\n\tpurpose of expiration) each time a new split-index file is\n\teither created based on it or read from it.\n\tSee linkgit:git-update-index[1].\n",
+      "display_url": "https://github.com/git/git/blob/v2.52.0/Documentation/config/splitindex.adoc"
+    }
+  },
+  "isError": false
+}

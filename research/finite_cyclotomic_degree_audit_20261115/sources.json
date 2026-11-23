@@ -1,0 +1,163 @@
+{
+  "schema": "finite-cyclotomic-source-plan/v1",
+  "created": "2026-11-15T02:27:11.332666+00:00",
+  "formal": {
+    "project": "research/finite_cyclotomic_degree_audit_20261115/lean",
+    "theorem": "FiniteCyclotomicDegreeAudit.finite_cyclotomic_degree_certificate",
+    "statement": "theorem finite_cyclotomic_degree_certificate : (∀ (K : Type) [Field K] [Fintype K] (r : ℕ) [NeZero (r : K)], Module.finrank K (rootsField K r) = orderOf (Fintype.card K : ZMod r) ∧ (∀ (n : ℕ), Module.finrank K (rootsField K r) ∣ n ↔ r ∣ Fintype.card K ^ n - 1) ∧ (∀ (L : IntermediateField K (Closure K)) [Finite L], (rootsField K r ≤ L ↔ r ∣ Nat.card L - 1) ∧ ((∀ x : Closure K, x ^ r = 1 → x ∈ L) ↔ r ∣ Fintype.card K ^ Module.finrank K L - 1))) ∧ (∀ (K : Type) [Field K], Module.finrank K (rootsField K 1) = 1 ∧ Module.finrank K (rootsField K 2) = 1) ∧ (∀ (K : Type) [Field K] [Fintype K] (p : ℕ) [Fact p.Prime] [CharP K p], Module.finrank K (rootsField K p) = 1 ∧ orderOf (Fintype.card K : ZMod p) = 0 ∧ Module.finrank K (rootsField K p) ≠ orderOf (Fintype.card K : ZMod p) ∧ rootsField K p ≤ (⊥ : IntermediateField K (Closure K)) ∧ ¬ p ∣ Fintype.card K - 1)",
+    "decl_sha256": "f288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742",
+    "scope": "Every actual finite field K, every natural r nonzero in K: derive primitive root, simple all-root adjoin in AlgebraicClosureK, finite dimension/carrier and actual Frobenius order, giving actual Module.finrank=orderOf(cardK:ZModr). Actual degree dividesn iff r dividescardK^n-1. For every actual finite intermediate field L, actual all-root containment/rationality iff r divides Nat.cardL-1, equivalently cardK^actualfinrankL-1, via splitting descent and actual finite-module cardinality. Every finite characteristicp field yields actual rootfieldp=bottom/degree1 versus modularorder0 and p does not dividecardK-1, refuting deletion of nonzero-characteristic guard. Every field actual r1/r2 root-adjoin degree1. Credited existing arguments generalized; correctly qualified source cyclotomic bridge survives. Not full elliptic torsion field/canonical Weil-Tate geometric comparison, nonprime SS classification, isogeny/Lang/Cartier/Jacobian/divisor/MOV-FR or all14 completion. No novelty claim/canonical promotion.",
+    "sources": [
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/CyclotomicCertificate.lean",
+        "bytes": 1840,
+        "sha256": "df53f99816ffb5d576963a8800c6a3e9a1c3eb7d9bb6caeb9d0434b8c75ce095"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/FrobeniusDegree.lean",
+        "bytes": 2118,
+        "sha256": "ff98457c7d245c1ca88220f2f290335b87040607018431ec1ab0455cb7063d22"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2264,
+        "sha256": "4e0018b9eecc0046e47a1a50b459c73900dbb2ebae6f92746492c1298f6816a7"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/RootField.lean",
+        "bytes": 4448,
+        "sha256": "d17949dac45cbfeef5497994dac9203fb20a18ab4b2aa959284b46d2934561a1"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/RootRationality.lean",
+        "bytes": 2738,
+        "sha256": "e008a55d27315b59aad315901522d2616215b397b50b2c4c5d44101d99ad8f1a"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/lakefile.toml",
+        "bytes": 400,
+        "sha256": "07a7af375473e1ab443a4eefdcde182e35e7245234c452ae8473d86b69cd8e89"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3181,
+        "sha256": "fa234c339c0a97e3bfd6bf52cf3237a9370c7628da40c1e8f4c2b9c4f21beaa3"
+      },
+      {
+        "path": "research/finite_cyclotomic_degree_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CyclotomicCertificate",
+    "FrobeniusDegree",
+    "GuardControls",
+    "RootField",
+    "RootRationality"
+  ],
+  "artifacts": [
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 16332,
+      "sha256": "ddb476645a77c723eda41b9cd161439f5a2ef0b3e8dfb9d895b08cb1a0f70a2f"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "6b464a54831f2ff0e183a338239e6b20745b2f8d53290d46e74fc2ea9a5ca0ab"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/attempts.json",
+      "bytes": 233,
+      "sha256": "22a3385700f95007ffd81603b7842678462a67ce0c70dbd4030a0fa518b7f93a"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1190,
+      "sha256": "2ea3dd8a1a7ea654a6a8a3138c3c7642e6841569064ce5047373ebc9ad5d307d"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/gate.json",
+      "bytes": 1271,
+      "sha256": "aa92694197810d744658833728a04ffd3225eda1f3c805898114ccf511e50e32"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/source-review.json",
+      "bytes": 3238,
+      "sha256": "ff9f9e183342c28128559895558c6d752ac370c61c317ac89f6bb29ac0854a8c"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/evidence/binding-check.json",
+      "bytes": 4358,
+      "sha256": "31ea34f640beb2ba8c5de80552835b86786b0bb0513daf8b63bb96815cbd1b80"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/proof-map.json",
+      "bytes": 4732,
+      "sha256": "cf45e8fdbcefa27c11f2f5804061baa5a00091846dc3688693068a3b8d6236df"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/render_report.py",
+      "bytes": 7158,
+      "sha256": "05b8c76998734993a1ab3f751c796ddb89ff960f76b94826fff5b5af3be7ddd3"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/export_binding_input.py",
+      "bytes": 1759,
+      "sha256": "f8d0545e4af97d4d6324e826768a5d62a1f37035b88bea8f5274935b7e1a3e88"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/reports/cyclotomic.svg",
+      "bytes": 1444,
+      "sha256": "0414d7242766929c2344a509a02fdb27c577c0e3df5721edfb280390f2961f91"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/reports/layout.json",
+      "bytes": 256,
+      "sha256": "fb61c60f590f759c85e7ae1db17631a3f6dbdda06e2f8e8bfd136857842a84fb"
+    },
+    {
+      "path": "research/finite_cyclotomic_degree_audit_20261115/reports/report.pdf",
+      "bytes": 46709,
+      "sha256": "16ae67189d1ae5c41c9ae1499180ccef3f614229a1cb046ea467077bbcbc0c14"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 23,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_general_cyclotomic_adjoin_degree_proved": true,
+    "actual_primitive_root_and_simple_extension_finiteness_derived": true,
+    "actual_all_root_rationality_in_finite_extensions_proved": true,
+    "actual_characteristic_p_guard_counterfamily_proved": true,
+    "r1_r2_actual_degree1_proved": true,
+    "full_geometric_elliptic_torsion_field_proved": false,
+    "general_nonprime_supersingular_at_most6_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

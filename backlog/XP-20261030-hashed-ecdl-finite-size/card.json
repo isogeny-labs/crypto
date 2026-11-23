@@ -1,0 +1,35 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261030-hashed-ecdl-finite-size",
+  "title": "Hash-selector and structured witness finite-size comparison",
+  "created": "2026-10-30",
+  "authors": ["Codex research lane"],
+  "status": "draft",
+  "status_note": "Native backend components are implemented and development-checked. The measurement driver, frozen identities/protocol, checker, cost envelope and execution admission are not ready. No job is posted.",
+  "blocked_on": [],
+  "links": {
+    "lead": "research/hashed_ecdl_finite_size_20261030/README.md",
+    "notes": ["backlog/2026-10-30-hashed-ecdl-native-ab.md"],
+    "prs": []
+  },
+  "question": "Do inverse-hash selector inputs and a structured witness backend lower full useful-relation cost against the current native hashed-base index-calculus baseline?",
+  "decision_value": "A qualified reduction against the current native baseline would justify extending this finite-size backend while retaining the source-counting implementation. Equal or higher cost, especially on natural failed queries, would redirect the next implementation decision toward width-aware encodings or checked local recursion rather than repeating generic enumeration or SAT wrappers.",
+  "protocol": {"path": null, "blob": null},
+  "code": {"repo": "crypto", "commit": null, "branch": "main", "build": []},
+  "resources": {
+    "cpus": 1, "ram_gb": 4, "disk_gb": 10, "gpu": null,
+    "est_core_hours": null, "est_wall_hours": null,
+    "notes": "Unapproved placeholder envelope; not a measured cost estimate. Freeze a derived envelope after the native driver and exact workload exist."
+  },
+  "run": {"argv": ["TODO-native-finite-size-driver"], "env": {}, "timeout_per_shard_s": 1800},
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {"result_schema": "TODO-finite-size-replay-schema", "verify": [], "land": "research/hashed_ecdl_finite_size_20261030"},
+  "cairn": {
+    "mode": "lab-task", "space": "TBD", "tasks": ["XP-20261030-hashed-ecdl-finite-size"],
+    "ttl_s": 3600,
+    "env": {"name": "TODO-digest-pinned-native-environment", "recipe": "TODO-not-implemented"},
+    "exec": {"cpus": 1, "memory_mb": 4096, "timeout_s": 1800, "sandbox": "auto", "publish": "runs/XP-20261030-hashed-ecdl-finite-size"},
+    "funding": {"units": 0, "rationale": "Unready planning card below funded experiments; no execution or funding is requested by this review."}
+  }
+}

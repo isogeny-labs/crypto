@@ -1,0 +1,27 @@
+Linearized two-summand root finding vs the Semaev pair loop (Koblitz a = 0, b = 1)
+same field Gf2, same low-order subspace V = <1, z, .., z^(l-1)>, same rational-point targets
+
+   l   n      |V|  pairs(loop) scanned(lin)    unit x absc% loop  rat% lin
+  ------------------------------------------------------------------------
+   5  15       32          528           17     31.1x      0.5      0.5
+   6  18       64         2080           77     27.0x     20.2     20.2
+   7  21      128         8256          139     59.4x     20.8     20.8
+   8  24      256        32896          255    129.0x     12.5     12.5
+   9  27      512       131328          519    253.0x     14.0     14.0
+  10  30     1024       524800          927    566.1x     10.5     10.5
+
+  per-target wall time (median target is a decide; mixed decomposable/not):
+
+   l   n      pair loop     linearized   speed-up
+  --------------------------------------------------
+   5  15        84.2 us         9.7 us       8.7x
+   6  18       325.0 us        39.7 us       8.2x
+   7  21       1.377 ms        82.1 us      16.8x
+   8  24       6.437 ms       205.9 us      31.3x
+   9  27      27.474 ms       429.6 us      64.0x
+  10  30     123.223 ms       937.2 us     131.5x
+
+  The linearized solver is exact and complete for RATIONAL decompositions (checked against an
+  independent group-law enumeration at l <= 8; every witness re-adds to R and has S4 = 0). The pair
+  loop decides the ABSCISSA question S4 = 0, a superset that also admits twist-only solutions, so a
+  real relation search lift-checks each of its hits. Pair loop O(2^(2l) l); linearized O(2^l l^2).

@@ -1,0 +1,10 @@
+[package]
+name="hec-collision-core"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="collision-core-gate"
+path="main.rs"

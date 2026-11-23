@@ -1,0 +1,4695 @@
+[
+  {
+    "name": "koblitz-n13",
+    "instance": "icv1-f2m13-t181-515ee569",
+    "arms": {
+      "fes-then-batched": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 711.6666666666666
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 2.3333333333333335
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 50
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 1658779.3333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 50.666666666666664
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 50.666666666666664
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 18.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.6666666666666667
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 49
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 44
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 49
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 99.33333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 192
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 512
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 65
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 325.6666666666667
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 33.333333333333336
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 7655
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 740.6666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 101
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 67.33333333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 6497.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 67
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 17227.333333333332
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 5712
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 3264
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 23990
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 5770870.333333333
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 1658779.3333333333
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 14.666666666666666
+        }
+      ],
+      "fes-then-inherited": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 711.6666666666666
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 2.3333333333333335
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 50
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 1658779.3333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 50.666666666666664
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 50.666666666666664
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 18.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.6666666666666667
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 49
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 44
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 49
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 99.33333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 192
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 512
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 65
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 325.6666666666667
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 33.333333333333336
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 33.666666666666664
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 7655
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 740.6666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 101
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 67.33333333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 6497.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 67
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 17227.333333333332
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 5712
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 3264
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 23990
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 5770870.333333333
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 1658779.3333333333
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 14.666666666666666
+        }
+      ],
+      "inherited-f4": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 688.3333333333334
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 1.6666666666666667
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 47
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 2369015.6666666665
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 47.333333333333336
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 47.333333333333336
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 8.666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 46
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 46
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 92.66666666666667
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 192
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 512
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 65
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 324.3333333333333
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 31
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 7040.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 689.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 94
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 62.666666666666664
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 6047.333333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 62.333333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 16205.666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 5376
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 3072
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 334183.6666666667
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 16446200
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 2369015.6666666665
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 14.666666666666666
+        }
+      ],
+      "pair-table": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 567.6666666666666
+        },
+        {
+          "counter": "decomposition.native.lookups",
+          "class": "C",
+          "mean_count": 47
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 47.333333333333336
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 47.333333333333336
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 8.666666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 46
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 46
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 92.66666666666667
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 127
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 192
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 512
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 65
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 324.3333333333333
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 31
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 31.333333333333332
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 7040.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 689.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 94
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 62.666666666666664
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 6047.333333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 62.333333333333336
+        },
+        {
+          "counter": "setup.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 8256
+        },
+        {
+          "counter": "setup.work_native.table_insert_attempts",
+          "class": "U",
+          "mean_count": 8192
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 14.666666666666666
+        }
+      ]
+    },
+    "rho": {
+      "emitted_per_run_fields": [
+        "planted",
+        "s",
+        "s_walk",
+        "seed",
+        "steps",
+        "steps_over_expected",
+        "verified"
+      ],
+      "unpriced_counters_emitted": [],
+      "note": "The matched rho records emit no unpriced counter (no canonicalisation, distinguished-point test, Frobenius map or table operation counts); only steps (walk group additions) and S. U_rho = 0 in the strict band, so rho is a lower bound at w > 0; rho_ext_* charge k native ops per walk step as a sensitivity.",
+      "mean_steps": 46.625
+    }
+  },
+  {
+    "name": "char2-n15",
+    "instance": "icv1-f2m15-tm249-9e24ae34",
+    "arms": {
+      "fes-then-batched": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 753
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 45.333333333333336
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 4174774.6666666665
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 10.333333333333334
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 89.33333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 393
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 1179
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 132
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 226.66666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 27
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 10764.333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 719.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 83
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 55.333333333333336
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 10900.666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 54.666666666666664
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 20029.333333333332
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 6672
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 3753
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 537898
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 27981443
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 4174774.6666666665
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 15.666666666666666
+        }
+      ],
+      "fes-then-inherited": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 753
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 45.333333333333336
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 4934462.333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 10.333333333333334
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 89.33333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 393
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 1179
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 132
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 226.66666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 27
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 10764.333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 719.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 83
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 55.333333333333336
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 10900.666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 54.666666666666664
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 20029.333333333332
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 6672
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 3753
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 537898
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 31067306.666666668
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 4934462.333333333
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 15.666666666666666
+        }
+      ],
+      "inherited-f4": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 753
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 45.333333333333336
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 4934462.333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 10.333333333333334
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 89.33333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 393
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 1179
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 132
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 226.66666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 27
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 10764.333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 719.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 83
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 55.333333333333336
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 10900.666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 54.666666666666664
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 20029.333333333332
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 6672
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 3753
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 541525.6666666666
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 31098202.333333332
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 4934462.333333333
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 15.666666666666666
+        }
+      ],
+      "pair-table": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 640
+        },
+        {
+          "counter": "decomposition.native.lookups",
+          "class": "C",
+          "mean_count": 45.333333333333336
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 45.666666666666664
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 10.333333333333334
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 44.333333333333336
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 89.33333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 255
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 393
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 1179
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 132
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 226.66666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 27
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 27.666666666666668
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 10764.333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 719.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 83
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 55.333333333333336
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 10900.666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 54.666666666666664
+        },
+        {
+          "counter": "setup.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 34453
+        },
+        {
+          "counter": "setup.work_native.table_insert_attempts",
+          "class": "U",
+          "mean_count": 34322
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 15.666666666666666
+        }
+      ]
+    },
+    "rho": {
+      "emitted_per_run_fields": [
+        "planted",
+        "s",
+        "s_walk",
+        "seed",
+        "steps",
+        "steps_over_expected",
+        "verified"
+      ],
+      "unpriced_counters_emitted": [],
+      "note": "The matched rho records emit no unpriced counter (no canonicalisation, distinguished-point test, Frobenius map or table operation counts); only steps (walk group additions) and S. U_rho = 0 in the strict band, so rho is a lower bound at w > 0; rho_ext_* charge k native ops per walk step as a sensitivity.",
+      "mean_steps": 77.9375
+    }
+  },
+  {
+    "name": "koblitz-n17",
+    "instance": "icv1-f2m17-tm101-00378d4e",
+    "arms": {
+      "fes-then-batched": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 1367.3333333333333
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 31987800.666666668
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 297.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 750
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 2250
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 251
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 966.6666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 95
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 80548.33333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 3252.6666666666665
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 287
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 191.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 71845.66666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 190.66666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 81473
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 27120
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 15066.666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 2676137.6666666665
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 193180999
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 31987800.666666668
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 21.666666666666668
+        }
+      ],
+      "fes-then-inherited": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 1367.3333333333333
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 39175344.666666664
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 297.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 750
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 2250
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 251
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 966.6666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 95
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 80548.33333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 3252.6666666666665
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 287
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 191.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 71845.66666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 190.66666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 81473
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 27120
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 15066.666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 2676137.6666666665
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 230377195.33333334
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 39175344.666666664
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 21.666666666666668
+        }
+      ],
+      "inherited-f4": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 1367.3333333333333
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 39175344.666666664
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 297.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 750
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 2250
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 251
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 966.6666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 95
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 80548.33333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 3252.6666666666665
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 287
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 191.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 71845.66666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 190.66666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 81473
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 27120
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 15066.666666666666
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 2682215
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 230434853
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 39175344.666666664
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 21.666666666666668
+        }
+      ],
+      "pair-table": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 983
+        },
+        {
+          "counter": "decomposition.native.lookups",
+          "class": "C",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 149.66666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 148.66666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 297.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 511
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 750
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 2250
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 251
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 966.6666666666666
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 95
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 95.66666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 80548.33333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 3252.6666666666665
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 287
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 191.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 71845.66666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 190.66666666666666
+        },
+        {
+          "counter": "setup.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 125250
+        },
+        {
+          "counter": "setup.work_native.table_insert_attempts",
+          "class": "U",
+          "mean_count": 125000
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 21.666666666666668
+        }
+      ]
+    },
+    "rho": {
+      "emitted_per_run_fields": [
+        "planted",
+        "s",
+        "s_walk",
+        "seed",
+        "steps",
+        "steps_over_expected",
+        "verified"
+      ],
+      "unpriced_counters_emitted": [],
+      "note": "The matched rho records emit no unpriced counter (no canonicalisation, distinguished-point test, Frobenius map or table operation counts); only steps (walk group additions) and S. U_rho = 0 in the strict band, so rho is a lower bound at w > 0; rho_ext_* charge k native ops per walk step as a sensitivity.",
+      "mean_steps": 257.75
+    }
+  },
+  {
+    "name": "koblitz-n19",
+    "instance": "icv1-f2m19-tm797-9c54981b",
+    "arms": {
+      "fes-then-batched": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 2032
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 132789912.66666667
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 550.6666666666666
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 1563
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 5731
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 522
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 1826.6666666666667
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 185.66666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 312513.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 7080.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 559
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 372.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 291425.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 372
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 183177.33333333334
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 61013.333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 33557.333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 17278799.333333332
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 646332097
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 132789912.66666667
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 24.333333333333332
+        }
+      ],
+      "fes-then-inherited": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 2032
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 149591538.66666666
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 550.6666666666666
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 1563
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 5731
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 522
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 1826.6666666666667
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 185.66666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 312513.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 7080.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 559
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 372.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 291425.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 372
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 183177.33333333334
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 61013.333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 33557.333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 17278799.333333332
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 711467487
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 149591538.66666666
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 24.333333333333332
+        }
+      ],
+      "inherited-f4": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 2032
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 149591538.66666666
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 550.6666666666666
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 1563
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 5731
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 522
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 1826.6666666666667
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 185.66666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 312513.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 7080.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 559
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 372.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 291425.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 372
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 183177.33333333334
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 61013.333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 33557.333333333336
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 17306164
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 711706909.6666666
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 149591538.66666666
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 24.333333333333332
+        }
+      ],
+      "pair-table": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 1290.3333333333333
+        },
+        {
+          "counter": "decomposition.native.lookups",
+          "class": "C",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 276.3333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 275.3333333333333
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 550.6666666666666
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 1023
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 1563
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 5731
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 522
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 1826.6666666666667
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 185.66666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 186.33333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 312513.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 7080.666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 559
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 372.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 291425.3333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 372
+        },
+        {
+          "counter": "setup.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 543403
+        },
+        {
+          "counter": "setup.work_native.table_insert_attempts",
+          "class": "U",
+          "mean_count": 542882
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 24.333333333333332
+        }
+      ]
+    },
+    "rho": {
+      "emitted_per_run_fields": [
+        "planted",
+        "s",
+        "s_walk",
+        "seed",
+        "steps",
+        "steps_over_expected",
+        "verified"
+      ],
+      "unpriced_counters_emitted": [],
+      "note": "The matched rho records emit no unpriced counter (no canonicalisation, distinguished-point test, Frobenius map or table operation counts); only steps (walk group additions) and S. U_rho = 0 in the strict band, so rho is a lower bound at w > 0; rho_ext_* charge k native ops per walk step as a sensitivity.",
+      "mean_steps": 468.375
+    }
+  },
+  {
+    "name": "char2-n21",
+    "instance": "icv1-f2m21-tm1325-b6925563",
+    "arms": {
+      "fes-then-batched": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 4422
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 2
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 775619100.3333334
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1691.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 3015
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 11055
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 1006
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 6242
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 528.6666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 1852854.6666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 22218
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1587
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1058
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 1595464
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1057.6666666666667
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 671020
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 223784
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 122064
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 80744005
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 3775790768.6666665
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 775619100.3333334
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 26.666666666666668
+        }
+      ],
+      "fes-then-inherited": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 4422
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 2
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 918505492.3333334
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1691.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 3015
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 11055
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 1006
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 6242
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 528.6666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 1852854.6666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 22218
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1587
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1058
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 1595464
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1057.6666666666667
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 671020
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 223784
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 122064
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 80744005
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 4419167376
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 918505492.3333334
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 26.666666666666668
+        }
+      ],
+      "inherited-f4": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 4422
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 2
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 918505492.3333334
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1691.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 3015
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 11055
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 1006
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 6242
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 528.6666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 1852854.6666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 22218
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1587
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1058
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 1595464
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1057.6666666666667
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 671020
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 223784
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 122064
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 80788009
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 4419642379.666667
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 918505492.3333334
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 26.666666666666668
+        }
+      ],
+      "pair-table": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 2330.3333333333335
+        },
+        {
+          "counter": "decomposition.native.lookups",
+          "class": "C",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 846.6666666666666
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 34
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 845.6666666666666
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1691.3333333333333
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 2047
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 3015
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 11055
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 1006
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 6242
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.native.single_column_rows",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 528.6666666666666
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 529
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 1852854.6666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 22218
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 1587
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1058
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 1595464
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1057.6666666666667
+        },
+        {
+          "counter": "setup.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 2021055
+        },
+        {
+          "counter": "setup.work_native.table_insert_attempts",
+          "class": "U",
+          "mean_count": 2020050
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 26.666666666666668
+        }
+      ]
+    },
+    "rho": {
+      "emitted_per_run_fields": [
+        "planted",
+        "s",
+        "s_walk",
+        "seed",
+        "steps",
+        "steps_over_expected",
+        "verified"
+      ],
+      "unpriced_counters_emitted": [],
+      "note": "The matched rho records emit no unpriced counter (no canonicalisation, distinguished-point test, Frobenius map or table operation counts); only steps (walk group additions) and S. U_rho = 0 in the strict band, so rho is a lower bound at w > 0; rho_ext_* charge k native ops per walk step as a sensitivity.",
+      "mean_steps": 996.4375
+    }
+  },
+  {
+    "name": "koblitz-n23",
+    "instance": "icv1-f2m23-tm5197-1f85e9e1",
+    "arms": {
+      "fes-then-batched": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 6720.666666666667
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 1376
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 2854847233.3333335
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 22.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2750.6666666666665
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 6060
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 24240
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 2021
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 861
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 9754.333333333334
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 5787945.666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 39606
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2584
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 5220541.333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 1287984.3333333333
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 429624
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 232713
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 132713178
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 11352775919.666666
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 2854847233.3333335
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 32
+        }
+      ],
+      "fes-then-inherited": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 6720.666666666667
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 1376
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 3498723453.6666665
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 22.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2750.6666666666665
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 6060
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 24240
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 2021
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 861
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 9754.333333333334
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 5787945.666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 39606
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2584
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 5220541.333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 1287984.3333333333
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 429624
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 232713
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 132713178
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 15885143535.333334
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 3498723453.6666665
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 32
+        }
+      ],
+      "inherited-f4": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 6720.666666666667
+        },
+        {
+          "counter": "decomposition.native.lift_failures",
+          "class": "descriptive",
+          "mean_count": 0.6666666666666666
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.solver_calls",
+          "class": "descriptive",
+          "mean_count": 1376
+        },
+        {
+          "counter": "decomposition.native.solver_ops",
+          "class": "C_solver(same count as solver.ops)",
+          "mean_count": 3498723453.6666665
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.unliftable_systems",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 22.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2750.6666666666665
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 6060
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 24240
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 2021
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 861
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 9754.333333333334
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 5787945.666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 39606
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2584
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 5220541.333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "solver.extra.bitop_field_adds",
+          "class": "solver_bitop_tally",
+          "mean_count": 1287984.3333333333
+        },
+        {
+          "counter": "solver.extra.bitop_field_muls",
+          "class": "solver_bitop_tally",
+          "mean_count": 429624
+        },
+        {
+          "counter": "solver.extra.bitop_field_sqrs",
+          "class": "solver_bitop_tally",
+          "mean_count": 232713
+        },
+        {
+          "counter": "solver.extra.bitop_hash_probes",
+          "class": "solver_bitop_tally",
+          "mean_count": 132778367.33333333
+        },
+        {
+          "counter": "solver.extra.bitop_word_ops",
+          "class": "solver_bitop_tally",
+          "mean_count": 15885750797.333334
+        },
+        {
+          "counter": "solver.ops",
+          "class": "C_solver",
+          "mean_count": 3498723453.6666665
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 32
+        }
+      ],
+      "pair-table": [
+        {
+          "counter": "decomposition.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 3299.3333333333335
+        },
+        {
+          "counter": "decomposition.native.lookups",
+          "class": "C",
+          "mean_count": 1376
+        },
+        {
+          "counter": "decomposition.native.relations",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "decomposition.native.repeated_targets_skipped",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.target_guard_probes",
+          "class": "C",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.trials",
+          "class": "descriptive",
+          "mean_count": 1376.3333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_jumps",
+          "class": "descriptive",
+          "mean_count": 16.333333333333332
+        },
+        {
+          "counter": "decomposition.native.walk_pool_offsets",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_pool_ops",
+          "class": "descriptive",
+          "mean_count": 22.666666666666668
+        },
+        {
+          "counter": "decomposition.native.walk_pool_restarts",
+          "class": "descriptive",
+          "mean_count": 0.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_restarts",
+          "class": "descriptive",
+          "mean_count": 1.3333333333333333
+        },
+        {
+          "counter": "decomposition.native.walk_steps",
+          "class": "descriptive",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.target_rng_draws",
+          "class": "counted_not_charged",
+          "mean_count": 39
+        },
+        {
+          "counter": "decomposition.work_native.walk_mix_hashes",
+          "class": "counted_not_charged",
+          "mean_count": 1375
+        },
+        {
+          "counter": "decomposition.work_native.walk_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2750.6666666666665
+        },
+        {
+          "counter": "factor_base.native.abscissae_scanned",
+          "class": "descriptive",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.native.as_solves",
+          "class": "C",
+          "mean_count": 4095
+        },
+        {
+          "counter": "factor_base.work_native.index_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 6060
+        },
+        {
+          "counter": "factor_base.work_native.index_sort_word_ops",
+          "class": "counted_not_charged",
+          "mean_count": 24240
+        },
+        {
+          "counter": "linear_algebra.native.columns",
+          "class": "descriptive",
+          "mean_count": 2021
+        },
+        {
+          "counter": "linear_algebra.native.rank",
+          "class": "descriptive",
+          "mean_count": 861
+        },
+        {
+          "counter": "linear_algebra.native.row_ops",
+          "class": "C",
+          "mean_count": 9754.333333333334
+        },
+        {
+          "counter": "linear_algebra.native.rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.native.two_column_rows",
+          "class": "descriptive",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.column_part_inserts",
+          "class": "counted_not_charged",
+          "mean_count": 861.3333333333334
+        },
+        {
+          "counter": "linear_algebra.work_native.gauss_entries_scanned",
+          "class": "counted_not_charged",
+          "mean_count": 5787945.666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.pivot_inversion_steps",
+          "class": "counted_not_charged",
+          "mean_count": 39606
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_adds",
+          "class": "counted_not_charged",
+          "mean_count": 2584
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_modr_muls",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "linear_algebra.work_native.row_build_words",
+          "class": "counted_not_charged",
+          "mean_count": 5220541.333333333
+        },
+        {
+          "counter": "linear_algebra.work_native.row_key_mixes",
+          "class": "counted_not_charged",
+          "mean_count": 1722.6666666666667
+        },
+        {
+          "counter": "setup.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 8162820
+        },
+        {
+          "counter": "setup.work_native.table_insert_attempts",
+          "class": "U",
+          "mean_count": 8160800
+        },
+        {
+          "counter": "verify.group_ops.adds+doubles",
+          "class": "group_ops (1 GAE each)",
+          "mean_count": 32
+        }
+      ]
+    },
+    "rho": {
+      "emitted_per_run_fields": [
+        "planted",
+        "s",
+        "s_walk",
+        "seed",
+        "steps",
+        "steps_over_expected",
+        "verified"
+      ],
+      "unpriced_counters_emitted": [],
+      "note": "The matched rho records emit no unpriced counter (no canonicalisation, distinguished-point test, Frobenius map or table operation counts); only steps (walk group additions) and S. U_rho = 0 in the strict band, so rho is a lower bound at w > 0; rho_ext_* charge k native ops per walk step as a sensitivity.",
+      "mean_steps": 359.6875
+    }
+  }
+]

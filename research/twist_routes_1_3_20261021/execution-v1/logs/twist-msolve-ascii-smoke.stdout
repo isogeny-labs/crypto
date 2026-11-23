@@ -1,0 +1,55 @@
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+ 10       2       2      19 x 45         20.00%        2 new       0 zero         0.00 | 0.00         
+  9       4       4      21 x 43         26.91%        4 new       0 zero         0.00 | 0.00         
+  8       8       8      25 x 39         36.00%        4 new       4 zero         0.00 | 0.00         
+  7       8       8      23 x 33         44.66%        4 new       4 zero         0.00 | 0.00         
+  6       8       8      21 x 27         51.68%        4 new       4 zero         0.00 | 0.00         
+  5       8       8      19 x 21         54.89%        4 new       4 zero         0.00 | 0.00         
+  4       8       8      17 x 15         53.73%        3 new       5 zero         0.00 | 0.00         
+  3       6       6      13 x 10         44.62%        2 new       4 zero         0.00 | 0.00         
+  2       3       3       8 x 6          41.67%        1 new       2 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis        1 x 1         100.00%        1 new       0 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ----------------
+overall(elapsed)        0.00 sec
+overall(cpu)            0.00 sec
+select                  0.00 sec  13.5%
+symbolic prep.          0.00 sec   6.6%
+update                  0.00 sec  38.9%
+convert                 0.00 sec  13.8%
+linear algebra          0.00 sec   7.3%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                     1
+#terms in basis                   1
+#pairs reduced                   55
+#GM criterion                   410
+#redundant elements              30
+#rows reduced                   111
+#zero reductions                 27
+max. matrix data                 25 x 39 (36.000%)
+max. symbolic hash table size  2^11
+max. basis hash table size     2^16
+-----------------------------------------
+
+Grobner basis has a single element
+No solution

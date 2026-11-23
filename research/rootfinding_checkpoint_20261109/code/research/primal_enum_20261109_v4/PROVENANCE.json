@@ -1,0 +1,38 @@
+{
+  "schema": "primal-enum-provenance/v2",
+  "scientific_execution": false,
+  "parent_variant": "research/primal_enum_20261109_v3",
+  "changed_assumption": "v3 global controls name collision repaired by renaming only the newly authored definition and its one call to primal_controls",
+  "command": [
+    "python",
+    "-m",
+    "research.primal_enum_20261109_v4.worker",
+    "primal-enum-20261109-v4"
+  ],
+  "artifact": "research/primal_enum_20261109_v4/raw.json.gz",
+  "input": "research/dual_ladder_20261109_v3/planted_inputs.json",
+  "input_sha256": "403db5080e81eda5e9b5643020babf54283472b338831f4f14d7655ef5955c93",
+  "input_rule": "All same five pinned planted cases; only public values sent to native; witnesses are independent post-enumeration checks.",
+  "budget": {
+    "whole_worker_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cores": 1
+  },
+  "identical_copies": [
+    "checker.py",
+    "worker.py",
+    "frozen_lll_prefix.hpp",
+    "EXTRACTION.json",
+    "EXTERNAL_GMP.json"
+  ],
+  "source_sha256": {
+    "research/primal_enum_20261109_v4/EXTERNAL_GMP.json": "edd39099d523d2679f4a7b9ab0d09717b3701c3c1824197d9926206bee4d7301",
+    "research/primal_enum_20261109_v4/EXTRACTION.json": "8007ac88c27a7284940ba7c916c0dc681d068cebb2defe42ae16dbc6d057ff68",
+    "research/primal_enum_20261109_v4/PROOF.md": "4fb6501acc983fabf1c699c90aeaf350f32dccec4e14cd4dcb5701b3c7607590",
+    "research/primal_enum_20261109_v4/STATIC_SYMBOL_AUDIT.json": "d1b68c11d102e82a6047fec72184baa8afc525f04cb305e1779a27b3aa4cd4ed",
+    "research/primal_enum_20261109_v4/checker.py": "ab68a5675adb6a047d621d129454626a6e87d3d692b05054c20f56d1bedc377b",
+    "research/primal_enum_20261109_v4/frozen_lll_prefix.hpp": "0ff2791be39425e7fade63ec285a9f9fec1da0cff6d290d2df23c4f8fd514c89",
+    "research/primal_enum_20261109_v4/native.cpp": "53757348f093db325504ae82b0709c9baa0032c209f5633447140286647e98a4",
+    "research/primal_enum_20261109_v4/worker.py": "397bdee6513aa3fd7dbbefd6cf803d193fe118cd49108bd401600d81af0df517"
+  }
+}

@@ -1,0 +1,11 @@
+name = "elliptic_finite_place_projection_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticFinitePlaceProjectionAudit"]
+
+[[require]]
+name = "elliptic_ramified_norm_projection_audit"
+path = "../../elliptic_ramified_norm_projection_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticFinitePlaceProjectionAudit"
+roots = ["FinitePlaceValuation", "FinitePlaceImports", "FinitePlaceFiber", "FinitePlaceResidue", "FinitePlaceSymbol", "FinitePlaceProjection", "FinitePlaceControls", "FinitePlaceCertificate"]

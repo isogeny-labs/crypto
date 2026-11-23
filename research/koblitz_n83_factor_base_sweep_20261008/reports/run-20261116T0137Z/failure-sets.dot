@@ -1,0 +1,10 @@
+digraph failures {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.45", ranksep="0.55", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#e8f0f6", color="#294b63", fontname="Helvetica", fontsize=13];
+  edge [color="#42586b", penwidth=1.6, fontname="Helvetica", fontsize=11];
+  mac [label="Prior macOS source\n63 failed names\nacbda5793b6b"];
+  shared [label="45 shared names\n0 Linux-only\n18 macOS-only", fillcolor="#f5e2d7", color="#a04a32"];
+  linux [label="Current Linux source\n45 failed names\n6a8d673562ae"];
+  mac -> shared [label="set comparison"];
+  shared -> linux [label="not a paired run"];
+}

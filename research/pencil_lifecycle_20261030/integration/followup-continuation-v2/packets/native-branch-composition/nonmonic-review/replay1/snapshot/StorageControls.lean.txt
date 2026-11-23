@@ -1,0 +1,31 @@
+import StorageEndpoint
+set_option autoImplicit false
+namespace StorageControls
+open QuotientStorage CoefficientTraversal MonicRemainder
+
+theorem empty_input : wordDiv 17 [16,1] [] 0=some ([],[]) := by decide
+
+theorem all_zero_input : wordDiv 17 [16,1] [0,0,0] 0=some ([],[]) := by decide
+
+theorem empty_divisor : wordDiv 17 [] [1] 3=none := by decide
+
+theorem exact_words : wordDiv 17 [16,1] [16,0,1] 3=some ([1,1],[]) := by decide
+
+theorem nonexact_words : wordDiv 17 [16,1] [1,0,1] 3=some ([1,1],[2]) := by decide
+
+theorem leading_zero_input : wordDiv 17 [16,1] [16,0,1,0,0] 5=some ([1,1],[]) := by decide
+
+theorem constant_divisor : wordDiv 17 [1] [2,3,4] 3=some ([2,3,4],[]) := by decide
+
+theorem insufficient_fuel : wordDiv 17 [16,1] [16,0,1] 1=none := by decide
+
+theorem repeated_write : (put (put (ProductPolynomial.zeros 3) ⟨1,by decide⟩ 4) ⟨1,by decide⟩ 7).val=#[0,7,0] := by decide
+
+theorem zero_capacity_guard : wloop 17 [16,1] 3 (ProductPolynomial.zeros 0) [16,0,1]=none := by decide
+
+theorem largest_usize_input : (2^64-1:Nat)-1+1<2^64 := by decide
+
+theorem empty_divisor_overflow_boundary : ¬((2^64-1:Nat)-0+1<2^64) := by decide
+
+theorem allocation_is_nonzero (a b:Nat) : 0<a-b+1 := by omega
+end StorageControls

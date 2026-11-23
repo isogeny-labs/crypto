@@ -1,0 +1,78 @@
+{
+  "schema": "cubic-native-cold-benchmark-launch-plan/v1",
+  "status": "blocked_preflight",
+  "created": "2026-11-05",
+  "protocol_frozen": false,
+  "benchmark_submitted": false,
+  "benchmark_executions": 0,
+  "baseline": {
+    "repository": "isogeny-labs/crypto",
+    "source_revision": "2d33e9c068c0f2b3226893017c8ea48548cc0749",
+    "implementation_pr": 2893,
+    "native_driver": "../transfer_test.cpp",
+    "source_controls": "../source_adapter.rs",
+    "curve_primes": [109, 157],
+    "subgroup_orders": [1293169, 3868159],
+    "input_law": "Public known-answer targets generated separately; solver APIs receive nine public lines and no scalar."
+  },
+  "planned_panel": {
+    "targets_per_curve": 8,
+    "target_generation_seeds": {"109": 500001109, "157": 500001157},
+    "measured_rounds": 5,
+    "nuisance_seeds": [2026110501, 2026110502, 2026110503, 2026110504, 2026110505],
+    "warmups_per_target_arm": 1,
+    "arms": [
+      "source-rho",
+      "source-rho-neg",
+      "source-rho-neg-aa",
+      "full-transfer-ic",
+      "full-transfer-target-rho"
+    ],
+    "measured_executions": 400,
+    "warmup_executions": 80,
+    "arm_order": "Interleave a preregistered permutation within each target/round block; no cross-target tables or retained algebraic setup.",
+    "fresh_process_per_execution": true,
+    "preserve_failures_and_retries": true
+  },
+  "accounting": {
+    "requested_primary": "Complete cold pipeline wall time through recovery and source verification, including setup, failed chart choices and retries.",
+    "reusable_setup": "Record separately; never substitute amortized or target-only cost for the requested cold total.",
+    "online_interval": "Do not relabel a mixed setup interval as online time. A separate online result requires explicit native phase instrumentation.",
+    "partial_counters": "Retain each native target-call M/I/NAT/LA scope. These are not complete FLINT/Singular or whole-pipeline GAE prices.",
+    "performance_admission": "Requires the frozen experiment.protocol/v1, actual per-execution L2 observations, A/A admission, source checks, independent replay and applicable full native pricing."
+  },
+  "proposed_resources": {
+    "backend": "existing IsoLab EKS Spot",
+    "account": "104186811093",
+    "region": "us-east-2",
+    "instance_type": "c8a.2xlarge",
+    "cpu_request_and_limit": 4,
+    "memory_request_and_limit": "8Gi",
+    "algorithm_threads": 1,
+    "concurrent_jobs": 1,
+    "maximum_elapsed_seconds": 21600,
+    "automatic_measurement_retries": 0,
+    "total_cost_ceiling_usd": 5,
+    "ceiling_includes": ["builds", "queue and idle worker time", "failed attempts", "storage", "transfer", "status polling"],
+    "spend_reserved_usd": null,
+    "daily_and_monthly_headroom": null,
+    "launch_allowed": false
+  },
+  "launch_gates": [
+    "Obtain an existing authorized operator role/runner or the documented scoped launch and image-publication permissions; do not grant access from this session.",
+    "Read current daily/monthly budgets and charged/reserved spending; verify live NodePool and namespace quota headroom.",
+    "Finish the standalone native measured-command integration, preserving the actual source-to-Jacobian pipeline and refusing absent isolation evidence.",
+    "Complete the strongest-applicable-source-reference review and native phase/pricing obligations before freezing comparative claims.",
+    "Validate and freeze experiment.protocol/v1 and its native analysis before affected timing data; disclose the earlier correctness pilots.",
+    "Push exact source, inputs, protocol and launch configuration, retain check-experiment-git receipt, and pass the official S3 checkpoint gate.",
+    "Build/publish one source-bound digest image and submit the exact immutable request once; reconcile ambiguous submissions by original identity.",
+    "Retain and hash all raw outputs, failures, Job/Pod identities and resource observations; do not treat command-job success as L2 admission."
+  ],
+  "sources_checked": [
+    "Tian arXiv:2012.07173, Algorithms 1-2 and sections 3.1-3.2, reviewed in this conversation",
+    "../NATIVE_MAP.md and ../REQUIREMENTS.md",
+    "taskq/deploy/eks-karpenter/{HARNESS,ACCESS,COST_CONTROLS}.md at the source revision above",
+    ".agents/skills/isolab-eks/SKILL.md and its submission reference",
+    "isogeny-labs/crypto-autoresearcher:.claude/skills/experiment-protocol/SKILL.md"
+  ]
+}

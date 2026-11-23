@@ -1,0 +1,10 @@
+[package]
+name="hec-public-source-normalization"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../counted/native"}
+[[bin]]
+name="public-source-normalization"
+path="../main.rs"

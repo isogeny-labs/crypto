@@ -1,0 +1,58 @@
+import EliminationField
+set_option autoImplicit false
+namespace Solve4Stage
+abbrev WRow := Fin 5 → UInt64
+def canonical (p : UInt64) (v : WRow) : Prop := ∀ j,(v j).toNat<p.toNat
+def decode (p : UInt64) (v : WRow) : Row (ZMod p.toNat) := fun j=>(v j).toNat
+def nativeSub (p a b : UInt64) := (a+p-b)%p
+def eliminate (p : UInt64) (col : Fin 4) (v pivot : WRow) : WRow :=
+ let z:=v col.castSucc
+ fun j=>if col.val≤j.val then nativeSub p (v j) (WordComparator.mul p z (pivot j)) else v j
+
+theorem sub_decode (p a b : UInt64) (hb : p.toNat≤2^32)
+ (ha : a.toNat<p.toNat) (hc : b.toNat<p.toNat) :
+ ((nativeSub p a b).toNat:ZMod p.toNat)=(a.toNat:ZMod p.toNat)-(b.toNat:ZMod p.toNat) := by
+ have hab : a.toNat+p.toNat<2^64 := by omega
+ have he : (a+p).toNat=a.toNat+p.toNat := by rw [UInt64.toNat_add,Nat.mod_eq_of_lt hab]
+ have hle : b≤a+p := by rw [UInt64.le_iff_toNat_le,he];omega
+ rw [nativeSub,UInt64.toNat_mod,UInt64.toNat_sub_of_le _ _ hle,he,ZMod.natCast_mod,Nat.cast_sub (by omega : b.toNat≤a.toNat+p.toNat)]
+ simp
+
+theorem sub_canonical (p a b : UInt64) (hp : 0<p.toNat) : (nativeSub p a b).toNat<p.toNat := by
+ rw [nativeSub,UInt64.toNat_mod];exact Nat.mod_lt _ hp
+
+theorem eliminate_refines (p : UInt64) [Fact p.toNat.Prime] (col : Fin 4) (v pivot : WRow)
+ (hp : 0<p.toNat) (hb : p.toNat≤2^32) (hv : canonical p v) (hpiv : canonical p pivot) :
+ canonical p (eliminate p col v pivot) ∧
+ decode p (eliminate p col v pivot)=suffix col (decode p v) (decode p pivot) (decode p v col.castSucc) := by
+ constructor
+ · intro j
+   by_cases h:col.val≤j.val
+   · exact by simpa only [eliminate,if_pos h] using sub_canonical p (v j) (WordComparator.mul p (v col.castSucc) (pivot j)) hp
+   · simpa only [eliminate,if_neg h] using hv j
+ · funext j
+   by_cases h:col.val≤j.val
+   · simp only [decode,eliminate,suffix,if_pos h]
+     rw [sub_decode p _ _ hb (hv j) (WordComparator.mul_canonical _ _ _ hp),WordComparator.mul_decode _ _ _ hb (hv col.castSucc) (hpiv j)]
+   · simp [decode,eliminate,suffix,h]
+
+theorem word_equation_preserved (p : UInt64) [Fact p.toNat.Prime] (col : Fin 4)
+ (v pivot : WRow) (x : Vector (ZMod p.toNat)) (hb : p.toNat≤2^32)
+ (hv : canonical p v) (hpiv : canonical p pivot)
+ (hzero : ∀ j : Fin 5,j.val<col.val→pivot j=0)
+ (hsolve : residual (decode p pivot) x=0) :
+ residual (decode p (eliminate p col v pivot)) x=0 ↔ residual (decode p v) x=0 := by
+ rw [(eliminate_refines p col v pivot (Fact.out:p.toNat.Prime).pos hb hv hpiv).2]
+ apply equation_preserved col (decode p v) (decode p pivot) _ x _ hsolve
+ intro j hj;simp [decode,hzero j hj]
+
+theorem word_pivot_zero (p : UInt64) [Fact p.toNat.Prime] (col : Fin 4)
+ (v pivot : WRow) (hb : p.toNat≤2^32) (hv : canonical p v) (hpiv : canonical p pivot)
+ (hunit : pivot col.castSucc=1) : eliminate p col v pivot col.castSucc=0 := by
+ have hp:0<p.toNat:=(Fact.out:p.toNat.Prime).pos
+ have h:=(eliminate_refines p col v pivot hp hb hv hpiv)
+ have he:=congrFun h.2 col.castSucc
+ have hz:=pivot_zero col (decode p v) (decode p pivot) (by simp [decode,hunit])
+ rw [hz] at he
+ exact (WordComparator.canonical_eq p _ 0 (h.1 col.castSucc) hp).mpr (by simpa [decode] using he)
+end Solve4Stage

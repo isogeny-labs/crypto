@@ -1,0 +1,94 @@
+[
+  {
+    "id": "F1",
+    "severity": "info",
+    "title": "Every claimed figure recomputes from session/records.jsonl",
+    "text": "All 17 figures the producer quoted (paired ratio and its interval, mean S of five arms, the band for fes-f2, inherited-f4 and rho-sfstrong-v2) recompute from the committed records with validator-written Python within half a unit of the printed precision, and the producer's full-precision band file (claimed/band.json: every arm, every weight, charged_sum, native_sum) and paired comparison (claimed/comparisons/...: ratio, ci95, arm means, the eight per-workload ratios, the band ratios) agree to <= 1e-9 relative. Accounting: every record's total_gae equals its phase sum (max |dev| 1.8e-12), cost.s = total_gae / sqrt(2003) exactly, and on every IC record G - C equals its group adds + doubles at 1 GAE (max |dev| 1.8e-12), so C (the pinned native and solver charge, docs/ic/calibration.json K_0/GF(2^13) at e9d5dbdccd) is exactly the non-group part of G.",
+    "evidence": ["validation/recompute.json", "validation/headline.json"]
+  },
+  {
+    "id": "F2",
+    "severity": "major",
+    "title": "H1 is not supported as frozen: the order flips at w = 0 (band verdict 'unresolved inside the band')",
+    "text": "The paired ratio fes/inherited is 0.70811 with 95 % interval [0.66829, 0.75031] (linearised t over 8 workloads, df 7, log scale): entirely below 1, and 47 of 48 pairs have fes below inherited (the exception, Wee0cc1d80340 round 5, tried 70 targets with fes against 26 with inherited: ratio 1.644). But the band means are fes 15.17711 vs inherited 15.17432 at w = 0 (ratio 1.000184), 3081.763 vs 4621.699 at w = 0.1 (0.6668) and 30681.04 vs 46080.42 at w = 1 (0.6658): the order does not hold at every weight, so the frozen conjunction fails. The amendment before freeze says to report this as 'unresolved inside the band', not as a win or a loss, which is the producer's reading. The w = 0 difference is 6 group operations out of 32,598 summed over the 48 measured runs (0.018 %); both arms tried exactly 2,007 targets in total (mean 41.8125); 40 of 48 pairs differ by a few group operations because the two solvers return different decompositions, and 10 pairs differ in targets tried. No improvement of fes-f2 over inherited-f4 may be claimed from this session under AGENTS.md 5a; the 0.708 ratio is the calibration-point reading (word XORs at the pinned 0.002304 GAE), a further point that never replaces the band.",
+    "evidence": ["validation/recompute.json H1, paired_fes_over_inherited, band_ranks"]
+  },
+  {
+    "id": "F3",
+    "severity": "major",
+    "title": "Route deviation: no Iso Lab L2 gate; no wall figure from this session is admissible",
+    "text": "The protocol's instrument is the Iso Lab EKS L2 pod (C-audit: 'L2 gate accepted'). The run used a Runpod CPU pod (owner decision, AWS budget exhausted): a container on a shared AMD EPYC 9575F host with 128 logical CPUs (loadavg 54-67 at preflight; p95 foreign busy 75.6 % in the claimed comparison's quality block), no isolcpus/nohz_full, schedutil governor, boost on. There is no l2-gate.json, control-comparison.json, result.json or image digest; protocol.instrument.image stays PLACEHOLDER and links.request (request.json) was never created. Grades: rho arms L1 x 48 each (solves of about 0.1 ms are under the 1 ms L2 minimum), pair table L1 46 / L2 2, inherited-f4 L2 43 / L1 5, fes-f2 L2 44 / L1 4. S is a count, unaffected: the replay on a different host class (Intel Xeon KVM guest) reproduced all 288 measured runs identically. H4 already excludes wall claims; the comparison's wall block (0.163 ns/GAE ratio, end-to-end 0.116) must not be cited.",
+    "evidence": ["session/session.json preflight", "session/records.jsonl isolation", "validation/recompute.json arms.*.isolation_levels", "claimed/comparisons/*.json quality"]
+  },
+  {
+    "id": "F4",
+    "severity": "major",
+    "title": "C-aa (A/A control) fails its frozen threshold; the threshold was unattainable for this spec on any host",
+    "text": "C-aa requires wall.status admitted, pairs_below_level 0, aa_pairs >= 5 and an aa_ci95. The A/A arms (rho-sfstrong-v2 vs rho-sfstrong-v2-aa) have 0 pairs at L2 or above, so aa_pairs = 0 and no aa_ci95: FAIL. Every A/A record's L2 blocker is 'solve too short to admit wall time' (about 0.12 ms against the 1.0 ms minimum), which would hold on Iso Lab too: the frozen A/A threshold could not be met by this spec on any host. The claimed comparison prints wall.status 'admitted' with reasons '9 of 48 pairs did not reach L2' and 'the A/A arms ... have 0 admitted pairs'; that status does not encode the protocol threshold and must not be read as a C-aa pass. At the count level the A/A is exact: 48/48 pairs identical (total_gae, counters, recovered scalar), ops ratio 1.0, band 'unresolved' only because the two arms are equal.",
+    "evidence": ["validation/recompute.json aa_control", "claimed/comparisons/*.json wall"]
+  },
+  {
+    "id": "F5",
+    "severity": "major",
+    "status": "open",
+    "title": "Binary-to-source binding is asserted by the producer and corroborated, not rebuilt",
+    "text": "session.json and every record carry binary_sha256 8f9576b5...e5130f4 but git_commit null and git_dirty null. The binary is the producer's local build from 'git archive e9d5dbdccd' on an unisolated container (smoke/build.json: 'Local smoke binary, not the measured binary'; rustc 1.97.0 2d8144b78), not the Iso Lab publish-only CI build the protocol names. Corroboration: smoke/build.json with this hash was committed in 03ac49860a (2026-11-12 16:40 Z) together with the frozen protocol and spec, 56 h before the run; the pod checked the hash before running (pod.log, inputs.sha256); the binary embeds the rustc commit 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3; and a string fingerprint fits e9d5dbdccd (it contains 'inherited-f4-next' and 'rootfind-mitm-prime-batch', present at e9d5dbdccd, and lacks 'fes-then-inherited', 'fes-then-batched' and 'inherited-f4-batched', added by 4840612771, 4900647bcd and 1da7694876 just after). The candidate's counts are structurally consistent (fes-f2: points = calls x 2^14 on every record, ops - 2 x points = 391-402 word XORs per call). A replay with the same binary cannot detect a binary that miscounts; the scalar check can only vouch for the answers. Not rebuilt here because the dispatch forbade extracting the tree (disk). To close: build ecbench from e9d5dbdccd on a host with disk (CI or a scratch host), run 'ecbench verify --dir research/fes_k13_validated_20261112/runpod-a1/session --replay-all --exit-code' and require 288/288 identical.",
+    "evidence": ["session/session.json", "../smoke/build.json", "pod.log", "validation/replay-host.json build", "validation/recompute.json fes_f2_count_structure"]
+  },
+  {
+    "id": "F6",
+    "severity": "minor",
+    "title": "Attempt history incomplete: launch 1 is not recorded",
+    "text": "The pod script is labelled 'launch 2' and the S3 results sit under launch2/; the session log entry 2026-11-15T00:15Z names pod buxbpz0nckybva (Runpod cpu3c, ubuntu:24.04), whereas the measured pod was cpu5m with runpod/base:1.0.2-ubuntu2404 (dispatch; host d4db6690f94f in pod.log). No launch1/ object exists in the S3 prefix and nothing in the evidence says what launch 1 did. The protocol's stopping rule keeps failed attempts in the record. Because S is a deterministic function of binary, spec and seeds, a second attempt cannot change the counts, so this is a disclosure gap, not a measurement defect; the producer should record launch 1's outcome (refused, failed, terminated) in the study.",
+    "evidence": ["validation/tarball-check.json s3_prefix_listing", "validation/s3-copy-inputs-pod-run.sh.txt", "docs/session-logs/2026-11-15.md"]
+  },
+  {
+    "id": "F7",
+    "severity": "minor",
+    "title": "The producer wrote into the session copy (corrected before validation)",
+    "text": "The producer's 'ecbench compare --save' had written session/comparisons/ into the committed-to-be session copy, which the pod tarball does not contain; at the producer's correction it was moved to claimed/comparisons/ and band.json to claimed/band.json. The validator then compared runpod-a1/ with the tarball fetched from S3 (sha256 cd2f7736...e3e69, matching): session/ is byte-identical (5 files, the empty exec/ directory), and so are the eight top-level pod files; host.err (0 bytes) was not copied. Validated commit 4812e1b245 carries the corrected layout. Future runs: point compare --save at a copy, never at the evidence directory.",
+    "evidence": ["validation/tarball-check.json"]
+  },
+  {
+    "id": "F8",
+    "severity": "minor",
+    "title": "rho-negation's band S is a lower bound: its table work is not listed as unpriced",
+    "text": "rho-negation lists only canonicalisations_uncharged (mean U = 62.5 a run); its distinguished-point table inserts and look-ups (e.g. distinguished_points 12 in the first record) and its work_native cycle_window_word_ops (no counted: marker) are not in cost.unpriced, so the band does not charge them. The reference rho-sfstrong-v2 lists canonicalisations, partition hashes, table inserts and table queries with counts (U mean 41.5 a run). No order changes: every IC arm is at least 5.4x either rho at w = 0. Record the missing emission as an implementation gap (AGENTS.md 5a).",
+    "evidence": ["session/records.jsonl arm rho-negation", "validation/recompute.json arms.rho-negation"]
+  },
+  {
+    "id": "F9",
+    "severity": "info",
+    "title": "H2 holds; the word-XOR basis is partial for both solvers",
+    "text": "112/112 descent records (warm-ups included) have detail.decomposition.solver.priced_by = 'pinned', ns_per_word_xor in calibration_pinned_units, empty cost.unpriced, and no solver_* counter anywhere in the session. Both op_units are word XORs. inherited-f4's unit reads 'elimination, specialisation and linear elimination only': its own bitop extras show 18.46 M word ops and 428,572 hash probes against 2.34 M counted XORs in the first measured record (fes-f2: 5.63 M and 23,502 against 1.63 M). The frozen H2 basis is met; the partial coverage leans toward under-pricing inherited-f4, i.e. against the candidate.",
+    "evidence": ["validation/recompute.json H2"]
+  },
+  {
+    "id": "F10",
+    "severity": "info",
+    "title": "Distance to rho is a statement at log2 r = 10.97 only",
+    "text": "Matched rho-sfstrong-v2 (same session, binary, unit) is below every IC arm at w = 0, 0.1 and 1. S(fes-f2)/S(rho-sfstrong-v2) = 33.30 at the charged price and 5.872 / 1151.07 / 8734.35 in the band; against rho-negation 30.87 and 5.444 / 1052.72 / 7333.93. inherited-f4: 47.03 (5.871 / 1726.25 / 13118.28) and 43.60 (5.443 / 1578.76 / 11014.97). At this size rho's fixed set-up is about 40 % of its S (ecbench table flag), so these gaps are not asymptotic.",
+    "evidence": ["validation/recompute.json distance_to_rho"]
+  },
+  {
+    "id": "F11",
+    "severity": "minor",
+    "title": "The two VALIDATION.json checkers require different schemas",
+    "text": "scripts/validation_gate.py (and docs/VALIDATION_GATE.md) require schema 'validation-gate/v1'; tools/validate_validation_json.py requires 'validation/v1' and fails any other schema unless --legacy-ok, which only skips the file. No VALIDATION.json in the repository uses validation/v1 (the model research/fes_then_batched_20261112/VALIDATION.json fails it the same way). One file cannot pass both; this VALIDATION.json follows the gate schema the dispatch names.",
+    "evidence": ["validation/gate-check.txt"]
+  },
+  {
+    "id": "F12",
+    "severity": "info",
+    "title": "Bookkeeping: analysis scripts never pinned; the bench record's spreads are unlabelled",
+    "text": "protocol.analysis.script_sha256 still reads 'to be pinned'; the analysis here is ecbench compare/band (claimed side) and this directory's scripts (pinned in validator-report.json). The bench record's metric 'spread' values ([78.914, 93.868], [106.689, 138.468], [2.512, 2.659]) are ecbench table's 95 % interval of mean S, log-scale cluster t over the 8 workloads (reproduced exactly here); label them as such. The pod script (S3 inputs/pod-run.sh, sha256 07d02be0...) is the run's only command record and is not committed; a byte copy is kept as validation/s3-copy-inputs-pod-run.sh.txt. session.json spec_sha256 (d9dcc43c...) is ecbench's identity digest of the parsed spec, not the file digest; it was checked by the audit's spec_id check on both hosts, and session/spec.json is byte-identical to the frozen spec (327e0bb4...a9d76c = protocol links.spec_sha256). Committing session/records.jsonl (3.1 MB) in Git follows the 913 committed ecbench session records and AGENTS.md 12, although 13's 64 KiB data-file rule would put it in the store.",
+    "evidence": ["validation/recompute.json arms.*.mean_s_ci95_log_cluster_t", "../protocol.json analysis", "validation/s3-copy-inputs-pod-run.sh.txt"]
+  },
+  {
+    "id": "F13",
+    "severity": "info",
+    "title": "Positive control reproduces",
+    "text": "ic-pairtable-mitm2 verified 48/48 with mean S 197.489 (local reference 197.7) and is above both descent arms at the charged price, as expected. Under the band its order against either descent arm is unresolved (above at w = 0, below at w = 0.1 and 1).",
+    "evidence": ["validation/recompute.json positive_control, band_ranks"]
+  }
+]

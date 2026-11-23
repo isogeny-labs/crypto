@@ -245,6 +245,42 @@ impl FastPoint {
     };
 }
 
+/// A short-Weierstrass point in Jacobian coordinates.
+///
+/// `(X : Y : Z)` represents affine `(X/Z², Y/Z³)`. `Z = 0` is the
+/// identity. There is intentionally no projective equality operation:
+/// callers normalize a lane group with [`FastCurve::jacobian_to_affine_batch`]
+/// when they need affine coordinates or equality.
+#[derive(Clone, Copy, Debug)]
+pub struct FastJacobianPoint {
+    x: u64,
+    y: u64,
+    z: u64,
+}
+
+impl FastJacobianPoint {
+    /// The point at infinity.
+    pub const INFINITY: Self = Self { x: 0, y: 0, z: 0 };
+
+    /// Lift an affine point without field arithmetic.
+    pub fn from_affine(f: &FastField, p: FastPoint) -> Self {
+        if p.infinity {
+            Self::INFINITY
+        } else {
+            Self {
+                x: p.x,
+                y: p.y,
+                z: f.one(),
+            }
+        }
+    }
+
+    /// Whether this is the projective identity.
+    pub fn is_infinity(self) -> bool {
+        self.z == 0
+    }
+}
+
 /// How a step must be finished once its denominator has been inverted.
 ///
 /// Splitting the step in two is what lets a whole block of chains share
@@ -348,6 +384,114 @@ impl FastCurve {
                 y: self.f.neg(p.y),
                 infinity: false,
             }
+        }
+    }
+
+    /// `2P` in Jacobian coordinates (EFD `dbl-2007-bl`, general `a`).
+    ///
+    /// This is inversion-free. `Y = 0` is a point of order two, whose
+    /// double is the identity.
+    #[inline]
+    pub fn jacobian_double(&self, p: FastJacobianPoint) -> FastJacobianPoint {
+        if p.is_infinity() || p.y == 0 {
+            return FastJacobianPoint::INFINITY;
+        }
+        let f = &self.f;
+        let xx = f.sqr(p.x);
+        let yy = f.sqr(p.y);
+        let yyyy = f.sqr(yy);
+        let zz = f.sqr(p.z);
+        let t = f.add(p.x, yy);
+        let s = f.dbl(f.sub(f.sub(f.sqr(t), xx), yyyy));
+        let m = f.add(f.add(f.dbl(xx), xx), f.mul(self.a, f.sqr(zz)));
+        let x3 = f.sub(f.sqr(m), f.dbl(s));
+        let yyyy8 = f.dbl(f.dbl(f.dbl(yyyy)));
+        let y3 = f.sub(f.mul(m, f.sub(s, x3)), yyyy8);
+        let yz = f.add(p.y, p.z);
+        let z3 = f.sub(f.sub(f.sqr(yz), yy), zz);
+        FastJacobianPoint {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// `P + Q` for Jacobian `P` and affine `Q` (EFD `madd-2007-bl`).
+    ///
+    /// The ordinary path is inversion-free. The identity, inverse, and
+    /// equal-point branches match [`Self::add`].
+    #[inline]
+    pub fn jacobian_add_mixed(&self, p: FastJacobianPoint, q: FastPoint) -> FastJacobianPoint {
+        if q.infinity {
+            return p;
+        }
+        if p.is_infinity() {
+            return FastJacobianPoint::from_affine(&self.f, q);
+        }
+        let f = &self.f;
+        let z1z1 = f.sqr(p.z);
+        let u2 = f.mul(q.x, z1z1);
+        let s2 = f.mul(q.y, f.mul(p.z, z1z1));
+        let h = f.sub(u2, p.x);
+        let r0 = f.sub(s2, p.y);
+        if h == 0 {
+            return if r0 == 0 {
+                self.jacobian_double(p)
+            } else {
+                FastJacobianPoint::INFINITY
+            };
+        }
+        let r = f.dbl(r0);
+        let hh = f.sqr(h);
+        let i = f.dbl(f.dbl(hh));
+        let j = f.mul(h, i);
+        let v = f.mul(p.x, i);
+        let x3 = f.sub(f.sub(f.sqr(r), j), f.dbl(v));
+        let y1j = f.mul(p.y, j);
+        let y3 = f.sub(f.mul(r, f.sub(v, x3)), f.dbl(y1j));
+        let zh = f.add(p.z, h);
+        let z3 = f.sub(f.sub(f.sqr(zh), z1z1), hh);
+        FastJacobianPoint {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// Normalize a group of Jacobian points with one simultaneous
+    /// inversion. `out`, `den`, and `scratch` must each be at least as
+    /// long as `points`; infinity lanes are preserved.
+    pub fn jacobian_to_affine_batch(
+        &self,
+        points: &[FastJacobianPoint],
+        out: &mut [FastPoint],
+        den: &mut [u64],
+        scratch: &mut [u64],
+    ) {
+        let n = points.len();
+        assert!(out.len() >= n && den.len() >= n && scratch.len() >= n);
+        let one = self.f.one();
+        let mut needs_inversion = false;
+        for (d, p) in den[..n].iter_mut().zip(points) {
+            *d = if p.is_infinity() { one } else { p.z };
+            needs_inversion |= !p.is_infinity() && p.z != one;
+        }
+        // Fresh and restarted lanes have Z = 1. Avoid an exponentiation
+        // when a whole round consists only of those lanes.
+        if needs_inversion {
+            self.f.batch_inv(&mut den[..n], &mut scratch[..n]);
+        }
+        for ((dst, p), &zi) in out[..n].iter_mut().zip(points).zip(&den[..n]) {
+            if p.is_infinity() {
+                *dst = FastPoint::INFINITY;
+                continue;
+            }
+            let zi2 = self.f.sqr(zi);
+            *dst = FastPoint {
+                x: self.f.mul(p.x, zi2),
+                y: self.f.mul(p.y, self.f.mul(zi2, zi)),
+                infinity: false,
+            };
         }
     }
 
@@ -607,21 +751,11 @@ impl BsgsFastPlan {
     ) -> Self {
         let workers = workers.max(1);
         let chains_per_worker = chains_per_worker.max(1);
-        let isqrt = |v: u64| {
-            let mut s = (v as f64).sqrt() as u64;
-            while s > 0 && s.saturating_mul(s) > v {
-                s -= 1;
-            }
-            while (s + 1).saturating_mul(s + 1) <= v {
-                s += 1;
-            }
-            s
-        };
         let ceil_div = |a: u64, b: u64| a.div_ceil(b);
         let m = if neg_map {
-            ceil_div(isqrt(width), 2).max(1)
+            ceil_div(isqrt_u64(width), 2).max(1)
         } else {
-            isqrt(ceil_div(width, 2)).max(1)
+            isqrt_u64(ceil_div(width, 2)).max(1)
         }
         // j has to fit the table's 32-bit index field.
         .min(0xFFFF_FFF0);
@@ -1891,23 +2025,25 @@ pub fn reference_scalar_mul(c: &CurveParams, k: u64) -> Point {
 
 /// `√v`, rounded down.
 fn isqrt_u64(v: u64) -> u64 {
-    let mut s = (v as f64).sqrt() as u64;
-    while s > 0 && s.saturating_mul(s) > v {
-        s -= 1;
-    }
-    while (s + 1).saturating_mul(s + 1) <= v {
-        s += 1;
-    }
-    s
+    v.isqrt()
 }
 
 /// `S = operations / √width`, the unit the repository's ECDLP threads
 /// report in, so a row here sits in the same table as a row from the GPU
 /// engine or from Pollard rho.
 pub fn cost_ratio(stats: &BsgsFastStats, width: u64, targets: u64) -> f64 {
-    let ops = stats.baby_steps + stats.giant_steps + stats.candidates;
+    // Preserve ordinary rounding; accumulated counters can have a finite
+    // floating-point total even when their exact sum exceeds one word.
+    let ops = match stats
+        .baby_steps
+        .checked_add(stats.giant_steps)
+        .and_then(|sum| sum.checked_add(stats.candidates))
+    {
+        Some(sum) => sum as f64,
+        None => stats.baby_steps as f64 + stats.giant_steps as f64 + stats.candidates as f64,
+    };
     let sqrt_w = isqrt_u64(width).max(1) as f64;
-    ops as f64 / targets.max(1) as f64 / sqrt_w
+    ops / targets.max(1) as f64 / sqrt_w
 }
 
 // ── tests ───────────────────────────────────────────────────────────────
@@ -1916,6 +2052,53 @@ pub fn cost_ratio(stats: &BsgsFastStats, width: u64, targets: u64) -> f64 {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ecdlp_variants::{bsgs as slow, EcGroup};
+
+    #[test]
+    fn full_width_square_root_boundaries() {
+        let values = [
+            0,
+            1,
+            2,
+            3,
+            4,
+            15,
+            16,
+            17,
+            u32::MAX as u64,
+            (u32::MAX as u64).pow(2) - 1,
+            (u32::MAX as u64).pow(2),
+            u64::MAX - 1,
+            u64::MAX,
+        ];
+        for value in values {
+            let root = isqrt_u64(value) as u128;
+            assert!(root * root <= value as u128);
+            assert!((root + 1) * (root + 1) > value as u128);
+        }
+        assert_eq!(isqrt_u64(u64::MAX), u32::MAX as u64);
+        let plan = BsgsFastPlan::new(u64::MAX, 0, true, 1, 1);
+        assert_eq!(plan.m, 1u64 << 31);
+        let stats = BsgsFastStats::default();
+        assert_eq!(cost_ratio(&stats, u64::MAX, 1), 0.0);
+    }
+
+    #[test]
+    fn cost_ratio_retains_accumulated_counter_magnitude() {
+        let stats = BsgsFastStats {
+            baby_steps: u64::MAX,
+            giant_steps: u64::MAX,
+            candidates: u64::MAX,
+            ..BsgsFastStats::default()
+        };
+        assert_eq!(cost_ratio(&stats, 4, 1), 3.0 * (u64::MAX as f64) / 2.0);
+        let ordinary = BsgsFastStats {
+            baby_steps: 15,
+            giant_steps: 17,
+            candidates: 3,
+            ..BsgsFastStats::default()
+        };
+        assert_eq!(cost_ratio(&ordinary, 81, 2), 35.0 / 2.0 / 9.0);
+    }
 
     /// A deterministic xorshift, so a failure is reproducible.
     struct Rng(u64);
@@ -2026,6 +2209,72 @@ mod tests {
         }
         assert!(curve.scalar_mul(curve.g, curve.n).infinity, "nG = O");
         assert_eq!(curve.lower(curve.g), g_ref, "generator");
+    }
+
+    /// Jacobian conversion, doubling, and mixed addition agree with the
+    /// affine formulas on the generic, j=0, and j=1728 curve shapes.
+    #[test]
+    fn jacobian_lanes_match_affine_on_every_curve_shape() {
+        let j0 = CurveParams {
+            name: "j0-223",
+            p: BigUint::from(223u32),
+            a: BigUint::from(0u32),
+            b: BigUint::from(7u32),
+            gx: BigUint::from(47u32),
+            gy: BigUint::from(71u32),
+            n: BigUint::from(223u32),
+            h: 1,
+        };
+        let j1728 = CurveParams {
+            name: "j1728-97",
+            p: BigUint::from(97u32),
+            a: BigUint::from(1u32),
+            b: BigUint::from(0u32),
+            gx: BigUint::from(1u32),
+            gy: BigUint::from(14u32),
+            n: BigUint::from(97u32),
+            h: 1,
+        };
+        for params in [toy40_params(), j0, j1728] {
+            let curve = FastCurve::from_params(&params).unwrap();
+            let mut projective = Vec::new();
+            let mut expected = Vec::new();
+            for k in 0..24 {
+                let p = curve.scalar_mul(curve.g, k);
+                let q = curve.scalar_mul(curve.g, k + 1);
+                let jp = FastJacobianPoint::from_affine(&curve.f, p);
+
+                projective.push(curve.jacobian_double(jp));
+                expected.push(curve.double(p));
+
+                projective.push(curve.jacobian_add_mixed(jp, q));
+                expected.push(curve.add(p, q));
+
+                let inverse = curve.jacobian_add_mixed(jp, curve.neg(p));
+                assert!(inverse.is_infinity(), "{}: P + (-P)", params.name);
+            }
+            // Exercise repeated mixed additions without resetting Z to one.
+            let mut chain = FastJacobianPoint::INFINITY;
+            let mut chain_affine = FastPoint::INFINITY;
+            for k in 1..40 {
+                let q = curve.scalar_mul(curve.g, k);
+                chain = curve.jacobian_add_mixed(chain, q);
+                chain_affine = curve.add(chain_affine, q);
+                projective.push(chain);
+                expected.push(chain_affine);
+            }
+            let n = projective.len();
+            let mut got = vec![FastPoint::INFINITY; n];
+            let mut den = vec![0u64; n];
+            let mut scratch = vec![0u64; n];
+            curve.jacobian_to_affine_batch(&projective, &mut got, &mut den, &mut scratch);
+            assert_eq!(got, expected, "{}: batch normalization", params.name);
+
+            let from_infinity = curve.jacobian_add_mixed(FastJacobianPoint::INFINITY, curve.g);
+            let mut affine = [FastPoint::INFINITY];
+            curve.jacobian_to_affine_batch(&[from_infinity], &mut affine, &mut [0], &mut [0]);
+            assert_eq!(affine[0], curve.g, "{}: O + G", params.name);
+        }
     }
 
     #[test]

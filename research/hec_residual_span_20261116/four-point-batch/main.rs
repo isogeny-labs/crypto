@@ -1,0 +1,30 @@
+#[path="../setup/fast.rs"]mod fast;
+#[path="../batched/inverse.rs"]mod inverse;
+use hec_native_ic::{counted,jac::Curve,fp::Fp,poly::Poly,oracle::{split_reference,OracleStats,Roots}};
+use std::{collections::BTreeMap,fs};
+type Point=(u64,u64);type Out=Vec<(Poly,Poly,Option<Roots>)>;
+fn u_for(p:&[Point],c:&Curve)->Poly{p.iter().fold(Poly::one(),|u,&(x,_)|u.mul(&Poly::x_minus(x,&c.fp),&c.fp))}
+fn shared(c:&Curve,pts:&[Point],correction:bool)->Out{
+ let f=&c.fp;let mut values=vec![];for i in 0..6{for j in i+1..6{let d=f.sub(pts[i].0,pts[j].0);assert_ne!(d,0);values.push(d);}}
+ let inverses=inverse::invert(&values,f);let mut iv=[[0u64;6];6];let mut t=0;
+ for i in 0..6{for j in i+1..6{iv[i][j]=inverses[t];iv[j][i]=f.neg(inverses[t]);t+=1;}}
+ let mut out=vec![];
+ for i in 1..6{for j in i+1..6{for k in j+1..6{
+  let ids=[0,i,j,k];let p=[pts[0],pts[i],pts[j],pts[k]];let mut part=[Poly::zero();4];let mut gamma=[0;4];
+  for a in 0..4{let mut basis=Poly::one();let mut w=p[a].1;for b in 0..4{if a!=b{basis=basis.mul(&Poly::x_minus(p[b].0,f),f);w=f.mul(w,iv[ids[a]][ids[b]]);}}gamma[a]=w;part[a]=basis.scale(w,f);}
+  let u=u_for(&p,c);let mut vs=[Poly::zero();8];
+  for mask in 0..8{vs[mask]=part[0];for a in 1..4{vs[mask]=if mask&(1<<(a-1))==0{vs[mask].add(&part[a],f)}else{vs[mask].sub(&part[a],f)};}}
+  let h0=c.f.sub(&vs[0].mul(&vs[0],f),f).div_exact(&u,f);let mut hs=[h0;8];
+  if correction{let mut cross=vec![];for a in 0..4{for b in a+1..4{let mut q=Poly::one();for d in 0..4{if d!=a&&d!=b{q=q.mul(&Poly::x_minus(p[d].0,f),f);}}let w=f.mul(gamma[a],gamma[b]);let w=f.add(w,w);let w=f.add(w,w);cross.push((a,b,q.scale(w,f)));}}
+   for mask in 1..8{for &(a,b,q) in &cross{let sa=a!=0&&mask&(1<<(a-1))!=0;let sb=b!=0&&mask&(1<<(b-1))!=0;if sa!=sb{hs[mask]=hs[mask].add(&q,f);}}}
+  }else{for mask in 1..8{hs[mask]=c.f.sub(&vs[mask].mul(&vs[mask],f),f).div_exact(&u,f);}}
+  for mask in 0..8{out.push((vs[mask],hs[mask],None));}
+ }}}
+ let leads:Vec<_>=out.iter().filter_map(|(_,h,_)|{assert!(!h.is_zero());(h.lc()!=1).then_some(h.lc())}).collect();
+ let invs=inverse::invert(&leads,f);let mut cursor=0;
+ for (_,h,roots) in &mut out{let monic=if h.lc()==1{*h}else{let m=h.scale(invs[cursor],f);cursor+=1;m};let mut stats=OracleStats::default();*roots=split_reference(&monic,f,&mut stats);}
+ assert_eq!(cursor,invs.len());out
+}
+
+fn main(){counted::disable();let mut triggers=BTreeMap::new();for l in fs::read_to_string("research/hec_residual_span_20261116/affine-promotion/CONTROL.stderr").unwrap().lines().filter(|l|l.starts_with("PROMOTE\t")){let v:Vec<_>=l.split('\t').collect();let n=|j:usize|v[j].parse::<u64>().unwrap();if n(7)!=0&&v[9]=="false"{triggers.entry((n(1),n(2))).or_insert(n(5)as usize);}}
+println!("p\tsm\trep\tarm\tmodulus\tsplit\tcounts");let(mut calls,mut checked)=(0,0);for(p,cc)in[(101,2),(251,18),(601,7)]{let c=Curve::new(Fp::new(p),Poly::from_coeffs(&[cc,0,0,0,0,1]));let(fb,z,_)=fast::prepare(&c);let mut reps=vec![];let mut seen=vec![false;fb.len()];for j in 0..fb.len(){if seen[j]{continue}reps.push(j);let mut x=fb[j].0;for _ in 0..5{let k=fb.binary_search_by_key(&x,|p|p.0).unwrap();assert!(!seen[k]);seen[k]=true;x=c.fp.mul(x,z);}}for sm in [1,17]{let Some(&r)=triggers.get(&(p,sm))else{eprintln!("no_trigger p={p} sm={sm}");continue};let mut pts=vec![fb[reps[r]]];let mut x=fb[0].0;for _ in 0..5{pts.push((x,fb[0].1));x=c.fp.mul(x,z);}let mut prior=BTreeMap::new();for rep in 0..2{let mut outputs=vec![None,None];for n in 0..2{let arm=if rep==0{n}else{1-n};counted::reset();let out=shared(&c,&pts,arm==1);let counts=counted::snapshot();counted::disable();assert_eq!(out.len(),80);let split=out.iter().filter(|x|x.2.is_some()).count();let mut index=0;for i in 1..6{for j in i+1..6{for kk in j+1..6{let u=u_for(&[pts[0],pts[i],pts[j],pts[kk]],&c);for _ in 0..8{let(v,h,roots)=out[index];let mut os=OracleStats::default();assert_eq!(roots,split_reference(&h.monic(&c.fp),&c.fp,&mut os));assert!((0..=2).contains(&h.deg()));assert_eq!(h.mul(&u,&c.fp),c.f.sub(&v.mul(&v,&c.fp),&c.fp));index+=1;checked+=1;}}}}let sig=(out.clone(),counts.clone());if rep==1{assert_eq!(prior[&arm],sig)}else{prior.insert(arm,sig);}for(modulus,v)in counts{assert_eq!(modulus,p);assert_eq!(v[8],2*v[7]+v[5]+v[6]);println!("{p}\t{sm}\t{rep}\t{arm}\t{modulus}\t{split}\t{}",v.iter().map(u64::to_string).collect::<Vec<_>>().join(","));}outputs[arm]=Some(out);calls+=1;}assert_eq!(outputs[0],outputs[1]);}}}assert_eq!(calls,20);assert_eq!(checked,1600);eprintln!("calls={calls} qualified_signed_outputs={checked} all_v_H_roots_identical=true repeats_exact=true preparation_and_quadratic_splitting_charged=true");}

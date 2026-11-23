@@ -1,0 +1,21 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-multi-production-cost v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_residual_span_20261116/production-cost/build)
+warning: fields `m`, `unknowns`, and `state_len` are never read
+  --> ../../production/core.rs:23:9
+   |
+19 | pub struct Report {
+   |            ------ fields in this struct
+...
+23 |     pub m: usize,
+   |         ^
+24 |     pub unknowns: usize,
+   |         ^^^^^^^^
+25 |     pub state_len: usize,
+   |         ^^^^^^^^^
+   |
+   = note: `Report` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-multi-production-cost` (bin "multi-production-cold") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 1.98s

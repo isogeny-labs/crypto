@@ -1,0 +1,11 @@
+id,location,disposition,observation
+S1,candidate-followup.rs:451-472,source_consistent,Both labels change sign; new-minus-first gives k=-delta_a/delta_b; zero db never inverted.
+S2,candidate-followup.rs:489-505,source_consistent,Vacant entry retains earliest processed normalized labels; duplicate lookup does not overwrite.
+S3,"candidate-followup.rs:470-487,595-608",source_consistent,Duplicate and identity/graph success paths all require original-curve scalar multiplication equality before Ok Outcome.
+S4,"native-core-source.rs:55-63,1246-1266",source_consistent,Field clone shares Rc counter; source verification is included before final phase snapshot.
+S5,"candidate-followup.rs:203-211,459-468,474-482,687-690",source_consistent,Observer errors propagate before successful Outcome; partial events alone cannot be accepted as a completed run.
+S6,"candidate-followup.rs:238-247,360-366",source_consistent,Default delegates false; optional label map is not allocated; no new Ring/source verification arithmetic on false branch. Runtime equivalence and overhead unmeasured.
+L1,candidate-followup.rs:274-318,input_contract_limit,Family/curve assertions and tau happen before new point/order checks; malformed input can panic before Result Err. Bind valid fixtures and explicit panic receipts or move preflight in successor.
+L2,"candidate-followup.rs:468,482,502,604,655",accounting_limit,"Failure paths return Err without Outcome/phases; full attempt costs need an outer receipt, including observer failure and panic."
+L3,"candidate-followup.rs:651-655,680-683",accounting_limit,Map counters and 24 value bytes exclude keys/tree/allocator/observer work. They are not measured total time or memory.
+L4,native-core-source.rs:1493-1526,premise_limit,Prime assertion delegates scalar_constructor_prime; tau homomorphism and group-law correctness remain explicit mathematical/source premises. No independent arithmetic execution was performed.

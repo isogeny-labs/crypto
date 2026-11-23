@@ -1,0 +1,326 @@
+\chapter{Covers, isogenies and other transfers}\label{sec:transfer}
+
+A recurring hope was that some other representation of the same
+instance---an isogenous curve, a curve at another level of the isogeny
+volcano, a Jacobian, a Weil descent---would make index calculus cheaper.
+These routes produced the programme's clearest negatives, and one lemma
+that explains most of them.
+
+\begin{lemma}[transport conservation,
+\art{docs/ic/RESEARCH_TRANSFER_AWARE_IC_20261010.md} \S1]\label{lem:conservation}
+Let $\varphi:E\to E'$ be an $\FF_q$-rational isogeny (or any homomorphism
+of rational points), $\kappa=\ker\varphi\cap E(\FF_q)$, $R\in E(\FF_q)$,
+$\Fb'\subset\varphi(E(\FF_q))$ a factor base on the codomain and
+$\Fb=\varphi^{-1}(\Fb')\cap E(\FF_q)$. Then the number of ordered
+$m$-decompositions of $R$ over $\Fb$ is $\abs\kappa^{m-1}$ times the number
+of ordered $m$-decompositions of $\varphi(R)$ over $\Fb'$.
+\end{lemma}
+\begin{proof}
+Images of decompositions of $R$ are decompositions of $\varphi(R)$.
+Conversely, for $\sum Q_i=\varphi(R)$ choose rational preimages $P_i$ of
+the $Q_i$; then $\sum P_i-R\in\kappa$, and of the $\abs\kappa^m$ choices
+exactly $\abs\kappa^{m-1}$ sum to $R$ (translate $P_1$ by the kernel
+element).
+\end{proof}
+
+So a homomorphic transfer changes nothing but three curve-specific inputs:
+the rational kernel symmetry $\abs\kappa^{m-1}$ (bounded by the rational
+torsion; trivial on prime-order curves), the factor-base geometry
+available on the destination, and the cost of arithmetic there. Sequences
+of isogenies compose to one homomorphism; a loop is an endomorphism and
+acts on the subgroup as a known scalar, useful only as a known-log
+multiplier. Multi-curve factor bases glued by isogenies are single-curve
+bases in disguise.
+
+\paragraph{Conductor gaps in the ECC2K-130 class.} Jao, Miller and
+Venkatesan~\cite{jmv2005} prove random self-reducibility among curves with
+the same endomorphism ring, leaving open whether curves whose conductors
+differ by a large prime could differ in hardness. The ECC2K-130 class has
+conductor gap 263; we computed its structure
+(\art{docs/ic/RESEARCH_ISOGENY_CONDUCTOR_GAP_20261007.md}) and ran
+several rounds of experiments. Native counted-$S$ index calculus on two fixed CM
+pairs gave floor/crater ratios $0.975$ (99\% $[0.603,1.451]$) at
+$\ell=8209$ and $1.127$ $[0.922,1.342]$ at $\ell=131101$: no level effect
+(192 verified records, 96 exact replays;
+\art{research/ecbench_conductor_gap_20261012/}). Two-torsion
+symmetrisation is a quotient isogeny: at a matched base of abscissae it
+cut F4 row-reduction work $4.1$--$4.3\times$ ($\abs H=2$) and
+$17.6$--$19.6\times$ ($\abs H=4$) over 1{,}128 systems---but a correction
+the next day showed that at a matched number of \emph{columns} the saving
+disappears; it was the cost of a redundant orbit base. A combined Weil
+descent used $234$--$529\times$ the F4 operations of the blind system
+(\art{research/isogeny_conductor_gap_round3_20261011/}).
+
+\paragraph{Fibre-aware index calculus.} Isogeny fibres are torsors whose
+arithmetic is controlled by one cohomology class
+(\art{RESEARCH_ISOGENY_FIBERS_ECDLP.md}); relation generation is
+isogeny-equivariant at zero lifting cost, and a fibre-closed pair table was
+the best lever of the conductor-gap rounds ($12.8\times$ rho in its best
+cell). Measured against matched rho across sizes at fixed cofactor, the
+envelope IC/rho ratio grows from $8.4$--$8.8$ to $35.1$--$37.0$ ($h=4$) and
+from $13.4$--$20.1$ to $60.4$--$63.1$ ($h=72$), as $\#E^{1/6}$: the gap
+widens, it does not close (816 audited records;
+\art{research/fiber_ic_scaling_20261011/}).
+
+\paragraph{Other structure.} Symmetrised $u$-frame bases saved
+$0.84\times$ at $n=17$ and $0.76$--$0.77\times$ at $n=23$, but cost
+$4.01\times$ at $n=31$ (\art{research/koblitz_symmetrised_e2e_20260927/}).
+GHS and hyperelliptic covers: ECC2K-130 does map to hyperelliptic curves,
+but the genus that would pay is missing. In odd characteristic the cubic
+GHS transfer from $E_0(\FF_{q^3})$ to a genus-3 Jacobian now runs end to end
+with double-large-prime index calculus, at about $q^{1.4}$ against rho's
+$q^{3/2}$, within $1.15\times$ of a measured negation-map rho at
+$q=2^{20}$ (\S\ref{sec:ladder}). The
+isogeny-loop GLV/GLS work produced a measured $1.09$--$1.15\times$ faster
+four-dimensional scalar multiplication (\art{research/isogeny_loop_glv_20261012/})
+and a $\sqrt{\text{\'elu}}$ kernel cost exponent $0.822$ $[0.805,0.838]$;
+these speed up curve arithmetic, not the discrete logarithm.
+
+\paragraph{Covers, 21--24 October.} The Joux--Vitse genus-3 cover of
+$E(\FF_{p^6})$ is now within $1.6$--$2.0\times$ of a pooled rho constant at
+$p=1009$; measuring the per-trial cost on a genus-255 binary Jacobian
+turned the $N=130$ GHS counterfactual's modelled margin negative ($-1.83$
+bits); and two censuses bound what covers exist at toy sizes (genus floor 13
+for odd-order $E/\FF_{q^4}$; a $2^{-l}$ genus-3 fraction over
+$\FF_{2^{3l}}$). All are in \S\ref{sec:ladder3}. None touches a prime field
+or a prime-degree binary field, where the GHS genus is out of reach.
+
+\paragraph{The published scale of high-genus index calculus.} The largest
+Weil-descent hyperelliptic discrete logarithms in the literature are at
+genus 31. Jacobson, Menezes and Stein~\cite{jms2001} applied GHS to elliptic
+curves over $\FF_{2^{62}}$, $\FF_{2^{93}}$, $\FF_{2^{124}}$ and
+$\FF_{2^{155}}$ and obtained genus-31 curves $C_{62}$, $C_{93}$, $C_{124}$
+and $C_{155}$ over $\FF_{2^2}$ to $\FF_{2^5}$, each with $\#J=2r$, $r$
+prime. They solved $C_{62}$, $C_{93}$ and $C_{124}$ with Enge--Gaudry
+(relation collection for $C_{124}$ took 379 CPU-days on a mixed cluster) and
+only estimated $C_{155}$, at 26{,}290 days on one 1\,GHz Pentium III.
+Velichka~\cite{velichka2008} solved $C_{155}$ ($\#J\approx2^{155}$) with
+Vollmer's algorithm and sieving: 136{,}533 relations, about 1{,}735 CPU-days
+in total, 21 days wall-clock, of which 14 days were linear algebra. No genus
+above 31 appears in that thesis; the journal version~\cite{vjs2014} was not
+available to us and is unchecked. Our genus-255 per-trial measurement
+(\S\ref{sec:ladder3}) is a cost sample, not a solved instance, at about
+eight times the largest published genus. The cover ECC2K-130 would need, of
+genus about $2^{130}$ (\S\ref{sec:ecc2k130}), lies about $2^{125}$ times
+beyond it.
+
+\paragraph{Genus three against the strongest rho.} Rounds three and four
+of the genus-3 work ran without a rho arm; a 23 October study supplied one
+(\art{research/ghs3_vs_rho_20261023/}; it has a frozen protocol and tables
+but no README, and no review is recorded in it). On round 4's instances,
+$q=2^{14}$ to $2^{20}$, three curves per size, in round 4's unit and binary,
+the reference was an ideal negation rho priced with Karatsuba products and
+32 walks per inversion ($R_{\mathrm{ideal}}$, the primary reference, the
+most favourable to rho) and a measured negation walk ($R_{\mathrm{meas}}$).
+The frozen rule declares ``IC below the strong rho'' at a size only if every
+curve is below both references at every weight of the band. At $q=2^{16}$
+it is: IC/$R_{\mathrm{ideal}}$ is $0.70$, $0.71$, $0.70$ at $w=0$ and $0.64$
+and $0.38$ (geometric means) at $w=0.1$ and $1$. At the other six sizes the
+decision is \emph{unresolved}, with geometric means $0.97$--$1.52$ ($1.27$ at
+$2^{20}$). Three things qualify the result. The registered unit prices one
+subgroup multiplication as one $\FF_q$ multiplication ($c_\ell=1$); the
+protocol's own sensitivity, $c_\ell=9$, puts every instance at $2.7$--$12.4\times$
+rho. The ratio carries $\sqrt c$ of the cofactor, because IC depends on $q$
+alone and rho on $\ell=\#E_0/c$: the three curves at $2^{16}$ all have
+cofactor 4, and a post-hoc fit gives exponent $0.474$ in $c$ (theory $0.5$)
+and $-0.081$ per bit of $q$ at fixed $c$ (theory $-0.167$). And the pooled
+trend over all 21 instances is flat ($0.034$ $[-0.047,0.105]$ per bit), so
+no crossover size is determined. This is the programme's only
+preregistered decision of index calculus below the strongest rho. It is a
+measurement of a known pipeline in a structured, weak class
+($E_0/\FF_{q^3}$ with $4\mid\#E_0$, never prime order), where theory
+predicts $q^{4/3}$ against $q^{3/2}$; it depends on the pricing of one
+operation; and it is not yet reviewed. It updates the ledger paper's
+``$1.15\times$ at $2^{20}$'' and bears on that paper's prediction of a
+crossover at $q\le2^{22}$ once rho is measured: below rho at one size,
+unresolved at the others, with no measurable pooled trend.
+
+\paragraph{The same family through a plane quartic.} The $m=2$ type of the
+cubic GHS cover gives a smooth plane quartic over $\FF_q$ directly. On a
+plane quartic, Diem's index calculus is $\tilde O(q)$ in theory, against
+$q^{4/3}$ for the hyperelliptic genus-3 route above. Before 18 October the
+repository's plane-quartic ``pure IC'' toys could not be priced: their
+logarithms came from enumerating the subgroup, and the degree-3 class keys
+merged distinct classes. A canonical $\mathrm{Pic}^0$ arithmetic now gives
+every class a unique key (checked against brute-force class counts on 21
+curves and full Cayley tables at $q=5$). A generic addition costs 3{,}523
+multiplications and 44 inversions, flat in $q$ up to $2^{31}-1$
+(\art{research/quartic_pic_canonical_20261018/}).
+
+On that arithmetic, a pipeline with relations on lines, a reduced factor base
+with one large prime, Lanczos modulo $\ell$ and canonical descent solved and
+verified 51 of 51 units. It ran on the GHS-weak family $E_0/\FF_{q^3}$ with
+$4\mid\#E_0$, for $q=223$ to $262{,}111$ (\art{research/quartic_n4_20261019/};
+Table~\ref{tab:prog_transfer-quartic}). Its reference is a matched
+\emph{plain} rho, without the negation map, on the same subgroup, and the
+order holds across the pricing band for every $q\ge4051$.
+This was a preregistered decision of index calculus below a matched
+\emph{plain} rho. Its successor, N4~v2
+(\art{research/quartic_n4v2_20261020/}, 20--25 October), took the same
+family and instances from $q=2^8$ to $2^{22}$ (63 instances, 501 index-calculus
+units and 2{,}442 rho runs, all verified) and added three changes: double
+large primes (D), structured Gaussian elimination with Lanczos (L), and a
+negation-map rho. DL's exponent is the $\tilde O(q)$ of Diem's
+analysis~\cite{diem2006,dt2008}. At $q=4{,}194{,}271$ one DL solve took
+$12.3$ CPU-seconds against 616 for negation rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}ll>{\raggedright}p{1.9cm}>{\raggedright}p{2.0cm}>{\raggedright}p{2.3cm}>{\raggedright}p{2.2cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Study & Arm & Over B0 & IC/rho & IC exponent & Rho exponent & Crossover \\
+\midrule
+N4 & & & $0.122$ $[0.10,0.16]$ & $1.083$ $[1.040,1.129]$ &
+  $1.485$ $[1.437,1.525]$ & wall time: only above $q\approx3\times10^4$ \\
+\addlinespace
+N4~v2 & D & $0.081$ & & & & \\
+ & DL & $0.042$ $[0.042,0.042]$ & $0.005$ $[0.004,0.008]$ &
+  $0.983$ $[0.975,0.993]$; $0.988$ on $k=17..22$ & $1.543$ $[1.494,1.583]$ &
+  $q^*=555$ $[389,752]$ (interpolated); $q^*\approx1{,}889$ in CPU time \\
+ & DL1 & $0.022$ & & & & \\
+\bottomrule
+\end{tabularx}
+\caption[]{Plane-quartic index calculus on the GHS-weak family
+$E_0/\FF_{q^3}$, $4\mid\#E_0$. N4 against a matched plain rho at
+$q=262{,}111$, exponents fitted on $q\ge4051$; N4~v2 against the frozen
+pipeline B0 and against negation rho at $q=2{,}097{,}091$ (the top size).
+IC/rho in $\FF_q$-multiplication equivalents. Exponents: fitted cost
+exponent in $q$, over the full range unless stated. Crossover: in counted
+units unless stated (the N4 crossover is in wall time).
+D: double large primes; DL: D with structured Gaussian elimination and
+Lanczos; DL1 is post hoc. Sources: \art{research/quartic_n4_20261019/},
+\art{research/quartic_n4v2_20261020/}.}
+\label{tab:prog_transfer-quartic}
+\end{table}
+The qualifications are substantial. The host was L0 (load average 22--60);
+the intervals resample only three units per size at $k\ge17$; the
+conversion constants move D's high-range exponent from $1.009$ to $1.048$;
+the frozen B0 records do not replay at any of 11 replayed sizes; the
+negation rho fails the calibration rule at three sizes; and there is no
+validation file. The program's closing note calls the result ``our
+measurements of a known result''
+(\art{research/plane_quartic_program_20261018/CLOSING.md}). It covers the
+GHS-weak family only; nothing here is about a generic curve, a prime-order
+curve or a standard curve.
+
+\paragraph{Smith's isogeny and the walk to it.} The other genus-3 type of the
+census is hyperelliptic. Smith's $(2,2,2)$-isogeny takes it to a plane quartic
+when his Propositions~2 and~4 pass. The walk study looked for curves on which
+Smith's construction succeeds by walking 2-isogenies on the elliptic side
+(\art{research/smith_elliptic_walk_20261018/}; Table~\ref{tab:prog_transfer-smith}).
+The preregistered expectation of about $0.186$ for the pass fraction is
+falsified, upward. A labelled post hoc analysis attributes the frozen fit's
+$o(p)$ label to censored walks at the small primes, and reads the
+$p\equiv3\pmod4$ exponent as $\tilde\Theta(p)$. At $p\equiv1\pmod4$ most
+walks stay inside small trapped sets.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Primes & Walks & Quantity & Value \\
+\midrule
+$p=7$ to $31$ & exhaustive & pass fraction & $0.53$--$0.61$ (random curves: $0.1857$) \\
+ & & neighbour & $0.74$--$0.98$, at $1.5$--$3.6$ steps \\
+\addlinespace
+$p=2^{10}$ to $2^{20}$ & sampled & walk-cost exponent & $-0.14$ $[-0.80,0.95]$ \\
+$p\equiv3\pmod4$ & successful & walk-cost exponent & $1.13$ $[1.00,1.26]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The 2-isogeny walk to curves on which Smith's construction
+succeeds. Pass fraction: share of descended curves passing Smith's full
+test. Neighbour: share of failing curves with a passing curve in their
+2-isogeny component, and the mean distance to it. Walk-cost exponent: in
+$p$; the first is the frozen fit, which labels the walk cost $o(p)$; the
+second is post hoc, over successful walks only. Source:
+\art{research/smith_elliptic_walk_20261018/}.}
+\label{tab:prog_transfer-smith}
+\end{table}
+A second study, also open and not yet merged, maps divisor classes through
+Smith's isogeny and runs the whole route at toy sizes. The program's closing
+note lists what stays open (\art{research/plane_quartic_program_20261018/CLOSING.md}).
+
+\paragraph{Joux--Vitse: two arms of one cover.} The Joux--Vitse cover of
+$E(\FF_{p^6})$ (full rational 2-torsion, a weak class) has been measured
+with two solvers, and their comparisons with rho do not agree. The
+\emph{plain Nagao arm} with a sparse-FGLM linear stage is $1.59$--$1.98\times$
+a pooled rho constant at $p=1009$ and closes as about $p^{-2}$
+(\art{research/jv_cover_p_scaling_20261024/}; \S\ref{sec:ladder3}); it is a
+lower-bound comparison and current. The \emph{sieve arm}
+(\texttt{jv\_cover --exp sieve}) measured $0.024$ $[0.019,0.031]$ of a strong
+rho at $p=1009$ and $0.0042$ at $p=1823$ on 19 October, but its 20 October
+review withheld every comparison (no numeric acceptance for the controls,
+uncharged rho hashes, incomplete accounting;
+\art{research/jv_sieve_strong_rho_20261019/}); a replication with fixed
+thresholds failed its acceptance rule and is in an open pull request, and a
+prospective re-run is registered and has not run. A 9 October whole-route
+replay from a non-weak challenge curve, through an isogeny walk to a weak
+curve and its cover, read $0.058$ of a pooled, unmatched rho at $p=1009$ on
+one seed per prime, with an earlier revision of the solver whose source
+includes the sieve module (\art{research/jv_cover_e2e_30bit_20261009/RESULT.md}).
+The roughly thirtyfold gap between the arms at $p=1009$ is unexplained on
+\texttt{main}. The cover-decomposition note still states a measured sieve
+crossover near $p\approx430$
+(\art{research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md}
+\S11) with no erratum; it should be read through the review. Leaderboard
+Table~D, the historical study, is withheld. On the method side, the
+sparse-FGLM stage made the plain arm $1.28\times$ cheaper end to end
+(\art{research/jv_cover_sparse_fglm_20261018/}); relation collection is
+$99.99\%$ of $S$ (\art{research/ic_cover_leads_20261018/}); depth-1 isogeny
+classes hold no weak curve over 4{,}871{,}062 curves, while 86--95\% of
+deeper classes hold one (\art{research/jv_weak_class_law_20261007/}); and
+the $(n-1)$-decomposition variant is $4.5\cdot10^7$--$1.8\cdot10^8\times$
+rho (\art{research/joux_vitse_n1_20261015/}).
+
+\paragraph{Cover censuses.} The minimal cubic GHS genus over an isogeny
+class follows $\#E(K)\bmod4$: 13 for odd order, 5 for $2\bmod4$, 3 for
+$0\bmod4$, and genus 3 is the only value below rho's $q^{3/2}$
+(\art{research/ghs_cubic_cover_census_20261012/}); at $n=5$ the floors are
+33, 33, 25 and 5 by 2-torsion type (\art{research/ghs_cover_census_n5_20261013/}).
+No deployed prime-field or prime-degree binary curve has a usable subfield;
+only the RFC~2409 Oakley groups 3 and 4 are reachable, at genus 15--16, where
+exponent models disagree in sign and the measured genus-16 relation phase
+alone is 5.2 bits slower than rho (\art{research/cover_route_prime_binary_20261008/},
+\art{research/ghs_oakley_extended_20261023/}). All 15{,}791 cover maps in the
+registry were assessed: 165 binary maps have genus-3 arithmetic and the
+15{,}626 odd-characteristic genus-2 covers lack a Jacobian implementation
+(\art{research/cover_transfer_assessment_20261013/}). An inventory of about
+90 cover and decomposition studies found every route on prime, Koblitz and
+prime-degree binary curves closed, negative or constant-factor
+(\art{research/cover_decomposition_gap_search_20261018/}). Smith's
+$(2,2,2)$-isogeny route was reproduced natively (full success $0.18638$
+against a theoretical $0.18574$ over $10^6$ curves) and its sign bias shrinks
+like $1/\sqrt p$ (\art{research/smith_prop24_native_20261014/},
+\art{research/smith_sign_scaling_20261016/}).
+
+\paragraph{Volcano levels and generators.} A 403{,}168-run census found the
+level effect equivalent in 33 of 35 comparisons and different in none
+(\art{research/volcano_ecdlp_census_20261017/}), and a large-sample rho study
+found the floor/crater ratio $0.998$ $[0.986,1.010]$
+(\art{research/conductor_gap_rho_large_sample_20261018/}). The one real level
+effect is the automorphism group: $\sqrt3$ on the $j=0$ crater, confirmed at
+$1.86$--$1.92\times$ (\art{research/drastic_prime_conductor_gap_round3_20261012/}).
+At $\ell=2$, floors give $5.8\%$ fewer relations than craters, and 99\% of the
+contrast is explained by the base's cofactor classes
+(\art{research/isogeny-volcano-cost-v2_20261017/},
+\art{research/generator_effect_ic_20261019/}).
+
+\paragraph{Other transfer lines.} Index calculus on genus-2 to -4
+Jacobians over $\FF_p$ (the ADH--Gaudry attack, measured against rho on the
+same Jacobian) read below a distinguished-point rho in early rounds, but the
+reference was later found slow and the ratios are lower bounds, unranked
+under the band (\art{research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md});
+later rounds are in review. A weak-curve atlas of 922 exact models and 36
+published cases ranks covering-model and pairing signals but leaves the
+selected-subgroup advantage unmeasured
+(\art{research/weak_curve_leaderboard_20261012/}); three complete isogeny
+volcano graphs (24{,}823 vertices) were built and their graph-wide IC
+surveys halted at checkpoints (\art{research/full_volcano_graphwide_ic_20261017/}).
+Weil restriction of ECC2K-130 to extension fields costs at least $2^{131}$,
+$2^{70.19}$ times rho (cluster ``transfer-boundaries'').
+
+\paragraph{Named obstructions.} Blocked requirements are kept open as
+problem records (\art{problems/README.md}), among them the complete-cost
+calibration of root-finding IC
+(\art{problems/rootfinding-complete-cost-calibration.md}), with exit
+criteria rather than abandoned.

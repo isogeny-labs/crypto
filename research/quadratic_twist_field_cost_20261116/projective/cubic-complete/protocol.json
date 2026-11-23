@@ -1,0 +1,2120 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-cubic-complete-20261116",
+  "version": 2,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/projective/cubic-complete",
+  "authors": [
+    "producer"
+  ],
+  "question": "Does a coefficient-only classical Cardano proportional-input branch restore complete accepted roots and useful rows at named membership-witness cap3, retaining all actual source recovery and stronger source controls? No speed result without new pricing.",
+  "claims": [
+    {
+      "id": "cubic-complete",
+      "text": "Proposed exact algebraic completion, full original-source recovery and useful-rank/degree comparison under explicitly limited field-input certificate scope",
+      "class": "exact_computation",
+      "decided_by": [
+        "full-native"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Wall-speed, calibrated total-cost, intrinsic regularity and original-S3 degree claims excluded",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "qualifier-build",
+      "role": "candidate",
+      "description": "Cubic-complete stage qualifier-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "cpp-build",
+      "role": "candidate",
+      "description": "Cubic-complete stage cpp-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "rust-build",
+      "role": "candidate",
+      "description": "Cubic-complete stage rust-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "compare-build",
+      "role": "candidate",
+      "description": "Cubic-complete stage compare-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "protocol-check",
+      "role": "candidate",
+      "description": "Cubic-complete stage protocol-check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-qualifier-head",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-qualifier-head",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-qualifier-source",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-qualifier-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "proof-A",
+      "role": "candidate",
+      "description": "Cubic-complete stage proof-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "proof-B",
+      "role": "candidate",
+      "description": "Cubic-complete stage proof-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-proof-exponent",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-proof-exponent",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1
+      }
+    },
+    {
+      "id": "reject-proof-proportional",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-proof-proportional",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1
+      }
+    },
+    {
+      "id": "reject-proof-factor",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-proof-factor",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1
+      }
+    },
+    {
+      "id": "selftest-produce",
+      "role": "candidate",
+      "description": "Cubic-complete stage selftest-produce",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "selftest-audit",
+      "role": "candidate",
+      "description": "Cubic-complete stage selftest-audit",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-C",
+      "role": "candidate",
+      "description": "Cubic-complete stage produce-C",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-A",
+      "role": "candidate",
+      "description": "Cubic-complete stage produce-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-B",
+      "role": "candidate",
+      "description": "Cubic-complete stage produce-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "independent-audit",
+      "role": "control_positive",
+      "description": "Cubic-complete stage independent-audit",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "compare",
+      "role": "candidate",
+      "description": "Cubic-complete stage compare",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "corrupt-source",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-source",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-columns",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-columns",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-columns",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-columns",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-columns",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-columns",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-cap",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-cap",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-cap",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-cap",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-cap",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-cap",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-witness",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-witness",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-witness",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-witness",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-witness",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-root",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-root",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-root",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-root",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-root",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-row",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-row",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-row",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-row",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-row",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-row",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-scalar",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-scalar",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-scalar",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-scalar",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-scalar",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-log",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-log",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-log",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-log",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-log",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-log",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-cost",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-cost",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-rank",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-rank",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-rank",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-rank",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-rank",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-rank",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-branch",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-branch",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-branch",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-missing-query",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-missing-query",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-missing-query",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-missing-query",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-query",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-missing-query",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-missing-policy",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-missing-policy",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-missing-policy",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-missing-policy",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-policy",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-missing-policy",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-missing-empty-branch",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-missing-empty-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-missing-empty-branch",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-missing-empty-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-empty-branch",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-missing-empty-branch",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "corrupt-drop-proportional",
+      "role": "candidate",
+      "description": "Cubic-complete stage corrupt-drop-proportional",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "hash-false-drop-proportional",
+      "role": "candidate",
+      "description": "Cubic-complete stage hash-false-drop-proportional",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-drop-proportional",
+      "role": "control_negative",
+      "description": "Cubic-complete stage reject-drop-proportional",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "audit-original-again",
+      "role": "candidate",
+      "description": "Cubic-complete stage audit-original-again",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "research": "NativeC++/Rust/Lean only; thin shell dispatch",
+          "counter_speed": "none",
+          "root_input": "coefficients only",
+          "compiler": "Os C++; O stripped std-only Rust; no timing comparisons"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "semantic-repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "independent-audit",
+      "expected_detection": "Full independent native reconstruction of roots/witnesses/rows/ranks/public logs and every original source scalar, plus exhaustive declared split/repeated-root selftests",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-drop-proportional",
+      "null_population": {
+        "description": "Fifteen actual rehashed changed case/source/member/polynomial/query/result objects and two false qualifier inputs",
+        "generator": "Native changed-byte patch with original/new byte hashes; reconstruct and hash entire false stream before independent rejection",
+        "n": 17,
+        "why_n": "Every declared integrity category, not random statistical null",
+        "matched_on": [
+          "same source fields and actual subgroup",
+          "same original C data and complete A/B repeats",
+          "same native independent audit code"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "payload_truth",
+        "levels": [
+          "original",
+          "genuinely false"
+        ]
+      },
+      {
+        "name": "fresh_repeat",
+        "levels": [
+          "C",
+          "A",
+          "B"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "ALL455policies×3roles×31diagnostics and30separate cold targets perprofile; sourcepoints repeat; full split/repeated cubic selftests over61base elements and32actualextension elements",
+        "how": "Deterministic complete declared finite domain, no candidate answer lookup"
+      },
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "Cardano proportional branch in both source/auxiliary controls; seven proposed Lean declarations, independent Rust field/group/replay arithmetic",
+        "how": "All source/input/analysis/control hashes in PINS, committed/frozen before affected data"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "qualifier-build",
+          "cpp-build",
+          "rust-build",
+          "compare-build",
+          "protocol-check",
+          "reject-qualifier-head",
+          "reject-qualifier-source",
+          "proof-A",
+          "proof-B",
+          "reject-proof-exponent",
+          "reject-proof-proportional",
+          "reject-proof-factor",
+          "selftest-produce",
+          "selftest-audit",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "compare",
+          "corrupt-source",
+          "hash-false-source",
+          "reject-source",
+          "corrupt-columns",
+          "hash-false-columns",
+          "reject-columns",
+          "corrupt-cap",
+          "hash-false-cap",
+          "reject-cap",
+          "corrupt-witness",
+          "hash-false-witness",
+          "reject-witness",
+          "corrupt-root",
+          "hash-false-root",
+          "reject-root",
+          "corrupt-row",
+          "hash-false-row",
+          "reject-row",
+          "corrupt-scalar",
+          "hash-false-scalar",
+          "reject-scalar",
+          "corrupt-log",
+          "hash-false-log",
+          "reject-log",
+          "corrupt-cost",
+          "hash-false-cost",
+          "reject-cost",
+          "corrupt-rank",
+          "hash-false-rank",
+          "reject-rank",
+          "corrupt-branch",
+          "hash-false-branch",
+          "reject-branch",
+          "corrupt-missing-query",
+          "hash-false-missing-query",
+          "reject-missing-query",
+          "corrupt-missing-policy",
+          "hash-false-missing-policy",
+          "reject-missing-policy",
+          "corrupt-missing-empty-branch",
+          "hash-false-missing-empty-branch",
+          "reject-missing-empty-branch",
+          "corrupt-drop-proportional",
+          "hash-false-drop-proportional",
+          "reject-drop-proportional",
+          "audit-original-again"
+        ],
+        "how": "Exact dependency order and fixed12:15UTC deadline; every incomplete/failure retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "full-native",
+        "arms": [
+          "qualifier-build",
+          "cpp-build",
+          "rust-build",
+          "compare-build",
+          "protocol-check",
+          "reject-qualifier-head",
+          "reject-qualifier-source",
+          "proof-A",
+          "proof-B",
+          "reject-proof-exponent",
+          "reject-proof-proportional",
+          "reject-proof-factor",
+          "selftest-produce",
+          "selftest-audit",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "compare",
+          "corrupt-source",
+          "hash-false-source",
+          "reject-source",
+          "corrupt-columns",
+          "hash-false-columns",
+          "reject-columns",
+          "corrupt-cap",
+          "hash-false-cap",
+          "reject-cap",
+          "corrupt-witness",
+          "hash-false-witness",
+          "reject-witness",
+          "corrupt-root",
+          "hash-false-root",
+          "reject-root",
+          "corrupt-row",
+          "hash-false-row",
+          "reject-row",
+          "corrupt-scalar",
+          "hash-false-scalar",
+          "reject-scalar",
+          "corrupt-log",
+          "hash-false-log",
+          "reject-log",
+          "corrupt-cost",
+          "hash-false-cost",
+          "reject-cost",
+          "corrupt-rank",
+          "hash-false-rank",
+          "reject-rank",
+          "corrupt-branch",
+          "hash-false-branch",
+          "reject-branch",
+          "corrupt-missing-query",
+          "hash-false-missing-query",
+          "reject-missing-query",
+          "corrupt-missing-policy",
+          "hash-false-missing-policy",
+          "reject-missing-policy",
+          "corrupt-missing-empty-branch",
+          "hash-false-missing-empty-branch",
+          "reject-missing-empty-branch",
+          "corrupt-drop-proportional",
+          "hash-false-drop-proportional",
+          "reject-drop-proportional",
+          "audit-original-again"
+        ],
+        "differs_in": [
+          "payload_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All65 expected outcomes and postmanifest, all seven Lean declarations pass twice unmodified gate with0 failing/trusted; all actual source root/row/scalar reconstructions and full membership exact; every false input rejects without receipt; false bytes reproducible from retained complete C plus exact patch/hash; all losses/source frontiers retained"
+      },
+      {
+        "id": "semantic-repeat",
+        "arms": [
+          "produce-C",
+          "produce-A",
+          "produce-B"
+        ],
+        "differs_in": [
+          "fresh_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "Actual E/F61 subgroup31 and its actual quadratic twist/pairing route",
+        "check": "Actual full source-domain homomorphism, point-row checks, legitimate admitted PUBLIClogs, and scalar verification on original E/P for every cold target; no target labels into solver"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact dependency order; no clock statistics",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One complete declared finite bundle; repeated actual points, not independent DLP challenges",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Prior failed/proved components observed; this new mechanism and analysis frozen before its affected data, no blinded-confirmation claim"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact full finite declared population, no p-value or timed effect claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 300,
+      "per_sample_seconds": 900,
+      "threads": 2,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Prior full native polynomial/source recovery replay and restored Lean cache; new Cardano branch unexecuted, conservative planning only"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native stage exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Actual native exit, expected controls remain failed invocations rather than signed passes",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "algebraic_recoveries",
+        "name": "Algebraic recoveries",
+        "unit": "configuration-target records",
+        "kind": "exact",
+        "definition": "Native original-source verified algebraic recovery count, not distinct DLP challenges",
+        "source": "native comparison JSON",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "named witness peak",
+      "accepted roots/rows/ranks",
+      "public setup/shift/query counts",
+      "original scalars"
+    ],
+    "record": [
+      "Full diagnostic witness bodies and freshC/A/B complete-profile hashes",
+      "Fresh cold public setup/results/counts; sequence independently rebuilt from setup_m/shift",
+      "Every byte-changing false patch and fully reconstructed false stream hash",
+      "All source/input/binary/Lean/gate/compiler hashes and stage failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "placement": {
+      "outer_seconds": 3600,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "First unexpected outcome or absolute12:15UTC; whole declared population or incomplete, no favorableprefix/subset",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "600sec each stage,3600sec focusedwindow,max2existingLOCALworkers; failure remains explicit",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exact component success only if full root/witness/source-scalar replay and all frozen gates/controls complete; report actual yield/degree comparisons with every loss and updated strongest-source frontier",
+    "comparison_ids": [
+      "full-native"
+    ],
+    "threshold": "All65 expected outcomes and postmanifest, all seven Lean declarations pass twice unmodified gate with0 failing/trusted; all actual source root/row/scalar reconstructions and full membership exact; every false input rejects without receipt; false bytes reproducible from retained complete C plus exact patch/hash; all losses/source frontiers retained",
+    "statistic": "Exact native root sets, actual original-point scalars and qualified certificate peaks",
+    "interval": "none; full finite declared domain",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact configuration-target changes, not clock speed or intrinsic regularity",
+    "verdict_vocabulary": [
+      "finite_cubic_component_observed_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_field_cost_20261116/projective/cubic-complete/compare.cpp",
+      "sha256": "47442a501bddf05b47cef823a027223c9693a55660bf6be2989d972bc68d691d"
+    },
+    "inputs": [
+      "Fresh native independent compressed receipt",
+      "Two exact pinned prior native mathematical receipts, not reexecuted",
+      "All complete A/B fresh profile digests and original C field witnesses"
+    ],
+    "outputs": [
+      "Full gain/loss/tie/rank/witness/source-scalar comparisons",
+      "Matched logical rows/recoveries and updated nonempty source-policy frontier",
+      "Every failed proof/control and incomplete execution retained"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Native-emitted full yield comparisons and full source frontier, no clock plot"
+    ],
+    "report_dir": "research/quadratic_twist_field_cost_20261116/projective/cubic-complete/reports"
+  },
+  "inadmissible": [
+    "Change full population/caps/criteria after data",
+    "Feed reference point enumeration into candidate stopping",
+    "Use target scalar labels or unadmitted public logs in recovery",
+    "Turn cap-unknown into a certified root",
+    "Claim named chart degree is original witness degree or intrinsic regularity",
+    "Infer speed from unisolated clocks or incomplete cost vectors",
+    "Discard ties/losses/blocked setups/failed queries",
+    "Upload denied findings/assets or use paid resources/credential fallback"
+  ],
+  "literature": [
+    {
+      "ref": "https://pages.cpsc.ucalgary.ca/~rscheidl/Papers/new-splitting.pdf",
+      "provenance": "retrieved",
+      "claim": "Primary2010Lemma7.2 Cardano compatible cube-root product and charnot2/3; directly derive and Leancheck identities, not rely on PDF exponent extraction"
+    },
+    {
+      "ref": "https://libntl.org/doc/ZZ_pEXFactoring.cpp.html",
+      "provenance": "retrieved",
+      "claim": "Primary FindRoots requires monic full distinct splitting; new selftests explicitly include repeated roots rather than silently applying that assumption"
+    },
+    {
+      "ref": "https://crypto.stanford.edu/pbc/notes/misc/galois.html",
+      "provenance": "retrieved",
+      "claim": "Classical Cardano and primitivecube-unity derivation, not a new invention"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "denominator-proof-v2",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "Prior whole-module proof build failed at a denominator side condition before any native data; retain exact prior source/log, no accepted theorem inferred",
+      "changes": [
+        "Use explicit ring equality3^3=27 before pow_ne_zero instead of simplifier normalization",
+        "Native algorithm, field inputs, population, source controls and decision criteria unchanged",
+        "Fresh samebranch checkpoint before affected corrected proof attempt"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "a80ce9305c19b285729762dea071cd5713775aa9c307368a60404495986ece12",
+    "commit": "384be24b31ac4fee3881ba2cc656c63db0eb37c5",
+    "frozen_at": "2026-11-16T11:52:02Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "pins_sha256": "b2d567a49b31a8e2017a92e208a77dd74dd18055e9ad59cf11f1a5a4e19a1119",
+    "window": "11:15–12:15UTC2026-11-16",
+    "deadline_epoch": 1794831300,
+    "stage_plan": [
+      {
+        "name": "qualifier-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "cpp-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "rust-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "compare-build",
+        "expected_exit": 0
+      },
+      {
+        "name": "protocol-check",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-qualifier-head",
+        "expected_exit": 101
+      },
+      {
+        "name": "reject-qualifier-source",
+        "expected_exit": 101
+      },
+      {
+        "name": "proof-A",
+        "expected_exit": 0
+      },
+      {
+        "name": "proof-B",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-proof-exponent",
+        "expected_exit": 1
+      },
+      {
+        "name": "reject-proof-proportional",
+        "expected_exit": 1
+      },
+      {
+        "name": "reject-proof-factor",
+        "expected_exit": 1
+      },
+      {
+        "name": "selftest-produce",
+        "expected_exit": 0
+      },
+      {
+        "name": "selftest-audit",
+        "expected_exit": 0
+      },
+      {
+        "name": "produce-C",
+        "expected_exit": 0
+      },
+      {
+        "name": "produce-A",
+        "expected_exit": 0
+      },
+      {
+        "name": "produce-B",
+        "expected_exit": 0
+      },
+      {
+        "name": "independent-audit",
+        "expected_exit": 0
+      },
+      {
+        "name": "compare",
+        "expected_exit": 0
+      },
+      {
+        "name": "corrupt-source",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-source",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-source",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-columns",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-columns",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-columns",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-cap",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-cap",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-cap",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-witness",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-witness",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-witness",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-root",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-root",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-root",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-row",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-row",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-row",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-scalar",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-scalar",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-scalar",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-log",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-log",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-log",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-cost",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-cost",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-cost",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-rank",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-rank",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-rank",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-branch",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-branch",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-branch",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-missing-query",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-missing-query",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-missing-query",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-missing-policy",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-missing-policy",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-missing-policy",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-missing-empty-branch",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-missing-empty-branch",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-missing-empty-branch",
+        "expected_exit": 101
+      },
+      {
+        "name": "corrupt-drop-proportional",
+        "expected_exit": 0
+      },
+      {
+        "name": "hash-false-drop-proportional",
+        "expected_exit": 0
+      },
+      {
+        "name": "reject-drop-proportional",
+        "expected_exit": 101
+      },
+      {
+        "name": "audit-original-again",
+        "expected_exit": 0
+      }
+    ],
+    "full_population": "1365profiles,42315diagnostics,40950separatecoldtargetworkloads PERfreshstream C/A/B; repeat30actualpoints",
+    "root_selftest": "All unordered triples WITHmultiplicity of61basefield elements, and32extension alphabet elements(actualμ31pluszero); roots expected independently outside candidate",
+    "certificate_degree": "Original membership witness cap3; actual root product certificate degree3; scalar field-root exponentiation is separate actual work",
+    "matrix_degree": null,
+    "compressed_pullback_degree": null,
+    "retention": "C compressed full diagnostic witness bodies and fresh full cold results/counts; A/B digest complete freshly computed bodies; no answer-table input; all possible queried Q already represented explicitly in diagnostics",
+    "false_objects": "Retained immutable C.xz plus full changed-byte patch+original/replacement hash and whole reconstructed false-stream hash. Actual whole stream consumed by separate sha256sum before independent rejection. No claim that standalone full false plaintext files existed.",
+    "prior_observations_disclosed": true,
+    "no_python_research_dispatch": true,
+    "samebranch_GitHub_source_protocol_checkpoint": true,
+    "raw_assets_and_detailed_results_local_only": true,
+    "new_IDC1_or_signed_PCC": false,
+    "canonical_guide_gap": "Current encrypted guide unreadable; historical plaintext fallback/current pinned external checker used",
+    "KB_gap": "Tools absent/wrapper previously127; no current query or novelty claim",
+    "coordination": "conductor127,no lease/reservation or invented replacement"
+  }
+}

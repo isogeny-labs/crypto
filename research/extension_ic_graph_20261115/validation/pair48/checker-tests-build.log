@@ -1,0 +1,32 @@
+error[E0277]: a value of type `Vec<principal_relation::Remainder>` cannot be built from an iterator over elements of type `remainder::Remainder`
+   --> examples/../research/extension_ic_graph_20261115/quadratic_pair_collection_check.rs:666:51
+    |
+666 |             remainders: old.remainder.into_iter().collect(),
+    |                                                   ^^^^^^^ value of type `Vec<principal_relation::Remainder>` cannot be built from `std::iter::Iterator<Item=remainder::Remainder>`
+    |
+help: the trait `FromIterator<remainder::Remainder>` is not implemented for `Vec<principal_relation::Remainder>`
+      but trait `FromIterator<principal_relation::Remainder>` is implemented for it
+   --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/mod.rs:3955:0
+    = help: for that trait implementation, expected `principal_relation::Remainder`, found `remainder::Remainder`
+note: the method call chain might not have had the expected associated types
+   --> examples/../research/extension_ic_graph_20261115/quadratic_pair_collection_check.rs:666:39
+    |
+666 |             remainders: old.remainder.into_iter().collect(),
+    |                         ------------- ^^^^^^^^^^^ `Iterator::Item` is `Remainder` here
+    |                         |
+    |                         this expression has type `Option<Remainder>`
+note: required by a bound in `std::iter::Iterator::collect`
+   --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/traits/iterator.rs:2087:4
+
+error: unused import: `Fld`
+  --> examples/../research/extension_ic_graph_20261115/quadratic_pair_collection_check.rs:12:44
+   |
+12 |     jv_cover::{self as cover, BaseEl, Ctx, Fld, Fq, Hyp, E2, E6},
+   |                                            ^^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0277`.

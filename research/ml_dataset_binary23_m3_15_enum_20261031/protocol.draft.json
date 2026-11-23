@@ -1,0 +1,577 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "frozen plan/protocol",
+      "native runner receipts",
+      "cell manifests",
+      "Git custody checkpoints",
+      "S3 readback receipts"
+    ],
+    "outputs": [
+      "26-row official export",
+      "native status counts by arity and twist",
+      "artifact and scalar labels",
+      "archive audit and report"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Thirteen fixed arities m3..15 on the untwisted ordinary-binary n23 curve; one generator/key, one attempt per cell, no timing comparison.",
+      "id": "binary23-m3-15-enumerate-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 3,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 150,
+        "seconds_per_case": 60,
+        "seed": 2026103107,
+        "shard_count": 26,
+        "shard_indices": "m3..15 each with untwisted then twisted",
+        "solver": "enumerate",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 4096
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Thirteen fixed arities m3..15 on the twisted ordinary-binary n23 curve; one generator/key, one attempt per cell, no timing comparison.",
+      "id": "binary23-m3-15-enumerate-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 3,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 150,
+        "seconds_per_case": 60,
+        "seed": 2026103107,
+        "shard_count": 26,
+        "shard_indices": "m3..15 each with untwisted then twisted",
+        "solver": "enumerate",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 4096
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset ordinary-binary n23 arity campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "All 26 fixed plan indices have at most one native attempt; censored, failed, unsupported and interrupted cells remain in the denominator. This is the ordinary-binary 26-cell block of a separately planned 78-cell three-family n23 arity portfolio."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "enumeration-capture",
+      "text": "A completed enumeration cell retains its counted visited transitions under the m-specific bounded finite-domain outcome; a budget stop or timeout does not certify no decomposition."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "scalar-label",
+      "text": "An ECDLP scalar label is promoted only after native independent recovery and generator-target group replay."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "custody",
+      "text": "Each attempted shard retains native verify, report and strict export statuses, a restricted archive and fresh S3 archive and pointer readback receipts; failures remain counted."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software coverage, replay and custody; no comparative performance claim or timing-effect inference.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact accounting of the fixed selected population; no detector false-positive or null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Any positive PDP witness or independently recovered ECDLP scalar requires native mathematical replay; this fixed-population pilot makes no detector-sensitivity claim.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts by arity, twist and native status; verified enumeration transitions, independently replayed scalar labels and S3 custody",
+    "text": "Account all 26 fixed cells. Promote only verified method and scalar labels. Retain timeout, unsupported, partial and construction failures. Durable requires fresh S3 readback/hash match.",
+    "verdict_vocabulary": [
+      "verified_enumeration_and_durable",
+      "verified_ecdlp_and_durable",
+      "verified_custody_pending",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 150
+  },
+  "extensions": {
+    "ml_dataset_binary23_m3_15_enum": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "export_mapping": {
+        "arms": "twist",
+        "instance_id_to_m": {
+          "0": 3,
+          "1": 4,
+          "10": 13,
+          "11": 14,
+          "12": 15,
+          "2": 5,
+          "3": 6,
+          "4": 7,
+          "5": 8,
+          "6": 9,
+          "7": 10,
+          "8": 11,
+          "9": 12
+        },
+        "instance_ids": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "rows_expected": 26,
+        "twist_identity_note": "m varies on a seeded curve and generator/key; opposite twists are distinct. Shared keys across m are not independent."
+      },
+      "label_scope": "bounded enumeration transition artifacts; scalar only after independent replay; ordinary-binary coefficient-field degree checked per twist",
+      "no_cloud_worker_submission": true,
+      "output_filesystem": "xfs",
+      "output_root": "/mnt/spot-codex-state/tmp/ml-dataset-binary23-m3-15-enum-20261031",
+      "plan_axes": {
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 3,
+        "families": [
+          "binary"
+        ],
+        "generators": 1,
+        "keys": 1,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "n": [
+          23
+        ],
+        "seed": 2026103107,
+        "solvers": [
+          "enumerate"
+        ],
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 4096
+      },
+      "planned_cells": 26,
+      "portfolio_scope": "One fixed 26-cell ordinary-binary block of a three-family 78-cell n23 m3..15 enumeration portfolio.",
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-binary23-m3-15-enum-20261031",
+      "schema": "ml-dataset.binary23-m3-15-enum/v1",
+      "selected_shards": "0..25 inclusive",
+      "separate_positive_control_dependency": "Native CLI currently samples unconditioned scalar targets; planted-PDP construction requires versioned target-generation/schema mode and restricted planting labels. Such controls must have a separate protocol and denominator.",
+      "shard_count": 26,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262"
+    }
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": false,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an attempted shard",
+    "dropping failed, timed-out or interrupted attempts",
+    "using restricted witnesses as public ML features",
+    "promoting missing S3 readback as durable",
+    "promoting a bounded negative as an exhaustive no-decomposition result",
+    "claiming timing advantage or exact fall degree from this fixed population",
+    "treating shared public key across m as independent key draws",
+    "assuming a nontrivial Frobenius orbit for ordinary-binary without recorded coefficient-field degree and physical transport",
+    "combining a future planted-positive control with the natural 26-cell denominator"
+  ],
+  "invalidation_rules": [
+    "Pinned binary, plan or protocol digest changes invalidate new admission.",
+    "Existing attempt marker or live worker blocks another attempt for that shard.",
+    "Failed native verify prevents method or scalar promotion.",
+    "Missing fresh S3 GET/hash match prevents durability promotion.",
+    "Point-count construction failure or timeout remains a counted cell and is never replaced by another curve seed."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Characteristic-two summation-polynomial and Weil-descent scope",
+      "provenance": "retrieved",
+      "ref": "https://eprint.iacr.org/2013/596.pdf",
+      "verified_by": "Shantz and Teske explicitly study E/F_(2^n) and distinguish the heuristic algebraic method from exact finite-domain observations; this pilot makes only exact software claims."
+    },
+    {
+      "claim": "Native ordinary-binary and enumeration capability",
+      "provenance": "internal",
+      "ref": "src/ml_dataset/curves.rs:687-885; src/ml_dataset/solvers.rs:746-838",
+      "verified_by": "Pinned source and native capabilities; per-cell construction remains observed."
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt",
+      "solver and twist",
+      "enumeration transition verification status",
+      "independent ECDLP scalar-recovery status"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Native verify passes and the retained manifest contains the counted enumeration transition artifact.",
+        "id": "method-artifact-verified",
+        "kind": "exact",
+        "name": "Verified method artifact",
+        "resolution": "1",
+        "source": "native cell manifest and dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Restricted archive and custody pointer pass S3 PUT and fresh GET byte-equality/hash checks.",
+        "id": "durable-cell",
+        "kind": "exact",
+        "name": "Durable cell",
+        "resolution": "1",
+        "source": "content-addressed S3 archive and pointer receipts",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes. Operational diagnostic only.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-BINARY23-M3-15-ENUM-20261031",
+  "question": "Can all 26 fixed natural ordinary-binary n23 m3..15 enumeration cells across both twists retain bounded native outcomes and durable custody?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native mixed-radix order pairs both twists at each m. No timing-effect comparison is made.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Fixed seed and one generator/key index. All m3..15 on both twists, exactly 26 cells; no replacement after timeout or failure. Arity labels are not independent public keys."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed fixed before data; one curve seed index0.",
+      "seeds": [
+        2026103107
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 13,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Thirteen m values per twist arm; 26 fixed native cells. Exact accounting only, no inferential effect or power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 150.0,
+      "fixed_seconds": 10.0,
+      "measured_on": "Planning allowance only: 26 cells have a hard 3900s generate-only outer bound at 150s each. Native finalization and S3 custody have separate bounded stages, not performance timings.",
+      "per_sample_seconds": 140.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All 26 plan indices0..25, at most one native attempt each; retain every outcome without replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has 60s inner and 150s outer cap; finite finalization and S3 stage caps. Stop on failed custody and resume finalization only; require 8GiB XFS free before new attempt. Overall campaign 8h ceiling."
+    }
+  ],
+  "study_dir": "research/ml_dataset_binary23_m3_15_enum_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "binary23-m3-15-enumerate-untwisted",
+          "binary23-m3-15-enumerate-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All 26 indices accounted; each promoted enumeration artifact requires native verification and S3 fresh readback."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Pinned clean source c41bec15 and binary SHA b8e0881e, checked per attempt.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Ordinary binary n23, m3..15, both twists, one curve seed and one generator/key; retain point-count construction failures.",
+        "name": "curve-arity-twist",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one native command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Shared host context retained; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "60s inner cell and 150s outer runner cap; enumeration has 4096-transition work limit.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All 26 indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "XFS output with 8GiB free-space floor and restricted S3 custody.",
+        "name": "filesystem",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 2
+}

@@ -1,0 +1,30 @@
+../modular-evidence/draft-001.lean.txt:49:5: error(lean.unknownIdentifier): Unknown identifier `pow_dvd_iff_le_padicValNat`
+../modular-evidence/draft-001.lean.txt:50:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ↑?m ^ ?n
+in the target expression
+  2 ^ extra d ∣ n
+
+case neg
+n : ℤ
+d : ℕ
+hd : 0 < d
+q : ↥integralRationals
+hrep : ↑n = ↑d * ↑q
+hn : ¬n = 0
+hdQ : ↑d ≠ 0
+hnQ : ↑n ≠ 0
+hq : ↑q ≠ 0
+hval : 0 ≤ padicValRat 2 ↑q
+hv : ↑(extra d) ≤ ↑(padicValInt 2 n)
+hi : extra d ≤ padicValNat 2 n.natAbs
+hN : 2 ^ extra d ∣ n.natAbs
+⊢ 2 ^ extra d ∣ n
+../modular-evidence/draft-001.lean.txt:69:4: error: Type mismatch: After simplification, term
+  hN
+ has type
+  n % (c * M) ≡ n [ZMOD c * M]
+but is expected to have type
+  n % (c * M) ≡ c * (n / c) [ZMOD c * M]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

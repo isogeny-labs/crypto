@@ -1,0 +1,10 @@
+{"schema":"ecbench.spec/v1","label":"r2 phase C smoke","description":"rho.negation_lanes_v1 and rootfind-mitm-prime-batch against their parents; correctness smoke, not a measurement",
+"workloads":{"curves":[{"kind":"prime_search","bits":24,"seed":59297},{"kind":"prime_search","bits":28,"seed":59297}],"targets_per_curve":3,"target_seed":20261112},
+"arms":[
+ {"name":"rho-neg","role":"reference","method":{"id":"rho.negation"}},
+ {"name":"lanes1","role":"candidate","method":{"id":"rho.negation_lanes_v1","params":{"lanes":"1"}}},
+ {"name":"lanes32","role":"candidate","method":{"id":"rho.negation_lanes_v1","params":{"lanes":"32"}}},
+ {"name":"rf","role":"baseline","method":{"id":"ic.pipeline","params":{"factor_base":"prime-abscissa:size=32","oracle":"rootfind-mitm:m=3","linalg":"structured-gauss"}}},
+ {"name":"rf-batch","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"prime-abscissa:size=32","oracle":"rootfind-mitm-prime-batch:m=3","linalg":"structured-gauss"}}}
+],
+"measurement":{"rounds":1,"warmup":0,"order":"alternate_measured","seed":20261112,"isolation_required":"L0","timeout_seconds":300}}

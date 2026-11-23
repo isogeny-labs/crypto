@@ -1,0 +1,178 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-hyperedge-solve v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_hyperedge_solve_20261116)
+warning: unused import: `Row`
+  --> main.rs:13:25
+   |
+13 |     solve::{solve_fast, Row, SolveStats},
+   |                         ^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `mul` is never used
+  --> ../hec_anchor_relations_20261114/anchor.rs:18:4
+   |
+18 | fn mul(f: &Fp, a: u64, b: u64) -> u64 {
+   |    ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `axpy` is never used
+  --> ../hec_anchor_relations_20261114/anchor.rs:29:4
+   |
+29 | fn axpy(a: &Row, b: &Row, s: u64, f: &Fp) -> Row {
+   |    ^^^^
+
+warning: function `scale` is never used
+  --> ../hec_anchor_relations_20261114/anchor.rs:56:4
+   |
+56 | fn scale(a: &Row, s: u64, f: &Fp) -> Row {
+   |    ^^^^^
+
+warning: struct `Forest` is never constructed
+   --> ../hec_anchor_relations_20261114/anchor.rs:105:12
+    |
+105 | pub struct Forest {
+    |            ^^^^^^
+
+warning: associated items `new`, `find`, and `insert` are never used
+   --> ../hec_anchor_relations_20261114/anchor.rs:115:12
+    |
+114 | impl Forest {
+    | ----------- associated items in this implementation
+115 |     pub fn new(n: usize, ell: u64) -> Self {
+    |            ^^^
+...
+126 |     pub fn find(&mut self, u: usize) -> (usize, u64, Row) {
+    |            ^^^^
+...
+142 |     pub fn insert(&mut self, off: &[(usize, u64)], mut hot: Row) -> Option<Row> {
+    |            ^^^^^^
+
+warning: struct `Report` is never constructed
+   --> ../hec_anchor_relations_20261114/anchor.rs:260:12
+    |
+260 | pub struct Report {
+    |            ^^^^^^
+
+warning: function `solve` is never used
+   --> ../hec_anchor_relations_20261114/anchor.rs:284:8
+    |
+284 | pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
+    |        ^^^^^
+
+warning: function `solve_orbit` is never used
+   --> ../hec_anchor_relations_20261114/anchor.rs:290:8
+    |
+290 | pub fn solve_orbit(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
+    |        ^^^^^^^^^^^
+
+warning: function `solve_compact` is never used
+   --> ../hec_anchor_relations_20261114/anchor.rs:294:8
+    |
+294 | pub fn solve_compact(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
+    |        ^^^^^^^^^^^^^
+
+warning: function `solve_variant` is never used
+   --> ../hec_anchor_relations_20261114/anchor.rs:298:4
+    |
+298 | fn solve_variant(
+    |    ^^^^^^^^^^^^^
+
+warning: struct `Orbit` is never constructed
+ --> ../hec_anchor_relations_20261114/compact.rs:4:12
+  |
+4 | pub struct Orbit {
+  |            ^^^^^
+
+warning: method `as_slice` is never used
+ --> ../hec_anchor_relations_20261114/compact.rs:9:12
+  |
+8 | impl Orbit {
+  | ---------- method in this implementation
+9 |     pub fn as_slice(&self) -> &[(Poly, Poly)] {
+  |            ^^^^^^^^
+
+warning: function `product` is never used
+  --> ../hec_anchor_relations_20261114/compact.rs:14:4
+   |
+14 | fn product(points: &[(u64, u64)], omitted: usize, f: &Fp) -> [u64; 6] {
+   |    ^^^^^^^
+
+warning: function `signed_orbit` is never used
+  --> ../hec_anchor_relations_20261114/compact.rs:31:8
+   |
+31 | pub fn signed_orbit(c: &Curve, points: &[(u64, u64)], weights: &[u64]) -> Orbit {
+   |        ^^^^^^^^^^^^
+
+warning: struct `DenseForest` is never constructed
+ --> ../hec_anchor_relations_20261114/dense.rs:6:12
+  |
+6 | pub struct DenseForest {
+  |            ^^^^^^^^^^^
+
+warning: associated items `new`, `product`, `find`, `bytes`, and `insert` are never used
+  --> ../hec_anchor_relations_20261114/dense.rs:20:12
+   |
+19 | impl DenseForest {
+   | ---------------- associated items in this implementation
+20 |     pub fn new(nodes: usize, anchors: usize, ell: u64) -> Self {
+   |            ^^^
+...
+39 |     fn product(&self, a: u64, b: u64) -> u64 {
+   |        ^^^^^^^
+...
+52 |     fn find(&mut self, start: usize) -> (usize, u64) {
+   |        ^^^^
+...
+73 |     pub fn bytes(&self) -> usize {
+   |            ^^^^^
+...
+78 |     pub fn insert(&mut self, off: &[(usize, u64)], on: &Row) -> Option<Row> {
+   |            ^^^^^^
+
+warning: struct `Echelon` is never constructed
+   --> ../hec_anchor_relations_20261114/dense.rs:141:12
+    |
+141 | pub struct Echelon {
+    |            ^^^^^^^
+
+warning: associated items `new`, `insert`, and `target` are never used
+   --> ../hec_anchor_relations_20261114/dense.rs:150:12
+    |
+149 | impl Echelon {
+    | ------------ associated items in this implementation
+150 |     pub fn new(anchors: usize, ell: u64) -> Self {
+    |            ^^^
+...
+160 |     pub fn insert(&mut self, row: &Row, rhs: u64) -> Option<u64> {
+    |            ^^^^^^
+...
+191 |     pub fn target(&self) -> Option<u64> {
+    |            ^^^^^^
+
+warning: function `inverse_differences` is never used
+ --> ../hec_anchor_relations_20261114/orbit.rs:5:8
+  |
+5 | pub fn inverse_differences(xs: &[u64], f: &Fp) -> Vec<u64> {
+  |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `signed_orbit_with_weights` is never used
+  --> ../hec_anchor_relations_20261114/orbit.rs:51:8
+   |
+51 | pub fn signed_orbit_with_weights(
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new` and `bytes` are never used
+   --> ../../crates/hec-native-ic/src/table_factor.rs:33:12
+    |
+ 32 | impl Tables {
+    | ----------- associated items in this implementation
+ 33 |     pub fn new(p: u64) -> Self {
+    |            ^^^
+...
+114 |     pub fn bytes(&self) -> usize {
+    |            ^^^^^
+
+warning: `hec-hyperedge-solve` (bin "hyperedge-solve-control") generated 22 warnings (run `cargo fix --bin "hyperedge-solve-control" -p hec-hyperedge-solve` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 1.98s

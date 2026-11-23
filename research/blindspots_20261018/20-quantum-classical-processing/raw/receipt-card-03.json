@@ -1,0 +1,296 @@
+{
+  "card_id": "CARD-BLINDSPOT-20-03",
+  "card_path": "research/blindspots_20261018/20-quantum-classical-processing/card-03.yaml",
+  "card_sha256": "6bcfc389f4e323e0efec71bc26cb36807bdb1af16aa025fbf4e11bdd06a1d516",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-20/card-03"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-20/card-03/b20",
+        "examples/blindspots_20_quantum_classical.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.833,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 2.833,
+      "stderr_sha256": "37075a5136d93b0a585fb378292988546e0f65b4ed0f2fcf09466e6cf9214e5f",
+      "stderr_tail": [
+        "warning: field `sigma` is never read",
+        "   --> examples/blindspots_20_quantum_classical.rs:250:5",
+        "    |",
+        "248 | struct Params {",
+        "    |        ------ field in this struct",
+        "249 |     m: u32,",
+        "250 |     sigma: u32,",
+        "    |     ^^^^^",
+        "    |",
+        "    = note: `Params` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: 1 warning emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-03/b20",
+        "--mode",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.086,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.086,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fc9da4942ff579ecb48c3f8329f4aaead3b4a98624fa6e47c89005076476a6d3",
+      "stdout_tail": [
+        "{\"kind\":\"selftest\",\"gate\":\"rnsl_formulas\",\"pass\":true,\"detail\":\"qubits=2330 toffoli_over_table=1.0218\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r29_s1_l4\",\"pass\":true,\"detail\":\"max_abs_diff=6.245e-17 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r31_s2_l3\",\"pass\":true,\"detail\":\"max_abs_diff=1.978e-16 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"sampler_exact_r13_s0_l4\",\"pass\":true,\"detail\":\"max_abs_diff=5.551e-17 sum=1.000000000000\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"lll_babai\",\"pass\":true,\"detail\":\"determinant preserved, planted point recovered (50 bases)\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"bsgs\",\"pass\":true,\"detail\":\"recovered_all=true mean_adds=30.4 model=39.5 ratio=0.769\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"window_vs_haner\",\"pass\":true,\"detail\":\"best_window=16 model_T=9.823e8 haner_range=[2.319e9,7.387e9]\"}",
+        "{\"kind\":\"selftest\",\"gate\":\"search_vs_criterion\",\"pass\":true,\"detail\":\"mismatches=0/150\"}",
+        "{\"kind\":\"selftest_done\",\"all_pass\":true}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-20/card-03/b20",
+        "--mode",
+        "single",
+        "--m",
+        "16",
+        "--sigma",
+        "0,2,4,7",
+        "--nu",
+        "0",
+        "--samples",
+        "4000",
+        "--verify",
+        "100",
+        "--seed",
+        "3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 69.444,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "s16-nu0",
+      "index": 4,
+      "outputs": {},
+      "seconds": 69.444,
+      "stderr_sha256": "13fce94848db9587b4bc5d79631cac4da68fb92a3c79765497871e1bc170a2f6",
+      "stderr_tail": [
+        "single m=16 sigma=0 nu=0 samples=4000 17.7s",
+        "single m=16 sigma=2 nu=0 samples=4000 18.9s",
+        "single m=16 sigma=4 nu=0 samples=4000 16.7s",
+        "single m=16 sigma=7 nu=0 samples=4000 16.2s"
+      ],
+      "stdout_sha256": "fd557956ad8da93ea7a083e63f83d9b5e8986d4d108ff183b4fd5d249d232ddc",
+      "stdout_tail": [
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":0,\"b_delta\":10,\"bt\":10,\"runs\":4000,\"success\":3963,\"rate\":0.99075,\"ci_lo\":0.9872766712829438,\"ci_hi\":0.993281600552785,\"null_success\":0,\"null_rate\":0,\"chance\":0.0003205079287556661,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":0,\"b_delta\":30,\"bt\":30,\"runs\":4000,\"success\":3981,\"rate\":0.99525,\"ci_lo\":0.9925926926030255,\"ci_hi\":0.9969569439260517,\"null_success\":2,\"null_rate\":0.0005,\"chance\":0.0009309992216236016,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":0,\"b_delta\":100,\"bt\":100,\"runs\":4000,\"success\":3992,\"rate\":0.998,\"ci_lo\":0.9960581334698354,\"ci_hi\":0.9989862259273995,\"null_success\":15,\"null_rate\":0.00375,\"chance\":0.0030677187466613756,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":0,\"bt\":0,\"runs\":4000,\"success\":3132,\"rate\":0.783,\"ci_lo\":0.7699574189098437,\"ci_hi\":0.7954995162496292,\"null_success\":0,\"null_rate\":0,\"chance\":0.000045786846965095163,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":1,\"bt\":1,\"runs\":4000,\"success\":3750,\"rate\":0.9375,\"ci_lo\":0.9295705242430957,\"ci_hi\":0.9445899320546759,\"null_success\":0,\"null_rate\":0,\"chance\":0.00013736054089528548,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":2,\"bt\":2,\"runs\":4000,\"success\":3845,\"rate\":0.96125,\"ci_lo\":0.9548128651156453,\"ci_hi\":0.9668020159525768,\"null_success\":0,\"null_rate\":0,\"chance\":0.0002289342348254758,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":4,\"bt\":4,\"runs\":4000,\"success\":3909,\"rate\":0.97725,\"ci_lo\":0.9721508359485276,\"ci_hi\":0.9814333418071557,\"null_success\":0,\"null_rate\":0,\"chance\":0.00041208162268585645,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":10,\"bt\":10,\"runs\":4000,\"success\":3966,\"rate\":0.9915,\"ci_lo\":0.988145945797788,\"ci_hi\":0.9939108868201657,\"null_success\":4,\"null_rate\":0.001,\"chance\":0.0009615237862669984,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":30,\"bt\":30,\"runs\":4000,\"success\":3984,\"rate\":0.996,\"ci_lo\":0.9935118748856361,\"ci_hi\":0.997536322425666,\"null_success\":16,\"null_rate\":0.004,\"chance\":0.002792997664870805,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":100,\"bt\":100,\"runs\":4000,\"success\":3995,\"rate\":0.99875,\"ci_lo\":0.9970769520710965,\"ci_hi\":0.9994659681083631,\"null_success\":49,\"null_rate\":0.01225,\"chance\":0.009203156239984127,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":0,\"bt\":0,\"runs\":4000,\"success\":3132,\"rate\":0.783,\"ci_lo\":0.7699574189098437,\"ci_hi\":0.7954995162496292,\"null_success\":2,\"null_rate\":0.0005,\"chance\":0.00007631141160849193,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":1,\"bt\":1,\"runs\":4000,\"success\":3751,\"rate\":0.93775,\"ci_lo\":0.9298342622771772,\"ci_hi\":0.9448257142813358,\"null_success\":2,\"null_rate\":0.0005,\"chance\":0.0002289342348254758,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":2,\"bt\":2,\"runs\":4000,\"success\":3846,\"rate\":0.9615,\"ci_lo\":0.9550810976601813,\"ci_hi\":0.9670333036687824,\"null_success\":2,\"null_rate\":0.0005,\"chance\":0.00038155705804245965,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":4,\"bt\":4,\"runs\":4000,\"success\":3910,\"rate\":0.9775,\"ci_lo\":0.9724253099408094,\"ci_hi\":0.9816583880756157,\"null_success\":3,\"null_rate\":0.00075,\"chance\":0.0006868027044764274,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":10,\"bt\":10,\"runs\":4000,\"success\":3967,\"rate\":0.99175,\"ci_lo\":0.9884368720329698,\"ci_hi\":0.9941194808457255,\"null_success\":8,\"null_rate\":0.002,\"chance\":0.0016025396437783306,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":30,\"bt\":30,\"runs\":4000,\"success\":3985,\"rate\":0.99625,\"ci_lo\":0.993821613353929,\"ci_hi\":0.9977261042181147,\"null_success\":25,\"null_rate\":0.00625,\"chance\":0.004654996108118008,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cell\",\"m\":16,\"r\":65521,\"rshape\":\"top\",\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":2,\"b_delta\":100,\"bt\":100,\"runs\":4000,\"success\":3996,\"rate\":0.999,\"ci_lo\":0.9974313811879697,\"ci_hi\":0.9996110592522315,\"null_success\":73,\"null_rate\":0.01825,\"chance\":0.015338593733306878,\"null_ok\":true,\"quantum_ops\":39}",
+        "{\"kind\":\"single_cost\",\"m\":16,\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":0,\"b_delta\":100,\"bt\":100,\"verified_runs\":100,\"search_successes\":100,\"criterion_mismatches\":0,\"mean_group_adds\":94.18,\"mean_native\":23,\"formula_group_adds\":102,\"formula_native\":29,\"ratio_adds\":0.9233333333333335,\"ratio_native\":0.7931034482758621}",
+        "{\"kind\":\"single_cost\",\"m\":16,\"sigma\":7,\"nu\":0,\"ell\":16,\"b_eta\":1,\"b_delta\":30,\"bt\":30,\"verified_runs\":100,\"search_successes\":99,\"criterion_mismatches\":0,\"mean_group_adds\":83.82,\"mean_native\":13.22,\"formula_group_adds\":203,\"formula_native\":32,\"ratio_adds\":0.4129064039408867,\"ratio_native\":0.413125}",
+        "{\"kind\":\"single_gates\",\"m\":16,\"rshape\":\"top\",\"null_gate_ok\":true,\"monotone_gate_ok\":true,\"positive_control_ok\":true}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-20/card-03/b20"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-20/card-03"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "02be1aff1b6d9fc672e1a6e9747381777f5597f1",
+  "dirty_after": [
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-13-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n41-c-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n41-c-b.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n41-c.jsonl",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-07-build.stderr.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-07-build.stdout.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-03-build.stderr.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-03-build.stdout.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s16-nu0.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s16-nu0.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-03.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-03.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-15-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-15-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-00-03-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-00-03-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-03-06-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-03-06-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-21-5-3-c15-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-21-5-3-c15-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c15.model",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-14-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-15-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-13-r2-build.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-13-r2-build.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-11-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-c-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-c-b.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n37-c.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n41-c.jsonl",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/c83a0-k300-cos-cyc.jsonl",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/c83a0-k300-cos-cyc.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-06-build.stderr.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-06-build.stdout.log",
+    "research/blindspots_20261018/17-cyclotomic-cost-n83/raw/receipt-card-06.json",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-02-build.stderr.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/card-02-build.stdout.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/receipt-card-02.json",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s12.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s12.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s16w.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/s16w.log",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-02.jsonl",
+    "research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-02.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

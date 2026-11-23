@@ -1,0 +1,37 @@
+import WordGuard22
+import WordBZero
+set_option autoImplicit false
+namespace PencilWordRefinement
+
+theorem guardB_literal_identity (p : UInt64) (a : WeightedWord) :
+ guardBWord p a=(bzeroWords p a).b := rfl
+
+theorem ordered_double_bzero_preserves (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31)
+ (a0 a1 a2 a3 : UInt64) (a b : WeightedWord)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat)
+ (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat)
+ (ha : a.canonical p) (hb : b.canonical p) (hz : a.z≠0) (hw : a.w≠0)
+ (hbranch : crossPreludeWord p a b=some .sameUDouble)
+ (hB : guardBWord p a=0)
+ (hv : a.normalizedValid p (WeightedDoubling.curve
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat)
+  (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hg : IsCoprime (WeightedDoubling.curve
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat)
+  (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat))
+  (WeightedDoubling.curve
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat)
+  (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)).derivative) :
+ let d := (bzeroWords p a).point
+ let c := dblWordPayload p a0 a1 a2 a3 d
+ a.s≠0 ∧ d.canonical p ∧ d.y≠0 ∧
+ bzeroWordDispatch p a0 a1 a2 a3 a=some c ∧
+ c.canonical p ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid p (WeightedDoubling.curve
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat)
+  (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)) := by
+ have hs := word_double_b_zero_forces_point_arm p hfive hbound a b ha hb hbranch hB
+ have hB' : (bzeroWords p a).b=0 := by rw [←guardB_literal_identity];exact hB
+ exact ⟨hs,bzero_word_preserves p hfive hbound a0 a1 a2 a3 a h0 h1 h2 h3 ha hz hw hs hB' hv hg⟩
+end PencilWordRefinement

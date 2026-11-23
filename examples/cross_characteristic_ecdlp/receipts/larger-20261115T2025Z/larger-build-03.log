@@ -1,0 +1,34 @@
+✖ [1868/1869] Building CrossCharacteristicLarger (3.7s)
+trace: .> LEAN_PATH=/workspace/ecdlp-transfer/.lake/packages/Cli/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/batteries/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/Qq/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/aesop/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/plausible/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.24.0/bin/lean /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/CrossCharacteristicLarger.lean -o /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CrossCharacteristicLarger.olean -i /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CrossCharacteristicLarger.ilean -c /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CrossCharacteristicLarger.c --setup /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CrossCharacteristicLarger.setup.json --json
+error: CrossCharacteristicLarger.lean:83:4: Type mismatch
+  mul_ne_zero (fun h => of_decide_eq_true (id (Eq.refl true)) ((CharP.cast_eq_zero_iff Fbig 2 27).mp h))
+    (pow_ne_zero 2 (pow_ne_zero 2 omega_ne_zero))
+has type
+  ↑27 * (omega ^ 2) ^ 2 ≠ 0
+but is expected to have type
+  ¬-((4 * omega) ^ 2 * (omega * omega ^ 2)) - 27 * (omega ^ 2) ^ 2 = 0
+error: CrossCharacteristicLarger.lean:138:2: Tactic `decide` failed for proposition
+  (8 / 4) ^ 2 + -(8 / 4) = 2 ∧ -8 + -(8 / 4 * ((8 / 4) ^ 2 + -(8 / 4) - 4)) - (8 / 4 + -(8 / 4) ^ 2) + 4 = 2
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, and `ZMod.decidableEq`, reduction got stuck at the `Decidable` instance
+  match h : (↑((8 / 4) ^ 2 + -(8 / 4))).beq ↑2 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: CrossCharacteristicLarger.lean:144:2: Tactic `decide` failed for proposition
+  (2 / 2) ^ 2 + -(2 / 2) + 4 - 2 - 2 = 0 ∧
+    -2 + -(2 / 2 * ((2 / 2) ^ 2 + -(2 / 2) + 4 - 2 - 2 - 2)) - (2 - ((2 / 2) ^ 2 + -(2 / 2) + 4 - 2)) = 0
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `Nat.decLe`, and `ZMod.decidableEq`, reduction got stuck at the `Decidable` instance
+  match h : (↑((2 / 2) ^ 2 + -(2 / 2) + 4 - 2 - 2)).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: Lean exited with code 1
+Some required targets logged failures:
+- CrossCharacteristicLarger
+error: build failed

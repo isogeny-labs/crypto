@@ -1,0 +1,42 @@
+spec ECS1h8d78081e210f (native hashed ECDLP: bounded end-to-end feasibility, four prime rosters): 1728 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm rho-neg-aa       control    ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm rho-neg-v2       control    ECM1h0de59de796c1 rho.negation_v2 {"cap_multiple": "64"}
+  arm native-source    baseline   ECM1h0dca15498cab ic.hashed_native_v1 {"attempts": "4096", "backend": "source", "bits": "1000000", "cache_entries": "4096", "columns": "4096", "derive_last": "1", "m": "2", "outer_multiplier": "2", "rank": "16", "slices": "16", "smallest_first": "1", "steps": "5000000", "threshold": "32", "trials": "16", "vector": "2000000"}
+  arm native-selectors candidate  ECM1h67a96d218635 ic.hashed_native_v1 {"attempts": "4096", "backend": "selectors", "bits": "1000000", "cache_entries": "4096", "columns": "4096", "derive_last": "1", "m": "2", "outer_multiplier": "2", "rank": "16", "slices": "16", "smallest_first": "1", "steps": "5000000", "threshold": "32", "trials": "16", "vector": "2000000"}
+  arm native-selectors-aa control    ECM1h67a96d218635 ic.hashed_native_v1 {"attempts": "4096", "backend": "selectors", "bits": "1000000", "cache_entries": "4096", "columns": "4096", "derive_last": "1", "m": "2", "outer_multiplier": "2", "rank": "16", "slices": "16", "smallest_first": "1", "steps": "5000000", "threshold": "32", "trials": "16", "vector": "2000000"}
+  arm native-width     candidate  ECM1h947ce1a5f163 ic.hashed_native_v1 {"attempts": "4096", "backend": "width", "bits": "1000000", "cache_entries": "4096", "columns": "4096", "derive_last": "1", "m": "2", "outer_multiplier": "2", "rank": "16", "slices": "16", "smallest_first": "1", "steps": "5000000", "threshold": "32", "trials": "16", "vector": "2000000"}
+  arm native-partial   candidate  ECM1h174583c6903a ic.hashed_native_v1 {"attempts": "4096", "backend": "partial", "bits": "1000000", "cache_entries": "4096", "columns": "4096", "derive_last": "1", "m": "2", "outer_multiplier": "2", "rank": "16", "slices": "16", "smallest_first": "1", "steps": "5000000", "threshold": "32", "trials": "16", "vector": "2000000"}
+  arm ic-mitm          baseline   ECM1he27eac0cec8f ic.pipeline {"factor_base": "prime-abscissa:size=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload W11cbe85b36c1 icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload W792797f689f0 icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload W9a6d331e3490 icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload W32ce7f32a9d8 icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload W6bd2993b76c4 icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload Wc0c0e573944d icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload W840bb2cb94de icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload W8c2ec97ee9ff icv1-fp10-t5-192cb216 r=2^9.68 A=2 registered=true ec1=EC1P10Cfphcf15d87ab724
+  workload Wab49bc515dc7 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload W58a5b405641a icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload We9d3c0c8fb49 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload Waef1644e1f59 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload Wbb0ce0bff906 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload W282a7aa3c9e4 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload W0f71395cb460 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload Wa811cabb4f49 icv1-fp12-t19-d4a315df r=2^11.93 A=2 registered=true ec1=EC1P12Cfphe249b36f57ee
+  workload W0ab2d654506c icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload We2a447ac209d icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload W184503ead880 icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload W348222951886 icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload W6e9abbbdc02d icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload W7bbc9c3df64c icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload Wd40d867d11e6 icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload Wcd47eb3a34c8 icv1-fp14-tm43-158b6914 r=2^13.99 A=2 registered=true ec1=EC1P14Cfph4f360f746508
+  workload Wb944f11f51f1 icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload W125267725c18 icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload W2e2039dd6864 icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload Wbdf2d507ba82 icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload W3e5edb82f0fb icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload Wf66af5b16ed1 icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload Wa3d8ab346413 icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2
+  workload W7b4b99a105ba icv1-fp16-t351-d433f24e r=2^15.99 A=2 registered=true ec1=EC1P16Cfph25cb80ed53b2

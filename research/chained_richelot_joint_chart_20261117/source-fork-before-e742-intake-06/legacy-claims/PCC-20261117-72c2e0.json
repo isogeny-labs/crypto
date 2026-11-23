@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:25:41Z",
+ "id": "PCC-20261117-72c2e0",
+ "kind": "statement",
+ "producer": {
+  "commit": "20909cbc11f1b52f2eaa37b3c77584a902ee619b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_joint_chart_20261117/EXACT_SOURCE13_BEFORE_FIRST_COMPILE_B.json",
+    "sha256": "34b82ef59f21e8ac0f22fbb911e7261751fe1c5b3af2ac445c21593e8b89002a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_joint_chart_20261117/run_first_compile_B_13.sh",
+    "sha256": "0fe7b234274c7ed0d62ede33c98a53e2fd3cef9b564320d9efdb9933fccb59ab"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_joint_chart_20261117/NEW_MUTABLE_CANONICAL_INDEX_RELOCATION.json",
+    "sha256": "a2531993515b23d163d28ad9837689341773f73ee39a4b2a9274edd98356e13b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Prospective caller13B before first compilation/arithmetic test: preserve first setup6df51e, original20909cbc/caller475c70 and Rust7ed6541c unchanged. New caller copies only actual compiler inputs/protocol/proof/receipt and retains full caller/source guards; historical evidence stays public and hash-manifested. Population,20MB guard,120s,one worker/exact test unchanged; Bash syntax0. Only new mutable own canonical index moved byte/mode-equal to runlock, old frozen indices untouched. No compilation/arithmetic result yet."
+}

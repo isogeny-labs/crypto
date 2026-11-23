@@ -1,0 +1,25 @@
+setring inverseBaseCertificate50;short=0;
+matrix originalMatrix50=matrix(integerColumns50);matrix basisMatrix50=matrix(basis50);
+if(originalMatrix50*originalLift50!=basisMatrix50 || basisMatrix50*reverseLift50!=originalMatrix50){ERROR("RR_TABLE_RELOAD50_MODULE_PRODUCTS");quit;}
+execute(read("../rr-mult50-02/rr-products50.sing"));
+intmat savedProductParents50=parents50;
+execute(read("../rr-mult50-02/rr-table50.sing"));
+intmat savedTableParents50=parents50;
+matrix savedEmbedding50=sourceLift50;
+setring inverseBaseCertificate50;
+map productReload50=productPidCertificate50,u;map tableReload50=tablePidCertificate50,u;
+module products50=productReload50(productNumerators50);
+matrix coefficients50=tableReload50(table50);matrix embedding50=tableReload50(savedEmbedding50);
+int left50;int right50;int pair50=0;int row50;
+if(size(products50)!=528 || nrows(coefficients50)!=32 || ncols(coefficients50)!=528){ERROR("RR_TABLE_RELOAD50_SHAPE");quit;}
+for(left50=1;left50<=32;left50++){for(right50=left50;right50<=32;right50++){
+ pair50++;
+ if(savedProductParents50[pair50,1]!=left50 || savedProductParents50[pair50,2]!=right50 || savedTableParents50[pair50,1]!=left50 || savedTableParents50[pair50,2]!=right50){ERROR("RR_TABLE_RELOAD50_PARENT_ORDER");quit;}
+}}
+if(commonDenominator50*basisMatrix50*coefficients50!=matrix(products50)){ERROR("RR_TABLE_RELOAD50_FULL_TABLE_PRODUCT");quit;}
+matrix corrupted50=coefficients50;corrupted50[1,1]=corrupted50[1,1]+1;
+if(commonDenominator50*basisMatrix50*corrupted50==matrix(products50)){ERROR("RR_TABLE_RELOAD50_CORRUPTION_ACCEPTED");quit;}
+matrix sourcePower50[32][32];for(row50=1;row50<=32;row50++){sourcePower50[row50,row50]=commonDenominator50;}
+if(embedding50!=sourceLift50 || basisMatrix50*embedding50!=sourcePower50){ERROR("RR_TABLE_RELOAD50_SOURCE_EMBEDDING");quit;}
+print("RR_TABLE_RELOAD50_RESULT actual_serialized_rings_reloaded=true product_pairs=528 both_original_module_products=true full_table_product=true full_source_embedding=true corrupted_coefficient_rejected=true");
+print("RR_TABLE_RELOAD50_ALL_CHECKS_PASS");quit;

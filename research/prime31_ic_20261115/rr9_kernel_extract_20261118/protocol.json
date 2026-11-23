@@ -1,0 +1,45 @@
+{
+  "schema": "prime31.rr9.d9-kernel-extraction-protocol.v1",
+  "experiment_id": "EXP-PRIME31-RR9-D9-KERNEL-001",
+  "status": "frozen_before_candidate_source",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1
+  },
+  "factor_base_x": [0, 1, 2, 3, 5, 6, 8, 9],
+  "positive_residual": [1911579686, 548820096],
+  "negative_residuals": [
+    [625037715, 2100627251],
+    [1923055775, 307731458]
+  ],
+  "positive_seeds": [228134913, 228134914, 228134915],
+  "negative_seeds": [228130817, 228130818],
+  "macaulay": {
+    "degree": 9,
+    "rows": 27456,
+    "columns": 11440,
+    "nonzeros": 240240,
+    "moments_per_arm": 22880
+  },
+  "acceptance": {
+    "positive_verified_kernel_min": 1,
+    "positive_rank_one_moment_min": 1,
+    "positive_public_rr9_and_group_replay": true,
+    "negative_full_rank_controls": 2,
+    "allow_known_witness_in_candidate": false,
+    "complete_unknown_ecdlp_solves": 0
+  },
+  "resources": {
+    "backend": "isolab-eks-cpu-spot",
+    "cpu": 4,
+    "memory_gib": 8,
+    "deadline_minutes": 20,
+    "infrastructure_retries": 1,
+    "max_usd": 1.0
+  },
+  "claim_scope": "B8 algebraic extraction component only; no ECDLP or rho claim",
+  "protocol_markdown": "PROTOCOL.md"
+}

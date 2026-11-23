@@ -1,0 +1,40 @@
+{
+  "kind": "transcribed_exact_readonly_tool_output",
+  "host_version": "losetup from util-linux 2.37.4",
+  "disk": "/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80/storage.ext4",
+  "queries": [
+    {
+      "argv": [
+        "--json",
+        "--associated",
+        "DISK"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "--list",
+        "--json",
+        "--associated",
+        "DISK"
+      ],
+      "exit": 0,
+      "stdout": "{\n   \"loopdevices\": [\n\n   ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "--list",
+        "--json",
+        "--output",
+        "NAME,BACK-FILE"
+      ],
+      "exit": 0,
+      "stdout": "{\n   \"loopdevices\": [\n\n   ]\n}\n",
+      "stderr": ""
+    }
+  ],
+  "claims": "Output-mode diagnosis only; not the reviewed complete reconciliation helper invocation."
+}

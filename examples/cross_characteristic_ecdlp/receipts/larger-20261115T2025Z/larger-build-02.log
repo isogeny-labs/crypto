@@ -1,0 +1,50 @@
+✖ [1868/1869] Building CrossCharacteristicLarger (3.5s)
+trace: .> LEAN_PATH=/workspace/ecdlp-transfer/.lake/packages/Cli/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/batteries/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/Qq/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/aesop/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/plausible/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.24.0/bin/lean /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/CrossCharacteristicLarger.lean -o /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CrossCharacteristicLarger.olean -i /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CrossCharacteristicLarger.ilean -c /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CrossCharacteristicLarger.c --setup /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CrossCharacteristicLarger.setup.json --json
+error: CrossCharacteristicLarger.lean:85:4: Type mismatch
+  mul_ne_zero (fun h => of_decide_eq_true (id (Eq.refl true)) ((CharP.cast_eq_zero_iff Fbig 2 27).mp h))
+    (pow_ne_zero 2 (pow_ne_zero 2 omega_ne_zero))
+has type
+  ↑27 * (omega ^ 2) ^ 2 ≠ 0
+but is expected to have type
+  ¬-((4 * omega) ^ 2 * (omega * omega ^ 2)) - 27 * (omega ^ 2) ^ 2 = 0
+error: CrossCharacteristicLarger.lean:136:33: unsolved goals
+⊢ (8 / 4) ^ 2 + -(8 / 4) = 2 ∧ -8 + -(8 / 4 * ((8 / 4) ^ 2 + -(8 / 4) - 4)) - (8 / 4 + -(8 / 4) ^ 2) + 4 = 2
+error: CrossCharacteristicLarger.lean:141:33: unsolved goals
+⊢ (2 / 2) ^ 2 + -(2 / 2) + 4 - 2 - 2 = 0 ∧
+    -2 + -(2 / 2 * ((2 / 2) ^ 2 + -(2 / 2) + 4 - 2 - 2 - 2)) - (2 - ((2 / 2) ^ 2 + -(2 / 2) + 4 - 2)) = 0
+warning: CrossCharacteristicLarger.lean:162:4: This simp argument is unused:
+  add_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [R, R2, S, Point.add_def, Point.add, negY, slope, addX, addY, negAddY,
+  ̵  ̵ ̵ ̵targetCurve,
+  ̲  ̲ ̲ ̲CharTwo.neg_eq, CharTwo.sub_eq_add, omega_ne_zero,
+  ̵  ̵ ̵ ̵a̵d̵d̵_̵a̵s̵s̵o̵c̵,̵ ̵CharTwo.add_self_eq_zero,
+  ̲  ̲ ̲ ̲CharTwo.add_cancel_left,
+  ̵  ̵ ̵ ̵CharTwo.add_cancel_right, add_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: CrossCharacteristicLarger.lean:162:15: This simp argument is unused:
+  CharTwo.add_self_eq_zero
+
+Hint: Omit it from the simp argument list.
+  simp [R, R2, S, Point.add_def, Point.add, negY, slope, addX, addY, negAddY,
+  ̵  ̵ ̵ ̵targetCurve,
+  ̲  ̲ ̲ ̲CharTwo.neg_eq, CharTwo.sub_eq_add, omega_ne_zero,
+  ̵  ̵ ̵ ̵add_assoc, CharTwo.add_s̵e̵l̵f̵_̵e̵q̵_̵z̵e̵r̵o̵,̵ ̵C̵h̵a̵r̵T̵w̵o̵.̵a̵d̵d̵_̵cancel_left,
+      CharTwo.add_cancel_right, add_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: CrossCharacteristicLarger.lean:163:4: This simp argument is unused:
+  CharTwo.add_cancel_right
+
+Hint: Omit it from the simp argument list.
+  simp [R, R2, S, Point.add_def, Point.add, negY, slope, addX, addY, negAddY, targetCurve,
+  ̲  ̲ ̲ ̲CharTwo.neg_eq, CharTwo.sub_eq_add, omega_ne_zero, add_assoc, CharTwo.add_self_eq_zero,
+  ̲  ̲ ̲ ̲CharTwo.add_cancel_left, C̵h̵a̵r̵T̵w̵o̵.̵a̵d̵d̵_̵c̵a̵n̵c̵e̵l̵_̵r̵i̵g̵h̵t̵,̵ ̵add_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: Lean exited with code 1
+Some required targets logged failures:
+- CrossCharacteristicLarger
+error: build failed

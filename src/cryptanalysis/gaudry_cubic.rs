@@ -20,9 +20,11 @@
 //! # What is implemented
 //!
 //! `k = 3`, `m = 3`: random curves `y² = x³ + ax + b` with
-//! `a, b ∈ F_{p³}` and prime group order `n ≈ p³`, the factor base of
+//! `a, b ∈ F_{p³}` and a prime-order subgroup `n` of `#E(F_{p³})`, the factor base of
 //! the `≈ p/2` points with `x ∈ F_p`, and the decomposition
-//! `R = ±P_i ± P_j ± P_k`.  The oracle is the meet-in-the-middle form:
+//! `R + T = ±P_i ± P_j ± P_k`, with `T` in the cofactor subgroup when
+//! `#E = hn`. Relations are checked in the full group and then multiplied
+//! by `h` before elimination modulo `n`. The oracle is the meet-in-the-middle form:
 //! for every `P_k` in the base, `Y = R ∓ P_k` (one group operation) is
 //! tested for `Y ∈ ±F ± F` by the **Weil-restricted `S₃`**:
 //! `S₃(x_Y, x_1, x_2) = 0` with `x_1, x_2 ∈ F_p` unknown is three
@@ -58,6 +60,25 @@ use rand::{Rng, SeedableRng};
 use serde::Serialize;
 
 use super::residual_walk::{inv_mod, is_prime_u64, mix64, pow_mod, sqrt_mod, RelationSystem};
+
+#[path = "gaudry_cubic_graph.rs"]
+mod graph;
+#[path = "gaudry_cubic_symmetric.rs"]
+mod symmetric;
+pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
+#[path = "gaudry_cubic_prepared.rs"]
+mod prepared;
+#[path = "gaudry_cubic_s4_f4.rs"]
+mod s4_f4;
+pub use s4_f4::{
+    solve_s4_f4, solve_s4_f4_krylov, solve_s4_f4_krylov_delayed, solve_s4_f4_trace_delayed,
+    S4F4Stats, S4TraceState, S4TraceStats,
+};
+#[path = "gaudry_cubic_krylov.rs"]
+mod krylov;
+pub use krylov::KrylovStats;
+#[path = "gaudry_cubic_sampling.rs"]
+mod sampling;
 
 /// `F_p` multiplications per affine addition in `E(F_{p³})`: measured by
 /// [`Fp3::adds_to_muls_ratio`] on construction and folded into the
@@ -97,13 +118,16 @@ pub(crate) fn sm(a: u64, b: u64, p: u64) -> u64 {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct E3(pub [u64; 3]);
 
-/// The cubic extension `F_p[t]/(t³ − c)`, `c` a non-cube, with an
-/// `F_p`-multiplication counter.
+/// A cubic extension in the basis `1,t,t²`, with an `F_p`-multiplication
+/// counter. The usual representation is `t³ = c`; `modulus` supports a
+/// general monic irreducible cubic `t³ + m₂t² + m₁t + m₀`.
 #[derive(Clone, Debug, Serialize)]
 pub struct Fp3 {
     pub p: u64,
-    /// `t³ = c`.
+    /// Binomial constant in `t³ = c`; zero when `modulus` is present.
     pub c: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modulus: Option<[u64; 3]>,
     #[serde(skip)]
     muls: Cell<u64>,
 }
@@ -122,6 +146,7 @@ impl Fp3 {
         Fp3 {
             p,
             c,
+            modulus: None,
             muls: Cell::new(0),
         }
     }
@@ -140,6 +165,33 @@ impl Fp3 {
         Ok(Fp3 {
             p,
             c: c % p,
+            modulus: None,
+            muls: Cell::new(0),
+        })
+    }
+
+    /// Construct `F_p[t]/(t³ + m₂t² + m₁t + m₀)` from canonical
+    /// coefficients. A degree-three polynomial is irreducible over a field
+    /// exactly when it has no root in that field.
+    pub fn with_irreducible_cubic(p: u64, modulus: [u64; 3]) -> Result<Fp3, String> {
+        if !(3..=1_000_000).contains(&p) || !is_prime_u64(p) {
+            return Err("cubic field base must be prime and at most 1000000".into());
+        }
+        if modulus.iter().any(|&coefficient| coefficient >= p) {
+            return Err("cubic modulus coefficients must be less than p".into());
+        }
+        if (0..p).any(|x| {
+            let value = am(x, modulus[2], p);
+            let value = am(mm(value, x, p), modulus[1], p);
+            let value = am(mm(value, x, p), modulus[0], p);
+            value == 0
+        }) {
+            return Err("cubic modulus has a root and is reducible".into());
+        }
+        Ok(Fp3 {
+            p,
+            c: 0,
+            modulus: Some(modulus),
             muls: Cell::new(0),
         })
     }
@@ -194,6 +246,23 @@ impl Fp3 {
         let p = self.p;
         let (a0, a1, a2) = (a.0[0], a.0[1], a.0[2]);
         let (b0, b1, b2) = (b.0[0], b.0[1], b.0[2]);
+        if let Some([m0, m1, m2]) = self.modulus {
+            self.count(15);
+            let mut d = [
+                mm(a0, b0, p),
+                am(mm(a0, b1, p), mm(a1, b0, p), p),
+                am(am(mm(a0, b2, p), mm(a1, b1, p), p), mm(a2, b0, p), p),
+                am(mm(a1, b2, p), mm(a2, b1, p), p),
+                mm(a2, b2, p),
+            ];
+            for degree in (3..=4).rev() {
+                let coefficient = d[degree];
+                d[degree - 3] = sm(d[degree - 3], mm(coefficient, m0, p), p);
+                d[degree - 2] = sm(d[degree - 2], mm(coefficient, m1, p), p);
+                d[degree - 1] = sm(d[degree - 1], mm(coefficient, m2, p), p);
+            }
+            return E3([d[0], d[1], d[2]]);
+        }
         self.count(11);
         let d0 = mm(a0, b0, p);
         let d1 = am(mm(a0, b1, p), mm(a1, b0, p), p);
@@ -209,9 +278,13 @@ impl Fp3 {
     pub fn sq(&self, a: &E3) -> E3 {
         self.mul(a, a)
     }
-    /// Inverse via the norm: `a⁻¹ = (a^{p} a^{p²}) / N(a)` computed as
-    /// the adjugate of the multiplication matrix.
+    /// Invert in the selected cubic presentation. The binomial path uses
+    /// an adjugate; the general path uses `a^(p³-2)` in the verified field.
     pub fn inv(&self, a: &E3) -> E3 {
+        if self.modulus.is_some() {
+            assert_ne!(*a, Fp3::ZERO, "inverse of zero in F_p³");
+            return self.pow(a, (self.p as u128).pow(3) - 2);
+        }
         let p = self.p;
         let c = self.c;
         let (a0, a1, a2) = (a.0[0], a.0[1], a.0[2]);
@@ -992,6 +1065,18 @@ pub fn subspace_triple_oracle(
     r: &Pt3,
     rng: &mut StdRng,
 ) -> (Vec<Vec<(usize, i64)>>, u64) {
+    triple_with_pair(inst, base, r, rng, |y, rng| {
+        weil_s3_pair_test(inst, base, y, rng)
+    })
+}
+
+fn triple_with_pair(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    r: &Pt3,
+    rng: &mut StdRng,
+    mut pair_test: impl FnMut(&Pt3, &mut StdRng) -> (Vec<Vec<(usize, i64)>>, u64),
+) -> (Vec<Vec<(usize, i64)>>, u64) {
     let curve = &inst.curve;
     let mut found = Vec::new();
     let mut muls = 0u64;
@@ -1014,7 +1099,7 @@ pub fn subspace_triple_oracle(
                 terms.sort_unstable();
                 found.push(terms);
             }
-            let (pairs, m) = weil_s3_pair_test(inst, base, &y, rng);
+            let (pairs, m) = pair_test(&y, rng);
             muls += m;
             for pair in pairs {
                 // Only keep k above both pair indices so every triple is
@@ -1038,6 +1123,45 @@ pub fn subspace_triple_oracle(
         *t = v;
     }
     found.retain(|t| !t.is_empty());
+    found.sort();
+    found.dedup();
+    (found, muls)
+}
+
+/// Four-point oracle: `R = s_k P_k + (triple)` for every `P_k` in the base,
+/// with the triple from [`subspace_triple_oracle`] on `R ∓ P_k`.  Keeps the
+/// decompositions with `k` above every other index (each quadruple once)
+/// and the shorter ones met on the way.  Costs about `2|F|` triple-oracle
+/// calls, i.e. `4|F|²` pair tests a residual.
+pub fn subspace_quad_oracle(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    r: &Pt3,
+    rng: &mut StdRng,
+) -> (Vec<Vec<(usize, i64)>>, u64) {
+    let curve = &inst.curve;
+    let (mut found, mut muls) = subspace_triple_oracle(inst, base, r, rng);
+    for (k, pk) in base.points.iter().enumerate() {
+        for s_k in [1i64, -1] {
+            let y = if s_k == 1 {
+                curve.sub(r, pk)
+            } else {
+                curve.add(r, pk)
+            };
+            if y.inf {
+                continue;
+            }
+            let (triples, m) = subspace_triple_oracle(inst, base, &y, rng);
+            muls += m;
+            for t in triples {
+                if t.len() == 3 && t.iter().all(|&(idx, _)| idx < k) {
+                    let mut terms = t;
+                    terms.push((k, s_k));
+                    found.push(terms);
+                }
+            }
+        }
+    }
     found.sort();
     found.dedup();
     (found, muls)
@@ -2910,6 +3034,17 @@ pub fn subspace_triple_oracle_groebner(
         stats.fp_muls += muls;
         return decs;
     };
+    settle_triple_signs(inst, base, r, triples, found)
+}
+
+fn settle_triple_signs(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    r: &Pt3,
+    triples: Vec<[u64; 3]>,
+    mut found: Vec<Vec<(usize, i64)>>,
+) -> Vec<Vec<(usize, i64)>> {
+    let curve = &inst.curve;
     for [x1, x2, x3] in triples {
         let idx: Option<Vec<usize>> = [x1, x2, x3]
             .iter()
@@ -2964,11 +3099,15 @@ pub struct GaudryReport {
     pub relations_independent: u64,
     pub rank: usize,
     pub solved: bool,
+    /// Candidate logarithm, accepted only after independent group replay.
+    pub recovered_scalar: Option<u64>,
     pub correct: Option<bool>,
     /// Affine additions in `E(F_{p³})` (sampling, neighbours, verification).
     pub group_ops: u64,
     /// `F_p` multiplications inside the pair tests.
     pub oracle_fp_muls: u64,
+    /// Field multiplications spent lifting points for cofactor shifts.
+    pub torsion_lift_fp_muls: u64,
     /// `F_p` multiplications per affine addition, measured.
     pub fp_muls_per_add: f64,
     /// `group_ops + oracle_fp_muls / fp_muls_per_add`.
@@ -3016,18 +3155,91 @@ pub struct GaudryReport {
     pub la_fp_equiv: f64,
     /// Large primes: the small base `|F'|` (`= |F|` when unused), the
     /// maximum number of large primes accepted per relation, the
-    /// decompositions by number of large primes (`0, 1, 2, ≥ 3`), and
+    /// decompositions by number of large primes (`0, 1, 2, 3, ≥ 4`), and
     /// the full relations produced by eliminating large primes.
     pub small_base: usize,
     pub max_large_primes: u8,
-    pub lp_histogram: [u64; 4],
+    pub lp_histogram: [u64; 5],
     pub lp_full_relations: u64,
+    /// Present only for the explicit protected-target comparison entry point.
+    /// Legacy serialization and counters are left unchanged for replay.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_backend: Option<LargePrimeBackend>,
+    /// Graph constructor (including primality) and feed events. These semantic
+    /// counts are not an instruction count or a fully priced native budget.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_graph_work: Option<pencil_symbolic_graph::meter::Snapshot>,
+    /// BLAKE3 of the factor base and every admitted projected relation, in
+    /// input order. Protected backends hash the same bytes; legacy runs do
+    /// not perform this additional diagnostic work.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_input_digest: Option<String>,
+    /// Hash input bytes (not a count of native hash instructions).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_input_hash_bytes: Option<u64>,
+    /// Present only for the symmetric S3 oracle variants. Fallback group
+    /// additions remain included in `group_ops`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub symmetric_pair_stats: Option<SymmetricPairStats>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub residual_sampler: Option<ResidualSampler3>,
+    /// Jump table and start-point construction, also retained in group_ops.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sampler_setup_group_ops: Option<u64>,
+    /// Group operations constructing sampled residuals, excluding setup.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sampling_group_ops: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sampler_restarts: Option<u64>,
+    /// Diagnostic only: repetition of x among decomposable residuals. This
+    /// stores no scalar coefficients and never supplies a recovery equation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relation_point_stats: Option<RelationPointStats>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub s4_f4_stats: Option<S4F4Stats>,
+    /// Present only for the cycle harvester: its extra counters.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub harvest: Option<HarvestStats>,
+    /// Present only when a non-default large-prime path ran.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_variant: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct RelationPointStats {
+    pub decomposed_residuals: u64,
+    pub distinct_abscissae: u64,
+    pub repeated_abscissae: u64,
+    pub first_repeat_residual: Option<u64>,
+}
+
+/// Auxiliary-column elimination for the protected-target comparison path.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LargePrimeBackend {
+    Pivot,
+    SymbolicGraph,
+}
+
+/// Residual construction for the explicit protected comparison API.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum ResidualSampler3 {
+    #[serde(rename = "fresh")]
+    FreshScalar,
+    #[serde(rename = "r-adding")]
+    RAdding32,
+    /// Same sampler with epochs up to ceil(sqrt(n)), capped at one million.
+    #[serde(rename = "r-adding-long")]
+    RAddingLong,
 }
 
 /// Options of a Gaudry-style run; see [`run_gaudry_opts`].
 #[derive(Clone, Debug, Serialize)]
 pub struct GaudryOptions {
     pub max_residuals: u64,
+    /// Cofactor of the prime-order target subgroup. Relations are projected
+    /// through multiplication by this value before linear algebra.
+    pub cofactor: u64,
     pub solver: Solver,
     /// Run the other oracle on every residual and count disagreements.
     pub cross_check: bool,
@@ -3051,18 +3263,30 @@ pub struct GaudryOptions {
     /// it in discarded residuals; which side of that trade wins is
     /// [`GaudryReport::lp_abandoned`] against the fitted exponent.
     pub max_merge_level: u8,
+    /// Points per decomposition: 3 (Gaudry's `m = n`, the default) or 4
+    /// (one more summand, [`subspace_quad_oracle`]; meet-in-the-middle only).
+    /// With `arity = 4` a relation can carry up to four large primes.
+    pub arity: u8,
+    /// How partial relations become full rows; see [`Harvester`].  Absent
+    /// from the serialised options in the default (eliminator) mode, so
+    /// every record written before the harvester existed is unchanged.
+    #[serde(skip_serializing_if = "Harvester::is_default")]
+    pub harvester: Harvester,
 }
 
 impl Default for GaudryOptions {
     fn default() -> Self {
         GaudryOptions {
             max_residuals: 1_000_000,
+            cofactor: 1,
             solver: Solver::MeetInTheMiddle,
             cross_check: false,
             sparse_la: false,
             small_base: 0,
             max_large_primes: 0,
             max_merge_level: 0,
+            arity: 3,
+            harvester: Harvester::Eliminator,
         }
     }
 }
@@ -3193,36 +3417,531 @@ impl LargePrimeEliminator {
     }
 }
 
+/// Which structure turns partial relations (decompositions carrying large
+/// primes) into full rows over the small base.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Default)]
+pub enum Harvester {
+    /// [`LargePrimeEliminator`]: one pivot per large prime, chained merges
+    /// (the behaviour of every run before the harvester existed).
+    #[default]
+    Eliminator,
+    /// [`GainForestHarvester`]: cycles of the large-prime graph.
+    Cycles,
+}
+
+impl Harvester {
+    fn is_default(&self) -> bool {
+        *self == Harvester::Eliminator
+    }
+}
+
+/// Counters of a [`GainForestHarvester`] run, reported beside the
+/// eliminator's own counters.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct HarvestStats {
+    /// Decompositions accepted, by number of large primes (0, 1, 2, 3).
+    pub accepted: [u64; 4],
+    /// Full rows that came straight from decompositions with no large prime.
+    pub mu_direct: u64,
+    /// Rows harvested from cycles / pinned components, as fed to the linear
+    /// algebra before the stop (`mu` of the plan, the cycle-derived part).
+    pub mu_harvested: u64,
+    /// Harvested rows by origin: a balanced cycle in a free component
+    /// (large primes cancelled), or a component attached to the sink.
+    pub rows_balanced: u64,
+    pub rows_pinned: u64,
+    /// Rows the harvester emitted (may exceed the rows fed if the run
+    /// stopped inside a burst).
+    pub rows_emitted: u64,
+    /// Unbalanced cycles / one-large-prime edges that attached a component
+    /// to the sink (no row), and unions of two free components.
+    pub pins: u64,
+    pub unions: u64,
+    /// 3-edges: accepted, reduced on arrival (two of three primes already in
+    /// a common root or the sink), peeled later out of the buffer, and still
+    /// buffered at the end.
+    pub three_edges_accepted: u64,
+    pub three_edges_on_arrival: u64,
+    pub three_edges_peeled: u64,
+    pub three_edges_left: u64,
+    /// Vertices (large primes) touched; components not attached to the sink;
+    /// vertices whose component is attached to the sink.
+    pub vertices: u64,
+    pub components_free: u64,
+    pub vertices_pinned: u64,
+    /// Mean number of distinct relations a harvested row was derived from
+    /// (the cycle length analogue: tree paths to the roots plus the closing
+    /// relation, shared parts counted once).
+    pub mean_cycle_len: f64,
+    /// Rows whose small-base part vanished with a nonzero right-hand side
+    /// (an inconsistency; must stay 0).
+    pub inconsistent: u64,
+    /// Equations that reduced to `0 = 0` (dependent; not rows).
+    pub rows_null: u64,
+    /// Mean weight of the harvested rows.
+    pub mean_row_weight: f64,
+    #[serde(skip)]
+    cycle_len_sum: u64,
+    #[serde(skip)]
+    row_weight_sum: u64,
+}
+
+#[derive(Clone, Debug, Default)]
+struct Aff {
+    /// `Σ coeff · x_col` over small-base columns (including `d`).
+    cols: Vec<(usize, u64)>,
+    k: u64,
+    /// Ids of the relations this expression was derived from.
+    rels: Vec<u32>,
+}
+
+#[derive(Clone, Debug)]
+struct HNode {
+    /// Itself for a free root, [`HSINK`] for a component attached to the
+    /// sink, otherwise the parent vertex.
+    parent: usize,
+    /// `x_v = g · x_parent + e`.
+    g: u64,
+    e: Aff,
+    size: u32,
+    touched: bool,
+}
+
+const HSINK: usize = usize::MAX;
+
+#[derive(Clone, Debug)]
+struct HEq {
+    /// `Σ coef · x_vertex + Σ s_c x_c ≡ rhs`.
+    vars: Vec<(usize, u64)>,
+    s: Vec<(usize, u64)>,
+    rhs: u64,
+    rels: Vec<u32>,
+}
+
+/// Sorted union of two sorted id lists.
+fn union_sorted(a: &[u32], b: &[u32]) -> Vec<u32> {
+    let mut out = Vec::with_capacity(a.len() + b.len());
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() || j < b.len() {
+        if j >= b.len() || (i < a.len() && a[i] < b[j]) {
+            out.push(a[i]);
+            i += 1;
+        } else if i >= a.len() || b[j] < a[i] {
+            out.push(b[j]);
+            j += 1;
+        } else {
+            out.push(a[i]);
+            i += 1;
+            j += 1;
+        }
+    }
+    out
+}
+
+/// `dst + c · src`, both sorted by column; zero entries dropped; one
+/// multiplication charged per entry of `src`.
+fn merge_scaled(
+    dst: &[(usize, u64)],
+    c: u64,
+    src: &[(usize, u64)],
+    n: u64,
+    ops: &mut u64,
+) -> Vec<(usize, u64)> {
+    let mut out = Vec::with_capacity(dst.len() + src.len());
+    let (mut i, mut j) = (0, 0);
+    while i < dst.len() || j < src.len() {
+        let take_dst = j >= src.len() || (i < dst.len() && dst[i].0 < src[j].0);
+        let take_src = i >= dst.len() || (j < src.len() && src[j].0 < dst[i].0);
+        if take_dst {
+            out.push(dst[i]);
+            i += 1;
+        } else if take_src {
+            *ops += 1;
+            let v = mm(c, src[j].1, n);
+            if v != 0 {
+                out.push((src[j].0, v));
+            }
+            j += 1;
+        } else {
+            *ops += 1;
+            let v = am(dst[i].1, mm(c, src[j].1, n), n);
+            if v != 0 {
+                out.push((dst[i].0, v));
+            }
+            i += 1;
+            j += 1;
+        }
+    }
+    out
+}
+
+/// **Gain-forest cycle harvester.**  Vertices are the large primes (base
+/// columns `> small`; the `d` column at index `small` is a small-base
+/// unknown) plus an implicit sink.  Each vertex keeps a parent and an affine
+/// map over `Z/nZ` so that `x_v = g_v · x_root + (combination of small-base
+/// columns) + const`; a root attached to the sink is pinned (`x_root` known).
+/// A relation with `k` large primes is an equation in those vertices:
+/// substituting every vertex by its root leaves an equation in at most `k`
+/// distinct free roots.  With none it is a full row (a balanced cycle, or a
+/// cycle inside a pinned component); with one the root is pinned; with two
+/// the components are joined; with three (a 3-edge of the hypergraph) the
+/// equation stays buffered until peeling reduces it.  Every accepted equation
+/// is used exactly once, so rows emitted `=` equations accepted `−` joins
+/// `−` pins `−` still buffered (the frame-matroid count).
+pub struct GainForestHarvester {
+    small: usize,
+    n: u64,
+    nodes: Vec<HNode>,
+    buffer: Vec<Option<HEq>>,
+    regs: Vec<Vec<usize>>,
+    watch: HashMap<usize, Vec<usize>>,
+    queue: Vec<usize>,
+    next_id: u32,
+    out: Vec<SparseRel>,
+    pub stats: HarvestStats,
+}
+
+impl GainForestHarvester {
+    /// `ncols` is one more than the largest column index that may occur.
+    pub fn new(small: usize, n: u64, ncols: usize) -> Self {
+        let nodes = (0..ncols)
+            .map(|i| HNode {
+                parent: i,
+                g: 1,
+                e: Aff::default(),
+                size: 1,
+                touched: false,
+            })
+            .collect();
+        GainForestHarvester {
+            small,
+            n,
+            nodes,
+            buffer: Vec::new(),
+            regs: Vec::new(),
+            watch: HashMap::new(),
+            queue: Vec::new(),
+            next_id: 0,
+            out: Vec::new(),
+            stats: HarvestStats::default(),
+        }
+    }
+
+    /// Root of `v`; afterwards `v`'s own map is relative to that root
+    /// (`HSINK` for a pinned component, with `g = 0`).
+    fn find(&mut self, v: usize, ops: &mut u64) -> usize {
+        let p = self.nodes[v].parent;
+        if p == v || p == HSINK {
+            return p;
+        }
+        let r = self.find(p, ops);
+        if r == p {
+            return r;
+        }
+        // p is attached to r (a root or the sink): compose.
+        let (gp, ep) = (self.nodes[p].g, self.nodes[p].e.clone());
+        let gv = self.nodes[v].g;
+        let n = self.n;
+        let node = &mut self.nodes[v];
+        node.e.cols = merge_scaled(&node.e.cols, gv, &ep.cols, n, ops);
+        node.e.k = am(node.e.k, mm(gv, ep.k, n), n);
+        node.e.rels = union_sorted(&node.e.rels, &ep.rels);
+        node.g = mm(gv, gp, n);
+        node.parent = r;
+        *ops += 2;
+        r
+    }
+
+    /// Substitute every vertex of `eq` by its root.  Returns the free roots
+    /// with nonzero coefficient, the small-base part, the right-hand side,
+    /// the relations composed, and whether any vertex had a free root.
+    #[allow(clippy::type_complexity)]
+    fn reduce(
+        &mut self,
+        eq: &HEq,
+        ops: &mut u64,
+    ) -> (Vec<(usize, u64)>, Vec<(usize, u64)>, u64, Vec<u32>, bool) {
+        let n = self.n;
+        let mut s = eq.s.clone();
+        let mut rhs = eq.rhs;
+        let mut rels = eq.rels.clone();
+        let mut roots: Vec<(usize, u64)> = Vec::new();
+        let mut saw_free = false;
+        for &(v, c) in &eq.vars {
+            let r = self.find(v, ops);
+            let (g, e) = if r == v {
+                (1, Aff::default())
+            } else {
+                (self.nodes[v].g, self.nodes[v].e.clone())
+            };
+            if r != HSINK {
+                saw_free = true;
+                let a = mm(c, g, n);
+                *ops += 1;
+                if let Some(x) = roots.iter_mut().find(|x| x.0 == r) {
+                    x.1 = am(x.1, a, n);
+                } else {
+                    roots.push((r, a));
+                }
+            }
+            s = merge_scaled(&s, c, &e.cols, n, ops);
+            rhs = sm(rhs, mm(c, e.k, n), n);
+            *ops += 1;
+            rels = union_sorted(&rels, &e.rels);
+        }
+        roots.retain(|x| x.1 != 0);
+        (roots, s, rhs, rels, saw_free)
+    }
+
+    fn wake(&mut self, r: usize) {
+        if let Some(list) = self.watch.remove(&r) {
+            self.queue.extend(list);
+        }
+    }
+
+    /// Apply a reduced equation with at most two free roots.
+    fn apply(
+        &mut self,
+        roots: Vec<(usize, u64)>,
+        s: Vec<(usize, u64)>,
+        rhs: u64,
+        rels: Vec<u32>,
+        saw_free: bool,
+        ops: &mut u64,
+    ) {
+        let n = self.n;
+        match roots.len() {
+            0 => {
+                if s.is_empty() {
+                    if rhs != 0 {
+                        self.stats.inconsistent += 1;
+                    } else {
+                        self.stats.rows_null += 1;
+                    }
+                    return;
+                }
+                self.stats.rows_emitted += 1;
+                if saw_free {
+                    self.stats.rows_balanced += 1;
+                } else {
+                    self.stats.rows_pinned += 1;
+                }
+                self.stats.cycle_len_sum += rels.len() as u64;
+                self.stats.row_weight_sum += s.len() as u64;
+                self.out.push(SparseRel { cols: s, rhs });
+            }
+            1 => {
+                // x_r = A^{-1} (rhs - s·x): pin the component to the sink.
+                let (r, a) = roots[0];
+                let inv = inv_mod(a, n);
+                let neg = n - inv;
+                let cols: Vec<(usize, u64)> = s
+                    .iter()
+                    .map(|&(c, v)| (c, mm(neg, v, n)))
+                    .filter(|x| x.1 != 0)
+                    .collect();
+                *ops += s.len() as u64 + 1;
+                let node = &mut self.nodes[r];
+                node.parent = HSINK;
+                node.g = 0;
+                node.e = Aff {
+                    cols,
+                    k: mm(inv, rhs, n),
+                    rels,
+                };
+                self.stats.pins += 1;
+                self.wake(r);
+            }
+            _ => {
+                // Two free roots: solve for the smaller one.
+                let (mut ra, mut aa) = roots[0];
+                let (mut rb, mut ab) = roots[1];
+                if self.nodes[ra].size > self.nodes[rb].size {
+                    std::mem::swap(&mut ra, &mut rb);
+                    std::mem::swap(&mut aa, &mut ab);
+                }
+                // A_a x_ra + A_b x_rb + s·x = rhs.
+                let inv = inv_mod(aa, n);
+                let neg = n - inv;
+                let cols: Vec<(usize, u64)> = s
+                    .iter()
+                    .map(|&(c, v)| (c, mm(neg, v, n)))
+                    .filter(|x| x.1 != 0)
+                    .collect();
+                *ops += s.len() as u64 + 3;
+                let size_a = self.nodes[ra].size;
+                let node = &mut self.nodes[ra];
+                node.parent = rb;
+                node.g = mm(neg, ab, n);
+                node.e = Aff {
+                    cols,
+                    k: mm(inv, rhs, n),
+                    rels,
+                };
+                self.nodes[rb].size += size_a;
+                self.stats.unions += 1;
+                self.wake(ra);
+            }
+        }
+    }
+
+    /// Handle one equation; a 3-edge that cannot be reduced is buffered.
+    fn process(&mut self, eq: HEq, arrival: bool, ops: &mut u64) {
+        let (roots, s, rhs, rels, saw_free) = self.reduce(&eq, ops);
+        if roots.len() <= 2 {
+            if eq.vars.len() == 3 && arrival {
+                self.stats.three_edges_on_arrival += 1;
+            }
+            self.apply(roots, s, rhs, rels, saw_free, ops);
+        } else {
+            let id = self.buffer.len();
+            let regs: Vec<usize> = roots.iter().map(|x| x.0).collect();
+            for &r in &regs {
+                self.watch.entry(r).or_default().push(id);
+            }
+            self.regs.push(regs);
+            self.buffer.push(Some(HEq {
+                vars: roots,
+                s,
+                rhs,
+                rels,
+            }));
+        }
+    }
+
+    fn drain(&mut self, ops: &mut u64) {
+        while let Some(id) = self.queue.pop() {
+            let Some(eq) = self.buffer[id].take() else {
+                continue;
+            };
+            let (roots, s, rhs, rels, saw_free) = self.reduce(&eq, ops);
+            if roots.len() <= 2 {
+                self.stats.three_edges_peeled += 1;
+                self.apply(roots, s, rhs, rels, saw_free, ops);
+            } else {
+                let new_roots: Vec<usize> = roots.iter().map(|x| x.0).collect();
+                for &r in &new_roots {
+                    if !self.regs[id].contains(&r) {
+                        self.watch.entry(r).or_default().push(id);
+                    }
+                }
+                self.regs[id] = new_roots;
+                self.buffer[id] = Some(HEq {
+                    vars: roots,
+                    s,
+                    rhs,
+                    rels,
+                });
+            }
+        }
+    }
+
+    /// Feed one relation (`Σ coeff · x_col ≡ rhs`, columns sorted); returns
+    /// the full rows it released (zero or more: a closed cycle can free
+    /// buffered 3-edges).
+    pub fn feed(&mut self, rel: SparseRel, ops: &mut u64) -> Vec<SparseRel> {
+        let mut vars = Vec::new();
+        let mut s = Vec::new();
+        for &(c, v) in &rel.cols {
+            if c > self.small {
+                vars.push((c, v));
+            } else {
+                s.push((c, v));
+            }
+        }
+        let k = vars.len().min(3);
+        self.stats.accepted[k] += 1;
+        self.next_id += 1;
+        if vars.is_empty() {
+            return vec![rel];
+        }
+        if vars.len() == 3 {
+            self.stats.three_edges_accepted += 1;
+        }
+        for &(c, _) in &vars {
+            if !self.nodes[c].touched {
+                self.nodes[c].touched = true;
+                self.stats.vertices += 1;
+            }
+        }
+        self.process(
+            HEq {
+                vars,
+                s,
+                rhs: rel.rhs,
+                rels: vec![self.next_id],
+            },
+            true,
+            ops,
+        );
+        self.drain(ops);
+        std::mem::take(&mut self.out)
+    }
+
+    /// Fill the end-of-run counters and return the statistics.
+    pub fn finish(&mut self) -> HarvestStats {
+        let mut dummy = 0u64;
+        let mut free = 0u64;
+        let mut pinned = 0u64;
+        for v in 0..self.nodes.len() {
+            if !self.nodes[v].touched {
+                continue;
+            }
+            let r = self.find(v, &mut dummy);
+            if r == v {
+                free += 1;
+            } else if r == HSINK {
+                pinned += 1;
+            }
+        }
+        self.stats.components_free = free;
+        self.stats.vertices_pinned = pinned;
+        self.stats.three_edges_left = self.buffer.iter().filter(|b| b.is_some()).count() as u64;
+        let m = self.stats.rows_emitted.max(1) as f64;
+        self.stats.mean_cycle_len = self.stats.cycle_len_sum as f64 / m;
+        self.stats.mean_row_weight = self.stats.row_weight_sum as f64 / m;
+        self.stats.clone()
+    }
+}
+
 /// Berlekamp–Massey over `Z/n` (`n` prime): the shortest linear
 /// recurrence `Σ_{j=0}^{L} c_j s_{i−j} = 0` (`c_0 = 1`) satisfied by
 /// the sequence; returns `c`.
 fn berlekamp_massey_u64(seq: &[u64], n: u64, ops: &mut u64) -> Vec<u64> {
+    use super::jv_bitops::words;
     let mut c = vec![1u64];
     let mut b = vec![1u64];
     let mut l = 0usize;
     let mut m = 1usize;
     let mut bb = 1u64;
     for i in 0..seq.len() {
+        words(1); // sequence scan
         let mut d = seq[i];
         for j in 1..=l {
+            words(1); // coefficient-bound comparison
             if j < c.len() {
+                words(2); // recurrence coefficient and sequence entry
                 d = am(d, mm(c[j], seq[i - j], n), n);
                 *ops += 1;
             }
         }
+        words(1); // discrepancy zero test
         if d == 0 {
             m += 1;
             continue;
         }
         let coef = mm(d, inv_mod(bb, n), n);
         let t = c.clone();
+        words(1); // polynomial-length comparison
         if c.len() < b.len() + m {
             c.resize(b.len() + m, 0);
         }
         for j in 0..b.len() {
+            words(2); // old and shifted recurrence coefficients
             c[j + m] = sm(c[j + m], mm(coef, b[j], n), n);
             *ops += 1;
         }
+        words(1); // recurrence-span comparison
         if 2 * l <= i {
             l = i + 1 - l;
             b = t;
@@ -3234,6 +3953,19 @@ fn berlekamp_massey_u64(seq: &[u64], n: u64, ops: &mut u64) -> Vec<u64> {
     }
     c.truncate(l + 1);
     c
+}
+
+/// Data comparisons of the solver's final answer check. Allocation, copies
+/// and loop bookkeeping are outside this scan convention.
+fn equal_solver_words(left: &[u64], right: &[u64]) -> bool {
+    super::jv_bitops::words(1);
+    if left.len() != right.len() {
+        return false;
+    }
+    left.iter().zip(right).all(|(a, b)| {
+        super::jv_bitops::words(1);
+        a == b
+    })
 }
 
 /// A square, singleton-free selection of relations: which relations
@@ -3326,8 +4058,17 @@ pub fn wiedemann_u64(
     rng: &mut StdRng,
     ops: &mut u64,
 ) -> Option<Vec<u64>> {
+    use super::jv_bitops::words;
     assert_eq!(rows.len(), ncols);
+    // Only instrumentation computes this aggregate. Each mat-vec consumes
+    // every sparse entry and indexes its vector once, with no skipped terms.
+    let mat_words = if super::jv_bitops::enabled() {
+        2 * rows.iter().map(|r| r.cols.len() as u64).sum::<u64>()
+    } else {
+        0
+    };
     let mat_vec = |v: &[u64], ops: &mut u64| -> Vec<u64> {
+        words(mat_words);
         rows.iter()
             .map(|r| {
                 let mut acc = 0u64;
@@ -3340,12 +4081,15 @@ pub fn wiedemann_u64(
             .collect()
     };
     let b: Vec<u64> = rows.iter().map(|r| r.rhs).collect();
+    words(rows.len() as u64); // RHS scan
     for _attempt in 0..3 {
-        let u: Vec<u64> = (0..ncols).map(|_| rng.gen_range(0..n)).collect();
-        super::jv_bitops::rng_words(ncols as u64);
+        let u: Vec<u64> = (0..ncols)
+            .map(|_| super::jv_bitops::uniform_mod_u64(rng, 0, n))
+            .collect();
         let mut seq = Vec::with_capacity(2 * ncols);
         let mut v = b.clone();
         for _ in 0..2 * ncols {
+            words(2 * ncols as u64); // both dot-product vectors
             let mut d = 0u64;
             for i in 0..ncols {
                 d = am(d, mm(u[i], v[i], n), n);
@@ -3356,23 +4100,31 @@ pub fn wiedemann_u64(
         }
         let c = berlekamp_massey_u64(&seq, n, ops);
         let l = c.len() - 1;
-        if l == 0 || c[l] == 0 {
+        words(1); // recurrence-length test
+        if l == 0 {
+            continue;
+        }
+        words(2); // terminal coefficient access and zero test
+        if c[l] == 0 {
             continue;
         }
         // x = −(1/c_L) Σ_{j<L} c_j A^{L−1−j} b, by Horner.
         let mut acc = vec![0u64; ncols];
         for &cj in c.iter().take(l) {
+            words(1 + 2 * ncols as u64); // recurrence, accumulator and RHS
             acc = mat_vec(&acc, ops);
             for i in 0..ncols {
                 acc[i] = am(acc[i], mm(cj, b[i], n), n);
             }
             *ops += ncols as u64;
         }
+        words(1); // terminal recurrence coefficient
         let neg_inv = (n - inv_mod(c[l], n)) % n;
         super::jv_bitops::hook_adds(n, 1);
         let x: Vec<u64> = acc.iter().map(|&a| mm(a, neg_inv, n)).collect();
+        words(ncols as u64); // accumulator scan
         *ops += ncols as u64;
-        if mat_vec(&x, ops) == b {
+        if equal_solver_words(&mat_vec(&x, ops), &b) {
             return Some(x);
         }
     }
@@ -3515,6 +4267,16 @@ pub enum Solver {
     MeetInTheMiddle,
     /// Gaudry's `O(1)` symmetrised-`S₄` solve per residual.
     Groebner,
+    /// Native F4 basis and counted finite-quotient extraction for S4.
+    F4Groebner,
+    /// Native F4 with checked sparse FGLM, charged dense fallback.
+    F4Krylov,
+    /// Same checked graph recurrence with bounded delayed dot products.
+    F4KrylovDelayed,
+    /// Certified bounded trace reuse with the same delayed sparse extraction.
+    F4TraceDelayed,
+    /// Same complete extraction with product/chain pair-dependency certificates.
+    F4TracePairGraph,
     /// **Joux–Vitse**: look for decompositions into `k − 1 = 2` base
     /// points instead of `k = 3`, with one Weil-restricted `S₃` pair
     /// test on the residual itself.
@@ -3534,6 +4296,17 @@ pub enum Solver {
     /// It is here to be measured rather than assumed; see
     /// `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` §11.9.
     PairOnly,
+    /// Pair-only channel using elementary symmetric coordinates and a
+    /// degree-at-most-three eliminant. Degenerate systems use a counted scan.
+    SymmetricPairOnly,
+    /// Same pair equations with charged cached constants and stack workspace.
+    PreparedSymmetricPairOnly,
+    /// Same prepared pair equations with inversion-free pseudo-remainder GCD steps.
+    PseudoRemainderPairOnly,
+    /// Pseudo-remainder pair finder with guarded delayed coefficient products.
+    DelayedPseudoRemainderPairOnly,
+    /// The existing hybrid triple scan, using the symmetric S3 pair oracle.
+    SymmetricMeetInTheMiddle,
 }
 
 /// Collect relations by full decomposition of random `R = aG + bQ` until
@@ -3585,6 +4358,67 @@ pub fn run_gaudry_opts(
     seed: u64,
     opts: &GaudryOptions,
 ) -> GaudryReport {
+    run_gaudry_impl(inst, base, seed, opts, None, ResidualSampler3::FreshScalar)
+}
+
+/// Compare pivot chaining and symbolic forests with the same algebraic oracle.
+/// Both backends protect the target column `small`, unlike the legacy pivot
+/// boundary retained by [`run_gaudry_opts`] for frozen evidence replay.
+/// The graph supports at most two surviving auxiliary variables and no merge
+/// cap. Unsupported configurations fail before sampling any residuals.
+pub fn run_gaudry_with_eliminator(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    seed: u64,
+    opts: &GaudryOptions,
+    backend: LargePrimeBackend,
+) -> GaudryReport {
+    run_gaudry_with_sampler(
+        inst,
+        base,
+        seed,
+        opts,
+        backend,
+        ResidualSampler3::FreshScalar,
+    )
+}
+
+/// Select residual construction without changing the algebraic oracle or
+/// eliminator. The r-adding sampler has no rho collision table; recovery still
+/// comes from admitted IC relations. All setup and walk additions are charged.
+pub fn run_gaudry_with_sampler(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    seed: u64,
+    opts: &GaudryOptions,
+    backend: LargePrimeBackend,
+    sampler: ResidualSampler3,
+) -> GaudryReport {
+    assert!(
+        !(opts.harvester == Harvester::Cycles && backend == LargePrimeBackend::SymbolicGraph),
+        "the cycle harvester replaces the pivot eliminator, not the symbolic graph"
+    );
+    if backend == LargePrimeBackend::SymbolicGraph {
+        assert!(
+            opts.max_large_primes <= 2,
+            "symbolic graph accepts at most two large variables"
+        );
+        assert_eq!(
+            opts.max_merge_level, 0,
+            "symbolic graph has no pivot merge-level cap"
+        );
+    }
+    run_gaudry_impl(inst, base, seed, opts, Some(backend), sampler)
+}
+
+fn run_gaudry_impl(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    seed: u64,
+    opts: &GaudryOptions,
+    backend: Option<LargePrimeBackend>,
+    sampler: ResidualSampler3,
+) -> GaudryReport {
     let max_residuals = opts.max_residuals;
     let solver = opts.solver;
     let cross_check = opts.cross_check;
@@ -3602,6 +4436,15 @@ pub fn run_gaudry_opts(
     let la_fp_equiv = 9.0;
     let curve = &inst.curve;
     let n = curve.n;
+    let h = opts.cofactor;
+    assert!(
+        h > 0 && !h.is_multiple_of(n),
+        "cofactor must be invertible modulo n"
+    );
+    assert!(
+        opts.arity == 3 || (opts.arity == 4 && solver == Solver::MeetInTheMiddle && !cross_check),
+        "arity must be 3, or 4 with the meet-in-the-middle oracle and no cross-check"
+    );
     let mut rng = StdRng::seed_from_u64(seed ^ 0x9A0D);
     curve.reset();
     let start = Instant::now();
@@ -3617,21 +4460,89 @@ pub fn run_gaudry_opts(
         curve.reset();
         m
     };
-    let pre = if solver == Solver::Groebner || cross_check {
+    let pre = if matches!(
+        solver,
+        Solver::Groebner
+            | Solver::F4Groebner
+            | Solver::F4Krylov
+            | Solver::F4KrylovDelayed
+            | Solver::F4TraceDelayed
+            | Solver::F4TracePairGraph
+    ) || cross_check
+    {
         Some(SymmetrisedS4::precompute(curve))
     } else {
         None
     };
+    let prepared_pair = match solver {
+        Solver::PreparedSymmetricPairOnly => Some(prepared::PreparedSymmetricPair::new(inst)),
+        Solver::PseudoRemainderPairOnly => Some(prepared::PreparedSymmetricPair::new_pseudo(inst)),
+        Solver::DelayedPseudoRemainderPairOnly => {
+            Some(prepared::PreparedSymmetricPair::new_delayed_pseudo(inst))
+        }
+        _ => None,
+    };
+    let mut trace_state = match solver {
+        Solver::F4TraceDelayed => Some(S4TraceState::new(inst)),
+        Solver::F4TracePairGraph => Some(S4TraceState::new_pair_graph(inst)),
+        _ => None,
+    };
     let precompute_muls = curve.field.muls();
     curve.reset();
+    let mut walk_sampler = match sampler {
+        ResidualSampler3::FreshScalar => None,
+        ResidualSampler3::RAdding32 => Some(sampling::RAddingSampler::new(inst, seed, 1024)),
+        ResidualSampler3::RAddingLong => Some(sampling::RAddingSampler::new(inst, seed, 1_000_000)),
+    };
+    let sampler_setup_group_ops = curve.ops();
+    let mut decomposed_x = backend.map(|_| std::collections::HashSet::new());
     let mut stats = SolveStats::default();
     let mut system = RelationSystem::new(n, unknowns);
-    let mut eliminator = LargePrimeEliminator::with_cap(small, n, opts.max_merge_level);
+    let mut eliminator = LargePrimeEliminator::with_cap(
+        small + usize::from(backend.is_some()),
+        n,
+        opts.max_merge_level,
+    );
+    let cycles = opts.harvester == Harvester::Cycles && max_lp > 0;
+    let mut forest = GainForestHarvester::new(small, n, if cycles { base.len() + 2 } else { 0 });
+    let mut mu_harvested = 0u64;
+    let mut mu_direct = 0u64;
+    let mut graph_eliminator = (backend == Some(LargePrimeBackend::SymbolicGraph)).then(|| {
+        graph::GraphEliminator::new(small, base.len() - small, n)
+            .expect("prime subgroup order required by symbolic graph")
+    });
+    let mut input_hasher = backend.map(|_| blake3::Hasher::new());
+    let mut input_hash_bytes = 0u64;
+    if let Some(hasher) = &mut input_hasher {
+        let domain = b"gaudry-cubic-projected-relations/v1\0";
+        hasher.update(domain);
+        input_hash_bytes += domain.len() as u64;
+        for value in [n, h, small as u64, base.len() as u64] {
+            hasher.update(&value.to_le_bytes());
+            input_hash_bytes += 8;
+        }
+        for point in &base.points {
+            hasher.update(&[u8::from(point.inf)]);
+            input_hash_bytes += 1;
+            for value in point.x.0.into_iter().chain(point.y.0) {
+                hasher.update(&value.to_le_bytes());
+                input_hash_bytes += 8;
+            }
+        }
+    }
     let mut full_rels: Vec<SparseRel> = Vec::new();
     let mut la_ops = 0u64;
     // The eliminator's share of `la_ops`, tracked alongside it so the solve's
     // share is the difference.
     let mut merge_ops = 0u64;
+    // The graph's constructor performs a deterministic primality check.
+    // Charge those multiplications rather than resetting its meter away.
+    if let Some(graph) = &graph_eliminator {
+        let constructor_muls = u64::try_from(graph.work.scalar_muls)
+            .expect("graph constructor multiplication count exceeds u64");
+        la_ops += constructor_muls;
+        merge_ops += constructor_muls;
+    }
     let mut la_attempts = 0u64;
     let mut next_attempt = unknowns;
     let mut la_rows_used = 0usize;
@@ -3646,9 +4557,11 @@ pub fn run_gaudry_opts(
         relations_independent: 0,
         rank: 0,
         solved: false,
+        recovered_scalar: None,
         correct: None,
         group_ops: 0,
         oracle_fp_muls: 0,
+        torsion_lift_fp_muls: 0,
         fp_muls_per_add: fp_per_add,
         total_ops: 0.0,
         s: 0.0,
@@ -3680,16 +4593,69 @@ pub fn run_gaudry_opts(
         la_fp_equiv,
         small_base: small,
         max_large_primes: max_lp,
-        lp_histogram: [0; 4],
+        lp_histogram: [0; 5],
         lp_full_relations: 0,
+        lp_backend: backend,
+        lp_graph_work: None,
+        lp_input_digest: None,
+        lp_input_hash_bytes: None,
+        symmetric_pair_stats: None,
+        residual_sampler: backend.map(|_| sampler),
+        sampler_setup_group_ops: backend.map(|_| sampler_setup_group_ops),
+        sampling_group_ops: backend.map(|_| 0),
+        sampler_restarts: backend.map(|_| 0),
+        relation_point_stats: backend.map(|_| RelationPointStats::default()),
+        s4_f4_stats: None,
+        harvest: None,
+        lp_variant: None,
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
         rep.residuals += 1;
-        let a = rng.gen_range(0..n);
-        let b = rng.gen_range(1..n);
-        let r = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+        let sampling_before = if backend.is_some() { curve.ops() } else { 0 };
+        let (a, b, subgroup_residual) = if let Some(walk) = &mut walk_sampler {
+            walk.next(curve, &inst.q)
+        } else {
+            let a = rng.gen_range(0..n);
+            let b = rng.gen_range(1..n);
+            (
+                a,
+                b,
+                curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b)),
+            )
+        };
+        if let Some(ops) = &mut rep.sampling_group_ops {
+            *ops += curve.ops() - sampling_before;
+        }
+        // A raw subspace decomposition can have any cofactor component.
+        // Sample one component in ker([h]) using [n] of a curve point;
+        // [h][n]P = O because #E = hn. Every accepted relation is then
+        // checked in the full group below before projection modulo n.
+        let torsion = if h == 1 {
+            Pt3::INFINITY
+        } else {
+            loop {
+                let x = E3([
+                    rng.gen_range(0..curve.field.p),
+                    rng.gen_range(0..curve.field.p),
+                    rng.gen_range(0..curve.field.p),
+                ]);
+                let before_lift = curve.field.muls();
+                let point = curve.lift(&x, &mut rng);
+                rep.torsion_lift_fp_muls += curve.field.muls() - before_lift;
+                if let Some(point) = point {
+                    break curve.mul(&point, n);
+                }
+            }
+        };
+        let r = curve.add(&subgroup_residual, &torsion);
         let decs = match solver {
+            Solver::MeetInTheMiddle if opts.arity == 4 => {
+                let (decs, muls) = subspace_quad_oracle(inst, base, &r, &mut rng);
+                rep.oracle_fp_muls += muls;
+                rep.pair_tests += 4 * (base.len() as u64) * (base.len() as u64);
+                decs
+            }
             Solver::MeetInTheMiddle => {
                 let (decs, muls) = subspace_triple_oracle(inst, base, &r, &mut rng);
                 rep.oracle_fp_muls += muls;
@@ -3709,11 +4675,76 @@ pub fn run_gaudry_opts(
                 rep.oracle_fp_muls += stats.fp_muls - before;
                 decs
             }
+            Solver::F4TraceDelayed | Solver::F4TracePairGraph => {
+                let before = stats.fp_muls;
+                let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
+                let decs = s4_f4::triple_oracle_trace_delayed(
+                    inst,
+                    base,
+                    pre.as_ref().unwrap(),
+                    &r,
+                    &mut rng,
+                    &mut stats,
+                    work,
+                    trace_state.as_mut().unwrap(),
+                );
+                rep.oracle_fp_muls += stats.fp_muls - before;
+                decs
+            }
+            Solver::F4Groebner | Solver::F4Krylov | Solver::F4KrylovDelayed => {
+                let before = stats.fp_muls;
+                let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
+                let oracle = match solver {
+                    Solver::F4Krylov => s4_f4::triple_oracle_krylov,
+                    Solver::F4KrylovDelayed => s4_f4::triple_oracle_krylov_delayed,
+                    _ => s4_f4::triple_oracle,
+                };
+                let decs = oracle(
+                    inst,
+                    base,
+                    pre.as_ref().unwrap(),
+                    &r,
+                    &mut rng,
+                    &mut stats,
+                    work,
+                );
+                rep.oracle_fp_muls += stats.fp_muls - before;
+                decs
+            }
             Solver::PairOnly => {
                 // One pair test on the residual itself: `R = ±P_i ±P_j`.
                 let (decs, muls) = weil_s3_pair_test(inst, base, &r, &mut rng);
                 rep.oracle_fp_muls += muls;
                 rep.pair_tests += 1;
+                decs
+            }
+            Solver::SymmetricPairOnly | Solver::SymmetricMeetInTheMiddle => {
+                let stats = rep
+                    .symmetric_pair_stats
+                    .get_or_insert_with(SymmetricPairStats::default);
+                let mut pair =
+                    |y: &Pt3, rng: &mut StdRng| symmetric::pair_test(inst, base, y, rng, stats);
+                let (decs, muls) = if solver == Solver::SymmetricPairOnly {
+                    pair(&r, &mut rng)
+                } else {
+                    triple_with_pair(inst, base, &r, &mut rng, pair)
+                };
+                rep.oracle_fp_muls += muls;
+                rep.pair_tests = stats.calls;
+                decs
+            }
+            Solver::PreparedSymmetricPairOnly
+            | Solver::PseudoRemainderPairOnly
+            | Solver::DelayedPseudoRemainderPairOnly => {
+                let stats = rep
+                    .symmetric_pair_stats
+                    .get_or_insert_with(SymmetricPairStats::default);
+                let (decs, muls) = prepared_pair
+                    .as_ref()
+                    .unwrap()
+                    .pair_test(inst, base, &r, &mut rng, stats);
+                rep.oracle_fp_muls += muls;
+                rep.pair_tests = stats.calls;
                 decs
             }
         };
@@ -3735,14 +4766,40 @@ pub fn run_gaudry_opts(
                         &mut st,
                     )
                 }
-                Solver::Groebner => subspace_triple_oracle(inst, base, &r, &mut rng).0,
+                Solver::Groebner
+                | Solver::F4Groebner
+                | Solver::F4Krylov
+                | Solver::F4KrylovDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
+                Solver::F4TraceDelayed | Solver::F4TracePairGraph => {
+                    subspace_triple_oracle(inst, base, &r, &mut rng).0
+                }
+                Solver::SymmetricPairOnly
+                | Solver::PreparedSymmetricPairOnly
+                | Solver::PseudoRemainderPairOnly
+                | Solver::DelayedPseudoRemainderPairOnly => {
+                    weil_s3_pair_test(inst, base, &r, &mut rng).0
+                }
+                Solver::SymmetricMeetInTheMiddle => {
+                    subspace_triple_oracle(inst, base, &r, &mut rng).0
+                }
             };
             // Compare distinct-index triples and singles only (the pair
             // channel differs between the two oracles).
             let filt = |v: &Vec<Vec<(usize, i64)>>| -> Vec<Vec<(usize, i64)>> {
                 v.iter().filter(|t| t.len() != 2).cloned().collect()
             };
-            if filt(&decs) != filt(&other) {
+            let mismatch = if matches!(
+                solver,
+                Solver::SymmetricPairOnly
+                    | Solver::PreparedSymmetricPairOnly
+                    | Solver::PseudoRemainderPairOnly
+                    | Solver::DelayedPseudoRemainderPairOnly
+            ) {
+                decs != other
+            } else {
+                filt(&decs) != filt(&other)
+            };
+            if mismatch {
                 rep.cross_check_mismatches += 1;
                 if std::env::var_os("GAUDRY_DEBUG").is_some() {
                     eprintln!(
@@ -3753,9 +4810,20 @@ pub fn run_gaudry_opts(
             }
             rep.cross_checked += 1;
         }
+        if !decs.is_empty() {
+            if let (Some(xs), Some(stats)) = (&mut decomposed_x, &mut rep.relation_point_stats) {
+                stats.decomposed_residuals += 1;
+                if xs.insert(r.x) {
+                    stats.distinct_abscissae += 1;
+                } else {
+                    stats.repeated_abscissae += 1;
+                    stats.first_repeat_residual.get_or_insert(rep.residuals);
+                }
+            }
+        }
         for terms in decs {
             rep.decompositions += 1;
-            // Verify aG + bQ = Σ c_i P_i.
+            // Verify aG + bQ + T = Σ c_i P_i in the full curve group.
             let mut acc = r;
             for &(i, c) in &terms {
                 acc = curve.sub(&acc, &curve.mul_signed(&base.points[i], c));
@@ -3775,27 +4843,60 @@ pub fn run_gaudry_opts(
                     (if i < small { i } else { i + 1 }, v)
                 })
                 .collect();
-            cols.push((small, (n - b) % n));
+            cols.push((small, (n - mm(h % n, b, n)) % n));
             cols.sort_unstable();
             let lp_count = cols.iter().filter(|&&(c, _)| c > small).count();
-            rep.lp_histogram[lp_count.min(3)] += 1;
+            rep.lp_histogram[lp_count.min(4)] += 1;
             if lp_count > max_lp as usize {
                 continue;
             }
             let t0 = Instant::now();
-            let rel = SparseRel { cols, rhs: a };
-            let full = if lp_count == 0 {
-                Some(rel)
+            let rel = SparseRel {
+                cols,
+                rhs: mm(h % n, a, n),
+            };
+            if let Some(hasher) = &mut input_hasher {
+                for value in [rep.residuals, rel.cols.len() as u64, rel.rhs] {
+                    hasher.update(&value.to_le_bytes());
+                    input_hash_bytes += 8;
+                }
+                for &(column, coefficient) in &rel.cols {
+                    hasher.update(&(column as u64).to_le_bytes());
+                    hasher.update(&coefficient.to_le_bytes());
+                    input_hash_bytes += 16;
+                }
+            }
+            let fulls: Vec<SparseRel> = if lp_count == 0 {
+                vec![rel]
+            } else if cycles {
+                let before = la_ops;
+                let rows = forest.feed(rel, &mut la_ops);
+                merge_ops += la_ops - before;
+                rep.lp_full_relations += rows.len() as u64;
+                rows
             } else {
                 let before = la_ops;
-                let f = eliminator.feed(rel, &mut la_ops);
+                let f = if let Some(graph) = &mut graph_eliminator {
+                    graph
+                        .feed(rel, &mut la_ops)
+                        .expect("admitted Gaudry relation must fit graph")
+                } else {
+                    eliminator.feed(rel, &mut la_ops)
+                };
                 merge_ops += la_ops - before;
                 if f.is_some() {
                     rep.lp_full_relations += 1;
                 }
-                f
+                f.into_iter().collect()
             };
-            if let Some(full) = full {
+            for full in fulls {
+                if cycles {
+                    if lp_count == 0 {
+                        mu_direct += 1;
+                    } else {
+                        mu_harvested += 1;
+                    }
+                }
                 if opts.sparse_la {
                     full_rels.push(full);
                     rep.relations_independent = full_rels.len() as u64;
@@ -3836,6 +4937,7 @@ pub fn run_gaudry_opts(
                             let dd = x.map(|x| x[map[small]]);
                             if dd.is_some_and(|dd| curve.mul(&curve.g, dd) == inst.q) {
                                 rep.solved = true;
+                                rep.recovered_scalar = dd;
                                 rep.correct = Some(dd == Some(inst.d));
                             } else {
                                 next_attempt = full_rels.len() + (sel.len() / 20).max(1);
@@ -3852,11 +4954,16 @@ pub fn run_gaudry_opts(
                     if system.insert(row, full.rhs) {
                         rep.relations_independent += 1;
                         if let Some(dd) = system.solved(small) {
-                            rep.solved = true;
+                            rep.solved = curve.mul(&curve.g, dd) == inst.q;
+                            rep.recovered_scalar = rep.solved.then_some(dd);
                             rep.correct = Some(dd == inst.d);
                         }
                     }
                     la_rows_used = system.rank();
+                }
+                if cycles && rep.solved {
+                    // A closed cycle can release several rows at once.
+                    break;
                 }
             }
             la += t0.elapsed();
@@ -3875,6 +4982,7 @@ pub fn run_gaudry_opts(
         system.rank()
     };
     rep.group_ops = curve.ops();
+    rep.sampler_restarts = backend.map(|_| walk_sampler.as_ref().map_or(0, |w| w.restarts));
     rep.solver = solver;
     rep.precompute_fp_muls = precompute_muls;
     rep.solve_stats = stats;
@@ -3882,6 +4990,19 @@ pub fn run_gaudry_opts(
     rep.lp_merge_ops = merge_ops;
     rep.lp_abandoned = eliminator.abandoned;
     rep.lp_mean_merge_depth = eliminator.mean_merge_depth();
+    if cycles {
+        let mut st = forest.finish();
+        st.mu_harvested = mu_harvested;
+        st.mu_direct = mu_direct;
+        // For the harvester the field is the mean number of relations
+        // composed into a harvested row (the cycle-length analogue).
+        rep.lp_mean_merge_depth = st.mean_cycle_len;
+        rep.harvest = Some(st);
+        rep.lp_variant = Some("cycles".to_string());
+    }
+    rep.lp_graph_work = graph_eliminator.map(|graph| graph.work);
+    rep.lp_input_digest = input_hasher.map(|hasher| hasher.finalize().to_hex().to_string());
+    rep.lp_input_hash_bytes = backend.map(|_| input_hash_bytes);
     rep.la_rows = la_rows_used;
     rep.la_attempts = la_attempts;
     if opts.sparse_la {
@@ -3892,7 +5013,7 @@ pub fn run_gaudry_opts(
         };
     }
     rep.total_ops = rep.group_ops as f64
-        + (rep.oracle_fp_muls + precompute_muls) as f64 / fp_per_add
+        + (rep.oracle_fp_muls + rep.torsion_lift_fp_muls + precompute_muls) as f64 / fp_per_add
         + rep.la_ops as f64 * la_fp_equiv / fp_per_add;
     rep.s = rep.total_ops / (n as f64).sqrt();
     rep.fp_muls_per_pair_test = rep.oracle_fp_muls as f64 / rep.pair_tests.max(1) as f64;
@@ -3911,6 +5032,8 @@ pub struct RhoReport3 {
     pub steps: u64,
     pub group_ops: u64,
     pub solved: bool,
+    /// Candidate logarithm, independently checked by callers using G and Q.
+    pub recovered_scalar: Option<u64>,
     pub correct: Option<bool>,
     pub s: f64,
     pub wall_ms: f64,
@@ -3970,6 +5093,7 @@ pub fn run_rho3(inst: &Instance3, seed: u64) -> RhoReport3 {
         steps,
         group_ops: curve.ops(),
         solved: solved.is_some(),
+        recovered_scalar: solved,
         correct: solved.map(|d| d == inst.d),
         s: curve.ops() as f64 / (n as f64).sqrt(),
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
@@ -4015,6 +5139,29 @@ mod tests {
         assert_eq!(f.mul(&f.mul(&t, &t), &t), f.from_base(f.c));
         let q = (f.p as u128).pow(3) - 1;
         assert_eq!(f.pow(&t, q), Fp3::ONE);
+    }
+
+    #[test]
+    fn irreducible_non_binomial_cubic_field_axioms() {
+        // t^3 + 4t^2 + 1 has no root over F_11; no irreducible
+        // binomial t^3-c exists there because 11 is 2 modulo 3.
+        let f = Fp3::with_irreducible_cubic(11, [1, 0, 4]).unwrap();
+        assert!(Fp3::with_irreducible_cubic(11, [0, 0, 1]).is_err());
+        assert!(Fp3::with_irreducible_cubic(11, [1, 0, 11]).is_err());
+        let t = E3([0, 1, 0]);
+        let t3 = f.mul(&f.sq(&t), &t);
+        assert_eq!(t3, E3([10, 0, 7]));
+        let mut rng = StdRng::seed_from_u64(11);
+        for _ in 0..64 {
+            let value = E3([
+                rng.gen_range(0..11),
+                rng.gen_range(0..11),
+                rng.gen_range(0..11),
+            ]);
+            if value != Fp3::ZERO {
+                assert_eq!(f.mul(&value, &f.inv(&value)), Fp3::ONE);
+            }
+        }
     }
 
     #[test]
@@ -4203,6 +5350,7 @@ mod tests {
     /// the same answer on every residual, not merely the same counts.
     #[test]
     fn the_border_check_sends_only_the_residuals_no_degree_solves_to_the_fallback() {
+        let _env = env_lock();
         let inst = generate_instance3(271, 1);
         let pre = SymmetrisedS4::precompute(&inst.curve);
         let p = inst.curve.field.p;
@@ -4311,6 +5459,49 @@ mod tests {
             st_lazy.lazy_pivots_reduced < st_lazy.lazy_pivots_planned,
             "reduced every planned row: {st_lazy:?}"
         );
+    }
+
+    #[test]
+    fn berlekamp_massey_native_scan_tally_is_hand_computable() {
+        use super::super::jv_bitops::{self, Kind, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(103, 101);
+        let before = jv_bitops::snapshot();
+        let other = jv_bitops::snapshot_other();
+        let mut ops = 0;
+        {
+            let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+            assert_eq!(berlekamp_massey_u64(&[1, 2], 101, &mut ops), vec![1, 99]);
+        }
+        let t = jv_bitops::snapshot().since(&before);
+        let la = t.phase(Phase::LinearAlgebra);
+        assert_eq!(la.get(Kind::ModrMul), 5);
+        assert_eq!(la.get(Kind::ModrAdd), 3);
+        assert_eq!(la.get(Kind::ModrInv), 2);
+        // First discrepancy: 6 scans/compares. Second: 9.
+        assert_eq!(la.get(Kind::WordOp), 15);
+        assert_eq!(la.get(Kind::FieldMul), 0);
+        assert_eq!(t.total(), *la);
+        assert_eq!(jv_bitops::snapshot_other(), other);
+        assert_eq!(ops, 3); // inherited arithmetic counter unchanged
+    }
+
+    #[test]
+    fn solver_equality_counts_only_the_comparisons_it_executes() {
+        use super::super::jv_bitops::{self, Kind, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        let before = jv_bitops::snapshot();
+        {
+            let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+            assert!(equal_solver_words(&[], &[]));
+            assert!(!equal_solver_words(&[], &[1, 2]));
+            assert!(!equal_solver_words(&[1, 2], &[1, 3]));
+            assert!(equal_solver_words(&[1, 2], &[1, 2]));
+        }
+        let t = jv_bitops::snapshot().since(&before);
+        assert_eq!(t.total().get(Kind::WordOp), 8);
     }
 
     #[test]
@@ -4624,6 +5815,27 @@ mod tests {
     }
 
     #[test]
+    fn arity_four_with_four_large_primes_recovers_the_planted_logarithm() {
+        let inst = generate_instance3(31, 5);
+        let mut rng = StdRng::seed_from_u64(3);
+        let base = SubspaceBase::build(&inst, &mut rng);
+        let rep = run_gaudry_opts(
+            &inst,
+            &base,
+            1,
+            &GaudryOptions {
+                max_residuals: 200_000,
+                small_base: 1,
+                max_large_primes: 4,
+                arity: 4,
+                ..GaudryOptions::default()
+            },
+        );
+        assert_eq!(rep.correct, Some(true), "{rep:?}");
+        assert!(rep.lp_histogram[4] > 0, "{rep:?}");
+    }
+
+    #[test]
     fn gaudry_and_rho_recover_the_planted_logarithm() {
         let inst = generate_instance3(67, 11);
         let mut rng = StdRng::seed_from_u64(2);
@@ -4680,5 +5892,278 @@ mod tests {
             pair_each * 50 < grob_each,
             "pair {pair_each} vs triple {grob_each} F_p muls per residual"
         );
+    }
+
+    // ── the default large-prime path is unchanged ────────────────────────
+
+    /// `GAUDRY_BORDER_RETRY` is process-wide and one test flips it; a test
+    /// that compares exact reports must not run while it is set.
+    fn env_lock() -> std::sync::MutexGuard<'static, ()> {
+        static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        LOCK.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
+    /// SHA-256 of the report's JSON with the two wall-clock fields zeroed.
+    fn report_digest(mut rep: GaudryReport) -> String {
+        rep.wall_ms = 0.0;
+        rep.linear_algebra_ms = 0.0;
+        let json = serde_json::to_string(&rep).unwrap();
+        crate::hash::sha256::sha256(json.as_bytes())
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect()
+    }
+
+    /// The reports of the default (eliminator) large-prime path, byte for
+    /// byte (wall clock excluded), as the code stood before the gain-forest
+    /// harvester was ported (crypto `c9601627e`).  `GOLDEN_PRINT=1` prints
+    /// the digests instead of asserting.
+    #[test]
+    fn default_large_prime_reports_are_unchanged() {
+        let _env = env_lock();
+        let mut got: Vec<(String, String)> = Vec::new();
+        let build = |p: u64, iseed: u64, bseed: u64| {
+            let inst = generate_instance3(p, iseed);
+            let mut rng = StdRng::seed_from_u64(bseed);
+            let base = SubspaceBase::build(&inst, &mut rng);
+            (inst, base)
+        };
+        let rule = |base: &SubspaceBase| (base.len() as f64).powf(2.0 / 3.0).ceil() as usize;
+        // 0: Groebner + Wiedemann + double large primes, the bench's arm.
+        let (inst, base) = build(67, 1, 1);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            ..GaudryOptions::default()
+        };
+        let rep = run_gaudry_opts(&inst, &base, 1, &opts);
+        assert_eq!(rep.correct, Some(true));
+        got.push(("groebner_lp2_p67".into(), report_digest(rep)));
+        // 1: the plain dense run.
+        let (inst, base) = build(67, 11, 2);
+        got.push((
+            "mitm_dense_p67".into(),
+            report_digest(run_gaudry(&inst, &base, 1, 20_000)),
+        ));
+        // 2: a larger field with a merge-level cap.
+        let (inst, base) = build(151, 3, 3);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            max_merge_level: 2,
+            ..GaudryOptions::default()
+        };
+        got.push((
+            "groebner_lp2_cap2_p151".into(),
+            report_digest(run_gaudry_opts(&inst, &base, 2, &opts)),
+        ));
+        // 3, 4: the two protected backends.
+        let (inst, base) = build(67, 1, 1);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            ..GaudryOptions::default()
+        };
+        for (name, backend) in [
+            ("pivot_backend_p67", LargePrimeBackend::Pivot),
+            ("graph_backend_p67", LargePrimeBackend::SymbolicGraph),
+        ] {
+            got.push((
+                name.into(),
+                report_digest(run_gaudry_with_eliminator(&inst, &base, 1, &opts, backend)),
+            ));
+        }
+        if std::env::var_os("GOLDEN_PRINT").is_some() {
+            for (k, v) in &got {
+                println!("GOLDEN {k} {v}");
+            }
+            return;
+        }
+        const GOLDEN: &[(&str, &str)] = &[
+            (
+                "groebner_lp2_p67",
+                "3a7b0cea7e1ee1bd4d3a7313fe85b5e9758256ad2eacad3e2efda1bc4e8b900d",
+            ),
+            (
+                "mitm_dense_p67",
+                "0edf9ac1de52650d79426602b3fad1a6989907472da94feab1ad08917e6067d8",
+            ),
+            (
+                "groebner_lp2_cap2_p151",
+                "9d8ce38d7fae38fe8a4a248e9428eb1791be9815c7fb7ebb4f6794c3aeb104f8",
+            ),
+            (
+                "pivot_backend_p67",
+                "b547716bfba01e59fba2eff97226fad464178ade3fda627164c2246fcb5f5eb0",
+            ),
+            (
+                "graph_backend_p67",
+                "780b187825cd4d82ba1b25d568f7d489ca981040bf6044b20ab9874324cb7847",
+            ),
+        ];
+        assert_eq!(got.len(), GOLDEN.len());
+        for ((k, v), (gk, gv)) in got.iter().zip(GOLDEN) {
+            assert_eq!(k, gk);
+            assert_eq!(v, gv, "{k}: the default path's report changed");
+        }
+    }
+
+    // ── gain-forest harvester ────────────────────────────────────────────
+
+    /// Random relations with 0..=3 large primes over a hidden solution, fed
+    /// to the harvester: every released row holds, none is inconsistent, and
+    /// the frame-matroid count balances (every accepted large-prime
+    /// equation is a row, a join, a pin, a null row or still buffered).
+    #[test]
+    fn harvester_rows_hold_on_a_planted_system_and_the_count_balances() {
+        let n = 1_000_003u64;
+        let small = 6usize; // columns 0..5 small, 6 = d, 7.. large primes
+        let nlp = 40usize;
+        let mut rng = StdRng::seed_from_u64(21);
+        let x: Vec<u64> = (0..small + 1 + nlp).map(|_| rng.gen_range(0..n)).collect();
+        let mut h = GainForestHarvester::new(small, n, small + 1 + nlp);
+        let mut ops = 0u64;
+        let mut rows = 0u64;
+        let mut lp_eqs = 0u64;
+        for _ in 0..400 {
+            let k = rng.gen_range(0..4usize);
+            let mut cols: Vec<(usize, u64)> = Vec::new();
+            let mut push = |c: usize, rng: &mut StdRng| {
+                if cols.iter().any(|e| e.0 == c) {
+                    return;
+                }
+                cols.push((c, rng.gen_range(1..n)));
+            };
+            for _ in 0..k {
+                push(small + 1 + rng.gen_range(0..nlp), &mut rng);
+            }
+            for _ in 0..rng.gen_range(0..3usize) {
+                push(rng.gen_range(0..=small), &mut rng);
+            }
+            if cols.is_empty() {
+                continue;
+            }
+            cols.sort_unstable();
+            let lps = cols.iter().filter(|e| e.0 > small).count();
+            if lps > 0 {
+                lp_eqs += 1;
+            }
+            let rhs = cols
+                .iter()
+                .fold(0u64, |a, &(c, v)| am(a, mm(v, x[c], n), n));
+            for r in h.feed(SparseRel { cols, rhs }, &mut ops) {
+                assert!(r.cols.iter().all(|&(c, _)| c <= small), "{r:?}");
+                let lhs = r
+                    .cols
+                    .iter()
+                    .fold(0u64, |a, &(c, v)| am(a, mm(v, x[c], n), n));
+                assert_eq!(
+                    lhs, r.rhs,
+                    "harvested row must hold against the hidden solution"
+                );
+                if lps > 0 {
+                    rows += 1;
+                }
+            }
+        }
+        let st = h.finish();
+        assert_eq!(st.inconsistent, 0);
+        assert!(
+            rows > 20 && st.three_edges_accepted > 20,
+            "{st:?} rows {rows}"
+        );
+        assert_eq!(
+            lp_eqs,
+            st.rows_emitted + st.unions + st.pins + st.rows_null + st.three_edges_left,
+            "{st:?}"
+        );
+        assert_eq!(st.rows_emitted, rows, "{st:?}");
+        assert!(ops > 0);
+    }
+
+    /// On a real instance every harvested row holds against the known
+    /// logarithms of the base points (brute-forced), and the run recovers
+    /// the planted `d`.
+    #[test]
+    fn harvester_rows_hold_against_known_logs_on_a_planted_instance() {
+        let inst = generate_instance3(67, 11);
+        let mut rng = StdRng::seed_from_u64(3);
+        let base = SubspaceBase::build(&inst, &mut rng);
+        let curve = &inst.curve;
+        let n = curve.n;
+        let mut table: HashMap<Pt3, u64> = HashMap::new();
+        let mut acc = curve.g;
+        for j in 1..n {
+            table.insert(acc, j);
+            acc = curve.add(&acc, &curve.g);
+        }
+        let logs: Vec<u64> = base.points.iter().map(|pt| table[pt]).collect();
+        let small = (base.len() as f64).powf(2.0 / 3.0).ceil() as usize;
+        let col_of = |i: usize| if i < small { i } else { i + 1 };
+        let mut xs = vec![0u64; base.len() + 2];
+        for (i, &l) in logs.iter().enumerate() {
+            xs[col_of(i)] = l;
+        }
+        xs[small] = inst.d;
+        let pre = SymmetrisedS4::precompute(curve);
+        let mut stats = SolveStats::default();
+        let mut h = GainForestHarvester::new(small, n, base.len() + 2);
+        let mut ops = 0u64;
+        let mut rows = 0usize;
+        let mut rng = StdRng::seed_from_u64(77);
+        for _ in 0..300 {
+            let a = rng.gen_range(0..n);
+            let b = rng.gen_range(1..n);
+            let r = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+            let decs =
+                subspace_triple_oracle_groebner(&inst, &base, &pre, &r, &mut rng, &mut stats);
+            for terms in decs {
+                let mut cols: Vec<(usize, u64)> = terms
+                    .iter()
+                    .map(|&(i, c)| {
+                        let v = c.unsigned_abs() % n;
+                        (col_of(i), if c >= 0 { v } else { (n - v) % n })
+                    })
+                    .collect();
+                cols.push((small, (n - b) % n));
+                cols.sort_unstable();
+                let rel = SparseRel { cols, rhs: a };
+                for r in h.feed(rel, &mut ops) {
+                    let lhs = r
+                        .cols
+                        .iter()
+                        .fold(0u64, |s, &(c, v)| am(s, mm(v, xs[c], n), n));
+                    assert_eq!(lhs, r.rhs, "harvested row fails against the known logs");
+                    rows += 1;
+                }
+            }
+        }
+        let st = h.finish();
+        assert!(rows > 0 && st.inconsistent == 0, "{st:?}");
+        let rep = run_gaudry_opts(
+            &inst,
+            &base,
+            1,
+            &GaudryOptions {
+                max_residuals: 200_000,
+                solver: Solver::Groebner,
+                sparse_la: true,
+                small_base: small,
+                max_large_primes: 3,
+                harvester: Harvester::Cycles,
+                ..GaudryOptions::default()
+            },
+        );
+        assert_eq!(rep.correct, Some(true), "{rep:?}");
+        let hs = rep.harvest.as_ref().expect("cycle stats present");
+        assert_eq!(hs.inconsistent, 0);
+        assert!(hs.mu_harvested + hs.mu_direct > 0 && rep.lp_merge_ops > 0);
+        assert!(hs.mu_harvested as usize >= rep.la_rows.saturating_sub(hs.mu_direct as usize));
     }
 }

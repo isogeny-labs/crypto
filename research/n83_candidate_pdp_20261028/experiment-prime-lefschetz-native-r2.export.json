@@ -1,0 +1,3643 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/prime_lefschetz_native.rs",
+      "sha256": "f920bae5b5e8cf4d66e0f532719176435d61fccdd0e2f172d389b0f6d8d48325",
+      "bytes": 15324,
+      "kind": "analysis"
+    },
+    "outputs": [],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+      "binary_sha256": "2684e262db1a1b9406fcbb250e39f7d83095aa2458d9713c3cb52135d7edc834",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2"
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+      "binary_sha256": "2684e262db1a1b9406fcbb250e39f7d83095aa2458d9713c3cb52135d7edc834",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2"
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+      "binary_sha256": "2684e262db1a1b9406fcbb250e39f7d83095aa2458d9713c3cb52135d7edc834",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2"
+    }
+  ],
+  "backend": "isolab-k8s",
+  "created": "2026-10-30T17:31:37Z",
+  "export_id": "N83-PRIME-LEFSCHETZ-NATIVE-20261030-R2",
+  "files": [
+    {
+      "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+      "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+      "bytes": 432,
+      "kind": "receipt"
+    },
+    {
+      "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+      "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+      "bytes": 2027,
+      "kind": "receipt"
+    },
+    {
+      "path": "evidence/prime-lefschetz-native-r2/logs.json",
+      "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+      "bytes": 135,
+      "kind": "receipt"
+    },
+    {
+      "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+      "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+      "bytes": 720,
+      "kind": "receipt"
+    },
+    {
+      "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+      "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+      "bytes": 203,
+      "kind": "receipt"
+    },
+    {
+      "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+      "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+      "bytes": 1567,
+      "kind": "receipt"
+    }
+  ],
+  "flow": {
+    "planned": 42,
+    "attempted": 42,
+    "completed": 0,
+    "not_completed": 42,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "No inference from incomplete cases or failed phases",
+        "run_ids": [
+          "original-prime-m3-planted",
+          "original-prime-m3-natural",
+          "original-prime-m4-planted",
+          "original-prime-m4-natural",
+          "original-prime-m5-planted",
+          "original-prime-m5-natural",
+          "original-prime-m6-planted",
+          "original-prime-m6-natural",
+          "original-prime-m7-planted",
+          "original-prime-m7-natural",
+          "original-prime-m8-planted",
+          "original-prime-m8-natural",
+          "original-prime-m9-planted",
+          "original-prime-m9-natural",
+          "baseline-prime-m3-planted",
+          "baseline-prime-m3-natural",
+          "baseline-prime-m4-planted",
+          "baseline-prime-m4-natural",
+          "baseline-prime-m5-planted",
+          "baseline-prime-m5-natural",
+          "baseline-prime-m6-planted",
+          "baseline-prime-m6-natural",
+          "baseline-prime-m7-planted",
+          "baseline-prime-m7-natural",
+          "baseline-prime-m8-planted",
+          "baseline-prime-m8-natural",
+          "baseline-prime-m9-planted",
+          "baseline-prime-m9-natural",
+          "spike40-prime-m3-planted",
+          "spike40-prime-m3-natural",
+          "spike40-prime-m4-planted",
+          "spike40-prime-m4-natural",
+          "spike40-prime-m5-planted",
+          "spike40-prime-m5-natural",
+          "spike40-prime-m6-planted",
+          "spike40-prime-m6-natural",
+          "spike40-prime-m7-planted",
+          "spike40-prime-m7-natural",
+          "spike40-prime-m8-planted",
+          "spike40-prime-m8-natural",
+          "spike40-prime-m9-planted",
+          "spike40-prime-m9-natural"
+        ]
+      }
+    ]
+  },
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "executor",
+      "text": "The42rows are submitted case slots in ONE EKS job, not42native process attempts or independent failures. attempts=1 and flow.attempted=42 count slot submission only. No worker start was observed; no source-audit or certificate records were published. Native execution counts are not inferred from submission counts."
+    },
+    {
+      "kind": "observation",
+      "by": "executor",
+      "text": "Job DeadlineExceeded; last predeadline Pod was Pending without node. Terminal retains no Pod; worker_execution_never_started_proven is null. Final S3 raw inventory has zero objects. No degree result or mathematical refutation."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "T-963",
+    "role": "executor"
+  },
+  "protocol": {
+    "path": "protocol-prime-lefschetz-native.json",
+    "sha256": "a74055d42a694d1ee8d54e2bed1084a6350668fcb86a6db8c5975f020ae53c59",
+    "protocol_id": "N83-PRIME-LEFSCHETZ-20261030",
+    "version": 2
+  },
+  "reviews_dir": "reviews-prime-lefschetz-native-r2",
+  "runs": [
+    {
+      "run_id": "original-prime-m3-planted",
+      "arm": "original",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m3-natural",
+      "arm": "original",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m4-planted",
+      "arm": "original",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m4-natural",
+      "arm": "original",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m5-planted",
+      "arm": "original",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m5-natural",
+      "arm": "original",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m6-planted",
+      "arm": "original",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m6-natural",
+      "arm": "original",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m7-planted",
+      "arm": "original",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m7-natural",
+      "arm": "original",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m8-planted",
+      "arm": "original",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m8-natural",
+      "arm": "original",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m9-planted",
+      "arm": "original",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "original-prime-m9-natural",
+      "arm": "original",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m3-planted",
+      "arm": "baseline",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m3-natural",
+      "arm": "baseline",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m4-planted",
+      "arm": "baseline",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m4-natural",
+      "arm": "baseline",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m5-planted",
+      "arm": "baseline",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m5-natural",
+      "arm": "baseline",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m6-planted",
+      "arm": "baseline",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m6-natural",
+      "arm": "baseline",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m7-planted",
+      "arm": "baseline",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m7-natural",
+      "arm": "baseline",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m8-planted",
+      "arm": "baseline",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m8-natural",
+      "arm": "baseline",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m9-planted",
+      "arm": "baseline",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "baseline-prime-m9-natural",
+      "arm": "baseline",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m3-planted",
+      "arm": "spike40",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m3-natural",
+      "arm": "spike40",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m4-planted",
+      "arm": "spike40",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m4-natural",
+      "arm": "spike40",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m5-planted",
+      "arm": "spike40",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m5-natural",
+      "arm": "spike40",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m6-planted",
+      "arm": "spike40",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m6-natural",
+      "arm": "spike40",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m7-planted",
+      "arm": "spike40",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m7-natural",
+      "arm": "spike40",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m8-planted",
+      "arm": "spike40",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m8-natural",
+      "arm": "spike40",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m9-planted",
+      "arm": "spike40",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    },
+    {
+      "run_id": "spike40-prime-m9-natural",
+      "arm": "spike40",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_source_audit_records": 0,
+          "published_certificate_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "No inference from incomplete cases or failed phases"
+      },
+      "artifacts": [
+        {
+          "path": "evidence/prime-lefschetz-native-r2/capacity-readonly-error.log",
+          "sha256": "554c511f70710b481719716107010a889459eadcb39bd1bc3e8cf7b9b2ef2435",
+          "bytes": 432,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/last-predeadline-status.json",
+          "sha256": "d7c9329810c5b269df5a495ca0b7f0a9ab713f5be5fd2856495594a97b173556",
+          "bytes": 2027,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/outcome.json",
+          "sha256": "9fb183bf7eda7631d62f2f36378dd836ffaf20a8e684a3838b7075be76cdd453",
+          "bytes": 720,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/raw-inventory.json",
+          "sha256": "8d6bcad5486a3e9f2506868d0f195e2c1ad7dd242bf33473bbd59bfe321c32f7",
+          "bytes": 203,
+          "kind": "receipt"
+        },
+        {
+          "path": "evidence/prime-lefschetz-native-r2/terminal-job.json",
+          "sha256": "9ded53e514095b9d3f3e08961b1f57be88f57e0d4c8eafb27366267833f41716",
+          "bytes": 1567,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T17:29:57Z",
+      "worker": null,
+      "backend_ref": "e157574b-2d6a-4450-9e13-fbc596db96fd"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "c080c9a021405096cc9597d5dbd715da1894db6f",
+    "dirty": false
+  },
+  "backend_record": {
+    "schema": "n83.native-lefschetz-infrastructure-outcome/v1",
+    "run_id": "n83-native-lefschetz-20261030-r2",
+    "job_uid": "e157574b-2d6a-4450-9e13-fbc596db96fd",
+    "job_status": "failed",
+    "reason": "DeadlineExceeded",
+    "submitted_jobs": 1,
+    "planned_case_slots": 42,
+    "worker_start_observed": false,
+    "worker_execution_never_started_proven": null,
+    "source_audit_records": 0,
+    "certificate_records": 0,
+    "raw_objects": 0,
+    "retries": 0,
+    "degree_claim": null,
+    "scope": "prime m3-9;original/baseline/spike40;planted/natural",
+    "interpretation": "Infrastructure deadline; no native measurement or mathematical refutation. Last retained observation had an unscheduled Pod; terminal has no retained Pod."
+  }
+}

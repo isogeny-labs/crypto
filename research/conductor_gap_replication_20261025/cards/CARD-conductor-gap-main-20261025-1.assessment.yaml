@@ -1,0 +1,29 @@
+card_id: CARD-conductor-gap-main-20261025-1
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+- research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-main-20261025-1.receipt.json (sha256 b63f0ffb38aa7ee34c3a5eeb365c8646d8828223efe5221d1ec42ee2f38541ab)
+  records all seven card argv in order at commit 68e6c8b12d9185824bc071d7bc29ce2c2b5a2372; every command exited
+  0, succeeded once and did not time out.
+- tools/task_card.py check-relay accepted research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-main-20261025-1.executor.txt
+  with relay_verbatim=true, no missing lines and no verification findings. The saved report also matches the original
+  tool stdout byte-for-byte, including its final newline.
+- All 71 bound input digests, 193 declared output digests and 14 stdout/stderr digests match research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-main-20261025-1.yaml
+  and its receipt. Frozen protocol, amendment, specifications, manifests and both binaries are unchanged; the main
+  card needed no post-execution lint workaround.
+- prepared-a/manifest.json names 56 complete sessions with 41,856 verified records; prepared-b-v2/manifest.json
+  names eight complete sessions with 1,664 verified records. Their 64 session audit receipts have ok=true, no problems
+  and all 43,520 deterministic replays reproduced. positive-control-gate.json records 8,192 controls and passed=true.
+- execution.jsonl contains the prescribed 128 run/replay completion entries in exact manifest order. execution-start.json
+  retains guard_seconds=7200; the final entry is 5,057 seconds after the shared start.
+- The receipt dirty_after includes .github/workflows/conductor-gap-replication.yml outside executor write_scope.
+  The main session explicitly declared its own creation of this file during execution before assessment; no listed
+  executor argv writes it. The generic assessment_facts helper flags that dirty path without writer attribution,
+  so that separate root action is not classified as an executor deviation.
+- 'Other separately declared root preparation files are confined to the study: validation-inputs.mjs, independent_geometry.cpp,
+  analysis_b.inc.rs, report.mjs, checks/measurement-Cargo.lock and checks/conductor-report-integration.log. The
+  dispatch states no builds, tests or other solvers overlapped the card; tracked frozen inputs and measured evidence
+  stayed unchanged.'
+interpretation: not_assessed

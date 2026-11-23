@@ -1,0 +1,74 @@
+{
+  "main": "JVGradedHilbertAudit.canonical_graded_hilbert_certificate",
+  "binding": "288fa232f61b729eee2a64e17f2741efcf7c144c019684d0bc676e5fcd2db8b6",
+  "custom_imports": {
+    "ActualIdeal": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+    "CanonicalPieces": "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+    "CubicDual": "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+    "CubicNormalForms": "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+    "DualBasis": "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+    "GradedBasis": "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+    "GradedCertificate": "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+    "LiteralQuadratics": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+    "MacaulayCertificate": "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+    "QuotientBasis": "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+    "SharpCutoff": "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean"
+  },
+  "modules": [
+    {
+      "file": "GradedBasis.lean",
+      "role": "Literal basis degree partition, checked actual multiplication coefficient grading, arbitrary coordinate/power/monomial/homogeneous image propagation and independent matching-index span dimensions."
+    },
+    {
+      "file": "CanonicalPieces.lean",
+      "role": "Independent canonical restricted actual quotient/kernel/image/firstisomorphism definitions; equality with matching-degree span, sourceIdeal homogeneity and exact degree-piece dimensions/cutoff; direct graded-vs-total control."
+    },
+    {
+      "file": "GradedCertificate.lean",
+      "role": "Full closed binding for actual ideal/kernel/image/canonical pieces/Hilbert function and scalar dimension/length, no assumed grading/Hilbert/GB/native result."
+    }
+  ],
+  "claims": [
+    {
+      "declaration": "matrix_respects_degree / homogeneous_image_mem",
+      "hypotheses": "Literal frozen actual source quotient and multiplication tables",
+      "conclusion": "All actual homogeneous polynomial images lie in matching-degree basis span."
+    },
+    {
+      "declaration": "degreeMap_kernel_mem",
+      "hypotheses": "Literal source ideal; arbitrary degree and homogeneous polynomial",
+      "conclusion": "Canonical kernel is exactly I∩P_d."
+    },
+    {
+      "declaration": "pieceEquivImage / degreeImage_eq_gradedSpan",
+      "hypotheses": "No extra hypotheses",
+      "conclusion": "Canonical quotient piece equivalent to actual image, equal to matching-degree span."
+    },
+    {
+      "declaration": "sourceIdeal_homogeneous",
+      "hypotheses": "No extra hypotheses; actual literal quadratic source generators",
+      "conclusion": "Ideal homogeneous for canonical Mathlib grading."
+    },
+    {
+      "declaration": "canonical_piece_dimension / zero_piece_iff",
+      "hypotheses": "Every natural degree",
+      "conclusion": "Canonical degree-piece dimensions1/3/3/1/0 and zero iff d≥4."
+    },
+    {
+      "declaration": "graded_dimension_not_total_dimension",
+      "hypotheses": "Actual source quotient",
+      "conclusion": "HF0=1 differs from total scalar dimension8."
+    }
+  ],
+  "gate_declarations": 26,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "not established",
+  "open": "Generic JV/FGHR and larger-system statements, internalF4 degree/refinement, wholecurve order/scalar relations and general graded-module Hilbert polynomial theory. No source assumption refuted."
+}

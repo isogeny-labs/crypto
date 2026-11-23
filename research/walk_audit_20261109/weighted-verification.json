@@ -1,0 +1,71 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T00:59:34.321Z",
+  "source_commit": "a88c6fa0f0692b471cb9472fece886b4fa3ee127",
+  "source_plan_sha256": "e563b864cf666ce4b9a38f81eb80e2573a0ba7b9790b597aff72692b845d56ac",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/walk_audit_20261109/lean",
+    "theorem": "WalkWeightedAudit.weighted_variance_audit_certificate",
+    "statement": "theorem weighted_variance_audit_certificate : Fintype.card Hash=8 ∧ Function.Injective (fun i : Fin 2=>((i.val:ZMod 3)+1)) ∧ (∀ i : Fin 2,((i.val:ZMod 3)+1)≠0) ∧ (∀ (a : ℝ) (ha : 0≤a) (ha1 : a≤1), (∑ h : Hash,(hashLaw a ha ha1 h).toReal*inDegree h)=1 ∧ (∑ h : Hash,(hashLaw a ha ha1 h).toReal*(inDegree h-1)^2)= 1-(a^2+(1-a)^2)) ∧ (∑ h : Hash,(unequalLaw h).toReal*inDegree h)=1 ∧ (∑ h : Hash,(unequalLaw h).toReal*(inDegree h-1)^2)=3/8",
+    "decl_sha256": "1444b26c13cfb84accd07ff49d360d7a3253ee8dedeefe8475c7855d44cebb89",
+    "sources": [
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      }
+    ],
+    "gate": {
+      "path": "evidence/weighted-gate-02.log",
+      "declarations": 43,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Actual8hashes on Z3/two distinct nonzero increments; product label probabilitiesa,1-a with0<=a<=1; normalized genuine PMF, exact in-degree mean1/variance1-(a2+(1-a)2)at vertex0. Unequal3/4control variance3/8. No collision-time/asymptotic/practical-hash conclusion."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-785828",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-785828",
+      "claim_sha256": "cfae2d97c0c9cfbc0212052b17c19120b1f67def18e06b7c967b5c63d44088e5",
+      "commit": "a88c6fa0f0692b471cb9472fece886b4fa3ee127",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/walk_audit_20261109/lean (WalkWeighted.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T00:55:32Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-785828",
+      "claim_sha256": "cfae2d97c0c9cfbc0212052b17c19120b1f67def18e06b7c967b5c63d44088e5",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-weighted-rho/report.pdf",
+    "bytes": 54334,
+    "sha256": "0ac5dd099d784d6666f544de613b5edf918fbb73aed529a651896b7c70f123a4",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "graphs_and_diagrams_inspected": true
+  },
+  "scope": "Actual8hashes on Z3/two distinct nonzero increments; product label probabilitiesa,1-a with0<=a<=1; normalized genuine PMF, exact in-degree mean1/variance1-(a2+(1-a)2)at vertex0. Unequal3/4control variance3/8. No collision-time/asymptotic/practical-hash conclusion.",
+  "paid_compute": 0
+}

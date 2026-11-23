@@ -1,0 +1,53 @@
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+    Checking itoa v1.0.19
+    Checking memchr v2.8.3
+    Checking hex v0.4.3
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking torus-section-search v0.1.0 (/workspace/isogeny-labs/crypto-exponent-ideas-20261117/tools/torus-section-search)
+error: using `chunks_exact` with a constant chunk size
+   --> src/../../../src/hash/sha256.rs:135:25
+    |
+135 |     for block in padded.chunks_exact(64) {
+    |                         ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/../../../src/hash/sha256.rs:154:25
+    |
+154 |     for block in padded.chunks_exact(64) {
+    |                         ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/../../../src/hash/sha256.rs:241:25
+    |
+241 |     for block in blocks.chunks_exact(64) {
+    |                         ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/../../../src/hash/sha256.rs:298:29
+    |
+298 |         for block in blocks.chunks_exact(64) {
+    |                             ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+
+error: could not compile `torus-section-search` (lib) due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: using `chunks_exact` with a constant chunk size
+   --> src/../../../src/hash/sha256.rs:506:33
+    |
+506 |             for block in blocks.chunks_exact(64) {
+    |                                 ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+
+error: could not compile `torus-section-search` (lib test) due to 5 previous errors

@@ -1,0 +1,8 @@
+research/prime_field_transfer_goal_20261116/round-04/v4/recognizer.cpp: In function ‘Recognized recognize(const WeberModel&, const Point&, unsigned int)’:
+research/prime_field_transfer_goal_20261116/round-04/v4/recognizer.cpp:215:13: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  215 |             for(size_t k=0;k<term.size();++k)value[k]=mod(value[k]+term[k],aux);mtrim(value);
+      |             ^~~
+research/prime_field_transfer_goal_20261116/round-04/v4/recognizer.cpp:215:81: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  215 |             for(size_t k=0;k<term.size();++k)value[k]=mod(value[k]+term[k],aux);mtrim(value);
+      |                                                                                 ^~~~~
+cc1plus: all warnings being treated as errors

@@ -1,0 +1,24 @@
+--- a/src/cryptanalysis/curve25519_wide.rs
++++ b/src/cryptanalysis/curve25519_wide.rs
+@@ -646,8 +646,10 @@
+         return (1, 1);
+     }
+     charge_add(ops); // t = 1 was not a hit
+-    let mut prev = (xq, f.one()); // t = 0
+-    let mut cur = (x1, f.one()); // t = 1
++    let shift = f.mul(f.from_u64(A25519), f.inv(f.from_u64(3)).expect("3"));
++    let xg = f.sub(xg, shift);
++    let mut prev = (f.sub(xq, shift), f.one()); // t = 0
++    let mut cur = (f.sub(x1, shift), f.one()); // t = 1
+     let mut idx = 2u64;
+     const BLOCK: u64 = 4096;
+     while idx < trials {
+@@ -672,7 +674,7 @@
+             let hit = if f.is_zero(z) {
+                 false
+             } else {
+-                base.contains_key(&f.mul(x, z))
++                base.contains_key(&f.add(f.mul(x, z), shift))
+             };
+             if hit {
+                 return (1, real);

@@ -1,0 +1,28 @@
+   Compiling crypto v0.1.0 (/workspace/crypto-trace)
+    Finished `release` profile [optimized] target(s) in 3m 45s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-5fc4d2fdff08ce53)
+
+running 5 tests
+test cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_ecc2k130_normal_basis_even_weight_is_zero ... ok
+test cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_zero_basis_keeps_contradictions_but_skips_zero ... ok
+test cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_homomorphism_on_ecc2k130_and_m83_fixtures ... ok
+test cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_on_off_preserves_group_answers_and_export_order ... FAILED
+test cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_rows_match_coordinate_trace_for_both_parities ... ok
+
+failures:
+
+---- cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_on_off_preserves_group_answers_and_export_order stdout ----
+
+thread 'cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_on_off_preserves_group_answers_and_export_order' (28586) panicked at src/cryptanalysis/koblitz_index_calculus.rs:18754:25:
+assertion `left == right` failed: a=0 m=3 trace=false target=Affine { x: F2mElement { bits: [0], m: 7 }, y: F2mElement { bits: [1], m: 7 } } reference=Some([0, 0, 0]) stats=SolveStats { reductions: 45, infeasible_branches: 15, propagations: 70, splits: 28, tail_enumerations: 0, tail_assignments_tested: 0, deferred_splits: 0, exhausted: false, unsupported: false, max_degree_built: 3, oversize: 0, eliminated: 30, geometric_refutations: 0, geometric_witnesses: 0, geometric_support_checks: 0, geometric_partial_support_checks: 0, geometric_partial_support_refutations: 0, geometric_residual_lookups: 0, geometric_fast_residual_lookups: 0, geometric_batch_groups: 0, geometric_group_additions: 0, geometric_pair_index_builds: 0, geometric_pair_index_lookups: 0, geometric_oracle_calls: 0, geometric_oracle_ns: 0, geometric_fallbacks: 0 }
+  left: false
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cryptanalysis::koblitz_index_calculus::tests::decomposition_trace_on_off_preserves_group_answers_and_export_order
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 6264 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `--lib`

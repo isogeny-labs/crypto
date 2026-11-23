@@ -1,0 +1,121 @@
+--- original/replay.py
++++ continuation/replay.py
+@@ -1,12 +1,19 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/var/tmp/actual-nonbranch-independent-t1577')
++W=Path('/home/ec2-user/pencil-native-nonbranch-t1628-20261105')
++ABSOLUTE_DEADLINE=1793937600  # 2026-11-06T04:00:00Z
++OWNED=False
++progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
++last_progress=0.0
++campaign_start=None
+ mode=sys.argv[1];assert mode in ('pre','compiler','post')
++EXPECTED_FREEZE=sys.argv[2];assert len(EXPECTED_FREEZE)==64
+ # Reject repeat attempts before entering receipt-writing cleanup, preserving prior receipts.
+ if (mode=='pre' and W.exists()) or (W/(mode+'.started')).exists():
+  raise SystemExit('existing workspace/phase attempt; no retry, original evidence preserved')
+-start=time.monotonic();limit=600 if mode=='compiler' else 300;work=limit-20
++start=time.monotonic();limit=600 if mode=='compiler' else 900;work=limit-20
++progress['phase']=mode
+ resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+ resource.setrlimit(resource.RLIMIT_STACK,(10*1024**2,10*1024**2))
+ resource.setrlimit(resource.RLIMIT_FSIZE,(16*1024**2,16*1024**2))
+@@ -15,16 +22,27 @@
+  pending.append(s)
+  raise RuntimeError('signal '+str(s))
+ signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
++def checkpoint(force=False):
++ global last_progress
++ now=time.monotonic()
++ if OWNED and (force or now-last_progress>=5):
++  progress.update(elapsed_seconds=now-start,recorded_utc_seconds=time.time())
++  durable(W/(mode+'-progress.json'),progress)
++  last_progress=now
+ def boundary():
++ checkpoint()
++ assert time.time()<ABSOLUTE_DEADLINE,'absolute deadline'
++ assert campaign_start is None or time.monotonic()-campaign_start<2380,'campaign work deadline'
+  assert not pending,'pending signal'
+  assert time.monotonic()-start<work,'work deadline'
+ def sha(p):
++ progress['current_path']=str(p);progress['current_bytes_read']=0
+  h=hashlib.sha256()
+  with Path(p).open('rb') as f:
+   while True:
+    boundary();b=f.read(1024*1024)
+    if not b:break
+-   h.update(b)
++   h.update(b);progress['current_bytes_read']+=len(b)
+  return h.hexdigest()
+ def durable(p,j):
+  t=p.with_suffix('.tmp')
+@@ -53,10 +71,17 @@
+  assert n<=256*1024**2,'sampled aggregate output threshold'
+  return n
+ try:
+- if mode=='pre':W.mkdir(mode=0o700)
++ if mode=='pre':
++  W.mkdir(mode=0o700);OWNED=True
++  campaign_start=start
++  durable(W/'campaign-start.json',{'monotonic':start,'absolute_deadline':ABSOLUTE_DEADLINE,'total_seconds':2400})
+  assert W.is_dir() and not W.is_symlink()
+  marker=W/(mode+'.started');fd=os.open(marker,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600);os.close(fd)
++ OWNED=True
++ campaign_start=json.loads((W/'campaign-start.json').read_text())['monotonic']
++ checkpoint(force=True)
+  assert shutil.disk_usage(W).free>=1024**3
++ assert sha(P/'freeze.json')==EXPECTED_FREEZE,'freeze pin mismatch'
+  F=json.loads((P/'freeze.json').read_text())
+  for n,h in F['files'].items():assert sha(P/n)==h,('frozen input',n)
+  if mode in ('pre','post'):
+@@ -66,16 +91,23 @@
+   files={f['path']:f for v in cp['done'].values() for f in v['files']}
+   assert set(files)==set(baseline) and len(files)==16736
+   done={}
++  progress['stage']='native_dependencies'
+   for name,v in sorted(files.items()):
+    boundary();p=Path(name);assert str(p.resolve())==v['realpath'];s=p.stat();h=sha(p);a=p.stat()
+    assert (s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns)==(a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns)
+    assert h==baseline[name]['sha256'] and a.st_size==v['bytes']
+    done[name]={'sha256':h,'bytes':a.st_size,'device':a.st_dev,'inode':a.st_ino}
++   progress['checked_files']+=1;progress['checked_bytes']+=a.st_size
++   progress['last_checked_path']=name
++   checkpoint()
+   durable(W/(mode+'-hashes.json'),done)
+   if mode=='post':assert done==json.loads((W/'pre-hashes.json').read_text())
++  assert progress['checked_files']==16736 and progress['checked_bytes']==3111892318
++  progress['stage']='runtime_support'
+   # Native runtime support is independently bound on both sides as well.
+   rt={k:sha(k) for k in F['runtime']};assert rt==F['runtime'];durable(W/(mode+'-runtime.json'),rt)
+  else:
++  progress['stage']='compiler'
+   pre=json.loads((W/'pre-receipt.json').read_text());assert pre['status']=='passed'
+   roots=F['lean_roots'];lean=F['lean']
+   for n in ('Nonbranch','IndependentControls','Readback','ExpectedFailure'):
+@@ -124,6 +156,7 @@
+   for n in ('Nonbranch','IndependentControls','Readback','ExpectedFailure'):assert sha(W/(n+'.lean'))==F['files'][n+'.lean.txt']
+   assert {k:sha(k) for k in F['runtime']}==F['runtime']
+  for n,h in F['files'].items():assert sha(P/n)==h
++ assert sha(P/'freeze.json')==EXPECTED_FREEZE,'final freeze pin mismatch'
+  boundary();status='passed'
+ except BaseException as e:errors.append(repr(e))
+ finally:
+@@ -139,11 +172,13 @@
+    remains=group_members(child.pid)
+    if remains:errors.append('remaining group '+repr(remains))
+   except BaseException as e:errors.append('cleanup '+repr(e))
+- if errors or pending or time.monotonic()-start>=limit-5:status='failed'
+- result={'phase':mode,'status':status,'errors':errors,'pending_signals':pending,'elapsed_seconds':time.monotonic()-start,'commands':rows,'compiler_invocations':len(rows),'workspace':str(W),'dependency_files':16736,'dependency_bytes':3111892318,'machine_review_complete':False,'post_custody_required':True,'scientific_execution':False,'independent_binary_kernel_rechecker':False,'trust':'Pinned shared caches; pre/post checks do not exclude transient concurrent changes.'}
++ if errors or pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=2400):status='failed'
++ result={'phase':mode,'status':status,'errors':errors,'pending_signals':pending,'elapsed_seconds':time.monotonic()-start,'commands':rows,'compiler_invocations':len(rows),'workspace':str(W),'dependency_files_declared':16736,'dependency_bytes_declared':3111892318,'checked_dependency_files':progress['checked_files'],'checked_dependency_bytes':progress['checked_bytes'],'hash_progress':dict(progress),'machine_review_complete':False,'post_custody_required':True,'scientific_execution':False,'independent_binary_kernel_rechecker':False,'trust':'Pinned shared caches; pre/post checks do not exclude transient concurrent changes.'}
+  try:
++  if not OWNED:raise RuntimeError('workspace/phase not owned; no receipt overwrite')
++  checkpoint(force=True)
+   durable(W/(mode+'-receipt.json'),result)
+-  if pending or time.monotonic()-start>=limit-5:
++  if pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=2400):
+    status='failed';result['status']='failed';result['late_boundary_failed']=True;durable(W/(mode+'-receipt.json'),result)
+  except BaseException as e:status='failed';print('receipt failure '+repr(e),file=sys.stderr)
+  print(json.dumps(result));sys.exit(0 if status=='passed' else 1)

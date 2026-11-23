@@ -1,0 +1,58 @@
+Status: completed
+
+card: CARD-BLINDSPOT-12-01 (sha256 0f67d922df4ee61ee10bd071a995fc3117270b48caac8f40325e3cedb81a6bc6)
+commit: b88ad91295fdd4e7b7c057b331ec0f22f19f22ba
+receipt: research/blindspots_20261018/12-degree-surrogate/raw/receipt-card-01.json sha256 c7b638f80a8ea4c931c13e8b374a725720bcfce0cb0b0563070a3acba112b042
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-12/card-01"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-12/card-01/b12", "examples/blindspots_12_degree_surrogate.rs"] exit 0 (3.848 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (selftest): ["prlimit", "--as=4294967296", "target/blindspots-12/card-01/b12", "selftest", "--raw", "research/blindspots_20261018/12-degree-surrogate/raw"] exit 0 (4.701 s) succeeded
+  stdout sha256 e5b896d9a482b75425a6ca2307c215074beb12fa653207b37e4bd7c252e580e6; last 20 lines:
+    CHECK columns_124314 PASS 124314
+    KV check_columns_124314=1
+    CHECK logcols PASS 
+    KV check_logcols=1
+    CHECK conformal_quantile PASS n=9: ceil(0.9*10)=9
+    KV check_conformal_quantile=1
+    CHECK conformal_quantile19 PASS n=19: ceil(0.9*20)=18
+    KV check_conformal_quantile19=1
+    CHECK spearman PASS 1 -1 0
+    KV check_spearman=1
+    CHECK gbt_planted_function PASS gbt mae 0.086 vs constant mae 1.969
+    KV check_gbt_planted_function=1
+    CHECK conformal_coverage_iid PASS mean coverage 0.8997 over 200 repetitions
+    KV check_conformal_coverage_iid=1
+    CHECK ridge_recovers_linear_law PASS max abs err 0.00017
+    KV check_ridge_recovers_linear_law=1
+    CHECK harvest_parsers PASS 
+    KV check_harvest_parsers=1
+    KV selftest_ok=1
+    SELFTEST OK
+command 4 (harvest): ["prlimit", "--as=4294967296", "target/blindspots-12/card-01/b12", "harvest", "--manifest", "research/blindspots_20261018/12-degree-surrogate/sources.tsv", "--raw", "research/blindspots_20261018/12-degree-surrogate/raw"] exit 0 (0.015 s) succeeded
+  stdout sha256 733405eb5199c52052fca9d38810992b790fd9713e625f19966f6f35ed94c1cc; last 20 lines:
+    LABELS f4-m4 D=3 10
+    LABELS f4-m4 D=4 34
+    LABELS f4-m4 D>=4 5
+    LABELS f4-m4 D=5 1
+    LABELS f4r-m4 D>=5 2
+    LABELS f4r-m4 D>=6 4
+    LABELS xl-m2 D>=4 6
+    LABELS xl-m2 D=5 16
+    LABELS xl-m2 D>=5 10
+    LABELS xl-m2 D=6 16
+    LABELS xl-m2 D=7 16
+    LABELS xl-m2 D=8 16
+    LABELS xl-m3 D=5 24
+    LABELS xl-m3 D=6 23
+    LABELS xl-m3 D=7 5
+    LABELS xl-m3 D>=7 16
+    LABELS xl-m4 D=5 12
+    LABELS xl-m4 D=6 16
+    LABELS xl-m4 D>=7 8
+    TOTAL records=404 exact=345 censored=59
+command 5 (remove-bin): ["rm", "-f", "target/blindspots-12/card-01/b12"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 6 (remove-bin-dir): ["rmdir", "target/blindspots-12/card-01"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

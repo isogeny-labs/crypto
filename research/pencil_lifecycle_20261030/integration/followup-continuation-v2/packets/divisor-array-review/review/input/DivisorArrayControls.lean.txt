@@ -1,0 +1,26 @@
+import DivisorArrayValidity
+import FastCallControls
+set_option autoImplicit false
+namespace DivisorArrayControls
+open DivisorArrayCopy ScaleTrim MonicRemainder MonicZeroTest
+
+theorem identity_exact : construct [1] []=some identity := by decide
+
+theorem degree_one_padding : raw [4,1] [7]=Stored.mk 1 #[4,1,0] #[7,0] ∧ up (raw [4,1] [7])=[4,1] ∧ vp (raw [4,1] [7])=[7] := by decide
+
+theorem degree_two_short_ordinate : raw [4,5,1] [7]=Stored.mk 2 #[4,5,1] #[7,0] ∧ vp (raw [4,5,1] [7])=[7] := by decide
+
+theorem empty_ordinate : (raw [4,5,1] []).v=#[0,0] ∧ vp (raw [4,5,1] [])=[] := by decide
+
+theorem bad_shapes_rejected : construct [] []=none ∧ construct [1,2,3,4] []=none ∧ construct [1] [2]=none := by decide
+
+theorem unnormalized_v_not_equal : vp (raw [4,1] [0])=[] ∧ vp (raw [4,1] [0])≠[0] := by decide
+
+theorem full_fast_to_stored :
+ ∃ d : Stored, d.degree≤2 ∧ d.u.size=3 ∧ d.v.size=2 ∧ d.canonical 17 ∧
+ MumfordValidity.Valid (wordsPoly 17 FastCallControls.fwords) (wordsPoly 17 (up d)) (wordsPoly 17 (vp d)) := by
+ obtain ⟨q,r,_,_,_,_,huc,hun,hrc,hrn,_,_,_,hvalid⟩ := FastCallControls.complete_calls
+ obtain ⟨d,_,hd,hus,hvs,hcan,_,_,_,_,hv⟩ := normalized_valid_construct 17 _ _ _
+  (by decide) huc hrc hun hrn hvalid
+ exact ⟨d,hd,hus,hvs,hcan,hv⟩
+end DivisorArrayControls

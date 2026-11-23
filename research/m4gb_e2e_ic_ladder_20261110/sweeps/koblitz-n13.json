@@ -1,0 +1,33 @@
+{
+  "_what": "End to end on a degree-13 Koblitz curve: the same 7-dimensional subspace base (14 boolean unknowns, 13 quadratics at m = 2) in front of the pair-table oracle (reference row) and of the symbolic descent solved by inherited-f4, f4-f2 and the external m4gb-f2. Read S, s_over_rho against the matched counted rho on the same planted targets, verified, and the solver's priced_by.",
+  "instance": {
+    "regime": "koblitz",
+    "degree": 13,
+    "max_cofactor": 8
+  },
+  "repeats": 2,
+  "seed": 20261110,
+  "configurations": [
+    {
+      "factor_base": "binary-subspace:dimension=7",
+      "oracle": "mitm:m=2",
+      "targets": "walk"
+    }
+  ],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=7"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "inherited-f4",
+      "f4-f2",
+      "m4gb-f2"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}

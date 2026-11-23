@@ -1,0 +1,83 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "proj-a",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4-s1093",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6,seed=1093",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4-s1308",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6,seed=1308",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/PROTOCOL.md (frozen before data). Same k=20 Curve25519 miniature, oracle and reference/baseline arms as curve25519_isogeny_seed_20261103 T5; PKM isogeny tower at seed 0 (incumbent), seed 1093 (argmax J) and seed 1308 (argmax J/columns); fresh target_seed, 16 targets, 2 measured rounds (alternate_measured). Public synthetic curve; no security claim.",
+ "label": "Curve25519 k=20: PKM isogeny tower seed 0 vs 1093 (J) vs 1308 (J/columns), ecbench counted unit",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate_measured",
+  "rounds": 2,
+  "seed": 2026111510,
+  "timeout_seconds": 1800,
+  "warmup": 0
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "group_order": 1049624,
+    "gx": 349837,
+    "gy": 122,
+    "kind": "prime_explicit",
+    "p": 1048573,
+    "r": 131203
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 2026111509,
+  "targets_per_curve": 16
+ }
+}

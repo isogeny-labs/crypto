@@ -1,0 +1,11 @@
+# Incremental original-owner proof admission and report joins
+
+The implementation is active in src/cryptanalysis/boolean_identity_bqi.rs and src/ml_dataset/dynamic_boolean_search_bqi.rs. The native bridge admits each actual modeled resource charge through the same original ledger; no production limit or deadline is raised. The actual Rust component fixture that previously stopped during audit now retains a candidate with a successful audit under identical limits. Independent lineage/eight basis identities remain verified. Standalone source checks cover22 controls; the full latest library/CLI has not been rebuilt.
+
+Owned capability dispositions now preserve the explicit v5 request (11focused controls). The private typed identity-capsule helper is registered (15standalone controls) but awaits invocation from dedicated owned central admission. The independent restricted report join validates the latest snapshot and terminal committed capture head (54controls including13new). Reports retain unknown degree labels and unverified original descent/completion. The existing SAT-map fallback misroutes owned reports; the dedicated native replay/export path remains unfinished and has not been bypassed.
+
+S3_RECEIPT.json identifies the immutable17281019-byte software archive. Fresh conditional-ETag readback matched every archive byte and all314 file hashes. Git retains reviewable text; ELF executables and fixture directories are in the archive. CONTENTS.json binds all original archive members, so restore the archive for complete fixture reproduction. Prior source/capture packets are linked by their saved receipt.
+
+The native-link plan is prepared but NOT authorized or launched. Its checked-in authorization remains false. The previous approved typecheck was consumed successfully at checkpointff02728b5831; it does not typecheck these later changes. No cloud job, scientific dataset generation or scientific deadline/budget change occurred.
+
+The actual native BQI meter, original owner policy, report/capture contracts and existing independent checker informed these fixes. Historical failed reservations, assertion failures, initial narrow-test cap failure and independent review counterexamples remain retained in their packets.

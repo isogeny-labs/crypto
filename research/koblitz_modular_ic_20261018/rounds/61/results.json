@@ -1,0 +1,1705 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 61,
+  "runs": [
+    {
+      "attempt": "check61-01",
+      "source_revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK61_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [],
+      "status": "rejected",
+      "result_lines_accepted": false,
+      "outcome": "manual_resource_stop",
+      "started_utc": "2026-11-01T19:38:56Z",
+      "finished_utc": "2026-11-01T19:46:58Z",
+      "native_wall_seconds": 482.0,
+      "artifacts": [
+        {
+          "path": "runs/check61-01/PROTOCOL.md",
+          "sha256": "621c345a428d2d5019324f5ffdd15186456a6e597c000c664f0b8717132eec13",
+          "bytes": 7816
+        },
+        {
+          "path": "runs/check61-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/check61-01/donors.json",
+          "sha256": "37e33ae25e1f775ceb2649c41faf85f84d6a995cb09259a0f3744ceae2fadacc",
+          "bytes": 3320
+        },
+        {
+          "path": "runs/check61-01/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/check61-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/check61-01/finished-utc.txt",
+          "sha256": "0bc6ab140d49a7b584deedc2b530bf8660136fc4b6784a6fce740bdf5819bbb7",
+          "bytes": 21
+        },
+        {
+          "path": "runs/check61-01/gate.log",
+          "sha256": "ae07a9f3e5a2a761991b5dce94a58033b94149ac641fcc85e1b9de8e0c4c687d",
+          "bytes": 160
+        },
+        {
+          "path": "runs/check61-01/input.sing",
+          "sha256": "2e4953dd2de8c38011dfbec7c4a336246a483f9494ffec806ed17b597a8027db",
+          "bytes": 4282
+        },
+        {
+          "path": "runs/check61-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/check61-01/native.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "runs/check61-01/protocol.json",
+          "sha256": "260471286e778b77896c59fbec00b0e9b40779bb492fac0c93cd5fd20b54f934",
+          "bytes": 4007
+        },
+        {
+          "path": "runs/check61-01/source-revision.txt",
+          "sha256": "afc83abe348091df3366333973c40e70782c3a0311e244e393ece25d90eddd4a",
+          "bytes": 41
+        },
+        {
+          "path": "runs/check61-01/source.sha256",
+          "sha256": "692ed5f63e70cd7a041e340442b5ae251842be4759f2aee4674dff446744fa22",
+          "bytes": 467
+        },
+        {
+          "path": "runs/check61-01/started-utc.txt",
+          "sha256": "612d9ba0a5f7f66692485871f8b2ef6599ffc4706617336c76d0dec2d5148867",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "check61-02",
+      "source_revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 821,
+      "first_errors": [
+        "   ? module(`int`) failed",
+        "   ? expected module(`module`)",
+        "   ? error occurred in or before input.sing line 28: ` selectedRows61=module(0);row61=0;`",
+        "   ? module(`int`) failed",
+        "   ? expected module(`module`)",
+        "   ? error occurred in or before input.sing line 28: ` selectedRows61=module(0);row61=0;`",
+        "   ? module(`int`) failed",
+        "   ? expected module(`module`)"
+      ],
+      "native_results": [
+        "CHECK61_RESULT patterns=818 ambient_dimension=324 mixed_dimension=76 fixed_dimension=38 principal_patterns=0 excluded_patterns=0 complete_certificates=818 source_row_reconstructions=818 regular_control_dimension=1 full_trace_contraction=1 changed_source_row_rejected=1"
+      ],
+      "status": "rejected",
+      "result_lines_accepted": false,
+      "outcome": "native_error",
+      "started_utc": "2026-11-01T19:48:40Z",
+      "finished_utc": "2026-11-01T19:48:41Z",
+      "native_wall_seconds": 1.0,
+      "artifacts": [
+        {
+          "path": "runs/check61-02/PROTOCOL.md",
+          "sha256": "59ddb9c0e923fc51cfff06cc95de3fefac6b864777027570efcf3e42807e4524",
+          "bytes": 8298
+        },
+        {
+          "path": "runs/check61-02/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/check61-02/donors.json",
+          "sha256": "37e33ae25e1f775ceb2649c41faf85f84d6a995cb09259a0f3744ceae2fadacc",
+          "bytes": 3320
+        },
+        {
+          "path": "runs/check61-02/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/check61-02/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/check61-02/finished-utc.txt",
+          "sha256": "8a8b929a6c084186f1d27c500ee5b84157c220455138a1a7caeb8602f165d4d9",
+          "bytes": 21
+        },
+        {
+          "path": "runs/check61-02/gate.log",
+          "sha256": "1143e75cc9dc57f0f8979e25581ea6ecf8ade5eade2595d6f3d0a649363b5af1",
+          "bytes": 160
+        },
+        {
+          "path": "runs/check61-02/input.sing",
+          "sha256": "a46628f64f356b5bc3a4af1e0613326e3dac44982cf6ab8cb0772d6bb9653138",
+          "bytes": 4728
+        },
+        {
+          "path": "runs/check61-02/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/check61-02/native.log",
+          "sha256": "8dd26081b4bf955b30043650e035f7f5adf7eee63d5700c36001e8f204ffc606",
+          "bytes": 40523
+        },
+        {
+          "path": "runs/check61-02/protocol.json",
+          "sha256": "e23cc29066adadfe05b1e98ac2faf6e847694dbd26062c726f9fc7dcab87abed",
+          "bytes": 4115
+        },
+        {
+          "path": "runs/check61-02/source-revision.txt",
+          "sha256": "bdd55e62f2d1a51e782544c17f6dc4f3b06b26a1e6db3a0136a86ca08158d473",
+          "bytes": 41
+        },
+        {
+          "path": "runs/check61-02/source.sha256",
+          "sha256": "0e4a892c1ed6750466156fd89cf5d3474c4aab200b29310d04f4d905c8a724ff",
+          "bytes": 467
+        },
+        {
+          "path": "runs/check61-02/started-utc.txt",
+          "sha256": "681d62d079f9cacac511329eb49600a2951ff0475309d568268caf4ae202061f",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "check61-03",
+      "source_revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK61_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [],
+      "status": "rejected",
+      "result_lines_accepted": false,
+      "outcome": "manual_resource_stop",
+      "started_utc": "2026-11-01T19:51:51Z",
+      "finished_utc": "2026-11-01T20:00:02Z",
+      "native_wall_seconds": 491.0,
+      "artifacts": [
+        {
+          "path": "runs/check61-03/PROTOCOL.md",
+          "sha256": "83d5d7fc4f7eaf93e72ea25d1bca78d829546004145e8fb6fe7209437d173cf4",
+          "bytes": 8769
+        },
+        {
+          "path": "runs/check61-03/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/check61-03/donors.json",
+          "sha256": "37e33ae25e1f775ceb2649c41faf85f84d6a995cb09259a0f3744ceae2fadacc",
+          "bytes": 3320
+        },
+        {
+          "path": "runs/check61-03/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/check61-03/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/check61-03/finished-utc.txt",
+          "sha256": "a99d5475486bb5b26c463b527ee53256f882445592e43f1c725929ab22ceeee4",
+          "bytes": 21
+        },
+        {
+          "path": "runs/check61-03/gate.log",
+          "sha256": "5c51713de7572fd313a9070f6e326d648bc529e904a6299593d09361fcc528ba",
+          "bytes": 160
+        },
+        {
+          "path": "runs/check61-03/input.sing",
+          "sha256": "e68860de432b6393ff1c111c90879a82a91a8397671ab48c71c83557e090fe65",
+          "bytes": 4766
+        },
+        {
+          "path": "runs/check61-03/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/check61-03/native.log",
+          "sha256": "8b6a47a655a06ba2377a2daea508d0d815f88a9da77de129d58581c2753f0283",
+          "bytes": 12327
+        },
+        {
+          "path": "runs/check61-03/protocol.json",
+          "sha256": "410dfe4183bb19ff777a55c1917e1cf7e9abb1d1732bae2373934fe985d90d0c",
+          "bytes": 4093
+        },
+        {
+          "path": "runs/check61-03/source-revision.txt",
+          "sha256": "d6215855ac71b0b10fc6b729d5d4379ca576a16967a3070bf8e72ef4000e3f5b",
+          "bytes": 41
+        },
+        {
+          "path": "runs/check61-03/source.sha256",
+          "sha256": "6bcb64bfd46f1862c48e6e4f4feaaaec51b87783f7b230765dbfa0f1c94b53f1",
+          "bytes": 467
+        },
+        {
+          "path": "runs/check61-03/started-utc.txt",
+          "sha256": "e5340339d6c0d5ccebe313f9e137c1e91b8b063a129abcaf7aa28ac2cfe16d7d",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "cohort61-01",
+      "source_revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "COHORT61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "COHORT61_RESULT patterns=818 fixed_dimension=38 constraint_rows=136 principal_patterns=0 excluded_patterns=818 complete_kernel_certificates=818 regular_control_dimension=1 both_trace_parities=1"
+      ],
+      "status": "accepted",
+      "result_lines_accepted": true,
+      "outcome": "completed",
+      "started_utc": "2026-11-01T19:16:08Z",
+      "finished_utc": "2026-11-01T19:21:36Z",
+      "native_wall_seconds": 328.0,
+      "artifacts": [
+        {
+          "path": "runs/cohort61-01/PROTOCOL.md",
+          "sha256": "d00d34b04271b22a4327e1ca8bfd0ca241a036730f306cbaaf95b1daf3b91ee3",
+          "bytes": 6855
+        },
+        {
+          "path": "runs/cohort61-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/cohort61-01/cohort-certificates61.sing",
+          "sha256": "fc6f88fe731dc04667ecd09dcfa7239cc60817faf7dc27b0fc83fe26c1fe4e74",
+          "bytes": 26798221
+        },
+        {
+          "path": "runs/cohort61-01/cohort61.tsv",
+          "sha256": "eead9aa164cfbb3f3b66c0f47ddf6013984b595cdc315f5afda4a00a87a0ba8d",
+          "bytes": 19462
+        },
+        {
+          "path": "runs/cohort61-01/donors.json",
+          "sha256": "649c8465ad2a7738a57be9d504f87f6709094573854f99a96b7f0edf4ad9b5ce",
+          "bytes": 3148
+        },
+        {
+          "path": "runs/cohort61-01/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/cohort61-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/cohort61-01/finished-utc.txt",
+          "sha256": "831f591412cb935f4a4707f640e734079c4edb084cf77724f88285d5efde474b",
+          "bytes": 21
+        },
+        {
+          "path": "runs/cohort61-01/gate.log",
+          "sha256": "5f79b0e39919484550c2a1e04b3e6052ac6548de7faa0c4468f6c7f20cf40bf8",
+          "bytes": 160
+        },
+        {
+          "path": "runs/cohort61-01/input.sing",
+          "sha256": "fa00b0e1c6587fc1012c08f431f4786394907bb33f9760e0000980f2edccad28",
+          "bytes": 4811
+        },
+        {
+          "path": "runs/cohort61-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/cohort61-01/native.log",
+          "sha256": "9cd3a079a26a2c827778d0b55d47fb14e29a6d69721496e7ef6dce22b0884c9c",
+          "bytes": 54218
+        },
+        {
+          "path": "runs/cohort61-01/principal-generators61.sing",
+          "sha256": "ff4d6b74aa4a9566a44f219476fbeddd9fa57f2a69726a78ce333d7e8100b449",
+          "bytes": 5497
+        },
+        {
+          "path": "runs/cohort61-01/protocol.json",
+          "sha256": "3044106e4cb688e67b0684d43f46b6f0ff4a3c0da1c4681043afe6c1d10f213e",
+          "bytes": 3931
+        },
+        {
+          "path": "runs/cohort61-01/source-revision.txt",
+          "sha256": "70710ea860d1b10ac22a27cc83d7b5f3c6653e57378c1c6fe6596d10a486029e",
+          "bytes": 41
+        },
+        {
+          "path": "runs/cohort61-01/source.sha256",
+          "sha256": "d1d0bcdbd130f4fd7bbd4801065fb007eedcbf72d8e3784b47b826eb5a5b6ecf",
+          "bytes": 467
+        },
+        {
+          "path": "runs/cohort61-01/started-utc.txt",
+          "sha256": "247b5a5385c503158ac62e93a9811db1858c927d696e46d94ccca770094f4626",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "cubic61-01",
+      "source_revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CUBIC61_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "error_count": 42,
+      "first_errors": [
+        "   ? `_` is undefined",
+        "   ? error occurred in or before ::lm line 0: `parameter list a; parameter list b; `",
+        "   ? leaving ::lm (0)",
+        "   ? `_` is undefined",
+        "   ? error occurred in or before ::lm line 0: `parameter list a; parameter list b; `",
+        "   ? leaving ::lm (0)",
+        "   ? `_` is undefined",
+        "   ? error occurred in or before ::lm line 0: `parameter list a; parameter list b; `"
+      ],
+      "native_results": [],
+      "status": "rejected",
+      "result_lines_accepted": false,
+      "outcome": "native_error",
+      "started_utc": "2026-11-01T18:30:18Z",
+      "finished_utc": "2026-11-01T18:33:32Z",
+      "native_wall_seconds": 194.0,
+      "artifacts": [
+        {
+          "path": "runs/cubic61-01/PROTOCOL.md",
+          "sha256": "26c33f152ac59a7127dd4f6f5bdfd2c5b82cc23e207024dc802ec7030541f47a",
+          "bytes": 3372
+        },
+        {
+          "path": "runs/cubic61-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/cubic61-01/donors.json",
+          "sha256": "9aba0e72792c0149a2dd150503b66a2e956e344f63eeec37ddf2ea7a495483f1",
+          "bytes": 2027
+        },
+        {
+          "path": "runs/cubic61-01/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/cubic61-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/cubic61-01/finished-utc.txt",
+          "sha256": "1cf18943fcb56223297b4db494b38e650c38bf2504c9b2709b101d63af337c4a",
+          "bytes": 21
+        },
+        {
+          "path": "runs/cubic61-01/gate.log",
+          "sha256": "78fe3005d477dd91345fc6655219bc3760328bffdee90f6abf90f6d6a53b4fb4",
+          "bytes": 160
+        },
+        {
+          "path": "runs/cubic61-01/input.sing",
+          "sha256": "d2300a75d1cc9f0fde5dc67632fe8e12f1e0df1c0d83e4f32b4f7fdc9c335c8f",
+          "bytes": 6660
+        },
+        {
+          "path": "runs/cubic61-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/cubic61-01/native.log",
+          "sha256": "fe963883d12f9204f3138ff049805a6d2ef93ab23c761f357408ba7a1243aea6",
+          "bytes": 3519
+        },
+        {
+          "path": "runs/cubic61-01/protocol.json",
+          "sha256": "55619246d70f27fe04cff9333f3b5dac922706c259d77eeb7cb64cf6891adf4e",
+          "bytes": 3972
+        },
+        {
+          "path": "runs/cubic61-01/source-revision.txt",
+          "sha256": "07775c8c73ba68bbade785782a4cc44df8e5ff8fedd6f839f7b70ee9763877d4",
+          "bytes": 41
+        },
+        {
+          "path": "runs/cubic61-01/source.sha256",
+          "sha256": "3be44210f4b7b61c1663de3758928981d091817e5c0d070e0b05bf796333d908",
+          "bytes": 467
+        },
+        {
+          "path": "runs/cubic61-01/started-utc.txt",
+          "sha256": "f9957f3458008ecef6322686708c8aa1a33b75be8892cadce742c3113020a9ca",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "cubic61-02",
+      "source_revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CUBIC61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "CUBIC61_RESULT ambient=324 ambient_degree=384 jet_orders=385 binary_jet_rows=770 local_conditions=248 constraint_rank=248 mixed_dimension=76 mixed_degree=136 source_charts=20 cubic_bound_checks=6480 conjugate_checks=1360 complete_splitting=1"
+      ],
+      "status": "accepted",
+      "result_lines_accepted": true,
+      "outcome": "completed",
+      "started_utc": "2026-11-01T18:38:11Z",
+      "finished_utc": "2026-11-01T18:52:00Z",
+      "native_wall_seconds": 829.0,
+      "artifacts": [
+        {
+          "path": "runs/cubic61-02/PROTOCOL.md",
+          "sha256": "0ed389985d1832854edff813f2c36b0a42c8e483121314521508d7308579e8e8",
+          "bytes": 3998
+        },
+        {
+          "path": "runs/cubic61-02/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/cubic61-02/cubic-space61.sing",
+          "sha256": "1ffa1f4813f11ac223a3f56bf4ddb42d02fdd1c2eab43a703578a99ec2e1459e",
+          "bytes": 9689404
+        },
+        {
+          "path": "runs/cubic61-02/donors.json",
+          "sha256": "a4828e7e7343560cde125f5310a076dc5e189f5cc0890fe199cd6d0c83f2452f",
+          "bytes": 2330
+        },
+        {
+          "path": "runs/cubic61-02/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/cubic61-02/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/cubic61-02/finished-utc.txt",
+          "sha256": "bfeb4055042a74336179f2ac7f3b6d4b31c751ff9d1b624cf3a95bb60b66b93e",
+          "bytes": 21
+        },
+        {
+          "path": "runs/cubic61-02/gate.log",
+          "sha256": "63bd0ac0d151fbbdd12c74b3cb635fb69c4bdf44798fec7f2d40b613a75a1bc0",
+          "bytes": 160
+        },
+        {
+          "path": "runs/cubic61-02/input.sing",
+          "sha256": "ac617371bcb459181af834a2aec29ab57c02a90a9e8081aa89b1b2e654d98fa5",
+          "bytes": 6961
+        },
+        {
+          "path": "runs/cubic61-02/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/cubic61-02/native.log",
+          "sha256": "efbc3da47dc0d4b9cab66ce9813f052e45f07e38e337351957f588545dfacd54",
+          "bytes": 1842
+        },
+        {
+          "path": "runs/cubic61-02/protocol.json",
+          "sha256": "5c93488f4cc6aa0b54c9557a2883462bdf1c211675fb76c0334cb12d8b8da3ae",
+          "bytes": 4005
+        },
+        {
+          "path": "runs/cubic61-02/source-revision.txt",
+          "sha256": "fad029336f88672b3201dde2dbdfd4c7680870173ef51968b2c07d2776d215f9",
+          "bytes": 41
+        },
+        {
+          "path": "runs/cubic61-02/source.sha256",
+          "sha256": "d5834d3bf7b9af9196ce952d420b663a6a115b07e0d6c8b9470cb416e0ea76ff",
+          "bytes": 467
+        },
+        {
+          "path": "runs/cubic61-02/started-utc.txt",
+          "sha256": "658f0990acb1c2386d148e44a390792164cf9fdeba26df583cf6de3a89477cf2",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "field61-01",
+      "source_revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIELD61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "FIELD61_RESULT source_degree=32 actual_cubic_functions=324 mixed_sections=76 actual_source_involution_checks=76 constant_control=1 changed_cubic_coefficient_rejected=1"
+      ],
+      "status": "accepted",
+      "result_lines_accepted": true,
+      "outcome": "completed",
+      "started_utc": "2026-11-01T19:01:42Z",
+      "finished_utc": "2026-11-01T19:01:47Z",
+      "native_wall_seconds": 5.0,
+      "artifacts": [
+        {
+          "path": "runs/field61-01/PROTOCOL.md",
+          "sha256": "1bd44ae527f9e32c1ba61e4a004bb296bf5158f8f5314d273ec7397509d39cdf",
+          "bytes": 5347
+        },
+        {
+          "path": "runs/field61-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/field61-01/donors.json",
+          "sha256": "76937e0de4e1c1ec74aedb65b6e93bce1000bfb5d0043bdd6dd3d089d569bd55",
+          "bytes": 2827
+        },
+        {
+          "path": "runs/field61-01/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/field61-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/field61-01/field-space61.sing",
+          "sha256": "39a16e0239219328efb4627df833aa63bfb9694e14ccdaa288159d1a9d091ba1",
+          "bytes": 1548012
+        },
+        {
+          "path": "runs/field61-01/finished-utc.txt",
+          "sha256": "901e8a797d65471d43a23b139256ed0241426c6edcdab5fa9d508231d586beea",
+          "bytes": 21
+        },
+        {
+          "path": "runs/field61-01/gate.log",
+          "sha256": "350d77c6a8f8cf2bf5bb258d03c040046f6dbf72dd95002c6f0d84728fdacc2e",
+          "bytes": 160
+        },
+        {
+          "path": "runs/field61-01/input.sing",
+          "sha256": "ddeee25eeb514d144201cc86088901ff1f2bb78c427b94093abfeff8825bae44",
+          "bytes": 2442
+        },
+        {
+          "path": "runs/field61-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/field61-01/native.log",
+          "sha256": "ea86484b42fb06b190dd62d6a22c1536812d181b70a9b82f27d5bfb0b4eff202",
+          "bytes": 192
+        },
+        {
+          "path": "runs/field61-01/protocol.json",
+          "sha256": "209b934fab59b00d892f51d09a84e6efd08b272fd6751a3ce2a3e3a43eb44a8d",
+          "bytes": 3767
+        },
+        {
+          "path": "runs/field61-01/source-revision.txt",
+          "sha256": "67ed946d04234e775f72672699eee82841df3107242a682cfa9b381bba7c6733",
+          "bytes": 41
+        },
+        {
+          "path": "runs/field61-01/source.sha256",
+          "sha256": "7e32304a16064ad2c8edc4ca955d7eacc74da8a909790d0ffcd60728cbadbedf",
+          "bytes": 467
+        },
+        {
+          "path": "runs/field61-01/started-utc.txt",
+          "sha256": "f89c2b047c3151d43b7be7860e37ddfc6ced4b57f60af87c2715e600b62fbc0f",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "fix61-01",
+      "source_revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "kind": "Singular-launch",
+      "status": "interrupted",
+      "outcome": "interrupted_before_native_start",
+      "interruption": {
+        "schema": "koblitz.interrupted-launch/v1",
+        "observed_utc": "2026-11-01T19:11:37.669724+00:00",
+        "status": "interrupted_before_native_start",
+        "source_revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+        "evidence": [
+          "saved gate.log is empty",
+          "no started-utc.txt, binary.sha256, native.log or exit.txt",
+          "no FIX61 or Singular process alive on recovered host"
+        ],
+        "native_result_accepted": false,
+        "next_attempt": "fix61-02",
+        "unchanged_native_caps": "1200 seconds, 4GiB virtual, one Singular and FLINT thread",
+        "migration_receipt": "/srv/experiments/agent-migration/handoff-receipt.json"
+      },
+      "artifacts": [
+        {
+          "path": "runs/fix61-01/PROTOCOL.md",
+          "sha256": "41be7a6ea4df96043e9727595d0fb9f85dd439b9d83eaef652a4776a4af53f4b",
+          "bytes": 6038
+        },
+        {
+          "path": "runs/fix61-01/donors.json",
+          "sha256": "a965e590c7fcaab9b16cb4bf4bbf7ba573d8485f63f30b459023287bfde77131",
+          "bytes": 2989
+        },
+        {
+          "path": "runs/fix61-01/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/fix61-01/gate.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "runs/fix61-01/input.sing",
+          "sha256": "3e40379a5ae912b247baec961d706b1994260737a62b48dbdbd7de808d33a8d8",
+          "bytes": 4798
+        },
+        {
+          "path": "runs/fix61-01/interrupted.json",
+          "sha256": "88eeed7ece86e375ad7b1193a2fb9c22da1dab5417b9e5e4d2ae4339088d0ce3",
+          "bytes": 623
+        },
+        {
+          "path": "runs/fix61-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/fix61-01/protocol.json",
+          "sha256": "d85d000132d9584f8b614d106bac8892399a6a8713f1c796988f5d1011a3e26f",
+          "bytes": 3891
+        },
+        {
+          "path": "runs/fix61-01/source-revision.txt",
+          "sha256": "bc010b17d94b100f19be24e111a7cbfa2461710f5a48946088a742dd32a63127",
+          "bytes": 41
+        },
+        {
+          "path": "runs/fix61-01/source.sha256",
+          "sha256": "625c761f720ffa9975d9eafb3df18e14f3bb429c85fd0c7a0c174704fbbde685",
+          "bytes": 467
+        }
+      ]
+    },
+    {
+      "attempt": "fix61-02",
+      "source_revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIX61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "FIX61_RESULT mixed_dimension=76 fixed_dimension=38 trace_rank=38 actual_fixed_source_checks=38 actual_preimage_source_checks=38 odd_trace_one=1 complete_trace_contraction=1 local_and_regular_imaginary_zero=1"
+      ],
+      "status": "accepted",
+      "result_lines_accepted": true,
+      "outcome": "completed",
+      "started_utc": "2026-11-01T19:13:20Z",
+      "finished_utc": "2026-11-01T19:13:25Z",
+      "native_wall_seconds": 5.0,
+      "artifacts": [
+        {
+          "path": "runs/fix61-02/PROTOCOL.md",
+          "sha256": "41be7a6ea4df96043e9727595d0fb9f85dd439b9d83eaef652a4776a4af53f4b",
+          "bytes": 6038
+        },
+        {
+          "path": "runs/fix61-02/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/fix61-02/donors.json",
+          "sha256": "a965e590c7fcaab9b16cb4bf4bbf7ba573d8485f63f30b459023287bfde77131",
+          "bytes": 2989
+        },
+        {
+          "path": "runs/fix61-02/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/fix61-02/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/fix61-02/finished-utc.txt",
+          "sha256": "bd180ad7024e07663e0ea111081602e42d2114347a1030c1973d2b327c18989c",
+          "bytes": 21
+        },
+        {
+          "path": "runs/fix61-02/fixed-field61.sing",
+          "sha256": "dd0f4cd182451556f340f9a97de6d277ec9d415261f770dfc9aa50fde2c11b19",
+          "bytes": 310737
+        },
+        {
+          "path": "runs/fix61-02/fixed-space61.sing",
+          "sha256": "4ffec09326854d54eb32a3dfd835a033703f93b7476d26b391b0893128e71d35",
+          "bytes": 294683
+        },
+        {
+          "path": "runs/fix61-02/gate.log",
+          "sha256": "7a42269419da20ebe2cbb7164e53ec2844219d5c992a49d856ae37633477de45",
+          "bytes": 160
+        },
+        {
+          "path": "runs/fix61-02/input.sing",
+          "sha256": "3e40379a5ae912b247baec961d706b1994260737a62b48dbdbd7de808d33a8d8",
+          "bytes": 4798
+        },
+        {
+          "path": "runs/fix61-02/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/fix61-02/native.log",
+          "sha256": "53af2c2355c61a6e2333d43a5306d73c928019435720bfe30ffbee536a00059c",
+          "bytes": 230
+        },
+        {
+          "path": "runs/fix61-02/protocol.json",
+          "sha256": "d85d000132d9584f8b614d106bac8892399a6a8713f1c796988f5d1011a3e26f",
+          "bytes": 3891
+        },
+        {
+          "path": "runs/fix61-02/source-revision.txt",
+          "sha256": "06b79fcca25b0ce0cc80e6a2faf4958c6bf6769ba5d0bbe41f92f9a92ceff406",
+          "bytes": 41
+        },
+        {
+          "path": "runs/fix61-02/source.sha256",
+          "sha256": "625c761f720ffa9975d9eafb3df18e14f3bb429c85fd0c7a0c174704fbbde685",
+          "bytes": 467
+        },
+        {
+          "path": "runs/fix61-02/started-utc.txt",
+          "sha256": "af689c77c8e8954a76413f3d4d049c6122536eb9cb62b9e5cd6d3bd48c0e97a3",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "source_revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "kind": "Rust",
+      "build_exit": 0,
+      "native_exit": 0,
+      "marker": "RUSTCHECK61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_results": [
+        "RUSTCHECK61_RESULT patterns=818 ambient_dimension=324 mixed_dimension=76 fixed_dimension=38 excluded_patterns=818 source_row_reconstructions=818 complete_left_inverses=818 regular_control_dimension=1 full_trace_contraction=1 changed_source_row_rejected=1 changed_inverse_rejected=1"
+      ],
+      "status": "accepted",
+      "result_lines_accepted": true,
+      "outcome": "completed",
+      "started_utc": "2026-11-01T20:02:13Z",
+      "finished_utc": "2026-11-01T20:02:13Z",
+      "native_wall_seconds": 0.0,
+      "artifacts": [
+        {
+          "path": "runs/rustcheck61-01/PROTOCOL.md",
+          "sha256": "b3d9cfacfcabfd2fe43bbd3f4e45edb800b64e991e0db0bfd8b57de7c4723d56",
+          "bytes": 9598
+        },
+        {
+          "path": "runs/rustcheck61-01/RUST-PROTOCOL.md",
+          "sha256": "b1f4cb88b6c1abe7d9ff676cb68428529d08c808cf1c4f6ae36878620b5d1c51",
+          "bytes": 1836
+        },
+        {
+          "path": "runs/rustcheck61-01/binary.sha256",
+          "sha256": "27672477f4e42c64755f8adf18e73e0b2c64985ca23e55c8e6eab82dab880672",
+          "bytes": 179
+        },
+        {
+          "path": "runs/rustcheck61-01/build.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/rustcheck61-01/build.log",
+          "sha256": "25d52064ceb16c61aba7905247ad5465dece06d4ee85074cda4c2419b4554290",
+          "bytes": 1984
+        },
+        {
+          "path": "runs/rustcheck61-01/compiler-version.txt",
+          "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+          "bytes": 36
+        },
+        {
+          "path": "runs/rustcheck61-01/compiler.sha256",
+          "sha256": "03ec6f191d3e78351883ad31439a708d84dec1063953400f5446fecc27dff8b5",
+          "bytes": 142
+        },
+        {
+          "path": "runs/rustcheck61-01/donors.json",
+          "sha256": "d90b3f164bdf70d7566146aa91fea16f74941a7908135c46cecc693dc73d9c77",
+          "bytes": 3463
+        },
+        {
+          "path": "runs/rustcheck61-01/driver.sh",
+          "sha256": "2a6aa8666c30ae7bbbf3618f039e6508e27ff84aa736ae2109561d3103144e83",
+          "bytes": 2322
+        },
+        {
+          "path": "runs/rustcheck61-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/rustcheck61-01/finished-utc.txt",
+          "sha256": "2b2de35e563802165e3deffb43e88874d5a931536e3a99b8aebf6a026798d66d",
+          "bytes": 21
+        },
+        {
+          "path": "runs/rustcheck61-01/gate.log",
+          "sha256": "0d00022c87f3261331058bb5a2461e019d9f0068a41179abf02fd1c961824425",
+          "bytes": 160
+        },
+        {
+          "path": "runs/rustcheck61-01/input.rs",
+          "sha256": "7d208fabd60c290a44e4d6239fa32665cc69a2787146bdcd005be730b5f20fde",
+          "bytes": 8890
+        },
+        {
+          "path": "runs/rustcheck61-01/launcher.sh",
+          "sha256": "5727856522ad430be2371a059d7861ad8c0b3447bd1ed6664092f60654d05b70",
+          "bytes": 492
+        },
+        {
+          "path": "runs/rustcheck61-01/native.log",
+          "sha256": "5debe943a9f923cb4e1115a971075d3b353f754d88ab9118b9fb83626843bbf3",
+          "bytes": 577
+        },
+        {
+          "path": "runs/rustcheck61-01/protocol.json",
+          "sha256": "3a91b40f7156f6073eb27a501d750ae58387453157f581c68acca863c0c3ea7d",
+          "bytes": 4521
+        },
+        {
+          "path": "runs/rustcheck61-01/rustcheck61",
+          "sha256": "ccb1180970f12c20b0176feb8d2d0060c6407fe7c6ea84abf6f49a93c616aa84",
+          "bytes": 4613856
+        },
+        {
+          "path": "runs/rustcheck61-01/source-revision.txt",
+          "sha256": "03f956132b2b7c4eaa3a0ec116af5410cabc482a24e123ed72224be932c61393",
+          "bytes": 41
+        },
+        {
+          "path": "runs/rustcheck61-01/source.sha256",
+          "sha256": "f4c15ae2df7b5f31298e5337b7ae20a3acfaf23c213b9f1feb0abd79d0a8ea7d",
+          "bytes": 548
+        },
+        {
+          "path": "runs/rustcheck61-01/started-utc.txt",
+          "sha256": "2b2de35e563802165e3deffb43e88874d5a931536e3a99b8aebf6a026798d66d",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "source_revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": [
+        "Scaling61.balanced_degree_bound",
+        "Scaling61.balanced_first_bound",
+        "Scaling61.coefficient_inverse_square",
+        "Scaling61.cubic_patterns_818",
+        "Scaling61.eigenfunctional_blocks_surjectivity",
+        "Scaling61.minor_pattern_count"
+      ],
+      "authored_claims": [
+        "Scaling61.balanced_degree_bound",
+        "Scaling61.balanced_first_bound",
+        "Scaling61.coefficient_inverse_square",
+        "Scaling61.cubic_patterns_818",
+        "Scaling61.eigenfunctional_blocks_surjectivity",
+        "Scaling61.minor_pattern_count"
+      ],
+      "status": "accepted",
+      "artifacts": [
+        {
+          "path": "runs/scaling-lean61-01/AuditAxioms.lean",
+          "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+          "bytes": 4004
+        },
+        {
+          "path": "runs/scaling-lean61-01/LEAN-PROTOCOL.md",
+          "sha256": "fea624a7ce1e620b5b0b186123936163d908c63a1b227af96f23d939456d52d3",
+          "bytes": 849
+        },
+        {
+          "path": "runs/scaling-lean61-01/Scaling61.lean",
+          "sha256": "961faa8a7e26795f42d95b26394a21152ce16bc655444b7d2298e285cd96e423",
+          "bytes": 2446
+        },
+        {
+          "path": "runs/scaling-lean61-01/Scaling61.olean",
+          "sha256": "3ca020f6411ab339f0d7c4b077fd95ee9a5d06b3178feced97fc165592504ccd",
+          "bytes": 236192
+        },
+        {
+          "path": "runs/scaling-lean61-01/audit.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/scaling-lean61-01/audit.log",
+          "sha256": "6e2b9e9566c43078c14e2c1ef8964e4d3dfacc4702b03555cd8e51843f9bca20",
+          "bytes": 598
+        },
+        {
+          "path": "runs/scaling-lean61-01/compile.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/scaling-lean61-01/compile.log",
+          "sha256": "8d3762425a102b1b45cdad9f9f7029796a1adc584937fe6a8c28d43ed69900f6",
+          "bytes": 143
+        },
+        {
+          "path": "runs/scaling-lean61-01/driver.sh",
+          "sha256": "319db18f63b11229ddef938598a162f2cab4eeb38a4e074043546570f678b0d1",
+          "bytes": 2273
+        },
+        {
+          "path": "runs/scaling-lean61-01/gate.log",
+          "sha256": "cb28adbcda3cb29ca2460c3021bf8df3d89a1b815e81cccf1cf6d847d19f9ff1",
+          "bytes": 160
+        },
+        {
+          "path": "runs/scaling-lean61-01/launcher.sh",
+          "sha256": "25eafa4cde41353f7bfcfc8e483113317f6638c43405136ee529e7d4fb3be22e",
+          "bytes": 388
+        },
+        {
+          "path": "runs/scaling-lean61-01/mathlib-revision.txt",
+          "sha256": "d26684ea790064f49bcb150415b3a062ec30b5e646b207927aa3fc5fcbb43fbe",
+          "bytes": 41
+        },
+        {
+          "path": "runs/scaling-lean61-01/source-revision.txt",
+          "sha256": "65067765501f46efbbff982ce213c48001e11be4e389bbb8dcb279e333fdb829",
+          "bytes": 41
+        },
+        {
+          "path": "runs/scaling-lean61-01/source.sha256",
+          "sha256": "e2d21f662a937fb00435e9bd25d72bbd110548db824cc99ba8b43abaff0bbbc0",
+          "bytes": 401
+        },
+        {
+          "path": "runs/scaling-lean61-01/version.txt",
+          "sha256": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+          "bytes": 106
+        },
+        {
+          "path": "runs/scaling-lean61-01/virtual-limit.txt",
+          "sha256": "18f8896eaec617889727989f993dcd8ba3177c99c34c28714ee0916d916a54fa",
+          "bytes": 10
+        }
+      ]
+    },
+    {
+      "attempt": "trace61-01",
+      "source_revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "TRACE61_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "TRACE61_RESULT normal_basis=32 product_columns=528 ordered_trace_products=1024 trace_pairing_rank=32 dual_columns=32 normal_source_reconstructions=32 inverse_products=2 wrong_gram_rejected=1"
+      ],
+      "status": "accepted",
+      "result_lines_accepted": true,
+      "outcome": "completed",
+      "started_utc": "2026-11-01T18:14:01Z",
+      "finished_utc": "2026-11-01T18:18:32Z",
+      "native_wall_seconds": 271.0,
+      "artifacts": [
+        {
+          "path": "runs/trace61-01/PROTOCOL.md",
+          "sha256": "f711b1e3d3eb97ef84f434ef8ffeadc9a186bb9d54dc540bf558377de2c351c1",
+          "bytes": 2071
+        },
+        {
+          "path": "runs/trace61-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/trace61-01/donors.json",
+          "sha256": "86502d4ebbf33cabf74a2b9d5f78c5b37d0049aed19809bad475a1df0ba57c66",
+          "bytes": 757
+        },
+        {
+          "path": "runs/trace61-01/driver.sh",
+          "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/trace61-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/trace61-01/finished-utc.txt",
+          "sha256": "486dac96e8b5de85bee226fbd5fb8315503d07a704f09a165d4c0a2d34b9cfce",
+          "bytes": 21
+        },
+        {
+          "path": "runs/trace61-01/gate.log",
+          "sha256": "1b0ebdbb1971ffbd482a79dd0cf2e60f6ca9f494a9f048295b7b6c353d375a29",
+          "bytes": 162
+        },
+        {
+          "path": "runs/trace61-01/input.sing",
+          "sha256": "9efa794f508796b26fda13f6b620f3035f3ee74d8eef917a2175ea30300d2cde",
+          "bytes": 4308
+        },
+        {
+          "path": "runs/trace61-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/trace61-01/native.log",
+          "sha256": "2b4e31221d47352c1ed1926f3e544ab7bf0498a998ce082a86dd7f1d9de9e5c3",
+          "bytes": 1676
+        },
+        {
+          "path": "runs/trace61-01/protocol.json",
+          "sha256": "5480108f52df6aca8674c5b5b0b047b3cbb77704525c5ee4be4936f5079770d1",
+          "bytes": 3704
+        },
+        {
+          "path": "runs/trace61-01/source-revision.txt",
+          "sha256": "edf402b18080295b89dc5d7545594e1241cc4221d004ab222773e1f4a0d3b784",
+          "bytes": 41
+        },
+        {
+          "path": "runs/trace61-01/source.sha256",
+          "sha256": "072cb67ae8ffb0436bc28189d153d40362ea96ee6e47076e4405f33496b9fb46",
+          "bytes": 467
+        },
+        {
+          "path": "runs/trace61-01/started-utc.txt",
+          "sha256": "ea2a03fa28531442fdcfc9222c93de3e2418ee5b58199b661168e0819b66b7c1",
+          "bytes": 21
+        },
+        {
+          "path": "runs/trace61-01/trace-dual61.sing",
+          "sha256": "f75b7224c62a8f0cfef76428036e4839986d669506b7a3085f3fbc4240d70b00",
+          "bytes": 602736
+        },
+        {
+          "path": "runs/trace61-01/trace-polynomial61.sing",
+          "sha256": "23db561dfa8fa574a6cb56e1bc925c1e6f533c32ce3845221be5d29c33ad03be",
+          "bytes": 213670
+        }
+      ]
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "check61-01",
+      "artifact": "input.sing",
+      "revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/CHECK61.sing",
+      "sha256": "2e4953dd2de8c38011dfbec7c4a336246a483f9494ffec806ed17b597a8027db"
+    },
+    {
+      "attempt": "check61-01",
+      "artifact": "driver.sh",
+      "revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "check61-01",
+      "artifact": "launcher.sh",
+      "revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "621c345a428d2d5019324f5ffdd15186456a6e597c000c664f0b8717132eec13"
+    },
+    {
+      "attempt": "check61-01",
+      "artifact": "protocol.json",
+      "revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "260471286e778b77896c59fbec00b0e9b40779bb492fac0c93cd5fd20b54f934"
+    },
+    {
+      "attempt": "check61-01",
+      "artifact": "donors.json",
+      "revision": "6748162baa4a07de291128639c7102eb3a5e8aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "37e33ae25e1f775ceb2649c41faf85f84d6a995cb09259a0f3744ceae2fadacc"
+    },
+    {
+      "attempt": "check61-02",
+      "artifact": "input.sing",
+      "revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/CHECK61.sing",
+      "sha256": "a46628f64f356b5bc3a4af1e0613326e3dac44982cf6ab8cb0772d6bb9653138"
+    },
+    {
+      "attempt": "check61-02",
+      "artifact": "driver.sh",
+      "revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "check61-02",
+      "artifact": "launcher.sh",
+      "revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check61-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "59ddb9c0e923fc51cfff06cc95de3fefac6b864777027570efcf3e42807e4524"
+    },
+    {
+      "attempt": "check61-02",
+      "artifact": "protocol.json",
+      "revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "e23cc29066adadfe05b1e98ac2faf6e847694dbd26062c726f9fc7dcab87abed"
+    },
+    {
+      "attempt": "check61-02",
+      "artifact": "donors.json",
+      "revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "37e33ae25e1f775ceb2649c41faf85f84d6a995cb09259a0f3744ceae2fadacc"
+    },
+    {
+      "attempt": "check61-03",
+      "artifact": "input.sing",
+      "revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/CHECK61.sing",
+      "sha256": "e68860de432b6393ff1c111c90879a82a91a8397671ab48c71c83557e090fe65"
+    },
+    {
+      "attempt": "check61-03",
+      "artifact": "driver.sh",
+      "revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "check61-03",
+      "artifact": "launcher.sh",
+      "revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check61-03",
+      "artifact": "PROTOCOL.md",
+      "revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "83d5d7fc4f7eaf93e72ea25d1bca78d829546004145e8fb6fe7209437d173cf4"
+    },
+    {
+      "attempt": "check61-03",
+      "artifact": "protocol.json",
+      "revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "410dfe4183bb19ff777a55c1917e1cf7e9abb1d1732bae2373934fe985d90d0c"
+    },
+    {
+      "attempt": "check61-03",
+      "artifact": "donors.json",
+      "revision": "b74a11dba113e184d80b04475655512f109fe21a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "37e33ae25e1f775ceb2649c41faf85f84d6a995cb09259a0f3744ceae2fadacc"
+    },
+    {
+      "attempt": "cohort61-01",
+      "artifact": "input.sing",
+      "revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/COHORT61.sing",
+      "sha256": "fa00b0e1c6587fc1012c08f431f4786394907bb33f9760e0000980f2edccad28"
+    },
+    {
+      "attempt": "cohort61-01",
+      "artifact": "driver.sh",
+      "revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "cohort61-01",
+      "artifact": "launcher.sh",
+      "revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "cohort61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "d00d34b04271b22a4327e1ca8bfd0ca241a036730f306cbaaf95b1daf3b91ee3"
+    },
+    {
+      "attempt": "cohort61-01",
+      "artifact": "protocol.json",
+      "revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "3044106e4cb688e67b0684d43f46b6f0ff4a3c0da1c4681043afe6c1d10f213e"
+    },
+    {
+      "attempt": "cohort61-01",
+      "artifact": "donors.json",
+      "revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "649c8465ad2a7738a57be9d504f87f6709094573854f99a96b7f0edf4ad9b5ce"
+    },
+    {
+      "attempt": "cubic61-01",
+      "artifact": "input.sing",
+      "revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/CUBIC61.sing",
+      "sha256": "d2300a75d1cc9f0fde5dc67632fe8e12f1e0df1c0d83e4f32b4f7fdc9c335c8f"
+    },
+    {
+      "attempt": "cubic61-01",
+      "artifact": "driver.sh",
+      "revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "cubic61-01",
+      "artifact": "launcher.sh",
+      "revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "cubic61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "26c33f152ac59a7127dd4f6f5bdfd2c5b82cc23e207024dc802ec7030541f47a"
+    },
+    {
+      "attempt": "cubic61-01",
+      "artifact": "protocol.json",
+      "revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "55619246d70f27fe04cff9333f3b5dac922706c259d77eeb7cb64cf6891adf4e"
+    },
+    {
+      "attempt": "cubic61-01",
+      "artifact": "donors.json",
+      "revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "9aba0e72792c0149a2dd150503b66a2e956e344f63eeec37ddf2ea7a495483f1"
+    },
+    {
+      "attempt": "cubic61-02",
+      "artifact": "input.sing",
+      "revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/CUBIC61.sing",
+      "sha256": "ac617371bcb459181af834a2aec29ab57c02a90a9e8081aa89b1b2e654d98fa5"
+    },
+    {
+      "attempt": "cubic61-02",
+      "artifact": "driver.sh",
+      "revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "cubic61-02",
+      "artifact": "launcher.sh",
+      "revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "cubic61-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "0ed389985d1832854edff813f2c36b0a42c8e483121314521508d7308579e8e8"
+    },
+    {
+      "attempt": "cubic61-02",
+      "artifact": "protocol.json",
+      "revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "5c93488f4cc6aa0b54c9557a2883462bdf1c211675fb76c0334cb12d8b8da3ae"
+    },
+    {
+      "attempt": "cubic61-02",
+      "artifact": "donors.json",
+      "revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "a4828e7e7343560cde125f5310a076dc5e189f5cc0890fe199cd6d0c83f2452f"
+    },
+    {
+      "attempt": "field61-01",
+      "artifact": "input.sing",
+      "revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/FIELD61.sing",
+      "sha256": "ddeee25eeb514d144201cc86088901ff1f2bb78c427b94093abfeff8825bae44"
+    },
+    {
+      "attempt": "field61-01",
+      "artifact": "driver.sh",
+      "revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "field61-01",
+      "artifact": "launcher.sh",
+      "revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "field61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "1bd44ae527f9e32c1ba61e4a004bb296bf5158f8f5314d273ec7397509d39cdf"
+    },
+    {
+      "attempt": "field61-01",
+      "artifact": "protocol.json",
+      "revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "209b934fab59b00d892f51d09a84e6efd08b272fd6751a3ce2a3e3a43eb44a8d"
+    },
+    {
+      "attempt": "field61-01",
+      "artifact": "donors.json",
+      "revision": "955d4e2e96d440401410b6922b3af46a7d6176db",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "76937e0de4e1c1ec74aedb65b6e93bce1000bfb5d0043bdd6dd3d089d569bd55"
+    },
+    {
+      "attempt": "fix61-01",
+      "artifact": "input.sing",
+      "revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/FIX61.sing",
+      "sha256": "3e40379a5ae912b247baec961d706b1994260737a62b48dbdbd7de808d33a8d8"
+    },
+    {
+      "attempt": "fix61-01",
+      "artifact": "driver.sh",
+      "revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "fix61-01",
+      "artifact": "launcher.sh",
+      "revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "fix61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "41be7a6ea4df96043e9727595d0fb9f85dd439b9d83eaef652a4776a4af53f4b"
+    },
+    {
+      "attempt": "fix61-01",
+      "artifact": "protocol.json",
+      "revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "d85d000132d9584f8b614d106bac8892399a6a8713f1c796988f5d1011a3e26f"
+    },
+    {
+      "attempt": "fix61-01",
+      "artifact": "donors.json",
+      "revision": "335013c5797db1b7f682839e00b12e3861b05e54",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "a965e590c7fcaab9b16cb4bf4bbf7ba573d8485f63f30b459023287bfde77131"
+    },
+    {
+      "attempt": "fix61-02",
+      "artifact": "input.sing",
+      "revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/FIX61.sing",
+      "sha256": "3e40379a5ae912b247baec961d706b1994260737a62b48dbdbd7de808d33a8d8"
+    },
+    {
+      "attempt": "fix61-02",
+      "artifact": "driver.sh",
+      "revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "fix61-02",
+      "artifact": "launcher.sh",
+      "revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "fix61-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "41be7a6ea4df96043e9727595d0fb9f85dd439b9d83eaef652a4776a4af53f4b"
+    },
+    {
+      "attempt": "fix61-02",
+      "artifact": "protocol.json",
+      "revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "d85d000132d9584f8b614d106bac8892399a6a8713f1c796988f5d1011a3e26f"
+    },
+    {
+      "attempt": "fix61-02",
+      "artifact": "donors.json",
+      "revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "a965e590c7fcaab9b16cb4bf4bbf7ba573d8485f63f30b459023287bfde77131"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "input.rs",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/CHECK61.rs",
+      "sha256": "7d208fabd60c290a44e4d6239fa32665cc69a2787146bdcd005be730b5f20fde"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "driver.sh",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/RUST_DRIVER.sh",
+      "sha256": "2a6aa8666c30ae7bbbf3618f039e6508e27ff84aa736ae2109561d3103144e83"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "launcher.sh",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_RUST.sh",
+      "sha256": "5727856522ad430be2371a059d7861ad8c0b3447bd1ed6664092f60654d05b70"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "b3d9cfacfcabfd2fe43bbd3f4e45edb800b64e991e0db0bfd8b57de7c4723d56"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "protocol.json",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "3a91b40f7156f6073eb27a501d750ae58387453157f581c68acca863c0c3ea7d"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "RUST-PROTOCOL.md",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/RUST-PROTOCOL.md",
+      "sha256": "b1f4cb88b6c1abe7d9ff676cb68428529d08c808cf1c4f6ae36878620b5d1c51"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "artifact": "donors.json",
+      "revision": "fc19ec43944d43244f0c25266ace24258d45a662",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "d90b3f164bdf70d7566146aa91fea16f74941a7908135c46cecc693dc73d9c77"
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "artifact": "driver.sh",
+      "revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/LEAN_DRIVER.sh",
+      "sha256": "319db18f63b11229ddef938598a162f2cab4eeb38a4e074043546570f678b0d1"
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "artifact": "launcher.sh",
+      "revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_LEAN.sh",
+      "sha256": "25eafa4cde41353f7bfcfc8e483113317f6638c43405136ee529e7d4fb3be22e"
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "artifact": "Scaling61.lean",
+      "revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/lean/Scaling61.lean",
+      "sha256": "961faa8a7e26795f42d95b26394a21152ce16bc655444b7d2298e285cd96e423"
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "artifact": "LEAN-PROTOCOL.md",
+      "revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/LEAN-PROTOCOL.md",
+      "sha256": "fea624a7ce1e620b5b0b186123936163d908c63a1b227af96f23d939456d52d3"
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "artifact": "AuditAxioms.lean",
+      "revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "trace61-01",
+      "artifact": "input.sing",
+      "revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/TRACE61.sing",
+      "sha256": "9efa794f508796b26fda13f6b620f3035f3ee74d8eef917a2175ea30300d2cde"
+    },
+    {
+      "attempt": "trace61-01",
+      "artifact": "driver.sh",
+      "revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/NATIVE_DRIVER.sh",
+      "sha256": "9bd4c7eda26fe7fef5926a374c4e005ffce8fac8b426be01bba3efe464fdbffa"
+    },
+    {
+      "attempt": "trace61-01",
+      "artifact": "launcher.sh",
+      "revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "trace61-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/PROTOCOL.md",
+      "sha256": "f711b1e3d3eb97ef84f434ef8ffeadc9a186bb9d54dc540bf558377de2c351c1"
+    },
+    {
+      "attempt": "trace61-01",
+      "artifact": "protocol.json",
+      "revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/protocol.json",
+      "sha256": "5480108f52df6aca8674c5b5b0b047b3cbb77704525c5ee4be4936f5079770d1"
+    },
+    {
+      "attempt": "trace61-01",
+      "artifact": "donors.json",
+      "revision": "80c5572c5370ba0510a0556792552aefb08bb5d9",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/61/donors.json",
+      "sha256": "86502d4ebbf33cabf74a2b9d5f78c5b37d0049aed19809bad475a1df0ba57c66"
+    }
+  ],
+  "authored_proved_claims": [
+    "Scaling61.balanced_degree_bound",
+    "Scaling61.balanced_first_bound",
+    "Scaling61.coefficient_inverse_square",
+    "Scaling61.cubic_patterns_818",
+    "Scaling61.eigenfunctional_blocks_surjectivity",
+    "Scaling61.minor_pattern_count"
+  ],
+  "audited_declarations": [
+    "Scaling61.balanced_degree_bound",
+    "Scaling61.balanced_first_bound",
+    "Scaling61.coefficient_inverse_square",
+    "Scaling61.cubic_patterns_818",
+    "Scaling61.eigenfunctional_blocks_surjectivity",
+    "Scaling61.minor_pattern_count"
+  ],
+  "protocol_metadata_disclosure": "PROTOCOL-METADATA61.md; historical versions immutable"
+}

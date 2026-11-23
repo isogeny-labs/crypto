@@ -29,6 +29,10 @@ pub struct Row {
     pub hyperelliptic: bool,
     pub extra_factors: Vec<(usize, usize)>, // (genus, sigma-orbit size) of non-E positive-genus quotients
     pub target: bool,
+    /// non-trivial elements of V (Hom(span, F_2)) commuting with Frobenius: F_q-rational automorphisms
+    pub frob_fixed: usize,
+    /// of those, how many act as -1 on every E-conjugate quotient (each folds the E-part by 2)
+    pub frob_fixed_negating_e: usize,
 }
 
 fn rot(mask: u32, s: usize, j: usize) -> u32 {
@@ -175,11 +179,27 @@ pub fn analyse(d: usize, g0: usize, orbs: &[Orbit]) -> Row {
         }
         extra.push((gen_c(v) as usize, orb.len()));
     }
+    // Frobenius-fixed functionals tau on the span (tau(sigma b) = tau(b) for every basis b)
+    let coords = |v: u64| -> u32 { span.iter().find(|&&(w, _)| w == v).map(|&(_, c)| c).unwrap_or(0) };
+    let bcoords: Vec<u32> = (0..m).map(|i| 1u32 << i).collect();
+    let sbcoords: Vec<u32> = basis.iter().map(|&b| coords(sigma(b))).collect();
+    let gcoords: Vec<u32> = gens.iter().map(|&g| coords(g)).collect();
+    let par = |a: u32, t: u32| (a & t).count_ones() % 2;
+    let mut frob_fixed = 0;
+    let mut frob_fixed_negating_e = 0;
+    for tau in 1u32..(1 << m) {
+        if (0..m).all(|i| par(bcoords[i], tau) == par(sbcoords[i], tau)) {
+            frob_fixed += 1;
+            if gcoords.iter().all(|&g| par(g, tau) == 1) {
+                frob_fixed_negating_e += 1;
+            }
+        }
+    }
     let target = d == 4
         && g0 == 1
         && ((deg_f == 3 && orbs == [Orbit { size: 4, mask: 0b0111 }])
             || (deg_f == 4 && orbs == [Orbit { size: 1, mask: 1 }, Orbit { size: 4, mask: 0b0111 }]));
-    Row { d, g0, deg_f, orbits: orbs.to_vec(), m, s, g, g_kani_rosen: g_kr, conj_distinct, e, twist, hyperelliptic: hyper, extra_factors: extra, target }
+    Row { d, g0, deg_f, orbits: orbs.to_vec(), m, s, g, g_kani_rosen: g_kr, conj_distinct, e, twist, hyperelliptic: hyper, extra_factors: extra, target, frob_fixed, frob_fixed_negating_e }
 }
 
 /// Enumerate every orbit configuration with deg f in {2 g0 + 1, 2 g0 + 2}.
@@ -229,7 +249,7 @@ pub fn row_json(r: &Row) -> String {
     let orbs: Vec<String> = r.orbits.iter().map(|o| format!("[{},\"{:0w$b}\"]", o.size, o.mask, w = o.size)).collect();
     let extra: Vec<String> = r.extra_factors.iter().map(|(g, o)| format!("[{},{}]", g, o)).collect();
     format!(
-        "{{\"d\":{},\"g0\":{},\"deg_f\":{},\"orbits\":[{}],\"m\":{},\"S\":{},\"g\":{},\"g_kani_rosen\":{},\"conjugates_distinct\":{},\"e\":{},\"twist\":\"{}\",\"hyperelliptic\":{},\"extra_factors_genus_orbit\":[{}],\"target_family\":{}}}",
-        r.d, r.g0, r.deg_f, orbs.join(","), r.m, r.s, r.g, r.g_kani_rosen, r.conj_distinct, r.e, r.twist, r.hyperelliptic, extra.join(","), r.target
+        "{{\"d\":{},\"g0\":{},\"deg_f\":{},\"orbits\":[{}],\"m\":{},\"S\":{},\"g\":{},\"g_kani_rosen\":{},\"conjugates_distinct\":{},\"e\":{},\"twist\":\"{}\",\"hyperelliptic\":{},\"extra_factors_genus_orbit\":[{}],\"target_family\":{},\"frob_fixed_involutions\":{},\"frob_fixed_negating_e\":{}}}",
+        r.d, r.g0, r.deg_f, orbs.join(","), r.m, r.s, r.g, r.g_kani_rosen, r.conj_distinct, r.e, r.twist, r.hyperelliptic, extra.join(","), r.target, r.frob_fixed, r.frob_fixed_negating_e
     )
 }

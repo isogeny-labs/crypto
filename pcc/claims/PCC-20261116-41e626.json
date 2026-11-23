@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:29:48Z",
+ "id": "PCC-20261116-41e626",
+ "kind": "execution",
+ "producer": {
+  "commit": "fc85acc268c349189fccb091188b214938b745d8",
+  "model": "GPT-6",
+  "session": "selected-root-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/selected-counter-fc85acc26-01-post-call.json",
+    "sha256": "d56bbfaf6540f78c9648a3275456dc8602922d6f8c7fea7b184ccfbe753b0193"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/counter-tests-01.log",
+    "sha256": "7d94b3dca97867f6c8a86999088c3b82552c1a9bda0df7f4c34cb682a5dceb4d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "The separately copied counter-feature selected-root release qualifier completed 33 fixed development correctness tests at source fc85acc26; its pre/post executable hash matches. These calls are not timing samples."
+}

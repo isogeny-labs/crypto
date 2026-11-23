@@ -1,0 +1,14 @@
+import DivisorArrayValidity
+set_option autoImplicit false
+open DivisorArrayCopy MonicZeroTest
+namespace ArrayReviewer
+-- Shape does not assert monicity or curve validity.
+theorem nonmonic_admitted : construct [2] [] = some (raw [2] []) := by decide
+-- Removing normalized U permits excessive trailing zero words despite a constant polynomial.
+theorem trailing_support_rejected : construct [1,0,0,0] [] = none := by decide
+-- Maximum capacity, last copied ordinate and zero trimming are distinct properties.
+theorem maximum_padding : (raw [3,2,1] [4,0]).v = #[4,0] ∧ vp (raw [3,2,1] [4,0]) = [4] := by decide
+end ArrayReviewer
+#print axioms ArrayReviewer.nonmonic_admitted
+#print axioms ArrayReviewer.trailing_support_rejected
+#print axioms ArrayReviewer.maximum_padding

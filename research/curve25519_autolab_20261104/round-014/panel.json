@@ -1,0 +1,139 @@
+{
+  "created": "2026-11-04T05:11:37Z",
+  "round": 14,
+  "rules": {
+    "exploration_slots": 3,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+            "family": "ksum4",
+            "n": 22,
+            "name": "ksum4-n22",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 18"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+            "family": "ksum4",
+            "n": 13,
+            "name": "ksum4-n13",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "incumbent neighbourhood: N = 0.7 x 18"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+            "family": "ksum4",
+            "n": 9,
+            "name": "ksum4-n9",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "incumbent neighbourhood: N = 0.5 x 18"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+            "family": "ksum4",
+            "n": 36,
+            "name": "ksum4-n36",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "incumbent neighbourhood: N = 2 x 18"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=26,scan_cap=416",
+            "family": "ksum3",
+            "n": 26,
+            "name": "ksum3-n26",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "alternative ksum3 (best S(0) 8.550 at N = 30): N = 0.85 x 30"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+            "family": "ksum3",
+            "n": 36,
+            "name": "ksum3-n36",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "alternative ksum3 (best S(0) 8.550 at N = 30): N = 1.2 x 30"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=30,scan_cap=480",
+            "family": "ksum3f",
+            "n": 30,
+            "name": "ksum3f-n30",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "reason": "exploration: family ksum3f untried at k = 28, at its parent ksum3's best N = 30"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+            "family": "ksum5f",
+            "n": 16,
+            "name": "ksum5f-n16",
+            "oracle": "ksum:m=5,free=1"
+          },
+          "reason": "exploration: family ksum5f untried at k = 28, N = 0.08 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+            "family": "ksum4f",
+            "n": 18,
+            "name": "ksum4f-n18",
+            "oracle": "ksum:m=4,free=1"
+          },
+          "reason": "exploration: family ksum4f untried at k = 28, at its parent ksum4's best N = 18"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+        "family": "ksum4",
+        "n": 18,
+        "name": "ksum4-n18",
+        "oracle": "ksum:m=4"
+      },
+      "incumbent_s": [
+        7.444768388348348,
+        7.910330744352813,
+        12.100391948393053
+      ],
+      "tried_before": 27
+    }
+  },
+  "track": "generic"
+}

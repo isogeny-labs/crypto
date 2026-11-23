@@ -1,0 +1,22 @@
+[package]
+name = "vieta-fiber-scale-lab"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+vieta-coset-lab = { path = "../fiber-scale-core", package = "vieta-fiber-scale-core" }
+vieta-shared-fp = { path = "../shared-field" }
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"
+sha2 = "0.10"
+
+[lib]
+name = "vieta_fiber_lab"
+path = "lib.rs"
+[[bin]]
+name = "vieta-fiber-scale-lab"
+path = "main.rs"

@@ -1,0 +1,17 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: GHS cover transfer",
+  "description": "Tiny generated GHS-eligible curve comparing the source generic solve with the explicit cover transfer. Development only.",
+  "workloads": {
+    "curves": [{"kind": "ghs_fp6_search", "p": 11, "seed": 1}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010361,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg-reference", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}},
+    {"name": "ghs-cover", "role": "candidate", "method": {"id": "transfer.ghs_cover", "params": {"inner": "rho.negation"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010362, "isolation_required": "L2", "timeout_seconds": 180}
+}

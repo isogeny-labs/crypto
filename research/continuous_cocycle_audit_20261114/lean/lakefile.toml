@@ -1,0 +1,11 @@
+name = "continuous_cocycle_audit"
+version = "0.1.0"
+defaultTargets = ["ContinuousCocycleAudit"]
+
+[[require]]
+name = "finite_tate_duality_audit"
+path = "../../finite_tate_duality_audit_20261114/lean"
+
+[[lean_lib]]
+name = "ContinuousCocycleAudit"
+roots = ["CompactCocycles", "GaloisImports", "GaloisCocycleControl", "CocycleEvaluationCertificate"]

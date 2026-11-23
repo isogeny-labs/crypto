@@ -1,0 +1,172 @@
+[
+  {
+    "id": "ordinary-full",
+    "role": "baseline",
+    "method": "group",
+    "family": "low-x",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "ordinary-dense",
+    "role": "candidate",
+    "method": "group",
+    "family": "low-x",
+    "alpha": "augment",
+    "compression": true,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "ordinary-sparse",
+    "role": "candidate",
+    "method": "group",
+    "family": "low-x",
+    "alpha": "augment",
+    "compression": true,
+    "sparse": true,
+    "evaluation": "map"
+  },
+  {
+    "id": "ordinary-map",
+    "role": "candidate",
+    "method": "group",
+    "family": "low-x",
+    "alpha": "augment",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "ordinary-scalar",
+    "role": "candidate",
+    "method": "group",
+    "family": "low-x",
+    "alpha": "augment",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "scalar"
+  },
+  {
+    "id": "twist-full",
+    "role": "candidate",
+    "method": "group",
+    "family": "twist-max",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "twist-dense",
+    "role": "candidate",
+    "method": "group",
+    "family": "twist-max",
+    "alpha": "augment",
+    "compression": true,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "twist-sparse",
+    "role": "candidate",
+    "method": "group",
+    "family": "twist-max",
+    "alpha": "augment",
+    "compression": true,
+    "sparse": true,
+    "evaluation": "map"
+  },
+  {
+    "id": "twist-map",
+    "role": "candidate",
+    "method": "group",
+    "family": "twist-max",
+    "alpha": "augment",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "twist-scalar",
+    "role": "candidate",
+    "method": "group",
+    "family": "twist-max",
+    "alpha": "augment",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "scalar"
+  },
+  {
+    "id": "rho",
+    "role": "reference",
+    "method": "rho",
+    "family": "reference",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "rho-negation",
+    "role": "reference",
+    "method": "rho-negation",
+    "family": "reference",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "bsgs",
+    "role": "reference",
+    "method": "bsgs",
+    "family": "reference",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "bsgs-negation",
+    "role": "reference",
+    "method": "bsgs-negation",
+    "family": "reference",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "gp-elllog",
+    "role": "reference",
+    "method": "gp-elllog",
+    "family": "reference",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "ordinary-aa",
+    "role": "control_aa",
+    "method": "group",
+    "family": "low-x",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  },
+  {
+    "id": "positive",
+    "role": "control_positive",
+    "method": "gp-poly",
+    "family": "low-x",
+    "alpha": "none",
+    "compression": false,
+    "sparse": false,
+    "evaluation": "map"
+  }
+]

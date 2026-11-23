@@ -1,0 +1,16 @@
+✖ [3150/3150] Building CryptoLean.Curve.LineIncidence (8.8s)
+warning: CryptoLean/Curve/LineIncidence.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Formula` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Curve/LineIncidence.lean: imports `Mathlib.Algebra.Polynomial.Roots` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Curve/LineIncidence.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/scratch/crypto-lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/scratch/crypto-lean/CryptoLean/Curve/LineIncidence.lean -o /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Curve/LineIncidence.olean -i /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Curve/LineIncidence.ilean -c /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Curve/LineIncidence.c --setup /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Curve/LineIncidence.setup.json --json
+warning: CryptoLean/Curve/LineIncidence.lean:57:13: This simp argument is unused:
+  and_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [s]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: CryptoLean/Curve/LineIncidence.lean:76:9: invalid 'by' tactic, expected type has not been provided
+Some required targets logged failures:
+- CryptoLean.Curve.LineIncidence
+error: build failed

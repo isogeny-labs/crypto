@@ -1,0 +1,55 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-n83-sat-boundary-20261019-pinned",
+  "card_path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/cards/pinned.json",
+  "card_sha256": "f72264798268b77509f3e71bb3204124ad7280ab0427318755e97b6890d8fd97",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-sat-boundary-20261019/runner-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-sat-boundary-20261019/specs/pinned.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.1790702610000001,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pinned",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/audit.json": "5a3ced0b5a37669bc4dbe994e6e674a694eaa2de10c0962b9e83d5f24825f548",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/config.json": "c23522630d9604fe7325ca63a289ccec85aa5a63d66f8b0675f8fd7d8bbc798b",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/custody.json": "5bb373eeeadaac7d84400734f0220b1d84df132971f5f4b062ae3534c3bb63fb",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/inspect-final.json": "f6e4f71436f393aa152f15be1fa256baae8a2454a7861e67d55cd0723772a0e3",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/inspect-live.json": "3cd3e3150c4def2efd257074aa6475d7c03f933c7df1cca496ac1ef178654e4a",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/outer.json": "5b50e968668febe55035ebeb67011972d8fffd7618a301abc3cc3ff53684715e",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/spec.json": "aa0de65e85fd3d2e5c583e075cd001fba370254b3c485363180b6b4f10aea053",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/stderr.log": "1aab0c96024981f0e78bba44d5fefa189a00fccbbbefbf7df65fec5db92fa311",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned/stdout.log": "f3d00b09b74144856490104e12b78620be04deb52a4c3e9d4f3480f0640654d5"
+      },
+      "seconds": 1.1790702610000001,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "54f05c36823c147fa4a9c9aaa224add31a98ff9ff6117b032fdbe6a8069f63d5",
+      "stdout_tail": [
+        "{\"control\":{\"before_fixed_units\":{\"clauses\":714072,\"domain_clauses\":465738,\"variables\":101636,\"xors\":4980},\"clauses\":720049,\"conflict_cap\":5000,\"conflicts\":0,\"control_variant\":\"fixed_coordinates_representatives_and_phases\",\"elapsed_wall_ms_L0\":433.663717,\"fixed_x_blocks\":8,\"fixture_blake3\":\"7e257cf3f278051094e27bd6df30ac8e78a0f55739b11f8b6837f23e5637703d\",\"fixture_sha256\":\"fc203db28eed0164e47b0c755c3d9a09f80df1acd5e4c7e09dfe172fa5f0a538\",\"identity_mask\":0,\"input_blake3\":\"22eb1821dd401063417260041017c43cd416a8f4fc1abea2e9946507029c6d4a\",\"model_verified\":true,\"natural_relations\":null,\"schema\":\"n83.fixed-witness-sat-control/v1\",\"scope\":\"known_answer_encoding_control_only\",\"selected_best_total_runtime\":null,\"selector_assignments\":[{\"domain_size\":1182,\"index\":401,\"phase\":0,\"phase_first_wire\":87190,\"representative\":\"3190528981678629953846779\",\"selector_first_wire\":84744},{\"domain_size\":1182,\"index\":780,\"phase\":0,\"phase_first_wire\":90805,\"representative\":\"6322576162995772655031682\",\"selector_first_wire\":88359},{\"domain_size\":1182,\"index\":1059,\"phase\":0,\"phase_first_wire\":94420,\"representative\":\"8674926856113960796960747\",\"selector_first_wire\":91974},{\"domain_size\":866,\"index\":193,\"phase\":0,\"phase_first_wire\":97403,\"representative\":\"2356799046069879186945790\",\"selector_first_wire\":95589},{\"domain_size\":866,\"index\":62,\"phase\":0,\"phase_first_wire\":100386,\"representative\":\"668067089966811331796550\",\"selector_first_wire\":98572}],\"status\":\"SAT_verified_witness_x\",\"total_index_calculus_runtime_ms\":null,\"variables\":101636,\"xors\":4980},\"natural_relations\":null,\"outer_wall_ms\":1001.912152,\"sat_trace\":{\"events\":[{\"conflicts\":0,\"counter_scope\":\"solver_instance_cumulative\",\"decisions\":0,\"elapsed_ms\":0.001247,\"ns_analyze\":0,\"ns_minimize\":0,\"ns_propagate_clauses\":0,\"ns_propagate_xors\":0,\"ns_reduce_db\":0,\"outcome\":null,\"phase\":\"solve_enter\",\"propagations\":6060,\"schema\":\"n83.sat-phase/v1\",\"xor_passes\":0,\"xor_propagations\":0},{\"conflicts\":0,\"counter_scope\":\"solver_instance_cumulative\",\"decisions\":0,\"elapsed_ms\":0.022815,\"ns_analyze\":0,\"ns_minimize\":0,\"ns_propagate_clauses\":0,\"ns_propagate_xors\":0,\"ns_reduce_db\":0,\"outcome\":null,\"phase\":\"initial_propagation_begin\",\"propagations\":6060,\"schema\":\"n83.sat-phase/v1\",\"xor_passes\":0,\"xor_propagations\":0},{\"conflicts\":0,\"counter_scope\":\"solver_instance_cumulative\",\"decisions\":0,\"elapsed_ms\":163.684271,\"ns_analyze\":0,\"ns_minimize\":0,\"ns_propagate_clauses\":7255766,\"ns_propagate_xors\":156383623,\"ns_reduce_db\":0,\"outcome\":null,\"phase\":\"initial_propagation_complete\",\"propagations\":101606,\"schema\":\"n83.sat-phase/v1\",\"xor_passes\":3,\"xor_propagations\":4233},{\"conflicts\":0,\"counter_scope\":\"solver_instance_cumulative\",\"decisions\":0,\"elapsed_ms\":163.956465,\"ns_analyze\":0,\"ns_minimize\":0,\"ns_propagate_clauses\":7255766,\"ns_propagate_xors\":156383623,\"ns_reduce_db\":0,\"outcome\":null,\"phase\":\"cdcl_enter\",\"propagations\":101606,\"schema\":\"n83.sat-phase/v1\",\"xor_passes\":3,\"xor_propagations\":4233},{\"conflicts\":0,\"counter_scope\":\"solver_instance_cumulative\",\"decisions\":23,\"elapsed_ms\":312.98412199999996,\"ns_analyze\":0,\"ns_minimize\":0,\"ns_propagate_clauses\":7265507,\"ns_propagate_xors\":305093112,\"ns_reduce_db\":0,\"outcome\":\"Sat\",\"phase\":\"solve_return\",\"propagations\":101636,\"schema\":\"n83.sat-phase/v1\",\"xor_passes\":26,\"xor_propagations\":4233}],\"schema\":\"n83.sat-trace-audit/v1\",\"status\":\"COMPLETE\",\"terminal_counters\":{\"conflicts\":0,\"counter_scope\":\"solver_instance_cumulative\",\"decisions\":23,\"elapsed_ms\":312.98412199999996,\"ns_analyze\":0,\"ns_minimize\":0,\"ns_propagate_clauses\":7265507,\"ns_propagate_xors\":305093112,\"ns_reduce_db\":0,\"outcome\":\"Sat\",\"phase\":\"solve_return\",\"propagations\":101636,\"schema\":\"n83.sat-phase/v1\",\"xor_passes\":26,\"xor_propagations\":4233}},\"schema\":\"n83.native-audit/v1\",\"selected_best_total_runtime\":null,\"status\":\"PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "5e9ee5d4b1aa6ca22368213e5bc05b343e00bfb4",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

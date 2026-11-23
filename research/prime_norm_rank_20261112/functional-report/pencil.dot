@@ -1,0 +1,13 @@
+digraph pencil {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,margin="0.13",fillcolor="#e8f5ed"];
+ edge [fontname="Helvetica",fontsize=10];
+ witness [label="Supplied actual norm witness\n(alpha F)^2-f(beta H)^2=cG; c nonzero\nExplicit monic/Bezout/degree-gap hypotheses",fillcolor="#fff1d5"];
+ linear [label="Genuine linear quotient moment\nmu(P)=coeff_top(PV mod F)"];
+ vanish [label="Divisibility + lowerFullRadical\nDerive mu(G)=0 from the actual norm equation"];
+ coeff [label="Bounded monomial expansion\nEliminate leading moment using monic G"];
+ pencil [label="Exact actual coefficient-pencil identity\nmu(N)=sum residual_coeff_j(N)*mu(X^j)"];
+ open [label="Still to assemble: coefficient matrices\nand actual branch/corank recovery\nPublic-input finder and search cost remain",fillcolor="#fff1d5"];
+ witness -> linear -> vanish -> coeff -> pencil;
+ pencil -> open [style=dashed];
+}

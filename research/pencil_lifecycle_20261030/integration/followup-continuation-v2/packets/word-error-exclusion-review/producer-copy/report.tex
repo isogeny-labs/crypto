@@ -1,0 +1,22 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath}
+\begin{document}
+\title{Bounded word prelude: zero-slope error exclusion}
+\author{Producer proof packet; independent review pending}
+\date{31 October 2026}\maketitle
+\section*{Statement checked}
+For prime $5\le p<2^{31}$, two canonical six-word weighted inputs, nonzero weight words, and normalized Mumford divisibility for the same polynomial $f$, the literal UInt64 cross-scaled same-support prelude cannot return Some(sameUMixedZeroSlope).
+\section*{Assumptions}
+For each input $(q,r,s,t,z,w)$, every word is less than $p$, $z,w$ are nonzero, and the decoded field polynomials satisfy
+\[
+X^2+\frac q{z^2}X+\frac r{z^4}\ \mid\ f-\left(\frac s{z^3w}X+\frac t{z^5w}\right)^2.
+\]
+The same $f$ is used for both inputs. No equality of support or ordinate coefficients is an input hypothesis. Smoothness and a concrete Jacobian interpretation are not needed for this algebraic exclusion and are not established by it.
+\section*{Derivation}
+Canonical residue injectivity converts nonzero weight words to nonzero field elements. The modulus bound gives characteristic different from two. The previously checked cross-scaling theorem translates the full guarded word prelude into its field expression. If the support guard fails, the result is None and cannot be the named error. If it succeeds, the guard itself supplies the support equalities required by the existing weighted validity theorem. That theorem derives the needed ordinate identities from the two divisibility assumptions and excludes the error. Thus the proof does not assume the coefficient identities it needs to establish.
+\section*{Native evidence and retained attempts}
+The final theorem and its weight-nonzero helper compiled. A separate process checked the complete theorem type and both axiom closures, containing only propext, Classical.choice and Quot.sound. A fixed $p=5$ canonical fixture checks a nonempty validity instance and the double-delegation branch. Each compile has a 120-second bound. Earlier attempts remain: a missing prime instance on the validity definition; a control requiring definition unfolding; and a control witness corrected after simplification removed an already divisible term. No scientific experiment or cost measurement occurred.
+\section*{Exact source boundary}
+The external Rust mapping assumes Field.n=1, table-free multiplication/squaring, normal execution and sufficient operation-counter headroom. The theorem models value operations, not counters, checked panic behavior or compiler correctness. SameUDouble means delegation to double22\_weighted, not its final returned label. None means the distinct-support path, not a failure. Reachable-state invariants, generic output congruence, complete addition-law correctness and cohort measurements remain separate tasks. This packet establishes only exclusion of this specific guarded word-prelude error under the stated inputs.
+\end{document}

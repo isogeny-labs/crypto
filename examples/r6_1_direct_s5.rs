@@ -1189,7 +1189,9 @@ impl FixedBase {
             point_index: self.fb.point_index.clone(),
             cost: self.fb.cost.clone(),
             subspace_basis: self.fb.subspace_basis.clone(),
+            affine_subspace: self.fb.affine_subspace.clone(),
             known_logs: self.fb.known_logs.clone(),
+            frobenius_orbit_layout: self.fb.frobenius_orbit_layout,
         }
     }
 }
@@ -1311,6 +1313,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S5Oracle<'_> {
             solving_degree: None,
             timed_out: call.outcome == "budget",
             extra: BTreeMap::new(),
+            ..Default::default()
         };
         self.totals
             .absorb(&self.shape, Some(&cost), call.outcome == "budget");

@@ -1,0 +1,55 @@
+{
+  "schema": "cubic-native-development-attempts/v1",
+  "benchmark": false,
+  "attempts": [
+    {
+      "record": "p157-construction-attempt1.log",
+      "status": "failed_assertion",
+      "reason": "The p157 fixture must require two 3-isogenies. The incorrect ambient Fp18 square test accepted prime-field nonsquares.",
+      "correction": "Use the Fp Legendre symbol. Explicitly test that an Fp nonsquare becomes square in Fp18 but is still rejected by the obstruction predicate.",
+      "replacement": "p157-construction-attempt2.json"
+    },
+    {
+      "record": "p109-construction-attempt1.json",
+      "status": "superseded",
+      "reason": "Geometry checks passed but kernel eligibility used the incorrect ambient square predicate. The reported zero-step eligibility is invalid.",
+      "replacement": "p109-construction-attempt2.json"
+    },
+    {
+      "record": "p109-transfer-ic-attempt1.log",
+      "status": "failed_converter",
+      "reason": "All three inversions recovered two divisors each, then the group converter failed to undo the support aggregator's projective normalization.",
+      "correction": "Renormalize Z to one before affine Hermite interpolation."
+    },
+    {
+      "record": "p109-transfer-ic-attempt2.log",
+      "status": "interrupted_unqualified",
+      "reason": "The execution environment restarted during the first inversion. The old session disappeared, no transfer/Singular process remained, and no result JSON was produced. No completed outcome or timing can be inferred."
+    },
+    {
+      "records": ["p109-transfer-ic-attempt3.log", "p109-transfer-ic-attempt4.log"],
+      "status": "failed_arithmetic_chart",
+      "reason": "Inversion and sign alignment completed, but an intermediate scalar-multiplication chart was unavailable in the pinned backend.",
+      "correction": "Bounded, recorded Jacobian base-point retries; original-fixture solves passed in p109 attempt5 and p157 attempt1."
+    },
+    {
+      "record": "panel-development-attempt1/p109-target01-ic.json",
+      "status": "failed_final_verification",
+      "reason": "Transfer passed and IC found a candidate, but the backend's final binary scalar verification was unavailable. This first panel stopped on its second case.",
+      "correction": "Retain the candidate and use (k+t)D-tD without reducing k+t modulo an assumed order. Return the first representable result; fail on a mismatch.",
+      "replacement": "p109-target01-transfer-ic-attempt2.json",
+      "replacement_scalar": 884834,
+      "replacement_verified_on_original_source": true,
+      "replacement_verification_split_attempts": 5
+    },
+    {
+      "record": "panel-development-attempt2",
+      "status": "checkpoint_interruption_then_completed",
+      "reason": "A shallow main fetch hid the public base ancestry from the checkpoint exclusion graph. The gate tried to bundle that already-published base and was stopped before uploading it.",
+      "correction": "Deepen public commit ancestry; verify the base is an ancestor of origin/main and unpushed count is zero. Resume only missing correctness phases after checking immutable input/binary hashes. No completed solve was repeated or overwritten.",
+      "completed_native_solves": 16,
+      "independent_cubic_verifications": 16,
+      "benchmark": false
+    }
+  ]
+}

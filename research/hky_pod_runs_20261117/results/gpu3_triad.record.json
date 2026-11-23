@@ -1,0 +1,276 @@
+{
+ "achieved": {
+  "single": {
+   "mode": "device",
+   "ops": {
+    "max": 4362076160.0,
+    "median": 4362076160.0,
+    "min": 4362076160.0,
+    "n": 10
+   },
+   "ops_per_s": {
+    "max": 8683531489.110586,
+    "median": 8682130131.109825,
+    "min": 8680996430.359774,
+    "n": 10
+   },
+   "threads": 1,
+   "wall_s": {
+    "max": 0.7737185590012814,
+    "median": 0.739384953998524,
+    "min": 0.7239092599993455,
+    "n": 10
+   }
+  }
+ },
+ "algorithmic": {
+  "best_known_ops": null,
+  "counted_ops": null,
+  "note": "not supplied; never folded into the score",
+  "ratio": null
+ },
+ "attainment": {
+  "single": {
+   "high": 1.0001280450161703,
+   "low": 0.9997418752172811,
+   "value": 0.9998724372009063
+  }
+ },
+ "calibration": {
+  "conditions": null,
+  "created_utc": "2026-11-17T16:27:14Z",
+  "fingerprint": "d82e16df00ed495d",
+  "sha256": "15985dce3ed9b4345c6b2b3dc6446285ad542e28c126bff7b01927f2f70496e7"
+ },
+ "conditions": {
+  "other_cpu_cores": {
+   "max": 5.669011569749612,
+   "median": 5.062732616967556,
+   "min": 4.7205571884992485,
+   "n": 10
+  }
+ },
+ "created_utc": "2026-11-17T16:28:44Z",
+ "device": "gpu",
+ "diagnosis": {
+  "branch_miss_rate": null,
+  "cycles_per_op": null,
+  "dtlb_misses_per_op": null,
+  "gpu": {
+   "host_cpu_utilisation": {
+    "max": 1.0102854292560048,
+    "median": 0.9927071757774406,
+    "min": 0.9785022927279443,
+    "n": 10
+   },
+   "nvidia_smi": {
+    "note": "nvidia-smi utilisation is the share of samples with a kernel resident; it is not SM activity",
+    "power_w": {
+     "max": 43.84,
+     "median": 42.83,
+     "min": 30.45,
+     "n": 38
+    },
+    "samples": 38,
+    "temperature_c": {
+     "max": 55.0,
+     "median": 54.0,
+     "min": 52.0,
+     "n": 38
+    },
+    "throttled_sample_share": 0.0,
+    "utilization_gpu_pct": {
+     "max": 100.0,
+     "median": 64.5,
+     "min": 0.0,
+     "n": 38
+    },
+    "utilization_memory_pct": {
+     "max": 100.0,
+     "median": 75.0,
+     "min": 0.0,
+     "n": 38
+    }
+   }
+  },
+  "instructions_per_op": null,
+  "ipc": null,
+  "l1d_misses_per_op": null,
+  "latency_attainment": null,
+  "llc_misses_per_op": null,
+  "scalar_ceiling_ratio": null,
+  "simd_headroom": null,
+  "startup_share": null,
+  "topdown": null,
+  "unavailable": {
+   "branch_miss_rate": "no hardware PMU on the measuring host",
+   "cycles_per_op": "no hardware PMU on the measuring host",
+   "dtlb_misses_per_op": "no hardware PMU on the measuring host",
+   "instructions_per_op": "no hardware PMU on the measuring host",
+   "ipc": "no hardware PMU on the measuring host",
+   "l1d_misses_per_op": "no hardware PMU on the measuring host",
+   "llc_misses_per_op": "no hardware PMU on the measuring host",
+   "topdown": "no hardware PMU on the measuring host",
+   "vector_share_sampled": "no hardware PMU on the measuring host"
+  },
+  "vector_share_sampled": null,
+  "vector_share_static": null
+ },
+ "flags": [
+  "CALIBRATION_GPU_CEILING_UNVALIDATED_BY_AUTHOR"
+ ],
+ "grade": {
+  "invalid": [],
+  "letter": "A",
+  "letter_range": "A",
+  "limiting_basis": "roofline",
+  "limiting_factor": "at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps",
+  "rule": "sqrt(A_single * A_full); letters A>=0.70 B>=0.40 C>=0.20 D>=0.08 E",
+  "scope": "single-thread only",
+  "score": 0.9998724372009063
+ },
+ "host": {
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 32768,
+   "L1i": 32768,
+   "L2": 524288,
+   "L3": 33554432
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "AMD EPYC 7443 24-Core Processor",
+  "cpufreq_boost": "1",
+  "cpufreq_governor": "schedutil",
+  "event_sources": [
+   "breakpoint",
+   "cpu",
+   "ibs_fetch",
+   "ibs_op",
+   "kprobe",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "d82e16df00ed495d",
+  "gpus": [
+   "NVIDIA RTX 2000 Ada Generation, 16380 MiB, 595.112.07, 8.9"
+  ],
+  "hypervisor": false,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "bmi2",
+   "fma",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.8.0-138-generic",
+  "logical_cpus": 48,
+  "mem_total_bytes": 270090555392,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "4",
+  "smt_active": "1",
+  "thread_siblings_cpu0": "0,24",
+  "turbo_disabled": null
+ },
+ "intensity": {
+  "bytes_per_op": 24.0,
+  "declared_bytes_per_op": 24.0,
+  "declared_over_measured": null,
+  "measured_bytes_per_op": null,
+  "ops_per_byte": 0.041666666666666664,
+  "source": "declared",
+  "working_set_bytes": null
+ },
+ "kernel": {
+  "command": [
+   "/workspace/gpu_one",
+   "triad"
+  ],
+  "op_class": "fma_f64",
+  "ops_source": "optlevel.ops/v1 line"
+ },
+ "kind": "record",
+ "label": "gpu-triad",
+ "noise_floor": {
+  "aa_ratio_deviation": 9.291688783830132e-05,
+  "pairs": 5,
+  "rel_range": 0.0002919858044662223,
+  "sufficient": true,
+  "value": 0.0002919858044662223
+ },
+ "not_a_speed_claim": "An optimization level describes how close one implementation runs to what its own machine can do for the operations it counts. It is not a speed result, not a comparison between algorithms, not a benchmark or leaderboard row, and not evidence under the validation gate. A perfectly tuned bad algorithm scores high.",
+ "parallel": null,
+ "roofline": {
+  "single": {
+   "bandwidth_bytes_per_s": 208397706941.45795,
+   "binding": "memory",
+   "bound_low_ops_per_s": 8682419748.53349,
+   "bound_ops_per_s": 8683237789.227415,
+   "ceiling_extrapolated": false,
+   "ceiling_interpolated": false,
+   "compute_roof_ops_per_s": 92802576606.50272,
+   "memory_roof_ops_per_s": 8683237789.227415,
+   "next_roof_ratio": 10.68755444215006,
+   "threads": 1
+  }
+ },
+ "schema": "optlevel.record/v1",
+ "tier": "T-gpu-timing",
+ "tool_version": "1.0.0"
+}

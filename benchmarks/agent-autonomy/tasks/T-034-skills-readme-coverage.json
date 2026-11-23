@@ -1,0 +1,33 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-034",
+  "title": "Add a missing skill to the skills README",
+  "class": "docs-tooling",
+  "difficulty": 1,
+  "source": [
+    ".agents/skills/README.md",
+    "tools/check_skills_parity.py"
+  ],
+  "prompt": "A skill directory under `.agents/skills/` is missing from `.agents/skills/README.md`. Find it and add it in the same style as its neighbours, with a one-line description taken from its SKILL.md front matter.",
+  "setup": "Harness removes the `perf-ipc` row or paragraph from .agents/skills/README.md and commits it as the setup commit.",
+  "acceptance": [
+    "every directory name under .agents/skills appears in .agents/skills/README.md",
+    "the description matches the `description:` of perf-ipc/SKILL.md in substance",
+    "only README.md changed"
+  ],
+  "check_command": "for d in .agents/skills/*/; do n=$(basename \"$d\"); grep -q \"$n\" .agents/skills/README.md || exit 1; done && python3 tools/check_skills_parity.py && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^.agents/skills/README.md$')\" = 0 ]",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding a skill that has no directory"
+  ],
+  "max_wall_minutes": 10,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Check passes on the unmodified tree; the fixture makes it fail. Whether README.md has per-skill rows was not confirmed."
+}

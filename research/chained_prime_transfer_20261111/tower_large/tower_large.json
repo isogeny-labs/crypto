@@ -1,0 +1,2703 @@
+{
+  "crosscheck": [
+    {
+      "ok": true,
+      "p": 53,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          3696,
+          173712
+        ],
+        "p": 53,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 11
+      }
+    },
+    {
+      "ok": true,
+      "p": 79,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          4488,
+          450912
+        ],
+        "p": 79,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 12
+      }
+    },
+    {
+      "ok": true,
+      "p": 101,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          12312,
+          1297776
+        ],
+        "p": 101,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 13
+      }
+    },
+    {
+      "ok": true,
+      "p": 131,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          19028,
+          2077536
+        ],
+        "p": 131,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 14
+      }
+    },
+    {
+      "ok": true,
+      "p": 151,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          20672,
+          3302656
+        ],
+        "p": 151,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 15
+      }
+    },
+    {
+      "ok": true,
+      "p": 181,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          33128,
+          5087936
+        ],
+        "p": 181,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 16
+      }
+    },
+    {
+      "ok": true,
+      "p": 211,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          36828,
+          8020320
+        ],
+        "p": 211,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 17
+      }
+    },
+    {
+      "ok": true,
+      "p": 251,
+      "report": {
+        "built": true,
+        "divisors_compared": 1200,
+        "field_checks": 3772,
+        "ic_solves_compared": 16,
+        "jac_orders": [
+          57720,
+          16030176
+        ],
+        "p": 251,
+        "r": 0,
+        "rho_runs_compared": 24,
+        "seed": 18
+      }
+    }
+  ],
+  "crosscheck_pass": true,
+  "fits": [
+    {
+      "series": "rho on E (group ops)",
+      "slope_all_points": 0.20870669592310273,
+      "slope_p_ge_1000": 0.19770962111132798
+    },
+    {
+      "series": "rho on E walk steps only",
+      "slope_all_points": 0.5590349125064309,
+      "slope_p_ge_1000": 0.5106757822581439
+    },
+    {
+      "series": "mean r",
+      "slope_all_points": 0.9792569418874921,
+      "slope_p_ge_1000": 1.010446641735426
+    },
+    {
+      "series": "IC2 group ops",
+      "slope_all_points": 0.9848539360995792,
+      "slope_p_ge_1000": 0.9948204150229819
+    },
+    {
+      "series": "IC3 group ops",
+      "slope_all_points": 0.9905416092327732,
+      "slope_p_ge_1000": 0.9951956766144322
+    },
+    {
+      "series": "IC3 / IC2",
+      "slope_all_points": 0.005687673133193958,
+      "slope_p_ge_1000": 0.00037526159144988326
+    },
+    {
+      "series": "IC2 linalg mulmods",
+      "slope_all_points": 1.0664940595234615,
+      "slope_p_ge_1000": 0.9880982673615374
+    },
+    {
+      "series": "IC3 linalg mulmods",
+      "slope_all_points": 1.8239004033061765,
+      "slope_p_ge_1000": 2.150437839423512
+    },
+    {
+      "series": "IC2 ops + 0.1 x linalg",
+      "slope_all_points": 1.0620672491456287,
+      "slope_p_ge_1000": 0.9883545426445346
+    },
+    {
+      "series": "IC3 ops + 0.1 x linalg",
+      "slope_all_points": 1.8039309168644149,
+      "slope_p_ge_1000": 2.126071786968137
+    },
+    {
+      "series": "IC2 ops + 1.0 x linalg",
+      "slope_all_points": 1.0660277255206687,
+      "slope_p_ge_1000": 0.988124804788048
+    },
+    {
+      "series": "IC3 ops + 1.0 x linalg",
+      "slope_all_points": 1.821816571161146,
+      "slope_p_ge_1000": 2.1479019243547843
+    },
+    {
+      "series": "IC2 trials per relation",
+      "slope_all_points": 0.004665927127170468,
+      "slope_p_ge_1000": 0.002304375321025331
+    },
+    {
+      "series": "IC3 trials per relation",
+      "slope_all_points": 0.006628684773315811,
+      "slope_p_ge_1000": 0.0003032103424156333
+    },
+    {
+      "series": "IC2 oracle fp muls",
+      "slope_all_points": 1.0864939342325726,
+      "slope_p_ge_1000": 1.100524973093528
+    },
+    {
+      "series": "IC3 oracle fp muls",
+      "slope_all_points": 1.0896636178494465,
+      "slope_p_ge_1000": 1.0865821973109724
+    },
+    {
+      "series": "factor-base columns, genus 2",
+      "slope_all_points": 0.9945974331753406,
+      "slope_p_ge_1000": 0.9982822239061069
+    }
+  ],
+  "instances": [
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        42,
+        30
+      ],
+      "ic": [
+        {
+          "canonicalisations": 267.125,
+          "columns": 126.0,
+          "factor_base_fp_muls": 8642.0,
+          "factor_base_lookups": 267.125,
+          "la_inversions": 118.125,
+          "la_mulmods": 31501.875,
+          "ops": 275.375,
+          "oracle_fp_muls": 8607.75,
+          "relations": 135.0,
+          "step_draws": 526.25,
+          "trials": 268.375
+        },
+        {
+          "canonicalisations": 365.375,
+          "columns": 115.0,
+          "factor_base_fp_muls": 8759.0,
+          "factor_base_lookups": 365.375,
+          "la_inversions": 113.0,
+          "la_mulmods": 82089.5,
+          "ops": 886.25,
+          "oracle_fp_muls": 250568.5,
+          "relations": 124.0,
+          "step_draws": 1420.75,
+          "trials": 879.25
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        63500,
+        14601952
+      ],
+      "n_e": 254,
+      "p": 251,
+      "r": 127,
+      "rho_dps": 10.703125,
+      "rho_ops": 450.421875,
+      "rho_steps": 10.796875,
+      "seed": 1251,
+      "solve_wall_s_bookkeeping": 0.055838593,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.071619508
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        34,
+        42
+      ],
+      "ic": [
+        {
+          "canonicalisations": 282.125,
+          "columns": 133.0,
+          "factor_base_fp_muls": 8887.0,
+          "factor_base_lookups": 282.125,
+          "la_inversions": 123.625,
+          "la_mulmods": 35849.5,
+          "ops": 278.0,
+          "oracle_fp_muls": 8939.5,
+          "relations": 142.0,
+          "step_draws": 533.125,
+          "trials": 269.0
+        },
+        {
+          "canonicalisations": 450.0,
+          "columns": 142.0,
+          "factor_base_fp_muls": 9610.0,
+          "factor_base_lookups": 450.0,
+          "la_inversions": 138.875,
+          "la_mulmods": 88370.375,
+          "ops": 714.75,
+          "oracle_fp_muls": 215149.75,
+          "relations": 151.0,
+          "step_draws": 1192.0,
+          "trials": 705.75
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        67056,
+        17940528
+      ],
+      "n_e": 254,
+      "p": 251,
+      "r": 127,
+      "rho_dps": 10.71875,
+      "rho_ops": 452.328125,
+      "rho_steps": 10.796875,
+      "seed": 1268,
+      "solve_wall_s_bookkeeping": 0.053541442,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.068035685
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        23,
+        29
+      ],
+      "ic": [
+        {
+          "canonicalisations": 284.125,
+          "columns": 134.0,
+          "factor_base_fp_muls": 8922.0,
+          "factor_base_lookups": 284.125,
+          "la_inversions": 124.0,
+          "la_mulmods": 33682.0,
+          "ops": 282.5,
+          "oracle_fp_muls": 9049.75,
+          "relations": 143.0,
+          "step_draws": 542.625,
+          "trials": 274.5
+        },
+        {
+          "canonicalisations": 453.375,
+          "columns": 144.0,
+          "factor_base_fp_muls": 9680.0,
+          "factor_base_lookups": 453.375,
+          "la_inversions": 141.25,
+          "la_mulmods": 90765.25,
+          "ops": 699.0,
+          "oracle_fp_muls": 210865.375,
+          "relations": 153.0,
+          "step_draws": 1173.375,
+          "trials": 691.0
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        67536,
+        18245440
+      ],
+      "n_e": 268,
+      "p": 251,
+      "r": 67,
+      "rho_dps": 8.34375,
+      "rho_ops": 344.3125,
+      "rho_steps": 8.4375,
+      "seed": 1285,
+      "solve_wall_s_bookkeeping": 0.054467711,
+      "target_pull_matches": [
+        true,
+        true
+      ],
+      "transfer_pull_ops": [
+        4,
+        4
+      ],
+      "transfer_wall_s": 0.137584867
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        31,
+        33
+      ],
+      "ic": [
+        {
+          "canonicalisations": 524.5,
+          "columns": 254.0,
+          "factor_base_fp_muls": 19719.0,
+          "factor_base_lookups": 524.5,
+          "la_inversions": 228.125,
+          "la_mulmods": 97654.25,
+          "ops": 525.375,
+          "oracle_fp_muls": 19215.25,
+          "relations": 263.0,
+          "step_draws": 1017.625,
+          "trials": 515.375
+        },
+        {
+          "canonicalisations": 781.125,
+          "columns": 253.0,
+          "factor_base_fp_muls": 20577.0,
+          "factor_base_lookups": 781.125,
+          "la_inversions": 242.375,
+          "la_mulmods": 172623.375,
+          "ops": 1612.625,
+          "oracle_fp_muls": 542246.25,
+          "relations": 262.0,
+          "step_draws": 2637.5,
+          "trials": 1602.625
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        255012,
+        127320928
+      ],
+      "n_e": 538,
+      "p": 503,
+      "r": 269,
+      "rho_dps": 9.765625,
+      "rho_ops": 529.96875,
+      "rho_steps": 24.640625,
+      "seed": 1503,
+      "solve_wall_s_bookkeeping": 0.115667355,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.115610656
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        34,
+        31
+      ],
+      "ic": [
+        {
+          "canonicalisations": 480.875,
+          "columns": 233.0,
+          "factor_base_fp_muls": 18879.0,
+          "factor_base_lookups": 480.875,
+          "la_inversions": 209.625,
+          "la_mulmods": 95205.375,
+          "ops": 543.125,
+          "oracle_fp_muls": 18479.875,
+          "relations": 242.0,
+          "step_draws": 1025.125,
+          "trials": 534.125
+        },
+        {
+          "canonicalisations": 726.5,
+          "columns": 235.0,
+          "factor_base_fp_muls": 19857.0,
+          "factor_base_lookups": 726.5,
+          "la_inversions": 227.0,
+          "la_mulmods": 160362.75,
+          "ops": 1768.125,
+          "oracle_fp_muls": 583482.125,
+          "relations": 244.0,
+          "step_draws": 2851.75,
+          "trials": 1759.125
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        235216,
+        118818784
+      ],
+      "n_e": 482,
+      "p": 503,
+      "r": 241,
+      "rho_dps": 8.75,
+      "rho_ops": 499.03125,
+      "rho_steps": 24.8125,
+      "seed": 1520,
+      "solve_wall_s_bookkeeping": 0.124659656,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.133157271
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        37,
+        33
+      ],
+      "ic": [
+        {
+          "canonicalisations": 580.625,
+          "columns": 282.0,
+          "factor_base_fp_muls": 20839.0,
+          "factor_base_lookups": 580.625,
+          "la_inversions": 251.5,
+          "la_mulmods": 112153.0,
+          "ops": 526.125,
+          "oracle_fp_muls": 20450.125,
+          "relations": 291.0,
+          "step_draws": 1045.25,
+          "trials": 515.125
+        },
+        {
+          "canonicalisations": 778.375,
+          "columns": 252.0,
+          "factor_base_fp_muls": 20645.0,
+          "factor_base_lookups": 778.375,
+          "la_inversions": 240.75,
+          "la_mulmods": 170427.375,
+          "ops": 1563.5,
+          "oracle_fp_muls": 527718.125,
+          "relations": 261.0,
+          "step_draws": 2565.0,
+          "trials": 1552.5
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        285140,
+        127570560
+      ],
+      "n_e": 538,
+      "p": 503,
+      "r": 269,
+      "rho_dps": 9.78125,
+      "rho_ops": 538.953125,
+      "rho_steps": 29.640625,
+      "seed": 1537,
+      "solve_wall_s_bookkeeping": 0.122748968,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.116059756
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        43,
+        42
+      ],
+      "ic": [
+        {
+          "canonicalisations": 1080.25,
+          "columns": 532.0,
+          "factor_base_fp_muls": 38426.0,
+          "factor_base_lookups": 1080.25,
+          "la_inversions": 464.375,
+          "la_mulmods": 248469.625,
+          "ops": 1038.0,
+          "oracle_fp_muls": 37002.75,
+          "relations": 541.0,
+          "step_draws": 2059.125,
+          "trials": 1027.0
+        },
+        {
+          "canonicalisations": 1561.25,
+          "columns": 513.0,
+          "factor_base_fp_muls": 39755.0,
+          "factor_base_lookups": 1561.25,
+          "la_inversions": 490.5,
+          "la_mulmods": 315313.0,
+          "ops": 3062.5,
+          "oracle_fp_muls": 1084729.125,
+          "relations": 522.0,
+          "step_draws": 5075.125,
+          "trials": 3051.5
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        1075288,
+        1046043456
+      ],
+      "n_e": 1028,
+      "p": 1009,
+      "r": 257,
+      "rho_dps": 9.765625,
+      "rho_ops": 531.59375,
+      "rho_steps": 26.6875,
+      "seed": 1012,
+      "solve_wall_s_bookkeeping": 0.238039358,
+      "target_pull_matches": [
+        true,
+        null
+      ],
+      "transfer_pull_ops": [
+        4,
+        2
+      ],
+      "transfer_wall_s": 0.38165206
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        44,
+        42
+      ],
+      "ic": [
+        {
+          "canonicalisations": 968.5,
+          "columns": 476.0,
+          "factor_base_fp_muls": 36503.0,
+          "factor_base_lookups": 968.5,
+          "la_inversions": 414.625,
+          "la_mulmods": 235056.375,
+          "ops": 1012.25,
+          "oracle_fp_muls": 34450.875,
+          "relations": 485.0,
+          "step_draws": 1967.25,
+          "trials": 1005.25
+        },
+        {
+          "canonicalisations": 1513.875,
+          "columns": 497.0,
+          "factor_base_fp_muls": 39078.0,
+          "factor_base_lookups": 1513.875,
+          "la_inversions": 475.125,
+          "la_mulmods": 306013.75,
+          "ops": 3070.75,
+          "oracle_fp_muls": 1082912.125,
+          "relations": 506.0,
+          "step_draws": 5076.875,
+          "trials": 3063.75
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        962360,
+        1008867520
+      ],
+      "n_e": 982,
+      "p": 1009,
+      "r": 491,
+      "rho_dps": 11.640625,
+      "rho_ops": 649.328125,
+      "rho_steps": 37.984375,
+      "seed": 1029,
+      "solve_wall_s_bookkeeping": 0.209517451,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.237767802
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        42,
+        34
+      ],
+      "ic": [
+        {
+          "canonicalisations": 980.375,
+          "columns": 482.0,
+          "factor_base_fp_muls": 36630.0,
+          "factor_base_lookups": 980.375,
+          "la_inversions": 419.625,
+          "la_mulmods": 243975.75,
+          "ops": 1050.0,
+          "oracle_fp_muls": 35193.875,
+          "relations": 491.0,
+          "step_draws": 2019.875,
+          "trials": 1038.0
+        },
+        {
+          "canonicalisations": 1498.75,
+          "columns": 492.0,
+          "factor_base_fp_muls": 39220.0,
+          "factor_base_lookups": 1498.75,
+          "la_inversions": 470.25,
+          "la_mulmods": 311056.0,
+          "ops": 3278.25,
+          "oracle_fp_muls": 1146579.75,
+          "relations": 501.0,
+          "step_draws": 5375.5,
+          "trials": 3266.25
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        973328,
+        998419936
+      ],
+      "n_e": 958,
+      "p": 1009,
+      "r": 479,
+      "rho_dps": 12.78125,
+      "rho_ops": 671.703125,
+      "rho_steps": 34.78125,
+      "seed": 1046,
+      "solve_wall_s_bookkeeping": 0.238855031,
+      "target_pull_matches": [
+        true,
+        null
+      ],
+      "transfer_pull_ops": [
+        4,
+        2
+      ],
+      "transfer_wall_s": 0.219879291
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        45,
+        39
+      ],
+      "ic": [
+        {
+          "canonicalisations": 2128.625,
+          "columns": 1056.0,
+          "factor_base_fp_muls": 91648.0,
+          "factor_base_lookups": 2128.625,
+          "la_inversions": 905.0,
+          "la_mulmods": 524298.875,
+          "ops": 2005.375,
+          "oracle_fp_muls": 88127.625,
+          "relations": 1065.0,
+          "step_draws": 4038.75,
+          "trials": 1994.375
+        },
+        {
+          "canonicalisations": 3133.25,
+          "columns": 1037.0,
+          "factor_base_fp_muls": 94635.0,
+          "factor_base_lookups": 3133.25,
+          "la_inversions": 977.375,
+          "la_mulmods": 796123.125,
+          "ops": 5829.375,
+          "oracle_fp_muls": 2282386.5,
+          "relations": 1046.0,
+          "step_draws": 9759.75,
+          "trials": 5818.375
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        4235108,
+        8315873472
+      ],
+      "n_e": 2042,
+      "p": 2003,
+      "r": 1021,
+      "rho_dps": 8.28125,
+      "rho_ops": 679.390625,
+      "rho_steps": 57.71875,
+      "seed": 1009,
+      "solve_wall_s_bookkeeping": 0.521144487,
+      "target_pull_matches": [
+        true,
+        true
+      ],
+      "transfer_pull_ops": [
+        4,
+        4
+      ],
+      "transfer_wall_s": 0.430738837
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        45,
+        40
+      ],
+      "ic": [
+        {
+          "canonicalisations": 2058.5,
+          "columns": 1021.0,
+          "factor_base_fp_muls": 90003.0,
+          "factor_base_lookups": 2058.5,
+          "la_inversions": 870.0,
+          "la_mulmods": 524822.125,
+          "ops": 2040.0,
+          "oracle_fp_muls": 86921.0,
+          "relations": 1030.0,
+          "step_draws": 4053.625,
+          "trials": 2029.0
+        },
+        {
+          "canonicalisations": 3222.625,
+          "columns": 1067.0,
+          "factor_base_fp_muls": 96171.0,
+          "factor_base_lookups": 3222.625,
+          "la_inversions": 1010.375,
+          "la_mulmods": 800890.0,
+          "ops": 5682.875,
+          "oracle_fp_muls": 2244551.25,
+          "relations": 1076.0,
+          "step_draws": 9568.625,
+          "trials": 5671.875
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        4089504,
+        8575307536
+      ],
+      "n_e": 2078,
+      "p": 2003,
+      "r": 1039,
+      "rho_dps": 10.625,
+      "rho_ops": 727.5,
+      "rho_steps": 44.65625,
+      "seed": 1026,
+      "solve_wall_s_bookkeeping": 0.571580578,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 0.421273432
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        42,
+        38
+      ],
+      "ic": [
+        {
+          "canonicalisations": 2023.625,
+          "columns": 1004.0,
+          "factor_base_fp_muls": 89204.0,
+          "factor_base_lookups": 2023.625,
+          "la_inversions": 857.375,
+          "la_mulmods": 510996.0,
+          "ops": 2025.875,
+          "oracle_fp_muls": 85775.0,
+          "relations": 1013.0,
+          "step_draws": 4016.5,
+          "trials": 2015.875
+        },
+        {
+          "canonicalisations": 2790.875,
+          "columns": 923.0,
+          "factor_base_fp_muls": 89403.0,
+          "factor_base_lookups": 2790.875,
+          "la_inversions": 870.875,
+          "la_mulmods": 665459.625,
+          "ops": 6562.625,
+          "oracle_fp_muls": 2488986.625,
+          "relations": 932.0,
+          "step_draws": 10751.125,
+          "trials": 6552.625
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        4019940,
+        7427590704
+      ],
+      "n_e": 1942,
+      "p": 2003,
+      "r": 971,
+      "rho_dps": 10.296875,
+      "rho_ops": 734.4375,
+      "rho_steps": 68.59375,
+      "seed": 1043,
+      "solve_wall_s_bookkeeping": 0.543820046,
+      "target_pull_matches": [
+        null,
+        true
+      ],
+      "transfer_pull_ops": [
+        2,
+        4
+      ],
+      "transfer_wall_s": 0.430004767
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        40,
+        48
+      ],
+      "ic": [
+        {
+          "canonicalisations": 4110.5,
+          "columns": 2047.0,
+          "factor_base_fp_muls": 180967.0,
+          "factor_base_lookups": 4110.5,
+          "la_inversions": 1727.5,
+          "la_mulmods": 1017129.875,
+          "ops": 4041.625,
+          "oracle_fp_muls": 173422.75,
+          "relations": 2056.0,
+          "step_draws": 8097.0,
+          "trials": 4030.625
+        },
+        {
+          "canonicalisations": 6079.875,
+          "columns": 2019.0,
+          "factor_base_fp_muls": 186561.0,
+          "factor_base_lookups": 6079.875,
+          "la_inversions": 1905.5,
+          "la_mulmods": 2324378.125,
+          "ops": 11889.5,
+          "oracle_fp_muls": 4853161.875,
+          "relations": 2028.0,
+          "step_draws": 19865.375,
+          "trials": 11878.5
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        16386288,
+        64589009664
+      ],
+      "n_e": 4052,
+      "p": 4001,
+      "r": 1013,
+      "rho_dps": 9.21875,
+      "rho_ops": 718.546875,
+      "rho_steps": 71.171875,
+      "seed": 1013,
+      "solve_wall_s_bookkeeping": 1.056781656,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 1.399842657
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        36,
+        36
+      ],
+      "ic": [
+        {
+          "canonicalisations": 4194.625,
+          "columns": 2089.0,
+          "factor_base_fp_muls": 182348.0,
+          "factor_base_lookups": 4194.625,
+          "la_inversions": 1766.375,
+          "la_mulmods": 1030066.25,
+          "ops": 4052.375,
+          "oracle_fp_muls": 175674.75,
+          "relations": 2098.0,
+          "step_draws": 8148.125,
+          "trials": 4038.375
+        },
+        {
+          "canonicalisations": 6244.75,
+          "columns": 2074.0,
+          "factor_base_fp_muls": 189287.0,
+          "factor_base_lookups": 6244.75,
+          "la_inversions": 1957.75,
+          "la_mulmods": 2425845.375,
+          "ops": 11658.0,
+          "oracle_fp_muls": 4792330.375,
+          "relations": 2083.0,
+          "step_draws": 19568.125,
+          "trials": 11644.0
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        16711600,
+        66378475200
+      ],
+      "n_e": 4076,
+      "p": 4001,
+      "r": 1019,
+      "rho_dps": 9.0,
+      "rho_ops": 725.796875,
+      "rho_steps": 77.71875,
+      "seed": 1030,
+      "solve_wall_s_bookkeeping": 1.388273744,
+      "target_pull_matches": [
+        null,
+        true
+      ],
+      "transfer_pull_ops": [
+        2,
+        4
+      ],
+      "transfer_wall_s": 1.3349548869999999
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        35,
+        39
+      ],
+      "ic": [
+        {
+          "canonicalisations": 4115.75,
+          "columns": 2050.0,
+          "factor_base_fp_muls": 180592.0,
+          "factor_base_lookups": 4115.75,
+          "la_inversions": 1733.875,
+          "la_mulmods": 1004998.5,
+          "ops": 4049.625,
+          "oracle_fp_muls": 173582.0,
+          "relations": 2059.0,
+          "step_draws": 8120.875,
+          "trials": 4045.625
+        },
+        {
+          "canonicalisations": 6126.375,
+          "columns": 2035.0,
+          "factor_base_fp_muls": 186980.0,
+          "factor_base_lookups": 6126.375,
+          "la_inversions": 1920.375,
+          "la_mulmods": 2379179.75,
+          "ops": 11898.75,
+          "oracle_fp_muls": 4869230.625,
+          "relations": 2044.0,
+          "step_draws": 19910.125,
+          "trials": 11894.75
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        16409512,
+        65127842048
+      ],
+      "n_e": 4084,
+      "p": 4001,
+      "r": 1021,
+      "rho_dps": 10.265625,
+      "rho_ops": 715.78125,
+      "rho_steps": 53.234375,
+      "seed": 1047,
+      "solve_wall_s_bookkeeping": 1.141615188,
+      "target_pull_matches": [
+        true,
+        null
+      ],
+      "transfer_pull_ops": [
+        4,
+        2
+      ],
+      "transfer_wall_s": 1.462377368
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        38,
+        40
+      ],
+      "ic": [
+        {
+          "canonicalisations": 8042.125,
+          "columns": 4013.0,
+          "factor_base_fp_muls": 391481.0,
+          "factor_base_lookups": 8042.125,
+          "la_inversions": 3376.875,
+          "la_mulmods": 1952062.625,
+          "ops": 8029.625,
+          "oracle_fp_muls": 376437.75,
+          "relations": 4022.0,
+          "step_draws": 16052.25,
+          "trials": 8017.625
+        },
+        {
+          "canonicalisations": 12164.5,
+          "columns": 4047.0,
+          "factor_base_fp_muls": 409074.0,
+          "factor_base_lookups": 12164.5,
+          "la_inversions": 3806.5,
+          "la_mulmods": 9830632.0,
+          "ops": 23913.75,
+          "oracle_fp_muls": 10671503.5,
+          "relations": 4056.0,
+          "step_draws": 39911.25,
+          "trials": 23901.75
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        64253552,
+        519132942784
+      ],
+      "n_e": 8068,
+      "p": 8009,
+      "r": 2017,
+      "rho_dps": 14.25,
+      "rho_ops": 930.296875,
+      "rho_steps": 73.640625,
+      "seed": 1033,
+      "solve_wall_s_bookkeeping": 3.162080662,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 6.324494045
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        43,
+        36
+      ],
+      "ic": [
+        {
+          "canonicalisations": 7823.625,
+          "columns": 3904.0,
+          "factor_base_fp_muls": 386362.0,
+          "factor_base_lookups": 7823.625,
+          "la_inversions": 3280.25,
+          "la_mulmods": 1918074.5,
+          "ops": 8085.0,
+          "oracle_fp_muls": 371311.625,
+          "relations": 3913.0,
+          "step_draws": 16018.5,
+          "trials": 8068.0
+        },
+        {
+          "canonicalisations": 11637.625,
+          "columns": 3872.0,
+          "factor_base_fp_muls": 400998.0,
+          "factor_base_lookups": 11637.625,
+          "la_inversions": 3639.625,
+          "la_mulmods": 8666582.875,
+          "ops": 25091.125,
+          "oracle_fp_muls": 11032082.0,
+          "relations": 3881.0,
+          "step_draws": 41497.25,
+          "trials": 25074.125
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        62551752,
+        496952945232
+      ],
+      "n_e": 7886,
+      "p": 8009,
+      "r": 3943,
+      "rho_dps": 10.265625,
+      "rho_ops": 944.5625,
+      "rho_steps": 114.4375,
+      "seed": 1050,
+      "solve_wall_s_bookkeeping": 4.099957382,
+      "target_pull_matches": [
+        null,
+        true
+      ],
+      "transfer_pull_ops": [
+        2,
+        4
+      ],
+      "transfer_wall_s": 3.704271791
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        43,
+        37
+      ],
+      "ic": [
+        {
+          "canonicalisations": 8148.25,
+          "columns": 4066.0,
+          "factor_base_fp_muls": 394474.0,
+          "factor_base_lookups": 8148.25,
+          "la_inversions": 3417.875,
+          "la_mulmods": 1988688.25,
+          "ops": 8048.0,
+          "oracle_fp_muls": 379717.875,
+          "relations": 4075.0,
+          "step_draws": 16130.125,
+          "trials": 8035.0
+        },
+        {
+          "canonicalisations": 11894.125,
+          "columns": 3957.0,
+          "factor_base_fp_muls": 404663.0,
+          "factor_base_lookups": 11894.125,
+          "la_inversions": 3717.75,
+          "la_mulmods": 9309233.0,
+          "ops": 24199.5,
+          "oracle_fp_muls": 10743892.625,
+          "relations": 3966.0,
+          "step_draws": 40251.75,
+          "trials": 24186.5
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        65137792,
+        507582333328
+      ],
+      "n_e": 8014,
+      "p": 8009,
+      "r": 4007,
+      "rho_dps": 11.703125,
+      "rho_ops": 1000.0,
+      "rho_steps": 127.84375,
+      "seed": 1067,
+      "solve_wall_s_bookkeeping": 2.957566549,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 3.144289349
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        39,
+        31
+      ],
+      "ic": [
+        {
+          "canonicalisations": 15900.5,
+          "columns": 7942.0,
+          "factor_base_fp_muls": 817477.0,
+          "factor_base_lookups": 15900.5,
+          "la_inversions": 6673.875,
+          "la_mulmods": 3813645.875,
+          "ops": 15967.125,
+          "oracle_fp_muls": 783716.0,
+          "relations": 7951.0,
+          "step_draws": 31891.125,
+          "trials": 15954.125
+        },
+        {
+          "canonicalisations": 24021.875,
+          "columns": 8000.0,
+          "factor_base_fp_muls": 852736.0,
+          "factor_base_lookups": 24021.875,
+          "la_inversions": 7523.125,
+          "la_mulmods": 48769072.875,
+          "ops": 47760.5,
+          "oracle_fp_muls": 22136987.125,
+          "relations": 8009.0,
+          "step_draws": 79613.0,
+          "trials": 47747.5
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        254174488,
+        4096467039744
+      ],
+      "n_e": 16012,
+      "p": 16001,
+      "r": 4003,
+      "rho_dps": 10.75,
+      "rho_ops": 946.03125,
+      "rho_steps": 103.796875,
+      "seed": 1049,
+      "solve_wall_s_bookkeeping": 8.907793222,
+      "target_pull_matches": [
+        true,
+        true
+      ],
+      "transfer_pull_ops": [
+        4,
+        4
+      ],
+      "transfer_wall_s": 13.140340057
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        32,
+        32
+      ],
+      "ic": [
+        {
+          "canonicalisations": 15891.625,
+          "columns": 7938.0,
+          "factor_base_fp_muls": 815441.0,
+          "factor_base_lookups": 15891.625,
+          "la_inversions": 6676.375,
+          "la_mulmods": 3806134.5,
+          "ops": 16073.25,
+          "oracle_fp_muls": 785815.0,
+          "relations": 7947.0,
+          "step_draws": 32046.75,
+          "trials": 16059.25
+        },
+        {
+          "canonicalisations": 23641.75,
+          "columns": 7873.0,
+          "factor_base_fp_muls": 845533.0,
+          "factor_base_lookups": 23641.75,
+          "la_inversions": 7403.75,
+          "la_mulmods": 46173272.875,
+          "ops": 48733.875,
+          "oracle_fp_muls": 22463075.625,
+          "relations": 7882.0,
+          "step_draws": 80941.625,
+          "trials": 48719.875
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        254032952,
+        4031430764704
+      ],
+      "n_e": 15802,
+      "p": 16001,
+      "r": 7901,
+      "rho_dps": 14.703125,
+      "rho_ops": 1150.484375,
+      "rho_steps": 140.78125,
+      "seed": 1066,
+      "solve_wall_s_bookkeeping": 9.812240131,
+      "target_pull_matches": [
+        true,
+        null
+      ],
+      "transfer_pull_ops": [
+        4,
+        2
+      ],
+      "transfer_wall_s": 9.843879124
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        37,
+        46
+      ],
+      "ic": [
+        {
+          "canonicalisations": 16197.375,
+          "columns": 8091.0,
+          "factor_base_fp_muls": 825388.0,
+          "factor_base_lookups": 16197.375,
+          "la_inversions": 6797.875,
+          "la_mulmods": 3894820.875,
+          "ops": 16103.375,
+          "oracle_fp_muls": 795631.375,
+          "relations": 8100.0,
+          "step_draws": 32234.5,
+          "trials": 16084.375
+        },
+        {
+          "canonicalisations": 24508.625,
+          "columns": 8162.0,
+          "factor_base_fp_muls": 861251.0,
+          "factor_base_lookups": 24508.625,
+          "la_inversions": 7668.25,
+          "la_mulmods": 51337850.25,
+          "ops": 47260.25,
+          "oracle_fp_muls": 21992337.125,
+          "relations": 8171.0,
+          "step_draws": 79012.0,
+          "trials": 47241.25
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        258935564,
+        4179917678736
+      ],
+      "n_e": 16222,
+      "p": 16001,
+      "r": 8111,
+      "rho_dps": 13.359375,
+      "rho_ops": 1103.65625,
+      "rho_steps": 132.125,
+      "seed": 1083,
+      "solve_wall_s_bookkeeping": 11.843153567,
+      "target_pull_matches": [
+        true,
+        null
+      ],
+      "transfer_pull_ops": [
+        4,
+        2
+      ],
+      "transfer_wall_s": 10.805595028
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        38,
+        33
+      ],
+      "ic": [
+        {
+          "canonicalisations": 32111.75,
+          "columns": 16048.0,
+          "factor_base_fp_muls": 1746848.0,
+          "factor_base_lookups": 32111.75,
+          "la_inversions": 13446.125,
+          "la_mulmods": 7735305.125,
+          "ops": 32043.0,
+          "oracle_fp_muls": 1684097.0,
+          "relations": 16057.0,
+          "step_draws": 64084.625,
+          "trials": 32033.0
+        },
+        {
+          "canonicalisations": 48416.25,
+          "columns": 16131.0,
+          "factor_base_fp_muls": 1815593.0,
+          "factor_base_lookups": 48416.25,
+          "la_inversions": 15157.5,
+          "la_mulmods": 320044393.0,
+          "ops": 95382.25,
+          "oracle_fp_muls": 46070996.25,
+          "relations": 16140.0,
+          "step_draws": 159253.375,
+          "trials": 95372.25
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        1027167904,
+        33040065384768
+      ],
+      "n_e": 32236,
+      "p": 32003,
+      "r": 8059,
+      "rho_dps": 15.75,
+      "rho_ops": 1237.625,
+      "rho_steps": 185.90625,
+      "seed": 1099,
+      "solve_wall_s_bookkeeping": 67.566032594,
+      "target_pull_matches": [
+        null,
+        true
+      ],
+      "transfer_pull_ops": [
+        2,
+        4
+      ],
+      "transfer_wall_s": 71.943458995
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        43,
+        36
+      ],
+      "ic": [
+        {
+          "canonicalisations": 32312.375,
+          "columns": 16148.0,
+          "factor_base_fp_muls": 1752748.0,
+          "factor_base_lookups": 32312.375,
+          "la_inversions": 13560.125,
+          "la_mulmods": 7727850.375,
+          "ops": 32052.5,
+          "oracle_fp_muls": 1690459.125,
+          "relations": 16157.0,
+          "step_draws": 64186.875,
+          "trials": 32033.5
+        },
+        {
+          "canonicalisations": 47869.25,
+          "columns": 15949.0,
+          "factor_base_fp_muls": 1804855.0,
+          "factor_base_lookups": 47869.25,
+          "la_inversions": 14981.0,
+          "la_mulmods": 307974335.125,
+          "ops": 96237.0,
+          "oracle_fp_muls": 46326872.0,
+          "relations": 15958.0,
+          "step_draws": 160334.125,
+          "trials": 96218.0
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        1033622356,
+        32667354510848
+      ],
+      "n_e": 32138,
+      "p": 32003,
+      "r": 16069,
+      "rho_dps": 11.515625,
+      "rho_ops": 1227.96875,
+      "rho_steps": 279.234375,
+      "seed": 1116,
+      "solve_wall_s_bookkeeping": 63.543590832,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 68.673065532
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        33,
+        35
+      ],
+      "ic": [
+        {
+          "canonicalisations": 31931.875,
+          "columns": 15958.0,
+          "factor_base_fp_muls": 1741538.0,
+          "factor_base_lookups": 31931.875,
+          "la_inversions": 13415.25,
+          "la_mulmods": 7596545.875,
+          "ops": 31915.875,
+          "oracle_fp_muls": 1675579.5,
+          "relations": 15967.0,
+          "step_draws": 63790.375,
+          "trials": 31896.875
+        },
+        {
+          "canonicalisations": 48307.625,
+          "columns": 16095.0,
+          "factor_base_fp_muls": 1813627.0,
+          "factor_base_lookups": 48307.625,
+          "la_inversions": 15141.625,
+          "la_mulmods": 324032801.75,
+          "ops": 95096.25,
+          "oracle_fp_muls": 45916233.25,
+          "relations": 16104.0,
+          "step_draws": 158777.875,
+          "trials": 95077.25
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        1021417884,
+        32968343642896
+      ],
+      "n_e": 32114,
+      "p": 32003,
+      "r": 16057,
+      "rho_dps": 11.609375,
+      "rho_ops": 1193.515625,
+      "rho_steps": 244.578125,
+      "seed": 1133,
+      "solve_wall_s_bookkeeping": 61.686668501,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 33.58001109
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        35,
+        40
+      ],
+      "ic": [
+        {
+          "canonicalisations": 64082.25,
+          "columns": 32033.0,
+          "factor_base_fp_muls": 3778303.0,
+          "factor_base_lookups": 64082.25,
+          "la_inversions": 26880.375,
+          "la_mulmods": 15349677.75,
+          "ops": 63991.875,
+          "oracle_fp_muls": 3650051.625,
+          "relations": 32042.0,
+          "step_draws": 128023.75,
+          "trials": 63971.875
+        },
+        {
+          "canonicalisations": 96226.375,
+          "columns": 32068.0,
+          "factor_base_fp_muls": 3908385.0,
+          "factor_base_lookups": 96226.375,
+          "la_inversions": 30111.375,
+          "la_mulmods": 2238577965.0,
+          "ops": 191718.375,
+          "oracle_fp_muls": 101330302.125,
+          "relations": 32077.0,
+          "step_draws": 319724.625,
+          "trials": 191698.375
+        }
+      ],
+      "instance": 0,
+      "jac_order": [
+        4100729088,
+        262752854008016
+      ],
+      "n_e": 63946,
+      "p": 64007,
+      "r": 31973,
+      "rho_dps": 15.21875,
+      "rho_ops": 1460.0,
+      "rho_steps": 328.4375,
+      "seed": 1199,
+      "solve_wall_s_bookkeeping": 529.127387113,
+      "target_pull_matches": [
+        null,
+        null
+      ],
+      "transfer_pull_ops": [
+        2,
+        2
+      ],
+      "transfer_wall_s": 264.620665635
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        36,
+        35
+      ],
+      "ic": [
+        {
+          "canonicalisations": 63773.875,
+          "columns": 31879.0,
+          "factor_base_fp_muls": 3768447.0,
+          "factor_base_lookups": 63773.875,
+          "la_inversions": 26764.25,
+          "la_mulmods": 15234920.875,
+          "ops": 63938.125,
+          "oracle_fp_muls": 3638332.5,
+          "relations": 31888.0,
+          "step_draws": 127789.125,
+          "trials": 63919.125
+        },
+        {
+          "canonicalisations": 95254.5,
+          "columns": 31744.0,
+          "factor_base_fp_muls": 3887821.0,
+          "factor_base_lookups": 95254.5,
+          "la_inversions": 29819.75,
+          "la_mulmods": 2094843796.375,
+          "ops": 194254.25,
+          "oracle_fp_muls": 102315763.25,
+          "relations": 31753.0,
+          "step_draws": 323206.5,
+          "trials": 194235.25
+        }
+      ],
+      "instance": 1,
+      "jac_order": [
+        4081032928,
+        260114023513296
+      ],
+      "n_e": 63814,
+      "p": 64007,
+      "r": 31907,
+      "rho_dps": 15.484375,
+      "rho_ops": 1427.0,
+      "rho_steps": 288.4375,
+      "seed": 1216,
+      "solve_wall_s_bookkeeping": 463.253100704,
+      "target_pull_matches": [
+        null,
+        true
+      ],
+      "transfer_pull_ops": [
+        2,
+        4
+      ],
+      "transfer_wall_s": 264.801487548
+    },
+    {
+      "all_recovered": true,
+      "certified_solves": 80,
+      "hom_checks": [
+        41,
+        35
+      ],
+      "ic": [
+        {
+          "canonicalisations": 63935.375,
+          "columns": 31960.0,
+          "factor_base_fp_muls": 3773631.0,
+          "factor_base_lookups": 63935.375,
+          "la_inversions": 26794.0,
+          "la_mulmods": 15318546.375,
+          "ops": 64128.5,
+          "oracle_fp_muls": 3648128.125,
+          "relations": 31969.0,
+          "step_draws": 128151.5,
+          "trials": 64107.5
+        },
+        {
+          "canonicalisations": 95755.375,
+          "columns": 31911.0,
+          "factor_base_fp_muls": 3898509.0,
+          "factor_base_lookups": 95755.375,
+          "la_inversions": 29940.0,
+          "la_mulmods": 2191544810.125,
+          "ops": 192850.0,
+          "oracle_fp_muls": 101758963.5,
+          "relations": 31920.0,
+          "step_draws": 321252.25,
+          "trials": 192829.0
+        }
+      ],
+      "instance": 2,
+      "jac_order": [
+        4091295952,
+        261471074958144
+      ],
+      "n_e": 64276,
+      "p": 64007,
+      "r": 16069,
+      "rho_dps": 11.9375,
+      "rho_ops": 1190.171875,
+      "rho_steps": 230.484375,
+      "seed": 1233,
+      "solve_wall_s_bookkeeping": 456.752889472,
+      "target_pull_matches": [
+        null,
+        true
+      ],
+      "transfer_pull_ops": [
+        2,
+        4
+      ],
+      "transfer_wall_s": 269.327119416
+    }
+  ],
+  "parameters": {
+    "ic_params": "fb_size=max, large_primes=false, extra_relations=8, branches=64, d_step_in=4, max_trials=5e6",
+    "instances": 3,
+    "min_r": "p/4",
+    "note": "operation counts only; wall seconds are bookkeeping, not cost claims; transfer columns are one-time and in no total",
+    "primes": [
+      251,
+      503,
+      1009,
+      2003,
+      4001,
+      8009,
+      16001,
+      32003,
+      64007
+    ],
+    "rho_seeds": 64,
+    "seeds": 8,
+    "weights_gae_per_native_op": [
+      0.0,
+      0.1,
+      1.0
+    ]
+  },
+  "rows": [
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 277.79166666666663,
+          "columns": 131.0,
+          "factor_base_fp_muls": 8817.0,
+          "factor_base_lookups": 277.79166666666663,
+          "la_inversions": 121.91666666666666,
+          "la_mulmods": 33677.791666666664,
+          "ops": 278.625,
+          "oracle_fp_muls": 8865.666666666666,
+          "relations": 140.0,
+          "step_draws": 534.0,
+          "trials": 270.625
+        },
+        {
+          "canonicalisations": 422.91666666666663,
+          "columns": 133.66666666666666,
+          "factor_base_fp_muls": 9349.666666666666,
+          "factor_base_lookups": 422.91666666666663,
+          "la_inversions": 131.04166666666666,
+          "la_mulmods": 87075.04166666666,
+          "ops": 766.6666666666666,
+          "oracle_fp_muls": 225527.875,
+          "relations": 142.66666666666666,
+          "step_draws": 1262.0416666666665,
+          "trials": 758.6666666666665
+        }
+      ],
+      "ic3_over_ic2": 2.751607596829669,
+      "instances": 3,
+      "p": 251,
+      "r_mean": 107.0,
+      "ratio_all": [
+        [
+          0.670275146594497,
+          13.253713774102277,
+          121.32273221822352
+        ],
+        [
+          1.8443341853355384,
+          79.45259225360282,
+          745.96740754911
+        ]
+      ],
+      "ratio_la": [
+        [
+          0.670275146594497,
+          8.77198416278254,
+          81.68736530847491
+        ],
+        [
+          1.8443341853355384,
+          22.79157018994637,
+          211.31669423144388
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          27.833506763787724,
+          364.2609781477628,
+          3392.108220603538
+        ],
+        [
+          76.58688865764829,
+          946.4312174817896,
+          8775.030176899063
+        ]
+      ],
+      "rho_dps": 9.921875,
+      "rho_ops": 415.6875,
+      "rho_seeds": 64,
+      "rho_steps": 10.010416666666666,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.6666666666666665,
+        2.6666666666666665
+      ],
+      "transfer_wall_s_mean": 0.09241335333333334,
+      "trials_per_relation": [
+        1.9330357142857142,
+        5.317757009345794
+      ],
+      "verdict_all": [
+        "unresolved (order changes inside the band)",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "unresolved (order changes inside the band)",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 528.6666666666666,
+          "columns": 256.3333333333333,
+          "factor_base_fp_muls": 19812.333333333332,
+          "factor_base_lookups": 528.6666666666666,
+          "la_inversions": 229.75,
+          "la_mulmods": 101670.875,
+          "ops": 531.5416666666666,
+          "oracle_fp_muls": 19381.75,
+          "relations": 265.3333333333333,
+          "step_draws": 1029.3333333333333,
+          "trials": 521.5416666666666
+        },
+        {
+          "canonicalisations": 762.0,
+          "columns": 246.66666666666666,
+          "factor_base_fp_muls": 20359.666666666664,
+          "factor_base_lookups": 762.0,
+          "la_inversions": 236.70833333333331,
+          "la_mulmods": 167804.5,
+          "ops": 1648.083333333333,
+          "oracle_fp_muls": 551148.8333333333,
+          "relations": 255.66666666666666,
+          "step_draws": 2684.75,
+          "trials": 1638.0833333333333
+        }
+      ],
+      "ic3_over_ic2": 3.100572234851454,
+      "instances": 3,
+      "p": 503,
+      "r_mean": 259.6666666666667,
+      "ratio_all": [
+        [
+          1.0170106328912096,
+          28.218951010676363,
+          257.34345563410494
+        ],
+        [
+          3.1533149308911894,
+          144.46881368379482,
+          1334.7825632799238
+        ]
+      ],
+      "ratio_la": [
+        [
+          1.0170106328912096,
+          20.469927951449446,
+          195.54618381847354
+        ],
+        [
+          3.1533149308911894,
+          35.25972755084754,
+          324.21744113045474
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          20.1612011062821,
+          405.7954958514422,
+          3876.5041485578827
+        ],
+        [
+          62.5112603713947,
+          698.9882259976295,
+          6427.280916633742
+        ]
+      ],
+      "rho_dps": 9.432291666666666,
+      "rho_ops": 522.6510416666666,
+      "rho_seeds": 64,
+      "rho_steps": 26.364583333333332,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.0,
+        2.0
+      ],
+      "transfer_wall_s_mean": 0.12160922766666667,
+      "trials_per_relation": [
+        1.9656092964824121,
+        6.407105606258148
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 1009.7083333333333,
+          "columns": 496.66666666666663,
+          "factor_base_fp_muls": 37186.33333333333,
+          "factor_base_lookups": 1009.7083333333333,
+          "la_inversions": 432.875,
+          "la_mulmods": 242500.5833333333,
+          "ops": 1033.4166666666665,
+          "oracle_fp_muls": 35549.166666666664,
+          "relations": 505.66666666666663,
+          "step_draws": 2015.4166666666665,
+          "trials": 1023.4166666666666
+        },
+        {
+          "canonicalisations": 1524.6249999999998,
+          "columns": 500.66666666666663,
+          "factor_base_fp_muls": 39351.0,
+          "factor_base_lookups": 1524.6249999999998,
+          "la_inversions": 478.625,
+          "la_mulmods": 310794.25,
+          "ops": 3137.1666666666665,
+          "oracle_fp_muls": 1104740.3333333333,
+          "relations": 509.66666666666663,
+          "step_draws": 5175.833333333333,
+          "trials": 3127.1666666666665
+        }
+      ],
+      "ic3_over_ic2": 3.0357229255705187,
+      "instances": 3,
+      "p": 1009,
+      "r_mean": 409.0,
+      "ratio_all": [
+        [
+          1.6734363403279129,
+          53.061076021178444,
+          484.4325013176422
+        ],
+        [
+          5.080089062816274,
+          240.34882975097824,
+          2215.302585725411
+        ]
+      ],
+      "ratio_la": [
+        [
+          1.6734363403279129,
+          40.94213615815398,
+          394.3604345185885
+        ],
+        [
+          5.080089062816274,
+          55.40774576614264,
+          508.35665609608
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          31.17297721916732,
+          762.6751296150826,
+          7346.194501178318
+        ],
+        [
+          94.63252160251375,
+          1032.142278083268,
+          9469.730086410056
+        ]
+      ],
+      "rho_dps": 11.395833333333334,
+      "rho_ops": 617.5416666666666,
+      "rho_seeds": 64,
+      "rho_steps": 33.151041666666664,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        3.3333333333333335,
+        2.0
+      ],
+      "transfer_wall_s_mean": 0.27976638433333334,
+      "trials_per_relation": [
+        2.0238958470665787,
+        6.13570961412688
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 2070.25,
+          "columns": 1027.0,
+          "factor_base_fp_muls": 90285.0,
+          "factor_base_lookups": 2070.25,
+          "la_inversions": 877.4583333333333,
+          "la_mulmods": 520039.0,
+          "ops": 2023.75,
+          "oracle_fp_muls": 86941.20833333333,
+          "relations": 1036.0,
+          "step_draws": 4036.291666666666,
+          "trials": 2013.0833333333333
+        },
+        {
+          "canonicalisations": 3048.9166666666665,
+          "columns": 1008.9999999999999,
+          "factor_base_fp_muls": 93403.0,
+          "factor_base_lookups": 3048.9166666666665,
+          "la_inversions": 952.8749999999999,
+          "la_mulmods": 754157.5833333333,
+          "ops": 6024.958333333333,
+          "oracle_fp_muls": 2338641.458333333,
+          "relations": 1017.9999999999999,
+          "step_draws": 10026.5,
+          "trials": 6014.291666666666
+        }
+      ],
+      "ic3_over_ic2": 2.9771257978175827,
+      "instances": 3,
+      "p": 2003,
+      "r_mean": 1010.3333333333334,
+      "ratio_all": [
+        [
+          2.835273085482871,
+          100.84787758781604,
+          907.5505551996582
+        ],
+        [
+          8.440964646648911,
+          452.9857604602457,
+          4111.856769165064
+        ]
+      ],
+      "ratio_la": [
+        [
+          2.835273085482871,
+          75.69271990951877,
+          731.4097413258419
+        ],
+        [
+          8.440964646648911,
+          114.09841730818344,
+          1065.0154912619942
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          35.51087552549808,
+          948.0267592761835,
+          9160.669713032352
+        ],
+        [
+          105.72034363004934,
+          1429.0456589288976,
+          13338.973496618533
+        ]
+      ],
+      "rho_dps": 9.734375,
+      "rho_ops": 713.7760416666666,
+      "rho_seeds": 64,
+      "rho_steps": 56.989583333333336,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.6666666666666665,
+        3.3333333333333335
+      ],
+      "transfer_wall_s_mean": 0.427339012,
+      "trials_per_relation": [
+        1.9431306306306306,
+        5.907948592010478
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 4140.291666666666,
+          "columns": 2062.0,
+          "factor_base_fp_muls": 181302.3333333333,
+          "factor_base_lookups": 4140.291666666666,
+          "la_inversions": 1742.5833333333333,
+          "la_mulmods": 1017398.2083333333,
+          "ops": 4047.875,
+          "oracle_fp_muls": 174226.5,
+          "relations": 2071.0,
+          "step_draws": 8121.999999999999,
+          "trials": 4038.208333333333
+        },
+        {
+          "canonicalisations": 6150.333333333333,
+          "columns": 2042.6666666666665,
+          "factor_base_fp_muls": 187609.3333333333,
+          "factor_base_lookups": 6150.333333333333,
+          "la_inversions": 1927.875,
+          "la_mulmods": 2376467.75,
+          "ops": 11815.416666666666,
+          "oracle_fp_muls": 4838240.958333333,
+          "relations": 2051.6666666666665,
+          "step_draws": 19781.208333333332,
+          "trials": 11805.75
+        }
+      ],
+      "ic3_over_ic2": 2.9189183625153112,
+      "instances": 3,
+      "p": 4001,
+      "r_mean": 1017.6666666666666,
+      "ratio_all": [
+        [
+          5.621723279902784,
+          196.71493853234844,
+          1750.65883260243
+        ],
+        [
+          16.409351310688038,
+          1038.0905027701058,
+          9346.261909585835
+        ]
+      ],
+      "ratio_la": [
+        [
+          5.621723279902784,
+          146.9188530756322,
+          1418.5930212371968
+        ],
+        [
+          16.409351310688038,
+          346.4552167119959,
+          3316.868005323766
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          60.07977736549165,
+          1570.1327767470625,
+          15160.609771181198
+        ],
+        [
+          175.36796536796535,
+          3702.592826221398,
+          35447.61657390228
+        ]
+      ],
+      "rho_dps": 9.494791666666666,
+      "rho_ops": 720.0416666666666,
+      "rho_seeds": 64,
+      "rho_steps": 67.375,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.6666666666666665,
+        2.6666666666666665
+      ],
+      "transfer_wall_s_mean": 1.3990583040000002,
+      "trials_per_relation": [
+        1.949883309190407,
+        5.754224207961007
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 8004.666666666666,
+          "columns": 3994.333333333333,
+          "factor_base_fp_muls": 390772.3333333333,
+          "factor_base_lookups": 8004.666666666666,
+          "la_inversions": 3358.333333333333,
+          "la_mulmods": 1952941.7916666665,
+          "ops": 8054.208333333332,
+          "oracle_fp_muls": 375822.4166666666,
+          "relations": 4003.333333333333,
+          "step_draws": 16066.958333333332,
+          "trials": 8040.208333333333
+        },
+        {
+          "canonicalisations": 11898.75,
+          "columns": 3958.6666666666665,
+          "factor_base_fp_muls": 404911.6666666666,
+          "factor_base_lookups": 11898.75,
+          "la_inversions": 3721.2916666666665,
+          "la_mulmods": 9268815.958333332,
+          "ops": 24401.458333333332,
+          "oracle_fp_muls": 10815826.041666666,
+          "relations": 3967.6666666666665,
+          "step_draws": 40553.416666666664,
+          "trials": 24387.458333333332
+        }
+      ],
+      "ic3_over_ic2": 3.0296532351100103,
+      "instances": 3,
+      "p": 8009,
+      "r_mean": 3322.3333333333335,
+      "ratio_all": [
+        [
+          8.404802408813474,
+          292.31357670849155,
+          2568.6631933684534
+        ],
+        [
+          25.463636808322143,
+          2144.444898566241,
+          19134.205763867365
+        ]
+      ],
+      "ratio_la": [
+        [
+          8.404802408813474,
+          212.2000010870097,
+          2046.3567891907753
+        ],
+        [
+          25.463636808322143,
+          992.6917425308845,
+          9697.744694033947
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          76.48291211236953,
+          1931.0000692418023,
+          18621.654483406695
+        ],
+        [
+          231.71670211187495,
+          9033.401572778079,
+          88248.56540877391
+        ]
+      ],
+      "rho_dps": 12.072916666666666,
+      "rho_ops": 958.2864583333334,
+      "rho_seeds": 64,
+      "rho_steps": 105.30729166666667,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.0,
+        2.6666666666666665
+      ],
+      "transfer_wall_s_mean": 4.391018395,
+      "trials_per_relation": [
+        2.0083784346378017,
+        6.146549189280013
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 15996.5,
+          "columns": 7990.333333333333,
+          "factor_base_fp_muls": 819435.3333333333,
+          "factor_base_lookups": 15996.5,
+          "la_inversions": 6716.041666666666,
+          "la_mulmods": 3838200.4166666665,
+          "ops": 16047.916666666666,
+          "oracle_fp_muls": 788387.4583333333,
+          "relations": 7999.333333333333,
+          "step_draws": 32057.458333333332,
+          "trials": 16032.583333333332
+        },
+        {
+          "canonicalisations": 24057.416666666664,
+          "columns": 8011.666666666666,
+          "factor_base_fp_muls": 853173.3333333333,
+          "factor_base_lookups": 24057.416666666664,
+          "la_inversions": 7531.708333333333,
+          "la_mulmods": 48760065.33333333,
+          "ops": 47918.20833333333,
+          "oracle_fp_muls": 22197466.625,
+          "relations": 8020.666666666666,
+          "step_draws": 79855.54166666666,
+          "trials": 47902.875
+        }
+      ],
+      "ic3_over_ic2": 2.985945735427755,
+      "instances": 3,
+      "p": 16001,
+      "r_mean": 6671.666666666667,
+      "ratio_all": [
+        [
+          15.044113841541714,
+          525.3935739235928,
+          4590.693436587094
+        ],
+        [
+          44.920907568441145,
+          6702.489356789864,
+          59734.80195675097
+        ]
+      ],
+      "ratio_la": [
+        [
+          15.044113841541714,
+          374.85607706617327,
+          3613.1637460878565
+        ],
+        [
+          44.920907568441145,
+          4615.9315193031625,
+          45755.02702491565
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          127.80289518437098,
+          3184.480816292671,
+          30694.582106267368
+        ],
+        [
+          381.6125098510929,
+          39213.30417686341,
+          388698.5291799743
+        ]
+      ],
+      "rho_dps": 12.9375,
+      "rho_ops": 1066.7239583333333,
+      "rho_seeds": 64,
+      "rho_steps": 125.56770833333333,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        4.0,
+        2.6666666666666665
+      ],
+      "transfer_wall_s_mean": 11.263271403,
+      "trials_per_relation": [
+        2.0042399366613886,
+        5.972430595960436
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 32118.666666666664,
+          "columns": 16051.333333333332,
+          "factor_base_fp_muls": 1747044.6666666665,
+          "factor_base_lookups": 32118.666666666664,
+          "la_inversions": 13473.833333333332,
+          "la_mulmods": 7686567.124999999,
+          "ops": 32003.791666666664,
+          "oracle_fp_muls": 1683378.5416666665,
+          "relations": 16060.333333333332,
+          "step_draws": 64020.625,
+          "trials": 31987.791666666664
+        },
+        {
+          "canonicalisations": 48197.70833333333,
+          "columns": 16058.333333333332,
+          "factor_base_fp_muls": 1811358.3333333333,
+          "factor_base_lookups": 48197.70833333333,
+          "la_inversions": 15093.375,
+          "la_mulmods": 317350509.9583333,
+          "ops": 95571.83333333333,
+          "oracle_fp_muls": 46104700.5,
+          "relations": 16067.333333333332,
+          "step_draws": 159455.125,
+          "trials": 95555.83333333333
+        }
+      ],
+      "ic3_over_ic2": 2.986265950258498,
+      "instances": 3,
+      "p": 32003,
+      "r_mean": 13395.0,
+      "ratio_all": [
+        [
+          26.239001123053338,
+          930.2777406747175,
+          7684.7684132537825
+        ],
+        [
+          78.35663562256867,
+          29445.33730029208,
+          248859.60386113793
+        ]
+      ],
+      "ratio_la": [
+        [
+          26.239001123053338,
+          656.4388397108244,
+          6328.237387000764
+        ],
+        [
+          78.35663562256867,
+          26097.024904455062,
+          260265.03932394748
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          135.28087710800932,
+          3384.4132094579713,
+          32626.604200607635
+        ],
+        [
+          403.98467702875257,
+          134548.8878340892,
+          1341853.0162476331
+        ]
+      ],
+      "rho_dps": 12.958333333333334,
+      "rho_ops": 1219.703125,
+      "rho_seeds": 64,
+      "rho_steps": 236.57291666666666,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.0,
+        2.6666666666666665
+      ],
+      "transfer_wall_s_mean": 58.06551187233333,
+      "trials_per_relation": [
+        1.9917265104501773,
+        5.947211733952948
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    },
+    {
+      "all_recovered": true,
+      "g_factorial": [
+        2.0,
+        6.0
+      ],
+      "ic": [
+        {
+          "canonicalisations": 63930.49999999999,
+          "columns": 31957.333333333332,
+          "factor_base_fp_muls": 3773460.333333333,
+          "factor_base_lookups": 63930.49999999999,
+          "la_inversions": 26812.874999999996,
+          "la_mulmods": 15301048.333333332,
+          "ops": 64019.49999999999,
+          "oracle_fp_muls": 3645504.083333333,
+          "relations": 31966.333333333332,
+          "step_draws": 127988.125,
+          "trials": 63999.49999999999
+        },
+        {
+          "canonicalisations": 95745.41666666666,
+          "columns": 31907.666666666664,
+          "factor_base_fp_muls": 3898238.333333333,
+          "factor_base_lookups": 95745.41666666666,
+          "la_inversions": 29957.041666666664,
+          "la_mulmods": 2174988857.1666665,
+          "ops": 192940.875,
+          "oracle_fp_muls": 101801676.29166666,
+          "relations": 31916.666666666664,
+          "step_draws": 321394.4583333333,
+          "trials": 192920.875
+        }
+      ],
+      "ic3_over_ic2": 3.013782909894642,
+      "instances": 3,
+      "p": 64007,
+      "r_mean": 26649.666666666668,
+      "ratio_all": [
+        [
+          47.10581400250633,
+          1702.4887925441142,
+          13931.485459218176
+        ],
+        [
+          141.96669719742928,
+          164407.11699214278,
+          1377901.5176518324
+        ]
+      ],
+      "ratio_la": [
+        [
+          47.10581400250633,
+          1172.9633056001594,
+          11305.680729979036
+        ],
+        [
+          141.96669719742928,
+          160178.55018069356,
+          1600507.8015321586
+        ]
+      ],
+      "ratio_la_vs_walk": [
+        [
+          226.6553078497538,
+          5643.854474378123,
+          54398.646973133444
+        ],
+        [
+          683.0898932344969,
+          770718.4213014697,
+          7701036.4039755855
+        ]
+      ],
+      "rho_dps": 14.213541666666666,
+      "rho_ops": 1359.0572916666667,
+      "rho_seeds": 64,
+      "rho_steps": 282.453125,
+      "seeds": 8,
+      "transfer_pull_ops_mean": [
+        2.0,
+        3.3333333333333335
+      ],
+      "transfer_wall_s_mean": 266.24975753300004,
+      "trials_per_relation": [
+        2.0020907413007434,
+        6.044518276762402
+      ],
+      "verdict_all": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ],
+      "verdict_la": [
+        "above rho at every weight",
+        "above rho at every weight"
+      ]
+    }
+  ]
+}

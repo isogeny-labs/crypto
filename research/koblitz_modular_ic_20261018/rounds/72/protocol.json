@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R72-RATIONAL-FIBER-RAMIFICATION",
+  "version":1,
+  "goal":"split both complete rational fibers into primitive local factors and obtain exact ramification indices",
+  "claims":[{"id":"rational_local_lengths72","class":"exact_computation","statement":"Complete idempotent enumeration in both rank32 fibers determines each primitive local length and ramification index"}],
+  "arms":{"reference":"R70 normal rank32 order; R71 complete residue profiles","candidate":"all 528 products, fixed-subspace idempotent enumeration and local multiplication-operator ranks","positive":["all 32 square slots and 528 product slots","both R71 image and branch dimensions","Frobenius square identity on stable images","all nonzero fixed vectors idempotent","complete Boolean order test","primitive orthogonality and unit sum","local rank sum32 and even local ranks"],"negative":[],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"complete deterministic fibers"}},
+  "variables":{"fixed":["both rational omitted fibers","complete rank32 normal order","full 528-product table","1200sec/4GiB","one Singular/FLINT thread","one math job"],"measured":["primitive idempotents","local ranks","ramification indices","exit/errors/UTC/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"complete two-fiber cohort","seeds":[72]},
+  "blinding":{"method":"none","reason":"exact algebra"},
+  "sample_size":{"instances":2,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["all primitive idempotents","all local multiplication ranks","all ramification indices","rank and degree sums"],
+  "execution":{"launcher":"REPLAY_CAS.sh rational-local72-01 RATIONAL_LOCAL72.sing RATIONAL_LOCAL72_ALL_CHECKS_PASS","backend":"original manually authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":72,"CPU_affinity":"not pinned","queue":"one math job at a time; R71 terminal and published","source_gate":"copied source/protocol/driver bytes match Git; all donor hashes","checkpoint":"existing checkpoint gate; immutable raw copies"},
+  "stopping":{"accept":"exit0/exact marker/no whitespace-question-mark errors and every assertion","failure":"retain raw attempt; freeze repair before fresh ID"},
+  "analysis":{"method":"finite-algebra idempotent enumeration and multiplication-rank decomposition","scope":"local factor lengths and ramification over z=0,z=1 only; no valuations or infinity"}
+}

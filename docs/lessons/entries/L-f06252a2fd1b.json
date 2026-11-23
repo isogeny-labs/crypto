@@ -1,0 +1,15 @@
+{
+  "action": "rate the verdict undetermined unless an upper bound or a fully charged ratio is below the threshold; check that the arm deciding it is the rule's subject (e.g. 'external solvers'), the margin against each scope choice (rho setup in or out, walk-only, A_rho*t_GA), and that the threshold text sits inside the hashed protocol object",
+  "created": "2026-11-17T08:41:10Z",
+  "evidence": [
+    "research/groebner_solver_shootout_20261116/analysis-local/out/summary.unblinded.json",
+    "research/groebner_solver_shootout_20261116/AMENDMENT1.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "a report says a preregistered abandon or kill threshold was 'not triggered' using a ratio it labels an IC lower bound (phases uncharged)",
+  "why": "GB shootout amendment-1: 2^19.54 vs 2^20 decided by in-house inherited-f4 while the rule concerns external solvers (msolve 2^26.6, CMS 2^28.8 flagged true); walk-only rho gives 2^20.48; the 2^20 text is only in unhashed AMENDMENT1.md"
+}

@@ -1,0 +1,8 @@
+| control | tier | class | binding roof | A single [low, high] | A full | raw par. eff. | norm. par. eff. | score | grade | A/A noise | other CPU (cores) | limiting factor |
+|:--|:--|:--|:--|:--|--:|--:|--:|--:|:--|--:|--:|:--|
+| positive-simd-incache | T-timing | modmuladd_p31 | compute | 0.996 [0.939, 1.083] | 0.640 | 0.507 | 0.643 | 0.996 | A | 0.096 | 2.98 | none above threshold: near the roofline; what remains is the algorithmic axis |
+| scalar-incache | T-timing | modmuladd_p31 | compute | 0.316 [0.277, 0.344] | 0.313 | 0.782 | 0.991 | 0.316 | C | 0.163 | 1.11 | core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 2.9x its scalar ceiling) |
+| serial-dependency | T-timing | modmuladd_p31 | compute | 0.073 [0.069, 0.080] | 0.074 | 0.797 | 1.010 | 0.073 | E | 0.094 | 1.01 | core bound / not vectorized (static vector share 0.00 in the named symbols; the class's SIMD ceiling is 2.9x its scalar ceiling) |
+| stream-daxpy | T-timing | fma_f64 | memory | 0.979 [0.885, 1.020] | 0.931 | 0.796 | 0.951 | 0.979 | A | 0.112 | 1.24 | at the memory-bandwidth roof: only higher arithmetic intensity (blocking, packing, fewer bytes per operation) or a different algorithm helps |
+| pointer-chase | T-timing | ptr_hop | memory | 0.021 [0.020, 0.022] | 0.012 | 0.481 | 0.574 | 0.021 | E | 0.094 | 2.99 | memory latency bound: the rate matches one outstanding dependent miss at a time (latency attainment 1.06); far below the bandwidth roof |
+| aa-repeat | T-timing | modmuladd_p31 | compute | 1.018 [0.963, 1.122] | 0.625 | 0.485 | 0.614 | 1.018 | A | 0.106 | 2.69 | none above threshold: near the roofline; what remains is the algorithmic axis |

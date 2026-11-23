@@ -1,0 +1,296 @@
+[
+  {
+    "theorem": "OrientationGradedNode.Graded.mono",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem mono {k l : \u2124} {P : \u211a[X]} (h : Graded k P) (hl : l \u2264 k) : Graded l P",
+    "decl_sha256": "5b318720c8bfba43bdfb9dcea4c89283c90fecba8c728822637bf97960238516",
+    "claim_id": "PCC-20261114-b32845"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.C",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem C {k : \u2124} {q : \u211a} (h : VBound k q) : Graded k (C q)",
+    "decl_sha256": "0a8a808b0a629719f853c9f7790f3adbaa13867ae61565ae60baf45e06480b7e",
+    "claim_id": "PCC-20261114-3b1fb7"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.one",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem one : Graded 0 (1:\u211a[X])",
+    "decl_sha256": "c22813dcd1e20ad26215a7d4c8ad4077aea9c49948fcb1991b076794381ef271",
+    "claim_id": "PCC-20261114-f9882d"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.X",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem X : Graded (-1) (X:\u211a[X])",
+    "decl_sha256": "5e1ad01342fbc679ad2732ba97825452db48c5d8633000380cdbe8d50a60f351",
+    "claim_id": "PCC-20261114-632f66"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.add",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem add {k : \u2124} {P Q : \u211a[X]} (hP : Graded k P) (hQ : Graded k Q) : Graded k (P+Q)",
+    "decl_sha256": "34f6818d33adf7916f860da1134c9ed5265458f782a7db4421c77f8dc7038a7d",
+    "claim_id": "PCC-20261114-633d14"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.mul",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem mul {k l : \u2124} {P Q : \u211a[X]} (hP : Graded k P) (hQ : Graded l Q) : Graded (k+l) (P*Q)",
+    "decl_sha256": "c005ed1dc570bdc832ebc97df5fd7ba9dc76b451b71801162082934b32acf84f",
+    "claim_id": "PCC-20261114-2f8e84"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.pow",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem pow {k : \u2124} {P : \u211a[X]} (h : Graded k P) (n : \u2115) : Graded ((n:\u2124)*k) (P^n)",
+    "decl_sha256": "917d0f556c6f039bcf3b4e9e111ad4132ca77bb58a0730e5c039f5abe6670ae2",
+    "claim_id": "PCC-20261114-1f390a"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.prod",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem prod {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 \u211a[X]) (k : \u03b9 \u2192 \u2124) (h : \u2200 j \u2208 S, Graded (k j) (P j)) : Graded (\u2211 j \u2208 S, k j) (\u220f j \u2208 S, P j)",
+    "decl_sha256": "affe9d547168b4b09a2be965c479f56f030487c0a6bf97921728a86e9a04e339",
+    "claim_id": "PCC-20261114-4a8b7b"
+  },
+  {
+    "theorem": "OrientationGradedNode.Graded.sum",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem sum {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 \u211a[X]) (k : \u2124) (h : \u2200 j \u2208 S, Graded k (P j)) : Graded k (\u2211 j \u2208 S, P j)",
+    "decl_sha256": "13c3bcbf9da8f09e5238c0fe9236a653f577b5d6863074a6a06273660476fcfb",
+    "claim_id": "PCC-20261114-fe043c"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_factor_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_factor_graded (a i j : \u2115) (t : \u2124) (d : \u211a) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hia : i<a) : Graded ((if j=i then (i:\u2124)+1 else min (i:\u2124) j)-padicValRat 2 ((2:\u211a)^j-d)) (chart a t (factor d j))",
+    "decl_sha256": "4de7738a3310456aad859ccc94d6b93c4c72117ac10e370c0880f3d9956f5233",
+    "claim_id": "PCC-20261114-b1f337"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_correction_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_correction_graded (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hia : i<a) : Graded (gain u x y i (chartOrder u x y) m) (chart a t (correction u x y m))",
+    "decl_sha256": "6fd02433043bff5f34b851a9485daa1fdb50808236d4f7eef6e754d55e54a049",
+    "claim_id": "PCC-20261114-554f5b"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_crossing_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_crossing_graded (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hia : i<a) (hiu : i<u) (hc : x.testBit i=y.testBit i) : Graded (schedule u i m) (chart a t (correction u x y m))",
+    "decl_sha256": "f94e19a0890a7210a8f4ad967f127e02af8665e63a467df819cc4c3f373c323a",
+    "claim_id": "PCC-20261114-ad0bbe"
+  },
+  {
+    "theorem": "OrientationGradedNode.indexed_base_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem indexed_base_graded (a i : \u2115) (m s : Nodes a) (hsm : s \u2260 m) (hv : padicValRat 2 (node a m-node a s) \u2264 (i:\u2124)) : Graded ((a:\u2124)-i) ((base (grid a) (node a s)).comp (C (node a m)+C ((2:\u211a)^(a+1))*X))",
+    "decl_sha256": "c5205952a341368484fe73462e46a1b040b781488594ed387df552f2fd83916a",
+    "claim_id": "PCC-20261114-c0b313"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_displacement_ne_node",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_displacement_ne_node (x y i : \u2115) (t : \u2124) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : delta x y \u2260 (t:\u211a)",
+    "decl_sha256": "fab1d3a5837765cbdb47c86cafd70b104177ab8de2e135b9b18e2bf0e7a3b961",
+    "claim_id": "PCC-20261114-2e4baa"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_denominator_le",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_denominator_le (x y i : \u2115) (t : \u2124) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : padicValRat 2 ((t:\u211a)-delta x y) \u2264 (i:\u2124)",
+    "decl_sha256": "5460d478af2497bee4e62734e03381d5eb0aa9917a7c2fd074f6f8277bd848b1",
+    "claim_id": "PCC-20261114-9f9673"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_base_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_base_graded (a i x y : \u2115) (t : \u2124) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : Graded ((a:\u2124)-i) (chart a t (base (grid a) (delta x y)))",
+    "decl_sha256": "0ef58bd2164fee5a3561bb10cb011539321316611f03779110776151d199b4ec",
+    "claim_id": "PCC-20261114-4f1b6c"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_completed_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_completed_graded (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) : Graded (jetWeight a u i m-1) (chart a t (completed (grid a) u x y m))",
+    "decl_sha256": "39d3dce6c04fc6dccc3877c86f85344d37b4427123b92985b1f1b2d5679f71d7",
+    "claim_id": "PCC-20261114-be578d"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_normalized_graded",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_normalized_graded (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) : Graded (-1) (normalizedNodeEntry a u i x y t m)",
+    "decl_sha256": "31df59df6fa04d993437db0797dcc8ea35e367a13a274aeda5325a5e555bde17",
+    "claim_id": "PCC-20261114-53a64f"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_coefficient_weight",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_coefficient_weight (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) (n : \u2115) : VBound (n:\u2124) ((normalizedNodeEntry a u i x y t m).coeff (n+1))",
+    "decl_sha256": "79bd46be9faa5ecdfc273954cfb40d5c0ef7dd9dc1051646449be4593dec943c",
+    "claim_id": "PCC-20261114-75d18d"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_constant",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_constant (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : (normalizedNodeEntry a u i x y t m).coeff 0=0",
+    "decl_sha256": "6e74e55f06e07939afb69d158042370a4d19ff4511c76025ca1f0e151ac1aade",
+    "claim_id": "PCC-20261114-e81c01"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_first",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_first (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : (normalizedNodeEntry a u i x y t m).coeff 1= (chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m",
+    "decl_sha256": "9e8d6c961fa2cbc1da225e1581cebda3c3d22b2a21c4395ddb501f599b0938e6",
+    "claim_id": "PCC-20261114-83c3e0"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_leading_entry",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_leading_entry (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) : Content 1 (normalizedNodeEntry a u i x y t m- C ((chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m)*X)",
+    "decl_sha256": "e8543dae28bf5437f8356ebdb5d31798cb4850d505fe3709afb02e66a234412d",
+    "claim_id": "PCC-20261114-bc2295"
+  },
+  {
+    "theorem": "OrientationGradedNode.positive_anchor_member",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem positive_anchor_member (a i : \u2115) (hi : i<a) : (2:\u211a)^i \u2208 grid a",
+    "decl_sha256": "a8b7ae79ea96c1bea4a118041731a5a6cc1502f1de9dc7eac39a1553e93ef21e",
+    "claim_id": "PCC-20261114-535255"
+  },
+  {
+    "theorem": "OrientationGradedNode.positive_anchor_correction_zero",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem positive_anchor_correction_zero (u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hi : i<u) (hc : x.testBit i=y.testBit i) (hm : 0 < m i) : (correction u x y m).eval ((2:\u211a)^i)=0",
+    "decl_sha256": "33608cd86b190bc464c0b1a0aaa10c98e7d53a486cea340f28f286d615d134a0",
+    "claim_id": "PCC-20261114-1ad384"
+  },
+  {
+    "theorem": "OrientationGradedNode.positive_anchor_first_zero",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem positive_anchor_first_zero (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hi : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) (hm : 0 < m i) : (chart a ((2:\u2124)^i) (completed (grid a) u x y m)).coeff 1=0",
+    "decl_sha256": "52434f3a58568a764b5267d987e8edc3f16cfd9e37e27e510ec77560dadb2849",
+    "claim_id": "PCC-20261114-c74b5e"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_correction_comparison",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_correction_comparison (u v x z y : \u2115) (T : \u211a) (m : \u2115 \u2192 \u2115) (hu : u\u2264v) (h : x % 2^v=z % 2^v) : (correction u x y m).eval T = (correction u z y m).eval T*correctionRatio u x z y m",
+    "decl_sha256": "4a1bf87f268e8f446016e0d60f28c3c0eb7ceafc458cc73e6341ca008baaf9f5",
+    "claim_id": "PCC-20261114-16e7e2"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_base_ratio_near",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_base_ratio_near (u v i x z y : \u2115) (t : \u2124) (hiu : i<u) (h : x % 2^v=z % 2^v) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : NearOne ((v:\u2124)-u+1) (((t:\u211a)-delta z y)/((t:\u211a)-delta x y))",
+    "decl_sha256": "c15b3658d34edbb4c18c0d237a505eb34b440083dc695a528ab75fa045fe5af3",
+    "claim_id": "PCC-20261114-eb4d77"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_comparison_near",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_comparison_near (u v i x z y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (huv : u\u2264v) (h : x % 2^v=z % 2^v) (ht : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : NearOne ((v:\u2124)-u+1) (nodeComparisonRatio u x z y t m)",
+    "decl_sha256": "3da1eb8f3ae8098685f0eea53be98aa964f343701a23bdacbfd3d3d8551b0d97",
+    "claim_id": "PCC-20261114-44e063"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_jet_comparison",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_jet_comparison (a u v i x z y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hz : z<2^a) (hy : y<2^a) (hiu : i<u) (huv : u\u2264v) (hva : v\u2264a) (h : x % 2^v=z % 2^v) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : (chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m = ((chart a t (completed (grid a) u z y m)).coeff 1/diagonalJet a u i m)* nodeComparisonRatio u x z y t m",
+    "decl_sha256": "2dd4a3395826a53b27fe6f6d6f74391ead69d9d840f62690dc1852f23e44cb83",
+    "claim_id": "PCC-20261114-108dee"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_first_integral",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_first_integral (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u\u2264a) (hc : x.testBit i=y.testBit i) : VBound 0 ((chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m)",
+    "decl_sha256": "19261156c61ecc283efee9acf2d9065f834aeaf0855814f2daedc6d7b453fe20",
+    "claim_id": "PCC-20261114-368add"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_precision_comparison",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_precision_comparison (a u v i x z y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hz : z<2^a) (hy : y<2^a) (hiu : i<u) (huv : u\u2264v) (hva : v\u2264a) (h : x % 2^v=z % 2^v) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : VBound ((v:\u2124)-u+1) ((chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m- (chart a t (completed (grid a) u z y m)).coeff 1/diagonalJet a u i m)",
+    "decl_sha256": "bffcb43cae845ca24336598694207c24e958a21d17cd14fda391dc26ad271c75",
+    "claim_id": "PCC-20261114-538559"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_right_integral",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_right_integral (a u v i : \u2115) (hva : v\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (huv : u\u2264v) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (r : Labels v) (y : Ports a) : VBound 0 (nodeRight a u v i hva t m r y)",
+    "decl_sha256": "3fb5a876989d0d6cebea06d5aaf1c9937a9ae18f408962e983b0fed67433d372",
+    "claim_id": "PCC-20261114-4c0558"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_product",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_product (a u v i : \u2115) (hva : v\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (leftFactor a v*nodeRight a u v i hva t m) x y = nodeCrossingFirst a u i t m (representative a v hva \u27e8x.val % 2^v,Nat.mod_lt _ (",
+    "decl_sha256": "238cc187faeba781e2e50b73da7e880767be3a7b7541122d09f0110ac0f3a4d4",
+    "claim_id": "PCC-20261114-856cd1"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_precision_factorization",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_precision_factorization (a u v i : \u2115) (hva : v\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (huv : u\u2264v) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (x y : Ports a) : VBound ((v:\u2124)-u+1) (nodeCrossingFirst a u i t m x y-(leftFactor a v*nodeRight a u v i hva t m) x y)",
+    "decl_sha256": "523f5caae6e44eb86246c000a3e7959b6e54f7fa82840469140ca3ed249feaaa",
+    "claim_id": "PCC-20261114-b2f99f"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_full_row_factorization",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_full_row_factorization (a u i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (leftFactor a a*nodeRight a u a i le_rfl t m) x y=nodeCrossingFirst a u i t m x y",
+    "decl_sha256": "fed0bb03affb750cec3e292bfbc6fb633a977d0ac89ca04392c965d032e9c589",
+    "claim_id": "PCC-20261114-0f2ba8"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_poly_product",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_poly_product (a u i : \u2115) (hua : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (chartLeft a u*nodePolyRight a u i hua t m) x y = C ((leftFactor a u*nodeRight a u u i hua t m) x y)*X",
+    "decl_sha256": "6a67ced0356dc0228dea460ff8f8de8356827b7d0f32d944122d9cf4aacd0441",
+    "claim_id": "PCC-20261114-95546e"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_poly_right_integral",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_poly_right_integral (a u i : \u2115) (hua : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (r : Labels u) (y : Ports a) : Content 0 (nodePolyRight a u i hua t m r y)",
+    "decl_sha256": "71bdf24cda63678b3a3b4ac27b51478efc0c1571393b5a02834c893c388dca87",
+    "claim_id": "PCC-20261114-010e1f"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_chart_to_first",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_chart_to_first (a u i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (hua : u\u2264a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (x y : Ports a) : Content 1 (nodePolynomialMatrix a u i t m x y-C (nodeCrossingFirst a u i t m x y)*X)",
+    "decl_sha256": "b3c400a05ca05c5f7dc533dbe6e474a257b17cd0df04c7dbf35fa60c356430fd",
+    "claim_id": "PCC-20261114-4495ef"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_chart_factorization",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_chart_factorization (a u i : \u2115) (hua : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (x y : Ports a) : Content 1 (nodePolynomialMatrix a u i t m x y-(chartLeft a u*nodePolyRight a u i hua t m) x y)",
+    "decl_sha256": "5a7a67eca4bf61e9767eea26f925b302fe28e65e96ac63b50a1449006642f9e9",
+    "claim_id": "PCC-20261114-64b8cc"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_crossing_scale",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_crossing_scale (a u i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hia : i\u2264a) (x y : Ports a) : nodeCrossingPolynomial a u i t m x y=C (diagonalJet a u i m)*nodePolynomialMatrix a u i t m x y",
+    "decl_sha256": "34147e2f8974514b1f6fd6b7db7dfbc3c2bb30b27f9b0bae3b2e32f2a7662549",
+    "claim_id": "PCC-20261114-3ddaba"
+  },
+  {
+    "theorem": "OrientationGradedNode.node_weighted_product",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem node_weighted_product (a u i : \u2115) (hua : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (chartWeightedLeft a u i m*nodePolyRight a u i hua t m) x y= C (diagonalJet a u i m)*(chartLeft a u*nodePolyRight a u i hua t m) x y",
+    "decl_sha256": "a347c0fc974cccf8a301d3c00ad8d75ad79dcbb6b55ffb49adef89a7d8690843",
+    "claim_id": "PCC-20261114-86e9ba"
+  },
+  {
+    "theorem": "OrientationGradedNode.actual_node_weighted_chart_factorization",
+    "source": "research/prime_orientation_layers_20261114/nodes/lean/OrientationNode.lean",
+    "statement": "theorem actual_node_weighted_chart_factorization (a u i : \u2115) (hua : u\u2264a) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (x y : Ports a) : Content (jetWeight a u i m+1) (nodeCrossingPolynomial a u i t m x y-(chartWeightedLeft a u i m*nodePolyRight a u i hua t m) x y)",
+    "decl_sha256": "eac739bf96b4c25a5211e17672760b96ff27dd8c236cfa07a17ed08ba6376bbd",
+    "claim_id": "PCC-20261114-28bc8e"
+  }
+]

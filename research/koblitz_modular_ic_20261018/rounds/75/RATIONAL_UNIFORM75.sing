@@ -1,0 +1,88 @@
+LIB "linalg.lib";
+proc require75(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump75(link out,string name,matrix M){
+ int x;int y;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(x=1;x<=nrows(M);x++){for(y=1;y<=ncols(M);y++){if(M[x,y]!=0){write(out,name+"["+string(x)+","+string(y)+"]="+string(M[x,y])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+execute(read("../../../72/runs/rational-local72-01/rational-local72.sing"));
+matrix savedIdems075=allIdempotents0_72;matrix savedIdems175=allIdempotents1_72;
+intmat masks075[2][1];intmat ranks075[2][1];intmat masks175[4][1];intmat ranks175[4][1];
+masks075[1,1]=primitiveMask0_1_72;masks075[2,1]=primitiveMask0_2_72;
+ranks075[1,1]=primitiveRank0_1_72;ranks075[2,1]=primitiveRank0_2_72;
+masks175[1,1]=primitiveMask1_1_72;masks175[2,1]=primitiveMask1_2_72;
+masks175[3,1]=primitiveMask1_3_72;masks175[4,1]=primitiveMask1_4_72;
+ranks175[1,1]=primitiveRank1_1_72;ranks175[2,1]=primitiveRank1_2_72;
+ranks175[3,1]=primitiveRank1_3_72;ranks175[4,1]=primitiveRank1_4_72;
+require75(masks075[1,1]==1 && masks075[2,1]==3 && ranks075[1,1]==28 && ranks075[2,1]==4,"RAT75_R72_ZERO_PROFILE");
+require75(masks175[1,1]==6 && masks175[2,1]==7 && masks175[3,1]==8 && masks175[4,1]==10 && ranks175[1,1]==2 && ranks175[2,1]==14 && ranks175[3,1]==2 && ranks175[4,1]==14,"RAT75_R72_ONE_PROFILE");
+execute(read("../../../52/source-data/rr-table50.sing"));
+map idemsToTable75=rationalLocal72,u;map unitToTable75=tracePolynomial61,u;
+matrix idems075=idemsToTable75(savedIdems075);matrix idems175=idemsToTable75(savedIdems175);
+matrix sourceUnit75=unitToTable75(unit61);
+intmat slots75[32][32];int p75;int i75;int j75;int k75;int x75;int y75;int f75;int b75;int mask75;int expected75;int e75;int branchCount75;int first75;int success75;int powerStep75;int ramified75=0;int unramified75=0;int candidate75=0;
+for(p75=1;p75<=528;p75++){
+ x75=parents50[p75,1];y75=parents50[p75,2];
+ require75(x75>=1 && x75<=y75 && y75<=32 && slots75[x75,y75]==0,"RAT75_UNIQUE_SOURCE_PAIR");
+ slots75[x75,y75]=p75;slots75[y75,x75]=p75;
+}
+for(i75=1;i75<=32;i75++){for(j75=1;j75<=32;j75++){require75(slots75[i75,j75]>0,"RAT75_ALL_SOURCE_PAIRS");}}
+matrix fiberTable75[32][528];matrix S75[32][32];matrix F475[32][32];matrix unitFiber75[32][1];
+matrix idempotent75[32][1];matrix operatorE75[32][32];matrix operatorT75[32][32];
+matrix yVector75[32][1];matrix tVector75[32][1];matrix power75[32][1];matrix penultimate75[32][1];
+matrix uniformizers075[32][2];matrix uniformizers175[32][4];
+link out75="ASCII:w rational-uniform75.sing";open(out75);write(out75,"ring rationalUniform75=2,(u),dp;short=0;");
+for(f75=0;f75<=1;f75++){
+ branchCount75=4;if(f75==0){branchCount75=2;}
+ for(p75=1;p75<=528;p75++){for(i75=1;i75<=32;i75++){fiberTable75[i75,p75]=subst(table50[i75,p75],u,f75);}}
+ for(i75=1;i75<=32;i75++){
+  unitFiber75[i75,1]=subst(sourceUnit75[i75,1],u,f75);
+  for(j75=1;j75<=32;j75++){S75[i75,j75]=fiberTable75[i75,slots75[j75,j75]];}
+ }
+ F475=S75*S75;
+ require75(S75*unitFiber75==unitFiber75 && F475*unitFiber75==unitFiber75,"RAT75_SOURCE_UNIT_FROBENIUS");
+ for(b75=1;b75<=branchCount75;b75++){
+  if(f75==0){mask75=masks075[b75,1];expected75=ranks075[b75,1];for(i75=1;i75<=32;i75++){idempotent75[i75,1]=idems075[i75,mask75];}}
+  else{mask75=masks175[b75,1];expected75=ranks175[b75,1];for(i75=1;i75<=32;i75++){idempotent75[i75,1]=idems175[i75,mask75];}}
+  operatorE75=matrix(0,32,32);
+  for(j75=1;j75<=32;j75++){for(i75=1;i75<=32;i75++){
+   if(idempotent75[i75,1]!=0){for(k75=1;k75<=32;k75++){operatorE75[k75,j75]=operatorE75[k75,j75]+idempotent75[i75,1]*fiberTable75[k75,slots75[i75,j75]];}}
+  }}
+  require75(operatorE75*operatorE75==operatorE75 && operatorE75*unitFiber75==idempotent75 && mat_rk(operatorE75)==expected75,"RAT75_REBOUND_PRIMITIVE_LOCAL_OPERATOR");
+  require75(expected75==2*(expected75 div 2),"RAT75_RESIDUE_DEGREE_TWO");e75=expected75 div 2;
+  if(e75==1){unramified75++;print("RAT75_FACTOR fiber="+string(f75)+" mask="+string(mask75)+" e=1 residue_degree=2 parameter=base_prime");}
+  else{
+   first75=0;success75=0;ramified75++;
+   for(j75=1;j75<=32;j75++){
+    candidate75++;for(i75=1;i75<=32;i75++){yVector75[i75,1]=operatorE75[i75,j75];}
+    tVector75=F475*yVector75+yVector75;
+    require75(operatorE75*tVector75==tVector75,"RAT75_CANDIDATE_IN_PROJECTED_FACTOR");
+    operatorT75=matrix(0,32,32);
+    for(y75=1;y75<=32;y75++){for(i75=1;i75<=32;i75++){
+     if(tVector75[i75,1]!=0){for(k75=1;k75<=32;k75++){operatorT75[k75,y75]=operatorT75[k75,y75]+tVector75[i75,1]*fiberTable75[k75,slots75[i75,y75]];}}
+    }}
+    power75=idempotent75;
+    for(powerStep75=1;powerStep75<=e75;powerStep75++){
+     power75=operatorT75*power75;
+     if(powerStep75==e75-1){penultimate75=power75;}
+    }
+    require75(power75==matrix(0,32,1),"RAT75_ALL_CANDIDATES_NILPOTENT_AT_E");
+    if(penultimate75!=matrix(0,32,1)){
+     success75++;if(first75==0){first75=j75;
+      for(i75=1;i75<=32;i75++){
+       if(f75==0){uniformizers075[i75,b75]=tVector75[i75,1];}
+       else{uniformizers175[i75,b75]=tVector75[i75,1];}
+      }
+     }
+    }
+   }
+   require75(first75>=1 && success75>=1,"RAT75_VALUATION_ONE_CANDIDATE_FOUND");
+   write(out75,"int first"+string(f75)+"_"+string(b75)+"_75="+string(first75)+";int successes"+string(f75)+"_"+string(b75)+"_75="+string(success75)+";");
+   print("RAT75_FACTOR fiber="+string(f75)+" mask="+string(mask75)+" e="+string(e75)+" residue_degree=2 first_basis="+string(first75)+" successes="+string(success75)+" candidates=32");
+  }
+ }
+}
+require75(ramified75==4 && unramified75==2 && candidate75==128,"RAT75_COMPLETE_SIX_BRANCH_COHORT");
+dump75(out75,"uniformizers0_75",uniformizers075);dump75(out75,"uniformizers1_75",uniformizers175);close(out75);
+print("RAT75_RESULT branches=6 ramified=4 unramified=2 candidates=128 all_nilpotency_checks=1");
+print("RATIONAL_UNIFORM75_ALL_CHECKS_PASS");quit;

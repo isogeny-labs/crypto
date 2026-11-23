@@ -1,0 +1,7 @@
+# Changed input-admission assumption, not an unchanged retry
+
+Core direct/Gaussian/support proof is unchanged from ../two_candidate_20261115_v1/PROOF.md. The failed frozen controls used GF8 A0/B1 and requested a curve target with abscissa outside V containing0and1. Such a target DOES NOT EXIST. E0 overF2 has four points; its Frobenius trace is−1. The power sums areS2=−3,S3=5, hence #E0(F8)=9−5=4. Its fourF2points already supply allF8points, with finite x0and1. Therefore the original next(generator) raises StopIteration, recorded as an empty error string. This is an input-admission failure, not evidence against the two-candidate algebra.
+
+This NEW variant changes GF8 to A1/B1, keeping odd/even field arithmetic, all RHS, domain/batch rules, direct candidate code and complete raw-r/s/source-index comparisons unchanged. E1 has #E1(F2)=2, trace1, S3=−5 and #E1(F8)=14, with seven distinct finite abscissas; neither size2 nor size4 prefix source domain contains them all. GF4 andGF16 cases remain unchanged. Every cell for each fixed selected target is retained. No prior source, pin, raw record or manifest is edited.
+
+The source coverage remains old affine-rank≤1. No novelty, original auxiliary completion, speed or global claim. The90s/4GiB/one-core/deadline/serialization contract remains identical. This repair controls experiment needs fresh source/input hashes, independent review and a NEW experiment ID; it must never overwrite the failed raw-controls file.

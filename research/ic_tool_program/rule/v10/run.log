@@ -1,0 +1,1070 @@
+== 20:26:32 v10 manifest
+{
+ "repository_commit": "9d492639ce31d5ffa6cb033e5a7fef145682d3e7",
+ "tree_status": "",
+ "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+ "cargo_lock_sha256": "cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6",
+ "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+ "cpu_flags_relevant": [
+  "pclmulqdq",
+  "popcnt",
+  "avx2",
+  "bmi2",
+  "avx512f",
+  "avx512dq",
+  "avx512ifma",
+  "avx512cd",
+  "avx512bw",
+  "avx512vl",
+  "avx512_bf16",
+  "avx512vbmi",
+  "avx512_vbmi2",
+  "gfni",
+  "vpclmulqdq",
+  "avx512_vnni",
+  "avx512_bitalg",
+  "avx512_vpopcntdq",
+  "avx512_fp16"
+ ],
+ "logical_cores": 4,
+ "memory": "MemTotal:       16472084 kB",
+ "transparent_hugepage": {
+  "enabled": "always [madvise] never",
+  "defrag": "always defer defer+madvise [madvise] never"
+ },
+ "os": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39",
+ "arch": "x86_64",
+ "glibc": "glibc 2.39",
+ "binaries": {
+  "ic": {
+   "path_basename": "ic-v10",
+   "sha256": "deffa5b10297b4f2253f148f71d46e83e3481f8c5500e3501fed893dae764e9c",
+   "built_from": "f67d6c481b100af831215ccd80676cf47cd57283"
+  }
+ },
+ "isolation_tool": {
+  "path": "src/bin/isolated_bench.rs",
+  "binary_sha256": "2f56b833615c124624ba27192e4a0beeb43c34da71aa9742ea190aa72adb0a4e"
+ },
+ "pinning": "isolated_bench run --wait --cpus 2 with RAYON_NUM_THREADS=1, after PSI some avg10 falls below 4.0; the tool's defaults (settle 2 s, other processes at most 0.10 CPUs, PSI at most 5); pins untimed under taskset -c 2",
+ "smt_siblings": {
+  "0": "0",
+  "1": "1",
+  "2": "2",
+  "3": "3"
+ },
+ "uptime": "20:26:33 up  1:07,  0 user,  load average: 1.02, 2.39, 2.59",
+ "hardware_class": "one x86-64 cloud container; no claim for Arm64, GPUs or other hosts",
+ "runner": "icprog (native)",
+ "note": "the host the rule's comparison ran on, at its start"
+}
+   exit 0
+== 20:26:33 v10 pin
+   exit 0
+== 20:26:48 v10c manifest
+{
+ "repository_commit": "9d492639ce31d5ffa6cb033e5a7fef145682d3e7",
+ "tree_status": "?? research/ic_tool_program/rule/v10/runs/",
+ "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+ "cargo_lock_sha256": "cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6",
+ "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+ "cpu_flags_relevant": [
+  "pclmulqdq",
+  "popcnt",
+  "avx2",
+  "bmi2",
+  "avx512f",
+  "avx512dq",
+  "avx512ifma",
+  "avx512cd",
+  "avx512bw",
+  "avx512vl",
+  "avx512_bf16",
+  "avx512vbmi",
+  "avx512_vbmi2",
+  "gfni",
+  "vpclmulqdq",
+  "avx512_vnni",
+  "avx512_bitalg",
+  "avx512_vpopcntdq",
+  "avx512_fp16"
+ ],
+ "logical_cores": 4,
+ "memory": "MemTotal:       16472084 kB",
+ "transparent_hugepage": {
+  "enabled": "always [madvise] never",
+  "defrag": "always defer defer+madvise [madvise] never"
+ },
+ "os": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39",
+ "arch": "x86_64",
+ "glibc": "glibc 2.39",
+ "binaries": {
+  "ic": {
+   "path_basename": "ic-v10c",
+   "sha256": "07cd65586868f4aa559d11283f1cb53086cacf5526b19f5093d30356f7e619da",
+   "built_from": "ca1a767b1fc006966e0c56fc15110ceb79f10342"
+  }
+ },
+ "isolation_tool": {
+  "path": "src/bin/isolated_bench.rs",
+  "binary_sha256": "2f56b833615c124624ba27192e4a0beeb43c34da71aa9742ea190aa72adb0a4e"
+ },
+ "pinning": "isolated_bench run --wait --cpus 2 with RAYON_NUM_THREADS=1, after PSI some avg10 falls below 4.0; the tool's defaults (settle 2 s, other processes at most 0.10 CPUs, PSI at most 5); pins untimed under taskset -c 2",
+ "smt_siblings": {
+  "0": "0",
+  "1": "1",
+  "2": "2",
+  "3": "3"
+ },
+ "uptime": "20:26:49 up  1:07,  0 user,  load average: 1.01, 2.32, 2.56",
+ "hardware_class": "one x86-64 cloud container; no claim for Arm64, GPUs or other hosts",
+ "runner": "icprog (native)",
+ "note": "the host the rule's comparison ran on, at its start"
+}
+   exit 0
+== 20:26:49 v10c pin
+   exit 0
+== 20:27:05 v10 size 1,47
+icv1-f2m47-t22705043-f4e44623: T01-R1 online speedup 17.82
+icv1-f2m47-t22705043-f4e44623: T02-R1 online speedup 29.84
+icv1-f2m47-t22705043-f4e44623: T03-R1 online speedup 10.56
+icv1-f2m47-t22705043-f4e44623: T04-R1 online speedup 160.17
+icv1-f2m47-t22705043-f4e44623: T05-R1 online speedup 28.79
+icv1-f2m47-t22705043-f4e44623: T06-R1 online speedup 36.68
+icv1-f2m47-t22705043-f4e44623: T07-R1 online speedup 44.87
+icv1-f2m47-t22705043-f4e44623: T08-R1 online speedup 18.95
+icv1-f2m47-t22705043-f4e44623: T09-R1 online speedup 3.25
+icv1-f2m47-t22705043-f4e44623: T10-R1 online speedup 145.21
+icv1-f2m47-t22705043-f4e44623: T11-R1 online speedup 30.46
+icv1-f2m47-t22705043-f4e44623: T12-R1 online speedup 136.86
+icv1-f2m47-t22705043-f4e44623: T13-R1 online speedup 3.77
+icv1-f2m47-t22705043-f4e44623: T14-R1 online speedup 11.01
+icv1-f2m47-t22705043-f4e44623: T15-R1 online speedup 18.96
+icv1-f2m47-t22705043-f4e44623: T16-R1 online speedup 11.29
+icv1-f2m47-t22705043-f4e44623: T17-R1 online speedup 3.79
+icv1-f2m47-t22705043-f4e44623: T18-R1 online speedup 9.04
+icv1-f2m47-t22705043-f4e44623: T19-R1 online speedup 12.07
+icv1-f2m47-t22705043-f4e44623: T20-R1 online speedup 3.89
+icv1-f2m47-t22705043-f4e44623: T21-R1 online speedup 20.36
+icv1-f2m47-t22705043-f4e44623: T22-R1 online speedup 3.91
+icv1-f2m47-t22705043-f4e44623: T23-R1 online speedup 18.47
+icv1-f2m47-t22705043-f4e44623: T24-R1 online speedup 177.10
+icv1-f2m47-t22705043-f4e44623: T25-R1 online speedup 43.36
+icv1-f2m47-t22705043-f4e44623: T26-R1 online speedup 20.26
+icv1-f2m47-t22705043-f4e44623: T27-R1 online speedup 4.71
+icv1-f2m47-t22705043-f4e44623: T28-R1 online speedup 47.51
+icv1-f2m47-t22705043-f4e44623: T29-R1 online speedup 7.21
+icv1-f2m47-t22705043-f4e44623: T30-R1 online speedup 7.32
+icv1-f2m47-t22705043-f4e44623: T31-R1 online speedup 123.81
+icv1-f2m47-t22705043-f4e44623: T32-R1 online speedup 11.12
+icv1-f2m47-t22705043-f4e44623: T33-R1 online speedup 169.54
+icv1-f2m47-t22705043-f4e44623: T34-R1 online speedup 19.71
+icv1-f2m47-t22705043-f4e44623: T35-R1 online speedup 4.74
+icv1-f2m47-t22705043-f4e44623: T36-R1 online speedup 30.53
+icv1-f2m47-t22705043-f4e44623: T37-R1 online speedup 6.24
+icv1-f2m47-t22705043-f4e44623: T38-R1 online speedup 87.43
+icv1-f2m47-t22705043-f4e44623: T39-R1 online speedup 22.36
+icv1-f2m47-t22705043-f4e44623: T40-R1 online speedup 9.64
+icv1-f2m47-t22705043-f4e44623: T41-R1 online speedup 34.10
+icv1-f2m47-t22705043-f4e44623: T42-R1 online speedup 2.94
+icv1-f2m47-t22705043-f4e44623: T43-R1 online speedup 104.71
+icv1-f2m47-t22705043-f4e44623: T44-R1 online speedup 5.52
+icv1-f2m47-t22705043-f4e44623: T45-R1 online speedup 70.01
+icv1-f2m47-t22705043-f4e44623: T46-R1 online speedup 54.68
+icv1-f2m47-t22705043-f4e44623: T47-R1 online speedup 3.92
+icv1-f2m47-t22705043-f4e44623: T48-R1 online speedup 25.49
+icv1-f2m47-t22705043-f4e44623: T49-R1 online speedup 3.56
+icv1-f2m47-t22705043-f4e44623: T50-R1 online speedup 14.38
+icv1-f2m47-t22705043-f4e44623: T51-R1 online speedup 14.28
+icv1-f2m47-t22705043-f4e44623: T52-R1 online speedup 20.26
+icv1-f2m47-t22705043-f4e44623: T53-R1 online speedup 10.82
+icv1-f2m47-t22705043-f4e44623: T54-R1 online speedup 16.92
+icv1-f2m47-t22705043-f4e44623: T55-R1 online speedup 4.85
+icv1-f2m47-t22705043-f4e44623: T56-R1 online speedup 6.84
+icv1-f2m47-t22705043-f4e44623: T57-R1 online speedup 14.61
+icv1-f2m47-t22705043-f4e44623: T58-R1 online speedup 53.51
+icv1-f2m47-t22705043-f4e44623: T59-R1 online speedup 7.61
+icv1-f2m47-t22705043-f4e44623: T60-R1 online speedup 46.22
+icv1-f2m47-t22705043-f4e44623: T61-R1 online speedup 77.16
+icv1-f2m47-t22705043-f4e44623: T62-R1 online speedup 16.72
+icv1-f2m47-t22705043-f4e44623: T63-R1 online speedup 11.19
+icv1-f2m47-t22705043-f4e44623: T64-R1 online speedup 102.40
+icv1-f2m47-t22705043-f4e44623: T01-R2 online speedup 16.85
+icv1-f2m47-t22705043-f4e44623: T02-R2 online speedup 30.48
+icv1-f2m47-t22705043-f4e44623: T03-R2 online speedup 10.89
+icv1-f2m47-t22705043-f4e44623: T04-R2 online speedup 157.68
+   exit 0
+== 20:46:29 v10c size 1,47
+icv1-f2m47-t22705043-f4e44623: T01-R1 online speedup 17.28
+icv1-f2m47-t22705043-f4e44623: T02-R1 online speedup 28.40
+icv1-f2m47-t22705043-f4e44623: T03-R1 online speedup 10.94
+icv1-f2m47-t22705043-f4e44623: T04-R1 online speedup 159.34
+icv1-f2m47-t22705043-f4e44623: T05-R1 online speedup 29.07
+icv1-f2m47-t22705043-f4e44623: T06-R1 online speedup 36.59
+icv1-f2m47-t22705043-f4e44623: T07-R1 online speedup 41.75
+icv1-f2m47-t22705043-f4e44623: T08-R1 online speedup 18.11
+icv1-f2m47-t22705043-f4e44623: T09-R1 online speedup 3.30
+icv1-f2m47-t22705043-f4e44623: T10-R1 online speedup 140.25
+icv1-f2m47-t22705043-f4e44623: T11-R1 online speedup 31.43
+icv1-f2m47-t22705043-f4e44623: T12-R1 online speedup 131.59
+icv1-f2m47-t22705043-f4e44623: T13-R1 online speedup 3.87
+icv1-f2m47-t22705043-f4e44623: T14-R1 online speedup 10.98
+icv1-f2m47-t22705043-f4e44623: T15-R1 online speedup 18.68
+icv1-f2m47-t22705043-f4e44623: T16-R1 online speedup 10.35
+icv1-f2m47-t22705043-f4e44623: T17-R1 online speedup 4.74
+icv1-f2m47-t22705043-f4e44623: T18-R1 online speedup 9.14
+icv1-f2m47-t22705043-f4e44623: T19-R1 online speedup 11.78
+icv1-f2m47-t22705043-f4e44623: T20-R1 online speedup 4.32
+icv1-f2m47-t22705043-f4e44623: T21-R1 online speedup 20.28
+icv1-f2m47-t22705043-f4e44623: T22-R1 online speedup 4.00
+icv1-f2m47-t22705043-f4e44623: T23-R1 online speedup 18.64
+icv1-f2m47-t22705043-f4e44623: T24-R1 online speedup 171.56
+icv1-f2m47-t22705043-f4e44623: T25-R1 online speedup 39.89
+icv1-f2m47-t22705043-f4e44623: T26-R1 online speedup 19.48
+icv1-f2m47-t22705043-f4e44623: T27-R1 online speedup 4.59
+icv1-f2m47-t22705043-f4e44623: T28-R1 online speedup 49.22
+icv1-f2m47-t22705043-f4e44623: T29-R1 online speedup 7.10
+icv1-f2m47-t22705043-f4e44623: T30-R1 online speedup 7.26
+icv1-f2m47-t22705043-f4e44623: T31-R1 online speedup 133.33
+icv1-f2m47-t22705043-f4e44623: T32-R1 online speedup 10.84
+icv1-f2m47-t22705043-f4e44623: T33-R1 online speedup 176.68
+icv1-f2m47-t22705043-f4e44623: T34-R1 online speedup 18.95
+icv1-f2m47-t22705043-f4e44623: T35-R1 online speedup 4.70
+icv1-f2m47-t22705043-f4e44623: T36-R1 online speedup 33.06
+icv1-f2m47-t22705043-f4e44623: T37-R1 online speedup 6.30
+icv1-f2m47-t22705043-f4e44623: T38-R1 online speedup 86.36
+icv1-f2m47-t22705043-f4e44623: T39-R1 online speedup 22.57
+icv1-f2m47-t22705043-f4e44623: T40-R1 online speedup 9.60
+icv1-f2m47-t22705043-f4e44623: T41-R1 online speedup 34.31
+icv1-f2m47-t22705043-f4e44623: T42-R1 online speedup 2.95
+icv1-f2m47-t22705043-f4e44623: T43-R1 online speedup 104.26
+icv1-f2m47-t22705043-f4e44623: T44-R1 online speedup 5.94
+icv1-f2m47-t22705043-f4e44623: T45-R1 online speedup 67.60
+icv1-f2m47-t22705043-f4e44623: T46-R1 online speedup 57.85
+icv1-f2m47-t22705043-f4e44623: T47-R1 online speedup 3.93
+icv1-f2m47-t22705043-f4e44623: T48-R1 online speedup 23.69
+icv1-f2m47-t22705043-f4e44623: T49-R1 online speedup 3.71
+icv1-f2m47-t22705043-f4e44623: T50-R1 online speedup 13.77
+icv1-f2m47-t22705043-f4e44623: T51-R1 online speedup 12.61
+icv1-f2m47-t22705043-f4e44623: T52-R1 online speedup 19.49
+icv1-f2m47-t22705043-f4e44623: T53-R1 online speedup 11.08
+icv1-f2m47-t22705043-f4e44623: T54-R1 online speedup 15.64
+icv1-f2m47-t22705043-f4e44623: T55-R1 online speedup 4.85
+icv1-f2m47-t22705043-f4e44623: T56-R1 online speedup 6.87
+icv1-f2m47-t22705043-f4e44623: T57-R1 online speedup 14.33
+icv1-f2m47-t22705043-f4e44623: T58-R1 online speedup 53.42
+icv1-f2m47-t22705043-f4e44623: T59-R1 online speedup 7.66
+icv1-f2m47-t22705043-f4e44623: T60-R1 online speedup 44.47
+icv1-f2m47-t22705043-f4e44623: T61-R1 online speedup 75.71
+icv1-f2m47-t22705043-f4e44623: T62-R1 online speedup 17.04
+icv1-f2m47-t22705043-f4e44623: T63-R1 online speedup 10.79
+icv1-f2m47-t22705043-f4e44623: T64-R1 online speedup 109.52
+icv1-f2m47-t22705043-f4e44623: T01-R2 online speedup 17.12
+icv1-f2m47-t22705043-f4e44623: T02-R2 online speedup 28.35
+icv1-f2m47-t22705043-f4e44623: T03-R2 online speedup 10.56
+icv1-f2m47-t22705043-f4e44623: T04-R2 online speedup 154.52
+   exit 0
+== 21:05:25 v10 size 0,57
+icv1-f2m57-tm747311035-c1f545af: T01-R1 online speedup 3.41
+icv1-f2m57-tm747311035-c1f545af: T02-R1 online speedup 6.37
+icv1-f2m57-tm747311035-c1f545af: T03-R1 online speedup 19.47
+icv1-f2m57-tm747311035-c1f545af: T04-R1 online speedup 17.66
+icv1-f2m57-tm747311035-c1f545af: T05-R1 online speedup 39.46
+icv1-f2m57-tm747311035-c1f545af: T06-R1 online speedup 48.35
+icv1-f2m57-tm747311035-c1f545af: T07-R1 online speedup 10.11
+icv1-f2m57-tm747311035-c1f545af: T08-R1 online speedup 4.34
+icv1-f2m57-tm747311035-c1f545af: T09-R1 online speedup 21.12
+icv1-f2m57-tm747311035-c1f545af: T10-R1 online speedup 10.86
+icv1-f2m57-tm747311035-c1f545af: T11-R1 online speedup 31.13
+icv1-f2m57-tm747311035-c1f545af: T12-R1 online speedup 36.42
+icv1-f2m57-tm747311035-c1f545af: T13-R1 online speedup 11.09
+icv1-f2m57-tm747311035-c1f545af: T14-R1 online speedup 16.66
+icv1-f2m57-tm747311035-c1f545af: T15-R1 online speedup 139.85
+icv1-f2m57-tm747311035-c1f545af: T16-R1 online speedup 7.28
+icv1-f2m57-tm747311035-c1f545af: T17-R1 online speedup 13.56
+icv1-f2m57-tm747311035-c1f545af: T18-R1 online speedup 4.09
+icv1-f2m57-tm747311035-c1f545af: T19-R1 online speedup 89.44
+icv1-f2m57-tm747311035-c1f545af: T20-R1 online speedup 56.05
+icv1-f2m57-tm747311035-c1f545af: T21-R1 online speedup 14.08
+icv1-f2m57-tm747311035-c1f545af: T22-R1 online speedup 11.80
+icv1-f2m57-tm747311035-c1f545af: T23-R1 online speedup 12.77
+icv1-f2m57-tm747311035-c1f545af: T24-R1 online speedup 17.52
+icv1-f2m57-tm747311035-c1f545af: T25-R1 online speedup 7.70
+icv1-f2m57-tm747311035-c1f545af: T26-R1 online speedup 66.12
+icv1-f2m57-tm747311035-c1f545af: T27-R1 online speedup 15.47
+icv1-f2m57-tm747311035-c1f545af: T28-R1 online speedup 31.16
+icv1-f2m57-tm747311035-c1f545af: T29-R1 online speedup 38.85
+icv1-f2m57-tm747311035-c1f545af: T30-R1 online speedup 5.59
+icv1-f2m57-tm747311035-c1f545af: T31-R1 online speedup 87.38
+icv1-f2m57-tm747311035-c1f545af: T32-R1 online speedup 11.69
+icv1-f2m57-tm747311035-c1f545af: T33-R1 online speedup 50.85
+icv1-f2m57-tm747311035-c1f545af: T34-R1 online speedup 33.09
+icv1-f2m57-tm747311035-c1f545af: T35-R1 online speedup 17.39
+icv1-f2m57-tm747311035-c1f545af: T36-R1 online speedup 2.49
+icv1-f2m57-tm747311035-c1f545af: T37-R1 online speedup 5.81
+icv1-f2m57-tm747311035-c1f545af: T38-R1 online speedup 81.00
+icv1-f2m57-tm747311035-c1f545af: T39-R1 online speedup 48.16
+icv1-f2m57-tm747311035-c1f545af: T40-R1 online speedup 10.52
+icv1-f2m57-tm747311035-c1f545af: T41-R1 online speedup 34.20
+icv1-f2m57-tm747311035-c1f545af: T42-R1 online speedup 28.46
+icv1-f2m57-tm747311035-c1f545af: T43-R1 online speedup 47.50
+icv1-f2m57-tm747311035-c1f545af: T44-R1 online speedup 2.99
+icv1-f2m57-tm747311035-c1f545af: T45-R1 online speedup 17.00
+icv1-f2m57-tm747311035-c1f545af: T46-R1 online speedup 79.07
+icv1-f2m57-tm747311035-c1f545af: T47-R1 online speedup 14.41
+icv1-f2m57-tm747311035-c1f545af: T48-R1 online speedup 6.48
+icv1-f2m57-tm747311035-c1f545af: T49-R1 online speedup 38.40
+icv1-f2m57-tm747311035-c1f545af: T50-R1 online speedup 53.27
+icv1-f2m57-tm747311035-c1f545af: T51-R1 online speedup 43.88
+icv1-f2m57-tm747311035-c1f545af: T52-R1 online speedup 28.72
+icv1-f2m57-tm747311035-c1f545af: T53-R1 online speedup 7.39
+icv1-f2m57-tm747311035-c1f545af: T54-R1 online speedup 20.69
+icv1-f2m57-tm747311035-c1f545af: T55-R1 online speedup 21.09
+icv1-f2m57-tm747311035-c1f545af: T56-R1 online speedup 116.20
+icv1-f2m57-tm747311035-c1f545af: T57-R1 online speedup 8.35
+icv1-f2m57-tm747311035-c1f545af: T58-R1 online speedup 43.47
+icv1-f2m57-tm747311035-c1f545af: T59-R1 online speedup 15.69
+icv1-f2m57-tm747311035-c1f545af: T60-R1 online speedup 0.82
+icv1-f2m57-tm747311035-c1f545af: T61-R1 online speedup 18.03
+icv1-f2m57-tm747311035-c1f545af: T62-R1 online speedup 12.50
+icv1-f2m57-tm747311035-c1f545af: T63-R1 online speedup 3.17
+icv1-f2m57-tm747311035-c1f545af: T64-R1 online speedup 81.46
+icv1-f2m57-tm747311035-c1f545af: T01-R2 online speedup 3.42
+icv1-f2m57-tm747311035-c1f545af: T02-R2 online speedup 6.21
+icv1-f2m57-tm747311035-c1f545af: T03-R2 online speedup 20.70
+icv1-f2m57-tm747311035-c1f545af: T04-R2 online speedup 19.86
+   exit 0
+== 21:23:26 v10c size 0,57
+icv1-f2m57-tm747311035-c1f545af: T01-R1 online speedup 3.67
+icv1-f2m57-tm747311035-c1f545af: T02-R1 online speedup 6.58
+icv1-f2m57-tm747311035-c1f545af: T03-R1 online speedup 28.16
+icv1-f2m57-tm747311035-c1f545af: T04-R1 online speedup 20.54
+icv1-f2m57-tm747311035-c1f545af: T05-R1 online speedup 43.04
+icv1-f2m57-tm747311035-c1f545af: T06-R1 online speedup 49.14
+icv1-f2m57-tm747311035-c1f545af: T07-R1 online speedup 10.24
+icv1-f2m57-tm747311035-c1f545af: T08-R1 online speedup 4.93
+icv1-f2m57-tm747311035-c1f545af: T09-R1 online speedup 21.76
+icv1-f2m57-tm747311035-c1f545af: T10-R1 online speedup 11.03
+icv1-f2m57-tm747311035-c1f545af: T11-R1 online speedup 30.15
+icv1-f2m57-tm747311035-c1f545af: T12-R1 online speedup 37.55
+icv1-f2m57-tm747311035-c1f545af: T13-R1 online speedup 10.72
+icv1-f2m57-tm747311035-c1f545af: T14-R1 online speedup 17.49
+icv1-f2m57-tm747311035-c1f545af: T15-R1 online speedup 146.09
+icv1-f2m57-tm747311035-c1f545af: T16-R1 online speedup 7.84
+icv1-f2m57-tm747311035-c1f545af: T17-R1 online speedup 14.25
+icv1-f2m57-tm747311035-c1f545af: T18-R1 online speedup 4.32
+icv1-f2m57-tm747311035-c1f545af: T19-R1 online speedup 88.28
+icv1-f2m57-tm747311035-c1f545af: T20-R1 online speedup 57.45
+icv1-f2m57-tm747311035-c1f545af: T21-R1 online speedup 14.60
+icv1-f2m57-tm747311035-c1f545af: T22-R1 online speedup 11.71
+icv1-f2m57-tm747311035-c1f545af: T23-R1 online speedup 13.18
+icv1-f2m57-tm747311035-c1f545af: T24-R1 online speedup 18.10
+icv1-f2m57-tm747311035-c1f545af: T25-R1 online speedup 7.75
+icv1-f2m57-tm747311035-c1f545af: T26-R1 online speedup 65.49
+icv1-f2m57-tm747311035-c1f545af: T27-R1 online speedup 15.83
+icv1-f2m57-tm747311035-c1f545af: T28-R1 online speedup 31.17
+icv1-f2m57-tm747311035-c1f545af: T29-R1 online speedup 37.07
+icv1-f2m57-tm747311035-c1f545af: T30-R1 online speedup 5.90
+icv1-f2m57-tm747311035-c1f545af: T31-R1 online speedup 92.20
+icv1-f2m57-tm747311035-c1f545af: T32-R1 online speedup 12.54
+icv1-f2m57-tm747311035-c1f545af: T33-R1 online speedup 54.07
+icv1-f2m57-tm747311035-c1f545af: T34-R1 online speedup 34.10
+icv1-f2m57-tm747311035-c1f545af: T35-R1 online speedup 18.39
+icv1-f2m57-tm747311035-c1f545af: T36-R1 online speedup 2.54
+icv1-f2m57-tm747311035-c1f545af: T37-R1 online speedup 5.86
+icv1-f2m57-tm747311035-c1f545af: T38-R1 online speedup 80.21
+icv1-f2m57-tm747311035-c1f545af: T39-R1 online speedup 48.39
+icv1-f2m57-tm747311035-c1f545af: T40-R1 online speedup 15.43
+icv1-f2m57-tm747311035-c1f545af: T41-R1 online speedup 43.48
+icv1-f2m57-tm747311035-c1f545af: T42-R1 online speedup 28.35
+icv1-f2m57-tm747311035-c1f545af: T43-R1 online speedup 51.57
+icv1-f2m57-tm747311035-c1f545af: T44-R1 online speedup 3.17
+icv1-f2m57-tm747311035-c1f545af: T45-R1 online speedup 16.63
+icv1-f2m57-tm747311035-c1f545af: T46-R1 online speedup 79.14
+icv1-f2m57-tm747311035-c1f545af: T47-R1 online speedup 14.89
+icv1-f2m57-tm747311035-c1f545af: T48-R1 online speedup 6.14
+icv1-f2m57-tm747311035-c1f545af: T49-R1 online speedup 37.64
+icv1-f2m57-tm747311035-c1f545af: T50-R1 online speedup 51.97
+icv1-f2m57-tm747311035-c1f545af: T51-R1 online speedup 45.87
+icv1-f2m57-tm747311035-c1f545af: T52-R1 online speedup 28.82
+icv1-f2m57-tm747311035-c1f545af: T53-R1 online speedup 7.73
+icv1-f2m57-tm747311035-c1f545af: T54-R1 online speedup 20.07
+icv1-f2m57-tm747311035-c1f545af: T55-R1 online speedup 21.32
+icv1-f2m57-tm747311035-c1f545af: T56-R1 online speedup 93.01
+icv1-f2m57-tm747311035-c1f545af: T57-R1 online speedup 8.17
+icv1-f2m57-tm747311035-c1f545af: T58-R1 online speedup 35.15
+icv1-f2m57-tm747311035-c1f545af: T59-R1 online speedup 16.50
+icv1-f2m57-tm747311035-c1f545af: T60-R1 online speedup 0.87
+icv1-f2m57-tm747311035-c1f545af: T61-R1 online speedup 18.24
+icv1-f2m57-tm747311035-c1f545af: T62-R1 online speedup 12.77
+icv1-f2m57-tm747311035-c1f545af: T63-R1 online speedup 3.26
+icv1-f2m57-tm747311035-c1f545af: T64-R1 online speedup 117.61
+icv1-f2m57-tm747311035-c1f545af: T01-R2 online speedup 3.56
+icv1-f2m57-tm747311035-c1f545af: T02-R2 online speedup 6.67
+icv1-f2m57-tm747311035-c1f545af: T03-R2 online speedup 23.28
+icv1-f2m57-tm747311035-c1f545af: T04-R2 online speedup 19.79
+   exit 0
+== 21:41:33 v10 size 0,41
+icv1-f2m41-tm2308219-7f48b14a: T01-R1 online speedup 9.58
+icv1-f2m41-tm2308219-7f48b14a: T02-R1 online speedup 43.20
+icv1-f2m41-tm2308219-7f48b14a: T03-R1 online speedup 9.86
+icv1-f2m41-tm2308219-7f48b14a: T04-R1 online speedup 22.43
+icv1-f2m41-tm2308219-7f48b14a: T05-R1 online speedup 28.72
+icv1-f2m41-tm2308219-7f48b14a: T06-R1 online speedup 11.05
+icv1-f2m41-tm2308219-7f48b14a: T07-R1 online speedup 14.60
+icv1-f2m41-tm2308219-7f48b14a: T08-R1 online speedup 17.65
+icv1-f2m41-tm2308219-7f48b14a: T09-R1 online speedup 8.01
+icv1-f2m41-tm2308219-7f48b14a: T10-R1 online speedup 36.41
+icv1-f2m41-tm2308219-7f48b14a: T11-R1 online speedup 15.60
+icv1-f2m41-tm2308219-7f48b14a: T12-R1 online speedup 19.31
+icv1-f2m41-tm2308219-7f48b14a: T13-R1 online speedup 6.22
+icv1-f2m41-tm2308219-7f48b14a: T14-R1 online speedup 86.19
+icv1-f2m41-tm2308219-7f48b14a: T15-R1 online speedup 0.95
+icv1-f2m41-tm2308219-7f48b14a: T16-R1 online speedup 16.94
+icv1-f2m41-tm2308219-7f48b14a: T17-R1 online speedup 16.69
+icv1-f2m41-tm2308219-7f48b14a: T18-R1 online speedup 12.62
+icv1-f2m41-tm2308219-7f48b14a: T19-R1 online speedup 23.99
+icv1-f2m41-tm2308219-7f48b14a: T20-R1 online speedup 7.80
+icv1-f2m41-tm2308219-7f48b14a: T21-R1 online speedup 1.58
+icv1-f2m41-tm2308219-7f48b14a: T22-R1 online speedup 10.47
+icv1-f2m41-tm2308219-7f48b14a: T23-R1 online speedup 13.60
+icv1-f2m41-tm2308219-7f48b14a: T24-R1 online speedup 12.48
+icv1-f2m41-tm2308219-7f48b14a: T25-R1 online speedup 7.89
+icv1-f2m41-tm2308219-7f48b14a: T26-R1 online speedup 4.36
+icv1-f2m41-tm2308219-7f48b14a: T27-R1 online speedup 29.06
+icv1-f2m41-tm2308219-7f48b14a: T28-R1 online speedup 8.20
+icv1-f2m41-tm2308219-7f48b14a: T29-R1 online speedup 32.62
+icv1-f2m41-tm2308219-7f48b14a: T30-R1 online speedup 8.89
+icv1-f2m41-tm2308219-7f48b14a: T31-R1 online speedup 27.75
+icv1-f2m41-tm2308219-7f48b14a: T32-R1 online speedup 3.63
+icv1-f2m41-tm2308219-7f48b14a: T33-R1 online speedup 8.47
+icv1-f2m41-tm2308219-7f48b14a: T34-R1 online speedup 219.52
+icv1-f2m41-tm2308219-7f48b14a: T35-R1 online speedup 4.30
+icv1-f2m41-tm2308219-7f48b14a: T36-R1 online speedup 7.63
+icv1-f2m41-tm2308219-7f48b14a: T37-R1 online speedup 3.75
+icv1-f2m41-tm2308219-7f48b14a: T38-R1 online speedup 76.20
+icv1-f2m41-tm2308219-7f48b14a: T39-R1 online speedup 44.80
+icv1-f2m41-tm2308219-7f48b14a: T40-R1 online speedup 17.97
+icv1-f2m41-tm2308219-7f48b14a: T41-R1 online speedup 2.83
+icv1-f2m41-tm2308219-7f48b14a: T42-R1 online speedup 159.34
+icv1-f2m41-tm2308219-7f48b14a: T43-R1 online speedup 14.91
+icv1-f2m41-tm2308219-7f48b14a: T44-R1 online speedup 22.05
+icv1-f2m41-tm2308219-7f48b14a: T45-R1 online speedup 26.05
+icv1-f2m41-tm2308219-7f48b14a: T46-R1 online speedup 1.37
+icv1-f2m41-tm2308219-7f48b14a: T47-R1 online speedup 7.83
+icv1-f2m41-tm2308219-7f48b14a: T48-R1 online speedup 26.09
+icv1-f2m41-tm2308219-7f48b14a: T49-R1 online speedup 4.62
+icv1-f2m41-tm2308219-7f48b14a: T50-R1 online speedup 3.53
+icv1-f2m41-tm2308219-7f48b14a: T51-R1 online speedup 15.83
+icv1-f2m41-tm2308219-7f48b14a: T52-R1 online speedup 102.85
+icv1-f2m41-tm2308219-7f48b14a: T53-R1 online speedup 104.78
+icv1-f2m41-tm2308219-7f48b14a: T54-R1 online speedup 8.36
+icv1-f2m41-tm2308219-7f48b14a: T55-R1 online speedup 2.47
+icv1-f2m41-tm2308219-7f48b14a: T56-R1 online speedup 6.07
+icv1-f2m41-tm2308219-7f48b14a: T57-R1 online speedup 9.67
+icv1-f2m41-tm2308219-7f48b14a: T58-R1 online speedup 7.99
+icv1-f2m41-tm2308219-7f48b14a: T59-R1 online speedup 3.22
+icv1-f2m41-tm2308219-7f48b14a: T60-R1 online speedup 12.72
+icv1-f2m41-tm2308219-7f48b14a: T61-R1 online speedup 19.86
+icv1-f2m41-tm2308219-7f48b14a: T62-R1 online speedup 51.27
+icv1-f2m41-tm2308219-7f48b14a: T63-R1 online speedup 61.88
+icv1-f2m41-tm2308219-7f48b14a: T64-R1 online speedup 10.34
+icv1-f2m41-tm2308219-7f48b14a: T01-R2 online speedup 9.60
+icv1-f2m41-tm2308219-7f48b14a: T02-R2 online speedup 40.36
+icv1-f2m41-tm2308219-7f48b14a: T03-R2 online speedup 9.80
+icv1-f2m41-tm2308219-7f48b14a: T04-R2 online speedup 21.46
+   exit 0
+== 21:50:32 v10c size 0,41
+icv1-f2m41-tm2308219-7f48b14a: T01-R1 online speedup 9.91
+icv1-f2m41-tm2308219-7f48b14a: T02-R1 online speedup 42.04
+icv1-f2m41-tm2308219-7f48b14a: T03-R1 online speedup 8.71
+icv1-f2m41-tm2308219-7f48b14a: T04-R1 online speedup 20.44
+icv1-f2m41-tm2308219-7f48b14a: T05-R1 online speedup 25.40
+icv1-f2m41-tm2308219-7f48b14a: T06-R1 online speedup 12.02
+icv1-f2m41-tm2308219-7f48b14a: T07-R1 online speedup 13.63
+icv1-f2m41-tm2308219-7f48b14a: T08-R1 online speedup 18.78
+icv1-f2m41-tm2308219-7f48b14a: T09-R1 online speedup 9.46
+icv1-f2m41-tm2308219-7f48b14a: T10-R1 online speedup 37.05
+icv1-f2m41-tm2308219-7f48b14a: T11-R1 online speedup 16.33
+icv1-f2m41-tm2308219-7f48b14a: T12-R1 online speedup 24.39
+icv1-f2m41-tm2308219-7f48b14a: T13-R1 online speedup 5.90
+icv1-f2m41-tm2308219-7f48b14a: T14-R1 online speedup 90.17
+icv1-f2m41-tm2308219-7f48b14a: T15-R1 online speedup 0.91
+icv1-f2m41-tm2308219-7f48b14a: T16-R1 online speedup 15.44
+icv1-f2m41-tm2308219-7f48b14a: T17-R1 online speedup 17.29
+icv1-f2m41-tm2308219-7f48b14a: T18-R1 online speedup 12.64
+icv1-f2m41-tm2308219-7f48b14a: T19-R1 online speedup 24.28
+icv1-f2m41-tm2308219-7f48b14a: T20-R1 online speedup 7.72
+icv1-f2m41-tm2308219-7f48b14a: T21-R1 online speedup 1.44
+icv1-f2m41-tm2308219-7f48b14a: T22-R1 online speedup 10.41
+icv1-f2m41-tm2308219-7f48b14a: T23-R1 online speedup 14.21
+icv1-f2m41-tm2308219-7f48b14a: T24-R1 online speedup 12.75
+icv1-f2m41-tm2308219-7f48b14a: T25-R1 online speedup 7.84
+icv1-f2m41-tm2308219-7f48b14a: T26-R1 online speedup 4.54
+icv1-f2m41-tm2308219-7f48b14a: T27-R1 online speedup 28.01
+icv1-f2m41-tm2308219-7f48b14a: T28-R1 online speedup 8.01
+icv1-f2m41-tm2308219-7f48b14a: T29-R1 online speedup 32.39
+icv1-f2m41-tm2308219-7f48b14a: T30-R1 online speedup 9.11
+icv1-f2m41-tm2308219-7f48b14a: T31-R1 online speedup 31.13
+icv1-f2m41-tm2308219-7f48b14a: T32-R1 online speedup 3.33
+icv1-f2m41-tm2308219-7f48b14a: T33-R1 online speedup 8.23
+icv1-f2m41-tm2308219-7f48b14a: T34-R1 online speedup 225.39
+icv1-f2m41-tm2308219-7f48b14a: T35-R1 online speedup 4.43
+icv1-f2m41-tm2308219-7f48b14a: T36-R1 online speedup 7.76
+icv1-f2m41-tm2308219-7f48b14a: T37-R1 online speedup 3.69
+icv1-f2m41-tm2308219-7f48b14a: T38-R1 online speedup 75.00
+icv1-f2m41-tm2308219-7f48b14a: T39-R1 online speedup 60.89
+icv1-f2m41-tm2308219-7f48b14a: T40-R1 online speedup 16.78
+icv1-f2m41-tm2308219-7f48b14a: T41-R1 online speedup 2.88
+icv1-f2m41-tm2308219-7f48b14a: T42-R1 online speedup 150.13
+icv1-f2m41-tm2308219-7f48b14a: T43-R1 online speedup 14.15
+icv1-f2m41-tm2308219-7f48b14a: T44-R1 online speedup 23.01
+icv1-f2m41-tm2308219-7f48b14a: T45-R1 online speedup 24.35
+icv1-f2m41-tm2308219-7f48b14a: T46-R1 online speedup 1.34
+icv1-f2m41-tm2308219-7f48b14a: T47-R1 online speedup 7.59
+icv1-f2m41-tm2308219-7f48b14a: T48-R1 online speedup 26.43
+icv1-f2m41-tm2308219-7f48b14a: T49-R1 online speedup 4.01
+icv1-f2m41-tm2308219-7f48b14a: T50-R1 online speedup 3.56
+icv1-f2m41-tm2308219-7f48b14a: T51-R1 online speedup 15.21
+icv1-f2m41-tm2308219-7f48b14a: T52-R1 online speedup 110.37
+icv1-f2m41-tm2308219-7f48b14a: T53-R1 online speedup 90.99
+icv1-f2m41-tm2308219-7f48b14a: T54-R1 online speedup 8.46
+icv1-f2m41-tm2308219-7f48b14a: T55-R1 online speedup 2.26
+icv1-f2m41-tm2308219-7f48b14a: T56-R1 online speedup 6.04
+icv1-f2m41-tm2308219-7f48b14a: T57-R1 online speedup 7.06
+icv1-f2m41-tm2308219-7f48b14a: T58-R1 online speedup 7.35
+icv1-f2m41-tm2308219-7f48b14a: T59-R1 online speedup 3.01
+icv1-f2m41-tm2308219-7f48b14a: T60-R1 online speedup 12.53
+icv1-f2m41-tm2308219-7f48b14a: T61-R1 online speedup 19.75
+icv1-f2m41-tm2308219-7f48b14a: T62-R1 online speedup 46.88
+icv1-f2m41-tm2308219-7f48b14a: T63-R1 online speedup 62.72
+icv1-f2m41-tm2308219-7f48b14a: T64-R1 online speedup 10.73
+icv1-f2m41-tm2308219-7f48b14a: T01-R2 online speedup 9.25
+icv1-f2m41-tm2308219-7f48b14a: T02-R2 online speedup 36.92
+icv1-f2m41-tm2308219-7f48b14a: T03-R2 online speedup 10.02
+icv1-f2m41-tm2308219-7f48b14a: T04-R2 online speedup 20.47
+   exit 0
+== 21:59:28 v10 size 0,53
+icv1-f2m53-tm56619371-dac20a85: T01-R1 online speedup 774.95
+icv1-f2m53-tm56619371-dac20a85: T02-R1 online speedup 23.21
+icv1-f2m53-tm56619371-dac20a85: T03-R1 online speedup 53.45
+icv1-f2m53-tm56619371-dac20a85: T04-R1 online speedup 6.46
+icv1-f2m53-tm56619371-dac20a85: T05-R1 online speedup 40.91
+icv1-f2m53-tm56619371-dac20a85: T06-R1 online speedup 92.18
+icv1-f2m53-tm56619371-dac20a85: T07-R1 online speedup 13.16
+icv1-f2m53-tm56619371-dac20a85: T08-R1 online speedup 10.93
+icv1-f2m53-tm56619371-dac20a85: T09-R1 online speedup 64.04
+icv1-f2m53-tm56619371-dac20a85: T10-R1 online speedup 32.20
+icv1-f2m53-tm56619371-dac20a85: T11-R1 online speedup 19.31
+icv1-f2m53-tm56619371-dac20a85: T12-R1 online speedup 58.20
+icv1-f2m53-tm56619371-dac20a85: T13-R1 online speedup 20.02
+icv1-f2m53-tm56619371-dac20a85: T14-R1 online speedup 31.74
+icv1-f2m53-tm56619371-dac20a85: T15-R1 online speedup 22.84
+icv1-f2m53-tm56619371-dac20a85: T16-R1 online speedup 84.86
+icv1-f2m53-tm56619371-dac20a85: T17-R1 online speedup 5.02
+icv1-f2m53-tm56619371-dac20a85: T18-R1 online speedup 50.14
+icv1-f2m53-tm56619371-dac20a85: T19-R1 online speedup 55.00
+icv1-f2m53-tm56619371-dac20a85: T20-R1 online speedup 25.98
+icv1-f2m53-tm56619371-dac20a85: T21-R1 online speedup 18.27
+icv1-f2m53-tm56619371-dac20a85: T22-R1 online speedup 40.60
+icv1-f2m53-tm56619371-dac20a85: T23-R1 online speedup 29.68
+icv1-f2m53-tm56619371-dac20a85: T24-R1 online speedup 23.38
+icv1-f2m53-tm56619371-dac20a85: T25-R1 online speedup 237.07
+icv1-f2m53-tm56619371-dac20a85: T26-R1 online speedup 416.68
+icv1-f2m53-tm56619371-dac20a85: T27-R1 online speedup 106.75
+icv1-f2m53-tm56619371-dac20a85: T28-R1 online speedup 31.02
+icv1-f2m53-tm56619371-dac20a85: T29-R1 online speedup 94.02
+icv1-f2m53-tm56619371-dac20a85: T30-R1 online speedup 55.89
+icv1-f2m53-tm56619371-dac20a85: T31-R1 online speedup 9.74
+icv1-f2m53-tm56619371-dac20a85: T32-R1 online speedup 23.76
+icv1-f2m53-tm56619371-dac20a85: T33-R1 online speedup 8.85
+icv1-f2m53-tm56619371-dac20a85: T34-R1 online speedup 24.87
+icv1-f2m53-tm56619371-dac20a85: T35-R1 online speedup 14.31
+icv1-f2m53-tm56619371-dac20a85: T36-R1 online speedup 18.20
+icv1-f2m53-tm56619371-dac20a85: T37-R1 online speedup 8.52
+icv1-f2m53-tm56619371-dac20a85: T38-R1 online speedup 43.72
+icv1-f2m53-tm56619371-dac20a85: T39-R1 online speedup 9.59
+icv1-f2m53-tm56619371-dac20a85: T40-R1 online speedup 10.54
+icv1-f2m53-tm56619371-dac20a85: T41-R1 online speedup 35.61
+icv1-f2m53-tm56619371-dac20a85: T42-R1 online speedup 8.14
+icv1-f2m53-tm56619371-dac20a85: T43-R1 online speedup 44.34
+icv1-f2m53-tm56619371-dac20a85: T44-R1 online speedup 2.06
+icv1-f2m53-tm56619371-dac20a85: T45-R1 online speedup 35.75
+icv1-f2m53-tm56619371-dac20a85: T46-R1 online speedup 133.96
+icv1-f2m53-tm56619371-dac20a85: T47-R1 online speedup 68.85
+icv1-f2m53-tm56619371-dac20a85: T48-R1 online speedup 18.70
+icv1-f2m53-tm56619371-dac20a85: T49-R1 online speedup 12.32
+icv1-f2m53-tm56619371-dac20a85: T50-R1 online speedup 9.41
+icv1-f2m53-tm56619371-dac20a85: T51-R1 online speedup 128.59
+icv1-f2m53-tm56619371-dac20a85: T52-R1 online speedup 31.17
+icv1-f2m53-tm56619371-dac20a85: T53-R1 online speedup 30.62
+icv1-f2m53-tm56619371-dac20a85: T54-R1 online speedup 29.15
+icv1-f2m53-tm56619371-dac20a85: T55-R1 online speedup 54.72
+icv1-f2m53-tm56619371-dac20a85: T56-R1 online speedup 18.42
+icv1-f2m53-tm56619371-dac20a85: T57-R1 online speedup 21.24
+icv1-f2m53-tm56619371-dac20a85: T58-R1 online speedup 109.19
+icv1-f2m53-tm56619371-dac20a85: T59-R1 online speedup 8.38
+icv1-f2m53-tm56619371-dac20a85: T60-R1 online speedup 3.96
+icv1-f2m53-tm56619371-dac20a85: T61-R1 online speedup 95.13
+icv1-f2m53-tm56619371-dac20a85: T62-R1 online speedup 14.57
+icv1-f2m53-tm56619371-dac20a85: T63-R1 online speedup 17.05
+icv1-f2m53-tm56619371-dac20a85: T64-R1 online speedup 44.47
+icv1-f2m53-tm56619371-dac20a85: T01-R2 online speedup 796.99
+icv1-f2m53-tm56619371-dac20a85: T02-R2 online speedup 24.00
+icv1-f2m53-tm56619371-dac20a85: T03-R2 online speedup 59.37
+icv1-f2m53-tm56619371-dac20a85: T04-R2 online speedup 6.37
+   exit 0
+== 22:12:00 v10c size 0,53
+icv1-f2m53-tm56619371-dac20a85: T01-R1 online speedup 800.92
+icv1-f2m53-tm56619371-dac20a85: T02-R1 online speedup 23.98
+icv1-f2m53-tm56619371-dac20a85: T03-R1 online speedup 52.61
+icv1-f2m53-tm56619371-dac20a85: T04-R1 online speedup 7.01
+icv1-f2m53-tm56619371-dac20a85: T05-R1 online speedup 39.41
+icv1-f2m53-tm56619371-dac20a85: T06-R1 online speedup 94.17
+icv1-f2m53-tm56619371-dac20a85: T07-R1 online speedup 15.40
+icv1-f2m53-tm56619371-dac20a85: T08-R1 online speedup 13.58
+icv1-f2m53-tm56619371-dac20a85: T09-R1 online speedup 62.98
+icv1-f2m53-tm56619371-dac20a85: T10-R1 online speedup 32.21
+icv1-f2m53-tm56619371-dac20a85: T11-R1 online speedup 17.99
+icv1-f2m53-tm56619371-dac20a85: T12-R1 online speedup 54.58
+icv1-f2m53-tm56619371-dac20a85: T13-R1 online speedup 19.13
+icv1-f2m53-tm56619371-dac20a85: T14-R1 online speedup 19.14
+icv1-f2m53-tm56619371-dac20a85: T15-R1 online speedup 23.60
+icv1-f2m53-tm56619371-dac20a85: T16-R1 online speedup 93.00
+icv1-f2m53-tm56619371-dac20a85: T17-R1 online speedup 5.77
+icv1-f2m53-tm56619371-dac20a85: T18-R1 online speedup 46.76
+icv1-f2m53-tm56619371-dac20a85: T19-R1 online speedup 56.60
+icv1-f2m53-tm56619371-dac20a85: T20-R1 online speedup 26.28
+icv1-f2m53-tm56619371-dac20a85: T21-R1 online speedup 19.36
+icv1-f2m53-tm56619371-dac20a85: T22-R1 online speedup 42.61
+icv1-f2m53-tm56619371-dac20a85: T23-R1 online speedup 31.93
+icv1-f2m53-tm56619371-dac20a85: T24-R1 online speedup 21.08
+icv1-f2m53-tm56619371-dac20a85: T25-R1 online speedup 226.09
+icv1-f2m53-tm56619371-dac20a85: T26-R1 online speedup 429.64
+icv1-f2m53-tm56619371-dac20a85: T27-R1 online speedup 93.67
+icv1-f2m53-tm56619371-dac20a85: T28-R1 online speedup 31.24
+icv1-f2m53-tm56619371-dac20a85: T29-R1 online speedup 94.03
+icv1-f2m53-tm56619371-dac20a85: T30-R1 online speedup 56.09
+icv1-f2m53-tm56619371-dac20a85: T31-R1 online speedup 9.35
+icv1-f2m53-tm56619371-dac20a85: T32-R1 online speedup 23.56
+icv1-f2m53-tm56619371-dac20a85: T33-R1 online speedup 8.43
+icv1-f2m53-tm56619371-dac20a85: T34-R1 online speedup 24.08
+icv1-f2m53-tm56619371-dac20a85: T35-R1 online speedup 13.30
+icv1-f2m53-tm56619371-dac20a85: T36-R1 online speedup 19.43
+icv1-f2m53-tm56619371-dac20a85: T37-R1 online speedup 8.56
+icv1-f2m53-tm56619371-dac20a85: T38-R1 online speedup 45.51
+icv1-f2m53-tm56619371-dac20a85: T39-R1 online speedup 8.84
+icv1-f2m53-tm56619371-dac20a85: T40-R1 online speedup 10.04
+icv1-f2m53-tm56619371-dac20a85: T41-R1 online speedup 34.50
+icv1-f2m53-tm56619371-dac20a85: T42-R1 online speedup 8.22
+icv1-f2m53-tm56619371-dac20a85: T43-R1 online speedup 47.69
+icv1-f2m53-tm56619371-dac20a85: T44-R1 online speedup 2.12
+icv1-f2m53-tm56619371-dac20a85: T45-R1 online speedup 33.42
+icv1-f2m53-tm56619371-dac20a85: T46-R1 online speedup 119.16
+icv1-f2m53-tm56619371-dac20a85: T47-R1 online speedup 63.55
+icv1-f2m53-tm56619371-dac20a85: T48-R1 online speedup 20.14
+icv1-f2m53-tm56619371-dac20a85: T49-R1 online speedup 11.75
+icv1-f2m53-tm56619371-dac20a85: T50-R1 online speedup 9.38
+icv1-f2m53-tm56619371-dac20a85: T51-R1 online speedup 130.20
+icv1-f2m53-tm56619371-dac20a85: T52-R1 online speedup 28.49
+icv1-f2m53-tm56619371-dac20a85: T53-R1 online speedup 35.07
+icv1-f2m53-tm56619371-dac20a85: T54-R1 online speedup 35.75
+icv1-f2m53-tm56619371-dac20a85: T55-R1 online speedup 52.88
+icv1-f2m53-tm56619371-dac20a85: T56-R1 online speedup 19.43
+icv1-f2m53-tm56619371-dac20a85: T57-R1 online speedup 21.15
+icv1-f2m53-tm56619371-dac20a85: T58-R1 online speedup 108.75
+icv1-f2m53-tm56619371-dac20a85: T59-R1 online speedup 8.19
+icv1-f2m53-tm56619371-dac20a85: T60-R1 online speedup 4.38
+icv1-f2m53-tm56619371-dac20a85: T61-R1 online speedup 88.48
+icv1-f2m53-tm56619371-dac20a85: T62-R1 online speedup 16.55
+icv1-f2m53-tm56619371-dac20a85: T63-R1 online speedup 15.77
+icv1-f2m53-tm56619371-dac20a85: T64-R1 online speedup 44.21
+icv1-f2m53-tm56619371-dac20a85: T01-R2 online speedup 777.61
+icv1-f2m53-tm56619371-dac20a85: T02-R2 online speedup 23.12
+icv1-f2m53-tm56619371-dac20a85: T03-R2 online speedup 50.44
+icv1-f2m53-tm56619371-dac20a85: T04-R2 online speedup 6.03
+   exit 0
+== 22:24:34 v10 size 1,59
+icv1-f2m59-tm943548413-98844ecc: T01-R1 online speedup 34.50
+icv1-f2m59-tm943548413-98844ecc: T02-R1 online speedup 22.71
+icv1-f2m59-tm943548413-98844ecc: T03-R1 online speedup 10.39
+icv1-f2m59-tm943548413-98844ecc: T04-R1 online speedup 78.91
+icv1-f2m59-tm943548413-98844ecc: T05-R1 online speedup 14.21
+icv1-f2m59-tm943548413-98844ecc: T06-R1 online speedup 22.46
+icv1-f2m59-tm943548413-98844ecc: T07-R1 online speedup 3.24
+icv1-f2m59-tm943548413-98844ecc: T08-R1 online speedup 60.46
+icv1-f2m59-tm943548413-98844ecc: T09-R1 online speedup 163.56
+icv1-f2m59-tm943548413-98844ecc: T10-R1 online speedup 233.29
+icv1-f2m59-tm943548413-98844ecc: T11-R1 online speedup 11.92
+icv1-f2m59-tm943548413-98844ecc: T12-R1 online speedup 23.76
+icv1-f2m59-tm943548413-98844ecc: T13-R1 online speedup 18.71
+icv1-f2m59-tm943548413-98844ecc: T14-R1 online speedup 14.52
+icv1-f2m59-tm943548413-98844ecc: T15-R1 online speedup 11.49
+icv1-f2m59-tm943548413-98844ecc: T16-R1 online speedup 3.77
+icv1-f2m59-tm943548413-98844ecc: T17-R1 online speedup 8.20
+icv1-f2m59-tm943548413-98844ecc: T18-R1 online speedup 23.85
+icv1-f2m59-tm943548413-98844ecc: T19-R1 online speedup 119.35
+icv1-f2m59-tm943548413-98844ecc: T20-R1 online speedup 3.49
+icv1-f2m59-tm943548413-98844ecc: T21-R1 online speedup 33.19
+icv1-f2m59-tm943548413-98844ecc: T22-R1 online speedup 3.27
+icv1-f2m59-tm943548413-98844ecc: T23-R1 online speedup 2.48
+icv1-f2m59-tm943548413-98844ecc: T24-R1 online speedup 256.88
+icv1-f2m59-tm943548413-98844ecc: T25-R1 online speedup 25.02
+icv1-f2m59-tm943548413-98844ecc: T26-R1 online speedup 28.58
+icv1-f2m59-tm943548413-98844ecc: T27-R1 online speedup 9.85
+icv1-f2m59-tm943548413-98844ecc: T28-R1 online speedup 39.31
+icv1-f2m59-tm943548413-98844ecc: T29-R1 online speedup 180.55
+icv1-f2m59-tm943548413-98844ecc: T30-R1 online speedup 54.50
+icv1-f2m59-tm943548413-98844ecc: T31-R1 online speedup 7.47
+icv1-f2m59-tm943548413-98844ecc: T32-R1 online speedup 28.74
+icv1-f2m59-tm943548413-98844ecc: T33-R1 online speedup 41.42
+icv1-f2m59-tm943548413-98844ecc: T34-R1 online speedup 22.69
+icv1-f2m59-tm943548413-98844ecc: T35-R1 online speedup 51.50
+icv1-f2m59-tm943548413-98844ecc: T36-R1 online speedup 1100.00
+icv1-f2m59-tm943548413-98844ecc: T37-R1 online speedup 77.82
+icv1-f2m59-tm943548413-98844ecc: T38-R1 online speedup 76.20
+icv1-f2m59-tm943548413-98844ecc: T39-R1 online speedup 14.60
+icv1-f2m59-tm943548413-98844ecc: T40-R1 online speedup 32.81
+icv1-f2m59-tm943548413-98844ecc: T41-R1 online speedup 33.96
+icv1-f2m59-tm943548413-98844ecc: T42-R1 online speedup 120.95
+icv1-f2m59-tm943548413-98844ecc: T43-R1 online speedup 78.08
+icv1-f2m59-tm943548413-98844ecc: T44-R1 online speedup 8.68
+icv1-f2m59-tm943548413-98844ecc: T45-R1 online speedup 132.80
+icv1-f2m59-tm943548413-98844ecc: T46-R1 online speedup 16.77
+icv1-f2m59-tm943548413-98844ecc: T47-R1 online speedup 83.45
+icv1-f2m59-tm943548413-98844ecc: T48-R1 online speedup 11.12
+icv1-f2m59-tm943548413-98844ecc: T49-R1 online speedup 953.31
+icv1-f2m59-tm943548413-98844ecc: T50-R1 online speedup 306.58
+icv1-f2m59-tm943548413-98844ecc: T51-R1 online speedup 15.84
+icv1-f2m59-tm943548413-98844ecc: T52-R1 online speedup 45.72
+icv1-f2m59-tm943548413-98844ecc: T53-R1 online speedup 67.97
+icv1-f2m59-tm943548413-98844ecc: T54-R1 online speedup 22.38
+icv1-f2m59-tm943548413-98844ecc: T55-R1 online speedup 97.41
+icv1-f2m59-tm943548413-98844ecc: T56-R1 online speedup 5.66
+icv1-f2m59-tm943548413-98844ecc: T57-R1 online speedup 12.82
+icv1-f2m59-tm943548413-98844ecc: T58-R1 online speedup 28.87
+icv1-f2m59-tm943548413-98844ecc: T59-R1 online speedup 5.92
+icv1-f2m59-tm943548413-98844ecc: T60-R1 online speedup 41.50
+icv1-f2m59-tm943548413-98844ecc: T61-R1 online speedup 98.26
+icv1-f2m59-tm943548413-98844ecc: T62-R1 online speedup 7.47
+icv1-f2m59-tm943548413-98844ecc: T63-R1 online speedup 13.52
+icv1-f2m59-tm943548413-98844ecc: T64-R1 online speedup 154.21
+icv1-f2m59-tm943548413-98844ecc: T01-R2 online speedup 30.32
+icv1-f2m59-tm943548413-98844ecc: T02-R2 online speedup 19.33
+icv1-f2m59-tm943548413-98844ecc: T03-R2 online speedup 8.42
+icv1-f2m59-tm943548413-98844ecc: T04-R2 online speedup 76.37
+   exit 0
+== 22:37:28 v10c size 1,59
+icv1-f2m59-tm943548413-98844ecc: T01-R1 online speedup 28.16
+icv1-f2m59-tm943548413-98844ecc: T02-R1 online speedup 18.44
+icv1-f2m59-tm943548413-98844ecc: T03-R1 online speedup 9.70
+icv1-f2m59-tm943548413-98844ecc: T04-R1 online speedup 70.29
+icv1-f2m59-tm943548413-98844ecc: T05-R1 online speedup 11.79
+icv1-f2m59-tm943548413-98844ecc: T06-R1 online speedup 17.74
+icv1-f2m59-tm943548413-98844ecc: T07-R1 online speedup 2.80
+icv1-f2m59-tm943548413-98844ecc: T08-R1 online speedup 74.76
+icv1-f2m59-tm943548413-98844ecc: T09-R1 online speedup 138.08
+icv1-f2m59-tm943548413-98844ecc: T10-R1 online speedup 208.91
+icv1-f2m59-tm943548413-98844ecc: T11-R1 online speedup 12.00
+icv1-f2m59-tm943548413-98844ecc: T12-R1 online speedup 20.47
+icv1-f2m59-tm943548413-98844ecc: T13-R1 online speedup 17.06
+icv1-f2m59-tm943548413-98844ecc: T14-R1 online speedup 13.62
+icv1-f2m59-tm943548413-98844ecc: T15-R1 online speedup 9.85
+icv1-f2m59-tm943548413-98844ecc: T16-R1 online speedup 3.44
+icv1-f2m59-tm943548413-98844ecc: T17-R1 online speedup 6.10
+icv1-f2m59-tm943548413-98844ecc: T18-R1 online speedup 23.43
+icv1-f2m59-tm943548413-98844ecc: T19-R1 online speedup 119.03
+icv1-f2m59-tm943548413-98844ecc: T20-R1 online speedup 3.47
+icv1-f2m59-tm943548413-98844ecc: T21-R1 online speedup 35.32
+icv1-f2m59-tm943548413-98844ecc: T22-R1 online speedup 2.80
+icv1-f2m59-tm943548413-98844ecc: T23-R1 online speedup 2.08
+icv1-f2m59-tm943548413-98844ecc: T24-R1 online speedup 204.76
+icv1-f2m59-tm943548413-98844ecc: T25-R1 online speedup 25.10
+icv1-f2m59-tm943548413-98844ecc: T26-R1 online speedup 26.78
+icv1-f2m59-tm943548413-98844ecc: T27-R1 online speedup 8.78
+icv1-f2m59-tm943548413-98844ecc: T28-R1 online speedup 35.26
+icv1-f2m59-tm943548413-98844ecc: T29-R1 online speedup 156.87
+icv1-f2m59-tm943548413-98844ecc: T30-R1 online speedup 50.17
+icv1-f2m59-tm943548413-98844ecc: T31-R1 online speedup 6.51
+icv1-f2m59-tm943548413-98844ecc: T32-R1 online speedup 22.06
+icv1-f2m59-tm943548413-98844ecc: T33-R1 online speedup 33.98
+icv1-f2m59-tm943548413-98844ecc: T34-R1 online speedup 20.52
+icv1-f2m59-tm943548413-98844ecc: T35-R1 online speedup 46.47
+icv1-f2m59-tm943548413-98844ecc: T36-R1 online speedup 1044.95
+icv1-f2m59-tm943548413-98844ecc: T37-R1 online speedup 70.76
+icv1-f2m59-tm943548413-98844ecc: T38-R1 online speedup 76.13
+icv1-f2m59-tm943548413-98844ecc: T39-R1 online speedup 12.72
+icv1-f2m59-tm943548413-98844ecc: T40-R1 online speedup 27.56
+icv1-f2m59-tm943548413-98844ecc: T41-R1 online speedup 29.12
+icv1-f2m59-tm943548413-98844ecc: T42-R1 online speedup 114.53
+icv1-f2m59-tm943548413-98844ecc: T43-R1 online speedup 74.48
+icv1-f2m59-tm943548413-98844ecc: T44-R1 online speedup 8.07
+icv1-f2m59-tm943548413-98844ecc: T45-R1 online speedup 126.44
+icv1-f2m59-tm943548413-98844ecc: T46-R1 online speedup 21.10
+icv1-f2m59-tm943548413-98844ecc: T47-R1 online speedup 81.92
+icv1-f2m59-tm943548413-98844ecc: T48-R1 online speedup 9.52
+icv1-f2m59-tm943548413-98844ecc: T49-R1 online speedup 905.68
+icv1-f2m59-tm943548413-98844ecc: T50-R1 online speedup 239.41
+icv1-f2m59-tm943548413-98844ecc: T51-R1 online speedup 15.01
+icv1-f2m59-tm943548413-98844ecc: T52-R1 online speedup 50.52
+icv1-f2m59-tm943548413-98844ecc: T53-R1 online speedup 70.61
+icv1-f2m59-tm943548413-98844ecc: T54-R1 online speedup 21.82
+icv1-f2m59-tm943548413-98844ecc: T55-R1 online speedup 94.40
+icv1-f2m59-tm943548413-98844ecc: T56-R1 online speedup 6.43
+icv1-f2m59-tm943548413-98844ecc: T57-R1 online speedup 12.80
+icv1-f2m59-tm943548413-98844ecc: T58-R1 online speedup 29.51
+icv1-f2m59-tm943548413-98844ecc: T59-R1 online speedup 5.89
+icv1-f2m59-tm943548413-98844ecc: T60-R1 online speedup 30.20
+icv1-f2m59-tm943548413-98844ecc: T61-R1 online speedup 101.33
+icv1-f2m59-tm943548413-98844ecc: T62-R1 online speedup 7.65
+icv1-f2m59-tm943548413-98844ecc: T63-R1 online speedup 12.97
+icv1-f2m59-tm943548413-98844ecc: T64-R1 online speedup 134.61
+icv1-f2m59-tm943548413-98844ecc: T01-R2 online speedup 29.90
+icv1-f2m59-tm943548413-98844ecc: T02-R2 online speedup 18.69
+icv1-f2m59-tm943548413-98844ecc: T03-R2 online speedup 9.16
+icv1-f2m59-tm943548413-98844ecc: T04-R2 online speedup 70.69
+   exit 0
+== 22:50:11 v10 size 0,61
+icv1-f2m61-t158598901-ab42b6c5: T01-R1 online speedup 19.92
+icv1-f2m61-t158598901-ab42b6c5: T02-R1 online speedup 72.41
+icv1-f2m61-t158598901-ab42b6c5: T03-R1 online speedup 78.86
+icv1-f2m61-t158598901-ab42b6c5: T04-R1 online speedup 4.11
+icv1-f2m61-t158598901-ab42b6c5: T05-R1 online speedup 13.41
+icv1-f2m61-t158598901-ab42b6c5: T06-R1 online speedup 6.96
+icv1-f2m61-t158598901-ab42b6c5: T07-R1 online speedup 163.30
+icv1-f2m61-t158598901-ab42b6c5: T08-R1 online speedup 9.05
+icv1-f2m61-t158598901-ab42b6c5: T09-R1 online speedup 7.08
+icv1-f2m61-t158598901-ab42b6c5: T10-R1 online speedup 6.19
+icv1-f2m61-t158598901-ab42b6c5: T11-R1 online speedup 5.14
+icv1-f2m61-t158598901-ab42b6c5: T12-R1 online speedup 65.43
+icv1-f2m61-t158598901-ab42b6c5: T13-R1 online speedup 35.96
+icv1-f2m61-t158598901-ab42b6c5: T14-R1 online speedup 13.92
+icv1-f2m61-t158598901-ab42b6c5: T15-R1 online speedup 27.93
+icv1-f2m61-t158598901-ab42b6c5: T16-R1 online speedup 5.62
+icv1-f2m61-t158598901-ab42b6c5: T17-R1 online speedup 21.38
+icv1-f2m61-t158598901-ab42b6c5: T18-R1 online speedup 168.63
+icv1-f2m61-t158598901-ab42b6c5: T19-R1 online speedup 59.32
+icv1-f2m61-t158598901-ab42b6c5: T20-R1 online speedup 20.87
+icv1-f2m61-t158598901-ab42b6c5: T21-R1 online speedup 39.82
+icv1-f2m61-t158598901-ab42b6c5: T22-R1 online speedup 8.27
+icv1-f2m61-t158598901-ab42b6c5: T23-R1 online speedup 51.22
+icv1-f2m61-t158598901-ab42b6c5: T24-R1 online speedup 14.91
+icv1-f2m61-t158598901-ab42b6c5: T25-R1 online speedup 68.43
+icv1-f2m61-t158598901-ab42b6c5: T26-R1 online speedup 44.14
+icv1-f2m61-t158598901-ab42b6c5: T27-R1 online speedup 11.34
+icv1-f2m61-t158598901-ab42b6c5: T28-R1 online speedup 108.56
+icv1-f2m61-t158598901-ab42b6c5: T29-R1 online speedup 56.92
+icv1-f2m61-t158598901-ab42b6c5: T30-R1 online speedup 5.60
+icv1-f2m61-t158598901-ab42b6c5: T31-R1 online speedup 43.71
+icv1-f2m61-t158598901-ab42b6c5: T32-R1 online speedup 3.69
+icv1-f2m61-t158598901-ab42b6c5: T33-R1 online speedup 2.54
+icv1-f2m61-t158598901-ab42b6c5: T34-R1 online speedup 5.01
+icv1-f2m61-t158598901-ab42b6c5: T35-R1 online speedup 79.57
+icv1-f2m61-t158598901-ab42b6c5: T36-R1 online speedup 133.25
+icv1-f2m61-t158598901-ab42b6c5: T37-R1 online speedup 1.97
+icv1-f2m61-t158598901-ab42b6c5: T38-R1 online speedup 70.57
+icv1-f2m61-t158598901-ab42b6c5: T39-R1 online speedup 8.50
+icv1-f2m61-t158598901-ab42b6c5: T40-R1 online speedup 5.24
+icv1-f2m61-t158598901-ab42b6c5: T41-R1 online speedup 3.29
+icv1-f2m61-t158598901-ab42b6c5: T42-R1 online speedup 31.46
+icv1-f2m61-t158598901-ab42b6c5: T43-R1 online speedup 7.53
+icv1-f2m61-t158598901-ab42b6c5: T44-R1 online speedup 39.99
+icv1-f2m61-t158598901-ab42b6c5: T45-R1 online speedup 2.91
+icv1-f2m61-t158598901-ab42b6c5: T46-R1 online speedup 4.08
+icv1-f2m61-t158598901-ab42b6c5: T47-R1 online speedup 6.40
+icv1-f2m61-t158598901-ab42b6c5: T48-R1 online speedup 158.91
+icv1-f2m61-t158598901-ab42b6c5: T49-R1 online speedup 7.63
+icv1-f2m61-t158598901-ab42b6c5: T50-R1 online speedup 14.86
+icv1-f2m61-t158598901-ab42b6c5: T51-R1 online speedup 8.25
+icv1-f2m61-t158598901-ab42b6c5: T52-R1 online speedup 13.03
+icv1-f2m61-t158598901-ab42b6c5: T53-R1 online speedup 17.62
+icv1-f2m61-t158598901-ab42b6c5: T54-R1 online speedup 5.13
+icv1-f2m61-t158598901-ab42b6c5: T55-R1 online speedup 53.04
+icv1-f2m61-t158598901-ab42b6c5: T56-R1 online speedup 3.75
+icv1-f2m61-t158598901-ab42b6c5: T57-R1 online speedup 15.76
+icv1-f2m61-t158598901-ab42b6c5: T58-R1 online speedup 15.98
+icv1-f2m61-t158598901-ab42b6c5: T59-R1 online speedup 105.25
+icv1-f2m61-t158598901-ab42b6c5: T60-R1 online speedup 591.43
+icv1-f2m61-t158598901-ab42b6c5: T61-R1 online speedup 2.12
+icv1-f2m61-t158598901-ab42b6c5: T62-R1 online speedup 43.31
+icv1-f2m61-t158598901-ab42b6c5: T63-R1 online speedup 102.74
+icv1-f2m61-t158598901-ab42b6c5: T64-R1 online speedup 73.69
+icv1-f2m61-t158598901-ab42b6c5: T01-R2 online speedup 16.00
+icv1-f2m61-t158598901-ab42b6c5: T02-R2 online speedup 63.05
+icv1-f2m61-t158598901-ab42b6c5: T03-R2 online speedup 82.86
+icv1-f2m61-t158598901-ab42b6c5: T04-R2 online speedup 4.01
+   exit 0
+== 23:04:31 v10c size 0,61
+icv1-f2m61-t158598901-ab42b6c5: T01-R1 online speedup 17.51
+icv1-f2m61-t158598901-ab42b6c5: T02-R1 online speedup 62.25
+icv1-f2m61-t158598901-ab42b6c5: T03-R1 online speedup 76.03
+icv1-f2m61-t158598901-ab42b6c5: T04-R1 online speedup 3.89
+icv1-f2m61-t158598901-ab42b6c5: T05-R1 online speedup 14.18
+icv1-f2m61-t158598901-ab42b6c5: T06-R1 online speedup 9.37
+icv1-f2m61-t158598901-ab42b6c5: T07-R1 online speedup 157.51
+icv1-f2m61-t158598901-ab42b6c5: T08-R1 online speedup 7.70
+icv1-f2m61-t158598901-ab42b6c5: T09-R1 online speedup 7.59
+icv1-f2m61-t158598901-ab42b6c5: T10-R1 online speedup 6.13
+icv1-f2m61-t158598901-ab42b6c5: T11-R1 online speedup 5.26
+icv1-f2m61-t158598901-ab42b6c5: T12-R1 online speedup 66.45
+icv1-f2m61-t158598901-ab42b6c5: T13-R1 online speedup 33.51
+icv1-f2m61-t158598901-ab42b6c5: T14-R1 online speedup 14.68
+icv1-f2m61-t158598901-ab42b6c5: T15-R1 online speedup 28.06
+icv1-f2m61-t158598901-ab42b6c5: T16-R1 online speedup 5.50
+icv1-f2m61-t158598901-ab42b6c5: T17-R1 online speedup 21.42
+icv1-f2m61-t158598901-ab42b6c5: T18-R1 online speedup 167.67
+icv1-f2m61-t158598901-ab42b6c5: T19-R1 online speedup 58.83
+icv1-f2m61-t158598901-ab42b6c5: T20-R1 online speedup 26.60
+icv1-f2m61-t158598901-ab42b6c5: T21-R1 online speedup 48.65
+icv1-f2m61-t158598901-ab42b6c5: T22-R1 online speedup 8.57
+icv1-f2m61-t158598901-ab42b6c5: T23-R1 online speedup 57.12
+icv1-f2m61-t158598901-ab42b6c5: T24-R1 online speedup 15.68
+icv1-f2m61-t158598901-ab42b6c5: T25-R1 online speedup 60.84
+icv1-f2m61-t158598901-ab42b6c5: T26-R1 online speedup 38.03
+icv1-f2m61-t158598901-ab42b6c5: T27-R1 online speedup 12.89
+icv1-f2m61-t158598901-ab42b6c5: T28-R1 online speedup 119.11
+icv1-f2m61-t158598901-ab42b6c5: T29-R1 online speedup 69.42
+icv1-f2m61-t158598901-ab42b6c5: T30-R1 online speedup 5.48
+icv1-f2m61-t158598901-ab42b6c5: T31-R1 online speedup 46.62
+icv1-f2m61-t158598901-ab42b6c5: T32-R1 online speedup 4.02
+icv1-f2m61-t158598901-ab42b6c5: T33-R1 online speedup 2.72
+icv1-f2m61-t158598901-ab42b6c5: T34-R1 online speedup 4.67
+icv1-f2m61-t158598901-ab42b6c5: T35-R1 online speedup 91.65
+icv1-f2m61-t158598901-ab42b6c5: T36-R1 online speedup 119.57
+icv1-f2m61-t158598901-ab42b6c5: T37-R1 online speedup 1.53
+icv1-f2m61-t158598901-ab42b6c5: T38-R1 online speedup 127.39
+icv1-f2m61-t158598901-ab42b6c5: T39-R1 online speedup 9.07
+icv1-f2m61-t158598901-ab42b6c5: T40-R1 online speedup 5.04
+icv1-f2m61-t158598901-ab42b6c5: T41-R1 online speedup 3.03
+icv1-f2m61-t158598901-ab42b6c5: T42-R1 online speedup 30.40
+icv1-f2m61-t158598901-ab42b6c5: T43-R1 online speedup 7.30
+icv1-f2m61-t158598901-ab42b6c5: T44-R1 online speedup 39.12
+icv1-f2m61-t158598901-ab42b6c5: T45-R1 online speedup 2.78
+icv1-f2m61-t158598901-ab42b6c5: T46-R1 online speedup 3.93
+icv1-f2m61-t158598901-ab42b6c5: T47-R1 online speedup 7.19
+icv1-f2m61-t158598901-ab42b6c5: T48-R1 online speedup 142.30
+icv1-f2m61-t158598901-ab42b6c5: T49-R1 online speedup 7.79
+icv1-f2m61-t158598901-ab42b6c5: T50-R1 online speedup 16.55
+icv1-f2m61-t158598901-ab42b6c5: T51-R1 online speedup 8.54
+icv1-f2m61-t158598901-ab42b6c5: T52-R1 online speedup 13.51
+icv1-f2m61-t158598901-ab42b6c5: T53-R1 online speedup 19.54
+icv1-f2m61-t158598901-ab42b6c5: T54-R1 online speedup 5.08
+icv1-f2m61-t158598901-ab42b6c5: T55-R1 online speedup 52.62
+icv1-f2m61-t158598901-ab42b6c5: T56-R1 online speedup 3.94
+icv1-f2m61-t158598901-ab42b6c5: T57-R1 online speedup 15.99
+icv1-f2m61-t158598901-ab42b6c5: T58-R1 online speedup 15.78
+icv1-f2m61-t158598901-ab42b6c5: T59-R1 online speedup 113.73
+icv1-f2m61-t158598901-ab42b6c5: T60-R1 online speedup 671.45
+icv1-f2m61-t158598901-ab42b6c5: T61-R1 online speedup 2.15
+icv1-f2m61-t158598901-ab42b6c5: T62-R1 online speedup 42.36
+icv1-f2m61-t158598901-ab42b6c5: T63-R1 online speedup 83.79
+icv1-f2m61-t158598901-ab42b6c5: T64-R1 online speedup 69.93
+icv1-f2m61-t158598901-ab42b6c5: T01-R2 online speedup 16.41
+icv1-f2m61-t158598901-ab42b6c5: T02-R2 online speedup 68.78
+icv1-f2m61-t158598901-ab42b6c5: T03-R2 online speedup 55.86
+icv1-f2m61-t158598901-ab42b6c5: T04-R2 online speedup 3.59
+   exit 0
+== 23:18:32 v10 reference
+reference icv1-f2m47-t22705043-f4e44623: T01 100.0 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T02 97.5 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T03 107.1 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T04 101.2 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T05 100.2 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T06 102.0 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T07 155.5 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T08 143.7 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T01 111.2 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T02 148.3 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T03 195.8 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T04 136.2 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T05 101.0 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T06 102.7 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T07 153.8 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T08 101.8 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T01 99.9 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T02 132.5 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T03 139.7 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T04 131.7 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T05 101.5 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T06 112.9 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T07 131.0 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T08 96.2 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T01 101.4 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T02 100.0 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T03 111.8 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T04 105.3 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T05 112.1 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T06 100.5 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T07 144.9 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T08 137.8 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T01 103.2 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T02 111.4 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T03 101.9 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T04 107.2 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T05 105.7 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T06 108.4 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T07 106.3 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T08 104.3 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T01 106.0 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T02 107.7 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T03 127.2 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T04 133.7 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T05 117.1 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T06 128.6 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T07 145.5 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T08 146.0 ns a step
+   exit 0
+== 23:20:54 v10 claims
+icprog: /home/user/wt/cheon-ecb/research/sat_factor_base_review_20260908/autolab/protocol.json: No such file or directory (os error 2)
+   exit 1
+== 23:20:54 stopped
+== 23:21:19 resumed after adding research/sat_factor_base_review_20260908/autolab to the sparse checkout; v10 claims rerun
+reference icv1-f2m47-t22705043-f4e44623: T01 101.4 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T02 95.9 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T03 99.4 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T04 105.0 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T05 100.9 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T06 126.6 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T07 108.9 ns a step
+reference icv1-f2m47-t22705043-f4e44623: T08 100.7 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T01 108.3 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T02 102.0 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T03 102.7 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T04 128.6 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T05 127.9 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T06 136.4 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T07 152.3 ns a step
+reference icv1-f2m57-tm747311035-c1f545af: T08 98.9 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T01 135.9 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T02 97.6 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T03 96.4 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T04 102.6 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T05 182.7 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T06 100.8 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T07 102.2 ns a step
+reference icv1-f2m41-tm2308219-7f48b14a: T08 143.9 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T01 101.1 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T02 101.9 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T03 141.0 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T04 102.3 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T05 97.7 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T06 101.1 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T07 110.4 ns a step
+reference icv1-f2m53-tm56619371-dac20a85: T08 118.1 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T01 106.5 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T02 152.5 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T03 105.3 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T04 109.3 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T05 140.6 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T06 107.8 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T07 119.9 ns a step
+reference icv1-f2m59-tm943548413-98844ecc: T08 103.7 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T01 117.1 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T02 106.1 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T03 118.7 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T04 114.0 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T05 115.3 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T06 142.0 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T07 108.7 ns a step
+reference icv1-f2m61-t158598901-ab42b6c5: T08 150.6 ns a step
+== 23:23:25 v10c reference, claims, analyse; matched; p1p2 (by hand, run.sh's order); all done

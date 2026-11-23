@@ -1,0 +1,3392 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "CM-RESIDUAL-SPLIT-V1-census",
+  "created": "2026-11-08T04:06:26Z",
+  "protocol": {
+    "path": "research/cm-marked-scalar/protocol/residual-v1/protocol.json",
+    "sha256": "31b28e2913c78fc1c78c819f8190af17b777d4f18b810dec9120cc22071fe335",
+    "protocol_id": "CM-RESIDUAL-SPLIT-V1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex_cli/native-cpp",
+    "model": null,
+    "session": "T-1888",
+    "role": "producer"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "research/cm-marked-scalar/residual-v1/host.json",
+    "sha256": "15a3a7a999ff0a8817e82369f3d96a18ffcf0af87428d2810d9ee5a9bb595242",
+    "class_id": "shared-development-count-only",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "logical_cpus": 32,
+      "memory_bytes": 132915929088,
+      "kernel": "Linux 6.18.54-121.166.amzn2023.x86_64",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "direct",
+      "role": "reference",
+      "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+      "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3"
+    },
+    {
+      "id": "binary",
+      "role": "baseline",
+      "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+      "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3"
+    },
+    {
+      "id": "relation",
+      "role": "candidate",
+      "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+      "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "P-192-w1-direct",
+      "arm": "direct",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 36,
+          "doubles": 192,
+          "negations": 12,
+          "offset": 6,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w1-binary_control",
+      "arm": "binary",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 39,
+          "doubles": 190,
+          "negations": 19,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 4,
+          "window": 4,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w1-relation",
+      "arm": "relation",
+      "instance_id": "P-192:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 232,
+          "D_A_N_tables": "192,40,19,6"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 40,
+          "doubles": 192,
+          "negations": 19,
+          "offset": 5,
+          "radix": 13,
+          "table_points": 6,
+          "window": 4,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-direct",
+      "arm": "direct",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 36,
+          "doubles": 192,
+          "negations": 12,
+          "offset": 6,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-binary_control",
+      "arm": "binary",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 39,
+          "doubles": 190,
+          "negations": 19,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 4,
+          "window": 4,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w2-relation",
+      "arm": "relation",
+      "instance_id": "P-192:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 232,
+          "D_A_N_tables": "192,40,19,6"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 40,
+          "doubles": 192,
+          "negations": 19,
+          "offset": 5,
+          "radix": 13,
+          "table_points": 6,
+          "window": 4,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-direct",
+      "arm": "direct",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 36,
+          "doubles": 192,
+          "negations": 12,
+          "offset": 6,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-binary_control",
+      "arm": "binary",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 39,
+          "doubles": 190,
+          "negations": 19,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 4,
+          "window": 4,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w3-relation",
+      "arm": "relation",
+      "instance_id": "P-192:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 232,
+          "D_A_N_tables": "192,40,19,6"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 40,
+          "doubles": 192,
+          "negations": 19,
+          "offset": 5,
+          "radix": 13,
+          "table_points": 6,
+          "window": 4,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-direct",
+      "arm": "direct",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 228,
+          "D_A_N_tables": "192,36,12,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 36,
+          "doubles": 192,
+          "negations": 12,
+          "offset": 6,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-binary_control",
+      "arm": "binary",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 229,
+          "D_A_N_tables": "190,39,19,4"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 39,
+          "doubles": 190,
+          "negations": 19,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 4,
+          "window": 4,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-192-w4-relation",
+      "arm": "relation",
+      "instance_id": "P-192:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 232,
+          "D_A_N_tables": "192,40,19,6"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 40,
+          "doubles": 192,
+          "negations": 19,
+          "offset": 5,
+          "radix": 13,
+          "table_points": 6,
+          "window": 4,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-direct",
+      "arm": "direct",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-binary_control",
+      "arm": "binary",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w1-relation",
+      "arm": "relation",
+      "instance_id": "P-224:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 267,
+          "D_A_N_tables": "222,45,19,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 45,
+          "doubles": 222,
+          "negations": 19,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-direct",
+      "arm": "direct",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-binary_control",
+      "arm": "binary",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w2-relation",
+      "arm": "relation",
+      "instance_id": "P-224:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 267,
+          "D_A_N_tables": "222,45,19,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 45,
+          "doubles": 222,
+          "negations": 19,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-direct",
+      "arm": "direct",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-binary_control",
+      "arm": "binary",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w3-relation",
+      "arm": "relation",
+      "instance_id": "P-224:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 267,
+          "D_A_N_tables": "222,45,19,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 45,
+          "doubles": 222,
+          "negations": 19,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-direct",
+      "arm": "direct",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-binary_control",
+      "arm": "binary",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 260,
+          "D_A_N_tables": "218,42,14,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 42,
+          "doubles": 218,
+          "negations": 14,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-224-w4-relation",
+      "arm": "relation",
+      "instance_id": "P-224:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 267,
+          "D_A_N_tables": "222,45,19,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 45,
+          "doubles": 222,
+          "negations": 19,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-direct",
+      "arm": "direct",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-binary_control",
+      "arm": "binary",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w1-relation",
+      "arm": "relation",
+      "instance_id": "P-256:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 304,
+          "D_A_N_tables": "252,52,24,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 52,
+          "doubles": 252,
+          "negations": 24,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-direct",
+      "arm": "direct",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-binary_control",
+      "arm": "binary",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w2-relation",
+      "arm": "relation",
+      "instance_id": "P-256:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 304,
+          "D_A_N_tables": "252,52,24,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 52,
+          "doubles": 252,
+          "negations": 24,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-direct",
+      "arm": "direct",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-binary_control",
+      "arm": "binary",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w3-relation",
+      "arm": "relation",
+      "instance_id": "P-256:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 304,
+          "D_A_N_tables": "252,52,24,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 52,
+          "doubles": 252,
+          "negations": 24,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-direct",
+      "arm": "direct",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-binary_control",
+      "arm": "binary",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 300,
+          "D_A_N_tables": "254,46,23,8"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 46,
+          "doubles": 254,
+          "negations": 23,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 8,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-256-w4-relation",
+      "arm": "relation",
+      "instance_id": "P-256:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 304,
+          "D_A_N_tables": "252,52,24,10"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 52,
+          "doubles": 252,
+          "negations": 24,
+          "offset": 3,
+          "radix": 11,
+          "table_points": 10,
+          "window": 5,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-direct",
+      "arm": "direct",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 69,
+          "doubles": 380,
+          "negations": 29,
+          "offset": 1,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-binary_control",
+      "arm": "binary",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 70,
+          "doubles": 380,
+          "negations": 27,
+          "offset": -1,
+          "radix": 1,
+          "table_points": 17,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w1-relation",
+      "arm": "relation",
+      "instance_id": "P-384:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 451,
+          "D_A_N_tables": "379,72,26,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 72,
+          "doubles": 379,
+          "negations": 26,
+          "offset": -2,
+          "radix": 19,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-direct",
+      "arm": "direct",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 69,
+          "doubles": 380,
+          "negations": 29,
+          "offset": 1,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-binary_control",
+      "arm": "binary",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 70,
+          "doubles": 380,
+          "negations": 27,
+          "offset": -1,
+          "radix": 1,
+          "table_points": 17,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w2-relation",
+      "arm": "relation",
+      "instance_id": "P-384:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 451,
+          "D_A_N_tables": "379,72,26,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 72,
+          "doubles": 379,
+          "negations": 26,
+          "offset": -2,
+          "radix": 19,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-direct",
+      "arm": "direct",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 69,
+          "doubles": 380,
+          "negations": 29,
+          "offset": 1,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-binary_control",
+      "arm": "binary",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 70,
+          "doubles": 380,
+          "negations": 27,
+          "offset": -1,
+          "radix": 1,
+          "table_points": 17,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w3-relation",
+      "arm": "relation",
+      "instance_id": "P-384:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 451,
+          "D_A_N_tables": "379,72,26,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 72,
+          "doubles": 379,
+          "negations": 26,
+          "offset": -2,
+          "radix": 19,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-direct",
+      "arm": "direct",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 449,
+          "D_A_N_tables": "380,69,29,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 69,
+          "doubles": 380,
+          "negations": 29,
+          "offset": 1,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-binary_control",
+      "arm": "binary",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 450,
+          "D_A_N_tables": "380,70,27,17"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 70,
+          "doubles": 380,
+          "negations": 27,
+          "offset": -1,
+          "radix": 1,
+          "table_points": 17,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-384-w4-relation",
+      "arm": "relation",
+      "instance_id": "P-384:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 451,
+          "D_A_N_tables": "379,72,26,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 72,
+          "doubles": 379,
+          "negations": 26,
+          "offset": -2,
+          "radix": 19,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-direct",
+      "arm": "direct",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 88,
+          "doubles": 518,
+          "negations": 31,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-binary_control",
+      "arm": "binary",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 88,
+          "doubles": 518,
+          "negations": 31,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w1-relation",
+      "arm": "relation",
+      "instance_id": "P-521:weight1",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 612,
+          "D_A_N_tables": "521,91,33,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 91,
+          "doubles": 521,
+          "negations": 33,
+          "offset": -1,
+          "radix": 7,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 1
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-direct",
+      "arm": "direct",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 88,
+          "doubles": 518,
+          "negations": 31,
+          "offset": 0,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-binary_control",
+      "arm": "binary",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 88,
+          "doubles": 518,
+          "negations": 31,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w2-relation",
+      "arm": "relation",
+      "instance_id": "P-521:weight2",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 612,
+          "D_A_N_tables": "521,91,33,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 91,
+          "doubles": 521,
+          "negations": 33,
+          "offset": -1,
+          "radix": 7,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 2
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-direct",
+      "arm": "direct",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 610,
+          "D_A_N_tables": "525,85,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 85,
+          "doubles": 525,
+          "negations": 31,
+          "offset": -152,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-binary_control",
+      "arm": "binary",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 88,
+          "doubles": 518,
+          "negations": 31,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w3-relation",
+      "arm": "relation",
+      "instance_id": "P-521:weight3",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 612,
+          "D_A_N_tables": "521,91,33,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 91,
+          "doubles": 521,
+          "negations": 33,
+          "offset": -1,
+          "radix": 7,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 3
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-direct",
+      "arm": "direct",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 610,
+          "D_A_N_tables": "525,85,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 85,
+          "doubles": 525,
+          "negations": 31,
+          "offset": -152,
+          "radix": 0,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-binary_control",
+      "arm": "binary",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 606,
+          "D_A_N_tables": "518,88,31,16"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 88,
+          "doubles": 518,
+          "negations": 31,
+          "offset": 0,
+          "radix": 1,
+          "table_points": 16,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    },
+    {
+      "run_id": "P-521-w4-relation",
+      "arm": "relation",
+      "instance_id": "P-521:weight4",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "D_plus_A": 612,
+          "D_A_N_tables": "521,91,33,18"
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "adds": 91,
+          "doubles": 521,
+          "negations": 33,
+          "offset": -1,
+          "radix": 7,
+          "table_points": 18,
+          "window": 6,
+          "addition_weight": 4
+        }
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No clock collected; development host"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "research/cm-marked-scalar/residual-v1/independent-replay.json and selected-qualification.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native-cpp",
+      "backend_ref": "single-30780-schedule-census; derived-minimum-case"
+    }
+  ],
+  "flow": {
+    "planned": 60,
+    "attempted": 60,
+    "completed": 60,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "research/cm-marked-scalar/residual-v1/runs.tar.xz",
+      "sha256": "f45bf33a443157615b1a7a68992fe14db5ce3fc1e10a65e85a37e7bc671e6b70",
+      "bytes": 104052,
+      "kind": "raw"
+    },
+    {
+      "path": "research/cm-marked-scalar/residual-v1/plans.json",
+      "sha256": "ee7e9e7150351ef8850dbe4d8e721bbbbe68ba552539017fff6cac04c79c8cb5",
+      "bytes": 7189,
+      "kind": "summary"
+    },
+    {
+      "path": "research/cm-marked-scalar/residual-v1/independent-replay.json",
+      "sha256": "0aa6f5240d4235cdbfb4b590f16d184cbd5997f8d0ec72f806389b61098b47c9",
+      "bytes": 179,
+      "kind": "receipt"
+    },
+    {
+      "path": "research/cm-marked-scalar/residual-v1/selected-qualification.json",
+      "sha256": "e2e2db961e45e367c18a0a2a1c5294db3decba6752826a01808bb91c5af7f0c8",
+      "bytes": 65,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "research/cm-marked-scalar/residual.cpp",
+      "sha256": "a628c1b9782969e569d19f779d0c37f8b88aaa292286a51744c378ebe99fc7d9",
+      "bytes": 13738,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "research/cm-marked-scalar/residual-v1/plans.json",
+        "sha256": "ee7e9e7150351ef8850dbe4d8e721bbbbe68ba552539017fff6cac04c79c8cb5",
+        "bytes": 7189,
+        "kind": "summary"
+      },
+      {
+        "path": "research/cm-marked-scalar/residual-v1/independent-replay.json",
+        "sha256": "0aa6f5240d4235cdbfb4b590f16d184cbd5997f8d0ec72f806389b61098b47c9",
+        "bytes": 179,
+        "kind": "receipt"
+      },
+      {
+        "path": "research/cm-marked-scalar/residual-v1/selected-qualification.json",
+        "sha256": "e2e2db961e45e367c18a0a2a1c5294db3decba6752826a01808bb91c5af7f0c8",
+        "bytes": 65,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "One complete42480-row census. The60 export rows are derived minimum records:5curves x3method arms x4weights, not60 process runs or timing trials."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "Primary weight1 compares relation to both direct and binary controls. Weights2..4 are declared sensitivities. No population or statistical-power inference."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "Independent GMP replay validates every raw row and20minimum sets. All300selected-plan point/count checks pass. Five corrupted raw/plan/protocol controls reject at intended checks."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "Original mu and input points are fixed. No generator or target substitution. Entire prefix, both tables, signed residual and main loop are charged in each schedule."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "No cryptographic clock or cloud submission. Search/plan preparation, field normalization, conversion, allocation, verification and destruction remain in future full first-use runtime accounting."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

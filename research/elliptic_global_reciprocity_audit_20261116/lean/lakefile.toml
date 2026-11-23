@@ -1,0 +1,11 @@
+name = "elliptic_global_reciprocity_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticGlobalReciprocityAudit"]
+
+[[require]]
+name = "p1_tame_reciprocity_audit"
+path = "../../p1_tame_reciprocity_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticGlobalReciprocityAudit"
+roots = ["ReciprocityFiber", "ReciprocityImports", "ReciprocityProduct", "ReciprocityQuadratic", "ReciprocityDivisors", "ReciprocitySingular", "ReciprocityFunctions", "ReciprocityControls", "ReciprocityCertificate"]

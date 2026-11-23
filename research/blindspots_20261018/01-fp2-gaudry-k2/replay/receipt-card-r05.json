@@ -1,0 +1,204 @@
+{
+  "card_id": "CARD-BLINDSPOT-01-REPLAY-R05",
+  "card_path": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r05.yaml",
+  "card_sha256": "7afa62d69a266dc71c3bf6dc22fe64a9bf428f0aab54c7d85f666d3e6f6fbe1f",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r05/b01",
+        "research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.244,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 8.244,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r05/b01",
+        "run",
+        "--family",
+        "gls",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "ic-gls-neg:0-1,ic-gls-psi:0-1,rho-neg:0-7,rho-psi:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 81.708,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gls-b40-i2",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i2.jsonl": "da3b43629bee7d2c99d4b1acb7b914aa9e031d7b101d65a38c2fb1e4d67d339a"
+      },
+      "seconds": 81.708,
+      "stderr_sha256": "fe9768d9d3900b25a9bf475bdf5ef5baea6b68a5c304a8ab657168eac88e18b3",
+      "stderr_tail": [
+        "[fp2-gls-b40-i2-p961189] n = 923882566708, r = 230970641677, cofactor 4"
+      ],
+      "stdout_sha256": "d37bd7c2b27aa3b1e921b8428d3dc91005fc4757cb45bd4bebc04b68db14c200",
+      "stdout_tail": [
+        "gls b40 i2 t0 ic-gls-neg: verified=true gae=153297605 S(w0)=318.98 S(w1)=376.13 wall=24.2s",
+        "gls b40 i2 t1 ic-gls-neg: verified=true gae=157392462 S(w0)=327.50 S(w1)=388.29 wall=24.8s",
+        "gls b40 i2 t0 ic-gls-psi: verified=true gae=86830092 S(w0)=180.67 S(w1)=215.96 wall=14.3s",
+        "gls b40 i2 t1 ic-gls-psi: verified=true gae=88809825 S(w0)=184.79 S(w1)=298.73 wall=16.4s",
+        "gls b40 i2 t0 rho-neg: verified=true gae=323682 S(w0)=0.67 S(w1)=2.68 wall=0.1s",
+        "gls b40 i2 t1 rho-neg: verified=true gae=482406 S(w0)=1.00 S(w1)=4.01 wall=0.2s",
+        "gls b40 i2 t2 rho-neg: verified=true gae=174195 S(w0)=0.36 S(w1)=1.44 wall=0.1s",
+        "gls b40 i2 t3 rho-neg: verified=true gae=493018 S(w0)=1.03 S(w1)=4.09 wall=0.2s",
+        "gls b40 i2 t4 rho-neg: verified=true gae=662987 S(w0)=1.38 S(w1)=5.51 wall=0.2s",
+        "gls b40 i2 t5 rho-neg: verified=true gae=340128 S(w0)=0.71 S(w1)=2.82 wall=0.1s",
+        "gls b40 i2 t6 rho-neg: verified=true gae=356460 S(w0)=0.74 S(w1)=2.96 wall=0.1s",
+        "gls b40 i2 t7 rho-neg: verified=true gae=382944 S(w0)=0.80 S(w1)=3.18 wall=0.1s",
+        "gls b40 i2 t0 rho-psi: verified=true gae=24819 S(w0)=0.05 S(w1)=0.24 wall=0.0s",
+        "gls b40 i2 t1 rho-psi: verified=true gae=307018 S(w0)=0.64 S(w1)=3.18 wall=0.1s",
+        "gls b40 i2 t2 rho-psi: verified=true gae=80204 S(w0)=0.17 S(w1)=0.82 wall=0.0s",
+        "gls b40 i2 t3 rho-psi: verified=true gae=249661 S(w0)=0.52 S(w1)=2.58 wall=0.1s",
+        "gls b40 i2 t4 rho-psi: verified=true gae=256927 S(w0)=0.53 S(w1)=2.66 wall=0.1s",
+        "gls b40 i2 t5 rho-psi: verified=true gae=70597 S(w0)=0.15 S(w1)=0.72 wall=0.0s",
+        "gls b40 i2 t6 rho-psi: verified=true gae=118485 S(w0)=0.25 S(w1)=1.22 wall=0.1s",
+        "gls b40 i2 t7 rho-psi: verified=true gae=299913 S(w0)=0.62 S(w1)=3.11 wall=0.1s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r05/b01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "0677940b8204d4cb60109550035c0a9c3b1a1070",
+  "dirty_after": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i2.stderr"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.stderr"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

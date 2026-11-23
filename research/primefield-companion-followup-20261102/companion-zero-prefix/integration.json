@@ -1,0 +1,92 @@
+[
+  {
+    "source": "companion-metric-views/selection_view.py",
+    "target": "selection_zero.py",
+    "substitutions": [
+      [
+        "    source_queries: int\n",
+        "    source_queries: int\n    zero_prefix: int\n"
+      ],
+      [
+        "    def result(indices, columns):",
+        "    def result(indices, columns, zero_prefix):"
+      ],
+      [
+        "tuple(indices), tuple(columns), queries)",
+        "tuple(indices), tuple(columns), queries, zero_prefix)"
+      ],
+      [
+        "return result((j,), (c,))",
+        "return result((j,), (c,), j)"
+      ],
+      [
+        "return result((i,), (other,))",
+        "return result((i,), (other,), j)"
+      ],
+      [
+        "return result((j, i), (c, other))",
+        "return result((j, i), (c, other), j)"
+      ],
+      [
+        "return result((), ())",
+        "return result((), (), n)"
+      ]
+    ]
+  },
+  {
+    "source": "companion-paired-transport/paired.py",
+    "target": "paired_zero.py",
+    "substitutions": [
+      [
+        "from transport import SmallInverse",
+        "from transport import SmallInverse\nfrom selection_zero import Selection"
+      ],
+      [
+        "def _swap(source, i, j, d, di, cache):",
+        "def _swap(source, i, j, d, di, cache, zeros):"
+      ],
+      [
+        "    missing = 0",
+        "    missing = 0\n    reused = 0"
+      ],
+      [
+        "            unit=[0]*n\n            unit[index]=1\n            cache[index]=tuple(source.apply(unit))\n            missing+=1\n            m.add('paired_transport_missing_column_queries')",
+        "            m.add('zero_prefix_membership_tests')\n            if index in zeros:\n                cache[index]=(0,)*n\n                reused+=1\n                m.add('zero_prefix_columns_reused')\n                m.add('zero_prefix_materialized_entries',n)\n            else:\n                unit=[0]*n\n                unit[index]=1\n                cache[index]=tuple(source.apply(unit))\n                missing+=1\n                m.add('paired_transport_missing_column_queries')"
+      ],
+      [
+        "    receipt=dict(kind=",
+        "    zeros={swap_index(key) for key in zeros}\n    m.add('zero_prefix_indices_transported',len(zeros))\n    receipt=dict(zero_columns_reused=reused,zero_prefix_size=len(zeros),kind="
+      ],
+      [
+        "updated,receipt\n",
+        "updated,zeros,receipt\n"
+      ],
+      [
+        "    if (selection.source is not source",
+        "    if (type(selection) is not Selection or selection.source is not source"
+      ],
+      [
+        "    selection.consumed=True",
+        "    prefix=selection.zero_prefix\n    if (type(prefix) is not int or not 0<=prefix<n or\n            any(type(i) is not int or not prefix<=i<n for i in selection.indices)):\n        raise ValueError('invalid zero-prefix provenance')\n    # Internal producer provenance, not an independent certificate of zero columns.\n    zeros=set(range(prefix))\n    m.add('zero_prefix_indices_retained',prefix)\n    selection.consumed=True"
+      ],
+      [
+        "moved,d,di,cache,receipt=_swap(moved,front,position,d,di,cache)",
+        "moved,d,di,cache,zeros,receipt=_swap(moved,front,position,d,di,cache,zeros)"
+      ]
+    ]
+  },
+  {
+    "source": "companion-metric-views/driver_views.py",
+    "target": "driver_zero.py",
+    "substitutions": [
+      [
+        "from selection_view import select",
+        "from selection_zero import select"
+      ],
+      [
+        "from paired import move",
+        "from paired_zero import move"
+      ]
+    ]
+  }
+]

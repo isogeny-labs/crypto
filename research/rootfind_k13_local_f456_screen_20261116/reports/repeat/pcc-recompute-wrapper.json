@@ -1,0 +1,109 @@
+{
+  "headline": [
+    {
+      "claimed": 0.000924480426925755,
+      "name": "batch-m3/matrix-f4 summed complete-cold wall ratio",
+      "recomputed": 0.000924480426925755,
+      "rel_tol": 1e-12
+    },
+    {
+      "claimed": 0.0011014841769916715,
+      "name": "batch-m3/matrix-f5 summed complete-cold wall ratio",
+      "recomputed": 0.0011014841769916715,
+      "rel_tol": 1e-12
+    },
+    {
+      "claimed": 0.10224557815167018,
+      "name": "batch-m3/inherited-f4 summed complete-cold wall ratio",
+      "recomputed": 0.10224557815167018,
+      "rel_tol": 1e-12
+    },
+    {
+      "claimed": 0.22155060492401862,
+      "name": "batch-m3/f6-ic summed complete-cold wall ratio",
+      "recomputed": 0.22155060492401862,
+      "rel_tol": 1e-12
+    },
+    {
+      "claimed": 1.106297622667769,
+      "name": "batch-m3/rootfind-m3 summed complete-cold wall ratio",
+      "recomputed": 1.106297622667769,
+      "rel_tol": 1e-12
+    },
+    {
+      "claimed": 1.0385716096459026,
+      "name": "batch-m3/batch-m3-aa summed complete-cold wall ratio",
+      "recomputed": 1.0385716096459026,
+      "rel_tol": 1e-12
+    },
+    {
+      "claimed": 1.139284615944602,
+      "name": "batch-m3/rho-strong summed complete-cold wall ratio",
+      "recomputed": 1.139284615944602,
+      "rel_tol": 1e-12
+    }
+  ],
+  "note": "Producer-authored arithmetic check; no independent signature.",
+  "pair_count_per_comparison": 4,
+  "pairs": {
+    "batch-m3-aa": {
+      "baseline_total_ns": 41348417,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 1.0385716096459026
+    },
+    "f6-ic": {
+      "baseline_total_ns": 193830624,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 0.22155060492401862
+    },
+    "inherited-f4": {
+      "baseline_total_ns": 420001459,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 0.10224557815167018
+    },
+    "matrix-f4": {
+      "baseline_total_ns": 46451272249,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 0.000924480426925755
+    },
+    "matrix-f5": {
+      "baseline_total_ns": 38986753416,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 0.0011014841769916715
+    },
+    "rho-strong": {
+      "baseline_total_ns": 37693208,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 1.139284615944602
+    },
+    "rootfind-m3": {
+      "baseline_total_ns": 38817124,
+      "candidate_total_ns": 42943292,
+      "pair_count": 4,
+      "ratio": 1.106297622667769
+    }
+  },
+  "raw_data": [
+    {
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl",
+      "sha256": "dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44"
+    },
+    {
+      "path": "research/rootfind_k13_local_f456_screen_20261116/audits/repeat/replay-all.json",
+      "sha256": "8b8211318f57115dc7c0a646c619be130b7b0aa122c8030501d400f742dd11c5"
+    },
+    {
+      "path": "research/rootfind_k13_local_f456_screen_20261116/reports/repeat/analysis.json",
+      "sha256": "d3294c959cc8c393d1bf0d418c3176a8f4ac28ef9035a3461cc8600d40342c33"
+    }
+  ],
+  "schema": "pcc.local-unsigned-recompute-wrapper/v1",
+  "session_id": "ECBS1hc322a24b6610",
+  "status": "pass"
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "experiment.review/v1",
+  "review_kind": "independent_machine_evidence_review",
+  "subject": "solve4-pivot-swap-renewal-20261111",
+  "status": "machine_evidence_consistent_run_failed",
+  "completion_sha256": "05493f4fd38b2cc40696789db61bbf812c7ad9608021a3497a1da25be14e173f",
+  "source_freeze_sha256": "dffa9f313ca8daf569d97f09a1103cf1c858b11e42a35d069a279146a8f3180b",
+  "bound_release_sha256": "b3acbb8650a1f370579e067fa89874d6348278a63517adb9cb1ee54aae8eecff",
+  "admission_sha256": "646b3db1432ad5d998b54e391978de4816d4ce44658ac8cf14e5fa2829407456",
+  "observations": {
+    "overall_elapsed_seconds": 128.24891154497163,
+    "pre_seconds": 45.61097849800717,
+    "compiler_seconds": 42.47305457800394,
+    "post_seconds": 40.05902259401046,
+    "pre_passed": true,
+    "compiler_passed": false,
+    "post_passed": true,
+    "all_phase_owners_terminal": true,
+    "wait_timeouts": 0,
+    "compiler_invocations": 2,
+    "module_exits": {
+      "EliminationField": 0,
+      "PivotSwap": 1
+    },
+    "compiled_outputs": ["EliminationField.olean"],
+    "unattempted_modules": ["Controls", "Readback", "ExpectedFailure"],
+    "failure_location": "PivotSwap.lean:59:2",
+    "failure_goal": "equal-row branch of swap_involutive remained unsolved",
+    "pre_post_dependency_files": 16736,
+    "pre_post_dependency_bytes": 3111892318,
+    "pre_post_hash_map_sha256": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad"
+  },
+  "checks": [
+    "completion, admission, freeze, release, source, command, receipt, stdout and custody hashes recomputed",
+    "workspace source files match the frozen source-file hashes",
+    "pre and post dependency maps are byte-identical",
+    "the two compiler processes were reaped with empty remaining process groups",
+    "all three outer phase owners are terminal and no outer wait timed out",
+    "only EliminationField produced a compiled object; later modules were not attempted",
+    "the retained PivotSwap stdout contains the exact unsolved goal at line 59"
+  ],
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "result",
+      "statement": "The bounded native run failed during PivotSwap compilation after EliminationField compiled; no controls, readback, or expected-failure module ran."
+    },
+    {
+      "id": "M2",
+      "severity": "metadata",
+      "statement": "The outer coordinator-release copy was JSON-canonicalized and is not byte-identical to the bound release. The repository release retains the bound digest, the admission receipt names that digest, and the two parsed JSON values are equal."
+    }
+  ],
+  "claim_judgments": {
+    "EliminationField_compiled": "supported",
+    "PivotSwap_compiled": "rejected_by_observation",
+    "full_five_module_replay_completed": "rejected_by_observation",
+    "formal_theorem_fidelity_beyond_compiled_module": "not_reviewed"
+  },
+  "limitations": [
+    "This review did not rerun Lean, a compiler, or any proof payload.",
+    "The shared-cache pre/post match establishes retained custody equality but does not exclude transient concurrent changes between the two scans.",
+    "This is machine evidence review, not an independent proof of the Lean statements."
+  ],
+  "recommendation": "preserve_failed_attempt_and_review_source_successor_before_any_new_run"
+}

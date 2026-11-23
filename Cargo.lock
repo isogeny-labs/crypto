@@ -595,6 +595,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "certified-relations"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -764,12 +772,15 @@ dependencies = [
  "aws-smithy-types",
  "base64 0.21.7",
  "blake3",
+ "certified-relations",
  "clap",
+ "ecdl-tensor-ic",
  "factor-base",
  "flate2",
  "getrandom 0.2.17",
  "hashed-ecdl-tensor",
  "hex",
+ "isogeny_algos",
  "libc",
  "num-bigint 0.4.8",
  "num-integer",
@@ -778,11 +789,14 @@ dependencies = [
  "rand",
  "rayon",
  "redis",
+ "relation-replay-checker",
  "rusqlite",
  "serde",
  "serde_json",
  "sha2 0.10.9",
+ "streebog",
  "subtle",
+ "tikv-jemallocator",
  "tokio",
  "volcano-cli",
  "zeroize",
@@ -853,6 +867,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.6",
+]
+
+[[package]]
+name = "ecdl-tensor-ic"
+version = "0.1.0"
+dependencies = [
+ "num-bigint 0.4.8",
+ "num-integer",
+ "num-traits",
+ "rand",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -1080,6 +1105,7 @@ dependencies = [
  "num-traits",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -1735,6 +1761,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cab834c73d247e67f4fae452806d17d3c7501756d98c8808d7c9c7aa7d18f973"
 
 [[package]]
+name = "relation-replay-checker"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "ring"
 version = "0.17.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2009,6 +2043,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
+name = "streebog"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e7fe6ed8a42cec360e070309427bb7959e102849b0dbaa7de19d5b9860bd536"
+dependencies = [
+ "digest 0.10.7",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2064,6 +2107,26 @@ dependencies = [
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "tikv-jemalloc-sys"
+version = "0.6.1+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd8aa5b2ab86a2cefa406d889139c162cbb230092f7d1d7cbc1716405d852a3b"
+dependencies = [
+ "cc",
+ "libc",
+]
+
+[[package]]
+name = "tikv-jemallocator"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0359b4327f954e0567e69fb191cf1436617748813819c94b8cd4a431422d053a"
+dependencies = [
+ "libc",
+ "tikv-jemalloc-sys",
 ]
 
 [[package]]

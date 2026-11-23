@@ -1,0 +1,188 @@
+import Std.Tactic
+import Init.GrindInstances.Ring.Fin
+
+/-! Additive cubic trace on explicitly stated modules. No actual Frobenius,
+curve, Jacobian, prime order or computational advantage is constructed. -/
+set_option autoImplicit false
+namespace CubicFrobeniusTraceDescent05
+open Lean.Grind
+
+def trace3 {M : Type} [IntModule M] (F : M → M) (x : M) : M :=
+  x+F x+F (F x)
+
+def normalized {M : Type} [IntModule M] (u : Int) (F : M → M) (x : M) : M :=
+  u • trace3 F x
+
+/-- Reuses the local Bezout argument; the ambient module may have torsion. -/
+theorem recover_annihilated_point {M : Type} [IntModule M]
+    (d r u v : Int) (hbez : u*d+v*r=1)
+    (x : M) (hr : r • x=0) : u • (d • x)=x := by
+  calc
+    u • (d • x) = (u*d) • x := (IntModule.mul_zsmul u d x).symm
+    _ = (u*d) • x+(v*r) • x := by
+      rw [IntModule.mul_zsmul v r,hr,IntModule.zsmul_zero,AddCommMonoid.add_zero]
+    _ = (u*d+v*r) • x := (IntModule.add_zsmul _ _ _).symm
+    _ = x := by rw [hbez,IntModule.one_zsmul]
+
+theorem trace3_add {M : Type} [IntModule M] (F : M → M)
+    (hadd : ∀ x y, F (x+y)=F x+F y) (x y : M) :
+    trace3 F (x+y)=trace3 F x+trace3 F y := by
+  unfold trace3
+  rw [hadd,hadd]
+  grind
+
+theorem trace3_smul {M : Type} [IntModule M] (F : M → M)
+    (hlin : ∀ (n : Int) x, F (n • x)=n • F x) (n : Int) (x : M) :
+    trace3 F (n • x)=n • trace3 F x := by
+  unfold trace3
+  rw [hlin,hlin]
+  grind
+
+theorem trace3_commutes {M : Type} [IntModule M] (F : M → M)
+    (hcube : ∀ x, F (F (F x))=x) (x : M) : trace3 F (F x)=trace3 F x := by
+  unfold trace3
+  rw [hcube]
+  grind
+
+theorem trace3_fixed_image {M : Type} [IntModule M] (F : M → M)
+    (hadd : ∀ x y, F (x+y)=F x+F y)
+    (hcube : ∀ x, F (F (F x))=x) (x : M) : F (trace3 F x)=trace3 F x := by
+  unfold trace3
+  rw [hadd,hadd,hcube]
+  grind
+
+theorem trace3_fixed_input {M : Type} [IntModule M] (F : M → M)
+    (x : M) (hx : F x=x) : trace3 F x=(3 : Int) • x := by
+  unfold trace3
+  rw [hx]
+  grind
+
+theorem normalized_fixed_input {M : Type} [IntModule M] (F : M → M)
+    (r u v : Int) (hbez : u*3+v*r=1)
+    (x : M) (hr : r • x=0) (hx : F x=x) : normalized u F x=x := by
+  unfold normalized
+  rw [trace3_fixed_input F x hx]
+  exact recover_annihilated_point 3 r u v hbez x hr
+
+theorem normalized_fixed_iff {M : Type} [IntModule M] (F : M → M)
+    (hadd : ∀ x y, F (x+y)=F x+F y)
+    (hlin : ∀ (n : Int) x, F (n • x)=n • F x)
+    (hcube : ∀ x, F (F (F x))=x)
+    (r u v : Int) (hbez : u*3+v*r=1)
+    (x : M) (hr : r • x=0) : normalized u F x=x ↔ F x=x := by
+  have hp : F (normalized u F x)=normalized u F x := by
+    unfold normalized
+    rw [hlin,trace3_fixed_image F hadd hcube x]
+  constructor
+  · intro h
+    rw [h] at hp
+    exact hp
+  · exact normalized_fixed_input F r u v hbez x hr
+
+theorem normalized_idempotent {M : Type} [IntModule M] (F : M → M)
+    (hadd : ∀ x y, F (x+y)=F x+F y)
+    (hlin : ∀ (n : Int) x, F (n • x)=n • F x)
+    (hcube : ∀ x, F (F (F x))=x)
+    (r u v : Int) (hbez : u*3+v*r=1) (hr : ∀ x : M, r • x=0) (x : M) :
+    normalized u F (normalized u F x)=normalized u F x := by
+  have hp : F (normalized u F x)=normalized u F x := by
+    unfold normalized
+    rw [hlin,trace3_fixed_image F hadd hcube x]
+  exact normalized_fixed_input F r u v hbez _ (hr _) hp
+
+theorem trace_zero_complement {M : Type} [IntModule M] (F : M → M)
+    (hadd : ∀ x y, F (x+y)=F x+F y)
+    (hlin : ∀ (n : Int) x, F (n • x)=n • F x)
+    (hcube : ∀ x, F (F (F x))=x)
+    (r u v : Int) (hbez : u*3+v*r=1) (hr : ∀ x : M, r • x=0) (x : M) :
+    trace3 F (x-normalized u F x)=0 ∧
+      normalized u F x+(x-normalized u F x)=x := by
+  have hp : trace3 F (normalized u F x)=trace3 F x := by
+    unfold normalized
+    rw [trace3_smul F hlin,trace3_fixed_input F _ (trace3_fixed_image F hadd hcube x)]
+    exact recover_annihilated_point 3 r u v hbez _ (hr _)
+  have hs := trace3_add F hadd (normalized u F x) (x-normalized u F x)
+  have hx : normalized u F x+(x-normalized u F x)=x := by grind
+  rw [hx,hp] at hs
+  constructor
+  · grind
+  · exact hx
+
+/-- Faithfulness is stated on scalar multiples of this cyclic generator. -/
+theorem faithful_stable_cyclic_forces_fixed {M : Type} [IntModule M] (F : M → M)
+    (hlin : ∀ (n : Int) x, F (n • x)=n • F x)
+    (hcube : ∀ x, F (F (F x))=x) (P : M) (lam : Int)
+    (heigen : F P=lam • P)
+    (faithful : ∀ a b : Int, a • trace3 F P=b • trace3 F P → a • P=b • P) :
+    F P=P := by
+  have h := trace3_commutes F hcube P
+  rw [heigen,trace3_smul F hlin] at h
+  have hs : lam • trace3 F P=(1 : Int) • trace3 F P := by
+    rw [IntModule.one_zsmul]
+    exact h
+  have hp := faithful lam 1 hs
+  rw [IntModule.one_zsmul] at hp
+  exact heigen.trans hp
+
+/-- Applies to a composed map once covariance and a fixed target are supplied. -/
+theorem fixed_target_eigenline_zero {M T : Type} [IntModule M] [IntModule T]
+    (F : M → M) (f : M → T)
+    (flin : ∀ (n : Int) x, f (n • x)=n • f x)
+    (fixed_target : ∀ x, f (F x)=f x)
+    (P : M) (r lam u v : Int) (hr : r • P=0)
+    (heigen : F P=lam • P) (hbez : u*(lam-1)+v*r=1) : f P=0 := by
+  have fz : f 0=0 := by
+    have h := flin 0 P
+    simpa only [IntModule.zero_zsmul] using h
+  have ht : r • f P=0 := by rw [← flin r P,hr,fz]
+  have he := fixed_target P
+  rw [heigen,flin] at he
+  have hz : (lam-1) • f P=0 := by
+    rw [IntModule.sub_zsmul,IntModule.one_zsmul,he]
+    exact AddCommGroup.sub_self (f P)
+  have h := recover_annihilated_point (lam-1) r u v hbez (f P) ht
+  rw [hz,IntModule.zsmul_zero] at h
+  exact h.symm
+
+theorem trace_eigenline_zero {M : Type} [IntModule M] (F : M → M)
+    (hlin : ∀ (n : Int) x, F (n • x)=n • F x)
+    (hcube : ∀ x, F (F (F x))=x)
+    (P : M) (r lam u v : Int) (hr : r • P=0)
+    (heigen : F P=lam • P) (hbez : u*(lam-1)+v*r=1) : trace3 F P=0 := by
+  exact fixed_target_eigenline_zero F (trace3 F) (trace3_smul F hlin)
+    (trace3_commutes F hcube) P r lam u v hr heigen hbez
+
+theorem composition_covariance {A B C : Type}
+    (s : A → A) (t : B → B) (w : C → C) (f : A → B) (g : B → C)
+    (hf : ∀ x, f (s x)=t (f x)) (hg : ∀ y, g (t y)=w (g y)) :
+    ∀ x, g (f (s x))=w (g (f x)) := by
+  intro x
+  rw [hf,hg]
+
+/-- An abstract scalar action, not an asserted curve Frobenius eigenvalue. -/
+theorem nonfixed_scalar_control : ∀ x : Fin 109,
+    45*(45*(45*x))=x ∧ x+45*x+45*(45*x)=0 := by decide
+
+theorem fixed_scalar_control : ∀ x : Fin 109, 73*(x+x+x)=x := by decide
+
+theorem characteristic_three_exception_control :
+    (3 : Fin 3)=0 ∧ ¬ ∃ u : Fin 3, u*3=1 := by decide
+
+end CubicFrobeniusTraceDescent05
+#print axioms CubicFrobeniusTraceDescent05.recover_annihilated_point
+#print axioms CubicFrobeniusTraceDescent05.trace3_add
+#print axioms CubicFrobeniusTraceDescent05.trace3_smul
+#print axioms CubicFrobeniusTraceDescent05.trace3_commutes
+#print axioms CubicFrobeniusTraceDescent05.trace3_fixed_image
+#print axioms CubicFrobeniusTraceDescent05.trace3_fixed_input
+#print axioms CubicFrobeniusTraceDescent05.normalized_fixed_input
+#print axioms CubicFrobeniusTraceDescent05.normalized_fixed_iff
+#print axioms CubicFrobeniusTraceDescent05.normalized_idempotent
+#print axioms CubicFrobeniusTraceDescent05.trace_zero_complement
+#print axioms CubicFrobeniusTraceDescent05.faithful_stable_cyclic_forces_fixed
+#print axioms CubicFrobeniusTraceDescent05.fixed_target_eigenline_zero
+#print axioms CubicFrobeniusTraceDescent05.trace_eigenline_zero
+#print axioms CubicFrobeniusTraceDescent05.composition_covariance
+#print axioms CubicFrobeniusTraceDescent05.nonfixed_scalar_control
+#print axioms CubicFrobeniusTraceDescent05.fixed_scalar_control
+#print axioms CubicFrobeniusTraceDescent05.characteristic_three_exception_control

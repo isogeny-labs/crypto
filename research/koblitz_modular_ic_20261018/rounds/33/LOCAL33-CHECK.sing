@@ -1,0 +1,43 @@
+ideal residueLocal33=std(ideal(T^2+T+1));int casesLocal33;
+proc inverseLocal33(poly value){
+ ideal gens=residueLocal33,value;if(std(gens)[1]!=1){ERROR("LOCAL33_REQUIRED_SPECIALIZATION_NOT_UNIT");}
+ matrix wit=lift(gens,ideal(1));poly ans=reduce(wit[nrows(wit),1],residueLocal33);
+ if(reduce(value*ans+1,residueLocal33)!=0){ERROR("LOCAL33_SPECIALIZATION_INVERSE");}return(ans);
+}
+proc checkLocal33(string label,number b,number c,number l,number n){
+ number A=1+c;if(c==0){ERROR("LOCAL33_PLANE_C_ZERO");}
+ number u0=(b+c)/c^2;if(u0==0 || u0==1){ERROR("LOCAL33_PLANE_U_EXCEPTION");}
+ number v0=((b/c)*u0^3+1)/(u0+1);number rn=(u0+1)*v0+1;number cn=rn+u0^3;
+ if(v0^2+v0!=u0^3+u0 || b!=rn*cn/u0^7 || c!=cn/u0^4){ERROR("LOCAL33_POINT_PLANE_INVERSE");}
+ map atLocal33=localCert33,n+b*T,l+A*T,v0,u0;
+ ideal localValues=reduce(atLocal33(localSource33),residueLocal33);
+ if(size(localValues)!=0){ERROR("LOCAL33_POINT_NOT_ON_PRESENTATION");}
+ poly dValue=atLocal33(localDenominator33);poly hValue=atLocal33(localTateFactor33);
+ poly di=inverseLocal33(dValue);poly hi=inverseLocal33(hValue);
+ matrix sj=atLocal33(localJacobian33);matrix ss=atLocal33(localSyzygies33);
+ int i;int j;int row;int col;int target;int productIndex=0;poly determinant;
+ for(i=1;i<=4;i++){
+  for(j=1;j<=3;j++){sj[i,j]=reduce(sj[i,j],residueLocal33);}
+  for(j=1;j<=ncols(ss);j++){ss[i,j]=reduce(ss[i,j],residueLocal33);}
+ }
+ ideal openValues;
+ for(i=1;i<=3;i++){
+  matrix mm[3][3];target=0;
+  for(row=1;row<=4;row++){if(row!=i){target++;for(col=1;col<=3;col++){mm[target,col]=sj[row,col];}}}
+  determinant=reduce(det(mm),residueLocal33);
+  for(j=1;j<=ncols(ss);j++){productIndex++;openValues[productIndex]=reduce(ss[i,j]*determinant,residueLocal33);}
+ }
+ ideal gens=residueLocal33,openValues;
+ if(std(gens)[1]!=1){ERROR("LOCAL33_NO_STANDARD_SMOOTH_PRESENTATION_ON_SOME_BRANCH");}
+ matrix witness=lift(gens,ideal(1));matrix reconstructed=matrix(gens)*witness;
+ if(reconstructed[1,1]!=1){ERROR("LOCAL33_LOCAL_UNIT_IDENTITY");}
+ link out="ASCII:w local-"+label+".sing";open(out);
+ write(out,"poly localDValue="+string(dValue)+";poly localDInverse="+string(di)+";poly localHValue="+string(hValue)+";poly localHInverse="+string(hi)+";ideal localUnitGenerators;");
+ write(out,"matrix localUnitWitness["+string(nrows(witness))+"][1];");
+ for(i=1;i<=ncols(matrix(gens));i++){
+  write(out,"localUnitGenerators["+string(i)+"]="+string(gens[i])+";");
+  write(out,"localUnitWitness["+string(i)+",1]="+string(witness[i,1])+";");
+ }
+ close(out);casesLocal33++;
+ print("LOCAL33_CHECK "+label+" denominator=unit Tate_factor=unit exact_local_presentation=standard_etale_over_u");
+}

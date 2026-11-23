@@ -1,0 +1,6 @@
+shasum: solver-runtime.sha256: No such file or directory
+
+thread 'main' (8973794) panicked at collect-v2.rs:16:5:
+assertion failed: Command::new("shasum").current_dir("../..").args(["-a", "256", "-c",
+                        "solver-runtime.sha256"]).status().unwrap().success()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

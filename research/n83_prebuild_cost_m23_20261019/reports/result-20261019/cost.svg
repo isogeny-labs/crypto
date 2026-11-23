@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="430" viewBox="0 0 960 430" role="img" aria-label="N83 bounded query cold cost at one and eight queries">
+<rect width="960" height="430" fill="#fff"/>
+<style>text{font-family:Arial,sans-serif;fill:#17324d}.title{font-size:21px;font-weight:700}.sub{font-size:13px}.label{font-size:15px}.number{font-size:15px;font-weight:700}.axis{font-size:12px}.pre{fill:#18709f}.demand{fill:#bd5c2b}.setup{fill:#7cb1c9}.grid{stroke:#dae4eb;stroke-width:1}</style>
+<text x="36" y="36" class="title">N83 D18: charged finite-query wall budget</text>
+<text x="36" y="59" class="sub">One-time D prebuild 87.989 s = census 27.914 + export 39.373 + generic replay 20.702; shared-host L0</text>
+<rect x="36" y="78" width="16" height="16" class="pre"/><text x="59" y="91" class="sub">prebuilt worker</text>
+<rect x="210" y="78" width="16" height="16" class="setup"/><text x="233" y="91" class="sub">one-time setup and replay</text>
+<rect x="449" y="78" width="16" height="16" class="demand"/><text x="472" y="91" class="sub">on-demand worker</text>
+<line x1="207" y1="113" x2="207" y2="358" class="grid"/>
+<line x1="387" y1="113" x2="387" y2="358" class="grid"/>
+<line x1="567" y1="113" x2="567" y2="358" class="grid"/>
+<line x1="747" y1="113" x2="747" y2="358" class="grid"/>
+<text x="202" y="380" class="axis">0</text><text x="377" y="380" class="axis">100</text><text x="557" y="380" class="axis">200</text><text x="737" y="380" class="axis">300 s</text>
+<text x="35" y="145" class="label">m=2, q=1</text>
+<rect x="207" y="126" width="158.38" height="12" class="setup"/><rect x="365.38" y="126" width="17.73" height="12" class="pre"/><text x="391" y="138" class="number">97.838 s</text>
+<rect x="207" y="143" width="63.24" height="12" class="demand"/><text x="279" y="155" class="number">35.131 s</text>
+<text x="35" y="203" class="label">m=3, q=1</text>
+<rect x="207" y="184" width="158.38" height="12" class="setup"/><rect x="365.38" y="184" width="15.89" height="12" class="pre"/><text x="389" y="196" class="number">96.818 s</text>
+<rect x="207" y="201" width="62.28" height="12" class="demand"/><text x="278" y="213" class="number">34.601 s</text>
+<text x="35" y="271" class="label">m=2, q=8</text>
+<rect x="207" y="252" width="158.38" height="12" class="setup"/><rect x="365.38" y="252" width="141.82" height="12" class="pre"/><text x="516" y="264" class="number">166.777 s</text>
+<rect x="207" y="269" width="505.88" height="12" class="demand"/><text x="722" y="281" class="number">281.045 s</text>
+<text x="35" y="329" class="label">m=3, q=8</text>
+<rect x="207" y="310" width="158.38" height="12" class="setup"/><rect x="365.38" y="310" width="127.13" height="12" class="pre"/><text x="501" y="322" class="number">158.617 s</text>
+<rect x="207" y="327" width="498.26" height="12" class="demand"/><text x="715" y="339" class="number">276.812 s</text>
+<text x="36" y="411" class="sub">Derived from sealed phase/query receipts. Finite m=2/m=3 natural rows and useful rank were zero; full IC cost remains open.</text>
+</svg>

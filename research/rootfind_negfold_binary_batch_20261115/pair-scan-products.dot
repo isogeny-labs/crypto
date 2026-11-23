@@ -1,0 +1,13 @@
+digraph PairScan {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.34", ranksep="0.50", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#5b779a", fontname="Helvetica", fontsize=12, margin="0.14,0.10"];
+  edge [color="#68798c", arrowsize=0.7];
+  input [label="Eight ordered K13 points\nthree x-pairs + two boundary singles"];
+  old [label="Existing lazy batch\neight denominator entries"];
+  new [label="Adjacent-x lazy batch\nfive denominator entries", fillcolor="#dff4e8", color="#478365"];
+  oldinv [label="Four-lane batch chain\n1 inverse + 33 products", fillcolor="#fff1d6", color="#aa7935"];
+  newinv [label="Four-lane batch chain\n1 inverse + 24 products", fillcolor="#dff4e8", color="#478365"];
+  same [label="Eight ordered sums\nsame table probes and witnesses"];
+  input -> old -> oldinv -> same;
+  input -> new -> newinv -> same;
+}

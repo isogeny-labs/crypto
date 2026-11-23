@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T04:00:34Z",
+ "id": "PCC-20261116-20e5d9",
+ "kind": "measurement",
+ "producer": {
+  "commit": "40c1117446782de7db8d47a49811ad3c668f37a3",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/replay-development/post-call-03.json",
+    "sha256": "a4574368442b0e5c9e52ebe290b8cbfd1ab2f0fbe7ea9ce98e62b61a714b365f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/replay-development/qualification-summary-03.json",
+    "sha256": "24b5b33ae6380cb6251d85a00e11b7a9130277793c5ef535f9e73751296a8b6f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115/replay-development",
+ "statement": "Corrected replay qualifier source40c111744 and unchanged producer35bdf5b70 completed both positive constructor checks and all ten tamper cases. CAS accepted valid certificates with clean stderr, rejected changed membership coefficient and a non-GB zero-pair witness; Rust rejected malformed/circular/missing/nonreduced data and a true but nonstandard S-pair identity. Executable/runtime/standard-library hashes match; strict clippy passed. Prior failed qualification retained; no runtime gain measured."
+}

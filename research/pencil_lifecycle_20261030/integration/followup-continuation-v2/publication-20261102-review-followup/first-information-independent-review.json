@@ -1,0 +1,46 @@
+{
+  "schema": "research.source-review/v1",
+  "reviewer": "assembler_independent_review_v2",
+  "producer": "first_information",
+  "independent_of_authorship": true,
+  "blinded": false,
+  "decision": "checked_scoped_claims",
+  "source_pins": {
+    "run.py": "72fdfdbf17e91cfe390d791502b5c04fe01e78a2cd1a61a9b716d7136c94ae98",
+    "common.py": "14632022bd2f0b49025d1ae9f5166ce9f31aa159278af07d4f6ac9ec1369bc21",
+    "check_only.py": "8fbeefad04e36125e8b28169b3b98d795fd5ab107c46890b9bb07191c5d5957e",
+    "PROOF.md": "0ba4ce2ea4921b4278ad397037632e059f65f987109f49537e033ea8e26c0e71",
+    "summary.json": "51a892295beb26a8044bb4a6b54a532dcf27ceba25a437498bc0e29c5ec3285d",
+    "boundary-manifest.json": "5e1bdce5b7de418c44ae8661e3f29db6a7d7c1bc244d639dc6718439cf209edd"
+  },
+  "replay": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 timeout 30s python3 signed-first-information/check_only.py",
+    "exit": 0,
+    "systems": 64,
+    "rows": 6900,
+    "determined_minimal_prefixes": 39,
+    "terminal_undetermined": 25,
+    "negative_controls_rejected": [
+      "duplicate_manifest",
+      "predecessor_direction",
+      "shifted_boundary"
+    ],
+    "producer_invoked": false,
+    "elimination_invoked": false,
+    "collector_invoked": false
+  },
+  "findings": [
+    "determined prefix has isolating combination and particular solution",
+    "preceding prefix has affine family covering every target coordinate",
+    "removing rows preserves affine family, proving minimality",
+    "all39 boundaries match final recorded relation and native attempt",
+    "first attempt range76 through255"
+  ],
+  "limitations": [
+    "one known-answer instance, two configurations, 64 saved streams",
+    "candidate indices are not timing or cost",
+    "linear nuisance assignments need not be geometrically realizable",
+    "Python assertion-based joins require optimization disabled",
+    "no independent geometric replay"
+  ]
+}

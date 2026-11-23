@@ -1,0 +1,104 @@
+{
+  "schema": "n83.topform-launch-gate/v1",
+  "observed_utc": "2026-11-05T17:37:51.761078+00:00",
+  "candidate": "spike38",
+  "attempt": "04",
+  "decision": "launch-authorized-by-existing-user-goal-after-reconciliation",
+  "pr_url": "https://github.com/isogeny-labs/crypto/pull/3485",
+  "pr_state": "open",
+  "pr_head_before_gate": "b6ccc2e0679676c172f047df698d088bade8f770",
+  "capsule_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-04/capsule-v1/",
+  "capsule_readback": {
+    "files": 423,
+    "bytes": 5159670,
+    "byte_identical": true
+  },
+  "results_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-04/results/",
+  "results_prefix_empty": true,
+  "matching_pdp_top_processes": 0,
+  "host": {
+    "instance_id": "i-0134957064d7a24c6",
+    "instance_type": "m8i.8xlarge",
+    "availability_zone": "us-east-2b",
+    "affinity_before_launch": "0-31",
+    "launch_cpu_cores": 1
+  },
+  "unrelated_active_eks_job": {
+    "name": "bridge-fbcm-k1n19-20261105d",
+    "uid": "969394af-8bdc-40c4-aa72-43659ed5f4c5",
+    "state": "active",
+    "cpu_cores": 4,
+    "memory_gib": 4,
+    "not_n83": true
+  },
+  "budgets": {
+    "daily_budget_usd": 200,
+    "daily_spend_observed_usd": 37.0452184422,
+    "monthly_budget_usd": 1000,
+    "monthly_spend_observed_usd": 538.7198087168,
+    "spot_usd_per_hour": 0.8015,
+    "spot_quote_utc": "2026-11-05T17:00:00Z",
+    "compute_ceiling_usd": 2.9,
+    "artifacts_ceiling_usd": 0.25,
+    "total_ceiling_usd": 3.15
+  },
+  "execution_limits": {
+    "wall_seconds": 12850,
+    "termination_grace_seconds": 45,
+    "retries": 0,
+    "aws_max_attempts": 1,
+    "cpu": 1,
+    "memory_gib": 8,
+    "fetch_concurrency": 4
+  },
+  "pinned_files": {
+    "preflight.json": {
+      "sha256": "504fda431d1c84313794a4112dc07fea8a6845f90fb938511b2ccf2eae3b2aec",
+      "bytes": 4580
+    },
+    "protocol-amendment.json": {
+      "sha256": "c3d34a5658d272e7b90dc5a1a07bc991037541086bccbab55841a8b0b81c805b",
+      "bytes": 2916
+    },
+    "protocol-amendment-binding.json": {
+      "sha256": "e55b1895880b4e6019e80c7d15e25b42ed9435874003e90e18811a5efed93cfd",
+      "bytes": 330
+    },
+    "launch.sh": {
+      "sha256": "420e2f0349d52c8bf9350fec7a616f1d9ce1a764397258d02dfcfe7dec3c7abb",
+      "bytes": 2134
+    },
+    "run-spike38-topform.sh": {
+      "sha256": "640cf19674a31b09dc2bcd56d02c2418ab933e62a76fc7cf6cb73bb0ec5314db",
+      "bytes": 6018
+    },
+    "source-pdp.rs": {
+      "sha256": "8e23a7287dc82afc967ef3f50e20c486f3f01d1e4a5f1847b5891b24df3b7629",
+      "bytes": 35349
+    },
+    "source-top.rs": {
+      "sha256": "2b22d880eb68ba304c8cca67fec0694c8987f1523436ef728bfa9ad39a621e7e",
+      "bytes": 27895
+    },
+    "pdp": {
+      "sha256": "b8e00f73512977828497c4bb30f0ae08d319350688a90b15310aa4143308a3ca",
+      "bytes": 1290088
+    },
+    "top": {
+      "sha256": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a",
+      "bytes": 800808
+    },
+    "data-index.json": {
+      "sha256": "3fb72aa61147882832bbb17fc65a3ccfb8f5f179c047a43e4ccf65cecfa34623",
+      "bytes": 1601
+    },
+    "s3-file-index.json": {
+      "sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+      "bytes": 330713
+    },
+    "s3-live-inventory.json": {
+      "sha256": "f2a6d3fddae48c0ddf6c83a00dae23c99c548d077aea97913b8f831697f4b97f",
+      "bytes": 188249
+    }
+  }
+}

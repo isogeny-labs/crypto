@@ -1,0 +1,136 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-16T03:57:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Volumes/SSD990-2/hec-tensorprod631-target/release/compare-tensor631",
+        "collect",
+        "/Volumes/SSD990-2/hec-inverse-work",
+        "/Volumes/SSD990-2/hec-inverse-work/research/hec_tensorprod631_20261116/timing"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T03:51:25+00:00",
+      "wall_s": 28.411
+    }
+  ],
+  "commit": "0911e248f4395b70ae670f4f741f8cb7aae8345b",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T03:51:02+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-tensor631"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0351Z-hec-tensor631",
+  "metrics": [
+    {
+      "baseline": 1.478166542,
+      "better": "lower",
+      "n": 5,
+      "name": "inverse_component_wall",
+      "note": "Compiled-A observations; frozen stability gate fails due baseline-A first cell. No qualified speedup; component only.",
+      "reference": 1.478166542,
+      "reference_kind": "baseline",
+      "spread": [
+        1.27559625,
+        1.407780416
+      ],
+      "unit": "wall_s",
+      "value": 1.290368459
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "baseline_a_component_wall",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.44852325,
+        2.065583333
+      ],
+      "unit": "wall_s",
+      "value": 1.478166542
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "baseline_a_over_tensor_a",
+      "note": "Observed ratio of medians; stability qualification failed; 10x fails; no stable inference.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.145538339604
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "stability_pass",
+      "note": "All four spread checks and both A/A checks required; baseline-A spread fails.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "ic:hec-f631-c49-inverse-pair",
+  "raw": [
+    {
+      "bytes": 1964315,
+      "path": "research/hec_tensorprod631_20261116/raw-timing.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c0/c02dfef75ccd60d0e7bd2a82815fb90699a52a93840a189cca7512a10d30a579",
+      "sha256": "c02dfef75ccd60d0e7bd2a82815fb90699a52a93840a189cca7512a10d30a579",
+      "uploaded": true
+    },
+    {
+      "bytes": 2788,
+      "path": "research/hec_tensorprod631_20261116/SUMMARY-TIMING.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8a/8a894b0944ae558b3dc686f774d256062c2e3cb5db01bee26021a18ff0f9eb99",
+      "sha256": "8a894b0944ae558b3dc686f774d256062c2e3cb5db01bee26021a18ff0f9eb99",
+      "uploaded": true
+    },
+    {
+      "bytes": 759,
+      "path": "research/hec_tensorprod631_20261116/timing/cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/475103cfc5f05b4c31287fec18f47c71c8c2ce84eaa2a05f60bdf6947b0d7f3a",
+      "sha256": "475103cfc5f05b4c31287fec18f47c71c8c2ce84eaa2a05f60bdf6947b0d7f3a",
+      "uploaded": true
+    },
+    {
+      "bytes": 268,
+      "path": "research/hec_tensorprod631_20261116/BOUNDS-TIMING.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/72c90596b5e0021bd061e1f06808cddd8ffea83f2d1d17468f43671f40b8b259",
+      "sha256": "72c90596b5e0021bd061e1f06808cddd8ffea83f2d1d17468f43671f40b8b259",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-hec-tensor631/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-hec-tensor631/REPORT.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-hec-tensor631/COST.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-tensor631",
+  "status": "measured",
+  "summary": "All20cells verified; stability gate fails; observed1.146ratio unqualified; 10xrejected; phase evidence redirects mechanism.",
+  "validation": null
+}

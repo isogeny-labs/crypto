@@ -1,0 +1,144 @@
+-- Prospective source only, not compiled or axiom-audited. [pcc:unverified]
+import Nonbranch
+import BranchConjugateOrders
+import Mathlib.Tactic.LinearCombination
+
+set_option autoImplicit false
+noncomputable section
+namespace BranchNormTransport
+open Polynomial Common22SeparateChartMap Common22BranchStalk
+  WeightedProjSmoothPoints WeightedProjFiniteBranchDVR
+  WeightedProjBranchPolynomialEval
+variable {K : Type*} [Field K]
+
+abbrev L (a3 a2 a1 a0 a : K) (hroot : fAt a3 a2 a1 a0 a = 0) :=
+  Localization.AtPrime (branchIdeal a3 a2 a1 a0 a hroot)
+
+def rho (a3 a2 a1 a0 a : K) (hroot : fAt a3 a2 a1 a0 a = 0) :
+    AffineRing a3 a2 a1 a0 →+* ProjBranchRing a3 a2 a1 a0 a hroot :=
+  (branchRingEquiv a3 a2 a1 a0 a hroot).symm.toRingHom.comp
+    (algebraMap (AffineRing a3 a2 a1 a0) (L a3 a2 a1 a0 a hroot))
+
+def E (a3 a2 a1 a0 a : K) (hroot : fAt a3 a2 a1 a0 a = 0) :
+    K[X] →+* ProjBranchRing a3 a2 a1 a0 a hroot :=
+  eval₂RingHom (projectiveCoeffHom a3 a2 a1 a0 a hroot)
+    (projectiveX a3 a2 a1 a0 a hroot)
+
+-- The actual polynomial evaluator is the affine evaluator followed by the
+-- actual localization and branch stalk isomorphism. Scalar compatibility is
+-- supplied by the existing algebra tower, not a new bridge premise.
+theorem eval_eq_rho_affine (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) :
+    E a3 a2 a1 a0 a hroot = (rho a3 a2 a1 a0 a hroot).comp
+      (ActualNonbranchNorm.affineEval a3 a2 a1 a0) := by
+  apply Polynomial.ringHom_ext
+  · intro k
+    simp only [E, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_C,
+      RingHom.comp_apply, ActualNonbranchNorm.affineEval]
+    change (branchRingEquiv a3 a2 a1 a0 a hroot).symm
+        (algebraMap K (L a3 a2 a1 a0 a hroot) k) =
+      (branchRingEquiv a3 a2 a1 a0 a hroot).symm
+        (algebraMap (AffineRing a3 a2 a1 a0) (L a3 a2 a1 a0 a hroot)
+          (algebraMap K (AffineRing a3 a2 a1 a0) k))
+    rw [IsScalarTower.algebraMap_apply K (AffineRing a3 a2 a1 a0)
+      (L a3 a2 a1 a0 a hroot)]
+  · simp [E, rho, ActualNonbranchNorm.affineEval, projectiveX]
+
+theorem curve_eval (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) :
+    E a3 a2 a1 a0 a hroot (quintic a3 a2 a1 a0) =
+      projectiveY a3 a2 a1 a0 a hroot ^ 2 := by
+  calc
+    _ = rho a3 a2 a1 a0 a hroot
+        (ActualNonbranchNorm.affineEval a3 a2 a1 a0 (quintic a3 a2 a1 a0)) := by
+      rw [eval_eq_rho_affine, RingHom.comp_apply]
+    _ = rho a3 a2 a1 a0 a hroot (ybar a3 a2 a1 a0 ^ 2) :=
+      congrArg (rho a3 a2 a1 a0 a hroot)
+        (ActualNonbranchNorm.affine_curve a3 a2 a1 a0).symm
+    _ = projectiveY a3 a2 a1 a0 a hroot ^ 2 := by
+      rw [map_pow]
+      rfl
+
+-- Map the actual polynomial identity; the target stalk identity is proved.
+theorem stalk_norm (a3 a2 a1 a0 a b : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) (n u1 u2 U : K[X])
+    (hnorm : n^2-u1*u2*U=C (b^2)*quintic a3 a2 a1 a0) :
+    let e := E a3 a2 a1 a0 a hroot
+    let B := projectiveCoeffHom a3 a2 a1 a0 a hroot b
+    let Y := projectiveY a3 a2 a1 a0 a hroot
+    (e n-B*Y)*(e n+B*Y)=e u1*e u2*e U := by
+  dsimp only
+  have hh := congrArg (E a3 a2 a1 a0 a hroot) hnorm
+  have hc : E a3 a2 a1 a0 a hroot (C b) =
+      projectiveCoeffHom a3 a2 a1 a0 a hroot b := by
+    simp [E]
+  simp only [map_sub, map_pow, map_mul, hc] at hh
+  rw [curve_eval] at hh
+  linear_combination hh
+
+theorem support_stalk_order_two (a3 a2 a1 a0 a b : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hsimple : Common22BranchParameter.derivativeAt a3 a2 a1 a0 a ≠ 0)
+    (hb : b ≠ 0) (n u1 u2 U : K[X])
+    (hnorm : n^2-u1*u2*U=C (b^2)*quintic a3 a2 a1 a0)
+    (hsupport : u1.eval a*u2.eval a*U.eval a=0) :
+    let R := ProjBranchRing a3 a2 a1 a0 a hroot
+    letI := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+    letI := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+    let v := IsDiscreteValuationRing.addVal R
+    let e := E a3 a2 a1 a0 a hroot
+    v (e u1)+v (e u2)+v (e U)=2 := by
+  dsimp only
+  let R := ProjBranchRing a3 a2 a1 a0 a hroot
+  letI : IsDomain R := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+  letI : IsDiscreteValuationRing R := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+  have hn := BranchConjugateOrders.numerator_root_from_norm
+    a3 a2 a1 a0 a b hroot n u1 u2 U hnorm hsupport
+  have hp := (BranchConjugateOrders.actual_branch_conjugate_orders
+    a3 a2 a1 a0 a b hroot hsimple hb n hn).2.2.1
+  have hh := congrArg (IsDiscreteValuationRing.addVal R)
+    (stalk_norm a3 a2 a1 a0 a b hroot n u1 u2 U hnorm)
+  change IsDiscreteValuationRing.addVal R
+    ((n.eval₂ (projectiveCoeffHom a3 a2 a1 a0 a hroot)
+       (projectiveX a3 a2 a1 a0 a hroot) -
+       projectiveCoeffHom a3 a2 a1 a0 a hroot b * projectiveY a3 a2 a1 a0 a hroot) *
+     (n.eval₂ (projectiveCoeffHom a3 a2 a1 a0 a hroot)
+       (projectiveX a3 a2 a1 a0 a hroot) +
+       projectiveCoeffHom a3 a2 a1 a0 a hroot b * projectiveY a3 a2 a1 a0 a hroot)) = _ at hh
+  rw [hp, AddValuation.map_mul, AddValuation.map_mul] at hh
+  exact hh.symm
+
+-- Exact source specialization: polynomial norm identity is derived from the
+-- coefficient expressions and divisor congruences, rather than assumed.
+theorem source_support_stalk_order_two
+    (a3 a2 a1 a0 a q1 r1 s1 t1 q2 r2 s2 t2 : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hs : (quintic a3 a2 a1 a0).Separable)
+    (hb : (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1 ≠ 0)
+    (valid1 : Common22Coprime.firstSupport q1 r1 ∣ quintic a3 a2 a1 a0-(C s1*X+C t1)^2)
+    (valid2 : Common22Coprime.secondSupport q2 r2 ∣ quintic a3 a2 a1 a0-(C s2*X+C t2)^2)
+    (hsupport : (Common22Coprime.firstSupport q1 r1).eval a *
+      (Common22Coprime.secondSupport q2 r2).eval a *
+      (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2).eval a = 0) :
+    let hsimple := WeightedProjQuinticHead.derivativeAt_ne_zero_of_separable
+      a3 a2 a1 a0 a hs hroot
+    let R := ProjBranchRing a3 a2 a1 a0 a hroot
+    letI := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+    letI := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+    let v := IsDiscreteValuationRing.addVal R
+    let e := E a3 a2 a1 a0 a hroot
+    v (e (Common22Coprime.firstSupport q1 r1))+
+      v (e (Common22Coprime.secondSupport q2 r2))+
+      v (e (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2))=2 := by
+  exact support_stalk_order_two a3 a2 a1 a0 a _ hroot
+    (WeightedProjQuinticHead.derivativeAt_ne_zero_of_separable a3 a2 a1 a0 a hs hroot)
+    hb _ _ _ _
+    (ActualNonbranchNorm.source_norm_identity a3 a2 a1 a0 q1 r1 s1 t1 q2 r2 s2 t2 hb valid1 valid2)
+    hsupport
+
+#print axioms eval_eq_rho_affine
+#print axioms curve_eval
+#print axioms stalk_norm
+#print axioms support_stalk_order_two
+#print axioms source_support_stalk_order_two
+end BranchNormTransport

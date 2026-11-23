@@ -1,0 +1,15 @@
+[package]
+name = "p1tool"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "P1 (IDEA-20261107-RR-DICKSON-TORUS): msolve input emitter and log parser for RR/T systems with Kummer or Dickson-torus membership towers"
+
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+
+[workspace]
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,14 @@
+spec ECS1ha8e5a396b20c (Curve25519 k=20: PKM isogeny t5/G4/seed1307 with and without F4 trace replay, ecbench counted unit): 64 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm proj-a           baseline   ECM1h899163a49ab7 ic.pipeline {"factor_base": "prime-projected-abscissa:size=32,scan_cap=512", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm pkm-iso-t5-g4-s1307 candidate  ECM1h29e77bb23d68 ic.pipeline {"factor_base": "prime-isogeny:t=5,seed=1307", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "pkm-semaev:m=2,mode=full,guess=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm pkm-iso-t5-g4-s1307-trace candidate  ECM1ha96da99fa4b8 ic.pipeline {"factor_base": "prime-isogeny:t=5,seed=1307", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "pkm-semaev:m=2,mode=full,guess=4,trace=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload W922e63b11b6c icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W2b04adf5218b icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W27ecdcd10429 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W920e51c9d9ae icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wc958573d8b61 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W35e10ec94078 icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload Wcc71dee6452b icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+  workload W752ef6bfd5cd icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=false ec1=-
+note: 8 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

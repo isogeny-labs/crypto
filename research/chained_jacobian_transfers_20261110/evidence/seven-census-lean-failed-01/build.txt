@@ -1,0 +1,35 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenCensusControls.lean:12:32: error: `grind` failed
+case grind.2.2
+A : Type
+inst : IntModule A
+a : A
+ha : 7 • a = 0
+hne : a ≠ 0
+h_2 : 1244018 • a = a
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] 7 • a = 0
+    [prop] ¬a = 0
+    [prop] ¬4976069 • a = 0 ∨ ¬1244018 • a = -a ∨ 1244018 • a = a
+    [prop] ¬1244018 • a = -a ∨ 1244018 • a = a
+    [prop] 1244018 • a = a
+  [eqc] True propositions
+    [prop] ¬1244018 • a = -a ∨ 1244018 • a = a
+    [prop] ¬4976069 • a = 0 ∨ ¬1244018 • a = -a ∨ 1244018 • a = a
+    [prop] 1244018 • a = a
+  [eqc] False propositions
+    [prop] a = 0
+  [eqc] Equivalence classes
+    [eqc] {a, 1244018 • a}
+    [eqc] {0, 7 • a}
+  [cases] Case analyses
+    [cases] [2/2]: ¬4976069 • a = 0 ∨ ¬1244018 • a = -a ∨ 1244018 • a = a
+      [cases] source: Initial goal
+    [cases] [2/2]: ¬1244018 • a = -a ∨ 1244018 • a = a
+      [cases] source: Initial goal
+  [linarith] Linarith assignment for `A`
+    [assign] a := 0
+'SevenCensusControls.nonzero_seven_shadow_rejected' depends on axioms: [sorryAx]
+'SevenCensusControls.deeper_shadow_retains_finite_controls' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

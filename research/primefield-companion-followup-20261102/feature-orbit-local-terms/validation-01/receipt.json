@@ -1,0 +1,36 @@
+{
+  "source_sha256": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2",
+  "scope": "local Miller software identities, not timings",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--test",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-orbit-local-terms/local.rs",
+        "-o",
+        "/tmp/orbit-local-8yexjbq_/tests"
+      ],
+      "timeout": 90,
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/tmp/orbit-local-8yexjbq_/tests",
+        "--test-threads=1"
+      ],
+      "timeout": 30,
+      "exit": 0,
+      "stdout_sha256": "e5edc93bff7946360c1bba8a6ec1678a66df5e07aca3ae1fbc4087caba9793d2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "binary_sha256": "6026721e9fd93f8176a78ece4b1abf2d39d124351a97517a9ad453acc13f5f38",
+  "passed": true
+}

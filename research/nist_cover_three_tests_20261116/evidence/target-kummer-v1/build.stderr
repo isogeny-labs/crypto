@@ -1,0 +1,10 @@
+target_kummer_fit.cpp: In function ‘int main(int, char**)’:
+target_kummer_fit.cpp:37:26: error: inconsistent deduction for ‘auto’: ‘FiniteDivisor’ and then ‘std::array<T24, 8>’
+   37 |     for(int s=0;s<8;++s){auto shifted=even.shift(s,generic),next=even.values(shifted);for(int t=0;t<8;++t){require(values[s]*next[t]==values[s^t],"generic normal even-subgroup equations");++group_checks;}auto expected=coordinates;for(int i=0;i<8;++i)expected[i]=expected[i]*T24(ek_sign(i,s));require(ek_projective_equal(even.coordinates(next),expected),"Kummer subgroup sign action");++heisenberg;}
+      |                          ^~~~
+target_kummer_fit.cpp:39:45: error: inconsistent deduction for ‘auto’: ‘FiniteDivisor’ and then ‘std::array<T24, 8>’
+   39 |     for(int n=0;n<8;++n){auto t=training[n];auto e=ek_points(points[t[0]],points[t[1]],points[t[2]],target),k=even.coordinates(even.values(e));left.emplace_back(k.begin(),k.end());auto h=ek_good_values(points,t,monomials,functions);for(int j=0;j<8;++j)require(h[j]==read_t24(good.at("generic_values").arr[n].arr[j]),"pinned good-function generic values");right.push_back(h);}
+      |                                             ^~~~
+target_kummer_fit.cpp:44:9: error: inconsistent deduction for ‘auto’: ‘FiniteDivisor’ and then ‘std::array<T24, 8>’
+   44 |         auto e=ek_points(points[t[0]],points[t[1]],points[t[2]],target),k=even.coordinates(even.values(e));auto h=ek_good_values(points,t,monomials,functions);require(ek_fit_equal(matrix,k,h),"heldout full coordinate match");heldout.push_back(t);heldout_k.push_back(k);heldout_h.push_back(h);
+      |         ^~~~

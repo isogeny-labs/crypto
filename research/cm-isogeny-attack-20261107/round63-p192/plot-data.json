@@ -1,0 +1,96 @@
+{
+  "unit": "exact primitive calls per frozen query/constructor, not time",
+  "first_shift": "Q=2G,U=O,i=0; all three panels retained",
+  "panels": [
+    {
+      "p": 11,
+      "r": 7,
+      "cases": 28,
+      "targets": 4,
+      "b": 1,
+      "n": 3,
+      "point_slots": 5,
+      "constructor_calls": 4,
+      "reference_constructor_calls": 7,
+      "query_add_calls": 7,
+      "reference_query_add_calls": 15,
+      "candidate_counts_first_shift": [
+        242,
+        10,
+        7
+      ],
+      "reference_counts_first_shift": [
+        213,
+        12,
+        15
+      ],
+      "algebra_counts_first_shift": [
+        521,
+        23,
+        0
+      ]
+    },
+    {
+      "p": 17,
+      "r": 19,
+      "cases": 304,
+      "targets": 16,
+      "b": 2,
+      "n": 4,
+      "point_slots": 7,
+      "constructor_calls": 6,
+      "reference_constructor_calls": 19,
+      "query_add_calls": 9,
+      "reference_query_add_calls": 39,
+      "candidate_counts_first_shift": [
+        636,
+        24,
+        9
+      ],
+      "reference_counts_first_shift": [
+        705,
+        36,
+        39
+      ],
+      "algebra_counts_first_shift": [
+        1930,
+        68,
+        0
+      ]
+    },
+    {
+      "p": 211,
+      "r": 199,
+      "cases": 49,
+      "targets": 7,
+      "b": 7,
+      "n": 14,
+      "point_slots": 22,
+      "constructor_calls": 21,
+      "reference_constructor_calls": 199,
+      "query_add_calls": 29,
+      "reference_query_add_calls": 399,
+      "candidate_counts_first_shift": [
+        8730,
+        218,
+        29
+      ],
+      "reference_counts_first_shift": [
+        12477,
+        396,
+        399
+      ],
+      "algebra_counts_first_shift": [
+        91595,
+        1663,
+        0
+      ]
+    }
+  ],
+  "sources": [
+    "response.json",
+    "response.log",
+    "audit-summary.json"
+  ],
+  "uncertainty": "none; deterministic counted operations; no statistical inference"
+}

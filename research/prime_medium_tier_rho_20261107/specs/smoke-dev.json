@@ -1,0 +1,67 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "DEVELOPMENT SMOKE ONLY: one 33-bit curve, 2 targets, 1 round (not a measurement)",
+  "description": "research/prime_medium_tier_rho_20261107/PROTOCOL.md. Generic prime-order curves from prime_orbit_index_calculus::generate_instance(generic, bits, seed), given explicitly (curves.json); seeds from seeds.json. Operation counts are the result; wall time only at L2 against the A/A arm.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 5557729739,
+        "a": 2036002406,
+        "b": 2773982840,
+        "group_order": 5557664551,
+        "r": 5557664551,
+        "gx": 3,
+        "gy": 898702012
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 54849620745713,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "baseline",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "rho-neg-v2",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 227095582935304,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

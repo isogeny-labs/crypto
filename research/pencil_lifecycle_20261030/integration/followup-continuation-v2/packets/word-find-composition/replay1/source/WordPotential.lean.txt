@@ -1,0 +1,47 @@
+import GraphRing
+import SameComposition
+import Inversion
+set_option autoImplicit false
+namespace SignedWord
+def Sign (s:Int8) : Prop := s=1 ∨ s= -1
+def sd (r:UInt64) (s:Int8) : ZMod r.toNat := (s.toInt:ZMod r.toNat)
+structure Pot where
+ s:Int8
+ a:UInt64
+ b:UInt64
+def GoodPot (r:UInt64) (p:Pot) : Prop := Sign p.s ∧ p.a.toNat<r.toNat ∧ p.b.toNat<r.toNat
+def decPot (r:UInt64) (p:Pot) : SignedGraphAlgebra.Potential (ZMod r.toNat) :=
+ ⟨sd r p.s,(p.a.toNat:ZMod r.toNat),(p.b.toNat:ZMod r.toNat)⟩
+def ident : Pot := ⟨1,0,0⟩
+def signed (r:UInt64) (s:Int8) (a:UInt64) := if s=1 then a else GraphRingWord.neg r a
+def compose (r:UInt64) (p q:Pot) : Pot :=
+ ⟨p.s*q.s,GraphRingWord.add r p.a (signed r p.s q.a),GraphRingWord.add r p.b (signed r p.s q.b)⟩
+theorem sign_mul (s t:Int8) (hs:Sign s) (ht:Sign t) : Sign (s*t) := by
+ rcases hs with rfl|rfl <;> rcases ht with rfl|rfl <;> norm_num [Sign]
+theorem sd_mul (r:UInt64) (s t:Int8) (hs:Sign s) (ht:Sign t) : sd r (s*t)=sd r s*sd r t := by
+ rcases hs with rfl|rfl <;> rcases ht with rfl|rfl <;> norm_num [sd]
+theorem sd_sign (r:UInt64) (s:Int8) (hs:Sign s) : sd r s=1 ∨ sd r s= -1 := by
+ rcases hs with rfl|rfl <;> norm_num [sd]
+theorem signed_correct (r a:UInt64) (s:Int8) (hp:0<r.toNat) (ha:a.toNat<r.toNat) (hs:Sign s) :
+ (signed r s a).toNat<r.toNat ∧ ((signed r s a).toNat:ZMod r.toNat)=sd r s*(a.toNat:ZMod r.toNat) := by
+ rcases hs with rfl|rfl
+ · simpa [signed,sd] using ha
+ · simpa [signed,sd] using GraphRingWord.neg_correct r a hp ha
+theorem ident_good (r:UInt64) (hp:0<r.toNat) : GoodPot r ident := by
+ exact ⟨Or.inl rfl,by simpa [ident] using hp,by simpa [ident] using hp⟩
+theorem ident_decode (r:UInt64) : decPot r ident=GraphFind.ident := by
+ simp [decPot,ident,sd,GraphFind.ident]
+theorem compose_correct (r:UInt64) (hp:0<r.toNat) (hb:r.toNat≤2^63)
+ (p q:Pot) (hg:GoodPot r p) (hq:GoodPot r q) :
+ GoodPot r (compose r p q) ∧ decPot r (compose r p q)=SignedGraphAlgebra.compose (decPot r p) (decPot r q) := by
+ have ha:=signed_correct r q.a p.s hp hq.2.1 hg.1
+ have hbq:=signed_correct r q.b p.s hp hq.2.2 hg.1
+ have haa:=GraphRingWord.add_correct r p.a _ hp hb hg.2.1 ha.1
+ have hbb:=GraphRingWord.add_correct r p.b _ hp hb hg.2.2 hbq.1
+ refine ⟨⟨sign_mul p.s q.s hg.1 hq.1,haa.1,hbb.1⟩,?_⟩
+ change SignedGraphAlgebra.Potential.mk _ _ _=SignedGraphAlgebra.Potential.mk _ _ _
+ congr 1
+ · exact sd_mul r p.s q.s hg.1 hq.1
+ · simpa only [compose,decPot,SignedGraphAlgebra.compose,ha.2] using haa.2
+ · simpa only [compose,decPot,SignedGraphAlgebra.compose,hbq.2] using hbb.2
+end SignedWord

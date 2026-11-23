@@ -1,0 +1,49 @@
+{
+  "schema": "structured-ic-consumer-followup/v1",
+  "standing": "producer_assertion",
+  "claim": "PCC-20261104-458dda",
+  "checked_head": "0bb2022f3ffb2ff5c06b933cc020fc2855fc68c9",
+  "source_and_claim_diff_since_800c": [],
+  "journal_versions_preserved_in_line_order": [
+    "800c7c4a3c49e5e499b7191ca33e95351da6a870",
+    "4b7219b176a2caca58710006461bc343e6ae3b55"
+  ],
+  "six_file_parity": [
+    {
+      "path": "src/structured.rs",
+      "sha256": "675bedac59fd382720bc904d57f40036d410921b3b24e2867995cc7d3a401d7b"
+    },
+    {
+      "path": "src/structured_runner.rs",
+      "sha256": "4b0e1823bad5e7580bf347748bc265bdef5c0fb12bb8ba7481e7b9096d092e08"
+    },
+    {
+      "path": "src/bin/tensor-structured.rs",
+      "sha256": "9aa450bfad2f4f340312aa44725d06ac521545c2990da13d77b39b489b22449f"
+    },
+    {
+      "path": "tests/structured.rs",
+      "sha256": "98dfc69b04776ece9ed75990a10781c9ff43a668ade698f1ac902df610b47834"
+    },
+    {
+      "path": "tests/structured_cli.rs",
+      "sha256": "fc2289d0b7433fa1ea87bf7da8dfea08ffddc3ff11ff71f54779664ba7acaf34"
+    },
+    {
+      "path": "examples/structured-prime.json",
+      "sha256": "3591c6dd1c5bba24d8265b21c481618fb91fd8356466cf881962b52de21a67a7"
+    }
+  ],
+  "commands": [
+    {
+      "command": "cargo check --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml",
+      "exit": 0
+    },
+    {
+      "command": "cargo test --release --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --test structured_cli",
+      "exit": 0,
+      "controls": 3
+    }
+  ],
+  "pcc_ledger": "84 entries; prefix and chain pass against 4b7219b176a2caca58710006461bc343e6ae3b55"
+}

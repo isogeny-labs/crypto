@@ -478,9 +478,13 @@ and the prime-field case (`secp256k1`, P-256) has no working index calculus at a
   *other IC variants* in the prime-field case — **but not Pollard rho.** Kudo–Yokota (CANS 2018,
   title literally *"…and Its Limitation"*) accelerate it and document that it still doesn't beat
   generic methods.
-- **Refuted/closed historically:** Silverman's **xedni calculus** was decisively refuted
-  (Jacobson–Koblitz–Silverman–Stein–Teske, DCC 2000) — an absolute bound on lifted-relation
-  coefficient size makes it asymptotically almost-certain to fail. Semaev's 2015 subexponential
+- **Conditionally obstructed and strongly negative historically:** for Silverman's **xedni
+  calculus**, Jacobson–Koblitz–Silverman–Stein–Teske (DCC 2000) derive an absolute
+  lifted-relation coefficient bound under explicit uniform height/discriminant and Lang premises,
+  then use an approximate random-relation step for asymptotic failure. The
+  [Lean audit](../../jksst_xedni_audit_20261101/README.md) proves finite replacements and records
+  the remaining algorithm bridges; it does not turn this into evidence that xedni succeeds.
+  Semaev's 2015 subexponential
   claim (eprint 2015/310) was **binary-only and rests on the now-distrusted first-fall-degree
   assumption** (§8.2), not a prime-field result.
 - **Status of the Holy Grail:** *open but unmoved.* No subexponential prime-field algorithm
@@ -523,8 +527,8 @@ lower bound (jmc-2019-0029); Euler–Petit quasi-subfield (FFA 2021, arXiv 1909.
 Joux–Vitse EUROCRYPT 2012 (eprint 2011/020); Vitse–Wallet LATINCRYPT 2015; Tian (J. Cryptology
 2023, arXiv 2012.07173); Fan (Math. Probl. Eng. 2022); Howe–Leprévost–Poonen gluing; Scholten
 construction; Lauter–Stange SAC 2008 (eprint 2008/099); Petit–Kosters–Messeng PKC 2016;
-Amadori–Pintore–Sala FFA 2018; Kudo–Yokota CANS 2018; xedni refutation (Jacobson–Koblitz–
-Silverman–Stein–Teske, DCC 2000).
+Amadori–Pintore–Sala FFA 2018; Kudo–Yokota CANS 2018; conditional xedni obstruction analysis
+(Jacobson–Koblitz–Silverman–Stein–Teske, DCC 2000).
 **Special-case/impl:** SafeCurves (safecurves.cr.yp.to transfer/twist); Smart/SSSA;
 Gaudry–Hess–Smart ePrint 2001/084; Kim–Barbulescu exTNFS (CRYPTO 2016); Minerva
 (minerva.crocs.fi.muni.cz); LadderLeak ePrint 2020/615; Osaki–Kunihiro SAC 2024;
@@ -555,3 +559,31 @@ in 2025"; Castryck–Decru ePrint 2022/975; Koblitz–Menezes ePrint 2015/1018.
 > assumption being distrusted, cover/gluing attacks confined to extension fields, Shor as the
 > operative threat, ~112–117-bit record frontier — are high-confidence and corroborated across
 > independent sources.
+
+## Precomputation and multi-target attacks on fixed curves (2026-10-31)
+
+This section extends §1a with exponents for three named groups. It is derived from published bounds and
+the atlas cards `KR-RHO-ea34b8` (precomputation) and `KR-RHO-46c2c6` (multi-target), which record the same results.
+No measurement; the evidence is `research/prime_field_leads_20261031/L3_precomputation/REPORT.md`.
+
+- **Bernstein–Lange (LATINCRYPT 2012, "Computing small discrete logarithms faster").** A per-curve precomputation
+  of about ℓ^{2/3} group operations stores about ℓ^{1/3} distinguished points. Each online discrete log then costs
+  about ℓ^{1/3}. The stored table is ℓ^{1/3} entries, not ℓ^{2/3}; the ℓ^{2/3} is the precomputation work.
+- **Kuhn–Struik (2001).** k discrete logs in one group cost about √(2kℓ) in total, against k·√ℓ independently.
+  The generic lower bound (Yun 2015) makes this tight.
+- **Corrigan-Gibbs–Kogan (EUROCRYPT 2018, eprint 2017/1113).** Preprocessing with advice S and online time T
+  satisfies S·T² = Ω̃(ℓ). Rho (S=1, T=ℓ^{1/2}) and Bernstein–Lange (S=ℓ^{1/3}, T=ℓ^{1/3}) both lie on this line.
+
+| Curve | log2 ℓ | Rho per target | BL table (entries) | BL precomputation | BL online per target | BL online, k = 2^10 | Kuhn–Struik total, k = 2^10 | Kuhn–Struik per target |
+|---|---|---|---|---|---|---|---|---|
+| P-256 | 256.00 | 2^128 | 2^85.3 | 2^170.7 | 2^85.3 | 2^95.3 | 2^133.5 | 2^123.5 |
+| Curve25519 | 252.00 | 2^126 | 2^84 | 2^168 | 2^84 | 2^94 | 2^131.5 | 2^121.5 |
+| ECCp-131 | 130.19 | 2^65.1 | 2^43.4 | 2^86.8 | 2^43.4 | 2^53.4 | 2^70.6 | 2^60.6 |
+
+Exponents are log2 of group operations, or of stored entries for the table column. Constants (about 1.2 and 1.77
+in the card) are dropped. The graph is `L3_precomputation/L3_tradeoff.svg`, with its data in `L3_tradeoff_line.csv`.
+
+This is the only known sub-rho online cost on a standardised curve (P-256, Curve25519) of the kinds listed here.
+It is **not a break**. The precomputation is 2^{170.7} for P-256 and 2^{168} for Curve25519, far above rho, and it
+must be paid once per curve before any online cost counts. The Kuhn–Struik multi-target total is √(2kℓ) and is tight,
+so no multi-target arrangement goes below that total.

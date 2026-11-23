@@ -1,0 +1,10 @@
+/var/tmp/pencil-division-quotient-20261101-v1/ExactDivision.lean:32:5: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/pencil-division-quotient-20261101-v1/ExactDivision.lean:40:1: error: Type mismatch: After simplification, term
+  h
+ has type
+  listPoly (List.map (fun w => ↑w.toNat) a) = q * listPoly (List.map (fun w => ↑w.toNat) b) + listPoly []
+but is expected to have type
+  listPoly (List.map (fun w => ↑w.toNat) a) = q * listPoly (List.map (fun w => ↑w.toNat) b)
+/var/tmp/pencil-division-quotient-20261101-v1/ExactDivision.lean:64:2: warning: Try `simp at h` instead of `simpa using h`
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`

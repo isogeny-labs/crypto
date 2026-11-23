@@ -1,0 +1,16 @@
+digraph n83_k600_v3_custody {
+  graph [rankdir=TB, bgcolor="white", label="N83 K600 v3 local-store control | run 20261115T1209Z | n=1, shared-host L0", labelloc=t, fontsize=18, fontname="Helvetica", pad=0.25];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fb", color="#245780", fontname="Helvetica", fontsize=11, margin="0.18,0.13"];
+  edge [color="#44749b", penwidth=1.6, arrowsize=0.8];
+  input [label="Frozen primary input\nK=600, 99,600 points\npublic_x_hash, seed 2026100801"];
+  build [label="Native construction\n1,102.783 ms (L0)"];
+  replay [label="Generic point/orbit replay\n99,600 points, 600 columns\n753.807 ms (L0)", fillcolor="#e4f4e6", color="#36814b"];
+  store [label="Local content-addressed push\nSHA-256 3e85c9e4…841ecf\n36.091 ms (L0)"];
+  fresh [label="Empty-cache fresh pull\n3,025,798 bytes, hash match\n22.700 ms (L0)", fillcolor="#e4f4e6", color="#36814b"];
+  check [label="Independent v3 import\nPASS: 99,600 points, 600 columns", fillcolor="#e4f4e6", color="#36814b"];
+  { rank=same; input; build; replay; }
+  { rank=same; store; fresh; check; }
+  input -> build -> replay -> store -> fresh -> check;
+  note [shape=note, fillcolor="#fff7dc", color="#aa8a2e", label="Construction/custody only\nNo natural relation or total IC runtime\nNo S3 write"];
+  check -> note [style=dashed, arrowhead=none];
+}

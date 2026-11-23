@@ -1,0 +1,14 @@
+{
+  "action": "Separate bounded regularity-output and certificate-completion stages; admit no result from partial reg lines when the frozen complete certificate stage times out",
+  "created": "2026-11-17T17:07:38Z",
+  "evidence": [
+    "research/p256_aux_smooth_20261114/goal_dreg_half_20261117/evidence/cocoa-complete/summary.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "path:research/p256_aux_smooth_20261114"
+  ],
+  "trigger": "Qualifying full-system regularity after a tiny CI succeeds",
+  "why": "Three cells printed reg assertions then timed out in Betti generation. Tiny known-answer success did not qualify full certificate cost; failures and partial output stay unadmitted."
+}

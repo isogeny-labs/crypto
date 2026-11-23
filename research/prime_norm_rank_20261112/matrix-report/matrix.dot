@@ -1,0 +1,13 @@
+digraph matrix {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,margin="0.13",fillcolor="#e8f5ed"];
+ edge [fontname="Helvetica",fontsize=10];
+ data [label="Actual supplied norm + Bezout data\nWitness-derived quotient functional mu",fillcolor="#fff1d5"];
+ entry [label="Actual entry E_ij = Ai*Aj - f*Bi*Bj\nD_ij=mu(E_ij); C_j from actual residual coefficients"];
+ quadratic [label="Exact quadratic expressions\nD evaluates mu(actual norm)\nC_j evaluates actual coefficient constraint"];
+ pencil [label="Actual matrix-pencil equality\nD = sum moments_j * C_j"];
+ basis [label="Canonical even chart: a=b+2, deg f<=3\nProduct monomial families span all bounded pairs\nFamily and entry degrees derived"];
+ open [label="Next: coordinate injectivity + actual branch\nWitness-line intersection and corank1 recovery\nPublic-input finder remains separate",fillcolor="#fff1d5"];
+ data -> entry -> quadratic -> pencil -> basis;
+ basis -> open [style=dashed];
+}

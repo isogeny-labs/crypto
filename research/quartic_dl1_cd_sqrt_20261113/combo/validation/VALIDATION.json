@@ -1,0 +1,38 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "d7128b07709b660fc8acf1c4c4057c60b00c0f50e2f6b0631fcca2b576396a1a"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "e58d15de1e16bf3a4b4e76f892ff6386e03708a789e2d05d1ba12e36ab63ca93"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "frozen N4 v2 grid negation-map rho (rho2::rho_neg) on the same GHS-weak E0 instances; k = 22 from the frozen supplement (research/quartic_n4v2_20261020/results/summary_supp.json), as that study does",
+  "unit": "cold F_q-multiplication equivalents (M-eq) with the frozen grid's per-size r_inv, r_lmul; hash/cmp at w*gae (section 5a)",
+  "binary_or_process": "N4 v2 driver: the IC arm (v3 ic, sha256 de500bc1...) and the rho reference (rho2.rs and common.rs, byte-identical in v3); v3 rho replays the frozen k = 22 negation-map run (seed 2, run 1) field for field: rho-replay-v3-k22-neg-seed2-run1.jsonl, 21 counted fields, 0 differences",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "strongest_available_note": "E0 has coefficients generic in K = F_{q^3} (built from u, u^q, u^{q^2}), so no Frobenius endomorphism; the negation map is the available symmetry. Plain rho at k = 22 for comparison: IC/rho 0.0024, 0.0026, 0.0032 at w = 0, 0.1, 1.",
+  "gae_band": {
+   "0": {
+    "ic": 1038514332.4152999,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1208511467.8152997,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2738485686.4153,
+    "rho": 1492814000000.0
+   }
+  },
+  "order_holds_across_band": true,
+  "scope": "DL arm, c_D = 1.7 + square-root chain, q = 4194271 (k = 22), mean over seeds 1-3; the paired improvement over the frozen DL at k = 18..22 is in the validator report"
+ }
+}

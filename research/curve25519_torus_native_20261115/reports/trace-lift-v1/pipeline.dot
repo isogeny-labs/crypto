@@ -1,0 +1,11 @@
+digraph TraceLift {
+  graph [rankdir=LR, bgcolor="white", pad=0.15, nodesep=0.35, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fillcolor="#edf5fb", color="#264c70", fontname="Helvetica", fontsize=12];
+  edge [color="#264c70", fontname="Helvetica", fontsize=10];
+  scalar [label="Public q, omega + real x\nT_q(x)=c\nStill degree q"];
+  lift [label="Guarded unique lift\nb=(x^2-1) U/(2d)\nd != 0; q != 0 in F"];
+  original [label="Original norm + power\nthen unchanged membership\nand point/target checks"];
+  scalar -> lift -> original;
+  discovery [label="Relation-root discovery\nand full cold costs\nremain open", fillcolor="#fff4dc", color="#9a6e18"];
+  discovery -> scalar [style=dashed, label="must supply roots"];
+}

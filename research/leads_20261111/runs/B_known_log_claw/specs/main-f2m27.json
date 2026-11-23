@@ -1,0 +1,68 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "LEAD-ICB-tableB-binary-known-log-claw main icv1-f2m27-t12543-569dca8b",
+  "description": "BOUNDARY (BSGS-class, owner ruling 2026-11-08): known-log pair claw vs matched rho.negation on a Table B random-binary instance; A/A = second base seed. Counts only (L0 container).",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_explicit",
+        "n": 27,
+        "modulus": 134217767,
+        "a": 1,
+        "b": 8672354,
+        "group_order": 134205186,
+        "r": 22367531,
+        "gx": 72506017,
+        "gy": 18815364
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 2026111202,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "known-log",
+      "role": "candidate",
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "size": "58",
+          "base_seed": "20261112",
+          "base_multiplier": "1",
+          "max_pair_work": "3422",
+          "max_trials": "166228"
+        }
+      }
+    },
+    {
+      "name": "known-log-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "size": "58",
+          "base_seed": "20261113",
+          "base_multiplier": "1",
+          "max_pair_work": "3422",
+          "max_trials": "166228"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 2026111201,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

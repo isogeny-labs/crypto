@@ -1,0 +1,42 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "status": "producer_checked_pending_independent_review",
+  "theorems": 7,
+  "scope": "same-u mixed extracted-point field validity and literal weighted normalization",
+  "premises": [
+    "field",
+    "two original normalized Mumford congruences",
+    "equal normalized support",
+    "nonzero slope difference",
+    "noninverse ordinate pair",
+    "four nonzero weights for weighted module"
+  ],
+  "smoothness_assumed": false,
+  "output_validity_assumed": false,
+  "singular_counterexample": {
+    "field": "Q",
+    "f": "X^5",
+    "u": "X^2",
+    "v1": "X",
+    "v2": "2X",
+    "extracted_y": 0,
+    "following_native_dbl_weight": 0
+  },
+  "negative_control": "inverse pair with nonzero slope difference need not yield support root",
+  "checks": {
+    "SameUMixed_attempt3": 0,
+    "WeightedExtract_weighted4": 0,
+    "controls4": 0,
+    "readback2": 0
+  },
+  "all_failures_retained": true,
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "full_cost_ratio": null,
+  "open": [
+    "word/guard composition",
+    "smoothness-to-nonzero-ordinate lemma",
+    "subsequent doubling composition",
+    "class sum/counters/compiler/walk"
+  ]
+}

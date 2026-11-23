@@ -1,0 +1,3 @@
+# Stronger correction-basis diagnostic
+
+All basis/support/field oracles passed before selection. The frozen largest-under-overhead rule selects8distinct necessary corrections at precisions18through25,versus C127's two duplicate rows at precision18. This is a stronger algebraic prefix,not an identical failed retry. Actual graph47,430variables169,977clauses is bound by the profile hash. Exact raw product,multiplicities,alltheta/q,degree,numericfactor,local/GF83prefixchecks and original recovery obligations remain. The first workerclock instruction now precedes project imports; supervisor full child lifetime still supplies the end-to-end observation. Limits90souter/40ssoft/4GiB/CPU0and78/84sreportingguards remain;unknowns never become empty roots or speed ratios.

@@ -924,6 +924,26 @@ branches each, and runs the degree-4 closure on every branch.
 - **Memory.** Peak 7.04 GB under the 15 GB limit; the earlier 10.6 GB was one
   outlier (median 7.0 GB over 68 runs).
 
+## Result 17: the unspecialised (22, 7) system does not refute at degree 4
+
+`research/dreg_closure_null22_7_20261028/` was pre-registered. It measures the
+**matched null** for the three-guess set of Result 16: the unspecialised
+m = 3, (n, ℓ) = (22, 7) system, with the same N = 43 unknowns, 44 equations and
+136,698 degree-4 columns, on its first four unsatisfiable draws (surplus +1).
+
+- **Registered verdict: "N0 does not refute on at least 3 draws: the pure ℓ = 7
+  reading."** It does not refute on 4 of 4. Controls valid: the identity control
+  matches its committed record on every non-timing field, the dimension-6 control
+  refutes on 4 of 4, and neither satisfiable draw is refuted.
+- **With Results 12 and 13, 12 of 12 unspecialised ℓ = 7 draws do not refute,**
+  over N = 40, 42, 43 and surplus −2, 0, +1, so surplus is not what caused the
+  earlier ℓ = 7 failure.
+- **Reading.** The three-guess failure (Result 16) is what ℓ = 7 does. The pattern
+  fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8. The 3-set and this cell are an analogy:
+  3 of 4 and 4 of 4 failures are not distinguishable at four draws each.
+- **Not measured:** a three-variable set leaving one summand at dimension 8
+  (predicted to fail), degree 5 at ℓ = 7, ℓ = 9.
+
 ## Reproducing
 
 ```sh
@@ -1065,3 +1085,42 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   `research/dreg_invariant_guess_more_20261029/RESULTS.md`).
 - `examples/dreg_linear_guess_more_score.rs` re-checks the draw generator's
   replay of the committed draws before scoring.
+
+## A second invariant guess on the pair (2026-10-29)
+
+- Replacing the raw guess `c₇` by `a₆ + b₆` at (22, 8) lets degree 4 refute on
+  every branch of 2 of 12 draws, against 7 of 12 for S3. That is no detected
+  difference at the registered two-sided threshold (p = 0.0625), and the new
+  arm is never better (`research/dreg_invariant_pair_guess_20261029/RESULTS.md`).
+
+## An invariant guess on the second link (2026-11-05)
+
+- Replacing the raw guess `c₇` by coordinate 20 of `e₁ + x₃` at (22, 8) lets
+  degree 4 refute on every branch of 6 of 12 draws, against 7 of 12 for S3.
+  One draw is discordant, so the registered two-sided verdict is no detected
+  difference (p = 1.0)
+  (`research/dreg_second_link_guess_20261105/RESULTS.md`). Unverified
+  assertion until a pcc verdict exists.
+
+## One invariant guess per link at m = 4, degree 3 (2026-11-06)
+
+- At m = 4, ℓ = 5, with k = 10 guesses, placing them on the three links'
+  swap invariants makes degree 3 refute on 1,888 of 8,192 branches, against
+  1,312 for raw guesses in the same places. By draw the split is 4 against 3,
+  so the registered two-sided verdict is no detected difference (p = 1.0)
+  (`research/dreg_m4_link_guess_d3_20261106/RESULTS.md`). Unverified
+  assertion until a pcc verdict exists.
+
+## Which guesses decide refutation at m = 4 (2026-11-06)
+
+- With the ten guesses of the m = 4 degree-3 design in place, no link-1 guess
+  changes refutation on any of 16 arm-draws; guessing only the essential ones
+  (one to three, on links 2 and 3) keeps every refutation on 7 of 13
+  (`research/dreg_m4_guess_bits_20261106/RESULTS.md`). Unverified assertion
+  until a pcc verdict exists.
+
+## Two guesses at (22, 8) (2026-11-07)
+
+- S3 or L3 without `e₁[0]` suffices at degree 4 on 1 of 12 draws (draw 6),
+  against 6–7 with three guesses (`research/dreg_two_guess_20261106/RESULTS.md`).
+  Unverified assertion until a pcc verdict exists.

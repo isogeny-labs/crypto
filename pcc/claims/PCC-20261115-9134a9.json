@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:54:19Z",
+ "id": "PCC-20261115-9134a9",
+ "kind": "statement",
+ "producer": {
+  "commit": "62214e5bc8869aadb9712696dcfaa320449dd2d2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/ic_framework/binary_subtract.rs",
+    "sha256": "539f62464ae999c9ef01e167ff9d08876fafc07744f59d5ae741b4fff65fb4a2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/ic_framework/binary_subtract_tests.rs",
+    "sha256": "507e82201f3a76ed4650e1bfc72dddc2c8eb06dc9998ce9fc79bde1eeee674c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/binary_subtract_frontier_20261115/evidence/production-controls.log",
+    "sha256": "7085ad1dd3b6064a6105658b994c7288619f313b0f0e6c83c542b18fb6a7f1b1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/binary_subtract_frontier_20261115/evidence/cli-check.log",
+    "sha256": "e077990a026533349c5006219862d3d2aa3fbd117f5a288f89ddf288156e522b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/binary_subtract_frontier_20261115",
+ "statement": "Producer targeted checks for the production subtract-binary-batch oracle pass five controls: 12900 first-witness comparisons against general pair enumeration; 880 comparisons at degrees 11,17,31 with preparation reuse; 90 OpenSSL-backed full-point comparisons; whole-pipeline known-answer recovery; and failure/extra-lane accounting. The actual production library and ic CLI release checks pass. Broader suites and canonical test wiring remain separately tracked. No wall-time frontier, overall speedup, or independent signed verification is claimed."
+}

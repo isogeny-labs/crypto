@@ -1,0 +1,11 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="N83 V5 Linux exporter build | attempt 2", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", color="#344054", fillcolor="#eef2f6"];
+  host [label="Host floors passed\nsource snapshot checked", fillcolor="#dcfce7"];
+  container [label="Pinned ARM64 container\n12 GiB, no network", fillcolor="#dbeafe"];
+  resolver [label="Offline Cargo resolver", fillcolor="#fef3c7"];
+  stop [label="STOP: exit 101\naws-credential-types absent", fillcolor="#fee2e2", color="#b42318"];
+  compiler [label="Rust compiler / binary\nnot reached", fillcolor="#f3f4f6", color="#98a2b3"];
+  host -> container -> resolver -> stop [color="#b42318"];
+  resolver -> compiler [style=dashed, color="#98a2b3", label="only if resolved"];
+}

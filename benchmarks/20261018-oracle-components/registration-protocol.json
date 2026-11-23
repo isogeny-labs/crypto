@@ -1,0 +1,9 @@
+{
+  "schema":"campaign-fp4-registration-protocol/v1",
+  "source_plan":"research/ideas_execution_20261018/oracle_integration/runs/factorial-current-session/plan.json",
+  "workload":"The four already-executed fp4_translation constructors p=13,17,29,37, seed=1, max_cofactor=16; no new curve search specification",
+  "checks":["exact constructor facts and packed generators match every frozen workload","prime p and r by exact trial division","degree-four Rabin Frobenius/unit-witness field check","nonsingular curve, nonidentity G, [r]G=O","unique multiple of r in the exact Hasse interval equals the declared order","every frozen target decodes on curve and is r-torsion","EC1QpD4 and full UID canonical preimages independently rehashed","old registry entries unchanged"],
+  "scope":"Exact metadata registration and native correctness checks; no timing, speed, new IC candidate, main model-registry coverage or runtime registration-flag claim. Frozen sessions remain unchanged.",
+  "runtime":"Existing release library, one process; no cloud or GPU",
+  "write_policy":"Source plan and raw sessions read-only; append new aliases only after active traits generation/freshness verification completes."
+}

@@ -1,0 +1,22 @@
+name: P-256 auxiliary elimination and offline CAS replay
+on:
+  pull_request:
+    paths:
+      - research/p256_aux_smooth_20261114/continuation_20261116/**
+      - .github/workflows/p256-aux-linear.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linear-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: research/p256_aux_smooth_20261114
+      - name: Install native dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ libgmp-dev libssl-dev pkg-config jq
+      - name: Exact elimination certificates and offline replay of captured CAS results
+        run: research/p256_aux_smooth_20261114/continuation_20261116/run_checks.sh "$RUNNER_TEMP/aux-linear"

@@ -1,0 +1,21 @@
+import Outer
+set_option autoImplicit false
+namespace MonicRemainder
+open Polynomial ScaleTrim
+
+def checkedPrem (p : UInt64) (b a : List UInt64) (fuel : Nat) : Option (List UInt64) :=
+ if b.getLast?=some 1 then premModel p b a fuel else none
+
+theorem monic_nonempty (b : List UInt64) (h : b.getLast?=some 1) : b≠[] := by
+ intro he
+ subst b
+ simp at h
+
+theorem checked_success_sound (p : UInt64) [Fact p.toNat.Prime] (b a : List UInt64) (fuel : Nat)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (ha : Canon p a)
+ (ho : checkedPrem p b a fuel=some []) :
+ b≠[] ∧ b.getLast?=some 1 ∧ wordsPoly p b∣wordsPoly p a := by
+ unfold checkedPrem at ho
+ split_ifs at ho with hm
+ · exact ⟨monic_nonempty b hm,hm,success_sound p b a fuel hp hb hbs ha ho⟩
+end MonicRemainder

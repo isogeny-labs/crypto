@@ -1,0 +1,137 @@
+{
+  "source": "2026-10-26 audit workflow wf_3231c71e-f6b (13 agents); per-claim m_values_tested and closure_verdict as recorded by each auditor; prepared cells from research/frobenius_msweep_20261027/*/PROTOCOL.md; G6 cells (m = 9, 10, 11, 12, 14, 16, 18, 20) from g6-large-m/PROTOCOL.md",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Frobenius is an equivariance between conjugate targets, not a per-instance symmetry",
+      "proof_scope": "all m",
+      "measured_m": [
+        2
+      ],
+      "verdict": "sound as stated"
+    },
+    {
+      "id": "C2",
+      "text": "fixed-target tau-orbit CNF clauses are unsound",
+      "proof_scope": "all m",
+      "measured_m": [
+        2
+      ],
+      "verdict": "sound, overscoped"
+    },
+    {
+      "id": "C3",
+      "text": "sound orbit encodings cost >= 0.95x plain (n = 17, 23, 31)",
+      "proof_scope": "none (pre-registered prediction)",
+      "measured_m": [],
+      "verdict": "unsupported"
+    },
+    {
+      "id": "C4",
+      "text": "Proposition T: n conjugates on non-stable V are n attempts",
+      "proof_scope": "all m",
+      "measured_m": [
+        2,
+        3
+      ],
+      "verdict": "sound, overscoped"
+    },
+    {
+      "id": "C5",
+      "text": "equivariant elimination is a constant only; not applicable to production",
+      "proof_scope": "none",
+      "measured_m": [
+        2,
+        3
+      ],
+      "verdict": "sound, overscoped"
+    }
+  ],
+  "prepared_cells": [
+    {
+      "id": "G1",
+      "question": "chained-S3 SAT: plain vs Frobenius-orbit domain",
+      "m": [
+        4,
+        5,
+        6
+      ],
+      "claims": [
+        "C3"
+      ]
+    },
+    {
+      "id": "G2",
+      "question": "per-slot-shift orbit-union yield by class, priced at D(n,m)",
+      "m": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "claims": [
+        "C4"
+      ]
+    },
+    {
+      "id": "G3",
+      "question": "C3 census (H-BINSTD-c72284 Stage 2)",
+      "m": [
+        2,
+        3
+      ],
+      "claims": [
+        "C3"
+      ]
+    },
+    {
+      "id": "G4",
+      "question": "iota-stable non-subspace bases, (Z/2)^(m-1) stabiliser",
+      "m": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "claims": [
+        "revisit_when"
+      ]
+    },
+    {
+      "id": "G5",
+      "question": "Proposition T / Sigma and sporadic-overlap census",
+      "m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "claims": [
+        "C1",
+        "C4"
+      ]
+    },
+    {
+      "id": "G6",
+      "question": "exact census at large m: normal-basis interleaved vs matched partitions; iota quotient",
+      "m": [
+        9,
+        10,
+        11,
+        12,
+        14,
+        16,
+        18,
+        20
+      ],
+      "claims": [
+        "revisit_when",
+        "m-coverage"
+      ]
+    }
+  ]
+}

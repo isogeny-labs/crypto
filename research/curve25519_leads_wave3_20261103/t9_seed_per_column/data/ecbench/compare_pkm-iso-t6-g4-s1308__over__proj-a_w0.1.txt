@@ -1,0 +1,28 @@
+ops (ok): pkm-iso-t6-g4-s1308 / proj-a = 62347.0134 [55941.094, 69486.487] (linearised_t, df 15) over 32 pairs on 16 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.4150, w=0.1: 62347.0134, w=1: 381802.2968): pkm-iso-t6-g4-s1308 > proj-a at every weight; wall: admitted ns/GAE pkm-iso-t6-g4-s1308/proj-a 59793.7757 [56562.396, 63209.762], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 84608.2500 [74999.424, 95448.146]; ns/GAE of proj-a, pkm-iso-t6-g4-s1308 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 32, verified 32, admitted 0; levels {"L0": 32}; p95 foreign busy 227.56%, p95 run queue 0.09%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+arm proj-a: verified 32/32 (0 censored); max/median S 1.24, top run 4% of total; unpriced: legendre_symbols_uncharged=2592, lookups_uncharged=45553, projected_base_column_map_entries_uncharged=2048, projected_base_dedup_probes_uncharged=1024, projected_base_membership_checks_uncharged=1024, row_ops_uncharged=7457, sqrt_solves_uncharged=1024, target_guard_probes_uncharged=45811
+arm pkm-iso-t6-g4-s1308: verified 32/32 (0 censored); max/median S 1.61, top run 5% of total; unpriced: legendre_symbols_uncharged=2304, pkm_grid_fp_mults_uncharged=2112960, pkm_system_fp_mults_uncharged=38287980, row_ops_uncharged=4294, solver_F_p_multiply-adds_(elimination_only)_uncharged=94403399367, sqrt_solves_uncharged=1312, target_guard_probes_uncharged=135475, velu_evaluations_uncharged=384
+| curve | log2 r | workloads | pkm-iso-t6-g4-s1308 / proj-a | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp20-tm1050-4295f05e | 17.00 | 16 | 62347.0134 | [55941.0938, 69486.4869] | linearised_t |
+
+| workload | curve | log2 r | proj-a mean S | pkm-iso-t6-g4-s1308 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W1248bcd1966f | icv1-fp20-tm1050-4295f05e | 17.00 | 13.6721 | 727706.2463 | 53225.6581 |
+| W14e5e5529f3a | icv1-fp20-tm1050-4295f05e | 17.00 | 11.4117 | 669964.2935 | 58708.4135 |
+| W17b2499db031 | icv1-fp20-tm1050-4295f05e | 17.00 | 10.8812 | 618616.1508 | 56851.5912 |
+| W1bf70c789633 | icv1-fp20-tm1050-4295f05e | 17.00 | 12.7673 | 597550.1910 | 46803.3342 |
+| W33015be44d6a | icv1-fp20-tm1050-4295f05e | 17.00 | 12.9009 | 934048.0610 | 72401.9014 |
+| W38833be997d4 | icv1-fp20-tm1050-4295f05e | 17.00 | 12.1094 | 601208.2545 | 49648.1918 |
+| W9128f17ee40c | icv1-fp20-tm1050-4295f05e | 17.00 | 14.5167 | 1204667.8525 | 82984.6895 |
+| W9daed39cbd7f | icv1-fp20-tm1050-4295f05e | 17.00 | 13.3935 | 929386.5407 | 69390.6855 |
+| W9ea587567e0e | icv1-fp20-tm1050-4295f05e | 17.00 | 13.1484 | 775806.7714 | 59003.9846 |
+| Wa67d53cffdb6 | icv1-fp20-tm1050-4295f05e | 17.00 | 13.9181 | 767675.1558 | 55156.6920 |
+| Wbce1b43a9e47 | icv1-fp20-tm1050-4295f05e | 17.00 | 14.0108 | 956733.6760 | 68285.2489 |
+| Wd445d6b50de6 | icv1-fp20-tm1050-4295f05e | 17.00 | 14.4073 | 599006.8878 | 41576.6687 |
+| Wd9c6cfe5c594 | icv1-fp20-tm1050-4295f05e | 17.00 | 13.4073 | 1024488.4190 | 76412.5135 |
+| We1b807282364 | icv1-fp20-tm1050-4295f05e | 17.00 | 13.1688 | 711419.9907 | 54023.1083 |
+| We94c9a0e5733 | icv1-fp20-tm1050-4295f05e | 17.00 | 11.6856 | 913058.1685 | 78135.3767 |
+| Wecef31692fbf | icv1-fp20-tm1050-4295f05e | 17.00 | 13.7065 | 1005775.4595 | 73379.6326 |

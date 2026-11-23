@@ -1,0 +1,125 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1192",
+  "kind": "word_array_cancellation_traversal",
+  "main_declarations": 4,
+  "control_declarations": 8,
+  "checks": {
+    "cancel2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "RemainderWord.cancel_word",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWord.step_correct",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWord.run_correct",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWord.shifted_index",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.product_wrap",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.subtraction_wrap",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.single_update",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.full_update",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.repeated_index",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.empty_trace",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.zero_multiplier",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "RemainderWordControls.overrun_excluded",
+      "axioms": []
+    }
+  ],
+  "failed_attempts": [
+    "cancel1"
+  ],
+  "assumptions": [
+    "0<p<2^31",
+    "canonical initial array and event operands and multiplier",
+    "bounded event indices"
+  ],
+  "native_scope": [
+    "extension degree one",
+    "odd modulus",
+    "diagnostic tables disabled",
+    "instrumentation unmodeled"
+  ],
+  "source_event_generation": "pending",
+  "polynomial_contribution_identification": "pending",
+  "independent_source_fidelity_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_initial_issue": "unescaped percent suppressed paragraph; fixed and reinspected",
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

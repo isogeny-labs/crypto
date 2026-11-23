@@ -1,0 +1,19 @@
+{
+  "schema": "source-construction-report/v1",
+  "status": "candidate_prepared_not_reviewed_or_compiled",
+  "source_packet": "kummer-signed-driver-20261109",
+  "execution_performed": false,
+  "checks": [
+    "Prepared opt-in run_observed over the exact native Kummer driver. Existing run uses the same internal loop with observation disabled; event closures are not evaluated when disabled. Native advance, signed fallback, lift and all arithmetic helper bodies remain byte-identical.",
+    "Both advance call sites and the signed lift call have paired callback boundaries. Lift status and tested-candidate count preserve exceptional returns; gate, restart, duplicate, signed graph relation and terminal events preserve actual control flow.",
+    "The canonical duplicate key is computed once at its original location. Original signed divisor and original a,b labels are retained in relation events and still passed unchanged into graph.edge. No Labels ingestion or alternate collision algorithm was inserted.",
+    "Extended existing NativeEvents with KummerDriver protocol; reused Trace byte/record limits, first-error poisoning and incomplete-prefix behavior. Missing call results, changed lift labels, missing lift dispositions and unmatched graph results are rejected by source logic.",
+    "Prepared one fixed p739 native comparison: archived original, disabled candidate, observed candidate and8 callback-fault reruns (11 full target invocations maximum). A separate actual zero-difference fallback and zero-vector lift probe plus4 protocol negatives are prospective controls. No control has run."
+  ],
+  "findings": [],
+  "remaining": [
+    "Independent source review and a published bounded staging/build plan precede qualification. Specific additional exceptional branches lack new native fixtures; full1260-target continuation remains separate."
+  ],
+  "kb": "KB unavailable; exact signed adapter, actualproducer qualification and archived native sources used as primary fallback.",
+  "trust": "Source construction only. No runtime success, geometry proof, timing equality or cost ratio is claimed."
+}

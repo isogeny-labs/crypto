@@ -1,0 +1,668 @@
+{
+  "flow": {
+    "attempted": 13,
+    "completed": 13,
+    "invalid_or_incomplete": 0,
+    "planned": 13
+  },
+  "identity": {
+    "configuration": {
+      "codec": "bv",
+      "columns": 3,
+      "p": 101,
+      "schema": "atlas.input/v1",
+      "seed": 42,
+      "source_dirty": false,
+      "source_revision": "5a7e0fa433aa01dfefee8ec7fcb7ad2e6765a957",
+      "targets_per_panel": 1
+    },
+    "external_replay_binary_sha256": "3eea7c4cd84a7f03bd5b337885b1d83a46b0cde1d6ac8126a1abef5cceba5854",
+    "query_manifest_sha256": "e8620bf6141bf16f3c6b579d9217ba022dc90df87b6ba0d5c0eebe518778503d",
+    "solver_binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+    "study_binary_sha256": "cf83ff3e069d5fb44363d63ce248a331007a9dfb8f4864b1d23695ebabbb6d43",
+    "timeout_seconds": 30
+  },
+  "independent_standing": "unverified",
+  "producer_check_passed": true,
+  "rows": [
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/source-holdout-0-mod.smt2"
+      ],
+      "arm": "source",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0000.solver.out",
+          "sha256": "f5b433cf69a7fea9ac789cfbf2dc4e8ddb69a449de9c4065a8566a4ba8dfcebb"
+        },
+        {
+          "bytes": 0,
+          "path": "0000.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 0,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "source-holdout-0-mod.smt2",
+      "query_sha256": "25b6f8164f852a34bdc3af1206c87e52ef88801c0d887970dca377f20ccc4267",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0000.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0000.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 9076608
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/source-aa-holdout-0-mod.smt2"
+      ],
+      "arm": "source-aa",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0001.solver.out",
+          "sha256": "7029e9ef0cf2a6eaa3614c86139a604fdf3b6385092c4f8ef1843f7417b47824"
+        },
+        {
+          "bytes": 0,
+          "path": "0001.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 1,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "source-aa-holdout-0-mod.smt2",
+      "query_sha256": "25b6f8164f852a34bdc3af1206c87e52ef88801c0d887970dca377f20ccc4267",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0001.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0001.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 9076608
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/positive-holdout-0-mod.smt2"
+      ],
+      "arm": "positive",
+      "artifacts": [
+        {
+          "bytes": 2955,
+          "path": "0002.solver.out",
+          "sha256": "350367fd839ea89fd35d3abd324f89a983e3f7ef4caae3aca4d0968525018e95"
+        },
+        {
+          "bytes": 0,
+          "path": "0002.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "mod",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 2,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "positive-holdout-0-mod.smt2",
+      "query_sha256": "65298cc5b918ece05ae7abc3e4b39c1417dc00007903519746bf86e293e75da9",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0002.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0002.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0002.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0002.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 2592765
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/source-holdout-0-carry.smt2"
+      ],
+      "arm": "source",
+      "artifacts": [
+        {
+          "bytes": 1087,
+          "path": "0003.solver.out",
+          "sha256": "67f1c927df445c62c324e890bd1faa5702e2b178c8896387165a0b146e024763"
+        },
+        {
+          "bytes": 0,
+          "path": "0003.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 3,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "source-holdout-0-carry.smt2",
+      "query_sha256": "15add47e3244ca873ffadf9e165f3d1165da5b7d08757a05b906fa1bc1bb9e36",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0003.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0003.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 85409974
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/positive-holdout-0-carry.smt2"
+      ],
+      "arm": "positive",
+      "artifacts": [
+        {
+          "bytes": 13015,
+          "path": "0004.solver.out",
+          "sha256": "dd33a2b679ac7c05bb29fb6e11b6a531657bde2b85905c159357202643966730"
+        },
+        {
+          "bytes": 0,
+          "path": "0004.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0",
+      "encoding": "carry",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 4,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "positive-holdout-0-carry.smt2",
+      "query_sha256": "ee013e9f8dec91db7e1fcb9a08c28e80231107a6bc7fe816c9ef4e7e56766138",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0004.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0004.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0004.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0004.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 68772253
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/same_support-holdout-0-mod.smt2"
+      ],
+      "arm": "same_support",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0005.solver.out",
+          "sha256": "a0c500363e1caf175373f1186fb0ee5071641bbd665e4f7485c00ee73e20088b"
+        },
+        {
+          "bytes": 0,
+          "path": "0005.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "85e49993de89f918c3b5347bf95113087032387314021d43f86956cda95bf5b5",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 5,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "same_support-holdout-0-mod.smt2",
+      "query_sha256": "587e356113e569f3bd96c4933622b37f23292f51fc896e17dc57d342b69df177",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0005.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0005.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 8048476
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/same_support-holdout-0-carry.smt2"
+      ],
+      "arm": "same_support",
+      "artifacts": [
+        {
+          "bytes": 1087,
+          "path": "0006.solver.out",
+          "sha256": "bb128c3f105f9117f8720deaab04ce98a5be8fe85734715b2e6fabc372223b4f"
+        },
+        {
+          "bytes": 0,
+          "path": "0006.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "85e49993de89f918c3b5347bf95113087032387314021d43f86956cda95bf5b5",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 6,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "same_support-holdout-0-carry.smt2",
+      "query_sha256": "04afd7c042c266fab48ce9100fc5ac1a81b748d02b4185f73a41e0fefa6a0fc2",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0006.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0006.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 92132058
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/target_native-holdout-0-mod.smt2"
+      ],
+      "arm": "target_native",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0007.solver.out",
+          "sha256": "36a1428d9897f140cbfa969c48b5b2b021598fcc8e20e86d5f3c49d8d3465e5d"
+        },
+        {
+          "bytes": 0,
+          "path": "0007.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 7,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "target_native-holdout-0-mod.smt2",
+      "query_sha256": "666036dbfaa58109cbeb666e21cff61c5ad916c053c9b49c5a44acace41256a3",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0007.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0007.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 8810116
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/target_native-holdout-0-carry.smt2"
+      ],
+      "arm": "target_native",
+      "artifacts": [
+        {
+          "bytes": 1086,
+          "path": "0008.solver.out",
+          "sha256": "8dfae374601a117619a7d46bed9eabb0b491b74ff9032b25c63733e55a7c174b"
+        },
+        {
+          "bytes": 0,
+          "path": "0008.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 8,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "target_native-holdout-0-carry.smt2",
+      "query_sha256": "30413ddcca48e8e8bdd766a861526d00a57474e4a0aec070d8e183c5e124d854",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0008.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0008.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 79735874
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/mixed-holdout-0-mod.smt2"
+      ],
+      "arm": "mixed",
+      "artifacts": [
+        {
+          "bytes": 2960,
+          "path": "0009.solver.out",
+          "sha256": "3fc44d534935ddde454b5506bd437027241646fa456720a195b9e3f5b9daca64"
+        },
+        {
+          "bytes": 0,
+          "path": "0009.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "41a6fe5944ff202970bb5045895893d4d9a7a0fed69eaaacd6ec652347d7dac8",
+      "encoding": "mod",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 9,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "mixed-holdout-0-mod.smt2",
+      "query_sha256": "8d51e45cfa8caceec0fcf2f2a32cdcf6d27b0364ddf0d53ecbd3c6f311670aef",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0009.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0009.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0009.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0009.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 6348943
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/mixed-holdout-0-carry.smt2"
+      ],
+      "arm": "mixed",
+      "artifacts": [
+        {
+          "bytes": 13016,
+          "path": "0010.solver.out",
+          "sha256": "ecb6d5dd246a17d2815d3aec4c5cc3001d70605c6862f33b39fabf75b1c6f2b0"
+        },
+        {
+          "bytes": 0,
+          "path": "0010.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "41a6fe5944ff202970bb5045895893d4d9a7a0fed69eaaacd6ec652347d7dac8",
+      "encoding": "carry",
+      "expected": "sat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 10,
+      "observed": "sat",
+      "producer_check_passed": true,
+      "query": "mixed-holdout-0-carry.smt2",
+      "query_sha256": "d2a1dacf90ed23c0c0ddf503371ebcc29b4db031da3afc4c30454d65f3cad1ba",
+      "replay_artifacts": [
+        {
+          "bytes": 78,
+          "path": "0010.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "0010.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "0010.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0010.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": 0,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 0,
+      "solver_rlimit": 102385598
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/random-holdout-0-mod.smt2"
+      ],
+      "arm": "random",
+      "artifacts": [
+        {
+          "bytes": 1012,
+          "path": "0011.solver.out",
+          "sha256": "790094af88afeda80bb1d557bd38682840c103494de9a9ea9733cadadbaee107"
+        },
+        {
+          "bytes": 0,
+          "path": "0011.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "dc59bc1e0d22ddb5b564901f26711e76db2bf95b9b9af09598f3ec0854451fff",
+      "encoding": "mod",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 11,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "random-holdout-0-mod.smt2",
+      "query_sha256": "a0af290679e4b9da481dff9b3073129dd7cc425d81f0dc757ea03a1ed3339622",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0011.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0011.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 7939734
+    },
+    {
+      "argv": [
+        "-T:30",
+        "-st",
+        "/work/inputs/random-holdout-0-carry.smt2"
+      ],
+      "arm": "random",
+      "artifacts": [
+        {
+          "bytes": 1087,
+          "path": "0012.solver.out",
+          "sha256": "9ab0db69b02b20c5ddef85737712bb87f9795685e76b0b70d3c45fe5ebb9a8ab"
+        },
+        {
+          "bytes": 0,
+          "path": "0012.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "base_sha256": "dc59bc1e0d22ddb5b564901f26711e76db2bf95b9b9af09598f3ec0854451fff",
+      "encoding": "carry",
+      "expected": "unsat",
+      "external_replay_exit": 0,
+      "independent_standing": "unverified",
+      "index": 12,
+      "observed": "unsat",
+      "producer_check_passed": true,
+      "query": "random-holdout-0-carry.smt2",
+      "query_sha256": "b48dc356c48ba0d31e067df4d93cec0b614b10fd4126b0812744ea0d1e308dda",
+      "replay_artifacts": [
+        {
+          "bytes": 100,
+          "path": "0012.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "0012.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "replay_exit": null,
+      "schema": "atlas.solver-row/v1",
+      "solver_exit": 1,
+      "solver_rlimit": 121797141
+    }
+  ],
+  "schema": "atlas.solver-run/v1"
+}

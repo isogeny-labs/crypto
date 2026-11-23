@@ -1,0 +1,15 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\sloppy
+\begin{document}
+\section*{Additional materializer: independent proposal review}
+The inert proposal is internally consistent. Runtime admission is not cleared. Exact revision \texttt{714e95ca6113} was reviewed after a saved preread plan. No worker, compiler, test or launch ran.
+\paragraph{Bindings checked.} All proposal files matched the published Git object; manifest bytes and hashes matched. All nine referenced local input hashes matched. Corrected materializer and cleanup-helper identities agree with the declared bindings.
+\paragraph{R1: effective-limit qualification gap.} The worker does not read or guard inherited address-space or data limits before child commands. Manager defaults are not worker-effective limits. Manual postlaunch reading of the captured PID can miss a short worker or occur after the first failed Git mapping. The proposal explicitly acknowledges this timing limitation. Removing a setrlimit call does not remove an inherited cap.
+\paragraph{Required source correction before qualification.} A versioned worker should record getrlimit and its own process limits before the first child, under the matched native identity, then apply an explicit reviewed acceptance policy. Unknown or incompatible limits must stop without widening limits. Publish and independently review that change with the later concrete admission. No current inherited limit or mapping size is asserted here.
+\paragraph{R2: approval boundary retained.} The extra attempt remains unapproved. Preparation has publication null, reviewed false and lease null; its unchanged worker rejects this before creating output. The descriptive disabled and approval-required flags are operator gates, not worker-enforced fields. Preserve this frozen proposal; a successor requires explicit attempt approval, exact publication/review, current accounting and a live runtime reservation.
+\paragraph{Caps and accounting.} CPU2, physical RAM4GiB, swap0, tasks512 and concurrency1 are unchanged. Inner880, unit885 plus5 stop, timeout895 plus5 kill, and total900 seconds remain distinct. Recorded arithmetic is $46800-4500=42300$ remaining; proposed900 leaves41400; separate1800 validation leaves39600. Deadline remains 2026-11-06 04:00 UTC. These values do not allocate another attempt.
+\paragraph{Ownership and evidence.} Fresh paths, refusal of existing outputs, captured invocation identity and empty-cgroup terminal proof remain required. RemainAfterExit requires explicit owned stop. Prior failed attempt and mapping error stay recorded. A prepared-input manifest may only be produced after successful materialization; none is fabricated.
+\paragraph{Waiver and scope.} The dollar-waiver patch preserves test, recipe, input, publication, lease and cleanup boundaries while replacing dollar-fact checks with a bound owner instruction and fixed worker/deadline checks. This is not additional-attempt approval or a live budget ledger. Concrete validation admission remains separate. No campaign renewal is requested by this review.
+\end{document}

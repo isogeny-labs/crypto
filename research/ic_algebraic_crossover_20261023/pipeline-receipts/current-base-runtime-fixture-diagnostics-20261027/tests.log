@@ -1,0 +1,130 @@
+
+running 23 tests
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... 
+thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (97011) panicked at src/cryptanalysis/ecbench/bounds.rs:2379:43:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible ... 
+thread 'cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible' (97012) panicked at src/cryptanalysis/ecbench/bounds.rs:2351:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_all_candidates_20261003/sessions/koblitz/session.json: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too ... 
+thread 'cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too' (97013) panicked at src/cryptanalysis/ecbench/bounds.rs:2203:9:
+Err("/workspace/crypto-current-base-20261026/research/ecbench_all_candidates_20261003/sessions/prime/session.json: No such file or directory (os error 2)")
+FAILED
+test cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples ... 
+thread 'cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples' (97014) panicked at src/cryptanalysis/ecbench/bounds.rs:2257:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_all_candidates_20261003/sessions/prime/session.json: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ... 
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (97015) panicked at src/cryptanalysis/ecbench/bounds.rs:2435:38:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/docs/bounds/records/challenge-prime-toy-reference-e1-bsgs-negation.json: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band ... 
+thread 'cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band' (97016) panicked at src/cryptanalysis/ecbench/bounds.rs:2421:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_all_candidates_20261003/sessions/prime/session.json: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2 ... 
+thread 'cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2' (97017) panicked at src/cryptanalysis/ecbench/challenge.rs:2145:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_bounds_challenges_20261006/verdict-prime-toy-reference-e1.json: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload ... 
+thread 'cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload' (97018) panicked at src/cryptanalysis/ecbench/claim.rs:2384:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup ... 
+thread 'cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup' (97019) panicked at src/cryptanalysis/ecbench/claim.rs:2384:10:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity ... 
+thread 'cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity' (97020) panicked at src/cryptanalysis/ecbench/compare.rs:2448:9:
+assertion failed: zero.legacy_comparison_id.is_none()
+FAILED
+test cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians ... 
+thread 'cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians' (97021) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1126:37:
+called `Result::unwrap()` on an `Err` value: "method `ic.hyperelliptic` has no parameter `branches`"
+FAILED
+test cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed ... 
+thread 'cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed' (97022) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1126:37:
+called `Result::unwrap()` on an `Err` value: "method `ic.hyperelliptic` has no parameter `branches`"
+FAILED
+test cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them ... 
+thread 'cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them' (97023) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1203:55:
+called `Result::unwrap()` on an `Err` value: "method `ic.hyperelliptic` has no parameter `branches`"
+FAILED
+test cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks ... 
+thread 'cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks' (97024) panicked at src/cryptanalysis/ecbench/work.rs:2067:84:
+called `Result::unwrap()` on an `Err` value: "/workspace/crypto-current-base-20261026/tests/fixtures/ecbench/work-v1/records.jsonl: No such file or directory (os error 2)"
+FAILED
+test cryptanalysis::ic_framework::planner::tests::every_cited_file_exists ... 
+thread 'cryptanalysis::ic_framework::planner::tests::every_cited_file_exists' (97025) panicked at src/cryptanalysis/ic_framework/planner.rs:725:13:
+missing evidence file docs/ic/LEADERBOARD.md
+FAILED
+test cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42 ... 
+thread 'cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42' (97026) panicked at src/cryptanalysis/ic_framework/plugins.rs:4142:10:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+test ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused - should panic ... 
+thread 'ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused' (97027) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+test ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree ... 
+thread 'ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree' (97028) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+test ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares ... 
+thread 'ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares' (97029) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+test ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors ... 
+thread 'ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors' (97030) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+test ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused ... 
+thread 'ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused' (97031) panicked at src/ecc/cryptopro_b_chain_set.rs:405:41:
+the frozen chain set is committed: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+test ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path ... 
+thread 'ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path' (97032) panicked at src/ecc/endo_generic_chain_set.rs:565:40:
+the CryptoPro-B chain set parses: "read /workspace/crypto-current-base-20261026/research/cryptopro_b_chain_sweep_20261006/frozen_inputs/chains.constants.json: No such file or directory (os error 2)"
+FAILED
+test ecc::endo_generic_chain_set::tests::tampered_sets_are_refused ... 
+thread 'ecc::endo_generic_chain_set::tests::tampered_sets_are_refused' (97033) panicked at src/ecc/endo_generic_chain_set.rs:665:49:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+FAILED
+
+failures:
+
+---- ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused stdout ----
+note: panic did not contain expected string
+      panic message: "the frozen chain set is committed: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }"
+ expected substring: "does not compose"
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload
+    cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible
+    cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too
+    cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+    cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band
+    cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2
+    cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload
+    cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup
+    cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity
+    cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians
+    cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed
+    cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them
+    cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks
+    cryptanalysis::ic_framework::planner::tests::every_cited_file_exists
+    cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42
+    ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused
+    ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree
+    ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares
+    ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors
+    ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused
+    ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path
+    ecc::endo_generic_chain_set::tests::tampered_sets_are_refused
+
+test result: FAILED. 0 passed; 23 failed; 0 ignored; 0 measured; 5000 filtered out; finished in 0.12s
+

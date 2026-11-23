@@ -1,0 +1,58 @@
+{
+  "schema": "pencil-observed-canonical-export-receipt/v1",
+  "run": "pencil-p739-20261030-a1",
+  "protocol": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/analysis_provenance_erratum_20261030/diagnostic-protocol-v6.json",
+    "protocol_id": "PENCIL-SYMBOLIC-PAIRED-P739-GATE60-20261029",
+    "sha256": "bfa694a5671250204f13036a92c932be067632850149716375b2026a8fc151b8",
+    "version": 6
+  },
+  "flow": {
+    "attempted": 1080,
+    "completed": 1080,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 1080,
+    "resumed": 0
+  },
+  "runs": 1080,
+  "all_wall_invalid": true,
+  "post_data_provenance_erratum": {
+    "amendment_id": "A-analysis-provenance-erratum-20261030",
+    "applied": true,
+    "changed_fields": [
+      "/extensions/analysis_build/receipt",
+      "/extensions/analysis_build/binaries/*/bytes",
+      "/extensions/finite_cost_model/analyzer_binaries_sha256",
+      "/extensions/analysis_support_sha256"
+    ],
+    "data_protocol_sha256": "cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb",
+    "filed_before_affected_data": false,
+    "metadata_protocol_sha256": "bfa694a5671250204f13036a92c932be067632850149716375b2026a8fc151b8",
+    "parent_protocol_sha256": "cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb"
+  },
+  "package_exit": 0,
+  "check_exit": 0,
+  "check_findings": [],
+  "qualified": false,
+  "request_sha256": "64f78a938f94e34e21054507fbdd6ae19ed6dca146d5fe2f502fe7c3769d3be5",
+  "artifact_store": {
+    "schema": "artifacts.manifest/v1",
+    "files": {
+      "execution-history.json": {
+        "sha256": "dab9c1abf78c3e5f892ef271a0172f12b5b3d0571d4fcdcb6f5f36188b97d169",
+        "bytes": 643891
+      },
+      "export.json": {
+        "sha256": "eeb55380e7a6812e5a04440971ffeda6ecc180f87e21af2754fc6880e5b10d28",
+        "bytes": 4260733
+      }
+    }
+  },
+  "complete_remote_readback_hash_verified": true,
+  "history": "1080 exact record/session/seq identities with evidence-derived fresh attempts1/resumed0; prior logical infrastructure failure separate",
+  "resources": "Original rusage/counters preserved in rows. Additional bound controller/failed-reservation sidecars retained; native analysis separate_resources remains null and no aggregate allocated-cost completeness claim is made.",
+  "new_solver_executions": 0,
+  "scope": "Canonical observation export and deterministic source-linked reconstruction passed; no wall-clock or general empirical qualification. Transparent post-data metadata erratum preserves original v5 data identity."
+}

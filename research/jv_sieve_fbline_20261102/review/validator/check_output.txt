@@ -1,0 +1,145 @@
+  [ok] R0 P_1009: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 H_1009: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 T_1009: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 U_1009: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 c2h_1009: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 c2t_1009: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 c3_1009: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 P_1511: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 H_1511: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 T_1511: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 U_1511: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 c2h_1511: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 c2t_1511: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 c3_1511: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 P_1823: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 H_1823: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 T_1823: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 U_1823: 16 records, 16 log lines, seeds Some(17)..Some(32), p ok true
+  [ok] R0 c2h_1823: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 c2t_1823: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+  [ok] R0 c3_1823: 1 records, 1 log lines, seeds Some(17)..Some(17), p ok true
+
+# Receipts (every run of every arm and control)
+  [ok] C4: 201 runs solved, correct, not exhausted, 0 failed verifications, lin_mode sparse (0 bad)
+  [ok] phase sums: relation = table+enum+sieve+extract+verify; descent = weil+f4+lin+post+verify+stream; total = setup+base+relation+descent+la; la = 16*la_ops; total_plus = total + sieve_adds + sieve_lookups + enum_adds + search adds + search lookups; setup >= search muls (0 bad of 201)
+  [ok] s = total_muls/(c_add_e sqrt l), s_plus = total_plus/(c_add_e sqrt l) to 1e-12, c_add_e = 331 (0 bad)
+  (info) descent_timed_out summed over all runs 0; descent_incomplete 0
+  [ok] pair identity: l, c_add_e, seed of every arm row equal P's (0 bad of 144)
+
+# Controls
+  [ok] C1: arm P equals V2 sparse record in every field but wall_ms (key sets equal too): 48/48
+  [ok] c2h p=1009: route fields equal P; d(total_muls) = 17662 = search muls (formula 17662); d(total_plus) = 33806 = muls+adds+lookups; best_index 0; fields differing from P: ["fb_line(only left)", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] c2t p=1009: route fields equal P; d(total_muls) = 38687587 = search muls (formula 38687587); d(total_plus) = 69233044 = muls+adds+lookups; best_index 0; fields differing from P: ["fb_line(only left)", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] C3 p=1009: table n=4096 = Horner n=4096 on seed 17: B 511->554 idx 642; route muls 1699629374 equal; differing fields ["fb_line", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] c2h p=1511: route fields equal P; d(total_muls) = 26447 = search muls (formula 26447); d(total_plus) = 50623 = muls+adds+lookups; best_index 0; fields differing from P: ["fb_line(only left)", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] c2t p=1511: route fields equal P; d(total_muls) = 86759358 = search muls (formula 86759358); d(total_plus) = 155257521 = muls+adds+lookups; best_index 0; fields differing from P: ["fb_line(only left)", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] C3 p=1511: table n=4096 = Horner n=4096 on seed 17: B 768->824 idx 3928; route muls 2455280006 equal; differing fields ["fb_line", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] c2h p=1823: route fields equal P; d(total_muls) = 31907 = search muls (formula 31907); d(total_plus) = 61075 = muls+adds+lookups; best_index 0; fields differing from P: ["fb_line(only left)", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] c2t p=1823: route fields equal P; d(total_muls) = 126287418 = search muls (formula 126287418); d(total_plus) = 225992757 = muls+adds+lookups; best_index 0; fields differing from P: ["fb_line(only left)", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] C3 p=1823: table n=4096 = Horner n=4096 on seed 17: B 924->997 idx 1306; route muls 2177065812 equal; differing fields ["fb_line", "relation_over_rho", "s", "s_over_rho", "s_plus", "s_plus_over_rho", "setup_muls", "total_muls", "total_plus"]
+  [ok] C5: fb_line.b_plain = P base and b_best = arm base on all 144 pairs (0 bad)
+  [ok] search counters exact on all 144 arm rows: Horner adds 15pn, lookups pn; table adds 29q+2pn, lookups q+pn, table_muls 38q; T exhaustive with n = 1 + p(p+1)/2 (0 bad)
+  search muls above the counted floor [(p-1)/2 + 5 per candidate t^2 + 17pn (Horner) | 38q (table)]:
+    H p=1009: min 1396769 max 1396769 = 341.09 per extra candidate (line_poly) + move
+    H p=1511: min 1396769 max 1396769 = 341.09 per extra candidate (line_poly) + move
+    H p=1823: min 1396759 max 1396769 = 341.09 per extra candidate (line_poly) + move
+    T p=1009: min 17544 max 17544
+    T p=1511: min 26044 max 26044
+    T p=1823: min 31348 max 31348
+    U p=1009: min 374 max 374
+    U p=1511: min 374 max 374
+    U p=1823: min 374 max 374
+
+# Replays (frozen main binary vs committed records, every field but wall_ms)
+  [ok] replay H p=1511 seed 27: differing fields []; total_muls 1891714868 total_plus 7509466645 digest 4797036971590996343
+  [ok] replay U p=1511 seed 21: differing fields []; total_muls 1581330207 total_plus 6721804729 digest 17330458084136567953
+  [ok] replay P p=1511 seed 32: differing fields []; vs V2 record: differing []; total_muls 4014620393 total_plus 15750759010 digest 361116479042323625
+  [ok] replay T p=1511 seed 18: differing fields []; total_muls 2798797746 total_plus 12712742206 digest 15126232982024961836
+
+# Paired ratios arm/P (geometric mean over seeds; 95% percentile bootstrap, 20000 resamples, validator RNG)
+  H S         p=1009 0.4949 [0.4099, 0.5996]  p=1511 0.6440 [0.5713, 0.7211]  p=1823 0.7587 [0.6167, 0.9277]  pooled 0.6230 [0.5632, 0.6882]  (x1.605)
+  H S+        p=1009 0.4886 [0.4292, 0.5551]  p=1511 0.5531 [0.5161, 0.5935]  p=1823 0.6166 [0.5548, 0.6832]  pooled 0.5503 [0.5177, 0.5840]  (x1.817)
+  H band_w0   p=1009 0.4949 [0.4093, 0.5984]  p=1511 0.6440 [0.5709, 0.7221]  p=1823 0.7587 [0.6166, 0.9290]  pooled 0.6230 [0.5623, 0.6886]  (x1.605)
+  H band_w0.1 p=1009 0.4860 [0.4299, 0.5509]  p=1511 0.5267 [0.4849, 0.5750]  p=1823 0.5747 [0.5284, 0.6216]  pooled 0.5279 [0.4986, 0.5591]  (x1.894)
+  H band_w1   p=1009 0.4858 [0.4293, 0.5522]  p=1511 0.5257 [0.4838, 0.5746]  p=1823 0.5732 [0.5275, 0.6204]  pooled 0.5271 [0.4977, 0.5583]  (x1.897)
+  T S         p=1009 0.4875 [0.3714, 0.6528]  p=1511 0.5688 [0.5000, 0.6614]  p=1823 0.6348 [0.5361, 0.7344]  pooled 0.5604 [0.4994, 0.6320]  (x1.784)
+  T S+        p=1009 0.5742 [0.4929, 0.6732]  p=1511 0.8301 [0.7846, 0.8774]  p=1823 1.0731 [0.9697, 1.1782]  pooled 0.7997 [0.7505, 0.8529]  (x1.250)
+  T band_w0   p=1009 0.4875 [0.3728, 0.6528]  p=1511 0.5688 [0.4999, 0.6609]  p=1823 0.6348 [0.5364, 0.7363]  pooled 0.5604 [0.4989, 0.6322]  (x1.784)
+  T band_w0.1 p=1009 0.6079 [0.5403, 0.6888]  p=1511 0.9151 [0.8558, 0.9808]  p=1823 1.2071 [1.0959, 1.3237]  pooled 0.8757 [0.8277, 0.9266]  (x1.142)
+  T band_w1   p=1009 0.6092 [0.5410, 0.6903]  p=1511 0.9184 [0.8588, 0.9859]  p=1823 1.2121 [1.1040, 1.3294]  pooled 0.8786 [0.8317, 0.9295]  (x1.138)
+  U S         p=1009 0.5503 [0.4162, 0.7306]  p=1511 0.6110 [0.5182, 0.7097]  p=1823 0.6422 [0.5662, 0.7271]  pooled 0.5999 [0.5357, 0.6733]  (x1.667)
+  U S+        p=1009 0.4832 [0.4103, 0.5680]  p=1511 0.5251 [0.4885, 0.5676]  p=1823 0.5701 [0.5226, 0.6179]  pooled 0.5249 [0.4914, 0.5602]  (x1.905)
+  U band_w0   p=1009 0.5503 [0.4186, 0.7315]  p=1511 0.6110 [0.5186, 0.7101]  p=1823 0.6422 [0.5647, 0.7250]  pooled 0.5999 [0.5357, 0.6727]  (x1.667)
+  U band_w0.1 p=1009 0.4477 [0.3952, 0.5081]  p=1511 0.4992 [0.4641, 0.5418]  p=1823 0.5503 [0.5026, 0.5964]  pooled 0.4973 [0.4697, 0.5266]  (x2.011)
+  U band_w1   p=1009 0.4461 [0.3928, 0.5055]  p=1511 0.4982 [0.4631, 0.5404]  p=1823 0.5496 [0.5019, 0.5956]  pooled 0.4962 [0.4683, 0.5249]  (x2.015)
+
+# Absolute arm S and S+ per prime (arithmetic mean | geometric mean over 16 seeds)
+  P p=1009: S 0.02038 | 0.01918   S+ 0.06351 | 0.06134
+  P p=1511: S 0.00615 | 0.00601   S+ 0.02478 | 0.02460
+  P p=1823: S 0.00401 | 0.00383   S+ 0.01648 | 0.01616
+  H p=1009: S 0.00975 | 0.00949   S+ 0.03010 | 0.02997
+  H p=1511: S 0.00394 | 0.00387   S+ 0.01365 | 0.01360
+  H p=1823: S 0.00298 | 0.00290   S+ 0.01001 | 0.00997
+  T p=1009: S 0.00997 | 0.00935   S+ 0.03547 | 0.03522
+  T p=1511: S 0.00351 | 0.00342   S+ 0.02045 | 0.02042
+  T p=1823: S 0.00250 | 0.00243   S+ 0.01736 | 0.01734
+  U p=1009: S 0.01128 | 0.01056   S+ 0.02997 | 0.02964
+  U p=1511: S 0.00377 | 0.00367   S+ 0.01297 | 0.01291
+  U p=1823: S 0.00249 | 0.00246   S+ 0.00923 | 0.00921
+
+# Sensitivity (validator, not in the protocol): table arms with 2 extra native ops per line-walk lookup (index arithmetic)
+  T:  w=1/331 (=S+): pooled 1.0161 [0.9556, 1.0821] per prime 0.673/1.076/1.447  w=0.1: pooled 1.1644 [1.1008, 1.2314] per prime 0.751/1.240/1.696  w=1: pooled 1.1701 [1.1066, 1.2387] per prime 0.754/1.246/1.705
+  U:  w=1/331 (=S+): pooled 0.5319 [0.4977, 0.5681] per prime 0.490/0.532/0.577  w=0.1: pooled 0.5067 [0.4789, 0.5365] per prime 0.457/0.509/0.560  w=1: pooled 0.5057 [0.4777, 0.5355] per prime 0.455/0.508/0.559
+  estimate (model): uncharged line_poly of the moved model per Ctx (341 muls) x [sieve batches ~ sieve_steps/(chunk p) + 4 + one per descent residual + 1] <= 2.67e-4 of total_muls on every arm run
+
+# Section 5a counter list (mean per run): emitted native counters of every arm; F4/descent additions have no counter on any arm; byte counters: none
+  P p=1009: sieve_adds 3.870e9 sieve_lookups 2.017e8 enum_adds 3.261e9 search_adds 0.000e0 search_lookups 0.000e0
+  P p=1511: sieve_adds 5.612e9 sieve_lookups 2.937e8 enum_adds 4.732e9 search_adds 0.000e0 search_lookups 0.000e0
+  P p=1823: sieve_adds 6.598e9 sieve_lookups 3.456e8 enum_adds 5.556e9 search_adds 0.000e0 search_lookups 0.000e0
+  H p=1009: sieve_adds 1.872e9 sieve_lookups 1.087e8 enum_adds 1.414e9 search_adds 6.199e7 search_lookups 4.133e6
+  H p=1511: sieve_adds 2.986e9 sieve_lookups 1.712e8 enum_adds 2.286e9 search_adds 9.284e7 search_lookups 6.189e6
+  H p=1823: sieve_adds 3.790e9 sieve_lookups 2.157e8 enum_adds 2.926e9 search_adds 1.120e8 search_lookups 7.467e6
+  T p=1009: sieve_adds 1.546e9 sieve_lookups 9.257e7 enum_adds 1.124e9 search_adds 1.058e9 search_lookups 5.151e8
+  T p=1511: sieve_adds 2.457e9 sieve_lookups 1.451e8 enum_adds 1.821e9 search_adds 3.518e9 search_lookups 1.728e9
+  T p=1823: sieve_adds 3.157e9 sieve_lookups 1.846e8 enum_adds 2.365e9 search_adds 6.158e9 search_lookups 3.034e9
+  U p=1009: sieve_adds 1.694e9 sieve_lookups 9.994e7 enum_adds 1.253e9 search_adds 9.565e7 search_lookups 3.408e7
+  U p=1511: sieve_adds 2.776e9 sieve_lookups 1.612e8 enum_adds 2.093e9 search_adds 1.652e8 search_lookups 5.180e7
+  U p=1823: sieve_adds 3.554e9 sieve_lookups 2.041e8 enum_adds 2.718e9 search_adds 2.158e8 search_lookups 6.306e7
+
+# Phase shares of total_muls (mean over seeds of per-run share), and search share of total_plus
+  P p=1009: enum 31.2% sieve 20.1% descent 44.1% la 4.4% search 0.00% other 0.27% | search native/total_plus 0.00% (search muls+native 0.00%)
+  P p=1511: enum 30.6% sieve 27.5% descent 32.7% la 8.7% search 0.00% other 0.37% | search native/total_plus 0.00% (search muls+native 0.00%)
+  P p=1823: enum 26.6% sieve 28.7% descent 32.6% la 11.7% search 0.00% other 0.40% | search native/total_plus 0.00% (search muls+native 0.00%)
+  H p=1009: enum 27.7% sieve 22.1% descent 34.8% la 10.2% search 4.55% other 0.57% | search native/total_plus 1.30% (search muls+native 2.72%)
+  H p=1511: enum 22.5% sieve 24.8% descent 31.0% la 16.2% search 4.92% other 0.62% | search native/total_plus 1.28% (search muls+native 2.66%)
+  H p=1823: enum 18.4% sieve 23.6% descent 35.2% la 17.7% search 4.53% other 0.56% | search native/total_plus 1.20% (search muls+native 2.49%)
+  T p=1009: enum 22.9% sieve 19.6% descent 43.0% la 11.4% search 2.57% other 0.63% | search native/total_plus 26.44% (search muls+native 27.09%)
+  T p=1511: enum 20.3% sieve 23.8% descent 31.1% la 19.5% search 4.56% other 0.73% | search native/total_plus 45.08% (search muls+native 45.82%)
+  T p=1823: enum 17.8% sieve 24.2% descent 29.7% la 22.3% search 5.32% other 0.69% | search native/total_plus 52.92% (search muls+native 53.64%)
+  U p=1009: enum 22.8% sieve 18.9% descent 45.7% la 9.8% search 2.30% other 0.54% | search native/total_plus 2.60% (search muls+native 3.38%)
+  U p=1511: enum 21.8% sieve 24.8% descent 30.9% la 17.6% search 4.25% other 0.68% | search native/total_plus 2.95% (search muls+native 4.14%)
+  U p=1823: enum 20.1% sieve 26.2% descent 27.0% la 20.9% search 5.19% other 0.66% | search native/total_plus 3.02% (search muls+native 4.39%)
+
+# B model check: route-only ratio (total_muls - search muls)/P total_muls vs (B_plain/B_best)^5
+  H: geo-mean measured/model 0.9303, sd of log 0.3593; gamma_hat 5.915 [4.932, 6.890]
+  T: geo-mean measured/model 0.9732, sd of log 0.3640; gamma_hat 5.476 [4.548, 6.259]
+  U: geo-mean measured/model 0.9615, sd of log 0.3870; gamma_hat 5.412 [4.303, 6.452]
+
+# n-selection rule recomputed (model; gamma 5, GAE 331, C_P from V2 sparse means)
+  p=1009: M_P 3.4646e9  N_P 7.3327e9
+  p=1511: M_P 3.5102e9  N_P 1.0638e10
+  p=1823: M_P 4.0241e9  N_P 1.2499e10
+  k(1)=0.000  k(16)=1.766  k(256)=2.827  k(4096)=3.626  k(65536)=4.291  k(1000000)=4.863
+  w = 0: H (Horner): n = 4096  J = 0.6554 [p=1009 0.6027, p=1511 0.6702, p=1823 0.6968]
+  w = 0: T (table): n = exhaustive  J = 0.5642 [p=1009 0.5109, p=1511 0.5777, p=1823 0.6085]
+  w = 0.1: H (Horner): n = 8192  J = 0.6340 [p=1009 0.5865, p=1511 0.6461, p=1823 0.6723]
+  w = 0.1: T (table): n = 32768  J = 0.6108 [p=1009 0.5600, p=1511 0.6237, p=1823 0.6524]
+  w = 1: H (Horner): n = 8192  J = 0.6336 [p=1009 0.5863, p=1511 0.6458, p=1823 0.6719]
+  w = 1: T (table): n = 32768  J = 0.6108 [p=1009 0.5601, p=1511 0.6237, p=1823 0.6523]
+  table w=0 at n=2^19: 0.5718 (k capped at L) / 0.5716 (k uncapped); n=2^20: 0.5662 / 0.5626
+
+# Producer analysis/analysis.txt vs validator recomputation (points: rounding tolerance; intervals: Monte Carlo)
+  [ok] 60 point estimates within half a unit of the last printed decimal (worst 0.997 of the tolerance); interval endpoints differ by at most 0.0036 (independent bootstrap streams)
+
+# Failures: none

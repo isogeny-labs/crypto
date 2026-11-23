@@ -1,0 +1,55 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm450-568a3277 | 17.00 | inc | 24/24 | 2.705 | 2.835 | 4.002 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | inc-aa | 24/24 | 2.705 | 2.835 | 4.002 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | rho-neg | 24/24 | 1.706 | 1.834 | 2.983 | — |
+| icv1-fp20-tm450-568a3277 | 17.00 | rho-neg-aa | 24/24 | 1.706 | 1.834 | 2.983 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | inc | 24/24 | 2.756 | 2.891 | 4.104 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | inc-aa | 24/24 | 2.756 | 2.891 | 4.104 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | rho-neg | 24/24 | 1.753 | 1.885 | 3.072 | — |
+| icv1-fp20-tm690-d5bed67c | 17.00 | rho-neg-aa | 24/24 | 1.753 | 1.885 | 3.072 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | inc | 24/24 | 2.449 | 2.554 | 3.496 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | inc-aa | 24/24 | 2.449 | 2.554 | 3.496 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | rho-neg | 24/24 | 1.703 | 1.830 | 2.975 | — |
+| icv1-fp20-tm1146-4a57e423 | 17.00 | rho-neg-aa | 24/24 | 1.703 | 1.830 | 2.975 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 24/24 | 2.514 | 2.625 | 3.619 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc-aa | 24/24 | 2.514 | 2.625 | 3.619 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 24/24 | 1.615 | 1.733 | 2.793 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg-aa | 24/24 | 1.615 | 1.733 | 2.793 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | inc | 24/24 | 2.580 | 2.695 | 3.734 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | inc-aa | 24/24 | 2.580 | 2.695 | 3.734 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | rho-neg | 24/24 | 1.525 | 1.634 | 2.614 | — |
+| icv1-fp20-tm1986-0aefc1a0 | 17.00 | rho-neg-aa | 24/24 | 1.525 | 1.634 | 2.614 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm450-568a3277 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp20-tm450-568a3277 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm450-568a3277 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp20-tm450-568a3277 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp20-tm450-568a3277 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp20-tm450-568a3277 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs inc-aa | unresolved inside the band |
+| icv1-fp20-tm690-d5bed67c | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm690-d5bed67c | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp20-tm690-d5bed67c | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp20-tm690-d5bed67c | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp20-tm690-d5bed67c | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp20-tm1146-4a57e423 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1146-4a57e423 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp20-tm1146-4a57e423 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp20-tm1146-4a57e423 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp20-tm1146-4a57e423 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs inc-aa | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp20-tm1050-4295f05e | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp20-tm1050-4295f05e | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1986-0aefc1a0 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp20-tm1986-0aefc1a0 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp20-tm1986-0aefc1a0 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp20-tm1986-0aefc1a0 | rho-neg vs rho-neg-aa | unresolved inside the band |

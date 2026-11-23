@@ -1,0 +1,14 @@
+{
+ "created_at": "2026-11-10T04:11:31Z",
+ "id": "PCC-20261110-d3ceb7",
+ "kind": "statement",
+ "producer": {
+  "commit": "7242133d0d8d7d54321bd2954f12a85398aa4475",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "ic_autolab round 37, Curve25519-family ledger curves k = 20, 28, 32, generic track, local route; one challenger tw2l-x20-j16-n2, holdout 64 targets x 4 rounds (256 pairs) vs the incumbent with rho-neg and an A/A arm; ecbench counted GAE, 2026-11-08 pricing; no signed replay or recompute",
+ "statement": "Round 37 (research/curve25519_autolab_20261104/round-037): every session ran, passed its audit and was banded, 8 replays reproduced. Holdout paired sel / inc at w = 0: k = 20 0.986 [0.941, 1.034] (null; band sel < inc); k = 28 0.967 [0.927, 1.008] (null; band sel < inc); k = 32 0.915 [0.864, 0.969] with band sel < inc at every weight (improvement; incumbent wwalkG-x06-sr-n2 replaced by tw2l-x20-j16-n2, S 1.715 at w = 0, 1.78x rho-neg). The k = 20 and k = 28 point estimates on the single ledger curve are weaker than the five-curve SNC panel's 0.936 and 0.909, consistent with the curve-to-curve spread recorded in the multicurve re-baseline. The 0.75x goal is not approached."
+}

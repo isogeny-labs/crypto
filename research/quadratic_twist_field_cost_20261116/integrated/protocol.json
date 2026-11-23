@@ -1,0 +1,1204 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-integrated-cold-20261116",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/integrated",
+  "authors": [
+    "producer"
+  ],
+  "question": "At declared field-witness caps3/4 and ALL455sourcepolicies, compare four actual twist-assisted admitted-public-log cold ORIGINAL-source recovery arms, retaining every blocked/identity/failed case. Test terminal-stop degree/admission and fresh Tate/bilinear progression costs, not generic known-log recovery or intrinsic regularity.",
+  "claims": [
+    {
+      "id": "row-degree-frontier",
+      "text": "Exact full census of declared two-cap policy frontier and original-source replay with per-workload cold observations, no signed verdict",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "All other caps/algorithms, stationary yield, intrinsic regularity and fastest IC-vs-rho remain outside this finite component",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "producerC",
+      "role": "candidate",
+      "description": "producerC full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "373894d584301e4aa421cab80c03f82d83fd30487cd7bdaf8b7060457a9596dc",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "producerA",
+      "role": "candidate",
+      "description": "producerA full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "373894d584301e4aa421cab80c03f82d83fd30487cd7bdaf8b7060457a9596dc",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "producerB",
+      "role": "control_aa",
+      "description": "producerB full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "373894d584301e4aa421cab80c03f82d83fd30487cd7bdaf8b7060457a9596dc",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "audit",
+      "role": "control_positive",
+      "description": "audit full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-map",
+      "role": "candidate",
+      "description": "mutate-map full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-map",
+      "role": "control_negative",
+      "description": "reject-map full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-missing-policy",
+      "role": "candidate",
+      "description": "mutate-missing-policy full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-missing-policy",
+      "role": "control_negative",
+      "description": "reject-missing-policy full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-target",
+      "role": "candidate",
+      "description": "mutate-target full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-target",
+      "role": "control_negative",
+      "description": "reject-target full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-scalar",
+      "role": "candidate",
+      "description": "mutate-scalar full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "reject-scalar full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-log",
+      "role": "candidate",
+      "description": "mutate-log full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-log",
+      "role": "control_negative",
+      "description": "reject-log full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-kind",
+      "role": "candidate",
+      "description": "mutate-kind full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-kind",
+      "role": "control_negative",
+      "description": "reject-kind full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-cost",
+      "role": "candidate",
+      "description": "mutate-cost full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "reject-cost full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-progress-cost",
+      "role": "candidate",
+      "description": "mutate-progress-cost full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-progress-cost",
+      "role": "control_negative",
+      "description": "reject-progress-cost full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-phase",
+      "role": "candidate",
+      "description": "mutate-phase full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-phase",
+      "role": "control_negative",
+      "description": "reject-phase full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-missing-target",
+      "role": "candidate",
+      "description": "mutate-missing-target full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-missing-target",
+      "role": "control_negative",
+      "description": "reject-missing-target full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-degree",
+      "role": "candidate",
+      "description": "mutate-degree full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-degree",
+      "role": "control_negative",
+      "description": "reject-degree full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-witness",
+      "role": "candidate",
+      "description": "mutate-witness full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "reject-witness full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-root",
+      "role": "candidate",
+      "description": "mutate-root full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "reject-root full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-missing-failure",
+      "role": "candidate",
+      "description": "mutate-missing-failure full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-missing-failure",
+      "role": "control_negative",
+      "description": "reject-missing-failure full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-source",
+      "role": "candidate",
+      "description": "mutate-source full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "reject-source full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "mutate-columns",
+      "role": "candidate",
+      "description": "mutate-columns full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3640
+      }
+    },
+    {
+      "id": "reject-columns",
+      "role": "control_negative",
+      "description": "reject-columns full integrated collector bundle or declared genuine corruption",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+        "build": null,
+        "binary_sha256": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "all455/caps3and4/all30targets/fourarms"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3640
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "audit",
+      "expected_detection": "Fresh independent audit accepts exact full partial/cold-recovery bundle",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-map",
+      "null_population": {
+        "description": "16 genuinely altered source/map/columns/coverage/degree/cert/root/failure/publiclog/scalar/work/phase controls",
+        "generator": "Native C++ mutation modes in frozen order",
+        "n": 16,
+        "why_n": "Every declared semantic control, no null exemption",
+        "matched_on": [
+          "same original bundle",
+          "all untargeted fields",
+          "rehash rule"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "route",
+        "levels": [
+          "Weil+legacy",
+          "Weil+terminal",
+          "fresh Tate+terminal",
+          "Tate public/shift progression+terminal"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "Actual E61A21B39/P0,10 and d59twistA23B54/U37,14, subgroup31, distinct coefficientF31",
+        "how": "Native independent field/group route checks"
+      },
+      {
+        "name": "policy_encoding_cap",
+        "treatment": "fixed",
+        "value": "ALL455geometric size3policies x2caps(3/4)x4routes x30separate unknown-point workloads;31diagnosticpoints each profile",
+        "how": "Complete nested native loops, unchanged after data"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Fresh full executions"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "producerC",
+          "producerA",
+          "producerB",
+          "audit",
+          "mutate-map",
+          "reject-map",
+          "mutate-missing-policy",
+          "reject-missing-policy",
+          "mutate-target",
+          "reject-target",
+          "mutate-scalar",
+          "reject-scalar",
+          "mutate-log",
+          "reject-log",
+          "mutate-kind",
+          "reject-kind",
+          "mutate-cost",
+          "reject-cost",
+          "mutate-progress-cost",
+          "reject-progress-cost",
+          "mutate-phase",
+          "reject-phase",
+          "mutate-missing-target",
+          "reject-missing-target",
+          "mutate-degree",
+          "reject-degree",
+          "mutate-witness",
+          "reject-witness",
+          "mutate-root",
+          "reject-root",
+          "mutate-missing-failure",
+          "reject-missing-failure",
+          "mutate-source",
+          "reject-source",
+          "mutate-columns",
+          "reject-columns"
+        ],
+        "how": "Fixed dependency order, no timing metric"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "audit",
+          "reject-map",
+          "reject-missing-policy",
+          "reject-target",
+          "reject-scalar",
+          "reject-log",
+          "reject-kind",
+          "reject-cost",
+          "reject-progress-cost",
+          "reject-phase",
+          "reject-missing-target",
+          "reject-degree",
+          "reject-witness",
+          "reject-root",
+          "reject-missing-failure",
+          "reject-source",
+          "reject-columns"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "ALL3640profiles/109200workloads per stream/112840diagnostics; every native certificate/root/row/rank/log/scalar/map and five exclusive phases reconstruct, all16controls101/no receipt"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "producerA",
+          "producerB"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "threshold": "Exact complete native stream and receipt equality"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "Actual rational order31source and actual minus-Frobenius twist partner; unknownQpoint only",
+        "check": "Independent rational linear-Miller map reconstruction,31point domain, bilinearity, every admitted public log and shifted scalar checked on ORIGINAL E/P"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Full fixed descriptive census, five timing repeats not independent DLP challenges; no statistical blinded claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 20,
+      "per_sample_seconds": 1800,
+      "threads": 1,
+      "estimated_total_seconds": 2300,
+      "measured_on": "Conservative2300s resource bound based on previous finite F61 native study; not a measured speed prediction. Every process600scap and outer2300s ensures completion before03:09UTC."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Complete execution-protocol stage exit status; retain all per-target native results/timings separately, no batch-throughput scalar",
+        "source": "data-stages.json exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "profiles",
+        "name": "profiles",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "3640complete policy/cap/route profiles",
+        "source": "audit.json profiles",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "target_workloads",
+        "name": "target_workloads",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "109200separate point workloads, repeated public fixtures not independent unique DLPs",
+        "source": "audit.json target_workloads",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "diagnostic_cells",
+        "name": "diagnostic_cells",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "112840diagnostic point queries per stream",
+        "source": "audit.json diagnostic_cells",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "profiles",
+      "target_workloads",
+      "diagnostic_cells"
+    ],
+    "record": [
+      "every full counted payload and independent reconstructed certificate/root/row/log/scalar",
+      "all fresh releaseA/B per-target five exclusive cold phase intervals, one warmup+five measured",
+      "all map/progression requests and blocked/identity outcomes",
+      "all native source/binary hashes and genuine changed false payloads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 2300,
+    "placement": {
+      "outer_seconds": 2300,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete36data/control stages or first failure,600s each/2300s outer and absolute03:09UTC deadline; retain incomplete/failure, never shrink population",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exact coverage/correctness first; only BOTH algebraic-admitted recoveries eligible for timing comparisons, all losses/ties retained; strongest source policy frontier limited explicitly to declaredcaps3/4",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "ALL3640profiles/109200workloads per stream/112840diagnostics; every native certificate/root/row/rank/log/scalar/map and five exclusive phases reconstruct, all16controls101/no receipt",
+    "statistic": "Per-workload median/min/q1/q3/max of5fresh measured repetitions after1stored warmup, each cold public setup charged; countedCtiming excluded",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defects, no statistical effect size",
+    "verdict_vocabulary": [
+      "finite_frontier_extension_unsigned",
+      "finite_null_unsigned",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "audit.rs",
+      "sha256": "f40dc7a20334ae27aa316fa77b6f7df489acc1cefd1d0d980f755c87c0ff671a"
+    },
+    "inputs": [
+      "FullCcertificate payload and index",
+      "UninstrumentedA/Btiming/result indexes",
+      "16genuine rehashed false trees",
+      "source/binary/protocol pins"
+    ],
+    "outputs": [
+      "audit.json full profiles_data/timing_data/comparisons/frontier",
+      "all true/false payloads/exits/logs"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "All455policies at declaredcaps3/4: admissible/blocked/identity and constructed field-witness scope",
+      "Per-workload cold A/B comparisons, losses/ties/ineligible retained, no batch throughput"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Use reference pair enumeration to supply candidate stopping/roots",
+    "Admit an uncertified branch root",
+    "Hide diagonal/O/failed branches or blocked setups",
+    "Read target scalar labels in recovery",
+    "Call chord expanded degree original S3 pullback degree or intrinsic regularity",
+    "Free log/setup caching between cold targets",
+    "Select favorable policy/cap prefix",
+    "Upload denied raw archives or use credentials/paid resources",
+    "Interpret conditional state counts as stationary weights or iid stopping expectation",
+    "Treat query-call proxy as complete polynomial/field/root/setup cost",
+    "Interpret source6 span containment as a universal cost or ECDLP impossibility"
+  ],
+  "literature": [
+    {
+      "ref": "https://crypto.stanford.edu/pbc/notes/ep/optimize.html",
+      "provenance": "retrieved",
+      "claim": "Established denominator elimination on actual subfield/minus-space domains"
+    },
+    {
+      "ref": "https://crypto.stanford.edu/pbc/notes/elliptic/tate.html",
+      "provenance": "retrieved",
+      "claim": "Reduced Tate bilinearity, not new invention"
+    },
+    {
+      "ref": "../../quadratic_twist_chord_proof_20261105/cm8-61-field-full-20261115/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Historical actual public-log setup/source recovery and capped certificate antecedents, not new data"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "88f15f04ece0b59ff5f990aac3acea096a335bb9c34c34aa48057e36657820e4",
+    "commit": "0367bdb039e872080539c80c3aac055801a7441e",
+    "frozen_at": "2026-11-16T02:22:09Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "source_commit": "0367bdb039e872080539c80c3aac055801a7441e",
+    "binary_pins": {
+      "producer": "373894d584301e4aa421cab80c03f82d83fd30487cd7bdaf8b7060457a9596dc",
+      "auditor": "51c921cdf8caceead16c72e0523b0d7a0d8247ed57cce2376aa71a1de46f463b"
+    },
+    "modes": [
+      "map",
+      "missing-policy",
+      "target",
+      "scalar",
+      "log",
+      "kind",
+      "cost",
+      "progress-cost",
+      "phase",
+      "missing-target",
+      "degree",
+      "witness",
+      "root",
+      "missing-failure",
+      "source",
+      "columns"
+    ],
+    "scope_contract": "PROTOCOL.md",
+    "matrix_degree": null,
+    "resource_window": "02:09-03:09UTC,2existingLOCALworkers,no paidresources",
+    "checkpoint": "Actual authorized samebranch GitHub source/protocol publication; no S3/raw asset upload",
+    "timing_counted_C_excluded": true,
+    "cold_IC_public_logs_admitted_relations_only": true,
+    "unknown_target_point_only": true,
+    "five_phases": [
+      "validation",
+      "fresh public setup and admitted logs",
+      "initial unknown map arm3",
+      "shifted algebraic solve",
+      "ORIGINALscalar and local destruction"
+    ]
+  }
+}

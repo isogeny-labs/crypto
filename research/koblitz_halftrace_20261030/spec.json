@@ -1,0 +1,24 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "native K_0 halftrace cache: matched one-target pipeline comparison",
+  "description": "Generic decomposition (bounded by sqrt(r); cannot beat rho). Candidate changes only cached point lifting; preserve all answers and base points. No scaling claim.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 0, "n": 31}],
+    "targets_per_curve": 8,
+    "target_seed": 20261030
+  },
+  "arms": [
+    {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rho-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "ic-baseline", "role": "baseline", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "koblitz-orbit:divisor=1;2", "oracle": "mitm-frobenius-counted:m=3", "linalg": "incremental-gauss-full-rank-checked"
+    }}},
+    {"name": "ic-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "koblitz-orbit:divisor=1;2", "oracle": "mitm-frobenius-counted:m=3", "linalg": "incremental-gauss-full-rank-checked"
+    }}},
+    {"name": "ic-halftrace-tables", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "koblitz-orbit:divisor=1;2,halftrace_tables=1", "oracle": "mitm-frobenius-counted:m=3", "linalg": "incremental-gauss-full-rank-checked"
+    }}}
+  ],
+  "measurement": {"rounds": 6, "warmup": 1, "order": "alternate", "seed": 20261030, "isolation_required": "L2", "timeout_seconds": 120}
+}

@@ -1,0 +1,1 @@
+T-1501 initial source proposal; released during lease renewal and Conductor marked cancelled. T-1505 successor claimed same directory. Two separately authorized native attempts (first invalid fixture), one Lean attempt. No index grant yet; no producer modification or scientific execution.

@@ -1,0 +1,9 @@
+{
+  "source": "primary-inputs/entire-balanced.rs.txt",
+  "range": "Class definition through all Balanced methods preceding classes(); append only the closing impl brace",
+  "method_body_bytes_unchanged": true,
+  "extracted_bytes": 8554,
+  "extracted_sha256": "2f0a6bd3fee1295ec7fa09ab459ceae2b045a9bc8bf13d4d9dcf98fa7cf96434",
+  "imports": "new small wrapper imports FpPoly/Fp2Ctx only; no old Curve/Divisor/norm_power dependency",
+  "format": "Rust include preserves the exact reused body; unchanged vendor modules are skipped by rustfmt only, compiled and strict-Clippy checked. New wrappers/adapter use ordinary cargo fmt."
+}

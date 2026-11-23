@@ -1,0 +1,244 @@
+# Remaining exact-degree and base-selection work
+
+The paired top-form phase is complete:96 cases,96 replays,16 prime graded-map
+certificates. Keep all prior fixed-base, paired FFD/V2, V3 and top datasets.
+No duplicate execution is needed. The broad FFD/LFD and elite-base objective
+remains open.
+
+Next exact finite-degree question: prime m2. The checked original highest S3
+form is x0^2*x1^2; the selector field tops are all variable squares. Thus its
+graded quotient has a product of two quadratic linear-form powers in disjoint
+selector blocks. Investigate a native Hilbert-function/rank certificate for that
+structure. Before claiming exact values, check primary literature on the relevant
+multiplication maps in monomial complete intersections, including finite-field
+characteristic hypotheses. Freeze the method and independent small explicit
+controls; do not transfer a characteristic-zero rank theorem to the saved prime
+without checking its conditions. No exact numerical prediction is claimed here.
+
+For binary elite-base selection, keep the same preprocessing rule across bases.
+Adding affine consequences can change the top ideal while retaining the same
+point base; any such experiment needs separate original/transformed arms and
+preserved sources. The current baseline/spike40 top bounds overlap, whereas
+m2 LFD differs2 versus3 on the retained targets. Neither result identifies an
+elite candidate. Larger-m LFD, prime LFD and held-out matched targets remain
+required evidence. A low first-fall degree or closure-rank plateau is insufficient.
+
+This handoff is not a frozen protocol or a new run receipt.
+
+## 2026-10-28 update: prime m2 resolved on six retained inputs
+
+Run n83-prime-m2-hilbert-20261028-r2 completed six certificates and six fresh
+replays; S3-restored executable/data replayed all six again. Exact original-top
+dreg42, h41=5348880, h42=0, total dimension9159376218609600. See
+experiment-hilbert.export.json, HILBERT_DESIGN.md, HILBERT_FORMAT_V2.json and
+reports/run-20261028T1632Z/. R1 failed on a missing witness suffix in the checker;
+all failed/partial outputs and original source are preserved. No need to repeat
+this calculation. Both frozen protocols and separate source versions remain.
+
+The next finite regularity gap is binary/Koblitz m2, still interval[28,55]
+on both paired bases and target kinds. First inspect the retained original
+highest-form ideals and relevant primary literature for stronger quotient/rank
+certificates; freeze any new method and explicit controls before new data.
+Do not substitute LFD2/3 for regularity. If affine consequences or preprocessing
+are investigated, they must form separate matched original/transformed arms;
+the point-base identity alone does not fix the polynomial presentation.
+
+Larger-m binary regularity, larger-m LFD, prime LFD and held-out targets remain
+open. Prime m3..9 original top quotients are positive-dimensional in this saved
+presentation, so a finite vanishing-degree search there is inappropriate without
+an explicitly different formulation. No elite factor base or universal FFD/LFD
+conclusion is established. All prior datasets remain required evidence.
+
+## 2026-10-28 update: binary/Koblitz m2 resolved on twelve retained inputs
+
+Run n83-binary-m2-pair-20261028-r1 completed12 exact original-top degree28
+certificates and12 fresh replays, followed by12 S3-restored replays and all60
+raw manifest checks. Source ac08cf2f902; frozen protocol95cf1fbd579f98e7b766b3fceb105b833d90c372566e180defe027e13cf95ad6.
+Original/baseline/spike40, both families and both targets all have degree28.
+Original/baseline quadratic/product rank53 and spike40 rank67. This rank change
+does not lower regularity on the retained m2 panel. Keep the exact LFD2 versus3
+results distinct from these equal regularities. The complete Hilbert functions
+are not known from this certificate: stored arrays are lower/upper bounds.
+See BINARY_PAIR_DESIGN.md, BINARY_PAIR_FORMAT.json, experiment-binary-pair.export.json.
+No need to repeat the binary m2 batch. All previous data remains required.
+
+Next investigate larger-m binary highest-form structure and held-out m2
+targets under a new frozen protocol. For larger m, retain the intermediate
+83-variable blocks and the original polynomial presentation; do not extrapolate
+the m2 disjoint-pair proof. A product-span failure must remain a failed
+certificate condition, not a different-degree assertion. Before any new base
+search, define matched target sampling and keep source/preprocessing constant.
+Prime larger-m positive-dimensional top quotients, larger-m LFD and prime LFD
+remain unresolved. No elite base or universal FFD/LFD result is established.
+
+
+## 2026-10-28 update:84 larger-m binary chain intervals tightened
+
+Run n83-binary-chain-20261028-r1 completed84 producer certificates and84 fresh
+replays; S3-restored executable replayed all84 and all360 raw manifest entries
+matched before/after. All84 cumulative partial summaries are immutable and kept.
+Original/baseline/spike40, Koblitz/binary, planted/natural now share these bounds:
+m3[111,138],m4[194,221],m5[277,331],m6[360,414],m7[443,524],m8[526,607],m9[609,717].
+These are stronger certificates on unchanged sources, not a base improvement.
+Every larger-m exact full-chain degree remains unknown. Source8ccd4eb9729;
+protocolce0a47828dbf3f0dcfe311cefd43730ab671dcf9ac1da7e0cee8ecd2d9a1fb72.
+See CHAIN_DESIGN.md, CHAIN_FORMAT.json and experiment-chain.export.json. Do not
+repeat this completed84-case batch. Every earlier dataset remains evidence.
+
+The method selects disjoint original S3 components and leaves overlap information
+unused. Next investigate overlaps/multigraded structure for exact m3 regularity,
+and bounded native higher-m LFD closure on retained systems. Do not equate a
+closure plateau with stabilization; keep strict nonmembership witnesses and any
+unresolved lower bound. Held-out matched targets and base selection remain open.
+The current base-independent interval proof cannot rank baseline/spike40.
+Prime larger-m original top quotients remain positive-dimensional; a different
+presentation needs explicit separate arms. No elite base or universal FFD/LFD
+conclusion is established. Independent scientific review remains pending.
+
+
+## 2026-10-29 update: retained m3 systems certify LFD at least3
+
+Run n83-degree3-m3-20261029-r1 attempted12 retained original/baseline/spike40
+Koblitz/binary planted/natural m3 inputs. All12 producers,12 fresh replays and
+12 S3-restored replays passed. All230 raw manifest entries match before/after.
+Every case has a replayed quadratic row in admitted V3 but outside complete V2,
+so LFD>=3. All stop at the frozen32768-row cap, with linear rank1; exact LFD and
+upper bounds remain null. No complete V3 closure or regularity change is claimed.
+Source6a2c028999634a4ddf9791dc3082180086b6c2ff;
+protocole4d9a88ecf15df5dd837e713d1cfaf936c02fae9b9b9359d6803d20214fbb438.
+All12 immutable cumulative summaries, dense rows, operations and V2 source
+traces remain. See DEGREE3_M3_FORMAT.json and experiment-degree3-m3.export.json.
+
+A next closure phase should reconstruct the saved queue and continue from these
+certified prefixes under a new frozen protocol, preserving the original rows
+and all prior traces. Do not repeat this completed bounded batch. Pending queues
+are3442 in10 cases,13353 in baseline Koblitz planted and13451 in spike40 Koblitz
+planted; these are recorded queue sizes, not estimates of work to completion.
+Even full V3 closure alone would not prove an LFD upper bound. A global unit,
+affine-completion or another independently justified stabilization certificate
+remains necessary. Higher-m/prime LFD and elite-base selection remain open.
+
+
+## 2026-10-29 update: retained m3 V3 continuation finished
+
+Run `n83-degree3-continuation-20261029-r1` extended all twelve immutable
+prefixes. All twelve producers, fresh replays and S3-restored replays passed.
+12 queues exhausted and 0 remained capped.
+It adds 40748 independent rows and 61224
+processed operations, summed from native records. The strict lower bound LFD>=3
+is inherited in 12 cases; no new global upper
+bound or exact LFD is certified. Complete V3 is not a stabilization theorem.
+All 270 new manifest entries and
+230 parent entries match before
+and after restored replay. The original prefixes remain unchanged.
+
+See `DEGREE3_CONTINUATION_FORMAT.json`, `experiment-degree3-continuation.export.json`
+and `evidence/degree3-continuation-publication.json`. Do not repeat this run.
+Complete V3 now permits verified nonmembership tests for future degree-four
+fall witnesses. Any such extension needs a new frozen method/protocol and
+must preserve parent and suffix traces. Exact higher-m regularity, prime LFD,
+held-out matched target sampling and elite-base selection remain unresolved.
+No regularity change or factor-base quality ranking follows from closure rank.
+
+
+## 2026-10-29: overlapping binary-chain regularity certificates
+
+The unchanged84 binary/Koblitz original/baseline/spike40 m3..9 systems now have
+matching native-checked lower and written-proof upper certificates:111,194,277,
+360,443,526,609. All84 producer/fresh/S3-restored replays pass. Prior disjoint
+intervals remain preserved. See CHAIN_EXACT_DESIGN.md, CHAIN_EXACT_FORMAT.json,
+evidence/chain-exact/verified-summary.json and experiment-chain-exact.export.json.
+Full algebraic Lean formalization and independent scientific review remain open.
+
+The support-rank argument includes the terminal quadratic's possible product
+defect; it does not infer equality merely by adding a missing relation. The
+formula applies under identical independent F2-linear selector weights and
+n>=2ell,n>=ell+2, with source shapes checked. All44 small controls passed,
+including8 outside-hypothesis cases that disprove naive formula extrapolation.
+
+This closes the tested original-top intervals, not FFD/LFD or solving degree.
+The currently tested base change does not lower this invariant. Next pursue
+strict degree4 fall witnesses against the saved complete m3 V3 spaces, or a
+separately specified selector/presentation change with exact matched targets.
+Prime presentations, global LFD bounds, held-out selection and elite-base
+performance remain unresolved. Do not rerun this completed certificate panel.
+
+
+## 2026-10-29: strict degree-four witnesses after complete V3
+
+Run `n83-degree4-witness-20261029-r1` completed all twelve retained m3
+original/baseline/spike40 Koblitz/binary planted/natural identities. Every one
+of 249 coordinates per case has a degree<=4 derivation and a nonzero remainder
+against complete V3. All 2,988 witnesses passed fresh and S3-restored replay.
+This raises each saved system's LFD lower bound from 3 to 4. It does not determine
+exact LFD, a global upper bound or complete V4; no regularity or elite-base gain.
+
+See DEGREE4_WITNESS_DESIGN.md, DEGREE4_WITNESS_FORMAT.json,
+evidence/degree4-witness/summary.json and experiment-degree4-witness.export.json.
+All parent data and the original fixed-base regularity view remain unchanged.
+Do not repeat the completed candidate panel. A next higher-fall test requires a
+verified V4 nonmembership certificate, not merely nonmembership in a restricted
+V4 subspace. Exact LFD requires an additional global upper certificate. The
+prime positive-dimensional presentation and held-out matched elite-base search
+remain separate open obligations. Independent scientific review is pending.
+
+
+## 2026-10-29: propagation of verified V4 consequences
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 2988 new independent rows and 2988 operations. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. A restricted queue stall or cap gives no higher-fall bound and no global upper. Unrestricted V4 was not computed. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+All twelve retained m3 original/baseline/spike40 Koblitz/binary identities were
+attempted. See DEGREE4_PROPAGATION_DESIGN.md, DEGREE4_PROPAGATION_FORMAT.json,
+evidence/degree4-propagation/summary.json and experiment-degree4-propagation.export.json.
+Original fixed-base regularity values and all older datasets are preserved.
+Where no upper certificate exists, the next method must enlarge the admitted
+consequence family or supply a different global ideal certificate. Repeating
+the exhausted restricted queue alone cannot resolve that obligation.
+
+
+## 2026-10-29: hybrid quartic closure of retained systems
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 50122 new independent rows and 50134 product attempts; 0 cases completed the V4 normal-form closure. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. Complete V4 normal forms and a global LFD upper certificate are distinct claims. A cap gives no full-closure conclusion or higher-fall bound. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+All twelve retained m3 original/baseline/spike40 Koblitz/binary identities were
+attempted. See DEGREE4_QUARTIC_DESIGN.md, DEGREE4_QUARTIC_FORMAT.json,
+evidence/degree4-quartic/summary.json and experiment-degree4-quartic.export.json.
+Original fixed-base regularity values and all older datasets are preserved.
+Where work remains pending, continue the exact saved hybrid basis and queue under a new frozen contract. Where full V4 completes without a global upper, a larger closure or a separate ideal certificate is still required. Preserve all prefixes and caps.
+
+
+## 2026-10-30: prime m2 highest-form FFD and strict filtered witnesses
+
+All six retained prime m2 original/baseline/spike40 planted/natural systems have highest-form **FFD = 17** and a strict filtered witness giving **LFD >= 17**. All six producer, fresh-process and S3-restored checks passed. Global upper and exact LFD remain unknown.
+
+These are source-bound certificates using native exact arithmetic and a written rank/Koszul/filtered-space argument; independent scientific review and full algebraic formalization remain pending. The original-top regularity is still42. No elite-base or performance gain is established.
+
+All71 raw payloads matched before/after S3 replay. The native controls retain36
+expanded polynomial comparisons,including12 exceptional-target cases,and12
+small dense-closure comparisons. All six production functionals were nonzero.
+Zero would have remained inconclusive for the affine test.
+
+Next examine whether terminal-relation annihilators can extend highest-form
+upper certificates to the retained higher-m prime systems; that extension has
+not been executed or certified. Exact prime LFD still needs an independent
+upper certificate. The saved binary quartic frontier and held-out elite-base
+selection remain open. Do not rerun this completed six-case panel.
+
+
+## 2026-10-30: higher-m prime terminal upper certificates
+
+All42 retained prime m3–9 original/baseline/spike40 planted/natural systems have source-bound highest-form **FFD <= 17** certificates. All42 producer,fresh-process and S3-restored replays pass. This is an upper bound,not exactFFD;no new strict LFD bound is certified.
+
+The stored affine consequences have derivations of degree at most17 and degree at most16. Other chain equations may derive them earlier;nonmembership inV16 is not checked. All original bases,targets,equations and regularity values remain unchanged. No elite-base or performance gain follows;independent scientific review and full algebraic formalization remain pending.
+
+The nontriviality projection keeps the last selector block and kills all other
+variables. It preserves H but kills every original top generator. Next distinguish
+this upper certificate from exact first-fall degree by testing earlier syzygies
+modulo Koszul relations. An affine last-fall lower bound additionally needs a
+functional annihilating the complete lower filtered space,not merely this
+terminal relation. Binary quartic closure and held-out elite-base selection
+remain open. Do not repeat the completed42case producer.

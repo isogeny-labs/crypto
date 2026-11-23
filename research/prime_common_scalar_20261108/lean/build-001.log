@@ -1,0 +1,35 @@
+ℹ [3139/3142] Built CauchyNormalizer (4.2s)
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:183:0: 'CauchyNormalizer.choose_all_ones' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:184:0: 'CauchyNormalizer.choose_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:185:0: 'CauchyNormalizer.weight_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:186:0: 'CauchyNormalizer.signedWeight_ratio_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:187:0: 'CauchyNormalizer.puncture_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:188:0: 'CauchyNormalizer.puncture_normalizer_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:189:0: 'CauchyNormalizer.cauchyRho_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:190:0: 'CauchyNormalizer.normalized_square_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [3140/3142] Built KernelNodes (1.6s)
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:84:0: 'CauchyNormalizer.baseKernel_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:85:0: 'CauchyNormalizer.squareKernel_node_preserved' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:86:0: 'CauchyNormalizer.squareKernel_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:87:0: 'CauchyNormalizer.squareKernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:88:0: 'CauchyNormalizer.matrixEntry_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [3141/3142] Building CommonScalar (1.6s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/crypto/research/prime_common_scalar_20261108/lean/CommonScalar.lean -o /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/lib/lean/CommonScalar.olean -i /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/lib/lean/CommonScalar.ilean -c /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/ir/CommonScalar.c --setup /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/ir/CommonScalar.setup.json --json
+error: CommonScalar.lean:63:2: linarith failed to find a contradiction
+case h1
+x : ℚ
+n : ℕ
+hx : 1 - x ≠ 0
+h : (1 - x) ^ 2 * ∑ b ∈ Finset.range n, (↑b + 1) * x ^ b = 1 - (↑n + 1) * x ^ n + ↑n * x ^ (n + 1)
+a✝ : 1 - (1 - x) ^ 2 * ∑ x_1 ∈ Finset.range n, (↑x_1 + 1) * x ^ x_1 < x ^ n * (↑n + 1 - x * ↑n)
+⊢ False
+failed
+info: CommonScalar.lean:80:0: 'CommonScalar.normalizer_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:81:0: 'CommonScalar.node_preserved' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:82:0: 'CommonScalar.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:83:0: 'CommonScalar.squared_geometric_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:84:0: 'CommonScalar.squared_geometric_remainder' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: CommonScalar.lean:85:0: 'CommonScalar.coarse_budget_inclusion' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CommonScalar
+error: build failed

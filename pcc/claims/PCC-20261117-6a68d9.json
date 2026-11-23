@@ -1,0 +1,121 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:03:41Z",
+ "id": "PCC-20261117-6a68d9",
+ "kind": "statement",
+ "producer": {
+  "commit": "36b85f8634f4ed34d972ba07ebf5221921993c77",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/ENGINE_ROLLBACK_PROTOCOL.md",
+    "sha256": "993fa816efd76ed4bb3e8dbef794fc5912dcb1f8d9fb663eceee6b351a17281e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/ENGINE_ROLLBACK_BUILD.json",
+    "sha256": "e55a422cc52bb33ae9d8f1605fb553a089ceaac11398d882c63caf37cac9e9fd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/ENGINE_ROLLBACK_PRECALL.json",
+    "sha256": "21df3a5d8d34e7533c6c45a31c51827d44136945ddba0a29033e2ee3bcfe4eb7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/ENGINE_ROLLBACK_QUALIFICATION.json",
+    "sha256": "d49c81ba9dd0f308adae596ca8257c00b14cd0768e408f0aa8dea7362a871ecb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/ENGINE_ROLLBACK_SOURCES.sha256",
+    "sha256": "a88b316d4514a0504891b87fcd89fe32f27821df51ad477323a63fb4aa5f9f4e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/engine-rollback-qualifier-template-v1.sh",
+    "sha256": "cd28f4214431fa54c36a463ac075c29e7d438c9f92e36e8c60a4b2f86cab0e67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/engine-rollback-qualifier-executed-v1.sh",
+    "sha256": "cd28f4214431fa54c36a463ac075c29e7d438c9f92e36e8c60a4b2f86cab0e67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/engine-rollback-source-v1.tar.xz",
+    "sha256": "bc332ad7149378e21108925c5d84ba24b167df305dda13837f6130db4b1bde70"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/engine-rollback-native-v1.tar.xz",
+    "sha256": "2bbb7a93b2d338dffa88e69f670bd49fd3c7f42b1f8345ebff2a11eebd67f1a5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/ENGINE_ROLLBACK_ARCHIVE.json",
+    "sha256": "9a3c81cfb9186f3d7b84c2e7b79ff4d70236790a2d0ddcb351f68ed659910277"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/engine-rollback-native-v1/results.json",
+    "sha256": "c65417355cb9dee36a541cb02db7413e4999ddb4a49b49b7a8d1511addd49bcc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/development/rollback-clippy-01.log",
+    "sha256": "7a7ecad74e3109cd046bc745fa752a88f3c3a574471044b8de7532b6284b237e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/development/rollback-build-01.log",
+    "sha256": "268d512c1769f1f4557789b3a2ce9b130ab6f754fe1b6d9f0c467a010f9e558c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/development/rollback-fmt-01.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/development/engine-rollback-qualification-v1.log",
+    "sha256": "d35eeae990439eb0b05a0b18023e3add0dd9127e39c25a0ef4e1f112f3f573c7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "separate actual-engine one-system correctness contract, outside core35",
+ "statement": "Separate Fp29 runtime contract returns an original root after actual conditional conflict,Drop and Undo; full24389assignment truth and corrupted missing-Drop/wrong-Undo refusals retained. This is a separately qualified143-input composite source context including immutable core140; no core source/result was altered or core35 rerun. It is not a curve or performance result and standing remains unsigned."
+}

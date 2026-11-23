@@ -5,7 +5,7 @@
 //!     ic corpus --degree 19 --dimension 6 --sat 5 --unsat 5 --dir corpus/n19l6
 
 use clap::Args;
-use crypto_lib::cryptanalysis::ic_corpus::{generate, write_corpus, CorpusConfig};
+use crypto_lib::cryptanalysis::ic_corpus::{generate, write_corpus, CorpusConfig, PLANTING};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -73,6 +73,7 @@ pub fn run(args: CorpusArgs) -> Result<Value, String> {
                 "dimacs_cnf": e.stats_cnf,
                 "anf": {"equations": e.anf_equations, "monomials": e.anf_monomials},
                 "label_checked_by_own_solver": e.checked,
+                "planting_redraws": e.planting_redraws,
                 "blake3": {
                     "dimacs_xor": blake3::hash(e.dimacs_xor.as_bytes()).to_hex().to_string(),
                     "dimacs_cnf": blake3::hash(e.dimacs_cnf.as_bytes()).to_hex().to_string(),
@@ -87,6 +88,8 @@ pub fn run(args: CorpusArgs) -> Result<Value, String> {
         "operation": "corpus",
         "status": "complete",
         "config": cfg,
+        "planting": PLANTING,
+        "planting_redraws_total": entries.iter().filter_map(|e| e.planting_redraws).sum::<usize>(),
         "instances": instances,
         "written": written.iter().map(|p| p.display().to_string()).collect::<Vec<_>>(),
         "formats": {

@@ -1,0 +1,10 @@
+[package]
+name="hec-c4-phases"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../native"}
+[[bin]]
+name="c4-phases"
+path="../main.rs"

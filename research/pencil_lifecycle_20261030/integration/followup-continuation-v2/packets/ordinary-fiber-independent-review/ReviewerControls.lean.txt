@@ -1,0 +1,21 @@
+import Fiber
+set_option autoImplicit false
+namespace ReviewerControls
+ theorem sextic_residual_nonzero :
+  OrdinaryFiber.extract (0:ℚ) 1 (OrdinaryFiber.xi4 0 1 0 0 0 0 0) 0 0 0 0 1 ≠ (0:ℚ)^2 := by
+  norm_num [OrdinaryFiber.extract, OrdinaryFiber.xi4]
+ theorem zero_scale_normalization_fails :
+  SourceChart.normalize (fun _ : Fin 4 => (0:ℚ)) 0 ≠ SourceChart.q 0 0 0 0 0 0 0 0 := by
+  norm_num [SourceChart.normalize,SourceChart.q]
+ theorem two_torsion_anchor_countermodel :
+  (0:ℤ)+(0:ℤ)=0 ∧ (-1:ℤ)≠1 ∧ (1:ℤ)^2=(-1:ℤ)^2 ∧ ((0:ℤ)+1)^2=((0:ℤ)+(-1))^2 := by norm_num
+ theorem missing_fiber_countermodel :
+  (1:ℤ)+(1:ℤ)≠0 ∧ (-1:ℤ)≠1 ∧ (fun _ : ℤ => ()) ((1:ℤ)+1)=(fun _ : ℤ => ()) ((1:ℤ)+(-1)) := by norm_num
+ theorem zero_slope_positive :
+  OrdinaryFiber.valid (0:ℚ) 0 1 0 1 0 ∧ OrdinaryFiber.valid (0:ℚ) 0 1 0 (-1) 0 := by norm_num [OrdinaryFiber.valid]
+end ReviewerControls
+#print axioms ReviewerControls.sextic_residual_nonzero
+#print axioms ReviewerControls.zero_scale_normalization_fails
+#print axioms ReviewerControls.two_torsion_anchor_countermodel
+#print axioms ReviewerControls.missing_fiber_countermodel
+#print axioms ReviewerControls.zero_slope_positive

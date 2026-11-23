@@ -1,0 +1,81 @@
+{
+  "schema": "prime-trace-weak-bound-verification/v1",
+  "source_commit": "ba07221512088fc02d4233dd82e6bda88593bb14",
+  "claim_id": "PCC-20261115-b69cc7",
+  "declaration_sha256": "d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 10,
+  "gate_declarations": 56,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 140,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-b69cc7",
+    "claim_sha256": "21f6ceac44714bcb035e8b2665d7522a9f66c5025bef8c855e96e1838ea6f071",
+    "commit": "ba07221512088fc02d4233dd82e6bda88593bb14",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/prime_trace_weak_bound_audit_20261115/lean (PrimeTraceCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T01:57:20Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-b69cc7",
+    "claim_sha256": "21f6ceac44714bcb035e8b2665d7522a9f66c5025bef8c855e96e1838ea6f071",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47699,
+    "sha256": "867cb966a4b4a48bd173109b6e8d3cf1300a2e1fc855e9fb4ae87babd7f045d9",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 56,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_cubic_euler_nonconstancy_proved": true,
+    "actual_general_Weierstrass_fiber_equivalence_proved": true,
+    "actual_weak_point_and_trace_bounds_proved": true,
+    "source_primefield_trace_zero_count_and_degree_proved": true,
+    "actual_root_adjoin_finiteness_Frobenius_degree_derived": true,
+    "Hasse_or_trace_zero_premise": false,
+    "actual_q3_and_r2_countercontrols_proved": true,
+    "actual_composite_order8_degree2_control_proved": true,
+    "alternate_geometric_SS_comparison_proved": false,
+    "general_Hasse_bound_proved": false,
+    "general_nonprime_at_most6_proved": false,
+    "full_geometric_torsion_field_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

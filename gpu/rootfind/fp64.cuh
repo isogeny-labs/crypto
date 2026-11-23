@@ -1,4 +1,4 @@
-/* fp64.cuh -- Montgomery arithmetic mod an odd prime p < 2^62 on one
+/* fp64.cuh -- Montgomery arithmetic mod an odd prime p < 2^63 on one
  * 64-bit word, for CUDA devices and for host emulation of the same code.
  *
  * This is a line-for-line mirror of `Fp64` in
@@ -26,8 +26,11 @@
  *   which keeps the kernel well under the 255-register ceiling and lets
  *   ptxas place >= 8 warps per scheduler on sm_120.  Register pressure
  *   comes from the batched-inversion scratch, not from the field.
- * - p < 2^62 means a + b < 2^63 and t + m*p < 2^128 never overflow, the
- *   same bound `prime_fast::MAX_BITS` enforces on the CPU.
+ * - For p < 2^63, a+b < 2^64 and REDC input T < p*2^64 gives
+ *   T+m*p < 2*p*2^64 < 2^128. The high-word sum is <2p<2^64.
+ *   See HAC 14.32/14.33. The mirrored Rust engine retains its stricter
+ *   MAX_BITS guard; widening this documented arithmetic domain changes
+ *   no operation or value for existing callers.
  */
 #ifndef GPU_ROOTFIND_FP64_CUH
 #define GPU_ROOTFIND_FP64_CUH
@@ -36,7 +39,7 @@
 
 #ifdef __CUDACC__
 #define RF_HD __host__ __device__ __forceinline__
-#define RF_BIG __host__ __device__ __noinline__
+#define RF_BIG __host__ __device__ __noinline__ inline
 #else
 #define RF_HD inline
 #define RF_BIG inline
@@ -46,7 +49,7 @@
  * (it lands in the constant parameter bank, which is broadcast to every
  * thread for free). */
 struct Fp64Ctx {
-    uint64_t p;      /* odd prime, 3 < p < 2^62 */
+    uint64_t p;      /* odd prime, 3 < p < 2^63 */
     uint64_t n_inv;  /* -p^-1 mod 2^64 */
     uint64_t one;    /* R mod p  (Montgomery 1) */
     uint64_t r2;     /* R^2 mod p (canonical -> Montgomery) */
@@ -86,7 +89,16 @@ RF_HD uint64_t fp64_add(const Fp64Ctx &f, uint64_t a, uint64_t b) {
 }
 
 RF_HD uint64_t fp64_sub(const Fp64Ctx &f, uint64_t a, uint64_t b) {
+#ifdef __CUDA_ARCH__
     return a >= b ? a - b : a + f.p - b;
+#else
+    /* Host: branchless correction avoids unpredictable a>=b branches
+     * in the two-sign rootfinder sweep.  a,b are canonical [0,p)
+     * and unsigned wrap is intentional when a<b.  Device unchanged. */
+    const uint64_t d = a - b;
+    const uint64_t mask = (uint64_t)0 - (uint64_t)(a < b);
+    return d + (f.p & mask);
+#endif
 }
 
 RF_HD uint64_t fp64_neg(const Fp64Ctx &f, uint64_t a) { return a == 0 ? 0 : f.p - a; }
@@ -97,15 +109,22 @@ RF_HD uint64_t fp64_to_mont(const Fp64Ctx &f, uint64_t a) { return fp64_mul(f, a
 /* Montgomery -> canonical */
 RF_HD uint64_t fp64_from_mont(const Fp64Ctx &f, uint64_t a) { return fp64_reduce(f, 0, a); }
 
-/* Fermat inversion a^(p-2).  The exponent is the public modulus, so the
- * branch pattern is identical for every thread of the warp: no
- * divergence, ~62 squarings + popcount(p-2) multiplications.  This is
- * deliberately *not* the binary extended Euclid the Rust side uses --
- * EEA has data-dependent loop trip counts and would serialise a warp.
- * Both compute the same field element, and the Montgomery representation
- * of a residue is unique, so the result matches `Fp64::inv` bit for bit.
- * inv(0) = 0. */
+/* Invert a Montgomery residue.
+ *
+ * On the GPU, Fermat exponentiation is uniform across the warp because
+ * the exponent is the public modulus. A data-dependent Euclidean loop
+ * would serialize lanes. Retain the original device implementation.
+ *
+ * On the CPU host-emulation path, use signed extended Euclid on the
+ * canonical value and convert the result back to Montgomery form.
+ * For the documented p < 2^63, Euclidean coefficients are bounded by p,
+ * so the signed intermediate products fit in int64_t. This is
+ * VARIABLE-TIME and intended only for public root-finding inputs, not
+ * secret-dependent modular arithmetic or signing. inv(0) = 0.
+ *
+ * Both paths return the unique Montgomery representation of a^{-1}. */
 RF_BIG uint64_t fp64_inv(const Fp64Ctx &f, uint64_t a) {
+#ifdef __CUDA_ARCH__
     uint64_t acc = f.one;
     uint64_t base = a;
     uint64_t e = f.pm2;
@@ -116,24 +135,44 @@ RF_BIG uint64_t fp64_inv(const Fp64Ctx &f, uint64_t a) {
         e >>= 1;
     }
     return acc;
+#else
+    if (a == 0) return 0;
+    uint64_t r0 = f.p, r1 = fp64_from_mont(f, a);
+    int64_t t0 = 0, t1 = 1;
+    while (r1 != 0) {
+        const uint64_t q = r0 / r1;
+        const uint64_t r2 = r0 - q * r1;
+        const int64_t t2 = t0 - (int64_t)q * t1;
+        r0 = r1;
+        r1 = r2;
+        t0 = t1;
+        t1 = t2;
+    }
+    /* All callers use prime moduli and nonzero inputs (gcd == 1). */
+    const uint64_t inverse = (uint64_t)(t0 < 0 ? t0 + (int64_t)f.p : t0);
+    return fp64_to_mont(f, inverse);
+#endif
 }
 
 /* Montgomery's simultaneous inversion of x[0..n) in place using scratch
- * of n words: one fp64_inv plus 3(n-1) multiplications.  Inputs must be
- * non-zero (the caller substitutes `one` for degenerate entries and
- * flags them). */
+ * of n words: one fp64_inv plus 3(n-1) multiplies, omitting the first
+ * prefix multiply by one and both redundant final multiplies by one.
+ * Inputs must be non-zero (the caller substitutes `one` for degenerate
+ * entries and flags them). n==0 is a no-op. */
 RF_HD void fp64_batch_inv(const Fp64Ctx &f, uint64_t *x, int n, uint64_t *scratch) {
-    uint64_t acc = f.one;
-    for (int i = 0; i < n; i++) {
+    if (n <= 0) return;
+    uint64_t acc = x[0];
+    for (int i = 1; i < n; i++) {
         scratch[i] = acc;
         acc = fp64_mul(f, acc, x[i]);
     }
     uint64_t inv_acc = fp64_inv(f, acc);
-    for (int i = n - 1; i >= 0; i--) {
+    for (int i = n - 1; i > 0; i--) {
         uint64_t xi = x[i];
         x[i] = fp64_mul(f, inv_acc, scratch[i]);
         inv_acc = fp64_mul(f, inv_acc, xi);
     }
+    x[0] = inv_acc;
 }
 
 /* Host-side context construction (mirrors `Fp64::new`). */

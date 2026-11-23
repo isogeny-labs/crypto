@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-15T20:56:50Z",
+ "id": "PCC-20261115-11e7ca",
+ "kind": "statement",
+ "producer": {
+  "commit": "a6505f782c40b9850adf231bc508b751fcd83625",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/profiles/baseline-discovery/hotspots.json",
+    "sha256": "17b4ae8c98aa7dc3d3c5108bc8a56a5b0390473a47ac22ac49ea8b2ce95dc488"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/profiles/baseline-discovery/manifest.json",
+    "sha256": "f1064db64785175602888dd0684d625ec854cecf05cac84ad2ef0cb84463e823"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Single local discovery profile, original solver source a6505f782; producer evidence only.",
+ "statement": "Discovery Callgrind profile of the unchanged cold n131,d12 uniform query records612766243 simulated instructions. Field reduction/squaring, BigUint XOR and allocation appear in the top self-instruction sites. This identifies implementation targets, not a runtime or speedup result."
+}

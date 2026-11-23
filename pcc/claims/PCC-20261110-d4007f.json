@@ -1,0 +1,27 @@
+{
+ "created_at": "2026-11-10T17:24:59Z",
+ "id": "PCC-20261110-d4007f",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f79068d307a34332433e912a7133187f17a373da",
+  "model": "Codex",
+  "session": "fourteen-target-20261110"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e1c9ad8b8b6a694a1fca416b95ec19b0922b88b1139601df6a7c05ebb2b31276",
+   "kind": "lean",
+   "project": "research/rho_collision_audit_20261110/lean",
+   "theorem": "RhoCollisionCounterfamilyAudit.twenty_partition_certificate"
+  },
+  {
+   "decl_sha256": "d7ce159ceddc752d7c4b929f631f33c268cfe2c3f6897e0c05558849d21f0250",
+   "kind": "lean",
+   "project": "research/rho_collision_audit_20261110/lean",
+   "theorem": "RhoCollisionCounterfamilyAudit.universal_variance_only_collision_bound_false"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Every actual walk with increments1..r has first repeat T with p\u2264rT and T\u2264p. Actual independent uniform node-label PMF expectation has p\u2264rE and E\u2264p. For r20 and primep>20, actual indegree mean1/variance19/20, distinct/nonzero increments. No realC bounds E\u00b2\u2264Cp uniformly over such primes. Fixed increment table; generic/random-support averages, exact limiting constants and qualified Hildebrand theorem remain open.",
+ "statement": "For actual walks onZ/p with fixed increments1..20 and independent uniform node labels, the least repeated-state indexT satisfies p\u226420T and T\u2264p pointwise. The actual normalized productPMF meanE satisfies p\u226420E and E\u2264p. For primep>20 the support is distinct/nonzero and actual indegree mean1/variance19/20; nevertheless no realC bounds E\u00b2\u2264Cp uniformly over all such primes. Both the actual support/PMF certificate and direct universal negation are kernel-audited."
+}

@@ -1,0 +1,48 @@
+{
+ "C1_ksum5_vs_ksum4": {
+  "disallowed_paths": 52,
+  "examples": [
+   ".counters.matrix_rank",
+   ".counters.matrix_rows",
+   ".counters.matrix_work",
+   ".counters.relations_found",
+   ".counters.targets_tried",
+   ".detail.decomposition.hit_rate"
+  ],
+  "detected": true
+ },
+ "C2_tampered_relations_adds": {
+  "paths": [
+   ".phases[relations].adds"
+  ],
+  "detected": true
+ },
+ "C3_pruned_vs_prebuild_ksum5": {
+  "detected": true,
+  "paths": [
+   ".arm",
+   ".binary_sha256",
+   ".boundaries.ratio_to_floor",
+   ".cost.s",
+   ".cost.total_gae",
+   ".detail.framework_total_gae_before_solver_removal",
+   ".detail.label",
+   ".env_class_id",
+   ".fbm_id",
+   ".method.method_id",
+   ".method.method_sha256",
+   ".method.params.oracle"
+  ]
+ },
+ "C4_seal": {
+  "original_ok": true,
+  "tampered_ok": false,
+  "changed": true,
+  "detected": true
+ },
+ "C5_rho_vs_ksum5_ratio_w0": {
+  "ratio": 6.994823782316004,
+  "detected": true
+ },
+ "all_detected": true
+}

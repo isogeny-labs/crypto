@@ -1,0 +1,15 @@
+/var/tmp/pencil-fallback-word-divisions-20261101-v1/FallbackWordControls.lean:7:15: error: Tactic `rfl` failed: The left-hand side
+  let n := a.length + [].length - 1;
+  have out := (↑(ProductPolynomial.rows 17 0 a [] ⋯ (ProductPolynomial.zeros n))).toList;
+  ScaleTrim.trimFuel out.length out
+is not definitionally equal to the right-hand side
+  []
+
+case neg
+a : List UInt64
+h✝¹ : ¬a = []
+h✝ : ¬[] = []
+⊢ (let n := a.length + [].length - 1;
+    have out := (↑(ProductPolynomial.rows 17 0 a [] ⋯ (ProductPolynomial.zeros n))).toList;
+    ScaleTrim.trimFuel out.length out) =
+    []

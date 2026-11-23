@@ -1,0 +1,31 @@
+{
+  "schema": "ecbench.launch/v1",
+  "pod": {
+    "id": "hnvmwjamem9ox9",
+    "name": "ecbench-affine-v1-4090-20261030",
+    "status": "RUNNING",
+    "gpu": {
+      "count": 1,
+      "id": "NVIDIA GeForce RTX 4090",
+      "memory": 31,
+      "vcpuCount": 12
+    },
+    "image": "nvidia/cuda@sha256:d266e59b88c295bc5fa0e4cef9064eaff84939381b09e2c3d76a5532a303e42d",
+    "cudaVersion": "13.2",
+    "cost": 0.89,
+    "dataCenterId": null,
+    "createdAt": "2026-10-30T23:29:29.194Z"
+  },
+  "source_commit": "333712634ae2fa0694236a530b7a5efd1be3efc5",
+  "protocol_sha256": "2cfc1be77efbdc0d65031c1a42a19a72aca407aa69459e4440731993a92dad66",
+  "source_archive_sha256": "360efb832e922ba1a63a3210df19c85e095c3c094d25342a420b8f00b6fb4172",
+  "controller_timeout_seconds": 18300,
+  "worker_timeout_seconds": 18000,
+  "max_gpu_hourly_usd": 0.9,
+  "status_at_publication": "RUNNING; GPU validation and panel pending",
+  "files": {
+    "bootstrap.sh": "27536bb818b9e199af3495bed08921b876dcfe7f329e065c086bd9ee107cf940",
+    "controller.sh": "a7f5e9b122f37168e809faf4c1ca989ea6c1dbc196cd9226c18ff9c114dc5599",
+    "pod-command.sh": "32a72486016c0b874da64173660906c3ff05665f51e9d8c2425db92204eabd99"
+  }
+}

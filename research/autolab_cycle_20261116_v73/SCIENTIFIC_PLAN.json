@@ -1,0 +1,50 @@
+{
+  "time": "2026-11-16T01:41:24.853846+00:00",
+  "fingerprint": "5526df4bf031a5b5324b1580190aa69cf36f0a65ad1bd38e13d62170a2bb030f",
+  "preregistration_sha256": "bf854e0947103cea1ecd9d51a5d9caa04f65a52446fe2a9e25f38492b3d6f1a1",
+  "spec": {
+    "artifact_paths": [
+      "research/frobenius_split_20261116_v73/raw.json",
+      "research/frobenius_split_20261116_v73/native_stdout.txt",
+      "research/frobenius_split_20261116_v73/native_stderr.txt",
+      "research/frobenius_split_20261116_v73/build_stdout.txt",
+      "research/frobenius_split_20261116_v73/build_stderr.txt"
+    ],
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.frobenius_split_20261116_v73.worker",
+      "frobenius-split-guard-20261116-v73"
+    ],
+    "cpu": 0,
+    "depends_on": [],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "research/frobenius_split_20261116_v73/DATA.json": "4efbe6eb81b0fdeba44a93171ce077ee7c0f105d7cf1fad94c803d89cf216900",
+      "research/frobenius_split_20261116_v73/PROOF.md": "ed7503f8a683fc6f218684d59a7dd43ba23c697ad0b874e41188df9e4e62471d",
+      "research/frobenius_split_20261116_v73/guards.cpp": "1c337adfee02186ad21a428a46b9c47d836506cf9eb9bc349e24be0dde0a4284",
+      "research/frobenius_split_20261116_v73/small.py": "7a0e18967c6a725aa2102e440ce8f5fc647d1677bb344eddc3168ab203824b3e",
+      "research/frobenius_split_20261116_v73/worker.py": "66e98ca3df63fc370938c2f0039c56827bc5ef31d6ab74d3ae41e6a26f423e21",
+      "research/frobenius_split_review_20261116_v73/REVIEW.md": "55d12c089169d378d65c8cbd275e3e31052b4d6e8c25192250295f5ecba00313",
+      "research/k0_zero_cubic_20261115_v43/lab_variant_02/native_gf83.h": "9fd30bf6acd6714d2b0f4947891e36b97edb02e8cea8fce78ebb98da1dbc626a"
+    },
+    "hypothesis": "Frobenius split plus exact low-arity guards make the distinct-source actual five-source GF83 branch rational, with repeated branches retained",
+    "id": "frobenius-split-guard-20261116-v73",
+    "input_paths": [
+      "research/frobenius_split_20261116_v73/DATA.json"
+    ],
+    "memory_limit_mb": 4096,
+    "source_paths": [
+      "research/frobenius_split_20261116_v73/worker.py",
+      "research/frobenius_split_20261116_v73/small.py",
+      "research/frobenius_split_20261116_v73/guards.cpp",
+      "research/frobenius_split_20261116_v73/PROOF.md",
+      "research/frobenius_split_review_20261116_v73/REVIEW.md",
+      "research/k0_zero_cubic_20261115_v43/lab_variant_02/native_gf83.h",
+      "lab/runner.py",
+      "performance/GATE.md"
+    ],
+    "timeout_seconds": 90
+  }
+}

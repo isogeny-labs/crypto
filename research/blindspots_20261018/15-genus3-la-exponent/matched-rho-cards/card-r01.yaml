@@ -1,0 +1,74 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-15-R01
+experiment_id: BLINDSPOT-15
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Item 15 matched rho: independent replay for the validation gate. Rho arm only, b = 20, curve 0 (walks 0 to 3) and curve 2 (walks 0 to 2); walks are seeded sequentially from one stream, so the sample is a prefix of the 16-walk run
+
+receipt: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/receipt-card-r01.json
+must_not_exist:
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/build.stdout.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/build.stderr.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c0.stdout.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c0.stderr.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c0_rho_replay.jsonl
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c2.stdout.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c2.stderr.log
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c2_rho_replay.jsonl
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/receipt-card-r01.json
+binds:
+  - {path: research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs, sha256: 79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991}
+  - {path: research/blindspots_20261018/15-genus3-la-exponent/orders.csv, sha256: d31864a01ff8aff7f1ef6e0a2649e52fa9a25dabec8852f3a9e4c5e4e6ddf235}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b", "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs"]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/build.stdout.log
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/build.stderr.log
+  - id: run-b20-c0-rho-replay
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b", "--bits", "20", "--curve", "0", "--kappa", "1.3059", "--cx", "8", "--streams", "r2", "--las", "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--arms", "rho", "--rho-targets", "4", "--rho-r", "64", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c0_rho_replay.jsonl"]
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c0.stdout.log
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c0.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c0_rho_replay.jsonl]
+  - id: run-b20-c2-rho-replay
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b", "--bits", "20", "--curve", "2", "--kappa", "1.3059", "--cx", "8", "--streams", "r2", "--las", "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8", "--orders", "research/blindspots_20261018/15-genus3-la-exponent/orders.csv", "--no-c1", "--no-gp-check", "--arms", "rho", "--rho-targets", "3", "--rho-r", "64", "--out", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c2_rho_replay.jsonl"]
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c2.stdout.log
+    stderr: research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c2.stderr.log
+    outputs: [research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c2_rho_replay.jsonl]
+  - id: remove-bin
+    argv: ["rm", "-f", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+  - id: remove-bin-dir
+    argv: ["rmdir", "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+
+bus_address: executor-mechanical-blindspot-15-r01
+background: true
+write_scope:
+  - research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with run_in_background true and timeout 3600000, and return the printed summary after the tool exits."

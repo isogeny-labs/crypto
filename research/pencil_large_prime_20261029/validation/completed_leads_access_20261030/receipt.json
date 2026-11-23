@@ -1,0 +1,89 @@
+{
+  "schema": "pencil-related-leads-artifact-access/v1",
+  "source_repository": "/home/ec2-user/crypto-pr2304-persist",
+  "source_commit": "157f7a0d82f73fef3490c84bcc9a3a659fa9a05d",
+  "audit_scope": "Read existing reports/summaries/validator receipts; retrieve retained PDF/CSV bytes from artifact store or exact committed Git blob and verify hashes. No solver, validator rerun, reanalysis or regenerated evidence.",
+  "remote_verified": 9,
+  "tracked_verified": 22,
+  "storage_fallbacks": [
+    {
+      "path": "research/kummer_differential_collector_20261022/KUMMER_PAIRED.pdf",
+      "initial": "No adjacent artifact manifest entry",
+      "resolved": "Exact committed PDF blob retrieved and current local hash matched"
+    },
+    {
+      "path": "research/four_followups_20261021/results/matched/price-grid.csv",
+      "initial": "Not a tracked file",
+      "resolved": "Artifact-store object downloaded; exact manifest SHA256 and201037bytes matched"
+    }
+  ],
+  "unavailable_selected_artifacts": [],
+  "matrix": [
+    {
+      "lead": "factor-base and jump sweep",
+      "arms": 5,
+      "targets_per_arm": 1260,
+      "candidate_verified_total": 6300,
+      "matched_rho_verified_total": 6300,
+      "pdf": "research/four_followups_20261021/REPORT.pdf",
+      "graph": "research/four_followups_20261021/factor-base-grid.svg",
+      "summary": "research/four_followups_20261021/results/matched/summary.json",
+      "validator": "research/four_followups_20261021/results/matched/validator-report.json",
+      "csv": "research/four_followups_20261021/results/matched/price-grid.csv",
+      "standard_targets": "research/four_followups_review_20261022/results/standard-targets.csv",
+      "availability": "all selected artifacts verified accessible"
+    },
+    {
+      "lead": "complete weighted/projective law",
+      "arms": 2,
+      "targets_per_arm": 1260,
+      "candidate_verified_per_arm": 1260,
+      "matched_rho_verified_per_arm": 1260,
+      "pdf": "research/projective_law_followup_20261022/REPORT.pdf",
+      "graph": "research/projective_law_followup_20261022/cost-ratios.svg",
+      "summaries": [
+        "research/projective_law_followup_20261022/results/summary-projective.json",
+        "research/projective_law_followup_20261022/results/summary-state.json"
+      ],
+      "validator": "research/projective_law_followup_20261022/validator-report.json",
+      "csvs": [
+        "research/projective_law_followup_20261022/results/price-grid-projective.csv",
+        "research/projective_law_followup_20261022/results/price-grid-state.csv"
+      ],
+      "availability": "all selected artifacts verified accessible",
+      "scope_limit": "Finite branch/cohort evidence; no universal mechanized completeness claim inferred"
+    },
+    {
+      "lead": "Kummer uncached matched baseline",
+      "arms": 1,
+      "targets": 1260,
+      "candidate_verified": 1260,
+      "matched_rho_targets": 1260,
+      "pdf": "research/kummer_differential_collector_20261022/KUMMER_PAIRED.pdf",
+      "graph": "research/kummer_differential_collector_20261022/collector-cost-paired.svg",
+      "summary": "research/kummer_differential_collector_20261022/results/paired/analysis/summary.json",
+      "validator": "research/kummer_differential_collector_20261022/results/paired/analysis/validator-report.json",
+      "csv": "research/kummer_differential_collector_20261022/results/paired/analysis/target-price.csv",
+      "availability": "all selected artifacts verified accessible"
+    },
+    {
+      "lead": "Kummer N19 labelled fallback",
+      "arms": 1,
+      "targets": 1260,
+      "candidate_verified": 1260,
+      "rho_verified": 1260,
+      "baseline_verified": 1260,
+      "pdf": "research/kummer_differential_collector_20261022/n19-labelled-fallback/REPORT.pdf",
+      "graph": "research/kummer_differential_collector_20261022/n19-labelled-fallback/cost-graph.svg",
+      "summary": "research/kummer_differential_collector_20261022/n19-labelled-fallback/results/analysis/summary.json",
+      "validator": "research/kummer_differential_collector_20261022/n19-labelled-fallback/results/validation.log",
+      "validator_record_schema": "kummer-n19-independent-validator/v1",
+      "csv": "research/kummer_differential_collector_20261022/n19-labelled-fallback/results/analysis/target-price.csv",
+      "availability": "all selected artifacts verified accessible"
+    }
+  ],
+  "interpretation": "Completion counts transcribed from existing hash-verified summaries and validator receipts; this access audit is not a fresh experiment or independent recomputation of historical scientific results.",
+  "scratch": "/home/ec2-user/pencil-other-leads-access-20261030",
+  "source_worktree_mutations": 0,
+  "new_solver_executions": 0
+}

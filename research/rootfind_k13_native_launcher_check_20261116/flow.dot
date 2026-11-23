@@ -1,0 +1,11 @@
+digraph launcher {
+  graph [rankdir=LR, bgcolor="white", pad="0.12", nodesep="0.3", ranksep="0.43"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#506174"];
+  edge [color="#506174", fontname="Helvetica", fontsize=9];
+  spec [label="Frozen v3 spec\nSHA-256 pinned", fillcolor="#d8f0e4"];
+  parse [label="Rust validator\nPASS", fillcolor="#d8f0e4"];
+  args [label="L2 command + exact spec\nPASS", fillcolor="#d8f0e4"];
+  budget [label="Budget readback\nAUTH UNAVAILABLE", fillcolor="#fff0cc"];
+  job [label="EKS L2 + replay\nPENDING", fillcolor="#fff0cc"];
+  spec -> parse -> args -> budget -> job;
+}

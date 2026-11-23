@@ -1,0 +1,281 @@
+{
+  "main": "GeneralTranslationAudit.actual_general_translation_certificate",
+  "binding": "1b948fe2fb1c6a1af59ef94db55340d8d15f3080d15f149ee4d80771b2161168",
+  "custom_imports": {
+    "AllMiller": "research/finite_point_evaluation_audit_20261115/lean/AllMiller.lean",
+    "BasechangeCertificate": "research/finite_point_evaluation_audit_20261115/lean/BasechangeCertificate.lean",
+    "BasechangeControls": "research/finite_point_evaluation_audit_20261115/lean/BasechangeControls.lean",
+    "BasechangeField": "research/finite_point_evaluation_audit_20261115/lean/BasechangeField.lean",
+    "BasechangeFunctions": "research/finite_point_evaluation_audit_20261115/lean/BasechangeFunctions.lean",
+    "BasechangeInfinity": "research/finite_point_evaluation_audit_20261115/lean/BasechangeInfinity.lean",
+    "BasechangeMiller": "research/finite_point_evaluation_audit_20261115/lean/BasechangeMiller.lean",
+    "BasechangeNorm": "research/finite_point_evaluation_audit_20261115/lean/BasechangeNorm.lean",
+    "BasechangePoints": "research/finite_point_evaluation_audit_20261115/lean/BasechangePoints.lean",
+    "ChartAdicValuation": "research/finite_point_evaluation_audit_20261115/lean/ChartAdicValuation.lean",
+    "ChartAlgebra": "research/finite_point_evaluation_audit_20261115/lean/ChartAlgebra.lean",
+    "ChartCertificate": "research/finite_point_evaluation_audit_20261115/lean/ChartCertificate.lean",
+    "ChartFractionField": "research/finite_point_evaluation_audit_20261115/lean/ChartFractionField.lean",
+    "ChartLocalization": "research/finite_point_evaluation_audit_20261115/lean/ChartLocalization.lean",
+    "ConstantDivisors": "research/finite_point_evaluation_audit_20261115/lean/ConstantDivisors.lean",
+    "ConstantKernel": "research/finite_point_evaluation_audit_20261115/lean/ConstantKernel.lean",
+    "DVRIdentification": "research/finite_point_evaluation_audit_20261115/lean/DVRIdentification.lean",
+    "DiscreteValuation": "research/finite_point_evaluation_audit_20261115/lean/DiscreteValuation.lean",
+    "DivisorDegree": "research/finite_point_evaluation_audit_20261115/lean/DivisorDegree.lean",
+    "DivisorEvaluation": "research/finite_point_evaluation_audit_20261115/lean/DivisorEvaluation.lean",
+    "EvaluationCertificate": "research/finite_point_evaluation_audit_20261115/lean/EvaluationCertificate.lean",
+    "EvaluationConstants": "research/finite_point_evaluation_audit_20261115/lean/EvaluationConstants.lean",
+    "EvaluationControls": "research/finite_point_evaluation_audit_20261115/lean/EvaluationControls.lean",
+    "EvaluationFormulas": "research/finite_point_evaluation_audit_20261115/lean/EvaluationFormulas.lean",
+    "FieldValuation": "research/finite_point_evaluation_audit_20261115/lean/FieldValuation.lean",
+    "FiniteControls": "research/finite_point_evaluation_audit_20261115/lean/FiniteControls.lean",
+    "FiniteDVR": "research/finite_point_evaluation_audit_20261115/lean/FiniteDVR.lean",
+    "FiniteFractionField": "research/finite_point_evaluation_audit_20261115/lean/FiniteFractionField.lean",
+    "FinitePointCertificate": "research/finite_point_evaluation_audit_20261115/lean/FinitePointCertificate.lean",
+    "FiniteRegular": "research/finite_point_evaluation_audit_20261115/lean/FiniteRegular.lean",
+    "FiniteValuation": "research/finite_point_evaluation_audit_20261115/lean/FiniteValuation.lean",
+    "FiniteZeros": "research/finite_point_evaluation_audit_20261115/lean/FiniteZeros.lean",
+    "FunctionDivisor": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisor.lean",
+    "FunctionDivisorCertificate": "research/finite_point_evaluation_audit_20261115/lean/FunctionDivisorCertificate.lean",
+    "FunctionEvaluation": "research/finite_point_evaluation_audit_20261115/lean/FunctionEvaluation.lean",
+    "GeometricCertificate": "research/finite_point_evaluation_audit_20261115/lean/GeometricCertificate.lean",
+    "GeometricControls": "research/finite_point_evaluation_audit_20261115/lean/GeometricControls.lean",
+    "GeometricDegree": "research/finite_point_evaluation_audit_20261115/lean/GeometricDegree.lean",
+    "GeometricFibers": "research/finite_point_evaluation_audit_20261115/lean/GeometricFibers.lean",
+    "GeometricMiller": "research/finite_point_evaluation_audit_20261115/lean/GeometricMiller.lean",
+    "GuardControls": "research/finite_point_evaluation_audit_20261115/lean/GuardControls.lean",
+    "InfinityEvaluation": "research/finite_point_evaluation_audit_20261115/lean/InfinityEvaluation.lean",
+    "InfinityMonic": "research/finite_point_evaluation_audit_20261115/lean/InfinityMonic.lean",
+    "LineEvaluation": "research/finite_point_evaluation_audit_20261115/lean/LineEvaluation.lean",
+    "LineIdeals": "research/finite_point_evaluation_audit_20261115/lean/LineIdeals.lean",
+    "LineMultiplicity": "research/finite_point_evaluation_audit_20261115/lean/LineMultiplicity.lean",
+    "LocalComparison": "research/finite_point_evaluation_audit_20261115/lean/LocalComparison.lean",
+    "LocalNegation": "research/finite_point_evaluation_audit_20261115/lean/LocalNegation.lean",
+    "LocalOrderAlgebra": "research/finite_point_evaluation_audit_20261115/lean/LocalOrderAlgebra.lean",
+    "LocalOriginEvaluation": "research/finite_point_evaluation_audit_20261115/lean/LocalOriginEvaluation.lean",
+    "MillerFunctions": "research/finite_point_evaluation_audit_20261115/lean/MillerFunctions.lean",
+    "MillerStep": "research/finite_point_evaluation_audit_20261115/lean/MillerStep.lean",
+    "NegationCertificate": "research/finite_point_evaluation_audit_20261115/lean/NegationCertificate.lean",
+    "NegationControls": "research/finite_point_evaluation_audit_20261115/lean/NegationControls.lean",
+    "NegationCoordinate": "research/finite_point_evaluation_audit_20261115/lean/NegationCoordinate.lean",
+    "NegationDivisor": "research/finite_point_evaluation_audit_20261115/lean/NegationDivisor.lean",
+    "NegationField": "research/finite_point_evaluation_audit_20261115/lean/NegationField.lean",
+    "NegationNorm": "research/finite_point_evaluation_audit_20261115/lean/NegationNorm.lean",
+    "NegationValuation": "research/finite_point_evaluation_audit_20261115/lean/NegationValuation.lean",
+    "NormDegree": "research/finite_point_evaluation_audit_20261115/lean/NormDegree.lean",
+    "NormEvaluation": "research/finite_point_evaluation_audit_20261115/lean/NormEvaluation.lean",
+    "Normalization": "research/finite_point_evaluation_audit_20261115/lean/Normalization.lean",
+    "NormalizedUniqueness": "research/finite_point_evaluation_audit_20261115/lean/NormalizedUniqueness.lean",
+    "OrderBounds": "research/finite_point_evaluation_audit_20261115/lean/OrderBounds.lean",
+    "OriginEvaluation": "research/finite_point_evaluation_audit_20261115/lean/OriginEvaluation.lean",
+    "PointDivisor": "research/finite_point_evaluation_audit_20261115/lean/PointDivisor.lean",
+    "PointLocalization": "research/finite_point_evaluation_audit_20261115/lean/PointLocalization.lean",
+    "PointResidue": "research/finite_point_evaluation_audit_20261115/lean/PointResidue.lean",
+    "PolynomialValues": "research/finite_point_evaluation_audit_20261115/lean/PolynomialValues.lean",
+    "RationalControls": "research/finite_point_evaluation_audit_20261115/lean/RationalControls.lean",
+    "RecursionCertificate": "research/finite_point_evaluation_audit_20261115/lean/RecursionCertificate.lean",
+    "RecursionControls": "research/finite_point_evaluation_audit_20261115/lean/RecursionControls.lean",
+    "ResidueNormalization": "research/finite_point_evaluation_audit_20261115/lean/ResidueNormalization.lean",
+    "SplitPolynomialDivisors": "research/finite_point_evaluation_audit_20261115/lean/SplitPolynomialDivisors.lean",
+    "UnitEvaluation": "research/finite_point_evaluation_audit_20261115/lean/UnitEvaluation.lean",
+    "ValuationCertificate": "research/finite_point_evaluation_audit_20261115/lean/ValuationCertificate.lean",
+    "PicardCertificate": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCertificate.lean",
+    "PicardControls": "research/elliptic_picard_bridge_audit_20261115/lean/PicardControls.lean",
+    "PicardCriterion": "research/elliptic_picard_bridge_audit_20261115/lean/PicardCriterion.lean",
+    "PicardMaximal": "research/elliptic_picard_bridge_audit_20261115/lean/PicardMaximal.lean",
+    "PicardQuotient": "research/elliptic_picard_bridge_audit_20261115/lean/PicardQuotient.lean",
+    "PicardReduction": "research/elliptic_picard_bridge_audit_20261115/lean/PicardReduction.lean",
+    "PicardRegular": "research/elliptic_picard_bridge_audit_20261115/lean/PicardRegular.lean",
+    "PicardSimplePole": "research/elliptic_picard_bridge_audit_20261115/lean/PicardSimplePole.lean",
+    "TranslationAction": "research/elliptic_translation_audit_20261115/lean/TranslationAction.lean",
+    "TranslationCertificate": "research/elliptic_translation_audit_20261115/lean/TranslationCertificate.lean",
+    "TranslationCoordinate": "research/elliptic_translation_audit_20261115/lean/TranslationCoordinate.lean",
+    "TranslationDivisors": "research/elliptic_translation_audit_20261115/lean/TranslationDivisors.lean",
+    "TranslationExample": "research/elliptic_translation_audit_20261115/lean/TranslationExample.lean",
+    "TranslationExampleField": "research/elliptic_translation_audit_20261115/lean/TranslationExampleField.lean",
+    "TranslationGeneration": "research/elliptic_translation_audit_20261115/lean/TranslationGeneration.lean",
+    "TranslationGeneric": "research/elliptic_translation_audit_20261115/lean/TranslationGeneric.lean",
+    "TranslationNaturality": "research/elliptic_translation_audit_20261115/lean/TranslationNaturality.lean",
+    "TranslationPicard": "research/elliptic_translation_audit_20261115/lean/TranslationPicard.lean",
+    "TranslationReciprocal": "research/elliptic_translation_audit_20261115/lean/TranslationReciprocal.lean",
+    "TranslationTranscendence": "research/elliptic_translation_audit_20261115/lean/TranslationTranscendence.lean",
+    "LocalTranslationCertificate": "research/local_translation_audit_20261115/lean/LocalTranslationCertificate.lean",
+    "TranslationEvaluation": "research/local_translation_audit_20261115/lean/TranslationEvaluation.lean",
+    "TranslationExpansion": "research/local_translation_audit_20261115/lean/TranslationExpansion.lean",
+    "TranslationInfinity": "research/local_translation_audit_20261115/lean/TranslationInfinity.lean",
+    "TranslationIntegral": "research/local_translation_audit_20261115/lean/TranslationIntegral.lean",
+    "TranslationLocal": "research/local_translation_audit_20261115/lean/TranslationLocal.lean",
+    "TranslationSign": "research/local_translation_audit_20261115/lean/TranslationSign.lean",
+    "TranslationTransport": "research/local_translation_audit_20261115/lean/TranslationTransport.lean",
+    "TranslationValuation": "research/local_translation_audit_20261115/lean/TranslationValuation.lean",
+    "GeneralAction": "research/general_translation_audit_20261115/lean/GeneralAction.lean",
+    "GeneralControls": "research/general_translation_audit_20261115/lean/GeneralControls.lean",
+    "GeneralEvaluation": "research/general_translation_audit_20261115/lean/GeneralEvaluation.lean",
+    "GeneralExtension": "research/general_translation_audit_20261115/lean/GeneralExtension.lean",
+    "GeneralField": "research/general_translation_audit_20261115/lean/GeneralField.lean",
+    "GeneralLocal": "research/general_translation_audit_20261115/lean/GeneralLocal.lean",
+    "GeneralLocalMap": "research/general_translation_audit_20261115/lean/GeneralLocalMap.lean",
+    "GeneralRegularBasechange": "research/general_translation_audit_20261115/lean/GeneralRegularBasechange.lean",
+    "GeneralTranscendence": "research/general_translation_audit_20261115/lean/GeneralTranscendence.lean",
+    "GeneralTranslationCertificate": "research/general_translation_audit_20261115/lean/GeneralTranslationCertificate.lean",
+    "GeneralTransport": "research/general_translation_audit_20261115/lean/GeneralTransport.lean",
+    "GeneralValuationBasechange": "research/general_translation_audit_20261115/lean/GeneralValuationBasechange.lean"
+  },
+  "claims": [
+    {
+      "declaration": "GeneralTranslationAudit.general_translated_x_transcendental",
+      "conclusion": "Actual generic abscissa transcendence over every coefficient field."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_coordinate_injective",
+      "conclusion": "Derived actual coordinate norm-product injection."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.generalTranslationEquiv",
+      "conclusion": "Actual coefficient-fixing full-field automorphism with derived inverse/action."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_faithful",
+      "conclusion": "Actual every-field faithful translation action."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_agrees",
+      "conclusion": "Actual comparison with frozen AC construction."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_basechange",
+      "conclusion": "Actual arbitrary coefficient-field extension square."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.point_eval_basechange",
+      "conclusion": "Actual rational-point coordinate evaluation diagram."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.pointLocalBasechange",
+      "conclusion": "Actual localization map with denominator units derived."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.point_local_basechange_field",
+      "conclusion": "Actual point-local/full-field square."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.point_local_basechange_residue",
+      "conclusion": "Actual point-local residue square."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.point_parameter_basechange",
+      "conclusion": "Actual chosen point uniformizer preserved."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.finite_valuation_basechange",
+      "conclusion": "Actual unit/uniformizer factorization derives normalized finite-point basechange."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.local_valuation_basechange",
+      "conclusion": "Actual point-image local normalization including infinity."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.regular_basechange_residue",
+      "conclusion": "Actual image-point regular residue diagram."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_valuation",
+      "conclusion": "Actual every-field all-point valuation compatibility."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_order",
+      "conclusion": "Actual local order compatibility."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_residue",
+      "conclusion": "Actual regular residue naturality."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.generalRegularEquiv",
+      "conclusion": "Actual regular-ring isomorphism with derived inverse."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_function_divisor",
+      "conclusion": "Actual K-rational point divisor negative-Q identity."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.general_translation_divisor_evaluation",
+      "conclusion": "Actual support-guarded evaluation transport."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.binary_translation_nontrivial",
+      "conclusion": "Actual nonsingular F2 curve/point/nonidentity map."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.ternary_translation_nontrivial",
+      "conclusion": "Actual credited F3 curve/point/nonidentity map."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.finite_example_not_affine",
+      "conclusion": "Actual source F5 translation excluded from affine coordinate-ring image."
+    },
+    {
+      "declaration": "GeneralTranslationAudit.rational_bad_degree_survives",
+      "conclusion": "Credited actual F3 rational-only degree minus four persists under every translation."
+    }
+  ],
+  "prior_methods": [
+    "actual infinity generic coordinate differences/nonsingular derivative branches",
+    "official trivial valuation transcendence",
+    "actual norm-product injection/fraction-field lift",
+    "actual generic Point.map/generation/action",
+    "actual norm-degree infinity basechange",
+    "actual point-local DVR unit/uniformizer method"
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "exact_source_root_coverage_every_state_from01": true,
+    "actual_every_field_translation_transcendence_injection_action_derived": true,
+    "actual_arbitrary_field_extension_square": true,
+    "actual_rational_point_localization_residue_full_field_diagrams": true,
+    "actual_chosen_uniformizer_normalization_and_units_derive_finite_basechange": true,
+    "actual_all_field_all_point_valuation_order_residue": true,
+    "actual_regular_RingEquiv_inverse_and_regular_extension_injection": true,
+    "actual_rational_point_principal_divisor_negative_Q": true,
+    "actual_guarded_evaluation_and_support_iff": true,
+    "actual_F2_F3_nontrivial_translation_controls": true,
+    "actual_F5_source_formula_not_affine_counter": true,
+    "actual_F3_minus4_persists_all_translations": true,
+    "AC_required_for_translation_conclusions": false,
+    "supplied_transcendence_injection_inverse_local_invariance_or_ramification_premise": false,
+    "rational_point_divisors_claimed_geometric_degree_zero_over_nonclosed": false,
+    "general_geometric_divisor_Picard_Galois_descent": false,
+    "separate_Scheme_linebundle_comparison": false,
+    "canonical_pairing_comparison": false,
+    "qualified_source_refuted": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 92,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "official_trivial_valuation_transcendence_credited": true,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false
+  }
+}

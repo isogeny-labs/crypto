@@ -1,0 +1,83 @@
+{
+  "schema": "crypto.isogeny-class-store-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T03:33:52.276112+00:00",
+  "source_commits": {
+    "crypto": "9b0603f7826d611959f0e3cc49036dc0ad45bc93",
+    "cryptanalysis": "bcd1014c9c26a4aa01dd507681013378f0bf44e0"
+  },
+  "binary_sha256": {
+    "crypto": "f9c65afe857350069341447c3f1ef8fff0daa61062180196369a03baf5d7b142",
+    "crax": "ef3240cff338bccf7fefa2d61fc9340629c905a2e44afd281b9659d9d186749d"
+  },
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T033047Z-8cec905e",
+  "curve": {
+    "p": 113,
+    "a": 19,
+    "b": 2,
+    "counted_order": 112
+  },
+  "objects": [
+    {
+      "logical_name": "evidence/isogeny-class-p113/20261024T033047Z-8cec905e/graph.sqlite",
+      "key": "ic/v1/acceptance/20261024T033047Z-8cec905e/sha256/d4/d4a1dad1e2d86521b9fd293469f42952953233dc65c49d5e8ae88d64b0f2bcf2",
+      "bytes": 32768,
+      "sha256": "d4a1dad1e2d86521b9fd293469f42952953233dc65c49d5e8ae88d64b0f2bcf2"
+    },
+    {
+      "logical_name": "evidence/isogeny-class-p113/20261024T033047Z-8cec905e/curve.json",
+      "key": "ic/v1/acceptance/20261024T033047Z-8cec905e/sha256/8d/8d223965ae4be940740acd5ccc3c59dfc3080514a6cfe3d19c5eb160bc728f65",
+      "bytes": 23,
+      "sha256": "8d223965ae4be940740acd5ccc3c59dfc3080514a6cfe3d19c5eb160bc728f65"
+    }
+  ],
+  "checks": {
+    "local_plan_expected_vertices": 8,
+    "local_build_status": "COMPLETE_SELECTED_DEGREE_CLASS",
+    "local_verify_vertices": 8,
+    "local_verify_edges": 16,
+    "remote_download_checked": 2,
+    "remote_download_statuses": [
+      "bytes_ok",
+      "bytes_ok"
+    ],
+    "fresh_graph_pull_sha256_equal": true,
+    "store_graph_status": {
+      "vertices": 8,
+      "expected": 8,
+      "complete": true,
+      "input_sha256": "d4a1dad1e2d86521b9fd293469f42952953233dc65c49d5e8ae88d64b0f2bcf2"
+    },
+    "store_graph_vertex_id": 0,
+    "digest_graph_status_verified": true,
+    "store_curve_plan_expected_vertices": 8,
+    "store_curve_build_complete": true,
+    "store_graph_dlp": {
+      "vertex": 0,
+      "order": 7,
+      "generator": [
+        37,
+        13
+      ],
+      "target": [
+        107,
+        24
+      ],
+      "scalar": 3,
+      "status": "VERIFIED_LOGARITHM",
+      "timing": null
+    },
+    "mutating_verify_store_ref_rejected": true,
+    "exact_objects_deleted": 2,
+    "prefix_empty_after_delete": true
+  },
+  "limitations": {
+    "independent_implementation_replay": "NOT_RUN",
+    "selected_degrees": [
+      2
+    ],
+    "all_arbitrary_degree_maps": "INFINITE_FAMILY_NOT_AN_ENUMERATION_TARGET"
+  }
+}

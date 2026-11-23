@@ -1,0 +1,346 @@
+--- /dev/null
++++ proposed-native/src/lib.rs
+@@ -0,0 +1,324 @@
++use serde_json::{Value, json};
++use std::collections::BTreeSet;
++type R = Result<Value, String>;
++fn req(b: bool, s: &str) -> Result<(), String> {
++    if b { Ok(()) } else { Err(s.into()) }
++}
++fn text<'a>(v: &'a Value, k: &str) -> Result<&'a str, String> {
++    v[k].as_str().ok_or(format!("string {k}"))
++}
++fn hex(s: &str, n: usize) -> bool {
++    s.len() == n
++        && s.bytes()
++            .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
++}
++fn uuid(s: &str) -> bool {
++    s.len() == 36
++        && s.bytes().enumerate().all(|(i, c)| {
++            if [8, 13, 18, 23].contains(&i) {
++                c == b'-'
++            } else {
++                c.is_ascii_digit() || (b'a'..=b'f').contains(&c)
++            }
++        })
++}
++fn empty(v: &Value) -> bool {
++    v.is_null() || v.as_array().is_some_and(|a| a.is_empty())
++}
++pub fn exact_diff(raw: &[u8]) -> R {
++    req(raw.len() <= 1024, "diff byte cap")?;
++    req(raw.is_ascii(), "diff ASCII")?;
++    req(
++        raw.ends_with(b"\n") && !raw.ends_with(b"\n\n"),
++        "diff final newline",
++    )?;
++    let s = std::str::from_utf8(raw).map_err(|_| "diff UTF8")?;
++    let lines: Vec<_> = s[..s.len() - 1].split('\n').collect();
++    let wanted: BTreeSet<_> = [
++        "A /fixtures",
++        "A /qualification",
++        "A /qualification/exec-gate",
++    ]
++    .into_iter()
++    .collect();
++    req(
++        lines.len() == 3 && lines.iter().copied().collect::<BTreeSet<_>>() == wanted,
++        "exact three additions",
++    )?;
++    Ok(
++        json!({"schema":"software.exact-mount-diff/v1","changes":[{"kind":"added","path":"/fixtures"},{"kind":"added","path":"/qualification"},{"kind":"added","path":"/qualification/exec-gate"}],"writer_attribution":null,"no_writes_claim":false}),
++    )
++}
++pub fn qualify(case: &str, rc: i64, raw: &[u8], c: &Value, e: &Value) -> R {
++    let exit = match case {
++        "Q1" => 0,
++        "Q2" => 2,
++        "Q3" => 125,
++        _ => return Err("active case Q1-Q3".into()),
++    };
++    let keys: BTreeSet<_> = [
++        "container_id",
++        "image_id",
++        "container_name",
++        "owner_nonce",
++        "fixtures_source",
++        "gate_source",
++    ]
++    .into_iter()
++    .collect();
++    req(
++        e.as_object()
++            .is_some_and(|m| m.keys().map(String::as_str).collect::<BTreeSet<_>>() == keys),
++        "expected identity schema",
++    )?;
++    let id = text(e, "container_id")?;
++    let image = text(e, "image_id")?;
++    let name = text(e, "container_name")?;
++    let nonce = text(e, "owner_nonce")?;
++    let fixture = text(e, "fixtures_source")?;
++    let gate = text(e, "gate_source")?;
++    req(
++        hex(id, 64) && image.strip_prefix("sha256:").is_some_and(|s| hex(s, 64)),
++        "full container/image IDs",
++    )?;
++    req(
++        uuid(nonce) && name == format!("isolab-runtime-q-{nonce}"),
++        "owner name/nonce",
++    )?;
++    req(
++        fixture.starts_with('/') && gate.starts_with('/'),
++        "absolute mount sources",
++    )?;
++    req(
++        c["Id"] == id && c["Image"] == image && c["Name"] == format!("/{name}"),
++        "container identity",
++    )?;
++    let config = &c["Config"];
++    req(
++        config["Labels"]["isolab.runtime-qualification.owner"] == nonce,
++        "owner label",
++    )?;
++    req(
++        config["User"] == "1000:1000"
++            && config["Entrypoint"] == json!(["/qualification/exec-gate"]),
++        "user/entrypoint",
++    )?;
++    req(
++        c["State"]["Running"] == false && c["State"]["ExitCode"].as_u64() == Some(exit),
++        "terminal state",
++    )?;
++    let h = &c["HostConfig"];
++    req(
++        h["ReadonlyRootfs"] == true && h["NetworkMode"] == "none",
++        "readonly root/network",
++    )?;
++    for (k, n) in [
++        ("PidsLimit", 1),
++        ("Memory", 512 * 1024 * 1024),
++        ("MemorySwap", 512 * 1024 * 1024),
++        ("NanoCpus", 1_000_000_000),
++    ] {
++        req(h[k].as_u64() == Some(n), "resource limits")?;
++    }
++    req(
++        h["CapDrop"] == json!(["ALL"]) && h["SecurityOpt"] == json!(["no-new-privileges"]),
++        "privilege restrictions",
++    )?;
++    req(
++        h["Privileged"] == false
++            && h["PidMode"] == ""
++            && h["UTSMode"] == ""
++            && h["IpcMode"] == "private"
++            && h["CgroupnsMode"] == "private",
++        "namespace restrictions",
++    )?;
++    for k in ["Devices", "DeviceRequests", "CapAdd"] {
++        req(empty(&h[k]), "device/capability additions")?;
++    }
++    let tmp = h["Tmpfs"].as_object().ok_or("tmpfs map")?;
++    req(
++        tmp.keys().map(String::as_str).collect::<BTreeSet<_>>()
++            == ["/tmp", "/work"].into_iter().collect(),
++        "tmpfs destinations",
++    )?;
++    let opts: BTreeSet<_> = ["rw", "noexec", "nosuid", "nodev", "size=16m", "mode=1777"]
++        .into_iter()
++        .collect();
++    for v in tmp.values() {
++        req(
++            v.as_str()
++                .is_some_and(|s| s.split(',').collect::<BTreeSet<_>>() == opts),
++            "tmpfs options",
++        )?;
++    }
++    let ms = c["Mounts"].as_array().ok_or("mount list")?;
++    let mut destinations = BTreeSet::new();
++    let mut binds = BTreeSet::new();
++    for m in ms {
++        let d = text(m, "Destination")?;
++        req(destinations.insert(d), "duplicate mount destination")?;
++        match text(m, "Type")? {
++            "tmpfs" => req(["/tmp", "/work"].contains(&d), "tmpfs destination")?,
++            "bind" => {
++                let expected = match d {
++                    "/fixtures" => fixture,
++                    "/qualification/exec-gate" => gate,
++                    _ => return Err("unexpected bind".into()),
++                };
++                req(
++                    m["Source"] == expected && m["RW"] == false,
++                    "readonly bind identity",
++                )?;
++                binds.insert(d);
++            }
++            _ => return Err("mount type".into()),
++        }
++    }
++    req(
++        binds
++            == ["/fixtures", "/qualification/exec-gate"]
++                .into_iter()
++                .collect(),
++        "required bind mounts",
++    )?;
++    req(rc == 0, "diff transport exit")?;
++    let parsed = exact_diff(raw)?;
++    Ok(
++        json!({"schema":"software.qualification-exact-mount-diff/v1","case":case,"container_id":id,"prerequisites_checked":true,"diff":parsed,"writer_attribution":null,"no_writes_claim":false,"adapter_executes_processes":false}),
++    )
++}
++fn fixtures() -> (Value, Value) {
++    let nonce = "0159ca8a-9eec-479a-9aa2-04d62b131f89";
++    let id = "a".repeat(64);
++    let image = format!("sha256:{}", "b".repeat(64));
++    let name = format!("isolab-runtime-q-{nonce}");
++    let e = json!({"container_id":id,"image_id":image,"container_name":name,"owner_nonce":nonce,"fixtures_source":"/fixed/fixtures","gate_source":"/fixed/exec-gate"});
++    let c = json!({"Id":id,"Image":image,"Name":format!("/{name}"),"Config":{"User":"1000:1000","Entrypoint":["/qualification/exec-gate"],"Labels":{"isolab.runtime-qualification.owner":nonce}},"State":{"Running":false,"ExitCode":0},"HostConfig":{"ReadonlyRootfs":true,"NetworkMode":"none","PidsLimit":1,"Memory":536870912,"MemorySwap":536870912,"NanoCpus":1000000000,"CapDrop":["ALL"],"SecurityOpt":["no-new-privileges"],"Privileged":false,"PidMode":"","UTSMode":"","IpcMode":"private","CgroupnsMode":"private","Devices":[],"DeviceRequests":null,"CapAdd":null,"Tmpfs":{"/tmp":"rw,noexec,nosuid,nodev,size=16m,mode=1777","/work":"rw,noexec,nosuid,nodev,size=16m,mode=1777"}},"Mounts":[{"Type":"bind","Source":"/fixed/fixtures","Destination":"/fixtures","RW":false},{"Type":"bind","Source":"/fixed/exec-gate","Destination":"/qualification/exec-gate","RW":false}]});
++    (c, e)
++}
++pub fn fixed_controls() -> R {
++    let (c, e) = fixtures();
++    let lines = [
++        "A /fixtures",
++        "A /qualification",
++        "A /qualification/exec-gate",
++    ];
++    let raw = (lines.join("\n") + "\n").into_bytes();
++    let mut rows = vec![];
++    for (case, exit) in [("Q1", 0), ("Q2", 2), ("Q3", 125)] {
++        let mut cc = c.clone();
++        cc["State"]["ExitCode"] = json!(exit);
++        let out = qualify(case, 0, &raw, &cc, &e)?;
++        req(
++            out["no_writes_claim"] == false && out["writer_attribution"].is_null(),
++            "claim flags",
++        )?;
++        rows.push(json!({"case":format!("valid-{case}"),"accepted":true,"expected":true}));
++    }
++    for order in [
++        [0, 1, 2],
++        [0, 2, 1],
++        [1, 0, 2],
++        [1, 2, 0],
++        [2, 0, 1],
++        [2, 1, 0],
++    ] {
++        let b = (order.map(|i| lines[i]).join("\n") + "\n").into_bytes();
++        exact_diff(&b)?;
++        rows.push(json!({"case":format!("order-{order:?}"),"accepted":true,"expected":true}));
++    }
++    let mutations = [
++        ("/Id", json!("wrong")),
++        ("/Image", json!("sha256:wrong")),
++        ("/Name", json!("/wrong")),
++        (
++            "/Config/Labels/isolab.runtime-qualification.owner",
++            json!("wrong"),
++        ),
++        ("/Config/User", json!("0:0")),
++        ("/Config/Entrypoint", json!(["/bin/sh"])),
++        ("/State/Running", json!(true)),
++        ("/State/ExitCode", json!(125)),
++        ("/HostConfig/ReadonlyRootfs", json!(false)),
++        ("/HostConfig/NetworkMode", json!("host")),
++        ("/HostConfig/PidsLimit", json!(true)),
++        ("/HostConfig/Memory", json!(1)),
++        ("/HostConfig/MemorySwap", json!(0)),
++        ("/HostConfig/NanoCpus", json!(0)),
++        ("/HostConfig/CapDrop", json!([])),
++        ("/HostConfig/SecurityOpt", json!(["seccomp=unconfined"])),
++        ("/HostConfig/Privileged", json!(true)),
++        ("/HostConfig/PidMode", json!("host")),
++        ("/HostConfig/UTSMode", json!("host")),
++        ("/HostConfig/IpcMode", json!("host")),
++        ("/HostConfig/CgroupnsMode", json!("host")),
++        ("/HostConfig/Devices", json!([{}])),
++        ("/HostConfig/DeviceRequests", json!([{}])),
++        ("/HostConfig/CapAdd", json!(["SYS_ADMIN"])),
++        ("/HostConfig/Tmpfs", json!({})),
++        ("/Mounts/0/Source", json!("/wrong")),
++        ("/Mounts/0/RW", json!(true)),
++        ("/Mounts/1/RW", Value::Null),
++        ("/Mounts/1/Destination", json!("/fixtures")),
++        ("/Mounts/0/Type", json!("volume")),
++        ("/Mounts", json!([])),
++    ];
++    for (path, v) in mutations {
++        let mut cc = c.clone();
++        *cc.pointer_mut(path).ok_or("test path")? = v;
++        let err = qualify("Q1", 0, &raw, &cc, &e)
++            .err()
++            .ok_or(format!("accepted mutation {path}"))?;
++        rows.push(json!({"case":format!("valid-diff-invalid-{path}"),"accepted":false,"expected":false,"error":err}));
++    }
++    let mut malformed = vec![
++        ("empty", vec![]),
++        ("missing-newline", raw[..raw.len() - 1].to_vec()),
++        ("extra-newline", [raw.clone(), b"\n".to_vec()].concat()),
++        ("oversize", vec![b'x'; 1025]),
++        ("nonascii", vec![255]),
++        (
++            "duplicate",
++            b"A /fixtures\nA /fixtures\nA /qualification\n".to_vec(),
++        ),
++        ("extra", [raw.clone(), b"A /other\n".to_vec()].concat()),
++    ];
++    for (from, to, name) in [
++        ("A ", "C ", "changed"),
++        ("A ", "D ", "deleted"),
++        ("/fixtures", "/fixtures/", "suffix"),
++        ("/fixtures", "/./fixtures", "dot"),
++        ("A ", "A\t", "tab"),
++        ("\n", "\r\n", "crlf"),
++    ] {
++        malformed.push((
++            name,
++            String::from_utf8(raw.clone())
++                .unwrap()
++                .replacen(from, to, 1)
++                .into_bytes(),
++        ));
++    }
++    for (name, b) in malformed {
++        let err = qualify("Q1", 0, &b, &c, &e)
++            .err()
++            .ok_or("accepted malformed diff")?;
++        rows.push(json!({"case":name,"accepted":false,"expected":false,"error":err}));
++    }
++    for (case, rc) in [("Q0", 0), ("Q4", 0), ("Q1", 1), ("Q1", -1)] {
++        let err = qualify(case, rc, &raw, &c, &e)
++            .err()
++            .ok_or("accepted case/transport")?;
++        rows.push(json!({"case":format!("case-{case}-rc-{rc}"),"accepted":false,"expected":false,"error":err}));
++    }
++    let mut ee = e.clone();
++    ee["unexpected"] = json!(true);
++    req(
++        qualify("Q1", 0, &raw, &c, &ee).is_err(),
++        "unknown expected identity field",
++    )?;
++    rows.push(json!({"case":"unexpected-expected-field","accepted":false,"expected":false}));
++    Ok(
++        json!({"schema":"native.qualification-diff-adapter-controls/v1","count":rows.len(),"cases":rows,"all_expected":true,"docker_invoked":false,"supervisor_invoked":false,"scientific_execution":false,"full_supervisor_integrated":false}),
++    )
++}
+--- /dev/null
++++ proposed-native/src/main.rs
+@@ -0,0 +1,16 @@
++use serde_json::json;
++fn main() {
++    let args: Vec<_> = std::env::args().skip(1).collect();
++    let result = if args == ["--self-test"] {
++        pencil_readonly_accounting::fixed_controls()
++    } else {
++        Err("usage: pencil-readonly-accounting --self-test (pure fixed controls only)".into())
++    };
++    match result {
++        Ok(v) => println!("{}", serde_json::to_string_pretty(&v).unwrap()),
++        Err(e) => {
++            println!("{}", json!({"accepted":false,"error":e}));
++            std::process::exit(1)
++        }
++    }
++}

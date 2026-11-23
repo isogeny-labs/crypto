@@ -22,6 +22,7 @@ concurrency:
 
 jobs:
   model-and-proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|sea-formal.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|sea-formal.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
@@ -30,6 +31,8 @@ jobs:
           sparse-checkout: |
             research/sea_point_count_20261016/formal
             research/sea_point_count_20261016/lean
+            tools/artifacts
+            .artifacts
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -41,7 +44,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
           printf '4bacca9502cb89736fe63d2685abc2947cfbf34dc87673504f1bb4c43eda9264  %s\n' "$RUNNER_TEMP/elan-init.sh" | sha256sum -c -
           export ELAN_HOME="$RUNNER_TEMP/sea-elan"
-          sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain leanprover/lean4:v4.19.0
+          sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain leanprover/lean4:v4.34.1
           echo "ELAN_HOME=$ELAN_HOME" >> "$GITHUB_ENV"
           echo "$ELAN_HOME/bin" >> "$GITHUB_PATH"
       - name: Check TLA+ models, negative controls, and Lean proofs

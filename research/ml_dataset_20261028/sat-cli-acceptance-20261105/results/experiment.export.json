@@ -1,0 +1,2463 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "sat-cli-initial-custody-acceptance-20261103-v1",
+  "created": "2026-11-05T15:30:52Z",
+  "protocol": {
+    "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/protocol.json",
+    "sha256": "b1d47282b1f736ff0a201ed00dfff65c8d36879c663554dd4a622b3075988d36",
+    "protocol_id": "sat-cli-initial-custody-acceptance-20261103-v1",
+    "version": 2
+  },
+  "producer": {
+    "runtime": "codex_cli",
+    "model": null,
+    "session": null,
+    "role": "evidence-adapter"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "93a5ab621ce5ec5aadc830dcd41f3ba186eaa64b",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "sat-plain",
+      "role": "control_positive",
+      "binary_sha256": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "commit": "93a5ab621ce5ec5aadc830dcd41f3ba186eaa64b"
+    },
+    {
+      "id": "sat-twist",
+      "role": "candidate",
+      "binary_sha256": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "commit": "93a5ab621ce5ec5aadc830dcd41f3ba186eaa64b"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "cell-0",
+      "arm": "sat-plain",
+      "instance_id": "0",
+      "seed": 42,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "pipeline_contract_pass": 1,
+          "cell_contract_pass": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/analysis.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/attempt.json",
+          "bytes": 257,
+          "sha256": "3df41a07ba55e46466c956f56826f8378eaab4de055f21672c98f26dca7675f1",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/capture-binding.json",
+          "bytes": 657,
+          "sha256": "e96ee313aa6fbc30cb3b0cef51f3e24ca012bb9d6fbec2fa8ae048484392b5b7",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/capture-limits.json",
+          "bytes": 246,
+          "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/config.json",
+          "bytes": 424,
+          "sha256": "7a1b2ca8939390c5ea36205b9160c9a315b30bbf5748bd944c53f7ed15dfe264",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/execution-context.json",
+          "bytes": 969,
+          "sha256": "71190cdd86e462b4f19a6cadd97bd495a32a123f133af078591c09ffc772f71c",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/factor-base.json",
+          "bytes": 4906,
+          "sha256": "ea116d63c375175db9e4a0074d0c3ede04eb17bc3629673cbf5277e043c8d9fe",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/host.json",
+          "bytes": 3292,
+          "sha256": "cb12782336eb05815fd3d0c1578ebf6defaf3e95291ccb2f6537b21d5186b313",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/live/committed.json",
+          "bytes": 303,
+          "sha256": "af9413c7a6533a3a6b2750594d2fe9b32f2846ad2c7842b044e1dbe67082ffbb",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/live/events.jsonl",
+          "bytes": 63757,
+          "sha256": "c70b3c113c68af07052c2394b9ddc67f64d5cd9c7af6592db26d73508ee82f94",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/live/payloads/sat-original-pattern-0.gate.json",
+          "bytes": 78034,
+          "sha256": "187db1cdbf967d0a3517463e258821f661ae585fb58d240e851f2109753bd276",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/manifest.json",
+          "bytes": 8540,
+          "sha256": "fcd61e5bbf44ee6e86b3bef0e8b32b4a6cf66ed5d8e6a0297ec8a958628fee38",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/measurement-policy.json",
+          "bytes": 785,
+          "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/plan.json",
+          "bytes": 671,
+          "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/protocol.json",
+          "bytes": 18794,
+          "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/public.json",
+          "bytes": 2849,
+          "sha256": "acc7654f8e742482dfb06b630dc982bd0d10e09d66dc3621d8e2b9ab36512688",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/result.json",
+          "bytes": 841,
+          "sha256": "3739ca1d4afe2e012acbbede3a6b384a472fa2dcc8dc68a653a95e12ccfa975b",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/run.json",
+          "bytes": 526,
+          "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/curve-construction-start.json",
+          "bytes": 1165,
+          "sha256": "8d6d6e03c5fb399d612e0a138c45800c867efa203e8d4273e84b63f652c917ec",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/curve-construction.json",
+          "bytes": 4523,
+          "sha256": "277fca62f74e99de440c78bf6c78ccbeef471c93d17dc0a0440b2799c31b8ede",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/factor-base-replay-start.json",
+          "bytes": 1170,
+          "sha256": "801e616ffd227bffff7a1a4a43a70b4cacbce5beaf2106c35fb778faf794ed7f",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/factor-base-replay.json",
+          "bytes": 4514,
+          "sha256": "39fc57935dac3170b9f49ddf1a39c9e139774beb2d0b6bb22a617ef55ae989de",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/known-answer-replay-start.json",
+          "bytes": 1171,
+          "sha256": "016e9f2d021b47ef42076c45e4d7a38f28c5272c669cd185d4e266c9007888be",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/known-answer-replay.json",
+          "bytes": 4513,
+          "sha256": "24b5a4ce89cdcf6f149dd8a9db4138bb097883995e24b7ae866e5d1b78d63570",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/solver-start.json",
+          "bytes": 1158,
+          "sha256": "cc53708fbd913b45c9b2b3f516ba5d6e427c475ffc999ccd663cde0dcb42f633",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/solver.json",
+          "bytes": 4521,
+          "sha256": "f4c8984afdd1eccf85fdd9c949491a2e61e69090028e822a4ae1e7b6125938d5",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/witness.json",
+          "bytes": 698,
+          "sha256": "397f3ebaf15d43e55061d451dd4386ecd474c5bb1b7f32713c38956cc1a6dc0a",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/worker-artifacts.json",
+          "bytes": 2744,
+          "sha256": "7bfa159e12c1a028a41ed9d0f690cdc4c95cbd2ba274f04face0b3827cf15813",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/worker-process.json",
+          "bytes": 168,
+          "sha256": "55a044c7f64ade1cdc9b44431626275abaaa692e7876401f864a6dea6ce20cfb",
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "cell-1",
+      "arm": "sat-twist",
+      "instance_id": "0",
+      "seed": 42,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "pipeline_contract_pass": 1,
+          "cell_contract_pass": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/analysis.json"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/attempt.json",
+          "bytes": 257,
+          "sha256": "0aeb318bedd12632e94de61df24ad00848a2beb9437ecf5549424be2c8515f3b",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/capture-binding.json",
+          "bytes": 657,
+          "sha256": "6fe92236c847670a6ec511a59987d1e2944eab717f55efa8a84041344a06e2d0",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/capture-limits.json",
+          "bytes": 246,
+          "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/config.json",
+          "bytes": 423,
+          "sha256": "017f9ad0f6d16769ca4a549077a33831f986bbfcec39917ded0ef7a106fc802e",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/execution-context.json",
+          "bytes": 969,
+          "sha256": "f541d38b5c1f2bc0c780160e1c59b82369597efc298de239ff401eaeb66c06eb",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/factor-base.json",
+          "bytes": 4597,
+          "sha256": "1a5deee8dba851411cbd89acd3d755811bba4c219f8f58f79a849b16d69edab0",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/host.json",
+          "bytes": 3292,
+          "sha256": "156c0621854c42b72b71a865bb8e926a9366fdad4ff19db219a09c6acf7b9fb8",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/live/committed.json",
+          "bytes": 303,
+          "sha256": "b833b4b4aa478ae611c858e44677fe1c419725b7187734b7a3c4185f8e1bc66c",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/live/events.jsonl",
+          "bytes": 63985,
+          "sha256": "75a03c88e1c5f8af4a705e1958ec747ad6ade1f21827bffddd95cb3090cae60d",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/live/payloads/sat-original-pattern-0.gate.json",
+          "bytes": 77812,
+          "sha256": "7c5aa9a07d86e96a10f1aba2f5aa154879c1ad3126223d5c1b01477e8adcda8d",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/manifest.json",
+          "bytes": 8539,
+          "sha256": "37cbf38b227b08a16a4ea0e53b21a062e122861d5dd46e533189197e268b3381",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/measurement-policy.json",
+          "bytes": 785,
+          "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/plan.json",
+          "bytes": 671,
+          "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/protocol.json",
+          "bytes": 18794,
+          "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/public.json",
+          "bytes": 3016,
+          "sha256": "e37f855213e18d6ff0bd831d98a94782bd983558422cec8a46edaade773233e5",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/result.json",
+          "bytes": 841,
+          "sha256": "53040afcba33ff76a6ad1f14786423cc56ef3c01a35d6ade9898b6150609dbac",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/run.json",
+          "bytes": 526,
+          "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/curve-construction-start.json",
+          "bytes": 1165,
+          "sha256": "7e7f5c0c4b68d18787217b60a59659e7cc62aeab11be8a9860a90a0f2973e7c7",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/curve-construction.json",
+          "bytes": 4518,
+          "sha256": "178c9372e59c2c5d07db412974ac3fef5ef28e8cf86c4a00706f7dfca8cc0f5c",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/factor-base-replay-start.json",
+          "bytes": 1166,
+          "sha256": "fd408c4da04e0281b5c4522f155f33fd005cf1f0bfe17a52813b3011673d0c01",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/factor-base-replay.json",
+          "bytes": 4514,
+          "sha256": "d9c35f5e79f5b5529c6906f88d560eb03cb8c51f1402e934f7952c94763a6e8b",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/known-answer-replay-start.json",
+          "bytes": 1167,
+          "sha256": "8defb3606c8f6c19c7ef5b9d90c6826a9ce6166ea36f511c25bff46d887655cb",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/known-answer-replay.json",
+          "bytes": 4515,
+          "sha256": "3ad5e8e4efc70620f78718b9e05191ec9cb4fa6c2f89258b12d5f748daa946c3",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/solver-start.json",
+          "bytes": 1154,
+          "sha256": "c866e7c91e353c460d916d41aec60b49cf49490b68e3882250d01fc49215bb11",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/solver.json",
+          "bytes": 4520,
+          "sha256": "75e8f7c74a3636b109aec699da84410843e89ff700a54c71be1921dc5b813e6d",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/witness.json",
+          "bytes": 818,
+          "sha256": "bd80a2401ef915fd2862862ff77041d685de5864b4643d7a183c50adbc194813",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/worker-artifacts.json",
+          "bytes": 2744,
+          "sha256": "7a90b2f892f3f728af5f09519766ba45eeb52f3480614925e7aacc6561fca0dd",
+          "kind": "raw"
+        },
+        {
+          "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/worker-process.json",
+          "bytes": 168,
+          "sha256": "c1973b73d992a08453e6226a264149d2ac4be0290aae7a9979faf3cbf7cc0a5e",
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/analysis.json",
+      "bytes": 11999,
+      "sha256": "955f92c4154e0f74720231a8f4152e12ed69450263306d93cc626923c6ca90f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/attempt-inventory.json",
+      "bytes": 54123,
+      "sha256": "8ee988741fa3d03970b84eb95d329aa72ade74e03591d4d49b6d94fd0204a744",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/attempt-result.json",
+      "bytes": 231,
+      "sha256": "d9ed61e5ae14074127f74de45720195e6b8e4104a79a456b8cc71a06cee6ceff",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/attempt-start.json",
+      "bytes": 456,
+      "sha256": "1c5c0978e27c44bc03b0ad7efd0f80e7254872ec67cf46f6d647e7dc8b576b77",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/manifest.json",
+      "bytes": 21490,
+      "sha256": "91b1a328bffad2192465067b84ea0c27229053d7ed853f42acaef3aac012b46f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/016e9f2d021b47ef42076c45e4d7a38f28c5272c669cd185d4e266c9007888be",
+      "bytes": 1171,
+      "sha256": "016e9f2d021b47ef42076c45e4d7a38f28c5272c669cd185d4e266c9007888be",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/017f9ad0f6d16769ca4a549077a33831f986bbfcec39917ded0ef7a106fc802e",
+      "bytes": 423,
+      "sha256": "017f9ad0f6d16769ca4a549077a33831f986bbfcec39917ded0ef7a106fc802e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/08e611fc56d6dc5fbc2220a4879bf61228a5df8d4f5b0174d88a9b5f7f54d946",
+      "bytes": 18100,
+      "sha256": "08e611fc56d6dc5fbc2220a4879bf61228a5df8d4f5b0174d88a9b5f7f54d946",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/0aeb318bedd12632e94de61df24ad00848a2beb9437ecf5549424be2c8515f3b",
+      "bytes": 257,
+      "sha256": "0aeb318bedd12632e94de61df24ad00848a2beb9437ecf5549424be2c8515f3b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/156c0621854c42b72b71a865bb8e926a9366fdad4ff19db219a09c6acf7b9fb8",
+      "bytes": 3292,
+      "sha256": "156c0621854c42b72b71a865bb8e926a9366fdad4ff19db219a09c6acf7b9fb8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/178c9372e59c2c5d07db412974ac3fef5ef28e8cf86c4a00706f7dfca8cc0f5c",
+      "bytes": 4518,
+      "sha256": "178c9372e59c2c5d07db412974ac3fef5ef28e8cf86c4a00706f7dfca8cc0f5c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/187db1cdbf967d0a3517463e258821f661ae585fb58d240e851f2109753bd276",
+      "bytes": 78034,
+      "sha256": "187db1cdbf967d0a3517463e258821f661ae585fb58d240e851f2109753bd276",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/1a5deee8dba851411cbd89acd3d755811bba4c219f8f58f79a849b16d69edab0",
+      "bytes": 4597,
+      "sha256": "1a5deee8dba851411cbd89acd3d755811bba4c219f8f58f79a849b16d69edab0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/1a6a3e872989287a37d02e164958934ae0feaee8d3195dc0bcb6b7e000dc1014",
+      "bytes": 7695,
+      "sha256": "1a6a3e872989287a37d02e164958934ae0feaee8d3195dc0bcb6b7e000dc1014",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/24b5a4ce89cdcf6f149dd8a9db4138bb097883995e24b7ae866e5d1b78d63570",
+      "bytes": 4513,
+      "sha256": "24b5a4ce89cdcf6f149dd8a9db4138bb097883995e24b7ae866e5d1b78d63570",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/2614110ce7f9f774a916a3672f69d5066bdc5812756f983f91d08b6b3eadda9c",
+      "bytes": 5017,
+      "sha256": "2614110ce7f9f774a916a3672f69d5066bdc5812756f983f91d08b6b3eadda9c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/277fca62f74e99de440c78bf6c78ccbeef471c93d17dc0a0440b2799c31b8ede",
+      "bytes": 4523,
+      "sha256": "277fca62f74e99de440c78bf6c78ccbeef471c93d17dc0a0440b2799c31b8ede",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/3690cf2a0821cc6f5d53ad8c5773a0651dd02a5d88e6728819d07cc9c972d963",
+      "bytes": 4283,
+      "sha256": "3690cf2a0821cc6f5d53ad8c5773a0651dd02a5d88e6728819d07cc9c972d963",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/3739ca1d4afe2e012acbbede3a6b384a472fa2dcc8dc68a653a95e12ccfa975b",
+      "bytes": 841,
+      "sha256": "3739ca1d4afe2e012acbbede3a6b384a472fa2dcc8dc68a653a95e12ccfa975b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/37cbf38b227b08a16a4ea0e53b21a062e122861d5dd46e533189197e268b3381",
+      "bytes": 8539,
+      "sha256": "37cbf38b227b08a16a4ea0e53b21a062e122861d5dd46e533189197e268b3381",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/397f3ebaf15d43e55061d451dd4386ecd474c5bb1b7f32713c38956cc1a6dc0a",
+      "bytes": 698,
+      "sha256": "397f3ebaf15d43e55061d451dd4386ecd474c5bb1b7f32713c38956cc1a6dc0a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/39fc57935dac3170b9f49ddf1a39c9e139774beb2d0b6bb22a617ef55ae989de",
+      "bytes": 4514,
+      "sha256": "39fc57935dac3170b9f49ddf1a39c9e139774beb2d0b6bb22a617ef55ae989de",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/3ad5e8e4efc70620f78718b9e05191ec9cb4fa6c2f89258b12d5f748daa946c3",
+      "bytes": 4515,
+      "sha256": "3ad5e8e4efc70620f78718b9e05191ec9cb4fa6c2f89258b12d5f748daa946c3",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/3df41a07ba55e46466c956f56826f8378eaab4de055f21672c98f26dca7675f1",
+      "bytes": 257,
+      "sha256": "3df41a07ba55e46466c956f56826f8378eaab4de055f21672c98f26dca7675f1",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+      "bytes": 785,
+      "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/4fa7675837abc746278c0afeb1a438851476210768589766f597d757a452d5ba",
+      "bytes": 2657,
+      "sha256": "4fa7675837abc746278c0afeb1a438851476210768589766f597d757a452d5ba",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/53040afcba33ff76a6ad1f14786423cc56ef3c01a35d6ade9898b6150609dbac",
+      "bytes": 841,
+      "sha256": "53040afcba33ff76a6ad1f14786423cc56ef3c01a35d6ade9898b6150609dbac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/55a044c7f64ade1cdc9b44431626275abaaa692e7876401f864a6dea6ce20cfb",
+      "bytes": 168,
+      "sha256": "55a044c7f64ade1cdc9b44431626275abaaa692e7876401f864a6dea6ce20cfb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/6fe92236c847670a6ec511a59987d1e2944eab717f55efa8a84041344a06e2d0",
+      "bytes": 657,
+      "sha256": "6fe92236c847670a6ec511a59987d1e2944eab717f55efa8a84041344a06e2d0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/71190cdd86e462b4f19a6cadd97bd495a32a123f133af078591c09ffc772f71c",
+      "bytes": 969,
+      "sha256": "71190cdd86e462b4f19a6cadd97bd495a32a123f133af078591c09ffc772f71c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/75a03c88e1c5f8af4a705e1958ec747ad6ade1f21827bffddd95cb3090cae60d",
+      "bytes": 63985,
+      "sha256": "75a03c88e1c5f8af4a705e1958ec747ad6ade1f21827bffddd95cb3090cae60d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/75e8f7c74a3636b109aec699da84410843e89ff700a54c71be1921dc5b813e6d",
+      "bytes": 4520,
+      "sha256": "75e8f7c74a3636b109aec699da84410843e89ff700a54c71be1921dc5b813e6d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/7a1b2ca8939390c5ea36205b9160c9a315b30bbf5748bd944c53f7ed15dfe264",
+      "bytes": 424,
+      "sha256": "7a1b2ca8939390c5ea36205b9160c9a315b30bbf5748bd944c53f7ed15dfe264",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/7a90b2f892f3f728af5f09519766ba45eeb52f3480614925e7aacc6561fca0dd",
+      "bytes": 2744,
+      "sha256": "7a90b2f892f3f728af5f09519766ba45eeb52f3480614925e7aacc6561fca0dd",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+      "bytes": 246,
+      "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/7bfa159e12c1a028a41ed9d0f690cdc4c95cbd2ba274f04face0b3827cf15813",
+      "bytes": 2744,
+      "sha256": "7bfa159e12c1a028a41ed9d0f690cdc4c95cbd2ba274f04face0b3827cf15813",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/7c5aa9a07d86e96a10f1aba2f5aa154879c1ad3126223d5c1b01477e8adcda8d",
+      "bytes": 77812,
+      "sha256": "7c5aa9a07d86e96a10f1aba2f5aa154879c1ad3126223d5c1b01477e8adcda8d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/7e7f5c0c4b68d18787217b60a59659e7cc62aeab11be8a9860a90a0f2973e7c7",
+      "bytes": 1165,
+      "sha256": "7e7f5c0c4b68d18787217b60a59659e7cc62aeab11be8a9860a90a0f2973e7c7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/801e616ffd227bffff7a1a4a43a70b4cacbce5beaf2106c35fb778faf794ed7f",
+      "bytes": 1170,
+      "sha256": "801e616ffd227bffff7a1a4a43a70b4cacbce5beaf2106c35fb778faf794ed7f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/842665d67fe2543944d06eed7cbefe5286b13900e2b8ddb6848f07cc78119a5a",
+      "bytes": 1955,
+      "sha256": "842665d67fe2543944d06eed7cbefe5286b13900e2b8ddb6848f07cc78119a5a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/8d6d6e03c5fb399d612e0a138c45800c867efa203e8d4273e84b63f652c917ec",
+      "bytes": 1165,
+      "sha256": "8d6d6e03c5fb399d612e0a138c45800c867efa203e8d4273e84b63f652c917ec",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/8defb3606c8f6c19c7ef5b9d90c6826a9ce6166ea36f511c25bff46d887655cb",
+      "bytes": 1167,
+      "sha256": "8defb3606c8f6c19c7ef5b9d90c6826a9ce6166ea36f511c25bff46d887655cb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/acc7654f8e742482dfb06b630dc982bd0d10e09d66dc3621d8e2b9ab36512688",
+      "bytes": 2849,
+      "sha256": "acc7654f8e742482dfb06b630dc982bd0d10e09d66dc3621d8e2b9ab36512688",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/af9413c7a6533a3a6b2750594d2fe9b32f2846ad2c7842b044e1dbe67082ffbb",
+      "bytes": 303,
+      "sha256": "af9413c7a6533a3a6b2750594d2fe9b32f2846ad2c7842b044e1dbe67082ffbb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/b833b4b4aa478ae611c858e44677fe1c419725b7187734b7a3c4185f8e1bc66c",
+      "bytes": 303,
+      "sha256": "b833b4b4aa478ae611c858e44677fe1c419725b7187734b7a3c4185f8e1bc66c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/bd80a2401ef915fd2862862ff77041d685de5864b4643d7a183c50adbc194813",
+      "bytes": 818,
+      "sha256": "bd80a2401ef915fd2862862ff77041d685de5864b4643d7a183c50adbc194813",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/c183e5772185bb26b2ca26f686a32fb6bc23cb68f011ef0e8680baeb9b19c84f",
+      "bytes": 11006,
+      "sha256": "c183e5772185bb26b2ca26f686a32fb6bc23cb68f011ef0e8680baeb9b19c84f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/c1973b73d992a08453e6226a264149d2ac4be0290aae7a9979faf3cbf7cc0a5e",
+      "bytes": 168,
+      "sha256": "c1973b73d992a08453e6226a264149d2ac4be0290aae7a9979faf3cbf7cc0a5e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/c70b3c113c68af07052c2394b9ddc67f64d5cd9c7af6592db26d73508ee82f94",
+      "bytes": 63757,
+      "sha256": "c70b3c113c68af07052c2394b9ddc67f64d5cd9c7af6592db26d73508ee82f94",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/c866e7c91e353c460d916d41aec60b49cf49490b68e3882250d01fc49215bb11",
+      "bytes": 1154,
+      "sha256": "c866e7c91e353c460d916d41aec60b49cf49490b68e3882250d01fc49215bb11",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/cb12782336eb05815fd3d0c1578ebf6defaf3e95291ccb2f6537b21d5186b313",
+      "bytes": 3292,
+      "sha256": "cb12782336eb05815fd3d0c1578ebf6defaf3e95291ccb2f6537b21d5186b313",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/cc53708fbd913b45c9b2b3f516ba5d6e427c475ffc999ccd663cde0dcb42f633",
+      "bytes": 1158,
+      "sha256": "cc53708fbd913b45c9b2b3f516ba5d6e427c475ffc999ccd663cde0dcb42f633",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/d96399851517a00a2eeb50c405e57946ed9ed81fa19871e6716fc2b19f6d3d89",
+      "bytes": 34,
+      "sha256": "d96399851517a00a2eeb50c405e57946ed9ed81fa19871e6716fc2b19f6d3d89",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/d9c35f5e79f5b5529c6906f88d560eb03cb8c51f1402e934f7952c94763a6e8b",
+      "bytes": 4514,
+      "sha256": "d9c35f5e79f5b5529c6906f88d560eb03cb8c51f1402e934f7952c94763a6e8b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/e37f855213e18d6ff0bd831d98a94782bd983558422cec8a46edaade773233e5",
+      "bytes": 3016,
+      "sha256": "e37f855213e18d6ff0bd831d98a94782bd983558422cec8a46edaade773233e5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/e96ee313aa6fbc30cb3b0cef51f3e24ca012bb9d6fbec2fa8ae048484392b5b7",
+      "bytes": 657,
+      "sha256": "e96ee313aa6fbc30cb3b0cef51f3e24ca012bb9d6fbec2fa8ae048484392b5b7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/ea116d63c375175db9e4a0074d0c3ede04eb17bc3629673cbf5277e043c8d9fe",
+      "bytes": 4906,
+      "sha256": "ea116d63c375175db9e4a0074d0c3ede04eb17bc3629673cbf5277e043c8d9fe",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/f2965ac91617d0162bcb2b076fefa16133def9f2f1113d3fb785676a6fe24394",
+      "bytes": 59698,
+      "sha256": "f2965ac91617d0162bcb2b076fefa16133def9f2f1113d3fb785676a6fe24394",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/f4c8984afdd1eccf85fdd9c949491a2e61e69090028e822a4ae1e7b6125938d5",
+      "bytes": 4521,
+      "sha256": "f4c8984afdd1eccf85fdd9c949491a2e61e69090028e822a4ae1e7b6125938d5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/f541d38b5c1f2bc0c780160e1c59b82369597efc298de239ff401eaeb66c06eb",
+      "bytes": 969,
+      "sha256": "f541d38b5c1f2bc0c780160e1c59b82369597efc298de239ff401eaeb66c06eb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/fcd61e5bbf44ee6e86b3bef0e8b32b4a6cf66ed5d8e6a0297ec8a958628fee38",
+      "bytes": 8540,
+      "sha256": "fcd61e5bbf44ee6e86b3bef0e8b32b4a6cf66ed5d8e6a0297ec8a958628fee38",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle/objects/sha256/fd408c4da04e0281b5c4522f155f33fd005cf1f0bfe17a52813b3011673d0c01",
+      "bytes": 1166,
+      "sha256": "fd408c4da04e0281b5c4522f155f33fd005cf1f0bfe17a52813b3011673d0c01",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/channels.json",
+      "bytes": 120,
+      "sha256": "6852915a6dc8105008a3648c3b75cc65ff24e895e4bbd12756734b8abd4fbc12",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-create/argv.json",
+      "bytes": 714,
+      "sha256": "6efaf5c9a4b763cf788b771202f53d87c54c3102491f7f8ef46a5497f40a439a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-create/argv.nul",
+      "bytes": 611,
+      "sha256": "76c4d28e5a6e1978b39220041822f1e57ce83b006c95c5af1a3318ea368d0c5b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-create/receipt.json",
+      "bytes": 1657,
+      "sha256": "169ff80240a039a0112fc1d4799025dc9868e14d2120c9b990e5ea33f4adc5bd",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-create/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-create/stdout",
+      "bytes": 335,
+      "sha256": "a11458a82d42dd2ff1fa7d685df197f764d66365afb6c399d8e6105588be77b8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-restore/argv.json",
+      "bytes": 505,
+      "sha256": "5243d6ddea1794bacaa1b76e3d71087d57dec3a17df1e6d7934262b4f1b7b868",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-restore/argv.nul",
+      "bytes": 442,
+      "sha256": "091e71a06f8234c426d34b4a0e1236bd9ad89f892ea3e803e570d559ca4a1069",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-restore/receipt.json",
+      "bytes": 1432,
+      "sha256": "9403d06f4d08d222f32c0cf0c2481cb7cdfb9362fbc585e308e5a6b2e94e1bf6",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-restore/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-restore/stdout",
+      "bytes": 876,
+      "sha256": "a033897a7bf927c20c2208b2ea7145d55b4da5a33ab5673d9bb9c6437e6cd841",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-verify/argv.json",
+      "bytes": 208,
+      "sha256": "288d3ab32be6e13c7e6da31cf189114c704d729b8c2a363c2d0f5e1567c0d8d0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-verify/argv.nul",
+      "bytes": 175,
+      "sha256": "645ab8e1fef9b11d19a2486ebf8f8d39173a50c25f5255770d1630555c556d68",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-verify/receipt.json",
+      "bytes": 1123,
+      "sha256": "23f5a4e13a04e7fbf706f2c4b5833f0ba191d3d90df9e0e2b16a704efb19d84c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-verify/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/custody-verify/stdout",
+      "bytes": 262,
+      "sha256": "96bd2e49d94087770bdb956f9c791bcca00685e207662f64c8168aa60cb018ee",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/export/argv.json",
+      "bytes": 465,
+      "sha256": "ab922aaf9c618766378563e724d86f842a70f7e694e63f498a6158f42a3d72db",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/export/argv.nul",
+      "bytes": 407,
+      "sha256": "d07235f9addced59f09635ecae0c302edd24faf305efde271b6af4be80a1eee1",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/export/receipt.json",
+      "bytes": 1390,
+      "sha256": "78cc37dadf43953517666e5e4427e76f724ddd14a7b6ca52d5bc14c1b5bf17af",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/export/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/export/stdout",
+      "bytes": 6776,
+      "sha256": "b85f117b2115e4d43be9f9d54c6a256d66b2e4a5bb1efd6d18fbb68565ee9682",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/generate/argv.json",
+      "bytes": 711,
+      "sha256": "71ab83fda6f91e6dbf9948e77a539abb63c4267a459f27198ee1ed53bf179377",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/generate/argv.nul",
+      "bytes": 583,
+      "sha256": "306e2f602b113d605916d80d5f432a8c4732e762f1163d331527214495b144a0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/generate/receipt.json",
+      "bytes": 1664,
+      "sha256": "39c1ed9bc745ccf6a5a771b36342672c950281118521a5f8dab126e6cdb7387a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/generate/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/generate/stdout",
+      "bytes": 3301,
+      "sha256": "2b54d2f8ef6148d18c4131a0f8ff42161be5f2a9483b695aa4cd46f23e061cb7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/plan/argv.json",
+      "bytes": 738,
+      "sha256": "99a7cdb5b777f1a21fa7fc9cc67d729b39a3cc034ce2aabce2e4365a8bd6e7d5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/plan/argv.nul",
+      "bytes": 570,
+      "sha256": "ba72bde8a6c60cf5f5345ee38928880009f969c80502c11489d25dbfa1757e45",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/plan/receipt.json",
+      "bytes": 1707,
+      "sha256": "fc0002d06aaceddf57d308218b23185e2322014b3eca9b6f40707a0f4caccb41",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/plan/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/plan/stdout",
+      "bytes": 287,
+      "sha256": "c321f11f6526cf25b7540473539a472d5f2ea9bb9d77ccb6bc76e04de6ac42cf",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/preflight/argv.json",
+      "bytes": 282,
+      "sha256": "ab468fdc9a7fef1e54ebb23f99dff7dade6fa9acef8fcf836d436263c6d5c11a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/preflight/argv.nul",
+      "bytes": 244,
+      "sha256": "94c59ce4c65ce6134f4805e5538d1477b40d6d44c06a327d89605d24b3601b27",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/preflight/receipt.json",
+      "bytes": 1199,
+      "sha256": "7b0cc67f433c30b4dced21ee7b44eb0aac650274a49168ede91056721f7ca968",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/preflight/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/preflight/stdout",
+      "bytes": 635,
+      "sha256": "0fbea5b07fdaaa394c3a8265688f5c0dd0dc8f4dd7a96be1460999763c9da781",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/report/argv.json",
+      "bytes": 465,
+      "sha256": "1a568b4987e777e5ce9be0022648f4b5b580a871f940da52c9174a493fbac9ab",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/report/argv.nul",
+      "bytes": 407,
+      "sha256": "cf714355f590c05bf28731ac61138965e13c74cc5675b6b371b68106ad1f7592",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/report/receipt.json",
+      "bytes": 1390,
+      "sha256": "0c7e3e448180d85d544d0689098951da72a1a4660b2acde3d406f8f8860aac78",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/report/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/report/stdout",
+      "bytes": 3729,
+      "sha256": "7c064e0a8caeb50dd41a812ab5323390f86df555606b2d185a5997f7501c7a48",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/restored-verify/argv.json",
+      "bytes": 413,
+      "sha256": "fba01a612d9239ae844784270a3eeedf4549b71d3644ca44ef8e336445d3adcd",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/restored-verify/argv.nul",
+      "bytes": 365,
+      "sha256": "8e8cdd8b346c4c811365a476c48f32c8a4c2136fd9dbd411dea0f175ef448652",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/restored-verify/receipt.json",
+      "bytes": 1334,
+      "sha256": "de1d0fb094be9818d8cfba9e384c378b8c4127be69a2cbbff32fc7b6eb8fab7a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/restored-verify/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/restored-verify/stdout",
+      "bytes": 675,
+      "sha256": "cab110c8888107eab3540b2eef86032df48c3b86c4b265d7c86d4157ca668f44",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/status/argv.json",
+      "bytes": 386,
+      "sha256": "9fe9509593765d01f5d4cbc4717f5a9102a538ced9ddcaf7b9ddea298febab33",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/status/argv.nul",
+      "bytes": 338,
+      "sha256": "4c12bf922a53e0638199f88540f5ae7cdba2bfb1be5f03dc83a2495aaa201264",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/status/receipt.json",
+      "bytes": 1307,
+      "sha256": "a1689bee3ed8e81753a57ccbb5d0988b8797371386dda5582611a8f606938f68",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/status/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/status/stdout",
+      "bytes": 676,
+      "sha256": "92c361263b9207dba8693af36d92b83c9808025d6e17417ca38520081e9a8f11",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/verify/argv.json",
+      "bytes": 386,
+      "sha256": "5edded3dd5901b81e219abf31fb72c4815cda47a1816c22c959c12cbbce5076e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/verify/argv.nul",
+      "bytes": 338,
+      "sha256": "3e052a20e7287f2840b8d112d95fa42346d7c2fd488bdee8504ca4569fd96555",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/verify/receipt.json",
+      "bytes": 1307,
+      "sha256": "51ff191af649aa0d8ee2b3a31e5ea7b4914679b686dbb05985fdfaafab71bddf",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/verify/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands/verify/stdout",
+      "bytes": 675,
+      "sha256": "cab110c8888107eab3540b2eef86032df48c3b86c4b265d7c86d4157ca668f44",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/commands.json",
+      "bytes": 3355,
+      "sha256": "9dd7423cf911afc1db6a1db1f7ab2cb2df407e5bcfef4eca9f20184177b4818b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/driver.py",
+      "bytes": 27632,
+      "sha256": "1b812af0f4beead5019eeb1aab4e985dcec807fd7f3c941a3dd46b5ade53ef82",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/expected-run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/.writer.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/algebraic-features.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/features.jsonl",
+      "bytes": 2657,
+      "sha256": "4fa7675837abc746278c0afeb1a438851476210768589766f597d757a452d5ba",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/manifest.json",
+      "bytes": 7695,
+      "sha256": "1a6a3e872989287a37d02e164958934ae0feaee8d3195dc0bcb6b7e000dc1014",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/prefix-features.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/restricted/algebraic-records.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/restricted/index.jsonl",
+      "bytes": 11006,
+      "sha256": "c183e5772185bb26b2ca26f686a32fb6bc23cb68f011ef0e8680baeb9b19c84f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/restricted/prefix-records.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export/restricted/targets.jsonl",
+      "bytes": 5017,
+      "sha256": "2614110ce7f9f774a916a3672f69d5066bdc5812756f983f91d08b6b3eadda9c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export_actual.py",
+      "bytes": 10172,
+      "sha256": "b94408b7361bcc99d4f5c7cf4c961b3c75fc7253c71f72f208e7619517133b2a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/factor-base-policies.json",
+      "bytes": 33,
+      "sha256": "1b830d9fcdcd021e085d63c8ce5ca3a587b4ee3d978d6995cef3e6f2cd57f398",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/limits.json",
+      "bytes": 531,
+      "sha256": "15944e94b6d986ae2e920866d59bac67538640b6518e69b0bcd6380c8c9a4547",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/custody-create.json",
+      "bytes": 505,
+      "sha256": "95c539412e85d6d1e9c393c69a691c0ce268b3c1ad5c0c01eb0c65e23de9e8db",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/custody-restore.json",
+      "bytes": 506,
+      "sha256": "03b1b57c3fa5b7a79079e2a11f46383b7bdaacd8927c7a9542ffcc5d25616029",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/export.json",
+      "bytes": 497,
+      "sha256": "3c72297eb2c01acdf1512334ef1ccf22c67613604d366807a571a6eba2813db5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/generate.json",
+      "bytes": 499,
+      "sha256": "f2c85f4ce5e2381964468f2ebca8a65131f7447d3da5de29f6628b4ca1278fc7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/report.json",
+      "bytes": 497,
+      "sha256": "79b357998ab7e96d52859eae4abf5a07601198c93f3ee51d54233ef26828da51",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/restored-verify.json",
+      "bytes": 506,
+      "sha256": "2e83c047d74647cd54e14bf6c0bebc24006a94497157a7618e1d879f21a06b98",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/status.json",
+      "bytes": 497,
+      "sha256": "b002c893ff6e6a7a5f3bebd61faa77985cb9e834aba3f4a52a66870bfd65c420",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/verify.json",
+      "bytes": 497,
+      "sha256": "dd6304463feb447f0b5c400be7d8b072c00efe9676ac514ec985b53ff4e88543",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policy-bindings.json",
+      "bytes": 1401,
+      "sha256": "aab481bfaf17d7a33179dd62616694caeb14b6b9841046ca88c3b9018da5768a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/publication.receipt.json",
+      "bytes": 160,
+      "sha256": "da212b80fe56ebb4d7a1549d350f0fdae8f7788d93114e63619346ee0a43552d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/ready.json",
+      "bytes": 1662,
+      "sha256": "8c8efb7aabd5cc5e7dbe85b7d3095c7f6afbe0b9547dcc87ca586dc863686854",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/ready.prepublication.json",
+      "bytes": 1663,
+      "sha256": "e3040661a3a6be2fa60d94ff26cbb20ab789d6da44cbc8d815fa0e3e1eb13fd7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/custody-create.json",
+      "bytes": 526,
+      "sha256": "f0bfffd6727b8a79de885c06388ececc5e26bd511ee503093f8d651ec1e6a2f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/custody-create.json.started.json",
+      "bytes": 213,
+      "sha256": "49c251f40a492bdacc6865e4f29a1f05765cd4ad818c5a44bceeda5126f869be",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/custody-restore.json",
+      "bytes": 526,
+      "sha256": "7183ca449b109887c0bfd08afc8d518e8910a24e7ff5557004406c17c0e4230b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/custody-restore.json.started.json",
+      "bytes": 213,
+      "sha256": "936d8915d0d0c3d31a51bcf0cffe3370d62a28bbd89ea3cf6d36e794f06239c8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/export.json",
+      "bytes": 526,
+      "sha256": "f0bfffd6727b8a79de885c06388ececc5e26bd511ee503093f8d651ec1e6a2f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/export.json.started.json",
+      "bytes": 213,
+      "sha256": "be635feb638f9c40594655c2ffdfee2210807a38bf2fc06c583cd840bcbb5931",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/generate.json",
+      "bytes": 527,
+      "sha256": "902a3978a595d068aa78cf19bc276a73a67d8270f4e98d68e3ced28d1b56fb69",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/generate.json.started.json",
+      "bytes": 213,
+      "sha256": "4cd226cc7df4b8383763abcfbabc4c8b06f61794f331fdd335dedfabb544a652",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/report.json",
+      "bytes": 526,
+      "sha256": "f0bfffd6727b8a79de885c06388ececc5e26bd511ee503093f8d651ec1e6a2f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/report.json.started.json",
+      "bytes": 213,
+      "sha256": "7752589df5e881ff1eef9b3d976f8a097b47ecf1db73a8e7c7e2f64d2752c393",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/restored-verify.json",
+      "bytes": 526,
+      "sha256": "f0bfffd6727b8a79de885c06388ececc5e26bd511ee503093f8d651ec1e6a2f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/restored-verify.json.started.json",
+      "bytes": 213,
+      "sha256": "befad4df5198f21bc827458568476b5aed6860c4565c6383be562a58611c9c3e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/status.json",
+      "bytes": 526,
+      "sha256": "f0bfffd6727b8a79de885c06388ececc5e26bd511ee503093f8d651ec1e6a2f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/status.json.started.json",
+      "bytes": 213,
+      "sha256": "9134de98b72964a981122da0f13f84ee00a3d8187652b72e370c9390eb4529bf",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/verify.json",
+      "bytes": 526,
+      "sha256": "f0bfffd6727b8a79de885c06388ececc5e26bd511ee503093f8d651ec1e6a2f8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/verify.json.started.json",
+      "bytes": 213,
+      "sha256": "63c8943c0973e809c6a1667a449b8ff7f7b84b2ba7d11a29436ce88727e21373",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report/.writer.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report/artifacts.jsonl",
+      "bytes": 18100,
+      "sha256": "08e611fc56d6dc5fbc2220a4879bf61228a5df8d4f5b0174d88a9b5f7f54d946",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report/coverage.jsonl",
+      "bytes": 1955,
+      "sha256": "842665d67fe2543944d06eed7cbefe5286b13900e2b8ddb6848f07cc78119a5a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report/measurements.jsonl",
+      "bytes": 59698,
+      "sha256": "f2965ac91617d0162bcb2b076fefa16133def9f2f1113d3fb785676a6fe24394",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report/observed-cells.jsonl",
+      "bytes": 34,
+      "sha256": "d96399851517a00a2eeb50c405e57946ed9ed81fa19871e6716fc2b19f6d3d89",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report/summary.json",
+      "bytes": 4283,
+      "sha256": "3690cf2a0821cc6f5d53ad8c5773a0651dd02a5d88e6728819d07cc9c972d963",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/.writer.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/algebraic-features.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/features.jsonl",
+      "bytes": 2657,
+      "sha256": "4fa7675837abc746278c0afeb1a438851476210768589766f597d757a452d5ba",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/manifest.json",
+      "bytes": 7695,
+      "sha256": "1a6a3e872989287a37d02e164958934ae0feaee8d3195dc0bcb6b7e000dc1014",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/prefix-features.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/restricted/algebraic-records.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/restricted/index.jsonl",
+      "bytes": 11006,
+      "sha256": "c183e5772185bb26b2ca26f686a32fb6bc23cb68f011ef0e8680baeb9b19c84f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/restricted/prefix-records.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/export/restricted/targets.jsonl",
+      "bytes": 5017,
+      "sha256": "2614110ce7f9f774a916a3672f69d5066bdc5812756f983f91d08b6b3eadda9c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/report/.writer.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/report/artifacts.jsonl",
+      "bytes": 18100,
+      "sha256": "08e611fc56d6dc5fbc2220a4879bf61228a5df8d4f5b0174d88a9b5f7f54d946",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/report/coverage.jsonl",
+      "bytes": 1955,
+      "sha256": "842665d67fe2543944d06eed7cbefe5286b13900e2b8ddb6848f07cc78119a5a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/report/measurements.jsonl",
+      "bytes": 59698,
+      "sha256": "f2965ac91617d0162bcb2b076fefa16133def9f2f1113d3fb785676a6fe24394",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/report/observed-cells.jsonl",
+      "bytes": 34,
+      "sha256": "d96399851517a00a2eeb50c405e57946ed9ed81fa19871e6716fc2b19f6d3d89",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/extra/report/summary.json",
+      "bytes": 4283,
+      "sha256": "3690cf2a0821cc6f5d53ad8c5773a0651dd02a5d88e6728819d07cc9c972d963",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/.writer.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/attempt.json",
+      "bytes": 257,
+      "sha256": "3df41a07ba55e46466c956f56826f8378eaab4de055f21672c98f26dca7675f1",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/capture-binding.json",
+      "bytes": 657,
+      "sha256": "e96ee313aa6fbc30cb3b0cef51f3e24ca012bb9d6fbec2fa8ae048484392b5b7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/capture-limits.json",
+      "bytes": 246,
+      "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/config.json",
+      "bytes": 424,
+      "sha256": "7a1b2ca8939390c5ea36205b9160c9a315b30bbf5748bd944c53f7ed15dfe264",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/execution-context.json",
+      "bytes": 969,
+      "sha256": "71190cdd86e462b4f19a6cadd97bd495a32a123f133af078591c09ffc772f71c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/factor-base.json",
+      "bytes": 4906,
+      "sha256": "ea116d63c375175db9e4a0074d0c3ede04eb17bc3629673cbf5277e043c8d9fe",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/host.json",
+      "bytes": 3292,
+      "sha256": "cb12782336eb05815fd3d0c1578ebf6defaf3e95291ccb2f6537b21d5186b313",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/live/committed.json",
+      "bytes": 303,
+      "sha256": "af9413c7a6533a3a6b2750594d2fe9b32f2846ad2c7842b044e1dbe67082ffbb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/live/events.jsonl",
+      "bytes": 63757,
+      "sha256": "c70b3c113c68af07052c2394b9ddc67f64d5cd9c7af6592db26d73508ee82f94",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/live/payloads/sat-original-pattern-0.gate.json",
+      "bytes": 78034,
+      "sha256": "187db1cdbf967d0a3517463e258821f661ae585fb58d240e851f2109753bd276",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/manifest.json",
+      "bytes": 8540,
+      "sha256": "fcd61e5bbf44ee6e86b3bef0e8b32b4a6cf66ed5d8e6a0297ec8a958628fee38",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/measurement-policy.json",
+      "bytes": 785,
+      "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/public.json",
+      "bytes": 2849,
+      "sha256": "acc7654f8e742482dfb06b630dc982bd0d10e09d66dc3621d8e2b9ab36512688",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/result.json",
+      "bytes": 841,
+      "sha256": "3739ca1d4afe2e012acbbede3a6b384a472fa2dcc8dc68a653a95e12ccfa975b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/curve-construction-start.json",
+      "bytes": 1165,
+      "sha256": "8d6d6e03c5fb399d612e0a138c45800c867efa203e8d4273e84b63f652c917ec",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/curve-construction.json",
+      "bytes": 4523,
+      "sha256": "277fca62f74e99de440c78bf6c78ccbeef471c93d17dc0a0440b2799c31b8ede",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/factor-base-replay-start.json",
+      "bytes": 1170,
+      "sha256": "801e616ffd227bffff7a1a4a43a70b4cacbce5beaf2106c35fb778faf794ed7f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/factor-base-replay.json",
+      "bytes": 4514,
+      "sha256": "39fc57935dac3170b9f49ddf1a39c9e139774beb2d0b6bb22a617ef55ae989de",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/known-answer-replay-start.json",
+      "bytes": 1171,
+      "sha256": "016e9f2d021b47ef42076c45e4d7a38f28c5272c669cd185d4e266c9007888be",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/known-answer-replay.json",
+      "bytes": 4513,
+      "sha256": "24b5a4ce89cdcf6f149dd8a9db4138bb097883995e24b7ae866e5d1b78d63570",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/solver-start.json",
+      "bytes": 1158,
+      "sha256": "cc53708fbd913b45c9b2b3f516ba5d6e427c475ffc999ccd663cde0dcb42f633",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/telemetry/solver.json",
+      "bytes": 4521,
+      "sha256": "f4c8984afdd1eccf85fdd9c949491a2e61e69090028e822a4ae1e7b6125938d5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/witness.json",
+      "bytes": 698,
+      "sha256": "397f3ebaf15d43e55061d451dd4386ecd474c5bb1b7f32713c38956cc1a6dc0a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/worker-artifacts.json",
+      "bytes": 2744,
+      "sha256": "7bfa159e12c1a028a41ed9d0f690cdc4c95cbd2ba274f04face0b3827cf15813",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000000/worker-process.json",
+      "bytes": 168,
+      "sha256": "55a044c7f64ade1cdc9b44431626275abaaa692e7876401f864a6dea6ce20cfb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/attempt.json",
+      "bytes": 257,
+      "sha256": "0aeb318bedd12632e94de61df24ad00848a2beb9437ecf5549424be2c8515f3b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/capture-binding.json",
+      "bytes": 657,
+      "sha256": "6fe92236c847670a6ec511a59987d1e2944eab717f55efa8a84041344a06e2d0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/capture-limits.json",
+      "bytes": 246,
+      "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/config.json",
+      "bytes": 423,
+      "sha256": "017f9ad0f6d16769ca4a549077a33831f986bbfcec39917ded0ef7a106fc802e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/execution-context.json",
+      "bytes": 969,
+      "sha256": "f541d38b5c1f2bc0c780160e1c59b82369597efc298de239ff401eaeb66c06eb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/factor-base.json",
+      "bytes": 4597,
+      "sha256": "1a5deee8dba851411cbd89acd3d755811bba4c219f8f58f79a849b16d69edab0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/host.json",
+      "bytes": 3292,
+      "sha256": "156c0621854c42b72b71a865bb8e926a9366fdad4ff19db219a09c6acf7b9fb8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/live/committed.json",
+      "bytes": 303,
+      "sha256": "b833b4b4aa478ae611c858e44677fe1c419725b7187734b7a3c4185f8e1bc66c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/live/events.jsonl",
+      "bytes": 63985,
+      "sha256": "75a03c88e1c5f8af4a705e1958ec747ad6ade1f21827bffddd95cb3090cae60d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/live/payloads/sat-original-pattern-0.gate.json",
+      "bytes": 77812,
+      "sha256": "7c5aa9a07d86e96a10f1aba2f5aa154879c1ad3126223d5c1b01477e8adcda8d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/manifest.json",
+      "bytes": 8539,
+      "sha256": "37cbf38b227b08a16a4ea0e53b21a062e122861d5dd46e533189197e268b3381",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/measurement-policy.json",
+      "bytes": 785,
+      "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/public.json",
+      "bytes": 3016,
+      "sha256": "e37f855213e18d6ff0bd831d98a94782bd983558422cec8a46edaade773233e5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/result.json",
+      "bytes": 841,
+      "sha256": "53040afcba33ff76a6ad1f14786423cc56ef3c01a35d6ade9898b6150609dbac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/curve-construction-start.json",
+      "bytes": 1165,
+      "sha256": "7e7f5c0c4b68d18787217b60a59659e7cc62aeab11be8a9860a90a0f2973e7c7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/curve-construction.json",
+      "bytes": 4518,
+      "sha256": "178c9372e59c2c5d07db412974ac3fef5ef28e8cf86c4a00706f7dfca8cc0f5c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/factor-base-replay-start.json",
+      "bytes": 1166,
+      "sha256": "fd408c4da04e0281b5c4522f155f33fd005cf1f0bfe17a52813b3011673d0c01",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/factor-base-replay.json",
+      "bytes": 4514,
+      "sha256": "d9c35f5e79f5b5529c6906f88d560eb03cb8c51f1402e934f7952c94763a6e8b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/known-answer-replay-start.json",
+      "bytes": 1167,
+      "sha256": "8defb3606c8f6c19c7ef5b9d90c6826a9ce6166ea36f511c25bff46d887655cb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/known-answer-replay.json",
+      "bytes": 4515,
+      "sha256": "3ad5e8e4efc70620f78718b9e05191ec9cb4fa6c2f89258b12d5f748daa946c3",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/solver-start.json",
+      "bytes": 1154,
+      "sha256": "c866e7c91e353c460d916d41aec60b49cf49490b68e3882250d01fc49215bb11",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/telemetry/solver.json",
+      "bytes": 4520,
+      "sha256": "75e8f7c74a3636b109aec699da84410843e89ff700a54c71be1921dc5b813e6d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/witness.json",
+      "bytes": 818,
+      "sha256": "bd80a2401ef915fd2862862ff77041d685de5864b4643d7a183c50adbc194813",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/worker-artifacts.json",
+      "bytes": 2744,
+      "sha256": "7a90b2f892f3f728af5f09519766ba45eeb52f3480614925e7aacc6561fca0dd",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/cells/000000000001/worker-process.json",
+      "bytes": 168,
+      "sha256": "c1973b73d992a08453e6226a264149d2ac4be0290aae7a9979faf3cbf7cc0a5e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run/run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/.writer.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/attempt.json",
+      "bytes": 257,
+      "sha256": "3df41a07ba55e46466c956f56826f8378eaab4de055f21672c98f26dca7675f1",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/capture-binding.json",
+      "bytes": 657,
+      "sha256": "e96ee313aa6fbc30cb3b0cef51f3e24ca012bb9d6fbec2fa8ae048484392b5b7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/capture-limits.json",
+      "bytes": 246,
+      "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/config.json",
+      "bytes": 424,
+      "sha256": "7a1b2ca8939390c5ea36205b9160c9a315b30bbf5748bd944c53f7ed15dfe264",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/execution-context.json",
+      "bytes": 969,
+      "sha256": "71190cdd86e462b4f19a6cadd97bd495a32a123f133af078591c09ffc772f71c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/factor-base.json",
+      "bytes": 4906,
+      "sha256": "ea116d63c375175db9e4a0074d0c3ede04eb17bc3629673cbf5277e043c8d9fe",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/host.json",
+      "bytes": 3292,
+      "sha256": "cb12782336eb05815fd3d0c1578ebf6defaf3e95291ccb2f6537b21d5186b313",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/live/committed.json",
+      "bytes": 303,
+      "sha256": "af9413c7a6533a3a6b2750594d2fe9b32f2846ad2c7842b044e1dbe67082ffbb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/live/events.jsonl",
+      "bytes": 63757,
+      "sha256": "c70b3c113c68af07052c2394b9ddc67f64d5cd9c7af6592db26d73508ee82f94",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/live/payloads/sat-original-pattern-0.gate.json",
+      "bytes": 78034,
+      "sha256": "187db1cdbf967d0a3517463e258821f661ae585fb58d240e851f2109753bd276",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/manifest.json",
+      "bytes": 8540,
+      "sha256": "fcd61e5bbf44ee6e86b3bef0e8b32b4a6cf66ed5d8e6a0297ec8a958628fee38",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/measurement-policy.json",
+      "bytes": 785,
+      "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/public.json",
+      "bytes": 2849,
+      "sha256": "acc7654f8e742482dfb06b630dc982bd0d10e09d66dc3621d8e2b9ab36512688",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/result.json",
+      "bytes": 841,
+      "sha256": "3739ca1d4afe2e012acbbede3a6b384a472fa2dcc8dc68a653a95e12ccfa975b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/curve-construction-start.json",
+      "bytes": 1165,
+      "sha256": "8d6d6e03c5fb399d612e0a138c45800c867efa203e8d4273e84b63f652c917ec",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/curve-construction.json",
+      "bytes": 4523,
+      "sha256": "277fca62f74e99de440c78bf6c78ccbeef471c93d17dc0a0440b2799c31b8ede",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/factor-base-replay-start.json",
+      "bytes": 1170,
+      "sha256": "801e616ffd227bffff7a1a4a43a70b4cacbce5beaf2106c35fb778faf794ed7f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/factor-base-replay.json",
+      "bytes": 4514,
+      "sha256": "39fc57935dac3170b9f49ddf1a39c9e139774beb2d0b6bb22a617ef55ae989de",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/known-answer-replay-start.json",
+      "bytes": 1171,
+      "sha256": "016e9f2d021b47ef42076c45e4d7a38f28c5272c669cd185d4e266c9007888be",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/known-answer-replay.json",
+      "bytes": 4513,
+      "sha256": "24b5a4ce89cdcf6f149dd8a9db4138bb097883995e24b7ae866e5d1b78d63570",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/solver-start.json",
+      "bytes": 1158,
+      "sha256": "cc53708fbd913b45c9b2b3f516ba5d6e427c475ffc999ccd663cde0dcb42f633",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/telemetry/solver.json",
+      "bytes": 4521,
+      "sha256": "f4c8984afdd1eccf85fdd9c949491a2e61e69090028e822a4ae1e7b6125938d5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/witness.json",
+      "bytes": 698,
+      "sha256": "397f3ebaf15d43e55061d451dd4386ecd474c5bb1b7f32713c38956cc1a6dc0a",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/worker-artifacts.json",
+      "bytes": 2744,
+      "sha256": "7bfa159e12c1a028a41ed9d0f690cdc4c95cbd2ba274f04face0b3827cf15813",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000000/worker-process.json",
+      "bytes": 168,
+      "sha256": "55a044c7f64ade1cdc9b44431626275abaaa692e7876401f864a6dea6ce20cfb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/attempt.json",
+      "bytes": 257,
+      "sha256": "0aeb318bedd12632e94de61df24ad00848a2beb9437ecf5549424be2c8515f3b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/capture-binding.json",
+      "bytes": 657,
+      "sha256": "6fe92236c847670a6ec511a59987d1e2944eab717f55efa8a84041344a06e2d0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/capture-limits.json",
+      "bytes": 246,
+      "sha256": "7afcca39a952f7b05399dc30f41784cba63f7178a6aab9b8d65216b9af75ef40",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/config.json",
+      "bytes": 423,
+      "sha256": "017f9ad0f6d16769ca4a549077a33831f986bbfcec39917ded0ef7a106fc802e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/execution-context.json",
+      "bytes": 969,
+      "sha256": "f541d38b5c1f2bc0c780160e1c59b82369597efc298de239ff401eaeb66c06eb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/factor-base.json",
+      "bytes": 4597,
+      "sha256": "1a5deee8dba851411cbd89acd3d755811bba4c219f8f58f79a849b16d69edab0",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/host.json",
+      "bytes": 3292,
+      "sha256": "156c0621854c42b72b71a865bb8e926a9366fdad4ff19db219a09c6acf7b9fb8",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/live/committed.json",
+      "bytes": 303,
+      "sha256": "b833b4b4aa478ae611c858e44677fe1c419725b7187734b7a3c4185f8e1bc66c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/live/events.jsonl",
+      "bytes": 63985,
+      "sha256": "75a03c88e1c5f8af4a705e1958ec747ad6ade1f21827bffddd95cb3090cae60d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/live/payloads/sat-original-pattern-0.gate.json",
+      "bytes": 77812,
+      "sha256": "7c5aa9a07d86e96a10f1aba2f5aa154879c1ad3126223d5c1b01477e8adcda8d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/manifest.json",
+      "bytes": 8539,
+      "sha256": "37cbf38b227b08a16a4ea0e53b21a062e122861d5dd46e533189197e268b3381",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/measurement-policy.json",
+      "bytes": 785,
+      "sha256": "45c9f43fa4df83c6c478094a84478690dd791e27fccaa19af5b87db33f6b4a50",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/public.json",
+      "bytes": 3016,
+      "sha256": "e37f855213e18d6ff0bd831d98a94782bd983558422cec8a46edaade773233e5",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/result.json",
+      "bytes": 841,
+      "sha256": "53040afcba33ff76a6ad1f14786423cc56ef3c01a35d6ade9898b6150609dbac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/curve-construction-start.json",
+      "bytes": 1165,
+      "sha256": "7e7f5c0c4b68d18787217b60a59659e7cc62aeab11be8a9860a90a0f2973e7c7",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/curve-construction.json",
+      "bytes": 4518,
+      "sha256": "178c9372e59c2c5d07db412974ac3fef5ef28e8cf86c4a00706f7dfca8cc0f5c",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/factor-base-replay-start.json",
+      "bytes": 1166,
+      "sha256": "fd408c4da04e0281b5c4522f155f33fd005cf1f0bfe17a52813b3011673d0c01",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/factor-base-replay.json",
+      "bytes": 4514,
+      "sha256": "d9c35f5e79f5b5529c6906f88d560eb03cb8c51f1402e934f7952c94763a6e8b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/known-answer-replay-start.json",
+      "bytes": 1167,
+      "sha256": "8defb3606c8f6c19c7ef5b9d90c6826a9ce6166ea36f511c25bff46d887655cb",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/known-answer-replay.json",
+      "bytes": 4515,
+      "sha256": "3ad5e8e4efc70620f78718b9e05191ec9cb4fa6c2f89258b12d5f748daa946c3",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/solver-start.json",
+      "bytes": 1154,
+      "sha256": "c866e7c91e353c460d916d41aec60b49cf49490b68e3882250d01fc49215bb11",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/telemetry/solver.json",
+      "bytes": 4520,
+      "sha256": "75e8f7c74a3636b109aec699da84410843e89ff700a54c71be1921dc5b813e6d",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/witness.json",
+      "bytes": 818,
+      "sha256": "bd80a2401ef915fd2862862ff77041d685de5864b4643d7a183c50adbc194813",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/worker-artifacts.json",
+      "bytes": 2744,
+      "sha256": "7a90b2f892f3f728af5f09519766ba45eeb52f3480614925e7aacc6561fca0dd",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/cells/000000000001/worker-process.json",
+      "bytes": 168,
+      "sha256": "c1973b73d992a08453e6226a264149d2ac4be0290aae7a9979faf3cbf7cc0a5e",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/plan.json",
+      "bytes": 671,
+      "sha256": "1f01fc1687e41d9b6349c96ca6dfe25cf6bd6d98781235d5f94d24cf2a96c41f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/protocol.json",
+      "bytes": 18794,
+      "sha256": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run/run.json",
+      "bytes": 526,
+      "sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/schedule.json",
+      "bytes": 662,
+      "sha256": "e8bdedee5f1db22c1db034f27a78d360bb5d88a78c762b4522ecc9d5b3d8fd4b",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/source-after.json",
+      "bytes": 852,
+      "sha256": "23c34c5c27b7074bfb4d5656243efa3fa9e9b455e91c90bf10a6cc4a2a583c10",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/source-before.json",
+      "bytes": 852,
+      "sha256": "23c34c5c27b7074bfb4d5656243efa3fa9e9b455e91c90bf10a6cc4a2a583c10",
+      "kind": "raw"
+    },
+    {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/tooling-pins.json",
+      "bytes": 10137,
+      "sha256": "abfd287091aca67240f537e02ec07bf2aa3f08ef018090b03ff0e1155cc2ced8",
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/driver.py",
+      "bytes": 27632,
+      "sha256": "1b812af0f4beead5019eeb1aab4e985dcec807fd7f3c941a3dd46b5ade53ef82",
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/analysis.json",
+        "bytes": 11999,
+        "sha256": "955f92c4154e0f74720231a8f4152e12ed69450263306d93cc626923c6ca90f8",
+        "kind": "analysis"
+      },
+      {
+        "path": "/var/tmp/sat-cli-custody-acceptance-20261103-v1/attempt-result.json",
+        "bytes": 231,
+        "sha256": "d9ed61e5ae14074127f74de45720195e6b8e4104a79a456b8cc71a06cee6ceff",
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "retained-evidence-adapter",
+      "text": "{\"attempted\": 2, \"cells\": [{\"attempted\": true, \"execution_status\": \"succeeded\", \"index\": 0, \"native_outcome\": {\"adapter_id\": \"sat-initial-v1\", \"checkpoint_sequence\": 4, \"checkpoint_sha256\": \"c5b873ff553ccf6f1c2468185b8956a8bc3b04d6387a868546ceb8b9de4fe1ab\", \"factor_base_verified\": true, \"first_stop\": null, \"initial_checked\": true, \"known_answer_verified\": true, \"pattern\": 0, \"patterns_checked\": 1, \"patterns_total\": 2, \"requested_channels\": {\"boolean_consequence\": null, \"sat_initial\": {\"execution_verified\": false, \"reason\": \"requires_actual_sat_initial_replay\", \"request\": {\"mode\": \"capture_and_check_initial\"}, \"status\": \"requested\", \"training_export_admitted\": false}, \"schema\": \"crypto.ml-dataset.requested-channels/v1\"}, \"scalar_recovered_without_witness\": false, \"solver_completed\": false, \"status\": \"partial\", \"strategy\": \"sat-initial-v1\", \"supervisor\": {\"checkpoint_mid_call\": false, \"clock_valid_for_comparison\": false, \"elapsed_ms_diagnostic\": 203.069508, \"exit_code\": 0, \"instruction_counter_status\": \"whole_worker_not_counted; see phase telemetry for available hardware counts\", \"interrupted_trace_loss_possible\": true, \"memory_limit_bytes\": 268435456, \"output_budget_bytes\": 134217728, \"output_budget_scope\": \"all_cell_files_before_manifest_seal\", \"retired_instructions\": null, \"worker_output_bytes_before_seal\": 203656}}}, {\"attempted\": true, \"execution_status\": \"succeeded\", \"index\": 1, \"native_outcome\": {\"adapter_id\": \"sat-initial-v1\", \"checkpoint_sequence\": 4, \"checkpoint_sha256\": \"714f78b0db8d6098554dbef5be68d8401720f72b201b03737bf54c239d7b5d4c\", \"factor_base_verified\": true, \"first_stop\": null, \"initial_checked\": true, \"known_answer_verified\": true, \"pattern\": 0, \"patterns_checked\": 1, \"patterns_total\": 2, \"requested_channels\": {\"boolean_consequence\": null, \"sat_initial\": {\"execution_verified\": false, \"reason\": \"requires_actual_sat_initial_replay\", \"request\": {\"mode\": \"capture_and_check_initial\"}, \"status\": \"requested\", \"training_export_admitted\": false}, \"schema\": \"crypto.ml-dataset.requested-channels/v1\"}, \"scalar_recovered_without_witness\": false, \"solver_completed\": false, \"status\": \"partial\", \"strategy\": \"sat-initial-v1\", \"supervisor\": {\"checkpoint_mid_call\": false, \"clock_valid_for_comparison\": false, \"elapsed_ms_diagnostic\": 102.878048, \"exit_code\": 0, \"instruction_counter_status\": \"whole_worker_not_counted; see phase telemetry for available hardware counts\", \"interrupted_trace_loss_possible\": true, \"memory_limit_bytes\": 268435456, \"output_budget_bytes\": 134217728, \"output_budget_scope\": \"all_cell_files_before_manifest_seal\", \"retired_instructions\": null, \"worker_output_bytes_before_seal\": 203623}}}], \"planned\": 2, \"sat_training_admitted\": false, \"terminal\": {\"cleanup\": {\"actions\": [], \"direct_child_live\": false, \"errors\": [], \"settled\": true, \"unresolved\": []}, \"finished_at\": \"2026-11-05T15:30:38.651101Z\", \"generate_invocations\": 1, \"status\": \"PASS\"}, \"unattempted\": 0}"
+    },
+    {
+      "kind": "observation",
+      "by": "retained-evidence-adapter",
+      "text": "succeeded denotes an uncensored actual worker exit only; timeout and trace-budget censorship remain not_completed. Initial checked partial1/2 is not completed SAT search, UNSAT, scalar recovery or SAT training projection. No measurements inferred."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

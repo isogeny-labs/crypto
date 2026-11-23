@@ -1,0 +1,99 @@
+{
+  "standing": "[pcc:unverified]",
+  "exact_source_run": "https://github.com/isogeny-labs/crypto/actions/runs/43974039411",
+  "raw_artifact": "https://github.com/isogeny-labs/crypto/actions/runs/43974039411/artifacts/14280322388",
+  "raw_zip_sha256": "46a58000e582e041706fec72996f9fb0459f82e99a450df834da3464e047de6a",
+  "verification": "independent local big-integer affine elliptic-curve arithmetic, no Rust group helpers; not external signed PCC",
+  "curve": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "a": 847514846,
+    "b": 2087444724,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "scalar_point_replays": 144,
+  "public_target_point_replays": 24,
+  "signed_congruences": 96,
+  "completed_calls": [
+    24,
+    24,
+    24,
+    24,
+    24,
+    24
+  ],
+  "arm_names": [
+    "APS_joint_binary",
+    "APS_window4_sqrt",
+    "APS_window4_public_y",
+    "APS_window4_public_y_AA",
+    "unfolded_rho32",
+    "unfolded_rho64"
+  ],
+  "cold_ns": [
+    77615866,
+    76218073,
+    74433895,
+    74136036,
+    79833260,
+    90267704
+  ],
+  "aps_source_setup_ns": [
+    28620986,
+    27765684,
+    27540275,
+    27167282
+  ],
+  "aps_s3_query_ns": [
+    40022188,
+    39606100,
+    38032218,
+    38080827
+  ],
+  "aps_s3_sqrt_counts": [
+    18432,
+    18432,
+    0,
+    0
+  ],
+  "paired_wins_composed_vs_binary_window4_rho32_rho64": [
+    22,
+    21,
+    13,
+    15
+  ],
+  "candidate_ratios": {
+    "vs_binary": 0.9590036011451576,
+    "vs_window4": 0.976591142628337,
+    "vs_rho32": 0.9323669733642344,
+    "vs_rho64": 0.8245905423716106
+  },
+  "paired_target_bootstrap": {
+    "draws": 25000,
+    "seed": "0x20261116",
+    "method": "resample 24 paired target tuples; ratio of sum of cold nanoseconds",
+    "percentile_95_ci": {
+      "vs_binary": [
+        0.9367108844886739,
+        0.9734770909591911
+      ],
+      "vs_window4": [
+        0.9644478936299763,
+        0.9861972930484649
+      ],
+      "vs_rho32": [
+        0.7022908704367723,
+        1.2269519636172017
+      ],
+      "vs_rho64": [
+        0.6306125781029754,
+        1.0830744498864298
+      ]
+    }
+  },
+  "preregistered_5pct_engineering_gate": false,
+  "classification": "published APS S3 pair enumeration generic MITM-equivalent; no non-generic speedup, no fastest-rho conclusion"
+}

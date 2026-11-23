@@ -1,0 +1,39 @@
+{
+  "schema": "research.accounting-negative-controls/v1",
+  "controls": [
+    {
+      "control": "conflicting_setup",
+      "native_exit": 1,
+      "expected_nonzero": true,
+      "passed": true,
+      "modified_raw_sha256": "560c6ea242b5f1d5d46fad1655278dc8d30fad3cdf6c86b12e0fb48626fcd66f",
+      "curve_operations": 0
+    },
+    {
+      "control": "duplicate",
+      "native_exit": 1,
+      "expected_nonzero": true,
+      "passed": true,
+      "modified_raw_sha256": "0532a768670c6c33656880563901579c4fe0e410ca1477ecef65e052e87bb36f",
+      "curve_operations": 0
+    },
+    {
+      "control": "identity_mismatch",
+      "native_exit": 1,
+      "expected_nonzero": true,
+      "passed": true,
+      "modified_raw_sha256": "c1e1a7662d46dcda23e72e4e69f0d030eb95a91e083dfc566e67d0daae8cffde",
+      "curve_operations": 0
+    },
+    {
+      "control": "missing",
+      "native_exit": 1,
+      "expected_nonzero": true,
+      "passed": true,
+      "modified_raw_sha256": "f9356ffd4996bf2eaad8850c7ca5596a07f8185caccb8ce6f88eac94a92ffef7",
+      "curve_operations": 0
+    }
+  ],
+  "all_pass": true,
+  "scope": "mutated copies of saved JSON only; no curve computation or measurements"
+}

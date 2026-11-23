@@ -1,0 +1,88 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+S4Degree.lean:49:61: error: unsolved goals
+R : Type u_1
+inst✝ : CommRing R
+a b c z b2 b4 b6 b8 : R
+⊢ ((((((((((((((((((((((((((((((⋯ - ⋯ - ⋯ * ⋯ - a ^ 2 * z ^ 3 * ⋯ 4 + a ^ 2 * z ^ 4 * if True then 1 else 0) +
+                                                                                                a ^ 2 * b6 ^ 2 *
+                                                                                                  if False then 1
+                                                                                                  else 0) +
+                                                                                              a ^ 2 *
+                                                                                                (X * ⋯ * 2).coeff 4 -
+                                                                                            z * b4 * b * c *
+                                                                                              if False then 1 else 0) -
+                                                                                          z * b4 * b ^ 2 *
+                                                                                            if False then 1 else 0) +
+                                                                                        z * b6 * b ^ 2 *
+                                                                                          if False then 1 else 0) +
+                                                                                      z * b * c * b2 *
+                                                                                        if False then 1 else 0) -
+                                                                                    z *
+                                                                                      (X * C (b6 * b * c) * 2).coeff 4 +
+                                                                                  z * (X * C (b ^ 2 * b8) * 2).coeff 4 -
+                                                                                z * (X ^ 3 * C (c ^ 2) * 4).coeff 4 +
+                                                                              z * (X ^ 4 * C (b * c) * 2).coeff 4 -
+                                                                            z ^ 2 * b4 * b * c *
+                                                                              if False then 1 else 0) +
+                                                                          z ^ 2 * b6 * b ^ 2 * if False then 1 else 0) +
+                                                                        z ^ 2 * b ^ 2 * if True then 1 else 0) +
+                                                                      z ^ 2 * (X ^ 2 * C (b4 * b ^ 2) * 2).coeff 4 -
+                                                                    z ^ 2 * (X ^ 2 * C (b * c * b2) * 2).coeff 4 +
+                                                                  z ^ 2 * (X ^ 2 * C (c ^ 2) * 6).coeff 4 -
+                                                                z ^ 2 * (X ^ 3 * C (b * c) * 2).coeff 4 -
+                                                              z ^ 3 * b4 * b ^ 2 * if False then 1 else 0) +
+                                                            z ^ 3 * b * c * b2 * if False then 1 else 0) -
+                                                          z ^ 3 * (X * C (c ^ 2) * 4).coeff 4 -
+                                                        z ^ 3 * (X ^ 2 * C (b * c) * 2).coeff 4 -
+                                                      z ^ 3 * (X ^ 3 * C (b ^ 2) * 2).coeff 4 +
+                                                    z ^ 4 * b ^ 2 * if False then 1 else 0) +
+                                                  z ^ 4 * (X * C (b * c) * 2).coeff 4 +
+                                                b4 * b * c * if False then 1 else 0) +
+                                              b6 * b * c * if False then 1 else 0) -
+                                            b6 * b ^ 2 * if False then 1 else 0) -
+                                          b ^ 2 * b8 * if False then 1 else 0) +
+                                        c ^ 2 * if True then 1 else 0) +
+                                      (if False then a * z * b4 * b6 * c else 0) * 2 -
+                                    if False then a * z * b4 * b * b8 else 0) -
+                                  if False then a * z * b6 ^ 2 * b else 0) -
+                                if False then a * z ^ 2 * b4 * b6 * b else 0) +
+                              if False then a * z ^ 2 * b4 ^ 2 * c else 0) +
+                            (if False then a * z ^ 2 * c * b8 else 0) * 2 +
+                          (if False then a * z ^ 3 * b6 * c else 0) * 2 -
+                        if False then a * b6 * b * b8 else 0) +
+                      if False then a * b6 ^ 2 * c else 0) +
+                    (if False then a ^ 2 * z * b6 * b8 else 0) * 2 +
+                  if False then a ^ 2 * z ^ 2 * b6 ^ 2 else 0) +
+                if False then a ^ 2 * b8 ^ 2 else 0) +
+              if False then z ^ 2 * b6 * b * c else 0) -
+            if False then z ^ 2 * b ^ 2 * b8 else 0) +
+          if False then z ^ 3 * b4 * b * c else 0) -
+        if False then z ^ 3 * b6 * b ^ 2 else 0) +
+      if False then z ^ 4 * c ^ 2 else 0) =
+    a * z ^ 2 * c * 2 + a * z ^ 3 * b * 2 + a ^ 2 * z ^ 4 + z * b * c * 2 + z ^ 2 * b ^ 2 + c ^ 2
+S4Degree.lean:56:31: warning: This simp argument is unused:
+  Polynomial.coeff_ofNat_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [← Polynomial.C_pow, ← Polynomial.C_mul, mul_assoc, Polynomial.coeff_add, Polynomial.coeff_sub,
+    Polynomial.coeff_neg, Polynomial.coeff_C_mul, Polynomial.coeff_mul_C, Polynomial.coeff_mul_ofNat,
+    Polynomial.coeff_X_pow, Polynomial.coeff_X, Polynomial.coeff_C]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+S4Degree.lean:100:47: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+S4Degree.lean:100:51: warning: Unused tactic linter: `ring` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+S4Degree.lean:100:51: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'S4DegreeAudit.curveLast_natDegree_four_iff' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

@@ -1,0 +1,91 @@
+C1 arm P vs V2 sparse records: 48/48 equal on total_muls, total_plus, relations, descent_digest, descent_muls, hits, lines, base; 48/48 equal on every field but wall_ms: PASS
+
+### Arm H against P (paired by seed)
+| p | n lines | B plain->best (mean) | S_P | S_arm | S ratio | S+_P | S+_arm | S+ ratio | route-only ratio | (B_p/B_b)^5 | search share of total_muls | search native / total_plus |
+|--|--|--|--|--|--|--|--|--|--|--|--|--|
+| 1009 | 4096 | 507.0 -> 560.2 | 0.02038 | 0.00975 | **0.495** | 0.06351 | 0.03010 | **0.489** | 0.472 | 0.605 | 4.55% | 1.30% |
+| 1511 | 4096 | 756.4 -> 826.8 | 0.00615 | 0.00394 | **0.644** | 0.02478 | 0.01365 | **0.553** | 0.612 | 0.641 | 4.92% | 1.28% |
+| 1823 | 4096 | 913.9 -> 989.5 | 0.00401 | 0.00298 | **0.759** | 0.01648 | 0.01001 | **0.617** | 0.724 | 0.671 | 4.53% | 1.20% |
+
+Paired geometric-mean ratio arm/P, 95% bootstrap over seeds (20000 resamples, strata = primes):
+  S  (muls, search charged): p=1009 0.4949 [0.4098, 0.5985]; p=1511 0.6440 [0.5709, 0.7218]; p=1823 0.7587 [0.6158, 0.9274]; pooled 0.6230 [0.5624, 0.6887]
+  S+ (muls + emitted adds/lookups, search incl.): p=1009 0.4886 [0.4307, 0.5545]; p=1511 0.5531 [0.5161, 0.5935]; p=1823 0.6166 [0.5545, 0.6820]; pooled 0.5503 [0.5186, 0.5837]
+  H1 (arm H: upper end of pooled S ratio < 1): SUPPORTED (upper 0.6884, point 0.6230)
+  §5a band, arm/P (native = emitted adds+lookups of route and search at w GAE each; descent/F4 adds are unemitted on both arms), pooled [per prime]:
+    w = 0: pooled 0.6230 [0.5622, 0.6900]  per prime 0.495 [0.410,0.600]  0.644 [0.572,0.722]  0.759 [0.617,0.929]
+    w = 0.1: pooled 0.5279 [0.4985, 0.5587]  per prime 0.486 [0.429,0.552]  0.527 [0.485,0.576]  0.575 [0.529,0.621]
+    w = 1: pooled 0.5271 [0.4979, 0.5586]  per prime 0.486 [0.429,0.552]  0.526 [0.485,0.575]  0.573 [0.527,0.619]
+  B model check (route-only ratio = (total_muls - search muls)/P total_muls vs (B_plain/B_best)^5): geo-mean measured/model 0.9303, sd of log 0.3593; fitted gamma (through origin) 5.915 [4.828, 6.939] vs 5
+
+### Arm T against P (paired by seed)
+| p | n lines | B plain->best (mean) | S_P | S_arm | S ratio | S+_P | S+_arm | S+ ratio | route-only ratio | (B_p/B_b)^5 | search share of total_muls | search native / total_plus |
+|--|--|--|--|--|--|--|--|--|--|--|--|--|
+| 1009 | 509546 | 507.0 -> 577.7 | 0.02038 | 0.00997 | **0.487** | 0.06351 | 0.03547 | **0.574** | 0.475 | 0.519 | 2.57% | 26.44% |
+| 1511 | 1142317 | 756.4 -> 851.6 | 0.00615 | 0.00351 | **0.569** | 0.02478 | 0.02045 | **0.830** | 0.543 | 0.553 | 4.56% | 45.08% |
+| 1823 | 1662577 | 913.9 -> 1016.7 | 0.00401 | 0.00250 | **0.635** | 0.01648 | 0.01736 | **1.073** | 0.601 | 0.586 | 5.32% | 52.92% |
+
+Paired geometric-mean ratio arm/P, 95% bootstrap over seeds (20000 resamples, strata = primes):
+  S  (muls, search charged): p=1009 0.4875 [0.3711, 0.6554]; p=1511 0.5688 [0.4997, 0.6616]; p=1823 0.6348 [0.5359, 0.7362]; pooled 0.5604 [0.4999, 0.6310]
+  S+ (muls + emitted adds/lookups, search incl.): p=1009 0.5742 [0.4921, 0.6730]; p=1511 0.8301 [0.7845, 0.8782]; p=1823 1.0731 [0.9678, 1.1808]; pooled 0.7997 [0.7503, 0.8534]
+  H1 (arm T: upper end of pooled S ratio < 1): SUPPORTED (upper 0.6320, point 0.5604)
+  §5a band, arm/P (native = emitted adds+lookups of route and search at w GAE each; descent/F4 adds are unemitted on both arms), pooled [per prime]:
+    w = 0: pooled 0.5604 [0.4995, 0.6321]  per prime 0.487 [0.371,0.654]  0.569 [0.501,0.662]  0.635 [0.537,0.734]
+    w = 0.1: pooled 0.8757 [0.8285, 0.9269]  per prime 0.608 [0.540,0.690]  0.915 [0.857,0.981]  1.207 [1.097,1.322]
+    w = 1: pooled 0.8786 [0.8313, 0.9294]  per prime 0.609 [0.541,0.690]  0.918 [0.858,0.985]  1.212 [1.101,1.329]
+  B model check (route-only ratio = (total_muls - search muls)/P total_muls vs (B_plain/B_best)^5): geo-mean measured/model 0.9732, sd of log 0.3640; fitted gamma (through origin) 5.476 [4.548, 6.285] vs 5
+
+### Arm U against P (paired by seed)
+| p | n lines | B plain->best (mean) | S_P | S_arm | S ratio | S+_P | S+_arm | S+ ratio | route-only ratio | (B_p/B_b)^5 | search share of total_muls | search native / total_plus |
+|--|--|--|--|--|--|--|--|--|--|--|--|--|
+| 1009 | 32768 | 507.0 -> 569.2 | 0.02038 | 0.01128 | **0.550** | 0.06351 | 0.02997 | **0.483** | 0.538 | 0.559 | 2.30% | 2.60% |
+| 1511 | 32768 | 756.4 -> 837.6 | 0.00615 | 0.00377 | **0.611** | 0.02478 | 0.01297 | **0.525** | 0.585 | 0.600 | 4.25% | 2.95% |
+| 1823 | 32768 | 913.9 -> 998.4 | 0.00401 | 0.00249 | **0.642** | 0.01648 | 0.00923 | **0.570** | 0.609 | 0.642 | 5.19% | 3.02% |
+
+Paired geometric-mean ratio arm/P, 95% bootstrap over seeds (20000 resamples, strata = primes):
+  S  (muls, search charged): p=1009 0.5503 [0.4168, 0.7314]; p=1511 0.6110 [0.5171, 0.7114]; p=1823 0.6422 [0.5653, 0.7274]; pooled 0.5999 [0.5350, 0.6736]
+  S+ (muls + emitted adds/lookups, search incl.): p=1009 0.4832 [0.4100, 0.5675]; p=1511 0.5251 [0.4878, 0.5682]; p=1823 0.5701 [0.5218, 0.6183]; pooled 0.5249 [0.4907, 0.5610]
+  H1 (arm U: upper end of pooled S ratio < 1): SUPPORTED (upper 0.6737, point 0.5999)
+  §5a band, arm/P (native = emitted adds+lookups of route and search at w GAE each; descent/F4 adds are unemitted on both arms), pooled [per prime]:
+    w = 0: pooled 0.5999 [0.5343, 0.6723]  per prime 0.550 [0.415,0.730]  0.611 [0.517,0.712]  0.642 [0.564,0.728]
+    w = 0.1: pooled 0.4973 [0.4697, 0.5268]  per prime 0.448 [0.394,0.509]  0.499 [0.464,0.541]  0.550 [0.503,0.596]
+    w = 1: pooled 0.4962 [0.4688, 0.5254]  per prime 0.446 [0.394,0.507]  0.498 [0.463,0.540]  0.550 [0.503,0.596]
+  B model check (route-only ratio = (total_muls - search muls)/P total_muls vs (B_plain/B_best)^5): geo-mean measured/model 0.9615, sd of log 0.3870; fitted gamma (through origin) 5.412 [4.307, 6.484] vs 5
+
+### Phase shares (share of the arm's own total_muls | S+ numerator in brackets), mean over seeds, pooled over primes by prime
+| arm | p | enumeration | sieve | descent | linear algebra | search | other (setup, base, extract, verify, table) |
+|--|--|--|--|--|--|--|--|
+| P | 1009 | 31.2% | 20.1% | 44.1% | 4.4% | 0.00% | 0.3% |
+| P | 1511 | 30.6% | 27.5% | 32.7% | 8.7% | 0.00% | 0.4% |
+| P | 1823 | 26.6% | 28.7% | 32.6% | 11.7% | 0.00% | 0.4% |
+| H | 1009 | 27.7% | 22.1% | 34.8% | 10.2% | 4.55% | 0.6% |
+| H | 1511 | 22.5% | 24.8% | 31.0% | 16.2% | 4.92% | 0.6% |
+| H | 1823 | 18.4% | 23.6% | 35.2% | 17.7% | 4.53% | 0.6% |
+| T | 1009 | 22.9% | 19.6% | 43.0% | 11.4% | 2.57% | 0.6% |
+| T | 1511 | 20.3% | 23.8% | 31.1% | 19.5% | 4.56% | 0.7% |
+| T | 1823 | 17.8% | 24.2% | 29.7% | 22.3% | 5.32% | 0.7% |
+| U | 1009 | 22.8% | 18.9% | 45.7% | 9.8% | 2.30% | 0.5% |
+| U | 1511 | 21.8% | 24.8% | 30.9% | 17.6% | 4.25% | 0.7% |
+| U | 1823 | 20.1% | 26.2% | 27.0% | 20.9% | 5.19% | 0.7% |
+
+S+ composition (share of total_plus): enumeration adds, sieve adds+lookups, search adds+lookups, muls
+| arm | p | muls | enum adds | sieve adds+lookups | search adds+lookups |
+|--|--|--|--|--|--|
+| P | 1009 | 31.7% | 30.2% | 38.1% | 0.00% |
+| P | 1511 | 24.9% | 33.4% | 41.7% | 0.00% |
+| P | 1823 | 24.1% | 33.7% | 42.3% | 0.00% |
+| H | 1009 | 32.1% | 27.8% | 38.9% | 1.30% |
+| H | 1511 | 28.7% | 29.4% | 40.6% | 1.28% |
+| H | 1823 | 29.4% | 29.3% | 40.1% | 1.20% |
+| T | 1009 | 27.3% | 18.8% | 27.4% | 26.44% |
+| T | 1511 | 17.0% | 15.6% | 22.3% | 45.08% |
+| T | 1823 | 14.3% | 13.6% | 19.2% | 52.92% |
+| U | 1009 | 36.5% | 25.0% | 35.9% | 2.60% |
+| U | 1511 | 28.8% | 28.4% | 39.9% | 2.95% |
+| U | 1823 | 26.9% | 29.4% | 40.7% | 3.02% |
+
+Correctness: every run solved, correct, 0 failed relation verifications, not exhausted, over 192 runs: PASS
+C2h (n = 1, Horner) on seed 17 per prime: PASS  [ p=1009: route fields equal true, d(total_muls) 17662 vs search muls 17662, d(total_plus) 33806 vs search muls+native 33806; p=1511: route fields equal true, d(total_muls) 26447 vs search muls 26447, d(total_plus) 50623 vs search muls+native 50623; p=1823: route fields equal true, d(total_muls) 31907 vs search muls 31907, d(total_plus) 61075 vs search muls+native 61075;]
+C2t (n = 1, table) on seed 17 per prime: PASS  [ p=1009: route fields equal true, d(total_muls) 38687587 vs search muls 38687587, d(total_plus) 69233044 vs search muls+native 69233044; p=1511: route fields equal true, d(total_muls) 86759358 vs search muls 86759358, d(total_plus) 155257521 vs search muls+native 155257521; p=1823: route fields equal true, d(total_muls) 126287418 vs search muls 126287418, d(total_plus) 225992757 vs search muls+native 225992757;]
+C3 table at n = n_H chooses the same line as Horner (equal B, index, route records): PASS  [ p=1009: same line (B 511 -> 554, index 642), route muls equal true, tbl search muls 38708436 vs horner 71676441; p=1511: same line (B 768 -> 824, index 3928), route muls equal true, tbl search muls 86780207 vs horner 106631956; p=1823: same line (B 924 -> 997, index 1306), route muls equal true, tbl search muls 126308267 vs horner 128357296;]
+
+Notes/failures: []

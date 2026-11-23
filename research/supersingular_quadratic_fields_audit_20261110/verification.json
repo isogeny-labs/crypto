@@ -1,0 +1,63 @@
+{
+  "schema": "supersingular-quadratic-fields-verification/v1",
+  "created": "2026-11-10T13:59:53.692454+00:00",
+  "source_commit": "711ed6ccfdc39b54b740db565737754c60b42a79",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/supersingular_quadratic_fields_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 42,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/supersingular_quadratic_fields_audit_20261110/evidence/attempts.tar.gz",
+    "files": 57,
+    "roundtrip_equal": true
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-520ce8",
+    "claim_sha256": "10f42cd6ff4266cf479706e6ce3618876c1603425cbbf47af9d56959bf8c060c",
+    "commit": "711ed6ccfdc39b54b740db565737754c60b42a79",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/supersingular_quadratic_fields_audit_20261110/lean (QuadraticCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T13:57:53Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-520ce8",
+    "claim_sha256": "10f42cd6ff4266cf479706e6ce3618876c1603425cbbf47af9d56959bf8c060c",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "Actual computable fieldsF4/F9, actual cardinalities/characteristics, all1024/59049general models through structural proof and729normalized kernel cases. Source trace criterion, actual point-count classification, every prime-divisor modular bound≤6/coprimality/actual order-r point. Explicit actual curves of prime orders7/13have modulardegree3. No geometric supersingularity equivalence or full torsion-field interpretation.",
+  "report": {
+    "pages": 2,
+    "bytes": 51365,
+    "sha256": "96811aae8d8b4f9f5dcf41bfe712e8ca9aafe717e424226e7a1d65200e38c982",
+    "inspection": "Both final pages visually inspected; no clipping."
+  },
+  "ledger_prefix": {
+    "base": "a90e1e4c50829eba78434eafc6ad861512d49753",
+    "nonempty_prefix_matches": true,
+    "guard": {
+      "path": "research/supersingular_quadratic_fields_audit_20261110/evidence/ledger-prefix-guard.json",
+      "bytes": 278,
+      "sha256": "6ae93670338c1e8ecbd3767b7ff5923ea1c19497c185031a329a39b81b60a08c"
+    },
+    "invalid_first_receipt": "evidence/ledger-prefix-invalid-base.log"
+  }
+}

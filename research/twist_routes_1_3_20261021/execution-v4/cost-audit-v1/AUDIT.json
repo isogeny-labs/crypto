@@ -1,0 +1,775 @@
+{
+  "schema": "twist.progression-audit/v1",
+  "plan_sha256": "e848e37b8cdf8d152ad0326869a37e9ff1e83f23b64a893d5516252eba11a57b",
+  "records_sha256": "269bee1ff0dc9f07bc5db2043a8a749ad56d8c75c8596bccc45c580a956b77be",
+  "geometry_rows_sha256": "3557e79103363b115839d1014fdd5837419775fecff85e9ba7c5bf0cc4fa9282",
+  "construction_records": 240,
+  "geometry_queries": 7680,
+  "filled_bases": 214,
+  "requested_cells": 880,
+  "accepted_cells": 751,
+  "by_arm": [
+    {
+      "arm": "companion-curve",
+      "requested": 80,
+      "accepted": 38
+    },
+    {
+      "arm": "direct-aa",
+      "requested": 160,
+      "accepted": 124
+    },
+    {
+      "arm": "direct-chain",
+      "requested": 160,
+      "accepted": 124
+    },
+    {
+      "arm": "group-aa",
+      "requested": 160,
+      "accepted": 156
+    },
+    {
+      "arm": "group-mitm",
+      "requested": 160,
+      "accepted": 156
+    },
+    {
+      "arm": "hybrid-eight",
+      "requested": 160,
+      "accepted": 153
+    }
+  ],
+  "ratio_distributions": [
+    {
+      "comparison": "companion-curve/direct-chain",
+      "ratio": {
+        "pairs": 38,
+        "fewer": 0,
+        "min": 1.2943715012885497,
+        "median": 1.352375384073076,
+        "max": 4.948801810455357
+      }
+    },
+    {
+      "comparison": "companion-curve/group-mitm",
+      "ratio": {
+        "pairs": 38,
+        "fewer": 0,
+        "min": 2.7197190982590165,
+        "median": 3.4524782516950037,
+        "max": 13.496649565420908
+      }
+    },
+    {
+      "comparison": "direct-chain/group-mitm",
+      "ratio": {
+        "pairs": 124,
+        "fewer": 0,
+        "min": 2.1011889519751707,
+        "median": 2.6611915882806296,
+        "max": 258.37602285298715
+      }
+    },
+    {
+      "comparison": "hybrid-eight/direct-chain",
+      "ratio": {
+        "pairs": 124,
+        "fewer": 124,
+        "min": 0.12837712863374748,
+        "median": 0.8937482746077081,
+        "max": 0.9085067663602162
+      }
+    },
+    {
+      "comparison": "hybrid-eight/group-mitm",
+      "ratio": {
+        "pairs": 124,
+        "fewer": 0,
+        "min": 1.9080664835900645,
+        "median": 2.3585326491871,
+        "max": 49.05657843514646
+      }
+    }
+  ],
+  "cross_constructor_cost_distributions": [
+    {
+      "comparison": "twist-orbit/curve-orbit:direct-chain",
+      "descriptive_ratio": {
+        "pairs": 27,
+        "fewer": 14,
+        "min": 0.6172300221162511,
+        "median": 0.9990426407413906,
+        "max": 3.501757759821723
+      }
+    },
+    {
+      "comparison": "twist-orbit/curve-orbit:group-mitm",
+      "descriptive_ratio": {
+        "pairs": 36,
+        "fewer": 19,
+        "min": 0.7302335823600968,
+        "median": 0.9772759002815595,
+        "max": 1.1812971548234932
+      }
+    },
+    {
+      "comparison": "twist-orbit/curve-orbit:hybrid-eight",
+      "descriptive_ratio": {
+        "pairs": 27,
+        "fewer": 15,
+        "min": 0.8612893468691359,
+        "median": 0.9991129649456124,
+        "max": 1.0787989428845504
+      }
+    },
+    {
+      "comparison": "twist-orbit/field-ap:direct-chain",
+      "descriptive_ratio": {
+        "pairs": 25,
+        "fewer": 8,
+        "min": 0.8453613309472623,
+        "median": 1.0019444099692052,
+        "max": 4.1243411887420125
+      }
+    },
+    {
+      "comparison": "twist-orbit/field-ap:group-mitm",
+      "descriptive_ratio": {
+        "pairs": 36,
+        "fewer": 20,
+        "min": 0.7936372749267028,
+        "median": 0.9883370925000383,
+        "max": 1.2837206443936489
+      }
+    },
+    {
+      "comparison": "twist-orbit/field-ap:hybrid-eight",
+      "descriptive_ratio": {
+        "pairs": 25,
+        "fewer": 9,
+        "min": 0.8490791266616851,
+        "median": 1.0041939002015052,
+        "max": 1.1833707020201967
+      }
+    },
+    {
+      "comparison": "twist-orbit/uniform:direct-chain",
+      "descriptive_ratio": {
+        "pairs": 27,
+        "fewer": 13,
+        "min": 0.8466505423073346,
+        "median": 1.00006209906257,
+        "max": 3.8979759143165036
+      }
+    },
+    {
+      "comparison": "twist-orbit/uniform:group-mitm",
+      "descriptive_ratio": {
+        "pairs": 36,
+        "fewer": 19,
+        "min": 0.7497650498142775,
+        "median": 0.9700083073961719,
+        "max": 1.232931285689249
+      }
+    },
+    {
+      "comparison": "twist-orbit/uniform:hybrid-eight",
+      "descriptive_ratio": {
+        "pairs": 27,
+        "fewer": 11,
+        "min": 0.8669601699596291,
+        "median": 1.0031416366416253,
+        "max": 1.3076191195431657
+      }
+    }
+  ],
+  "query_yield_aggregates": [
+    {
+      "family": "twist-orbit",
+      "shift": 0,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 0,
+      "nonempty_queries": 0,
+      "total_relations": 0,
+      "relation_count_min": null,
+      "relation_count_max": null
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 0,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 0,
+      "nonempty_queries": 0,
+      "total_relations": 0,
+      "relation_count_min": null,
+      "relation_count_max": null
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 0,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 0,
+      "nonempty_queries": 0,
+      "total_relations": 0,
+      "relation_count_min": null,
+      "relation_count_max": null
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 0,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 0,
+      "nonempty_queries": 0,
+      "total_relations": 0,
+      "relation_count_min": null,
+      "relation_count_max": null
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 1,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 36,
+      "total_relations": 54,
+      "relation_count_min": 0,
+      "relation_count_max": 4
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 1,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 79,
+      "total_relations": 890,
+      "relation_count_min": 0,
+      "relation_count_max": 38
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 1,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 66,
+      "total_relations": 224,
+      "relation_count_min": 0,
+      "relation_count_max": 9
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 1,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 123,
+      "total_relations": 7127,
+      "relation_count_min": 0,
+      "relation_count_max": 255
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 3,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 33,
+      "total_relations": 49,
+      "relation_count_min": 0,
+      "relation_count_max": 3
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 3,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 82,
+      "total_relations": 904,
+      "relation_count_min": 0,
+      "relation_count_max": 42
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 3,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 128,
+      "nonempty_queries": 54,
+      "total_relations": 108,
+      "relation_count_min": 0,
+      "relation_count_max": 5
+    },
+    {
+      "family": "twist-orbit",
+      "shift": 3,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 128,
+      "nonempty_queries": 108,
+      "total_relations": 3201,
+      "relation_count_min": 0,
+      "relation_count_max": 110
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 0,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 11,
+      "total_relations": 54,
+      "relation_count_min": 0,
+      "relation_count_max": 7
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 0,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 19,
+      "total_relations": 770,
+      "relation_count_min": 0,
+      "relation_count_max": 81
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 0,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 26,
+      "total_relations": 201,
+      "relation_count_min": 0,
+      "relation_count_max": 15
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 0,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 34,
+      "total_relations": 6327,
+      "relation_count_min": 0,
+      "relation_count_max": 353
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 1,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 38,
+      "total_relations": 61,
+      "relation_count_min": 0,
+      "relation_count_max": 4
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 1,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 85,
+      "total_relations": 915,
+      "relation_count_min": 0,
+      "relation_count_max": 40
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 1,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 65,
+      "total_relations": 104,
+      "relation_count_min": 0,
+      "relation_count_max": 5
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 1,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 144,
+      "nonempty_queries": 123,
+      "total_relations": 3626,
+      "relation_count_min": 0,
+      "relation_count_max": 94
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 3,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 37,
+      "total_relations": 60,
+      "relation_count_min": 0,
+      "relation_count_max": 4
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 3,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 79,
+      "total_relations": 952,
+      "relation_count_min": 0,
+      "relation_count_max": 50
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 3,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 84,
+      "total_relations": 243,
+      "relation_count_min": 0,
+      "relation_count_max": 10
+    },
+    {
+      "family": "curve-orbit",
+      "shift": 3,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 135,
+      "total_relations": 7426,
+      "relation_count_min": 0,
+      "relation_count_max": 263
+    },
+    {
+      "family": "field-ap",
+      "shift": 0,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 39,
+      "total_relations": 57,
+      "relation_count_min": 0,
+      "relation_count_max": 3
+    },
+    {
+      "family": "field-ap",
+      "shift": 0,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 87,
+      "total_relations": 915,
+      "relation_count_min": 0,
+      "relation_count_max": 43
+    },
+    {
+      "family": "field-ap",
+      "shift": 0,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 72,
+      "total_relations": 224,
+      "relation_count_min": 0,
+      "relation_count_max": 11
+    },
+    {
+      "family": "field-ap",
+      "shift": 0,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 134,
+      "total_relations": 7420,
+      "relation_count_min": 0,
+      "relation_count_max": 254
+    },
+    {
+      "family": "field-ap",
+      "shift": 1,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 37,
+      "total_relations": 56,
+      "relation_count_min": 0,
+      "relation_count_max": 3
+    },
+    {
+      "family": "field-ap",
+      "shift": 1,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 82,
+      "total_relations": 898,
+      "relation_count_min": 0,
+      "relation_count_max": 43
+    },
+    {
+      "family": "field-ap",
+      "shift": 1,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 71,
+      "total_relations": 229,
+      "relation_count_min": 0,
+      "relation_count_max": 11
+    },
+    {
+      "family": "field-ap",
+      "shift": 1,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 135,
+      "total_relations": 7415,
+      "relation_count_min": 0,
+      "relation_count_max": 254
+    },
+    {
+      "family": "field-ap",
+      "shift": 3,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 45,
+      "total_relations": 62,
+      "relation_count_min": 0,
+      "relation_count_max": 3
+    },
+    {
+      "family": "field-ap",
+      "shift": 3,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 78,
+      "total_relations": 905,
+      "relation_count_min": 0,
+      "relation_count_max": 41
+    },
+    {
+      "family": "field-ap",
+      "shift": 3,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 74,
+      "total_relations": 230,
+      "relation_count_min": 0,
+      "relation_count_max": 10
+    },
+    {
+      "family": "field-ap",
+      "shift": 3,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 137,
+      "total_relations": 7417,
+      "relation_count_min": 0,
+      "relation_count_max": 256
+    },
+    {
+      "family": "uniform",
+      "shift": 0,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 37,
+      "total_relations": 56,
+      "relation_count_min": 0,
+      "relation_count_max": 4
+    },
+    {
+      "family": "uniform",
+      "shift": 0,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 87,
+      "total_relations": 888,
+      "relation_count_min": 0,
+      "relation_count_max": 35
+    },
+    {
+      "family": "uniform",
+      "shift": 0,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 81,
+      "total_relations": 239,
+      "relation_count_min": 0,
+      "relation_count_max": 10
+    },
+    {
+      "family": "uniform",
+      "shift": 0,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 143,
+      "total_relations": 7446,
+      "relation_count_min": 0,
+      "relation_count_max": 260
+    },
+    {
+      "family": "uniform",
+      "shift": 1,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 45,
+      "total_relations": 66,
+      "relation_count_min": 0,
+      "relation_count_max": 3
+    },
+    {
+      "family": "uniform",
+      "shift": 1,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 90,
+      "total_relations": 901,
+      "relation_count_min": 0,
+      "relation_count_max": 47
+    },
+    {
+      "family": "uniform",
+      "shift": 1,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 76,
+      "total_relations": 231,
+      "relation_count_min": 0,
+      "relation_count_max": 9
+    },
+    {
+      "family": "uniform",
+      "shift": 1,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 137,
+      "total_relations": 7422,
+      "relation_count_min": 0,
+      "relation_count_max": 259
+    },
+    {
+      "family": "uniform",
+      "shift": 3,
+      "B": 8,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 39,
+      "total_relations": 56,
+      "relation_count_min": 0,
+      "relation_count_max": 4
+    },
+    {
+      "family": "uniform",
+      "shift": 3,
+      "B": 8,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 85,
+      "total_relations": 914,
+      "relation_count_min": 0,
+      "relation_count_max": 43
+    },
+    {
+      "family": "uniform",
+      "shift": 3,
+      "B": 16,
+      "arity": 2,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 75,
+      "total_relations": 236,
+      "relation_count_min": 0,
+      "relation_count_max": 10
+    },
+    {
+      "family": "uniform",
+      "shift": 3,
+      "B": 16,
+      "arity": 3,
+      "requested_queries": 160,
+      "supported_queries": 160,
+      "nonempty_queries": 139,
+      "total_relations": 7307,
+      "relation_count_min": 0,
+      "relation_count_max": 258
+    }
+  ],
+  "PARI_positive_and_wrong_sign_expected_each": 1841,
+  "replay_script_sha256": "d1969da5954dee368f31dafbcd8c32fa88a0a41ce0b7b74fef3330cd379fa7d6",
+  "PARI_replay_admitted": false,
+  "unit": "simulated guest instructions Ir",
+  "wall_time_admitted": false,
+  "complete_IC_cost": false,
+  "different_constructor_outputs_identical": false,
+  "cross_constructor_speedup_claim": false,
+  "novelty_established": false,
+  "final_E28_labels_opened": false
+}

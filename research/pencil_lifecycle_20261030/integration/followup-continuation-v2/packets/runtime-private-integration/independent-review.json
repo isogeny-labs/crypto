@@ -1,0 +1,58 @@
+{
+  "schema": "software.source-review/v1",
+  "reviewer": "assembler_independent_review_v2",
+  "authored_implementation": false,
+  "advisory_design_participation": true,
+  "blinded": false,
+  "decision": "no_remaining_required_source_correction_in_this_pass",
+  "source_sha256": {
+    "runtime-private-supervisor/supervise.py": "2af9bb631a0d73f8118655857a7bb74b4f688fa26628054251196412a85c0256",
+    "runtime-private-supervisor/test_supervise.py": "29cd83febb04022e1eaddd10ca33ea8b7fac6fdf53d1362c23773e16277fa21f",
+    "runtime-private-qualifier-v2/supervise.py": "23f726c63740205e5041af3af3c364de7864fa8b36ed2ffa93c33a277c1c89ae",
+    "runtime-private-qualifier-v2/private_contract.py": "c968d2e0cc0463f4fc8977e8701005e89f49d8d25ce98160d030203b657be442",
+    "runtime-private-qualifier-v2/gate.c": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc",
+    "runtime-private-qualifier-v2/head_contract.py": "832f72588d276f9b35c2dc8904e7cb34eabe8508722c6bbaca64ca8dea6ab749",
+    "runtime-private-qualifier-v2/test_private.py": "673f8e1e1ba8c087480f533b1543b35d155bcfdcea0b80d857cbf50d61fd3632",
+    "runtime-private-qualifier-v2/binding.template.json": "e211031f7305d60c4e796c793ae2138afb1c02845fc7c5cce423985497bc73c8"
+  },
+  "fresh_tests": {
+    "supervisor_mocked_and_temporary_files": 21,
+    "qualifier_mocked_static_and_temporary_files": 14,
+    "total": 35,
+    "failed": 0,
+    "command_bound_seconds_each": 30
+  },
+  "interface_checks": [
+    "separate600/300 second services, distinct owner/service identity",
+    "exact predecessor disk custody and empty prior cgroup",
+    "private endpoint for Docker CLI and curl",
+    "invocation ID and container cgroup ancestor joins",
+    "four-file immutable callback source snapshot",
+    "held gate host observation precedes release",
+    "exact context directory and token modes despite0077 umask"
+  ],
+  "source_findings_corrected": [
+    "predecessor disk write allowlist",
+    "mounted root0700",
+    "context member modes",
+    "release token0444",
+    "gate.c missing callback dependency",
+    "phase-clipped endpoint expiry",
+    "early error receipts",
+    "containerd discovery across daemon threads",
+    "transient unit lifetime/readback",
+    "unnecessary key provisioning removed",
+    "owner/tag/platform/runtime readback",
+    "poll stopped unit and empty cgroup together through asynchronous stop"
+  ],
+  "runtime_executed": false,
+  "execution_approved": false,
+  "limitations": [
+    "native gate/container behavior not established by these tests",
+    "partial-copy C behavior is source inspected only",
+    "synchronous launcher/receipt I/O cannot guarantee unconditional process termination",
+    "actual cgroup/resource/loop/mount readback remains pending",
+    "unknown owned processes or D-state must remain unresolved with no automatic retry"
+  ],
+  "supervisor_review_receipt_sha256": "6675b40cfaa0c732188a464d0c7fd89b3aca53d90e1872812ce8dae2fce70cce"
+}

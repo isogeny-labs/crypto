@@ -1,0 +1,43 @@
+{
+  "schema": "pencil-resource-authorization/v1",
+  "id": "first-gate-limits-20261029",
+  "recorded_utc": "2026-10-29T22:31:12.855352+00:00",
+  "authority": "explicit_user_approval",
+  "question_item_id": [
+    "request_user_input_async",
+    "call_eb37d371ccdf4f8d97c9c8b377742abd",
+    0
+  ],
+  "scope": {
+    "stage": "first_gate_only",
+    "prepared_spec": "gate-p739.json",
+    "base_prime": 739,
+    "targets": "all_60_prescribed_targets",
+    "target_count": 60,
+    "matrix_coefficient_cap": 25000000,
+    "timeout_seconds_per_execution": 3600
+  },
+  "historical_difference": {
+    "older_small_gate_coefficient_cap": 10000000,
+    "older_3600_seconds_scope": "one_external_gate_command",
+    "newly_approved_scope": "25000000 coefficients and 3600 seconds per execution for the first gate"
+  },
+  "unchanged": {
+    "mathematical_public_synthetic_known_answer_scope": true,
+    "full_research_objective": true,
+    "prepared_specs": true,
+    "controls_and_seed_design": true,
+    "existing_memory_limit": true
+  },
+  "not_granted": [
+    "cumulative resource budget",
+    "original absolute deadline or deadline reset",
+    "IAM or controller deployment",
+    "image/runtime publication",
+    "protocol freeze",
+    "independent review",
+    "experiment launch",
+    "extension of this approval to later gates or the full cohort"
+  ],
+  "transcript_included": false
+}

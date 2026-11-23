@@ -1,0 +1,23 @@
+{
+  "schema": "joint-frobenius-inputs/v1",
+  "invocation": ["python", "-m", "research.joint_frobenius_20261112_v1.worker", "EXPERIMENT_ID"],
+  "fields": [[3,2],[5,3],[7,3],[11,2],[13,2]],
+  "field_definition": "K=Fp(theta), theta squared=d, polynomial basis [1,theta], encode a+b*theta as a+p*b; d explicitly nonsquare",
+  "domain": "All ordered pairs from the prime subfield Fp; explicitly different from earlier D={0,1,theta}",
+  "map": ["t=x+theta*y", "u=x squared+theta*y squared"],
+  "targets": "Every q squared target pair in canonical order; q=p squared",
+  "correctness_target_count": 46309,
+  "independent_original_source_count": 373,
+  "candidate": "Actual generic binary-exponentiation Frobenius and field inverses; q decoded values cached before emitting all q squared targets",
+  "reference": "Source-image index built by visiting all p squared source pairs once",
+  "profile_fields": [[3,2],[5,3],[7,3]],
+  "profile_target_count_per_arm_round": 3107,
+  "order": [["indexed","frobenius"],["frobenius","indexed"],["indexed","frobenius"]],
+  "raw_artifact": "research/joint_frobenius_20261112_v1/raw-profile.json.gz",
+  "caps": {"seconds":90,"memory_mb":4096,"cores":1,"predicates":200000},
+  "selection": "Fixed structured calibration family from the unexecuted reviewed plan; no unopened hard holdout",
+  "elliptic_chart_coverage": false,
+  "global_original_allroots": false,
+  "novelty_claim": false,
+  "qualified_gain_claim": false
+}

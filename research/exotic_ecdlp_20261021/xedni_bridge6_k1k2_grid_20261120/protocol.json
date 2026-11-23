@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-bridge6-k1k2-grid-protocol-v1",
+  "source_bridge_result_sha256": "a7029ae3e18fc040c554f95ebc9e6763ad62a06f1533cb904ace2cee0cc7e805",
+  "source_single_shift_result_sha256": "121131b9bbedb0800ef2e7f87cf9a2b26e994c420871596d9f54587441a3ce14",
+  "input_law": "one frozen rational point pair P=(2,2), Q=(-16,17); all 25 pairs (u,v) in [-2,2]^2 in lexicographic order",
+  "coefficient_law": "k1=-3+77u, k2=-11+77v, k3=1+77t for every integer t; reconstruct a4,a6 from both point equations",
+  "per_cell_checks": "verify center nonsingularity, point membership, good reduction, orders and coefficient-six relations at 7 and 11; over QQ(t) compute primitive integer numerator and denominator of x(6Q)-x(P) after cancellation; retain all failures and statuses",
+  "certificate": "search primes 13 through 257 in order for a rootless numerator modulus; if none, mark unresolved rather than excluded",
+  "resource": "25 exact function-field constructions and at most 25 times the frozen finite-prime search; no timing comparison",
+  "claim_boundary": "all integer k3 shifts in the 25 frozen k1/k2 classes only, with one point pair and the order-four/order-eight auxiliary policy; the source pair was selected using its reduced relation as a correctness control"
+}

@@ -1,0 +1,20 @@
+{
+ "idea_id": "MP-ml_empirical-1",
+ "skeptic_lens": "mathematical refutation",
+ "verdict": "refuted",
+ "confidence": 0.85,
+ "reason": "(1) Censoring: held-out n=31..45 cells are certified LOWER bounds d_F>=5 (falldegree.tex thm lfd5, 2 instances/n, 1 polynomial instance n>=41); every law with predictions >=5 there, bounded or growing (e.g. 5+floor(log2(n/31)), ceil(n/8)+1), has zero censored residual, so the falsifier cannot separate the hypotheses; 'residual>=1' is not measurable against a one-sided bound. (2) Identifiability: integer d_F over n in [13,45]: log2 n spans 3.70..5.49 (<2 units), so log-growth laws change by <=1 step inside the grid; with ~2-30 cells/n and integer noise, a 5-bit MDL margin between 'constant' and 'constant+floor(log2 n)' is not attainable without the uncensored large-n values the method is supposed to predict. No finite grid decides limsup_n d_F(n)<inf (any finite table is fit by both a constant and a law exceeding it after n=47); the only proved bound is d_F<=k+2=ceil(n/2)+2. (3) Grammar search with feature ord_n(2) at prime n 13..45 has ~10 distinct values -> overfit capacity exceeds data. (4) Non-genericity: no field-representation use beyond the existing Weil-descent oracle; the regression changes no exponent (proposal admits accounting). Even true d_F=O(1) gives an oracle of cost poly(n) per call but does not by itself place B*D^2 below N: factor-base hit probability ~1/m! and relation count B ~ 2^{n/2} remain, so the CGK line must be argued separately.",
+ "fix": "Weakened survivor (accounting/hypothesis-generation only): fit only on fully-solved (uncensored) cells n<=29, report the conjectured law as a conjecture, and replace the held-out test by a one-sided decisive test: a growing law is falsified only if some cell certifies d_F<=c (upper certificate, i.e. 1 in M_c) at an n where the law predicts >c; a bounded law is falsified only by a certified codim W_c lower bound exceeding it. Does not decide lever 1.",
+ "collisions": [
+  "falldegree.tex Not-settled item (HKY 2015, Kousidis-Wiemers 2019 open problem)",
+  "Petit-Quisquater first-fall-degree assumption",
+  "Huang-Kosters-Yeo last fall degree"
+ ],
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-ml_empirical-1.refute.json",
+ "numbers": {
+  "log2n_13": 3.7,
+  "log2n_45": 5.492,
+  "k_plus_2_upper_at_n45": 25,
+  "certified_lower_n33_45": 5
+ }
+}

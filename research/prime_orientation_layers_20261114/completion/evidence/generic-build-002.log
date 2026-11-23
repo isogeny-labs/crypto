@@ -1,0 +1,95 @@
+../evidence/generic-draft-002.lean.txt:73:6: warning: `Polynomial.finset_sum_coeff` has been deprecated: Use `Polynomial.finsetSum_coeff` instead
+
+Hint: Replace the deprecated name:
+  finset_̵s̵S̲um_coeff
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+../evidence/generic-draft-002.lean.txt:84:44: error: unsolved goals
+a i j : ℕ
+t : ℤ
+d : ℚ
+ht : t ≠ 0
+hi : padicValInt 2 t = i
+hia : i < a
+k : ℤ := (if j = i then ↑i + 1 else min ↑i ↑j) - padicValRat 2 (2 ^ j - d)
+⊢ C (2 ^ j) * C (-d + 2 ^ j)⁻¹ - C ↑t * C (-d + 2 ^ j)⁻¹ - C (2 ^ a * 2) * X * C (-d + 2 ^ j)⁻¹ =
+    X * C (-((-d + 2 ^ j)⁻¹ * 2 ^ a * 2)) + C (-((-d + 2 ^ j)⁻¹ * ↑t) + (-d + 2 ^ j)⁻¹ * 2 ^ j)
+../evidence/generic-draft-002.lean.txt:98:13: error: Type mismatch: After simplification, term
+  hslope
+ has type
+  VBound ((if j = i then ↑i + 1 else min ↑i ↑j) - padicValRat 2 (2 ^ j - d) + 1) (-(2 ^ (a + 1) * (2 ^ j - d)⁻¹))
+but is expected to have type
+  VBound ((if j = i then ↑i + 1 else min ↑i ↑j) - padicValRat 2 (2 ^ j - d) + 1)
+    (((C 2 ^ j).coeff 1 - (↑t).coeff 1) * (2 ^ j - d)⁻¹ + -((C 2 ^ (a + 1)).coeff 0 * (2 ^ j - d)⁻¹))
+../evidence/generic-draft-002.lean.txt:99:2: error: unsolved goals
+case neg
+a i j : ℕ
+t : ℤ
+d : ℚ
+ht : t ≠ 0
+hi : padicValInt 2 t = i
+hia : i < a
+k : ℤ := (if j = i then ↑i + 1 else min ↑i ↑j) - padicValRat 2 (2 ^ j - d)
+he : chart a t (OrientationAnchor.factor d j) = C ((2 ^ j - ↑t) * (2 ^ j - d)⁻¹) + C (-2 ^ (a + 1) * (2 ^ j - d)⁻¹) * X
+h0 :
+  VBound ((if j = i then ↑i + 1 else min ↑i ↑j) - padicValRat 2 (2 ^ j - d))
+    ((chart a t (OrientationAnchor.factor d j)).coeff 0)
+hinv : VBound (-padicValRat 2 (2 ^ j - d)) (2 ^ j - d)⁻¹
+hb : VBound (↑(a + 1) + -padicValRat 2 (2 ^ j - d)) (-2 ^ (a + 1) * (2 ^ j - d)⁻¹)
+hslope : VBound (k + 1) (-2 ^ (a + 1) * (2 ^ j - d)⁻¹)
+n : ℕ
+hn0 : ¬n = 0
+hn1 : ¬n = 1
+⊢ ((C 2 ^ j).coeff n - (↑t).coeff n) * (2 ^ j - d)⁻¹ + -(C 2 ^ (a + 1) * C (2 ^ j - d)⁻¹ * X).coeff n = 0 ∨
+    (if j = i then ↑i + 1 else min ↑i ↑j) - padicValRat 2 (2 ^ j - d) + ↑n ≤
+      padicValRat 2
+        (((C 2 ^ j).coeff n - (↑t).coeff n) * (2 ^ j - d)⁻¹ + -(C 2 ^ (a + 1) * C (2 ^ j - d)⁻¹ * X).coeff n)
+../evidence/generic-draft-002.lean.txt:99:14: warning: This simp argument is unused:
+  coeff_C_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [he, coeff_X, hn0, Ne.symm hn0, hn1, Ne.symm hn1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-002.lean.txt:99:27: warning: This simp argument is unused:
+  coeff_X
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [he, coeff_C_mul, hn0, Ne.symm hn0, hn1, Ne.symm hn1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-002.lean.txt:99:36: warning: This simp argument is unused:
+  hn0
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [he, coeff_C_mul, coeff_X, Ne.symm hn0, hn1, Ne.symm hn1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-002.lean.txt:99:41: warning: This simp argument is unused:
+  Ne.symm hn0
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [he, coeff_C_mul, coeff_X, hn0, hn1, Ne.symm hn1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-002.lean.txt:99:54: warning: This simp argument is unused:
+  hn1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [he, coeff_C_mul, coeff_X, hn0, Ne.symm hn0, Ne.symm hn1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-002.lean.txt:99:59: warning: This simp argument is unused:
+  Ne.symm hn1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [he, coeff_C_mul, coeff_X, hn0, Ne.symm hn0, hn1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-002.lean.txt:128:15: error(lean.unknownIdentifier): Unknown identifier `vbound_div`
+'OrientationGradedNode.actual_crossing_graded' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationGradedNode.indexed_base_graded' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

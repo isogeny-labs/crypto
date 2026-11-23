@@ -1,0 +1,44 @@
+import Quotient
+set_option autoImplicit false
+namespace CZeroOutput
+open Polynomial CZeroInterpolation
+variable {K : Type*} [Field K]
+
+theorem quotient_formula (f : K[X]) (q1 r1 s1 t1 q2 r2 a : K)
+ (hf:f.natDegree=5) (h5:f.coeff 5=1) (h4:f.coeff 4=0)
+ (hd:CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2 ∣
+ f-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1)^2) :
+ f-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1)^2=
+ CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2*(X-C (q1+q2+a^2)) := by
+ obtain ⟨t,ht⟩:=hd
+ have hc:=quotient_coefficients f q1 r1 s1 t1 q2 r2 a t hf h5 h4 ht
+ have he:=linear_expansion t (quotient_degree f q1 r1 s1 t1 q2 r2 a t hf ht)
+ rw [hc.1,hc.2] at he
+ have he' : t=X-C (q1+q2+a^2) := by simpa [map_neg,sub_eq_add_neg,add_comm] using he
+ simpa [he'] using ht
+
+theorem output_on_curve (f : K[X]) (q1 r1 s1 t1 q2 r2 a : K)
+ (hf:f.natDegree=5) (h5:f.coeff 5=1) (h4:f.coeff 4=0)
+ (hd:CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2 ∣
+ f-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1)^2) :
+ (-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1).eval (q1+q2+a^2))^2 =
+ f.eval (q1+q2+a^2) := by
+ have he:=congrArg (fun z : K[X]=>z.eval (q1+q2+a^2))
+  (quotient_formula f q1 r1 s1 t1 q2 r2 a hf h5 h4 hd)
+ simp only [eval_sub,eval_pow,eval_mul,eval_X,eval_C,sub_self,mul_zero] at he
+ rw [neg_sq]
+ simpa only [eval_sub,eval_mul,eval_C] using (sub_eq_zero.mp he).symm
+
+theorem czero_output (f : K[X]) (q1 r1 s1 t1 q2 r2 s2 t2 : K)
+ (hf:f.natDegree=5) (hm:f.Monic) (h4:f.coeff 4=0)
+ (hb:bnum q1 r1 q2 r2≠0) (hc:cnum q1 r1 s1 t1 q2 r2 s2 t2=0)
+ (h1:CZeroInterpolation.support q1 r1∣f-(ordinate s1 t1)^2)
+ (h2:CZeroInterpolation.support q2 r2∣f-(ordinate s2 t2)^2) :
+ let a:=anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2
+ let x:=q1+q2+a^2
+ (-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1).eval x)^2=f.eval x := by
+ apply output_on_curve f q1 r1 s1 t1 q2 r2 _ hf
+ · simpa [hf] using hm.coeff_natDegree
+ · exact h4
+ · exact product_divides_residual q1 r1 s1 t1 q2 r2 s2 t2 f hb hc h1 h2
+end CZeroOutput

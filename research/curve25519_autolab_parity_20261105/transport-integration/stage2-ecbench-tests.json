@@ -1,0 +1,54 @@
+{
+  "status": "unsigned_producer_observation",
+  "command": "CARGO_TARGET_DIR=/tmp/curve25519-autolab-target CARGO_BUILD_JOBS=2 timeout 1200 cargo test --release --lib --offline --locked cryptanalysis::ecbench:: -- --test-threads=2",
+  "exit_code": 0,
+  "passed": 517,
+  "failed": 0,
+  "ignored": 5,
+  "filtered": 5671,
+  "test_seconds": 106.46,
+  "sources": {
+    "src/cryptanalysis/ecbench/aps/mod.rs": "2c38bf8bf498b6221e8c3f71c63c699eb1c234f5fc56a07062b1a939aa371bc6",
+    "src/cryptanalysis/ecbench/aps/tests.rs": "c7ccfda12434aba13538e3093ecaf7ab4a2672bbf5a5ea789b8eacb40ffd642d",
+    "src/cryptanalysis/ecbench/audit.rs": "deac0f46302ea118007b36c503f3138272d61f69c38c706a358ca202d649bd2d",
+    "src/cryptanalysis/ecbench/claim.rs": "20d4698164d35bc286ab549c5c4b5e8dfcc2fd3af859a57b72524f6f7cc5d484",
+    "src/cryptanalysis/ecbench/cm_folded.rs": "f9d7648f5cf5c968121e340884b4f2349d35a9e6f7013397607752fc4ac77068",
+    "src/cryptanalysis/ecbench/exact_scalar.rs": "53dcca1d5e743893745a3c8bb46267510a6b28e20912d1d0dfb52e06b3679093",
+    "src/cryptanalysis/ecbench/hyper_ic.rs": "c256f2246cd53ff360c11880d4a6d4aa4b78ac514a7a62d91f1fbbfbb8b8f58f",
+    "src/cryptanalysis/ecbench/methods.rs": "42e68a005c60f7d03b1694ba07a04045c0643800ce831ddb084dd5f7b80490d3",
+    "src/cryptanalysis/ecbench/pencil.rs": "587368899e467bb749c94820ffab3b7b1c5b2e12f8d8136492f9ddff1e5020b9",
+    "src/cryptanalysis/ecbench/prime_orbit.rs": "adaa7ba937a6409cf714e714a5412cf58bd461071ef8097f5f28cf2342acba2a",
+    "src/cryptanalysis/ecbench/runner.rs": "41bed9b5c856dd6d304cfbfffafbfd5476c88e734247ceb1b7d02b41c84604ba",
+    "src/cryptanalysis/ecbench/three_leads.rs": "6d2c6e70a49a672a8114c80f5277b0edcc478a58c461ac36924b6d58ce211777",
+    "src/cryptanalysis/ecbench/workload.rs": "c709cc143d6abbe61c4082ab07167f0e46fc8b51ae30813e732ad48ed7e3fb6c",
+    "src/cryptanalysis/ecbench_large_prime/trace_line_tests.rs": "d7a639592ce4e287509f264b8ce7ac451c2b95d9015ef614f28d15d5d0d0db95"
+  },
+  "scope": "Actual-crate filtered ecbench development tests. Full-library gate and entrypoint check not included.",
+  "logs": [
+    {
+      "path": "stage2-check.log",
+      "sha256": "aca74796e931ed6e71ccacb42a653aeda01c70cb5a8680e6130fc504fa2ea7ff",
+      "bytes": 2191
+    },
+    {
+      "path": "stage2-ecbench-tests.log",
+      "sha256": "d03a4945db2f3d0292392b47dd34e0cd205fee7c219dfde90e10aae6391193b2",
+      "bytes": 58069
+    },
+    {
+      "path": "stage2-lib-build.log",
+      "sha256": "13ae32fd4dd9d73efa39ba6e31ed3382cda2b3c5b7fa59456dcca8473ee209f1",
+      "bytes": 818
+    },
+    {
+      "path": "stage2-tests-check-attempt2.log",
+      "sha256": "8e801fa9853c8692ecb1344910f86ba4b0b06f379148f2160851b68b1988eb05",
+      "bytes": 16573
+    },
+    {
+      "path": "stage2-tests-check.log",
+      "sha256": "9c62b03e4d9446c6fd4b9e49d1abbffb71ea962cdebacc128314ec1c5fd0dc0d",
+      "bytes": 1043
+    }
+  ]
+}

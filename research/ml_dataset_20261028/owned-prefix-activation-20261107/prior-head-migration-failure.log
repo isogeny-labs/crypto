@@ -1,0 +1,11 @@
+migrate	Prefetch changed Git blobs in bounded batches	﻿2026-11-07T05:09:51.6683817Z ##[group]Run set -euo pipefail
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6684091Z ^[[36;1mset -euo pipefail^[[0m
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6684303Z ^[[36;1mcd candidate^[[0m
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6684524Z ^[[36;1mbase=$(git merge-base "$BASE_SHA" HEAD)^[[0m
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6684861Z ^[[36;1mpython3 ../trusted/.github/scripts/artifact_prefetch.py "$base" HEAD^[[0m
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6724372Z shell: /usr/bin/bash -e {0}
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6724595Z env:
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6724820Z   BASE_SHA: b5317ce978126f7158b29cfecab6ee386f09b56d
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6725076Z ##[endgroup]
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6884712Z python3: can't open file '/home/runner/work/crypto/crypto/candidate/../trusted/.github/scripts/artifact_prefetch.py': [Errno 2] No such file or directory
+migrate	Prefetch changed Git blobs in bounded batches	2026-11-07T05:09:51.6912738Z ##[error]Process completed with exit code 2.

@@ -1,0 +1,30 @@
+   Compiling quadratic-twist-mixed-audit v0.1.0 (/workspace/crypto-next/research/quadratic_twist_evidence_20261021/native/mixed-audit)
+    Finished `release` profile [optimized] target(s) in 4.17s
+     Running unittests main.rs (research/quadratic_twist_evidence_20261021/native/mixed-audit/target/release/deps/quadratic_twist_mixed_audit-cc4ced39e4c2dd8c)
+
+running 22 tests
+test identity_certificate::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity_certificate::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity_certificate::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity_certificate::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity_certificate::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity_certificate::tests::tampering_with_the_digest_is_detected ... ok
+test identity_certificate::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test sha_backend::tests::sha224_abc ... ok
+test sha_backend::tests::sha224_empty ... ok
+test sha_backend::tests::sha256_abc ... ok
+test sha_backend::tests::sha256_block_boundary_55 ... ok
+test sha_backend::tests::sha256_empty ... ok
+test sha_backend::tests::sha256_fips180_112byte ... ok
+test sha_backend::tests::sha256_fips180_56byte ... ok
+test sha_backend::tests::sha256_hello_world ... ok
+test identity_certificate::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity_certificate::tests::schoenhage_identity_certifies_and_checks ... ok
+test sha_backend::tests::sha256_two_blocks_64 ... ok
+test sha_backend::tests::sha256_million_a ... ok
+test sha_backend::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test sha_backend::tests::streaming_million_a ... ok
+test sha_backend::tests::streaming_matches_one_shot_at_every_split ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

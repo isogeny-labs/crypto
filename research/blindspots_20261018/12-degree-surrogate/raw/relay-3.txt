@@ -1,0 +1,62 @@
+status: completed (exit 0)
+
+```
+card: CARD-BLINDSPOT-12-03 (sha256 6388f8e606680077ee29c3a3715f50d7e77bbdbde48bab9c63c2545daa023388)
+commit: 77395371a2907f50209bd246aebc788c0d2f5bae
+receipt: research/blindspots_20261018/12-degree-surrogate/raw/receipt-card-03.json sha256 51f38aca7bda9503738c0f1cf2fe278b210031f4c261a0f5e88b0e9ede7d1ca8
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-12/card-03"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-12/card-03/b12", "examples/blindspots_12_degree_surrogate.rs"] exit 0 (3.956 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (t3): ["prlimit", "--as=4294967296", "target/blindspots-12/card-03/b12", "t3", "--manifest", "research/blindspots_20261018/12-degree-surrogate/sources.tsv", "--raw", "research/blindspots_20261018/12-degree-surrogate/raw"] exit 0 (0.022 s) succeeded
+  stdout sha256 6eff68cba06d0c4fcd5f7822c33d3d9ffb3d1d3fbdfa15f34df54955d2ec3ec1; last 13 lines:
+    FOLD f4-m3 cells=4 evaluable=true | a mae=5.9344 cover=1.0000 rho=0.9487 | b mae=2.6295 cover=0.9781 rho=0.0000 | c1 mae=1.4657 cover=0.8531 rho=0.4000 | e mae=2.5831 cover=0.5625 rho=0.8000
+    FOLD f4-m4 cells=13 evaluable=true | a mae=8.2569 cover=0.2817 rho=0.9904 | b mae=3.1103 cover=0.1798 rho=0.0000 | c1 mae=3.0442 cover=0.2673 rho=0.0000 | e mae=2.2007 cover=0.5183 rho=0.9904
+    KV t3_items=61
+    KV t3_folds=f4-m3,f4-m4
+    KV t3_mae_log2cols_a=7.095641
+    KV t3_rho_a=0.969518
+    KV t3_mae_log2cols_b=2.869920
+    KV t3_rho_b=0.000000
+    KV t3_mae_log2cols_c1=2.254984
+    KV t3_rho_c1=0.200000
+    KV t3_mae_log2cols_e=2.391898
+    KV t3_rho_e=0.895177
+    T3 DONE
+command 4 (rank): ["prlimit", "--as=4294967296", "target/blindspots-12/card-03/b12", "rank", "--manifest", "research/blindspots_20261018/12-degree-surrogate/sources.tsv", "--raw", "research/blindspots_20261018/12-degree-surrogate/raw"] exit 0 (0.178 s) succeeded
+  stdout sha256 35456b1a77bbcb8b819c6d6c6d00e1cbd6ffe99d5f7615f5344e541382044f08; last 20 lines:
+    3 cl 4 19 5 58 4.073 13 8.927 18.80
+    4 f4 4 22 3 56 3.854 12 8.146 18.60
+    5 cl 4 22 4 60 3.878 12 8.122 19.00
+    -- next 15 by score (not one per (m, l)) --
+    - cl 4 14 7 56 4.127 14 9.873 18.60
+    - cl 4 15 7 58 4.128 14 9.872 18.80
+    - cl 4 16 7 60 4.130 14 9.870 19.00
+    - f4 4 14 7 56 4.132 14 9.868 18.60
+    - f4 4 15 7 58 4.133 14 9.867 18.80
+    - f4 4 16 7 60 4.135 14 9.865 19.00
+    - f4 4 3 7 34 3.967 13 9.033 15.69
+    - cl 4 3 7 34 3.974 13 9.026 15.69
+    - f4 4 4 7 36 3.992 13 9.008 16.03
+    - f4 4 6 7 40 3.995 13 9.005 16.64
+    - cl 4 4 7 36 4.000 13 9.000 16.03
+    - cl 4 6 7 40 4.001 13 8.999 16.64
+    - f4 4 5 7 38 4.028 13 8.972 16.34
+    - cl 4 5 7 38 4.034 13 8.966 16.34
+    - cl 4 14 6 52 4.045 13 8.955 18.17
+    RANK DONE
+command 5 (verdict): ["prlimit", "--as=4294967296", "target/blindspots-12/card-03/b12", "verdict", "--raw", "research/blindspots_20261018/12-degree-surrogate/raw"] exit 0 (0.004 s) succeeded
+  stdout sha256 3f7752b230800308a864a8bf19d40a561b21b570cfb323028904f1ba80bd097d; last 7 lines:
+    CONDITION selftest_ok=true planted_ok=true evaluable_folds=7
+    CONDITION macro_mae_d a=2.3821 b=0.3908 c1=0.4819
+    CONDITION beat_a=true (diff a-c1 interval [1.6471, 2.1368])
+    CONDITION beat_b=false (diff b-c1 interval [-0.1947, 0.0056])
+    CONDITION null_excluded=false (real3 0.5687, null q025 0.4835)
+    CONDITION cover_c1=0.7349 in_band=false
+    VERDICT MATCHES (primitive)
+command 6 (remove-bin): ["rm", "-f", "target/blindspots-12/card-03/b12"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 7 (remove-bin-dir): ["rmdir", "target/blindspots-12/card-03"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

@@ -1,0 +1,32 @@
+{
+  "started_at": "2026-11-05T19:03:01.952875+00:00",
+  "source_base": "80fc3b565c4f",
+  "source_semantics": "local tested native-SAT commit plus reviewed owner continuation and ingress-prefix correction",
+  "sat_sha256": "f4097d9d66a3ef2b392110b5cea624e679ed881a031982f4e953d1ea5e1f7c0e",
+  "target": "/var/tmp/crypto-ml-sat-admission-target-20261105",
+  "jobs": 8,
+  "test_threads": 1,
+  "compile_timeout_seconds": 1200,
+  "native_timeout_seconds": 900,
+  "retries": 0,
+  "new_cloud_jobs": 0,
+  "source_manifest_sha256": "9590a170e514408867ec1c0f270b204513ae124b4a36cc4a995411667b276727",
+  "production_gate_opened": false,
+  "compile_argv": [
+    "cargo",
+    "+1.98",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--no-run"
+  ],
+  "compile_exit": 0,
+  "compile_log_sha256": "36e86a8cc2f28861e9f25fa22de1680eb1f6fdc189cebe711d7023c368979b3f",
+  "binary": "/var/tmp/crypto-ml-sat-admission-target-20261105/release/deps/crypto_lib-e38f712455658d63",
+  "binary_sha256": "d791f824b6797ee391894ece3753d74c668305d7451d4c8e8f7061fb1403aa7d",
+  "exception": "AssertionError((13, 0, 1))",
+  "passed": false,
+  "finished_at": "2026-11-05T19:08:46.518553+00:00"
+}

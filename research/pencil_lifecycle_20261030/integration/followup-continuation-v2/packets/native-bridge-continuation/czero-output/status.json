@@ -1,0 +1,96 @@
+{
+  "schema": "research.formal-component/v1",
+  "scope": "normalized C0 quotient and output curve membership",
+  "main_declarations": 12,
+  "control_declarations": 10,
+  "axiom_readbacks": 22,
+  "checks": {
+    "probe1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "output1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "output2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "quotient1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "quotient2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "quotient3": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "quotient4": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "quotient5": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "point1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "point2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "source_modules": {
+    "Output": "de762b26b64cb8b509bf6ac7bb8c4d76fb3449c549ba68c13f1622c4d3d67be1",
+    "Quotient": "b6f0f16eb1db9bbdde5a5885b9eaa636abe241c163609f67e91d881acc320ec5",
+    "CurvePoint": "f524d6e6c729de8b884d285c3dd4ccddd0d02ba6aa81fae46ac2e96ba0ec7d02",
+    "PointControls": "1447ffb651ca6070dc92398254f165ab711889e05acd61d12ede02393ebdcdf7",
+    "PointReadback": "439349df5497f467bd6a9a2791085eca573a9d5aff8589b3f8a3ee8a598cc6ea"
+  },
+  "scientific_execution": false,
+  "independent_review": false,
+  "weighted_transport": false,
+  "class_sum": false,
+  "compiled_equivalence": false,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ]
+}

@@ -1,0 +1,35 @@
+\documentclass[11pt]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{amsmath,booktabs,hyperref}
+\begin{document}
+\section*{Root-count rejection reorder}
+Proposal ID: root-count-rejection-20261030. Status: unapplied source-only proposal.\par
+No source patch was applied. No tests, solver runs, benchmarks or new measurements were executed. This report contains no speed estimate or scientific verdict.
+\subsection*{Proposed pipeline}
+Existing: complement and its assertions $\to$ final bucket count $\to$ reject or geometric verification and graph insertion.\par
+Proposed: final bucket count $\to$ immediate rejection if count differs from three; otherwise the same complement, geometric verification and graph insertion. The same measured closure surrounds both orders. Editable diagram: pipeline.svg.
+\subsection*{Conditional equivalence}
+The prior sieve calls complement at $\lambda=0$, establishing monicity and $u\mid(v^2-h)$ for the same divisor. Since
+\[
+(v+\lambda u)^2-h=(v^2-h)+u(2\lambda v+\lambda^2u),
+\]
+the numerator remains divisible by $u$. Accepted candidates retain the same checks and graph path. Rejected candidates never enter the graph. Ordinary and exceptional candidates use finalized buckets.
+This argument assumes a valid degree-two divisor, a length-six quintic, normalized residues and bounded arithmetic ($p\leq2^{63}$ for the helper additions/subtractions). It is not a full-u64 panic equivalence proof.
+\subsection*{Observed behavior intentionally changes}
+A rejected candidate skips complement assertions, allocations and counters. Resource exhaustion, deadlines and arbitrary-input errors need not behave identically. Matrix cap checks are unchanged because both versions omit graph insertion for rejected candidates. This is a proposed new instrument, not a repair to frozen evidence.
+\subsection*{Removed semantic counts per rejection}
+Let $D$ be actual monic division iterations ($1\ldots4$), $L$ the trimmed squared-polynomial length, $T$ all trim predicate evaluations and $V$ those on nonempty vectors. These are source-derived event formulas, not measured savings.
+\begin{center}\begin{tabular}{ll}\toprule
+Category&Removed count\\\midrule
+Base multiplications&$12+3D$\\
+Base additions&$18+3D$\\
+Initialized elements&$18$\\
+Copied elements&$D$\\
+Entry visits&$33+L+7D+V$\\
+Predicate comparisons&$6+D+T$\\
+Inversions; engine group operations&$0$; $0$\\\bottomrule
+\end{tabular}\end{center}
+\subsection*{Evidence and next validation}
+Source: \texttt{src/native\_solver.rs}, candidate-verification block near line1332. Full relative path, source digest, formulas and assumptions are in proposal.json. The unapplied patch and full static argument are retained in unapplied.patch and proof.md. Independent static review is bound in proposal.json and retained unchanged in independent-review.json; it found no concrete algebra or count defect within the stated domain. This does not replace future execution checks.\par
+Future software validation must cover ordinary and exceptional paths, root counts zero through greater than three, exact counter deltas, and unchanged graph cap behavior. Later measurements require a prospective contract and resource authorization. The incomplete upper gate does not authorize a rerun or remaining-cohort execution.
+\end{document}

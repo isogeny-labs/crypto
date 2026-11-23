@@ -1,0 +1,81 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "commit": {
+      "sha": "f55ad14c5c4d8e15e34544c070eb674385fd0f63",
+      "message": "Move PR data files to the artifact store",
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/f55ad14c5c4d8e15e34544c070eb674385fd0f63",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/f55ad14c5c4d8e15e34544c070eb674385fd0f63",
+      "diff": "@@ -0,0 +1,12 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"norm-point-reuse-expected-native-01.json.xz\": {\"sha256\": \"39889d1bc834ed1332629d42f7785afde9893b49fd16805bd0e2be8acf4b90a5\", \"bytes\": 1291312},\n+  \"norm-point-reuse-whole-native-01.txt.xz\": {\"sha256\": \"3da4d14312172d4d70a227a53e6b63cfb909c08c659635f62a49298af69b8b72\", \"bytes\": 373892},\n+  \"original-prime-native01-completed-records.json\": {\"sha256\": \"a03f5c10cf505d5a74c507757d20522b0866d90c9fded5e2ebd474f17c772eb6\", \"bytes\": 4575215},\n+  \"whole-closed-science-23.tar.xz.part-0000\": {\"sha256\": \"228811add3b1b54c0fd6a5c77b79f1a129695cdf4415f9566bbc144077ecf628\", \"bytes\": 33554432},\n+  \"whole-closed-science-23.tar.xz.part-0001\": {\"sha256\": \"194b79a6e0eac32f26f4362049874614c085bd2376def9b7b41a9e6ac8003273\", \"bytes\": 33554432},\n+  \"whole-closed-science-23.tar.xz.part-0002\": {\"sha256\": \"a0c0e7af03f660c3abc6b431baa1c2dea34360db4280f43c1ef2170d0a3eed32\", \"bytes\": 22266948},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"6d417087d0fc6f8e7a8d9a4b0cecb42f7c3c6827dda82e0eb33077551ac7bc8e\", \"bytes\": 624900}\n+ }\n+}\n@@ -0,0 +1,10 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/norm-point-reuse-expected-native-01.json.xz\n+/norm-point-reuse-whole-native-01.txt.xz\n+/original-prime-native01-completed-records.json\n+/whole-closed-science-23.tar.xz.part-0000\n+/whole-closed-science-23.tar.xz.part-0001\n+/whole-closed-science-23.tar.xz.part-0002\n+/whole-current-inputs.json.xz\n+# <<< artifacts\n\n\n\n\n\n\n",
+      "files": [
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/.artifacts.json",
+          "patch": "@@ -0,0 +1,12 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"norm-point-reuse-expected-native-01.json.xz\": {\"sha256\": \"39889d1bc834ed1332629d42f7785afde9893b49fd16805bd0e2be8acf4b90a5\", \"bytes\": 1291312},\n+  \"norm-point-reuse-whole-native-01.txt.xz\": {\"sha256\": \"3da4d14312172d4d70a227a53e6b63cfb909c08c659635f62a49298af69b8b72\", \"bytes\": 373892},\n+  \"original-prime-native01-completed-records.json\": {\"sha256\": \"a03f5c10cf505d5a74c507757d20522b0866d90c9fded5e2ebd474f17c772eb6\", \"bytes\": 4575215},\n+  \"whole-closed-science-23.tar.xz.part-0000\": {\"sha256\": \"228811add3b1b54c0fd6a5c77b79f1a129695cdf4415f9566bbc144077ecf628\", \"bytes\": 33554432},\n+  \"whole-closed-science-23.tar.xz.part-0001\": {\"sha256\": \"194b79a6e0eac32f26f4362049874614c085bd2376def9b7b41a9e6ac8003273\", \"bytes\": 33554432},\n+  \"whole-closed-science-23.tar.xz.part-0002\": {\"sha256\": \"a0c0e7af03f660c3abc6b431baa1c2dea34360db4280f43c1ef2170d0a3eed32\", \"bytes\": 22266948},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"6d417087d0fc6f8e7a8d9a4b0cecb42f7c3c6827dda82e0eb33077551ac7bc8e\", \"bytes\": 624900}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/.gitignore",
+          "patch": "@@ -0,0 +1,10 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/norm-point-reuse-expected-native-01.json.xz\n+/norm-point-reuse-whole-native-01.txt.xz\n+/original-prime-native01-completed-records.json\n+/whole-closed-science-23.tar.xz.part-0000\n+/whole-closed-science-23.tar.xz.part-0001\n+/whole-closed-science-23.tar.xz.part-0002\n+/whole-current-inputs.json.xz\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/norm-point-reuse-expected-native-01.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/norm-point-reuse-whole-native-01.txt.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/original-prime-native01-completed-records.json",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/whole-closed-science-23.tar.xz.part-0000",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/whole-closed-science-23.tar.xz.part-0001",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/whole-closed-science-23.tar.xz.part-0002",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-norm-point-and-original-prime-handoff-23/whole-current-inputs.json.xz",
+          "patch": null
+        }
+      ],
+      "repository_full_name": "isogeny-labs/crypto",
+      "comments": null,
+      "author": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "committer": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "created_at": "2026-11-15T06:02:29Z",
+      "git_author_email": null,
+      "display_url": "https://github.com/isogeny-labs/crypto/commit/f55ad14c5c4d8e15e34544c070eb674385fd0f63",
+      "display_title": "Move PR data files to the artifact store"
+    },
+    "url": "https://github.com/isogeny-labs/crypto/commit/f55ad14c5c4d8e15e34544c070eb674385fd0f63",
+    "title": "Move PR data files to the artifact store",
+    "diff": "@@ -0,0 +1,12 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"norm-point-reuse-expected-native-01.json.xz\": {\"sha256\": \"39889d1bc834ed1332629d42f7785afde9893b49fd16805bd0e2be8acf4b90a5\", \"bytes\": 1291312},\n+  \"norm-point-reuse-whole-native-01.txt.xz\": {\"sha256\": \"3da4d14312172d4d70a227a53e6b63cfb909c08c659635f62a49298af69b8b72\", \"bytes\": 373892},\n+  \"original-prime-native01-completed-records.json\": {\"sha256\": \"a03f5c10cf505d5a74c507757d20522b0866d90c9fded5e2ebd474f17c772eb6\", \"bytes\": 4575215},\n+  \"whole-closed-science-23.tar.xz.part-0000\": {\"sha256\": \"228811add3b1b54c0fd6a5c77b79f1a129695cdf4415f9566bbc144077ecf628\", \"bytes\": 33554432},\n+  \"whole-closed-science-23.tar.xz.part-0001\": {\"sha256\": \"194b79a6e0eac32f26f4362049874614c085bd2376def9b7b41a9e6ac8003273\", \"bytes\": 33554432},\n+  \"whole-closed-science-23.tar.xz.part-0002\": {\"sha256\": \"a0c0e7af03f660c3abc6b431baa1c2dea34360db4280f43c1ef2170d0a3eed32\", \"bytes\": 22266948},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"6d417087d0fc6f8e7a8d9a4b0cecb42f7c3c6827dda82e0eb33077551ac7bc8e\", \"bytes\": 624900}\n+ }\n+}\n@@ -0,0 +1,10 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/norm-point-reuse-expected-native-01.json.xz\n+/norm-point-reuse-whole-native-01.txt.xz\n+/original-prime-native01-completed-records.json\n+/whole-closed-science-23.tar.xz.part-0000\n+/whole-closed-science-23.tar.xz.part-0001\n+/whole-closed-science-23.tar.xz.part-0002\n+/whole-current-inputs.json.xz\n+# <<< artifacts\n\n\n\n\n\n\n",
+    "display_url": "https://github.com/isogeny-labs/crypto/commit/f55ad14c5c4d8e15e34544c070eb674385fd0f63",
+    "display_title": "Move PR data files to the artifact store"
+  },
+  "isError": false
+}

@@ -1,0 +1,24 @@
+file	kind	what	source_path	verified
+sections/falldegree.tex	text	paragraph "Per-instance records" (column count a function of k, 2517..179447; wall 0.0..2001.3 s; P45a 1850.7 s vs ~6000 s cert rerun)	crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json; certificates.txt	yes
+sections/falldegree.tex	figure	fig-bin-fd-closure: per-instance D=4 columns and top-degree closure wall time vs n, by family, refuting vs not	crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json	yes
+sections/falldegree.tex	table	tab-bin-fd-inst-a: 42 per-instance rows, polynomial subspaces (P, S): D, dim W_D, columns, codim, 1 in W_D, s, d_F, cert hash	crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json; certificates.txt	yes
+sections/falldegree.tex	table	tab-bin-fd-inst-b: 51 per-instance rows, random subspaces (R, U, T)	crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json; certificates.txt	yes
+sections/falldegree.tex	table	tab-bin-fd-certs: 13 VALID certificate checks (graded W_4 dims, columns, codim bound, closure/check s, SHA-256 prefix)	crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt; instances_sat.json; instances_t3.json	yes
+sections/falldegree.tex	text	note: instances.json records R35a as >=5 (lower bound); text's exact 5 comes from Lemma branch, now stated in caption	crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json	yes
+sections/binary_ext.tex	text	routing band paragraph: band ranks rho<pipeline<pipeline71 at every curve; pipeline/rho band-mean ratio 10.8-22.9 (w=0) to 17.4-27.2 (w=1); k41 band-mean ratio 12.9 vs README cluster ratio 14.1 [11.0,18.0] (unexplained in source)	research/ic_planner_exhaustive_20261026/analysis/band-K-*.json; README.md	yes
+sections/binary_ext.tex	figure	fig-bin-routing: descent/rho, pipeline/rho, descent/pipeline vs log2 r with cluster CIs, dashed 1	research/ic_planner_exhaustive_20261026/README.md	yes
+sections/binary_ext.tex	table	tab-bin-routing-band: S per arm (rho, pipeline, pipeline71, descent) at six weights, six curves (24 rows)	research/ic_planner_exhaustive_20261026/analysis/band-K-{k41,k47,k53,k57,k59,k61}.json	yes
+sections/binary_ext.tex	text	LP paragraph: session-1 n=61 best two-LP 0.513 [0.497,0.526] of plain-k660; every arm 32.9-249x rho at w=0; A/A and lp0 = 1.0 [1.0,1.0]	research/icb_large_prime_n53_n61_20261029/results.json	yes
+sections/binary_ext.tex	table	tab-bin-lp-arms: all 31 arms (n53, n61 s1, n61 s2): S at w=0/0.1/1, paired arm/rho and arm/best-plain with 95% CI	research/icb_large_prime_n53_n61_20261029/results.json; band/n53-all.json, n61-s1.json, n61-s2.json	yes
+sections/binary_ext.tex	figure	fig-bin-lp: arm/rho-strong paired ratio with CI vs factor-base columns, three sessions, dashed 1	research/icb_large_prime_n53_n61_20261029/results.json	yes
+sections/binary_ext.tex	table	tab-bin-dlp-band: per curve base/dlp/rho-frob/rho-strong band S at w=0/0.1/1 and distance to rho-frob with CI (16 rows)	research/ic_koblitz_dlp_tuning_20261023/REPORT.md; bands/holdout-n{37,41,43,47}.band.json	yes
+sections/binary_ext.tex	figure	fig-bin-dlp: DLP/ic-compact ratio vs w with CI; arm/rho-frob vs w with CI, dashed 1	research/ic_koblitz_dlp_tuning_20261023/REPORT.md	yes
+sections/binary_ext.tex	table	tab-bin-n83chain: per (m, arm) cell, public refuted / planted witness, median conflicts and seconds (17 rows)	research/n83_chain_sat_order_20261031/table.tsv; research/n83_chain_sat_meet_20261101/table.tsv	yes
+sections/binary_ext.tex	figure	fig-bin-n83chain: median seconds per decided query vs m per arm, public and planted	research/n83_chain_sat_order_20261031/table.tsv; research/n83_chain_sat_meet_20261101/table.tsv	yes
+sections/binary_ext.tex	table	tab-bin-guess: per draw x guess set degree-4 closure records (runs, refuting, columns, ranks, s min-max), 17 rows	research/dreg_closure_guess_20261022/runs/*.jsonl; research/dreg_closure_guess3_20261023/runs/*.jsonl	yes
+sections/binary_ext.tex	slop	em dash in "The measurements---...---do not" -> parentheses	n/a	yes
+sections/machinery.tex	slop	13 em-dash asides -> parentheses/colons/commas (component speed-up unit, generator-orbit crossover, decision, FieldStructure engine list, F6-IC aside, Macaulay matrix, V storage, trace replay, atlas lead, tree-glued encoding, planner weight rules x2)	n/a	yes
+sections/machinery.tex	slop	"is robust to that choice" -> "holds under that choice"	n/a	yes
+sections/machinery.tex	slop	deleted restating close "A planner, in short, is a model of the engines..."	n/a	yes
+sections/prog_binary.tex	slop	2 em-dash asides -> parentheses	n/a	yes
+sections/obstructions.tex	slop	rhetorical question "Could twist points supply relations...? They cannot." -> declarative	n/a	yes

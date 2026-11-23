@@ -1,0 +1,3 @@
+# Additive v2 correction
+
+V1 source-only review found the proposed helper explicitly invokes Drop::drop, forbidden by Rust E0040. No compiler invocation or native run occurred. V1 remains unchanged. V2 extracts the owner-release body into private release_owner_lock(&self); actual Drop delegates to it. C4 invokes this same helper then libc close, so it exercises the exact owner-release logic and descriptor close, not the Rust destructor invocation or String deallocation. This method is not public API. Its sole production call is Drop. The six controls leave non-WouldBlock acquisition errors source-reviewed only; they do not claim execution coverage of that branch. No compilation or execution yet.

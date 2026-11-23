@@ -1,0 +1,42 @@
+OMP: Warning #179: Function Can't set size of /tmp file failed:
+Initial seed for pseudo-random number generator is 1793574361
+
+--------------- INPUT DATA ---------------
+#variables                      32
+#equations                      63
+#invalid equations               0
+field characteristic             2
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         3
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2      26      46      31 x 289        50.71%       26 new       0 zero         0.01 | 0.00         
+  2       3     285      64 x 390        15.02%        2 new       1 zero         0.00 | 0.00         
+  3     315     315    2010 x 5437        1.19%      285 new      30 zero         0.16 | 0.11         
+  3     452    2038    3263 x 6334        3.05%      452 new       0 zero         1.73 | 0.42         
+  4    9998    9998   48786 x 52305       1.21%     4463 new    5535 zero       222.00 | 89.21        
+  4   11283   59444   51636 x 48197       2.00%     3688 new    7595 zeroexit 124

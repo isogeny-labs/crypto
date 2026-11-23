@@ -1,0 +1,12 @@
+digraph {
+  graph [rankdir=TB,bgcolor="white",nodesep="0.35",ranksep="0.45",pad="0.1"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#456273",fillcolor="#edf4f4"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#407758",arrowsize=0.7];
+  C0 [label="Jac(C0)/F101\ny²=x⁶+6x⁴+13x²+56\nE0/F0 rational components:109 /113"];
+  C20 [label="Jac(C20)/F101\ny²=18x⁶+75x⁴+45x²+40"];
+  T20 [label="Jac(T20)/F101\ny²=76x⁶+62x⁵+52x⁴+63x³+69x²+3x+25",fillcolor="#e4f2e8"];
+  C0 -> C20 [label="Φ49 · degree49 (written)\nactual two normalized seven maps\nadjoint norm diag(49,1)"];
+  C20 -> T20 [label="R20 · degree4 (written)\nproper completed fibres and basepoint\nboth positive adjoint compositions[2]"];
+  N [shape=note,fillcolor="#fff5df",label="Complete41 /6cecba · all12317 rational classes\nC20→T20 and C0→C20→T20 bijections\nChain degree196; adjoint norm diag(98,2)\nActual recovery and all109+113 scalar images\nUnsigned; coordinate-key caches, no DLP labels"];
+  T20 -> N [style=invis];
+}

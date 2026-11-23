@@ -1,0 +1,535 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PF-native-seed-factor-single-target-counts-20261103",
+  "version": 1,
+  "created": "2026-11-03",
+  "repository": "crypto",
+  "study_dir": "research/primefield-companion-followup-20261102/feature-native-factor-matched",
+  "authors": [
+    "native prime-field research"
+  ],
+  "links": {
+    "status": "Draft: source/binary/strict cold analysis bound. No panel; new-instrument preflight, remaining reserved allowance and authoritative quota admission outstanding."
+  },
+  "question": "Does factoring the normalization seed reduce single-target setup+prepare+query+verification field arithmetic on the eight fixed public targets?",
+  "claims": [
+    {
+      "id": "C-correct",
+      "text": "Every panel row returns the checked scalar and independently verifies its point.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-count",
+      "text": "Candidate strictly Pareto-improves derived single-target setup+prepare+query+verification field products and inversions at every fixed target.",
+      "class": "comparative",
+      "decided_by": [
+        "backend"
+      ],
+      "if_supported": "Report only dominance in the two counted field-operation dimensions; no total-cost or timing inference.",
+      "if_not_supported": "Report all product/inversion deltas and weighted-model thresholds, including regression and mixed outcomes."
+    }
+  ],
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "reference",
+      "description": "Preserved homogeneous seed-pair consumer under baseline label",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0446a9ddd8981073a25c600358e2fe6734d327cc",
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "research/primefield-companion-followup-20261102/feature-native-factor-matched/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": "d39a1c37099bc0c8d517f1ca5c8fd352c95382684fdaab5cf1376efc54c7e7a2",
+        "threads": 1,
+        "flags": {
+          "optimization": "-O",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "source_backend": "homogeneous_pairs"
+      }
+    },
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Seed-free residual with two final seed powers; public exponent setup recorded separately",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0446a9ddd8981073a25c600358e2fe6734d327cc",
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "research/primefield-companion-followup-20261102/feature-native-factor-matched/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": "d39a1c37099bc0c8d517f1ca5c8fd352c95382684fdaab5cf1376efc54c7e7a2",
+        "threads": 1,
+        "flags": {
+          "optimization": "-O",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "source_backend": "factored_seed"
+      },
+      "same_instrument_as": "baseline"
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Preserved homogeneous seed-pair consumer under aa label",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0446a9ddd8981073a25c600358e2fe6734d327cc",
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "research/primefield-companion-followup-20261102/feature-native-factor-matched/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": "d39a1c37099bc0c8d517f1ca5c8fd352c95382684fdaab5cf1376efc54c7e7a2",
+        "threads": 1,
+        "flags": {
+          "optimization": "-O",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "source_backend": "homogeneous_pairs"
+      },
+      "same_instrument_as": "baseline"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "All24 rows have known-answer scalar and independent point verification; malformed output invalidates the panel."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "A deterministic cost comparison asserts no null-population detection. Invalid inputs and repair removal have separate software rejection checks."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "source_backend",
+        "levels": [
+          "homogeneous_pairs",
+          "factored_seed"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "F509/r479,P=(3,68)",
+        "how": "Same curve/program in every arm"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "0,1,2,25,173,292,440,478",
+        "how": "Use saved public coordinates; labels checker-only"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One native binary, one compiler and flags, one thread",
+        "how": "Publish exact binary SHA before submission"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Pending isolated CPU Spot placement",
+        "how": "Record CPU/kernel/instance/host and authoritative admission; no timed claim"
+      },
+      {
+        "name": "layout",
+        "treatment": "fixed",
+        "value": "Same allocator and container implementations",
+        "how": "Source backend is the sole implementation factor; record observed allocation requests"
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "value": "baseline,candidate,aa then aa,candidate,baseline by target parity",
+        "how": "All targets use both backend implementations; counters reset at each row"
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 0,
+        "how": "No elapsed-time primary metric; count every declared operation"
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "value": "No resume/retry",
+        "how": "Keep failed/incomplete rows; new attempt requires amendment"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unblinded exact integer analysis",
+        "how": "No inferential statistics; all rows retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "backend",
+        "arms": [
+          "baseline",
+          "candidate"
+        ],
+        "differs_in": [
+          "source_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "repeat",
+        "arms": [
+          "baseline",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261103
+      ],
+      "nonce": null,
+      "note": "No random arithmetic; seed identifies fixed parity-interleaved schedule."
+    },
+    "instance_sampling": {
+      "rule": "Eight previously fixed public software fixtures; no general-population inference",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact event counts with fixed analysis and no sampling inference",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 8,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exhaustive comparison over the fixed8 fixtures; exact integer inequalities, no p-value or population-power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "field_products",
+        "name": "field_products",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "Sum field_products over setup, preparation, query and verification for one target; retain each stage and query-only view separately",
+        "source": "comparison.json pairs[].baseline/candidate.field_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "field_inversions",
+        "name": "field_inversions",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "Sum field_inversions over setup, preparation, query and verification for one target; retain each stage and query-only view separately",
+        "source": "comparison.json pairs[].baseline/candidate.field_inversions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "polynomial_products",
+        "name": "polynomial_products",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "Query polynomial products",
+        "source": "comparison.json query_analysis.pairs[].baseline/candidate.polynomial_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "unit_inversions",
+        "name": "unit_inversions",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "Sum operand-one field inverse calls across query and verification; subset of field inversions",
+        "source": "comparison.json query_analysis.pairs[].baseline/candidate.unit_inversions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "allocation_requests",
+        "name": "allocation_requests",
+        "unit": "bytes requested",
+        "kind": "counted",
+        "definition": "Observed query allocator requested bytes, full realloc requests; not peak memory",
+        "source": "comparison.json query_analysis.pairs[].baseline/candidate.allocation_requests",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "exponent_mod_products",
+        "name": "exponent_mod_products",
+        "unit": "primitive calls",
+        "kind": "counted",
+        "definition": "Separate public exponent setup primitive; see README definitions; not a field or machine instruction count",
+        "source": "comparison.json exponent_setup.<arm>.exponent_mod_products",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "exponent_mod_adds",
+        "name": "exponent_mod_adds",
+        "unit": "primitive calls",
+        "kind": "counted",
+        "definition": "Separate public exponent setup primitive; see README definitions; not a field or machine instruction count",
+        "source": "comparison.json exponent_setup.<arm>.exponent_mod_adds",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "exponent_divisibility_tests",
+        "name": "exponent_divisibility_tests",
+        "unit": "primitive calls",
+        "kind": "counted",
+        "definition": "Separate public exponent setup primitive; see README definitions; not a field or machine instruction count",
+        "source": "comparison.json exponent_setup.<arm>.exponent_divisibility_tests",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "exponent_exact_divisions",
+        "name": "exponent_exact_divisions",
+        "unit": "primitive calls",
+        "kind": "counted",
+        "definition": "Separate public exponent setup primitive; see README definitions; not a field or machine instruction count",
+        "source": "comparison.json exponent_setup.<arm>.exponent_exact_divisions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "all frozen native stage counters"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel",
+      "binary_sha256",
+      "image_digest",
+      "job_id",
+      "pod_id",
+      "threads",
+      "stage_counters",
+      "admission",
+      "cost_receipt"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "cpus": 1,
+      "memory_mib": 512,
+      "spot": true,
+      "max_total_usd": 1,
+      "reservation_status": "not_reserved; reconcile remaining shared budget and live NodePool/quota before submission"
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 60,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly3 arms x8 targets=24 rows plus separately recorded setup/preparation; retain every failure, stop on deadline; no replacement trials.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any point verification or A/A arithmetic mismatch invalidates the comparison; preserve all rows.",
+    "No performance claim from diagnostics or unisolated clocks."
+  ],
+  "decision_rule": {
+    "text": "Require full strict validation and A/A equality. Compare derived setup+prepare+query+verify field products/inversions per target with the declared Pareto rules. Keep query-only results and integer setup primitives separate.",
+    "comparison_ids": [
+      "backend"
+    ],
+    "threshold": "Per-target strict Pareto relation in single-target field products/inversions only",
+    "statistic": "Paired deltas of setup+prepare+query+verify field products and inversions; constant symbolic w only, excludes exponent integer primitives and all other costs",
+    "interval": "Exact fixed-fixture values; no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Signed integer deltas and exact rational break-even w; no chosen weight or timing conclusion",
+    "verdict_vocabulary": [
+      "counted_pareto_improvement",
+      "counted_pareto_regression",
+      "counted_tradeoff_or_mixed",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "cold_analyze.py",
+      "sha256": "ba988f0cba00f923236b84cc57887c425ec6ac3f7f10c6f47df18b1d060f1148"
+    },
+    "inputs": [
+      "rows.jsonl; independently captured producer exit status; expected frozen protocol SHA256",
+      "Verify imported analyze.py and the full analysis-lock.json before use; old17-slot rows are invalid"
+    ],
+    "outputs": [
+      "comparison.json (exclusive-create receipt; invalid inputs retain raw SHA256)"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-target product and inversion deltas; exact A/A equality; secondary allocation requests separate"
+    ],
+    "report_dir": "future-panel-report"
+  },
+  "inadmissible": [
+    "Launching before source/runner/binary/protocol freeze and authoritative admission",
+    "Treating local correctness logs as this comparison",
+    "Replacing original4563-case cohort with this8-target panel",
+    "Reporting timing or weighted total cost from event counts",
+    "Inferring cold elapsed time from summed field counters, omitting setup from the primary arithmetic verdict, or counting exponent primitives as field operations"
+  ],
+  "literature": [
+    {
+      "ref": "../feature-native-accounting/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Frozen event semantics and baseline costs",
+      "verified_by": "Current native accounting evidence"
+    },
+    {
+      "ref": "https://flintlib.org/doc/nmod_poly/index.html",
+      "provenance": "retrieved",
+      "claim": "Context for standard polynomial division/evaluation methods; no external speed claim",
+      "verified_by": "Read2026-11-03"
+    },
+    {
+      "ref": "../feature-native-matched/README.md",
+      "provenance": "internal",
+      "claim": "Fixed output schema, schedule and compiled instrument identity",
+      "verified_by": "Source read and compiled-runner receipt; no panel executed"
+    },
+    {
+      "ref": "../feature-native-low-product/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Truncated Karatsuba identity and five changed polynomial callsites",
+      "verified_by": "66-method native correctness run and source read"
+    },
+    {
+      "ref": "../feature-native-pair-seeds/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Homogeneous seed/source correctness and added denominator work",
+      "verified_by": "148-method native source check and current source inspection"
+    },
+    {
+      "ref": "../feature-native-seed-factor/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Source factorization and public exponent formula",
+      "verified_by": "192-method correctness run and current source inspection"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

@@ -1,0 +1,5 @@
+import Mathlib.Algebra.Group.Hom.Basic
+import Mathlib.Data.ZMod.Basic
+example {G : Type*} [AddGroup G] (P Q : G) (h : Q = -P)
+    (f : G →+ ZMod 5) : f Q = -f P := by
+  rw [h, map_neg]

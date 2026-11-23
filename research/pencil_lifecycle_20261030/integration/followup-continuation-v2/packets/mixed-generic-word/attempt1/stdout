@@ -1,0 +1,78 @@
+/var/tmp/pencil-mixed-generic-word-20261031-v1/WordGeneric.lean:72:44: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hb : p.toNat < 2 ^ 31
+a : WordD1
+b : WeightedWord
+a3 : UInt64
+h3 : a3.toNat < p.toNat
+hax : a.x.toNat < p.toNat
+hay : a.y.toNat < p.toNat
+haz : a.z.toNat < p.toNat
+haw : a.w.toNat < p.toNat
+hbq : b.q.toNat < p.toNat
+hbr : b.r.toNat < p.toNat
+hbs : b.s.toNat < p.toNat
+hbt : b.t.toNat < p.toNat
+hbz : b.z.toNat < p.toNat
+hbw : b.w.toNat < p.toNat
+h1 : UInt64.toNat 1 < p.toNat
+⊢ 1 < p.toNat
+/var/tmp/pencil-mixed-generic-word-20261031-v1/WordGeneric.lean:94:39: error: Tactic `rfl` failed: The left-hand side
+  { q := FieldExpr.field p (genericExpr a b a3).payload.q, r := FieldExpr.field p (genericExpr a b a3).payload.r,
+    s := FieldExpr.field p (genericExpr a b a3).payload.s, t := FieldExpr.field p (genericExpr a b a3).payload.t,
+    z := FieldExpr.field p (genericExpr a b a3).payload.z, w := FieldExpr.field p (genericExpr a b a3).payload.w }
+is not definitionally equal to the right-hand side
+  MixedGeneric.output (WordD1.decode p a) (WeightedWord.decodeTwo p b) ↑a3.toNat
+
+case refine_2
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hb : p.toNat < 2 ^ 31
+a : WordD1
+b : WeightedWord
+a3 : UInt64
+ha : WordD1.canonical p a
+hc : WeightedWord.canonical p b
+h3 : a3.toNat < p.toNat
+good :
+  FieldExpr.good p (genericExpr a b a3).k ∧
+    FieldExpr.good p (genericExpr a b a3).payload.q ∧
+      FieldExpr.good p (genericExpr a b a3).payload.r ∧
+        FieldExpr.good p (genericExpr a b a3).payload.s ∧
+          FieldExpr.good p (genericExpr a b a3).payload.t ∧
+            FieldExpr.good p (genericExpr a b a3).payload.z ∧ FieldExpr.good p (genericExpr a b a3).payload.w
+hk :
+  (FieldExpr.word p (genericExpr a b a3).k).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).k).toNat = FieldExpr.field p (genericExpr a b a3).k
+hq :
+  (FieldExpr.word p (genericExpr a b a3).payload.q).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).payload.q).toNat = FieldExpr.field p (genericExpr a b a3).payload.q
+hr :
+  (FieldExpr.word p (genericExpr a b a3).payload.r).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).payload.r).toNat = FieldExpr.field p (genericExpr a b a3).payload.r
+hs :
+  (FieldExpr.word p (genericExpr a b a3).payload.s).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).payload.s).toNat = FieldExpr.field p (genericExpr a b a3).payload.s
+ht :
+  (FieldExpr.word p (genericExpr a b a3).payload.t).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).payload.t).toNat = FieldExpr.field p (genericExpr a b a3).payload.t
+hz :
+  (FieldExpr.word p (genericExpr a b a3).payload.z).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).payload.z).toNat = FieldExpr.field p (genericExpr a b a3).payload.z
+hw :
+  (FieldExpr.word p (genericExpr a b a3).payload.w).toNat < p.toNat ∧
+    ↑(FieldExpr.word p (genericExpr a b a3).payload.w).toNat = FieldExpr.field p (genericExpr a b a3).payload.w
+⊢ { q := FieldExpr.field p (genericExpr a b a3).payload.q, r := FieldExpr.field p (genericExpr a b a3).payload.r,
+      s := FieldExpr.field p (genericExpr a b a3).payload.s, t := FieldExpr.field p (genericExpr a b a3).payload.t,
+      z := FieldExpr.field p (genericExpr a b a3).payload.z, w := FieldExpr.field p (genericExpr a b a3).payload.w } =
+    MixedGeneric.output (WordD1.decode p a) (WeightedWord.decodeTwo p b) ↑a3.toNat
+/var/tmp/pencil-mixed-generic-word-20261031-v1/WordGeneric.lean:76:78: warning: This simp argument is unused:
+  h1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [genericExpr, FieldExpr.good, hax, hay, haz, haw, hbq, hbr, hbs, hbt, hbz, hbw, h3]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

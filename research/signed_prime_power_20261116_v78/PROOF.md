@@ -1,0 +1,7 @@
+# Guarded sparse signed modular powers
+
+The nonadjacent signed representation n=sum d_i*2^i uses d_i in {-1,1}. Evaluate a single squaring ladder, multiply positive terms into N and negative terms into D, then return N/D only when the reduced base is a unit modulo monic nonconstant H. A linear base is checked by evaluating H at its root; other bases use gcd. Polynomial extended Euclid emits and verifies D*Dinv=1. Any nonunit uses the frozen generic positive-exponent routine. Repeated H and zero roots are preserved; no field exponent reduction is applied to the quotient ring. The Mersenne recurrence remains the inverse-free first branch.
+
+Powering counters count ladder/multiply operations and separate inverse calls; they do not hide the Euclidean work as free. Actual process timings include unit tests, inversions, original root verification, setup and serialization. Sparse eligibility is frozen as bit length>=64 and at most7 signed digits; other primes route directly to the reference solver at entry. P521 retains the old exact Mersenne body.
+
+Independent Taylor/Hasse remainder oracles exercise units/nonunits and repeated roots in characteristic3, other small fields and the five actual NIST primes. Constructed factor products check complete large-field roots including zero. The new cold panel uses five distinct exposed translated inputs per fresh process in six fields, and reports batch throughput, not single-instance cold latency. The first noisy C77 panel remains unchanged; this is a changed algorithm and cohort, not a silent retry or holdout claim.

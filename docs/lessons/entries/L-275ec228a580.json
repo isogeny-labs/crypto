@@ -1,0 +1,16 @@
+{
+  "action": "Require error-free whole-response admission and exact original-domain replay/complete-reference sets; enable quit-on-error and preserve failed requests before changing serializers",
+  "created": "2026-11-16T19:35:09Z",
+  "evidence": [
+    "research/p256_aux_smooth_20261114/continuation_20261116/evidence/api-unit001/response.json",
+    "research/p256_aux_smooth_20261114/continuation_20261116/evidence/api-unit002/response.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "prime-field-research",
+    "report-evidence"
+  ],
+  "trigger": "A CAS service returns exit code zero or a completion-looking marker after a syntax/runtime error and may continue with stale variables",
+  "why": "Both responses continued after errors; strict flags prevented admitting stale-ideal output."
+}

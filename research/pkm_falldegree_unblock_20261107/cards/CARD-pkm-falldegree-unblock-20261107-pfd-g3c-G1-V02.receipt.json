@@ -1,0 +1,379 @@
+{
+  "card_id": "CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-V02",
+  "card_path": "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-V02.yaml",
+  "card_sha256": "6e55757ffba8ba31095da7474eb6c70a314beda4dc6c5059993296284f53a5a7",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "61c1aa5a2b375aa558555e757bf090da334278de",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "61c1aa5a2b375aa558555e757bf090da334278de",
+        "HEAD",
+        "--",
+        "research/pkm_falldegree_unblock_20261107",
+        ":(exclude)research/pkm_falldegree_unblock_20261107/cards",
+        ":(exclude)research/pkm_falldegree_unblock_20261107/receipts",
+        ":(exclude)research/pkm_falldegree_unblock_20261107/results",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "ef5e18ea8443d75bc61d925fadbb52406d1fe6fcfaf87d68d99a2361cd657cd2",
+        ".provenance.protocol_sha256 == $h",
+        "research/pkm_falldegree_unblock_20261107/requests_r2e/pfd-g3c.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "pfd-g3c-20261109",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/wait_command_status.sh",
+        "research/pkm_falldegree_unblock_20261107/cards/status_request_g3c.json",
+        "pfd-g3c-20261109",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/collect-v02",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 53.188,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "status-once",
+      "index": 5,
+      "outputs": {
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/collect-v02/final-status.json": "ace3ec687b7f800343cf142bca49a746e70d781cecbd780161c43a82066da154"
+      },
+      "seconds": 53.188,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4c9691a0b637805b102461d1d980a02dd6708a0ac29c0eca486a247b8b3af2c4",
+      "stdout_tail": [
+        "2026-11-09T20:28:06Z poll 1 launcher_exit 0 state succeeded",
+        "{\"state\":\"succeeded\",\"job_name\":\"pfd-g3c-20261109\",\"job_uid\":\"ff3b92f1-f447-420a-95c6-45f570cb5257\",\"pods\":[],\"launcher\":\"isolab-experiment-launcher:0ff753cd-9d36-42ec-9b36-e8f9ae2d9e4b\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/pfd-g3c-20261109/launcher/0ff753cd-9d36-42ec-9b36-e8f9ae2d9e4b/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/status_with_audit_pod.sh",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/collect-v02/final-status.json",
+        "2026-11-08T00:00:00Z",
+        "2026-11-09T20:27:00Z",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/collect-v02/status-with-audit-pod.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 128.147,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pod-from-audit",
+      "index": 6,
+      "outputs": {
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/collect-v02/status-with-audit-pod.json": "1bbf63c06c127ed82da04e43e87efb8288ceff27da2dfda35e286863615d1d05"
+      },
+      "seconds": 128.147,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2de33f88dd65ce0f5609eda61defc5540d0fbac895eeac346dc341344820d7a3",
+      "stdout_tail": [
+        "pod pfd-g3c-20261109-wdprt uid 7c2b54f1-afcd-474f-a9b8-c7b58ee44c04 exit 0 (from 1 node report(s)); job pfd-g3c-20261109 uid ff3b92f1-f447-420a-95c6-45f570cb5257"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/pfd-g3c-20261109/",
+        "research/pkm_falldegree_unblock_20261107/results/G1",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.481,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 7,
+      "outputs": {},
+      "seconds": 1.481,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/verify_results_nosums.sh",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/collect-v02/status-with-audit-pod.json",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/launch/result.json",
+        "research/pkm_falldegree_unblock_20261107/results/G1",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/local-sha256-02.txt",
+        "binary.sha256",
+        "f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot",
+        "binary.sha256",
+        "7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools",
+        "host.txt",
+        "nproc: 12",
+        "host.txt",
+        "rayon: 12",
+        "gates/g3.exit",
+        "g3 exit 0",
+        "gates/g3.log",
+        ", 0 disagreements",
+        "gates/g3-inputs.sha256",
+        "C-t3-m5-p0.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.034,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 8,
+      "outputs": {
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/local-sha256-02.txt": "5f36f517910f1d3cad6353fee60b4d8510491eb5e4090158c028d3b85d2d26d1"
+      },
+      "seconds": 0.034,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a5b38a8bee5f66230bcfc24b1a7d12f40152c9cd61d16d85b37102a6c32c78f9",
+      "stdout_tail": [
+        "found in binary.sha256: f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot",
+        "found in binary.sha256: 7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools",
+        "found in host.txt: nproc: 12",
+        "found in host.txt: rayon: 12",
+        "found in gates/g3.exit: g3 exit 0",
+        "found in gates/g3.log: , 0 disagreements",
+        "found in gates/g3-inputs.sha256: C-t3-m5-p0.jsonl",
+        "local sha256 lines: 6 written to research/pkm_falldegree_unblock_20261107/receipts/G1/local-sha256-02.txt",
+        "verified: job pfd-g3c-20261109 job_uid ff3b92f1-f447-420a-95c6-45f570cb5257 pod_uid 7c2b54f1-afcd-474f-a9b8-c7b58ee44c04"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/pkm_falldegree_unblock_20261107/results/G1",
+        "-type",
+        "f",
+        "-exec",
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261109T2016Z-pkm-fd-pfd-g3c.json",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.067,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.067,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2d55a58d99ebc78aa1757f2712bb86902b30fae00f5f0d3e5998d98f7b66c746",
+      "stdout_tail": [
+        "6 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261109T2016Z-pkm-fd-pfd-g3c.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 11.833,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload-raw",
+      "index": 10,
+      "outputs": {},
+      "seconds": 11.833,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 10,
+  "commit": "61c1aa5a2b375aa558555e757bf090da334278de",
+  "dirty_after": [
+    "benchmarks/records/20261109T2016Z-pkm-fd-pfd-g3c.json",
+    "enchmarks/records/20261108T2223Z-pkm-fd-pfd-c.json",
+    "research/pkm_falldegree_unblock_20261107/RESULTS.md",
+    "research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_C.md",
+    "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-C01.yaml",
+    "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-V01.yaml",
+    "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-V02.yaml"
+  ],
+  "dirty_before": [
+    "enchmarks/records/20261109T2016Z-pkm-fd-pfd-g3c.json",
+    "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-C01.yaml",
+    "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-V01.yaml",
+    "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-g3c-G1-V02.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

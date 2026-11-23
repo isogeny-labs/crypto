@@ -1,0 +1,1 @@
+Fresh independent review directory created only after verifying absence. Reviewer performs static and metadata audit, with no compilation or scientific execution. Prior frozen v3 evidence remains unchanged.

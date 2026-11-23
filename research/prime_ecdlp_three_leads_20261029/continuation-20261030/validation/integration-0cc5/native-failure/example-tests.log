@@ -1,0 +1,26 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded streebog v0.10.2
+   Compiling sha2 v0.10.9
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+   Compiling factor-base v0.1.0 (/workspace/crypto/tools/factor-base)
+   Compiling volcano-cli v0.1.0 (/workspace/crypto/tools/volcano-cli)
+   Compiling ecdl-tensor-ic v0.1.0 (/workspace/crypto/crates/ecdl-tensor-ic)
+   Compiling streebog v0.10.2
+   Compiling crypto v0.1.0 (/workspace/crypto)
+error: this file contains an unclosed delimiter
+    --> src/cryptanalysis/binary_semaev_chain_sat.rs:1703:3
+     |
+  27 | pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
+     |                                                                - unclosed delimiter
+  28 |     if !(2..=9).contains(&m) || !(2..=127).contains(&n) {
+     |                                                         - this delimiter might not be properly closed...
+...
+  40 | }
+     | - ...as it matches this but it has different indentation
+...
+1703 | }
+     |  ^
+
+error: could not compile `crypto` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

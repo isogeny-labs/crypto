@@ -1,0 +1,1485 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/fes_k13_validated_20261112",
+ "evidence_dir": "research/fes_k13_validated_20261112/runpod-a1",
+ "protocol_id": "FES-K13-VALIDATED-20261112 (attempt a1, Runpod launch 2)",
+ "snapshot": {
+  "validated_at_head": "4812e1b245e1518b38f9c197444a1307ccfa0436",
+  "evidence_commit": "4812e1b245e1518b38f9c197444a1307ccfa0436",
+  "tree_clean_outside_validator_outputs": true,
+  "tree_note": "git status --porcelain shows only the validator's own untracked outputs (runpod-a1/validation/, runpod-a1/VALIDATION.json)",
+  "frozen_inputs_commit": "03ac49860a (2026-11-12 16:40 Z): protocol.json, spec.json, smoke/build.json unchanged since"
+ },
+ "status": "pass",
+ "status_scope": "pass = every number the producer claimed for session ECBS1h695ef8e76c34 (dispatch figures, claimed/band.json, the saved paired comparison, the bench record spreads and the table's S/reference column) recomputes from the committed session/records.jsonl within tolerance; the independent replay reproduced 288/288 measured runs on a different host class; every record's [d]G = Q holds under validator-written arithmetic; H2 holds. It does NOT say H1 is supported (it is not: F2), does not admit any wall figure (F3, F4), and rests the binary-to-source binding on the producer's build record plus corroboration (F5, open).",
+ "disposition": "validated",
+ "disposition_scope": "Validated: the session's counted measurement (S of all six arms, the paired ratio 0.7081 [0.6683, 0.7503], the band at w = 0, 0.1, 1 and its ranks) and the reading 'H1 not supported: unresolved inside the band'. Not validated: any statement that fes-f2 improves on inherited-f4 under AGENTS.md 5a, any wall-time figure, and any claim needing the L2 gate or the A/A noise floor. Open: F5 (rebuild e9d5dbdccd and replay) before this session backs a published leaderboard row.",
+ "independent": true,
+ "independence": "Recomputed by the validator from the committed session files with validator-written Python (validation/recompute.py, verify_scalars.py), importing no repository code. The band rule, PRICED_NATIVE, PINNABLE_NATIVE, the table-work counters and the K_0/GF(2^13) pinned ratios were transcribed from src/cryptanalysis/ecbench/band.rs, methods.rs, ic_framework/solver_units.rs and docs/ic/calibration.json at e9d5dbdccd (band.rs has changed since; the measured revision's version was used) and are checked by rebuilding G - C from group counts. The linearised t interval follows stats.rs linearised_ratio (workloads as clusters, df 7, log scale), with a Student t quantile written here (t0.975,7 = 2.364624251592784, textbook 2.364624251592785). ecbench table/band/compare output is read only as the claimed side.",
+ "raw_data_paths_relative_to": "research/fes_k13_validated_20261112/runpod-a1/ (the evidence directory)",
+ "raw_data": [
+  {
+   "path": "session/records.jsonl",
+   "repo_path": "research/fes_k13_validated_20261112/runpod-a1/session/records.jsonl",
+   "sha256": "965d95f5ab02e85ba7bbc33024f306243c0e7fecf88b04196a98dde0bf9962c8"
+  },
+  {
+   "path": "session/plan.json",
+   "repo_path": "research/fes_k13_validated_20261112/runpod-a1/session/plan.json",
+   "sha256": "4ed34a74e05c735287f4ae9fd8131dc4c4e6926579c465fac4e91c5b333bfafe"
+  },
+  {
+   "path": "session/session.json",
+   "repo_path": "research/fes_k13_validated_20261112/runpod-a1/session/session.json",
+   "sha256": "5a2e5bbbcabfd19abfde26798f6e34096d2d3cca35fa19c48d78b56d960dfe76"
+  },
+  {
+   "path": "session/spec.json",
+   "repo_path": "research/fes_k13_validated_20261112/runpod-a1/session/spec.json",
+   "sha256": "327e0bb42228fcfd79121b59d35b5f57f7e68826b221dc4aeb6832da46a9d76c"
+  },
+  {
+   "path": "session/host.json",
+   "repo_path": "research/fes_k13_validated_20261112/runpod-a1/session/host.json",
+   "sha256": "aff7577b33544099ae3d293e41cb36d7cb822cd8dd9253690b1a95d4461eb25d"
+  }
+ ],
+ "inputs": [
+  {
+   "path": "../protocol.json",
+   "sha256": "b6d5827cde2972146b8314124a1e68537e3009a28b38284baf89094fb29591ff",
+   "role": "frozen protocol (H1-H4, controls, decision rule)"
+  },
+  {
+   "path": "../spec.json",
+   "sha256": "327e0bb42228fcfd79121b59d35b5f57f7e68826b221dc4aeb6832da46a9d76c",
+   "role": "frozen spec"
+  },
+  {
+   "path": "../smoke/build.json",
+   "sha256": "81db9d534beae86c0fde0ab47c894fc79186ef68b73cb3291cc339792c445432",
+   "role": "binary provenance record"
+  },
+  {
+   "path": "claimed/band.json",
+   "sha256": "cee2903dae688a7d226aa64dd3ecc88c53440d40cfb399bd674d7f768b3e6478",
+   "role": "claimed side: producer's ecbench band (reproduced byte-for-byte by the validator's rerun of ecbench band on a copy)"
+  },
+  {
+   "path": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json",
+   "sha256": "996ed720d72a098aded2da5f72f1d11fecee5e89d4df77af05bde28f83f65aca",
+   "role": "claimed side: producer's ecbench compare"
+  },
+  {
+   "path": "validation/claimed.json",
+   "sha256": "d5c2d541fde17107767fbea6ff15af981c096936720523390b462c6fc5067d6e",
+   "role": "claimed side: the dispatch figures, transcribed"
+  },
+  {
+   "path": "audit.stdout",
+   "sha256": "7d5cc3fca151144f85e2043547891841dcefff784d7494e6d6d8df822ff7ad0c",
+   "role": "in-pod same-host audit (not independent)"
+  },
+  {
+   "path": "pod.log",
+   "sha256": "c8e370634da3d385014a97076dfdcae356df3764bb0f9edf515dabda500974a1",
+   "role": "pod log"
+  },
+  {
+   "path": "run.stdout",
+   "sha256": "7d87db187140416a249676cd184ad174016d6ba1a8b7db1c60ec136f980a81a1",
+   "role": "pod ecbench run output"
+  },
+  {
+   "path": "inputs.sha256",
+   "sha256": "1d8a914ee64428c0086d312e4b15256a80eeaed5d3ebc8472ac328e557c46791",
+   "role": "pod-side input hashes"
+  },
+  {
+   "path": "validation/s3-copy-inputs-pod-run.sh.txt",
+   "sha256": "07d02be05154bd61d5786932a8d7ae4038a8c4f4c79038f02e81906bbdad3aee",
+   "role": "byte copy of S3 inputs/pod-run.sh (the pod's commands)"
+  }
+ ],
+ "scripts": [
+  {
+   "path": "validation/verify_scalars.py",
+   "sha256": "f4d405a0b628f6a43c7d5b812809c304e1981962cd7a72ff4f44cf002a672b14"
+  },
+  {
+   "path": "validation/recompute.py",
+   "sha256": "6af447afbcf6135cb8c6400ac86effbd54045cbcdd89a3dbe26ce81f08b20025"
+  },
+  {
+   "path": "validation/check_tarball.sh",
+   "sha256": "8f66dea8fce63d3d10bd37f8094bffb5df7dda5de7ce8d1f51ada6e9293a5bb7"
+  },
+  {
+   "path": "validation/build_reports.py",
+   "sha256": "5414cc11da4539321212f5fd16bc765408c70692d985c51a0ef300bb5a3937d5"
+  },
+  {
+   "path": "validation/findings.json",
+   "sha256": "9143a770a6fd02a7af93abb045ace286692862df7f6640fc5564c7e7062b686b"
+  }
+ ],
+ "outputs": [
+  {
+   "path": "validation/recompute.json",
+   "sha256": "e1b5e820de2133442cfd9495810cd4ff0e3f6a78f31f4accaf10a908a1457d89"
+  },
+  {
+   "path": "validation/scalar-check.json",
+   "sha256": "5fec1e2fbad4882cc72502bc19584bb28a0fb72610c32464cef8a41a03d51067"
+  },
+  {
+   "path": "validation/headline.json",
+   "sha256": "41ac7b066985b8392ffda6f71692bf68e0c34f289947ae22250e06703ebae4de"
+  },
+  {
+   "path": "validation/replay-receipt.json",
+   "sha256": "b15871060003ab0733d5900932916acd5dc27cdcc1a77a084179c4872bcea5e1"
+  },
+  {
+   "path": "validation/replay-host.json",
+   "sha256": "e40fce4413f3f1e4d4590872879c0df249039b8b9779a83b1429eefbdfad8938"
+  },
+  {
+   "path": "validation/replay-verify.stdout",
+   "sha256": "b15871060003ab0733d5900932916acd5dc27cdcc1a77a084179c4872bcea5e1"
+  },
+  {
+   "path": "validation/replay-verify.stderr",
+   "sha256": "46d6cdd385adc49003888f9c0773b4ce7d5c3528279d38419f60c4d5947c08e3"
+  },
+  {
+   "path": "validation/replay-verify.time",
+   "sha256": "5d4d461c1a9e6156fd0c3927d9b458b84bcdc39d746826d0039d668076dd56a2"
+  },
+  {
+   "path": "validation/tarball-check.json",
+   "sha256": "985cc86d5aeee2f3f45e2b1e0ba48e31bc97f779975080a6f0889d4d00e69a83"
+  },
+  {
+   "path": "validation/claimed-side-ecbench-table.md",
+   "sha256": "d400241edf08b85263737a6f07b2681574cf91dadbc12c4ed50762789cf5685d"
+  },
+  {
+   "path": "validation/replay-certificate.json",
+   "note": "hash pinned in VALIDATION.json"
+  }
+ ],
+ "headline": [
+  {
+   "name": "paired_ratio_fes_over_inherited",
+   "claimed": 0.7081,
+   "recomputed": 0.7081118835774792,
+   "rel_tol": 7.061149555147578e-05,
+   "printed": "0.7081",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "paired_ratio_ci95_low",
+   "claimed": 0.6683,
+   "recomputed": 0.6682851635212668,
+   "rel_tol": 7.481669908723627e-05,
+   "printed": "0.6683",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "paired_ratio_ci95_high",
+   "claimed": 0.7503,
+   "recomputed": 0.7503120928520939,
+   "rel_tol": 6.66400106624017e-05,
+   "printed": "0.7503",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "mean_S/rho-sfstrong-v2",
+   "claimed": 2.584,
+   "recomputed": 2.5844832898041115,
+   "rel_tol": 0.0001934984520123839,
+   "printed": "2.584",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "mean_S/rho-negation",
+   "claimed": 2.788,
+   "recomputed": 2.7878705300298487,
+   "rel_tol": 0.0001793400286944046,
+   "printed": "2.788",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "mean_S/ic-pairtable-mitm2",
+   "claimed": 197.489,
+   "recomputed": 197.48875834226385,
+   "rel_tol": 2.531786580518409e-06,
+   "printed": "197.489",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "mean_S/ic-descent-inherited-f4",
+   "claimed": 121.544,
+   "recomputed": 121.54420898208006,
+   "rel_tol": 4.11373658921872e-06,
+   "printed": "121.544",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "mean_S/ic-descent-fes-f2",
+   "claimed": 86.067,
+   "recomputed": 86.06689876023547,
+   "rel_tol": 5.8094275390103066e-06,
+   "printed": "86.067",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/ic-descent-fes-f2/w=0",
+   "claimed": 15.177,
+   "recomputed": 15.17711316765623,
+   "rel_tol": 3.294458720432233e-05,
+   "printed": "15.177",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/ic-descent-fes-f2/w=0.1",
+   "claimed": 3081.763,
+   "recomputed": 3081.7630559809927,
+   "rel_tol": 1.6224479299673596e-07,
+   "printed": "3081.763",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/ic-descent-fes-f2/w=1",
+   "claimed": 30681.037,
+   "recomputed": 30681.036541301015,
+   "rel_tol": 1.6296711222635663e-08,
+   "printed": "30681.037",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/ic-descent-inherited-f4/w=0",
+   "claimed": 15.174,
+   "recomputed": 15.174320176642675,
+   "rel_tol": 3.295110056675893e-05,
+   "printed": "15.174",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/ic-descent-inherited-f4/w=0.1",
+   "claimed": 4621.699,
+   "recomputed": 4621.699133238475,
+   "rel_tol": 1.0818532318958894e-07,
+   "printed": "4621.699",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/ic-descent-inherited-f4/w=1",
+   "claimed": 46080.422,
+   "recomputed": 46080.42245079496,
+   "rel_tol": 1.0850595074845451e-08,
+   "printed": "46080.422",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/rho-sfstrong-v2/w=0",
+   "claimed": 2.584,
+   "recomputed": 2.5844832898041115,
+   "rel_tol": 0.0001934984520123839,
+   "printed": "2.584",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/rho-sfstrong-v2/w=0.1",
+   "claimed": 2.677,
+   "recomputed": 2.677303691154579,
+   "rel_tol": 0.00018677624206200972,
+   "printed": "2.677",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "band_S/rho-sfstrong-v2/w=1",
+   "claimed": 3.513,
+   "recomputed": 3.5126873033087898,
+   "rel_tol": 0.00014232849416453175,
+   "printed": "3.513",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "dispatch (validation/claimed.json)"
+  },
+  {
+   "name": "bench_record_spread/ic-descent-fes-f2/low",
+   "claimed": 78.914,
+   "recomputed": 78.91401830838943,
+   "rel_tol": 6.336011354132347e-06,
+   "printed": "78.914",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json"
+  },
+  {
+   "name": "bench_record_spread/ic-descent-fes-f2/high",
+   "claimed": 93.868,
+   "recomputed": 93.8681266141674,
+   "rel_tol": 5.326628883112456e-06,
+   "printed": "93.868",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json"
+  },
+  {
+   "name": "bench_record_spread/ic-descent-inherited-f4/low",
+   "claimed": 106.689,
+   "recomputed": 106.68895995489105,
+   "rel_tol": 4.686518760134597e-06,
+   "printed": "106.689",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json"
+  },
+  {
+   "name": "bench_record_spread/ic-descent-inherited-f4/high",
+   "claimed": 138.468,
+   "recomputed": 138.4678859305189,
+   "rel_tol": 3.6109426004564237e-06,
+   "printed": "138.468",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json"
+  },
+  {
+   "name": "bench_record_spread/rho-sfstrong-v2/low",
+   "claimed": 2.512,
+   "recomputed": 2.5123539146480036,
+   "rel_tol": 0.00019904458598726116,
+   "printed": "2.512",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json"
+  },
+  {
+   "name": "bench_record_spread/rho-sfstrong-v2/high",
+   "claimed": 2.659,
+   "recomputed": 2.658683490543381,
+   "rel_tol": 0.00018804061677322304,
+   "printed": "2.659",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-fes-f2/mean_s/w=0",
+   "claimed": 15.177113167656225,
+   "recomputed": 15.17711316765623,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-fes-f2/mean_s/w=0.1",
+   "claimed": 3081.763055980992,
+   "recomputed": 3081.7630559809927,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-fes-f2/mean_s/w=1",
+   "claimed": 30681.036541301,
+   "recomputed": 30681.036541301015,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-fes-f2/charged_sum",
+   "claimed": 32603.999999999996,
+   "recomputed": 32603.99999999999,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-fes-f2/native_sum",
+   "claimed": 65877461,
+   "recomputed": 65877461,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-inherited-f4/mean_s/w=0",
+   "claimed": 15.174320176642675,
+   "recomputed": 15.174320176642675,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-inherited-f4/mean_s/w=0.1",
+   "claimed": 4621.699133238475,
+   "recomputed": 4621.699133238475,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-inherited-f4/mean_s/w=1",
+   "claimed": 46080.42245079496,
+   "recomputed": 46080.42245079496,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-inherited-f4/charged_sum",
+   "claimed": 32598.0,
+   "recomputed": 32597.999999999993,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-descent-inherited-f4/native_sum",
+   "claimed": 98958961,
+   "recomputed": 98958961,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-pairtable-mitm2/mean_s/w=0",
+   "claimed": 197.21961244612893,
+   "recomputed": 197.21961244612893,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-pairtable-mitm2/mean_s/w=0.1",
+   "claimed": 216.59552210416246,
+   "recomputed": 216.59552210416243,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-pairtable-mitm2/mean_s/w=1",
+   "claimed": 390.97870902646355,
+   "recomputed": 390.97870902646355,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-pairtable-mitm2/charged_sum",
+   "claimed": 423674.0,
+   "recomputed": 423674.00000000006,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/ic-pairtable-mitm2/native_sum",
+   "claimed": 416240,
+   "recomputed": 416240,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-negation/mean_s/w=0",
+   "claimed": 2.7878705300298487,
+   "recomputed": 2.7878705300298487,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-negation/mean_s/w=0.1",
+   "claimed": 2.9274269810071316,
+   "recomputed": 2.927426981007132,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-negation/mean_s/w=1",
+   "claimed": 4.18343503980268,
+   "recomputed": 4.1834350398026805,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-negation/charged_sum",
+   "claimed": 5989.0,
+   "recomputed": 5989.0,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-negation/native_sum",
+   "claimed": 2998,
+   "recomputed": 2998,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2/mean_s/w=0",
+   "claimed": 2.5844832898041115,
+   "recomputed": 2.5844832898041115,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2/mean_s/w=0.1",
+   "claimed": 2.677303691154579,
+   "recomputed": 2.677303691154579,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2/mean_s/w=1",
+   "claimed": 3.5126873033087898,
+   "recomputed": 3.5126873033087898,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2/charged_sum",
+   "claimed": 5552.07648845554,
+   "recomputed": 5552.076488455546,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2/native_sum",
+   "claimed": 1994,
+   "recomputed": 1994,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2-aa/mean_s/w=0",
+   "claimed": 2.5844832898041115,
+   "recomputed": 2.5844832898041115,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2-aa/mean_s/w=0.1",
+   "claimed": 2.677303691154579,
+   "recomputed": 2.677303691154579,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2-aa/mean_s/w=1",
+   "claimed": 3.5126873033087898,
+   "recomputed": 3.5126873033087898,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2-aa/charged_sum",
+   "claimed": 5552.07648845554,
+   "recomputed": 5552.076488455546,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "claimed/band.json/rho-sfstrong-v2-aa/native_sum",
+   "claimed": 1994,
+   "recomputed": 1994,
+   "rel_tol": 1e-09,
+   "source": "claimed/band.json"
+  },
+  {
+   "name": "comparison/ops.ratio_b_over_a",
+   "claimed": 0.7081118835774791,
+   "recomputed": 0.7081118835774792,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/ops.ci95.low",
+   "claimed": 0.6682851635212668,
+   "recomputed": 0.6682851635212668,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/ops.ci95.high",
+   "claimed": 0.7503120928520939,
+   "recomputed": 0.7503120928520939,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/ops.dof",
+   "claimed": 7.0,
+   "recomputed": 7.0,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/a.mean_s (inherited-f4)",
+   "claimed": 121.54420898208004,
+   "recomputed": 121.54420898208006,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/b.mean_s (fes-f2)",
+   "claimed": 86.06689876023545,
+   "recomputed": 86.06689876023547,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/ops.band.ratio_b_over_a/w=0",
+   "claimed": 1.0001840603718022,
+   "recomputed": 1.000184060371802,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/ops.band.ratio_b_over_a/w=0.1",
+   "claimed": 0.6668030451868827,
+   "recomputed": 0.6668030451868829,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/ops.band.ratio_b_over_a/w=1",
+   "claimed": 0.6658150014588615,
+   "recomputed": 0.6658150014588617,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/W0317f6abdbe6/ratio_b_over_a",
+   "claimed": 0.6994499368534062,
+   "recomputed": 0.6994499368534063,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/W0db0098cab33/ratio_b_over_a",
+   "claimed": 0.7055102408754406,
+   "recomputed": 0.7055102408754403,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/W397d9e81e56e/ratio_b_over_a",
+   "claimed": 0.6775379844441315,
+   "recomputed": 0.6775379844441316,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/W3e8f3093142d/ratio_b_over_a",
+   "claimed": 0.687944364382434,
+   "recomputed": 0.6879443643824339,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/W4028b938b5e1/ratio_b_over_a",
+   "claimed": 0.6946123887638801,
+   "recomputed": 0.69461238876388,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/W8f17ebdf8664/ratio_b_over_a",
+   "claimed": 0.7069009722125927,
+   "recomputed": 0.7069009722125927,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/Wee0cc1d80340/ratio_b_over_a",
+   "claimed": 0.8678511925728153,
+   "recomputed": 0.8678511925728153,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "comparison/workload/Wfe0ef994165f/ratio_b_over_a",
+   "claimed": 0.6796942659762437,
+   "recomputed": 0.6796942659762438,
+   "rel_tol": 1e-09,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "name": "S/S(rho-sfstrong-v2)/rho-negation",
+   "claimed": 1.079,
+   "recomputed": 1.0786955137330962,
+   "rel_tol": 0.0004633920296570899,
+   "printed": "1.079",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "validation/claimed-side-ecbench-table.md (S / reference column)"
+  },
+  {
+   "name": "S/S(rho-sfstrong-v2)/ic-pairtable-mitm2",
+   "claimed": 76.413,
+   "recomputed": 76.41324636199614,
+   "rel_tol": 6.54338921387722e-06,
+   "printed": "76.413",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "validation/claimed-side-ecbench-table.md (S / reference column)"
+  },
+  {
+   "name": "S/S(rho-sfstrong-v2)/ic-descent-inherited-f4",
+   "claimed": 47.028,
+   "recomputed": 47.02843677170472,
+   "rel_tol": 1.0631963936378328e-05,
+   "printed": "47.028",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "validation/claimed-side-ecbench-table.md (S / reference column)"
+  },
+  {
+   "name": "S/S(rho-sfstrong-v2)/ic-descent-fes-f2",
+   "claimed": 33.301,
+   "recomputed": 33.30139494411621,
+   "rel_tol": 1.5014564127203386e-05,
+   "printed": "33.301",
+   "agrees": true,
+   "recomputed_rounds_to_printed": true,
+   "source": "validation/claimed-side-ecbench-table.md (S / reference column)"
+  }
+ ],
+ "headline_summary": {
+  "entries": 74,
+  "within_tol": 74,
+  "max_rel_diff_full_precision": 9.828697825010643e-16
+ },
+ "verdict_checks": [
+  {
+   "pair": [
+    "ic-descent-fes-f2",
+    "ic-descent-inherited-f4"
+   ],
+   "claimed": "unresolved inside the band",
+   "recomputed": "unresolved inside the band",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-fes-f2",
+    "ic-pairtable-mitm2"
+   ],
+   "claimed": "unresolved inside the band",
+   "recomputed": "unresolved inside the band",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-fes-f2",
+    "rho-negation"
+   ],
+   "claimed": "rho-negation < ic-descent-fes-f2",
+   "recomputed": "rho-negation < ic-descent-fes-f2",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-fes-f2",
+    "rho-sfstrong-v2"
+   ],
+   "claimed": "rho-sfstrong-v2 < ic-descent-fes-f2",
+   "recomputed": "rho-sfstrong-v2 < ic-descent-fes-f2",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-fes-f2",
+    "rho-sfstrong-v2-aa"
+   ],
+   "claimed": "rho-sfstrong-v2-aa < ic-descent-fes-f2",
+   "recomputed": "rho-sfstrong-v2-aa < ic-descent-fes-f2",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-inherited-f4",
+    "ic-pairtable-mitm2"
+   ],
+   "claimed": "unresolved inside the band",
+   "recomputed": "unresolved inside the band",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-inherited-f4",
+    "rho-negation"
+   ],
+   "claimed": "rho-negation < ic-descent-inherited-f4",
+   "recomputed": "rho-negation < ic-descent-inherited-f4",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-inherited-f4",
+    "rho-sfstrong-v2"
+   ],
+   "claimed": "rho-sfstrong-v2 < ic-descent-inherited-f4",
+   "recomputed": "rho-sfstrong-v2 < ic-descent-inherited-f4",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-inherited-f4",
+    "rho-sfstrong-v2-aa"
+   ],
+   "claimed": "rho-sfstrong-v2-aa < ic-descent-inherited-f4",
+   "recomputed": "rho-sfstrong-v2-aa < ic-descent-inherited-f4",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-pairtable-mitm2",
+    "rho-negation"
+   ],
+   "claimed": "rho-negation < ic-pairtable-mitm2",
+   "recomputed": "rho-negation < ic-pairtable-mitm2",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-pairtable-mitm2",
+    "rho-sfstrong-v2"
+   ],
+   "claimed": "rho-sfstrong-v2 < ic-pairtable-mitm2",
+   "recomputed": "rho-sfstrong-v2 < ic-pairtable-mitm2",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-pairtable-mitm2",
+    "rho-sfstrong-v2-aa"
+   ],
+   "claimed": "rho-sfstrong-v2-aa < ic-pairtable-mitm2",
+   "recomputed": "rho-sfstrong-v2-aa < ic-pairtable-mitm2",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "rho-negation",
+    "rho-sfstrong-v2"
+   ],
+   "claimed": "rho-sfstrong-v2 < rho-negation",
+   "recomputed": "rho-sfstrong-v2 < rho-negation",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "rho-negation",
+    "rho-sfstrong-v2-aa"
+   ],
+   "claimed": "rho-sfstrong-v2-aa < rho-negation",
+   "recomputed": "rho-sfstrong-v2-aa < rho-negation",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "rho-sfstrong-v2",
+    "rho-sfstrong-v2-aa"
+   ],
+   "claimed": "unresolved inside the band",
+   "recomputed": "unresolved inside the band",
+   "agrees": true
+  },
+  {
+   "pair": [
+    "ic-descent-inherited-f4",
+    "ic-descent-fes-f2"
+   ],
+   "claimed": "unresolved inside the band",
+   "recomputed": "unresolved inside the band",
+   "agrees": true,
+   "source": "claimed/comparisons/ic-descent-inherited-f4__ic-descent-fes-f2__ECC1h0db9ef964e47.json"
+  },
+  {
+   "pair": [
+    "H1 interpretation"
+   ],
+   "claimed": "H1 unresolved inside the band, because the order flips at w=0",
+   "recomputed": "not supported: the order is not fes < inherited at every band weight (band verdict: unresolved inside the band); the paired 95 % interval itself is below 1",
+   "agrees": true
+  }
+ ],
+ "requirements": [
+  {
+   "id": "R1",
+   "requirement": "Session copy byte-identical to the pod's results tarball (S3, sha256 cd2f7736...e3e69)",
+   "result": "pass",
+   "evidence": "validation/tarball-check.json"
+  },
+  {
+   "id": "R2",
+   "requirement": "session/spec.json is the frozen spec (sha256 = protocol links.spec_sha256)",
+   "result": "pass",
+   "evidence": "session/spec.json, ../protocol.json"
+  },
+  {
+   "id": "R3",
+   "requirement": "Binary sha256 = smoke/build.json ecbench_sha256 on every record, the session and the replay",
+   "result": "pass",
+   "evidence": "validation/recompute.json integrity, validation/replay-host.json, ../smoke/build.json"
+  },
+  {
+   "id": "R4",
+   "requirement": "Binary built from e9d5dbdccd (source binding)",
+   "result": "partial (asserted and corroborated, not rebuilt; F5 open)",
+   "evidence": "validator-report findings F5"
+  },
+  {
+   "id": "R5",
+   "requirement": "Record set complete and as planned (336 = 8 x 7 x 6, every cell once, seeds shared per (workload, round), alternate_measured order, frozen seeds from the protocol tags, records_sha256)",
+   "result": "pass",
+   "evidence": "validation/recompute.json integrity"
+  },
+  {
+   "id": "R6",
+   "requirement": "Independent replay on a different host class: verify --replay-all, every replay identical",
+   "result": "pass",
+   "evidence": "validation/replay-receipt.json, validation/replay-host.json"
+  },
+  {
+   "id": "R7",
+   "requirement": "Every record's answer re-checked [d]G = Q by validator-written code",
+   "result": "pass",
+   "evidence": "validation/scalar-check.json"
+  },
+  {
+   "id": "R8",
+   "requirement": "Headline numbers recompute (claimed vs recomputed)",
+   "result": "pass",
+   "evidence": "validation/headline.json"
+  },
+  {
+   "id": "R9",
+   "requirement": "H2 / C-pricing-basis: priced_by pinned on every descent record, no solver_*_uncharged",
+   "result": "pass",
+   "evidence": "validation/recompute.json H2"
+  },
+  {
+   "id": "R10",
+   "requirement": "C-fes-vs-inherited: paired 95 % interval entirely below 1",
+   "result": "pass",
+   "evidence": "validation/recompute.json paired_fes_over_inherited"
+  },
+  {
+   "id": "R11",
+   "requirement": "C-band: fes < inherited at w = 0, 0.1 and 1",
+   "result": "fail (order flips at w = 0: unresolved inside the band)",
+   "evidence": "validation/recompute.json band_ranks, H1"
+  },
+  {
+   "id": "R12",
+   "requirement": "C-aa: wall admitted, pairs_below_level 0, aa_pairs >= 5, aa_ci95 present",
+   "result": "fail (0 admitted A/A pairs; counts identical 48/48)",
+   "evidence": "validation/recompute.json aa_control"
+  },
+  {
+   "id": "R13",
+   "requirement": "C-audit: in-pod replay-all reproduced; L2 gate accepted; independent replay on another host class",
+   "result": "partial (in-pod 288/288 identical and independent replay 288/288 identical; no L2 gate: Runpod route deviation)",
+   "evidence": "audit.stdout, validation/replay-receipt.json"
+  },
+  {
+   "id": "R14",
+   "requirement": "Positive control: pair table verifies on every run and sits above both descent arms",
+   "result": "pass",
+   "evidence": "validation/recompute.json positive_control"
+  },
+  {
+   "id": "R15",
+   "requirement": "Matched rho reference in the same session, binary and unit, priced in the band (every arm's unpriced counters listed with counts)",
+   "result": "pass with caveat (rho-negation under-lists its table work, F8; the reference rho-sfstrong-v2 lists four counters with counts)",
+   "evidence": "validation/recompute.json arms, distance_to_rho"
+  },
+  {
+   "id": "R16",
+   "requirement": "Attempt history complete (stopping rule)",
+   "result": "partial (launch 1 not recorded, F6)",
+   "evidence": "validation/tarball-check.json s3_prefix_listing"
+  }
+ ],
+ "hypotheses": {
+  "H1": {
+   "verdict": "not supported: the order is not fes < inherited at every band weight (band verdict: unresolved inside the band); the paired 95 % interval itself is below 1",
+   "leg_interval_below_1": true,
+   "ci95": [
+    0.6682851635212668,
+    0.7503120928520939
+   ],
+   "leg_order_at_every_band_weight": false,
+   "order_by_weight": {
+    "0": "fes > inherited",
+    "0.1": "fes < inherited",
+    "1": "fes < inherited"
+   },
+   "band_ratio_fes_over_inherited": {
+    "0": 1.000184060371802,
+    "0.1": 0.6668030451868829,
+    "1": 0.6658150014588617
+   },
+   "producer_reading_matches": true
+  },
+  "H2": {
+   "verdict": "supported",
+   "priced_by_counts": {
+    "pinned": 112
+   },
+   "solver_uncharged_counters": []
+  },
+  "H3": {
+   "verdict": "reported (descriptive)",
+   "distance_to_rho": {
+    "ic-descent-inherited-f4/rho-sfstrong-v2": {
+     "charged_mean_s_ratio": 47.02843677170472,
+     "band_ratio": {
+      "0": 5.871316806924606,
+      "0.1": 1726.2513582257757,
+      "1": 13118.281951083241
+     },
+     "band_order": "rho-sfstrong-v2 < ic-descent-inherited-f4"
+    },
+    "ic-descent-inherited-f4/rho-negation": {
+     "charged_mean_s_ratio": 43.59750844698614,
+     "band_ratio": {
+      "0": 5.442978794456502,
+      "0.1": 1578.7581255565449,
+      "1": 11014.972627128072
+     },
+     "band_order": "rho-negation < ic-descent-inherited-f4"
+    },
+    "ic-descent-fes-f2/rho-sfstrong-v2": {
+     "charged_mean_s_ratio": 33.30139494411621,
+     "band_ratio": {
+      "0": 5.872397483679055,
+      "0.1": 1151.0696624229402,
+      "1": 8734.348916398249
+     },
+     "band_order": "rho-sfstrong-v2 < ic-descent-fes-f2"
+    },
+    "ic-descent-fes-f2/rho-negation": {
+     "charged_mean_s_ratio": 30.871913825680416,
+     "band_ratio": {
+      "0": 5.44398063115712,
+      "0.1": 1052.7207257346395,
+      "1": 7333.9340158006
+     },
+     "band_order": "rho-negation < ic-descent-fes-f2"
+    },
+    "ic-pairtable-mitm2/rho-sfstrong-v2": {
+     "charged_mean_s_ratio": 76.41324636199614,
+     "band_ratio": {
+      "0": 76.30910721077908,
+      "0.1": 80.90061759514337,
+      "1": 111.30472919071948
+     },
+     "band_order": "rho-sfstrong-v2 < ic-pairtable-mitm2"
+    },
+    "ic-pairtable-mitm2/rho-negation": {
+     "charged_mean_s_ratio": 70.83856879829689,
+     "band_ratio": {
+      "0": 70.74202704959092,
+      "0.1": 73.98836025950898,
+      "1": 93.45877378435516
+     },
+     "band_order": "rho-negation < ic-pairtable-mitm2"
+    }
+   }
+  },
+  "H4": {
+   "verdict": "respected by the claimed figures (no wall, other-degree or size-rule claim)"
+  }
+ },
+ "controls": {
+  "aa": {
+   "pairs": 48,
+   "count_identical_pairs": 48,
+   "ops_ratio": 1.0,
+   "pairs_both_at_least_L2": 0,
+   "protocol_threshold": "wall.status admitted, pairs_below_level 0, aa_pairs >= 5, aa_ci95 present",
+   "wall_threshold_met": false,
+   "L2_blockers_seen_on_aa_arms": [
+    "L2: solve too short to admit wall time"
+   ]
+  },
+  "positive": {
+   "arm": "ic-pairtable-mitm2",
+   "verified": 48,
+   "measured": 48,
+   "mean_s": 197.48875834226385,
+   "above_both_descent_arms_charged": true,
+   "local_reference_s": 197.7
+  },
+  "negative": "none (protocol: not applicable, counts deterministic)",
+  "reference_arm": "rho-sfstrong-v2 present, verified 48/48, priced with 4 unpriced counters and their counts",
+  "external_fastest_implementation": "not applicable: the claim compares arms inside one harness"
+ },
+ "band": {
+  "weights": [
+   0,
+   0.1,
+   1
+  ],
+  "formula": "S(w) = mean over measured runs of [G - C + w (U + n_C)] / sqrt(r), band.rs at e9d5dbdccd, table work priced (2026-11-08 default reading)",
+  "arms": {
+   "rho-sfstrong-v2": {
+    "0": 2.5844832898041115,
+    "0.1": 2.677303691154579,
+    "1": 3.5126873033087898
+   },
+   "rho-negation": {
+    "0": 2.7878705300298487,
+    "0.1": 2.927426981007132,
+    "1": 4.1834350398026805
+   },
+   "ic-pairtable-mitm2": {
+    "0": 197.21961244612893,
+    "0.1": 216.59552210416243,
+    "1": 390.97870902646355
+   },
+   "ic-descent-inherited-f4": {
+    "0": 15.174320176642675,
+    "0.1": 4621.699133238475,
+    "1": 46080.42245079496
+   },
+   "ic-descent-fes-f2": {
+    "0": 15.17711316765623,
+    "0.1": 3081.7630559809927,
+    "1": 30681.036541301015
+   },
+   "rho-sfstrong-v2-aa": {
+    "0": 2.5844832898041115,
+    "0.1": 2.677303691154579,
+    "1": 3.5126873033087898
+   }
+  },
+  "ranks": [
+   {
+    "a": "ic-descent-fes-f2",
+    "b": "ic-descent-inherited-f4",
+    "verdict": "unresolved inside the band",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": "<",
+     "1": "<"
+    }
+   },
+   {
+    "a": "ic-descent-fes-f2",
+    "b": "ic-pairtable-mitm2",
+    "verdict": "unresolved inside the band",
+    "order_by_weight": {
+     "0": "<",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-fes-f2",
+    "b": "rho-negation",
+    "verdict": "rho-negation < ic-descent-fes-f2",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-fes-f2",
+    "b": "rho-sfstrong-v2",
+    "verdict": "rho-sfstrong-v2 < ic-descent-fes-f2",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-fes-f2",
+    "b": "rho-sfstrong-v2-aa",
+    "verdict": "rho-sfstrong-v2-aa < ic-descent-fes-f2",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-inherited-f4",
+    "b": "ic-pairtable-mitm2",
+    "verdict": "unresolved inside the band",
+    "order_by_weight": {
+     "0": "<",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-inherited-f4",
+    "b": "rho-negation",
+    "verdict": "rho-negation < ic-descent-inherited-f4",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-inherited-f4",
+    "b": "rho-sfstrong-v2",
+    "verdict": "rho-sfstrong-v2 < ic-descent-inherited-f4",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-descent-inherited-f4",
+    "b": "rho-sfstrong-v2-aa",
+    "verdict": "rho-sfstrong-v2-aa < ic-descent-inherited-f4",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-pairtable-mitm2",
+    "b": "rho-negation",
+    "verdict": "rho-negation < ic-pairtable-mitm2",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-pairtable-mitm2",
+    "b": "rho-sfstrong-v2",
+    "verdict": "rho-sfstrong-v2 < ic-pairtable-mitm2",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "ic-pairtable-mitm2",
+    "b": "rho-sfstrong-v2-aa",
+    "verdict": "rho-sfstrong-v2-aa < ic-pairtable-mitm2",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "rho-negation",
+    "b": "rho-sfstrong-v2",
+    "verdict": "rho-sfstrong-v2 < rho-negation",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "rho-negation",
+    "b": "rho-sfstrong-v2-aa",
+    "verdict": "rho-sfstrong-v2-aa < rho-negation",
+    "order_by_weight": {
+     "0": ">",
+     "0.1": ">",
+     "1": ">"
+    }
+   },
+   {
+    "a": "rho-sfstrong-v2",
+    "b": "rho-sfstrong-v2-aa",
+    "verdict": "unresolved inside the band",
+    "order_by_weight": {
+     "0": "=",
+     "0.1": "=",
+     "1": "="
+    }
+   }
+  ]
+ },
+ "reporting_contract": {
+  "one_unit": "ecbench.gae, S = GAE / sqrt(r), r = 2003",
+  "all_arms_priced_including_reference": true,
+  "phases_separated": "per-record phases in records.jsonl; IC G - C = group adds + doubles checked",
+  "m83_ecc2k130_disclosure": "not applicable (degree 13; no m = 83 or ECC2K-130 statement in the claimed artifacts)",
+  "producer_report": "not yet written; only the claimed figures above were checked"
+ },
+ "route_deviation": "Protocol instrument: Iso Lab EKS L2 pod; actual: Runpod CPU pod (owner decision, AWS budget exhausted). No L2 gate, image digest or launcher receipt exists. Counts are host-independent and replay identically on a different host class; wall figures are not admissible (validator-report F3, F4).",
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "info",
+   "title": "Every claimed figure recomputes from session/records.jsonl",
+   "text": "All 17 figures the producer quoted (paired ratio and its interval, mean S of five arms, the band for fes-f2, inherited-f4 and rho-sfstrong-v2) recompute from the committed records with validator-written Python within half a unit of the printed precision, and the producer's full-precision band file (claimed/band.json: every arm, every weight, charged_sum, native_sum) and paired comparison (claimed/comparisons/...: ratio, ci95, arm means, the eight per-workload ratios, the band ratios) agree to <= 1e-9 relative. Accounting: every record's total_gae equals its phase sum (max |dev| 1.8e-12), cost.s = total_gae / sqrt(2003) exactly, and on every IC record G - C equals its group adds + doubles at 1 GAE (max |dev| 1.8e-12), so C (the pinned native and solver charge, docs/ic/calibration.json K_0/GF(2^13) at e9d5dbdccd) is exactly the non-group part of G.",
+   "evidence": [
+    "validation/recompute.json",
+    "validation/headline.json"
+   ]
+  },
+  {
+   "id": "F2",
+   "severity": "major",
+   "title": "H1 is not supported as frozen: the order flips at w = 0 (band verdict 'unresolved inside the band')",
+   "text": "The paired ratio fes/inherited is 0.70811 with 95 % interval [0.66829, 0.75031] (linearised t over 8 workloads, df 7, log scale): entirely below 1, and 47 of 48 pairs have fes below inherited (the exception, Wee0cc1d80340 round 5, tried 70 targets with fes against 26 with inherited: ratio 1.644). But the band means are fes 15.17711 vs inherited 15.17432 at w = 0 (ratio 1.000184), 3081.763 vs 4621.699 at w = 0.1 (0.6668) and 30681.04 vs 46080.42 at w = 1 (0.6658): the order does not hold at every weight, so the frozen conjunction fails. The amendment before freeze says to report this as 'unresolved inside the band', not as a win or a loss, which is the producer's reading. The w = 0 difference is 6 group operations out of 32,598 summed over the 48 measured runs (0.018 %); both arms tried exactly 2,007 targets in total (mean 41.8125); 40 of 48 pairs differ by a few group operations because the two solvers return different decompositions, and 10 pairs differ in targets tried. No improvement of fes-f2 over inherited-f4 may be claimed from this session under AGENTS.md 5a; the 0.708 ratio is the calibration-point reading (word XORs at the pinned 0.002304 GAE), a further point that never replaces the band.",
+   "evidence": [
+    "validation/recompute.json H1, paired_fes_over_inherited, band_ranks"
+   ]
+  },
+  {
+   "id": "F3",
+   "severity": "major",
+   "title": "Route deviation: no Iso Lab L2 gate; no wall figure from this session is admissible",
+   "text": "The protocol's instrument is the Iso Lab EKS L2 pod (C-audit: 'L2 gate accepted'). The run used a Runpod CPU pod (owner decision, AWS budget exhausted): a container on a shared AMD EPYC 9575F host with 128 logical CPUs (loadavg 54-67 at preflight; p95 foreign busy 75.6 % in the claimed comparison's quality block), no isolcpus/nohz_full, schedutil governor, boost on. There is no l2-gate.json, control-comparison.json, result.json or image digest; protocol.instrument.image stays PLACEHOLDER and links.request (request.json) was never created. Grades: rho arms L1 x 48 each (solves of about 0.1 ms are under the 1 ms L2 minimum), pair table L1 46 / L2 2, inherited-f4 L2 43 / L1 5, fes-f2 L2 44 / L1 4. S is a count, unaffected: the replay on a different host class (Intel Xeon KVM guest) reproduced all 288 measured runs identically. H4 already excludes wall claims; the comparison's wall block (0.163 ns/GAE ratio, end-to-end 0.116) must not be cited.",
+   "evidence": [
+    "session/session.json preflight",
+    "session/records.jsonl isolation",
+    "validation/recompute.json arms.*.isolation_levels",
+    "claimed/comparisons/*.json quality"
+   ]
+  },
+  {
+   "id": "F4",
+   "severity": "major",
+   "title": "C-aa (A/A control) fails its frozen threshold; the threshold was unattainable for this spec on any host",
+   "text": "C-aa requires wall.status admitted, pairs_below_level 0, aa_pairs >= 5 and an aa_ci95. The A/A arms (rho-sfstrong-v2 vs rho-sfstrong-v2-aa) have 0 pairs at L2 or above, so aa_pairs = 0 and no aa_ci95: FAIL. Every A/A record's L2 blocker is 'solve too short to admit wall time' (about 0.12 ms against the 1.0 ms minimum), which would hold on Iso Lab too: the frozen A/A threshold could not be met by this spec on any host. The claimed comparison prints wall.status 'admitted' with reasons '9 of 48 pairs did not reach L2' and 'the A/A arms ... have 0 admitted pairs'; that status does not encode the protocol threshold and must not be read as a C-aa pass. At the count level the A/A is exact: 48/48 pairs identical (total_gae, counters, recovered scalar), ops ratio 1.0, band 'unresolved' only because the two arms are equal.",
+   "evidence": [
+    "validation/recompute.json aa_control",
+    "claimed/comparisons/*.json wall"
+   ]
+  },
+  {
+   "id": "F5",
+   "severity": "major",
+   "status": "open",
+   "title": "Binary-to-source binding is asserted by the producer and corroborated, not rebuilt",
+   "text": "session.json and every record carry binary_sha256 8f9576b5...e5130f4 but git_commit null and git_dirty null. The binary is the producer's local build from 'git archive e9d5dbdccd' on an unisolated container (smoke/build.json: 'Local smoke binary, not the measured binary'; rustc 1.97.0 2d8144b78), not the Iso Lab publish-only CI build the protocol names. Corroboration: smoke/build.json with this hash was committed in 03ac49860a (2026-11-12 16:40 Z) together with the frozen protocol and spec, 56 h before the run; the pod checked the hash before running (pod.log, inputs.sha256); the binary embeds the rustc commit 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3; and a string fingerprint fits e9d5dbdccd (it contains 'inherited-f4-next' and 'rootfind-mitm-prime-batch', present at e9d5dbdccd, and lacks 'fes-then-inherited', 'fes-then-batched' and 'inherited-f4-batched', added by 4840612771, 4900647bcd and 1da7694876 just after). The candidate's counts are structurally consistent (fes-f2: points = calls x 2^14 on every record, ops - 2 x points = 391-402 word XORs per call). A replay with the same binary cannot detect a binary that miscounts; the scalar check can only vouch for the answers. Not rebuilt here because the dispatch forbade extracting the tree (disk). To close: build ecbench from e9d5dbdccd on a host with disk (CI or a scratch host), run 'ecbench verify --dir research/fes_k13_validated_20261112/runpod-a1/session --replay-all --exit-code' and require 288/288 identical.",
+   "evidence": [
+    "session/session.json",
+    "../smoke/build.json",
+    "pod.log",
+    "validation/replay-host.json build",
+    "validation/recompute.json fes_f2_count_structure"
+   ]
+  },
+  {
+   "id": "F6",
+   "severity": "minor",
+   "title": "Attempt history incomplete: launch 1 is not recorded",
+   "text": "The pod script is labelled 'launch 2' and the S3 results sit under launch2/; the session log entry 2026-11-15T00:15Z names pod buxbpz0nckybva (Runpod cpu3c, ubuntu:24.04), whereas the measured pod was cpu5m with runpod/base:1.0.2-ubuntu2404 (dispatch; host d4db6690f94f in pod.log). No launch1/ object exists in the S3 prefix and nothing in the evidence says what launch 1 did. The protocol's stopping rule keeps failed attempts in the record. Because S is a deterministic function of binary, spec and seeds, a second attempt cannot change the counts, so this is a disclosure gap, not a measurement defect; the producer should record launch 1's outcome (refused, failed, terminated) in the study.",
+   "evidence": [
+    "validation/tarball-check.json s3_prefix_listing",
+    "validation/s3-copy-inputs-pod-run.sh.txt",
+    "docs/session-logs/2026-11-15.md"
+   ]
+  },
+  {
+   "id": "F7",
+   "severity": "minor",
+   "title": "The producer wrote into the session copy (corrected before validation)",
+   "text": "The producer's 'ecbench compare --save' had written session/comparisons/ into the committed-to-be session copy, which the pod tarball does not contain; at the producer's correction it was moved to claimed/comparisons/ and band.json to claimed/band.json. The validator then compared runpod-a1/ with the tarball fetched from S3 (sha256 cd2f7736...e3e69, matching): session/ is byte-identical (5 files, the empty exec/ directory), and so are the eight top-level pod files; host.err (0 bytes) was not copied. Validated commit 4812e1b245 carries the corrected layout. Future runs: point compare --save at a copy, never at the evidence directory.",
+   "evidence": [
+    "validation/tarball-check.json"
+   ]
+  },
+  {
+   "id": "F8",
+   "severity": "minor",
+   "title": "rho-negation's band S is a lower bound: its table work is not listed as unpriced",
+   "text": "rho-negation lists only canonicalisations_uncharged (mean U = 62.5 a run); its distinguished-point table inserts and look-ups (e.g. distinguished_points 12 in the first record) and its work_native cycle_window_word_ops (no counted: marker) are not in cost.unpriced, so the band does not charge them. The reference rho-sfstrong-v2 lists canonicalisations, partition hashes, table inserts and table queries with counts (U mean 41.5 a run). No order changes: every IC arm is at least 5.4x either rho at w = 0. Record the missing emission as an implementation gap (AGENTS.md 5a).",
+   "evidence": [
+    "session/records.jsonl arm rho-negation",
+    "validation/recompute.json arms.rho-negation"
+   ]
+  },
+  {
+   "id": "F9",
+   "severity": "info",
+   "title": "H2 holds; the word-XOR basis is partial for both solvers",
+   "text": "112/112 descent records (warm-ups included) have detail.decomposition.solver.priced_by = 'pinned', ns_per_word_xor in calibration_pinned_units, empty cost.unpriced, and no solver_* counter anywhere in the session. Both op_units are word XORs. inherited-f4's unit reads 'elimination, specialisation and linear elimination only': its own bitop extras show 18.46 M word ops and 428,572 hash probes against 2.34 M counted XORs in the first measured record (fes-f2: 5.63 M and 23,502 against 1.63 M). The frozen H2 basis is met; the partial coverage leans toward under-pricing inherited-f4, i.e. against the candidate.",
+   "evidence": [
+    "validation/recompute.json H2"
+   ]
+  },
+  {
+   "id": "F10",
+   "severity": "info",
+   "title": "Distance to rho is a statement at log2 r = 10.97 only",
+   "text": "Matched rho-sfstrong-v2 (same session, binary, unit) is below every IC arm at w = 0, 0.1 and 1. S(fes-f2)/S(rho-sfstrong-v2) = 33.30 at the charged price and 5.872 / 1151.07 / 8734.35 in the band; against rho-negation 30.87 and 5.444 / 1052.72 / 7333.93. inherited-f4: 47.03 (5.871 / 1726.25 / 13118.28) and 43.60 (5.443 / 1578.76 / 11014.97). At this size rho's fixed set-up is about 40 % of its S (ecbench table flag), so these gaps are not asymptotic.",
+   "evidence": [
+    "validation/recompute.json distance_to_rho"
+   ]
+  },
+  {
+   "id": "F11",
+   "severity": "minor",
+   "title": "The two VALIDATION.json checkers require different schemas",
+   "text": "scripts/validation_gate.py (and docs/VALIDATION_GATE.md) require schema 'validation-gate/v1'; tools/validate_validation_json.py requires 'validation/v1' and fails any other schema unless --legacy-ok, which only skips the file. No VALIDATION.json in the repository uses validation/v1 (the model research/fes_then_batched_20261112/VALIDATION.json fails it the same way). One file cannot pass both; this VALIDATION.json follows the gate schema the dispatch names.",
+   "evidence": [
+    "validation/gate-check.txt"
+   ]
+  },
+  {
+   "id": "F12",
+   "severity": "info",
+   "title": "Bookkeeping: analysis scripts never pinned; the bench record's spreads are unlabelled",
+   "text": "protocol.analysis.script_sha256 still reads 'to be pinned'; the analysis here is ecbench compare/band (claimed side) and this directory's scripts (pinned in validator-report.json). The bench record's metric 'spread' values ([78.914, 93.868], [106.689, 138.468], [2.512, 2.659]) are ecbench table's 95 % interval of mean S, log-scale cluster t over the 8 workloads (reproduced exactly here); label them as such. The pod script (S3 inputs/pod-run.sh, sha256 07d02be0...) is the run's only command record and is not committed; a byte copy is kept as validation/s3-copy-inputs-pod-run.sh.txt. session.json spec_sha256 (d9dcc43c...) is ecbench's identity digest of the parsed spec, not the file digest; it was checked by the audit's spec_id check on both hosts, and session/spec.json is byte-identical to the frozen spec (327e0bb4...a9d76c = protocol links.spec_sha256). Committing session/records.jsonl (3.1 MB) in Git follows the 913 committed ecbench session records and AGENTS.md 12, although 13's 64 KiB data-file rule would put it in the store.",
+   "evidence": [
+    "validation/recompute.json arms.*.mean_s_ci95_log_cluster_t",
+    "../protocol.json analysis",
+    "validation/s3-copy-inputs-pod-run.sh.txt"
+   ]
+  },
+  {
+   "id": "F13",
+   "severity": "info",
+   "title": "Positive control reproduces",
+   "text": "ic-pairtable-mitm2 verified 48/48 with mean S 197.489 (local reference 197.7) and is above both descent arms at the charged price, as expected. Under the band its order against either descent arm is unresolved (above at w = 0, below at w = 0.1 and 1).",
+   "evidence": [
+    "validation/recompute.json positive_control, band_ranks"
+   ]
+  }
+ ],
+ "limitations": [
+  "Binary not rebuilt from source (dispatch: do not extract the tree); see F5.",
+  "The bootstrap intervals in the claimed comparison (ci95_bootstrap) use ecbench's resampling RNG and were not recomputed; they are not headline figures.",
+  "spec_sha256 in session.json (ecbench identity digest) was not reproduced independently; the audit's spec_id check passed on both hosts."
+ ]
+}

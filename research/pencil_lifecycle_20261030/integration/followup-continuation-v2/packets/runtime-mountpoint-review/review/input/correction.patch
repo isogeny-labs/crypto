@@ -1,0 +1,11 @@
+--- Dockerfile.runtime.original
++++ Dockerfile.runtime.proposed
+@@ -2,5 +2,8 @@
+ ARG BASE_IMAGE
+ FROM ${BASE_IMAGE}
+ COPY runtime/ /opt/isolab/recovery/
++# Immutable destinations for the existing read-only qualification bind mounts.
++COPY --chown=0:0 mountpoints/fixtures.marker /fixtures/.mountpoint
++COPY --chown=0:0 mountpoints/exec-gate /qualification/exec-gate
+ USER 0:0
+ ENTRYPOINT []

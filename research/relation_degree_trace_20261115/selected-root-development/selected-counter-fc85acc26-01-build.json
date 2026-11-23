@@ -1,0 +1,13 @@
+{
+  "schema": "selected-root-build/v1",
+  "source_commit": "fc85acc26",
+  "class": "development release correctness qualification",
+  "executable": {
+    "path": "/workspace/relation-native-qualifiers/selected-counter-fc85acc26-01",
+    "sha256": "6bad1809f24de9b8993ecbaa747abffb90b882abee72a3ba006847bf5ef71ac5",
+    "bytes": 2588272
+  },
+  "command": "cargo test --release --locked --lib --no-run --features count-field-ops --manifest-path crates/certified-relations/Cargo.toml --message-format=json",
+  "transform": "separate copy, strip debug, read-only before hash",
+  "build_json_sha256": "2968871ce7adac25bb0d8ffb104076eec9de9a4e8a7a83eb8ac98de377cabab5"
+}

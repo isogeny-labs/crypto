@@ -1,0 +1,273 @@
+[
+    {
+        "Id": "641518cd3d425ea7b763d6b5e1b491f8ca11014c3468ba3b78b61ff1bc11b732",
+        "Created": "2026-10-18T20:19:27.585339678Z",
+        "Path": "cargo",
+        "Args": [
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--no-default-features",
+            "--example",
+            "koblitz_n83_mixed_orbit_worker"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 11251,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-18T20:19:27.690467261Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31",
+        "ResolvConfPath": "/var/lib/docker/containers/641518cd3d425ea7b763d6b5e1b491f8ca11014c3468ba3b78b61ff1bc11b732/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/641518cd3d425ea7b763d6b5e1b491f8ca11014c3468ba3b78b61ff1bc11b732/hostname",
+        "HostsPath": "/var/lib/docker/containers/641518cd3d425ea7b763d6b5e1b491f8ca11014c3468ba3b78b61ff1bc11b732/hosts",
+        "LogPath": "/var/lib/docker/containers/641518cd3d425ea7b763d6b5e1b491f8ca11014c3468ba3b78b61ff1bc11b732/641518cd3d425ea7b763d6b5e1b491f8ca11014c3468ba3b78b61ff1bc11b732-json.log",
+        "Name": "/n83-mixed-build-bd20ab31df14437a",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/cargo": "rw,mode=1777"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 8589934592,
+            "NanoCpus": 4000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 8589934592,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 256,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Users/adamburan/.cargo/registry",
+                    "Target": "/cargo/registry",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012",
+                    "Target": "/src",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/llm/tmp/n83-first-mixed-orbit-20261018-01/build/target",
+                    "Target": "/target"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Users/adamburan/.cargo/registry",
+                "Destination": "/cargo/registry",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012",
+                "Destination": "/src",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/llm/tmp/n83-first-mixed-orbit-20261018-01/build/target",
+                "Destination": "/target",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "641518cd3d42",
+            "Domainname": "",
+            "User": "501:20",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "CARGO_HOME=/cargo",
+                "CARGO_TARGET_DIR=/target",
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "RUST_VERSION=1.93.1"
+            ],
+            "Cmd": [
+                "cargo",
+                "build",
+                "--release",
+                "--offline",
+                "--locked",
+                "--no-default-features",
+                "--example",
+                "koblitz_n83_mixed_orbit_worker"
+            ],
+            "Image": "sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31",
+            "Volumes": null,
+            "WorkingDir": "/src",
+            "Entrypoint": null,
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "913b553903a0a58c41fe32c5eef520c92ba464f5aa48446d6d908eceb46b4e12",
+            "SandboxKey": "/var/run/docker/netns/913b553903a0",
+            "Ports": {},
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "dc053748e31d45366de97db4d48a29c0e156b61a47571b6a61ad24d52db43551",
+                    "EndpointID": "8b371693d198e51d0df9bfcc6690dcf759abe698872c1db6d2a62979f8dbbe8c",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:e469417188261e17b3ec9c14a54c2802beafe400bf9baf9688fdb5294d925c06",
+            "size": 1942,
+            "annotations": {
+                "com.docker.official-images.bashbrew.arch": "arm64v8",
+                "org.opencontainers.image.base.digest": "sha256:adc6d8c3c358512d67f057da417b6a046adc76412a5138d98c591755cb4c7606",
+                "org.opencontainers.image.base.name": "buildpack-deps:bookworm",
+                "org.opencontainers.image.created": "2026-02-24T23:05:06Z",
+                "org.opencontainers.image.revision": "a67145c24ae0a04790c9d7b5289beb103e35e95e",
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust.git#a67145c24ae0a04790c9d7b5289beb103e35e95e:stable/bookworm",
+                "org.opencontainers.image.url": "https://hub.docker.com/_/rust",
+                "org.opencontainers.image.version": "1-bookworm"
+            },
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux",
+                "variant": "v8"
+            }
+        }
+    }
+]

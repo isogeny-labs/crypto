@@ -1,0 +1,36 @@
+import FallbackNormIdentity
+set_option autoImplicit false
+namespace FallbackGeometry
+open Polynomial ScaleTrim MonicRemainder FallbackWord
+
+theorem word_quotient_valid (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f : List UInt64)
+ (ch : Chain p ua ub va vb) (u w : List UInt64) (hdiv : Divided p ua ub va vb f ch u w)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb) (hf : Canon p f)
+ (hanz : wordsPoly p ua ≠ 0)
+ (hvalidA : wordsPoly p ua ∣ wordsPoly p f-wordsPoly p va*wordsPoly p va)
+ (hvalidB : wordsPoly p ub ∣ wordsPoly p f-wordsPoly p vb*wordsPoly p vb) :
+ wordsPoly p u ∣ wordsPoly p f-wordsPoly p w*wordsPoly p w := by
+ have hd1nz := result_nonzero p _ _ ch.d1 ch.e1 ch.e2 ch.first hanz
+ have hdnz := result_nonzero p _ _ ch.d ch.c1 ch.c2 ch.second hd1nz
+ rcases ch.first with ⟨hcd1,hce1,hce2,_,_,_,bez1,_,_,_⟩
+ rcases ch.second with ⟨hcd,hcc1,hcc2,_,_,_,bez2,_,_,_⟩
+ rcases hdiv with ⟨_,_,_,_,_,_,hU,hN,_⟩
+ have hsum := ResidualWord.add_correct p va vb (by omega) hb hva hvb
+ have hnum := numerator_correct p ua ub va vb f ch.c1 ch.c2 ch.e1 ch.e2 (by omega) hb hua hub hva hvb hf hcc1 hcc2 hce1 hce2
+ have hD : wordsPoly p ch.d =
+   (wordsPoly p ch.c1*wordsPoly p ch.e1)*wordsPoly p ua+
+   (wordsPoly p ch.c1*wordsPoly p ch.e2)*wordsPoly p ub+
+   wordsPoly p ch.c2*(wordsPoly p va+wordsPoly p vb) := by
+   rw [bez2,bez1,hsum.2]
+   ring
+ have hN' :
+   ((wordsPoly p ch.c1*wordsPoly p ch.e1)*wordsPoly p ua)*wordsPoly p vb+
+   ((wordsPoly p ch.c1*wordsPoly p ch.e2)*wordsPoly p ub)*wordsPoly p va+
+   wordsPoly p ch.c2*(wordsPoly p va*wordsPoly p vb+wordsPoly p f)=wordsPoly p w*wordsPoly p ch.d := by
+   rw [←hnum.2]
+   exact hN
+ exact quotient_valid (wordsPoly p ua) (wordsPoly p ub) (wordsPoly p va) (wordsPoly p vb) (wordsPoly p f)
+   (wordsPoly p ch.c1*wordsPoly p ch.e1) (wordsPoly p ch.c1*wordsPoly p ch.e2) (wordsPoly p ch.c2)
+   (wordsPoly p ch.d) (wordsPoly p u) (wordsPoly p w) hdnz hvalidA hvalidB hD hN' hU
+end FallbackGeometry

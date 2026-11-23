@@ -1,0 +1,66 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T02:34:51.767382+00:00",
+  "source_commit": "c60c141ec8b0b2c159f20b6f8509243f995976d9",
+  "source_plan_sha256": "7d9ff25b92c638eb11bb41469dc2561901103ae7ee541de3207ff6b1d82dd8c9",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "SupersingularTraceClassesAudit.trace_classification_audit_certificate",
+    "statement": "theorem trace_classification_audit_certificate : (\u2200 (K : Type*) [Field K] [Fintype K] (E : WeierstrassCurve.Affine K) (r : \u2115), Nat.Prime r \u2192 r\u2223Nat.card E.Point \u2192 TraceSquares (Fintype.card K) (fieldTrace E) \u2192 (orderOf (Fintype.card K:ZMod r)=1 \u2228 orderOf (Fintype.card K:ZMod r)=2 \u2228 orderOf (Fintype.card K:ZMod r)=3 \u2228 orderOf (Fintype.card K:ZMod r)=4 \u2228 orderOf (Fintype.card K:ZMod r)=6) \u2227 orderOf (Fintype.card K:ZMod r)\u22646 \u2227 Nat.Coprime r (Fintype.card K) \u2227 (\u2203 P : E.Point,addOrderOf P=r)) \u2227 (Nat.Coprime 81 289 \u2227 81\u2223(324:\u2115) \u2227 TraceSquares 289 ((289:\u2124)+1-324) \u2227 \u00ac orderOf (289:ZMod 81)\u22646)",
+    "decl_sha256": "8ea7c208ce1f34eb39d74d1dd70a40c97fc48fb66435bb5f50542f9e544f4269",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/SupersingularTraceClasses.lean",
+        "bytes": 7821,
+        "sha256": "6f50f299794aecf2e85e42ffa651001f4a7a69b3f7e0f7daf3a6f8ef5aaff275"
+      }
+    ],
+    "gate": {
+      "path": "evidence/supersingular-trace-gate.log",
+      "declarations": 331,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Actual finite-field curve and prime divisor of actual point count, conditional on explicit integer trace-square classification: modular order in {1,2,3,4,6}, bound6, coprimality and actual prime-order point via Cauchy. Composite q289/N324/r81 control is arithmetic only; no actual curve/point81 claimed. Classification and modular-order/embedding-field identification remain open."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-9c7d48",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-9c7d48",
+      "claim_sha256": "7a1d33d885fb4ab13a2eb11008d7a92151b4c9effe2ddda64f707afae8983bc5",
+      "commit": "c60c141ec8b0b2c159f20b6f8509243f995976d9",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (SupersingularTraceClasses.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T02:34:04Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-9c7d48",
+      "claim_sha256": "7a1d33d885fb4ab13a2eb11008d7a92151b4c9effe2ddda64f707afae8983bc5",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-supersingular-trace/report.pdf",
+    "bytes": 60957,
+    "sha256": "7697b52aa55eed627e875c62b0ef4b6d297c6118b69fb068da227b33c1e33e58",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Actual finite-field curve and prime divisor of actual point count, conditional on explicit integer trace-square classification: modular order in {1,2,3,4,6}, bound6, coprimality and actual prime-order point via Cauchy. Composite q289/N324/r81 control is arithmetic only; no actual curve/point81 claimed. Classification and modular-order/embedding-field identification remain open.",
+  "paid_compute": 0
+}

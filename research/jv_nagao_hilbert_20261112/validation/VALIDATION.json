@@ -1,0 +1,41 @@
+{
+ "schema": "validation-gate/v1",
+ "status_note": "NOT VALIDATED. The independent validator returned insufficient_evidence (validator-report.json). Blocking items: (1) no independent certificate for 8 of 9 cover solves and the 252 rho solves (re-run with JV_DUMP_INSTANCE); (2) section 5a: the cover's native count is a lower bound (F_p additions, F4 pair selection, matrix assembly not emitted), so 'order holds across the band' is conditional; under an addition proxy U2 at p=1451/1601 would be above rho at w=0.1 and 1; (3) the preregistered Hilbert/plain ratio band at w=0.1/1 was missed (0.821/0.959); (4) no S3 bench.record/v1 (AWS identity rejected). [pcc:unverified]",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "a99691f6ca7a2ed75458b4b56b4b8e9d3fe49ef8c2254390c5ccf5e569c7d6a2"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "548f492571bf828a18f96ae18510e04c5e9705df99b2e50478124113cb6c7a77"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/jv_cover_negrho_rescore_20261101/PROTOCOL.md: rhostrong --neg 1 --batch 16 --r 256 --dp-bits 16 --run R, runs 0..13 on the 9 instances (126), estimator (b) pooled iff homogeneous; re-run with the study binary on the pod",
+  "unit": "U2 textbook F_p multiplications / (c_add_e = 331) per sqrt(l) (rho s_tuned; cover total_muls), native operations priced at w GAE each (cover f4_native_ops, a lower bound; rho canon_cmp+hash+dp_check+scalar_ops+table_ops+cycle_cmp)",
+  "binary_or_process": "examples/jv_cover built from dd00d429d6bc060085948ded46c3cbabcc60a882 (sha256 9ccf9217c717fa58f859fe7d75c2880f240d3a71696c17765dff9254eecab2fc): --exp dlp --stop hilbert:16 (cover) and --exp rhostrong (rho), both on the same RunPod pod",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "strongest_available_basis": "research/jv_cover_fbline_20261102/review/red_team/REPORT.md row 7: on all 9 instances j is not in F_{p^2} or F_{p^3}, j != 0, 1728; no Frobenius or automorphism fold beyond negation",
+  "independent_sample_check": "runs 14..27 (126 new walks, same binary, same pod): U2 p=1601 0.728 [0.672, 0.793] w=0, below at all w (rescore_fresh_run14-27/table.md)",
+  "cell": "U2, p = 1601 (the other five cells, U1/U2 x p, are in band_fresh_run0-13.json)",
+  "gae_band": {
+   "0": {
+    "ic": 0.2697386483248473,
+    "rho": 0.3879327425814328
+   },
+   "0.1": {
+    "ic": 1.1757366225394175,
+    "rho": 1.9688690805512918
+   },
+   "1": {
+    "ic": 9.329718332514483,
+    "rho": 16.197296122280022
+   }
+  },
+  "order_holds_across_band": false,
+  "order_holds_across_band_note": "producer computed true on emitted counters only; validator: conditional on unemitted cover native work (section 5a), so not claimed"
+ }
+}

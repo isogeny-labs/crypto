@@ -1,0 +1,87 @@
+{
+  "schema": "rho-report-source-plan/v1",
+  "created": "2026-11-12T23:00:15.326991+00:00",
+  "formal": {
+    "project": "research/rho_constant_audit_20261112/lean",
+    "theorem": "RhoConstantReportAudit.finite_report_arithmetic_certificate",
+    "statement": "theorem finite_report_arithmetic_certificate : (∀ i : Fin 4,lowerBounds i<normalizedMean (subgroupOrders i) 48 (negationTotals i) ∧ normalizedMean (subgroupOrders i) 48 (negationTotals i)<upperBounds i) ∧ (∀ i : Fin 4,setupTotals i+searchTotals i+verificationTotals i=negationTotals i) ∧ (∀ i : Fin 4,negationTotals i<plainTotals i ∧ plainTotals i<negationTotals i+emittedUnpricedCounts i) ∧ (∀ i : Fin 4,Real.sqrt (Real.pi/4)<normalizedMean (subgroupOrders i) 48 (negationTotals i))",
+    "decl_sha256": "13773bdc8a2afb0d915a6367179888e314290ba9b0638cf657958b7c194da8ea",
+    "scope": "Exact arithmetic on displayed recorded integer totals: four rational normalized-mean intervals, setup/search/internal-check sums, emitted-counter weight0/1 ordering reversal, and each fixed mean above sqrt(pi/4). No native execution authenticity, actual curve-order proof, compiler refinement, expected-cost or asymptotic theorem.",
+    "sources": [
+      {
+        "path": "research/rho_constant_audit_20261112/lean/ReportedMeans.lean",
+        "bytes": 4241,
+        "sha256": "a7906e19eb274ae842981cfcb7143ca7c6f2e95d9f8beefe902faa0af0988a71"
+      },
+      {
+        "path": "research/rho_constant_audit_20261112/lean/lakefile.toml",
+        "bytes": 309,
+        "sha256": "c1bb3d6142189873d908986e1bb88c29af8bc91ad065bc56ea773e26b3bfb35f"
+      },
+      {
+        "path": "research/rho_constant_audit_20261112/lean/lake-manifest.json",
+        "bytes": 3559,
+        "sha256": "9f145fa857e721bb17a4936a95fa0e22e158fbf8388c2841005674fbe677d67b"
+      },
+      {
+        "path": "research/rho_constant_audit_20261112/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/rho_constant_audit_20261112/evidence/reported-attempts.tar.gz",
+      "bytes": 492,
+      "sha256": "4ec3cfc127a07af6ac982a6142241b5d7c4d2b9d576bf5a89faae8b483bcc96c"
+    },
+    {
+      "path": "research/rho_constant_audit_20261112/evidence/reported-attempts.json",
+      "bytes": 466,
+      "sha256": "968e3a6eb9675aab15348625b89798dd88202d1b14aefee63d3394856ca5a925"
+    },
+    {
+      "path": "research/rho_constant_audit_20261112/evidence/reported-gate.tar.gz",
+      "bytes": 994,
+      "sha256": "973a79b76ceb0de223b3524138d9cb46d94c0ee6faaf59cb17a5a17cb51f1a03"
+    },
+    {
+      "path": "research/rho_constant_audit_20261112/evidence/reported-gate.json",
+      "bytes": 1152,
+      "sha256": "85c49aaf4b79c467234b595aae9b70711346a28760e3691e2eeafd31638d436e"
+    },
+    {
+      "path": "research/rho_constant_audit_20261112/evidence/source-review.json",
+      "bytes": 4775,
+      "sha256": "f7e3c0bfad280feb87b005d067b715980480da01b50b27f11a29a157b4cfdec8"
+    }
+  ],
+  "gate": {
+    "archive": "research/rho_constant_audit_20261112/evidence/reported-gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 11,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "native_execution_proved": false,
+    "curve_orders_proved": false,
+    "asymptotic_law_proved": false,
+    "paid_compute": 0,
+    "lean4checker": "Unavailable; actual kernel and transitive axiom gate."
+  }
+}

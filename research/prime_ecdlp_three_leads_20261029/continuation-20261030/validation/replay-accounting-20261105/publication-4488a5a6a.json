@@ -1,0 +1,137 @@
+{
+  "recorded_utc": "2026-11-05T17:19:35.404979+00:00",
+  "new_regular_PR": 3482,
+  "url": "https://github.com/isogeny-labs/crypto/pull/3482",
+  "branch": "codex/pkm-replay-accounting-20261105",
+  "normal_pushed_head": "4488a5a6adc6b0aeb3c3d54dbcf914ffd4e937dc",
+  "tested_source": "f866dd7a4578a5c02cb60ee7d3c2101f3b044cde",
+  "all22_objects_still_equal": {
+    "src": "b044c4974fe2dbbf2a4da2280de1b9e96b063bb0",
+    "crates": "cb0a697e787d418fbeb448a606102b46630528b4",
+    "Cargo.toml": "4863d96e15c3fe919e4b744f2a246d55fc1b8104",
+    "Cargo.lock": "426a5848aa26aecc9325b763b496c4761f413455",
+    "examples/pkm_oracle_program.rs": "60986c64dfa501d0512fc5de52895432ee1a0144",
+    "examples/pkm_oracle_program": "79009cfa0a695000da43f3bb16497155cac959ee",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34",
+    "scripts/checkpoint.sh": "41fe3054e9ec1a980677b95c6000daa51208c0c7",
+    "tools/lean": "ba3a29487f9b75366f56ce5213eb73dcbc4f1fb9",
+    "tests": "5a5ccad9afd3d9cd1771c00f79900c0359c3dc35",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a",
+    "isogeny_algos": "8b57bb4a80eac0e2ec1f254fbf82a01aeb2a4baa",
+    "research/pencil_large_prime_20261029": "adfb8daf1615549a49ecbd00e3d90a3989c41438",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs": "0d4acf23d34597507ecd2518e372d31f494eac51",
+    "research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json": "865150d97b350d7de7807388a20c6949fd811c36",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/replay-accounting-20261105/rank-harness.rs": "619787cc1565ca088e0187b53800c7f1badaa1db"
+  },
+  "old_PR3452": "MERGED17:02:10as2dc51a00; maintenanceSTOPPED",
+  "old_PR2949": "MERGED;maintenanceSTOPPED",
+  "exact4488_snapshot": {
+    "state": "OPEN",
+    "mergeable": "CONFLICTING",
+    "autoMergeRequest": null,
+    "review": "SUCCESS",
+    "migrate": "SUCCESS",
+    "gate": "ABSENT",
+    "size": "ABSENT",
+    "artifacts": "ABSENT",
+    "reviews": []
+  },
+  "required_CI_pass_claimed": false,
+  "report_only_request": {
+    "comment": 6664459966,
+    "url": "https://github.com/isogeny-labs/crypto/pull/3482#issuecomment-6664459966",
+    "scope": "REPORT ONLY canonicalfrozenforkcontract; explicitlyno edits/resolution/rechain/side-selection",
+    "wait_does_not_authorize_frozen_merge": true
+  },
+  "final_4488_local_policies": {
+    "recorded_utc": "2026-11-05T17:16:59.617518+00:00",
+    "head": "4488a5a6adc6b0aeb3c3d54dbcf914ffd4e937dc",
+    "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+    "checks": {
+      "whitespace": {
+        "command": [
+          "git",
+          "diff",
+          "--check",
+          "d30b9e0db7ec00c55330effef5f64532f97cd160",
+          "4488a5a6adc6b0aeb3c3d54dbcf914ffd4e937dc"
+        ],
+        "exit": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_utf8": ""
+      },
+      "size": {
+        "command": [
+          "scripts/check-large-files.sh",
+          "d30b9e0db7ec00c55330effef5f64532f97cd160",
+          "4488a5a6adc6b0aeb3c3d54dbcf914ffd4e937dc"
+        ],
+        "exit": 0,
+        "bytes": 65,
+        "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+        "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n"
+      },
+      "artifacts": {
+        "command": [
+          "python3",
+          "tools/artifacts/artifacts.py",
+          "check",
+          "d30b9e0db7ec00c55330effef5f64532f97cd160",
+          "4488a5a6adc6b0aeb3c3d54dbcf914ffd4e937dc"
+        ],
+        "exit": 0,
+        "bytes": 41,
+        "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+        "raw_utf8": "artifacts check: no data files committed\n"
+      },
+      "ledger-old-d30": {
+        "command": [
+          "python3",
+          "tools/pcc/pcc.py",
+          "ledger",
+          "verify",
+          "--base",
+          "d30b9e0db7ec00c55330effef5f64532f97cd160"
+        ],
+        "exit": 0,
+        "bytes": 30,
+        "sha256": "6d34d7f38ed990cb8dc96563588d1a8c3671c412aaa7e70cf2ab7db8409f0164",
+        "raw_utf8": "ledger: 131 entries, chain ok\n"
+      },
+      "body-lint": {
+        "command": [
+          "python3",
+          "tools/pcc/pcc.py",
+          "lint-prose",
+          "/workspace/pkm-replay-accounting-20261105/pr-body.md"
+        ],
+        "exit": 0,
+        "bytes": 25,
+        "sha256": "78860995516e3367bf95a303485b67d572a3b44e8a1165dc117ca264ddb7b3eb",
+        "raw_utf8": "lint-prose: 0 finding(s)\n"
+      }
+    },
+    "current_main_prefix": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "c224878f19c01aa8954695c7bd20e42ad86379ef"
+      ],
+      "exit": 1,
+      "raw_utf8": "ledger[95]: differs from the base branch (history rewritten)\nledger: 131 entries, BROKEN\n",
+      "expected_unresolved_fork": true
+    }
+  },
+  "scope": "changedRusttestedatf866 only; oldlibrarycap/lint/PCC/runtime failures preserved; no new nativejob; no newerbasequalification",
+  "pcc_standing": "unverified"
+}

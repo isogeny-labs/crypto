@@ -1,0 +1,11 @@
+# Frozen private musl gate software build v2
+
+T-1425,2026-11-03. Preserve first failure commit6c3bbf34defe35575546d0cc8d2541b3cbbab85a. One new ordinary software-validation attempt, no automatic retry. Exact reviewed gate6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc and unchanged helper controlse45743457120067f4d4fc684e2bec5826bdf431d27a52bfc8b823bbb35cb6316.
+
+Pin and check all364 hash/resolvedpath entries copied from the previously qualified musl toolchain compiler-bindings.json, sha256d3059f6a44903b1c0705da1991eff2fb3a7af83c40b08c8b911ebe738055e724. Compiler is /var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc. Exact child environment PATH=/usr/bin:/bin, LC_ALL=C, REALGCC=/usr/bin/gcc, fresh private TMPDIR. No installation/download/toolchain modification.
+
+Outer command: `timeout --signal=TERM --kill-after=5s 175s bash -c 'ulimit -v 1048576; exec python3 -B run.py'`. Total ceiling180seconds including kill reserve,1GiB virtual memory. Each compile<=60seconds. Native helper<=25seconds. Per-command remaining time reserves cleanup. Inherited reviewed processgroup/signal registration kills/reaps compiler/helper children and preserves failure/uncertainty. Freeze source/plan hashes before independent recipe review and attempt.
+
+Build candidate -static -std=c11 -O2 -Wall -Wextra -Werror -march=x86-64 -mtune=generic; bind wrapper/version/target/364files/source/binary and inspect readelf x86-64 without INTERP or NEEDED. Candidate is NEVER executed. Native helper includes exact gate with renamed never-executed main; calls release_token/await_release only. Only fstat uid/gid interposed for unprivileged fixtures; real file bytes,type,mode,size,linkcount remain.37 partial lengths, complete token, malformed nonce/newline/size/mode/ownership, symlink/FIFO/directory/hardlink and real15second invalid-token timeout. No whole gate/PID1/cgroup/namespace/mount/privilege/Docker/systemd/cloud/scientific execution.
+
+Candidate and helper results are software evidence only. Actual gate/rootownership/transport/containment controls and runtime/image admission remain separate. Publish exact outputs with official artifact transport/fresh remote readback; scoped local commit, rootpublishes.

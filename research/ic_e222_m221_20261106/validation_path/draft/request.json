@@ -1,0 +1,29 @@
+{
+ "job": {
+  "command": [
+   "python3",
+   "-I",
+   "research/ic_e222_m221_20261106/run_baseline.py",
+   "--inst",
+   "research/ic_e222_m221_20261106/results/instances",
+   "--out",
+   "/work/h1_on",
+   "--seeds",
+   "3",
+   "--extra=--project-cofactor"
+  ],
+  "cpu": 4,
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "isolation_profile": "standard",
+  "job_name": "e222m221-h1-panel-draft-001",
+  "memory": "8Gi",
+  "retries": 0,
+  "seconds": 1800,
+  "wait_seconds": 600
+ },
+ "provenance": {
+  "harness": "claude-code-draft",
+  "source_revision": "0000000000000000000000000000000000000000"
+ },
+ "schema": "isolab.eks.command-request/v1"
+}

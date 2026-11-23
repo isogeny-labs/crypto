@@ -1,0 +1,33 @@
+import FallbackWordDivisions
+set_option autoImplicit false
+namespace FallbackWord
+private theorem mul_empty_left (a : List UInt64) : ProductPolynomial.product 17 [] a=[] := by simp [ProductPolynomial.product]
+private theorem mul_empty_right (a : List UInt64) : ProductPolynomial.product 17 a []=[] := by
+ unfold ProductPolynomial.product
+ split_ifs <;> simp_all
+private theorem mul_one : ProductPolynomial.product 17 [1] [1]=[1] := by decide
+private theorem mul_one_left : ProductPolynomial.product 17 [1] [16,1]=[16,1] := by decide
+private theorem mul_one_right : ProductPolynomial.product 17 [16,1] [1]=[16,1] := by decide
+private theorem add_empty_left : ResidualWord.padd 17 [] [16,1]=[16,1] := by
+ simp only [ResidualWord.padd,ResidualWord.slots]
+ decide
+private theorem add_empty_right : ResidualWord.padd 17 [16,1] []=[16,1] := by
+ simp only [ResidualWord.padd,ResidualWord.slots]
+ decide
+
+theorem control_cancellation_numerator :
+ numerator 17 [16,1] [16,1] [1] [16] [1] [1] [] [] [1]=[16,1] := by
+ simp only [numerator,mul_empty_left,mul_empty_right,mul_one,mul_one_left,mul_one_right,add_empty_left,add_empty_right]
+
+theorem control_cancellation_u :
+ exactDiv 17 (ProductPolynomial.product 17 [16,1] [16,1]) (ProductPolynomial.product 17 [16,1] [16,1])=some [1] := by decide
+
+theorem control_cancellation_v :
+ exactDiv 17 (numerator 17 [16,1] [16,1] [1] [16] [1] [1] [] [] [1]) [16,1]=some [1] := by
+ rw [control_cancellation_numerator]
+ decide
+
+theorem control_nonmonic_constant : exactDiv 17 [3,6] [3]=some [1,2] := by decide
+theorem control_inexact_rejected : exactDiv 17 [1] [0,1]=none := by decide
+theorem control_empty_divisor : exactDiv 17 [1] []=none := by decide
+end FallbackWord

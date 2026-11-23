@@ -1,0 +1,108 @@
+module
+public import OrientationTransport
+public import Mathlib.Data.Nat.PadicValNat
+public import Mathlib.Data.Int.ModEq
+import all OrientationTransport
+public section
+noncomputable section
+namespace OrientationModularReduction
+open OrientationAnchor OrientationCoefficientReduction
+
+def extra (d : ℕ) : ℕ := padicValNat 2 d
+def oddPart (d : ℕ) : ℕ := d.divMaxPow 2
+
+theorem denominator_factor (d : ℕ) : 2^(extra d)*oddPart d=d :=
+  Nat.pow_padicValNat_mul_divMaxPow 2 d
+
+theorem oddPart_not_dvd (d : ℕ) (hd : 0 < d) : ¬ 2 ∣ oddPart d :=
+  Nat.not_dvd_divMaxPow (by decide) (Nat.ne_of_gt hd)
+
+theorem oddPart_unit (d p : ℕ) (hd : 0 < d) : IsUnit (oddPart d : ZMod (2^p)) := by
+  have hc : (oddPart d).Coprime 2 := Nat.coprime_comm.mpr
+    ((Nat.prime_two.coprime_iff_not_dvd).mpr (oddPart_not_dvd d hd))
+  exact (ZMod.isUnit_iff_coprime _ _).mpr (hc.pow_right p)
+
+theorem extra_le_bound (d B : ℕ) (hd : 0 < d) (hb : d ≤ 2^B) : extra d ≤ B := by
+  have hv : 2^(extra d) ≤ d := Nat.le_of_dvd hd pow_padicValNat_dvd
+  by_contra! h
+  have hp : 2^B < 2^(extra d) := Nat.pow_lt_pow_right (by decide) h
+  omega
+
+theorem numerator_divisible (n : ℤ) (d : ℕ) (hd : 0 < d) (q : integralRationals)
+    (hrep : (n:ℚ)=(d:ℚ)*q.val) : (2:ℤ)^(extra d) ∣ n := by
+  by_cases hn : n=0
+  · subst n; exact dvd_zero _
+  have hdQ : (d:ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hd)
+  have hnQ : (n:ℚ) ≠ 0 := by exact_mod_cast hn
+  have hq : q.val ≠ 0 := by intro h; simp only [h,mul_zero] at hrep; exact hnQ hrep
+  have hval := q.property.resolve_left hq
+  have hv : (extra d:ℤ) ≤ padicValInt 2 n := by
+    have H : padicValRat 2 (n:ℚ)=padicValRat 2 (d:ℚ)+padicValRat 2 q.val := by
+      rw [hrep,padicValRat.mul hdQ hq]
+    rw [padicValRat.of_int,padicValRat.of_nat] at H
+    dsimp [extra]
+    omega
+  have hi : extra d ≤ padicValNat 2 n.natAbs := by
+    change (extra d:ℤ) ≤ (padicValInt 2 n:ℤ) at hv
+    exact_mod_cast hv
+  have hN : 2^(extra d) ∣ n.natAbs :=
+    (Nat.pow_dvd_iff_le_padicValNat (by decide) (Int.natAbs_ne_zero.mpr hn)).mpr hi
+  have HD : ((2^(extra d):ℕ):ℤ) ∣ n := Int.natCast_dvd.mpr hN
+  simpa only [Nat.cast_pow,Nat.cast_ofNat] using HD
+
+def quotientResidue (n : ℤ) (d p : ℕ) : ZMod (2^p) :=
+  ((n % (2:ℤ)^(p+extra d))/(2:ℤ)^(extra d) : ℤ)
+
+theorem quotientResidue_eq (n : ℤ) (d p : ℕ) (hn : (2:ℤ)^(extra d) ∣ n) :
+    quotientResidue n d p=((n/(2:ℤ)^(extra d):ℤ):ZMod (2^p)) := by
+  let c : ℤ := 2^(extra d)
+  let M : ℤ := 2^p
+  have hnc : c ∣ n := hn
+  have hc : c ≠ 0 := by dsimp [c]; positivity
+  have hN : n % (c*M) ≡ n [ZMOD c*M] := by
+    change n % (c*M) % (c*M)=n % (c*M)
+    exact Int.emod_emod _ _
+  have hDiff : c ∣ n-n%(c*M) := (dvd_mul_right c M).trans (Int.modEq_iff_dvd.mp hN)
+  have hr : c ∣ n%(c*M) := by
+    have H := Int.dvd_sub hnc hDiff
+    simpa only [sub_sub_cancel] using H
+  have hh : c*(n%(c*M)/c) ≡ c*(n/c) [ZMOD c*M] := by
+    simpa only [Int.mul_ediv_cancel' hr,Int.mul_ediv_cancel' hnc] using hN
+  have he := Int.ModEq.mul_left_cancel' hc hh
+  apply (ZMod.intCast_eq_intCast_iff _ _ _).mpr
+  have hpow : (2:ℤ)^(p+extra d)=c*M := by dsimp [c,M]; rw [pow_add]; ring
+  simpa only [quotientResidue,hpow,c,M,Nat.cast_pow,Nat.cast_ofNat] using he
+
+def reduceCleared (n : ℤ) (d p : ℕ) : ZMod (2^p) :=
+  quotientResidue n d p*(oddPart d : ZMod (2^p))⁻¹
+
+theorem quotient_representation (n : ℤ) (d : ℕ) (hd : 0 < d) (q : integralRationals)
+    (hrep : (n:ℚ)=(d:ℚ)*q.val) :
+    ((n/(2:ℤ)^(extra d):ℤ):ℚ)=(oddPart d:ℚ)*q.val := by
+  have hcQ : ((2:ℤ)^(extra d):ℚ) ≠ 0 := by positivity
+  apply mul_left_cancel₀ hcQ
+  have hdiv := Int.mul_ediv_cancel' (numerator_divisible n d hd q hrep)
+  have hfactor : ((2:ℤ)^(extra d):ℚ)*(oddPart d:ℚ)=(d:ℚ) := by
+    exact_mod_cast denominator_factor d
+  calc
+    _ = (n:ℚ) := by exact_mod_cast hdiv
+    _ = (d:ℚ)*q.val := hrep
+    _ = _ := by rw [← hfactor]; ring
+
+theorem reduceCleared_correct (n : ℤ) (d p : ℕ) (hd : 0 < d) (q : integralRationals)
+    (hrep : (n:ℚ)=(d:ℚ)*q.val) : reduceCleared n d p=reduce p q := by
+  have H : ((n/(2:ℤ)^(extra d):ℤ):integralRationals)=(oddPart d:integralRationals)*q := by
+    apply Subtype.ext
+    exact quotient_representation n d hd q hrep
+  have he := congrArg (reduce p) H
+  simp only [map_intCast,map_mul,map_natCast] at he
+  unfold reduceCleared
+  rw [quotientResidue_eq n d p (numerator_divisible n d hd q hrep),he]
+  calc
+    _ = reduce p q*((oddPart d:ZMod (2^p))*(oddPart d:ZMod (2^p))⁻¹) := by ring
+    _ = _ := by rw [ZMod.mul_inv_of_unit _ (oddPart_unit d p hd),mul_one]
+
+end OrientationModularReduction
+#print axioms OrientationModularReduction.numerator_divisible
+#print axioms OrientationModularReduction.quotientResidue_eq
+#print axioms OrientationModularReduction.reduceCleared_correct

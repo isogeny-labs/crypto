@@ -1,0 +1,152 @@
+{
+  "holdout_spec_sha256": {
+    "holdout-k24": "8cac8f91ebf047cd5d788812398f62b38a1fd9b058c4a8f967fa1c55d0349476"
+  },
+  "round": 2,
+  "rule": "lowest mean S at w = 0 among candidates whose every run verified; a challenger only if below inc at w = 0",
+  "schema": "ic_autolab.selection/v1",
+  "selected": "2026-11-04T02:32:01Z",
+  "sizes": {
+    "20": {
+      "alt_w1": {
+        "factor_base": "prime-projected-abscissa:size=45,scan_cap=720",
+        "family": "mitm2",
+        "n": 45,
+        "name": "mitm2-n45",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=45,scan_cap=720",
+            "family": "mitm2",
+            "n": 45,
+            "name": "mitm2-n45",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "s": [
+            14.019639598382799,
+            14.738057481631333,
+            21.203818430868136
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+            "family": "mitm2",
+            "n": 22,
+            "name": "mitm2-n22",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "s": [
+            11.449202667180618,
+            12.552418254683294,
+            22.481358542207403
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=5,scan_cap=80",
+            "family": "ksum4",
+            "n": 5,
+            "name": "ksum4-n5",
+            "oracle": "ksum:m=4"
+          },
+          "s": [
+            34.14969626360207,
+            39.914587388656145,
+            91.79860751414282
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=4,scan_cap=64",
+            "family": "ksum5",
+            "n": 4,
+            "name": "ksum5-n4",
+            "oracle": "ksum:m=5"
+          },
+          "s": null,
+          "status": "no verified runs"
+        }
+      ],
+      "inc_s": [
+        8.67861088331048,
+        9.365797707651339,
+        15.550479126719093
+      ],
+      "rho_s": [
+        1.3398296818678224,
+        1.4303824979713942,
+        2.245357842903538
+      ],
+      "sel": null,
+      "session_id": "ECBS1h46801373f9df",
+      "status": "no_challenger"
+    },
+    "24": {
+      "alt_w1": {
+        "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+        "family": "ksum4",
+        "n": 12,
+        "name": "ksum4-n12",
+        "oracle": "ksum:m=4"
+      },
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+            "family": "ksum4",
+            "n": 12,
+            "name": "ksum4-n12",
+            "oracle": "ksum:m=4"
+          },
+          "s": [
+            6.8137828343951,
+            7.3092781046206055,
+            11.768735536650139
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=6,scan_cap=96",
+            "family": "ksum5",
+            "n": 6,
+            "name": "ksum5-n6",
+            "oracle": "ksum:m=5"
+          },
+          "s": [
+            51.351606559785075,
+            61.20497283548487,
+            149.88526931678297
+          ],
+          "status": "verified"
+        }
+      ],
+      "inc_s": [
+        7.848197290126553,
+        8.520530003457953,
+        14.571524423440543
+      ],
+      "rho_s": [
+        1.3014227680352826,
+        1.4198092562059415,
+        2.4852876497418714
+      ],
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+        "family": "ksum4",
+        "n": 12,
+        "name": "ksum4-n12",
+        "oracle": "ksum:m=4"
+      },
+      "session_id": "ECBS1h852c2d4d4e70",
+      "status": "challenger"
+    }
+  },
+  "track": "generic"
+}

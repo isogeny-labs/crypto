@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T11:47:50Z",
+ "id": "PCC-20261112-c7cd22",
+ "kind": "theorem",
+ "producer": {
+  "commit": "92cc496cd5b371080ac3c0dbd3dfe01f208121df",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "46f64c42bdf87a5245680623c31f7576432cf7ea33458c08bcb1d1df13465914",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+   "theorem": "QuarticGluing.kernel_transport_bijective"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful ring/structural consequences:h4duplication,injectivefactor kernelprojection,bijectionofkernels undercommutingsquare,and saturatedTate-lattice implications. Actual varieties,Picard,polarization,finitecardinality,Tate exactness/classification remain written;failed01 retained.",
+ "statement": "theorem kernel_transport_bijective {E F A E' F' A' : Type} (s : E \u2192 F \u2192 A) (t : E' \u2192 F' \u2192 A') (z : A) (w : A') (e : E \u2192 E') (f : F \u2192 F') (u : A \u2192 A') (he : Bijective e) (hf : Bijective f) (hu : Function.Injective u) (uz : u z=w) (comm : \u2200 p q, u (s p q)=t (e p) (f q)) : Bijective (transport s t z w e f u uz comm)"
+}

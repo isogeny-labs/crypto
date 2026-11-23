@@ -1,0 +1,3 @@
+# Saved-stream scheduler verification
+
+Software validation only; no collector invocation or timing comparison. Reconstruct the 16 jumps and starting state from pinned seed, then check jump indices, candidate transitions, duplicate-walk membership, restart draws and first-maximal choice priority. Check six saved native streams; deliberately alter seed, jump index and a valid choice to isolate scheduler failures while graph/label checks still pass where applicable. Constructed exceptional controls remain separately classified, not generated scheduler traces. No new scientific execution is authorized. Preserve failed checks and source hashes; independent review remains pending.

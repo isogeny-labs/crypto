@@ -1,0 +1,748 @@
+{
+  "schema": "research.lead-sweep/v3",
+  "observed_at": "2026-11-17T16:09:17.731Z",
+  "scope": "public repositories only",
+  "non_atomic": true,
+  "method": "Connector user-recent-PR pagination per public repo and org-wide open-PR search cross-check; not direct REST Link-page audit",
+  "coverage": [
+    {
+      "repository": "isogeny-labs/crypto",
+      "open_prs": 12,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/cryptanalysis",
+      "open_prs": 1,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/lfd-summation-systems",
+      "open_prs": 3,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/ecbench",
+      "open_prs": 2,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/ecc-challenges",
+      "open_prs": 1,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/prototype",
+      "open_prs": 3,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/crypto-autoresearcher",
+      "open_prs": 0,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/autoresearcher",
+      "open_prs": 0,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    },
+    {
+      "repository": "isogeny-labs/experiments",
+      "open_prs": 0,
+      "collection": "connector author-query paginated to requested limit; cross-checked against accessible organization search",
+      "unresolved_non_author_matches": 0
+    }
+  ],
+  "pr_count": 22,
+  "org_visible_open_pr_count": 62,
+  "org_public_results": 22,
+  "missing_org_public_matches": [],
+  "previous_snapshot": "docs/leads/2026-11-16/public-pr-inventory-0908-PT.json",
+  "delta_summary": {
+    "previous": 250,
+    "current": 22,
+    "added": 18,
+    "no_longer_observed": 246,
+    "retained_changed_head": 0
+  },
+  "delta": {
+    "newly_present": [
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1718",
+      "https://github.com/isogeny-labs/crypto/pull/4572",
+      "https://github.com/isogeny-labs/crypto/pull/4571",
+      "https://github.com/isogeny-labs/crypto/pull/4570",
+      "https://github.com/isogeny-labs/crypto/pull/4569",
+      "https://github.com/isogeny-labs/crypto/pull/4568",
+      "https://github.com/isogeny-labs/crypto/pull/4567",
+      "https://github.com/isogeny-labs/crypto/pull/4566",
+      "https://github.com/isogeny-labs/crypto/pull/4565",
+      "https://github.com/isogeny-labs/crypto/pull/4564",
+      "https://github.com/isogeny-labs/crypto/pull/4563",
+      "https://github.com/isogeny-labs/crypto/pull/4562",
+      "https://github.com/isogeny-labs/crypto/pull/4561",
+      "https://github.com/isogeny-labs/ecbench/pull/8",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/29",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/28",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/27",
+      "https://github.com/isogeny-labs/prototype/pull/5"
+    ],
+    "no_longer_observed": [
+      "https://github.com/isogeny-labs/crypto/pull/4439",
+      "https://github.com/isogeny-labs/crypto/pull/4438",
+      "https://github.com/isogeny-labs/crypto/pull/4437",
+      "https://github.com/isogeny-labs/crypto/pull/4436",
+      "https://github.com/isogeny-labs/crypto/pull/4435",
+      "https://github.com/isogeny-labs/crypto/pull/4434",
+      "https://github.com/isogeny-labs/crypto/pull/4433",
+      "https://github.com/isogeny-labs/crypto/pull/4431",
+      "https://github.com/isogeny-labs/crypto/pull/4430",
+      "https://github.com/isogeny-labs/crypto/pull/4429",
+      "https://github.com/isogeny-labs/crypto/pull/4427",
+      "https://github.com/isogeny-labs/crypto/pull/4426",
+      "https://github.com/isogeny-labs/crypto/pull/4425",
+      "https://github.com/isogeny-labs/crypto/pull/4424",
+      "https://github.com/isogeny-labs/crypto/pull/4423",
+      "https://github.com/isogeny-labs/crypto/pull/4421",
+      "https://github.com/isogeny-labs/crypto/pull/4420",
+      "https://github.com/isogeny-labs/crypto/pull/4419",
+      "https://github.com/isogeny-labs/crypto/pull/4418",
+      "https://github.com/isogeny-labs/crypto/pull/4417",
+      "https://github.com/isogeny-labs/crypto/pull/4416",
+      "https://github.com/isogeny-labs/crypto/pull/4414",
+      "https://github.com/isogeny-labs/crypto/pull/4412",
+      "https://github.com/isogeny-labs/crypto/pull/4410",
+      "https://github.com/isogeny-labs/crypto/pull/4409",
+      "https://github.com/isogeny-labs/crypto/pull/4408",
+      "https://github.com/isogeny-labs/crypto/pull/4407",
+      "https://github.com/isogeny-labs/crypto/pull/4406",
+      "https://github.com/isogeny-labs/crypto/pull/4405",
+      "https://github.com/isogeny-labs/crypto/pull/4403",
+      "https://github.com/isogeny-labs/crypto/pull/4402",
+      "https://github.com/isogeny-labs/crypto/pull/4400",
+      "https://github.com/isogeny-labs/crypto/pull/4399",
+      "https://github.com/isogeny-labs/crypto/pull/4397",
+      "https://github.com/isogeny-labs/crypto/pull/4395",
+      "https://github.com/isogeny-labs/crypto/pull/4391",
+      "https://github.com/isogeny-labs/crypto/pull/4390",
+      "https://github.com/isogeny-labs/crypto/pull/4389",
+      "https://github.com/isogeny-labs/crypto/pull/4372",
+      "https://github.com/isogeny-labs/crypto/pull/4364",
+      "https://github.com/isogeny-labs/crypto/pull/4363",
+      "https://github.com/isogeny-labs/crypto/pull/4361",
+      "https://github.com/isogeny-labs/crypto/pull/4357",
+      "https://github.com/isogeny-labs/crypto/pull/4352",
+      "https://github.com/isogeny-labs/crypto/pull/4349",
+      "https://github.com/isogeny-labs/crypto/pull/4347",
+      "https://github.com/isogeny-labs/crypto/pull/4345",
+      "https://github.com/isogeny-labs/crypto/pull/4344",
+      "https://github.com/isogeny-labs/crypto/pull/4336",
+      "https://github.com/isogeny-labs/crypto/pull/4326",
+      "https://github.com/isogeny-labs/crypto/pull/4323",
+      "https://github.com/isogeny-labs/crypto/pull/4317",
+      "https://github.com/isogeny-labs/crypto/pull/4313",
+      "https://github.com/isogeny-labs/crypto/pull/4307",
+      "https://github.com/isogeny-labs/crypto/pull/4301",
+      "https://github.com/isogeny-labs/crypto/pull/4288",
+      "https://github.com/isogeny-labs/crypto/pull/4284",
+      "https://github.com/isogeny-labs/crypto/pull/4278",
+      "https://github.com/isogeny-labs/crypto/pull/4270",
+      "https://github.com/isogeny-labs/crypto/pull/4269",
+      "https://github.com/isogeny-labs/crypto/pull/4240",
+      "https://github.com/isogeny-labs/crypto/pull/4211",
+      "https://github.com/isogeny-labs/crypto/pull/4175",
+      "https://github.com/isogeny-labs/crypto/pull/4170",
+      "https://github.com/isogeny-labs/crypto/pull/4147",
+      "https://github.com/isogeny-labs/crypto/pull/4141",
+      "https://github.com/isogeny-labs/crypto/pull/4122",
+      "https://github.com/isogeny-labs/crypto/pull/4120",
+      "https://github.com/isogeny-labs/crypto/pull/4118",
+      "https://github.com/isogeny-labs/crypto/pull/4108",
+      "https://github.com/isogeny-labs/crypto/pull/4096",
+      "https://github.com/isogeny-labs/crypto/pull/4065",
+      "https://github.com/isogeny-labs/crypto/pull/4041",
+      "https://github.com/isogeny-labs/crypto/pull/3920",
+      "https://github.com/isogeny-labs/crypto/pull/3919",
+      "https://github.com/isogeny-labs/crypto/pull/3909",
+      "https://github.com/isogeny-labs/crypto/pull/3877",
+      "https://github.com/isogeny-labs/crypto/pull/3876",
+      "https://github.com/isogeny-labs/crypto/pull/3781",
+      "https://github.com/isogeny-labs/crypto/pull/3771",
+      "https://github.com/isogeny-labs/crypto/pull/3765",
+      "https://github.com/isogeny-labs/crypto/pull/3747",
+      "https://github.com/isogeny-labs/crypto/pull/3744",
+      "https://github.com/isogeny-labs/crypto/pull/3739",
+      "https://github.com/isogeny-labs/crypto/pull/3674",
+      "https://github.com/isogeny-labs/crypto/pull/3667",
+      "https://github.com/isogeny-labs/crypto/pull/3666",
+      "https://github.com/isogeny-labs/crypto/pull/3650",
+      "https://github.com/isogeny-labs/crypto/pull/3647",
+      "https://github.com/isogeny-labs/crypto/pull/3610",
+      "https://github.com/isogeny-labs/crypto/pull/3603",
+      "https://github.com/isogeny-labs/crypto/pull/3602",
+      "https://github.com/isogeny-labs/crypto/pull/3590",
+      "https://github.com/isogeny-labs/crypto/pull/3587",
+      "https://github.com/isogeny-labs/crypto/pull/3476",
+      "https://github.com/isogeny-labs/crypto/pull/3403",
+      "https://github.com/isogeny-labs/crypto/pull/3370",
+      "https://github.com/isogeny-labs/crypto/pull/3369",
+      "https://github.com/isogeny-labs/crypto/pull/3093",
+      "https://github.com/isogeny-labs/crypto/pull/2988",
+      "https://github.com/isogeny-labs/crypto/pull/2984",
+      "https://github.com/isogeny-labs/crypto/pull/2980",
+      "https://github.com/isogeny-labs/crypto/pull/2958",
+      "https://github.com/isogeny-labs/crypto/pull/2873",
+      "https://github.com/isogeny-labs/crypto/pull/2826",
+      "https://github.com/isogeny-labs/crypto/pull/2807",
+      "https://github.com/isogeny-labs/crypto/pull/2806",
+      "https://github.com/isogeny-labs/crypto/pull/2783",
+      "https://github.com/isogeny-labs/crypto/pull/2655",
+      "https://github.com/isogeny-labs/crypto/pull/2654",
+      "https://github.com/isogeny-labs/crypto/pull/2653",
+      "https://github.com/isogeny-labs/crypto/pull/2638",
+      "https://github.com/isogeny-labs/crypto/pull/2598",
+      "https://github.com/isogeny-labs/crypto/pull/2509",
+      "https://github.com/isogeny-labs/crypto/pull/2490",
+      "https://github.com/isogeny-labs/crypto/pull/2462",
+      "https://github.com/isogeny-labs/crypto/pull/2452",
+      "https://github.com/isogeny-labs/crypto/pull/2431",
+      "https://github.com/isogeny-labs/crypto/pull/2430",
+      "https://github.com/isogeny-labs/crypto/pull/2380",
+      "https://github.com/isogeny-labs/crypto/pull/2372",
+      "https://github.com/isogeny-labs/crypto/pull/2344",
+      "https://github.com/isogeny-labs/crypto/pull/2329",
+      "https://github.com/isogeny-labs/crypto/pull/2318",
+      "https://github.com/isogeny-labs/crypto/pull/2282",
+      "https://github.com/isogeny-labs/crypto/pull/2256",
+      "https://github.com/isogeny-labs/crypto/pull/2246",
+      "https://github.com/isogeny-labs/crypto/pull/2239",
+      "https://github.com/isogeny-labs/crypto/pull/2231",
+      "https://github.com/isogeny-labs/crypto/pull/2229",
+      "https://github.com/isogeny-labs/crypto/pull/2205",
+      "https://github.com/isogeny-labs/crypto/pull/2185",
+      "https://github.com/isogeny-labs/crypto/pull/2168",
+      "https://github.com/isogeny-labs/crypto/pull/2159",
+      "https://github.com/isogeny-labs/crypto/pull/2156",
+      "https://github.com/isogeny-labs/crypto/pull/2155",
+      "https://github.com/isogeny-labs/crypto/pull/2101",
+      "https://github.com/isogeny-labs/crypto/pull/2084",
+      "https://github.com/isogeny-labs/crypto/pull/2036",
+      "https://github.com/isogeny-labs/crypto/pull/2035",
+      "https://github.com/isogeny-labs/crypto/pull/1853",
+      "https://github.com/isogeny-labs/crypto/pull/1850",
+      "https://github.com/isogeny-labs/crypto/pull/1830",
+      "https://github.com/isogeny-labs/crypto/pull/1828",
+      "https://github.com/isogeny-labs/crypto/pull/1790",
+      "https://github.com/isogeny-labs/crypto/pull/1749",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1665",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1664",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1663",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1662",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1661",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1660",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1659",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1658",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1657",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1656",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1655",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1654",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1653",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1652",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1651",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1650",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1649",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1648",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1647",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1646",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1645",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1644",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1643",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1642",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1641",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1640",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1639",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1638",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1637",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1636",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1635",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1634",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1633",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1631",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1630",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1629",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1628",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1627",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1626",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1625",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1623",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1622",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1621",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1620",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1619",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1589",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1587",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1578",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1576",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1575",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1573",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1547",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1545",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1541",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1537",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1536",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1533",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1508",
+      "https://github.com/isogeny-labs/cryptanalysis/pull/1435",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3316",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3315",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3309",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3308",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3303",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3282",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3273",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3263",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3262",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3259",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3258",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3219",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3213",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3211",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3194",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3190",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3189",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3188",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3187",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3186",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3185",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3184",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3124",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3109",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/3041",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/2985",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/2786",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/2594",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/2590",
+      "https://github.com/isogeny-labs/crypto-autoresearcher/pull/2439",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/23",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/21",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/20",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/19",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/18",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/17",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/16",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/15",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/11",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/10",
+      "https://github.com/isogeny-labs/lfd-summation-systems/pull/9"
+    ],
+    "retained_changed_head": []
+  },
+  "prs": [
+    {
+      "repository": "isogeny-labs/cryptanalysis",
+      "number": 1718,
+      "title": "CT186: blind first-four-slot same-route sham diagnostics for cold transfer panels",
+      "url": "https://github.com/isogeny-labs/cryptanalysis/pull/1718",
+      "head_sha": "4b424a078d90f263009db457a211f853a8703e40",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T15:57:21Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 29,
+          "success": 6,
+          "skipped": 1,
+          "in_progress": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/cryptanalysis/commit/4b424a078d90f263009db457a211f853a8703e40/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4572,
+      "title": "Prime-field IC root-finding decomposition oracle: local baseline + measured optimization",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4572",
+      "head_sha": "a6ce8aff900c60b0c6c63b24586e449764ff678f",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T16:06:53Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "skipped": 13,
+          "in_progress": 2
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/a6ce8aff900c60b0c6c63b24586e449764ff678f/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4571,
+      "title": "docs: 2026-11-17 source-bounded research PR sweep",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4571",
+      "head_sha": "a5e8010b2da1a1d13fc7435ef5cb8b5cfc993293",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T16:03:40Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "skipped": 13,
+          "in_progress": 1,
+          "failure": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/a5e8010b2da1a1d13fc7435ef5cb8b5cfc993293/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4570,
+      "title": "Run frozen norm-branch tensor rank census",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4570",
+      "head_sha": "b4555a8809edfa2c33483f5fbde12e60cffb8451",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T16:08:05Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "success": 4,
+          "in_progress": 9,
+          "failure": 5,
+          "skipped": 14
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/b4555a8809edfa2c33483f5fbde12e60cffb8451/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4569,
+      "title": "Clean up main CI breakages and add an ecbench CI check",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4569",
+      "head_sha": "0b4de5e9f24817df7f198726551428ee4ed7db17",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T15:57:34Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 2,
+          "skipped": 13
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/0b4de5e9f24817df7f198726551428ee4ed7db17/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4568,
+      "title": "hky2 on a rented host: second depth-13 draw, depth-14 degree-6 closure; optlevel PMU and GPU validation",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4568",
+      "head_sha": "e146b7e3ea87fa76e0dd638651ea22dc3de35fdd",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T15:58:38Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 2,
+          "skipped": 13
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/e146b7e3ea87fa76e0dd638651ea22dc3de35fdd/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4567,
+      "title": "Pursue matched P-256 regularity halving: protocol, certificates and report",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4567",
+      "head_sha": "6358f7d4a5d7deed83f6212d025bb5e3eddc1fc4",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T16:03:44Z",
+      "ci": {
+        "workflow_run_conclusions": {},
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/6358f7d4a5d7deed83f6212d025bb5e3eddc1fc4/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4566,
+      "title": "ECDB research sweeps and model-ready feature datasets",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4566",
+      "head_sha": "b5430c5d32d70414e0e3fab357fa8fc37206293f",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T15:46:05Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 2,
+          "skipped": 13
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/b5430c5d32d70414e0e3fab357fa8fc37206293f/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4565,
+      "title": "Freeze the lazy-orbit column sweep, file blocked queue registrations, fix ecbench build",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4565",
+      "head_sha": "a6c26dc94ab3d47b6021f972320950829d80f720",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T15:56:47Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 9,
+          "success": 7
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/a6c26dc94ab3d47b6021f972320950829d80f720/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4564,
+      "title": "Autolab rounds 39 and 40: tw2l-x20-j16-n2 improves k = 28 (0.944, counted GAE); validator report",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4564",
+      "head_sha": "87c46148e77b5517d356c948cc12550e6253e006",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T16:03:53Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 8,
+          "success": 6,
+          "in_progress": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/87c46148e77b5517d356c948cc12550e6253e006/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4563,
+      "title": "Semaev: evaluate compiled and projection-only decomposition oracles",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4563",
+      "head_sha": "8b6b3a24361ef856e9b5b21a89a5da0b0d90ec15",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T15:40:05Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "failure": 2,
+          "skipped": 13
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/8b6b3a24361ef856e9b5b21a89a5da0b0d90ec15/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4562,
+      "title": "Boolean F4: support-subset reducer indexing for Semaev systems",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4562",
+      "head_sha": "b72ff385338c4b06d1ed40649540125786ca67ea",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T16:03:29Z",
+      "ci": {
+        "workflow_run_conclusions": {},
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/b72ff385338c4b06d1ed40649540125786ca67ea/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/crypto",
+      "number": 4561,
+      "title": "Qualify HEC scalar certificates with traced Frobenius action",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4561",
+      "head_sha": "47bb75c8634469156ff7f974b55dc60e5dfe2936",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T16:08:53Z",
+      "ci": null,
+      "check_url": "https://github.com/isogeny-labs/crypto/commit/47bb75c8634469156ff7f974b55dc60e5dfe2936/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/ecbench",
+      "number": 8,
+      "title": "Standardize the repository CI check contract",
+      "url": "https://github.com/isogeny-labs/ecbench/pull/8",
+      "head_sha": "e27787b260cb9d129e2877466d5b28e4468910c4",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T16:04:53Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "in_progress": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/ecbench/commit/e27787b260cb9d129e2877466d5b28e4468910c4/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/ecbench",
+      "number": 1,
+      "title": "Add verified small-field corpus and polynomial research benchmarks",
+      "url": "https://github.com/isogeny-labs/ecbench/pull/1",
+      "head_sha": "f54e10b16838eac564272ac6eb511c8785c7d6cf",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-10-15T19:26:33Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "success": 2
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/ecbench/commit/f54e10b16838eac564272ac6eb511c8785c7d6cf/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/ecc-challenges",
+      "number": 79,
+      "title": "Add per-challenge leaderboards and an ecc CLI",
+      "url": "https://github.com/isogeny-labs/ecc-challenges/pull/79",
+      "head_sha": "e5688014fa2bd78269751e7c661f64df7078ab2f",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-02T02:33:00Z",
+      "ci": {
+        "workflow_run_conclusions": {},
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/ecc-challenges/commit/e5688014fa2bd78269751e7c661f64df7078ab2f/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/lfd-summation-systems",
+      "number": 29,
+      "title": "Standardize the repository CI check contract",
+      "url": "https://github.com/isogeny-labs/lfd-summation-systems/pull/29",
+      "head_sha": "d12df21ee07b34c0cdfd04e7b989b4c9869199ed",
+      "base": "main",
+      "draft": true,
+      "updated_at": "2026-11-17T15:46:22Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "in_progress": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/lfd-summation-systems/commit/d12df21ee07b34c0cdfd04e7b989b4c9869199ed/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/lfd-summation-systems",
+      "number": 28,
+      "title": "Root-finding solver for index-calculus summation systems (F4/F5 replacement)",
+      "url": "https://github.com/isogeny-labs/lfd-summation-systems/pull/28",
+      "head_sha": "c02d880be5f184f90dc7ba0f3094b64352d36560",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T16:03:12Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "in_progress": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/lfd-summation-systems/commit/c02d880be5f184f90dc7ba0f3094b64352d36560/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/lfd-summation-systems",
+      "number": 27,
+      "title": "Manuscript cleanup before ePrint",
+      "url": "https://github.com/isogeny-labs/lfd-summation-systems/pull/27",
+      "head_sha": "fc17f4f63bfe11418cfba258c78e386401b33449",
+      "base": "main",
+      "draft": false,
+      "updated_at": "2026-11-17T15:24:56Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "in_progress": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/lfd-summation-systems/commit/fc17f4f63bfe11418cfba258c78e386401b33449/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/prototype",
+      "number": 5,
+      "title": "Standardize the repository CI check contract",
+      "url": "https://github.com/isogeny-labs/prototype/pull/5",
+      "head_sha": "bafb5f182e39c758dcc0743aac6f03ce5777c681",
+      "base": "mvp/crypto-simple",
+      "draft": true,
+      "updated_at": "2026-11-17T16:06:09Z",
+      "ci": null,
+      "check_url": "https://github.com/isogeny-labs/prototype/commit/bafb5f182e39c758dcc0743aac6f03ce5777c681/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/prototype",
+      "number": 3,
+      "title": "Add ctcrypto, a constant-time CNSA 2.0 algorithm library, and the CSfC priorities note",
+      "url": "https://github.com/isogeny-labs/prototype/pull/3",
+      "head_sha": "a2bf2234be9f14b446a145c245173084aba9b11f",
+      "base": "claude/isogeny-evidence-lab-mvp-sg3pva",
+      "draft": false,
+      "updated_at": "2026-11-15T04:01:47Z",
+      "ci": {
+        "workflow_run_conclusions": {
+          "success": 1
+        },
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/prototype/commit/a2bf2234be9f14b446a145c245173084aba9b11f/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    },
+    {
+      "repository": "isogeny-labs/prototype",
+      "number": 2,
+      "title": "Add the side-channel audit tool (crypto crate, Valgrind) to the toolkit",
+      "url": "https://github.com/isogeny-labs/prototype/pull/2",
+      "head_sha": "d0e901ce27b3cb347e9a213b1c24f9f4d3d835f4",
+      "base": "claude/isogeny-evidence-lab-mvp-sg3pva",
+      "draft": false,
+      "updated_at": "2026-11-03T02:51:17Z",
+      "ci": {
+        "workflow_run_conclusions": {},
+        "source": "first page PR-triggered Actions at exact SHA"
+      },
+      "check_url": "https://github.com/isogeny-labs/prototype/commit/d0e901ce27b3cb347e9a213b1c24f9f4d3d835f4/checks",
+      "evidence": "PR source; no independent experiment replay/PCC standing"
+    }
+  ],
+  "limitations": [
+    "Rapid concurrent merges and new PRs: snapshot non-atomic; no-longer-observed means not open at this observation, NOT necessarily merged",
+    "Actions wrapper filters to pull_request and first page; excludes check suites, required contexts, and independent PCC standing",
+    "CI is tied to exact recorded head only when ci object populated; null means not queried or head changed",
+    "Dedicated KB query MCP absent; backup repository contains snapshots/metadata, not live catalog"
+  ]
+}

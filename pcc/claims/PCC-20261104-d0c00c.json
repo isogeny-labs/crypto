@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-04T02:58:29Z",
+ "id": "PCC-20261104-d0c00c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "78713ef2084c154e94d1964cb7b3e9c196bf84df",
+  "model": "claude-opus-5-5",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b949c1853bf26dc7d6c4d2ba639ab34844d2e7893145569801188902112fb67b",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "ProtocolCountermodels.pedersen_alternate_opening"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; statement fidelity per research/ecdlp_weakness_lean_20261104/README.md",
+ "statement": "If H = tG then commit(m, r) = commit(m + t, r - 1) for Pedersen commitments."
+}

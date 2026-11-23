@@ -44,11 +44,16 @@ use std::collections::{BTreeMap, HashMap};
 pub type Poly = Vec<u64>;
 
 // ---------------------------------------------------------------------------
-// F_p with p odd and below 2^31, so products fit in u64.
+// F_p with p odd and below 2^62. Below 2^32 products fit in u64 (the
+// original path, unchanged); above, the product is formed in u128.
 
 #[inline]
 fn md(a: u64, b: u64, p: u64) -> u64 {
-    a * b % p
+    if p < (1 << 32) {
+        a * b % p
+    } else {
+        ((a as u128 * b as u128) % p as u128) as u64
+    }
 }
 
 #[inline]
@@ -422,14 +427,29 @@ fn edf(g: &[u64], d: usize, p: u64, rng: &mut SplitMix64, out: &mut Vec<Poly>) {
         out.push(g.to_vec());
         return;
     }
-    let e = ((p as u128).pow(d as u32) - 1) / 2;
+    // `a^((p^d - 1)/2) mod g`. When `p^d` does not fit in a u128 (degree
+    // d >= 3 at 56 bits), use (p^d - 1)/2 = ((p - 1)/2)(1 + p + ... + p^(d-1)):
+    // the product of the d Frobenius conjugates, raised to (p - 1)/2.
+    let q = (p as u128).checked_pow(d as u32);
     loop {
         let mut a: Poly = (0..n).map(|_| rng.below(p)).collect();
         trim(&mut a);
         if deg(&a) < 1 {
             continue;
         }
-        let b = psub(&ppowmod(&a, e, g, p), &[1], p);
+        let half = match q {
+            Some(q) => ppowmod(&a, (q - 1) / 2, g, p),
+            None => {
+                let mut t = prem(&a, g, p);
+                let mut acc = t.clone();
+                for _ in 1..d {
+                    t = ppowmod(&t, p as u128, g, p);
+                    acc = prem(&pmul(&acc, &t, p), g, p);
+                }
+                ppowmod(&acc, ((p - 1) / 2) as u128, g, p)
+            }
+        };
+        let b = psub(&half, &[1], p);
         let h = pgcd(&b, g, p);
         let dh = deg(&h);
         if dh > 0 && (dh as usize) < n {
@@ -727,7 +747,10 @@ fn kp_gcd(k: &Ext, a: &[El], b: &[El]) -> Vec<El> {
 /// One root in `K` of a monic polynomial over `K` with distinct roots, all in `K`.
 fn kp_one_root(k: &Ext, f: &[El], rng: &mut SplitMix64) -> El {
     let mut f = kp_monic(k, f);
-    let e = (k.size().expect("|K| fits in u128") - 1) / 2;
+    // `(|K| - 1)/2`, or `None` when `|K| = p^d` overflows a u128; then the
+    // power is taken as the product of the d Frobenius conjugates raised to
+    // (p - 1)/2 (see `edf`).
+    let e = k.size().map(|q| (q - 1) / 2);
     loop {
         let n = f.len() - 1;
         if n == 1 {
@@ -746,16 +769,31 @@ fn kp_one_root(k: &Ext, f: &[El], rng: &mut SplitMix64) -> El {
         if a.len() < 2 {
             continue;
         }
-        let mut r = vec![k.one()];
-        let mut b = kp_divrem(k, &a, &f).1;
-        let mut ee = e;
-        while ee > 0 {
-            if ee & 1 == 1 {
-                r = kp_mulmod(k, &r, &b, &f);
+        let pw = |base: &[El], mut ee: u128| -> Vec<El> {
+            let mut r = vec![k.one()];
+            let mut b = base.to_vec();
+            while ee > 0 {
+                if ee & 1 == 1 {
+                    r = kp_mulmod(k, &r, &b, &f);
+                }
+                b = kp_mulmod(k, &b, &b, &f);
+                ee >>= 1;
             }
-            b = kp_mulmod(k, &b, &b, &f);
-            ee >>= 1;
-        }
+            r
+        };
+        let a0 = kp_divrem(k, &a, &f).1;
+        let mut r = match e {
+            Some(e) => pw(&a0, e),
+            None => {
+                let mut t = a0.clone();
+                let mut acc = a0;
+                for _ in 1..k.d {
+                    t = pw(&t, k.p as u128);
+                    acc = kp_mulmod(k, &acc, &t, &f);
+                }
+                pw(&acc, ((k.p - 1) / 2) as u128)
+            }
+        };
         if r.is_empty() {
             r.push(k.zero());
         }
@@ -1698,8 +1736,8 @@ impl Diag {
 /// `None` if `F` is not squarefree.
 pub fn analyze_curve(f: &[u64], p: u64, rng: &mut SplitMix64) -> Option<CurveOutcome> {
     assert!(
-        p % 2 == 1 && (7..(1 << 31)).contains(&p),
-        "odd prime 7 <= p < 2^31"
+        p % 2 == 1 && (7..(1 << 62)).contains(&p),
+        "odd prime 7 <= p < 2^62"
     );
     let w = Weierstrass::new(f, p, rng)?;
     let subgroups = tractable_subgroups(&w, rng)

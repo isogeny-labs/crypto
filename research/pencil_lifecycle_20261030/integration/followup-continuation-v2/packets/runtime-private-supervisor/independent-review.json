@@ -1,0 +1,29 @@
+{
+  "schema": "private.supervisor.independent-mock-replay/v1",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "advisory_design_role": true,
+  "implementation_authorship": false,
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor",
+    "-p",
+    "test_supervise.py",
+    "-v"
+  ],
+  "timeout_seconds": 30,
+  "exit": 0,
+  "tests": 21,
+  "source_hashes": {
+    "supervise.py": "2af9bb631a0d73f8118655857a7bb74b4f688fa26628054251196412a85c0256",
+    "test_supervise.py": "29cd83febb04022e1eaddd10ca33ea8b7fac6fdf53d1362c23773e16277fa21f"
+  },
+  "sources_unchanged": true,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "5c773eabe88cd84952d3164e1f1f871148e5642a8e576790e2ae76da23454211",
+  "service_mount_docker_calls": 0,
+  "execution_admission": false
+}

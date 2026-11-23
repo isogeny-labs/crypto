@@ -1,0 +1,161 @@
+# executor: commands of PROTOCOL.md section 10 in order; unittest stderr goes to raw/unittest.log
+[2026-11-16T20:07:08Z] CMD: python3 -m unittest discover -s tests -v 2> raw/unittest.log ; exit=0
+    066b429549f53ea96158727b8eaf996e3d5053e5607398ec1f919c4d9c68f3ef  raw/unittest.log
+[2026-11-16T20:07:08Z] CMD: python3 run.py gate --g 2 --p 131 --out raw/gate_g2_p131.jsonl ; exit=0
+    de40186ce08e576070c2e104a53f7703bd865f241a3cfde517a93ee191e6c534  raw/gate_g2_p131.jsonl
+[2026-11-16T20:07:13Z] CMD: python3 run.py gate --g 2 --p 257 --out raw/gate_g2_p257.jsonl ; exit=0
+    52cbe952f6117b1c8ebafe13ae7d7533cd4643305281ce5eb53fc90915aedf24  raw/gate_g2_p257.jsonl
+[2026-11-16T20:07:14Z] CMD: python3 run.py gate --g 3 --p 67 --out raw/gate_g3_p67.jsonl ; exit=0
+    5881fdc1f3b200919c894c09333c16f4dbee37772873376442a9d43e4b0ec7aa  raw/gate_g3_p67.jsonl
+[2026-11-16T20:07:21Z] CMD: python3 run.py gate --g 3 --p 97 --out raw/gate_g3_p97.jsonl ; exit=0
+    772a865399dc7c90883f921e6e12ebbef8d6cc100aeeffee2b41a10cf3eacb47  raw/gate_g3_p97.jsonl
+[2026-11-16T20:07:30Z] CMD: python3 run.py relphase --g 2 --p 1031 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p1031_c1_s1.jsonl ; exit=0
+    c5897792f5fb5800fe17e18b1129ea826b2f1f266e362b17f5c1a87202f8dc63  raw/rel_g2_p1031_c1_s1.jsonl
+[2026-11-16T20:07:30Z] CMD: python3 run.py relphase --g 2 --p 1031 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p1031_c1_s2.jsonl ; exit=0
+    18e207162fc077748fea9e69761db005126c243cdec57da8af69f21592e29345  raw/rel_g2_p1031_c1_s2.jsonl
+[2026-11-16T20:07:31Z] CMD: python3 run.py relphase --g 2 --p 1031 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p1031_c2_s1.jsonl ; exit=0
+    bb3851a0a5c17c59b4cc57c11607837b1c874f7c3e5d4c8bd94660c8e51f29d6  raw/rel_g2_p1031_c2_s1.jsonl
+[2026-11-16T20:07:31Z] CMD: python3 run.py relphase --g 2 --p 1031 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p1031_c2_s2.jsonl ; exit=0
+    59739154f5fea3675bedd233fb2fe5416c2c686f07de1fdd36a0cbd15133f0cd  raw/rel_g2_p1031_c2_s2.jsonl
+[2026-11-16T20:07:32Z] CMD: python3 run.py relphase --g 2 --p 1031 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p1031_c3_s1.jsonl ; exit=0
+    c99ae9a772b7400635c88e5b5767638a659e56b3617841793b1699523e4ba4fc  raw/rel_g2_p1031_c3_s1.jsonl
+[2026-11-16T20:07:32Z] CMD: python3 run.py relphase --g 2 --p 1031 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p1031_c3_s2.jsonl ; exit=0
+    1cea5d413e5fb937a3b060fc052ee18ccc4102ded2a1f42c82a72461204c33b1  raw/rel_g2_p1031_c3_s2.jsonl
+[2026-11-16T20:07:33Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p4099_c1_s1.jsonl ; exit=0
+    721851f0708c71c120010cd015fa898ce5b39773ec0e724bc85ba38ab0643974  raw/rel_g2_p4099_c1_s1.jsonl
+[2026-11-16T20:07:34Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p4099_c1_s2.jsonl ; exit=0
+    94f671b918831b8e0a57566183772e45a3d7c9969dfaca8ec0b1b4379b0dea2b  raw/rel_g2_p4099_c1_s2.jsonl
+[2026-11-16T20:07:34Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p4099_c2_s1.jsonl ; exit=0
+    c61188a88dfe741db4cd633402732c60f99ed84b9da2dd96f5fda1c4c615ceac  raw/rel_g2_p4099_c2_s1.jsonl
+[2026-11-16T20:07:35Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p4099_c2_s2.jsonl ; exit=0
+    0aaedf5467bdd20fbb241c0a3c6117b029070b9ee794aa238d7c9b5620c513ff  raw/rel_g2_p4099_c2_s2.jsonl
+[2026-11-16T20:07:36Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p4099_c3_s1.jsonl ; exit=0
+    6c9b387e81b0a6b27ade85371126d32f54382551de6d9c6005a75be563b56986  raw/rel_g2_p4099_c3_s1.jsonl
+[2026-11-16T20:07:37Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p4099_c3_s2.jsonl ; exit=0
+    ee53cc05a3162f62943cd0e6c774a7a0080a1fcf71899399e5799b214905fedf  raw/rel_g2_p4099_c3_s2.jsonl
+[2026-11-16T20:07:38Z] CMD: python3 run.py relphase --g 2 --p 16411 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p16411_c1_s1.jsonl ; exit=0
+    42b8b1f8388b518498090869d8da74961e7ebbb854dd01eddf5205f25cca6be2  raw/rel_g2_p16411_c1_s1.jsonl
+[2026-11-16T20:07:41Z] CMD: python3 run.py relphase --g 2 --p 16411 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p16411_c1_s2.jsonl ; exit=0
+    f1858dec785af2b8f75ed7c422d6e7e47d9f5a346e4adfd5ffa96597051d25f9  raw/rel_g2_p16411_c1_s2.jsonl
+[2026-11-16T20:07:44Z] CMD: python3 run.py relphase --g 2 --p 16411 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p16411_c2_s1.jsonl ; exit=0
+    80c54afe5f3488551db90cbce706c134b2ab79447e34ef6f8e275fcb5d03c319  raw/rel_g2_p16411_c2_s1.jsonl
+[2026-11-16T20:07:47Z] CMD: python3 run.py relphase --g 2 --p 16411 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p16411_c2_s2.jsonl ; exit=0
+    a2fa62fc4ad18d25a1b9721fa6c0433080dd0ba0178e1476e3b17374b1d50e3d  raw/rel_g2_p16411_c2_s2.jsonl
+[2026-11-16T20:07:50Z] CMD: python3 run.py relphase --g 2 --p 16411 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p16411_c3_s1.jsonl ; exit=0
+    339c00dd931aef7e797ba3c2acfbf914be4cab4950d224855ddb965026ea8433  raw/rel_g2_p16411_c3_s1.jsonl
+[2026-11-16T20:07:53Z] CMD: python3 run.py relphase --g 2 --p 16411 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p16411_c3_s2.jsonl ; exit=0
+    5edd0ebb249c660bda1f6453beebc19688d2a5cfe42bf7b1d1deb3d80628d042  raw/rel_g2_p16411_c3_s2.jsonl
+[2026-11-16T20:07:56Z] CMD: python3 run.py relphase --g 2 --p 65537 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p65537_c1_s1.jsonl ; exit=0
+    fcfd70e54a97ce8c1313bea1244e5c0b89f84e9e3931ffd770977a2d12bec8ec  raw/rel_g2_p65537_c1_s1.jsonl
+[2026-11-16T20:08:07Z] CMD: python3 run.py relphase --g 2 --p 65537 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p65537_c1_s2.jsonl ; exit=0
+    789202348932f8c10c079c55052882f33c11497c0954d5606437067f91ec9496  raw/rel_g2_p65537_c1_s2.jsonl
+[2026-11-16T20:08:18Z] CMD: python3 run.py relphase --g 2 --p 65537 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p65537_c2_s1.jsonl ; exit=0
+    1a5ce46fc83156cb9d196771b0e09919addc73ff560f69c11993a33e0bad84c8  raw/rel_g2_p65537_c2_s1.jsonl
+[2026-11-16T20:08:30Z] CMD: python3 run.py relphase --g 2 --p 65537 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p65537_c2_s2.jsonl ; exit=0
+    3ad1c00baad95304b2a02c879836738af7fa57129d12cced96f58442bbc43341  raw/rel_g2_p65537_c2_s2.jsonl
+[2026-11-16T20:08:41Z] CMD: python3 run.py relphase --g 2 --p 65537 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p65537_c3_s1.jsonl ; exit=0
+    9004ff2127e37af0d67c1c031fb9459c4e724455dc3787f2c7db725ad3350a4f  raw/rel_g2_p65537_c3_s1.jsonl
+[2026-11-16T20:08:53Z] CMD: python3 run.py relphase --g 2 --p 65537 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g2_p65537_c3_s2.jsonl ; exit=0
+    db1fd4395513217349d23e2f4c0e9b94946373f2cf20db59293f3af427b0d40a  raw/rel_g2_p65537_c3_s2.jsonl
+[2026-11-16T20:09:04Z] CMD: python3 run.py relphase --g 3 --p 1031 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p1031_c1_s1.jsonl ; exit=0
+    7604736daf634465977ce1cce8a03f19645742b39889fcfe36264888f2b2205f  raw/rel_g3_p1031_c1_s1.jsonl
+[2026-11-16T20:09:05Z] CMD: python3 run.py relphase --g 3 --p 1031 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p1031_c1_s2.jsonl ; exit=0
+    dd17f3c04385a10a3bb989628e52928bba1d1ceaf693c316ae86cedaa4a85d98  raw/rel_g3_p1031_c1_s2.jsonl
+[2026-11-16T20:09:05Z] CMD: python3 run.py relphase --g 3 --p 1031 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p1031_c2_s1.jsonl ; exit=0
+    a886eb21ce0fd210af38d61684008e9c9105d0a47cbabfdf7367a6fb07ff4ca0  raw/rel_g3_p1031_c2_s1.jsonl
+[2026-11-16T20:09:06Z] CMD: python3 run.py relphase --g 3 --p 1031 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p1031_c2_s2.jsonl ; exit=0
+    c2d9a74551add8bf3aec6b681d44ec29f0276971a57966185d5af80cc6eeaafa  raw/rel_g3_p1031_c2_s2.jsonl
+[2026-11-16T20:09:06Z] CMD: python3 run.py relphase --g 3 --p 1031 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p1031_c3_s1.jsonl ; exit=0
+    5a069a3d63314ccdce7645eb92cb2871d88305e941ad473093a9910604b80eb2  raw/rel_g3_p1031_c3_s1.jsonl
+[2026-11-16T20:09:07Z] CMD: python3 run.py relphase --g 3 --p 1031 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p1031_c3_s2.jsonl ; exit=0
+    1841ab348c48dcbe0d40a326e8d8ee27f822b897509eb79d671ffcefe3e40aa2  raw/rel_g3_p1031_c3_s2.jsonl
+[2026-11-16T20:09:08Z] CMD: python3 run.py relphase --g 3 --p 4099 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p4099_c1_s1.jsonl ; exit=0
+    d8f7a1f1fd708d7bf1b6224d8b998d1e57002085507ae7dbb7b855864dc77478  raw/rel_g3_p4099_c1_s1.jsonl
+[2026-11-16T20:09:10Z] CMD: python3 run.py relphase --g 3 --p 4099 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p4099_c1_s2.jsonl ; exit=0
+    cbd3a4ddb4aff5de9ea628a400831d855382f8dea8f7b20c5f5510aca5176044  raw/rel_g3_p4099_c1_s2.jsonl
+[2026-11-16T20:09:12Z] CMD: python3 run.py relphase --g 3 --p 4099 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p4099_c2_s1.jsonl ; exit=0
+    6122b9c5585da7982ff2de403d3656ab201b26a288c5be5c984415dc6fe4d1cb  raw/rel_g3_p4099_c2_s1.jsonl
+[2026-11-16T20:09:14Z] CMD: python3 run.py relphase --g 3 --p 4099 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p4099_c2_s2.jsonl ; exit=0
+    99cfd5c0267e88186febae8b0dfd8afbf486237c8890f700ba1c7620819e0d70  raw/rel_g3_p4099_c2_s2.jsonl
+[2026-11-16T20:09:17Z] CMD: python3 run.py relphase --g 3 --p 4099 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p4099_c3_s1.jsonl ; exit=0
+    9bfd49f3952675e135d440023b548e3e67ac137394bb7ca0eed51e766fc6be3d  raw/rel_g3_p4099_c3_s1.jsonl
+[2026-11-16T20:09:19Z] CMD: python3 run.py relphase --g 3 --p 4099 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p4099_c3_s2.jsonl ; exit=0
+    a31e9760371fa4c72fb4e4401bf0959f43b6c0448cfe6c7fd9fb235f27b624c6  raw/rel_g3_p4099_c3_s2.jsonl
+[2026-11-16T20:09:21Z] CMD: python3 run.py relphase --g 3 --p 16411 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p16411_c1_s1.jsonl ; exit=0
+    fda80d7d845cdec1f411d4beec0262e95c1762e759cc3740fc9f97f008d70648  raw/rel_g3_p16411_c1_s1.jsonl
+[2026-11-16T20:09:28Z] CMD: python3 run.py relphase --g 3 --p 16411 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p16411_c1_s2.jsonl ; exit=0
+    9f5f1ec4e5d1816bc548f6203cc3ab2737f48b7945b2a74aa912f3c1a30777cc  raw/rel_g3_p16411_c1_s2.jsonl
+[2026-11-16T20:09:36Z] CMD: python3 run.py relphase --g 3 --p 16411 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p16411_c2_s1.jsonl ; exit=0
+    3a4d9c16b1334f5096844439347c969745553b341542599d25dc07e965ee833c  raw/rel_g3_p16411_c2_s1.jsonl
+[2026-11-16T20:09:43Z] CMD: python3 run.py relphase --g 3 --p 16411 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p16411_c2_s2.jsonl ; exit=0
+    98aef0c89591a131c9205769d12ff14d6736b8df85912ee0656fe344fb3022ec  raw/rel_g3_p16411_c2_s2.jsonl
+[2026-11-16T20:09:50Z] CMD: python3 run.py relphase --g 3 --p 16411 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p16411_c3_s1.jsonl ; exit=0
+    71d93b116c49a2714b0d11332128c3879ad4f2b19da91338713d915c09481b2f  raw/rel_g3_p16411_c3_s1.jsonl
+[2026-11-16T20:09:57Z] CMD: python3 run.py relphase --g 3 --p 16411 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p16411_c3_s2.jsonl ; exit=0
+    afcd9328eb4375a7ce999d6949490fed7bad5858fe63b4e5062bdc87a7e9466b  raw/rel_g3_p16411_c3_s2.jsonl
+[2026-11-16T20:10:05Z] CMD: python3 run.py relphase --g 3 --p 65537 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p65537_c1_s1.jsonl ; exit=0
+    130fbad8dd30cbebbf06a369cc7e3ea4f99beea0c316bef4708d9e9b64180219  raw/rel_g3_p65537_c1_s1.jsonl
+[2026-11-16T20:10:37Z] CMD: python3 run.py relphase --g 3 --p 65537 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p65537_c1_s2.jsonl ; exit=0
+    3001c73a4e97a40918b88dc6e5db42d69c37037850cf75c88ca24ef930a4c8c7  raw/rel_g3_p65537_c1_s2.jsonl
+[2026-11-16T20:11:10Z] CMD: python3 run.py relphase --g 3 --p 65537 --curve-index 2 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p65537_c2_s1.jsonl ; exit=0
+    131775fd52d7c143560d401c06cbaf1faceb2c38102e64c3db6a548f2fc3be0e  raw/rel_g3_p65537_c2_s1.jsonl
+[2026-11-16T20:11:43Z] CMD: python3 run.py relphase --g 3 --p 65537 --curve-index 2 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p65537_c2_s2.jsonl ; exit=0
+    12d4ef2da797a94c1217c66fd9f06fac1f29164f75d348017ff1a8ed1d41280d  raw/rel_g3_p65537_c2_s2.jsonl
+[2026-11-16T20:12:15Z] CMD: python3 run.py relphase --g 3 --p 65537 --curve-index 3 --seed 1 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p65537_c3_s1.jsonl ; exit=0
+    1630ca3de3455f7b53df48bf4a954cbad561532aa8a5cf48a0ef090b74fd5df9  raw/rel_g3_p65537_c3_s1.jsonl
+[2026-11-16T20:12:48Z] CMD: python3 run.py relphase --g 3 --p 65537 --curve-index 3 --seed 2 --arms P_full,P_naive1,B_lab --rows-dir raw/rows --out raw/rel_g3_p65537_c3_s2.jsonl ; exit=0
+    3efe7752bf02d3feff2f27d8e8201c4e16fe928459437c8273543b16366e3e75  raw/rel_g3_p65537_c3_s2.jsonl
+[2026-11-16T20:13:21Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 1 --seed 1 --arms P_full,P_naive1,B_lab --out raw/aa_g2_p4099_c1_s1.jsonl ; exit=0
+    d47801452e75a920cc11c5de6e4dcb0ff913bbcd7b272ae3dd6272d9fac3c8d2  raw/aa_g2_p4099_c1_s1.jsonl
+[2026-11-16T20:13:21Z] CMD: python3 run.py relphase --g 2 --p 4099 --curve-index 1 --seed 2 --arms P_full,P_naive1,B_lab --out raw/aa_g2_p4099_c1_s2.jsonl ; exit=0
+    94059b75d6a4cc805cc218eb4faf53baff5ebb4d57d82d2ae0af7a18e451bc2e  raw/aa_g2_p4099_c1_s2.jsonl
+[2026-11-16T20:13:22Z] CMD: python3 run.py lp2 --g 2 --p 4099 --curve-index 1 --seed 1 --out raw/lp2_g2_p4099_c1.jsonl ; exit=0
+    56d1c2cc2c037d811e2a70ecfe7f0dd51d68c170f6c6d5463e0a69e592c1e396  raw/lp2_g2_p4099_c1.jsonl
+[2026-11-16T20:13:23Z] CMD: python3 run.py lp2 --g 2 --p 4099 --curve-index 2 --seed 1 --out raw/lp2_g2_p4099_c2.jsonl ; exit=0
+    334a3d25a50b9699871e396818b749f9dac74e250a43d009d5b2bda42dcfadb3  raw/lp2_g2_p4099_c2.jsonl
+[2026-11-16T20:13:23Z] CMD: python3 run.py lp2 --g 2 --p 4099 --curve-index 3 --seed 1 --out raw/lp2_g2_p4099_c3.jsonl ; exit=0
+    efb0bbfe4584b64c2f8cecd92e9971e62e0686b36967b4e1a385b508351c6580  raw/lp2_g2_p4099_c3.jsonl
+[2026-11-16T20:13:24Z] CMD: python3 run.py lp2 --g 2 --p 16411 --curve-index 1 --seed 1 --out raw/lp2_g2_p16411_c1.jsonl ; exit=0
+    f185aac8f1071dab1cc0e61ebeb5f130c2a7051ddcbdcc924ac04f8c2ec290bd  raw/lp2_g2_p16411_c1.jsonl
+[2026-11-16T20:13:26Z] CMD: python3 run.py lp2 --g 2 --p 16411 --curve-index 2 --seed 1 --out raw/lp2_g2_p16411_c2.jsonl ; exit=0
+    9e77773b50bc427f0ce37b0801b1a5f1f54e475d6360ed38929f3937448c2537  raw/lp2_g2_p16411_c2.jsonl
+[2026-11-16T20:13:28Z] CMD: python3 run.py lp2 --g 2 --p 16411 --curve-index 3 --seed 1 --out raw/lp2_g2_p16411_c3.jsonl ; exit=0
+    9cb6b65d736f10fcce3f6b14e5756e70765c822bea534cab75e06e9566affa88  raw/lp2_g2_p16411_c3.jsonl
+[2026-11-16T20:13:29Z] CMD: python3 run.py lp2 --g 3 --p 4099 --curve-index 1 --seed 1 --out raw/lp2_g3_p4099_c1.jsonl ; exit=0
+    78cdec0b41efc43b360bd0288d2618f79e3a1921ba6c0f8e14367309cc22d0a1  raw/lp2_g3_p4099_c1.jsonl
+[2026-11-16T20:13:32Z] CMD: python3 run.py lp2 --g 3 --p 4099 --curve-index 2 --seed 1 --out raw/lp2_g3_p4099_c2.jsonl ; exit=0
+    173ef1c3fa17b98b55ab45cb34ab09d548c671454751c07a62301e4dd0126b6b  raw/lp2_g3_p4099_c2.jsonl
+[2026-11-16T20:13:35Z] CMD: python3 run.py lp2 --g 3 --p 4099 --curve-index 3 --seed 1 --out raw/lp2_g3_p4099_c3.jsonl ; exit=0
+    d5dfde60ab0b7508eaf7c7dd5d46372692bdcaad677e8bc235572c86c776b381  raw/lp2_g3_p4099_c3.jsonl
+[2026-11-16T20:13:38Z] CMD: python3 run.py lp2 --g 3 --p 16411 --curve-index 1 --seed 1 --out raw/lp2_g3_p16411_c1.jsonl ; exit=0
+    a731c27cdfab20da031deeef0abcebfa6283082bd6d9961820ae6dfd934b4807  raw/lp2_g3_p16411_c1.jsonl
+[2026-11-16T20:13:50Z] CMD: python3 run.py lp2 --g 3 --p 16411 --curve-index 2 --seed 1 --out raw/lp2_g3_p16411_c2.jsonl ; exit=0
+    1fc84a7cc008281ba981d9c7b11d7fa781521ad96aa7c48f92ff4e545cae1984  raw/lp2_g3_p16411_c2.jsonl
+[2026-11-16T20:14:03Z] CMD: python3 run.py lp2 --g 3 --p 16411 --curve-index 3 --seed 1 --out raw/lp2_g3_p16411_c3.jsonl ; exit=0
+    be2ec766709c430449e1107a3fa1ae5b3a86961a62275fe01a7e53e76ca4eaef  raw/lp2_g3_p16411_c3.jsonl
+[2026-11-16T20:14:15Z] CMD: python3 run.py la --g 2 --p 1031 --curve-index 1 --seed 1 --rows-dir raw/rows --out raw/la_g2_p1031_c1.jsonl ; exit=0
+    d631169a9c637171b1b965b4c0fb35a8a565f74a33ddaaebc434a7af1f21ba2d  raw/la_g2_p1031_c1.jsonl
+[2026-11-16T20:14:16Z] CMD: python3 run.py la --g 2 --p 1031 --curve-index 2 --seed 1 --rows-dir raw/rows --out raw/la_g2_p1031_c2.jsonl ; exit=0
+    9fd294f74a38d44218e648998161706716dd979df2182aa3b2f8116492a47bf8  raw/la_g2_p1031_c2.jsonl
+[2026-11-16T20:14:16Z] CMD: python3 run.py la --g 2 --p 1031 --curve-index 3 --seed 1 --rows-dir raw/rows --out raw/la_g2_p1031_c3.jsonl ; exit=0
+    1fa9cd6b445522e26ac5784a097ecaf658d51f2ea4dc7e43c0bcad0f7c96b82d  raw/la_g2_p1031_c3.jsonl
+[2026-11-16T20:14:16Z] CMD: python3 run.py la --g 2 --p 4099 --curve-index 1 --seed 1 --rows-dir raw/rows --out raw/la_g2_p4099_c1.jsonl ; exit=0
+    ba334d33d967dc2569968b949970da19c47a5f56a7a6ca426ab83a77426e6be9  raw/la_g2_p4099_c1.jsonl
+[2026-11-16T20:14:17Z] CMD: python3 run.py la --g 2 --p 4099 --curve-index 2 --seed 1 --rows-dir raw/rows --out raw/la_g2_p4099_c2.jsonl ; exit=0
+    5fd176a34f6368e5db8540c2aeb0230805a096f0a0df8bac61218573581f416a  raw/la_g2_p4099_c2.jsonl
+[2026-11-16T20:14:19Z] CMD: python3 run.py la --g 2 --p 4099 --curve-index 3 --seed 1 --rows-dir raw/rows --out raw/la_g2_p4099_c3.jsonl ; exit=0
+    5cd37e204d89ed354583347861fb302e99431648b2abb5264042659d3a97842f  raw/la_g2_p4099_c3.jsonl
+[2026-11-16T20:14:20Z] CMD: python3 run.py la --g 3 --p 1031 --curve-index 1 --seed 1 --rows-dir raw/rows --out raw/la_g3_p1031_c1.jsonl ; exit=0
+    1d6be22c39422fbc1612ab15c94146d2394631719983cc848c4c8c569eba2b4c  raw/la_g3_p1031_c1.jsonl
+[2026-11-16T20:14:21Z] CMD: python3 run.py la --g 3 --p 1031 --curve-index 2 --seed 1 --rows-dir raw/rows --out raw/la_g3_p1031_c2.jsonl ; exit=0
+    822e08894e84ad13232dc1ce37b181b3fa8a1adc8f99e843d1294fa871ee8aa3  raw/la_g3_p1031_c2.jsonl
+[2026-11-16T20:14:21Z] CMD: python3 run.py la --g 3 --p 1031 --curve-index 3 --seed 1 --rows-dir raw/rows --out raw/la_g3_p1031_c3.jsonl ; exit=0
+    643d810b392504079315fb30561c7b3536782818b979824500642c94ec3399f4  raw/la_g3_p1031_c3.jsonl
+[2026-11-16T20:16:09Z] CMD: python3 analyze.py --raw raw --out-json raw/analysis.json --out-md raw/summary.md ; exit=0
+    ebade838f675b6f58bade43bed747d23c61d2e468913222b12bf82294e0cb2d8  raw/analysis.json
+[2026-11-16T20:17:02Z] CMD: python3 make_results.py (generates raw/results_tables.md and plot.svg; not in PROTOCOL section 10) ; exit=0
+[2026-11-16T20:17:02Z] CMD: sha256sum raw/*.jsonl raw/rows/* raw/analysis.json raw/summary.md > raw/data.sha256 ; exit=0
+fb7b16ef8f66864eab4961b0db478df4196a07cce5735b9b7fbc89ccba60f5bb  raw/data.sha256
+c813106dc90d7ad508b61df7914550a647662232ccb78849d99c41db38d04f0b  raw/results_tables.md
+7036d515b770a5270ff71e385194ad9c85554210060cc239515fd5058e9bcf09  plot.svg
+[2026-11-16T20:17:49Z] FINAL: RESULTS.md, DEVIATIONS.md, IMPLEMENTATION_NOTES.md written

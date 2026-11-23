@@ -1,0 +1,31 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{theorem}{Theorem}
+\title{Exact Weighted Integer Fibers for Finite-Field Rootfinding Components}
+\author{Generalized Rootfinding Research Checkpoint C143}
+\date{17 November 2026}
+\begin{document}\maketitle
+\begin{abstract}
+We describe an exact bounded frontend for a polynomial constraint whose restriction to a certified field direction is affine. Integer box domains admit disjoint boundary representatives; coordinate reflection handles signed directions. Independent exhaustive small checks and coefficient-family examples are reported. These results do not establish a novel complete generalized-rootfinding algorithm or qualified superiority over Gr\"obner methods.
+\end{abstract}
+Let $p$ be prime, $0\le M_i<p$, and suppose an independently certified identity holds for every field tuple and scalar:
+\[c(z+t v)=c(z)+\kappa t.\]
+Additional original predicates are arbitrary and remain mandatory. Reflect a coordinate with negative integer $v_i$ by $\theta_i=M_i-y_i$; leave the others unchanged. This bijects the original box and replaces the direction by $w_i=|v_i|$ with the same slope.
+\begin{theorem}
+For nonzero $w\ge0$, the integer box partitions uniquely into fibers $y=u+bw$ with some $u_i<w_i$ and
+\[0\le b\le\min_{i:w_i>0}\left\lfloor\frac{M_i-u_i}{w_i}\right\rfloor<p.\]
+The number of boundary representatives is exactly
+\[N=\prod_i(M_i+1)-\prod_i\max(M_i+1-w_i,0).\]
+If $\kappa\ne0$, the only possible root parameter in each fiber is $b=-c'(u)/\kappa\pmod p$, where $c'$ includes the reflection. Retaining this parameter only when its canonical integer lies in the joint fiber range, followed by every original predicate, returns all original ordered roots exactly once. If $\kappa=0$, retain the entire admissible fiber precisely when $c'(u)=0$.
+\end{theorem}
+\begin{proof}
+For any original $y$, set $b=\min_{i:w_i>0}\lfloor y_i/w_i\rfloor$ and $u=y-bw$. Then $u$ lies in the box and at least one positive-direction coordinate is smaller than its weight. Conversely this normalization is unique on each integer translation fiber. Partition the boundary by the first such coordinate: the complement consists exactly of points with $u_i\ge w_i$ for every positive weight, yielding the stated product difference. The pivot range has fewer than or equal to $p$ integer points, so a nonzero field slope selects at most one. The affine identity proves necessity and sufficiency of the selected parameter; disjoint integer normalization prevents duplicate original tuples even when several fibers lie in one modular field orbit. Zero slopes and arbitrary predicates follow directly.
+\end{proof}
+A zero integer direction uses capped direct enumeration. Empty domains return complete empty; candidate or output admission failures return incomplete with null roots and count. Work is boundary enumeration plus correction, validation and unavoidable output costs. This does not make a refused full-width domain tractable.
+
+\paragraph{Evidence.} One frozen CPU0 worker checked 32,430 structural cases, 97,290 complete small root sets, and 888 signed cases over primes 3,5,7, exercising all box bounds below each prime and integer weights 0 through 3. A separate profile checked 17 certified coefficient-family contexts. All five NIST examples admit balanced directions with magnitudes $(1,1,1)$, hence $N=(M+1)^3-M^3$ in those boxes. These are candidate counts, not speedups. The original hard binary 63-selector direction preserves only an $\mathbb F_2$ translation factor of two; the larger coefficient-prefix result does not transfer to it.
+
+\paragraph{Measurement limits.} The earlier C142 development result was 2.9473 times geometrically faster than its preceding projected-product wrapper on 20 components. It was not a genuine F4/F5/F6 comparison. C143 has no new paired speed ratio. Identical 16 MiB probes under different ledger launchers produced nearly equal post-exec high-water RSS but very different lifetime RSS, so both channels must remain distinct. The full matching hard-instance release gate remains unpassed.
+
+\paragraph{Prior art and open work.} Boundary partitions, reflections, projective scaling and additive quotients are standard constructions. Primary-source receipts and raw evidence accompany this note; novelty of a complete solver is unestablished. Next work is symbolic integration with every original support and auxiliary constraint, a general additive-domain quotient for odd extensions, and completed independent original-root comparisons before hard performance evaluation.
+\end{document}

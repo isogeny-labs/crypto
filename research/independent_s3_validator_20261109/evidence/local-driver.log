@@ -1,0 +1,92 @@
+src/main.rs: OK
+run-driver.sh: OK
+compare.mjs: OK
+check-protocol.mjs: OK
+PROTOCOL.md: OK
+provenance.json: OK
+.gitignore: OK
+../../.github/workflows/theorem-audit-independent-s3.yml: OK
+../theorem_census_20261109/evidence/semaev-native.jsonl: OK
+{"protocol_id":"independent-s3-20261109","protocol_sha256":"44eea2cae6e05da1f23450dab8373984e369929ce9abf8a2d2227786db67e820","source_sha256":"c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1"}
+
+S3_VALIDATOR_BEGIN host.json
+{
+  "schema": "independent-s3-host/v1",
+  "arm": "local",
+  "created": "2026-11-09T05:44:11.185Z",
+  "git_sha": "770ee2e560370eaaf08d5dca3b8d3a9a596384ba",
+  "source_sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "9cee15ca13d1a8160ecfdb8d5d5219b0d52e5a7efa3a23428a8b2d0d464d6afe",
+  "protocol_sha256": "44eea2cae6e05da1f23450dab8373984e369929ce9abf8a2d2227786db67e820",
+  "os": "Linux",
+  "release": "6.18.57",
+  "arch": "x64",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "threads": 1,
+  "clock_valid": false
+}
+
+S3_VALIDATOR_END host.json
+
+S3_VALIDATOR_BEGIN build.exit
+0
+
+S3_VALIDATOR_END build.exit
+
+S3_VALIDATOR_BEGIN build.stdout
+
+S3_VALIDATOR_END build.stdout
+
+S3_VALIDATOR_BEGIN build.stderr
+
+S3_VALIDATOR_END build.stderr
+
+S3_VALIDATOR_BEGIN actual.jsonl
+{"q":5,"m":3,"curves":20,"tuples":2500,"zeros":496,"false_zeros":0,"missing_zeros":0}
+{"q":7,"m":3,"curves":42,"tuples":14406,"zeros":2052,"false_zeros":0,"missing_zeros":0}
+{"q":11,"m":3,"curves":110,"tuples":146410,"zeros":13300,"false_zeros":0,"missing_zeros":0}
+{"q":13,"m":3,"curves":156,"tuples":342732,"zeros":26352,"false_zeros":0,"missing_zeros":0}
+{"q":17,"m":3,"curves":272,"tuples":1336336,"zeros":78592,"false_zeros":0,"missing_zeros":0}
+{"q":19,"m":3,"curves":342,"tuples":2345778,"zeros":123444,"false_zeros":0,"missing_zeros":0}
+
+S3_VALIDATOR_END actual.jsonl
+
+S3_VALIDATOR_BEGIN actual.stderr
+{"q":5,"nonsquare":2,"inverse_checks":24,"base_square_lifts":5,"sum_membership_checks":true}
+{"q":7,"nonsquare":3,"inverse_checks":48,"base_square_lifts":7,"sum_membership_checks":true}
+{"q":11,"nonsquare":2,"inverse_checks":120,"base_square_lifts":11,"sum_membership_checks":true}
+{"q":13,"nonsquare":2,"inverse_checks":168,"base_square_lifts":13,"sum_membership_checks":true}
+{"q":17,"nonsquare":3,"inverse_checks":288,"base_square_lifts":17,"sum_membership_checks":true}
+{"q":19,"nonsquare":2,"inverse_checks":360,"base_square_lifts":19,"sum_membership_checks":true}
+
+S3_VALIDATOR_END actual.stderr
+
+S3_VALIDATOR_BEGIN comparison.json
+{"comparison":"Rust versus existing independent C++ S3 prime-field aggregates","fields":[5,7,11,13,17,19],"matched":true,"scope":"Both directions/counts only; not binary, S4/S5, symbolic degrees, signed or execution-proof standing."}
+
+S3_VALIDATOR_END comparison.json
+
+S3_VALIDATOR_BEGIN comparison.stderr
+
+S3_VALIDATOR_END comparison.stderr
+
+S3_VALIDATOR_BEGIN run.exit
+0
+
+S3_VALIDATOR_END run.exit
+
+S3_VALIDATOR_BEGIN comparison.exit
+0
+
+S3_VALIDATOR_END comparison.exit
+
+S3_VALIDATOR_BEGIN start-epoch
+1794203049
+
+S3_VALIDATOR_END start-epoch
+
+S3_VALIDATOR_BEGIN end-epoch
+1794203051
+
+S3_VALIDATOR_END end-epoch

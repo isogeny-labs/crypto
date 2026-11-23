@@ -1,0 +1,247 @@
+{
+  "format": "correspondence-assessment-v3",
+  "case_id": "integer-factoring-residual-identity-to-ic-partial-relations-20261101",
+  "authority": "Draft diagnostic mechanism assessment; no research-state, performance, or security promotion.",
+  "source": {
+    "object": "quadratic-order partial relation with a fixed-base word and a composite residual ideal keyed by norm plus canonical arithmetic root",
+    "subgroup": "not an ECDLP subgroup; the source relation lattice is used only as an algorithmic design pattern"
+  },
+  "destination": {
+    "object": "isogeny-labs/crypto ic.pipeline partial-relation collector on an exact ICV1/EC1 curve and factor base to be frozen by the correctness fixture",
+    "group_object": "the prime-order subgroup <G> together with verified relation rows over Z/rZ"
+  },
+  "transformation": {
+    "kind": "algorithmic-mechanism adaptation, not an algebraic-object homomorphism or ECDLP transfer"
+  },
+  "typed_path": {
+    "nodes": [
+      "factoring partial: fixed-base word plus oriented residual ideal",
+      "proposed IC partial: factor-base row plus unit-weighted canonical residual atom",
+      "independently replayed complete row modulo r",
+      "existing ic.pipeline relation matrix and individual-log recovery"
+    ],
+    "edges": [
+      "design analogy: bind full residual identity, ambient context, and orientation/unit",
+      "open implementation: eliminate only compatible equal-key residual records",
+      "existing interface: replay verified row before matrix insertion"
+    ],
+    "weakest_open_obligation": "Implement the adversarial typed-key fixture and show every admitted collision eliminates to a source-group identity identical to the legacy collector on the compatible subset."
+  },
+  "algebraic_screen": {
+    "dimension": {
+      "state": "not_applicable",
+      "evidence": [],
+      "scope": "No change of curve, abelian variety, or dimension is proposed."
+    },
+    "group_order": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "The A0/A1 fixture has not frozen its exact source curve, subgroup order, and factor-base identity."
+    },
+    "frobenius_or_weil_polynomial": {
+      "state": "not_applicable",
+      "evidence": [],
+      "scope": "No isogeny-class or field-transfer claim is made."
+    },
+    "field_of_definition": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "The fixture must bind one prime-field and one binary-field case; no cross-field map is proposed."
+    },
+    "riemann_hurwitz_or_different": {
+      "state": "not_applicable",
+      "evidence": [],
+      "scope": "No cover is asserted."
+    },
+    "polarization_or_jacobian_locus": {
+      "state": "not_applicable",
+      "evidence": [],
+      "scope": "No higher-dimensional Jacobian or polarized variety is asserted."
+    }
+  },
+  "obligations": {
+    "existence": {
+      "state": "supported",
+      "evidence": [
+        "factoring-collision-selection",
+        "ic-prime-residual",
+        "ic-double-large-prime"
+      ],
+      "scope": "The source residual mechanism and the destination partial-relation integration seam both exist; this does not establish the proposed adapter."
+    },
+    "explicit_construction": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "The typed destination key and adversarial fixture are specified but not implemented."
+    },
+    "map_correctness": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "There is no homomorphism between the factoring and EC objects; the proposed row-elimination adapter still needs exact group replay."
+    },
+    "subgroup_preservation": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "The candidate must bind subgroup order r and prove that automorphism/orbit units are applied modulo that exact r."
+    },
+    "scalar_recovery": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "Existing ic.pipeline recovery is verified for its current collectors, not for the unimplemented adapter."
+    },
+    "destination_solver_applicability": {
+      "state": "supported",
+      "evidence": [
+        "ic-residual-walks",
+        "ic-prime-residual",
+        "ic-double-large-prime"
+      ],
+      "scope": "The named destination solver accepts independently verified full rows and performs rank, linear algebra, individual-log recovery, and source replay."
+    },
+    "computational_advantage": {
+      "state": "unknown",
+      "evidence": [
+        "factoring-collision-selection",
+        "ic-prime-residual",
+        "ic-double-large-prime"
+      ],
+      "scope": "Upstream query reductions are not wall-time results; host residual gains are generic or finite constant-factor diagnostics. The proposed adapter has no cost record."
+    },
+    "scaling_support": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "No destination scaling run exists for this adapter."
+    },
+    "novelty_within_boundary": {
+      "state": "not_applicable",
+      "evidence": [],
+      "scope": "This is an attributed adaptation of known large-prime and residual-collision patterns, not a novelty claim."
+    }
+  },
+  "solver_assessment": {
+    "name": "ic.pipeline with residual or WideLargePrimeEliminator relation collection, rank modulo r, linear algebra, individual-log recovery, and source verification",
+    "family": "index_calculus",
+    "implementation": "isogeny-labs/crypto@5b1a48263005103527772339162a730726a0babe; current residual and double-large-prime surfaces described by the bound sources",
+    "applicability": {
+      "state": "supported",
+      "evidence": [
+        "ic-residual-walks",
+        "ic-prime-residual",
+        "ic-double-large-prime"
+      ],
+      "scope": "The solver applies once a complete relation is independently replayed in the exact order-r subgroup."
+    },
+    "image_subgroup_access": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "The new key has not yet been shown to preserve the exact orbit/sign coefficient on a frozen subgroup."
+    },
+    "relation_or_search_compatibility": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "Compatibility of the proposed key with all partial shapes and duplicate/rank policy awaits the adversarial fixture."
+    },
+    "individual_log_and_recovery": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "No end-to-end solve has used the proposed adapter."
+    }
+  },
+  "cost_comparison": {
+    "accounting_complete": "unknown",
+    "modeled_or_measured": "unmeasured"
+  },
+  "advantage_measurement": {
+    "claim_scope": "unmeasured",
+    "basis": "unmeasured",
+    "unit": null,
+    "target_count": 1,
+    "source_reference": null,
+    "destination_generic_control": null,
+    "destination_candidate": null,
+    "net_speedup": null,
+    "net_speedup_ci95": null,
+    "verified_pairs": 0,
+    "scaling_sizes": 0,
+    "replay_receipts": [],
+    "unpriced_work": [],
+    "resource_envelope": null,
+    "evidence": []
+  },
+  "sources": [
+    {
+      "id": "factoring-collision-selection",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/cofactor-collision-selection.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "factoring-prime-saturation",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/prime-cofactor-saturation.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "factoring-small-word",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/small-word-fourier-constructor.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "factoring-divisor-moments",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/divisor-moment-recovery.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "factoring-pole-cauchy",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/pole-cauchy-circuit-moments.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "factoring-pole-localization-obstruction",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/pole-cauchy-localization-obstruction.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "factoring-f4-crossing",
+      "uri": "https://github.com/1337isnot1337/integer-factoring/blob/5aebed85b2978ec14868dde354660cb38f55bcb3/research/f4-hyperoval-crossing-bound.md",
+      "revision": "5aebed85b2978ec14868dde354660cb38f55bcb3"
+    },
+    {
+      "id": "ic-residual-walks",
+      "uri": "research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md",
+      "revision": "5b1a48263005103527772339162a730726a0babe"
+    },
+    {
+      "id": "ic-prime-residual",
+      "uri": "research/ic_prime_residual_lp_20261026/README.md",
+      "revision": "5b1a48263005103527772339162a730726a0babe"
+    },
+    {
+      "id": "ic-double-large-prime",
+      "uri": "research/ic_techniques_20261012/double_large_prime/README.md",
+      "revision": "5b1a48263005103527772339162a730726a0babe"
+    },
+    {
+      "id": "ic-multiplier-base",
+      "uri": "research/generator_multiplier_e2e_20261101/README.md",
+      "revision": "5b1a48263005103527772339162a730726a0babe"
+    },
+    {
+      "id": "transfer-methodology",
+      "uri": "docs/transfer-assessment/METHODOLOGY.md",
+      "revision": "5b1a48263005103527772339162a730726a0babe"
+    }
+  ],
+  "open_obligations": [
+    "Freeze exact prime-field and binary-field fixture identities.",
+    "Implement the complete typed residual key and an intentionally under-keyed negative control.",
+    "Prove compatible residual coefficients eliminate modulo the exact subgroup order and independently replay every admitted row.",
+    "Only after correctness, price a held-out cold three-arm comparison including table work, memory, rank, linear algebra, individual log, recovery, and verification."
+  ],
+  "verdicts": {
+    "valid_transfer": "unknown",
+    "algorithmically_relevant": "unknown",
+    "modeled_advantage": "unknown",
+    "measured_advantage": "unknown",
+    "novel_reduction_within_boundary": "not_applicable"
+  },
+  "official_status_change": "none"
+}

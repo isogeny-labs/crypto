@@ -1,0 +1,24 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 1, 0, 0, z^3]);
+assert #E eq 138;
+c := z^94;
+assert WeilDescentGenus(E, GF(2), c) eq 14;
+C, h := WeilDescent(E, GF(2), c);
+print "curve_type", Type(C);
+print "curve_genus", Genus(C);
+found := false;
+for pt in Points(E) do
+    if Order(pt) eq 23 then
+        print "point", pt;
+        print "point_order", Order(pt);
+        image := h(pt);
+        zero_image := h(E!0);
+        print "image_type", Type(image);
+        print "image", image;
+        print "zero_image", zero_image;
+        found := true;
+        break;
+    end if;
+end for;
+assert found;

@@ -1,0 +1,108 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "cheon-ecbench plus: matched rho and Cheon n+1 (comb) with a static-DH oracle, curves of cheon_p224_shape_20261022",
+  "description": "research/cheon_ecbench_20261022/PROTOCOL.md section 3. The cheon.* arm queries the workload's static-DH oracle (2d - 1 queries); queries are counters.oracle_queries, outside the unit. Operation counts only.",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1650266196,
+        "b": 921941151,
+        "group_order": 3221175689,
+        "gx": 4,
+        "gy": 97745148,
+        "kind": "prime_explicit",
+        "p": 3221225473,
+        "r": 3221175689
+      },
+      {
+        "a": 42563202063,
+        "b": 36790426922,
+        "group_order": 51539736719,
+        "gx": 1,
+        "gy": 6624694904,
+        "kind": "prime_explicit",
+        "p": 51539607599,
+        "r": 51539736719
+      },
+      {
+        "a": 549438520351,
+        "b": 720403155216,
+        "group_order": 824633358973,
+        "gx": 3,
+        "gy": 252676842005,
+        "kind": "prime_explicit",
+        "p": 824633720837,
+        "r": 824633358973
+      },
+      {
+        "a": 10139896036112,
+        "b": 12540980411941,
+        "group_order": 13194137032873,
+        "gx": 4,
+        "gy": 2126751510582,
+        "kind": "prime_explicit",
+        "p": 13194139533349,
+        "r": 13194137032873
+      },
+      {
+        "a": 149792481057423,
+        "b": 201282812286566,
+        "group_order": 211106244944429,
+        "gx": 1,
+        "gy": 99919188284797,
+        "kind": "prime_explicit",
+        "p": 211106232533047,
+        "r": 211106244944429
+      },
+      {
+        "a": 675828149500061,
+        "b": 1658838600702915,
+        "group_order": 3377699707176467,
+        "gx": 1,
+        "gy": 326523113627640,
+        "kind": "prime_explicit",
+        "p": 3377699720527897,
+        "r": 3377699707176467
+      },
+      {
+        "a": 51670185159952162,
+        "b": 44313559061370316,
+        "group_order": 54043195250336543,
+        "gx": 4,
+        "gy": 1458116676856818,
+        "kind": "prime_explicit",
+        "p": 54043195528445957,
+        "r": 54043195250336543
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261022
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "cheon-comb",
+      "role": "candidate",
+      "method": {
+        "id": "cheon.pplus1_comb",
+        "params": {
+          "d": "shape:0.21106:0.015"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

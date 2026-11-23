@@ -1,0 +1,47 @@
+import UnionReturn
+set_option autoImplicit false
+namespace UnionReturn
+open SignedWord
+variable {n : Nat}
+theorem word_safe (r : UInt64) [Fact r.toNat.Prime] (s : UnionState n)
+ (child parent : Fin n) (p : Pot) (v : Fin n→F r) (k : F r)
+ (hp : 1<r.toNat) (hr : r.toNat≤2^63) (hg : GoodPot r p) (hf : FixedGood r s)
+ (hv : GraphUnion.Valid (unionDecode r s) v k)
+ (he : v child=SignedGraphAlgebra.eval (decPot r p) (v parent) k) :
+ GraphSameRoot.Safe (outDecode r (word r s child parent p)) k := by
+ rw [word_refines r s child parent p hp hr hg hf]
+ exact field_safe _ child parent _ v k hv (sd_square r p.s hg.1) he
+
+theorem answer_canonical (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot)
+ (x : UInt64) (hp : 0<r.toNat) (hx : word r s child parent p=.answer x) : x.toNat<r.toNat := by
+ cases hc:s.fixed child with
+ | none => simp [word,hc] at hx
+ | some ab =>
+   cases ht:s.fixed parent with
+   | none => simp [word,hc,ht] at hx
+   | some xy => exact constraint_answer_canonical r _ _ x hp (by simpa [word,hc,ht] using hx)
+
+theorem answer_equal (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot)
+ (x k : UInt64) (hp : 0<r.toNat) (hk : k.toNat<r.toNat)
+ (hs : GraphSameRoot.Safe (outDecode r (word r s child parent p)) (wd r k))
+ (hx : word r s child parent p=.answer x) : x=k := by
+ have hxc:=answer_canonical r s child parent p x hp hx
+ have he:wd r x=wd r k := by simpa [hx,outDecode,GraphSameRoot.Safe] using hs
+ apply UInt64.toNat.inj
+ exact (PencilWordRefinement.canonical_equality r.toNat x.toNat k.toNat hxc hk).mp he
+
+theorem assertion_excluded (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot)
+ (k : F r) (hs : GraphSameRoot.Safe (outDecode r (word r s child parent p)) k) :
+ word r s child parent p≠.inconsistent := by
+ intro h
+ simpa [h,outDecode,GraphSameRoot.Safe] using hs
+
+def branch (r : UInt64) (s : UnionState n) (ru rv : Fin n) (p : Pot) (forward : Bool) :=
+ if forward then word r s ru rv p else word r s rv ru (reversePot r p)
+theorem branch_canonical (r : UInt64) (s : UnionState n) (ru rv : Fin n) (p : Pot)
+ (forward : Bool) (x : UInt64) (hp : 0<r.toNat) (hx : branch r s ru rv p forward=.answer x) :
+ x.toNat<r.toNat := by
+ cases forward
+ · exact answer_canonical r s rv ru _ x hp (by simpa [branch] using hx)
+ · exact answer_canonical r s ru rv _ x hp (by simpa [branch] using hx)
+end UnionReturn

@@ -1,0 +1,181 @@
+{
+  "schema": "rootfind-first-independent-results/v1",
+  "status": "completed_fixed_stream_screen",
+  "run_id": "run-20261116T1342Z",
+  "protocol_commit": "0e413634e86a9358d431aaf2e0a3dc77ce5e9b40",
+  "source_commit": "83407456e0f052d4cf51d533b1fda824063b2287",
+  "harness_commit": "ea2fc503bfb431f1b2ad7f5a9ec24c1241fcba9f",
+  "branch_head_at_run": "42671e8c465116fa9991b8964a5618905d56e4e9",
+  "test_executable_sha256": "f58ad80e4402725f22ee51dfe14db1b8bb0af12a2c56f22cddbbf6de5b6c0247",
+  "raw_sha256": {
+    "stdout": "87abaa1f1aae3cea5002c9cb8ee19edc787d6507ce4a4619545a1ac2627c7db5",
+    "stderr": "273fc461a391e550f74acd55e81f989bc0b6eb55df3a163d46897171ed6095a2",
+    "meta": "19a927330301799f295b44a7fd8e174fa11619924db5e328ca97f47dab402076"
+  },
+  "checked_scalar": 641,
+  "scalar_check_scope": "source harness asserts 641 at full rank and independently re-adds each triple; no separate reviewer replay",
+  "cost_unit": "modeled batch subtraction or pair re-addition, one group-addition proxy each",
+  "isolation": "L0 macOS shared host",
+  "cells": [
+    {
+      "field_degree": 13,
+      "curve_id": "ICV1:f2m-13-752c6463:181:8012:0x1:-7:unk:r:515ee5696294",
+      "base_sha256": "d9f69121c63a04c3f744c5be0e4ea488a030db0315794a4e05c7a9d3cd341807",
+      "subgroup_order": 2003,
+      "base_points": 33,
+      "columns_with_target": 18,
+      "seed_rank": 5,
+      "sample_targets": 2003,
+      "nonidentity_queries": 2002,
+      "hit_targets": 998,
+      "first_full_rank": {
+        "queries": 37,
+        "scan": {
+          "lookups": 896,
+          "modeled_group_adds": 963,
+          "pair_readds": 14,
+          "row_attempts": 14,
+          "subtractions": 949
+        }
+      },
+      "candidate_full_rank": {
+        "dependent_hits_skipped": 5,
+        "queries": 37,
+        "scan": {
+          "lookups": 920,
+          "modeled_group_adds": 991,
+          "pair_readds": 18,
+          "row_attempts": 18,
+          "subtractions": 973
+        }
+      },
+      "all_full_rank": {
+        "queries": 37,
+        "scan": {
+          "lookups": 1221,
+          "modeled_group_adds": 1267,
+          "pair_readds": 46,
+          "row_attempts": 46,
+          "subtractions": 1221
+        }
+      },
+      "candidate_later_independent_rows": 0,
+      "candidate_dependent_skips": 4063,
+      "delta_candidate_minus_first": {
+        "queries": 0,
+        "modeled_group_adds": 28,
+        "lookups": 24,
+        "pair_readds": 4,
+        "row_attempts": 4
+      },
+      "candidate_passes_operation_prediction": false
+    },
+    {
+      "field_degree": 19,
+      "curve_id": "ICV1:f2m-19-87f45376:797:523492:0x1:-7:unk:r:b6cf2467887c",
+      "base_sha256": "013a0d4223494500cd06b48bf41b51dda2dd5add0009d1b89cdb0b7bd49c0a5a",
+      "subgroup_order": 130873,
+      "base_points": 139,
+      "columns_with_target": 71,
+      "seed_rank": 11,
+      "sample_targets": 1024,
+      "nonidentity_queries": 1024,
+      "hit_targets": 576,
+      "first_full_rank": {
+        "queries": 182,
+        "scan": {
+          "lookups": 13725,
+          "modeled_group_adds": 14203,
+          "pair_readds": 103,
+          "row_attempts": 103,
+          "subtractions": 14100
+        }
+      },
+      "candidate_full_rank": {
+        "dependent_hits_skipped": 129,
+        "queries": 156,
+        "scan": {
+          "lookups": 14944,
+          "modeled_group_adds": 15337,
+          "pair_readds": 189,
+          "row_attempts": 189,
+          "subtractions": 15148
+        }
+      },
+      "all_full_rank": {
+        "queries": 103,
+        "scan": {
+          "lookups": 14317,
+          "modeled_group_adds": 14565,
+          "pair_readds": 248,
+          "row_attempts": 248,
+          "subtractions": 14317
+        }
+      },
+      "candidate_later_independent_rows": 3,
+      "candidate_dependent_skips": 2236,
+      "delta_candidate_minus_first": {
+        "queries": -26,
+        "modeled_group_adds": 1134,
+        "lookups": 1219,
+        "pair_readds": 86,
+        "row_attempts": 86
+      },
+      "candidate_passes_operation_prediction": false
+    },
+    {
+      "field_degree": 23,
+      "curve_id": "ICV1:f2m-23-c07a6b8c:5197:8383412:0x1:-7:unk:r:69e76b739aa7",
+      "base_sha256": "686cba2fafe973e49139c2722df47bf728340e25a4df5faad8b51dfa91df3877",
+      "subgroup_order": 2095853,
+      "base_points": 275,
+      "columns_with_target": 139,
+      "seed_rank": 23,
+      "sample_targets": 1024,
+      "nonidentity_queries": 1024,
+      "hit_targets": 327,
+      "first_full_rank": {
+        "queries": 610,
+        "scan": {
+          "lookups": 127387,
+          "modeled_group_adds": 128211,
+          "pair_readds": 195,
+          "row_attempts": 195,
+          "subtractions": 128016
+        }
+      },
+      "candidate_full_rank": {
+        "dependent_hits_skipped": 265,
+        "queries": 610,
+        "scan": {
+          "lookups": 143461,
+          "modeled_group_adds": 144219,
+          "pair_readds": 381,
+          "row_attempts": 381,
+          "subtractions": 143838
+        }
+      },
+      "all_full_rank": {
+        "queries": 503,
+        "scan": {
+          "lookups": 138325,
+          "modeled_group_adds": 138914,
+          "pair_readds": 589,
+          "row_attempts": 589,
+          "subtractions": 138325
+        }
+      },
+      "candidate_later_independent_rows": 1,
+      "candidate_dependent_skips": 758,
+      "delta_candidate_minus_first": {
+        "queries": 0,
+        "modeled_group_adds": 16008,
+        "lookups": 16074,
+        "pair_readds": 186,
+        "row_attempts": 186
+      },
+      "candidate_passes_operation_prediction": false
+    }
+  ],
+  "candidate_passes_all_cells": false
+}

@@ -23,6 +23,7 @@
         "arXiv 2609.14052"
       ],
       "status": "not started",
+      "evidence": "No journey entry, research directory, benchmark directory or branch for W1 exists on main (a1d0f1e6d).",
       "prs": []
     },
     {
@@ -36,6 +37,7 @@
         "arXiv 2509.14754"
       ],
       "status": "not started",
+      "evidence": "No journey entry, research directory, benchmark directory or branch for W2 exists on main (a1d0f1e6d).",
       "prs": []
     },
     {
@@ -48,6 +50,7 @@
         "ePrint 2026/2253"
       ],
       "status": "merged",
+      "evidence": "PR #1683 merged (3d7374868). 4 diagnostic journey entries; research/lit2026_w3_ggm_audit_20261011.",
       "prs": [
         "aburan28/crypto#1683"
       ]
@@ -59,7 +62,8 @@
       "papers": [
         "arXiv 2603.24890"
       ],
-      "status": "PR open",
+      "status": "negative (closed)",
+      "evidence": "PR #1687 merged (b75fb46f9). 7 journey entries: 3 no-change (original/candidate word-XOR 1.00083-1.00378, mode 1), 3 negative (0.99714-0.99928, mode 2), 1 diagnostic; switches remain off. benchmarks/20261011-lit2026-w4-early-abort; research/lit2026_w4_early_abort_20261011.",
       "prs": [
         "aburan28/crypto#1687"
       ]
@@ -73,6 +77,7 @@
         "arXiv 2603.16378"
       ],
       "status": "merged",
+      "evidence": "PR #1714 merged (5cbe16d51). 11 journey entries: 4 speedup (gate-first original/candidate word-XOR 1.5675-1.7788), 4 negative (lane-batched roots cost 2.6-4.0x the sequential control), 3 diagnostic. benchmarks/20261011-lit2026-w5-gate-first-lane-roots; benchmarks/20261012-lit2026-w5-gate-first-rref; research/lit2026_w5_lane_batched_f4_20261011.",
       "prs": [
         "aburan28/crypto#1714"
       ]
@@ -91,6 +96,7 @@
         "ePrint 2025/1788"
       ],
       "status": "not started",
+      "evidence": "No journey entry, research directory, benchmark directory or branch for W6 exists on main (a1d0f1e6d).",
       "prs": []
     },
     {
@@ -102,6 +108,7 @@
         "ePrint 2026/560"
       ],
       "status": "not started",
+      "evidence": "No journey entry, research directory, benchmark directory or branch for W7 exists on main (a1d0f1e6d).",
       "prs": []
     },
     {
@@ -114,7 +121,8 @@
         "ePrint 2026/1927",
         "arXiv 2609.18866"
       ],
-      "status": "PR open",
+      "status": "merged",
+      "evidence": "PR #1712 merged (b4251b3ac). 9 journey entries: 5 speedup (E/G quotient S3 original/candidate F4 word-operation ratios 1.340-1.642), 2 negative (convolution splitting 1.21-2.07x more word operations; Frobenius auxiliaries 57-701x more), 2 diagnostic. benchmarks/20261011-lit2026-w8-quotient-s3; benchmarks/20261011-lit2026-w8-summation-models; research/lit2026_w8_summation_models_20261011.",
       "prs": [
         "aburan28/crypto#1712"
       ]
@@ -129,6 +137,7 @@
         "arXiv 2505.23696"
       ],
       "status": "not started",
+      "evidence": "No journey entry, research directory, benchmark directory or branch for W9 exists on main (a1d0f1e6d).",
       "prs": []
     },
     {
@@ -140,7 +149,8 @@
         "ePrint 2026/1027",
         "ePrint 2026/423"
       ],
-      "status": "PR open",
+      "status": "negative (closed)",
+      "evidence": "PR #1691 merged (fe5acc745). 3 journey entries: 2 negative, 1 diagnostic. No benchmarks/ directory. research/lit2026_w10_s5_coppersmith_20261011.",
       "prs": [
         "aburan28/crypto#1691"
       ]
@@ -156,7 +166,8 @@
         "ePrint 2026/1823",
         "arXiv 2508.14011"
       ],
-      "status": "PR open",
+      "status": "merged",
+      "evidence": "PR #1692 merged (3b5df9b1d). 12 journey entries: 8 speedup (paired BSGS original/paired wall ratios 1.145-1.670), 3 diagnostic, 1 no-change (binary class walk 1.069). benchmarks/20261011-lit2026-w11-generic-engineering; research/lit2026_w11_generic_engineering_20261011.",
       "prs": [
         "aburan28/crypto#1692"
       ]
@@ -169,10 +180,12 @@
         "arXiv 2607.09814",
         "ePrint 2025/015"
       ],
-      "status": "PR open",
+      "status": "negative (closed)",
+      "evidence": "PR #1713 merged (21fa4a23a). 8 journey entries: 7 negative, 1 diagnostic (zero-minor/rho counted field-operation cost 260-6715x). benchmarks/20261012-lit2026-w12-zero-minor; research/lit2026_w12_flagged_claims_20261011.",
       "prs": [
         "aburan28/crypto#1713"
       ]
     }
-  ]
+  ],
+  "status_note": "Statuses updated 2026-10-18 from main a1d0f1e6d: PR merge commits, journey/entries kinds and the benchmarks/ and research/ directories named in each evidence field. 'negative (closed)' means the merged PR recorded only no-change, negative or diagnostic steps for the workstream's speed claim."
 }

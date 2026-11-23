@@ -1,0 +1,88 @@
+{
+  "recorded_at": "2026-10-30T07:20:40.600794+00:00",
+  "scope": "Dependency-free real Cargo control using the actual current ic_binary helper and opt-in module pattern. Not a replacement for the actual95contract tests in the repository workflow.",
+  "cases": [
+    {
+      "case": "clean-default-selected-bin",
+      "command": [
+        "test",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 0,
+      "log": "clean-default-selected-bin.log"
+    },
+    {
+      "case": "normal-integration-builds-current-cli",
+      "command": [
+        "test",
+        "--test",
+        "ic_framework"
+      ],
+      "actual_exit": 0,
+      "log": "normal-integration-builds-current-cli.log"
+    },
+    {
+      "case": "production-build-for-opted-in-contracts",
+      "command": [
+        "build",
+        "--features",
+        "ic-cli-contracts",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 0,
+      "log": "production-build-for-opted-in-contracts.log"
+    },
+    {
+      "case": "explicit-current-cli-contracts",
+      "command": [
+        "test",
+        "--features",
+        "ic-cli-contracts",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 0,
+      "log": "explicit-current-cli-contracts.log"
+    },
+    {
+      "case": "opted-in-missing-binding-refuses-stale-sibling",
+      "command": [
+        "test",
+        "--features",
+        "ic-cli-contracts",
+        "--bin",
+        "ic"
+      ],
+      "actual_exit": 101,
+      "log": "opted-in-missing-binding-refuses-stale-sibling.log"
+    }
+  ],
+  "stale_executable_was_invoked": false,
+  "default_library_qualification": {
+    "full_test_source": "a275d15349598790d5052d42a905470698817b55",
+    "full_test_passed": 5448,
+    "full_test_failed": 0,
+    "full_test_ignored": 123,
+    "later_changes": "Only one unused empty root Cargo feature, CLI cfg(test) modules/helpers/workflow and developer docs/reports. Parsed Cargo settings/defaults/dependencies unchanged after removing new feature; no library/path-crate/alias source changed.",
+    "changed_Rust_Cargo_paths": [
+      "Cargo.toml",
+      "src/bin/ic.rs"
+    ],
+    "contract_test_assertion_bodies": "Framework and tensor test bodies byte-identical; executable selection helper alone changed."
+  },
+  "current_configuration_source_recheck": {
+    "command": "cargo +1.98.0 test --release --lib cryptanalysis::f4_fp::tests:: -- --test-threads=32",
+    "passed": 26,
+    "failed": 0,
+    "notes": "Recompiled all library test source after the empty-feature manifest addition; all26F4 tests pass concurrently. Complete5448 library result remains attributed to sourcea275.",
+    "raw_log_sha256": "e8daf550a1d49d9fc67e7e37360d856b6a7108bcd10bd997bcf64212519a12e8"
+  },
+  "proof_qualification": {
+    "actual_run": 41012873738,
+    "actual_source": "a88ae7a32fa7378696bb10560caa7b9ad9561caa",
+    "jobs_succeeded": 129,
+    "tracked_Lean_context_discovery_workflow_changes_since_source": []
+  }
+}

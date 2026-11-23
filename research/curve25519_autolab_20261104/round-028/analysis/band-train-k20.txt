@@ -1,0 +1,60 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 32/32 | 5.009 | 5.263 | 7.552 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 32/32 | 1.407 | 1.505 | 2.383 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2-b45-n2 | 32/32 | 13.915 | 13.953 | 14.297 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b10-n2 | 32/32 | 3.228 | 3.483 | 5.771 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b120-n2 | 32/32 | 131.772 | 139.606 | 210.110 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b15-n2 | 32/32 | 2.553 | 2.667 | 3.698 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b160-n2 | 32/32 | 271.796 | 291.391 | 467.741 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b180-n2 | 32/32 | 361.741 | 389.203 | 636.366 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b30-n2 | 32/32 | 5.575 | 5.611 | 5.934 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum2g-b60-n2 | 32/32 | 21.241 | 21.375 | 22.585 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2-b45-n2 | inc < wsum2-b45-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b10-n2 | wsum2g-b10-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b120-n2 | inc < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b15-n2 | wsum2g-b15-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b160-n2 | inc < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b180-n2 | inc < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b30-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum2g-b60-n2 | inc < wsum2g-b60-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2-b45-n2 | rho-neg < wsum2-b45-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b10-n2 | rho-neg < wsum2g-b10-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b120-n2 | rho-neg < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b15-n2 | rho-neg < wsum2g-b15-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b160-n2 | rho-neg < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b180-n2 | rho-neg < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b30-n2 | rho-neg < wsum2g-b30-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum2g-b60-n2 | rho-neg < wsum2g-b60-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b10-n2 | wsum2g-b10-n2 < wsum2-b45-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b120-n2 | wsum2-b45-n2 < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b15-n2 | wsum2g-b15-n2 < wsum2-b45-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b160-n2 | wsum2-b45-n2 < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b180-n2 | wsum2-b45-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b30-n2 | wsum2g-b30-n2 < wsum2-b45-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2-b45-n2 vs wsum2g-b60-n2 | wsum2-b45-n2 < wsum2g-b60-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b10-n2 vs wsum2g-b120-n2 | wsum2g-b10-n2 < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b10-n2 vs wsum2g-b15-n2 | wsum2g-b15-n2 < wsum2g-b10-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b10-n2 vs wsum2g-b160-n2 | wsum2g-b10-n2 < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b10-n2 vs wsum2g-b180-n2 | wsum2g-b10-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b10-n2 vs wsum2g-b30-n2 | wsum2g-b10-n2 < wsum2g-b30-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b10-n2 vs wsum2g-b60-n2 | wsum2g-b10-n2 < wsum2g-b60-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b120-n2 vs wsum2g-b15-n2 | wsum2g-b15-n2 < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b120-n2 vs wsum2g-b160-n2 | wsum2g-b120-n2 < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b120-n2 vs wsum2g-b180-n2 | wsum2g-b120-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b120-n2 vs wsum2g-b30-n2 | wsum2g-b30-n2 < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b120-n2 vs wsum2g-b60-n2 | wsum2g-b60-n2 < wsum2g-b120-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b15-n2 vs wsum2g-b160-n2 | wsum2g-b15-n2 < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b15-n2 vs wsum2g-b180-n2 | wsum2g-b15-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b15-n2 vs wsum2g-b30-n2 | wsum2g-b15-n2 < wsum2g-b30-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b15-n2 vs wsum2g-b60-n2 | wsum2g-b15-n2 < wsum2g-b60-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b160-n2 vs wsum2g-b180-n2 | wsum2g-b160-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b160-n2 vs wsum2g-b30-n2 | wsum2g-b30-n2 < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b160-n2 vs wsum2g-b60-n2 | wsum2g-b60-n2 < wsum2g-b160-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b180-n2 vs wsum2g-b30-n2 | wsum2g-b30-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b180-n2 vs wsum2g-b60-n2 | wsum2g-b60-n2 < wsum2g-b180-n2 |
+| icv1-fp20-tm1050-4295f05e | wsum2g-b30-n2 vs wsum2g-b60-n2 | wsum2g-b30-n2 < wsum2g-b60-n2 |

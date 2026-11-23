@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "Replay certificate: 320 per-run re-executions made by ecbench verify --replay-all (fresh child process each, recovered scalar and all counts compared with the record), 320 of 320 identical, joined to the records by examples/cheon_ecbench_validate.rs; same ecbench binary and host class as the sessions, not a second machine. Gae band: cheon.pplus1_comb (n+1) versus rho.negation, sums over the 48 paired targets pooled over 36 to 56 bits, oracle queries priced at q=0; the 12-cell (w,q) grid incl. q=0.1, 1 and server work stays below 1 (max 0.2815 at w=0, q=server). The n-1 comb arm (ratio 0.552/0.528/0.418) and naive n-1 (7.66/6.98/3.94, dearer than rho) are in the validator report; the naive arm is not claimed to beat rho.",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "31c0d392e1c5bea69ddfbff536559cd74e23676b4de42c27e7ba0ea89765d84f"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "c9132aa549871f155d461559bf63043cf9e6b052617c8ebb392bd4a758e2c01f"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "ecbench rho.negation (negation-map r-adding walk, distinguished points), the strongest rho available on a prime-order curve with automorphism group {+-1}; same frozen curves and planted targets as the Cheon arms (research/cheon_ecbench_20261022/PROTOCOL.md), paired per workload in the same session",
+    "unit": "counted group operations (ecbench.gae: one affine addition or doubling), unpriced native work at w GAE per operation",
+    "binary_or_process": "ecbench sessions ECBS1h293023c203b3, ECBS1h6323501e31ef, ECBS1ha367083f3e51: Cheon arms and rho.negation interleaved in the same session, same binary, replayed by the same ecbench verify --replay-all",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 944003391.0,
+        "rho": 3378388381.0
+      },
+      "0.1": {
+        "ic": 961092659.5999999,
+        "rho": 3716225105.7999997
+      },
+      "1": {
+        "ic": 1114896077.0,
+        "rho": 6756755629.0
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

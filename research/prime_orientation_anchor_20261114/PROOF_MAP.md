@@ -1,0 +1,75 @@
+# Proof map: orientation-guarded anchors
+
+Every row is source-bound to freeze `a970572ef271aef7c9a6b852413957fb7cff5b9c`.
+All claims are unsigned; consult PCC standing before promotion.
+Exact quantified hypotheses are retained in [claim-pins.json](evidence/claim-pins.json).
+No row supplies an absolute Cauchy base-content proof or a rank factorization.
+
+| Declaration | Source | Unsigned claim |
+| --- | --- | --- |
+| `OrientationAnchor.anchor_flips` | [source](lean/OrientationAnchor.lean) | PCC-20261114-e45d6b |
+| `OrientationAnchor.denominator_ne_zero` | [source](lean/OrientationAnchor.lean) | PCC-20261114-a2def2 |
+| `OrientationAnchor.factor_at_delta` | [source](lean/OrientationAnchor.lean) | PCC-20261114-3deacf |
+| `OrientationAnchor.correction_at_delta` | [source](lean/OrientationAnchor.lean) | PCC-20261114-b59f52 |
+| `OrientationAnchor.quotient_identity` | [source](lean/OrientationAnchor.lean) | PCC-20261114-54ec26 |
+| `OrientationAnchor.nodal_puncture` | [source](lean/OrientationAnchor.lean) | PCC-20261114-b5f767 |
+| `OrientationAnchor.completed_identity` | [source](lean/OrientationAnchor.lean) | PCC-20261114-347a54 |
+| `OrientationAnchor.completed_at_node` | [source](lean/OrientationAnchor.lean) | PCC-20261114-5661cf |
+| `OrientationAnchor.delta_in_grid` | [source](lean/OrientationAnchor.lean) | PCC-20261114-b3ef56 |
+| `OrientationAnchor.grid_card` | [source](lean/OrientationAnchor.lean) | PCC-20261114-266dd4 |
+| `OrientationAnchor.zero_in_grid` | [source](lean/OrientationAnchor.lean) | PCC-20261114-773b53 |
+| `OrientationAnchor.normalizer_eq` | [source](lean/OrientationAnchor.lean) | PCC-20261114-bedf6d |
+| `OrientationAnchor.normalizer_ne_zero` | [source](lean/OrientationAnchor.lean) | PCC-20261114-6189b6 |
+| `OrientationAnchor.completed_origin_diagonal` | [source](lean/OrientationAnchor.lean) | PCC-20261114-6c17bb |
+| `OrientationAnchor.completed_origin_offdiagonal` | [source](lean/OrientationAnchor.lean) | PCC-20261114-fb4e87 |
+| `OrientationAnchor.factor_degree` | [source](lean/OrientationAnchor.lean) | PCC-20261114-7b4860 |
+| `OrientationAnchor.correction_degree` | [source](lean/OrientationAnchor.lean) | PCC-20261114-56f500 |
+| `OrientationAnchor.base_degree` | [source](lean/OrientationAnchor.lean) | PCC-20261114-ca4f96 |
+| `OrientationAnchor.completed_degree` | [source](lean/OrientationAnchor.lean) | PCC-20261114-039d00 |
+| `OrientationAnchor.quotient_degree` | [source](lean/OrientationAnchor.lean) | PCC-20261114-bede32 |
+| `OrientationAnchor.completion_degree` | [source](lean/OrientationAnchor.lean) | PCC-20261114-278ad6 |
+| `OrientationAnchor.beta_lower` | [source](lean/OrientationAnchor.lean) | PCC-20261114-4a5676 |
+| `OrientationAnchor.crossing_gain` | [source](lean/OrientationAnchor.lean) | PCC-20261114-d08fe0 |
+| `OrientationAnchor.beta_nonnegative` | [source](lean/OrientationAnchor.lean) | PCC-20261114-309bc0 |
+| `OrientationAnchor.VBound.zero` | [source](lean/OrientationContent.lean) | PCC-20261114-0dda53 |
+| `OrientationAnchor.VBound.mono` | [source](lean/OrientationContent.lean) | PCC-20261114-2b2700 |
+| `OrientationAnchor.VBound.neg` | [source](lean/OrientationContent.lean) | PCC-20261114-333da1 |
+| `OrientationAnchor.VBound.add` | [source](lean/OrientationContent.lean) | PCC-20261114-826016 |
+| `OrientationAnchor.VBound.mul` | [source](lean/OrientationContent.lean) | PCC-20261114-02d6f8 |
+| `OrientationAnchor.VBound.sum` | [source](lean/OrientationContent.lean) | PCC-20261114-f80a8d |
+| `OrientationAnchor.Content.mono` | [source](lean/OrientationContent.lean) | PCC-20261114-81a8ff |
+| `OrientationAnchor.Content.one` | [source](lean/OrientationContent.lean) | PCC-20261114-8db006 |
+| `OrientationAnchor.Content.C` | [source](lean/OrientationContent.lean) | PCC-20261114-8bd1d1 |
+| `OrientationAnchor.Content.X` | [source](lean/OrientationContent.lean) | PCC-20261114-ab5273 |
+| `OrientationAnchor.Content.add` | [source](lean/OrientationContent.lean) | PCC-20261114-901087 |
+| `OrientationAnchor.Content.mul` | [source](lean/OrientationContent.lean) | PCC-20261114-ad2d5a |
+| `OrientationAnchor.Content.pow` | [source](lean/OrientationContent.lean) | PCC-20261114-c10c51 |
+| `OrientationAnchor.Content.prod` | [source](lean/OrientationContent.lean) | PCC-20261114-9a98a8 |
+| `OrientationAnchor.int_bound_of_dvd` | [source](lean/OrientationContent.lean) | PCC-20261114-8975a6 |
+| `OrientationAnchor.numerator_extra_dvd` | [source](lean/OrientationContent.lean) | PCC-20261114-8506ac |
+| `OrientationAnchor.chart_numerator_content` | [source](lean/OrientationContent.lean) | PCC-20261114-176309 |
+| `OrientationAnchor.selected_denominator_valuation` | [source](lean/OrientationProduct.lean) | PCC-20261114-7c87fe |
+| `OrientationAnchor.chart_factor_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-a39253 |
+| `OrientationAnchor.chart_correction_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-23cc94 |
+| `OrientationAnchor.actual_crossing_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-7a81c4 |
+| `OrientationAnchor.beta_nonnegative_of_j_le` | [source](lean/OrientationProduct.lean) | PCC-20261114-b40b22 |
+| `OrientationAnchor.actual_noncrossing_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-8da936 |
+| `OrientationAnchor.actual_inactive_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-189754 |
+| `OrientationAnchor.actual_nonzero_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-a6cd15 |
+| `OrientationAnchor.old_counterexample_covered` | [source](lean/OrientationProduct.lean) | PCC-20261114-7e76a5 |
+| `OrientationAnchor.zero_chart_factor_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-509249 |
+| `OrientationAnchor.actual_zero_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-ad7522 |
+| `OrientationAnchor.grid_order_le` | [source](lean/OrientationProduct.lean) | PCC-20261114-ecd827 |
+| `OrientationAnchor.all_grid_correction_content` | [source](lean/OrientationProduct.lean) | PCC-20261114-e9d567 |
+| `OrientationAnchor.completed_content_from_base` | [source](lean/OrientationProduct.lean) | PCC-20261114-9a239f |
+| `OrientationAnchor.completed_crossing_content_from_base` | [source](lean/OrientationProduct.lean) | PCC-20261114-8e3afc |
+| `OrientationAnchor.delta_as_int` | [source](lean/OrientationValuation.lean) | PCC-20261114-be5833 |
+| `OrientationAnchor.signed_ne_zero` | [source](lean/OrientationValuation.lean) | PCC-20261114-5ae9fd |
+| `OrientationAnchor.bit_diff_of_exact_divisibility` | [source](lean/OrientationValuation.lean) | PCC-20261114-0b9ec3 |
+| `OrientationAnchor.order_bit_diff` | [source](lean/OrientationValuation.lean) | PCC-20261114-8ad53d |
+| `OrientationAnchor.mask_omits_order` | [source](lean/OrientationValuation.lean) | PCC-20261114-8f64e1 |
+| `OrientationAnchor.bits_below_order` | [source](lean/OrientationValuation.lean) | PCC-20261114-87c0b9 |
+| `OrientationAnchor.order_le_of_bit_diff` | [source](lean/OrientationValuation.lean) | PCC-20261114-40cc2f |
+| `OrientationAnchor.delta_valuation` | [source](lean/OrientationValuation.lean) | PCC-20261114-c1b217 |
+| `OrientationAnchor.denominator_valuation` | [source](lean/OrientationValuation.lean) | PCC-20261114-d1c39d |
+| `OrientationAnchor.diagonal_denominator_valuation` | [source](lean/OrientationValuation.lean) | PCC-20261114-0acf3f |

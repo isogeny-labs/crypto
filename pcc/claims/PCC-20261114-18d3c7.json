@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T01:28:44Z",
+ "id": "PCC-20261114-18d3c7",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "model": "",
+  "session": "norm-target-fiber-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ac41db289949b59f37f0f6693cfbbebe7bfaf0764e8f192114385084e669a983",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetFiber.membershipTargetRowsIff"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual declaration/context hypotheses: CommRing, Nontrivial ring where needed, and Field for field specializations/factor removal. Curve equation, d>=3, bounded remainder and e!=0 premises are explicit. Actual computed norm/division/remainder and base change only; no weighted-degree29, low closure, finder or sub-exponential claim. Unsigned source-bound evidence.",
+ "statement": "Exact source-bound theorem NormTargetFiber.membershipTargetRowsIff: theorem membershipTargetRowsIff [Nontrivial R] (e a b r z a1 a2 c0 c1 terminal : R) (hp : z^2=r^3+a*r+b) (n : \u2115) : membership e a b r z a1 a2 c0 c1 terminal n=0 \u2194 (membership e a b r z a1 a2 c0 c1 terminal n).eval (e^2*r)=0 \u2227 \u2200 j, 1\u2264j \u2192 j\u22644 \u2192 (membership e a b r z a1 a2 c0 c1 terminal n).coeff j=0"
+}

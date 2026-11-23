@@ -1,0 +1,21 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 90,
+  "runs": [
+    {
+      "attempt": "transport90-01",
+      "status": "rejected",
+      "kind": "Singular",
+      "source_revision": "156f7cbe80488153878fb2a96f711df18faedcf2",
+      "native_exit": 0,
+      "driver_exit": 1,
+      "pole_bound": 61,
+      "checked_prefix": {"direction": 1, "column": 1, "first_pole_power": 61, "full_product": true, "corruption_rejected": true},
+      "failure": "forward column 2: matrix(vector) trimmed trailing zero to 31x1",
+      "accepted_full_transport": false,
+      "raw_archive_sha256": "e0f9c30552acfe5534b65352d71970515f7eb46b1a47cbc2fc33244ae0239932",
+      "raw_members_verified": 18
+    }
+  ],
+  "next": "Freeze explicit 32x1 power-vector conversion and rerun under a new attempt"
+}

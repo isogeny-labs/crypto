@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--release",
+    "--lib",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=2",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "started_utc": "2026-10-30T20:10:53Z",
+  "ended_utc": "2026-10-30T20:40:01Z",
+  "source_manifest": "validation-source-hashes-v10.json",
+  "source_manifest_sha256": "fb7283b6e5b4d17db63e0647528335d8aaf23d56f3ff2bf0d474bb51745f0d68",
+  "scientific_cohort_execution": false,
+  "purpose": "software regression; known-answer fixtures only",
+  "logs": {
+    "stdout": "b14d848f771c37c9f749c4c264a1878118049355d7e77bc26db7c3a6eadeed7d",
+    "stderr": "c3168c87e705e1693011b53cec871c21e98202eaf2994ed1d41599f7456c1b61"
+  }
+}

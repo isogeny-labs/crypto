@@ -1,0 +1,33 @@
+{
+  "_what": "End to end, degree-23 Koblitz curve (the instance of research/m4gb_e2e_ic_ladder_20261110, seed 20261110): symbolic descent solved by inherited-f4, fes-f2 (CPU Gray code) and fes-f2-gpu (the same search on the gpu/fes CUDA serve worker, same counted cost). Read S and s_over_rho (counted), verified, and the solver wall time (practicality note, AGENTS.md section 6).",
+  "instance": {
+    "regime": "koblitz",
+    "degree": 23,
+    "max_cofactor": 8
+  },
+  "repeats": 2,
+  "seed": 20261110,
+  "configurations": [
+    {
+      "factor_base": "binary-subspace:dimension=12",
+      "oracle": "mitm:m=2",
+      "targets": "walk"
+    }
+  ],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=12"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "inherited-f4",
+      "fes-f2",
+      "fes-f2-gpu"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}

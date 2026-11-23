@@ -1,0 +1,55 @@
+   Compiling crypto v0.1.0 (/workspace/crypto)
+    Finished `release` profile [optimized] target(s) in 9m 31s
+     Running unittests src/lib.rs (target/release/build/crypto/1f3348487c0dcc6d/out/crypto_lib-1f3348487c0dcc6d)
+
+running 33 tests
+test cryptanalysis::gaudry_cubic::graph::tests::bad_columns_are_rejected ... ok
+test cryptanalysis::gaudry_cubic::graph::tests::comparison_pivot_boundary_keeps_the_target_symbolic ... ok
+test cryptanalysis::gaudry_cubic::graph::tests::duplicate_large_terms_and_nonzero_rhs_preserve_target ... ok
+test cryptanalysis::gaudry_cubic::graph::tests::graph_projection_matches_pivots_after_every_prefix ... ok
+test cryptanalysis::gaudry_cubic::graph::tests::graph_refuses_unsupported_budget_before_sampling - should panic ... ok
+test cryptanalysis::gaudry_cubic::sampling::tests::fresh_sampler_keeps_observed_pilot_prefix ... ok
+test cryptanalysis::gaudry_cubic::sampling::tests::incremental_residuals_keep_exact_group_invariant ... ok
+test cryptanalysis::gaudry_cubic::sampling::tests::walk_oracles_match_between_protected_backends_and_recover ... FAILED
+test cryptanalysis::gaudry_cubic::symmetric::tests::dependent_extension_components_use_exact_counted_scan ... ok
+test cryptanalysis::gaudry_cubic::symmetric::tests::general_irreducible_cubic_uses_the_same_pair_identity ... ok
+test cryptanalysis::gaudry_cubic::symmetric::tests::symmetric_pairs_match_all_constructed_signed_pairs ... ok
+test cryptanalysis::gaudry_cubic::symmetric::tests::symmetric_pairs_match_every_tiny_group_target ... ok
+test cryptanalysis::gaudry_cubic::symmetric::tests::symmetric_triple_channel_agrees_with_existing_oracle ... ok
+test cryptanalysis::gaudry_cubic::symmetric::tests::vanishing_both_denominators_retains_a_repeated_pair ... ok
+test cryptanalysis::gaudry_cubic::graph::tests::actual_cubic_oracles_keep_the_same_relation_prefix_and_scalar ... ok
+test cryptanalysis::gaudry_cubic::tests::fp3_field_axioms ... ok
+test cryptanalysis::gaudry_cubic::tests::gaudry_and_rho_recover_the_planted_logarithm ... ok
+test cryptanalysis::gaudry_cubic::tests::groebner_solve_agrees_with_the_meet_in_the_middle_oracle ... ok
+test cryptanalysis::gaudry_cubic::tests::instance3_has_prime_order_and_known_answer ... ok
+test cryptanalysis::gaudry_cubic::tests::irreducible_non_binomial_cubic_field_axioms ... ok
+test cryptanalysis::gaudry_cubic::tests::large_prime_elimination_cancels_every_large_prime ... ok
+test cryptanalysis::gaudry_cubic::tests::sparse_and_large_prime_runs_recover_the_logarithm ... ok
+test cryptanalysis::gaudry_cubic::tests::square_core_is_square_and_free_of_singletons ... ok
+test cryptanalysis::gaudry_cubic::tests::symbolic_s4_vanishes_on_sums_and_symmetrisation_is_exact ... ok
+test cryptanalysis::gaudry_cubic::tests::the_border_check_sends_only_the_residuals_no_degree_solves_to_the_fallback ... ok
+test cryptanalysis::gaudry_cubic::tests::the_lazy_elimination_reads_the_same_normal_forms ... ok
+test cryptanalysis::gaudry_cubic::tests::the_merge_cap_bounds_depth_and_charges_what_it_discards ... ok
+test cryptanalysis::gaudry_cubic::tests::the_pair_only_variant_recovers_the_logarithm_without_a_macaulay_step ... ok
+test cryptanalysis::gaudry_cubic::tests::triple_oracle_finds_constructed_triples_and_verifies ... ok
+test cryptanalysis::gaudry_cubic::tests::weil_pair_test_agrees_with_brute_force ... ok
+test cryptanalysis::gaudry_cubic::tests::wiedemann_solves_random_sparse_systems ... ok
+test cryptanalysis::gaudry_cubic::tests::wiedemann_wide_prime_orders ... ok
+test cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm ... ok
+
+failures:
+
+---- cryptanalysis::gaudry_cubic::sampling::tests::walk_oracles_match_between_protected_backends_and_recover stdout ----
+
+thread 'cryptanalysis::gaudry_cubic::sampling::tests::walk_oracles_match_between_protected_backends_and_recover' (7101) panicked at src/cryptanalysis/gaudry_cubic_sampling.rs:133:13:
+assertion `left == right` failed: GaudryReport { p: 7, n: 347, bits: 8.43879185257826, base: 1, residuals: 20000, decompositions: 0, relations_verified: 0, relations_independent: 0, rank: 0, solved: false, recovered_scalar: None, correct: None, group_ops: 20663, oracle_fp_muls: 2524161, torsion_lift_fp_muls: 0, fp_muls_per_add: 63.0, total_ops: 60729.04761904762, s: 3260.1060893597555, pair_tests: 20000, fp_muls_per_pair_test: 126.20805, decomposition_rate: 0.0, wall_ms: 43.764935, linear_algebra_ms: 0.0, solver: SymmetricPairOnly, precompute_fp_muls: 0, solve_stats: SolveStats { solves: 0, fp_muls: 0, macaulay_muls: 0, quotient_dim_total: 0, e_solutions: 0, split_cubics: 0, degenerate_eigenspaces: 0, retried_at_degree_11: 0, retried_at_degree_12: 0, retried_at_degree_13: 0, border_unreachable: 0, unsolved: 0, fallback_fp_muls: 0, macaulay_rows: 0, echelon_muls: 0, charpoly_muls: 0, eigenvector_muls: 0, roots_muls: 0, lazy_solves: 0, lazy_fallbacks: 0, lazy_pivots_reduced: 0, lazy_pivots_planned: 0, lazy_verified: 0, lazy_verify_mismatches: 0, lazy_needless_fallbacks: 0 }, cross_checked: 0, cross_check_mismatches: 0, la_mode: "dense", la_ops: 0, lp_abandoned: 0, lp_mean_merge_depth: 0.0, lp_max_merge_level: 0, lp_merge_ops: 0, la_unknowns: 2, la_rows: 0, la_avg_weight: 0.0, la_attempts: 0, la_filtered_out: 0, la_fp_equiv: 9.0, small_base: 1, max_large_primes: 0, lp_histogram: [0, 0, 0, 0, 0], lp_full_relations: 0, lp_backend: Some(Pivot), lp_graph_work: None, lp_input_digest: Some("80fabb30b84af28ec8fabb5631c3ce452e3e93cbeb5c795f1dae249f3492caea"), lp_input_hash_bytes: Some(117), symmetric_pair_stats: Some(SymmetricPairStats { calls: 20000, cubic_eliminations: 20000, constant_gcd_rejections: 19998, degenerate_scans: 0, zero_denominator_sums: 0, symmetric_candidates: 0 }), residual_sampler: Some(RAdding32), sampler_setup_group_ops: Some(664), sampling_group_ops: Some(19999) }
+  left: None
+ right: Some(true)
+
+
+failures:
+    cryptanalysis::gaudry_cubic::sampling::tests::walk_oracles_match_between_protected_backends_and_recover
+
+test result: FAILED. 32 passed; 1 failed; 0 ignored; 0 measured; 6576 filtered out; finished in 16.81s
+
+error: test failed, to rerun pass `--lib`

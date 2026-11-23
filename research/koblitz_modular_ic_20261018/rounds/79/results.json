@@ -1,0 +1,294 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 79,
+  "runs": [
+    {
+      "attempt": "candidate-u0-79-01",
+      "kind": "Singular",
+      "status": "rejected",
+      "source_revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "native_exit": 0,
+      "marker_present": true,
+      "error_count": 25,
+      "errors": [
+        "   ? ideal(...) failed",
+        "   ? error occurred in or before input.sing line 7: `ideal zero79=std(ideal(specialized79,p,y));`",
+        "   ? expected ideal-expression. type 'help ideal;'",
+        "   ? `zero79` is not defined",
+        "   ? error occurred in or before input.sing line 8: `int dimZero79=vdim(zero79);`",
+        "   ? expected int-expression. type 'help int;'",
+        "   ? `dimZero79` is not defined",
+        "   ? error occurred in or before input.sing line 9: `require79(dimZero79>0 && dimZero79<=32,\"CAND79_ZERO_FINITE_DIMENSION\");`",
+        "   ? `zero79` is not defined",
+        "   ? error occurred in or before input.sing line 10: `require79(reduce(x^16+x^8+1,zero79)==0,\"CAND79_ZERO_SOURCE_FACTOR\");`",
+        "   ? ideal(...) failed",
+        "   ? error occurred in or before input.sing line 12: `ideal one79=std(ideal(specialized79,p,y+1));`",
+        "   ? expected ideal-expression. type 'help ideal;'",
+        "   ? `one79` is not defined",
+        "   ? error occurred in or before input.sing line 13: `int dimOne79=vdim(one79);`",
+        "   ? expected int-expression. type 'help int;'",
+        "   ? `dimOne79` is not defined",
+        "   ? error occurred in or before input.sing line 14: `require79(dimOne79>0 && dimOne79<=32,\"CAND79_ONE_FINITE_DIMENSION\");`",
+        "   ? `one79` is not defined",
+        "   ? error occurred in or before input.sing line 15: `require79(reduce(x^16,one79)==0,\"CAND79_ONE_SOURCE_FACTOR\");`",
+        "   ? `dimZero79` is not defined",
+        "   ? error occurred in or before input.sing line 16: `require79(dimZero79+dimOne79==32,\"CAND79_FULL_CANDIDATE_RANK\");`",
+        "   ? `dimZero79` is not defined",
+        "   ? error occurred in or before input.sing line 18: `omponents=2 total_dimension=\"+string(dimZero79+dimOne79)+\" candidate_only=1\");`",
+        "   ? wrong type declaration. type 'help string;'"
+      ],
+      "started_utc": "2026-11-03T18:32:10Z",
+      "finished_utc": "2026-11-03T18:32:11Z",
+      "native_wall_seconds": 1.0,
+      "artifacts": [
+        {
+          "path": "runs/candidate-u0-79-01/PROTOCOL.md",
+          "sha256": "c48024a5e8a86635ea90538bbaa5f23840c39a95bd50ec74d157538d07346897",
+          "bytes": 1258
+        },
+        {
+          "path": "runs/candidate-u0-79-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/candidate-u0-79-01/donors.json",
+          "sha256": "e440f3bd74df8ca7bc9e59992a39e06c727162d2dd4b79883869d580ec2a2235",
+          "bytes": 939
+        },
+        {
+          "path": "runs/candidate-u0-79-01/driver.sh",
+          "sha256": "4239f111f368763b8681cd878e26c0e08f61423b6a34648c3e2f526a7d48c71b",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/candidate-u0-79-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/candidate-u0-79-01/finished-utc.txt",
+          "sha256": "8222825384dd65a32fdab269272ff3c5c8b27bc7ff8dcdcf114baf3acf8d7e02",
+          "bytes": 21
+        },
+        {
+          "path": "runs/candidate-u0-79-01/gate.log",
+          "sha256": "5d37e0cbd6ca0e5650a8c1cd4ebe0a87282c8669470799f8c47dfaefbee4ced4",
+          "bytes": 165
+        },
+        {
+          "path": "runs/candidate-u0-79-01/input.sing",
+          "sha256": "ab3e915a9ce75e8f4698142e3ff955d456d0adc456e002baeb5e96834761c29a",
+          "bytes": 1223
+        },
+        {
+          "path": "runs/candidate-u0-79-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/candidate-u0-79-01/native.log",
+          "sha256": "6e2bd8af61a533f9ad91f0802a2033d7a878007ad5f75c0989aaa430175c37e0",
+          "bytes": 1764
+        },
+        {
+          "path": "runs/candidate-u0-79-01/protocol.json",
+          "sha256": "3da842f5c643ef0f63e2abab8b9da32c633cc1d103a3f744ccc3381f322910df",
+          "bytes": 2095
+        },
+        {
+          "path": "runs/candidate-u0-79-01/source-revision.txt",
+          "sha256": "208430b187f72c239f97d719df499cabef7e0b750de548083c368884bb362519",
+          "bytes": 41
+        },
+        {
+          "path": "runs/candidate-u0-79-01/source.sha256",
+          "sha256": "b5c4fa15808a1065831a55989e4ed0905b1e1d3ff943b7a1819a647d3c9af663",
+          "bytes": 467
+        },
+        {
+          "path": "runs/candidate-u0-79-01/started-utc.txt",
+          "sha256": "c830f2bef50d886422cfec16488a0170f91294963e444fd57701e9eaf00bc713",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "kind": "Singular",
+      "status": "accepted",
+      "source_revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "native_exit": 0,
+      "marker_present": true,
+      "error_count": 0,
+      "errors": [],
+      "started_utc": "2026-11-03T18:33:50Z",
+      "finished_utc": "2026-11-03T18:33:53Z",
+      "native_wall_seconds": 3.0,
+      "artifacts": [
+        {
+          "path": "runs/candidate-u0-79-02/PROTOCOL.md",
+          "sha256": "e3adff97b62b4dbb5fd1c604206c0d95d41a30e16b09034b8438b7af46b42d72",
+          "bytes": 1729
+        },
+        {
+          "path": "runs/candidate-u0-79-02/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/candidate-u0-79-02/donors.json",
+          "sha256": "e440f3bd74df8ca7bc9e59992a39e06c727162d2dd4b79883869d580ec2a2235",
+          "bytes": 939
+        },
+        {
+          "path": "runs/candidate-u0-79-02/driver.sh",
+          "sha256": "4239f111f368763b8681cd878e26c0e08f61423b6a34648c3e2f526a7d48c71b",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/candidate-u0-79-02/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/candidate-u0-79-02/finished-utc.txt",
+          "sha256": "f59b6dde1962bcda2003553fb2ab6832f4e1a756e4167764e864c141cf773d89",
+          "bytes": 21
+        },
+        {
+          "path": "runs/candidate-u0-79-02/gate.log",
+          "sha256": "53e75aaa0776438455f0eba297c98771de7692536bea815ae20a9df949f350f9",
+          "bytes": 165
+        },
+        {
+          "path": "runs/candidate-u0-79-02/input.sing",
+          "sha256": "ab74d8e95c0879daa6967edcff9005ea73f9f65103b9375655605734de23a800",
+          "bytes": 1265
+        },
+        {
+          "path": "runs/candidate-u0-79-02/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/candidate-u0-79-02/native.log",
+          "sha256": "241cb6b76d740d543a3ff28347bd323cf3c6662ad05092741e02f35c80528676",
+          "bytes": 195
+        },
+        {
+          "path": "runs/candidate-u0-79-02/protocol.json",
+          "sha256": "0b2f9af9a3de4800c8aabf5e2f3d4b1997f254dd5ccbe6a6bbf03ab666ab3f47",
+          "bytes": 2262
+        },
+        {
+          "path": "runs/candidate-u0-79-02/source-revision.txt",
+          "sha256": "275f0ae4a12e933e0c9c19be1a5ef2f24a322dbca95bde86d6af0b79eba7d086",
+          "bytes": 41
+        },
+        {
+          "path": "runs/candidate-u0-79-02/source.sha256",
+          "sha256": "ead522d8468984da344139015ba28f28f91ce2b63afdfb1740dea2d7d9410aeb",
+          "bytes": 467
+        },
+        {
+          "path": "runs/candidate-u0-79-02/started-utc.txt",
+          "sha256": "20e89ead0bf8db32ecd89ce9ff952dbd75b58df7859fb246ada003a93e1469d8",
+          "bytes": 21
+        }
+      ]
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "candidate-u0-79-01",
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/CANDIDATE_U0_79.sing",
+      "revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "sha256": "ab3e915a9ce75e8f4698142e3ff955d456d0adc456e002baeb5e96834761c29a"
+    },
+    {
+      "attempt": "candidate-u0-79-01",
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/NATIVE_DRIVER.sh",
+      "revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "sha256": "4239f111f368763b8681cd878e26c0e08f61423b6a34648c3e2f526a7d48c71b"
+    },
+    {
+      "attempt": "candidate-u0-79-01",
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/REPLAY_CAS.sh",
+      "revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "candidate-u0-79-01",
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/PROTOCOL.md",
+      "revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "sha256": "c48024a5e8a86635ea90538bbaa5f23840c39a95bd50ec74d157538d07346897"
+    },
+    {
+      "attempt": "candidate-u0-79-01",
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/protocol.json",
+      "revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "sha256": "3da842f5c643ef0f63e2abab8b9da32c633cc1d103a3f744ccc3381f322910df"
+    },
+    {
+      "attempt": "candidate-u0-79-01",
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/donors.json",
+      "revision": "f308c42849eb4446bd332867b76dc21f9900b05a",
+      "sha256": "e440f3bd74df8ca7bc9e59992a39e06c727162d2dd4b79883869d580ec2a2235"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/CANDIDATE_U0_79.sing",
+      "revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "sha256": "ab74d8e95c0879daa6967edcff9005ea73f9f65103b9375655605734de23a800"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/NATIVE_DRIVER.sh",
+      "revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "sha256": "4239f111f368763b8681cd878e26c0e08f61423b6a34648c3e2f526a7d48c71b"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/REPLAY_CAS.sh",
+      "revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/PROTOCOL.md",
+      "revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "sha256": "e3adff97b62b4dbb5fd1c604206c0d95d41a30e16b09034b8438b7af46b42d72"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/protocol.json",
+      "revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "sha256": "0b2f9af9a3de4800c8aabf5e2f3d4b1997f254dd5ccbe6a6bbf03ab666ab3f47"
+    },
+    {
+      "attempt": "candidate-u0-79-02",
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/79/donors.json",
+      "revision": "ae7c54825a14a874b77b8663bea3a48d0cf422d1",
+      "sha256": "e440f3bd74df8ca7bc9e59992a39e06c727162d2dd4b79883869d580ec2a2235"
+    }
+  ],
+  "donor_hashes": 6,
+  "candidate_component_dimensions": [
+    16,
+    16
+  ],
+  "normality_certified": false
+}

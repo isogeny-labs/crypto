@@ -1,0 +1,64 @@
+{
+  "namespace": "MumfordFixedGenusAudit",
+  "proofs": [
+    {
+      "file": "ScalarExtension.lean",
+      "claim": "All actual pairs, actual curve, finite encoding and injective coefficient extension",
+      "declarations": [
+        "curve_properties",
+        "extend_injective",
+        "ambient_strict_count"
+      ]
+    },
+    {
+      "file": "CantorTransport.lean",
+      "claim": "Actual normalized gcd/Bezout/numerator/quotient/reduction and output uniqueness",
+      "declarations": [
+        "normalized_gcd_map",
+        "extended_addition_is_Cantor",
+        "zeroStep_unique",
+        "extended_composition_numerator"
+      ]
+    },
+    {
+      "file": "OddFields.lean",
+      "claim": "Actual unbounded odd-degree field sizes and nonsmooth point",
+      "declarations": [
+        "family_card",
+        "actual_nonsmooth_point",
+        "fields_unbounded"
+      ]
+    },
+    {
+      "file": "ImageGroup.lean",
+      "claim": "Actual Cantor-compatible group/subgroup and strict finite fractions",
+      "declarations": [
+        "image_Cantor_iff_addition",
+        "cyclic_is_zmultiples",
+        "generator_order",
+        "fixed_genus_unequal_fractions"
+      ]
+    },
+    {
+      "file": "EvenControl.lean",
+      "claim": "Actual even-degree control/direct false extension and generator coordinates",
+      "declarations": [
+        "even_point_smooth",
+        "nonsmooth_preserved_under_every_extension_false",
+        "actual_generator_coordinates"
+      ]
+    },
+    {
+      "file": "FixedGenusCertificate.lean",
+      "claim": "Closed all-parameter/unbounded-field certificate and direct equality negation",
+      "declarations": [
+        "unbounded_fixed_genus_counterexamples",
+        "universal_fixed_genus_equality_false",
+        "fixed_genus_counterfamily_certificate"
+      ]
+    }
+  ],
+  "local_gate": "60/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Whole ambient Cantor group/Picard identification; large-prime/typical-subgroup asymptotics and uniform limiting gap are not refuted."
+}

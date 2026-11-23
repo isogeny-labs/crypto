@@ -1,0 +1,64 @@
+{
+ "host": {
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "arch": "x86_64",
+  "kernel": "6.18.44-fc-v553",
+  "logical_cpus": 4,
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "hypervisor": true,
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 2097152,
+   "L3": 272629760
+  },
+  "mem_total_bytes": 16869134336,
+  "smt_active": "0",
+  "thread_siblings_cpu0": "0",
+  "numa_nodes": 1,
+  "cpufreq_governor": null,
+  "turbo_disabled": null,
+  "cpufreq_boost": null,
+  "event_sources": [
+   "breakpoint",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "perf_event_paranoid": "2",
+  "cgroup_cpu_max": null,
+  "fingerprint": "44113cdb2d87e834"
+ },
+ "cpu_tier": "T-timing",
+ "perf": null,
+ "pmu_unavailable_reason": "no working perf binary (event sources: breakpoint msr power software tracepoint uprobe)",
+ "gpu": null,
+ "gpu_unavailable_reason": "nvidia-smi is not installed: no NVIDIA GPU is visible to this host",
+ "ncu": null,
+ "uncore_imc": []
+}

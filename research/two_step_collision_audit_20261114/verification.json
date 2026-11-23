@@ -1,0 +1,77 @@
+{
+  "schema": "degree-two-collision-verification/v1",
+  "source_commit": "12ce7e4446b80b49510510da71804064cd6c6d54",
+  "claim_id": "PCC-20261114-480d25",
+  "declaration_sha256": "4c1acf0fd9722f21066a7ce0cb3de28321e7e626a7fbb2eaa2efafd2c441c000",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 7,
+  "gate_declarations": 26,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 96,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-480d25",
+    "claim_sha256": "c7017e14e6bbe17136b2be0bd7c1f834053c65d8038e476d08dbfa728f6ace7c",
+    "commit": "12ce7e4446b80b49510510da71804064cd6c6d54",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/two_step_collision_audit_20261114/lean (TwoStepCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T17:30:06Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-480d25",
+    "claim_sha256": "c7017e14e6bbe17136b2be0bd7c1f834053c65d8038e476d08dbfa728f6ace7c",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47371,
+    "sha256": "054c931381a6144dd8d618e83e1fd8c84dbca2585963643bce8697e4c598d7db",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 26,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "kernel_checked_finite_decisions": true,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "generic_weighted_label_coefficient_proved": true,
+    "actual_Z7_complete_population_proved": true,
+    "actual_uniform_PMF_product_and_rates_proved": true,
+    "source_degree_two_genericity_verified": true,
+    "hypothesis_deletion_counterexample_proved": true,
+    "general_actual_group_coefficient_proved": false,
+    "limiting_random_table_collision_penalty_proved": false,
+    "practical_hash_refinement_proved": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

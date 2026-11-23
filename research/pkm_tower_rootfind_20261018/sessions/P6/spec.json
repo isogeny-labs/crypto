@@ -1,0 +1,131 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Root finders against F4/F5/F6 on a prime curve: 11-bit, t=6",
+ "description": "Preregistered (PROTOCOL.md): the repository's root-finding decomposers against tower F4, signature F5 and the F6 analogue on one Kummer base and the 2026-10-11 round's public targets.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 11,
+    "seed": 20
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610112301,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-negation",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation",
+    "params": {}
+   }
+  },
+  {
+   "name": "f4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "pkm-tower:m=2,t=6,g=684,engine=f4,degree=20",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "sig-f5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "pkm-tower:m=2,t=6,g=684,engine=sig-f5,degree=20",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "f6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "pkm-tower:m=2,t=6,g=684,engine=f6,degree=20,cap=4",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "enum",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "pkm-tower:m=2,t=6,g=684,engine=enum,degree=20",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "rootfind-subtract",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "rootfind-subtract:m=2",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "rootfind-mitm",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "rootfind-mitm:m=2",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "rootfind-mitm-m3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "rootfind-mitm:m=3",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "rootfind-pairs-m3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6,g=684",
+     "oracle": "rootfind-pairs:m=3",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610112302,
+  "isolation_required": "L1",
+  "timeout_seconds": 3600
+ }
+}

@@ -1,0 +1,19 @@
+[package]
+name = "p256-cover-classification"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+publish = false
+
+[workspace]
+members = ["reference"]
+
+[dependencies]
+p256-genus-check = { path = "../native" }
+smith-reference = { path = "reference" }
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"
+
+[profile.release]
+overflow-checks = true

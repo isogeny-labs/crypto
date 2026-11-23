@@ -1,0 +1,798 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/curve25519_wave6_runs_20261115 (leads L1_faithful and L3_flat only)",
+ "validated_at_utc": "2026-11-15T04:12Z",
+ "validator": "validator subagent dispatched by the producing session; did not produce the runs or the analysis; recomputed from the committed artifacts with its own code (analyse_l1.py and analyse_l3.py were read for their claims only, never run or imported)",
+ "independent": true,
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "summary": "L3 validated as a measurement in counted field_ops. The three chain controls (m3 D = 9, 21; m2 D = 57) reproduce the recorded dc2c30a4 cells per target exactly. Validator replays with the new binary and with the frozen binary also match exactly (P5). Each of the 16 flat cells that has a complete chain record shares its six target_x in order. All 354 targets in L1, L3 and the recorded comparators were re-derived from the seed law with independent Montgomery-ladder code. Every consistency flag was re-checked by brute force over V^m with independent summation polynomials. All agree, including the consistent system at flat m2 D = 171. Flat SD = D + 1 holds on all 96 targets (P1). All 16 ratios recompute to the README values (m = 3: 19.5 to 362.6; m = 2: 2.35 to 27.1). P2 fails as written, because D = 27 gives 362.6, above [70, 260]. D = 28 gives 201.0, and every D <= 21 is above 10 (smallest 10.52). The protocol's refutation condition is not triggered. P3 holds (D = 36: 201.6 s in total, longest target 34.5 s, under ulimit -v 6 GB). P4 holds at all nine m = 2 cells (flat/curve 0.98 to 1.25, not only at D = 57 and 133). The non-preregistered fits recompute to 4.40 [4.10, 4.71] (n = 8, span 4.0x) and 2.26 [2.21, 2.31] (n = 9, span 24.3x). Fifteen L3 cells were replayed with the new binary, and all were identical. sub and subflat give the same abscissae (own discrete-log arithmetic and the engine's subcensus, 8 values of D). Major interpretive erratum E1: at m = 2 the flat presentation is slower than the chain in F4 solve time at every D, by 1.1x to 138x. Same-binary controls at D = 57 show 4.1x in the producer's run and 3.3x in the validator's replay. Flat ns per counted op rises from 70 to 14,152, against 3 to 53 for the chain. So the m = 2 'component improvement' exists only in a unit that omits the flat arm's dominant work; it is not validated as an improvement. At m = 3 the direction holds in solve time: 5.7x to 146x across binaries and 5.4x to 9.2x on the same binary. L1 validated, all P1 to P4 holding. p = 16777141 is prime, p = 5 mod 8, p - 1 = 2^2*3*5*279619 with 279619 prime, v2(p + 1) = 1. A = 7842 = 2 mod 4 and A^2 - 4 is a non-square. An independent character sum over 16.7 M terms gives #E = 8*2098009 and twist 4*4192553, both cofactors prime, with r > 2^21. The 10 shared (m, D, k) cells agree to 4 digits (ratios 1.0000000 to 1.0000005, 8 of them exactly), and their SD sets agree. The pre-data amendment (96ac7772bf, 01:35:43Z) is append-only and precedes the first L1 cell (01:35:46Z) by 3 s. Seventeen L1 cells were replayed, and all were identical. Full family rule recomputed: p = 1048261 admits no A in 6..39998 (9,999 values, 100% coverage), and neither do the other six primes. For those six, Hasse makes the r bound unsatisfiable for any A (E6). Errata: README §1 m = 2 range '2.7 to 17x' should be 2.4 to 27x (E2); double rounding of 1.42e7 (actually 1.41e7) and 2.99e11 (actually 2.98e11) (E3); divisor-set wording (E4); the amendment says the engine enforces r > 2^(k-3), but it does not (E5); 'no target finished' cannot be observed in the cells (E7); REPORT.typ/pdf are missing and the figure is stale (E8).",
+ "commit": {
+  "validated_sha": "f813e0b69292b1c67e621d80649f0d278d12d413",
+  "branch": "claude/curve25519-index-calculus-i674j4",
+  "sha_at_dispatch_start": "bf6aa9b3d48717f741c89863447844a9c0ae7b9e",
+  "tree_state": "HEAD moved twice during validation. (1) f813e0b692 (committer time 03:52:57Z) adds only docs/session-logs/2026-11-15.md; git diff bf6aa9b3d4 f813e0b692 -- research/ is empty. (2) bf74815770 (04:08:10Z, 'L1/L3 validator scripts in progress (snapshot)') was committed by another session, not by this validator. It adds only the eight validation/l1_*, l3_* scripts, byte-identical to the versions hashed below, and changes no evidence: git diff f813e0b692 bf74815770 over L1_faithful, L3_flat, README.md and both exponent-study cell directories is empty. Every L1/L3 file and recorded chain cell read by the validator equals its blob at f813e0b692; l3_check.py and l1_check.py assert this per file. git status shows no other changes.",
+  "protocol_freeze_commit": "c66e2b3f4f (2026-11-15T00:06:38Z): L1_faithful/PROTOCOL.md and L3_flat/PROTOCOL.md. L3 is byte-identical at the validated sha. L1's frozen text is an exact byte prefix of the amended file.",
+  "amendment_commit": "96ac7772bf (committer and author time 2026-11-15T01:35:43Z): appends the 'Pre-data amendment' section to L1_faithful/PROTOCOL.md and adds checks/faithful_full.py and L1_faithful/faithful_search.txt. The first L1 cell started at 01:35:46Z (p16777141_A7842_sub_m2_sym_d3 .. d60, ext.started_utc), 3.0 s later. No other L1 path ever appears in history.",
+  "data_commits": "L3 cells: cbc46b0602 (01:13:52Z), 96ac7772bf (d171), d55b601662 (d189), 7f469c93ce (d219, d399). L1 cells: d55b601662 (m2 all, m3 to D = 15), 7f469c93ce (m3 D = 20, 30), bf6aa9b3d4 (m3 D = 60). Each cell file was added once and never modified. First L3 data: 01:01:52Z.",
+  "git_use": "read-only (rev-parse, log, show, diff, status, ls-tree); no commits, no pushes"
+ },
+ "binary": {
+  "curve25519_family": {
+   "path": "/home/user/ctarget-f1/release/curve25519_family",
+   "sha256": "5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746",
+   "matches_recorded": true,
+   "mtime_utc": "2026-11-15T01:00:44Z"
+  },
+  "frozen_reference": {
+   "path": "/home/user/bin-archive/curve25519_family-dc2c30a4",
+   "sha256": "dc2c30a4242d80281622b2cb42cbaf9cb457d041ffbc9a4d35794bb893bf3faf",
+   "matches_recorded": true,
+   "mtime_utc": "2026-11-08T23:39:58Z"
+  },
+  "note": "Used in place and read-only; nothing was built. All 40 L1/L3 cells carry ext.bin_sha256 5abc70ba... The binary-to-source link rests on README_PLAN.md, as in the L2-L4 report (its E7)."
+ },
+ "artifact_hashes_sha256": {
+  "README.md": "f1d0dec9bab4590bef007cfe6ab39f4b2167594a2a7cc2e71e837041539fa838",
+  "README_PLAN.md": "0ce2661cfcbaa91b7da93d5e336070837206d5bf042e27635eeee11faba9d7d4",
+  "run_cells.py": "56b08c4e0cc437ff59ce8275a4bf88687083d353d6fafc9ee7eb42963518f6fd",
+  "launch_all.sh": "02ff31be7c79491fb2926bca793504aab876fffd394641a5ca1189d5400cdc6a",
+  "smoke_equivalence.sh": "a13293242878d1c1eb8216c35063e423ec4176a7bd91f25c23cbd6b9bd4e3cd1",
+  "figure.py": "3eb382b7c02efa45bd0e54d9938e2ac757e66ffe5f78d2084261e5d26b05b772",
+  "wave6_runs.svg": "f993aed55869ab36ba4e2dc37f1117d9307211ab0c299933c7fd6c7c02ab3bcf",
+  "wave6_runs.png": "9f8ce76d673a6840db769bbfd0072decd46081bb7fa7064660871da5f3626671",
+  "checks/faithful_full.py": "b6cab35f8f64dd1761850ecf5d9011b2f62b057f2346a7123c080900310f1f3c",
+  "L1_faithful/PROTOCOL.md": "e76e3316b28bba1828512070e8abb505eff1af2b5898d20069fca542668b34f4",
+  "L1_faithful/analyse_l1.py": "49805ee6296f9326c97f598862b52ee223f51a2ca1e1522fc1973f479996db85",
+  "L1_faithful/analysis.json": "2d67dad927c9459a4c6564d868b3cd0cd809f2eaece7bae1dcc9e47edd71dc48",
+  "L1_faithful/faithful_search.txt": "a60a19d1a91faed4ab98eef0fc813f397ff58ea46d749c40c592401842fc14ea",
+  "L1_faithful/run.log": "04deee35e866b547725783f6a2aee9ef53f6d2571f8c8250f1e7bd2992051a47",
+  "L3_flat/PROTOCOL.md": "6817705f29ff457bd71ac580849ce78d60275297ca664fb614a8bce8ec69fa27",
+  "L3_flat/analyse_l3.py": "44ccbd57eb45c23a9ca68ae0f5e0e7375423732ef069c26f071fa34bf1416049",
+  "L3_flat/analysis.json": "59d68d32a8cca0b5498f816c83fdbf40186cb448736076f37f9237ad5dd23315",
+  "L3_flat/run.log": "273885549bf407da03c6f1f8c013e71697c5348837be0c8a044e4e3f76cc10ca"
+ },
+ "raw_data": [
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d10.json",
+   "sha256": "15ad6aaa3f738f189942037c0794452234364d7a8a7ce04d1c0dac9de5842d4b"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d12.json",
+   "sha256": "d43e2e641b66bddee5cb00f697e51f2845f8361929a53ebd7c1e6a2f93369da0"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d15.json",
+   "sha256": "21282b4d7dad5967e156556c0527623165297c1e7c1cb3358b81daa3afeb62a1"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d20.json",
+   "sha256": "e48e5e6a827813abdeb6f0e53c67812d75c1b679a993068e163ec72926734b0f"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d3.json",
+   "sha256": "66c9d11b3797b3402b118684d036a6aa74129ea12b0330b6862d980a8683c863"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d30.json",
+   "sha256": "5f1ccf3970ea4766dbbf95317498639d7958c61e0fa7a3128d25e8dba27123ff"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d4.json",
+   "sha256": "63ba8950a2ab2c96ba9fbc184247d7bee58df2e5a5305d46c81f6bdcc9719abc"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d5.json",
+   "sha256": "c121c25e7b7dcb72a98feb4d2ae883cc1e67ca43a8c993399c8e54ace63dd01c"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d6.json",
+   "sha256": "a4c13a9871190893a5f09d659751752ac92f521e86dd031205f8b72763113755"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m2_sym_d60.json",
+   "sha256": "c3d0c5fb5682a5960fe1d371b1ddfee15ee37d34e8ef52ed95f43f0d7b73e422"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d10.json",
+   "sha256": "a0ae1f53e2e059a12e60a6d51e645cc017066c6add3afa80da6783d591ae1abe"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d12.json",
+   "sha256": "9fb31a1dd271a390a12fb6a31c33fef7af5bb9b5d2f856a06688ab29b837fc51"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d15.json",
+   "sha256": "254b03306a2e0f2766ac00e902cf6ff7aaf934c226e85ebaca60d18f021806e4"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d20.json",
+   "sha256": "0096c1b4bb09010cce892148982a0ccd95cf92554edc78751a7b6ed8bcd3ff01"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d3.json",
+   "sha256": "26e824e1a08d0aca8e10997341563347845231f2470ff65df0aeb301cfbf9736"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d30.json",
+   "sha256": "5498d242047f03287895ef99cb9a87cf80b5080e365f4a0f23b7dfdf58a21c83"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d4.json",
+   "sha256": "ef0bedc9c77c00aebfa48ded150b7c0b790796493562409be7cebb8a0dee7c2b"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d5.json",
+   "sha256": "ef3b2c131654009cb582db52e39efa6ef832ead5d4103558c2f354ae3b71a64d"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d6.json",
+   "sha256": "e95f1baadc45d67add7003b810e4a7a98de646172e7d68eb02800a46d94c043c"
+  },
+  {
+   "path": "L1_faithful/cells/p16777141_A7842_sub_m3_sym_d60.json",
+   "sha256": "bdc6cfe37977f3843a150b72f1b23543f20211e85bba5c97dc95282fdaf1f09b"
+  },
+  {
+   "path": "L3_flat/cells/20_sub_m2_sym_d57.json",
+   "sha256": "b54fc085bdaaa4f3cbe6593debc403d8eae10d54a1928857a36876234199d243"
+  },
+  {
+   "path": "L3_flat/cells/20_sub_m3_sym_d21.json",
+   "sha256": "22dccfb7a3de929b9df9ae97f189ccbbbc235bd64597c51f1cf7a18ca06d17ac"
+  },
+  {
+   "path": "L3_flat/cells/20_sub_m3_sym_d9.json",
+   "sha256": "4343dd9df62f97e6c547e6d8bb68569ceace3bfc82d6ff56075eee53a9f33d97"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d133.json",
+   "sha256": "dc63af3b8e97a58daa3476d1d7500687858ca6ef9e124744ce7211532ce7502b"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d171.json",
+   "sha256": "e732f74b5c2c58d5830874d33535f1dc413b9add4e9b9c574269442ee11624cd"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d189.json",
+   "sha256": "621024ba81008188c1f19d9bf59f14ae0ed918387bcd70d3a95274de11ab568f"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d21.json",
+   "sha256": "3d3016f8c18212810aef8443a815a30d309c4ef88568724b01321564db0dc62f"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d219.json",
+   "sha256": "985bde44e931f803c44d403371b4bc23399b39c82eb385c7228b7272ec3f05a9"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d27.json",
+   "sha256": "d6bb34acf823013b2d4330833611febc9a77f6c22e9e078bef8b2774bd576698"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d399.json",
+   "sha256": "3b1eb49f3b179d2da0e346f99a911219ef2b04fbccb2ec942620ca5b7c515827"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d57.json",
+   "sha256": "235f2bfc65b64b367956766691390ac0a3bde80334f7dd0305e972bbdf2b2800"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d63.json",
+   "sha256": "504a8570c49622846017d1723b54e3f66af9103431746e240d2ccb144dc8d5df"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m2_sym_d9.json",
+   "sha256": "7ae56affb1bc4e25a7f88e418bf9c8df65a4b10e9667c18239cf8ca979baea60"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d12.json",
+   "sha256": "d43f1ad1018fb10a5aad3dab29294439d3d43ce1cf2cdcd2806d97f49dc2156a"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d14.json",
+   "sha256": "a8e372561a50423acdd26bc130c4e0cda6b5a2ae8f85feb098fcd875891f37c7"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d18.json",
+   "sha256": "dec53811a59099450971e40fa37e4728948b01e98b9f8ff6ccdfa17796129caa"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d21.json",
+   "sha256": "9314220beb6b681cde77697880e443616dc0d129d43348a301c7d04347782bb6"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d27.json",
+   "sha256": "5a0f35f64e40ad47bf3d593d74c178d5527d0d118ce08c60bde203d86cb7d443"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d28.json",
+   "sha256": "3f67b6515f81af2bd8bca38b162f07c14ec1d035eef03123f1fd917c9f851418"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d36.json",
+   "sha256": "cbdef6991711593d30925fce2f8799547fc0d0101f78fcc9a0e8cb045d264c4d"
+  },
+  {
+   "path": "L3_flat/cells/20_subflat_m3_sym_d9.json",
+   "sha256": "8925469ddc1d50b93624107d1f44e8133488f1d24c887de508a9e97cb9c07a29"
+  }
+ ],
+ "headline": [
+  {
+   "name": "L3 chain/flat ratio m=3 D=9",
+   "claimed": 19.5,
+   "recomputed": 19.4538,
+   "rel_tol": 0.002564102565102564,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=3 D=12",
+   "claimed": 28.4,
+   "recomputed": 28.4187,
+   "rel_tol": 0.0017605633812816904,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=3 D=14",
+   "claimed": 16.6,
+   "recomputed": 16.5714,
+   "rel_tol": 0.003012048193771084,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=3 D=18",
+   "claimed": 170.5,
+   "recomputed": 170.5178,
+   "rel_tol": 0.0002932551329648094,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=3 D=21",
+   "claimed": 10.5,
+   "recomputed": 10.5236,
+   "rel_tol": 0.004761904762904763,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=3 D=27",
+   "claimed": 362.6,
+   "recomputed": 362.5923,
+   "rel_tol": 0.00013789299603585219,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=3 D=28",
+   "claimed": 201.0,
+   "recomputed": 200.9993,
+   "rel_tol": 0.00024875621990547267,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=9",
+   "claimed": 2.7,
+   "recomputed": 2.6937,
+   "rel_tol": 0.018518518519518516,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=21",
+   "claimed": 3.6,
+   "recomputed": 3.6252,
+   "rel_tol": 0.01388888888988889,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=27",
+   "claimed": 8.7,
+   "recomputed": 8.6778,
+   "rel_tol": 0.00574712643778161,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=57",
+   "claimed": 3.6,
+   "recomputed": 3.6328,
+   "rel_tol": 0.01388888888988889,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=63",
+   "claimed": 16.7,
+   "recomputed": 16.6897,
+   "rel_tol": 0.0029940119770479044,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=133",
+   "claimed": 4.6,
+   "recomputed": 4.592,
+   "rel_tol": 0.010869565218391306,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=171",
+   "claimed": 27.1,
+   "recomputed": 27.0903,
+   "rel_tol": 0.0018450184511845018,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=189",
+   "claimed": 21.7,
+   "recomputed": 21.6952,
+   "rel_tol": 0.002304147466437788,
+   "agrees": true
+  },
+  {
+   "name": "L3 chain/flat ratio m=2 D=219",
+   "claimed": 2.4,
+   "recomputed": 2.3508,
+   "rel_tol": 0.020833333334333334,
+   "agrees": true
+  },
+  {
+   "name": "L3 flat T m=3 D=36 (complete; chain censored)",
+   "claimed": 4130000000.0,
+   "recomputed": 4133237528.6666665,
+   "rel_tol": 0.0012106537530266344,
+   "agrees": true
+  },
+  {
+   "name": "L3 flat T m=2 D=171 (README 1.42e7; E3)",
+   "claimed": 14200000.0,
+   "recomputed": 14146663.666666666,
+   "rel_tol": 0.0035211267605633804,
+   "agrees": false
+  },
+  {
+   "name": "L3 fit m=3 slope (non-preregistered)",
+   "claimed": 4.4,
+   "recomputed": 4.4025,
+   "rel_tol": 0.0011363636363636363,
+   "agrees": true
+  },
+  {
+   "name": "L3 fit m=3 lo95",
+   "claimed": 4.1,
+   "recomputed": 4.0992,
+   "rel_tol": 0.0012195121951219514,
+   "agrees": true
+  },
+  {
+   "name": "L3 fit m=3 hi95",
+   "claimed": 4.71,
+   "recomputed": 4.7059,
+   "rel_tol": 0.0010615711252653928,
+   "agrees": true
+  },
+  {
+   "name": "L3 fit m=2 slope (non-preregistered)",
+   "claimed": 2.26,
+   "recomputed": 2.2638,
+   "rel_tol": 0.002212389380530974,
+   "agrees": true
+  },
+  {
+   "name": "L3 fit m=2 lo95",
+   "claimed": 2.21,
+   "recomputed": 2.2142,
+   "rel_tol": 0.0022624434389140274,
+   "agrees": true
+  },
+  {
+   "name": "L3 fit m=2 hi95",
+   "claimed": 2.31,
+   "recomputed": 2.3134,
+   "rel_tol": 0.0021645021645021645,
+   "agrees": true
+  },
+  {
+   "name": "L3 P4 prediction at D=57",
+   "claimed": 1100000.0,
+   "recomputed": 1087523,
+   "rel_tol": 0.045454545454545456,
+   "agrees": true
+  },
+  {
+   "name": "L3 P4 prediction at D=133",
+   "claimed": 7000000.0,
+   "recomputed": 7014350,
+   "rel_tol": 0.0071428571428571435,
+   "agrees": true
+  },
+  {
+   "name": "L1 #E",
+   "claimed": 16784072,
+   "recomputed": 16784072,
+   "rel_tol": 0.0,
+   "agrees": true
+  },
+  {
+   "name": "L1 #E twist",
+   "claimed": 16770212,
+   "recomputed": 16770212,
+   "rel_tol": 0.0,
+   "agrees": true
+  },
+  {
+   "name": "L1 m=3 D=20 mean field_ops",
+   "claimed": 27000000000.0,
+   "recomputed": 27033490184.666668,
+   "rel_tol": 0.0018518518518518517,
+   "agrees": true
+  },
+  {
+   "name": "L1 m=3 D=30 mean field_ops (README 2.99e11; E3)",
+   "claimed": 299000000000.0,
+   "recomputed": 298493076491.1667,
+   "rel_tol": 0.0016722408026755853,
+   "agrees": false
+  },
+  {
+   "name": "L1 m=3 D=60 censoring wall s",
+   "claimed": 1524,
+   "recomputed": 1523.8,
+   "rel_tol": 0.00032808398950131233,
+   "agrees": true
+  },
+  {
+   "name": "L1 m=3 D=12 / 7.75e8 (P4)",
+   "claimed": 1.0,
+   "recomputed": 0.999748,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=2 D=3 k=20 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=2 D=3 k=22 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=2 D=3 k=24 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=2 D=5 k=22 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=2 D=15 k=22 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=3 D=3 k=20 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=3 D=3 k=22 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=3 D=5 k=22 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=3 D=12 k=20 (curve25519_exponent_study_ext_20261110)",
+   "claimed": 1.0,
+   "recomputed": 1.0000005,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L1 faithful/record mean field_ops m=3 D=15 k=22 (curve25519_exponent_study_20261108)",
+   "claimed": 1.0,
+   "recomputed": 1.0000003,
+   "rel_tol": 0.0005,
+   "agrees": true
+  }
+ ],
+ "checks": [
+  {
+   "id": "C1",
+   "requirement": "frozen artifact set: commit, freeze order, amendment order, tree state",
+   "result": "pass",
+   "evidence": "See commit.*. L3 PROTOCOL.md was frozen at 00:06:38Z, 55 min before the first L3 cell (01:01:52Z), and is unchanged since. L1's amendment is append-only and committed 3 s before the first L1 cell. All cell files were added once and never modified (l3_check.json git_integrity, l1_check.json git_integrity/freeze).",
+   "notes": "The 3 s margin rests on self-reported git timestamps. launch_all.sh still names the invalid member p=1048261,A=383; its explanatory comment was added after the fact in d55b601662. The actual L1 launch is recorded only through ext.cmd and run.log."
+  },
+  {
+   "id": "C2",
+   "requirement": "binaries",
+   "result": "pass (hashes); source binding not re-proved",
+   "evidence": "sha256 of both binaries equals README_PLAN.md and every cell's ext.bin_sha256.",
+   "notes": "No rebuild."
+  },
+  {
+   "id": "C3",
+   "requirement": "cell metadata, commands, limits, seed rule",
+   "result": "pass",
+   "evidence": "For all 21 L3 and 20 L1 cells, ext.cmd equals the command rebuilt from the protocols: 'ulimit -v 6000000; RAYON_NUM_THREADS=1 <bin> f4sub <20|p=16777141,A=7842> <sub|subflat> D 0 mont M sym 6 SEED 1800', SEED = 20261108 + 1000 M + D. In every complete cell, seed, p, k (20 or 24), a_mont (L1), frame, gidx, form, base and v_size = D are as specified; 6/6 targets are complete with no timeouts; exit 0; mean_field_ops equals the mean of the per-target field_ops (l3_check.json cell_metadata, l1_check.json cell_metadata)."
+  },
+  {
+   "id": "C4",
+   "requirement": "targets follow the seed law (independent curve code)",
+   "result": "pass",
+   "evidence": "l1_l3_targets_decomp.py recomputed #E by a primitive-root character sum: k20 member p = 1048573, A = 926: n = 1049624, r = 131203; faithful member: n = 16784072, r = 2098009. G is the smallest u >= 2 on E of order r: u = 4 and u = 47. The script reimplements the engine's LCG and computes x(eG) with an x-only Montgomery ladder (Weierstrass x = u + A/3). All 354 per-target target_x values in 59 complete cells are identical: 19 L1 cells, 20 L3 cells and 20 recorded k20 chain cells. This includes flat m3 D = 36, whose chain record is censored and therefore cannot be compared directly."
+  },
+  {
+   "id": "C5",
+   "requirement": "correctness column: consistency flag re-verified (certificate analogue; no solve, relation or closure is claimed)",
+   "result": "pass",
+   "evidence": "For every target, a brute force over V^m (V = mu_D in the Montgomery frame) of S3 (Montgomery form) and of S4 = Res_X(S3(u1,u2,X), S3(u3,uT,X)) checks the engine's 'inconsistent' flag. All 354 agree. The brute force finds roots exactly for the 5 systems the engine marks consistent: L3 flat m2 D = 171 target 89609, the same target in the chain record, recorded m2 D = 399 (1) and D = 513 (2); these serve as positive controls. S3/S4 self-tests passed on 30 points per curve (P + 2P = 3P, 2P + 3P = 5P, P + 2P + 3P = 6P, perturbation nonzero).",
+   "notes": "This confirms the solvability verdict of each system, not the internals of F4. field_ops are confirmed by same-binary replay only."
+  },
+  {
+   "id": "C6",
+   "requirement": "L3 P5: chain controls reproduce the recorded per-target field_ops exactly",
+   "result": "pass",
+   "evidence": "20_sub_m3_sym_d9, 20_sub_m3_sym_d21 and 20_sub_m2_sym_d57 equal k20_m3_sym_d9_g0, k20_m3_sym_d21_g0 and k20_m2_sym_d57_g0 in (target_x, field_ops, SD, max_cols, max_rows, steps, inconsistent, basis_len) for all 6 targets. Validator replays of the three with the new binary were identical. Frozen-binary replays of m3 D = 9 and m2 D = 57 (l3_frozen_replay.sh) were identical to the records."
+  },
+  {
+   "id": "C7",
+   "requirement": "L3 flat cells share the recorded cells' six targets at every D",
+   "result": "pass",
+   "evidence": "Identical target_x lists, in order, at all 16 values of D with a complete chain record. At m3 D = 36 (chain censored) the flat targets equal the seed-law targets (C4). At m2 D = 399 the flat cell is censored and has no targets."
+  },
+  {
+   "id": "C8",
+   "requirement": "L3 P1: flat SD = D + 1 in every complete cell",
+   "result": "pass",
+   "evidence": "Per-target solving_degree_max min = max = D + 1 in all 16 complete flat cells (96 targets): {\"m2_D9\": 10, \"m2_D21\": 22, \"m2_D27\": 28, \"m2_D57\": 58, \"m2_D63\": 64, \"m2_D133\": 134, \"m2_D171\": 172, \"m2_D189\": 190, \"m2_D219\": 220, \"m3_D9\": 10, \"m3_D12\": 13, \"m3_D14\": 15, \"m3_D18\": 19, \"m3_D21\": 22, \"m3_D27\": 28, \"m3_D28\": 29, \"m3_D36\": 37}"
+  },
+  {
+   "id": "C9",
+   "requirement": "L3 README §2 table: flat T, flat SD, wall, chain T, chain SD, chain/flat",
+   "result": "pass with one erratum (E3)",
+   "evidence": "All 17 rows were recomputed from the cells (l3_check.json table). Every value agrees at the printed precision except the flat T at m2 D = 171: 14,146,663.7 is 1.41e7, not 1.42e7. Ratios (4 dp): m3 19.4538, 28.4187, 16.5714, 170.5178, 10.5236, 362.5923, 200.9993; m2 2.6937, 3.6252, 8.6778, 3.6328, 16.6897, 4.5920, 27.0903, 21.6952, 2.3508."
+  },
+  {
+   "id": "C10",
+   "requirement": "L3 P2 verdict",
+   "result": "P2 fails as written; README verdict wording correct",
+   "evidence": "D = 27: 362.59, outside [70, 260]; D = 28: 201.00, inside. D = 9, 12, 14, 18, 21: 19.45, 28.42, 16.57, 170.52 and 10.52, all above 10. The refutation clause (ratio below 10 at D <= 21 or below 70 at D = 27, 28) is not triggered.",
+   "notes": "README §1's 'P2 holds except that D = 27 lies above the band' is accurate but should say 'P2 fails (upward) at D = 27'."
+  },
+  {
+   "id": "C11",
+   "requirement": "L3 P3: flat m3 D = 36 completes under 6 GB and 1800 s per target",
+   "result": "pass",
+   "evidence": "Not capped; 6/6 complete; exit 0; longest target solve 34.5 s; cell wall 201.6 s; cmd contains 'ulimit -v 6000000'. The recorded chain cell k20_m3_sym_d36_g0 ended with exit -6 at mem_kb 12,000,000."
+  },
+  {
+   "id": "C12",
+   "requirement": "L3 P4: m = 2 ratio > 1 where D has >= 2 prime factors; flat within 3x of 9.7e4*(D/19)^2.2",
+   "result": "pass",
+   "evidence": "Every m = 2 D (9 = 3^2, 21, 27, 57, 63, 133, 171, 189, 219) has at least 2 prime factors. Chain/flat is 2.35 to 27.09. Flat/curve: {\"9\": 1.035, \"21\": 0.992, \"27\": 0.982, \"57\": 0.981, \"63\": 0.987, \"133\": 1.091, \"171\": 1.16, \"189\": 1.194, \"219\": 1.251}. The README quotes only D = 57 (curve 1.087e6) and D = 133 (curve 7.01e6); every one of the nine D lies within 3x."
+  },
+  {
+   "id": "C13",
+   "requirement": "L3 non-preregistered fits with the parent's estimator",
+   "result": "pass",
+   "evidence": "OLS of ln T on ln |V| (v_size = D), two-sided 95% t interval with n - 2 df; the t quantile was computed here by Simpson integration of the Student density (t975(6) = 2.44691, t975(7) = 2.36462). m = 3: n = 8, D = 9..36, span 4.0x, s = 4.4025 [4.0992, 4.7059]. m = 2: n = 9, D = 9..219, span 24.3x, s = 2.2638 [2.2142, 2.3134].",
+   "notes": "m = 3 meets the parent's span gate (>= 4x) exactly at the boundary. Both fits are in counted field_ops; see E1 for m = 2."
+  },
+  {
+   "id": "C14",
+   "requirement": "replay L3 flat cells under two minutes with the new binary",
+   "result": "pass",
+   "evidence": "15 L3 cells replayed (l3_l1_replay.sh, compared by l3_l1_replay_compare.py): flat m3 D = 9, 12, 14, 18, 21, 27, 28; flat m2 D = 9, 21, 27, 57, 63; and the three chain controls. Every top-level structural field and every per-target counted field was identical (timings excluded)."
+  },
+  {
+   "id": "C15",
+   "requirement": "subflat is the same point set as sub",
+   "result": "pass",
+   "evidence": "l3_subflat_set.py on p = 1048573, A = 926 at D = 9, 12, 21, 27, 36, 57, 63, 219. The chain solution set (discrete-log space, factors ascending) and the flat set {y^D = 1} are both mu_D, giving identical abscissae A/3 + y. The engine's subcensus output for 'sub' and 'subflat' is identical at every D (v_size, columns, base_points, covered m2/m3) and equals the validator's own Euler-criterion counts of columns and base points (e.g. D = 57: 34 columns, 68 base points)."
+  },
+  {
+   "id": "C16",
+   "requirement": "L3 censored cell m2 D = 399",
+   "result": "pass with caveat (E7)",
+   "evidence": "capped, exit -6, stderr 'memory allocation of 16 bytes failed', wall 3851.3 s, ulimit -v 6000000. The m2 chain stops there as the protocol requires; the m3 chain completed all 8 values of D."
+  },
+  {
+   "id": "C17",
+   "requirement": "L3 classification as a component improvement (counted unit against work actually done)",
+   "result": "fail at m = 2; pass in direction at m = 3",
+   "evidence": "F4 solve time (per-target 'ms', summed) flat against chain. At m = 2 the flat arm is slower at every D: flat/chain = {\"9\": 1.13, \"21\": 1.19, \"27\": 1.46, \"57\": 4.64, \"63\": 5.2, \"133\": 97.96, \"171\": 64.88, \"189\": 138.21, \"219\": 113.26}. Flat ns per counted field op: {\"9\": 70.0, \"57\": 274.0, \"133\": 3103.0, \"219\": 14152.0}; chain: {\"9\": 23.0, \"57\": 16.3, \"133\": 6.9, \"219\": 53.2}. Same binary and session at m2 D = 57: chain 0.429 s, flat 1.757 s (producer cells); 0.467 s and 1.537 s (validator replay). At m = 3, chain/flat solve time = {\"9\": 6.3, \"12\": 12.0, \"14\": 8.2, \"18\": 49.5, \"21\": 5.7, \"27\": 145.6, \"28\": 79.8} (cross-binary). Same binary: 7.3x / 5.8x at D = 9 / 21 (producer), 9.2x / 5.4x (validator replay). Flat ns/op at m = 3 stays between 7.0 and 8.6.",
+   "notes": "The cross-binary timings are trustworthy at this scale: the P5 controls show chain solve times within about 15% across binaries (0.378/0.429, 2.49/2.87, 64.5/65.7 s), far smaller than the 65x to 138x reversal at m2 D >= 133. See E1."
+  },
+  {
+   "id": "C18",
+   "requirement": "L1 curve arithmetic",
+   "result": "pass",
+   "evidence": "Trial division: p = 16777141 = 2^24 - 75 is prime, p mod 8 = 5, p - 1 = [2, 2, 3, 5, 279619], 279619 is prime, v2(p + 1) = 1. A mod 4 = 2. (A^2 - 4)^((p-1)/2) = p - 1, matching the chi table's -1. The character sum over 16,777,141 terms (chi tabulated from powers of the primitive root 6) is 6930, so #E = 16784072 = 8*2098009 and #E' = 16770212 = 4*4192553; both cofactors are prime and r = 2098009 > 2^21 = 2097152. The engine's own derived r (subcensus) and the target law (C4) agree."
+  },
+  {
+   "id": "C19",
+   "requirement": "L1 shared (m, D) cells agree with the records to four digits; SD agrees",
+   "result": "pass",
+   "evidence": "All recorded complete sym gidx-0 cells in both exponent-study directories were enumerated. The (m, D, k) triples shared with L1 are exactly 10: m2 D = 3 (k20, 22, 24), 5 (k22), 15 (k22); m3 D = 3 (k20, k22), 5 (k22), 12 (k20, ext), 15 (k22). Ratios are 1.0 exactly in 8 cells, 1.0000005 at m3 D = 12 and 1.0000003 at m3 D = 15. The per-target SD sets are equal in all 10 (l1_check.json shared). No shared cell was omitted."
+  },
+  {
+   "id": "C20",
+   "requirement": "L1 protocol comparators equal the records",
+   "result": "pass",
+   "evidence": "{\"m2_D3\": [1650.0, 1648.0], \"m2_D5\": [5340.0, 5343.0], \"m3_D3\": [19000.0, 19010.0], \"m3_D5\": [202000.0, 201745.0], \"m3_D12\": [775000000.0, 774804479.8333334]}"
+  },
+  {
+   "id": "C21",
+   "requirement": "L1 P1 to P4",
+   "result": "pass",
+   "evidence": "P1: faithful/comparator {\"m2_D3\": 0.9988, \"m2_D5\": 1.0006, \"m3_D3\": 1.0005, \"m3_D5\": 0.9987} (all within 2x). P2: SD = 4, 6, 4, 6 at m2 D3, m2 D5, m3 D3, m3 D5, i.e. D + 1. P3: m3 censored first at D = 60; complete m3 cells with D >= 9 are 10, 12, 15, 20, 30, a span of 3.0x < 4x, so the estimator is inapplicable. P4: 774,804,863.7 / 7.75e8 = 0.99975."
+  },
+  {
+   "id": "C22",
+   "requirement": "L1 m = 3 completion and censoring",
+   "result": "pass with one erratum (E3)",
+   "evidence": "D = 20: T = 27,033,490,184.7 (2.70e10), wall 425.8 s, SD 9. D = 30: T = 298,493,076,491.2, which is 2.98e11 and not 2.99e11; wall 6088.6 s; SD 9. D = 60: capped, exit -6, stderr 'memory allocation of 42832 bytes failed', wall 1523.8 s, ulimit -v 6000000. The m = 2 chain is complete at all 10 values of D."
+  },
+  {
+   "id": "C23",
+   "requirement": "replay L1 m2 D = 3, 5 and m3 D = 3, 5 with the new binary",
+   "result": "pass",
+   "evidence": "Requested cells replayed, plus all ten m = 2 cells and m = 3 D = 4, 6, 10, 12, 15: 17 cells, all identical (l3_l1_replay_compare.json)."
+  },
+  {
+   "id": "C24",
+   "requirement": "README §3 / amendment: under the full family rule, p = 1048261 admits no A < 40000",
+   "result": "pass (complete coverage)",
+   "evidence": "l1_family_search.py: A = 6, 10, ..., 39998 (9,999 values, 100% coverage, 33.8 s). Conditions: A^2 - 4 a non-square; #E = 8r with r prime and r > 2^17; #E' = 4r' with r' prime. #E comes from a primitive-root character sum. There are 0 full-rule hits. 30 values of A pass every condition except r > 2^17 (largest r = 131041 < 131072). The other six shape primes also have 0 hits with complete coverage: {\"1048261\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 30, \"max_r_without_bound\": 131041, \"seconds\": 33.8}, \"1045021\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 23, \"max_r_without_bound\": 130579, \"seconds\": 41.7}, \"1043221\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 54, \"max_r_without_bound\": 130579, \"seconds\": 43.7}, \"1039021\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 23, \"max_r_without_bound\": 130057, \"seconds\": 32.5}, \"1037941\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 7, \"max_r_without_bound\": 129901, \"seconds\": 31.0}, \"1032541\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 39, \"max_r_without_bound\": 129277, \"seconds\": 32.4}, \"1031461\": {\"complete\": true, \"A_tested\": 9999, \"A_range\": [6, 39999], \"full_rule_hits\": 0, \"hits_without_r_bound\": 15, \"max_r_without_bound\": 129121, \"seconds\": 30.8}}. Positive control: on p = 1048573 the same code finds A = 926 as the first full-rule A (r = 131203), the lab's k = 20 member. The first seven primes p = 60C + 1 < 2^20 (p and C prime) reproduce faithful_search.txt's list."
+  },
+  {
+   "id": "C25",
+   "requirement": "amendment: the engine's explicit-curve path enforces the full family rule",
+   "result": "fail (partly false; E5); no effect on L1's validity",
+   "evidence": "`subcensus p=1048261,A=383 ...` panics at 'A = 383 must satisfy A = 2 (mod 4)'. `subcensus p=1048261,A=1562 sub 3 0 mont 2` is accepted and reports r = 131011 < 2^17. miniature_explicit calls miniature_for_a with r_above = 0."
+  },
+  {
+   "id": "C26",
+   "requirement": "reporting contract (one table, one unit, ratio column, reference arm priced, figure and report present)",
+   "result": "partial",
+   "evidence": "L3 has one table in field_ops, with the chain reference arm priced in the same unit and a ratio column; L1 has one comparison per (m, D). REPORT.typ and REPORT.pdf, listed in README Files, are absent at the validated sha. wave6_runs.svg/png were last generated at d55b601662 (01:39Z), before the flat m2 D = 219 cell existed (it finished at 02:14Z). There is no matched rho reference and no §5a band. These are not claimed, but the validation gate needs them for any leaderboard or benchmarks/ use (E8, O3)."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "major",
+   "location": "README Class paragraph ('L3 is a measured component improvement of the decomposition oracle'), §1 L3 answer at m = 2, §2 interpretation; L3 PROTOCOL decision sentence",
+   "issue": "At m = 2 the flat presentation is cheaper only in counted field_ops (2.35x to 27.1x). In F4 solve time it is slower than the chain at every D: 1.13x (D = 9) to 138x (D = 189), and 4.1x / 3.3x on the same binary at D = 57. The flat arm's time per counted op grows from 70 ns to 14,152 ns while the chain's stays at 3 to 53 ns, so field_ops omits the dominant work of the flat arm at m = 2. Under the owner's rules (every cost the method incurs belongs in the unit; accounting changes are not improvements), the m = 2 field_ops ratio is not evidence of a component improvement. The frozen decision sentence ('a measured ratio above 1 at every D is a component improvement') is satisfied literally, but its unit is inadequate at m = 2. The README discloses that wall time per op grows with D, but not that flat is slower in absolute time at every m = 2 cell.",
+   "fix": "Restrict the component-improvement classification to m = 3. There solve time agrees in direction (5.7x to 146x across binaries; 5.4x to 9.2x on the same binary at D = 9, 21), with magnitudes 2x to 3.5x smaller than in field_ops. Report m = 2 as 'fewer counted field operations, more time (1.1x to 138x)', and price the uncounted symbolic work before calling either presentation cheaper at m = 2. The m = 2 fit s = 2.26 is a field_ops slope; the flat solve-time slope from D = 57 to 219 is about 5.3."
+  },
+  {
+   "id": "E2",
+   "severity": "moderate",
+   "location": "README title ('flat beats chain by 10 to 360x') and §1 L3 answer ('2.7 to 17x at m = 2')",
+   "issue": "The §2 table's m = 2 ratios run from 2.35 (D = 219) to 27.1 (D = 171); '2.7 to 17x' predates the D = 171, 189 and 219 cells. The '10 to 360x' range in the title holds only at m = 3.",
+   "fix": "Write '10 to 363x at m = 3 and 2.4 to 27x at m = 2 in counted field_ops', subject to E1."
+  },
+  {
+   "id": "E3",
+   "severity": "minor",
+   "location": "README §2 table (m2 D = 171 flat T) and §3 (m3 D = 30); repeated in the dispatch",
+   "issue": "Double rounding from 4-digit run.log values. 14,146,663.7 rounds to 1.41e7, not 1.42e7 (the log shows 1.415e+07). 298,493,076,491 rounds to 2.98e11, not 2.99e11 (the log shows 2.985e+11).",
+   "fix": "1.41e7 and 2.98e11. No ratio or verdict changes."
+  },
+  {
+   "id": "E4",
+   "severity": "minor",
+   "location": "README §3 'D over the divisors of (p - 1)/4 = 3*5*279619 up to 60'",
+   "issue": "(p - 1)/4 = 4194285 is odd, so seven of the ten D (4, 6, 10, 12, 20, 30, 60) do not divide it. The D set is the divisors >= 3 of 60, all of which divide p - 1 = 2^2*3*5*279619.",
+   "fix": "'D over the divisors of p - 1 = 4*3*5*279619 up to 60 (the divisors >= 3 of 60)'."
+  },
+  {
+   "id": "E5",
+   "severity": "minor",
+   "location": "L1 PROTOCOL.md pre-data amendment (frozen; correct in README or errata only)",
+   "issue": "'the engine's explicit-curve path enforces it': the explicit path enforces A = 2 mod 4, A^2 - 4 non-square and the cofactor primality, but not r > 2^(k-3) (r_above = 0). The binary accepts p = 1048261, A = 1562 (r = 131011 < 2^17). The move to k = 24 therefore rests on the lab's size bound, not on engine enforcement; a k = 20 member accepted by the explicit path existed. Also, 'the seven such primes below 2^20 - 17,115' should read 'the first seven such primes below 2^20, down to 2^20 - 17,115'.",
+   "fix": "State that the explicit path checks A mod 4 and the cofactors, and that the size bound r > 2^(k-3) was applied by the search, not by the engine. The faithful member satisfies the bound (r = 2098009 > 2^21), so L1 is unaffected."
+  },
+  {
+   "id": "E6",
+   "severity": "minor",
+   "location": "README §3 'The shape is restrictive at small k [pcc:unverified]'",
+   "issue": "For six of the seven searched primes (2^20 - p >= 3555), r > 2^17 with #E = 8r needs #E >= 2^20 + 8 > p + 1 + 2 sqrt(p). Hasse's bound therefore excludes every A, so those searches were vacuous. Only p = 1048261 (2^20 - 315) carries content, with 30 values of A < 40000 failing only the size bound. The restriction comes from the size bound on primes more than about 2 sqrt(p) below 2^k, not from Curve25519's shape.",
+   "fix": "Attribute the restriction to the r > 2^(k-3) bound and say that the search had content at one prime."
+  },
+  {
+   "id": "E7",
+   "severity": "minor",
+   "location": "README §2 'no target finished' (m2 D = 399) and §3 'before its first target finished' (m3 D = 60)",
+   "issue": "The engine prints one JSON object at the end of the cell, so a crash loses any finished targets; the cells cannot show how many finished. If the claim is true for D = 399, the first target ran 3,851 s against the 1,800 s per-target cap, which means the cap is checked only between F4 steps.",
+   "fix": "Word both as inferences, and note that the per-target cap is not a hard wall-clock limit."
+  },
+  {
+   "id": "E8",
+   "severity": "minor",
+   "location": "README Files table; wave6_runs.svg/png; L1_faithful/faithful_search.txt",
+   "issue": "REPORT.typ and REPORT.pdf are listed but not committed. The figure predates the final L3 cell (D = 219) and the README table. checks/faithful_full.py is not listed. The k = 24 search script cited in faithful_search.txt (faithful_a_np.py) is not committed, though the validator verified the k = 24 member independently and no number depends on the script.",
+   "fix": "Regenerate the figure from the final cells, commit the report and PDF, and list or commit the search scripts."
+  },
+  {
+   "id": "E9",
+   "severity": "minor",
+   "location": "README §2 '143 s for 7.7e6 field operations at D = 133, 2,232 s for 2.6e7 at D = 219'",
+   "issue": "This pairs the per-target mean T with the wall time of the whole 6-target cell. Per counted op the figures are 3.1 us and 14.2 us. The conclusion 'grows with D' holds.",
+   "fix": "Quote ns per field op, or the 6-target totals."
+  }
+ ],
+ "observations": [
+  "O1 L1 equality detail: 8 of the 10 shared cells are bit-identical in mean field_ops across primes and family rules. m3 D = 12 and 15 differ in the 7th digit. 'Cost is a function of (m, D) alone' is a generalisation from four values of D (3, 5, 12, 15); it has not been shown at larger D, and the faithful member has no other shared D.",
+  "O2 The variation in the L3 ratio across D comes mainly from the chain. The chain's T is not monotone in D (m3: D = 18 costs 2.43e10 and D = 21 costs 2.79e9; D = 27 costs 2.63e11 and D = 28 costs 2.02e11), while flat T rises smoothly (fit residuals are small; s = 4.40 with a narrow interval). P2's upward failure at D = 27 reflects the chain cell's cost, not the flat cell's.",
+  "O3 L1 and L3 are stage measurements of F4 on one decomposition system. Neither prices rho or the §5a band, and neither claims to; under AGENTS.md a stage ratio does not establish an end-to-end gain. Nothing here can enter the leaderboard or benchmarks/ without VALIDATION.json, a matched rho reference with the band, and a pcc claim. README §7 already says so.",
+  "O4 Wall-time comparisons in C17 mix binaries and host loads (the chain records come from dc2c30a4 in earlier runs; the flat cells ran beside three other leads). The P5 controls bound the binary and load effect on chain solve time at about 15%, small against the m = 2 reversal of 65x to 138x at D >= 133. Wall time is still not a claim of this study.",
+  "O5 At m = 3 flat ns per counted op is flat (7.0 to 8.6 ns from D = 9 to 36), so the m = 3 fit s = 4.40 is not visibly distorted by uncounted work. At m = 2 it is (E1).",
+  "O6 Process gaps as disclosed in README §7: no Conductor, EKS, S3 checkpoint, benchrec record, pcc claim or VALIDATION.json. Every number remains an unverified assertion with no claim id. This report is one input to the gate, not the gate.",
+  "O7 The scratchpad that the validator inherited also holds other sessions' files, including the producer's faithful_a_np.py and faithful_full.py. The validator's outputs are in dedicated subdirectories (l13_replay, l13_frozen) and in the l1_*/l3_* JSON files listed under validator_scripts.outputs."
+ ],
+ "not_done": [
+  "No rebuild of the binary from source; the source binding rests on README_PLAN.md.",
+  "Replays were limited to cells under about 2 minutes. L3 flat m3 D = 36, flat m2 D = 133, 171, 189, 219 and L1 m3 D = 20, 30 were not replayed. Their targets and consistency flags were verified (C4, C5), but their field_ops rest on the producer's run.",
+  "The censored cells (L3 m2 D = 399, L1 m3 D = 60) were not rerun.",
+  "The unit tests (subflat_has_the_abscissae_of_sub and others) were not run.",
+  "There is no independent F4 implementation: field_ops are confirmed by same-binary replay, not recomputed. Consistency flags are confirmed by brute force.",
+  "No replay on another host class.",
+  "Not checked whether A = 7842 is the smallest full-rule A at p = 16777141 (not claimed).",
+  "L2 and L4 are out of scope (see validator-report-L2-L4.json)."
+ ],
+ "validator_scripts": {
+  "note": "validation/ in this study directory; stdlib Python, numpy and bash; outputs written to the validator's scratchpad (hashes listed). The scripts were committed by another session as snapshot bf74815770, byte-identical to the hashes below; this validator did not commit.",
+  "validation/l1_check.py": "fec389637c8342d8c0ba1d8ed80f6ad6913bacc3d4b1d44ec986a5b5823c0f54",
+  "validation/l1_family_search.py": "5f96af92adcb6cbb49cdfeff83181a1a41ac12628fc6069d6dd3cba546389a34",
+  "validation/l1_l3_targets_decomp.py": "23121089fe505b631d3f3889114067b4c647272760056fbd40a0da7c05f4e01c",
+  "validation/l3_check.py": "f55013869d454f3f7282feae401ba80029a5ed9aeadedd4e586499074045a4f8",
+  "validation/l3_frozen_replay.sh": "d3e0d1ac08844f0e2f50d9ac9dc0d92303c4987c209b9a9c31afe4f605745cb6",
+  "validation/l3_l1_replay.sh": "00bbaf8186fe02a8019905ca27dab0d2ff84dfece4b4683309845324af08a286",
+  "validation/l3_l1_replay_compare.py": "95a1eaad3ca0317ee3ae49ce34713f4c1127092423574ebf699a0b230fbbb0f9",
+  "validation/l3_subflat_set.py": "90c2df32dceca791705ecf196d58bd67cd20ed83d402f2fa2451d688c2eadb6e",
+  "outputs": {
+   "l3_check.py -> l3_check.json": "60e161f4e4d37c7c581bbbf58f247d2f92999f51c0ff86cee3f1b1001c5cd2a9",
+   "l1_check.py -> l1_check.json": "5f222c6b0510f0cbc8f076e11c9bcb56d9af0afbfc3eb3a24a50bf57bf2cc318",
+   "l1_l3_targets_decomp.py -> l1_l3_targets_decomp.json": "0dc7aa813b95b575ff18aa13cf0904e9f58374d65f27b89bae1524b80142ab50",
+   "l1_family_search.py -> l1_family_search.json": "e06280262edba84867541b99dfbaa728ad0093fe79d5c20f7d900aefc3d97020",
+   "l1_family_search.py (positive control p = 1048573, A < 1000) -> fam_posctl_k20.json": "a70b67b3fbc37f7a943552e7cbfe68fd71f72ddc34f27458cee6de98bd051786",
+   "l3_subflat_set.py -> l3_subflat_set.json": "6acea4614a8ece31433c6017592959b361e79f1cde2361e59eaa4bfcbe23c71d",
+   "l3_l1_replay.sh -> l13_replay/replay.log": "32c3775ef822b18ac15418f15546b10e8ab1ceacfc9651a8eed668b7e2fdd4b4",
+   "l3_l1_replay_compare.py -> l3_l1_replay_compare.json": "8fb9798a2b9c1667ffac56132cfa5e9d876ccb6176119075e237cc53b502b6a7",
+   "l3_frozen_replay.sh -> l13_frozen/frozen_m3_d9.json": "646959505d03bec38e8d2955dafea6d62cc1810349e7bde09ee2d2f4bde0105e",
+   "l3_frozen_replay.sh -> l13_frozen/frozen_m2_d57.json": "d55ebd92b80004453368a99108a7c13f6f73d8af149d245f29d8404e5a2ec2b0"
+  },
+  "commands": [
+   "python3 -I validation/l3_check.py /home/user/crypto f813e0b69292b1c67e621d80649f0d278d12d413 <out.json>",
+   "python3 -I validation/l1_check.py /home/user/crypto f813e0b69292b1c67e621d80649f0d278d12d413 <out.json>",
+   "python3 -I validation/l1_l3_targets_decomp.py <out.json> L3_flat/cells/*.json L1_faithful/cells/*.json <20 recorded k20 chain cells>",
+   "python3 -I validation/l1_family_search.py <out.json> 40000 840 1048261 1045021 1043221 1039021 1037941 1032541 1031461",
+   "python3 -I validation/l3_subflat_set.py <out.json> 1048573 926 20 9 12 21 27 36 57 63 219",
+   "bash validation/l3_l1_replay.sh <replay_dir>; python3 -I validation/l3_l1_replay_compare.py <study_dir> <replay_dir> <out.json>",
+   "bash validation/l3_frozen_replay.sh <dir>",
+   "curve25519_family subcensus p=1048261,A=383 sub 3 0 mont 2 (panics: A mod 4); subcensus p=1048261,A=1562 sub 3 0 mont 2 (accepted, r = 131011)"
+  ]
+ }
+}
