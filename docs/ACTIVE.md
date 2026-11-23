@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [ ] DiSSECT hyperelliptic-transfer trait family for prime-field curves (OpenCode, started 2026-11-22, branch feat/curve-traits-hyperelliptic-transfer-20261122)
+
 - [ ] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, and linear-stage accounting for extension-field graph IC (Cursor, started 2026-11-18, branch cursor/graph-index-calculus-ecdlp-7226)
 
 - [x] Keep the n83_d18_shared_bits include_bytes! CSV in Git (store policy keep entry) so CI `check --all-targets` can compile it (Claude, started 2026-11-19, branch aburan28/zealous-lovelace-tc390j-keep-n83-csv, PR #4786)
