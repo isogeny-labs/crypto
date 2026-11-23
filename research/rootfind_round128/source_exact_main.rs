@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 mod cryptanalysis {
     pub mod ic_boundary {
-        #[derive(Clone)]
+        #[derive(Clone, Debug)]
         pub struct PrimeCurve { pub p: u64, pub a: u64, pub b: u64 }
         #[derive(Clone, Copy, Debug, PartialEq, Eq)]
         pub struct PrimePoint { pub x: u64, pub y: u64, pub infinity: bool }
