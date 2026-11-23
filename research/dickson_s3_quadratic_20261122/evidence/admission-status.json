@@ -1,0 +1,400 @@
+{
+  "schema": "dickson-s3-admission-status/v1",
+  "assembled_at": "2026-11-23T03:07:18.433Z",
+  "capture_phase": "post-observation administrative assembly; not a scientific pre-call manifest",
+  "study": "research/dickson_s3_quadratic_20261122",
+  "tracking_pr": "https://github.com/isogeny-labs/crypto/pull/4940",
+  "observed_checkout_head": "e95645aede904b21421683d917b29b622140da1e",
+  "observed_checkout_was_not_declared_frozen_by_this_audit": true,
+  "status": "scientific_execution_not_admitted",
+  "evidence_status": "unsigned producer observations; no independent signed verdict",
+  "commands": [
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v gh"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "/usr/bin/gh",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v aws"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v kubectl"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v conductor"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v conductor-mcp"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v conductord"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v cargo"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "/home/agent/.cargo/bin/cargo",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v rustc"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "/home/agent/.cargo/bin/rustc",
+      "stderr": ""
+    },
+    {
+      "kind": "executable_lookup",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "command -v timeout"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "/usr/bin/timeout",
+      "stderr": ""
+    },
+    {
+      "kind": "authentication_status",
+      "argv": [
+        "gh",
+        "auth",
+        "status"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "You are not logged into any GitHub hosts. To log in, run: gh auth login"
+    },
+    {
+      "kind": "toolchain_inventory",
+      "argv": [
+        "rustup",
+        "toolchain",
+        "list"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "stable-x86_64-unknown-linux-gnu\n1.100.0-x86_64-unknown-linux-gnu (active, default)",
+      "stderr": ""
+    },
+    {
+      "kind": "toolchain_version",
+      "argv": [
+        "rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+      "stderr": ""
+    },
+    {
+      "kind": "toolchain_version",
+      "argv": [
+        "cargo",
+        "--version"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+      "stderr": ""
+    },
+    {
+      "kind": "observed_checkout_revision",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "e95645aede904b21421683d917b29b622140da1e",
+      "stderr": ""
+    },
+    {
+      "kind": "disk_capacity_snapshot",
+      "argv": [
+        "df",
+        "-h",
+        "."
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "Filesystem      Size  Used Avail Use% Mounted on\noverlay          63G   22G   38G  37% /workspace",
+      "stderr": ""
+    },
+    {
+      "kind": "read_only_live_pool_preflight",
+      "argv": [
+        "/bin/bash",
+        "scripts/isolab_pool_check.sh",
+        "--cpu",
+        "2",
+        "--memory",
+        "8Gi",
+        "--pool",
+        "cpu-spot",
+        "--json"
+      ],
+      "exit_code": 3,
+      "signal": null,
+      "stdout": "",
+      "stderr": "isolab_pool_check: kubectl not found (use --from-json)"
+    }
+  ],
+  "environment_presence": {
+    "AWS_PROFILE": false,
+    "AWS_ACCESS_KEY_ID": false,
+    "AWS_SECRET_ACCESS_KEY": false,
+    "AWS_SESSION_TOKEN": false,
+    "AWS_WEB_IDENTITY_TOKEN_FILE": false,
+    "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI": false,
+    "AWS_CONTAINER_CREDENTIALS_FULL_URI": false,
+    "CHECKPOINT_UPLOAD_TOKEN": false,
+    "CHECKPOINT_TOKEN_FILE": false
+  },
+  "checkpoint_token_file": {
+    "default_path_used": true,
+    "present": false,
+    "contents_read": false
+  },
+  "tool_metadata": {
+    "checked_name_pattern": "isolab|(?:^|__)eks_|(?:^|__)aws_|checkpoint|workflow_dispatch|dispatch_workflow|launch_remote",
+    "matching_tool_names": [],
+    "github_workflow_related_tools": [
+      "mcp__codex_apps__github_download_workflow_artifact",
+      "mcp__codex_apps__github_fetch",
+      "mcp__codex_apps__github_fetch_commit_workflow_runs",
+      "mcp__codex_apps__github_fetch_workflow_job_logs",
+      "mcp__codex_apps__github_fetch_workflow_job_steps",
+      "mcp__codex_apps__github_fetch_workflow_run_artifacts",
+      "mcp__codex_apps__github_fetch_workflow_run_jobs",
+      "mcp__codex_apps__github_rerun_failed_workflow_run_jobs",
+      "mcp__codex_apps__github_rerun_workflow_job"
+    ],
+    "interpretation": "No new-workflow-dispatch or EKS execution operation was exposed by the inspected tool metadata. github_fetch supports GET only; rerun tools require an existing run or job and do not dispatch a new source revision."
+  },
+  "local_resources": {
+    "memory_kib": {
+      "MemTotal": 10206472,
+      "MemAvailable": 3836052,
+      "SwapTotal": 0
+    },
+    "cgroup_interfaces": [
+      {
+        "path": "/sys/fs/cgroup/memory.max",
+        "readable": false
+      },
+      {
+        "path": "/sys/fs/cgroup/memory.current",
+        "readable": false
+      },
+      {
+        "path": "/sys/fs/cgroup/memory/memory.limit_in_bytes",
+        "readable": false
+      }
+    ],
+    "swap_available": false,
+    "hard_memory_bound_established": false,
+    "note": "Memory availability is a momentary host snapshot, not a reservation or measured peak."
+  },
+  "supported_routes": [
+    {
+      "route": "installed EKS MCP",
+      "requires": "A live installed connection with submit/status/results tools plus normal source, checkpoint, budget and capacity admission.",
+      "current_status": "No such tool was exposed in the inspected metadata."
+    },
+    {
+      "route": "existing AWS identity through CodeBuild bridge",
+      "client": "taskq/deploy/eks-karpenter/remote/validate-request then remote/launch-remote",
+      "requires": "Existing authorized AWS identity, intended account 104186811093, scoped S3/CodeBuild permissions, frozen source-bound request, live admission.",
+      "current_status": "aws executable unavailable; no identity validation or permission request attempted. Absence of local tooling does not prove the account lacks access."
+    },
+    {
+      "route": "main-branch GitHub workflow",
+      "workflow": ".github/workflows/isolab-experiment.yml",
+      "requires": "Authenticated Actions-write dispatch, exact published source_revision/spec, reviewed build support, repository OIDC trust and configured variables, ordinary admission.",
+      "current_status": "gh reports no authenticated host; connector exposes no new dispatch operation. Live repository OIDC trust and variables were not established."
+    }
+  ],
+  "admission": {
+    "checkpoint_gate_attempted": false,
+    "checkpoint_uploaded_by_this_audit": false,
+    "checkpoint_reason": "Checkpoint gate calls cmd_push and can upload; it was not invoked by this read-only audit. No usable upload transport was observed.",
+    "live_pool_preflight_command_recorded": true,
+    "live_pool_snapshot_obtained": false,
+    "live_budget_queried": false,
+    "remaining_daily_or_monthly_budget_known": false,
+    "source_publication_receipt_obtained_by_this_audit": false,
+    "tested_image_or_binary_for_remote_submission_established": false,
+    "canonical_protocol_readability_established_by_this_audit": false,
+    "canonical_protocol_prior_evidence": "PR #4922 problems/shared-s3-prime31-execution-gates.md reports canonical blob 9bd790292cdb7fe3424e25a9ba2ebf8753d59f04 as VLT1 binary; this audit did not independently fetch that blob.",
+    "proposed_envelope": {
+      "dollars": 5,
+      "cpu": 2,
+      "memory": "8Gi",
+      "total_minutes": 60,
+      "automatic_retries": 0,
+      "absolute_deadline": null,
+      "status": "proposal only; does not authorize spend or replace live admission"
+    },
+    "remote_build_or_job_submitted": false,
+    "remote_request_id": null,
+    "scientific_experiment_executed_by_this_audit": false,
+    "measured_cost": null,
+    "credentials_or_roles_created": false,
+    "quota_or_runner_caps_changed": false
+  },
+  "development_gate": {
+    "requirement": "AGENTS.md verify-before-pushing requires cargo test --release --lib and touched-example tests.",
+    "recommended_no_run_command": "timeout --signal=TERM --kill-after=20s 600s env CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=0 cargo test --release --lib --no-run --locked --offline --message-format=json --target-dir /workspace/scratch/108b275c78dd/dickson-root-release-build",
+    "recommended_command_executed_by_this_audit": false,
+    "caller": "Parent session owns the actual gate attempt and its separate source/build/exit records.",
+    "limitations": [
+      "No-run compiles but does not execute the required full library suite.",
+      "Local installed Rust is 1.100.0; the maintained remote full-library workflow pins 1.99.1.",
+      "One compiler job and a wall timeout do not establish a hard memory cap.",
+      "An offline dependency failure, compiler failure or timeout leaves the full-library gate open.",
+      "An isolated actual-source qualifier is useful scoped development evidence and does not replace the whole-library gate."
+    ],
+    "cache_observation": "No tikv-jemalloc-sys or tikv-jemallocator .crate appeared in the inspected default Cargo registry cache; current root default features include jemalloc. Offline hydration may fail before compilation.",
+    "prior_root_build_evidence": {
+      "pr": "https://github.com/isogeny-labs/crypto/pull/4922",
+      "receipt": "research/s3_shared_elimination_20261122/evidence/development-receipt.json",
+      "observations": [
+        "unmodified-root-library: cargo test --offline --release --lib --no-run, exit 101, rustc SIGKILL",
+        "modified-root-library: timeout 900 cargo check --offline --release --lib --tests, exit 101, rustc SIGKILL"
+      ],
+      "cause": "not established; no OOM or mathematical conclusion follows"
+    },
+    "supported_remote_library_gate": {
+      "workflow": ".github/workflows/rust-all-targets.yml",
+      "workflow_ref": "main",
+      "inputs": {
+        "full_library": true,
+        "source_revision": "exact published 40-character source SHA required"
+      },
+      "job": "full-library / Native full library (manual)",
+      "runner": "ubuntu-24.04",
+      "rust_toolchain": "1.99.1",
+      "job_minutes": 130,
+      "build_minutes": 40,
+      "test_minutes": 70,
+      "compile_jobs": 2,
+      "test_threads": 4,
+      "automatic_retries": 0,
+      "current_dispatch_status": "unavailable through observed local authentication and connector operations"
+    }
+  },
+  "source_documents": [
+    {
+      "path": "scripts/checkpoint.sh",
+      "sha256": "4f50bbeae65b6f87cdf686644b42eb4d7ce9e40a9c52d84beb8e19a21eb631b2"
+    },
+    {
+      "path": "scripts/isolab_pool_check.sh",
+      "sha256": "887146b97a21c909808364cdbc23ef31fa0b40f4d05b8221e9d35ee7728c1d7f"
+    },
+    {
+      "path": "taskq/deploy/eks-karpenter/ACCESS.md",
+      "sha256": "690b12e45d29f6027ddb6ec41d0632a88e4f62f74132fb46118755ad86dfbe44"
+    },
+    {
+      "path": "taskq/deploy/eks-karpenter/COST_CONTROLS.md",
+      "sha256": "e57d6eb9378caebf9071f5eb306870f8fbc1149288d74ec65a78cc8108384f3d"
+    },
+    {
+      "path": ".github/workflows/isolab-experiment.yml",
+      "sha256": "8ed531c035989e3529c6dc2e6522d85acc7e4ec5cc0bab517fad7cd2624fc661"
+    },
+    {
+      "path": ".github/workflows/rust-all-targets.yml",
+      "sha256": "9a71dbe59785897e8afd2273dacbfb818749e6d01c73fd5e200ab4776887232a"
+    },
+    {
+      "path": "docs/CONDUCTOR.md",
+      "sha256": "7d4a0b1448d5ade380122bd4faff3be127fb0ccfa4275aa5e8d0c31f03c003a4"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "3f559087a5ef7c81357fc3e6a079c365df0ead7cbdc5e6f6710f4a921ec4bfb0"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+    }
+  ],
+  "consulted_skill_sources": [
+    "https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md",
+    "https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/references/submission.md"
+  ],
+  "conclusions": [
+    "Existing support routes were identified; none is currently established as usable and admitted from this environment.",
+    "Local build/unit/static development work remains possible under AGENTS section 9a and does not establish a scientific measurement.",
+    "Do not create identities, loosen OIDC trust, reuse rerun tools to simulate a new-source dispatch, raise resource caps, or switch backend to bypass the open gates."
+  ]
+}

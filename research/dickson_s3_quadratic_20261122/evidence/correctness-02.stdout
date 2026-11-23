@@ -1,0 +1,244 @@
+{
+  "block_identities": {
+    "exhaustive_triples": 468,
+    "fields": [
+      5,
+      7
+    ],
+    "input_degree_checked": true
+  },
+  "exceptional_charts": {
+    "horizontal": {
+      "e1": 0,
+      "excluded_by_e1_inverse_chart": true,
+      "p": 2147483647,
+      "retained_by_q_and_l": true,
+      "x": [
+        0,
+        1,
+        2147483646
+      ]
+    },
+    "twist_only": {
+      "a": 2,
+      "b": 1,
+      "line_l": false,
+      "p": 5,
+      "quartic_and_q": true,
+      "x": [
+        2,
+        2,
+        4
+      ]
+    }
+  },
+  "performance_claim": null,
+  "prime31_assignments": {
+    "cells": [
+      {
+        "arm": "quartic_s3",
+        "equations": 7,
+        "m": 2,
+        "signed_target_replay": true,
+        "variables": 6
+      },
+      {
+        "arm": "invariant_q",
+        "equations": 10,
+        "m": 2,
+        "signed_target_replay": true,
+        "variables": 9
+      },
+      {
+        "arm": "line_l",
+        "equations": 10,
+        "m": 2,
+        "signed_target_replay": true,
+        "variables": 9
+      },
+      {
+        "arm": "quartic_s3",
+        "equations": 11,
+        "m": 3,
+        "signed_target_replay": true,
+        "variables": 10
+      },
+      {
+        "arm": "invariant_q",
+        "equations": 17,
+        "m": 3,
+        "signed_target_replay": true,
+        "variables": 16
+      },
+      {
+        "arm": "line_l",
+        "equations": 17,
+        "m": 3,
+        "signed_target_replay": true,
+        "variables": 16
+      },
+      {
+        "arm": "quartic_s3",
+        "equations": 15,
+        "m": 4,
+        "signed_target_replay": true,
+        "variables": 14
+      },
+      {
+        "arm": "invariant_q",
+        "equations": 24,
+        "m": 4,
+        "signed_target_replay": true,
+        "variables": 23
+      },
+      {
+        "arm": "line_l",
+        "equations": 24,
+        "m": 4,
+        "signed_target_replay": true,
+        "variables": 23
+      }
+    ],
+    "infinity_prefix_explicitly_rejected": true,
+    "planted_correctness_only": true,
+    "wrong_target_sign_rejected": true
+  },
+  "prime31_solver_measurements": null,
+  "schema": "dickson-s3-quadratic-correctness/v1",
+  "selector": {
+    "completeness_reason": "4096 distinct roots of a monic polynomial of degree 4096",
+    "degree": 4096,
+    "depth": 12,
+    "distinct_roots_checked": 4096,
+    "p": 2147483647
+  },
+  "tiny_complete_solve": {
+    "arms": [
+      {
+        "arm": "quartic_s3",
+        "audit_counters": {
+          "candidates_rejected": 0,
+          "complete": true,
+          "domain_evaluations": 0,
+          "f4_runs": 3,
+          "factored_univariates": 3,
+          "field_ops": 84,
+          "first_hilbert_deviation_degree": null,
+          "full_field_branches": 0,
+          "last_hilbert_deviation_degree": null,
+          "max_cols": 9,
+          "max_rows": 7,
+          "root_field_multiplications": 47,
+          "solutions_visited": 2,
+          "solving_degree": 3,
+          "staircase_extinction_degree": null,
+          "stopped_early": false,
+          "timed_out": false,
+          "trace_error": null,
+          "trace_stopped": false
+        },
+        "distinct_ordered_leaf_witnesses": [
+          [
+            8,
+            23
+          ],
+          [
+            23,
+            8
+          ]
+        ],
+        "fallback_classification": "no_full_field_fallback_observed; this alone is not an algebraic-extractor proof",
+        "variables": 2
+      },
+      {
+        "arm": "invariant_q",
+        "audit_counters": {
+          "candidates_rejected": 0,
+          "complete": true,
+          "domain_evaluations": 0,
+          "f4_runs": 6,
+          "factored_univariates": 12,
+          "field_ops": 788,
+          "first_hilbert_deviation_degree": null,
+          "full_field_branches": 0,
+          "last_hilbert_deviation_degree": null,
+          "max_cols": 29,
+          "max_rows": 26,
+          "root_field_multiplications": 188,
+          "solutions_visited": 2,
+          "solving_degree": 3,
+          "staircase_extinction_degree": null,
+          "stopped_early": false,
+          "timed_out": false,
+          "trace_error": null,
+          "trace_stopped": false
+        },
+        "distinct_ordered_leaf_witnesses": [
+          [
+            8,
+            23
+          ],
+          [
+            23,
+            8
+          ]
+        ],
+        "fallback_classification": "no_full_field_fallback_observed; this alone is not an algebraic-extractor proof",
+        "variables": 5
+      },
+      {
+        "arm": "line_l",
+        "audit_counters": {
+          "candidates_rejected": 0,
+          "complete": true,
+          "domain_evaluations": 0,
+          "f4_runs": 10,
+          "factored_univariates": 15,
+          "field_ops": 1765,
+          "first_hilbert_deviation_degree": null,
+          "full_field_branches": 0,
+          "last_hilbert_deviation_degree": null,
+          "max_cols": 44,
+          "max_rows": 45,
+          "root_field_multiplications": 376,
+          "solutions_visited": 4,
+          "solving_degree": 2,
+          "staircase_extinction_degree": null,
+          "stopped_early": false,
+          "timed_out": false,
+          "trace_error": null,
+          "trace_stopped": false
+        },
+        "distinct_ordered_leaf_witnesses": [
+          [
+            8,
+            23
+          ],
+          [
+            23,
+            8
+          ]
+        ],
+        "fallback_classification": "no_full_field_fallback_observed; this alone is not an algebraic-extractor proof",
+        "variables": 5
+      }
+    ],
+    "deadline_seconds_guard": 10,
+    "domain_policy": "all variables full field; selector roots are not supplied to solve_visit",
+    "fixture": {
+      "a": 2,
+      "b": 3,
+      "depth": 1,
+      "m": 2,
+      "p": 31,
+      "target": {
+        "infinity": false,
+        "x": 20,
+        "y": 18
+      }
+    },
+    "ground_truth": "exhaustive 2^2 selector tuples with production signed point lifting",
+    "max_degree_guard": 8,
+    "purpose": "bounded complete correctness control; no performance conclusion"
+  }
+}
