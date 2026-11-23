@@ -1,0 +1,14 @@
+{
+  "action": "Allocate a fresh output path from run ID and attempt; propagate it to exports, artifacts and any isolated verifier. PR path filters use the cumulative PR diff, so report-only pushes can still launch replay.",
+  "created": "2026-11-23T07:24:31Z",
+  "evidence": [
+    "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-publication-collision.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research-visuals"
+  ],
+  "trigger": "A write-once CI replay writes inside its checkout and historical outputs are subsequently committed",
+  "why": "P192 publication made the fixed output directory exist; preparation rejected before arithmetic, and the always-upload step collected historical records."
+}
