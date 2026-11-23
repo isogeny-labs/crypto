@@ -37,6 +37,7 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 
 pub mod eval;
 pub mod witness;
+pub mod projected_rank;
 
 // ---------------------------------------------------------------------------
 // Field helpers (uncounted; the evaluator times phases instead)
