@@ -146,9 +146,8 @@ fn factorbase(f:Fp,n:usize)->Vec<u64>{
 fn membership(f:Fp,w:&[u64])->Poly {
     w.iter().fold(vec![1],|h,&x| product(f,&h,&vec![f.neg(x),1]))
 }
-fn construct(f:Fp,w:&[u64],z:u64)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly) {
+fn construct_from_membership(f:Fp,w:&[u64],z:u64,h:&Poly)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly) {
     let (q,r)=coeff_s3(f,z);
-    let h=membership(f,w);
     let b=w.len();
     let mut ps:Vec<Pair>=vec![(vec![2],vec![0]),(vec![0,1],vec![0])];
     for k in 2..=b+1 {
@@ -170,6 +169,10 @@ fn construct(f:Fp,w:&[u64],z:u64)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly) {
         &product(f,&r,&product(f,a0,a0)));
     let c=gcd(f,d.clone(),n.clone());
     (hs.remove(0),hs.remove(0),q,r,d,n,c)
+}
+fn construct(f:Fp,w:&[u64],z:u64)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly) {
+    let h=membership(f,w);
+    construct_from_membership(f,w,z,&h)
 }
 // Rank-four algebra Fp[s,t,X]/(F_z(t),X^2-sX+t).
 // This balanced factor-tree construction is source-independent of the
@@ -247,10 +250,11 @@ fn construct_tree_full(f:Fp,w:&[u64],z:u64)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly
     let c=gcd(f,d.clone(),n.clone());
     (h0,h1,q,r,d,n,c)
 }
-fn extract_with_method(f:Fp,w:&[u64],z:u64,tree:bool)
+fn extract_with_cached_h(f:Fp,w:&[u64],z:u64,tree:bool,cached_h:Option<&Poly>)
     ->Result<(Vec<(u64,u64)>,usize,usize,usize),String>
 {
     let (h0,h1,q,r,d,n,c)=if tree { construct_tree_full(f,w,z) }
+                            else if let Some(h)=cached_h { construct_from_membership(f,w,z,h) }
                             else { construct(f,w,z) };
     if zero(&d) && zero(&n){return Err("D=N=0 identically; fallback needed".into());}
     let roots=fp_roots(f,&c)?;
@@ -269,6 +273,11 @@ fn extract_with_method(f:Fp,w:&[u64],z:u64,tree:bool)
         }
     }
     Ok((pairs.into_iter().collect(),degree(&d),degree(&n),degree(&c)))
+}
+fn extract_with_method(f:Fp,w:&[u64],z:u64,tree:bool)
+    ->Result<(Vec<(u64,u64)>,usize,usize,usize),String>
+{
+    extract_with_cached_h(f,w,z,tree,None)
 }
 fn extract(f:Fp,w:&[u64],z:u64)->Result<(Vec<(u64,u64)>,usize,usize,usize),String>{
     extract_with_method(f,w,z,false)
@@ -378,10 +387,59 @@ fn planted_pair_target(f:Fp,u:u64,v:u64)->u64{
     assert_eq!(Curve::new(P,A,B).s3(u,v,z),0);
     z
 }
+
+// Run76: compare balanced tree, uncached Newton and precomputed-h Newton.
+// This does not change the registered Run75 two-arm panel.
+fn compare_cached_construction(f:Fp,size:usize,targets:&[u64]) {
+    let w=factorbase(f,size);
+    let start_setup=Instant::now();
+    let cached=membership(f,&w);
+    let setup_ms=start_setup.elapsed().as_secs_f64()*1000.;
+    let mut totals=[0f64;3];
+    let mut positive=0usize;
+    let mut accepted=0usize;
+    for &z in targets {
+        let expected=reference(f,&w,z);
+        let mut times=[Vec::new(),Vec::new(),Vec::new()];
+        for rep in 0..5usize {
+            for offset in 0..3usize {
+                // Rotating order avoids systematically favoring a hot arm.
+                let arm=(rep+offset)%3;
+                let start=Instant::now();
+                let (got,_,_,_)=match arm {
+                    0=>extract_with_cached_h(f,&w,z,false,None),
+                    1=>extract_with_cached_h(f,&w,z,true,None),
+                    _=>extract_with_cached_h(f,&w,z,false,Some(&cached)),
+                }.expect("run76 x-only extraction");
+                let elapsed=start.elapsed().as_secs_f64()*1000.;
+                assert_eq!(got,expected,"run76 mismatch B={size} z={z} arm={arm}");
+                times[arm].push(elapsed);
+            }
+        }
+        let mut medians=[0f64;3];
+        for arm in 0..3usize {
+            times[arm].sort_by(f64::total_cmp);
+            medians[arm]=times[arm][2];
+            totals[arm]+=medians[arm];
+        }
+        if !expected.is_empty(){positive+=1;}
+        accepted+=expected.len();
+        println!("run76-compare p={P} B={size} z={z} pairs={} newton_ms={:.6} tree_ms={:.6} cached_newton_ms={:.6} exact=pass reps=5",
+            expected.len(),medians[0],medians[1],medians[2]);
+    }
+    if targets.len()==8 {
+        assert_eq!(positive,3,"run76 wrong positive count");
+        assert_eq!(accepted,3,"run76 wrong witness count");
+    }
+    println!("run76-total p={P} B={size} cells={} positives={positive} pairs={accepted} membership_setup_ms={setup_ms:.6} newton_sum_ms={:.6} tree_sum_ms={:.6} cached_newton_sum_ms={:.6} cached_amortized_ms={:.6} exact=pass",
+        targets.len(),totals[0],totals[1],totals[2],setup_ms+totals[2]);
+}
+
 fn main(){
     let f=Fp::new(P);
     let compare=std::env::args().any(|a|a=="--compare");
-    let scale=compare || std::env::args().any(|a|a=="--scale");
+    let compare_cached=std::env::args().any(|a|a=="--compare-cached");
+    let scale=compare || compare_cached || std::env::args().any(|a|a=="--scale");
     let sizes:&[usize]=if scale { &[64,128,256,677] } else { &[3,4,8,16,32] };
     for &size in sizes {
         let mut targets:Vec<u64>=if scale {
@@ -396,6 +454,7 @@ fn main(){
         targets.dedup();
         if scale {assert_eq!(targets.len(),8,"all scale controls must be distinct");}
         println!("native original-Rust Prime31 non-table S3 pair elimination scale={} compare={} B={} z={:?}; public-only oracle, two planted positives for grading",scale,compare,size,targets);
+        if compare_cached { compare_cached_construction(f,size,&targets); continue; }
         if compare { compare_construction(f,size,&targets); continue; }
         let mut total_pairs=0usize;
         let mut positive_targets=0usize;
