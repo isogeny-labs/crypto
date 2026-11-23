@@ -21,8 +21,14 @@ CI: [#45088863033](https://github.com/isogeny-labs/crypto/actions/runs/450888630
 - Independent reference: only *after* the candidate returns, enumerate all unordered pairs in `W_B`, require original `Curve::s3` equality, and compare exact sorted pair lists. Separately report `reference_scan_ms`, **not included** in candidate online time. Check balanced product-tree pair coefficients agree exactly with the independent Newton recurrence.
 - CI timeout: five minutes for this scaling step, plus full original Rust base/circuit/F4 stages in a 30-minute job. A timeout means **censored**, not failure of mathematical method or proof of no roots.
 
+
+## Explicit post-registration amendment — positive-control coverage
+The initial 24-cell protocol had only `GX` as a guaranteed positive per B; the four LCG curve-x values are legitimate *negative controls* but unlikely to be decomposable as 2-sums from small W. To prevent a trivial all-empty pass, the source at commit `116801035be0ce84624c4df07b9a4b6294095dde` now includes **two additional planted nontrivial S3-positive x targets per B** (from pairs of public factor-base abscissae at `(B/3,B/2)` and `(B/4,B-3)`). An exact quadratic discriminant formula reconstructs each z and checks `Curve::s3(u,v,z)==0`. The candidate `extract()` still receives only the abscissa z and W, not the pair indices. These are *planted correctness controls*, not truly blind random positives.
+
+Updated 32 total cells: B=64/128/256/677 x 8 distinct targets (GX, X10G, 4 LCG curve-x, 2 algebraically planted positives). An independently written Python EC/S3 grader of the initial source found all four LCG x targets negative for these B values (i.e., prior panel would exercise mostly empty sets). The expansion was made openly **after** the first `--scale` workflow launch; it is not represented as originally preregistered. Newly triggered source-bound CI required. The original 24-cell historical run remains separately attributable.
+
 ## Success and failure interpretation
-**Correctness pass:** every one of the 24 (B,z) cells has exact pair-set agreement, including true empty cells, no hidden generic pair dictionary in the candidate. A correct returned x pair still requires a signed group certificate to qualify as an ECDLP relation.
+**Correctness pass:** every one of the 32 (B,z) cells has exact pair-set agreement, including true empty cells, no hidden generic pair dictionary in the candidate. A correct returned x pair still requires a signed group certificate to qualify as an ECDLP relation.
 
 **Performance-gate pass:** demonstrate reproducible same-host cold time lower than the strongest project index-calculus-frontier *after* full signed group extraction, independent rank, 1/32/128/1024 target recovery, exceptional cases, failed probes, amortization and optimized negation-map rho/BSGS comparison. This CI does NOT implement that gate.
 
