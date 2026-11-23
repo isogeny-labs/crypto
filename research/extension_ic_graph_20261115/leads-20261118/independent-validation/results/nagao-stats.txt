@@ -1,0 +1,68 @@
+PASS row_count_24: 24 rows
+PASS registered_key_set: 3 warmup + 6 control + 15 measurement
+PASS all_valid_and_isolation_admitted: 
+PASS ic_residuals_1506_rho_null: 
+PASS single_recorded_scalar: {242624768583643540}
+NOTE sum_of_24_walls_vs_runner_outer: 1240.464 s of 24 walls; results/flow.json outer_seconds 1311.20168185; slack 70.737 s
+NOTE measurement_round_0_order: rho,baseline,unit
+NOTE measurement_round_1_order: unit,rho,baseline
+NOTE measurement_round_2_order: baseline,unit,rho
+NOTE measurement_round_3_order: rho,unit,baseline
+NOTE measurement_round_4_order: baseline,rho,unit
+NOTE ic_first_by_round: ["baseline", "unit", "baseline", "unit", "baseline"]
+NOTE rho_position_by_round: [0, 1, 2, 0, 1]
+PASS ic_order_alternates_by_round: 
+PASS rho_position_changes_each_round: 
+PASS baseline_walls_array_equals_rows: 
+PASS baseline_median: recomputed 20.714492434, recorded 20.714492434
+PASS baseline_minimum: recomputed 20.604572691, recorded 20.604572691
+PASS baseline_AA_max_over_min_le_1.10: recomputed 1.030481404, recorded 1.030481404
+PASS unit_walls_array_equals_rows: 
+PASS unit_median: recomputed 21.101767406, recorded 21.101767406
+PASS unit_minimum: recomputed 20.840967883, recorded 20.840967883
+PASS unit_AA_max_over_min_le_1.10: recomputed 1.009884621, recorded 1.009884621
+PASS rho_walls_array_equals_rows: 
+PASS rho_median: recomputed 111.402041183, recorded 111.402041183
+PASS rho_minimum: recomputed 111.024525688, recorded 111.024525688
+PASS rho_AA_max_over_min_le_1.10: recomputed 1.009513141, recorded 1.009513141
+PASS unit_over_baseline_paired_ratios: [1.0061056503990913, 0.942184482714035, 1.0409382286234372, 1.0241303094444472, 0.9812696687446524]
+PASS unit_over_baseline_geometric_mean: recomputed 0.998319645796, recorded 0.998319645796
+PASS unit_over_baseline_median_ratio: recomputed 1.018695846554, recorded 1.018695846554
+PASS unit_over_baseline_bootstrap_draws_10000: 
+PASS unit_over_baseline_bootstrap_lo_attainable: recorded 0.967250590741 = geometric mean of multiset Some([0, 0, 1, 1, 1]); exact-distribution rank [0.0259,0.0291]
+PASS unit_over_baseline_bootstrap_hi_attainable: recorded 1.027166362441 = geometric mean of multiset Some([0, 2, 2, 3, 3]); exact-distribution rank [0.9709,0.9805]
+PASS unit_over_baseline_bootstrap_lo_near_exact_2.5pct: exact 2.5% point 0.965851341336
+PASS unit_over_baseline_bootstrap_hi_near_exact_97.5pct: exact 97.5% point 1.027166362441
+NOTE unit_over_baseline_own_mc_8_seeds: lo in [0.965851,0.967251], hi in [1.027166,1.027166]
+PASS unit_over_baseline_readme_rounding: README (0.99832, 0.96725, 1.02717)
+PASS unit_over_baseline_interval_contains_1: no demonstrated E2E gain
+PASS unit_over_baseline_exact_interval_contains_1: exact [0.965851,1.027166]
+PASS readme_ratio_of_medians_1.01870: 1.018696
+PASS unit_over_rho_paired_ratios: [0.18707886912739943, 0.18808796281515114, 0.18910128873872153, 0.19006401761443575, 0.18085800745289227]
+PASS unit_over_rho_geometric_mean: recomputed 0.187009459432, recorded 0.187009459432
+PASS unit_over_rho_median_ratio: recomputed 0.189419935056, recorded 0.189419935056
+PASS unit_over_rho_bootstrap_draws_10000: 
+PASS unit_over_rho_bootstrap_lo_attainable: recorded 0.183716027528 = geometric mean of multiset Some([1, 1, 4, 4, 4]); exact-distribution rank [0.0227,0.0259]
+PASS unit_over_rho_bootstrap_hi_attainable: recorded 0.189282279760 = geometric mean of multiset Some([1, 2, 2, 3, 3]); exact-distribution rank [0.9709,0.9805]
+PASS unit_over_rho_bootstrap_lo_near_exact_2.5pct: exact 2.5% point 0.183716027528
+PASS unit_over_rho_bootstrap_hi_near_exact_97.5pct: exact 97.5% point 0.189282279760
+NOTE unit_over_rho_own_mc_8_seeds: lo in [0.183716,0.183902], hi in [0.189282,0.189282]
+PASS unit_over_rho_readme_rounding: README (0.18701, 0.18372, 0.18928)
+PASS baseline_over_rho_paired_ratios: [0.18594356273935145, 0.19962965455910425, 0.1816642751114961, 0.18558577542494417, 0.1843101985250045]
+PASS baseline_over_rho_geometric_mean: recomputed 0.187324230490, recorded 0.187324230490
+PASS baseline_over_rho_median_ratio: recomputed 0.185943562739, recorded 0.185943562739
+PASS baseline_over_rho_bootstrap_draws_10000: 
+PASS baseline_over_rho_bootstrap_lo_attainable: recorded 0.183247235805 = geometric mean of multiset Some([2, 2, 4, 4, 4]); exact-distribution rank [0.0243,0.0275]
+PASS baseline_over_rho_bootstrap_hi_attainable: recorded 0.193696215817 = geometric mean of multiset Some([0, 1, 1, 1, 4]); exact-distribution rank [0.9741,0.9805]
+PASS baseline_over_rho_bootstrap_lo_near_exact_2.5pct: exact 2.5% point 0.183247235805
+PASS baseline_over_rho_bootstrap_hi_near_exact_97.5pct: exact 97.5% point 0.193696215817
+NOTE baseline_over_rho_own_mc_8_seeds: lo in [0.183223,0.183247], hi in [0.193622,0.193696]
+PASS baseline_over_rho_readme_rounding: README (0.18732, 0.18325, 0.1937)
+PASS readme_table_median_baseline: 20.714492
+PASS readme_table_median_unit: 21.101767
+PASS readme_table_median_rho: 111.402041
+PASS summary_admitted_true: 
+PASS rejection_reasons_empty: 
+PASS complete_operation_count_null: 
+PASS general_rho_parity_null: 
+SUMMARY nagao: 56 checks, 0 failed

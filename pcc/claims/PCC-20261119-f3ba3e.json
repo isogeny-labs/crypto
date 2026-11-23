@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T19:31:48Z",
+ "id": "PCC-20261119-f3ba3e",
+ "kind": "statement",
+ "producer": {
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "model": "codex",
+  "session": "conductor-twist-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/archive-info.json",
+    "sha256": "e5ca0de3d282ebef2046806c9fb5bf8ec8eefa458df210aed5e233cf88c37009"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/summary.json",
+    "sha256": "09a0466361e4aa7b85cdecb665c74a88182ce736361d7af9432e1dbd5c3d9588"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/raw-results.tar.xz",
+    "sha256": "e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "retained33555419-repeated-construction-and-archive",
+ "statement": "Three full fixed33555419-degree constructor calls on the same33-point input return identical output bytes with elapsed8.661,8.664,8.457seconds at L0. Complete native results plus qualification/negative-control directories are preserved in one61700-byte archive SHA256e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259; all extracted file hashes and deterministic repack match. This fits the configured64KiB threshold naturally; no S3 upload/readback succeeded. The original80bit objective remains open."
+}

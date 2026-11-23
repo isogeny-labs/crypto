@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T18:12:31Z",
+ "id": "PCC-20261119-77c30f",
+ "kind": "statement",
+ "producer": {
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "model": "codex",
+  "session": "conductor-local-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/scalar-result.json",
+    "sha256": "98216ce279508eb261e9d3b0432e42ecb43bc765db0804d4113599348978ec99"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/scalar-pre-call.sha256",
+    "sha256": "1d4bc6cf80040fe7905233263e291db1ad5b32f4b8298bebd2c8783fe6993bc8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/scalar-audit-v4.stdout",
+    "sha256": "b5e38914fb9899b3ab31869cb7754daec0d18c813cd2d39c425e29dbef1d960f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/scalar-audit-v4-pre-call.sha256",
+    "sha256": "94dc933c2e68065449e2a84116f7e450338e7cbdd805644f6c95c1b799d6995f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/scalar-post-call.stdout",
+    "sha256": "38df2f529d689ff70a20a4dedd175c905fd6da0342318fccbcbc38f49be795c8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/bin/ecbench/scalar_timing.rs",
+    "sha256": "ed795c8da5f99ba879a7dfb3199d442c8915def7de2fc115b76508fc6f20e4ab"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "authorized-local-scalar-measurements",
+ "statement": "Actual ecbench CLI scalar-timing adapter over unchanged qualified release library records1344 batches across32 varied target bases per model, six measured rounds plus warmup, six source/image/coordinate models on202/96bit fields. Every output independently matches PARI; three focused controls and two negative audit controls pass. Clocks remain descriptive L0, not admitted wall evidence; no ECDLP or80bit speedup follows. Earlier audit parser failures are preserved and rejected."
+}

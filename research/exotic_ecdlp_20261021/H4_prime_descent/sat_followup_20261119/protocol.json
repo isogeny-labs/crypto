@@ -1,0 +1,20 @@
+{
+  "schema": "h4-n17-sat-followup-v1",
+  "question": "Can a complete Boolean SAT solver find and independently verify a decomposition on the frozen n=17 planted and ordinary-query systems within a 180-second per-arm cap?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "solver": "/opt/homebrew/bin/cryptominisat5",
+  "solver_version": "5.14.7",
+  "solver_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "instance": {"field_degree": 17, "instance_index": 0, "seed_formula": "20261022*1000+17*10+0", "arms": ["planted", "random"], "subspace_dimension": 6, "summands": 3},
+  "method": "Reuse frozen builder; Tseitin CNF with shared monomial AND gates and four-clause XOR gates; solve one witness per arm; verify witness against original Boolean equations and exact V^3 enumeration",
+  "stage_order": ["planted", "random"],
+  "per_arm_solver_deadline_seconds": 180,
+  "process_deadline_seconds": 480,
+  "memory_observation_limit_bytes": 12884901888,
+  "host": "local macOS, one Sage producer and one SAT process at a time; algorithmic diagnostic tier",
+  "statistics": ["cnf_vars", "cnf_clauses", "build_seconds", "exact_solution_count", "sat_status", "solver_seconds", "witness_residual", "witness_in_exact_set", "peak_rss_bytes"],
+  "checks": "source and solver hashes, planted residual zero, exact V^3 enumeration, witness replay through original equations; preserve timeout, crash, and zero-solution states",
+  "claim_boundary": "stage-level first-witness result on two deterministic n=17 inputs; does not measure full relation yield, n=131 cost, or single-target end-to-end time",
+  "status": "frozen before execution"
+}

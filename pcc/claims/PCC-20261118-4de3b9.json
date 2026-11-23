@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T18:48:50Z",
+ "id": "PCC-20261118-4de3b9",
+ "kind": "statement",
+ "producer": {
+  "commit": "c17030e0f29b15ccde2154c63272d86f83fc740f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v3-cli-summary.json",
+    "sha256": "0de755211a29344d284d0d410504ecad05d976e9c9fa7b086bbfe5ace6ae9d21"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v3-paired.json",
+    "sha256": "837ac87e4d26034d88e53fdad7ca8666a579a49802762994b8d3db48c507896a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v3-full.json",
+    "sha256": "9b7e044fb8b792ffe9bf5be1ce04823a59a7b8ef7dad359169d8b813bfec6828"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/cli-v3-pre-call.sha256",
+    "sha256": "e55ae8be2b7e9114cd7b25985f31052c3108e0e06822e97ba2c0dff6c3d4c39e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/paired-schedule-20261118",
+ "statement": "The version-3 actual ecbench CLI produces byte-identical legacy plan output to the preserved previous executable, validates a 12-workload/252-execution paired doc and 192-workload/4032-execution full summary, and rejects four invalid admissions including unsupported IC. Workloads remain unregistered and no measurement session was executed. Root clippy rejected a style expression on this v3 source; corrected-source v4 qualification remains pending. This is CLI/schema/planning evidence only."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "matched-recovery-build-plan/v1",
+  "capture_phase": "prebuild",
+  "captured_at": "2026-11-23T01:56:28Z",
+  "source_tracking_commit": "3eab1e26187bb7740dc3b4565274c138f27560d7",
+  "worktree_modified": true,
+  "example_sha256": "dd965d7116f387ed9cd61cf79fedcee8230af768f3352a503d3da563d69d0868",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "host": "Linux d66351118a41 6.18.57 #1 SMP Tue Oct 20 21:56:04 UTC 2026 x86_64 GNU/Linux",
+  "command": "CARGO_BUILD_JOBS=1 timeout 600 cargo build --offline --release --locked --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/99b214ce852d/build --bin shared-s3-matrix",
+  "build_jobs": 1,
+  "build_timeout_seconds": 600,
+  "profile": "release; qualifier package opt-level 0; codegen-units 256",
+  "inputs": "requested-sources.prebuild.sha256",
+  "test_command_after_success": "RAYON_NUM_THREADS=1 timeout 180 IMMUTABLE_TEST_COPY --test-threads=1 --nocapture",
+  "test_timeout_seconds": 180,
+  "cli_mode": "--check-prime31-recovery-arms",
+  "cli_timeout_seconds": 180,
+  "performance_run": false,
+  "complete_hermetic_manifest": false,
+  "purpose": "build CLI for matched Prime31 records"
+}

@@ -1,0 +1,13 @@
+[package]
+name = "a1_trinomial_roots"
+version = "0.1.0"
+edition = "2021"
+description = "Protocol A1 (P2.3): exact maximum root counts of trinomials a+bX+cX^d over prime fields"
+
+[workspace]
+
+[dependencies]
+rayon = "1.10"
+
+[profile.release]
+opt-level = 3

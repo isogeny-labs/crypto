@@ -1,0 +1,14 @@
+{
+  "action": "get the omitted instance measured (or measure it) before accepting the row's headline, and report the row with and without it",
+  "created": "2026-11-20T22:05:56Z",
+  "evidence": [
+    "research/ic_genus2_16_speedup_20261117/validation/g10p11_with_c27.out"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "when a cell's row omits an instance that its admission step admitted (timeout, partial rerun)",
+  "why": "g=10 p=11 dropped admitted curve 27; once run, arm D moved from 0.72x to 1.03x of rho and arm E exhausted"
+}

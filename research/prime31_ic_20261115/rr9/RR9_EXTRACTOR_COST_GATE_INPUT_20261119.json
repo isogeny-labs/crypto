@@ -1,0 +1,64 @@
+{
+  "schema": "prime31.rr9-extractor-cost-gate-input.v1",
+  "date_utc": "2026-11-19",
+  "classification": "derived reanalysis of prior frozen measurements, NOT a new solver benchmark",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "pinned_rust_arithmetic": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "comparison": {
+    "url": "https://github.com/isogeny-labs/crypto/pull/4774",
+    "source": "research/prime31_ic_20261115/rr9/W8_MATCHED_SIGNED_BSGS_SUMMARY_20261119.json",
+    "source_blob_sha": "0ca2050b3c7e060bd83679dd4d6d31c9b92d9493",
+    "ci": "https://github.com/isogeny-labs/crypto/actions/runs/44436754627",
+    "mean_signed_shared_bsgs_1024_ms": 3342.7934425,
+    "mean_ternary_w8_1024_ms": 7834.9334925,
+    "completed_logs": 1024
+  },
+  "queries": {
+    "source": "https://github.com/isogeny-labs/crypto/pull/4770",
+    "training": 42,
+    "online": 1177,
+    "identical_for_replacement_assumption": true
+  },
+  "chart": {
+    "url": "https://github.com/isogeny-labs/crypto/pull/4780",
+    "source": "research/prime31_ic_20261115/rr9/RR9_GRAPH_CHART_SUMMARY_20261119.json",
+    "source_blob_sha": "a3204da7c772a7b29e8b19a8bb764eeb9bd16855",
+    "ci": "https://github.com/isogeny-labs/crypto/actions/runs/44452737502",
+    "b4_natural_negative_full_scan_mean_ms": 1445.472364,
+    "b4_negative_pairs": 16777216,
+    "b8_negative_pairs": 4294967296,
+    "fp_products_per_pair": 30
+  },
+  "warnings": [
+    "#4774 and #4780 are different GitHub Actions executions; do not treat their timings as a matched cross-experiment comparison.",
+    "The query budget is a necessary optimistic upper bound conditional on 1219 queries, ignoring all non-extractor costs.",
+    "No empirical B8 exhaustive wall time or public-only F4 runtime is provided.",
+    "Previous signed PCC independent validation remains unverified.",
+    "Earlier merged #4532 achieved 170.113 ms for 1024 complete logs using 2^20 shared BSGS baby points (67,924 KiB RSS) on the SAME Prime31 curve; this is a different run and Q cohort from #4774. A new experiment must remeasure it on the SAME runner; until then, 170.113/1219 is a sensitivity budget only."
+  ],
+  "historical_frontier": {
+    "source_pr": "https://github.com/isogeny-labs/crypto/pull/4532",
+    "source_ci": "https://github.com/isogeny-labs/crypto/actions/runs/44031618724",
+    "source_report": "research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_INDEPENDENT_AUDIT_20261117.json",
+    "curve_same_as_prime31": true,
+    "same_public_target_cohort_as_4774": false,
+    "same_host_run_as_4774": false,
+    "n_public_logs": 1024,
+    "baby_table_size": 1048576,
+    "setup_ms": 103.84,
+    "online_ms": 66.274,
+    "fully_charged_batch_ms": 170.113,
+    "memory_rss_kib": 67924,
+    "warning": "Historical independent GitHub runner and different PR target cohort; sensitivity comparator ONLY, never a paired cross-run speed ratio or qualified gate."
+  }
+}

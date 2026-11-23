@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-wide-period-relation-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "wide_selector_candidate_rows_raw_sha256": "951b870c9c5ac12c2bb12e5f8639e3a1d3caa118f77cf2db64c01d7dbf099a1a",
+  "input_law": "all 1722 ordered point pairs and all 215040 wide-period centered CRT candidates",
+  "selection": "retain every candidate with selected_coefficient=2 from the order-5/order-11 local selector; never use reduced relation status to select",
+  "rational_check": "reconstruct every selected rational curve and test P+2Q=O by exact group arithmetic; preserve all zero and positive rows",
+  "postcheck": "verify each positive relation by reduction at 47; count reduced-compatible selected candidates separately after the scan",
+  "resource": "complete finite coefficient-two arm, expected 13440 rational checks from frozen selector",
+  "claim_boundary": "rational relation yield on this one coefficient arm, with full selector work charged separately; no unknown-target DLP timing claim"
+}
