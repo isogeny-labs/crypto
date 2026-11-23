@@ -1,0 +1,63 @@
+PRESET for route A9 (BKK / sparse-resultant presentation of Semaev systems)   [pcc:unverified]
+Frozen 2026-11-18, before any measurement data was taken.
+Workspace: /dev/shm/bkk (the scratchpad volume /tmp/claude-0 is at 0 bytes free; files are copied
+to /tmp/claude-0/-home-user/ad79db08-cd5f-5158-81c2-aa769b65fafd/scratchpad/r7/bkk/ when space allows).
+
+QUESTION
+  Does choosing a sparse / BKK-minimal presentation of the prime-field Semaev decomposition system
+  lower the cost of an F4 (msolve) decomposition attempt by a factor that GROWS with p, or only by a
+  p-independent constant (or not at all)?
+
+SYSTEM (one decomposition attempt)
+  p prime of b bits, b in {12,14,16,18,20}; E: y^2 = x^3 + a x + b random over F_p.
+  m in {3,4} summands. Factor base V = L random distinct elements of F_p (roots of a dense degree-L
+  polynomial f), L = round(2^(b/m)) (balanced choice |V|^m ~ p).
+  Target x_R = x(R), R a random point of E(F_p).
+  Base constraints f(x_i) = 0 for every summand i; identical in every presentation.
+
+PRESENTATIONS (arms)
+  D   dense:     S_{m+1}(x_1..x_m, x_R)                              vars x_1..x_m
+  m=3:
+  C3  chain:     S_3(x1,x2,u), S_3(u,x3,x_R)                          vars x1,x2,x3,u (u last in DRL)
+  C3u chain:     same equations, u first in DRL
+  m=4:
+  C4  chain:     S_3(x1,x2,u1), S_3(u1,x3,u2), S_3(u2,x4,x_R)          6 vars
+  B4  balanced:  S_3(x1,x2,u), S_3(x3,x4,v), S_3(u,v,x_R)              6 vars
+  H4a hybrid:    S_4(x1,x2,x3,u), S_3(u,x4,x_R)                       5 vars
+  H4b hybrid:    S_3(x1,x2,u), S_4(u,x3,x4,x_R)                       5 vars
+  BKK pick: the arm minimising the BKK mixed volume of its square subsystem (base equation of the
+  last summand dropped); ties broken by fewer variables, then by arm order as listed.
+  Oracle pick (more generous to the route): per instance, the alternative arm with the lowest
+  measured value of the metric.
+
+INSTRUMENT
+  msolve (system binary /usr/bin/msolve), 1 thread, default solve mode (GB + parametrisation),
+  -v 2 to log every F4 step (degree, matrix rows x cols). Per call: timeout 900 s, address space
+  limit 6 GB (ulimit -v). Metrics per run:
+    T     wall time of the msolve call (s)
+    Dmax  largest F4 step degree printed
+    Msum  sum over F4 steps of rows*cols (matrix work proxy; deterministic)
+    Mmax  largest rows*cols of a single step
+  Instances: 3 per (m,b) cell (seeds derived from (m,b,i)). Arms run interleaved per instance.
+  Positive control per (m, arm): one planted instance per m at the smallest b (V contains the
+  x-coordinates of P_1..P_m and R = P_1+...+P_m); the arm must return a solution. An arm that fails
+  its positive control is excluded and reported.
+  Correctness check of S_4, S_5: they vanish on x-coordinates of 20 random sums on a test curve.
+
+ANALYSIS (frozen)
+  For each m, arm X in {BKK pick, oracle pick} and metric in {T, Msum}:
+    R_X(b) = geometric mean over instances of metric_D / metric_X  (saving factor; >1 = X cheaper)
+    OLS fit  log2 R_X(b) = alpha + beta * b      (so R ~ p^beta)
+    95% CI for beta by bootstrap over instances (2000 resamples, instances resampled within cell).
+  Cells where any of the two arms timed out are excluded from the fit and reported as censored
+  (a censored D with a finished X counts as evidence of growth and is reported separately).
+
+KILL RULE (frozen)
+  Route A9 is KILLED ("saving is a p-independent constant, or none") unless, for at least one m,
+  BOTH metrics T and Msum give beta >= 0.05 with bootstrap 95% CI lower bound > 0 for the BKK pick
+  or the oracle pick, on at least 3 uncensored bit sizes.
+  Additionally record Dmax(D) and Dmax(X) per b; a gap Dmax(D) - Dmax(X) that grows with b is
+  reported as supporting evidence but does not by itself rescue the route.
+  If for both m fewer than 3 uncensored bit sizes are available, the verdict is INCONCLUSIVE
+  (blocked by instrument limits), not KILL.
+  Everything reported is [pcc:unverified].

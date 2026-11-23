@@ -1,0 +1,48 @@
+rootfind-floor vs rootfind-subtract  bits=32 targets=2048  [pcc:unverified]
+A=  64  |Fx|=  64  subtract   2412.9 ns/tgt (  18.9 ns/pt)  floor   1256.8 ns/tgt (   9.8 ns/pt)  ratio  1.92x  hits 0/0  adds 262144/262144
+A= 256  |Fx|= 256  subtract   8853.0 ns/tgt (  17.3 ns/pt)  floor   4284.4 ns/tgt (   8.4 ns/pt)  ratio  2.07x  hits 0/0  adds 1048576/1048576
+A=1024  |Fx|=1024  subtract  34913.4 ns/tgt (  17.0 ns/pt)  floor  16457.5 ns/tgt (   8.0 ns/pt)  ratio  2.12x  hits 1/1  adds 4192391/4192391
+{
+  "bits": 32,
+  "classification": "engineering",
+  "host_note": "shared VM; wall times are diagnostic",
+  "pcc": "unverified",
+  "rows": [
+    {
+      "A": 64,
+      "abscissae": 64,
+      "charged_adds": 262144,
+      "floor_ns_per_point": 9.818843841552734,
+      "floor_ns_per_target": 1256.81201171875,
+      "hits": 0,
+      "speedup_subtract_over_floor": 1.9198275336243775,
+      "subtract_ns_per_point": 18.850486755371094,
+      "subtract_ns_per_target": 2412.8623046875,
+      "targets": 2048
+    },
+    {
+      "A": 256,
+      "abscissae": 256,
+      "charged_adds": 1048576,
+      "floor_ns_per_point": 8.367902755737305,
+      "floor_ns_per_target": 4284.3662109375,
+      "hits": 0,
+      "speedup_subtract_over_floor": 2.066361254843931,
+      "subtract_ns_per_point": 17.291110038757324,
+      "subtract_ns_per_target": 8853.04833984375,
+      "targets": 2048
+    },
+    {
+      "A": 1024,
+      "abscissae": 1024,
+      "charged_adds": 4192391,
+      "floor_ns_per_point": 8.035907506942749,
+      "floor_ns_per_target": 16457.53857421875,
+      "hits": 1,
+      "speedup_subtract_over_floor": 2.121425315662741,
+      "subtract_ns_per_point": 17.047577619552612,
+      "subtract_ns_per_target": 34913.43896484375,
+      "targets": 2048
+    }
+  ]
+}

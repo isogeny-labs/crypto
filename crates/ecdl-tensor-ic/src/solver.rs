@@ -13,7 +13,7 @@ use crate::gadgets::{bits_uint, concat, Arith, ArithRef};
 use crate::linalg::left_kernel_vector_sparse;
 use crate::pointgadget::{gadget_cofactor_relation_network, gadget_relation_network};
 use crate::relation::{
-    mitm_find_relation, new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases,
+    new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases, MitmTable,
 };
 use crate::tensor::{find_witness, Counter, Network, NetworkStats};
 use crate::{Error, Result};
@@ -81,11 +81,16 @@ pub struct Solver {
     pub(crate) arith: Option<ArithRef>,
 }
 
-/// mitm_relation finds one decomposition of r and checks it: membership in
-/// each F_i, every point on the curve, and the sum. Pure, so it can run on
-/// worker threads.
-fn mitm_relation(c: &Curve, fb: &FactorBases, r: Point) -> Result<Option<Relation>> {
-    let pts = match mitm_find_relation(c, fb, r) {
+/// mitm_relation finds one decomposition of r with the factor base's prebuilt
+/// left table and checks it: membership in each F_i, every point on the curve,
+/// and the sum. Pure, so it can run on worker threads.
+fn mitm_relation(
+    c: &Curve,
+    fb: &FactorBases,
+    table: &MitmTable<'_>,
+    r: Point,
+) -> Result<Option<Relation>> {
+    let pts = match table.find(r) {
         None => return Ok(None),
         Some(pts) => pts,
     };
@@ -112,6 +117,7 @@ fn mitm_relation(c: &Curve, fb: &FactorBases, r: Point) -> Result<Option<Relatio
 fn parallel_mitm(
     c: &Curve,
     fb: &FactorBases,
+    table: &MitmTable<'_>,
     targets: &[(u64, u64, Point)],
     workers: usize,
     q: Point,
@@ -131,7 +137,7 @@ fn parallel_mitm(
             handles.push(scope.spawn(move || -> Result<()> {
                 for (slot, (u, v, _)) in head.iter_mut().zip(slice) {
                     let r = c.add(c.mul(*u, c.g), c.mul(*v, q));
-                    *slot = mitm_relation(c, fb, r)?;
+                    *slot = mitm_relation(c, fb, table, r)?;
                 }
                 Ok(())
             }));
@@ -253,10 +259,22 @@ impl Solver {
             ));
 
             // Step 2: relation finding by tensor contraction.
+            //
+            // For mitm, the left half of the meet-in-the-middle search depends
+            // only on the factor base, so it is built once per draw here and
+            // reused by every trial below. Its point additions are charged
+            // once, to relation_search, where the per-trial rebuilds used to
+            // be charged.
+            let mitm_table = if self.mitm {
+                crate::opcount::set_phase("relation_search");
+                Some(MitmTable::new(&c, &fb))
+            } else {
+                None
+            };
             let mut rels: Vec<Relation> = Vec::with_capacity(need);
             let workers = self.worker_count();
             while rels.len() < need {
-                if self.mitm && !crate::opcount::active() {
+                if let (Some(table), false) = (&mitm_table, crate::opcount::active()) {
                     // Draw the targets first, in order, so the batch is the
                     // same whatever the thread count; then evaluate them in
                     // parallel and keep the hits in target order.
@@ -274,7 +292,7 @@ impl Solver {
                     }
                     st.attempts += batch;
                     crate::opcount::set_phase("relation_search");
-                    let found = match parallel_mitm(&c, &fb, &targets, workers, q) {
+                    let found = match parallel_mitm(&c, &fb, table, &targets, workers, q) {
                         Ok(f) => f,
                         Err(e) => return (Err(e), st),
                     };
@@ -303,7 +321,12 @@ impl Solver {
                 crate::opcount::set_phase("relation_target");
                 let target = c.add(c.mul(u, c.g), c.mul(v, q));
                 crate::opcount::set_phase("relation_search");
-                let (rel, ns) = match self.find_relation(&fb, target) {
+                let found = match &mitm_table {
+                    Some(table) => mitm_relation(&c, &fb, table, target)
+                        .map(|rel| (rel, NetworkStats::default())),
+                    None => self.find_relation(&fb, target),
+                };
+                let (rel, ns) = match found {
                     Ok(v) => v,
                     Err(e) => return (Err(e), st),
                 };
@@ -397,7 +420,10 @@ impl Solver {
     ) -> Result<(Option<Relation>, NetworkStats)> {
         let c = self.curve;
         if self.mitm {
-            return Ok((mitm_relation(&c, fb, r)?, NetworkStats::default()));
+            // One-off search: builds the left table for this call only. The
+            // solve loop builds it once per factor base instead.
+            let table = MitmTable::new(&c, fb);
+            return Ok((mitm_relation(&c, fb, &table, r)?, NetworkStats::default()));
         }
         let net: Network;
         let a: Vec<Vec<usize>>;

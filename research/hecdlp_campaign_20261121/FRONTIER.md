@@ -11,6 +11,7 @@ in the two studies); everything else is a single producer's measurement.
 |---|---|--:|--:|---|---|
 | 2, hyperelliptic | 2LP + prefilter | 3–5 | 2^24 | none (no lead targeted it) | `genus_ladder_scale_20261115` |
 | 3, hyperelliptic | 2LP + prefilter + SGE(16,3) | 0.255 | 32771 | C1: w_max 16 (was 0.283 with SGE(8,3)); the LA drift 0.32→0.39 stops at 0.31–0.32 | `genus_ladder_sge_depth_20261121` |
+| 3, hyperelliptic | 2LP + prefilter + SGE(8,3) | 0.416 [0.336, 0.678] / 0.507 [0.354, 0.823] / 0.293 [0.167, 0.623] | 65537 / 131101 / 262147 | C4: orders by BSGS from N_1 alone (order search 6.5 s instead of 204 s at 8209; genus 3 reaches p ≈ 2·10^6); the ratio stops falling; exponents over 8209…131101: SGE arm 1.418 [1.411, 1.425], rho 1.243 [1.069, 1.421] | `genus_ladder_fast_order_20261121` |
 | 3, hyperelliptic | same, cc 1.5 | 0.368 | 16411 | C2: cc 1.5 gains 0.8–3.7 % over cc 2.0; not a lever | `genus_ladder_cc_sweep_20261121` |
 | 3, plane quartic (random) | Diem 2LP + algebraic decomposition + SGE(8,3) | 0.0070 [0.0037, 0.0133] | 8209 | C3: decomposition by conic resultant (`rel_mul` 0.20 of the scan), FPM 0.54 of the old arm (was 0.013 of quartic rho); arm now LA-bound | `quartic_diem_alg_20261121` |
 | 4, hyperelliptic | 2LP + prefilter + SGE(8,3) | 0.0198 | 4099 | C2: first SGE point at genus 4, p = 4099 (was 0.0375 without SGE); C1: w_max 16 is worse at genus 4 | `genus_ladder_cc_sweep_20261121` |
@@ -31,12 +32,243 @@ in the two studies); everything else is a single producer's measurement.
 - **Genus 3 at p = 32771 is replayed** (C5): 36 IC rows, 18 unmerged, 18 rho rows, 9 instances with
   0 mismatches; the analyzer double-counted the unmerged arm (intervals too narrow, means unchanged;
   errata in both studies).
-- Pending: C4 (exact orders by BSGS from N_1 alone; genus-3 extension to 65537 and 131101).
+- **The genus-3 ratio does not keep falling** (C4). With the order search made cheap (BSGS over the
+  one-dimensional Weil window from N_1; `count_points(2)` 2.3–2.5× faster by Barrett reduction,
+  counts unchanged), genus 3 was extended to p = 262147: SGE arm over rho 0.416, 0.507, 0.293 at
+  65537, 131101, 262147 with wide intervals (3 curves × 2 seeds), and the SGE arm's exponent
+  (1.418) sits above the rho fit (1.243 [1.069, 1.421]) over 8209…131101. The campaign target
+  ≤ 0.25 at 2^17 is missed (O2 falsified). At genus 4 the N_1-only BSGS is 4.4–4.5× slower than
+  the N_1 + N_2 route: a negative; genus 4 reaches about 2^15.7 with the faster count only.
 
 ## Distance remaining and next levers
-At genus 3 the arm sits at about a quarter of rho in the FPM reading with exponent 1.40 against rho's
-1.41: no exponent gain, a constant-factor gain. The linear algebra after the merge is now the whole
+At genus 3 the arm sits at a quarter to a half of rho in the FPM reading, and over 8209…131101 its
+exponent (1.42) is above the rho fit (1.24, wide): a constant-factor gain that shrinks with p unless
+more curves per prime say otherwise. The linear algebra after the merge is now the whole
 lever at genus 3 and on quartics: block Wiedemann with a wider block, or a sparse solver that
 exploits the two-large-prime structure before the merge (the core's generic entries dominate the
 cost, per C1's model check). The relation phase's Cantor steps are the lever at genus 2, where no
 arm is below rho.
+
+## Round 2 opening analysis (2026-11-21, main session, from C4's rows) [pcc:unverified]
+
+**Cost shares of the genus-3 SGE(8,3) arm** (FPM_mid): the linear-algebra share rises 0.48, 0.53,
+0.57, 0.60, 0.64, 0.68 from p = 8209 to 262147 while the Cantor walk falls 0.24 → 0.13 and the
+smoothness test 0.22 → 0.16. Over the 32× range of p: `la_mul` scales as p^1.52, the relation
+phase (`cantor_mul`) as p^1.25, `core_cols` as p^0.69 (theory 2/3), so the average weight of the
+merged core grows about p^0.15. The LA, not the relation phase, caps the ratio.
+
+**Expected-rho reference.** Replacing the six measured rho runs per prime by the expected
+negation-rho cost (0.886·√r steps × the measured 219 `cantor_mul` and the measured inversions per
+step) gives SGE arm / expected rho = 0.333, 0.546, 0.388, 0.434, 0.358, 0.342 at p = 8209, 16411,
+32771, 65537, 131101, 262147. Measured rho ran at 1.15, 1.43, 1.37, 1.04, 0.71, 1.16 of its
+expectation, which is what produced 0.290 at 8209 and 0.507 at 131101. The de-noised line is flat
+at 0.33–0.43 across a 32× range of p where the asymptotic p^{−1/6} would predict a fall by 1.8×.
+
+**Round 2 leads.** R2: 9 curves per prime at 65537–262147 to pin both exponents (with the expected
+reference as a second reading). R3: relation excess with lightest-row selection before SGE, to cut
+the merged core's weight (the only lever the shares point at). Not pursued: deeper merge (C1) and
+the base constant (C2), both closed.
+
+## Round 2 results (2026-11-22) [pcc:unverified]
+
+| genus / kind | best arm | over rho | at p | change | source |
+|---|---|--:|--:|---|---|
+| 3, hyperelliptic | 2LP + prefilter + SGE(8,3) | 0.300 [0.223, 0.420] / 0.399 [0.288, 0.534] / 0.377 [0.263, 0.565] (expected rho: 0.330 / 0.393 / 0.324) | 65537 / 131101 / 262147 | R2: 9 curves per prime; flat, no resolved trend; exponents rho 1.360 [1.254, 1.464], SGE arm 1.422 [1.418, 1.425], unmerged 1.347; the data do not separate the exponents | `genus_ladder_g3_highp_20261121` |
+| 3, hyperelliptic | + relation excess, keep lightest fraction K ≥ 0.5 | 1.8–5.2× the plain arm | 32771–131101 | R3: negative; Wiedemann pays per row (`la_wied_mul ≈ c·cols·(generic + rows)`, c 4.9–6.0), so an enlarged core costs more however light its rows | `genus_ladder_light_rows_20261121` |
+| 3, hyperelliptic | + excess 0.2, keep only the lightest cols + margin rows (post hoc) | FPM 0.877 / 0.866 / 0.843 of plain; `la_mul` 0.63–0.65 | 32771 / 65537 / 131101 | R3 post-hoc lead, same 3 curves: gain grows with p; preregistered on fresh instances as R4 | `genus_ladder_light_rows_20261121` |
+
+What round 2 established: the genus-3 arm is a constant factor 2.5–3.3 below rho across 8209–262147
+with no measurable exponent gap, and the merged core's row count, not its weight, prices the LA.
+Relation filtering that leaves the core at cols + margin but lighter is the one lever that moved
+(about 15 % at 131101, post hoc); it is the subject of R4.
+
+## Round 3: the light-row floor, preregistered (2026-11-22) [pcc:unverified]
+
+R4 (`genus_ladder_light_floor_20261122`) tested R3's post-hoc variant on six curves per prime that R3
+never saw (R2's curves 4 to 9), protocol frozen before data. Relation excess E, then keep only the
+lightest cols + margin rows after peel, then SGE(8,3) and Wiedemann. 180 runs certified; plain rows
+equal R2's.
+
+| p | FPM_mid / plain, E = 0.2 | E = 0.3 | `la_mul` / plain | best arm over rho | plain over rho (same curves) |
+|--:|--:|--:|--:|--:|--:|
+| 65537 | 0.860 [0.855, 0.865] | 0.857 | 0.64 | 0.226 | 0.263 |
+| 131101 | 0.848 [0.843, 0.853] | 0.841 | 0.65 | 0.303 | 0.360 |
+| 262147 | 0.829 [0.825, 0.833] | 0.809 [0.805, 0.814] | 0.65 | 0.356 [0.254, 0.588] | 0.439 |
+
+**A measured improvement over the index-calculus baseline** [pcc:unverified], confirmed out of sample: 14 to 19 % off
+the genus-3 arm, growing with p. Predictions L1 to L4 held; L5 (≤ 0.33 of rho at 262147) failed at
+0.356. The selection lowers the LA level, not its exponent (`la_mul` exponent 1.51 for both); the
+arm's FPM exponent falls from 1.43 to 1.39 because the relation phase takes a larger share.
+Disclosed deviations: the frozen command lacked `--curves 6` (a partial run on two curves was analysed
+before the rerun) and the analysis script got a key-name fix; both in `AMENDMENT.md`.
+
+### R5: the floor does not carry to genus 4 and 5 [pcc:unverified]
+
+`genus_ladder_light_floor_g45_20261122`, same option on the earlier genus-4 and genus-5 instances, 105
+runs certified, plain rows identical. Best-E FPM_mid over plain: 0.984 [0.958, 1.002] at genus 4,
+p = 2053; 0.963 [0.950, 0.971] at genus 4, p = 4099; 1.072 [1.063, 1.082] at genus 5, p = 1031. G2 to
+G5 failed. Cause: at these primes the plain merged core already holds only 17 to 32 rows beyond its
+columns, so the floor removes 1 to 2.5 % of the rows, and the LA share is lower (0.52, 0.60, 0.23)
+than at genus 3, p = 262147 (0.67). The lever scales with the core's size; it is a genus-3, large-p
+effect on present evidence.
+
+### R6: replay of R4, and a correction [pcc:unverified]
+
+The validator replayed R4 in full (204 rows, 0 mismatches; ratios recomputed independently and [pcc:unverified]
+bit-equal). Its finding F1 corrects the round-3 reading above: the light-row floor wins only when a
+mod-r multiplication in the linear algebra costs more than 2.5 to 4.1 field multiplications (κ). R4
+scored κ = 9. At κ = 1 the selection costs 1.09 to 1.11 of plain, and in GAE at w = 1 it costs 1.03
+to 1.05. The lab's measured κ is about 2 (PR #4852). **At the measured price, R4 is not an
+improvement**; it is conditional on κ, which nobody has measured at genus 3. The decisive next
+measurement is κ itself: cycles of a mod-r multiply-add in Wiedemann against a field multiplication
+in Cantor, on the same host (`perf-ipc` or `optlevel` skill; this container has no PMU, so wall time
+over repeated kernels). Errata in `genus_ladder_light_floor_20261122/ERRATA.md`.
+
+### R7: κ measured at genus 3, and what it does to the frontier [pcc:unverified]
+
+`genus_ladder_kappa_20261122` (protocol frozen before data; one VM, single thread, wall clock, no
+PMU, one instance per prime, medians of 16 trials). κ is the wall-clock cost of one counted
+`la_mul` in F_p multiplications as counted in Cantor (`fmul + 10·finv`).
+
+| p | κ in situ (range) | κ bare mod-r multiply | κ per `la_add` |
+|--:|--:|--:|--:|
+| 65537 | 17.9 (15.6–23.7) | 2.25–2.85 | 0.99 |
+| 131101 | 17.0 (13.6–22.8) | 1.78–2.67 | 1.00 |
+| 262147 | 15.8 (12.7–19.9) | 1.08–1.80 | 1.00 |
+
+The bare multiply agrees with main's κ ≈ 2. In situ, Wiedemann's wall time follows the matrix
+entries it visits (about 11 additions per counted multiplication), so a counted `la_mul` costs
+16 to 18 field multiplications of wall time. FPM with κ = g² = 9 therefore **under-weights the
+linear algebra by about 2×** on this host.
+
+Consequences, re-priced at the in-situ κ from the recorded counts: [pcc:unverified]
+- **The light-row floor (R4) is an improvement in wall-clock terms**: lighter rows cut both
+  additions and multiplications, and κ in situ is far above the 2.5–4.1 break-even. The R4
+  errata's "not an improvement at the measured price" referred to the bare-multiply κ and is
+  superseded for wall time.
+- **The genus-3 arm is further from rho than FPM at κ = 9 said.** R2's nine-curve rows, SGE(8,3) arm
+  over negation rho: 0.300 / 0.399 / 0.377 at κ = 9 become 0.479 / 0.625 / 0.568 at the in-situ κ
+  (p = 65537 / 131101 / 262147). The unmerged arm goes from 0.54–0.67 to 0.95–1.13, at or above
+  rho. The arm stays below rho, by a factor of about 1.6 to 2.1 instead of 2.5 to 3.3.
+- Every study in this campaign that reports FPM_mid used κ = g²; their ratios to rho are
+  optimistic for arms whose linear algebra is a large share, by up to the factor above.
+
+Limits: wall time on one shared VM, no hardware counters, one instance per prime, the LA time
+obtained by differencing two runs. The figures that would settle it are cycles on an isolated host
+(the `perf-ipc` skill refuses on this VM).
+
+### R8: Wiedemann 5.5–6.1× faster in wall time, every count unchanged [pcc:unverified]
+
+`genus_ladder_wied_speed_20261122`: a local Wiedemann in `genus_ladder.rs` (CSR rows split into ±1
+and generic entries, Shoup multipliers, one Barrett reduction per row, transposed CSR, fused
+diagonal, u128 dot products in Berlekamp–Massey) and a division-free `mulmod` / branchless `addm`
+in `chained_transfer/ic_control.rs`. Counts and outputs identical on 24 fixture runs (recorded
+from the unmodified build before the change) and on the timing instances; the main session reran
+the identity tests (5 passed). Wall time per counted `la_mul` (median of 15, load < 1.5):
+
+| p | ns before → after | speedup | κ in situ before → after |
+|--:|--:|--:|--:|
+| 65537 | 100.7 → 16.6 | 6.06× | 18.2 → 2.86 |
+| 131101 | 120.4 → 20.3 | 5.93× | 16.6 → 2.96 |
+| 262147 | 104.4 → 19.0 | 5.49× | 16.3 → 2.66 |
+
+This is a **component speed-up of the linear algebra**, measured in wall time on one VM. After it, [pcc:unverified]
+κ in situ (2.7–3.0) agrees with the bare-multiply κ, so FPM at κ ≈ 3 now describes this host.
+Re-priced from R2's counts at the new κ, the SGE(8,3) arm is 0.176 / 0.228 / 0.198 of negation rho
+at p = 65537 / 131101 / 262147. **That ratio is not yet a matched comparison:** it prices rho at its
+counted field operations times the Cantor field-multiplication time, while only the index-calculus
+linear algebra was engineered. The matched test is end-to-end wall time of both arms on the same
+instances and binary (R9).
+
+### R9: matched wall-clock comparison against rho [pcc:unverified]
+
+`genus_ladder_wallclock_vs_rho_20261122`: one binary (committed tree f6acc4c2e4, with R8's
+Wiedemann), R2's curves 1–6 per prime, 2 seeds, one thread, one prime at a time (load 1.00), both
+arms timed end to end with the instance search excluded. 108 runs certified; every count equal
+to R2's rows.
+
+| p | IC + SGE(8,3) wall (s) | negation rho wall (s) | ratio [95 %] | without SGE |
+|--:|--:|--:|--:|--:|
+| 65537 | 2.89 | 14.28 | 0.202 [0.158, 0.271] | 0.272 |
+| 131101 | 8.48 | 32.51 | 0.261 [0.220, 0.324] | 0.335 |
+| 262147 | 22.19 | 118.76 | 0.187 [0.121, 0.325] | 0.226 |
+
+- **Rho is not the weak side.** Rho costs 6.35 / 7.34 / 7.10 ns per counted field operation; the [pcc:unverified]
+  index-calculus relation phase 6.57 / 7.15 / 7.63. They share one Cantor implementation.
+- **Where this stands.** The genus-3 index-calculus arm solves the DLP in about a fifth of rho's
+  wall time across p = 65537 to 262147, against about half before R8 (old binary, a confounded
+  cross-check). Wall-time exponents over the three primes are 1.47 for the arm and 1.53 for rho;
+  that is descriptive, three points, no interval, and not an exponent claim.
+- **What it is not.** A constant factor of about 5 at genus 3 on one VM; no sub-exponential
+  algorithm; no leaderboard row (no isolated host, no `VALIDATION.json`; the gate workflow is
+  disabled). The deviation `raw/load.log` was deleted and reconstructed from printed lines,
+  disclosed in RESULTS.md.
+
+### R10: the exponent test to p = 2^20 [pcc:unverified]
+
+`genus_ladder_exponent_g3_20261122`: same binary as R9, genus 3, three new curves × 2 seeds at
+p = 524309 and 1048583, joined with R9's three primes; protocol frozen before data; 36 new runs
+certified; load 1.00 throughout.
+
+| p | IC + SGE(8,3) wall (s) | rho wall (s) | ratio [95 %] |
+|--:|--:|--:|--:|
+| 524309 | 56.77 | 480.20 | 0.118 [0.055, 0.487] |
+| 1048583 | 150.07 | 817.16 | 0.184 [0.107, 0.300] |
+
+| exponent over five primes (65537 … 1048583) | estimate [95 %] |
+|---|--:|
+| IC + SGE wall time | 1.414 [1.394, 1.433] |
+| rho wall time | 1.556 [1.277, 1.764] |
+| IC − rho (paired) | −0.142 [−0.355, 0.141] |
+| IC relation phase, counts | 1.308 [1.307, 1.309] (theory 4/3) |
+| IC linear algebra, `la_mul` | 1.496 [1.492, 1.501] (theory 3/2) |
+
+**The separation test failed (E3)**: the point estimates favour the index calculus by 0.14 in the
+exponent, but rho's interval, from three curves per new prime, spans 1.28 to 1.76, so the data do
+not establish an exponent gap. The relation phase scales at 1.31, at or below the 4/3 theory; the
+linear algebra scales at 3/2, the same as rho, and it is what keeps the arm's exponent near 1.41.
+Against expected rho (post hoc, outside the frozen protocol), the ratio falls monotonically
+0.216 → 0.131 over the five primes, but that slope rests on six curves at the two new primes.
+
+**Campaign status against the standing goal.** The genus-3 arm is a measured constant factor of
+about 5 below rho in matched wall time from 2^16 to 2^20. An exponent gap is not established, and
+the linear algebra's p^{3/2} scaling, equal to rho's, is the structural reason the arm cannot pull
+away: any exponent gain must come from a linear algebra that scales below p^{3/2} on these cores.
+No sub-exponential method for fixed genus has been found or claimed.
+
+### R11: a bounded-weight core lowers the LA exponent, and the relation phase pays it back [pcc:unverified]
+
+`genus_ladder_bounded_core_20261122` (`--bounded W,STEP,EMAX,COVER`; defaults byte-identical; 120
+runs certified; main session reran the identity and new tests, 95 passed): adaptive relation excess
+until the selected core's mean weight is ≤ 8, greedy heaviest-row removal keeping every column
+covered. Genus 3, p = 32771 … 262147, 3 curves × 2 seeds.
+
+| exponent over four primes | plain SGE(8,3) | bounded, cover 1 | bounded, cover 2 |
+|---|--:|--:|--:|
+| `la_mul` | 1.524 [1.516, 1.533] | 1.390 [1.376, 1.402] | 1.365 [1.351, 1.378] |
+| relation phase | 1.300 | 1.408 | 1.408 |
+| total, FPM at κ = 3 | 1.380 | 1.405 | 1.399 |
+
+B1–B3 held (the weight after SGE varies by 2–3 % instead of 13 %; the LA exponent falls by
+0.13–0.16, intervals excluding plain). B4 failed: at κ = 3 the arm costs 1.08–1.10 of plain at
+262147 and its total exponent is higher. Holding the weight fixed needs an excess that grows with p
+(0.2 → 0.5), which raises the relation phase from p^1.30 to p^1.41.
+
+**What rounds 1–4 establish about the exponent.** The relation phase and the linear algebra trade
+against each other through the core's weight: every construction tried here either leaves the LA at
+p^1.5 (plain, SGE, R4) or buys it down by spending relations (R11). The best total exponent measured
+is about 1.38–1.41 in counts and 1.41 in wall time (R10), against rho's 1.5–1.56 with an interval
+that does not exclude it. The double-large-prime theory's 4/3 is not reached at p ≤ 2^20 by any
+variant tried.
+
+### R12: per-prime weight target [pcc:unverified]
+
+`genus_ladder_bounded_sweep_20261122`, same binary and instances as R11, W ∈ {8.5, 9, 9.5, 10}
+with cover 1, 144 runs certified, plain rows equal to R11's. W = 10 (the top of the grid) wins at
+every prime: FPM at κ = 3 of 0.987 / 0.979 / 0.971 / 0.971 of plain at p = 32771 / 65537 / 131101 /
+262147, with excess 0.1–0.2. Total exponent 1.372 [1.367, 1.375] against plain's 1.380; paired
+difference −0.008 [−0.012, −0.005]. S2 held, S3 and S4 failed (a drop of 0.02 was predicted).
+
+A 1–3 % constant gain that grows with p, and an exponent change of under 0.01. The same trade as
+R11: lowering W lowers the LA exponent and raises the relation phase's by about as much. W > 10 is
+untested but can only matter at the largest prime, where the excess is already above its floor.

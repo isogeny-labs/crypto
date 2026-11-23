@@ -1,0 +1,80 @@
+PRESET: r7/m8 -- settle the PKM Kummer chain at m = 8 (then m = 9 if feasible).
+Frozen 2026-11-15T23:4xZ, before any run of this study. Standing: everything here is [pcc:unverified].
+Parent: crypto research/pkm_m8_runs_20261115/ (PRESET sha256 fd02b3a4...2fcd), whose section 6 kill
+rule is applied UNCHANGED below. No commit, no push, no PR (task constraint).
+
+0. DISCLOSURE (data that exists before this file)
+- Parent study (same .ms systems, same msolve 0.6.5): m = 8 exact rungs N = 8..11 all D = 7 (both draws),
+  N = 12 r0 censored twice (AS 6e9 at 454 s; AS 10e9 / 1800 s wall, peak RSS 6.4 GB, last round degree 7).
+  m = 9 exact N = 9..12 all D = 7; N = 13 r0 censored (memory, >= 8). m = 10 N = 12 censored (>= 7, wall).
+- The parent ext log of m = 8 N = 12 r0 shows a degree-8 round at about 6 s msolve time, preceded only by
+  rounds of degree <= 7. I read that log before writing this file. It motivates reading B below.
+- Systems reused byte-identically from the parent scratch (scratchpad/followups/m8-runs/out/systems/),
+  sha256 checked against the parent .json metadata before use.
+
+1. ROUTE
+Repository route first (CLAUDE.md, AGENTS.md section 9a: isolab-eks; checkpoint.sh; benchrec; director card ->
+executor). Checked at 23:35-23:39Z: aws CLI installable (pip) but STS GetCallerIdentity -> InvalidClientTokenId;
+kubectl downloadable; gh GH_TOKEN invalid; isolab-experiment.yml dispatch only runs ecbench.spec/v1 specs at a
+pushed commit (msolve cells are not an ecbench spec; a new spec would need a commit, forbidden here); no
+Agent tool in this subagent (no director/executor relay). Fallback, as the task permits: local container
+(4 vCPU, ~14 GB shared), one heavy job at a time. checkpoint.sh init and benchrec init/run/close are done
+in a scratch git mirror (r7/m8/repo); S3 push/upload impossible without credentials (recorded, not faked).
+
+2. CELLS (arm B: p = 2013265921, repo curve, refutation regime; two draws r0, r1 per rung)
+Priority order: (1) m = 8 N = 12 r0, r1; (2) m = 8 N = 13 r0, r1 (only if (1) gives D = 7 for both);
+(3) m = 9 N = 13 r0, r1; (4) m = 8 N = 8..11 and m = 9 N = 9..12 re-runs (cheap, for reading B traces);
+(5) m = 10 N = 12 only if time remains. Order: (4) cheap cells first (< 5 min each), then (1), (3), (2).
+
+3. INSTRUMENTS AND CAPS
+I1 msolve 0.6.5: msolve -t T -v 2 -g 2 -f SYS.ms -o SYS.out. RLIMIT_AS 12e9, wall cap 7200 s, T = 4 for
+   heavy cells (nvars >= 17), T = 2 otherwise; nice 10. Background, one heavy job at a time.
+   Low-memory variant, only if the default run dies on memory: add -m 5000 (max pairs per matrix); recorded
+   as a different instrument setting. Its D is reported under its own label and counts for reading A only
+   if no default run of that cell finished.
+I2 Singular 4.3.2, ring (p),(vars),dp; std() with degBound = c (c = 7, 8). RLIMIT_AS 12e9, wall 7200 s.
+I3 Truncated-basis checker (Singular script, new): given G = std(I) at degBound c, checks
+   (a) every input generator reduces to 0 mod G, (b) every S-polynomial of a pair with deg lcm <= c reduces
+   to 0 mod G, (c) 1 not in G; then counts standard monomials of degree <= c of the monomial ideal lead(G).
+
+4. OBSERVABLES
+A (parent observable, primary): D_cell = max msolve round degree, both draws finished, min over draws.
+B (PC-degree value, secondary but frozen here): D_PC(cell) = min c such that 1 is in V_c, where V_c is the
+  smallest subspace of F_p[x]_{<=c} containing the generators and closed under (w in V_c, deg w <= c-1 =>
+  x_i w in V_c) (HKY closure; order-independent).
+  Upper bound U: 1 in V_c if (i) msolve finishes with max round degree c, or (ii) Singular std with
+  degBound = c returns 1 (every polynomial formed has degree <= c under dp, so the refutation lies in V_c).
+  Lower bound L: 1 not in V_c certified by I3 (a)+(b)+(c) on G = std(I) at degBound = c: if all pairs with
+  deg lcm <= c reduce to 0 and all generators reduce to 0, span{t*g : deg <= c} = V_c and has leading
+  monomials <LT(G)>_{<=c}; then 1 in V_c iff 1 in G. The certificate value is the rank deficit
+  delta_c = dim F_p[x]_{<=c} - dim V_c = #standard monomials of degree <= c (delta_c > 0 iff 1 not in V_c).
+  Supporting, not certifying: msolve -v 2 trace enters a round of degree c+1 before any 1 is found.
+  D_PC is a value when L = U - 1 certificate holds (1 not in V_{U-1} and 1 in V_U).
+
+5. KILL RULE (parent section 6, unchanged; per arity m; min over draws; exact = both draws finished)
+- alpha*(m,1) / alpha*(m,2): m=8 0.1561/0.0563; m=9 0.1740/0.0615; m=10 0.1893/0.0658.
+- sigma_hat(m) = OLS slope of D on N over exact rungs; needs >= 3 exact rungs spanning Delta N >= ceil(m/2),
+  otherwise INCONCLUSIVE(m).
+- KILL(m): sigma_hat >= alpha*(m,1). WEAK-KILL(m): alpha*(m,2) <= sigma_hat < alpha*(m,1).
+  OPEN-LOW(m): sigma_hat < alpha*(m,2).
+- Item verdict (m = 8, 9, 10): CLOSED-AT-TOY-SCALE iff each of m = 8, 9, 10 reads KILL or WEAK-KILL and at
+  least one KILL; OPEN if some m reads OPEN-LOW; INCONCLUSIVE otherwise.
+Application here:
+- Reading A: the rule on msolve D_cell (parent rungs N = 8..11 + new exact cells).
+- Reading B: the same arithmetic on D_PC values (a rung counts only if D_PC is a value for both draws; rungs
+  N = 8..11 need their own L/U certificates from this study).
+- Per-m verdicts are stated for both readings. Reading A is the parent's frozen observable; reading B is
+  reported as the value-not-censor reading the task asked for. If they disagree, both are reported, and
+  the item verdict is stated for each; no reading is chosen post hoc.
+- Ladder stop: if a cell is censored under both I1 and I2 (no value, no U), deeper rungs of that m are not run.
+
+6. PREDICTIONS (before data)
+- P1: m = 8 N = 12: L certificate at c = 7 holds (delta_7 > 0) within minutes; U at 8 via Singular degBound 8
+  is uncertain (may exceed memory); msolve default completes within 2 h: 50/50.
+- P2: rungs N = 8..11 at m = 8 have D_PC = 7 (L at 6, U at 7).
+- P3: if D_PC(m=8,N=12) = 8, reading B gives sigma_hat = 0.2 -> KILL(8); item verdict stays INCONCLUSIVE
+  unless m = 9 and m = 10 also resolve.
+
+7. WHAT THIS CANNOT SHOW
+Toy N <= 13; one presentation; D_PC is a property of this presentation over F_p, not an algorithm-independent
+lower bound for ECDLP; an OLS slope over integer steps at N <= 13 is not an asymptotic statement.
