@@ -1,0 +1,27 @@
+name: Prime31 signed pair support reference-only census
+
+on:
+  push:
+    branches: [research/symmetric-pair-quotient-prime31-20261122]
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run79_exact_pair_support.rs"
+      - ".github/workflows/prime31-run79-signed-pair-support.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run79_exact_pair_support.rs"
+      - ".github/workflows/prime31-run79-signed-pair-support.yml"
+  workflow_dispatch:
+
+jobs:
+  signed-pair-support:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Exact signed pair-support census using existing native group law
+        timeout-minutes: 8
+        run: cargo run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_run79_exact_pair_support
