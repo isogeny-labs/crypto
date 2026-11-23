@@ -1,4 +1,4 @@
-# Decisions behind the capped RunPod route (draft Amendment 18)
+# Decisions behind the capped RunPod route (Amendment 33 draft; draft Amendment 18 until 2026-11-15)
 
 This file records the decisions that `AMENDMENT_R2_H_runpod_capped.md` and the route scripts rely on, so that a reader
 can find them in a committed file (second review, S13). Owner decisions are the owner's answers, recorded in full in
@@ -17,6 +17,10 @@ decision, not results. Every entry is `[pcc:unverified]`.
 | 13 | 2026-11-15 | One relaunch per t = 14 cell on positive host-side evidence of loss only; an abort, a no-evidence outcome or a loss without host-side evidence goes to the owner; t = 13 gets none. | Section 4.3; `fetch.sh` `relaunch`; `common.sh` `cell_next`. |
 | 14 | 2026-11-15 | The deadline and the cost cap are enforced by session check-ins and a scheduled reaper; no enforcement independent of Claude sessions. | Section 2.6; `reap.sh`. |
 | 15 | 2026-11-15 | A 112 GiB attempt whose own process peak exceeds 112 GiB counts as OOM (censored). | Rule P2p. |
+| 20 | 2026-11-21 | Run exactly one cell on this route, within the budget. | The allow-list holds one study name and its one relaunch (`common.sh` `STUDY_NAMES`). |
+| 21 | 2026-11-21 | Study ceiling US$540, study spend guard US$510 (Amendment 20 had US$500 and US$470); the per-job cap stays US$40. | `common.sh` `STUDY_GUARD_USD`, `STUDY_CEILING_USD`, `CEIL_USD`; `run.sh` step 5. |
+| 22 | 2026-11-21 | Run without S3 (this session's AWS credentials are invalid): results come back to the session and go into git; no S3 raw upload and no S3 resume checkpoint. A disclosed deviation. | `fetch.sh --delete REF` (the git gate); `.gitignore`; amendment sections 2.5 and 6. |
+| 23 | 2026-11-21 | The cell is t = 14, draw 0, cap 7 at Amendment 14's -m112 setting, stage `cap:14:0:7:27900000000` (Amendment 31 route F). Reading: refutes, d_F = 7; completes without refuting, d_F >= 8; oversize or a memory kill at 112Gi, censored and d_F >= 7 stands. | `common.sh` `STUDY_STAGE`; `run.sh` step 1; amendment section 1. |
 
 ## Main-session decisions
 
@@ -43,3 +47,78 @@ decision, not results. Every entry is `[pcc:unverified]`.
 | N3a aligned | 2026-11-15 | Host-side evidence for an automatic relaunch is either form the owner's question for decision 13 named: a RunPod-side status change, or the pod gone from the list with GET 404, each recorded before any logged session action. | Aligns the route with owner decision 13 as answered, including its caveat that RunPod keeps no record of who ended a pod. |
 | round 3 (R1-R3, S1) | 2026-11-15 | Host-side evidence counts only when tied to the loss (between the last check-in that saw the runner alive and the first loss; a user-named status at the loss check-in, or a runner seen done before the loss, sends the relaunch to the owner); the text is brought up to date with the second smoke (cgroup v2, two CPU models under `cpu5m`); `reap.sh` takes the per-name lock and skips a held pod; classifier `a18-r4`. | The third review found host-side evidence not tied to the loss, a loss after an observed completion getting an automatic relaunch, stale text, and a reaper without the lock. |
 | tests | 2026-11-15 | The test suite writes into the repository only with `--write`. | The reviewer had to run it on an archive copy because it rewrote committed files. |
+
+## Port decisions (2026-11-21, Amendment 33 draft)
+
+Taken by the port session on the main session's instructions of 2026-11-21. Records of a decision, not results; every
+entry is `[pcc:unverified]`.
+
+| id | date | decision | reason (one line) |
+|:--|:--|:--|:--|
+| P1 allow-list | 2026-11-21 | The allow-list is `pkm-x-t14-k0-c7-m112` and `pkm-x-t14-k0-c7-m112-r1` (owner decision 13: only after a LOST with relaunch `auto`); `pkm-x-dev-*` (t <= 10) stays. Every draft Amendment 18 name is removed. `next_allowed` reduces to base, then the relaunch. | Owner decisions 20 and 23: one cell. |
+| P2 request | 2026-11-21 | No frozen `pfd-x-t14-k0-c7-m112` request exists on main (searched `requests*/`, `runpod/`, `results/` and the study's text files). `make_requests_m112.sh` derives it from `requests_r2i/pfd-x-t14-k0-c6.json`: command[1] `cap:14:0:7:27900000000`, memory 112Gi, job name `pfd-x-t14-k0-c7-m112-20261108`, one sentence appended to the note; every other field copied. Its SHA-256 `44e009f1…` is pinned in `common.sh`; `run.sh` checks the pin and re-derives it. It passes the validator the r2i requests passed. The three cap-6 `-m112` requests were removed. | Amendment 7 B (cap 6 to 7) and Amendment 14 (-m112) define every changed field. |
+| P3 stage | 2026-11-21 | `run.sh` refuses any stage other than `cap:14:0:7:27900000000` for a study name; development stages take `--max-dense` 12800000000 or 27900000000. | One stage per name; a development check may exercise the -m112 stage shape. |
+| P4 REST v2 | 2026-11-21 | Every REST call moves to `api.runpod.io/v2` (price from the CPU catalog, create, get, list with its envelope and cursor pages, delete), with main's `runpod/rp.sh` create body and the v2 field names of `V2_FIELDS.md`. The create must answer 201. | REST v1 answers 502 from here (Amendment 32); v2 answers 200. |
+| P5 lastStatusChange | 2026-11-21 | v2 has no `lastStatusChange`, so the host-side form "a RunPod-side status change" can no longer be seen and never counts. Host-side evidence is only the pod gone from a successful list with GET 404. Classifier `a33-r1`. | Fail closed: a missing field must not open an automatic relaunch. |
+| P6 interruptible | 2026-11-21 | v2 has no interruptible field in the request or the record; rule 7 requires `cloud` `SECURE` on the create response and GET record and no `interruptible` key in `pod-request.json`. | The not-interruptible fact now rests on v2 having no spot pod field (spec `CreatePodRequest`). |
+| P7 data center | 2026-11-21 | The data center id is checked on a GET record taken once the runner answers (`pod-record-ready.json`), not on the create response. | v2 documents `dataCenterId` as assigned by the scheduler; it may be null at create. |
+| P8 image | 2026-11-21 | The pod image is main's pinned digest `python:3.12-slim@sha256:5e2bdb1b…` (the smokes used the tag `python:3.12-slim`). | Main's v2 smoke reached the runner with it; a digest cannot move. |
+| P9 runner | 2026-11-21 | `run.sh` embeds `server_pinned.py`, a vendored copy of `runpod/server.py` at `d2a16c723d` (SHA-256 `f56fd08e…`), not main's current `runpod/server.py` (`c6d8afb1…`). | This route was reviewed with that runner; main's file changed. |
+| P10 git gate | 2026-11-21 | `fetch.sh NAME --delete REF` replaces the bench-record gate: the pod is deleted only when every file of the kept tree, `outcome.json` and `local-sha256-<k>.txt` are in commit REF with the blob hash of the local file, each local file still has its manifest SHA-256, and REF is an ancestor of a branch head that `git ls-remote --heads origin` lists now. The study results trees are not git-ignored; development trees are. The hard deadline still deletes regardless (2 h wait at most). | Owner decision 22: no S3; git is the durable copy. |
+| P11 ledger | 2026-11-21 | `ledger.tsv` takes RunPod's own billing per pod (`GET /v2/billing/pods`, `billing_v2_20261121.tsv`) for every study pod whose id is in a study file, the eight Amendment 31 pods (US$370.84, Amendment 32), and one row `a32-remainder/unitemised` that brings the pre-Amendment-31 spend to Amendment 32's US$95. Sum 465.8424. Two snapshot pods of unclear study (US$72.96) are listed as unknown, not as rows. | Owner decision 21 rests on Amendment 32's total of about US$466. |
+| P12 memory | 2026-11-21 | The 56 GiB step of the memory rule is removed (P2m and `as_m112`): the attempt here is the cell's -m112 attempt itself (the 56Gi attempt was the other session's, Amendment 30). P2p (owner decision 15) and the pre-start cgroup check (at least 112 GiB or `max`) stay; the GET record's `cpu.memory` floor is 121 GB for every name. | One attempt size; owner decision 15 already covers it. |
+| P13 bench record | 2026-11-21 | The run's `bench.record/v1` stays a Git record without S3 upload; the RESUME note is committed and pushed instead of the S3 checkpoint. | Owner decision 22. |
+
+## Owner decision 24 and the d54 retarget (2026-11-21, Amendment 33 draft revision 6)
+
+| # | date | decision | where it acts |
+|:--|:--|:--|:--|
+| 24 (owner) | 2026-11-21 | After the bigger-memory design (`t14_bigmem/`): draw 0 only, as a probe, stage `cap:14:0:7:54000000000` on a 32 vCPU / 256 GB reserved pod; per-job cap US$65, study spend guard US$535, ceiling US$540 (decision 21 had US$510 / US$540). Draw 1 needs a later decision from draw 0's outcome. | `common.sh` `STUDY_STAGE`, `STUDY_NAMES`, `VCPU`, `CEIL_USD`, `STUDY_GUARD_USD`; amendment sections 1, 2, 5. |
+
+| id | date | decision | reason (one line) |
+|:--|:--|:--|:--|
+| Q1 names | 2026-11-21 | The allow-list is `pkm-x-t14-k0-c7-d54` and `-r1` (decision 13: host-side evidence only), plus `pkm-x-dev-*`. The names of decision 23 are retired; their request and generator stay as a record (`requests_m112/`, `make_requests_m112.sh`, now self-contained and reproducing `44e009f1…`). | The `-m112` cell is measured (`results/SNAPSHOT_20261117`, oversize at step 35, censored). |
+| Q2 request | 2026-11-21 | `make_requests_d54.sh` derives `requests_d54/pfd-x-t14-k0-c7-d54.json` from `requests_r2i/pfd-x-t14-k0-c6.json`: command[1] `cap:14:0:7:54000000000`, memory 238Gi, job name `pfd-x-t14-k0-c7-d54-20261108`, one sentence in the note; pinned SHA-256 `089176f2…`; it passes the r2i validator (a first, longer sentence failed the 2,048-character limit). | The changes the design lists; 238Gi is the largest whole GiB of the 256 GB pod and gives `4·C <= request − 36 GiB` at `C = 54·10⁹`. |
+| Q3 pod | 2026-11-21 | `cpu5m` at 32 vCPU / 256 GB, no fallback (`cpu3m` has the same memory but would be a second deviation); `cpu.memory` floor 256 GB; cgroup `memory.max` before start `max` or at least 256,000,000,000 bytes (238.42 GiB = 201.17 GiB of `B'` cap + the design's 36 GiB headroom + 1.25 GiB; the design's worst-case peak 230.9 GiB). `RAYON_NUM_THREADS` stays 12. | `t14_bigmem/MEMORY.md` section 5, `HOSTS.md` section 2; Amendment 9. |
+| Q4 budget | 2026-11-21 | Per job: price × 30 h <= US$65 (2.08 × 30 = 62.40). Study: ledger sum + worst case <= US$535 (465.84 + 62.40 = 528.24). | Owner decision 24. |
+| Q5 memory rule | 2026-11-21 | P2p (a 112Gi attempt with a peak above 112 GiB) is replaced: OOM is cgroup `oom_kill > 0` with exit 137 (P2b) or without (P2k), or a memory peak above the pod's numeric `memory.max` (P2p; the tree's value, else the one read before start). All are censored at the new size. Classifier `a33-r2`. | Owner decision 15 mirrored an EKS 112Gi request; here the limit is the pod's own. |
+| Q6 reading | 2026-11-21 | The classifier writes a `reading` into `outcome.json` from the class, the row and the log's stop line: refutes, `d_F = 7`; degree 7 completed without refuting, `d_F >= 8`; oversize (stop line `oversize`), budget (stop line `budget`), OOM or LIMIT, censored with `d_F >= 7` standing; anything else, no reading (owner). | The pilot writes `timed_out = timed_out || oversize`, so the row alone does not tell the two stops apart. |
+| Q7 amendment | 2026-11-21 | The route draft and the design's "proposed Amendment 34" are merged into one draft Amendment 33; `t14_bigmem/project.py` is an analysis script, not part of the route. | One frozen text for the route and its one job. |
+
+## Owner decisions 25-27 and the fourth review (2026-11-21, Amendment 33 draft revision 7)
+
+| # | date | decision | where it acts |
+|:--|:--|:--|:--|
+| 25 (owner) | 2026-11-21 | While the pod exists, a scheduled task starts a fresh cloud session every hour that runs the route's reaper, independently of this session; removed when the pod is gone. Supersedes decision 14 for this job. | `INDEPENDENT_REAPER.md` (the stored prompt); `reap.sh` header and `REAPER BLIND` exit; amendment section 2.6. |
+| 26 (owner) | 2026-11-21 | The shared balance covers US$62.40: Amendment 29's per-batch confirmation for this job; results are fetched every 15 minutes while it runs. | `watch.sh`; amendment sections 2.6 and 5. |
+| 27 (owner) | 2026-11-21 | `pkm-dense-rerun-20261115` (US$37.26) is study spend; study ceiling US$600, guard US$595; per-job cap stays US$65. | `ledger.tsv` row; `common.sh` `STUDY_GUARD_USD`, `STUDY_CEILING_USD`; amendment section 5. |
+
+| id | date | change | reason (one line) |
+|:--|:--|:--|:--|
+| R4-M1 | 2026-11-21 | Section 2.6 rewritten: who deletes the pod (fetch.sh through the git gate, fetch.sh at the hard deadline, reap.sh from the session and from the hourly independent task), how Amendment 32's relaunch precondition is met, and the worst-case pod life with each cadence. | The old sentence claimed a backstop that shared Amendment 32's root cause. |
+| R4-M2 | 2026-11-21 | Amendment 29 applied: decision 26 is the balance confirmation; `watch.sh` is the 15-minute fetch (every 900 s, segments of at most 2 h, deletes nothing itself). | Frozen precondition not addressed before. |
+| R4-M3 | 2026-11-21 | Settled by decision 27; `bdr-growthlaw` stays outside (another study, `docs/session-logs/2026-11-15.md:4536`). | Ledger attribution. |
+| R4-M4 | 2026-11-21 | The tests read `tests/fixtures/ledger_fixture.tsv` (one row of US$500), never the live ledger; B03/B04/B04b boundaries computed against it (65.05 > 65; 595.004 > 595; 594.994 <= 595). | The live ledger moved under the fixed increments. |
+| R4-M5 | 2026-11-21 | `V2_FIELDS.md`: list entries carry `env` and `args` (only six fields are kept); 32 vCPU / 256 GB floors; smoke3 results and what is still unobserved. `run.sh` comment at step 5. The 230.9 GiB peak is called a projection with the review's extra terms. The stock sentence matches the code (exit 10 also on an empty `dataCenters` list). Worst-case pod life 30.8 h, US$64.06, used by every cost check (`WORST_HOURS=30.8`). | Text the smoke and the API contradicted. |
+| R4-S1 | 2026-11-21 | The boot loop and `cgroup-prestart.json` record `memory.oom.group`, `memory.swap.max` and `vm.max_map_count`; section 4.2 says how a group OOM and an allocation abort are classified. | Record only; no rule reads them. |
+| R4-S3 | 2026-11-21 | `memory.max` `max` refused for study names (allowed for development names). | The headroom and P2p need the numeric limit. |
+| R4-S4 | 2026-11-21 | The reading table says "no contrary stop line"; tests R10 and R11 for a missing stop line. | The code already accepted it; a deadline at the step loop prints no stop line. |
+| R4-S5, S6, S9, S14 | 2026-11-21 | Text: the existing grid-zeros certificate for draw 0; the relaunch fits the guard only after a base pod life of about 13 h or less; "structurally identical" traces; the time-band corrections. | Disclosure. |
+| R4-S8 | 2026-11-21 | An OOM with the peak under 90 percent of `memory.max` carries `oom_note` (likely a host-level or group kill). Classifier `a33-r3`. | So it is not read as "54·10⁹ is too small". |
+| R4-S11 | 2026-11-21 | Stale "guard US$510" comments in `common.sh` and `ledger.tsv` fixed; the repeated paragraph in `ledger_SOURCES.md` removed. | Hygiene. |
+| R4-S13 | 2026-11-21 | A failed create's non-JSON response is not copied to `run.log`; only its size is. | It could echo the body with the pod token. |
+| Not done | 2026-11-21 | S7 (reaper fallback to known pod ids when the list is unreadable; a pod after a timed-out create without a ledger row; the unconfirmed pre-start delete), S10 (token recovery on a real pod), S12 (main's numbering, to check at the freeze), the request's inherited first note sentence (S11, documentary). | Larger changes or not doable offline; the reaper now reports a blind pass instead. |
+
+## Owner decision 28 (2026-11-22, draft Amendment 34)
+
+| # | date | decision | where it acts |
+|:--|:--|:--|:--|
+| 28 (owner) | 2026-11-22 | Retry the t = 14 draw 0 cap-7 probe with one pre-start check: refuse any pod whose host allows fewer than 262,144 memory mappings, delete it before the job starts and try another host. Same cell, flags, request, binaries, limits and budget. | `AMENDMENT_34_hostcheck.md`; `run.sh` step 10c and `precleanup`; `common.sh` `STUDY_NAMES`, `MAP_COUNT_MIN`, `HOST_REFUSE_MAX`, `next_allowed`; `fetch.sh` rule P2h. |
+
+| id | date | change | reason (one line) |
+|:--|:--|:--|:--|
+| H1 names | 2026-11-22 | Allow-list `pkm-x-t14-k0-c7-d54-h1`, `-h2`, `-h3`, each with `-r1` (decision 13); h(N+1) only after hN or its relaunch ended as a host-limit abort; the Amendment 33 name is retired. | N6 forbids reusing the used name; at most three retries. |
+| H2 host check | 2026-11-22 | After the cgroup check and before `/start`, `run.sh` reads `recorded.max_map_count` from the pre-start fetch (the boot loop's copy of `/proc/sys/vm/max_map_count`; the runner's `/status` does not report it) and refuses a value below 262,144 or none: logged delete, exit 13. | The probe's host allowed 65,530 and the pilot aborted at step 34 with 63.5 GiB used. |
+| H3 refusal accounting | 2026-11-22 | A confirmed host refusal moves the receipts to `<name>.hostrefused-<k>/` and books the ledger row as `<name>.hostrefused-<k>/<pod id>` (closed, derived cost), so N6 (`ledger_has`, rows `<name>/…`) does not block the name; at most five per name, then the owner. An unconfirmed delete stays the exit-11 path. | A pre-start refusal must not use the name, and nothing may be overwritten. |
+| H4 classifier | 2026-11-22 | Rule P2h (classifier `a34-r1`): pilot exit 134 with a "memory allocation of N bytes failed" line, `oom_kill` 0 and the peak under the numeric `memory.max` is NOT_ADMITTED with `host_limit: true`; on the committed probe tree it gives P2h (test D54). The probe's own `outcome.json` is not rewritten. | The order of H1 needs to recognise a host-limit abort. |
+| H5 heading | 2026-11-22 | `AMENDMENT_HEADING` is `## Amendment 34`; `run.sh` and `fetch.sh` refuse study names until Amendment 34 and the new script hashes are in the preregistration. | The route scripts changed after Amendment 33 froze them. |

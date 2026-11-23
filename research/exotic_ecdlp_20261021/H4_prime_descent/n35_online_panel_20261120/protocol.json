@@ -1,0 +1,71 @@
+{
+  "arm_order": [
+    [
+      "ic",
+      "rho"
+    ],
+    [
+      "rho",
+      "ic"
+    ],
+    [
+      "ic",
+      "rho"
+    ],
+    [
+      "rho",
+      "ic"
+    ],
+    [
+      "ic",
+      "rho"
+    ],
+    [
+      "rho",
+      "ic"
+    ],
+    [
+      "ic",
+      "rho"
+    ],
+    [
+      "rho",
+      "ic"
+    ],
+    [
+      "ic",
+      "rho"
+    ],
+    [
+      "rho",
+      "ic"
+    ]
+  ],
+  "calibration": "512 repeated point additions before and after each pair; ratio=max/min; pass at most 1.25",
+  "calibration_ratio_cap": 1.25,
+  "claim_boundary": "secondary ten-target exploratory paired panel; report each point, order, failure, calibration, shared setup; do not replace primary one-target row or promote isolated-host performance",
+  "fixture_generator": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_online_panel_20261120/make_fixtures.py",
+  "fixture_generator_sha256": "c84d10468e95b9fff0db0104b7fff0dfa70603858be3e8a824230c8106ec9139",
+  "fixtures": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_online_panel_20261120/fixtures.json",
+  "fixtures_sha256": "6178c1b85498e33bbc997b05f1869dcee6e1320d83793580fea8aaa2f89aec8f",
+  "full_candidate": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/candidate.json",
+  "full_candidate_sha256": "7dba2e69c56f22a626f5d9305fbcdb52f1f2d91a4c7aaa584c742d5c91a11857",
+  "full_result": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/result.json",
+  "full_result_sha256": "4c74a617cc2f600e32ad648f3690ae4170d601783dd3a73c4ee0025fb3ba66a5",
+  "full_runner": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/run.py",
+  "full_runner_sha256": "c19b76ed28c57f1e19269b493659b73cd9a4627347a77dd1f78fc544921b965f",
+  "observed_rss_cap_bytes": 8589934592,
+  "online_clock": "IC uses full candidate five exclusive target phases, including relation and scalar checks; rho starts target walk and ends after independent scalar replay; exclude fixture construction, pair index, factor logs, and calibration from both",
+  "per_arm_cap_seconds": 30,
+  "process_cap_seconds": 600,
+  "question": "Across ten frozen fresh n35 public points, how variable are same-point IC and rho online intervals with the audited packed index and factor logs ready?",
+  "resource_envelope": "one checked Sage process, one CPU worker per arm, ordinary local macOS host, no physical-host isolation",
+  "runner_sha256": "dbb43f7ac268403a7e44a77d022148961551709da11c3a702e6dba853c53bfd9",
+  "schema": "h4-n35-online-panel-protocol-v1",
+  "shared_setup": "rebuild exact 4096-point base and 8321091-key index, load and replay all 2048 factor logs; charge separately once for 10 targets",
+  "statistics": "retain every pair; report per-point rho/IC ratio only for two verified scalar certificates; median paired ratio, geometric mean, and min/max descriptive; no host uncertainty interval or performance promotion",
+  "status": "frozen before measurement",
+  "subgroup_order": 520604191,
+  "target_count": 10,
+  "target_law": "SHA256 labels h4-n35-panel-target-0..9 modulo r-1 plus 1 times exact fixed G; exact points and scalars in hashed fixtures.json"
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h3d3b391ffa1d",
+  "label": "Koblitz matched rho reference, v5 tallied: a=1 n=29",
+  "spec_id": "ECS1he426a406d0ec",
+  "spec_sha256": "e426a406d0ec7aac453d95bb6bc5ba9a3aa41a0da457d692d804cc99e87d17d7",
+  "env_class_id": "ECBENV3ha7153aea3de6",
+  "host_sha256": "a4b4dac035fdfa60ddf3fe5503136b1f50d5f29bc569b4150687a8f1625a2896",
+  "plan_sha256": "aa6c2101596568cbe41047d6ec347f66b1eaa0881ce032d0368525f52773ae66",
+  "binary_sha256": "621bf770bfc3e7d582d9e4ba981b8dc2980cd6d17d36178b408b22ed54d25821",
+  "git_commit": "98ec8c5496539a3308768212f7f9dd575afede3f",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1795144273813,
+  "finished_unix_ms": 1795144300733,
+  "status": "complete",
+  "executions_planned": 960,
+  "records_written": 960,
+  "records_sha256": "33d785eedd3a2350cc5d4625b83b13b47b571c640e816e98f735230dfd29771f",
+  "status_counts": {
+    "verified": 960
+  },
+  "last_seq": 959
+}

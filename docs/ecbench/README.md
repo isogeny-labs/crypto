@@ -62,6 +62,7 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `ecbench …` | does | described in |
 |---|---|---|
 | `methods` | list every method with its parameters | §7, §11 |
+| `panel` | list/filter the canonical 20/30/60/80-subgroup-bit curve ladder and its exact cell IDs | [phased panel](../../research/ecbench_phased_panel_20261117/README.md) |
 | `optimize` | `optimize inventory [--json]` lists every registered method with its search strategy, claim scope and knob count (`--json` adds parameter roles and nested solvers/engines); `optimize audit --development SPEC... [--holdout SPEC...] [--require-all]` audits the split between adaptive development specs and fresh confirmatory holdout specs, prints a JSON report, and exits 1 when the campaign is not admissible (`--require-all` also demands that development cover the live method registry, every system solver, every PDP3 engine and every prime PKM tower engine). It runs nothing and makes no performance claim | `src/cryptanalysis/ecbench/optimization.rs` (module header) |
 | `host` | print the host capsule | §5 |
 | `plan` | validate a spec and print what it expands to; an arm its curve cannot run is refused here | §1, §3 |
@@ -96,9 +97,59 @@ and static musl), Apple silicon, and Windows. A source build is:
 cargo build --release --bin ecbench
 ```
 
+List the shared curve ladder before writing a scaling spec:
+
+```bash
+./target/release/ecbench panel
+./target/release/ecbench panel --phase 1 --family koblitz --json
+./target/release/ecbench panel --phase 1 --lane hyperelliptic_jacobian
+```
+
+New specs use `ecbench.spec/v2` and classify curve selection explicitly:
+
+- `{"mode":"phase","phase":1,"lane":"elliptic_generic_decomposition"}`
+  is scaling/claim evidence in one independently promoted lane. Every curve must
+  be named as `{"kind":"panel","cell":"P1-K0-23"}`, use public targets,
+  and meet the phase's target-count floor. Copied parameters, wrong-phase
+  cells, a lane whose admission state is blocked, and substitutes are refused
+  before execution. For compatibility, an omitted `lane` means
+  `elliptic_algebraic`; new specs should always name it.
+- `{"mode":"smoke"}` is for correctness and plumbing fixtures.
+- `{"mode":"diagnostic","off_panel_reason":"..."}` is for research that
+  cannot use the panel and records why.
+
+Smoke and diagnostic sessions are never current `vs_rho` claim evidence. In
+particular, tiny fields such as `F_5` may remain unit-test fixtures, but cannot
+enter a phase. Size always means `ceil(log2(r))`; field bits or binary degree
+are recorded separately. The authoritative cells are embedded from
+[`panel.json`](../../research/ecbench_phased_panel_20261117/panel.json), so a
+cell ID resolves to the same parameters and identities everywhere.
+The canonical lanes are `elliptic_algebraic`,
+`elliptic_generic_decomposition`, `hyperelliptic_jacobian`, and
+`cover_transfer`. The two decomposition tracks do not share promotion evidence.
+The current higher-genus and transfer entries are deliberately blocked until
+phase-matched objects and complete end-to-end adapters clear their listed
+obligations.
+
+An executable Phase 1 compatible-family slice is
+[`panel-phase1-k0-23.json`](specs/panel-phase1-k0-23.json). A full phase still
+requires all mandatory compatible-family specs and the promotion dossier in
+the panel protocol.
+
+Frozen `ecbench.spec/v1` files still plan, verify, and replay unchanged. A new
+`run`, `isolab-job`, or claim reconstruction refuses them unless
+`--allow-legacy-spec` is supplied explicitly for reproduction.
+
 ```bash
 ./target/release/ecbench plan --spec docs/ecbench/specs/smoke-prime.json
 ```
+
+New binary Gröbner/Semaev `ic.pipeline` specs also carry
+`"field_profile": "semaev-groebner-f2m17-v1"`. Planning, running and Iso Lab
+job construction reject a missing or different profile and reject any curve
+other than the exact `K1-17` field representation. Historical unpinned sessions
+remain replayable. See
+[`../ic/GROEBNER_FIELD_POLICY.md`](../ic/GROEBNER_FIELD_POLICY.md).
 
 The exact binary-field correctness fixture pairs `ic.large_prime` with
 the matched `rho.signed_frobenius` on the same explicit Koblitz curve and targets:
@@ -184,7 +235,9 @@ strong-rho run on a public target into a checked `vs_rho` claim (§9). On Linux 
 (`--cpus auto`); on macOS there is no affinity control, so it records
 every run at L0 and says so. Operation counts are unaffected.
 
-The skills in [`.agents/skills/`](../../.agents/skills) walk an agent
+The skills in the workspace trunk
+([`isogeny-labs/workspace:.agents/skills/`](https://github.com/isogeny-labs/workspace/tree/main/.agents/skills);
+[`.agents/skills/README.md`](../../.agents/skills/README.md)) walk an agent
 through a measurement (`ecbench-measure`), an independent run
 (`ecbench-independent-runner`) and an extension (`ecbench-extend`).
 
@@ -521,6 +574,7 @@ default; the ids are:
 | `rho.signed_frobenius_full`, `rho.signed_frobenius_v2_full` (the Brent walk of `rho.signed_frobenius_v2`), `rho.signed_frobenius_strong_full`, `ic.pipeline_full` | — | the base method repriced with every native operation charged (`price-units`) |
 | `bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation` | bsgs | baby table then giant steps (mean 1.5√r); Pollard's interleaving (mean 4√r/3); classes `{P, −P}` with stride 2m + 1 (mean about √r) |
 | `bsgs.textbook_v2`, `bsgs.interleaved_v2`, `bsgs.negation_v2` | bsgs | the same, plus one charged final `[d]G = Q` in a `verification` phase |
+| `bsgs.negation_table_v2` | bsgs | arbitrary-width negation baby table under versioned cached accounting: the complete `G`-only build, inserts and stride negation are charged once in the cold total and marked reusable; lookups plus the hit's key comparison and mod-`r` recovery arithmetic, then final `[d]G = Q` verification, are per-target inside the exclusive online clock. Each ecbench child still builds its own table, so `setup/M` computed across v2 records is a derived accounting view, not a measured shared-table batch; the frozen [prime31 1,024-target run](../../research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_RESULT_20261117.md) remains the measured reuse diagnostic. Neither cached figure substitutes for the cold one-target row |
 | `kangaroo.vow`, `kangaroo.vow_v2` | kangaroo | van Oorschot–Wiener tame/wild kangaroo on `[0, r)`, distinguished points; the frozen id charges a re-placement after a same-kind collision to `search`, the `_v2` id to its own `restarts` phase and adds the charged final check |
 | `claw.pair_table`, `claw.pair_table_v2` | claw | the four-point signed-Frobenius pair claw (cryptanalysis#175): known-log orbit base, target-independent quotient pair table; the `_v2` id adds the final check and counts the `recover` phase in the `max_adds` budget |
 | `ic.pipeline`, `ic.pipeline_counted` | ic | the index-calculus pipeline (factor base, oracle, relations, linear algebra, verification), and the same with the relation charge rebuilt from counted work; the prime-only components `wsum`, `wwalk` and the `prime-interval` base are refused at plan time on any other curve and for a parameter outside their range (`wwalk`'s base of exactly two columns is known only after the base is built, and the run refuses it) |
@@ -528,12 +582,14 @@ default; the ids are:
 | `ic.koblitz_descent`, `ic.koblitz_descent_v2` | ic | the ledger §23 one-target Koblitz index calculus (subgroup-orbit base, folded pair table, aimed m = 3 collection, sparse logs, walked m = 2 descent), every stage charged by counted group operations; the frozen id pins the Low folded-table filter for exact replay, while `_v2` uses the measured partition-local Top layout and matches the current `ic price --single-target` path; odd `n < 64` Koblitz curves |
 | `ic.koblitz_batched`, `ic.koblitz_batched_v2` | ic | the candidate tournament worker's pair-table pipeline (`examples/ic_tournament_worker.rs`: subgroup-orbit base, folded pair table, relation collection in `batch_trials` queries with a rank check after each batch, sparse logs, one-target descent), every stage charged by counted group operations; the frozen id pins the Low filter and `_v2` uses Top; exists so the tournament's `batch_trials` candidates can be measured under L2, replay and A/A; odd `n < 64` Koblitz curves; a `factor_base_points` above the subgroup's `r − 1` non-identity points is refused at plan time (the run would draw `1024·points` abscissae and fail) |
 | `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
+| `ic.k3_gaudry` | ic | Gaudry's k = 3 index calculus on `E(F_{p³})`, `fp3_random` curves only (`gaudry_cubic::generate_instance3`, prime order, `67 ≤ p < 2^20`, `p ≡ 1 mod 3`); `harvester=eliminator\|cycles` (required, no default) handles the double or triple large primes by pivot elimination or by the gain-forest cycle harvester. **Charge:** the relation oracle runs for real and counts its own `F_p` multiplications, so everything is charged in GAE with the curve's measured `F_p` multiplications per addition `c_E` as the rate: `factor_base` (lifting `x ∈ F_p`, the once-per-curve `S₄` symmetrisation) and `relations` (every group addition, including the `aG + bQ` samples, the decomposition checks and the `[d]G = Q` checks) plus the oracle's `F_p` multiplications ÷ `c_E`; `linear_algebra` is every multiplication mod `r` (eliminator or harvester merges, Wiedemann) × 9 `F_p` multiplications ÷ `c_E` (`r ≈ p³`, three limbs; `ic.k4_gaudry` charges 16 for four). Unlike `ic.k4_gaudry` there is no per-trial constant and no enumeration stand-in. Counted but not charged: `relation_hash_bytes_uncharged`, the BLAKE3 digest the protected path keeps of the admitted relations, so the record is a lower bound by that diagnostic only. Generic `rho.plain`, `rho.negation`, `bsgs.*` and `kangaroo.vow*` run on the same curve through `Fp3Group` |
 | `rho.multitarget_pooled`, `ic.residual_batch` | rho | the Kuhn–Struik batch (the record's target and `batch − 1` public companions on one distinguished-point table, `{P, −P}` walks); the residual id adds one public base point `P0` of unknown logarithm to every relation (an index-calculus column, `B = 1`); prime curves, `batch` in 1..=65536 refused at plan time otherwise |
 | `rho.preprocessing` | rho | Bernstein–Lange preprocessing rho on `{P, −P}`: a target-blind table of `entries` distinguished points, then the target's walks on the same map; prime curves; `entries > 0` and `dp_bits ≤ 40` refused at plan time |
 | `ic.known_log_mitm2_v1`, `ic.known_log_ksum_v1` | ic | a target-blind seeded known-log signed base and a folded two-sum table (`mitm2`, prime and one-word binary curves) or a table of every signed `k`-sum, `k = 3, 4, 5` (`ksum`, prime curves); injective `Q + [a]H` queries, no matrix. `size`, `base_multiplier`, `k`, the `max_pair_work`/`max_sums` budget and `max_trials` are checked at plan time (`known_log::plan_check`) |
 | `ic.tensor_contraction_v1` | ic | toy index calculus by exact sparse tensor contraction (`crates/ecdl-tensor-ic`); prime-order curves (cofactor 1), `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise |
 | `ic.tensor_contraction_cofactor_v1` | ic | the same toy on a fixed-cofactor prime curve (#E = c·r, c > 1, r > c; `ecbench::tensor_cofactor`): free S_i ∈ E, A_i = [c]S_i hashed into F_i ⊂ G, preimages of each F_i listed once per draw; `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise (c = 1 is `ic.tensor_contraction_v1`) |
 | `jacobian_image.rho3`, `jacobian_image.bsgs`, `…_field_tally` | rho, bsgs | rho and textbook BSGS in the genus-3 Jacobian image of the certified degree-three pullback of a binary curve; no source-GAE conversion exists, so `total_gae` is 0 and the Cantor and field work is counted `_uncharged` (the `_field_tally` ids tally the complete instrumented route and are accounting-only; their wall time includes the ledger) |
+| `jacobian_image.genus3_projected_ic_v1` | ic | characteristic-two genus-3 hyperelliptic index calculus on the exact cover image: degree-one factor-base relations and sparse elimination modulo `r`; applying `phi_*` and clearing the exact source cofactor gives every factor-base column a valid source-subgroup logarithm and scales the known labels by `3h`. Generic destination rho/BSGS remain controls. Destination native work is unpriced in source GAE; the final source replay is charged. |
 | `ic.hyperelliptic_thread` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only; frozen: their records carry `total_gae` 0 |
 | `ic.cm_folded_native_v2`, `ic.cm_folded_recurrence_v2`, `ic.cm_folded_native_d43_v2` | ic | the same three controls with the replay's counted operations charged (2026-10-28): `independent_replay` carries them as GAE, `total_gae` is the phase sum, and `unpriced` names the `native_*_uncharged` counters instead of a sentence |
@@ -578,6 +634,7 @@ Curves of higher genus and the transfers are described in
 | `rho.negation_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | as the matching first-rule id under the `_v2` accounting (the Accounting v2 paragraph below); the strong id's jump table, lanes and start multiples are charged and its candidate checks are a `verification` phase | as the first-rule id; the `_v2` walk also counts the distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
 | `jacobian_image.rho3`, `jacobian_image.bsgs` | none until a versioned conversion to source-curve GAE is certified | construction of the same-field degree-three genus-3 cover, both point-class pullbacks, Cantor additions/doublings/scalar multiplications, rho walk/restarts/collisions, BSGS table inserts/lookups; cold solve wall includes the entire route |
+| `jacobian_image.genus3_projected_ic_v1` | the final source `[d]G=Q` replay only | cover construction and pullbacks, factor-base construction, Cantor walk operations, characteristic-two smoothness calls, sparse modular row operations, and destination replay; the nine cold wall phases include all of it even where no source-GAE conversion exists |
 | `rho.negation_strong` | every `F_q` multiplication on the tower's counter (`Gf2q::muls`): the jump table and start points (`setup`), every step with its share of the batched inversion, the start additions, the escape doublings and unbatched additions (`search`), each canonicalisation at one `F_q` multiplication (`canonicalisation`: four `F_q` additions and a comparison, no multiplication, so one is an upper bound), the candidate checks (`check`); each phase's GAE is its multiplications over the curve's `fq_muls_per_add`, the divisor `solve_ic_f2m4` prices IC with | partition hashes, distinguished-point tests, table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `rho.negation_lanes` | as `rho.negation`, for every lane: walks still in flight when another lane's collision recovers the logarithm are charged too, so `S` sits a few percent above `rho.negation`'s | canonicalisations. Its `field_ops` block records the batched work actually performed: per round of `n` additions, `3(n − 1)` multiplications and one inversion for the shared inverse, then `2M + 1S` per addition |
@@ -591,6 +648,7 @@ Curves of higher genus and the transfers are described in
 | `cheon.pminus1_comb`, `cheon.pminus1_naive`, `cheon.pplus1_comb` | every addition and doubling of the comb tables (comb) or per-step double-and-add (naive), the baby and giant steps, the shift, the `n + 1` polynomial multi-scalar sums, and the final `[α]G = Q` check; phases `p-1:*` / `p+1:*`. The auxiliary inputs come from the workload's **static-DH oracle** (`P ↦ [α]P`): `d − 1` queries for `n − 1`, `2d − 1` for `n + 1`; the queries are a **separate resource**, in `counters.oracle_queries` and `oracle_server_group_ops` and `detail.oracle`, **not** in `total_gae` | hash inserts and lookups, scalar-field multiplications, `F_{n²}` multiplications |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
+| `ic.pipeline` with `oracle=mitm-coset[:m=2][,negation_folded=1]` | as `mitm` (set-up additions of the pair table, one lookup and one verifying addition a probe) over the pairs whose classes in `E/⟨G⟩` cancel only, plus, at cofactor above 2, one `[r]P` a `±` pair of base points to label its class (phase `oracle_setup`, in `adds`/`doubles`/`scalar_mults` and so in `S`) | at cofactor 2 the class is `Tr(x) = Tr(a)`, `2(n−1)` field squarings a base point, counted as `mitm_coset_label_field_squarings_uncharged` (phase `oracle_setup`, listed in `unpriced`); lookups and table inserts as for `mitm` |
 | `ic.orbit_rank_v1` | cofactor projection, direct or signed-Frobenius quotient pair-table additions, ordinary `aG+bQ` queries, and independent full-point relation checks; every scalar multiplication uses its actual additions/doublings | raw-x lifting, Frobenius maps, canonicalisations, table inserts/probes and modular rank operations; all native work remains unpriced |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
 | `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
@@ -710,17 +768,18 @@ pricing from the reported group-addition equivalents. Solver conflicts and
 other work without a pinned conversion stay visible as unpriced counters;
 the recorded `S` is therefore a lower bound on the complete pipeline cost.
 
-The `jacobian_image.*` adapters are transfer diagnostics, not source-curve
-speedup rows. They reconstruct `binary_cubic_pullback_v1`, pull the generator
-and unseen target into its exact cyclic Jacobian image, solve there without
-receiving the planted logarithm, verify the collision in `Jac(H)`, and return
-the candidate for the runner's independent source-curve replay. Their native
-phase counters are meaningful within that destination. Their `total_gae` is
-deliberately zero and their records are lower bounds because one genus-3
-Cantor operation is not one elliptic-curve addition. Use cold wall and the
-resource vector to identify implementation bottlenecks; promote a net-cost
-claim only after supplying a pinned conversion or a matched end-to-end wall
-comparison that clears the A/A and isolation gates.
+The `jacobian_image.*` adapters are transfer diagnostics until a matched
+end-to-end comparison clears the claim gates. They build the certified cover,
+pull the generator and unseen target into its exact cyclic Jacobian image,
+solve there without receiving the planted logarithm, verify any candidate in
+`Jac(H)`, and return it for source-curve replay. The projected-IC adapter also
+collects actual genus-3 relations; its `phi_*` plus cofactor-clearing equation
+makes the modular factor-base columns valid on the exact order-`r` source
+subgroup. Native phase counters are meaningful within the destination, while
+only the source replay currently contributes source GAE. The remaining native
+work makes the record a lower bound in that unit. Use the complete cold wall
+and resource vector for the algorithmic comparison; promote a net-cost claim
+only after the A/A, isolation, recovery, and complete-accounting gates clear.
 
 The standing strong-rho implementation applies paired normal-basis maps and
 paired coefficient reductions during signed-Frobenius canonicalization. The
@@ -796,6 +855,28 @@ unpinned work keeps the reported `S` a lower bound. The
 probe but adds canonicalisation, Frobenius-map, lookup, entry and
 representative counts to `oracle_setup`. Use `mitm-frobenius:m=3` on the
 same base as its accounting control.
+
+`mitm-coset:m=2[,negation_folded=1]` (binary and Koblitz curves,
+`ic_framework::plugins::CosetMitmOracle`) is `mitm` over a coset-filtered
+pair table (the GT-02 lead of `docs/notes/graph-theory-ic-20261121.md`,
+ported from the cryptanalysis repository).  A subgroup target `R` can only
+equal `P_i + P_j` when the classes of `P_i` and `P_j` in `E/⟨G⟩` cancel, so
+the table is built over those pairs alone, visited in `mitm`'s order: every
+key a subgroup target can reach keeps `mitm`'s first witness, and the probe,
+its lookups and its verifying addition are `mitm`'s, so the relations are
+identical and only the set-up additions fall (a fraction of up to `1 − 1/h`
+of the table).  At `m = 3` the probed `R − P` leaves the subgroup, so the
+oracle builds the full table and labels nothing.  The labelling is part of
+`S`: one `[r]P` per `±` pair of base points when the cofactor is not 2, and
+at cofactor 2 the trace test's field squarings, counted but uncharged
+(`mitm_coset_label_field_squarings_uncharged`; about `2n` squarings a base
+point against `|F|²/4` additions).  The filter helps only on a base that
+straddles the classes: a subgroup-orbit base (every point is `[h]P`) lies in
+one class and the labelling is then pure cost, and on a Koblitz divisor base
+the trace vanishes unless `(x + 1)` divides the divisor, so a divisor without
+`x + 1` is one class and the filter keeps every pair.  `mitm_coset_classes`
+and `mitm_coset_in_subgroup` in `oracle_setup` say which case a run was in.
+Use `mitm:m=2` on the same base as the matched control.
 
 `cm-multiplier:size=K,norm=N[,endo=I][,mult=M]` and
 `binary-multiplier:size=K,mult=M` expose the generator-relative multiplier
@@ -989,6 +1070,21 @@ bases the Gröbner arms use, so the engines meet on one query stream
   per relation and nothing else. The difference the unit does not see, one
   inversion a target against `2|F_x|`, is in the `inversions` counter, the
   record's field-operation tally and wall time.
+- `rootfind-floor:m=2|3` is the same search and the same charged additions
+  as `rootfind-subtract`, with x-only Montgomery candidates and a
+  word-blocked Bloom filter in front of the exact abscissa map (lever 1 of
+  `research/rootfind_baseline_100x_20261117/PLAN.md`). It is a separate
+  oracle id: never change what `rootfind-subtract` counts. Classification
+  is constant-factor engineering (wall / field work); evidence under
+  `research/rootfind_floor_oracle_20261119/`.
+- `rootfind-kmitm:m=3..12` is meet-in-the-middle root finding. Default
+  **probe-favoring** split: left `L = min(9, m−1)`, right `R = m−L`
+  (so `R = 1` for every `m ≤ 10`); `split=balanced` keeps `⌈m/2⌉/⌊m/2⌋`.
+  On primes, both `R = 1` and `R ≥ 2` use one Montgomery batch inversion
+  a target (over the factor base or the precomputed right sums) and
+  Bloom-filtered folded-key lookups into the left table (lever-1 +
+  lever-3 of the 100× plan). Enables `m = 10..12`. New id; evidence under
+  `research/rootfind_kmitm_20261119/`.
 
 Read a root-finding arm against a Gröbner arm on the resource vector and on
 wall time: the root finder's `S` is a complete count of group additions,
@@ -1266,6 +1362,16 @@ Every arm of a session runs on every curve, so a session holds one
 family; `plan` refuses an arm its curve cannot run, with the reason (no
 rational ℓ-isogeny, a negation the Jacobian does not have, a family the
 method does not take).
+
+These workload kinds and methods are implementation inventory, not automatic
+admission to the phased panel. A direct hyperelliptic run must enter the
+`hyperelliptic_jacobian` lane with an exact phase-matched Jacobian subgroup and
+same-Jacobian rho reference. A cover run must enter `cover_transfer` only after
+the typed route, subgroup preservation, destination solver, source recovery,
+three-arm control, and complete nine-phase cost obligations in
+[`docs/transfer-assessment/MEASUREMENT.md`](../transfer-assessment/MEASUREMENT.md)
+are executable. Until then, `plan` refuses those phase lanes even though smoke
+or diagnostic specs remain available.
 
 ## 8. Statistics
 
@@ -1948,6 +2054,9 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
   `research/conductor_gap_cm_pairs_20261010/`. `hyperelliptic_thread`
   and `hyperelliptic_explicit` build genus 2–4 Jacobians over `F_p`,
   `p < 256` (§7, "Hyperelliptic Jacobians").
+  `fp3_random` (`{"kind": "fp3_random", "p": 271, "seed": 1}`) builds a
+  random prime-order curve over `F_{p³}` (`p ≡ 1 mod 3`, `67 ≤ p < 2^20`) for
+  `ic.k3_gaudry` and the generic methods; planted targets only, unregistered.
 - **A factor base or oracle:** add it to `ic_framework` as a plug-in;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.
