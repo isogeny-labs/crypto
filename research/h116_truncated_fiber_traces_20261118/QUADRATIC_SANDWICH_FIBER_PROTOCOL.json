@@ -1,0 +1,56 @@
+{
+  "schema": "h116.quadratic-sandwich-fibers-protocol/v1",
+  "protocol_id": "H116-QUADRATIC-SANDWICH-FIBERS-001",
+  "status": "frozen-before-producer-or-verifier-implementation-and-before-affected-data",
+  "question": "On fixed splitting extensions, does the finite [2] fiber modulo sign realize the 2-by-2 quadratic function-field sandwich, while under-split, branch and inseparable controls reject the naive generic-fiber reading?",
+  "selection": {
+    "field_modulus": "first monic irreducible polynomial in the existing h116_field.rs coefficient ordering",
+    "target": "first affine P in x-index then y-index order such that Q=[2]P is affine, nonidentity and Q != -Q",
+    "branch_target": "first nonidentity T in the primary cell with [2]T=O"
+  },
+  "cells": [
+    {"slug":"fp5-a2-b1-d3-n2","p":5,"a":2,"b":1,"primary_degree":3,"scalar":2},
+    {"slug":"fp7-a1-b1-d3-n2","p":7,"a":1,"b":1,"primary_degree":3,"scalar":2},
+    {"slug":"fp11-a1-b1-d2-n2","p":11,"a":1,"b":1,"primary_degree":2,"scalar":2}
+  ],
+  "primary_measurements": [
+    "curve point count and rational two-torsion kernel count",
+    "point-fiber sizes over Q and -Q and their union size",
+    "distinct source x-values in the union",
+    "minimum and maximum source x-lift multiplicities in the union",
+    "target x-lift multiplicity",
+    "base-field, extension-field, point-addition and scalar-multiplication operation counts"
+  ],
+  "primary_acceptance": [
+    "the primary two-torsion kernel has four points",
+    "the Q and -Q point fibers each have four points and are disjoint",
+    "their union has eight points and four distinct x-values",
+    "every union x-value has two lifts and target x(Q) has two lifts",
+    "the counted balance coordinate_degree*source_x_degree = target_x_degree*curve_degree is 4*2=2*4"
+  ],
+  "controls": [
+    "over the base field, the canonical [2] point fiber has fewer than four points",
+    "for the first nonzero two-torsion target T, the +T/-T union has fewer than eight points and the target x-lift count is one",
+    "the distinct rational kernel of [p] in the primary extension has size strictly below p^2"
+  ],
+  "producer": {
+    "path": "h116_quadratic_sandwich_fibers.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "dependencies": ["h116_field.rs"]
+  },
+  "independent_verifier": {
+    "path": "h116_quadratic_sandwich_fibers_verify.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "shared_arithmetic_with_producer": false
+  },
+  "execution": {
+    "route": "isolab EKS Spot after committed source gate; local execution is permitted only as an explicitly labelled development self-test before affected data",
+    "resources": {"cpu":1,"memory_gib":2,"timeout_minutes":10},
+    "budget_usd_max": 0.25,
+    "retries": 0
+  },
+  "failure_policy": "Retain every cell and control. Do not change extensions, target selection, acceptance thresholds or controls after observing affected counts.",
+  "claim_boundary": "Finite rational-point fiber counts over three toy splitting extensions do not construct the function-field embeddings, prove reduced rational-function degree, establish scheme degree or separability, solve ECDLP, or imply subexponential runtime.",
+  "filed_before_code": true,
+  "filed_before_data": true
+}

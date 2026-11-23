@@ -1,0 +1,49 @@
+F4-attributed totals (prog file, frac-weighted): {'alloc': 921147, 'dealloc': 751864, 'zalloc': 32537, 'realloc': 70228}
+per F4 call: {'alloc': 8857.2, 'dealloc': 7229.5, 'zalloc': 312.9, 'realloc': 675.3}
+    alloc   zalloc  realloc   dealloc  site
+   408630        0        0         0  <f4_fp::Cols>::get
+   115911      832     4833      3841  <f4_fp::Packed>::symbolic
+    94306        0        0     94306  <Vec<(u32, u64)> as spec_from_iter_nested::SpecFromIterNested<(u32, u64), map::Map<zip::Zip<into_iter::IntoIter<u32>, Iter<(Vec<u32>, u64)>>, f4_fp::f4_with_arithmetic::{closure#30}::{closure#0}>>>::f
+    78412      883     5441    427233  f4_fp::f4_with_arithmetic
+    33790        0     2516    100045  f4_fp::rref32_deferred
+    31292        0        0         0  <map::Map<Iter<Vec<u32>>, f4_fp::rref32_deferred::{closure#1}> as >::fold::<(), ::for_each::call<(Vec<u64>, usize), <Vec<(Vec<u64>, usize)>>::extend_trusted<map::Map<Iter<Vec<u32>>, f4_fp::rref32_defe
+    24186        0        0         0  <Vec<u32> as spec_from_iter_nested::SpecFromIterNested<u32, map::Map<Iter<usize>, f4_fp::f4_with_arithmetic::{closure#41}::{closure#1}>>>::from_iter
+    24026        0        0     24026  <Vec<u32> as spec_from_iter_nested::SpecFromIterNested<u32, map::Map<into_iter::IntoIter<u64>, f4_fp::rref32_deferred::{closure#7}::{closure#0}>>>::from_iter
+     7343        0    15125      8532  f4_fp::f4_with_arithmetic::add
+     6837        0    13164         0  <Vec<(Vec<u32>, u64)> as spec_from_iter_nested::SpecFromIterNested<(Vec<u32>, u64), map::Map<filter::Filter<enumerate::Enumerate<Iter<u32>>, f4_fp::interreduce_linear_with::{closure#14}::{closure#0}>,
+    19450        0        0         0  <map::Map<core::ops::range::Range<usize>, f4_fp::rref32_deferred::{closure#7}> as >::fold::<(), ::for_each::call<Vec<u32>, <Vec<Vec<u32>>>::extend_trusted<map::Map<core::ops::range::Range<usize>, f4_f
+     6272        0    12419         0  <Vec<(Vec<u32>, u64)> as spec_from_iter_nested::SpecFromIterNested<(Vec<u32>, u64), map::Map<filter::Filter<enumerate::Enumerate<Iter<u64>>, f4_fp::f4_with_arithmetic::{closure#48}>, f4_fp::f4_with_ar
+    16757        0        0      4266  <into_iter::IntoIter<(usize, u128)> as >::fold::<(), map::map_fold<(usize, u128), (usize, Vec<u32>, u128), (), f4_fp::f4_with_arithmetic::add::{closure#5}, ::for_each::call<(usize, Vec<u32>, u128), <V
+        0    16365        0     16365  <&f4_fp::f4_with_arithmetic::{closure#41} as core::ops::function::FnMut<(&Vec<(u32, u64)>,)>>::call_mut
+    15291        0        0     15291  <Vec<u64> as spec_from_iter_nested::SpecFromIterNested<u64, map::Map<into_iter::IntoIter<u32>, <u64 as core::convert::From<u32>>::from>>>::from_iter
+    10682        0     1119         0  <Vec<(Vec<u32>, u64)> as spec_from_iter_nested::SpecFromIterNested<(Vec<u32>, u64), cloned::Cloned<filter::Filter<Iter<(Vec<u32>, u64)>, f4_fp::normalise::{closure#0}>>>>::from_iter
+        0     7822        0      7822  <map::Map<Iter<Vec<(u32, u64)>>, f4_fp::f4_with_arithmetic::{closure#41}> as >::try_fold::<(), <GenericShunt<map::Map<Iter<Vec<(u32, u64)>>, f4_fp::f4_with_arithmetic::{closure#41}>, core::option::Opt
+     1012        0     4975         0  <Vec<Vec<u32>> as spec_extend::SpecExtend<Vec<u32>, map::Map<take_while::TakeWhile<inspect::Inspect<map::Map<Iter<Vec<(u32, u64)>>, &f4_fp::f4_with_arithmetic::{closure#41}>, &<core::option::Option<_>
+     4266        0        0         0  <Vec<(usize, Vec<u32>, u128)> as spec_from_iter_nested::SpecFromIterNested<(usize, Vec<u32>, u128), map::Map<into_iter::IntoIter<(usize, u128)>, f4_fp::f4_with_arithmetic::add::{closure#5}>>>::from_it
+      104     4159        0         0  <Vec<(usize, Vec<u32>)> as spec_from_iter_nested::SpecFromIterNested<(usize, Vec<u32>), map::Map<core::ops::range::Range<usize>, f4_fp::interreduce_linear_with::{closure#3}>>>::from_iter
+     1290        0     2765         0  <Vec<usize> as spec_from_iter_nested::SpecFromIterNested<usize, filter::Filter<core::ops::range::Range<usize>, f4_fp::f4_with_arithmetic::{closure#39}>>>::from_iter
+      314     1502     1545         0  <map::Map<Iter<usize>, f4_fp::reduce_pairs_fl::{closure#7}> as >::fold::<(), ::for_each::call<(Vec<u64>, usize, Vec<(usize, u64)>), <Vec<(Vec<u64>, usize, Vec<(usize, u64)>)>>::extend_trusted<map::Map
+     3129        0        0      7599  <hashbrown::map::HashMap<(usize, Vec<u32>), (), core::hash::BuildHasherDefault<fx_hash::FxHasher>>>::insert
+     1218        0     1901         0  <Vec<usize> as spec_from_iter_nested::SpecFromIterNested<usize, filter::Filter<core::ops::range::Range<usize>, <f4_fp::Packed>::symbolic::{closure#3}>>>::from_iter
+     2757      114       79        10  <map::Map<Chunks<Vec<(u32, u64)>>, f4_fp::reduce_pairs_blocked::{closure#0}> as >::fold::<(), ::for_each::call<core::option::Option<Vec<Vec<u32>>>, <Vec<core::option::Option<Vec<Vec<u32>>>>>::extend_t
+     2657        0        0         0  <rayon::iter::extend::ListVecFolder<Vec<u32>> as rayon::iter::plumbing::Folder<Vec<u32>>>::complete
+      440        0     2167         0  <drain::Drain<f4_fp::Pair> as >::partition::<Vec<f4_fp::Pair>, f4_fp::f4_with_arithmetic::{closure#24}>
+      838      838        0         0  <f4_fp::MonoTable>::with_capacity
+     1630        8        0      4087  f4_fp::reduce_pairs_fl
+     1344        0        0       830  <hashbrown::map::HashMap<(usize, u128), (), core::hash::BuildHasherDefault<f4_fp::PackedHasher>>>::insert
+      436        0      604         0  <Vec<Vec<u32>> as spec_from_iter::SpecFromIter<Vec<u32>, GenericShunt<map::Map<Iter<Vec<(u32, u64)>>, f4_fp::f4_with_arithmetic::{closure#41}>, core::option::Option<core::convert::Infallible>>>>::from
+      942        0        0         0  <Vec<u64> as spec_from_iter_nested::SpecFromIterNested<u64, map::Map<copied::Copied<Iter<u32>>, <u64 as core::convert::From<u32>>::from>>>::from_iter
+      929        0        0         0  <Vec<(Vec<u64>, usize)> as spec_from_iter_nested::SpecFromIterNested<(Vec<u64>, usize), map::Map<Iter<Vec<u32>>, f4_fp::rref32_deferred::{closure#1}>>>::from_iter
+      832        0        0         0  <Vec<(u128, u32)> as spec_from_iter_nested::SpecFromIterNested<(u128, u32), map::Map<enumerate::Enumerate<Iter<u128>>, <f4_fp::Packed>::symbolic::{closure#8}>>>::from_iter
+      832        0        0         0  <Vec<Vec<u32>> as spec_from_iter_nested::SpecFromIterNested<Vec<u32>, map::Map<core::ops::range::Range<usize>, f4_fp::rref32_deferred::{closure#7}>>>::from_iter
+      728        0        0         0  <Vec<usize> as spec_from_iter_nested::SpecFromIterNested<usize, chain::Chain<map::Map<Iter<(usize, Vec<u32>)>, f4_fp::f4_with_arithmetic::{closure#27}>, map::Map<Iter<(usize, u128)>, f4_fp::f4_with_ar
+      624        0        0         0  <cloned::Cloned<filter::Filter<Iter<(Vec<u32>, u64)>, f4_fp::normalise::{closure#0}>> as >::next
+      624        0        0         0  <map::Map<Iter<Vec<(Vec<u32>, u64)>>, f4_fp::f4_with_arithmetic::{closure#5}> as >::fold::<(), ::for_each::call<Vec<u32>, <Vec<Vec<u32>>>::extend_trusted<map::Map<Iter<Vec<(Vec<u32>, u64)>>, f4_fp::f4
+      191        0      432         0  <Vec<usize> as spec_from_iter_nested::SpecFromIterNested<usize, filter::Filter<core::ops::range::Range<usize>, f4_fp::interreduce_linear_with::{closure#13}>>>::from_iter
+      174        0      345         0  <Vec<&Vec<(Vec<u32>, u64)>> as spec_from_iter_nested::SpecFromIterNested<&Vec<(Vec<u32>, u64)>, map::Map<filter::Filter<enumerate::Enumerate<Iter<Vec<(Vec<u32>, u64)>>>, f4_fp::interreduce_linear_with
+       70        0      344         0  rayon::iter::collect::collect_with_consumer::<Vec<(u32, u64)>, rayon::iter::collect::special_extend<rayon::iter::map::Map<rayon::iter::zip::Zip<rayon::vec::IntoIter<Vec<u32>>, rayon::slice::Iter<usize
+       68        0      338      6512  <Vec<Vec<u32>> as rayon::iter::ParallelExtend<Vec<u32>>>::par_extend::<rayon::iter::while_some::WhileSome<rayon::iter::inspect::Inspect<rayon::iter::map::Map<rayon::slice::Iter<Vec<(u32, u64)>>, f4_fp
+      112        0        0         0  f4_fp::reduce_pairs_blocked
+      112        0        0         0  <Vec<core::option::Option<Vec<Vec<u32>>>> as spec_from_iter_nested::SpecFromIterNested<core::option::Option<Vec<Vec<u32>>>, map::Map<Chunks<Vec<(u32, u64)>>, f4_fp::reduce_pairs_blocked::{closure#0}>>
+       18        0       92         0  rayon::iter::collect::collect_with_consumer::<(Vec<u64>, usize), rayon::iter::collect::special_extend<rayon::iter::map::Map<rayon::slice::Iter<Vec<u32>>, f4_fp::rref32_deferred::{closure#1}>, (Vec<u64
+frac of a few: {'<f4_fp::Cols>::get': 1.0, 'f4_fp::normalise': 0.0, '<alloc::raw_vec::RawVec<[usize; 4]>>::grow_one': 0.711}

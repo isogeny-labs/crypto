@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-word2-word6-bridge-protocol-v1",
+  "word6_result_sha256": "427c6efe8870d0c32f28d9d740f5fe05fbf27f8b0ba766a2d3928cfd20f4234b",
+  "word2_result_sha256": "616a17f5f4bc090f639026180d332e2b4d8e78560af061df5b15ab0a7c9a358e",
+  "measured_word2_result_sha256": "6a75b9c633c5f6bcd0857a6edf1234f6cbb962eed3a9edefe06a61e36aa8a8a9",
+  "arithmetic_sha256": "1605edd1e877873111b992a297760f9a7dd451ee391394262925646bf107fe4a",
+  "curve": "E(F47): y^2=x^3-x-2, order 43, 21 sign-folded nonidentity columns",
+  "arms": "full 42-row coefficient-six envelope; full 42-row coefficient-two envelope; union; coefficient-six envelope plus the measured coefficient-two row at source index 425; then lexicographically earliest source-indexed coefficient-two rows that each increase rank until the union rank is reached",
+  "prediction": "multipliers -6 and -2 have coprime orders six and seven modulo 43; the combined full-word relation graph is connected after sign folding, so rank 20 and nullity one are expected",
+  "outputs": "all stage ranks, exact six-row bridge witness or explicit failure, row identities and digests, comparison to measured coefficient-two support",
+  "claim_boundary": "finite-field upper envelope; selected cross-word rows are construction targets, and only previously measured rows have rational-lift evidence"
+}

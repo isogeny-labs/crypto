@@ -348,6 +348,9 @@ def old_components(record: dict[str, Any]) -> Components:
 
 def parse_rho_record(record: dict[str, Any], q: int, seed: int, target: int, ell: int,
                      arm: str, expected_index: int) -> RhoRun:
+    authority = record.get("count_authoritative", True)
+    need(authority is True,
+         "non-authoritative or malformed rho field counts cannot enter modeled cost")
     need(record.get("rec") == "rho" and record.get("arm") == arm, "wrong rho record arm")
     need(record.get("q") == q and record.get("seed") == seed and record.get("i") == expected_index, "rho identity mismatch")
     need(record.get("target_kind") == "ic" and record.get("k") == target, "rho target mismatch")

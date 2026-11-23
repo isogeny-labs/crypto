@@ -9,6 +9,7 @@ on:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_public.rs'
       - '.github/workflows/prime31-rr9-public-barycentric.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
@@ -21,6 +22,7 @@ permissions:
 
 jobs:
   public-b8-barycentric:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
