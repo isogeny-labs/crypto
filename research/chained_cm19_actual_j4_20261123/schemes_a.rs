@@ -49,6 +49,9 @@ impl Ring {
         modulus[degree] = I;
         Self { modulus }
     }
+    pub fn constant(&self) -> K {
+        self.modulus[0].opposite()
+    }
     pub fn degree(&self) -> usize {
         self.modulus.len() - 1
     }
