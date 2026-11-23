@@ -2410,8 +2410,456 @@ fn audit_grid_v2(v1_dir: &str, v2_dir: &str) {
     }
 }
 
+fn run_batch(base_path: &str, targets_path: &str, round: u64, arm: &str) {
+    assert!(round < 3);
+    assert!(matches!(
+        arm,
+        "direct-dual"
+            | "direct-inverse"
+            | "destination-direct"
+            | "source-bsgs"
+            | "rho-negation"
+            | "rho-negation-aa"
+    ));
+    let wall = Instant::now();
+    let cpu = thread_cpu_ns();
+    take_field_counters();
+    let base_bytes = fs::read(base_path).unwrap();
+    let target_bytes = fs::read(targets_path).unwrap();
+    let base: Value = serde_json::from_slice(&base_bytes).unwrap();
+    let batch: Value = serde_json::from_slice(&target_bytes).unwrap();
+    let base_sha = sha256_hex(&base_bytes);
+    let batch_sha = sha256_hex(&target_bytes);
+    assert_eq!(batch["schema"], "isogeny_dual_batch_public/v1");
+    assert_eq!(batch["p"], 211);
+    assert_eq!(batch["r"], 229);
+    assert_eq!(batch["cofactor"], 195);
+    assert_eq!(batch["targets"].as_array().unwrap().len(), 64);
+    if arm == "direct-dual" {
+        assert_eq!(base["schema"], "isogeny_dual_projected_public/v1");
+        assert!(base.get("base_witness_source").is_none());
+        assert_eq!(
+            base_sha,
+            "59864a39ea05ab57823a7e072822ea781aaf625bfcc0a1752faeab63ef819383"
+        );
+    } else {
+        assert_eq!(base["schema"], "isogeny_fiber_base_grid_public/v1");
+        assert_eq!(
+            base_sha,
+            "f4e0b303e37173c0a764e717dffe571facf0c39e492869712e0d11090d46b73f"
+        );
+    }
+    let field = Fp2::new(211).unwrap();
+    let source = Curve {
+        f: field,
+        a: [190, 0],
+        b: [37, 0],
+    };
+    let destination = Curve {
+        f: field,
+        a: [130, 0],
+        b: [179, 0],
+    };
+    let torsion = Point::affine([3, 0], [1, 0]);
+    let generator = parse_point(&batch["generator"]);
+    let mapped_generator = parse_point(&batch["mapped_generator"]);
+    let mut setup_ops = GroupOps::default();
+    assert!(source.is_on_curve(generator));
+    assert!(destination.is_on_curve(mapped_generator));
+    assert_eq!(
+        velu(&source, torsion, generator, &mut setup_ops),
+        mapped_generator
+    );
+    assert!(source.mul(&mut setup_ops, generator, 229).infinity);
+    let relation_arm = matches!(arm, "direct-dual" | "direct-inverse" | "destination-direct");
+    let destination_relation = arm == "destination-direct";
+    let query_curve = if destination_relation {
+        &destination
+    } else {
+        &source
+    };
+    let query_generator = if destination_relation {
+        mapped_generator
+    } else {
+        generator
+    };
+    let mut signed = Vec::new();
+    let mut positive_base = Vec::new();
+    let mut candidate_count = 0u64;
+    let mut dual_stats = DualStats::default();
+    let mut inverse_stats = InverseStats::default();
+    if arm == "direct-dual" {
+        let (raw, projected, columns, stats) =
+            dual_projected_base(&source, &destination, torsion, 64, &mut setup_ops);
+        candidate_count = stats.kernel_points_scanned + stats.destination_points_scanned;
+        dual_stats = stats;
+        for index in 0..64 {
+            assert_eq!(
+                raw[index],
+                parse_point(&base["base_raw_destination"][index])
+            );
+            assert_eq!(
+                projected[index],
+                parse_point(&base["base_projected_destination"][index])
+            );
+            positive_base.push(columns[index]);
+            signed.push(columns[index]);
+            signed.push(source.neg(columns[index]));
+        }
+    } else if arm == "direct-inverse" {
+        let (raw, projected, witnesses, stats) =
+            inverse_velu_base(&source, &destination, torsion, 64, &mut setup_ops);
+        candidate_count = stats.destination_points;
+        inverse_stats = stats;
+        for index in 0..64 {
+            assert_eq!(
+                raw[index],
+                parse_point(&base["base_raw_destination"][index])
+            );
+            assert_eq!(
+                projected[index],
+                parse_point(&base["base_projected_destination"][index])
+            );
+            let subgroup = source.mul(&mut setup_ops, witnesses[index], 195);
+            assert_eq!(
+                velu(&source, torsion, subgroup, &mut setup_ops),
+                projected[index]
+            );
+            positive_base.push(subgroup);
+            signed.push(subgroup);
+            signed.push(source.neg(subgroup));
+        }
+    } else if destination_relation {
+        let (_, projected, scanned) = destination_direct_base(&destination, 64, &mut setup_ops);
+        candidate_count = scanned;
+        for (index, subgroup) in projected.into_iter().enumerate() {
+            assert_eq!(
+                subgroup,
+                parse_point(&base["base_projected_destination"][index])
+            );
+            positive_base.push(subgroup);
+            signed.push(subgroup);
+            signed.push(destination.neg(subgroup));
+        }
+    }
+    let mut table = BTreeMap::<u64, Vec<(usize, usize)>>::new();
+    if relation_arm {
+        for i in 0..signed.len() {
+            for j in i..signed.len() {
+                let sum = query_curve.add(&mut setup_ops, signed[i], signed[j]);
+                if !sum.infinity {
+                    table.entry(query_curve.key(&sum)).or_default().push((i, j));
+                }
+            }
+        }
+    }
+    let mut baby = BTreeMap::<u64, u64>::new();
+    let mut giant_step = source.identity();
+    if arm == "source-bsgs" {
+        let mut cursor = source.identity();
+        for small in 0..16 {
+            baby.insert(source.key(&cursor), small);
+            cursor = source.add(&mut setup_ops, cursor, generator);
+        }
+        giant_step = source.neg(source.mul(&mut setup_ops, generator, 16));
+    }
+    let setup_cpu_ns = thread_cpu_ns() - cpu;
+    let setup_fp = take_field_counters();
+    let mut query_total_ops = GroupOps::default();
+    let mut verify_total_ops = GroupOps::default();
+    let mut query_total_fp = (0u64, 0u64);
+    let mut verify_total_fp = (0u64, 0u64);
+    let mut query_total_cpu_ns = 0u64;
+    let mut verify_total_cpu_ns = 0u64;
+    let mut completed = 0usize;
+    let mut relation_witnesses = 0usize;
+    let mut trials_total = 0u64;
+    for (position, item) in batch["targets"].as_array().unwrap().iter().enumerate() {
+        let target = parse_point(&item["source"]);
+        let mapped_target = parse_point(&item["destination"]);
+        let query_target = if destination_relation {
+            mapped_target
+        } else {
+            target
+        };
+        let seed = (0x2026_1015u64 ^ 211)
+            .wrapping_add(round.wrapping_mul(0x9e37_79b9))
+            .wrapping_add(((position + 64) as u64).wrapping_mul(0x0123_4567));
+        let query_cpu_start = thread_cpu_ns();
+        let mut row_cpu_ns = 0u64;
+        let mut recovery_cpu_ns = 0u64;
+        let mut query_ops = GroupOps::default();
+        let mut witnesses = Vec::new();
+        let mut rho_attempts = Vec::new();
+        let mut trials = 0u64;
+        let mut relations = 0u64;
+        let mut rank = 0usize;
+        let recovered = if relation_arm {
+            let mut rng = StdRng::seed_from_u64(seed);
+            let mut pivots = vec![None; 65];
+            for _ in 0..1832 {
+                trials += 1;
+                let a = rng.gen_range(0..229u64);
+                let b = rng.gen_range(0..229u64);
+                let a_g = query_curve.mul(&mut query_ops, query_generator, a);
+                let b_q = query_curve.mul(&mut query_ops, query_target, b);
+                let candidate = query_curve.add(&mut query_ops, a_g, b_q);
+                let projected = query_curve.mul(&mut query_ops, candidate, 195);
+                if projected.infinity {
+                    continue;
+                }
+                if let Some(entries) = table.get(&query_curve.key(&projected)) {
+                    let mut pairs = BTreeSet::new();
+                    for &(i, j) in entries {
+                        if query_curve.add(&mut query_ops, signed[i], signed[j]) == projected {
+                            pairs.insert((i, j));
+                        }
+                    }
+                    if let Some(&(i, j)) = pairs.first() {
+                        let row_cpu_start = thread_cpu_ns();
+                        let mut row = vec![0u64; 66];
+                        for index in [i, j] {
+                            let column = index / 2;
+                            let coefficient = if index.is_multiple_of(2) { 1 } else { 228 };
+                            row[column] = (row[column] + coefficient) % 229;
+                        }
+                        row[64] = (229 - modmul(195, b)) % 229;
+                        row[65] = modmul(195, a);
+                        witnesses.push(json!({"a":a,"b":b,"i":i,"j":j,"projected":projected}));
+                        relations += 1;
+                        if insert_relation_grid(&mut pivots, row, 64) {
+                            rank += 1;
+                        }
+                        row_cpu_ns += thread_cpu_ns() - row_cpu_start;
+                        if rank == 65 {
+                            break;
+                        }
+                    }
+                }
+            }
+            let recovery_cpu_start = thread_cpu_ns();
+            let answer = recover_grid(&pivots, 64).map(|solution| solution[64]);
+            recovery_cpu_ns = thread_cpu_ns() - recovery_cpu_start;
+            answer
+        } else if arm == "source-bsgs" {
+            let mut cursor = target;
+            let mut answer = None;
+            for giant in 0..15u64 {
+                trials += 1;
+                if let Some(&small) = baby.get(&source.key(&cursor)) {
+                    answer = Some((giant * 16 + small) % 229);
+                    break;
+                }
+                cursor = source.add(&mut query_ops, cursor, giant_step);
+            }
+            answer
+        } else {
+            let mut answer = None;
+            for retry in 0..32u64 {
+                let try_seed = seed.wrapping_add(retry * 0x0100_0000);
+                let result =
+                    rho_reference_negation(&source, generator, target, 229, try_seed, 4580);
+                query_ops.merge(result.group_ops);
+                trials += result.steps;
+                rho_attempts.push(json!({"retry":retry,"seed":try_seed,"steps":result.steps,
+                    "walks":result.walks,"group_ops":result.group_ops,
+                    "recovered":result.recovered,"verified":result.verified}));
+                if result.verified {
+                    answer = result.recovered;
+                    break;
+                }
+            }
+            answer
+        };
+        let query_cpu_ns = thread_cpu_ns() - query_cpu_start;
+        assert!(query_cpu_ns >= row_cpu_ns + recovery_cpu_ns);
+        let relation_cpu_ns = query_cpu_ns - row_cpu_ns - recovery_cpu_ns;
+        let query_fp = take_field_counters();
+        let verify_cpu_start = thread_cpu_ns();
+        let mut verify_ops = GroupOps::default();
+        let verified = recovered.is_some_and(|scalar| {
+            source.mul(&mut verify_ops, generator, scalar) == target
+                && destination.mul(&mut verify_ops, mapped_generator, scalar) == mapped_target
+        });
+        let verify_cpu_ns = thread_cpu_ns() - verify_cpu_start;
+        let verify_fp = take_field_counters();
+        let status = if verified && (!relation_arm || rank == 65) {
+            completed += 1;
+            "pass"
+        } else {
+            "fail"
+        };
+        relation_witnesses += witnesses.len();
+        trials_total += trials;
+        query_total_ops.merge(query_ops);
+        verify_total_ops.merge(verify_ops);
+        query_total_fp.0 += query_fp.0;
+        query_total_fp.1 += query_fp.1;
+        verify_total_fp.0 += verify_fp.0;
+        verify_total_fp.1 += verify_fp.1;
+        query_total_cpu_ns += query_cpu_ns;
+        verify_total_cpu_ns += verify_cpu_ns;
+        println!(
+            "{}",
+            json!({"schema":"isogeny_dual_batch_target/v1",
+            "base_public_sha256":base_sha,"batch_public_sha256":batch_sha,
+            "round":round,"arm":arm,"position":position,"seed":seed,
+            "target":target,"mapped_target":mapped_target,
+            "query_group_ops":query_ops,"verify_group_ops":verify_ops,
+            "query_fp_muls":query_fp.0,"query_fp_invs":query_fp.1,
+            "verify_fp_muls":verify_fp.0,"verify_fp_invs":verify_fp.1,
+            "query_cpu_ns":query_cpu_ns,"relation_cpu_ns":relation_cpu_ns,
+            "row_cpu_ns":row_cpu_ns,"recovery_cpu_ns":recovery_cpu_ns,
+            "verify_cpu_ns":verify_cpu_ns,
+            "trials":trials,"relations":relations,"rank":rank,
+            "recovered":recovered,"verified":verified,
+            "relation_witnesses":witnesses,"rho_attempts":rho_attempts,
+            "status":status})
+        );
+    }
+    let peak_rss = peak_rss_bytes();
+    let total_cpu_ns = thread_cpu_ns() - cpu;
+    assert!(total_cpu_ns >= setup_cpu_ns + query_total_cpu_ns + verify_total_cpu_ns);
+    let other_cpu_ns = total_cpu_ns - setup_cpu_ns - query_total_cpu_ns - verify_total_cpu_ns;
+    let status = if completed == 64 && peak_rss <= 512 * 1024 * 1024 {
+        "pass"
+    } else {
+        "fail"
+    };
+    println!(
+        "{}",
+        json!({"schema":"isogeny_dual_batch_summary/v1",
+        "base_public_sha256":base_sha,"batch_public_sha256":batch_sha,
+        "round":round,"arm":arm,"columns":64,"target_count":64,
+        "completed_targets":completed,"candidate_count":candidate_count,
+        "positive_base":positive_base,
+        "setup_group_ops":setup_ops,"query_group_ops":query_total_ops,
+        "verify_group_ops":verify_total_ops,
+        "setup_fp_muls":setup_fp.0,"setup_fp_invs":setup_fp.1,
+        "query_fp_muls":query_total_fp.0,"query_fp_invs":query_total_fp.1,
+        "verify_fp_muls":verify_total_fp.0,"verify_fp_invs":verify_total_fp.1,
+        "setup_cpu_ns":setup_cpu_ns,"query_cpu_ns":query_total_cpu_ns,
+        "verify_cpu_ns":verify_total_cpu_ns,"other_cpu_ns":other_cpu_ns,
+        "total_cpu_ns":total_cpu_ns,"total_wall_ns":wall.elapsed().as_nanos(),
+        "peak_rss_bytes":peak_rss,"trials":trials_total,
+        "relation_witnesses":relation_witnesses,
+        "dual_stats":{"kernel_x":dual_stats.kernel_x,"kernel_y":dual_stats.kernel_y,
+            "kernel_points_scanned":dual_stats.kernel_points_scanned,
+            "destination_points_scanned":dual_stats.destination_points_scanned,
+            "dual_evaluations":dual_stats.dual_evaluations,
+            "source_multiplications":dual_stats.source_multiplications,
+            "forward_checks":dual_stats.forward_checks},
+        "inverse_stats":{"destination_points":inverse_stats.destination_points,
+            "polynomial_calls":inverse_stats.polynomial_calls,
+            "split_attempts":inverse_stats.split_attempts,
+            "rational_x_roots":inverse_stats.rational_x_roots,
+            "rejected_no_root":inverse_stats.rejected_no_root,
+            "rejected_no_lift":inverse_stats.rejected_no_lift,
+            "exact_map_checks":inverse_stats.exact_map_checks,
+            "rejected_map_mismatch":inverse_stats.rejected_map_mismatch,
+            "accepted_image_points":inverse_stats.accepted_image_points},
+        "status":status})
+    );
+    assert_eq!(status, "pass");
+}
+
+fn freeze_batch_targets(prior_path: &str, public_path: &str, checker_path: &str) {
+    let prior_bytes = fs::read(prior_path).unwrap();
+    assert_eq!(
+        sha256_hex(&prior_bytes),
+        "e1969305462131722556dead399593b77a919a8017f0e035e3019986b645958e"
+    );
+    let prior: Value = serde_json::from_slice(&prior_bytes).unwrap();
+    assert_eq!(prior["schema"], "different_j_chi_heldout_public/v1");
+    let field = Fp2::new(211).unwrap();
+    let source = Curve {
+        f: field,
+        a: [190, 0],
+        b: [37, 0],
+    };
+    let destination = Curve {
+        f: field,
+        a: [130, 0],
+        b: [179, 0],
+    };
+    let torsion = Point::affine([3, 0], [1, 0]);
+    let generator = parse_point(&prior["generator"]);
+    let mapped_generator = parse_point(&prior["mapped_generator"]);
+    let mut ops = GroupOps::default();
+    assert_eq!(
+        velu(&source, torsion, generator, &mut ops),
+        mapped_generator
+    );
+    let mut targets = Vec::with_capacity(64);
+    let mut scalars = Vec::with_capacity(64);
+    let mut used = BTreeSet::new();
+    for entry in prior["targets"].as_array().unwrap() {
+        let point = parse_point(&entry["source"]);
+        let scalar = (1..229u64)
+            .find(|&k| source.mul(&mut ops, generator, k) == point)
+            .expect("prior public target is outside the generator subgroup");
+        assert!(used.insert(scalar), "prior targets must be distinct");
+        assert_eq!(
+            velu(&source, torsion, point, &mut ops),
+            parse_point(&entry["destination"])
+        );
+        targets.push(entry.clone());
+        scalars.push(scalar);
+    }
+    assert_eq!(targets.len(), 4);
+    let seed = 0x2026_1118_0064u64;
+    let mut rng = StdRng::seed_from_u64(seed);
+    while targets.len() < 64 {
+        let scalar = rng.gen_range(1..229u64);
+        if !used.insert(scalar) {
+            continue;
+        }
+        let source_point = source.mul(&mut ops, generator, scalar);
+        let destination_point = velu(&source, torsion, source_point, &mut ops);
+        assert!(!source_point.infinity && !destination_point.infinity);
+        assert_eq!(
+            destination.mul(&mut ops, mapped_generator, scalar),
+            destination_point
+        );
+        targets.push(json!({"source":source_point,"destination":destination_point}));
+        scalars.push(scalar);
+    }
+    let public = json!({"schema":"isogeny_dual_batch_public/v1",
+        "prior_public_sha256":sha256_hex(&prior_bytes),
+        "p":211,"r":229,"cofactor":195,
+        "generator":generator,"mapped_generator":mapped_generator,
+        "targets":targets});
+    let public_bytes = format!("{}\n", serde_json::to_string_pretty(&public).unwrap());
+    fs::write(public_path, &public_bytes).unwrap();
+    let checker = json!({"schema":"isogeny_dual_batch_checker/v1",
+        "public_sha256":sha256_hex(public_bytes.as_bytes()),
+        "selection_seed":seed,"scalars":scalars});
+    fs::write(
+        checker_path,
+        format!("{}\n", serde_json::to_string_pretty(&checker).unwrap()),
+    )
+    .unwrap();
+    println!(
+        "{}",
+        json!({"schema":"isogeny_dual_batch_freeze/v1",
+        "public_sha256":sha256_hex(public_bytes.as_bytes()),
+        "checker_sha256":sha256_hex(&fs::read(checker_path).unwrap()),
+        "target_count":64,"distinct_scalars":used.len(),"status":"pass"})
+    );
+}
+
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("run-batch") {
+        assert_eq!(args.len(), 6);
+        run_batch(&args[2], &args[3], args[4].parse().unwrap(), &args[5]);
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("freeze-batch-targets") {
+        assert_eq!(args.len(), 5);
+        freeze_batch_targets(&args[2], &args[3], &args[4]);
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("audit-dual") {
         assert_eq!(args.len(), 3);
         audit_dual_pairs(&args[2]);

@@ -5,3 +5,4 @@ import ChainSd.Popcount
 import ChainSd.GroupAlgebra
 import ChainSd.Reach
 import ChainSd.LowerThree
+import ChainSd.Cofactor

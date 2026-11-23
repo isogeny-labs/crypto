@@ -1,0 +1,58 @@
+{
+  "id": "EXP-IC-PAIRKEY-20261118-R4",
+  "date": "2026-11-18",
+  "status": "falsified-on-frozen-toy",
+  "evidence": "local-independent-audit-pcc-unverified",
+  "curve": {
+    "p": 1009,
+    "a": 4,
+    "b": 10,
+    "order": 1069
+  },
+  "all_arms_passed": 160,
+  "censored": 0,
+  "failed": 0,
+  "negative_mutation_verifier_exit": 1,
+  "primary_threshold": 0.97,
+  "expected_rho_steps": 40.9778144042,
+  "cells": [
+    {
+      "B": 24,
+      "seeds": 24,
+      "median_ratio": 1.0077524875,
+      "ci95": [
+        0.9835858586,
+        1.0127770141
+      ],
+      "median_w01": 1.0093089151,
+      "median_w1": 1.0133578116,
+      "unique_over_rho": 9.5083146067
+    },
+    {
+      "B": 32,
+      "seeds": 8,
+      "median_ratio": 1.0232339222,
+      "ci95": [
+        0.9531914894,
+        1.034965035
+      ],
+      "median_w01": 1.0264265148,
+      "median_w1": 1.0370684889,
+      "unique_over_rho": 12.8733108108
+    },
+    {
+      "B": 40,
+      "seeds": 8,
+      "median_ratio": 1.0499273256,
+      "ci95": [
+        0.9092970522,
+        1.0840108401
+      ],
+      "median_w01": 1.0493477722,
+      "median_w1": 1.0459603793,
+      "unique_over_rho": 18.4682539683
+    }
+  ],
+  "notes": "median per-seed ratio; not ratio of means, toy only; external leaderboard units not comparable",
+  "full_raw": "conversation archive; compact seed records in GitHub"
+}

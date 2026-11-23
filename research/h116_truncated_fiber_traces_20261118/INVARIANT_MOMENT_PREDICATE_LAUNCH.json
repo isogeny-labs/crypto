@@ -1,0 +1,24 @@
+{
+  "schema": "h116.invariant-moment-predicate-launch/v1",
+  "protocol_id": "H116-INVARIANT-MOMENT-PREDICATE-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and the exact hashes in INVARIANT_MOMENT_PREDICATE_SOURCE_GATE.md",
+  "backend": "local h114 workspace, ordinary non-resumable commands",
+  "resources": {"cpu": 1, "memory_gib": 2, "timeout_minutes": 30},
+  "retries": 0,
+  "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "commands": {
+    "producer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_invariant_moment_producer.rs", "-o", "/tmp/h116_invariant_moment_producer"],
+    "scorer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_invariant_moment_scorer.rs", "-o", "/tmp/h116_invariant_moment_scorer"],
+    "producer_run": ["/tmp/h116_invariant_moment_producer", "--generate", "INVARIANT_MOMENT_PREDICATE_MOMENTS.tsv", "INVARIANT_MOMENT_PREDICATE_LABELS.tsv"],
+    "scorer_run": ["/tmp/h116_invariant_moment_scorer", "--score", "INVARIANT_MOMENT_PREDICATE_MOMENTS.tsv", "INVARIANT_MOMENT_PREDICATE_LABELS.tsv", "INVARIANT_MOMENT_PREDICATE_RESULT.json"]
+  },
+  "outputs": [
+    "INVARIANT_MOMENT_PREDICATE_MOMENTS.tsv",
+    "INVARIANT_MOMENT_PREDICATE_LABELS.tsv",
+    "INVARIANT_MOMENT_PREDICATE_RESULT.json",
+    "INVARIANT_MOMENT_PREDICATE_RUN.txt",
+    "INVARIANT_MOMENT_PREDICATE_SHA256SUMS"
+  ],
+  "acceptance": "retain all rows and aggregate scores; infrastructure success requires exact gated sources, both zero exits, 576 model records, 288 target labels, zero candidate/direct/repeat/invariant mismatches, and a passing synthetic scorer control",
+  "measurement_scope": "excluded-fixture hypothesis generation and fixed shuffled-label control only; no timing, decoder, generic-prime-field, ECDLP, or speedup claim"
+}

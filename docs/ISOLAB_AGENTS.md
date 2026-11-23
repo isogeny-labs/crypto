@@ -42,7 +42,7 @@ bash scripts/isolab-agent.sh check nats
 This reads the worker roster with a 30-second deadline. An empty roster means
 the hub answered, not that a worker can accept a strict job. In the agent, call
 `isolab_overview`, inspect worker readiness, then use the existing
-[independent-runner workflow](../.agents/skills/ecbench-independent-runner/SKILL.md).
+[independent-runner workflow](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/ecbench-independent-runner/SKILL.md).
 Strict placement and binary compatibility still need verification.
 
 The launcher requires an explicit hub URL; it does not invent a localhost hub.
