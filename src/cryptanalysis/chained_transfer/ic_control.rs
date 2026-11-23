@@ -609,18 +609,44 @@ pub(crate) fn mulmod(a: u64, b: u64, r: u64) -> u64 {
         } else {
             t
         }) as u64
+    } else if a < r && b < r {
+        mulmod_wide(a, b, r)
     } else {
         ((a as u128 * b as u128) % r as u128) as u64
     }
 }
+
+/// `a·b mod r` for `a, b < r`: the product is below `r²`, so its high word is
+/// below `r` and one 128-by-64-bit `div` gives the remainder (no library call).
+#[inline]
+fn mulmod_wide(a: u64, b: u64, r: u64) -> u64 {
+    #[cfg(target_arch = "x86_64")]
+    {
+        let prod = a as u128 * b as u128;
+        let rem: u64;
+        // SAFETY: `div` faults only for r = 0 or a quotient above 64 bits;
+        // `r > a, b >= 0` makes `r` nonzero and `prod / r < r`.
+        unsafe {
+            std::arch::asm!(
+                "div {r}",
+                r = in(reg) r,
+                inout("rax") prod as u64 => _,
+                inout("rdx") (prod >> 64) as u64 => rem,
+                options(pure, nomem, nostack),
+            );
+        }
+        rem
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        ((a as u128 * b as u128) % r as u128) as u64
+    }
+}
+/// `a + b mod r` for reduced operands, without a branch.
 #[inline]
 pub(crate) fn addm(a: u64, b: u64, r: u64) -> u64 {
     let s = a + b;
-    if s >= r {
-        s - r
-    } else {
-        s
-    }
+    s.min(s.wrapping_sub(r))
 }
 #[inline]
 pub(crate) fn subm(a: u64, b: u64, r: u64) -> u64 {
@@ -2195,6 +2221,51 @@ mod tests {
                 assert_eq!(
                     mulmod(a, b, r),
                     ((a as u128 * b as u128) % r as u128) as u64
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn mulmod_addm_match_u128_across_moduli() {
+        let mut st = 0x1234_5678_9abc_def0u64;
+        let mut next = || {
+            st = mix64(st.wrapping_add(0x9E37_79B9_7F4A_7C15));
+            st
+        };
+        let mut rs = vec![
+            3u64,
+            65_537,
+            (1 << 50) - 1,
+            1 << 50,
+            (1 << 50) + 1,
+            (1 << 50) + 7,
+        ];
+        for bits in [20u32, 31, 40, 49, 50, 51, 52, 53, 57, 60, 61, 62, 63] {
+            for _ in 0..6 {
+                let r = (next() >> (64 - bits)) | (1 << (bits - 1));
+                rs.push(r.min((1u64 << 63) - 1));
+            }
+        }
+        rs.push((1u64 << 63) - 1);
+        for &r in &rs {
+            for k in 0..3000 {
+                let (mut a, mut b) = (next() % r, next() % r);
+                if k % 7 == 0 {
+                    a = r - 1 - (k as u64 % 3).min(r - 1);
+                }
+                if k % 11 == 0 {
+                    b = r - 1;
+                }
+                assert_eq!(
+                    mulmod(a, b, r),
+                    (a as u128 * b as u128 % r as u128) as u64,
+                    "mul r={r}"
+                );
+                assert_eq!(
+                    addm(a, b, r),
+                    ((a as u128 + b as u128) % r as u128) as u64,
+                    "add r={r}"
                 );
             }
         }

@@ -1,0 +1,22 @@
+   Compiling crypto v0.1.0 (/home/user/crypto)
+warning: function `vpow` is never used
+   --> src/cryptanalysis/prime_root_trace.rs:566:4
+    |
+566 | fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
+    |    ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `crypto` (lib test) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 22m 15s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-b4fa3a3eb9ba3f87)
+
+running 1 test
+kappa_phase r=35204231349877 reps=7 sge_ns=8194027 sge_mul=19964 sge_add=348743 wied_ns=4800612145 wied_mul=157024186 wied_add=367923078 wied_ns_per_mul=30.57 wied_ns_per_add=13.05
+test cryptanalysis::genus_ladder::kappa_phase_split::sge_and_wiedemann_wall_per_counted_op has been running for over 60 seconds
+kappa_phase r=562757240242147 reps=7 sge_ns=8064378 sge_mul=20912 sge_add=348743 wied_ns=4955800857 wied_mul=157034950 wied_add=367923078 wied_ns_per_mul=31.56 wied_ns_per_add=13.47
+kappa_phase r=4511942408507159 reps=7 sge_ns=8043375 sge_mul=22176 sge_add=348743 wied_ns=3617064842 wied_mul=157049302 wied_add=367923078 wied_ns_per_mul=23.03 wied_ns_per_add=9.83
+test cryptanalysis::genus_ladder::kappa_phase_split::sge_and_wiedemann_wall_per_counted_op ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7799 filtered out; finished in 93.81s
+

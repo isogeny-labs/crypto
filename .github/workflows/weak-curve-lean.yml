@@ -40,7 +40,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/weak_curve_properties_20261010 research/weak_curve_properties_lean_20261011
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/weak_curve_properties_lean_20261011
       - uses: dtolnay/rust-toolchain@stable
       - name: Verify source and evidence pins
         run: |

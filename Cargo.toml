@@ -121,6 +121,19 @@ path = "src/bin/quartic_ic.rs"
 name = "hyperelliptic-cover"
 path = "src/bin/hyperelliptic_cover.rs"
 
+# Finite, replayable enumeration of the explicit cover shapes implemented by
+# this repository. Empty searches retain an explicit nonexistence disclaimer.
+[[bin]]
+name = "curve-transfer-sweep"
+path = "src/bin/curve_transfer_sweep.rs"
+
+# Deterministic export and byte-for-byte replay of the retained
+# odd-characteristic named-subgroup transfer corpus. Unsupported rows are
+# preserved and make the command exit nonzero after writing its result.
+[[bin]]
+name = "odd-transfer-catalog"
+path = "src/bin/odd_transfer_catalog.rs"
+
 # `hecx` — inspect, estimate and solve HECDLP instances over prime and binary
 # fields, with arbitrary genus, coefficients and subgroup orders.
 [[bin]]
@@ -235,6 +248,13 @@ f4-wide-tables = []
 redis-cache = []
 # Verbose tracing in the isogeny rho attack's linear-algebra step.
 rho_debug = []
+# jemalloc as the global allocator of the binaries that opt in (today
+# examples/jv_cover.rs). F4 over F_p allocates one exponent vector per term,
+# and glibc's allocator was ~30% of F4's instructions on jv_cover's systems;
+# jv_cover --exp dlp ran 1.18x faster with jemalloc preloaded
+# (research/f4_inner_dispatch_20261120). Off by default so every other wall
+# time in the lab stays comparable; counted operations are unchanged.
+jemalloc = ["dep:tikv-jemallocator"]
 # Field-operation counters in the CryptoPro-B field (`cryptopro_b_field::opcount`),
 # for the counting run of `cryptopro-b-chain-sweep`; timing builds leave it off.
 cryptopro-b-opcount = []
@@ -274,6 +294,7 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+tikv-jemallocator = { version = "0.6", optional = true }
 certified-relations = { path = "crates/certified-relations" }
 relation-replay-checker = { path = "crates/relation-replay-checker" }
 hashed-ecdl-tensor = { path = "crates/hashed-ecdl-tensor" }
@@ -573,6 +594,12 @@ test = true
 
 
 [[example]]
+name = "f4_f5_boolean_runtime_analyze"
+path = "examples/maintained/wide/f4_f5_boolean_runtime_analyze.rs"
+test = true
+
+
+[[example]]
 name = "ic_qualified_closure_audit"
 path = "examples/maintained/wide/ic_qualified_closure_audit.rs"
 test = true
@@ -648,4 +675,8 @@ test = true
 name = "ecbench_open_questions_replay_failures"
 path = "examples/maintained/wide/ecbench_open_questions_replay_failures.rs"
 test = true
+
+[[example]]
+name = "floor_crater_bridge_cost"
+path = "research/floor_crater_ecdlp_gap_20261120/bridge_cost.rs"
 

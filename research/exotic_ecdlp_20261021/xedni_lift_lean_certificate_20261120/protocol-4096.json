@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-lift-lean-full-certificate-protocol-v1",
+  "source_instance_protocol": "protocol.json",
+  "instance": {"p":1009,"t":9,"public_target":[744,244],"height_cap":4096},
+  "canonical_coordinates": "x=a/b^2,y=c/b^3 with a,c integers, b positive, gcd(abs(a),b)=1, |a|<=4096, b<=4096, exact equation c^2=a^3+9*a*b^4+b^6 and both coordinate reductions modulo 1009",
+  "candidate_generation": "for each b from 1 to 4096, all a from -4096 to 4096 with a-744*b^2 divisible by 1009; the Lean implementation uses the exactly covering residue+1009*j list for j=-5..4",
+  "negative_certificate": "each coprime candidate has negative curve right side or a nonsquare residue modulo at least one listed prime",
+  "witness_primes": [3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97],
+  "lean_proof_map": "CandidateListProof.x_candidate_mem covers bounded x-compatible pairs; SquareModulo.square_has_modular_root proves a square has a root residue; Sieve4096.check4096 kernel-checks all b and residue representatives; FullLift4096.no_canonical_lift_height4096 combines them",
+  "remaining_bridge": "formalize that every rational point on the integral elliptic curve model admits this reduced canonical coordinate representation and that good reduction agrees with both displayed congruences"
+}

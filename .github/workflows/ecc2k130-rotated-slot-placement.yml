@@ -37,7 +37,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/rotated_slot_placement_20260925
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/rotated_slot_placement_20260925/evidence
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
