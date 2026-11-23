@@ -37,5 +37,7 @@ jobs:
         run: python3 tools/test_result_switches.py
       - name: Task-card tool tests
         run: python3 tools/test_task_card.py
+      - name: PCC verifier and signed schema controls
+        run: python3 tools/pcc/test_pcc.py
       - name: Loss-ledger tool tests
         run: python3 tools/test_loss_ledger.py

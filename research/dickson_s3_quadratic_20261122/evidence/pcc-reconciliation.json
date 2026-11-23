@@ -1,0 +1,224 @@
+{
+  "schema": "dickson-s3.pcc-reconciliation/v1",
+  "started_at": "2026-11-23T03:37:22.903Z",
+  "completed_at": "2026-11-23T03:37:22.964Z",
+  "status": "publication_ledger_prepared_not_committed_or_published",
+  "scope": "Reconcile one unpublished draft registration onto the freshly fetched main prefix; retain original draft bytes and receipts.",
+  "procedure_sources": [
+    {
+      "path": "docs/session-logs/2026-11-22.md",
+      "section": "2026-11-23T00:32Z / PR #4928 third iteration and publication gate; unpublished local ledger append preserved in scratch"
+    },
+    {
+      "path": "docs/SABOTAGE_RESISTANCE.md",
+      "section": "I3 append-only hash-chained ledger"
+    },
+    {
+      "path": "tools/pcc/pcc.py",
+      "functions": [
+        "canonical",
+        "claim_digest",
+        "entry_hash",
+        "check_chain",
+        "check_prefix",
+        "append_entry"
+      ],
+      "source_commit": "69fad1271054225a95d5682f5fdcd11fd2a692d7",
+      "source_sha256": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb"
+    }
+  ],
+  "main": {
+    "revision": "c49f8d009978ded324b6ddc404229af1c91a4730",
+    "fetch_checked_at": "2026-11-23T03:34:40.093Z",
+    "fetch_argv": [
+      "git",
+      "fetch",
+      "--no-tags",
+      "--no-recurse-submodules",
+      "origin",
+      "main"
+    ],
+    "fetch_exit_code": 0,
+    "ledger_git_blob_sha1": "18405fe4fcf46e8342446db72926f4316efaa656",
+    "prefix_entries": 1548,
+    "prefix_bytes": 894052,
+    "prefix_sha256": "0ba48d5d67f4d1bcab3872f1e30b61d93f0874aeb0a936b83d30b9f94b56e868",
+    "tail_before": "6f90af239e89b5f53910aec610e54f10c681286080ebaa28d0d1a98673fd998b",
+    "new_entries_since_core": [
+      {
+        "seq": 1545,
+        "type": "claim",
+        "hash": "a0255f864542beaa1cc7b25e47ed6bcec6e334dd7bee8df165e6c16ff781c246",
+        "body": {
+          "claim_id": "PCC-20261123-f307d3",
+          "claim_sha256": "08691877f788eb50abd89d715c33694e36d1531e5fb26bc4dffcd176c3891af6",
+          "path": "pcc/claims/PCC-20261123-f307d3.json"
+        }
+      },
+      {
+        "seq": 1546,
+        "type": "claim",
+        "hash": "2c1251382ac1c09a7cb9deb5401acf84b685e93283e06dcac8c7606a32530de7",
+        "body": {
+          "claim_id": "PCC-20261123-b6b455",
+          "claim_sha256": "f74f6b9b80f03bcfcd3c0b25bd4ee45d5f658ad68cf7eae0893fcc127528aa78",
+          "path": "pcc/claims/PCC-20261123-b6b455.json"
+        }
+      },
+      {
+        "seq": 1547,
+        "type": "note",
+        "hash": "6f90af239e89b5f53910aec610e54f10c681286080ebaa28d0d1a98673fd998b",
+        "body": {
+          "replacement_claim_id": "PCC-20261123-b6b455",
+          "source_commit": "883e2d2dda223ae1b8eafdc83b289a49fa178855",
+          "superseded_claim_id": "PCC-20261123-f307d3",
+          "text": "PCC-20261123-f307d3 was created before the local source commit import completed and pins the older producer commit. Preserve it as an unsigned superseded administrative record; cite PCC-20261123-b6b455 for the intended source-bound statement. No signed verdict or verification is asserted."
+        }
+      }
+    ],
+    "exact_prefix_preserved": true
+  },
+  "core": {
+    "revision": "69fad1271054225a95d5682f5fdcd11fd2a692d7",
+    "ledger_entries": 1545,
+    "ledger_sha256": "cedb35a1b3b5542209e78ed000bc0db31d384ea2e5ed1088336ce3702943085f",
+    "exact_common_prefix": true
+  },
+  "original_draft": {
+    "ledger_path": "pcc/ledger.jsonl",
+    "saved_path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-draft-ledger.jsonl",
+    "ledger_sha256": "426f401b20710c64e854ff359e418cdcc160fdda97ce375f425338d5d4c0305a",
+    "ledger_bytes": 892958,
+    "entries": 1546,
+    "original_entry": {
+      "at": "2026-11-23T03:24:48Z",
+      "body": {
+        "claim_id": "PCC-20261123-d1c503",
+        "claim_sha256": "ace47be167eff067821af1f4be12a8afa335b58cb31cbbeb54233f377f7d2136",
+        "path": "pcc/claims/PCC-20261123-d1c503.json"
+      },
+      "hash": "6a23155dbfc9e3c219b1f9b84deea70624388aa9901743f22eb88221de50ab9b",
+      "prev": "90f7799fb5d77170d64e019939cb9c293dfcbd7829e36e6d39682e4a4cbe7c96",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1545,
+      "type": "claim"
+    },
+    "tail_raw_utf8": "{\"at\":\"2026-11-23T03:24:48Z\",\"body\":{\"claim_id\":\"PCC-20261123-d1c503\",\"claim_sha256\":\"ace47be167eff067821af1f4be12a8afa335b58cb31cbbeb54233f377f7d2136\",\"path\":\"pcc/claims/PCC-20261123-d1c503.json\"},\"hash\":\"6a23155dbfc9e3c219b1f9b84deea70624388aa9901743f22eb88221de50ab9b\",\"prev\":\"90f7799fb5d77170d64e019939cb9c293dfcbd7829e36e6d39682e4a4cbe7c96\",\"schema\":\"pcc.ledger-entry/v1\",\"seq\":1545,\"type\":\"claim\"}\n",
+    "preserved_byte_for_byte": true,
+    "publication_status_before_reconciliation": "uncommitted and unpublished local suffix; no committed suffix changed"
+  },
+  "claim": {
+    "path": "pcc/claims/PCC-20261123-d1c503.json",
+    "id": "PCC-20261123-d1c503",
+    "raw_file_sha256": "ae2ca19ac30d516e467c1e80c3302e6e63e4b2c2d6cb2beb6625b34e1b8af79b",
+    "canonical_claim_sha256": "ace47be167eff067821af1f4be12a8afa335b58cb31cbbeb54233f377f7d2136",
+    "producer_commit": "69fad1271054225a95d5682f5fdcd11fd2a692d7",
+    "created_at": "2026-11-23T03:24:48Z",
+    "unchanged_byte_for_byte": true,
+    "body_unchanged": true
+  },
+  "original_receipts": [
+    {
+      "path": "research/dickson_s3_quadratic_20261122/evidence/pcc-preview.json",
+      "saved_path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-pcc-preview.json",
+      "bytes": 2557,
+      "sha256_before": "ac291f4cf491f125afe24022268183414a71c7e934ba7f01f59c2dbef748c268",
+      "sha256_after": "ac291f4cf491f125afe24022268183414a71c7e934ba7f01f59c2dbef748c268",
+      "unchanged": true
+    },
+    {
+      "path": "research/dickson_s3_quadratic_20261122/evidence/pcc-registration.json",
+      "saved_path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-pcc-registration.json",
+      "bytes": 2556,
+      "sha256_before": "9d9985ee89c082207f33e8f464539e94bca1517505f72d10bcf3718960e7f165",
+      "sha256_after": "9d9985ee89c082207f33e8f464539e94bca1517505f72d10bcf3718960e7f165",
+      "unchanged": true
+    }
+  ],
+  "imported_main_claims": [
+    {
+      "path": "pcc/claims/PCC-20261123-b6b455.json",
+      "bytes": 1067,
+      "sha256": "0a59b1a78216e5fd51660b6de8abbb331a87281fc6f650a1ec1b28bd0158a5f4",
+      "canonical_claim_sha256": "f74f6b9b80f03bcfcd3c0b25bd4ee45d5f658ad68cf7eae0893fcc127528aa78",
+      "git_blob_sha1": "61802ba76c735f555081733d75dd7fdd68ba0180",
+      "action": "copied exact main blob",
+      "source_revision": "c49f8d009978ded324b6ddc404229af1c91a4730"
+    },
+    {
+      "path": "pcc/claims/PCC-20261123-f307d3.json",
+      "bytes": 927,
+      "sha256": "fd243cf62f9e79d43b359d29baf02a8f89524ef877f4fe8322a5cfb19396f400",
+      "canonical_claim_sha256": "08691877f788eb50abd89d715c33694e36d1531e5fb26bc4dffcd176c3891af6",
+      "git_blob_sha1": "bcd3ed35538fd9e04b639d55e0e7283bf7f76714",
+      "action": "copied exact main blob",
+      "source_revision": "c49f8d009978ded324b6ddc404229af1c91a4730"
+    }
+  ],
+  "publication_ledger": {
+    "path": "pcc/ledger.jsonl",
+    "entries": 1549,
+    "bytes": 894456,
+    "sha256": "5a4541316c305edb4819431449317000b8376fe5d9164b91bffc39b280256016",
+    "new_entry": {
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1548,
+      "prev": "6f90af239e89b5f53910aec610e54f10c681286080ebaa28d0d1a98673fd998b",
+      "type": "claim",
+      "at": "2026-11-23T03:37:22Z",
+      "body": {
+        "claim_id": "PCC-20261123-d1c503",
+        "claim_sha256": "ace47be167eff067821af1f4be12a8afa335b58cb31cbbeb54233f377f7d2136",
+        "path": "pcc/claims/PCC-20261123-d1c503.json"
+      },
+      "hash": "acd189de42ec33f520fe3ae62b6eb8b00aa5707da0d390d946ac7ef5698a87a7"
+    },
+    "new_entry_hash": "acd189de42ec33f520fe3ae62b6eb8b00aa5707da0d390d946ac7ef5698a87a7",
+    "metadata_hash_chain_checked": true,
+    "main_prefix_checked_byte_for_byte": true
+  },
+  "files_written": [
+    "pcc/ledger.jsonl",
+    "pcc/claims/PCC-20261123-b6b455.json",
+    "pcc/claims/PCC-20261123-f307d3.json",
+    "research/dickson_s3_quadratic_20261122/evidence/pcc-reconciliation.json"
+  ],
+  "scratch_copies": [
+    {
+      "path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-draft-ledger.jsonl",
+      "bytes": 892958,
+      "sha256": "426f401b20710c64e854ff359e418cdcc160fdda97ce375f425338d5d4c0305a"
+    },
+    {
+      "path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-claim.json",
+      "bytes": 1272,
+      "sha256": "ae2ca19ac30d516e467c1e80c3302e6e63e4b2c2d6cb2beb6625b34e1b8af79b"
+    },
+    {
+      "path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-pcc-preview.json",
+      "bytes": 2557,
+      "sha256": "ac291f4cf491f125afe24022268183414a71c7e934ba7f01f59c2dbef748c268"
+    },
+    {
+      "path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/original-pcc-registration.json",
+      "bytes": 2556,
+      "sha256": "9d9985ee89c082207f33e8f464539e94bca1517505f72d10bcf3718960e7f165"
+    },
+    {
+      "path": "/workspace/scratch/108b275c78dd/pcc-reconciliation-6UPPFH/main-prefix-ledger.jsonl",
+      "bytes": 894052,
+      "sha256": "0ba48d5d67f4d1bcab3872f1e30b61d93f0874aeb0a936b83d30b9f94b56e868"
+    }
+  ],
+  "original_registration_receipt_scope": "The preserved original receipt describes the old local draft append. This separate receipt describes its preparation for publication on the current main prefix; it does not replace or retroactively change that observation.",
+  "standing": "unverified",
+  "standing_source": "Unsigned producer metadata; no PCC standing or scientific verifier executed.",
+  "scientific_verifier_run": false,
+  "signature_created": false,
+  "python_executed": false,
+  "source_or_proof_artifacts_edited": false,
+  "staging_performed": false,
+  "commit_created": false,
+  "publication_performed": false
+}

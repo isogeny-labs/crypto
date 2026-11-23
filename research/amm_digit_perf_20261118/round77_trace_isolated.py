@@ -10,7 +10,9 @@ import subprocess
 import tempfile
 
 root=Path(__file__).resolve().parents[2]
-source=(root/"src/cryptanalysis/prime_root_trace.rs").read_text()
+# Historical microbenchmarks compare their original production snapshot.
+# Round78's separate harness tests current code against the Round77 base.
+source=subprocess.check_output(["git", "show", "5b1b404b4fe0632d4add0a1b20209430c0a8a810:src/cryptanalysis/prime_root_trace.rs"], cwd=root, text=True)
 def extract(signature):
     start=source.index(signature)
     brace=source.index("{",start)

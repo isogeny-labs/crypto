@@ -387,7 +387,11 @@ class Remote:
         """Size of the stored object, or None when absent."""
         if self.kind == "file":
             p = self.dir / object_key(digest)
-            return p.stat().st_size if p.exists() else None
+            if not p.exists():
+                return None
+            if sha256_file(p) != digest:
+                die(f"{self.key(digest)}: stored object checksum mismatch; refused")
+            return p.stat().st_size
         if self.kind == "http":
             req = urllib.request.Request(self._url(digest), method="HEAD")
             try:
@@ -421,10 +425,25 @@ class Remote:
         if self.kind == "file":
             dest = self.dir / object_key(digest)
             dest.parent.mkdir(parents=True, exist_ok=True)
-            tmp = dest.with_name(dest.name + f".tmp{os.getpid()}")
-            shutil.copyfile(src, tmp)
-            os.replace(tmp, dest)
-            return True
+            fd, name = tempfile.mkstemp(prefix=dest.name + ".tmp-", dir=dest.parent)
+            os.close(fd)
+            tmp = Path(name)
+            try:
+                shutil.copyfile(src, tmp)
+                if tmp.stat().st_size != size or sha256_file(tmp) != digest:
+                    die(f"{self.key(digest)}: source changed before publication; refused")
+                tmp.chmod(0o644)
+                try:
+                    # Same-filesystem link publishes only when the key is absent.
+                    # Concurrent writers keep independent, verified temporary files.
+                    os.link(tmp, dest)
+                except FileExistsError:
+                    if self.head(digest) != size:
+                        die(f"{self.key(digest)}: concurrent object size mismatch; refused")
+                    return False
+                return True
+            finally:
+                tmp.unlink(missing_ok=True)
         argv = self.put_multipart_args(digest, src) if size > SINGLE_PUT_MAX else self.put_args(digest, src)
         p = self._run(argv)
         if p.returncode != 0:

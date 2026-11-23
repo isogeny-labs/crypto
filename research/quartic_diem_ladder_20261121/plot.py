@@ -9,11 +9,13 @@ import sys
 import matplotlib
 
 matplotlib.use("Agg")
+matplotlib.rcParams["svg.fonttype"] = "none"
+matplotlib.rcParams["svg.hashsalt"] = "ladder"
 import matplotlib.pyplot as plt
 
 a = json.load(open(sys.argv[1]))
 t = a["ic_over_rho"]
-fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.9))
+fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.6))
 cols = {"0.0": "#1b9e77", "0.1": "#d95f02", "1.0": "#7570b3"}
 mk = {"Q_diem_2lp_new": ("o", "--", "2lp-new"), "Q_diem_2lp_sfb": ("s", "-", "2lp-sfb")}
 ax = axes[0]
@@ -24,13 +26,13 @@ for arm, (m, ls, lab) in mk.items():
         y = [pp[str(p)]["gm"] for p in ps]
         lo = [pp[str(p)]["gm"] - pp[str(p)]["ci95"][0] for p in ps]
         hi = [pp[str(p)]["ci95"][1] - pp[str(p)]["gm"] for p in ps]
-        ax.errorbar(ps, y, yerr=[lo, hi], marker=m, ls=ls, color=c, ms=4, lw=1, capsize=2,
+        ax.errorbar(ps, y, yerr=[lo, hi], marker=m, ls=ls, color=c, ms=4, lw=1, capsize=0,
                     label=f"{lab}, w={w}")
 ax.axhline(1, color="k", lw=0.8)
 ax.set_xscale("log", base=2)
 ax.set_yscale("log")
 ax.set_xlabel("p")
-ax.set_ylabel("IC / ideal negation rho  (GAE, all native ops at w)")
+ax.set_ylabel("IC / ideal neg. rho (GAE_w, all native)")
 ax.set_title("IC/rho, 5 curves x 2 seeds, boot95", fontsize=9)
 ax.legend(fontsize=6, ncol=2)
 ax = axes[1]
@@ -54,7 +56,25 @@ ax.set_xlabel("p")
 ax.set_ylabel("counted F_p multiplications")
 ax.set_title("cost per solve (geo-mean)", fontsize=9)
 ax.legend(fontsize=6)
+for ax in axes:
+    ax.minorticks_off()
 fig.suptitle("research/quartic_diem_ladder_20261121  [pcc:unverified]", fontsize=8)
 fig.tight_layout()
 fig.savefig("fig_ladder.svg")
-fig.savefig("fig_ladder.png", dpi=80)
+fig.savefig("fig_ladder.png", dpi=72)
+
+# size: round SVG coordinates to 1 decimal, palette PNG (layout only)
+import re
+
+svg = open("fig_ladder.svg").read()
+svg = re.sub(r"(\d+\.\d)\d+", r"\1", svg)
+svg = re.sub(r"<metadata>.*?</metadata>", "", svg, flags=re.S)
+svg = re.sub(r"<!--.*?-->", "", svg, flags=re.S)
+svg = "\n".join(x.strip() for x in svg.splitlines() if x.strip())
+open("fig_ladder.svg", "w").write(svg)
+try:
+    from PIL import Image
+
+    Image.open("fig_ladder.png").convert("RGB").quantize(64).save("fig_ladder.png", optimize=True)
+except ImportError:
+    pass
