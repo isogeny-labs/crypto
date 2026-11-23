@@ -1,0 +1,60 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "paired_curves_v1, two frozen fields, small-degree source/map controls",
+  "description": "Degree-2 and degree-5 controls in two frozen fields; no 80-bit target quotient or measured session.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_mont4_explicit",
+        "p": "4794168233664648458988367110514316682522236917173341621535751",
+        "a": "4794168233664648458988367110514316682522236917173341621535611",
+        "b": "784",
+        "group_order": "4794168233664648458988367110509937564696162391583477974939208",
+        "r": 1125023250121,
+        "gx": "603209182794240622510892080705207481693427956682909708617837",
+        "gy": "1682738350748939452891832813322046124324576766734042502997852"
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261118,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-counted",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "bsgs-exact-key",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.prime_mont4_v1"
+      }
+    },
+    {
+      "name": "rho-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "paired_curves_v1",
+    "seed": 20261118,
+    "isolation_required": "L2",
+    "timeout_seconds": 600,
+    "algorithm_seed_round": "measured_index"
+  }
+}
