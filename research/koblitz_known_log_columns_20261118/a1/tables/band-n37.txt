@@ -1,0 +1,43 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m37-tm534059-32aad96b | 27.78 | gen-c8 | 144/144 | 0.704 | 0.875 | 2.417 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | gen-c8-aa | 144/144 | 0.704 | 0.875 | 2.417 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | kl-c8 | 144/144 | 0.432 | 0.545 | 1.563 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-strong | 144/144 | 0.266 | 0.301 | 0.614 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-v5 | 144/144 | 0.151 | 0.167 | 0.306 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | sp-c8-d3 | 144/144 | 0.283 | 0.366 | 1.114 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | sp-c8-d5 | 144/144 | 0.268 | 0.348 | 1.068 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | sp-c9-d5 | 144/144 | 0.286 | 0.373 | 1.154 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs gen-c8-aa | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs kl-c8 | kl-c8 < gen-c8 |
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs rho-strong | rho-strong < gen-c8 |
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs rho-v5 | rho-v5 < gen-c8 |
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs sp-c8-d3 | sp-c8-d3 < gen-c8 |
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs sp-c8-d5 | sp-c8-d5 < gen-c8 |
+| icv1-f2m37-tm534059-32aad96b | gen-c8 vs sp-c9-d5 | sp-c9-d5 < gen-c8 |
+| icv1-f2m37-tm534059-32aad96b | gen-c8-aa vs kl-c8 | kl-c8 < gen-c8-aa |
+| icv1-f2m37-tm534059-32aad96b | gen-c8-aa vs rho-strong | rho-strong < gen-c8-aa |
+| icv1-f2m37-tm534059-32aad96b | gen-c8-aa vs rho-v5 | rho-v5 < gen-c8-aa |
+| icv1-f2m37-tm534059-32aad96b | gen-c8-aa vs sp-c8-d3 | sp-c8-d3 < gen-c8-aa |
+| icv1-f2m37-tm534059-32aad96b | gen-c8-aa vs sp-c8-d5 | sp-c8-d5 < gen-c8-aa |
+| icv1-f2m37-tm534059-32aad96b | gen-c8-aa vs sp-c9-d5 | sp-c9-d5 < gen-c8-aa |
+| icv1-f2m37-tm534059-32aad96b | kl-c8 vs rho-strong | rho-strong < kl-c8 |
+| icv1-f2m37-tm534059-32aad96b | kl-c8 vs rho-v5 | rho-v5 < kl-c8 |
+| icv1-f2m37-tm534059-32aad96b | kl-c8 vs sp-c8-d3 | sp-c8-d3 < kl-c8 |
+| icv1-f2m37-tm534059-32aad96b | kl-c8 vs sp-c8-d5 | sp-c8-d5 < kl-c8 |
+| icv1-f2m37-tm534059-32aad96b | kl-c8 vs sp-c9-d5 | sp-c9-d5 < kl-c8 |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs sp-c8-d3 | rho-strong < sp-c8-d3 |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs sp-c8-d5 | rho-strong < sp-c8-d5 |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs sp-c9-d5 | rho-strong < sp-c9-d5 |
+| icv1-f2m37-tm534059-32aad96b | rho-v5 vs sp-c8-d3 | rho-v5 < sp-c8-d3 |
+| icv1-f2m37-tm534059-32aad96b | rho-v5 vs sp-c8-d5 | rho-v5 < sp-c8-d5 |
+| icv1-f2m37-tm534059-32aad96b | rho-v5 vs sp-c9-d5 | rho-v5 < sp-c9-d5 |
+| icv1-f2m37-tm534059-32aad96b | sp-c8-d3 vs sp-c8-d5 | sp-c8-d5 < sp-c8-d3 |
+| icv1-f2m37-tm534059-32aad96b | sp-c8-d3 vs sp-c9-d5 | sp-c8-d3 < sp-c9-d5 |
+| icv1-f2m37-tm534059-32aad96b | sp-c8-d5 vs sp-c9-d5 | sp-c8-d5 < sp-c9-d5 |
