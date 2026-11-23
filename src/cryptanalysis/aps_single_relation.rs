@@ -1662,6 +1662,136 @@ pub fn solve_dlp_with_mode(
     Ok(attempts)
 }
 
+/// Sample labeled bases on one producer thread and search independent bases on
+/// `workers` downstream threads. The bounded channel limits bases waiting for
+/// a solver. Seeds are assigned by attempt index before dispatch, so scheduling
+/// cannot change the sampled bases. Returned attempts are sorted by that index.
+/// A verified result stops new work; already running solvers finish their
+/// individual budgets before the function returns.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_dlp_queued(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    encoding: Encoding,
+    labels: Labels,
+    subset_size: usize,
+    seed: u64,
+    max_attempts: usize,
+    budget: Duration,
+    workers: usize,
+    queue_capacity: usize,
+) -> Result<Vec<(usize, Attempt)>, String> {
+    use std::sync::{
+        atomic::{AtomicBool, Ordering as AtomicOrdering},
+        mpsc, Arc, Mutex,
+    };
+
+    validate_instance(curve, g, q)?;
+    let arity = match encoding {
+        Encoding::Partitioned3 | Encoding::Unordered3 | Encoding::Line3 => 3,
+        _ => 4,
+    };
+    if !(1..=4).contains(&subset_size)
+        || !(1..=128).contains(&max_attempts)
+        || !(1..=128).contains(&workers)
+        || !(1..=128).contains(&queue_capacity)
+        || budget.is_zero()
+    {
+        return Err("bounded queued search requires subset size 1..=4, attempts/workers/capacity 1..=128 and a deadline".into());
+    }
+    let (work_tx, work_rx) = mpsc::sync_channel::<(usize, LabeledBase)>(queue_capacity);
+    let work_rx = Arc::new(Mutex::new(work_rx));
+    let (result_tx, result_rx) = mpsc::channel::<Result<(usize, Attempt), String>>();
+    let stop = AtomicBool::new(false);
+    let mut sampling_error = None;
+    std::thread::scope(|scope| {
+        for _ in 0..workers {
+            let rx = Arc::clone(&work_rx);
+            let tx = result_tx.clone();
+            let stop = &stop;
+            scope.spawn(move || loop {
+                let next = rx.lock().expect("APS work queue poisoned").recv();
+                let Ok((index, base)) = next else { break };
+                if stop.load(AtomicOrdering::Acquire) {
+                    continue;
+                }
+                let result = find_relation(
+                    curve,
+                    g,
+                    q,
+                    &base,
+                    RelationSearch::System(encoding),
+                    24,
+                    budget,
+                )
+                .map(|(algebra, recovery)| {
+                    (
+                        index,
+                        Attempt {
+                            base,
+                            algebra,
+                            recovery,
+                        },
+                    )
+                });
+                if matches!(
+                    &result,
+                    Err(_)
+                        | Ok((
+                            _,
+                            Attempt {
+                                recovery: Some(_),
+                                ..
+                            }
+                        ))
+                ) {
+                    stop.store(true, AtomicOrdering::Release);
+                }
+                if tx.send(result).is_err() {
+                    break;
+                }
+            });
+        }
+        drop(result_tx);
+        for index in 0..max_attempts {
+            if stop.load(AtomicOrdering::Acquire) {
+                break;
+            }
+            match sample_base(
+                curve,
+                g,
+                q,
+                &vec![subset_size; arity],
+                labels,
+                seed.wrapping_add(index as u64),
+                10_000,
+            ) {
+                Ok(base) => {
+                    if work_tx.send((index, base)).is_err() {
+                        break;
+                    }
+                }
+                Err(error) => {
+                    sampling_error = Some(error);
+                    stop.store(true, AtomicOrdering::Release);
+                    break;
+                }
+            }
+        }
+        drop(work_tx);
+    });
+    if let Some(error) = sampling_error {
+        return Err(error);
+    }
+    let mut attempts = Vec::new();
+    for result in result_rx {
+        attempts.push(result?);
+    }
+    attempts.sort_by_key(|(index, _)| *index);
+    Ok(attempts)
+}
+
 /// Existing symmetric S3 identity, expressed in the repository's certificate
 /// format. Issuing/checking a certificate evaluates it over the format's field;
 /// it is not a formal proof over every characteristic.
@@ -2413,6 +2543,48 @@ mod tests {
                 assert_eq!(
                     run.algebra.coordinate_sets,
                     direct_sets(&curve, &run.base.parts)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn queued_workers_preserve_seeded_bases_and_verify_recovery() {
+        let (curve, g, q, d) = fixture();
+        for workers in [1, 4] {
+            let runs = solve_dlp_queued(
+                &curve,
+                g,
+                q,
+                Encoding::Partitioned3,
+                Labels::Guaranteed,
+                3,
+                20261026,
+                32,
+                Duration::from_secs(10),
+                workers,
+                2,
+            )
+            .unwrap();
+            assert!(!runs.is_empty());
+            assert!(runs
+                .iter()
+                .any(|(_, run)| run.recovery.as_ref().is_some_and(|r| r.logarithm == d)));
+            for (index, run) in runs {
+                let expected = sample_base(
+                    &curve,
+                    g,
+                    q,
+                    &[3, 3, 3],
+                    Labels::Guaranteed,
+                    20261026 + index as u64,
+                    10_000,
+                )
+                .unwrap();
+                assert_eq!(run.base.parts, expected.parts);
+                assert_eq!(
+                    run.base.points.keys().collect::<Vec<_>>(),
+                    expected.points.keys().collect::<Vec<_>>()
                 );
             }
         }
