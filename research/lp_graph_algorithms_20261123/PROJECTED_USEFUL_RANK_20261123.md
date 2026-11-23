@@ -1,0 +1,24 @@
+# Exact useful projected rank after LP cancellation — preregistered native gate
+
+Date: 2026-11-23 UTC. Lane: draft PR #4988. Status: proposed / unexecuted as of this preregistration. [pcc:unverified]
+
+## Mathematical target
+Let L in F_ell^(R x C) be the large-prime incidence/coefficient matrix, S in F_ell^(R x B) the original factor-base coefficient matrix and b in F_ell^R its scalar RHS. The already implemented forest emits an explicit basis W of ker(L^T), retaining source coefficients and replayable original-row IDs. The resulting useful factor-base system is T = W S, with RHS u = W b. It is **not** valid to count all d = R - rank(L) emitted LP dependencies as useful: useful rank is rank(T), which can be zero even when d > 0. A nonzero left-kernel row that gives (0,u_i) with u_i != 0 identifies an inconsistent projected system, not an independent useful relation. Authentic group validity remains a separate prerequisite.
+
+This iteration adds a sparse streaming exact-field rank audit to the existing native Rust graph lane. It selects the original indices of rows whose *small-coordinate* coefficients increase rank, without losing their witness/source records. It reduces each canonical sparse row against stored normalized leading-pivot rows, carrying RHS through the same elimination. A reduced zero-coefficient row with nonzero RHS flags a contradiction; it must not be counted as new small-coordinate rank or silently promoted to a valid equation. A contradiction indicates incompatible input or arithmetic assumptions; it is not itself a group validation oracle. For one RHS column, rank([T|u]) = rank(T) + (any contradiction ? 1 : 0). All arithmetic uses F_ell, not coordinate F_p. The modulus must be prime for rank theorems; composite odd modulus is allowed by the parent API but noninvertible pivots must fail closed.
+
+## Fixed inputs and acceptance
+- Control: existing LpIndex + collect_witnesses_lazy + materialize_complete_relations. Candidate: new audit_projected_rank over *the exact replayed CompleteRelation output*, preserving its source row IDs and original small rows. No filtering or solver behavior changes in this step.
+- A four-row synthetic F7 LP stream with identical LP coefficient and small scalings 1,1,2,3, consistent RHS 2,2,4,6: LP left-nullity 3, useful small rank exactly 1. Retain all three emitted witnesses; only one small row is independent. A duplicated small coefficient with changed RHS must flag a contradiction.
+- Deterministic multi-field canonical sparse synthetic rows: compare small rank and augmented rank with the existing independent dense_rank oracle, compare the rank of selected original rows with the full rank, include zero rows, duplicates and free columns. Refuse noncanonical coefficients, duplicate/unsorted support, RHS out of range and composite nonunit pivots.
+- Source-exact native Rust harness, existing GitHub-hosted workflow, 12 minute cap. No isolated wall-clock benchmark, paid compute, merge, or leaderboard change authorized. Full unshimmed root-crate build and authentic p=2147483647, ell=2147446831 group-valid inputs remain separate gates. No novel asymptotic claim.
+
+## Cost model and falsification
+Charge sparse input traversal, exact BTreeMap row elimination and normalization, coefficient multiply-add terms, modular inversions, persistent pivot nonzeros and original witness materialization separately. Worst-case fill still can be quadratic in factor-base width; an explicit small-rank audit is **not** a faster complete ECDLP solver. If any selected original subset loses dense rank, an inconsistent RHS is unreported, or a malformed row is accepted, the candidate fails. No benchmark claim follows from passing synthetic tests.
+
+## Sources checked
+- Repository AGENTS.md, docs/ACTIVE.md, docs/session-logs/2026-11-23.md, docs/ic/graph-algorithms/{README,SOURCES}.md and current PR #4988 original Rust witness/replay implementation.
+- isogeny-labs/cryptanalysis: experiments/ic-assumption-graph/REPORT-2026-10-06.md (rank accumulation context) and experiments/ic-bench/prime_bridge.py (coefficient-rank versus structural assumptions).
+- isogeny-labs/crypto-autoresearcher: bounded code-search for LP/rank; no direct owning implementation identified by those hits, not an absence proof.
+- Cavallar, *Strategies in filtering in the number field sieve* (2000), https://ir.cwi.nl/pub/4456; Diem, *Index calculus with double large prime variation* (2006), https://arxiv.org/abs/math/0606607. These motivate filtering and rank checking but do not prove prime-field ECDLP gains.
+- Sources checked (KB): KB unavailable — research-KB MCP server and repository wrapper/checkout are not exposed in this runtime. No source_id receipt claimed. Conductor command and independent worker spawning similarly unavailable. Current ownership is the already open draft graph-IC lane; no new worktree or competing build was launched.
