@@ -339,6 +339,24 @@ const POLICIES: &[PolicyDecl] = &[
         JacobianImageNative
     ),
     policy!(
+        "jacobian_image.rho3_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.bsgs_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.genus3_projected_ic_v1",
+        NativeGrid,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
         "bsgs.textbook",
         ReplayControl,
         FrozenHistorical,
@@ -360,6 +378,12 @@ const POLICIES: &[PolicyDecl] = &[
         "bsgs.negation_table",
         NativeGrid,
         DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "bsgs.negation_table_v2",
+        NativeGrid,
+        FrontierEligible,
         StandardBand
     ),
     policy!(
@@ -621,6 +645,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "rho.signed_frobenius_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v6",
         ImplementationAb,
         FrontierEligible,
         StandardBand

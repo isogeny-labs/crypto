@@ -1,0 +1,1094 @@
+{
+ "schema": "validator-report/v1 (L4 wave 7)",
+ "lead": "L4 mixed curve/twist S3 roots",
+ "directory": "research/curve25519_wave7_untried_20261122/L4_twist_roots",
+ "validated_commit": "4b488871ade16f3bc951b2f664ac6aad4fde8c28",
+ "last_commit_touching_L4": "fcd9e9186a4991c7de40ee70273c9e6ac5f8b64d",
+ "protocol_commit": "e897b1a0f8b8dd7a6b2c7602c33fa592e2b649dd",
+ "run_commit": "c47218b9d5bd8b107cccf889a2efe40efc694d9d",
+ "validator_date": "2026-11-22",
+ "verdict": "pass_with_errata",
+ "verdict_reason": "Every measured number in README.md and data/ was reproduced exactly by independent code (exhaustive k = 16 census of 2,141,033,203 pairs, seed-rule replays of all four sampled cells, curve facts by two methods, the discriminant identity symbolically, P5/P6 and point arithmetic). Main result reproduced: 0 of 1,070,453,835 mixed pairs at k = 16 have an F_p root. Errata are scope and labelling: P6's wording versus the x = 0 diagonal pair, the given-cell flag label, untagged or unlabelled derived sentences (factor-base implication), attribution, timing label and reproducibility logging. No erratum changes a count or the P1 conclusion.",
+ "independence": "Validator code in the session scratchpad (vcore.py, v_facts.py, v_identity.py, v_exhaustive.py, v_p5p6_points.py, v_replay.py, v_compare.py) imports none of l4core.py, run_l4.py, controls.py, analyze_l4.py; only the protocol text (seed rule, polynomial) was reused. analyze_l4.py was run once, on a scratch copy, solely to check that results_main.{md,json} regenerate from the JSONs.",
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "host": "shared 4-core container, one core used, nice 5"
+ },
+ "checks": [
+  {
+   "name": "binding: validated commit and tree state",
+   "result": "pass",
+   "detail": "Validated from HEAD 4b488871ade16f3bc951b2f664ac6aad4fde8c28 on branch claude/curve25519-index-calculus-i674j4 (last commit touching L4: fcd9e9186a; HEAD advanced during validation through commits of other leads only); `git status` clean for research/curve25519_wave7_untried_20261122/L4_twist_roots at validation time (other lead directories had uncommitted changes from concurrent agents, outside scope). Run commit c47218b9d5 is an ancestor of HEAD; no L4 file in data/ or the frozen set was modified after its first commit (git log --name-status shows only A for data files)."
+  },
+  {
+   "name": "(6) frozen files at e897b1a0f8 byte-identical to those at the run commit and in the worktree",
+   "result": "pass",
+   "detail": "sha256 of PROTOCOL.md, l4core.py, run_l4.py, controls.py, analyze_l4.py, run_all.sh identical at e897b1a0f8, c47218b9d5 and the worktree (see frozen_hashes). Freeze commit 2026-11-22T03:05:29Z precedes run.log launch 03:05:56Z and the first data commit 2d683358c2 (03:06:28Z)."
+  },
+  {
+   "name": "(6) run.log shows the frozen commands",
+   "result": "partial",
+   "detail": "run.log records 'launch 2026-11-22T03:05:56Z commit e897b1a0f8' and then the outputs in exactly the order and with the parameters of the frozen run_all.sh (controls k16/k20 n=20000 n3=1e6; exhaustive k16 65437 rows; sample k20 n=2e8; given k16, k20 n=5e7; controls k24 n=5000; sample k24 n=5e7; analysis). It does not echo the command lines themselves, nor python/numpy versions. The analysis block at the end of run.log is byte-identical to data/results_main.md, and re-running the frozen analyze_l4.py on copies of the run JSONs regenerates results_main.md and results_main.json byte-identically. PROTOCOL section 3 lists the k24 controls before the cells; run_all.sh (also frozen) runs them after; no effect on any number. See erratum E7."
+  },
+  {
+   "name": "artifact integrity: hist vs hist_rows, totals",
+   "result": "pass",
+   "detail": "For all five run JSONs the validator's own decode of 'hist' equals 'hist_rows' and sum(hist) == npairs."
+  },
+  {
+   "name": "(1) curve facts by two independent methods",
+   "result": "pass",
+   "detail": "Euler-criterion character sums give #E = 65672, 1049624, 16784072 and twist orders 65204, 1047524, 16770212 for k = 16, 20, 24; x-only ladder point orders on random E-class and T-class x have lcm equal to these orders and each is the unique multiple of the lcm in the Hasse interval (E(F_p) cyclic of order 8r, twist cyclic of order 4r'). r = 8209, 131203, 2098009 and r' = 16301, 261881, 4192553 are prime (trial division); #E + #twist = 2p + 2; A^2 - 4 non-square at every k so Z = {0}; x-class counts Z/E/T = 1/32835/32601, 1/524811/523761, 1/8392035/8385105. All equal the README table and the run JSON curve_facts."
+  },
+  {
+   "name": "(2) discriminant identity disc/4 = 4 f(x1) f(x2), symbolic",
+   "result": "pass",
+   "detail": "Expanded B2^2 - (x1-x2)^2 (x1 x2-1)^2 - 4 f(x1) f(x2) in Z[x1, x2, A] with the validator's own polynomial arithmetic: the zero polynomial. The identity therefore holds over every F_p (not only on sampled pairs), and the reversed ('given') polynomial has the same disc/4 because a c is symmetric."
+  },
+  {
+   "name": "(2) consequence: mixed pairs have no F_p root (brute force, no discriminant used)",
+   "result": "pass",
+   "detail": "At p = 101 and p = 103, for every A with A^2 != 4 (99 and 101 values, about half with full rational 2-torsion), S3 was evaluated at every X in F_p for every pair: mixed (E,T) pairs with an F_p root 0 of 480300 and 0 of 510102; non-diagonal non-Z same-class pairs with != 2 roots 0; same-class roots on the other curve 0; identity failures 0. Derivation: with a = (x1-x2)^2 != 0 (mixed implies x1 != x2), disc/4 = 4 f(x1) f(x2) is (square)(non-square), a non-square, so no F_p root."
+  },
+  {
+   "name": "(3) independent exhaustive census at k = 16 (all classes)",
+   "result": "pass",
+   "detail": "All 2141033203 unordered pairs x1 <= x2 classified with the validator's own code (Euler QR table, Atkin square roots, Fermat inverses, disc computed directly as B2^2 - a c), 201.3 s CPU on one core. Every cell of all 8 rows equals data/exhaustive_k16_std_main.json and the README table: (E,twist) 1070453835 pairs, 1070453835 with 0 roots, 0 with any root; (E,E) non-diagonal 539052195 all with 2 roots, 1078087973 on E, 0 on twist, 16417 at x = 0; (twist,twist) non-diagonal 531396300, 1062776300 on twist, 0 on E, 16300 at x = 0."
+  },
+  {
+   "name": "sampled cells replayed from the protocol seed rule (k = 20, 24 std; k = 16, 20 given)",
+   "result": "pass",
+   "detail": "Re-drawing the samples from the PROTOCOL seed rule (sha256 first 8 bytes big-endian, default_rng, numpy 2.5.3) and classifying with the validator's own root code reproduces every cell of sample_k20_std_main.json (601,048,573 pairs), sample_k24_std_main.json (166,777,141), sample_k16_given_main.json (150,065,437) and sample_k20_given_main.json (151,048,573) exactly."
+  },
+  {
+   "name": "(4) P5 2-torsion-translate counts",
+   "result": "pass",
+   "detail": "S3(x1, x2, 0) = (x1 x2 - 1)^2, so a root at x = 0 (the only Z point) occurs iff x1 x2 = 1; x(P + T0) = 1/x confirmed by explicit addition on 4000 points per k; f(1/x) = f(x)/x^4 for every x != 0 so the class is preserved. Unordered pairs {x, 1/x}, x != 1/x: k16 EE 16417, TT 16300, ET 0; k20 262405, 261880; k24 4196017, 4192552 (= (|class| - 1)/2; x = 1 and x = -1 are the 2 fixed points). The validator's exhaustive census has exactly 16417 (E,E) and 16300 (twist,twist) non-diagonal pairs with a root at x = 0, 0 mixed: equal to 16417 and 16300. Sampled k20: observed 390, 420 vs expected 381.09, 381.85 (z = 0.46, 1.95); k24: 4, 2 vs 5.96, 5.96 (z = -0.80, -1.62), recomputed from unrounded values."
+  },
+  {
+   "name": "(4) P6 diagonal",
+   "result": "pass_with_erratum",
+   "detail": "For every non-Z x the linear S3 root c/(2 B2) equals x(2P) from the Weierstrass doubling formula, and lies on the point's own curve except x = 1 and x = -1 (x(2P) = 0) at every k; 0 on the other curve. The single ZZ diagonal pair x1 = x2 = 0 has B2 = 0, c = 1: no finite root (2 T0 = O). The frozen P6 wording ('x1 = x2: exactly one finite root x(2P) ... 100%') does not cover it, and analyze_l4.py evaluates P6 on EE/TT diagonals only. See erratum E1."
+  },
+  {
+   "name": "(5) (E,E) and (T,T) roots equal x(P1 +- P2) by the validator's point arithmetic",
+   "result": "pass",
+   "detail": "Long-Weierstrass affine addition (twist mapped to Y^2 = X^3 + A n X^2 + n^2 X, X = n x, with a large non-residue n, not the producer's smallest one): k16 EE 19999/19999, TT 19999/19999; k20 20000/20000, 20000/20000; k24 5000/5000, 5000/5000 root sets equal; S3 vanishes at both sums in every case. Mixed pairs over F_p^2 (2000 per k): both x(P1 +- P2) are S3 roots, conjugate, outside F_p; 300 k16 mixed pairs evaluated at all 65437 X: 0 roots."
+  },
+  {
+   "name": "(7) README numbers vs data and recomputation",
+   "result": "pass",
+   "detail": "Every cell of the README exhaustive and sampled tables equals results_main.json (sampled table has 'roots on twist' and 'roots on E' columns swapped relative to the exhaustive table; values are under the right headers). Pair-count arithmetic: C(32835,2) = 539,052,195, C(32601,2) = 531,396,300, 32835 x 32601 = 1,070,453,835, p(p+1)/2 = 2,141,033,203. Rule-of-three 3/2e8 = 1.5e-8 (Clopper-Pearson 1.498e-8). P8 fractions 0.5004, 0.4996, 0.4996, 0.4998, 0.5006 match the controls JSONs. P7a 19999/19999, 19998/19998; P7b 20000/20000; P9 20000/20000 match. Timings match the JSONs (but are wall-clock; E6)."
+  },
+  {
+   "name": "(7) every result sentence carries [pcc:unverified]",
+   "result": "fail_minor",
+   "detail": "Untagged result sentences: 'At every k the only rational 2-torsion x is 0 (A^2 - 4 is a non-square).'; 'Positive controls (P7a, P7b) show the counter and the mechanism are visible.'; the bold lead sentences of Answer items 1-3; Answer item 4 first sentence; and four sentences of 'What the outcome implies for twist points in a factor base'. See errata E3, E4."
+  },
+  {
+   "name": "(7) derived vs measured labelling",
+   "result": "fail_moderate",
+   "detail": "The S_m (m > 3) argument is labelled 'Argued, not measured' and tagged, and is correct (R in E(F_p) with pi(R) = -R forces 2R = 0). The factor-base implication is labelled derived only in Answer item 4's last sentence; the section 'What the outcome implies ...' states it as fact without a derived label or tags, and 'Derived versus measured' omits it. See E3."
+  },
+  {
+   "name": "(7) no relabelling; scope; reporting contract",
+   "result": "pass",
+   "detail": "No rho or BSGS relabelled as index calculus; no distance to rho asserted; no leaderboard or benchmarks row; ratio 1.00 for the lever is stated as derived and matches STRUCTURE-R4.md line 148. Section 5a band, certificates and the m=83/ECC2K-130 rules are not applicable (no cross-method cost comparison, no DLP solve, no relation or closure claim)."
+  },
+  {
+   "name": "controls present and meaningful",
+   "result": "pass",
+   "detail": "Positive controls C1/C2 (explicit arithmetic), negative/sensitivity control C3 (A+1 gives about 0.5 F_p-root fraction in every class), identity C4, Z predictor C5 all present for k = 16, 20, 24; the validator re-derived C1, C2, C4 and C5 independently (above)."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate",
+   "text": "P6 as frozen ('x1 = x2: exactly one finite root x(2P) ... 100%') does not hold for the one ZZ diagonal pair x1 = x2 = 0: 2 T0 = O, S3 degenerates to the constant 1 and has no finite root (README exhaustive table row '(Z,Z) yes 1 pair, 0 roots'; same in the k = 20 and k = 24 Z strata, omitted from the README sampled table). analyze_l4.py evaluates P6 on the EE and TT diagonals only, so 'P6 held' and 'All 10 numbered predictions (P1 to P10) held; none failed' overstate the frozen wording. The exception follows from the mathematics and the count is otherwise exact (32,835 E and 32,601 twist diagonal pairs).",
+   "suggested_fix": "In the README Errata section (or a sibling ERRATA.md; leave data/ byte-equal): state that P6 as worded fails on 1 of 65,437 diagonal pairs at k = 16 (x = 0, 2 T0 = O, 0 finite roots), that P6 held on the EE/TT diagonals, and replace 'none failed' with '9 held as worded; P6 held on the EE/TT diagonals and fails on the x = 0 diagonal pair, which the protocol did not except'."
+  },
+  {
+   "id": "E2",
+   "severity": "minor",
+   "text": "In data/results_main.md the 'given' cells label the leading-coefficient-zero flag as 'x1=x2'. For the given polynomial a = (x1 x2 - 1)^2, so the flag marks x1 x2 = 1 pairs (the ZZ pair (0,0) appears as 'x1=x2 False'). Validator replay: k = 16 given has 1595 (E,E) and 1594 (twist,twist) pairs with x1 x2 = 1 but 1474 and 1518 with x1 = x2; k = 20 given 94/99 vs 91/97. The P6 lines of the given cells therefore test x1 x2 = 1 pairs, and README's '100% two-root same-class pairs' for the given cells holds only for pairs with x1 x2 != 1 (those have one finite root, the other at infinity).",
+   "suggested_fix": "Errata note: the column is 'a = 0 (x1 x2 = 1)' in the given cells, the given-cell P6 lines are about x1 x2 = 1 pairs, and the README sentence becomes '100% two-root same-class pairs with x1 x2 != 1; the 1595 + 1594 (k = 16) and 94 + 99 (k = 20) pairs with x1 x2 = 1 have one finite root'."
+  },
+  {
+   "id": "E3",
+   "severity": "moderate",
+   "text": "The factor-base implication is not consistently labelled derived and is mostly untagged: 'What the outcome implies for twist points in a factor base' states 'Twist points therefore add no relations for a target on E', 'They serve only the twist's own discrete logarithm ... which carries no information about E', 'The only mixed rational relations run through translation by 2-torsion (P5) ... as in the torsion leads' and 'A factor base using twist x-coordinates lowers the density of usable columns' as facts without [pcc:unverified] or a derived label; Answer item 4's first sentence is also untagged; 'Derived versus measured' omits the implication (PROTOCOL section 7 calls it 'a derivation plus count'). 'As in the torsion leads' cites a study that 'Sources checked' says was not read. 'Can use only E-class base points' omits x = 0 (T0), which does give relations S3(x_Q, 0, 1/x_Q) = 0.",
+   "suggested_fix": "Add a 'Derived (argued from the S3 counts, not measured): factor-base implication' bullet to 'Derived versus measured', tag each sentence of the implication section, drop or source 'as in the torsion leads', and write 'only E-class base points or x = 0'."
+  },
+  {
+   "id": "E4",
+   "severity": "minor",
+   "text": "Other result sentences without [pcc:unverified]: 'At every k the only rational 2-torsion x is 0 (A^2 - 4 is a non-square).'; 'Positive controls (P7a, P7b) show the counter and the mechanism are visible.'; the bold lead sentences of Answer items 1-3 (the following sentences are tagged).",
+   "suggested_fix": "Append [pcc:unverified] to each."
+  },
+  {
+   "id": "E5",
+   "severity": "minor",
+   "text": "README heading 'Erratum to the brief' says 'The brief writes S3 = (x1 x2 - 1)^2 x3^2 ...', but research/curve25519_wave7_untried_20261122/BRIEF.md contains no S3 formula; PROTOCOL section 2 correctly attributes the reversed form to 'the task text'.",
+   "suggested_fix": "Retitle to 'Erratum to the task text' and replace 'the brief' by 'the L4 task text (dispatch)' in that section."
+  },
+  {
+   "id": "E6",
+   "severity": "minor",
+   "text": "Times labelled 'CPU' (305 s, 97 s, 52 s; cpu_seconds in the JSONs) are wall-clock time.time() intervals on a loaded shared host, not CPU time.",
+   "suggested_fix": "Relabel as 'wall s (shared host)'; use time.process_time() in future runs."
+  },
+  {
+   "id": "E7",
+   "severity": "minor",
+   "text": "Reproducibility binding is incomplete: run.log does not echo the commands (only the launch commit and outputs, consistent with run_all.sh), and neither run.log nor the run JSONs record the git commit, python or numpy version (the validator's replay on this host, numpy 2.5.3, reproduced every sampled draw, so the binding holds here de facto). results_main.md prints 'complete=True' for sampled cells from d.get('complete', True), a default rather than a recorded field (harmless: it only gates exhaustive-mode P5).",
+   "suggested_fix": "Errata note recording python 3.13.18 / numpy 2.5.3 as the replay environment; future launchers log 'set -x' command lines and write commit and versions into each JSON."
+  },
+  {
+   "id": "E8",
+   "severity": "minor",
+   "text": "P10 has no machine verdict: analyze_l4.py evaluates P1-P9 only, and the code never tests r or r' for primality (it follows from complete trial division in factor_small). README's 'P10 held' is read off the curve-facts line. The validator confirms P10 independently.",
+   "suggested_fix": "Say 'P10 held (read from curve_facts; confirmed by the validator)'."
+  },
+  {
+   "id": "E9",
+   "severity": "info",
+   "text": "The README sampled table puts 'roots on twist' before 'roots on E', the reverse of the exhaustive table, and omits the diagonal and ZZ rows (370/387 and 3/3 diagonal pairs, 1 ZZ pair) that are included in its pair totals. Values are correct.",
+   "suggested_fix": "Use one column order in both tables, or note the swap."
+  },
+  {
+   "id": "E10",
+   "severity": "info",
+   "text": "'Frozen before any data': the Phase 1 smoke (labelled not data, as BRIEF Phase 1 requires) had already classified 400 of 65,437 k = 16 rows (26,095,000 pairs, 1.2% of the M16 population) and 2e5-pair samples at k = 16 and 20 before the freeze; the P5 targets came from the predictor run, not the counts.",
+   "suggested_fix": "Write 'frozen before the confirmatory run (the smoke saw 1.2% of the k = 16 population)'."
+  }
+ ],
+ "recomputed": {
+  "curve_facts": {
+   "16": {
+    "p": 65437,
+    "A": 1058,
+    "#E_charsum": 65672,
+    "#twist_charsum": 65204,
+    "r": 8209,
+    "r_twist": 16301,
+    "r_prime": true,
+    "r_twist_prime": true,
+    "n_x_Z": 1,
+    "n_x_E": 32835,
+    "n_x_T": 32601,
+    "Z_x": [
+     0
+    ],
+    "A2-4_square": false,
+    "class_x=1": 1,
+    "class_x=-1": 2,
+    "ladder_E_unique": true,
+    "ladder_twist_unique": true
+   },
+   "20": {
+    "p": 1048573,
+    "A": 926,
+    "#E_charsum": 1049624,
+    "#twist_charsum": 1047524,
+    "r": 131203,
+    "r_twist": 261881,
+    "r_prime": true,
+    "r_twist_prime": true,
+    "n_x_Z": 1,
+    "n_x_E": 524811,
+    "n_x_T": 523761,
+    "Z_x": [
+     0
+    ],
+    "A2-4_square": false,
+    "class_x=1": 2,
+    "class_x=-1": 1,
+    "ladder_E_unique": true,
+    "ladder_twist_unique": true
+   },
+   "24": {
+    "p": 16777141,
+    "A": 7842,
+    "#E_charsum": 16784072,
+    "#twist_charsum": 16770212,
+    "r": 2098009,
+    "r_twist": 4192553,
+    "r_prime": true,
+    "r_twist_prime": true,
+    "n_x_Z": 1,
+    "n_x_E": 8392035,
+    "n_x_T": 8385105,
+    "Z_x": [
+     0
+    ],
+    "A2-4_square": false,
+    "class_x=1": 1,
+    "class_x=-1": 2,
+    "ladder_E_unique": true,
+    "ladder_twist_unique": true
+   }
+  },
+  "identity_symbolic_zero": true,
+  "bruteforce_small_p": {
+   "101": {
+    "A_values": 99,
+    "mixed_pairs": 480300,
+    "mixed_with_Fp_root": 0,
+    "same_nondiag_nonZ_pairs": 480494,
+    "same_not_2_roots": 0,
+    "same_root_on_other_curve": 0,
+    "same_root_in_Z": 19112,
+    "identity_failures": 0,
+    "A_with_full_2torsion": 49,
+    "cpu_s": 1.5
+   },
+   "103": {
+    "A_values": 101,
+    "mixed_pairs": 510102,
+    "mixed_with_Fp_root": 0,
+    "same_nondiag_nonZ_pairs": 510300,
+    "same_not_2_roots": 0,
+    "same_root_on_other_curve": 0,
+    "same_root_in_Z": 19900,
+    "identity_failures": 0,
+    "A_with_full_2torsion": 50,
+    "cpu_s": 1.3
+   }
+  },
+  "exhaustive_k16": {
+   "npairs": 2141033203,
+   "cpu_s": 201.3,
+   "table": [
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": true,
+     "pairs": 1,
+     "roots0": 1,
+     "roots1": 0,
+     "roots2": 0,
+     "roots_on_E": 0,
+     "roots_on_twist": 0,
+     "roots_on_Z": 0,
+     "pairs_with_root_on_Z": 0
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 32835,
+     "roots0": 0,
+     "roots1": 32835,
+     "roots2": 0,
+     "roots_on_E": 32835,
+     "roots_on_twist": 0,
+     "roots_on_Z": 0,
+     "pairs_with_root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 32601,
+     "roots0": 0,
+     "roots1": 32601,
+     "roots2": 0,
+     "roots_on_E": 0,
+     "roots_on_twist": 32601,
+     "roots_on_Z": 0,
+     "pairs_with_root_on_Z": 0
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 539052195,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 539052195,
+     "roots_on_E": 1078087973,
+     "roots_on_twist": 0,
+     "roots_on_Z": 16417,
+     "pairs_with_root_on_Z": 16417
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": true,
+     "pairs": 32835,
+     "roots0": 0,
+     "roots1": 32835,
+     "roots2": 0,
+     "roots_on_E": 32834,
+     "roots_on_twist": 0,
+     "roots_on_Z": 1,
+     "pairs_with_root_on_Z": 1
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 1070453835,
+     "roots0": 1070453835,
+     "roots1": 0,
+     "roots2": 0,
+     "roots_on_E": 0,
+     "roots_on_twist": 0,
+     "roots_on_Z": 0,
+     "pairs_with_root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 531396300,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 531396300,
+     "roots_on_E": 0,
+     "roots_on_twist": 1062776300,
+     "roots_on_Z": 16300,
+     "pairs_with_root_on_Z": 16300
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": true,
+     "pairs": 32601,
+     "roots0": 0,
+     "roots1": 32601,
+     "roots2": 0,
+     "roots_on_E": 0,
+     "roots_on_twist": 32600,
+     "roots_on_Z": 1,
+     "pairs_with_root_on_Z": 1
+    }
+   ]
+  },
+  "replays": {
+   "16_given": {
+    "npairs": 150065437,
+    "cpu_s": 19.3,
+    "diag_vs_a0": {
+     "EE": {
+      "x1_eq_x2": 1474,
+      "leading_coeff_zero": 1595
+     },
+     "ET": {
+      "x1_eq_x2": 0,
+      "leading_coeff_zero": 0
+     },
+     "TT": {
+      "x1_eq_x2": 1518,
+      "leading_coeff_zero": 1594
+     }
+    },
+    "table": [
+     {
+      "pair_class": "ZZ",
+      "leading_coeff_zero": false,
+      "pairs": 1,
+      "roots0": 0,
+      "roots1": 1,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 1,
+      "pairs_with_root_on_Z": 1
+     },
+     {
+      "pair_class": "ZE",
+      "leading_coeff_zero": false,
+      "pairs": 32835,
+      "roots0": 0,
+      "roots1": 32835,
+      "roots2": 0,
+      "roots_on_E": 32835,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ZT",
+      "leading_coeff_zero": false,
+      "pairs": 32601,
+      "roots0": 0,
+      "roots1": 32601,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 32601,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": false,
+      "pairs": 49998405,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 49998405,
+      "roots_on_E": 99995336,
+      "roots_on_twist": 0,
+      "roots_on_Z": 1474,
+      "pairs_with_root_on_Z": 1474
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": true,
+      "pairs": 1595,
+      "roots0": 0,
+      "roots1": 1595,
+      "roots2": 0,
+      "roots_on_E": 1595,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ET",
+      "leading_coeff_zero": false,
+      "pairs": 50000000,
+      "roots0": 50000000,
+      "roots1": 0,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": false,
+      "pairs": 49998406,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 49998406,
+      "roots_on_E": 0,
+      "roots_on_twist": 99995294,
+      "roots_on_Z": 1518,
+      "pairs_with_root_on_Z": 1518
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": true,
+      "pairs": 1594,
+      "roots0": 0,
+      "roots1": 1594,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 1594,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     }
+    ]
+   },
+   "20_given": {
+    "npairs": 151048573,
+    "cpu_s": 23.2,
+    "diag_vs_a0": {
+     "EE": {
+      "x1_eq_x2": 91,
+      "leading_coeff_zero": 94
+     },
+     "ET": {
+      "x1_eq_x2": 0,
+      "leading_coeff_zero": 0
+     },
+     "TT": {
+      "x1_eq_x2": 97,
+      "leading_coeff_zero": 99
+     }
+    },
+    "table": [
+     {
+      "pair_class": "ZZ",
+      "leading_coeff_zero": false,
+      "pairs": 1,
+      "roots0": 0,
+      "roots1": 1,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 1,
+      "pairs_with_root_on_Z": 1
+     },
+     {
+      "pair_class": "ZE",
+      "leading_coeff_zero": false,
+      "pairs": 524811,
+      "roots0": 0,
+      "roots1": 524811,
+      "roots2": 0,
+      "roots_on_E": 524811,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ZT",
+      "leading_coeff_zero": false,
+      "pairs": 523761,
+      "roots0": 0,
+      "roots1": 523761,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 523761,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": false,
+      "pairs": 49999906,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 49999906,
+      "roots_on_E": 99999721,
+      "roots_on_twist": 0,
+      "roots_on_Z": 91,
+      "pairs_with_root_on_Z": 91
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": true,
+      "pairs": 94,
+      "roots0": 0,
+      "roots1": 94,
+      "roots2": 0,
+      "roots_on_E": 94,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ET",
+      "leading_coeff_zero": false,
+      "pairs": 50000000,
+      "roots0": 50000000,
+      "roots1": 0,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": false,
+      "pairs": 49999901,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 49999901,
+      "roots_on_E": 0,
+      "roots_on_twist": 99999705,
+      "roots_on_Z": 97,
+      "pairs_with_root_on_Z": 97
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": true,
+      "pairs": 99,
+      "roots0": 0,
+      "roots1": 99,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 99,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     }
+    ]
+   },
+   "20_std": {
+    "npairs": 601048573,
+    "cpu_s": 91.3,
+    "diag_vs_a0": {
+     "EE": {
+      "x1_eq_x2": 370,
+      "leading_coeff_zero": 370
+     },
+     "ET": {
+      "x1_eq_x2": 0,
+      "leading_coeff_zero": 0
+     },
+     "TT": {
+      "x1_eq_x2": 387,
+      "leading_coeff_zero": 387
+     }
+    },
+    "table": [
+     {
+      "pair_class": "ZZ",
+      "leading_coeff_zero": true,
+      "pairs": 1,
+      "roots0": 1,
+      "roots1": 0,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ZE",
+      "leading_coeff_zero": false,
+      "pairs": 524811,
+      "roots0": 0,
+      "roots1": 524811,
+      "roots2": 0,
+      "roots_on_E": 524811,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ZT",
+      "leading_coeff_zero": false,
+      "pairs": 523761,
+      "roots0": 0,
+      "roots1": 523761,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 523761,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": false,
+      "pairs": 199999630,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 199999630,
+      "roots_on_E": 399998870,
+      "roots_on_twist": 0,
+      "roots_on_Z": 390,
+      "pairs_with_root_on_Z": 390
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": true,
+      "pairs": 370,
+      "roots0": 0,
+      "roots1": 370,
+      "roots2": 0,
+      "roots_on_E": 370,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ET",
+      "leading_coeff_zero": false,
+      "pairs": 200000000,
+      "roots0": 200000000,
+      "roots1": 0,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": false,
+      "pairs": 199999613,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 199999613,
+      "roots_on_E": 0,
+      "roots_on_twist": 399998806,
+      "roots_on_Z": 420,
+      "pairs_with_root_on_Z": 420
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": true,
+      "pairs": 387,
+      "roots0": 0,
+      "roots1": 387,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 387,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     }
+    ]
+   },
+   "24_std": {
+    "npairs": 166777141,
+    "cpu_s": 60.8,
+    "diag_vs_a0": {
+     "EE": {
+      "x1_eq_x2": 3,
+      "leading_coeff_zero": 3
+     },
+     "ET": {
+      "x1_eq_x2": 0,
+      "leading_coeff_zero": 0
+     },
+     "TT": {
+      "x1_eq_x2": 3,
+      "leading_coeff_zero": 3
+     }
+    },
+    "table": [
+     {
+      "pair_class": "ZZ",
+      "leading_coeff_zero": true,
+      "pairs": 1,
+      "roots0": 1,
+      "roots1": 0,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ZE",
+      "leading_coeff_zero": false,
+      "pairs": 8392035,
+      "roots0": 0,
+      "roots1": 8392035,
+      "roots2": 0,
+      "roots_on_E": 8392035,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ZT",
+      "leading_coeff_zero": false,
+      "pairs": 8385105,
+      "roots0": 0,
+      "roots1": 8385105,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 8385105,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": false,
+      "pairs": 49999997,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 49999997,
+      "roots_on_E": 99999990,
+      "roots_on_twist": 0,
+      "roots_on_Z": 4,
+      "pairs_with_root_on_Z": 4
+     },
+     {
+      "pair_class": "EE",
+      "leading_coeff_zero": true,
+      "pairs": 3,
+      "roots0": 0,
+      "roots1": 3,
+      "roots2": 0,
+      "roots_on_E": 3,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "ET",
+      "leading_coeff_zero": false,
+      "pairs": 50000000,
+      "roots0": 50000000,
+      "roots1": 0,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 0,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": false,
+      "pairs": 49999997,
+      "roots0": 0,
+      "roots1": 0,
+      "roots2": 49999997,
+      "roots_on_E": 0,
+      "roots_on_twist": 99999992,
+      "roots_on_Z": 2,
+      "pairs_with_root_on_Z": 2
+     },
+     {
+      "pair_class": "TT",
+      "leading_coeff_zero": true,
+      "pairs": 3,
+      "roots0": 0,
+      "roots1": 3,
+      "roots2": 0,
+      "roots_on_E": 0,
+      "roots_on_twist": 3,
+      "roots_on_Z": 0,
+      "pairs_with_root_on_Z": 0
+     }
+    ]
+   }
+  },
+  "P5_pairs_x_1overx": {
+   "16": {
+    "EE": 16417,
+    "TT": 16300,
+    "ET": 0,
+    "diag_x_eq_1_over_x": 2
+   },
+   "20": {
+    "EE": 262405,
+    "TT": 261880,
+    "ET": 0,
+    "diag_x_eq_1_over_x": 2
+   },
+   "24": {
+    "EE": 4196017,
+    "TT": 4192552,
+    "ET": 0,
+    "diag_x_eq_1_over_x": 2
+   }
+  },
+  "P5_sampled_expected": {
+   "k20": {
+    "EE": [
+     390,
+     381.089,
+     0.46
+    ],
+    "TT": [
+     420,
+     381.853,
+     1.95
+    ]
+   },
+   "k24": {
+    "EE": [
+     4,
+     5.958,
+     -0.8
+    ],
+    "TT": [
+     2,
+     5.963,
+     -1.62
+    ]
+   },
+   "format": "[observed, expected, z]"
+  },
+  "P6": {
+   "16": {
+    "diag_classes": {
+     "E": {
+      "x": 32835,
+      "x2P_on_own_curve": 32834,
+      "x2P_in_Z": 1,
+      "x2P_on_other_curve": 0
+     },
+     "T": {
+      "x": 32601,
+      "x2P_on_own_curve": 32600,
+      "x2P_in_Z": 1,
+      "x2P_on_other_curve": 0
+     }
+    },
+    "lin_root_eq_x2P": true,
+    "x0_diag": {
+     "B2": 0,
+     "c": 1,
+     "finite_roots": 0,
+     "reason": "2 T0 = O: the polynomial degenerates to the constant c = 1"
+    }
+   },
+   "20": {
+    "diag_classes": {
+     "E": {
+      "x": 524811,
+      "x2P_on_own_curve": 524810,
+      "x2P_in_Z": 1,
+      "x2P_on_other_curve": 0
+     },
+     "T": {
+      "x": 523761,
+      "x2P_on_own_curve": 523760,
+      "x2P_in_Z": 1,
+      "x2P_on_other_curve": 0
+     }
+    },
+    "lin_root_eq_x2P": true,
+    "x0_diag": {
+     "B2": 0,
+     "c": 1,
+     "finite_roots": 0,
+     "reason": "2 T0 = O: the polynomial degenerates to the constant c = 1"
+    }
+   },
+   "24": {
+    "diag_classes": {
+     "E": {
+      "x": 8392035,
+      "x2P_on_own_curve": 8392034,
+      "x2P_in_Z": 1,
+      "x2P_on_other_curve": 0
+     },
+     "T": {
+      "x": 8385105,
+      "x2P_on_own_curve": 8385104,
+      "x2P_in_Z": 1,
+      "x2P_on_other_curve": 0
+     }
+    },
+    "lin_root_eq_x2P": true,
+    "x0_diag": {
+     "B2": 0,
+     "c": 1,
+     "finite_roots": 0,
+     "reason": "2 T0 = O: the polynomial degenerates to the constant c = 1"
+    }
+   }
+  },
+  "points": {
+   "16": {
+    "EE": {
+     "tested": 19999,
+     "roots_eq_x(P1+-P2)": 19999,
+     "S3_vanishes_at_x(P1+-P2)": 19999
+    },
+    "TT": {
+     "tested": 19999,
+     "roots_eq_x(P1+-P2)": 19999,
+     "S3_vanishes_at_x(P1+-P2)": 19999
+    },
+    "ET_over_Fp2": {
+     "tested": 2000,
+     "both_roots_of_S3": 2000,
+     "conjugate": 2000,
+     "not_in_Fp": 2000,
+     "no_Fp_root_by_validator_formula": 2000
+    },
+    "ET_bruteforce_all_X_300_pairs_roots_found": 0
+   },
+   "20": {
+    "EE": {
+     "tested": 20000,
+     "roots_eq_x(P1+-P2)": 20000,
+     "S3_vanishes_at_x(P1+-P2)": 20000
+    },
+    "TT": {
+     "tested": 20000,
+     "roots_eq_x(P1+-P2)": 20000,
+     "S3_vanishes_at_x(P1+-P2)": 20000
+    },
+    "ET_over_Fp2": {
+     "tested": 2000,
+     "both_roots_of_S3": 2000,
+     "conjugate": 2000,
+     "not_in_Fp": 2000,
+     "no_Fp_root_by_validator_formula": 2000
+    }
+   },
+   "24": {
+    "EE": {
+     "tested": 5000,
+     "roots_eq_x(P1+-P2)": 5000,
+     "S3_vanishes_at_x(P1+-P2)": 5000
+    },
+    "TT": {
+     "tested": 5000,
+     "roots_eq_x(P1+-P2)": 5000,
+     "S3_vanishes_at_x(P1+-P2)": 5000
+    },
+    "ET_over_Fp2": {
+     "tested": 2000,
+     "both_roots_of_S3": 2000,
+     "conjugate": 2000,
+     "not_in_Fp": 2000,
+     "no_Fp_root_by_validator_formula": 2000
+    }
+   }
+  },
+  "pair_arithmetic": {
+   "C(32835,2)": 539052195,
+   "C(32601,2)": 531396300,
+   "32835*32601": 1070453835,
+   "p(p+1)/2_k16": 2141033203,
+   "rule3_k20": 1.5e-08,
+   "clopper_pearson_k20": 1.4978661200260035e-08
+  }
+ },
+ "frozen_hashes": {
+  "PROTOCOL.md": {
+   "at_e897b1a0f8": "5556e93ad47ceb7b59f522e92cac5663362096887166bf8fb8398e61f7ac7bd1",
+   "at_c47218b9d5": "5556e93ad47ceb7b59f522e92cac5663362096887166bf8fb8398e61f7ac7bd1",
+   "worktree": "5556e93ad47ceb7b59f522e92cac5663362096887166bf8fb8398e61f7ac7bd1",
+   "identical": true
+  },
+  "l4core.py": {
+   "at_e897b1a0f8": "998d299b9a914c6bf11b45cb6b74bacd2f81c99710b1ffd10c920d1dcb91bfcf",
+   "at_c47218b9d5": "998d299b9a914c6bf11b45cb6b74bacd2f81c99710b1ffd10c920d1dcb91bfcf",
+   "worktree": "998d299b9a914c6bf11b45cb6b74bacd2f81c99710b1ffd10c920d1dcb91bfcf",
+   "identical": true
+  },
+  "run_l4.py": {
+   "at_e897b1a0f8": "5295600f6c3e5598c594098f31bd13b06e429a245d8e5847cda599de39157921",
+   "at_c47218b9d5": "5295600f6c3e5598c594098f31bd13b06e429a245d8e5847cda599de39157921",
+   "worktree": "5295600f6c3e5598c594098f31bd13b06e429a245d8e5847cda599de39157921",
+   "identical": true
+  },
+  "controls.py": {
+   "at_e897b1a0f8": "cfb97ace2d0b1ea618bac94be6aa939d559ccb3eef6bd70f6722c90482ca6b1e",
+   "at_c47218b9d5": "cfb97ace2d0b1ea618bac94be6aa939d559ccb3eef6bd70f6722c90482ca6b1e",
+   "worktree": "cfb97ace2d0b1ea618bac94be6aa939d559ccb3eef6bd70f6722c90482ca6b1e",
+   "identical": true
+  },
+  "analyze_l4.py": {
+   "at_e897b1a0f8": "e18c3c785b9a344493e79dc5045498a0c8bcc31c12c3d5dc92c834afc8b74efe",
+   "at_c47218b9d5": "e18c3c785b9a344493e79dc5045498a0c8bcc31c12c3d5dc92c834afc8b74efe",
+   "worktree": "e18c3c785b9a344493e79dc5045498a0c8bcc31c12c3d5dc92c834afc8b74efe",
+   "identical": true
+  },
+  "run_all.sh": {
+   "at_e897b1a0f8": "dbef8943a6ecb702a2a8c36eec6416e5664c173d9a065be19399809e5707a833",
+   "at_c47218b9d5": "dbef8943a6ecb702a2a8c36eec6416e5664c173d9a065be19399809e5707a833",
+   "worktree": "dbef8943a6ecb702a2a8c36eec6416e5664c173d9a065be19399809e5707a833",
+   "identical": true
+  }
+ },
+ "artifact_sha256_at_validation": {
+  "data/controls_k16_main.json": "0f5ad97fca55d7ef9e62bc674e3aba7844a0f250bf95e11576d0416443921a8b",
+  "data/controls_k20_main.json": "3caf8c1ab4bae9aff3cc3a28d021670000fb978e3bbdffe1e532e47005f1cba5",
+  "data/controls_k24_main.json": "85b5c939ac3a4f1897fce5528704cd9fa02c9f1711b8688fe63d80e4ae7fea7e",
+  "data/exhaustive_k16_std_main.json": "ba5e6877d3b00fb63099f6233c18a87e6e35519a678c315b71695b644fe0fea5",
+  "data/results_main.json": "631e5285d087087ab497b1d3c86460aa8e015f208b87b26b9cf7235ff92906a6",
+  "data/results_main.md": "4f066553b62061ad9865799ce22d366d3daa998634cfc1429dd1c0e39ed21090",
+  "data/sample_k16_given_main.json": "66cf2ec7ec4483fc37770759970cba951726f4563b9ebd7d0b1269dcff15e133",
+  "data/sample_k20_given_main.json": "402eae7112bb8e071525896aedcf15f1385ca1f52d32d479fd1457dd0461d676",
+  "data/sample_k20_std_main.json": "d1ca40d1cbf681dd64d313ab548450480ef0bdc16e950a93f9773e7fe9c5de59",
+  "data/sample_k24_std_main.json": "86ed9de059480978ee45fc4d0ca16c6e1e7723235df45138e47fcfcd1a216e45",
+  "README.md": "a56510d8151c3439911d4eed3b349bc4159d3a450e09c33a891881f33e17f0fd",
+  "run.log": "26a235354200c43fc5f2f6ecb3044167f3efbb37dac0507d4f0effd9d301e75e",
+  "REPORT.typ": "fedd11918984e2a67d2af72d5507aabe99d6e21ec2bff8749ff60fed5ca97ebd",
+  "REPORT.pdf": "cf02ad0f19f9c94141282f925628d39ee31148138b9113581c672e81ea0a9cd4",
+  "figure.py": "661e3ea7e04895524c1f629fa18f1f58687051bcd5cd1ccaeb6bed2cae119623",
+  "l4_roots.svg": "01d914a95eb98d116b240ae324137143346ef4e93531c4a98329fadb750fc0f3",
+  "l4_roots.png": "c810fdf24015abc871224cd70c6cbf994deb8d22e12d8a6a4b87dccd0ee45782"
+ },
+ "pinning_note": "data/*.json and data/results_main.md are pinned above and must stay byte-equal; record errata in the README Errata section or a sibling ERRATA.md.",
+ "commands": [
+  "python3 tools/lessons.py brief --scope validator",
+  "git -C /home/user/crypto show <commit>:<path> | sha256sum   (frozen-file comparison at e897b1a0f8, c47218b9d5, worktree)",
+  "python3 -I v_facts.py facts.json",
+  "python3 -I v_identity.py identity.json",
+  "nice -n 5 python3 -I v_exhaustive.py exh_k16.json",
+  "python3 -I v_compare.py exh_k16.json data/exhaustive_k16_std_main.json",
+  "nice -n 5 python3 -I v_p5p6_points.py p5p6.json",
+  "nice -n 5 python3 -I v_replay.py replay_k{16,20}_given.json {16,20} given 50000000; v_replay.py replay_k20_std.json 20 std 200000000; v_replay.py replay_k24_std.json 24 std 50000000",
+  "python3 -I v_compare.py replay_<cell>.json data/sample_<cell>_main.json leading_coeff_zero",
+  "python3 -I analyze_l4.py --dir <scratch copy of data> --tag main --ks 16,20,24 ; cmp with data/results_main.{md,json}",
+  "python3 -I build_report.py"
+ ],
+ "not_applicable": [
+  "section 5a band (no cross-method cost comparison)",
+  "DLP/relation/closure certificates (none claimed)",
+  "m=83 / ECC2K-130 disclosure"
+ ],
+ "edits_by_validator": [
+  "validator-report.json (this file) only"
+ ]
+}
