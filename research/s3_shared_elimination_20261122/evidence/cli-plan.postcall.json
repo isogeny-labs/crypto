@@ -1,0 +1,66 @@
+{
+  "backends": [
+    "integer",
+    "fma",
+    "split16"
+  ],
+  "benchmark_executed": false,
+  "checks": [
+    "expanded S3 versus existing numeric evaluator",
+    "original/shared/fresh complete p17 polynomial solution sets",
+    "existing F4 visitor with original equations retained",
+    "signed finite-prefix witnesses and exceptional-prefix control",
+    "public toy logarithm recovered modulo19",
+    "committed p31 point witness and arithmetic equality"
+  ],
+  "common": [
+    "S3(x1,x2,u)",
+    "membership(x1)",
+    "membership(x2)",
+    "membership(x3)"
+  ],
+  "complete_cost_comparison": false,
+  "limits": {
+    "max_cells": 65536,
+    "max_degree": 4,
+    "max_input_terms": 128,
+    "max_monomials": 70,
+    "max_parameter_powers": 3,
+    "max_rows": 128,
+    "max_scalar_products": 4000000,
+    "max_variables": 4
+  },
+  "macaulay_degree": 4,
+  "mode": "correctness-only",
+  "native_blas_or_gpu": false,
+  "next_run": "--check",
+  "p17": {
+    "assignments_per_parameter": 459,
+    "auxiliary_domain": "full F17",
+    "curve": {
+      "a": 2,
+      "b": 2,
+      "p": 17
+    },
+    "exhaustive_parameters": 17,
+    "factor_base_x": [
+      0,
+      3,
+      5
+    ],
+    "generator": {
+      "x": 5,
+      "y": 1
+    },
+    "subgroup_order": 19
+  },
+  "parameterized": "S3(u,x3,t)",
+  "schema": "shared-s3-matrix.fixture-plan/v1",
+  "status": "planned",
+  "variables": [
+    "x1",
+    "x2",
+    "x3",
+    "u"
+  ]
+}
