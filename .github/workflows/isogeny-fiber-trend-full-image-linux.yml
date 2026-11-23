@@ -2,6 +2,7 @@ name: Isogeny full-image larger-order Linux hard-cap probe
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/isogeny-fiber-trend-full-image-linux.yml'
       - 'research/isogeny_torsion_fibers_20261012/portable_order_trend_20261015/inverse_velu/trend_four_cell_v1/RUN_FULL_IMAGE_LINUX_V1.sh'
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   full-image-probe:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T02:43:54Z",
+ "id": "PCC-20261119-e1a1a1",
+ "kind": "theorem",
+ "producer": {
+  "commit": "3dfbdf73cb2310207c2b9eb0a0239b49cd782dfc",
+  "model": "Codex",
+  "session": "bird-bit-cost-boundary-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d49a6bab1c87617fbbd98cf5cb7290711b8661678d839983295971f48da0ea32",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.eagerBirdZModInverseBitWork_le"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Conditional cost-composition theorem only; modular-operation and extended-GCD polynomial bit bounds are explicit hypotheses. Excludes array allocation/indexing, rectangular postprocessing, external-tree integration, curve coverage, and end-to-end ECDLP expected time.",
+ "statement": "The complete Bird ZMod inverse has an explicit conditional bit-work bound: its determinant, adjugate, and scaling use at most 4(n+1)^6 + 4(n+1)^4 + n^2 charged modular ring operations, plus one separately charged scalar inverse."
+}

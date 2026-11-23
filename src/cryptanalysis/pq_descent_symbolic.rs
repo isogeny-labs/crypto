@@ -500,6 +500,176 @@ pub fn descend_affine(
     })
 }
 
+// ── The target-independent template ────────────────────────────────
+
+/// **The descent with the target left symbolic.**  `S_{m+1}(x_1, …, x_m, X)`
+/// is a polynomial in the target abscissa `X` (degree 2 for `S_3`, 4 for
+/// `S_4`) whose coefficients are polynomials in the boolean variables
+/// alone:
+///
+/// `S_{m+1} = Σ_k X^k · T_k(v)`.
+///
+/// None of the `T_k` depends on the target, so an oracle that descends
+/// one system a target builds them once ([`descent_template_affine`]) and
+/// per target only scales them by the powers of `x_R` and sums
+/// ([`DescentTemplate::specialise`]), then splits the sum into its `n`
+/// coordinate equations — the one step of the Weil restriction that
+/// genuinely depends on `x_R`.  The result is the same polynomial over
+/// `F_{2^n}[v]/(v² − v)` as [`descend_affine`] builds (the ring element
+/// has one representation, and both sum the same products), so the
+/// systems agree equation for equation.
+#[derive(Clone, Debug)]
+pub struct DescentTemplate {
+    pub n: u32,
+    pub n_prime: u32,
+    pub summands: u32,
+    pub n_vars: usize,
+    pub summand_bases: Vec<Vec<u64>>,
+    pub offset: u64,
+    /// `coeffs[k]` is `T_k`, the coefficient of `X^k`.
+    coeffs: Vec<FieldBoolPoly>,
+}
+
+/// The checks [`descend_affine`] makes: one dimension for every summand,
+/// 2 or 3 summands, and a mask wide enough.
+fn check_bases(bases: &[Vec<u64>]) -> Result<(u32, u32), String> {
+    let summands = bases.len() as u32;
+    let n_prime = bases.first().map_or(0, |v| v.len()) as u32;
+    if bases.iter().any(|v| v.len() as u32 != n_prime) {
+        return Err("every summand's basis must have the same dimension".into());
+    }
+    if !(2..=3).contains(&summands) {
+        return Err(format!(
+            "the symbolic descent takes 2 or 3 summands, not {summands}"
+        ));
+    }
+    if n_prime == 0 || n_prime > max_n_prime(summands) {
+        return Err(format!(
+            "a subspace of dimension {n_prime} at {summands} summands needs {} boolean variables; \
+             the monomial mask holds {MAX_VARS}",
+            n_prime * summands
+        ));
+    }
+    Ok((summands, n_prime))
+}
+
+/// Build the [`DescentTemplate`] of `S_{m+1}` with summand `i` over
+/// `offset + span(bases[i])`: the target-independent part of
+/// [`descend_affine`], counted on the descent counter like it.
+pub fn descent_template_affine(
+    gf: &Gf2,
+    b: u64,
+    bases: &[Vec<u64>],
+    offset: u64,
+) -> Result<DescentTemplate, String> {
+    let (summands, n_prime) = check_bases(bases)?;
+    // The copy of the bases into the template: a word an element.
+    note(|w| w.word_ops += (n_prime as u64) * (summands as u64));
+    let np = n_prime;
+    let x1 = affine_form(0, &bases[0], offset);
+    let x2 = affine_form(np, &bases[1], offset);
+    let bconst = FieldBoolPoly::constant(b);
+    // `S_3(p, q, X) = A X² + B X + C`, `A = (p + q)²`, `B = p q`, `C = B² + b`.
+    let a1 = x1.add(&x2).sqr(gf);
+    let b1 = x1.mul(&x2, gf);
+    let c1 = b1.sqr(gf).add(&bconst);
+    let coeffs = if summands == 2 {
+        vec![c1, b1, a1]
+    } else {
+        // `S_4 = Res_Y(S_3(x_1, x_2, Y), S_3(x_3, X, Y))` with
+        // `(a2, b2, c2) = (p² + X², p X, p² X² + b)`, `p = x_3`:
+        // `(a1 c2 + a2 c1)² = X⁴ (a1 p² + c1)² + (a1 b + p² c1)²` and
+        // `(a1 b2 + a2 b1)(b1 c2 + b2 c1) = (Σ_i L_i X^i)(Σ_i R_i X^i)` with
+        // `L = (p² b1, a1 p, b1)`, `R = (b b1, p c1, b1 p²)`.
+        let p = affine_form(2 * np, &bases[2], offset);
+        let p2 = p.sqr(gf);
+        let a1p2 = a1.mul(&p2, gf);
+        let p2c1 = p2.mul(&c1, gf);
+        let hi = a1p2.add(&c1).sqr(gf);
+        let lo = a1.scale(b, gf).add(&p2c1).sqr(gf);
+        let l0 = p2.mul(&b1, gf); // = R_2
+        let l1 = a1.mul(&p, gf);
+        let r0 = b1.scale(b, gf);
+        let r1 = p.mul(&c1, gf);
+        let t0 = lo.add(&l0.mul(&r0, gf));
+        let t1 = l0.mul(&r1, gf).add(&l1.mul(&r0, gf));
+        let t2 = l0.sqr(gf).add(&l1.mul(&r1, gf)).add(&b1.mul(&r0, gf));
+        let t3 = l1.mul(&l0, gf).add(&b1.mul(&r1, gf));
+        let t4 = hi.add(&b1.mul(&l0, gf));
+        vec![t0, t1, t2, t3, t4]
+    };
+    Ok(DescentTemplate {
+        n: gf.n,
+        n_prime,
+        summands,
+        n_vars: (summands * n_prime) as usize,
+        summand_bases: bases.to_vec(),
+        offset,
+        coeffs,
+    })
+}
+
+/// [`descent_template_affine`] over linear subspaces: the template of
+/// [`descend_with_bases`].
+pub fn descent_template_with_bases(
+    gf: &Gf2,
+    b: u64,
+    bases: &[Vec<u64>],
+) -> Result<DescentTemplate, String> {
+    descent_template_affine(gf, b, bases, 0)
+}
+
+impl DescentTemplate {
+    /// Monomials over `F_{2^n}` the template holds, all coefficients
+    /// together: the size of what is precomputed.
+    pub fn template_monomials(&self) -> usize {
+        self.coeffs.iter().map(FieldBoolPoly::len).sum()
+    }
+
+    /// The descended system at the target abscissa `x_r`: `Σ_k x_r^k T_k`,
+    /// split into its `n` coordinate equations.  Equal, equation for
+    /// equation, to [`descend_affine`] on the template's bases.
+    ///
+    /// Counted: the powers of `x_r` (a squaring or a product each), the
+    /// copy of `T_0`, per term of every other `T_k` a product and an
+    /// `add_term`, the split, and the copies of the bases into the result.
+    pub fn specialise(&self, gf: &Gf2, x_r: u64) -> SymbolicDescent {
+        let deg = self.coeffs.len();
+        let mut pows = vec![1u64; deg];
+        for k in 1..deg {
+            pows[k] = if k == 1 {
+                x_r
+            } else if k % 2 == 0 {
+                note(|w| w.field_sqrs += 1);
+                gf.sqr(pows[k / 2])
+            } else {
+                note(|w| w.field_muls += 1);
+                gf.mul(pows[k - 1], x_r)
+            };
+        }
+        let mut poly = self.coeffs[0].counted_clone();
+        for (t, &c) in self.coeffs.iter().zip(&pows).skip(1) {
+            note(|w| w.field_muls += t.terms.len() as u64);
+            for (&m, &a) in &t.terms {
+                poly.add_term(m, gf.mul(a, c));
+            }
+        }
+        // The copies of the bases into the result: a word an element.
+        note(|w| w.word_ops += (self.n_prime as u64) * (1 + self.summands as u64));
+        SymbolicDescent {
+            n: self.n,
+            n_prime: self.n_prime,
+            summands: self.summands,
+            n_vars: self.n_vars,
+            equations: poly.split(gf.n, self.n_vars),
+            v_basis: self.summand_bases[0].clone(),
+            summand_bases: self.summand_bases.clone(),
+            offset: self.offset,
+            field_monomials: poly.len(),
+        }
+    }
+}
+
 /// **The fiber-combined descent.**  `S_{m+1}(x_1, …, x_m, X) = 0` with
 /// every `x_i` in the span of `v_basis` and the target abscissa `X`
 /// **free** in its own `n` boolean variables (bits `m·n' … m·n' + n − 1`,
@@ -704,6 +874,58 @@ mod tests {
                     };
                     let zero = sys.equations.iter().all(|e| e.eval(mask_from64(v)) == 0);
                     assert_eq!(zero, word == 0, "summands {summands}, v = {v:#x}");
+                }
+            }
+        }
+    }
+
+    /// **The template, specialised, is the direct descent, equation for
+    /// equation**: for plain, Frobenius-shifted (τ-slot) and affine bases,
+    /// at two and three summands, and at several targets including
+    /// `x_R = 0`.
+    #[test]
+    fn the_template_specialises_to_the_direct_descent() {
+        let mut rng = StdRng::seed_from_u64(29);
+        for &(n, seed) in &[(11u32, 5u64), (13, 6)] {
+            let inst = random_binary_instance(n, seed, 1 << 20).expect("a curve");
+            let gf = &inst.gf;
+            for n_prime in [3u32, 4] {
+                let v: Vec<u64> = (0..n_prime).map(|_| rng.gen::<u64>() & gf.mask).collect();
+                let shifted: Vec<u64> = v.iter().map(|&e| gf.sqr(gf.sqr(e))).collect();
+                for summands in [2u32, 3] {
+                    for (bases, offset) in [
+                        ((0..summands).map(|_| v.clone()).collect::<Vec<_>>(), 0u64),
+                        (
+                            {
+                                let mut b = vec![v.clone(), shifted.clone()];
+                                if summands == 3 {
+                                    b.push(v.clone());
+                                }
+                                b
+                            },
+                            0,
+                        ),
+                        ((0..summands).map(|_| v.clone()).collect(), 1u64 << 3),
+                    ] {
+                        let tmpl = descent_template_affine(gf, inst.b, &bases, offset).unwrap();
+                        let mut targets: Vec<u64> =
+                            (0..5).map(|_| rng.gen::<u64>() & gf.mask).collect();
+                        targets.push(0);
+                        targets.push(1);
+                        for x_r in targets {
+                            let old = descend_affine(gf, inst.b, x_r, &bases, offset).unwrap();
+                            let new = tmpl.specialise(gf, x_r);
+                            assert_eq!(
+                                new.equations, old.equations,
+                                "n = {n}, m = {summands}, x_R = {x_r:#x}"
+                            );
+                            assert_eq!(new.field_monomials, old.field_monomials);
+                            assert_eq!(new.n_vars, old.n_vars);
+                            assert_eq!(new.summand_bases, old.summand_bases);
+                            assert_eq!(new.v_basis, old.v_basis);
+                            assert_eq!(new.offset, old.offset);
+                        }
+                    }
                 }
             }
         }
