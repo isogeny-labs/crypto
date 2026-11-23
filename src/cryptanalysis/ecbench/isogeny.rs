@@ -219,6 +219,33 @@ impl Fp<'_> {
             return vec![];
         }
         self.make_monic(&mut f);
+        // Degree one needs no Frobenius/GCD computation: a monic linear
+        // polynomial x + c has exactly one rational root, -c.
+        if f.len() == 2 {
+            return vec![self.sub(0, f[0])];
+        }
+        // For p = 3 (mod 4), solve every quadratic directly. Unlike the
+        // split() shortcut, this bypasses x^p mod f and the initial GCD too.
+        // The checked square root rejects irreducible quadratics; sort and
+        // deduplicate to handle discriminant zero and the public API order.
+        if f.len() == 3 && (p & 3) == 3 {
+            let b_squared = self.mul(f[1], f[1]);
+            let four_c = self.mul(4 % p, f[0]);
+            let discriminant = self.sub(b_squared, four_c);
+            let s = self.pow(discriminant, (p + 1) / 4);
+            if self.mul(s, s) != discriminant {
+                return Vec::new();
+            }
+            let neg_b = self.sub(0, f[1]);
+            let plus = self.add(neg_b, s);
+            let minus = self.sub(neg_b, s);
+            // p <= 2^63-1 in the supported fields, so v + p fits in u64.
+            let half = |v: u64| if v & 1 == 0 { v >> 1 } else { (v + p) >> 1 };
+            let mut roots = vec![half(plus), half(minus)];
+            roots.sort_unstable();
+            roots.dedup();
+            return roots;
+        }
         let xp = self.powmod(&[0, 1], p, &f);
         let mut h = xp;
         if h.len() < 2 {
@@ -591,6 +618,67 @@ mod tests {
                     assert_eq!(field.roots(&polynomial), expected,
                         "p={p}, b={b}, c={c}");
                 }
+            }
+        }
+    }
+
+
+    #[test]
+    fn round132_low_degree_paths_match_linear_quadratic_oracles() {
+        // Small fields: all monic quadratics, and nonmonic scaled linear
+        // polynomials with padded trailing zeros.
+        for p in [3u64, 5, 7, 11, 13, 19, 23, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for a in 1..p {
+                for b in 0..p {
+                    let expected: Vec<u64> = (0..p).filter(|&x| {
+                        let ax = field.mul(a, x);
+                        field.add(ax, b) == 0
+                    }).collect();
+                    assert_eq!(field.roots(&[b, a, 0, 0]), expected,
+                        "linear p={p} a={a} b={b}");
+                }
+            }
+            for b in 0..p {
+                for c in 0..p {
+                    let expected: Vec<u64> = (0..p).filter(|&x| {
+                        let x_squared = field.mul(x, x);
+                        let bx = field.mul(b, x);
+                        field.add(field.add(x_squared, bx), c) == 0
+                    }).collect();
+                    for scalar in [1u64, 2, 3] {
+                        let poly = [field.mul(c, scalar), field.mul(b, scalar),
+                                    scalar % p];
+                        if scalar % p == 0 { continue; }
+                        assert_eq!(field.roots(&poly), expected,
+                            "quadratic p={p} b={b} c={c} scale={scalar}");
+                    }
+                }
+            }
+        }
+
+        for p in [65_521u64, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for i in 0..80u64 {
+                let root = (31 + i * 7919) % p;
+                let leading = [1u64, 3, 7, p - 1][(i as usize) % 4];
+                let constant = field.sub(0, field.mul(leading, root));
+                assert_eq!(field.roots(&[constant, leading, 0]), vec![root]);
+                let r2 = (root + 1237) % p;
+                let sum = field.add(root, r2);
+                let product = field.mul(root, r2);
+                let mut expected = vec![root, r2];
+                expected.sort_unstable();
+                expected.dedup();
+                let quadratic = [product, field.sub(0, sum), 1];
+                assert_eq!(field.roots(&quadratic), expected);
+                // Repeated roots must not be returned twice.
+                let repeated_product = field.mul(root, root);
+                let twice_root = field.add(root, root);
+                let repeated = [repeated_product, field.sub(0, twice_root), 1];
+                assert_eq!(field.roots(&repeated), vec![root]);
             }
         }
     }
