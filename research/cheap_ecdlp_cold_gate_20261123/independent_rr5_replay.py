@@ -64,6 +64,25 @@ def verify_public_query_schedule(attempts, seed, max_queries, status):
     return len(attempts)
 
 
+def verify_terminal_clock_consistency(record):
+    """Check only source-implied terminal clock flags, not the truth of timing.
+
+    The native SolveRecord *always* serializes deadline_exceeded. Requiring a
+    Boolean and checking the two deterministic status implications prevents a
+    shortened query transcript from being laundered as a deadline event by
+    changing its label alone. Neither check attests wall-clock or extraction.
+    """
+    status = record.get("status")
+    expired = record.get("deadline_exceeded")
+    if type(expired) is not bool:
+        raise ValueError("producer deadline_exceeded: missing or non-Boolean")
+    if status in ("deadline", "solved_after_deadline") and not expired:
+        raise ValueError("producer terminal clock/status contradiction")
+    if status == "solved" and expired:
+        raise ValueError("producer terminal clock/status contradiction")
+    return True
+
+
 def point(value, label):
     if value is None:
         return None
@@ -373,6 +392,7 @@ def main():
         base = [point(v,"base") for v in manifest["base"]]
         q = point(raw["target"],"producer target")
         rows=[]
+        verify_terminal_clock_consistency(raw)
         attempts=raw["attempts"]
         checked_schedule = None
         if args.seed is not None:
