@@ -297,7 +297,9 @@ pub fn sparse_solve_mod_n(
     // were eliminated FROM later rows, so later pivots' rows may still
     // contain columns of earlier pivots — those need to be substituted
     // in.
-    // A column that was never a pivot has no value and counts as zero.
+    // Free variables are temporarily set to zero to construct a particular
+    // solution. Returning a target requires the exact free-variable
+    // dependency check below: a particular value is not a unique value.
     let mut solution: Vec<Option<BigUint>> = vec![None; width];
     for (i, &col) in pivot_cols.iter().enumerate().rev() {
         let row = &pivot_rows[i];
@@ -314,7 +316,52 @@ pub fn sparse_solve_mod_n(
         solution[col] = Some(val);
     }
 
-    solution.get(target_col).cloned().flatten()
+    // A pivot target need not be uniquely determined. In the echelon
+    // equations, each pivot variable is rhs minus a linear combination of
+    // *later* pivot variables and free columns. Expand only the requested
+    // target in forward pivot order; earlier pivot columns never reappear
+    // in later pivot rows. The remaining map gives its EXACT coefficients
+    // on free columns modulo n. In particular, distinct dependency paths
+    // can cancel, so a boolean reachability check would reject valid
+    // determined targets. This pass costs up to the affected pivot-row
+    // support (and map updates), not zero: charge it in benchmarks.
+    let target_value = solution.get(target_col).cloned().flatten()?;
+    let mut pending = BTreeMap::new();
+    pending.insert(target_col, BigUint::from(1u32));
+    for (&pivot_col, row) in pivot_cols.iter().zip(pivot_rows.iter()) {
+        let Some(weight) = pending.remove(&pivot_col) else {
+            continue;
+        };
+        for (&col, coef) in &row.entries {
+            if col == pivot_col {
+                continue;
+            }
+            let term = (&weight * coef) % n;
+            if term.is_zero() {
+                continue;
+            }
+            match pending.entry(col) {
+                Entry::Occupied(mut e) => {
+                    sub_mod_assign(e.get_mut(), &term, n);
+                    if e.get().is_zero() {
+                        e.remove();
+                    }
+                }
+                Entry::Vacant(e) => {
+                    e.insert(n - &term);
+                }
+            }
+        }
+    }
+
+    // All later pivot variables were substituted; any surviving key
+    // represents a free variable with nonzero coefficient. The particular
+    // target value above is then not determined by the equations.
+    if pending.is_empty() {
+        Some(target_value)
+    } else {
+        None
+    }
 }
 
 /// `a ← (a + n − term) mod n` for `term < n`, the canonical residue of
@@ -441,12 +488,81 @@ mod tests {
         let r2 = SparseRow::from_entries(vec![(0, BigUint::one())], BigUint::from(5u32));
         // x = 3 AND x = 5 mod 7 is inconsistent.
         let sol = sparse_solve_mod_n(vec![r1, r2], 1, 0, &n);
-        assert!(
-            sol.is_none() || sol == Some(BigUint::from(3u32)) || sol == Some(BigUint::from(5u32))
+        assert_eq!(sol, None, "inconsistent equations must never return a target");
+    }
+
+    /// A single equation does not determine either target separately.
+    /// Previously choosing the unpivoted variable as zero returned Some(1)
+    /// for the pivot, incorrectly certifying a discrete logarithm.
+    #[test]
+    fn underdetermined_pivot_target_must_be_none() {
+        let n = BigUint::from(7u32);
+        let rows = vec![SparseRow::from_entries(
+            vec![(0, BigUint::one()), (1, BigUint::one())],
+            BigUint::one(),
+        )];
+        assert_eq!(sparse_solve_mod_n(rows.clone(), 2, 0, &n), None);
+        assert_eq!(sparse_solve_mod_n(rows, 2, 1, &n), None);
+    }
+
+    /// Reachability alone is insufficient: x+y+z=2 and y+z=1
+    /// uniquely determine x=1 despite leaving y and z free. Their
+    /// coefficients must cancel after exact symbolic back-substitution.
+    #[test]
+    fn exact_free_dependency_cancellation_keeps_unique_target() {
+        let n = BigUint::from(7u32);
+        let rows = vec![
+            SparseRow::from_entries(
+                vec![(0, BigUint::one()), (1, BigUint::one()), (2, BigUint::one())],
+                BigUint::from(2u32),
+            ),
+            SparseRow::from_entries(
+                vec![(1, BigUint::one()), (2, BigUint::one())],
+                BigUint::one(),
+            ),
+        ];
+        assert_eq!(
+            sparse_solve_mod_n(rows.clone(), 3, 0, &n),
+            Some(BigUint::one())
         );
-        // We accept either None or one of the rows' values; we just
-        // shouldn't get something wildly wrong.  (Our pivot-elim
-        // detects the inconsistency in the no-active-cols branch.)
+        assert_eq!(sparse_solve_mod_n(rows.clone(), 3, 1, &n), None);
+        assert_eq!(sparse_solve_mod_n(rows, 3, 2, &n), None);
+    }
+
+    /// A completely separate singleton target must still be reported
+    /// even when the other component of the relation graph is deficient.
+    #[test]
+    fn singleton_target_determined_amid_free_component() {
+        let n = BigUint::from(7u32);
+        let rows = vec![
+            SparseRow::from_entries(vec![(0, BigUint::one())], BigUint::from(3u32)),
+            SparseRow::from_entries(
+                vec![(1, BigUint::one()), (2, BigUint::one())],
+                BigUint::from(2u32),
+            ),
+        ];
+        assert_eq!(
+            sparse_solve_mod_n(rows.clone(), 3, 0, &n),
+            Some(BigUint::from(3u32))
+        );
+        assert_eq!(sparse_solve_mod_n(rows, 3, 1, &n), None);
+    }
+
+    /// Compression of distant column IDs must retain the same target
+    /// uniqueness decision as a compact equation.
+    #[test]
+    fn distant_free_column_is_not_inadvertently_fixed_to_zero() {
+        let n = BigUint::from(7u32);
+        let distant = 10_000_000usize;
+        let rows = vec![SparseRow::from_entries(
+            vec![(0, BigUint::one()), (distant, BigUint::one())],
+            BigUint::one(),
+        )];
+        assert_eq!(sparse_solve_mod_n(rows.clone(), distant + 1, 0, &n), None);
+        assert_eq!(
+            sparse_solve_mod_n(rows, distant + 1, distant, &n),
+            None
+        );
     }
 
     /// **Composite modulus** with non-invertible pivot: ensure no panic.
