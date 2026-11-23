@@ -138,6 +138,9 @@ fn verify(data:&Certificate)->Result<Report,String>{
         data.relations.len()>65_536 || data.targets.len()>4096 {
         return Err("input exceeds fixed verifier caps".into())
     }
+    if data.stop_when_all_targets_determined && data.targets.is_empty() {
+        return Err("prefix stop requires at least one public target".into())
+    }
     let mut ar=Arithmetic::default();
     check_curve(PRIME31,&mut ar)?;
     let mut base=Vec::new();
@@ -376,6 +379,13 @@ mod tests {
         assert_eq!(out.unchecked_relation_count,2);
         assert_eq!(out.targets[0].first_determined_relation_prefix,Some(0));
         c.targets[0].q=Some([PRIME31.g.0,PRIME31.g.1]);
+        assert!(verify(&c).is_err());
+    }
+    #[test]
+    fn prefix_stop_rejects_empty_target_set(){
+        let mut c=sample();
+        c.stop_when_all_targets_determined=true;
+        c.targets.clear();
         assert!(verify(&c).is_err());
     }
     #[test]
