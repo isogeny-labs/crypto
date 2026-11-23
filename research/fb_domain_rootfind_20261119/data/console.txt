@@ -1,0 +1,13 @@
+ m bits    |D|  tgt |  root mul scan  root mul frob   ratio |   F4 field_ops  F4 share | wall scan wall frob   ratio | auto/scan wall
+ 2   16     64   16 |         524288         728409    0.7x |           3216      0.6% |    0.010s    0.018s    0.5x | 0.86  (planted found 8, solutions 18)
+ 2   16    256   16 |        8388608        2914627    2.9x |          12432      0.1% |    0.063s    0.069s    0.9x | 1.12  (planted found 8, solutions 69)
+ 2   20    256   16 |        8388608        3678558    2.3x |              0      0.0% |    0.054s    0.074s    0.7x | 1.36  (planted found 8, solutions 20)
+ 2   20   1024    8 |       67108864        7442442    9.0x |              0      0.0% |    0.367s    0.162s    2.3x | 0.40  (planted found 4, solutions 40)
+ 2   24   1024    8 |       67108864        8942083    7.5x |              0      0.0% |    0.388s    0.185s    2.1x | 0.50  (planted found 4, solutions 12)
+ 2   31   1024    8 |       67108864       11909735    5.6x |              0      0.0% |    0.363s    0.221s    1.6x | 0.61  (planted found 4, solutions 8)
+ 2   31   4096    4 |      536870912       23800840   22.6x |              0      0.0% |    2.757s    0.434s    6.4x | 0.16  (planted found 2, solutions 4)
+ 3   16     16    8 |         507904        2822840    0.2x |         234117     31.6% |    0.098s    0.144s    0.7x | 1.00  (planted found 4, solutions 30)
+ 3   20     32    6 |        3096576       10904975    0.3x |         512640     14.2% |    0.275s    0.454s    0.6x | 0.97  (planted found 3, solutions 18)
+ 3   31     32    6 |        3096576       17434767    0.2x |         512640     14.2% |    0.345s    0.645s    0.5x | 0.94  (planted found 3, solutions 18)
+ 3   31     64    4 |       16646144       47226203    0.4x |        1289728      7.2% |    0.901s    1.642s    0.5x | 1.04  (planted found 2, solutions 12)
+every mode visited the identical solution sequence on every target

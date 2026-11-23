@@ -34,7 +34,7 @@ pub use pointgadget::{
     cofactor_shape, gadget_cofactor_relation_network, gadget_relation_network, gadget_shapes,
     FieldPoint,
 };
-pub use relation::{mitm_find_relation, relation_network, FactorBases};
+pub use relation::{mitm_find_relation, relation_network, FactorBases, MitmTable};
 pub use schedule::{DFSCounter, EdgeHint, Step};
 pub use solver::{Relation, Solver, Stats};
 pub use tensor::{

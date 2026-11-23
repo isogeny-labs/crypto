@@ -48,6 +48,7 @@ use rand::{Rng, SeedableRng};
 use super::chained_transfer::ic_control::{
     build_rows, mulmod, pa, peel, pm, ppow, split_order, subm, wiedemann, Dsu, Nat, Rel, REL_FB,
 };
+use super::genus_ladder::{sge_reduce, SgeParams, SgeStats};
 use super::ic_boundary::{rho_reference_walk, CountedGroup, GroupOps, RhoWalk};
 use super::plane_quartic_pic::{
     is_odd_prime_below_2_31, mons_of_degree, next_smooth_quartic_with_point, FqCounter, PicClass,
@@ -429,6 +430,8 @@ struct Ctx {
     /// reported apart from `rel`; counted in both modes).
     lookups: u64,
     inserts: u64,
+    /// Indices of the rational points on the line `x = 0` (at most four).
+    inf: Vec<u32>,
 }
 
 impl Ctx {
@@ -502,6 +505,7 @@ impl Ctx {
             };
         }
         let n = pts.len();
+        let inf: Vec<u32> = (0..n as u32).filter(|&k| pts[k as usize][0] == 0).collect();
         Ctx {
             q: qq,
             sq: Sqrt::new(qq),
@@ -516,6 +520,7 @@ impl Ctx {
             dynamic: false,
             lookups: 0,
             inserts: n as u64,
+            inf,
         }
     }
 
@@ -717,28 +722,38 @@ impl Ctx {
         LineRes::Split(res[0], res[1])
     }
 
-    /// The rational points on all three conics of `m`: `Some` iff exactly
-    /// three distinct ones (then they are the divisor `D`).
-    fn decompose(&self, m: &[[u32; 6]; 3], nat: &mut Nat) -> Option<[u32; 3]> {
+    /// Whether the conic values `v` (at a point) vanish on all three conics
+    /// of `m` (counted; stops at the first conic that does not vanish).
+    fn on_net(&self, v: &[u64; 6], m: &[[u32; 6]; 3], nat: &mut Nat) -> bool {
         let q = self.q;
+        for row in m {
+            let mut s = 0u64;
+            for c in 0..6 {
+                if row[c] != 0 && v[c] != 0 {
+                    let t = if row[c] == 1 {
+                        v[c]
+                    } else {
+                        pm(q, row[c] as u64, v[c], nat)
+                    };
+                    s = pa(q, s, t, nat);
+                }
+            }
+            if s != 0 {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// The rational points on all three conics of `m`: `Some` iff exactly
+    /// three distinct ones (then they are the divisor `D`).  The scan:
+    /// evaluates the conics at every rational point of `C`.
+    fn decompose(&self, m: &[[u32; 6]; 3], nat: &mut Nat) -> Option<[u32; 3]> {
         let mut found = [0u32; 3];
         let mut nf = 0usize;
-        'pts: for (k, v) in self.val2.iter().enumerate() {
-            for row in m {
-                let mut s = 0u64;
-                for c in 0..6 {
-                    if row[c] != 0 && v[c] != 0 {
-                        let t = if row[c] == 1 {
-                            v[c]
-                        } else {
-                            pm(q, row[c] as u64, v[c], nat)
-                        };
-                        s = pa(q, s, t, nat);
-                    }
-                }
-                if s != 0 {
-                    continue 'pts;
-                }
+        for (k, v) in self.val2.iter().enumerate() {
+            if !self.on_net(v, m, nat) {
+                continue;
             }
             found[nf] = k as u32;
             nf += 1;
@@ -766,7 +781,6 @@ impl Ctx {
     /// conics, normalised and looked up in the point index (the same
     /// identity map as [`Ctx::line`]).  If no coordinate square occurs, the
     /// net is `<xy, xz, yz>` and the candidates are the coordinate points.
-    ///
     /// `Err(())` when `g` vanishes identically or more than three points
     /// are found (the net has a common component); the caller then falls
     /// back to the counted scan, so the output always equals
@@ -809,9 +823,7 @@ impl Ctx {
                         };
                         let y = if ak == 0 || cs[i0][s] == 0 {
                             0
-                        } else {
                             pm(q, ak, cs[i0][s], nat)
-                        };
                         d[slot][s] = fs(q, x, y, nat);
                     }
                 }
@@ -825,45 +837,29 @@ impl Ctx {
                     for j in 0..3 {
                         let t1 = if b1[i] != 0 && c2[j] != 0 {
                             pm(q, b1[i], c2[j], nat)
-                        } else {
-                            0
-                        };
                         let t2 = if b2[i] != 0 && c1[j] != 0 {
                             pm(q, b2[i], c1[j], nat)
-                        } else {
-                            0
-                        };
                         let t = fs(q, t1, t2, nat);
                         g[i + j] = pa(q, g[i + j], t, nat);
-                    }
-                }
                 if g.iter().all(|&x| x == 0) {
                     return Err(());
-                }
                 // roots (u0 : w0) of g
                 let mut roots: Vec<(u64, u64)> =
                     proots(q, &g, rs, nat).into_iter().map(|t| (t, 1)).collect();
                 if g[3] == 0 {
                     roots.push((1, 0));
-                }
                 let ev_lin = |b: &[u64; 2], (u0, w0): (u64, u64), nat: &mut Nat| {
                     if w0 == 0 {
                         b[1]
                     } else {
                         let t = pm(q, b[1], u0, nat);
                         pa(q, b[0], t, nat)
-                    }
-                };
                 let ev_quad = |c: &[u64; 3], (u0, w0): (u64, u64), u2: u64, nat: &mut Nat| {
-                    if w0 == 0 {
                         c[2]
-                    } else {
                         let t1 = pm(q, c[1], u0, nat);
                         let t2 = pm(q, c[2], u2, nat);
                         let s = pa(q, c[0], t1, nat);
                         pa(q, s, t2, nat)
-                    }
-                };
                 for rt in roots {
                     let u2 = if rt.1 == 0 { 0 } else { pm(q, rt.0, rt.0, nat) };
                     let bb1 = ev_lin(&b1, rt, nat);
@@ -872,13 +868,10 @@ impl Ctx {
                     if bb1 != 0 || bb2 != 0 {
                         let (bb, cc) = if bb1 != 0 {
                             (bb1, ev_quad(&c1, rt, u2, nat))
-                        } else {
                             (bb2, ev_quad(&c2, rt, u2, nat))
-                        };
                         let ib = finv(q, bb, nat);
                         let y = pm(q, cc, ib, nat);
                         vs.push(fs(q, 0, y, nat));
-                    } else {
                         // the line through e_v and the root: a0 v^2 + b0 v + c0 = 0
                         let b0 = ev_lin(&lin(&cs[i0]), rt, nat);
                         let c0 = ev_quad(&quad(&cs[i0]), rt, u2, nat);
@@ -897,16 +890,12 @@ impl Ctx {
                                 vs.push(pm(q, r2, ia, nat));
                             }
                         }
-                    }
                     for y in vs {
                         let mut pt = [0u64; 3];
                         pt[u] = rt.0;
                         pt[w] = rt.1;
                         pt[v] = y;
                         cands.push(pt);
-                    }
-                }
-            }
         }
         let mut found: Vec<u32> = Vec::with_capacity(3);
         for pt in cands {
@@ -916,40 +905,160 @@ impl Ctx {
                 for j in i..3 {
                     if pt[i] != 0 && pt[j] != 0 {
                         mv[I2[i][j]] = pm(q, pt[i], pt[j], nat);
-                    }
-                }
-            }
             let on_all = cs.iter().all(|c| {
                 let mut s = 0u64;
                 for k in 0..6 {
                     if c[k] != 0 && mv[k] != 0 {
                         let t = if c[k] == 1 { mv[k] } else { pm(q, c[k], mv[k], nat) };
                         s = pa(q, s, t, nat);
-                    }
-                }
                 s == 0
             });
             if !on_all {
                 continue;
-            }
             let Some(np) = self.normalize(pt, nat) else {
-                continue;
             };
             if let Some(id) = self.lookup(np, nat) {
                 if !found.contains(&id) {
                     found.push(id);
-                }
-            }
-        }
         match found.len() {
             3 => {
                 found.sort_unstable_by_key(|&k| self.order_key(k));
                 Ok(Some([found[0], found[1], found[2]]))
-            }
             0..=2 => Ok(None),
             _ => Err(()),
-        }
     }
+
+    /// The same point set by algebra: the affine common points of two
+    /// conics of the net from the resultant (degree <= 4 in one variable,
+    /// counted root finding, back-substitution), kept when they lie on the
+    /// third conic and on `C`; the at most four rational points of `C` on
+    /// `x = 0` by direct test.  Returns the first three by point index
+    /// (as the scan does) and whether every elimination was degenerate, in
+    /// which case the scan answered instead.
+    fn decompose_alg(&self, m: &[[u32; 6]; 3], nat: &mut Nat) -> (Option<[u32; 3]>, bool) {
+        let mut rs = 0xA16E_B4A1_C0DE_0001u64;
+        for row in m {
+            for &c in row {
+                rs = mix64(rs ^ c as u64);
+        let mut found: Vec<u32> = Vec::new();
+        for &k in &self.inf {
+            if self.on_net(&self.val2[k as usize], m, nat) {
+                found.push(k);
+        // chart x = 1, unknowns (u, w); `swap` exchanges y and z.
+        let mut res_poly: Option<(Vec<u64>, usize, usize, bool)> = None;
+        'pick: for (ia, ib) in [(0usize, 1usize), (0, 2), (1, 2)] {
+            for swap in [false, true] {
+                let a = conic_uw(&m[ia], swap);
+                let b = conic_uw(&m[ib], swap);
+                let mut r = resultant_w(q, &a, &b, nat);
+                ptrim(&mut r);
+                if !r.is_empty() {
+                    res_poly = Some((r, ia, ib, swap));
+                    break 'pick;
+        let Some((rp, ia, ib, swap)) = res_poly else {
+            return (self.decompose(m, nat), true);
+        };
+        let a = conic_uw(&m[ia], swap);
+        let b = conic_uw(&m[ib], swap);
+        let mut inv2: [Option<u64>; 2] = [None; 2];
+        for u0 in proots(q, &rp, &mut rs, nat) {
+            let mut cand: Vec<u64> = Vec::new();
+            let mut done = false;
+            for (ci, c) in [&a, &b].into_iter().enumerate() {
+                // c as a polynomial in w at u = u0: [a0, a1, a2]
+                let u2 = pm(q, u0, u0, nat);
+                let t1 = pm(q, c[1], u0, nat);
+                let t3 = pm(q, c[3], u2, nat);
+                let a0 = pa(q, pa(q, c[0], t1, nat), t3, nat);
+                let t4 = pm(q, c[4], u0, nat);
+                let a1 = pa(q, c[2], t4, nat);
+                let a2 = c[5];
+                if a2 != 0 {
+                    let i2 = match inv2[ci] {
+                        Some(v) => v,
+                        None => {
+                            let two_a = pa(q, a2, a2, nat);
+                            let v = finv(q, two_a, nat);
+                            inv2[ci] = Some(v);
+                            v
+                    };
+                    let t = pm(q, a1, a1, nat);
+                    let f4 = pm(q, pm(q, a2, a0, nat), 4, nat);
+                    let disc = fs(q, t, f4, nat);
+                    if let Some(d) = self.sq.sqrt(disc, nat) {
+                        let n1 = fs(q, d, a1, nat);
+                        cand.push(pm(q, n1, i2, nat));
+                        if d != 0 {
+                            let n2 = fs(q, 0, pa(q, a1, d, nat), nat);
+                            cand.push(pm(q, n2, i2, nat));
+                    done = true;
+                } else if a1 != 0 {
+                    let i1 = finv(q, a1, nat);
+                    let n0 = fs(q, 0, a0, nat);
+                    cand.push(pm(q, n0, i1, nat));
+                } else if a0 != 0 {
+                    done = true; // no root of this conic at u0
+                if done {
+                    break;
+            if !done {
+                // both conics vanish on the whole line u = u0
+                return (self.decompose(m, nat), true);
+            for w0 in cand {
+                let (y, z) = if swap { (w0, u0) } else { (u0, w0) };
+                if let Some(&k) = self.idx.get(&[1, y as u32, z as u32]) {
+                    if self.on_net(&self.val2[k as usize], m, nat) {
+                        found.push(k);
+        found.sort_unstable();
+        found.dedup();
+        if found.len() >= 3 {
+            (Some([found[0], found[1], found[2]]), false)
+        } else {
+            (None, false)
+}
+
+/// A conic of the net in the chart `x = 1` with unknowns `(u, w)` (`w` the
+/// variable eliminated; `swap`: `u = z`, `w = y`): the six coefficients of
+/// `1, u, w, u^2, u w, w^2`.
+fn conic_uw(c: &[u32; 6], swap: bool) -> [u64; 6] {
+    let c: [u64; 6] = std::array::from_fn(|i| c[i] as u64);
+    if swap {
+        [c[0], c[2], c[1], c[5], c[4], c[3]]
+    } else {
+        c
+
+/// Counted product of polynomials (ascending coefficients).
+fn pmul_poly(q: u64, a: &[u64], b: &[u64], n: &mut Nat) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    let mut c = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 {
+            continue;
+        for (j, &y) in b.iter().enumerate() {
+            if y != 0 {
+                let t = pm(q, x, y, n);
+                c[i + j] = pa(q, c[i + j], t, n);
+    c
+
+fn psub_poly(q: u64, a: &[u64], b: &[u64], n: &mut Nat) -> Vec<u64> {
+    let mut c = vec![0u64; a.len().max(b.len())];
+    for (i, ci) in c.iter_mut().enumerate() {
+        let x = a.get(i).copied().unwrap_or(0);
+        let y = b.get(i).copied().unwrap_or(0);
+        *ci = if y == 0 { x } else { fs(q, x, y, n) };
+
+/// Resultant in `w` of two conics given by `conic_uw` coefficient vectors:
+/// `(a2 b0 - a0 b2)^2 - (a2 b1 - a1 b2)(a1 b0 - a0 b1)`, a polynomial in `u`
+/// of degree <= 4 (counted).
+fn resultant_w(q: u64, a: &[u64; 6], b: &[u64; 6], n: &mut Nat) -> Vec<u64> {
+    let (a0, a1, a2) = ([a[0], a[1], a[3]], [a[2], a[4]], [a[5]]);
+    let (b0, b1, b2) = ([b[0], b[1], b[3]], [b[2], b[4]], [b[5]]);
+    let x = psub_poly(q, &pmul_poly(q, &a2, &b0, n), &pmul_poly(q, &a0, &b2, n), n);
+    let y = psub_poly(q, &pmul_poly(q, &a2, &b1, n), &pmul_poly(q, &a1, &b2, n), n);
+    let z = psub_poly(q, &pmul_poly(q, &a1, &b0, n), &pmul_poly(q, &a0, &b1, n), n);
+    let xx = pmul_poly(q, &x, &x, n);
+    let yz = pmul_poly(q, &y, &z, n);
+    psub_poly(q, &xx, &yz, n)
 }
 
 /// `kappa = [K - 4 P0]` from the first line (in pair order) whose residual
@@ -1231,6 +1340,26 @@ pub struct QIcParams {
     pub verify_relations: bool,
 }
 
+/// How the degree-3 divisor of a decomposition class is found.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Decomp {
+    /// Evaluate the conics at every rational point of `C` (`O(q)`).
+    #[default]
+    Scan,
+    /// Intersect two conics of the net by a resultant (`O(log q)`).
+    Algebraic,
+}
+
+/// Additive options of [`run_diem_opts`]; the default reproduces
+/// [`run_diem`] exactly.  (Kept apart from [`QIcParams`] so that existing
+/// struct literals of `QIcParams` keep compiling.)
+#[derive(Clone, Copy, Debug, Default)]
+pub struct QIcOpts {
+    pub decomp: Decomp,
+    /// Structured Gaussian elimination between the peel and Wiedemann.
+    pub sge: Option<SgeParams>,
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct QIcResult {
     pub arm: &'static str,
@@ -1286,6 +1415,11 @@ pub struct QIcResult {
     /// points in the index at the end (base point + base + large primes).
     pub fb_samples: u64,
     pub idx_points: u64,
+    /// Merge stage (inside `la`) and its statistics; default when no SGE.
+    pub la_sge: Nat,
+    pub sge: SgeStats,
+    /// Algebraic decompositions that fell back to the scan (every
+    /// elimination degenerate); 0 for `Scan`.
 }
 
 impl QIcResult {
@@ -1369,161 +1503,26 @@ impl Verifier {
     }
 }
 
-/// How a decomposition trial finds the base points of the conic net.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum QDescent {
-    /// The frozen instrument: evaluate the net at every rational point
-    /// ([`Ctx::decompose`], `O(q)` counted work per trial).
-    #[default]
-    Scan,
-    /// [`Ctx::decompose_alg`]: resultant, cubic root finding and at most one
-    /// square root per root, `polylog q` counted work per trial; identical
-    /// output (a counted scan fallback when the net has a common component).
-    Algebraic,
-}
-
-/// When the relation loop asks for a counted linear-algebra attempt.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum QSolve {
-    /// The frozen instrument: every decomposition relation with at most two
-    /// large primes counts towards the inhomogeneous rows, and an attempt
-    /// runs Wiedemann whenever the core is large enough.
-    #[default]
-    Legacy,
-    /// Descent last: decompositions start only once the line relations
-    /// give enough cycles (the frozen cycle check), and a decomposition
-    /// relation counts towards the inhomogeneous rows only if it closes a
-    /// cycle in the component of the vertex "1" of the large-prime graph
-    /// when it is found (its large primes are already linked to the factor
-    /// base), i.e. it reaches the cycle matrix; others are still kept as
-    /// edges.  Line relations alone leave the degree direction
-    /// (`lambda_P + c`, `lambda_kappa + 4c`) and `t` undetermined; two
-    /// linked decomposition rows fix both.  Before Wiedemann, an attempt
-    /// whose core has no row in the `t` column is skipped and charged only
-    /// its structural pass.
-    Linked,
-}
-
-/// How the `DoubleLp` factor base and the point index are built.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum QFactorBase {
-    /// The frozen instrument: enumerate all `~q` rational points
-    /// ([`rational_points`], `O(q log q)` counted work in `rel_enum`), draw
-    /// `nb` of them by a seeded shuffle, and index every point.
-    #[default]
-    Enumerated,
-    /// No enumeration: draw x-coordinates `y` of the chart `[1, y, z]` in a
-    /// seeded order without repetition, find the rational roots `z` of
-    /// `F(1, y, z)` by counted Cantor-Zassenhaus (the same per-`y` work as
-    /// the enumeration) and keep points until `nb` are in the base (counted
-    /// in `rel_enum`).  The point index holds only the base point, the base
-    /// and the large primes seen so far: a residual or descent point not in
-    /// it is checked on the curve (counted) and inserted, and is a large
-    /// prime by definition.  Requires [`QDescent::Algebraic`] (the scan
-    /// needs every point); a descent that would fall back to the scan is
-    /// counted in `decomp_fallbacks` and treated as a failed trial.
-    Sampled,
-}
-
-/// Options of [`run_diem_with`]; the default is the frozen instrument.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct QDiemOpts {
-    pub descent: QDescent,
-    pub solve: QSolve,
-    /// Per-attempt diagnostics (dense rank of the core over `F_r`,
-    /// uncounted, test / diagnosis only).
-    pub diag: bool,
-    /// Inhomogeneous rows wanted before the first attempt (0: the frozen 8);
-    /// every failed attempt adds 4, as in the frozen instrument.
-    pub inhom_rows: u64,
-    /// After every counted decomposition row, step the walk once by `T`
-    /// (one counted Pic addition) besides the frozen step by `G`.
-    ///
-    /// Why: the line relations are homogeneous, so they fix the
-    /// logarithms only up to `alpha v_deg + mu lambda` (`v_deg`: every
-    /// `lambda_P + 1`, `lambda_kappa + 4`, the base-point shift; `lambda`:
-    /// the true logarithms, scale).  A decomposition row of
-    /// `x = [a]G + [b]T` removes the combination
-    /// `-alpha + mu h a + h b (mu t - tau) = 0` from the kernel
-    /// `alpha v_deg + mu lambda + tau e_t`, so `t` is determined only when the
-    /// rows' points `(a_i, b_i)` span the affine plane.  One walk
-    /// `x + i G` puts them all on the line `b = const`: with no line through
-    /// `P0` in the core the frozen first attempt is singular in `t` by
-    /// construction.  The kick moves each later row off that line.
-    pub kick_t: bool,
-    /// Factor-base construction (`DoubleLp` only).
-    pub fb: QFactorBase,
-}
-
-/// One counted attempt's diagnosis (only with [`QDiemOpts::diag`]).
-#[derive(Clone, Copy, Debug, Default)]
-pub struct QAttemptDiag {
-    pub core_rows: usize,
-    pub core_cols: usize,
-    /// Core rows with a nonzero `t` coefficient.
-    pub t_weight: usize,
-    pub rank: usize,
-    /// Rank without the `t` column: `t` is determined iff `rank_no_t + 1 == rank`.
-    pub rank_no_t: usize,
-    /// 0 core too small, 1 Wiedemann `None`, 2 wrong `t`, 3 certified,
-    /// 4 skipped by [`QSolve::Linked`] (no `t` row).
-    pub outcome: u8,
-    /// Inhomogeneous relations found so far / of those, ones that closed a
-    /// cycle in the component of "1" when found.
-    pub inhom: u64,
-    pub inhom_linked: u64,
-}
-
-/// Rank of `rows` (columns `0..ncols`, minus `skip`) over `F_r`, dense
-/// Gaussian elimination, uncounted (diagnosis only).
-fn dense_rank(rows: &[(Vec<(u32, u64)>, u64)], ncols: usize, skip: Option<u32>, r: u64) -> usize {
-    let mut m: Vec<Vec<u64>> = rows
-        .iter()
-        .map(|(t, _)| {
-            let mut v = vec![0u64; ncols];
-            for &(c, x) in t {
-                if Some(c) != skip {
-                    v[c as usize] = x % r;
-                }
-            }
-            v
-        })
-        .collect();
-    let inv = |a: u64| {
-        let (mut b, mut e, mut res) = (a, r - 2, 1u64);
-        while e > 0 {
-            if e & 1 == 1 {
-                res = mulmod(res, b, r);
-            }
-            b = mulmod(b, b, r);
-            e >>= 1;
-        }
-        res
-    };
-    let mut rank = 0;
-    for c in 0..ncols {
-        let Some(pr) = (rank..m.len()).find(|&i| m[i][c] != 0) else {
-            continue;
-        };
-        m.swap(rank, pr);
-        let ip = inv(m[rank][c]);
-        let piv = m[rank].clone();
-        for (i, row) in m.iter_mut().enumerate() {
-            if i != rank && row[c] != 0 {
-                let f = mulmod(row[c], ip, r);
-                for k in c..ncols {
-                    if piv[k] != 0 {
-                        row[k] = subm(row[k], mulmod(f, piv[k], r), r);
-                    }
-                }
-            }
-        }
-        rank += 1;
+/// Advance `rng` exactly as `wiedemann` on an `nr x ncols` system would
+/// (see `genus_ladder::skip_wiedemann_draws`), so that the relation phase
+/// after a failed attempt is the same with and without the merge.
+fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense_u: bool) {
+    for _ in 0..nr {
+        let _: u64 = rng.gen_range(1..r);
     }
-    rank
+    if dense_u || ncols <= 16 {
+        for _ in 0..ncols {
+            let _: u64 = rng.gen_range(1..r);
+        }
+    } else {
+        for _ in 0..16 {
+            let _: usize = rng.gen_range(0..ncols);
+            let _: u64 = rng.gen_range(1..r);
+        }
+    }
 }
 
-/// Run one Diem arm on an instance (the frozen instrument).
+/// Run one Diem arm on an instance (scan decomposition, no merge).
 pub fn run_diem(inst: &QInstance, prm: QIcParams) -> QIcResult {
     run_diem_with(inst, prm, QDiemOpts::default())
 }
@@ -1531,7 +1530,6 @@ pub fn run_diem(inst: &QInstance, prm: QIcParams) -> QIcResult {
 /// [`run_diem`] with the descent and solve policy chosen by `opts`.
 pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcResult {
     run_diem_inner(inst, prm, opts, None)
-}
 
 /// The seeded factor-base draw of the enumerated `DoubleLp` arm: point
 /// indices (never `p0i`) in base order.
@@ -1544,7 +1542,6 @@ fn shuffled_base(n: usize, p0i: usize, q: u32, nb: usize) -> Vec<usize> {
     }
     order.truncate(nb.clamp(2, n - 1));
     order
-}
 
 /// The sampled factor base ([`QFactorBase::Sampled`]) in a dynamic
 /// context: up to `nb` points `[1, y, z] != p0`, `y` in the seeded order
@@ -1567,7 +1564,6 @@ fn sampled_base(
             }
         }
         return (base, 0);
-    }
     let q = ctx.q;
     let m4 = mons_of_degree(4);
     let f = ctx.f;
@@ -1579,40 +1575,30 @@ fn sampled_base(
     for i in 0..q {
         if base.len() >= nb {
             break;
-        }
         let y = ((alpha as u128 * i as u128 + beta as u128) % q as u128) as u64;
         samples += 1;
         // F(1, y, z) as a polynomial in z (the per-y work of rational_points)
         let mut yp = [1u64, y, 0, 0, 0];
         for k in 2..5 {
             yp[k] = pm(q, yp[k - 1], y, nat);
-        }
         let mut co = [0u64; 5];
         for (k, &(_a, b, c)) in m4.iter().enumerate() {
             if f[k] == 0 {
                 continue;
-            }
             let t = if b == 0 {
                 f[k] as u64
             } else {
                 pm(q, f[k] as u64, yp[b as usize], nat)
             };
             co[c as usize] = pa(q, co[c as usize], t, nat);
-        }
         for z in proots(q, &co, &mut rs, nat) {
             let pt = [1, y as u32, z as u32];
             if pt == p0 {
-                continue;
-            }
             if base.len() >= nb {
                 break;
-            }
             // distinct fibres give distinct points: no lookup needed
             base.push(ctx.insert_new(pt, nat) as usize);
-        }
-    }
     (base, samples)
-}
 
 fn run_diem_inner(
     inst: &QInstance,
@@ -1620,6 +1606,10 @@ fn run_diem_inner(
     opts: QDiemOpts,
     given_base: Option<&[Pt]>,
 ) -> QIcResult {
+    run_diem_opts(inst, prm, QIcOpts::default())
+
+/// Run one Diem arm on an instance with the additive options.
+pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResult {
     let start = Instant::now();
     let pq = inst.curve();
     let c_start = pq.counter();
@@ -1783,79 +1773,41 @@ fn run_diem_inner(
             res.line_relations += 1;
         }
 
-        // Legacy: decompositions, then the cycle check (the frozen order).
-        // Linked: the cycle check first, decompositions once the factor-base
-        // logarithms are determined up to the degree direction (descent last).
-        for stage in 0..2u8 {
-            let inhom_now = (stage == 0) == (opts.solve == QSolve::Legacy);
-            // ── inhomogeneous rows: x = [a]G + [b]T, a stepped by G ──
-            if inhom_now && ninhom < want_inhom {
-                let mut a = rng.gen_range(1..r);
-                let mut b = rng.gen_range(1..r);
-                let ag = cmul(&pq, &mut ops, &g, a);
-                let bt = cmul(&pq, &mut ops, &tgt, b);
-                let mut x = pq.add(&ag, &bt);
-                ops.adds += 1;
-                while ninhom < want_inhom {
-                    if res.decomp_trials >= max_decomp {
-                        res.exhausted = true;
-                        break 'outer;
-                    }
-                    res.decomp_trials += 1;
-                    let mut kick = false;
-                    if let PicClass::Typ(m) = &x {
-                        let dec = match opts.descent {
-                            QDescent::Scan => ctx.decompose(m, &mut res.rel_decomp),
-                            QDescent::Algebraic => {
-                                match ctx.decompose_alg(m, &mut drs, &mut res.rel_decomp) {
-                                    Ok(d) => d,
-                                    Err(()) if sampled => {
-                                        res.decomp_fallbacks += 1;
-                                        None
-                                    }
-                                    Err(()) => {
-                                        res.decomp_fallbacks += 1;
-                                        ctx.decompose(m, &mut res.rel_decomp)
-                                    }
-                                }
-                            }
-                        };
-                        if let Some(qs) = dec {
-                            let tcoef = subm(0, mulmod(h, b, r), r);
-                            let rhs = mulmod(h, a, r);
-                            if let Some((rel, lps)) = make_rel(&qs, tcoef, rhs, &col) {
-                                let good =
-                                    !prm.verify_relations || ver.check(&pq, &mut ctx, &qs, true, &x);
-                                if good {
-                                    // does the edge close a cycle in the component of "1"?
-                                    // (counted DSU finds under Linked; an uncounted,
-                                    // non-compressing read under Legacy, so the
-                                    // frozen instrument's counts are unchanged)
-                                    let linked = if opts.solve == QSolve::Linked {
-                                        let r0 = dsu.find(0);
-                                        lps.iter().all(|k| match vid.get(k) {
-                                            Some(&v) => dsu.find(v) == r0,
-                                            None => false,
-                                        })
-                                    } else {
-                                        let r0 = dsu_root(&dsu, 0);
-                                        lps.iter().all(|k| match vid.get(k) {
-                                            Some(&v) => dsu_root(&dsu, v) == r0,
-                                            None => false,
-                                        })
-                                    };
-                                    push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
-                                    res.decomp_relations += 1;
-                                    if linked {
-                                        res.inhom_linked += 1;
-                                    }
-                                    if linked || opts.solve == QSolve::Legacy {
-                                        ninhom += 1;
-                                        kick = true;
-                                    }
-                                } else {
-                                    res.bad_relations += 1;
-                                }
+        // ── inhomogeneous rows: x = [a]G + [b]T, a stepped by G ──
+        if ninhom < want_inhom {
+            let mut a = rng.gen_range(1..r);
+            let b = rng.gen_range(1..r);
+            let ag = cmul(&pq, &mut ops, &g, a);
+            let bt = cmul(&pq, &mut ops, &tgt, b);
+            let mut x = pq.add(&ag, &bt);
+            ops.adds += 1;
+            while ninhom < want_inhom {
+                if res.decomp_trials >= max_decomp {
+                    res.exhausted = true;
+                    break 'outer;
+                }
+                res.decomp_trials += 1;
+                if let PicClass::Typ(m) = &x {
+                    let dec = match opts.decomp {
+                        Decomp::Scan => ctx.decompose(m, &mut res.rel_decomp),
+                        Decomp::Algebraic => {
+                            let (d, fb) = ctx.decompose_alg(m, &mut res.rel_decomp);
+                            res.decomp_fallbacks += u64::from(fb);
+                            d
+                        }
+                    };
+                    if let Some(qs) = dec {
+                        let tcoef = subm(0, mulmod(h, b, r), r);
+                        let rhs = mulmod(h, a, r);
+                        if let Some((rel, lps)) = make_rel(&qs, tcoef, rhs, &col) {
+                            let good =
+                                !prm.verify_relations || ver.check(&pq, &mut ctx, &qs, true, &x);
+                            if good {
+                                push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
+                                res.decomp_relations += 1;
+                                ninhom += 1;
+                            } else {
+                                res.bad_relations += 1;
                             }
                         }
                     }
@@ -1928,38 +1880,32 @@ fn run_diem_inner(
             dg.inhom_linked = res.inhom_linked;
         }
         if core.len() >= cc + margin(cc) {
-            // Linked: no core row holds t, so t is not determined (counted scan)
-            let t_seen = opts.solve == QSolve::Legacy || {
-                let mut seen = false;
-                for (t, _) in &core {
-                    res.la.add += t.len() as u64;
-                    if t.iter().any(|&(c, v)| c == ct && v != 0) {
-                        seen = true;
-                        break;
-                    }
+            let dense = res.attempts > 1;
+            let sol = match opts.sge {
+                None => {
+                    wiedemann(&core, cc, r, &mut rng, dense, &mut res.la).map(|xs| xs[ct as usize])
                 }
-                seen
+                Some(sp) => {
+                    let mut s_nat = Nat::default();
+                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                    res.la_sge.merge(s_nat);
+                    res.la.merge(s_nat);
+                    res.sge = st;
+                    // solved with a copy of the stream; the stream itself
+                    // advances as the unmerged solve would
+                    let mut wrng = rng.clone();
+                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut res.la)
+                        .map(|xs| xs[rct as usize])
+                }
             };
-            dg.outcome = 1;
-            if !t_seen {
-                res.la_skipped += 1;
-                dg.outcome = 4;
-            } else {
-                let dense = res.attempts > 1;
-                if let Some(xs) = wiedemann(&core, cc, r, &mut rng, dense, &mut res.la) {
-                    let t = xs[ct as usize];
-                    let chk = cmul(&pq, &mut ops, &g, t);
-                    dg.outcome = 2;
-                    if chk == tgt {
-                        res.recovered = Some(t);
-                        res.certified = true;
-                        solved = true;
-                        dg.outcome = 3;
-                        if opts.diag {
-                            res.diag.push(dg);
-                        }
-                        continue;
-                    }
+            if let Some(t) = sol {
+                let chk = cmul(&pq, &mut ops, &g, t);
+                if chk == tgt {
+                    res.recovered = Some(t);
+                    res.certified = true;
+                    solved = true;
+                    continue;
                 }
             }
         }
@@ -2801,6 +2747,108 @@ mod tests {
     #[test]
     fn end_to_end_q251() {
         end_to_end(251, 48);
+    }
+
+    /// The algebraic decomposition returns exactly the scan's answer.
+    #[test]
+    fn algebraic_decomposition_matches_scan() {
+        for (q, seed) in [(101u32, 3u64), (251, 4), (1031, 5)] {
+            let (pq, pts) = curve(q, seed);
+            let mut nat = Nat::default();
+            let ctx = Ctx::new(q, pq.coefficients(), &mut nat);
+            let mut rng = StdRng::seed_from_u64(seed ^ 0xD1CE);
+            let (mut typ, mut some, mut fallbacks) = (0, 0, 0);
+            let (mut sc, mut al) = (Nat::default(), Nat::default());
+            for i in 0..260 {
+                let x = if i % 2 == 0 {
+                    random_class(&pq, &pts, &mut rng)
+                } else {
+                    let y = random_class(&pq, &pts, &mut rng);
+                    pq.add(&y, &random_class(&pq, &pts, &mut rng))
+                };
+                let PicClass::Typ(m) = &x else { continue };
+                typ += 1;
+                let a = ctx.decompose(m, &mut sc);
+                let (b, fb) = ctx.decompose_alg(m, &mut al);
+                assert_eq!(a, b, "q={q} class {i}");
+                some += usize::from(a.is_some());
+                fallbacks += usize::from(fb);
+            }
+            eprintln!(
+                "q={q}: {typ} typical classes, {some} decomposed, {fallbacks} fallbacks, scan mul {} alg mul {}",
+                sc.mul, al.mul
+            );
+            assert!(typ >= 200, "q={q}: only {typ} typical classes");
+            assert!(some >= 20, "q={q}: only {some} decompositions");
+            if q >= 1031 {
+                assert!(al.mul < sc.mul, "q={q}: algebraic not cheaper");
+            }
+        }
+    }
+
+    /// Same relations, rows and logarithm with the scan and with the
+    /// algebraic decomposition; SGE leaves the relation phase unchanged.
+    #[test]
+    fn algebraic_and_sge_runs_are_identical_where_they_must() {
+        for (q, nb) in [(101u32, 30usize), (251, 48)] {
+            let inst = instance(q);
+            let prm = QIcParams {
+                arm: QArm::DoubleLp,
+                nb,
+                seed: 9,
+                max_lines: 1 << 22,
+                verify_relations: true,
+            };
+            let a = run_diem_opts(&inst, prm, QIcOpts::default());
+            let b = run_diem_opts(
+                &inst,
+                prm,
+                QIcOpts {
+                    decomp: Decomp::Algebraic,
+                    sge: None,
+                },
+            );
+            let c = run_diem_opts(
+                &inst,
+                prm,
+                QIcOpts {
+                    decomp: Decomp::Algebraic,
+                    sge: Some(SgeParams {
+                        w_max: 8,
+                        fill_max: 3.0,
+                    }),
+                },
+            );
+            for x in [&a, &b, &c] {
+                assert!(x.certified);
+                assert_eq!(x.recovered, Some(inst.t_secret));
+                assert_eq!(x.bad_relations, 0);
+            }
+            let key = |x: &QIcResult| {
+                (
+                    x.relations,
+                    x.rels_by_lp,
+                    x.line_relations,
+                    x.decomp_relations,
+                    x.decomp_trials,
+                    x.lines_tried,
+                    x.attempts,
+                    x.core_rows,
+                    x.core_cols,
+                    x.group_ops,
+                    x.pic_mul,
+                    (x.pic_inv, x.rel_enum.mul, x.rel_enum.add),
+                )
+            };
+            assert_eq!(key(&a), key(&b), "q={q} scan vs algebraic");
+            assert_eq!(key(&a), key(&c), "q={q} scan vs algebraic+sge");
+            assert_eq!(a.decomp_fallbacks + b.decomp_fallbacks, 0);
+            assert!(c.sge.rows_in > 0 && c.la_sge.mul + c.la_sge.add > 0);
+            eprintln!(
+                "q={q}: decomp scan {} alg {}; la {} vs +sge {} (sge {})",
+                a.rel_decomp.mul, b.rel_decomp.mul, b.la.mul, c.la.mul, c.la_sge.mul
+            );
+        }
     }
 
     /// Timing check at q = 1031 (run with `--ignored`).

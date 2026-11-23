@@ -236,7 +236,7 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
                 // 2^61 = 1 mod p: end-around carry rather than u128 divide.
                 let product = a as u128 * b as u128;
                 let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-                let folded = (folded & MAX_PRIME) + (folded >> 61);
+                // Canonical product < p^2, hence the first fold < 2p.
                 if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
             } else if p <= u32::MAX as u64 && a < p && b < p {
                 (a * b) % p
@@ -555,7 +555,8 @@ fn vmul(a: u64, b: u64, p: u64) -> u64 {
     if p == MAX_PRIME && a < p && b < p {
         let product = a as u128 * b as u128;
         let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-        let folded = (folded & MAX_PRIME) + (folded >> 61);
+        // Independent verifier: one fold plus one correction is exact
+        // for canonical operands, including p-1 times p-1.
         if folded >= p { folded - p } else { folded }
     } else if p <= u32::MAX as u64 && a < p && b < p {
         (a * b) % p
@@ -563,6 +564,7 @@ fn vmul(a: u64, b: u64, p: u64) -> u64 {
         ((a as u128 * b as u128) % p as u128) as u64
     }
 }
+#[expect(dead_code, reason = "retained as the Fermat inversion reference")]
 fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1;
     while e > 0 {
@@ -1405,7 +1407,7 @@ mod tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };

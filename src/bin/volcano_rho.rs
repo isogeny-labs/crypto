@@ -959,7 +959,8 @@ fn write_ecbench(
     };
     let spec = |label: &str, arms: serde_json::Value, seed: u64| {
         json!({
-            "schema": "ecbench.spec/v1",
+            "schema": "ecbench.spec/v2",
+            "curve_policy": {"mode": "diagnostic", "off_panel_reason": "volcano rho study requires every generated isogenous model in one exact graph"},
             "label": label,
             "description": format!(
                 "volcano-rho --ecbench: every curve of an {}-isogeny volcano over F_{} ({} curves x {} models), \

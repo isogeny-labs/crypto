@@ -1,0 +1,97 @@
+name: Prime31 transformed-slot S3 chart original-source gate
+on:
+  push:
+    branches:
+      - automation/prime31-horner-xy-chain-20261119
+    paths:
+      - '.github/workflows/prime31-transformed-slot-f3.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_transformed_slot_f3.py'
+      - 'research/prime31_ic_20261115/rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md'
+  pull_request:
+    paths:
+      - '.github/workflows/prime31-transformed-slot-f3.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_transformed_slot_f3.py'
+      - 'research/prime31_ic_20261115/rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md'
+permissions:
+  contents: read
+jobs:
+  original-prime31-rust-chart:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs
+            research/prime31_ic_20261115/native/verify_prime31_transformed_slot_f3.py
+            research/prime31_ic_20261115/rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md
+      - name: Fetch pinned original Rust Arithmetic / PRIME31
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/
+            src/cryptanalysis/f4_fp_tower.rs
+            src/cryptanalysis/sig_fp_tower.rs
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Copy only candidate example into original pinned Rust crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs
+          git rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md \
+            research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs
+      - name: Run original 40-test Rust baseline
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Focused transformed F3 original-Rust tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_transformed_slot_f3
+      - name: Run preregistered original-Rust 512-case cohort
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_transformed_slot_f3 > prime31-transformed-f3-full.json
+          jq -e '.schema=="prime31.transformed_slot_f3.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==128 and .tested==512 and
+            .ordinary==512 and .exceptional==0 and
+            .h_zero==4096 and .s3_zero==3584 and .k_zero==3584 and
+            .wrong_slot_rejected==512 and
+            .mutated_public_target_rejected==512 and
+            .post_solve_sign_lift_verified==512 and
+            .direct_variables==14 and .direct_equations==15 and
+            .direct_max_total_degree==8 and
+            .eliminated_variables==7 and .eliminated_equations==8 and
+            .eliminated_max_total_degree_bound==32 and
+            .generic_sum_table_calls==0 and
+            .planted_witness_controls_only==true and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false and .pcc_signed==false' prime31-transformed-f3-full.json
+      - name: Independent full 512-case affine EC and polynomial replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_transformed_slot_f3.py \
+            prime31-transformed-f3-full.json | tee prime31-transformed-f3-independent.json
+          sha256sum prime31-transformed-f3-full.json prime31-transformed-f3-independent.json \
+            research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs \
+            research/prime31_ic_20261115/native/verify_prime31_transformed_slot_f3.py \
+            research/prime31_ic_20261115/rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md | tee sha256.txt
+      - name: Upload frozen run outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-transformed-f3-source-evidence
+          path: |
+            prime31-transformed-f3-full.json
+            prime31-transformed-f3-independent.json
+            sha256.txt
+          if-no-files-found: warn
