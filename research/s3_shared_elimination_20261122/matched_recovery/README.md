@@ -46,6 +46,10 @@ expected incomplete outcomes. No arm is excluded from that flow.
   metadata extraction of those printed outcomes, not another solver run.
 - [Bindings audit](evidence/attempt1/bindings-audit.postcall.json) records the
   51 source/input checks and unchanged immutable executable identities.
+- [Registration records](registration/README.md) bind unsigned statement
+  PCC-20261123-13014e to the committed receipt, without scientific verification.
+- [CI dispatch plan](ci-dispatch-plan.json) fixes the exact published source
+  and maintained workflow inputs; no run has been launched.
 
 The example digest is
 `dd965d7116f387ed9cd61cf79fedcee8230af768f3352a503d3da563d69d0868`.
