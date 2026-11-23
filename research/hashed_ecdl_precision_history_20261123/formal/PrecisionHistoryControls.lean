@@ -1,0 +1,154 @@
+import PrecisionHistory
+
+open CryptoLeanCore.TaperedPrecision
+open NativePrecisionHistory
+
+namespace NativePrecisionHistoryControls
+
+private def edges (k : Nat) : Nat := if k = 0 then 64 else if k = 1 then 8 else 1
+private def exponents (k : Nat) : Nat := if k = 0 then 2 else 4
+private def precisions (k : Nat) : Nat := if k = 0 then 64 else if k = 1 then 7744 else 11136
+private def badStart (k : Nat) : Nat :=
+  if k = 0 then 1000000000 else if k = 1 then 1000007680 else 1000011072
+private def edgeDrop (k : Nat) : Nat := if k = 0 then 1 else 0
+private def arbitraryPrecision (k : Nat) : Nat := if k = 0 then 1 else 1000
+private def composedEdges (k : Nat) : Nat := if k = 0 then 128 else 16
+private def composedScale (k : Nat) : Nat := if k = 0 then 1 else 16
+private def composedCoordinate (k : Nat) : Nat := if k = 0 then 0 else 15
+private def composedPrecision (k : Nat) : Nat :=
+  if k = 0 then 129 else if k = 1 then 15489 else 12602881
+
+theorem positive_two_step : precisions 2 ≤ 81 * 64 * 2 ^ 4 := by
+  apply inherited_precision_le 64 4 2 edges (fun _ => 1) exponents (fun _ => 0) precisions
+  · decide
+  · decide
+  · intro k hk
+    have h : k = 0 ∨ k = 1 := by omega
+    rcases h with rfl | rfl <;> decide
+  · intro k hk
+    have h : k = 0 ∨ k = 1 := by omega
+    rcases h with rfl | rfl <;> decide
+  · intro k hk
+    have h : k = 0 ∨ k = 1 := by omega
+    rcases h with rfl | rfl <;> decide
+  · intro k hk
+    have h : k = 0 ∨ k = 1 := by omega
+    rcases h with rfl | rfl <;> decide
+
+theorem positive_empty_history : (fun _ : Nat => 5) 0 ≤ 81 * 7 * 2 ^ 0 := by
+  apply inherited_precision_le 7 0 0 (fun _ => 7) (fun _ => 1)
+    (fun _ => 0) (fun _ => 0) (fun _ => 5)
+  · decide
+  · decide
+  · intro k hk; omega
+  · intro k hk; omega
+  · intro k hk; omega
+  · intro k hk; omega
+
+theorem positive_composed_endpoint :
+    composedPrecision 2 * composedScale 1 ≤
+      34 * composedEdges 1 * 2 ^ (2 + 2 * composedScale 1 - composedCoordinate 1) := by
+  apply next_precision_mul_le 256 2 1 16 composedEdges composedScale
+    (fun _ => 2) composedCoordinate composedPrecision
+  · exact (nonempty_normalization 128 (by decide)).1
+  · exact (nonempty_normalization 128 (by decide)).2
+  · intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+  · intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+  · intro k hk; decide
+  · intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+  · decide
+  · decide
+  · decide
+  · decide
+  · decide
+  · decide
+
+/-- All non-initial-budget hypotheses remain true. -/
+theorem without_initial_budget :
+    edges 0 ≤ 64 ∧
+    (∀ k < 2, 8 * edges (k + 1) ≤ edges k) ∧
+    (∀ k < 2, 0 < (1 : Nat) ∧ 1 ≤ edges k) ∧
+    (∀ k < 2, exponents k ≤ 4) ∧
+    (∀ k < 2, badStart (k + 1) = childPrecision (badStart k) (edges k) 1 (exponents k) 0) ∧
+    ¬ (badStart 2 ≤ 81 * 64 * 2 ^ 4) := by
+  refine ⟨by decide, ?_, ?_, ?_, ?_, by decide⟩
+  all_goals
+    intro k hk
+    have h : k = 0 ∨ k = 1 := by omega
+    rcases h with rfl | rfl <;> decide
+
+/-- Initial budget, shrink, scale, exponent and recurrence are kept. -/
+theorem without_root_edge_bound :
+    (1 : Nat) ≤ 1 ∧
+    (∀ k < 1, 8 * (if k + 1 = 0 then 1000000 else 0) ≤
+      (if k = 0 then 1000000 else 0)) ∧
+    (∀ k < 1, 0 < (1 : Nat) ∧ 1 ≤ (if k = 0 then 1000000 else 0)) ∧
+    (∀ k < 1, (0 : Nat) ≤ 0) ∧
+    (∀ k < 1, (if k + 1 = 0 then 1 else 32000001) =
+      childPrecision (if k = 0 then 1 else 32000001)
+        (if k = 0 then 1000000 else 0) 1 0 0) ∧
+    ¬ ((32000001 : Nat) ≤ 81 * 1 * 2 ^ 0) := by
+  refine ⟨by decide, ?_, ?_, ?_, ?_, by decide⟩
+  all_goals
+    intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+
+/-- A constant edge count with exact repeated increments violates the bound. -/
+theorem without_edge_shrink :
+    (1 : Nat) ≤ 1 ∧ (1 : Nat) ≤ 1 ∧
+    (∀ k < 4, 0 < (1 : Nat) ∧ 1 ≤ 1) ∧
+    (∀ k < 4, (0 : Nat) ≤ 0) ∧
+    (∀ k < 4, 1 + 32 * (k + 1) = childPrecision (1 + 32 * k) 1 1 0 0) ∧
+    ¬ ((1 + 32 * 4 : Nat) ≤ 81 * 1 * 2 ^ 0) := by
+  refine ⟨by decide, by decide, ?_, ?_, ?_, by decide⟩
+  · intro k hk; decide
+  · intro k hk; decide
+  · intro k hk
+    simp only [childPrecision]
+    omega
+
+/-- Only the common exponent cap is deleted. -/
+theorem without_exponent_cap :
+    edgeDrop 0 ≤ 1 ∧ (1 : Nat) ≤ 1 ∧
+    (∀ k < 1, 8 * edgeDrop (k + 1) ≤ edgeDrop k) ∧
+    (∀ k < 1, 0 < (1 : Nat) ∧ 1 ≤ edgeDrop k) ∧
+    (∀ k < 1, (if k + 1 = 0 then 1 else 24665) =
+      childPrecision (if k = 0 then 1 else 24665) (edgeDrop k) 1 10 0) ∧
+    ¬ ((24665 : Nat) ≤ 81 * 1 * 2 ^ 0) := by
+  refine ⟨by decide, by decide, ?_, ?_, ?_, by decide⟩
+  all_goals
+    intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+
+/-- Without the exact recurrence, the final precision is unconstrained. -/
+theorem without_exact_recurrence :
+    edgeDrop 0 ≤ 1 ∧ arbitraryPrecision 0 ≤ 1 ∧
+    (∀ k < 1, 8 * edgeDrop (k + 1) ≤ edgeDrop k) ∧
+    (∀ k < 1, 0 < (1 : Nat) ∧ 1 ≤ edgeDrop k) ∧
+    (∀ k < 1, (0 : Nat) ≤ 0) ∧
+    ¬ (arbitraryPrecision 1 ≤ 81 * 1 * 2 ^ 0) := by
+  refine ⟨by decide, by decide, ?_, ?_, ?_, by decide⟩
+  · intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+  · intro k hk
+    have h : k = 0 := by omega
+    subst k
+    decide
+  · intro k hk; decide
+
+end NativePrecisionHistoryControls
