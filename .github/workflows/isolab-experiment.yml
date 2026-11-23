@@ -239,8 +239,21 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          # Harness scripts only; research study store trees are not experiment inputs
-          # and cannot hydrate while S3 is AllAccessDisabled (see build job note).
+          # Harness scripts are Git-tracked. ic-size-sweep-20261026 validation
+          # blobs are store-backed, unrecovered while S3 is AllAccessDisabled
+          # (see build job note), and are not inputs for ordinary m45-t4-finish /
+          # non-size_sweep launch — quarantine their manifests so pull can finish.
+          set -euo pipefail
+          skip_root=taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026
+          if [[ -d "$skip_root" ]]; then
+            mkdir -p "$RUNNER_TEMP/skipped-ic-size-sweep-manifests"
+            while IFS= read -r -d '' m; do
+              rel="${m#./}"
+              mv "$m" "$RUNNER_TEMP/skipped-ic-size-sweep-manifests/${rel//\//_}"
+            done < <(find "$skip_root" -name '.artifacts.json' -print0)
+            echo "Skipping unrecovered $skip_root store pull (S3 disabled; not required for ordinary experiment launch)."
+            find "$RUNNER_TEMP/skipped-ic-size-sweep-manifests" -type f | wc -l
+          fi
           python3 tools/artifacts/artifacts.py pull --jobs 16 taskq/deploy/eks-karpenter
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
