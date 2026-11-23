@@ -45,6 +45,9 @@ jobs:
       - name: Exact paired Newton versus balanced-tree whole S3 x-root oracle, B64 to B677
         timeout-minutes: 5
         run: cargo run --locked --release --example prime31_monic_s3_pair_oracle -- --compare
+      - name: Setup-charged cached Newton vs balanced tree vs uncached Newton, B64 to B677
+        timeout-minutes: 5
+        run: cargo run --locked --release --example prime31_monic_s3_pair_oracle -- --compare-cached
       - name: Matched m2 F4 arms, planted genuine Prime31 S3
         run: cargo run --locked --release --example prime31_trace_f4_pilot
       - name: Quadratic Newton circuit versus matched F4 arms
