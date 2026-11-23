@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:12:51Z",
+ "id": "PCC-20261123-e89520",
+ "kind": "statement",
+ "producer": {
+  "commit": "2e3e496be74639b01960d5a7386b8b56675e5939",
+  "model": "",
+  "session": "codex-ecc2k-adjoint-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/artifact-autofix-45213255631.txt.xz",
+    "sha256": "70bd2b04e1465d60ab87e361c44b9efe2f58e233c86051dda8bfc84e8aa87ad4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/artifact-autofix-45213255631.json",
+    "sha256": "b635a165e2b984f332c73675e9504afbfb56a097a40f2557fb3ba3f1b450bd1d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Observed authenticated artifact publication failure only; no inference about mathematical feasibility or algorithm measurements.",
+ "statement": "PR5015 artifact-autofix run45213255631 at head2e3e496b failed its original upload/replay step with HTTP403 on HeadObject requests for five distinct content-addressed objects. The cause and object existence are not established. Code and complete original raw payloads remain preserved in the PR; remote migration and normal merge gates remain unresolved."
+}

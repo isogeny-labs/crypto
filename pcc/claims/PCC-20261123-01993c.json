@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T09:40:29Z",
+ "id": "PCC-20261123-01993c",
+ "kind": "measurement",
+ "producer": {
+  "commit": "53f4110986537b3a6a8e744153ba8537c2713b4c",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/summary-hot-a1.json",
+    "sha256": "b84a89f12c5c657ee038c34908b8b852487c66607ec826c758699327a4929ddc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/diagnostics-hot-a1.json",
+    "sha256": "7c8f2e25816d756be36d0204b2457b92dfa18d41013a428ee2bb1302b6a9caf6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/observed-frontier.json",
+    "sha256": "b400dde951c712a2d9d49685bdded0860504495ceaaab40b662f839355935759"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/PROTOCOL_HOT.json",
+    "sha256": "c99120343f99c5bde54c9846d953fc80d2488df9e1cf2e7a12d096e8737358ea"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Final hotp31 matrix completes24192 rows/scalar replays,10632 generation checks and6720 exact trial/pair-scan comparisons, with every arm completing. Predeclared combined-native-balanced mean3.171358ms improves same-target baseline3.491454ms but fails strict parity against all twelve generic/native rho controls; fastest observed mean native-tuned32 is2.419907ms. The quarter ablation mean3.005858ms also exceeds that reference. Native finite-frontier supplement retains all eight stages/118110 raw records; no global Pareto or cryptographic-size claim. Unsigned producer data."
+}

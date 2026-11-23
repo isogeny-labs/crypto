@@ -19,6 +19,9 @@ pub enum ReplayForm {
     /// Same wire families, with packed monomials throughout construction.
     PackedSparse,
     PackedDag,
+    /// Same complete wires and checks, using sorted-vector packed storage.
+    FlatSparse,
+    FlatDag,
 }
 
 /// Accepted only after independent wire replay and the native representation check.
@@ -58,10 +61,10 @@ fn packed_check(
     form: ReplayForm,
 ) -> Result<ReplayChecked, String> {
     match form {
-        ReplayForm::CompactSparse | ReplayForm::PackedSparse => {
+        ReplayForm::CompactSparse | ReplayForm::PackedSparse | ReplayForm::FlatSparse => {
             relation_replay_checker::packed::verify_json(original, witness)
         }
-        ReplayForm::CompactDag | ReplayForm::PackedDag => {
+        ReplayForm::CompactDag | ReplayForm::PackedDag | ReplayForm::FlatDag => {
             relation_replay_checker::packed::verify_dag_json(original, witness)
         }
     }
@@ -99,6 +102,8 @@ pub fn try_packed_replay_basis(
         }
         ReplayForm::PackedSparse => algebra::packed_constructor::produce_sparse(&system, kernels)?,
         ReplayForm::PackedDag => algebra::packed_constructor::produce_dag(&system, kernels)?,
+        ReplayForm::FlatSparse => algebra::flat_constructor::produce_sparse(&system, kernels)?,
+        ReplayForm::FlatDag => algebra::flat_constructor::produce_dag(&system, kernels)?,
     };
     let checked = packed_check(&original_json, &witness_json, form)?;
     let basis = export_replayed(&checked, p)?;

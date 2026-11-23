@@ -1,0 +1,57 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded tikv-jemallocator v0.6.1
+  Downloaded tikv-jemalloc-sys v0.6.1+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7
+   Compiling tikv-jemalloc-sys v0.6.1+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7
+   Compiling isogeny_algos v0.1.0 (/workspace/crypto-unit-descent-20261123/isogeny_algos)
+   Compiling factor-base v0.1.0 (/workspace/crypto-unit-descent-20261123/tools/factor-base)
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto-unit-descent-20261123/crates/hashed-ecdl-tensor)
+   Compiling ecdl-tensor-ic v0.1.0 (/workspace/crypto-unit-descent-20261123/crates/ecdl-tensor-ic)
+   Compiling volcano-cli v0.1.0 (/workspace/crypto-unit-descent-20261123/tools/volcano-cli)
+   Compiling pencil-symbolic-graph v0.1.0 (/workspace/crypto-unit-descent-20261123/research/pencil_large_prime_20261029)
+   Compiling certified-relations v0.1.0 (/workspace/crypto-unit-descent-20261123/crates/certified-relations)
+   Compiling relation-replay-checker v0.1.0 (/workspace/crypto-unit-descent-20261123/crates/relation-replay-checker)
+   Compiling tikv-jemallocator v0.6.1
+   Compiling crypto v0.1.0 (/workspace/crypto-unit-descent-20261123)
+error: mismatched closing delimiter: `)`
+   --> src/cryptanalysis/binary_hyperelliptic_index_calculus.rs:640:94
+    |
+640 |     let chunks: Vec<(Vec<HecRelation>, HecIndexCalculusReport)> = std::thread::scope(|scope| {
+    |                                                                                     -        ^ unclosed delimiter
+    |                                                                                     |
+    |                                                                                     closing delimiter possibly meant for this
+...
+656 |     });
+    |      ^ mismatched closing delimiter
+
+error: this file contains an unclosed delimiter
+    --> src/cryptanalysis/binary_hyperelliptic_index_calculus.rs:1233:2
+     |
+  75 | pub struct BhecFactorBase {
+     |                           - unclosed delimiter
+...
+  79 | impl BhecFactorBase {
+     |                     - unclosed delimiter
+...
+  84 |     pub fn is_empty(&self) -> bool {
+     |                                    - unclosed delimiter
+...
+  87 |     pub fn index_of_x(&self, x: &BigUint) -> Option<usize> {
+     |                                                            - unclosed delimiter
+...
+ 103 | pub fn affine_point_for_x(curve: &HyperellipticCurve, x: &F2mElement) -> Option<F2mElement> {
+     |                                                                                             - unclosed delimiter
+...
+ 128 | fn artin_schreier_solve(a: &F2mElement, irr: &IrreduciblePoly) -> Option<F2mElement> {
+     |                                                                                      - another 198 unclosed delimiters begin from here
+...
+ 642 |         for t in 0..threads {
+     |                             - this delimiter might not be properly closed...
+...
+ 656 |     });
+     |     - ...as it matches this but it has different indentation
+...
+1233 |
+     | ^
+
+error: could not compile `crypto` (lib test) due to 2 previous errors

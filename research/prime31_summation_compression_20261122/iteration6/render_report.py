@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Layout the iteration-six report and its vector topology figure.
+"""Layout the maintained iteration-six through ten research report.
 
 This script renders supplied prose, equations, and recorded validation status.
 It performs no finite-field, curve, resultant, solver, or benchmark calculation.
@@ -13,8 +13,6 @@ import hashlib
 import json
 import platform
 import re
-import subprocess
-import tempfile
 
 import fitz
 import pypdf
@@ -25,14 +23,13 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.graphics.shapes import Drawing, Rect, String, Line
-from reportlab.graphics import renderSVG, renderPDF
 
 ROOT = Path(__file__).resolve().parent
 FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 VALIDATION = json.loads((ROOT / "report-validation.json").read_text())
 WIDTH = 504
-REPORT_PAGES = 7
+REPORT_PAGES = 9
 NAVY = colors.HexColor("#153145")
 TEAL = colors.HexColor("#087C80")
 INK = colors.HexColor("#243746")
@@ -195,18 +192,43 @@ def topology_diagram():
 diagram = topology_diagram()
 svg_path = FIG / "rational-chain-topology.svg"
 png_path = FIG / "rational-chain-topology.png"
-renderSVG.drawToFile(diagram, str(svg_path))
-svg = svg_path.read_text()
-svg = svg.replace("font-family: ReportSansBold;", "font-family: Liberation Sans, Arial, sans-serif; font-weight: bold;")
-svg = svg.replace("font-family: ReportSans;", "font-family: Liberation Sans, Arial, sans-serif;")
-svg = svg.replace("<title>...</title>", "<title>Affine chain completeness and a balanced-tree counterexample</title>")
-svg_path.write_text(svg)
-with tempfile.TemporaryDirectory(prefix="prime31-iteration6-figure-") as td:
-    tmp = Path(td)
-    renderPDF.drawToFile(diagram, str(tmp / "figure.pdf"))
-    subprocess.run(["pdftoppm", "-singlefile", "-r", "105", "-png",
-                    str(tmp / "figure.pdf"), str(tmp / "figure")], check=True, capture_output=True)
-    png_path.write_bytes((tmp / "figure.png").read_bytes())
+# The source figure is pinned evidence. Rendering this maintained report must
+# never regenerate or overwrite either historical export.
+for path, expected in (
+    (svg_path, "6c22a0058ab21809ee56b81d5d7b826c0f585c870c49eb027a7a231354504b74"),
+    (png_path, "23c92a09b3e0238f3745ddab127c6beb7ecef03add2321c8cd6ef0b0191dc0d5"),
+):
+    if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+        raise RuntimeError(f"Pinned topology figure changed: {path.name}")
+
+
+def family_interval_diagram():
+    """Draw supplied exact exponent intervals; this is a layout operation."""
+    d = Drawing(WIDTH, 115)
+    d.add(Rect(0, 0, WIDTH, 115, rx=5, ry=5, fillColor=GREY,
+               strokeColor=RULE, strokeWidth=.6))
+    d.add(String(12, 96, "Available exponents contain the conditional optimum",
+                 fontName="ReportSansBold", fontSize=10.5, fillColor=NAVY))
+    # The positions are a schematic linear scale from 0 to 1/2. The labels,
+    # endpoint inclusion and ranges come from the reviewed family note.
+    x0, xend = 126, 474
+    d.add(Line(x0, 24, xend, 24, strokeColor=RULE, strokeWidth=.8))
+    for x, label in ((126, "0"), (265.2, "1/5"), (300, "1/4"),
+                     (416, "5/12"), (474, "1/2")):
+        d.add(Line(x, 20, x, 28, strokeColor=MUTED, strokeWidth=.6))
+        d.add(String(x, 8, label, textAnchor="middle", fontName="ReportSans",
+                     fontSize=8, fillColor=MUTED))
+    d.add(String(12, 68, "Field family", fontName="ReportSans", fontSize=9, fillColor=INK))
+    d.add(Rect(126, 65, 290, 7, fillColor=TEAL, strokeColor=None))
+    for x in (126, 416):
+        d.add(Rect(x-2.5, 64, 5, 9, fillColor=WHITE, strokeColor=TEAL, strokeWidth=1))
+    d.add(String(428, 66, "open", fontName="ReportSans", fontSize=7.4, fillColor=TEAL))
+    d.add(String(12, 43, "m=4 optimum", fontName="ReportSans", fontSize=9, fillColor=INK))
+    d.add(Rect(265.2, 40, 34.8, 7, fillColor=AMBER, strokeColor=None))
+    d.add(Rect(262.7, 39, 5, 9, fillColor=AMBER, strokeColor=AMBER, strokeWidth=1))
+    d.add(Rect(297.5, 39, 5, 9, fillColor=WHITE, strokeColor=AMBER, strokeWidth=1))
+    d.add(String(312, 41, "0 ≤ τ < 1", fontName="ReportSans", fontSize=8, fillColor=AMBER))
+    return d
 
 status = VALIDATION["status"]
 ci_passed = status in ("passed", "success")
@@ -225,10 +247,10 @@ next_action = VALIDATION.get("next_action", "Complete source-bound correctness r
 
 story = []
 # Page 1: the new representation and its domain.
-story += [p("ISOGENY LABS  /  ITERATIONS 6-7", "LabelR"),
-          p("An exact quadratic<br/>relation system", "TitleR"),
-          p("Rational S3 chains, compact Dickson membership, and the next solving gate", "BodyR"),
-          caption("22 November 2026, America/Los_Angeles  |  Existing research lane: PR #4928"),
+story += [p("ISOGENY LABS  /  ITERATIONS 6-10", "LabelR"),
+          p("Exact chains and<br/>reusable S3 pencils", "TitleR"),
+          p("Quadratic relation equations, available Dickson fibres, and the missing fast query", "BodyR"),
+          caption("22 November 2026, America/Los_Angeles  |  PRs #4928 / #4962 merged; draft #4977"),
           Spacer(1, 8),
           box("THE CONCRETE CANDIDATE", "Orient every S3 node from a known rational target, then attach a squaring ladder at each leaf. The resulting system has <b>mk+3m-5 variables</b> and <b>mk+3m-4 equations</b>, all of total degree at most two. On its finite Fp domain, full-fibre membership preserves exactly the rational signed witnesses. [M1, M2]"),
           Spacer(1, 12),
@@ -242,7 +264,7 @@ story += [p("ISOGENY LABS  /  ITERATIONS 6-7", "LabelR"),
           ], [142, 362]),
           caption("Curve/order inputs are inherited from the lane; this iteration supplies no new point-count certificate. Counts assume m>=2 and k>=1. [M1]"),
           h("The guarantee and the next obligation"),
-          p("A left chain with free leaf order represents every unordered signed multiset of m<=n nonzero points with a nonzero total in the prime-order group. Its compact equations still need an actual root-solving algorithm, including exact empty-target handling and all extraction costs. [M1, M2]"),
+          p("A freely ordered left chain is complete for m<=n signed leaves with nonzero total. The new rank-three pencil makes the unresolved query exact; the field-family refinement supports its conditional parameter range. Neither supplies a faster solver, including misses and extraction. [M1, M2, P1, F4]"),
           box(status_label, ci_summary + " Mathematical derivations and independent written review retain <b>[pcc:unverified]</b> standing.", WARM, "SmallR"),
           PageBreak()]
 
@@ -332,16 +354,16 @@ story += [table([
           ], [156, 348]),
           Spacer(1, 5),
           p(ci_line, "SmallR"),
-          p("Frozen source: " + source_commit + ". [E1]", "MonoR"),
+          p("Latest build: " + source_commit + "; run 45113871392 / job 137492117014. [E4]", "MonoR"),
           p("The frozen panel covers the original N=64/B=31 fibre, an explicit Fp<super>2</super> ghost, repeated and damaged certificates, repaired identity prefixes, the balanced-tree counterexample, and all 64 triples plus 256 quadruples on a fixed four-point signed base. " + ("The retained receipt gives the actual executed results." if ci_passed else "These are specified controls, not yet reported observations.") + " [E1]", "SmallR"),
           box("NEXT DISCRIMINATING ACTION", escape(next_action) + " [M1, E1]", body_style="SmallR"),
           Spacer(1, 7),
           h("Prior art and source map"),
           p("<b>L1.</b> Semaev (2015), <link href='https://arxiv.org/pdf/1504.01175' color='#087C80'>arXiv:1504.01175</link>, Section 3 equation (4), Section 4.1 Lemma 2 and Section 4.2: ground-field S3 chains and a related minimality lemma already exist. <b>R1.</b> Native prime31_m8_oriented_f4.rs already has Dickson ladders and orientation of its final pair. This continuation makes no literature-wide novelty claim.", "SmallR"),
-          p("<b>M1.</b> MATHEMATICAL_NOTE.md, unchanged proof note. <b>M2.</b> INDEPENDENT_REVIEW.md, written proof audit. <b>R2.</b> ROOT_REVIEW.md, integration and exponent-budget review. <b>E1.</b> SCOPE.md, SOURCE_FREEZE.json and report-validation.json, with the actual CI receipt when present. <b>E2.</b> ../identity-certificates/centered-s3.json and s3-discriminant.json: IDC1hf62e2402e4871a82 and IDC1h869923a46a34c70c. Evaluated identities do not certify the all-arity theorem.", "SmallR"),
+          p("<b>M1/M2.</b> MATHEMATICAL_NOTE.md / INDEPENDENT_REVIEW.md. <b>R2.</b> ROOT_REVIEW.md. <b>E1.</b> SCOPE.md, SOURCE_FREEZE.json and report-validation.json. <b>E2.</b> Earlier native identity records IDC1hf62e2402e4871a82 / IDC1h869923a46a34c70c; evaluated identities do not certify the all-arity theorem. <b>E4.</b> evidence/ci-framework-restored-failure/receipt.json and the retained native artifact/logs.", "SmallR"),
           p("M1 SHA-256: 948d36ca3d72661aa4cf16786ebed30fcb2ba146afb0df4420767a91e8f35ddc", "MonoR"),
-          p("PCC-20261123-ed96d7: representation; PCC-20261123-36ec87: scoped budget; PCC-20261123-184d4e: audits. All three records remain unverified.", "SmallR"),
-          caption("Continuation records: <link href='https://github.com/isogeny-labs/crypto/pull/4928' color='#087C80'>isogeny-labs/crypto PR #4928</link> and the <link href='https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84' color='#087C80'>research Space</link>. New mathematical standing remains [pcc:unverified]. Previous pinned reports and evidence are unchanged."),
+          p("New PCC-20261123 records: 5ce73e, third failure; f0209c, exact pencil; 391a91, smooth-modulus correction. The sixteen claims covered by this core report (d6e1d03) remain unverified. Merged PRs and written reviews do not establish passing native tests.", "SmallR"),
+          caption("Research <link href='https://github.com/isogeny-labs/crypto/pull/4928' color='#087C80'>PR #4928</link> and <link href='https://github.com/isogeny-labs/crypto/pull/4962' color='#087C80'>PR #4962</link> merged. <link href='https://github.com/isogeny-labs/crypto/pull/4977' color='#087C80'>Draft PR #4977</link> carries this continuation. The <link href='https://github.com/isogeny-labs/crypto/tree/main/research/prime31_summation_compression_20261122' color='#087C80'>research archive</link> and previously confirmed <link href='https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84' color='#087C80'>Space</link> retain history; the latest Page save is unconfirmed after RPC hangs and an aborted Browser fallback."),
           PageBreak()]
 
 # Page 7: the reviewed growing-family and factor-base availability refinements.
@@ -362,7 +384,51 @@ story += [h("An unconditional smooth p+1 family"),
           p("The variable-curve route does not itself guarantee prime order. For fixed arity m, excluding leaf points of order at most m-1 preserves a Θ(N) base asymptotically and recovers the free-order peeling hypothesis. Its additional membership guards are outside the frozen counts. Subgroup size, relation rank and the exact target solver remain separately charged. [F3]", "SmallR"),
           h("Provenance and limits"),
           p("<b>F1.</b> ../iteration7/SMOOTH_TORUS_FAMILY.md. <b>F2.</b> ../iteration7/INDEPENDENT_REVIEW.md and FIXED_CURVE_FIBRE_DENSITY.md. <b>F3.</b> ../iteration7/SELECTABLE_CURVE_AVAILABILITY.md. Linnik: Koukoulopoulos, <i>The Distribution of Prime Numbers</i>, Chapter 27, Theorem 27.1. Ordinary traces: Waterhouse (1969), Theorem 4.1. Fixed-curve density uses the degree-five Weil character bound. [pcc:unverified]", "SmallR"),
-          caption("These are written proofs and reviewed deductions, not numerical measurements or signed formal certificates. No asymptotic relation-solving speedup is asserted.")]
+          caption("These are written proofs and reviewed deductions, not numerical measurements or signed formal certificates. No asymptotic relation-solving speedup is asserted. Claims PCC-20261123-2d6d3e and PCC-20261123-0d1e17 remain unverified. Page 9 strengthens the field-size range using prior art."),
+          PageBreak()]
+
+# Page 8: the exact reusable pencil and the missing query, with scoped limits.
+story += page("7  A reusable S3 pencil", "The value matrix has rank at most three; computing its column products remains the hard step.")
+story += [p("Let A be sign-closed in an odd-order rational subgroup, U=(A+A) without O, X=x(U), and D=|X|≥1. Put H(V)=∏<sub>u in X</sub>(V-u) and w(t)=(1,t,t<super>2</super>)<super>t</super>. For a nonzero target R in this subgroup, r=x(R); all f(u) and f(r) are nonzero squares. [P1]", "SmallR"),
+          eq("S3(u,v,r)=w(u)<super>t</super>C<sub>r</sub>w(v), &nbsp; M<sub>r</sub>=W<sub>X</sub>C<sub>r</sub>W<sub>X</sub><super>t</super>, &nbsp; rank M<sub>r</sub>≤3"),
+          Table([[p("a<super>2</super>-4br", "SmallR"), p("-2ar-4b", "SmallR"), p("r<super>2</super>", "SmallR")],
+                 [p("-2ar-4b", "SmallR"), p("-2(r<super>2</super>+a)", "SmallR"), p("-2r", "SmallR")],
+                 [p("r<super>2</super>", "SmallR"), p("-2r", "SmallR"), p("1", "SmallR")]],
+                colWidths=[168,168,168], style=TableStyle([
+                    ("BACKGROUND", (0,0), (-1,-1), GREY),
+                    ("BOX", (0,0), (-1,-1), .6, RULE),
+                    ("LEFTPADDING", (0,0), (-1,-1), 12),
+                    ("TOPPADDING", (0,0), (-1,-1), 3),
+                    ("BOTTOMPADDING", (0,0), (-1,-1), 1)])),
+          caption("The entries of C<sub>r</sub>, displayed by rows. This exact factorization is not a fast product algorithm. [P1]"),
+          eq("Φ<sub>X</sub>(Z)=∏<sub>u in X</sub>(Z<sub>0</sub>+uZ<sub>1</sub>+u<super>2</super>Z<sub>2</sub>)"),
+          eq("K(T,V)=Φ<sub>X</sub>(C<sub>T</sub>w(V)) mod H(V)"),
+          box("EXACT FORMAL DEGREE", "deg<sub>T</sub>K=2D-1; &nbsp; [T<super>2D-1</super>]K=-4f(V)H′(V)<super>2</super> mod H.<br/>The leading coefficient is a unit: every CRT component has one linear diagonal factor and D-1 quadratic factors. [P1]", body_style="SmallR"),
+          Spacer(1, 6),
+          p("A dense rectangular coefficient table allocates 2D<super>2</super> field slots, while Φ<sub>X</sub> has an O(D)-factor description. The slot count is a format cost, not an intrinsic lower bound; fixed-basis span results concern arbitrary subsets, not a proved obstruction for Dickson-derived X. [P1]", "SmallR"),
+          h("The discriminant cannot prune this domain"),
+          eq("disc<sub>U</sub> S3(U,v,r)=16f(v)f(r)"),
+          p("For v≠r the two roots are rational and distinct; v=r gives a nonzero linear factor. Testing those roots for membership in X is still required. A target is empty exactly when r lies outside X and no component K(r,v) vanishes; r in X and R=O need separate branches. [P1]", "SmallR"),
+          box("THE MISSING INDEX", "With D=Θ(B<super>2</super>) and near-linear setup in D, the conventional m=4 budget needs empty-inclusive query Õ(D<super>θ</super>+h) with <b>θ&lt;1/2</b>. Existing product-tree and complement scans have θ=1 up to logarithms. Witness recovery, output and certificate costs remain charged. [P1]", WARM, "SmallR"),
+          Spacer(1, 5),
+          caption("P1: <link href='https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_CONTRACTION.md' color='#087C80'>../iteration10/S3_PENCIL_CONTRACTION.md</link> and <link href='https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_INDEPENDENT_REVIEW.md' color='#087C80'>its independent review</link>; PCC-20261123-f0209c. Full proofs, exceptional charts and the scope of each format observation are retained there. [pcc:unverified]"),
+          PageBreak()]
+
+# Page 9: apply the stronger existing smooth-modulus theorem to the budget.
+story += page("8  Field size supports the budget", "An existing least-prime theorem removes an unnecessary restriction on the factor-base exponent.")
+story += [p("Chang's Corollary 11 gives a prime p&lt;Q<super>12/5+o(1)</super> in every coprime residue class when the largest prime factor ℓ of Q satisfies log ℓ=o(log Q). Powers of two meet that hypothesis. The proof treats a possible exceptional real zero; this application is unconditional. [F4]", "SmallR"),
+          eq("Q<sub>k</sub>=2<super>k+2</super>, &nbsp; p<sub>k</sub>≡-1 mod Q<sub>k</sub>, &nbsp; Q<sub>k</sub>-1≤p<sub>k</sub>&lt;Q<sub>k</sub><super>12/5+o(1)</super>"),
+          eq("0&lt;β&lt;5/12, &nbsp; e<sub>k</sub>=floor(β log<sub>2</sub>p<sub>k</sub>), &nbsp; N<sub>k</sub>=2<super>e<sub>k</sub></super>"),
+          p("For each fixed interior β, eventually N<sub>k</sub> divides 2<super>k</super>, so 4N<sub>k</sub> divides p<sub>k</sub>+1. Also p<sub>k</sub><super>β</super>/2&lt;N<sub>k</sub>≤p<sub>k</sub><super>β</super> and N<sub>k</sub>≤√p<sub>k</sub>/16. These are the original density lemma's exact hypotheses; β=5/12 is excluded. [F4]", "SmallR"),
+          family_interval_diagram(),
+          caption("Figure 2. The supported range 0&lt;β&lt;5/12 contains every conditional optimum 1/5≤β*&lt;1/4. Open endpoints are hollow. This is a schematic of proved inequalities, not a performance plot. [F4]"),
+          p("For an already supplied nonsingular odd-order E/Fp<sub>k</sub>, the fixed-source lemma then finds a full regular fibre with N<sub>k</sub>/4≤B<sub>k</sub>≤N<sub>k</sub>. Thus B<sub>k</sub>=Θ(p<sub>k</sub><super>β</super>), at expected O(N<sub>k</sub> log p<sub>k</sub>) basic field operations plus charged inversions and O(N<sub>k</sub>) storage. [F2, F4]", "SmallR"),
+          box("CONDITIONAL FOUR-SUMMAND BALANCE", "For setup exponent σ≤2 and query exponent 0≤τ&lt;1:<br/>Õ(B<super>σ</super>+B<super>2</super>+pB<super>τ-3</super>), &nbsp; β*=1/(5-τ), &nbsp; γ*=2/(5-τ)&lt;1/2.<br/>Every β* is available. The earlier extra τ&lt;1/2 restriction from fixing β=1/5 is unnecessary. The needed τ&lt;1 query, relation yield and rank remain unproved. [F4]", body_style="SmallR"),
+          Spacer(1, 5),
+          h("Input availability has a bounded scope"),
+          p("This chooses a prime-field family; it does not transfer an arbitrary source DLP, guarantee a growing prime-order curve family, or prove density in a prescribed proper subgroup. If primes are not supplied, enumeration of tQ<sub>k</sub>-1 may inspect up to Q<sub>k</sub><super>7/5+o(1)</super> candidates; primality, curve construction and order certification belong in cold setup. [F4]", "SmallR"),
+          p("<b>F4.</b> <link href='https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/FAMILY_SIZE_CORRECTION.md' color='#087C80'>../iteration10/FAMILY_SIZE_CORRECTION.md</link> and <link href='https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/FAMILY_SIZE_INDEPENDENT_REVIEW.md' color='#087C80'>its independent review</link>; PCC-20261123-391a91. Primary source: Chang, <i>Short character sums for composite moduli</i>, Corollary 11, printed pp. 4 and 39, <link href='https://math.ucr.edu/~mcc/paper/143%20Char060114.pdf' color='#087C80'>author's PDF</link>; <link href='https://arxiv.org/abs/1201.0299v2' color='#087C80'>arXiv:1201.0299v2</link>. This applies prior art and makes no novelty claim for prime distribution.", "SmallR"),
+          caption("Current result: exact representation and sharper available parameters; no measured or proved asymptotic relation-solving gain. The sixteen claims in this core report (d6e1d03) remain [pcc:unverified].")]
 
 
 def on_page(canvas, doc):
@@ -375,7 +441,7 @@ def on_page(canvas, doc):
     canvas.drawString(54, 760, "ISOGENY LABS  /  PRIME-FIELD RELATION RESEARCH")
     canvas.setFont("ReportSans", 7.6)
     canvas.setFillColor(MUTED)
-    canvas.drawRightString(558, 760, "ITERATIONS 6-7  |  2026-11-22 PT")
+    canvas.drawRightString(558, 760, "ITERATIONS 6-10  |  2026-11-22 PT")
     canvas.line(54, 42, 558, 42)
     canvas.setFont("ReportSans", 7.4)
     canvas.drawString(54, 29, "Unsigned mathematical checkpoint  [pcc:unverified]")
@@ -386,8 +452,8 @@ def on_page(canvas, doc):
 pdf_path = ROOT / "REPORT.pdf"
 doc = SimpleDocTemplate(str(pdf_path), pagesize=(612, 792),
                         rightMargin=54, leftMargin=54, topMargin=58, bottomMargin=58,
-                        title="Prime31 iteration 6 - exact quadratic relation system",
-                        author="Isogeny Labs", subject="Rational S3 chain and quadratic Dickson membership",
+                        title="Prime31 - exact chains, S3 pencils and available fibres",
+                        author="Isogeny Labs", subject="Quadratic relation equations and the remaining sublinear-query obligation",
                         pageCompression=1)
 doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
 with fitz.open(pdf_path) as pdf:

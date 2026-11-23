@@ -1,0 +1,24 @@
+{
+  "schema": "vieta-artifact-policy-correction/v1",
+  "policy_path": ".artifacts/config.json",
+  "policy_sha256": "4e71a9ede165f46d73f9fbd9902f914fad8115f0a422089c5c501caf7e6d3052",
+  "policy_equals_inspected_main": true,
+  "policy_keep_matches": [
+    "*.pdf",
+    "benchmarks/progress/progress.json"
+  ],
+  "original_sparse_diagnostic": "policy off disk; default thresholds incorrectly used for current repository standing",
+  "supersedes": [
+    "local-checks.json artifact_policy field",
+    "pending-artifact-migration.json migration requirement"
+  ],
+  "corrected_local_command": "python3 tools/artifacts/artifacts.py check origin/main HEAD",
+  "corrected_local_exit": 0,
+  "corrected_output": "artifacts check: no data files committed",
+  "official_migration_job": 137534431122,
+  "official_migration_output": "artifacts migrate: no changed data files",
+  "official_migration_source_head": "24aae5d1885b03a3f5679d04b4f7b1a0b596b7b0",
+  "local_s3_operation": false,
+  "s3_availability_claim": false,
+  "policy_or_workflow_edited": false
+}
