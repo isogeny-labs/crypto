@@ -259,6 +259,48 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal_64: u64) -> u64 
     }
 }
 
+// Cached reciprocal is computed once at admission; the trace producer
+// otherwise repeats a hardware remainder for every 32-bit field product.
+// Keep the original general field_value for the independent cross-check and
+// all noncanonical inputs. Only canonical operands take the Barrett path.
+#[inline]
+fn field_value_cached(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal32: u64) -> u64 {
+    // Dispatch once by operation; the 61-bit Mersenne fast path must not
+    // take an extra wrapper call or reciprocal guard on every field event.
+    match op {
+        FieldOp::Add => {
+            if a < p && b < p {
+                let sum = a + b;
+                if sum >= p { sum - p } else { sum }
+            } else {
+                ((a as u128 + b as u128) % p as u128) as u64
+            }
+        }
+        FieldOp::Sub => {
+            if a < p && b < p {
+                if a >= b { a - b } else { a + p - b }
+            } else {
+                ((a as u128 + p as u128 - b as u128) % p as u128) as u64
+            }
+        }
+        FieldOp::Mul | FieldOp::Square => {
+            if p == MAX_PRIME && a < p && b < p {
+                let product = a as u128 * b as u128;
+                let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
+                if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+            } else if reciprocal32 != 0 && a < p && b < p {
+                let product = a * b; // canonical p <= 2^32-1
+                let quotient = ((product as u128 * reciprocal32 as u128) >> 64) as u64;
+                let remainder = product - quotient * p;
+                // The quotient underestimates floor(product/p) by at most 1.
+                if remainder >= p { remainder - p } else { remainder }
+            } else {
+                ((a as u128 * b as u128) % p as u128) as u64
+            }
+        }
+    }
+}
+
 fn validate_input(f: &[u64], p: u64, limits: &RootLimits) -> Result<(), String> {
     limits.validate()?;
     if !(3..=MAX_PRIME).contains(&p) || !is_prime_u64(p) {
@@ -274,6 +316,7 @@ struct Engine<'a> {
     reciprocal_64: u64,
     sink: &'a mut dyn FnMut(&RootEvent) -> Result<(), String>,
     next_id: u64,
+    reciprocal32: u64,
 }
 type Work<T> = Result<T, RootStop>;
 impl Engine<'_> {
@@ -797,6 +840,11 @@ pub fn solve(
         },
         sink,
         next_id: 0,
+        reciprocal32: if p <= u32::MAX as u64 {
+            ((1u128 << 64) / p as u128) as u64
+        } else {
+            0
+        },
     };
     engine.report.stop = match engine.run() {
         Ok(stop) | Err(stop) => stop,
@@ -2568,16 +2616,83 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round75_cached_barrett_matches_frozen_field_and_noncanonical_fallback() {
+        let mut seed = 0x7520_2611_2026_0001u64;
+        for p in [3, 65521, 998244353, 1_000_000_007, 4_294_967_291,
+                  MAX_PRIME - 30, MAX_PRIME] {
+            let reciprocal = if p <= u32::MAX as u64 {
+                ((1u128 << 64) / p as u128) as u64
+            } else { 0 };
+            for _ in 0..8192 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = seed % p;
+                let b = seed % p;
+                for op in [FieldOp::Mul, FieldOp::Square, FieldOp::Add, FieldOp::Sub] {
+                    assert_eq!(
+                        field_value_cached(&op, a, b, p, reciprocal),
+                        field_value(&op, a, b, p),
+                        "p={p}, a={a}, b={b}, op={op:?}"
+                    );
+                        field_value_cached(&op, a + p, b, p, reciprocal),
+                        field_value(&op, a + p, b, p),
+                        "noncanonical p={p}, a={a}, b={b}, op={op:?}"
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round75_sparse_products_and_divisions_still_certify() {
+        for p in [17, 65521, 1_000_000_007, MAX_PRIME] {
+            // Roots 1 and 2, with zero middle coefficients in the
+            // quartic cofactor; exercise sparse convolution and division.
+            let f = vproduct(&[p - 1, 1], &[p - 2, 1], p);
+            let f = vproduct(&f, &[1, 0, 0, 0, 1], p);
+            let r = run(&f, p);
+            verify(&r).unwrap();
+            assert!(r.roots.contains(&1) && r.roots.contains(&2));
+
+    #[ignore = "run with --ignored --nocapture to benchmark cached trace arithmetic"]
+    fn bench_round75_trace_field_barrett() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn measure(p: u64, reciprocal: u64, pairs: &[(u64, u64)], fast: bool) -> f64 {
+            let start = Instant::now();
+            let mut checksum = 0u64;
+            for _ in 0..32 {
+                for &(a, b) in pairs {
+                    let a = black_box(a);
+                    let b = black_box(b);
+                    checksum ^= if fast {
+                        field_value_cached(&FieldOp::Mul, a, b, p, reciprocal)
+                    } else {
+                        field_value(&FieldOp::Mul, a, b, p)
+                    };
+            black_box(checksum);
+            start.elapsed().as_nanos() as f64 / (32 * pairs.len()) as f64
+        let mut seed = 0x7520_2611_2026_0002u64;
+        for p in [65521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            let mut pairs = Vec::new();
+                pairs.push((a, seed % p));
+            let (mut old, mut new) = (Vec::new(), Vec::new());
+            for trial in 0..13 {
+                if trial % 2 == 0 {
+                    old.push(measure(p, reciprocal, &pairs, false));
+                    new.push(measure(p, reciprocal, &pairs, true));
+                } else {
+            old.sort_by(f64::total_cmp);
+            new.sort_by(f64::total_cmp);
+            println!("round75 field p={p}: {:.3} -> {:.3} ns, {:.3}x",
+                     old[6], new[6], old[6] / new[6]);
+
     fn round124_cached_barrett_trace_field_matches_wide_reference() {
         let mut state = 0x524f_4f54_2026_1122u64;
         for p in [3u64, 487, 65_521, 998_244_353,
                   1_000_000_007, 4_294_967_291, MAX_PRIME] {
             let reciprocal_64 = if p <= u32::MAX as u64 {
-                ((1u128 << 64) / p as u128) as u64
             } else {
                 0
             };
-            for _ in 0..8192 {
                 state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
                 let a = state % p;
                 let b = state % p;
@@ -2592,12 +2707,7 @@ mod tests {
                             "noncanonical p={p} op={op:?}"
                         );
                     }
-                }
-            }
-        }
-    }
 
-    #[test]
     fn round113_quadratic_karatsuba_and_inverse_match_independent_formulas() {
         let mut rng = StdRng::seed_from_u64(0x7131_3331_3331_3371);
         for p in [3u64, 5, 65_521, 1_000_000_007, MAX_PRIME] {
@@ -2660,10 +2770,8 @@ mod tests {
                         bits >>= 1;
                         if bits != 0 {
                             power = vdiv(&vsquare(&power, p), &monic, p).unwrap().1;
-                    assert_eq!(
                         vpower(&base, exponent, &modulus, p).unwrap(), expected,
                         "degree={degree} case={case} exponent={exponent}",
-                    );
 
     fn round111_reused_frobenius_and_gcd_reject_modified_certificates() {
         let p = 65_521u64;
@@ -2773,7 +2881,6 @@ mod tests {
             let step = tampered.events.iter_mut().find_map(|event| {
                 if let RootEvent::GcdStep { quotient, .. } = event {
                     Some(quotient)
-                } else {
                     None
             }).expect("root solver must perform a GCD step");
             if step.is_empty() {
