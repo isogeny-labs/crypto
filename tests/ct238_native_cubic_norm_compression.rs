@@ -725,7 +725,7 @@ mod ct241 {
                     "forged off-by-one scalar accepted");
                 assert!(run.restarts<=MAX_RESTARTS);
                 assert!(run.tally.walk_steps<=
-                    (MAX_RESTARTS*STEPS_PER_RESTARTS) as u64);
+                    (MAX_RESTARTS*STEPS_PER_RESTART) as u64);
                 total_adds += run.tally.ec_adds;
                 logs += 1;
             }
