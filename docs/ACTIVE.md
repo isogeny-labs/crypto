@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Representation technique (Delaplace–May 2019 / DFKM 2020) in `ic bench`: results, lead specs, report and bench records for (a) descent m=4 split, (b) `rep-join`, (c) `fp2` regime (code in cryptanalysis #1877) under `research/representation_join_ic_20261120` (Claude Code, completed 2026-11-20, branch claude/representation-join-ic-results-20261120, PR #4840; (b) both rep-join leads FAIL phase 1, (a) no cheaper relation at l'=4..13, (c) fp2-weil 7x-284x over table mitm but S/rho 13->61) [pcc:unverified]
+
 - [ ] Preregister and execute IDEA-20261119-3d1680: the t=4 Burgess-edge interval factor-base multiplicity panel on 32–48-bit prime-field curves (Codex, started 2026-11-20, branch codex/burgess-edge-t4-20261120, PR #4836)
 
 - [x] Integrate the genus-3 HECDLP cover-reduction evidence and NIST P-224/P-256 transfer status, with explicit toy-scope limits and a construction-first next goal (Codex, completed 2026-11-20, branch codex/genus3-hecdlp-evidence-20261120, PR #4834) [pcc:unverified]
