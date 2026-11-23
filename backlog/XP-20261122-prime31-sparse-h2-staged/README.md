@@ -6,7 +6,8 @@ not the scientific run command. This entry records pending work; it supplies no
 runner admission, spending authority, lease, source/image freeze, or benchmark
 result.
 
-Tracking: [PR #4937](https://github.com/isogeny-labs/crypto/pull/4937), branch
+Tracking: [PR #4945](https://github.com/isogeny-labs/crypto/pull/4945), following the
+merged tracking-only PR #4937; branch
 `lane/prime31-sparse-h2`, following merged PR #4923. The requested card ID carries
 the continuing study's date, 2026-11-22; this backlog record was written on
 2026-11-23. The required `created` field matches the date in that ID.
@@ -205,6 +206,15 @@ No `backlog` executable was found on PATH or in the workspace. A normal root
 build is blocked by the already recorded duplicate manifest key; it was not
 retried or repaired. The available JSON Schema CLI is used only to validate
 this card's metadata against the exact tracked Draft202012 schema. The retained
-`validation.json` records its outcome and the narrower scope of this fallback.
+`validation.json` preserves the original card check at implementation commit
+`44e05d7b3cb7ece0d1e761222f8df4e64b2197a5`. After tracking-only PR #4937 merged,
+the card's review link moved to PR #4945; `validation-v2.json` records the current
+card hash and schema revalidation. Both records retain the narrower scope of
+this metadata fallback and leave native backlog validation open.
 It is not a `backlog validate` pass, experiment verification, runner admission,
 or permission to launch.
+
+PR #4945 subsequently merged the implementation. The completed PR-review blocker
+is removed; `validation-v3.json` binds the current card. Checkpoint, authenticated
+runner, live budget/capacity, canonical selection and source-image admission remain
+open. Merging the implementation does not authorize a run.

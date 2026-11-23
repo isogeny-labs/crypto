@@ -1,7 +1,12 @@
 # Sparse H2, fair plain controls, and staged recovery
 
 Follow-up to merged [PR #4923](https://github.com/isogeny-labs/crypto/pull/4923),
-recorded in [PR #4937](https://github.com/isogeny-labs/crypto/pull/4937).
+merged in [PR #4945](https://github.com/isogeny-labs/crypto/pull/4945).
+Initial tracking PR #4937 merged while implementation was being completed;
+it contained only the task entry. The implementation continuation merged at
+commit `333370a3f7b840f86984f1e770d4c7ecaf7e7ca8`.
+[MERGE_STATUS.json](MERGE_STATUS.json) records the observed state. Merging did
+not supply a signed verdict, a green full integration result, or execution admission.
 
 **Implementation and development qualification are complete; campaign execution
 is blocked before launch.** The retained optimized native suite reports 76
@@ -90,6 +95,15 @@ canonical execution protocol/selection/image binding. No comparison of solving c
 useful-rank yield, complete scalar recovery or global best-method conclusion follows from
 the development checks. The pending execution is recorded in
 [`XP-20261122-prime31-sparse-h2-staged`](../../../backlog/XP-20261122-prime31-sparse-h2-staged/README.md).
+
+## Published source
+
+The immutable native source check returned exit0 against published commit
+`44e05d7b3cb7ece0d1e761222f8df4e64b2197a5`, matching all84 inventoried
+inputs and retaining the same binary hash. [POST_PUBLICATION.json](POST_PUBLICATION.json)
+records the scope under claim `PCC-20261123-a63eb4`, standing unverified.
+This is unsigned source-custody evidence, not execution admission.
+[pcc:unverified]
 
 ## Reproduction and next action
 
