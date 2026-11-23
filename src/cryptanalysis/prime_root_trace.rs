@@ -3617,7 +3617,7 @@ mod tests {
                 }
                 let reference = vdiv(&a, &b, p).unwrap();
                 let mut sink = |_event: &RootEvent| Ok(());
-                let mut engine = Engine {
+                let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
                     report: RootReport {
                         schema: "prime-root-trace/v1".into(),
                         p,
@@ -4173,7 +4173,7 @@ mod round100_traced_multiplication {
                     }
                     let expected = trim(expected);
                     let mut observer = |_: &RootEvent| -> Result<(), String> { Ok(()) };
-                    let mut engine = Engine {
+                    let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
                         report: RootReport {
                             schema: "prime-root-trace/v1".into(),
                             p,
@@ -4263,7 +4263,7 @@ mod round107_inverse_chain {
                 sink_error: None,
                 roots: vec![],
             };
-            let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
+            let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 }, report, sink: &mut sink, next_id: 0 };
             let actual = engine.inv(value).unwrap();
             assert_eq!(actual, vpow(value, p - 2, p), "value={value}");
             assert_eq!(vmul(actual, value, p), 1, "value={value}");
@@ -4329,7 +4329,7 @@ mod round108_unit_monomial_fastpaths {
                                 events: vec![], unacknowledged: None,
                                 sink_error: None, roots: vec![],
                             };
-                            let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
+                            let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 }, report, sink: &mut sink, next_id: 0 };
                             let actual = engine.mul(a, b).unwrap();
                             assert_eq!(actual, vproduct(a, b, p),
                                 "p={p} width={width} case={case} a={a:?} b={b:?}");

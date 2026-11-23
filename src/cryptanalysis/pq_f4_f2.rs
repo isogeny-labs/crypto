@@ -4610,7 +4610,7 @@ mod tests {
         guard: EarlyGuard,
     ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
         let before = tally::snapshot();
-        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, true);
+        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, None, TraceMode::Off, true);
         (gb, st, tally::snapshot().since(before))
     }
 
@@ -5068,6 +5068,7 @@ mod tests {
                 EARLY_GUARD,
                 None,
                 TraceMode::Verify(&eqs),
+                fl_enabled(),
             );
             assert_eq!(ok.trace_verify_failures, 0, "system {k}: the basis fails");
             assert_eq!(ok.steps, 1);
@@ -5086,6 +5087,7 @@ mod tests {
                 EARLY_GUARD,
                 None,
                 TraceMode::Verify(&eqs),
+                fl_enabled(),
             );
             assert_eq!(
                 bad.trace_verify_failures, 1,
@@ -5104,6 +5106,7 @@ mod tests {
                     EARLY_GUARD,
                     None,
                     TraceMode::Verify(&eqs),
+                    fl_enabled(),
                 );
                 assert_eq!(
                     bad.trace_verify_failures, 1,

@@ -4006,7 +4006,7 @@ pub fn decomposable_points(
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::PrimeInstance;
-    use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
+    use crate::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeKummerBase};
     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
     use rand::{rngs::StdRng, Rng, SeedableRng};
 
@@ -4259,7 +4259,7 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         // Every zero of the rules is a zero of the chain: L(x) = c on V.
         for &x in &tower.v {
             assert_eq!(tower.eval(x), Some(tower.c));
@@ -4293,7 +4293,7 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower = isogeny_tower(curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         let bits_fb = prime_factor_base(&inst, 6);
@@ -4424,7 +4424,7 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         for g in [1, 2] {
@@ -4725,7 +4725,7 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         agrees_with_grid_m3(
