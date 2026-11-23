@@ -69,6 +69,22 @@ jobs:
               assert new['mst_filter']['exact_projected_rank'] is not None
           else:
               assert new['mst_filter'].get('exact_projected_rank') is None
+          # Exact affine-basis admission is opt-in and source-preserving:
+          # useful rank alone cannot erase a nonzero known-RHS residual.
+          for arm_name in ('forest_filter', 'pivot_filter', 'mst_filter'):
+              arm = new[arm_name]
+              basis = arm.get('exact_projected_rank')
+              if arm['refused']:
+                  assert basis is None, arm_name
+                  continue
+              assert basis is not None, arm_name
+              indices = basis['augmented_basis_row_indices']
+              assert len(indices) == basis['augmented_rank'], arm_name
+              assert basis['useful_small_rank'] <= basis['augmented_rank'] <= basis['useful_small_rank'] + 1
+              assert indices == sorted(set(indices)), arm_name
+              assert all(0 <= i < arm['replayed'] for i in indices), arm_name
+              assert basis['augmented_basis_nonzeros'] <= arm['residual_nonzeros'], arm_name
+              assert basis['augmented_basis_source_terms'] <= arm['source_terms'], arm_name
           assert cap['forest_skip_reason'] == 'row_cap'
           assert 'forest_filter' not in cap
           assert 'exact_projected_rank' not in cap['pivot_filter']
