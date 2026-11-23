@@ -1,0 +1,16 @@
+{
+  "schema": "xedni-fixed-rank1-height-protocol-v1",
+  "source_final_audit_sha256": "b8070ba201f437d56e1907f00f032cd0d04afd87527082411896ad52048dc82b",
+  "rational_curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "rational_generator": ["17", "10"],
+  "reduced_curve_a_invariants": [0, 0, 0, -1, -2],
+  "reduced_prime": 47,
+  "subgroup_order": 43,
+  "multiplier_prefix": [1, 21],
+  "relation_words": [2, 6],
+  "height_metric": "maximum bit length of absolute numerator and denominator of affine x and y of nQ and -m*nQ",
+  "prefix_rank_law": "At each M=1..21, insert reduced P=-m*nQ plus m times reduced nQ for m in {2,6}, n<=M, sign-fold all 42 nonidentity points, and compute rank over F43",
+  "checks": ["rank_one_curve_identity", "rational_relation_each_row", "common_reduction", "point_order_43", "every_prefix_rank", "all_21_folded_generator_orbits"],
+  "aggregate_wall_cap_seconds": 180,
+  "status_law": "Preserve full prefix cells and cap/error if encountered; report exact coordinate heights, not an asymptotic inference"
+}

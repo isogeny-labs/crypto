@@ -1,0 +1,18 @@
+{
+  "schema": "xedni-explicit-height-exclusion-protocol-v1",
+  "source_generator_sha256": "53fd653948c4376920c4d0ee2d53f2db275ebd7be5004d50f73d5d68986ade4e",
+  "source_lift_class_sha256": "d7e599026feb648a2a95b24829c1c6ea484cb87f47dc43e8bcf401552961ef2e",
+  "curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "generator_Q": ["17", "10"],
+  "witness_multiple": 65,
+  "target_reduction": [10, 1],
+  "target_scalar_class_mod_43": 22,
+  "candidate_law": "rational x=a/b^2 with integers gcd(a,b)=1,b>0 and H=max(abs(a),b)",
+  "exclusion_claim": "no rational point reducing to target under the candidate law has H<=2^130",
+  "silverman_bound_method": "on this exact Weierstrass model use Sage silverman_height_bound default formula for |h(x(P))-hhat(P)|; certify a conservative bound B<14 from exact discriminant, j, b2 and rational logarithm inequalities",
+  "log2_bounds": ["2/3 < log(2)", "log(2) < 1"],
+  "bit_input": "x(65Q) has max numerator/denominator bit length 2894, hence h(x(65Q))>=2893*log(2)",
+  "height_law": "hhat(nQ)=n^2*hhat(Q), with hhat(Q)>0 because Q is non-torsion",
+  "formalization_scope": "Lean proves exact integer, logarithm and real-inequality implication; actual curve invariants, Mordell-Weil generator, canonical-height law and Silverman bound are separately checked or cited inputs",
+  "status_law": "retain every source and numerical diagnostic; do not present the conditional Lean inequality as a fully formalized curve-specific theorem"
+}

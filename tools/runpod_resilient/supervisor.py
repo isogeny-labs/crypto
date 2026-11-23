@@ -11,6 +11,12 @@ Resilience:
     so a job that resumes from its own output files continues without any client action.
   * WORK/boots.log gets one line per boot (time, pod id); WORK/heartbeat.json is rewritten every
     60 s, so the time a lost pod was last alive is known.
+  * Self-stop: once no job has been running for $SELF_STOP_GRACE seconds (default 3600; counted
+    from boot or from the last job's exit; a negative value disables it), the pod terminates
+    itself through the RunPod REST v2 API with the RUNPOD_API_KEY RunPod injects into every pod.
+    It first appends a line to WORK/selfstop.log. Everything worth keeping is on the volume, so a
+    client that dies (or never comes back) cannot leave a finished or crashed pod billing. The grace
+    period leaves the client time to mirror the last rows; a live client usually deletes the pod first.
 
 Endpoints:
   GET  /health                  running, return code, argv, boots, last heartbeat, meminfo
@@ -27,6 +33,8 @@ import os
 import subprocess
 import threading
 import time
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -35,7 +43,9 @@ TOKEN = os.environ.pop("MON_TOKEN")
 WORK = Path(os.environ.get("WORK_DIR", "/workspace/run"))
 WORK.mkdir(parents=True, exist_ok=True)
 POD = os.environ.get("RUNPOD_POD_ID", "unknown")
-state = {"proc": None, "argv": None}
+API = os.environ.get("RUNPOD_API_BASE", "https://api.runpod.io/v2")  # overridable for tests
+GRACE = float(os.environ.get("SELF_STOP_GRACE", "3600"))
+state = {"proc": None, "argv": None, "idle_since": time.time()}
 lock = threading.Lock()
 
 
@@ -49,6 +59,41 @@ def start(argv):
     log.flush()
     state["proc"] = subprocess.Popen(argv, cwd=WORK, stdout=log, stderr=log)
     state["argv"] = argv
+
+
+def self_stop():
+    """Terminate this pod after GRACE seconds with no running job (see the module docstring)."""
+    while GRACE >= 0:
+        time.sleep(min(60, max(GRACE, 1)))
+        with lock:
+            p = state["proc"]
+            if p is not None and p.poll() is None:
+                continue
+            if p is not None and state.get("exited_seen") is not p:
+                state["exited_seen"], state["idle_since"] = p, time.time()  # job just ended: restart the clock
+            idle = time.time() - state["idle_since"]
+        if idle < GRACE:
+            continue
+        key = os.environ.get("RUNPOD_API_KEY")
+        with open(WORK / "selfstop.log", "a") as f:
+            f.write(f"{now()} {POD} idle {int(idle)}s >= {int(GRACE)}s: terminate (key {'present' if key else 'absent'})\n")
+        if not key or POD == "unknown":
+            return
+        req = urllib.request.Request(f"{API}/pods/{POD}/action", method="POST",
+                                     data=json.dumps({"action": "terminate"}).encode(),
+                                     headers={"Authorization": "Bearer " + key, "Content-Type": "application/json",
+                                              "User-Agent": "runpod-resilient/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                code = r.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        except Exception as e:  # noqa: BLE001
+            code = repr(e)
+        with open(WORK / "selfstop.log", "a") as f:
+            f.write(f"{now()} {POD} terminate -> {code}\n")
+        time.sleep(300)  # if the call failed, try again later
+        state["idle_since"] = time.time() - GRACE
 
 
 def heartbeat():
@@ -66,6 +111,7 @@ runs = WORK / "runs"
 if auto.exists() and not (runs.exists() and any(runs.rglob("COMPLETE"))):
     start(json.loads(auto.read_text())["argv"])
 threading.Thread(target=heartbeat, daemon=True).start()
+threading.Thread(target=self_stop, daemon=True).start()
 
 
 def safe(rel):

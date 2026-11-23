@@ -1,0 +1,42 @@
+{
+  "schema": "prime31-rational-chain-source-freeze/v1",
+  "frozen_at_utc": "2026-11-23T01:43:30.894970+00:00",
+  "starting_checkpoint": "4b29204b844e806932a6473b25a34bae5dcc12cc",
+  "scope": "Fixed deterministic development correctness only; no relation search or performance experiment",
+  "sources": {
+    "examples/prime31_rational_chain_guard.rs": {
+      "sha256": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0",
+      "git_blob": "7f991783bd99d4f95ec4df1a94b50e79be693b51",
+      "bytes": 28154
+    },
+    "examples/identity_certificate_rational_chain.rs": {
+      "sha256": "b803aa70037cd95467cc0865f99fd8af5848912eb490542d8ad327b3dfa490fc",
+      "git_blob": "a71898f453975cf1f77881d2a0779fc99622e712",
+      "bytes": 3999
+    },
+    ".github/workflows/prime31-rational-chain-guard.yml": {
+      "sha256": "cc01c75ccfe15595d08be1e154b1d64174ec0dae830815f5147d3d7f46cf0157",
+      "git_blob": "5a1b5950c28c43be6ca8397b0250978cea2aaef2",
+      "bytes": 2547
+    }
+  },
+  "commands": [
+    "cargo test --locked --release --example prime31_rational_chain_guard",
+    "cargo run --locked --release --example prime31_rational_chain_guard",
+    "cargo run --locked --release --example identity_certificate_rational_chain -- correctness-receipts/identities",
+    "cargo run --locked --release --example identity_certificate_rational_chain -- --check correctness-receipts/identities 6677026024"
+  ],
+  "controls": [
+    "depth6 N64 B31 original fibre",
+    "explicit Fp2 projected S4 ghost with gcd(q,X^p-X)=1",
+    "oriented Q1-Q3 and original group replay",
+    "P,-P,Q identity-prefix repair by permutation",
+    "P,P,P,-P balanced-tree incompleteness",
+    "all64 ordered m3 and256 ordered m4 tuples on first two canonical rational points and negatives",
+    "damaged auxiliary, signed rational target, slope rejections",
+    "native evaluated-tier cubic residual identity; proof null"
+  ],
+  "execution_before_freeze": false,
+  "local_original_lock_build": "Not attempted: partial connector materialization has no root crate checkout. Hosted CI will use original root manifest and lock.",
+  "producer_review": "Draft written by Rust worker; worker terminated with provider screening error before execution. Root reviewed public APIs and arithmetic source bindings, preserved draft, and prepared the native identity issuer. No successful worker run is asserted."
+}
