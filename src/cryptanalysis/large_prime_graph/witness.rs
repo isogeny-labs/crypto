@@ -16,7 +16,7 @@ use crate::cryptanalysis::large_prime_filter::{
     replay_complete_relation, CompleteRelation, PartialRelation,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet};
 
 /// The first occurrence of row_index has coefficient one in `sources`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -34,8 +34,11 @@ pub struct WitnessStats {
     pub anchors: usize,
     pub dependent_rows: usize,
     pub source_terms: usize,
-    /// Number of unique adjacency entries inspected during path searches.
+    /// Legacy BFS adjacency-list scan counter (zero for parent-path traversal).
     pub adjacency_scans: u64,
+    /// Parent edges reversed when joining a smaller forest component.
+    #[serde(default)]
+    pub reroot_steps: u64,
     /// Tree edge steps used while reducing original or anchor rows.
     pub path_steps: u64,
     /// Explicit modular inverse calls, including input validation.
@@ -83,20 +86,24 @@ fn coeff_at(row: &[(usize, u64)], vertex: usize) -> u64 {
 
 /// Streaming frame-matroid row basis plus exact left-kernel witnesses.
 ///
-/// The deterministic BFS path reconstruction deliberately charges up to
-/// O(R*(V+E)*log(R+2)+L) conservatively including balanced-map
-/// updates, for R rows, V LP vertices, E tree edges and L emitted terms.
-/// Modular inversions and their bit complexity are additionally charged;
-/// stored input rows require O(R) space even when no witness is emitted.
-/// Its benefit is explicit correct certificates and a testable comparator,
-/// NOT an asymptotic speedup. Forest paths may be long and dense.
+/// Paths now follow explicit parent edges rather than allocating a V-entry
+/// BFS predecessor array for each query. Joining two trees reroots only the
+/// smaller component; each vertex is rerooted at most O(log V) times, so all
+/// reroot work is O(V log V). For R rows, maximum forest depth D and L
+/// emitted source terms, the conservative ordered-map work is
+/// O((R D + V log V) log(R+2) + L), excluding modular inverse bit costs.
+/// D may be V, and witness materialization may dominate; no complete-cost
+/// or asymptotic ECDLP advantage is assumed.
 #[derive(Clone, Debug)]
 pub struct ForestWitnessExtractor {
     p: u64,
     parent: Vec<usize>,
     size: Vec<usize>,
-    /// Undirected adjacency only for independent two-ended tree equations.
-    adjacency: Vec<Vec<(usize, usize)>>,
+    /// Forest parent edges are distinct from the component union-find parent.
+    /// The tree root remains the corresponding union-find component root.
+    tree_parent: Vec<usize>,
+    /// Input-row index for the edge to tree_parent; None at the tree root.
+    tree_parent_edge: Vec<Option<usize>>,
     /// Exactly one independent anchor row, if pinned, per root.
     anchor: Vec<Option<usize>>,
     /// Every admitted row is retained for source reconstruction.
@@ -113,7 +120,8 @@ impl ForestWitnessExtractor {
             p: modulus,
             parent: (0..vertices).collect(),
             size: vec![1; vertices],
-            adjacency: vec![Vec::new(); vertices],
+            tree_parent: (0..vertices).collect(),
+            tree_parent_edge: vec![None; vertices],
             anchor: vec![None; vertices],
             rows: Vec::new(),
             stats: WitnessStats::default(),
@@ -127,39 +135,47 @@ impl ForestWitnessExtractor {
         v
     }
 
-    /// The unique forest path from `start` to its component root.
-    /// Records adjacency scans even though a path query touches at most
-    /// two LP endpoints. No uncharged O(1) shortest-path assertion.
+    /// Follow the directed equation-forest path from start to its component
+    /// root, without searching unrelated forest edges or allocating V slots.
     fn path_to_root(&self, start: usize, root: usize) -> (Vec<(usize, usize, usize)>, u64) {
-        if start == root {
-            return (Vec::new(), 0);
+        let mut path = Vec::new();
+        let mut node = start;
+        while node != root {
+            let next = self.tree_parent[node];
+            let edge = self.tree_parent_edge[node]
+                .expect("nonroot forest vertex must have a parent equation");
+            debug_assert_ne!(node, next);
+            path.push((node, next, edge));
+            node = next;
         }
-        let mut prev: Vec<Option<(usize, usize)>> = vec![None; self.parent.len()];
-        let mut queue = VecDeque::new();
-        prev[start] = Some((start, usize::MAX));
-        queue.push_back(start);
-        let mut scanned = 0u64;
-        while let Some(v) = queue.pop_front() {
-            if v == root {
+        // There are no adjacency-list scans in the direct-parent arm.
+        (path, 0)
+    }
+
+    /// Reverse parent pointers along a path in the *smaller* component.
+    /// Then its endpoint can be attached to any vertex of the larger tree
+    /// while preserving a single directed path to the common component root.
+    /// Every vertex can lie on such a reversal path at most O(log V) times:
+    /// whenever this happens, its component at least doubles in size.
+    fn reroot_smaller_tree(&mut self, vertex: usize) -> u64 {
+        let mut node = vertex;
+        let mut previous = vertex;
+        let mut previous_edge = None;
+        let mut flips = 0;
+        loop {
+            let next = self.tree_parent[node];
+            let next_edge = self.tree_parent_edge[node];
+            self.tree_parent[node] = previous;
+            self.tree_parent_edge[node] = previous_edge;
+            if node == next {
                 break;
             }
-            for &(next, edge_idx) in &self.adjacency[v] {
-                scanned += 1;
-                if prev[next].is_none() {
-                    prev[next] = Some((v, edge_idx));
-                    queue.push_back(next);
-                }
-            }
+            previous = node;
+            previous_edge = next_edge;
+            node = next;
+            flips += 1;
         }
-        let mut path = Vec::new();
-        let mut node = root;
-        while node != start {
-            let (child, edge) = prev[node].expect("joined forest component has a path");
-            path.push((child, node, edge));
-            node = child;
-        }
-        path.reverse();
-        (path, scanned)
+        flips
     }
 
     fn project(&self, row: &[(usize, u64)]) -> Result<Reduced, LpGraphError> {
@@ -277,14 +293,20 @@ impl ForestWitnessExtractor {
                 // At least one side was unanchored, else this would be dependent.
                 let (big, small) = if self.size[u] >= self.size[v] { (u, v) } else { (v, u) };
                 debug_assert!(self.anchor[u].is_none() || self.anchor[v].is_none());
+                // Reroot only the smaller equation tree at its joining
+                // endpoint, then attach this endpoint to the larger tree.
+                let (small_endpoint, big_endpoint) = if small == u {
+                    (terms[0].0, terms[1].0)
+                } else {
+                    (terms[1].0, terms[0].0)
+                };
+                self.stats.reroot_steps += self.reroot_smaller_tree(small_endpoint);
+                self.tree_parent[small_endpoint] = big_endpoint;
+                self.tree_parent_edge[small_endpoint] = Some(row_idx);
                 self.parent[small] = big;
                 self.size[big] += self.size[small];
                 self.anchor[big] = self.anchor[u].or(self.anchor[v]);
                 self.anchor[small] = None;
-                let a = terms[0].0;
-                let b = terms[1].0;
-                self.adjacency[a].push((b, row_idx));
-                self.adjacency[b].push((a, row_idx));
                 self.stats.tree_edges += 1;
             }
             _ => {
