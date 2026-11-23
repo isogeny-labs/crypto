@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T03:57:00Z",
+ "id": "PCC-20261123-08018e",
+ "kind": "statement",
+ "producer": {
+  "commit": "260e5fb7bdb36f287d4586cc5f1ab9a4c78c5af8",
+  "model": "GPT-6 Astra Pro",
+  "session": "rr5-qualification-followup-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/b8-positive-01/stdout.txt",
+    "sha256": "e93271b81a8ebb271a572d8af836b7c2c67ee7c374cab837b6af33aa8efd06aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/b8-empty-01/stdout.txt",
+    "sha256": "051b08648810e49f039f79f3eb1e47115a75054ab0f217d268c9df9c3a0e2fa8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/b8-positive-02/stdout.txt",
+    "sha256": "545e58c3fd5af52d496f3be67bb28e88070fb687cd345b91c2bb787458f3b5b3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/b8-empty-02/stdout.txt",
+    "sha256": "17d1a76e7de7b073812299748d59e6d45e0f2142b3837009de3c5f4e44fdbbba"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Expanded b8-positive-01/b8-empty-01 versus compact b8-positive-02/b8-empty-02, fixed PRIME31 inputs only; unsigned",
+ "statement": "Both expanded B8 controls remained inconclusive; under unchanged fixed limits the compact quotient-product formulation completed the positive and empty controls, matching each independent1120-tuple oracle. The successful traces report no full-field branches or domain evaluations. This records bounded correctness, not a speed comparison."
+}
