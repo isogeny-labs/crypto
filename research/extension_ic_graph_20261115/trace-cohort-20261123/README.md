@@ -1,7 +1,7 @@
 # Full saved-cohort comparison of traced coordinate backends
 
-The native analysis reads every one of the3415saved Run51systems, checks all
-3419root multisets across original-unit/five-trace/six-trace, and totals only
+The native analysis reads every one of the3415saved Run51systems, checks all3415coordinate root sets containing
+3419roots across original-unit/five-trace/six-trace, and totals only
 the emitted F4and linear-stage Fp multiplication counters. It makes zero new
 solver, natural-yield or timing calls. The initial saved-counter-summary.json
 is retained; proof-bound-counter-summary.json adds explicit embedded replay
@@ -41,6 +41,7 @@ Builds link only the native JSON/hash dependencies; no cryptographic solver is
 invoked by this program. Original failures, binaries, records and earlier reports
 are unchanged. [pcc:unverified]
 
+[Root-set wording clarification](ROOT_COUNT_CLARIFICATION.md) ·
 [Readable report](report/REPORT.md) · [PDF](report/report.pdf) ·
 [Source review](SOURCES.md) · [Analysis plan](PLAN.md).
 

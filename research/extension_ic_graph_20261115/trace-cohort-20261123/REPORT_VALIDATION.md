@@ -16,3 +16,9 @@ Original input/replay files and earlier report proof subjects are unchanged.
 This is a complete saved denominator and partial solver accounting, not a
 new experiment or full-cost comparison. No benchmark/leaderboard promotion,
 S3upload, signed validation, fresh yield or rho-parity inference is made.
+
+Root-set wording clarification: re-rendered and inspected the corrected full
+one-page PDF/PNG (59970B). It now explicitly says3415coordinate root sets with
+3419roots total. Numeric table, graph SVG and proof-bound summary bytes are
+unchanged. Initial prose is preserved at2ea1f9f; correction457e58and the named
+clarification record preserve the distinction without editing the old claim.

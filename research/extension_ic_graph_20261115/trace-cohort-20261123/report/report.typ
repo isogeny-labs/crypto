@@ -4,7 +4,7 @@
 = Complete saved-cohort solver counters
 Rust graph IC continuation · 23 November 2026
 
-All 3415 saved systems and 3419 root multisets agree across the three recorded paths. This analysis performs no new solver, relation search or timing call. All raw inputs and both replay summaries are hash-bound. Producer observation: PCC-20261123-400f7d, *UNVERIFIED*. [pcc:unverified]
+All 3415 saved coordinate root sets, containing 3419 roots in total, agree across the three recorded paths. This analysis performs no new solver, relation search or timing call. All raw inputs and both replay summaries are hash-bound. Producer observation: PCC-20261123-400f7d, *UNVERIFIED*. [pcc:unverified]
 
 #image("solver-counts.svg", width: 100%)
 #table(columns:(1.7fr,1fr,1fr,1.1fr),align:(left,right,right,right),[Backend],[Reported F4],[Reported linear],[Reported sum],[Unit without trace],[2179269070],[716225084],[2895494154],

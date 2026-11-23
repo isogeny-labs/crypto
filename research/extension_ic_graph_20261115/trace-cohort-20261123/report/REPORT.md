@@ -1,6 +1,6 @@
 # Complete saved-cohort counter comparison
 
-All3415 captured systems and3419 root multisets agree across the original unit and both traced paths. The analysis reads saved outputs only: zero new solver, relation-yield or timing calls. SHA256pins bind the three raw inputs and both full replay summaries. Unsigned PCC-20261123-400f7d. [pcc:unverified]
+All3415 captured coordinate root sets, containing3419 roots in total, agree across the original unit and both traced paths. The analysis reads saved outputs only: zero new solver, relation-yield or timing calls. SHA256pins bind the three raw inputs and both full replay summaries. Unsigned PCC-20261123-400f7d. [pcc:unverified]
 
 ![Saved solver subtotals](solver-counts.svg)
 
