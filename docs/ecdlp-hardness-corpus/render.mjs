@@ -43,6 +43,11 @@ function quote(value) {
   return JSON.stringify(value.replaceAll("\n", " "));
 }
 
+function quoteLabel(value) {
+  // Graphviz line breaks require one emitted backslash; JSON doubles it.
+  return quote(value).replaceAll("\\\\n", "\\n");
+}
+
 function label(node) {
   const formula = node.formula ? `\\n${node.formula}` : "";
   return `${node.id}\\n${node.label}${formula}`;
@@ -63,7 +68,7 @@ for (const [clusterId, clusterLabel, kinds] of clusters) {
     const [fill, stroke] = colors[node.kind];
     const style = node.status === "open" || node.status === "heuristic" ? "rounded,filled,dashed" : "rounded,filled";
     const refuted = node.status === "refuted";
-    lines.push(`    ${quote(node.id)} [label=${quote(refuted ? `${label(node)}\\nREFUTED` : label(node))}, fillcolor=\"${refuted ? "#f8c9c9" : fill}\", color=\"${refuted ? "#a33a3a" : stroke}\", style=\"${style}\"${refuted ? ", penwidth=2" : ""}];`);
+    lines.push(`    ${quote(node.id)} [label=${quoteLabel(refuted ? `${label(node)}\\nREFUTED` : label(node))}, fillcolor=\"${refuted ? "#f8c9c9" : fill}\", color=\"${refuted ? "#a33a3a" : stroke}\", style=\"${style}\"${refuted ? ", penwidth=2" : ""}];`);
     emitted.add(node.id);
   }
   lines.push("  }");
@@ -71,7 +76,7 @@ for (const [clusterId, clusterLabel, kinds] of clusters) {
 
 for (const node of corpus.nodes.filter(item => !emitted.has(item.id))) {
   const [fill, stroke] = colors[node.kind] ?? ["#eeeeee", "#555555"];
-  lines.push(`  ${quote(node.id)} [label=${quote(label(node))}, fillcolor=\"${fill}\", color=\"${stroke}\"];`);
+  lines.push(`  ${quote(node.id)} [label=${quoteLabel(label(node))}, fillcolor=\"${fill}\", color=\"${stroke}\"];`);
 }
 
 for (const edge of corpus.edges) {
@@ -152,7 +157,7 @@ const overview = [
   "  edge [fontname=\"DejaVu Sans\", fontsize=9, color=\"#66788a\", arrowsize=0.8];"
 ];
 for (const [id, labelText] of Object.entries(domainLabels)) {
-  overview.push(`  ${quote(id)} [label=${quote(`${labelText}\\n${domainCounts.get(id)?.length ?? 0} claims`)}, fillcolor=\"${domainColors[id]}\", color=\"#526575\"];`);
+  overview.push(`  ${quote(id)} [label=${quoteLabel(`${labelText}\\n${domainCounts.get(id)?.length ?? 0} claims`)}, fillcolor=\"${domainColors[id]}\", color=\"#526575\"];`);
 }
 for (const [key, count] of [...aggregateEdges].sort()) {
   const [from, to] = key.split("\u0000");

@@ -54,7 +54,8 @@ use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id, splitmix64}
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::legacy;
 use crate::cryptanalysis::ecbench::methods::{
-    MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+    v5_pre_tally_record, MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+    V5_JUMP_INDEX_COUNTER,
 };
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
@@ -726,6 +727,15 @@ fn compare_replay(
         rep.counters
             .retain(|k, _| !legacy::is_cost_accounting_counter(k) || r.counters.contains_key(k));
     }
+    // A `rho.signed_frobenius_v5` record written before its per-step
+    // jump-index tally (2026-11-19) is compared without it: the tally is a
+    // native counter only, equal to the recorded `steps`, and the walk,
+    // outcome and group operations it replays are unchanged.  Readers that
+    // price such a record derive the tally from `steps`.
+    if v5_pre_tally_record(&r.method.id, &r.counters) {
+        rep.counters.remove(V5_JUMP_INDEX_COUNTER);
+        rep.unpriced.retain(|k| k != V5_JUMP_INDEX_COUNTER);
+    }
     let rep = &rep;
     let mut diffs = Vec::new();
     if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
@@ -738,7 +748,11 @@ fn compare_replay(
     // the same serialise-parse round trip the record's took.
     let same_gae = |phases: &[f64], total: f64| {
         (
-            Some(json_roundtrip(total).to_bits()) == r.cost.total_gae.map(f64::to_bits),
+            Some(json_roundtrip(total).to_bits())
+                == r.cost
+                    .total_gae
+                    .or(r.cost.total_gae_store)
+                    .map(f64::to_bits),
             phases
                 .iter()
                 .map(|g| json_roundtrip(*g).to_bits())
@@ -1326,8 +1340,8 @@ fn consistency_problems(
             ));
         }
     }
-    // Phases sum to the total.
-    if let Some(total) = r.cost.total_gae {
+    // Phases sum to the total (an amortized run's, under `*_store`).
+    if let Some(total) = r.cost.total_gae.or(r.cost.total_gae_store) {
         // A named pre-fix producer's class-set-up record is short of its
         // phase sum by exactly the set-up, which its replay checks
         // (`legacy_class_setup`); every other record sums to its total.
@@ -1379,7 +1393,29 @@ fn consistency_problems(
             r.outcome.status
         ));
     }
-    if !failed && r.cost.total_gae.is_none() {
+    // An amortized run (factor-base logs from a store) carries its total
+    // under `total_gae_store` with the cold fields null, never both.
+    let amortized = r.log_table_amortized();
+    if amortized
+        && (r.cost.total_gae.is_some()
+            || r.cost.s.is_some()
+            || r.boundaries.ratio_to_floor.is_some()
+            || r.cost.cost_basis.as_deref() != Some("amortized"))
+    {
+        out.push(format!(
+            "{tag}: its factor-base logs came from a store, so its cost is amortized and must not sit under the cold `total_gae`, `s` or `ratio_to_floor`"
+        ));
+    }
+    if !amortized
+        && (r.cost.total_gae_store.is_some()
+            || r.cost.s_store.is_some()
+            || r.cost.cost_basis.is_some())
+    {
+        out.push(format!(
+            "{tag}: carries an amortized cost but its log table was computed in the run"
+        ));
+    }
+    if !failed && r.cost.total_gae.or(r.cost.total_gae_store).is_none() {
         out.push(format!(
             "{tag}: status `{}` has no total, so no solve finished",
             r.outcome.status
@@ -1687,6 +1723,11 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
             && match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
                 (Some(t), Some(sv), Some(q)) => close(sv, t / sqrt_r) && close(q, sv / floor),
                 (None, None, None) => true,
+                _ => false,
+            }
+            && match (r.cost.total_gae_store, r.cost.s_store) {
+                (Some(t), Some(sv)) => close(sv, t / sqrt_r),
+                (None, None) => true,
                 _ => false,
             }
             && r.cost.lower_bound != r.cost.unpriced.is_empty()

@@ -1,0 +1,50 @@
+{
+  "schema": "h116.scalar-divpoly-degree-protocol/v1",
+  "protocol_id": "H116-SCALAR-DIVPOLY-DEGREE-001",
+  "status": "frozen-before-producer-or-verifier-implementation-and-before-execution",
+  "question": "Do independently constructed division-polynomial x-maps for [N] have exact degrees (N^2,N^2-1), agree with direct scalar multiplication on every point of the frozen extension panel, and exhibit the predicted denominator-degree collapse for the excluded characteristic scalar [p]?",
+  "parent_dual_pair_result_sha256": "b7ad7021167eb89a6b32cb0b1e8b4c5d704a075d67c2f32a9256d1628d1c3458",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2,"N":7},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3,"N":7},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4,"N":7},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2,"N":5},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3,"N":5},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4,"N":5},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2,"N":14},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3,"N":14}
+  ],
+  "positive_checks": [
+    "the [N] numerator and denominator have exact degrees N^2 and N^2-1",
+    "their leading coefficients are 1 and N^2 mod p",
+    "the rational x-map equals the x-coordinate of direct [N]P for every finite non-kernel point",
+    "the denominator vanishes at every finite point sent to infinity and nowhere among regular points",
+    "the numerator and denominator have no common observed root"
+  ],
+  "controls": [
+    "adding one to the numerator constant produces at least one regular-point mismatch in every cell",
+    "constructing the [p] denominator in characteristic p yields degree strictly below p^2-1 in every base-curve family",
+    "the excluded [p] leading coefficient at expected degree p^2-1 is zero"
+  ],
+  "measurements": [
+    "exact polynomial degrees and leading coefficients",
+    "complete affine-point, regular-point, pole-point, map-failure, pole-failure, cancellation, and mutation-failure counts",
+    "division-polynomial base-field operation counts and direct-evaluation extension-field/group operation counts"
+  ],
+  "producer": {
+    "path": "h116_scalar_divpoly_degree.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "method": "division-polynomial recurrence over F_p plus exhaustive evaluation through the shared extension-field implementation"
+  },
+  "independent_verifier": {
+    "path": "h116_scalar_divpoly_degree_verify.py",
+    "method": "separate Python prime-extension arithmetic, division-polynomial recurrence, and exhaustive point-action replay"
+  },
+  "acceptance": {
+    "primary": "all exact degree, leading-coefficient, pointwise-map and pole checks pass in all eight cells; both controls reject in every cell; producer exact fields equal independent replay",
+    "failure_policy": "retain all rows and report failures without changing cells, scalars, controls, or acceptance criteria"
+  },
+  "claim_boundary": "This experiment checks a scalar coordinate-map certificate on three toy prime-field curves. It does not identify the coordinate map with a scheme morphism in Lean, prove its function-field degree, prove duality of V-1 and pi-1, solve ECDLP, or establish subexponential runtime.",
+  "filed_before_code": true,
+  "filed_before_data": true
+}

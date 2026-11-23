@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "note": "Validator's manifest for the genus-4 follow-up (54 targets at p = 16411, arm x). The rho reference is the strongest available, the ideal negation floor; against it arm x is below at w = 0 and 0.1 and above at w = 1, so the order does not hold and arm x is not ranked against negation rho. Against the measured plain rho Q the frozen readings are in the validator report. [pcc:unverified]",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "e4df255739e12d5c729b159e4e606ab0fc56750a3ae3d5b427a815a280c2912d"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "8df892413ddd3628c0b811e1fc169b5871224ada8dc591fd496224345e718d89"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md (frozen ae36cdc6e4) section 6 (s1) and section 8: the ideal negation bound sqrt(pi r/4) group operations with nothing else charged, which section 8 requires in the rho-reference band before promotion. The frozen decision rule's measured reference is window-free plain rho Q (R_rho_plain_nowin), the cheapest measured rho on these curves; its band is in the validator report.",
+  "unit": "GAE per key, mean over the 108 keys (54 targets x 2 seeds) at p = 16411: one counted Jacobian group operation = 1; each listed unpriced native operation (rel_mul, rel_add, la_mul, la_add) = w; the negation floor charges no native work at any w",
+  "binary_or_process": "IC arm x: genus_ladder sha256 74f02ea1fb6a353e2762ba1494f2666acab0a774b17deec38bd02090dc11a6f9 (built from ae36cdc6e4; validator rebuild 90128561... has identical code sections and replays the sampled rows identically). The negation floor is a closed form of each instance's r as emitted by that binary and certified by the validator's own arithmetic; no other binary or process enters it. The measured Q rows ran in the same binary (k = 3..17) and in the lean-rho binary (k = 0..2), whose rows the validator's rebuild reproduces (G3 key and nonce-drawn key 172/k1/s1).",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 427570.6111111111,
+    "rho": 192050067.7063408
+   },
+   "0.1": {
+    "ic": 24207911.64814815,
+    "rho": 192050067.7063408
+   },
+   "1": {
+    "ic": 238230980.9814815,
+    "rho": 192050067.7063408
+   }
+  },
+  "order_holds_across_band": false
+ }
+}
