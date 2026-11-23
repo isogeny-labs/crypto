@@ -1,0 +1,9 @@
+Trigger: Assess relation-finding benchmark
+Requested: 2026-11-23T15:12:42Z
+Target: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen Koblitz GF(2^23), a=0, m=2 exact two-summand control; not ECC2K-130
+Natural trials: 256; planted-SAT controls: 64; proven-UNSAT controls: 64
+Metrics: elapsed seconds, verified natural relations/sec, natural success rate
+Output: results/hourly_log.csv (append, commit and push to hourly-runs)
+Baseline: results/relation_baseline.json; alert for failure or |change| >20%
