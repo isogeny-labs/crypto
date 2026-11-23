@@ -126,7 +126,8 @@ fn correctness(){
    for q in inputs(p,kind,256){
     let before=baseline::roots(&x,&q);
     let after=candidate::roots(&y,&q);
-    assert_eq!(before,after,"p={p} kind={kind} q={q:?}");
+    assert_eq!(before.roots,after.roots,"p={p} kind={kind} q={q:?}");
+    assert_eq!(before.frobenius_fallback,after.frobenius_fallback);
     let reduced:Vec<_>=q.iter().map(|&v|v%p).collect();
     for root in after.roots {
      let eval=reduced.iter().rev().fold(0u64,|acc,&v|y.f.add(y.f.mul(acc,root),v));
@@ -150,9 +151,9 @@ fn benchmark(){
     let start=Instant::now();let mut h=0x125abc_u64;
     for _ in 0..20 {
      for poly in &q {
-      let roots=if opt{candidate::roots(black_box(&y),black_box(poly))}
-                else {baseline::roots(black_box(&x),black_box(poly))};
-      h=hash(h,black_box(digest(&roots.roots)));
+      let roots=if opt{candidate::roots(black_box(&y),black_box(poly)).roots}
+                else {baseline::roots(black_box(&x),black_box(poly)).roots};
+      h=hash(h,black_box(digest(&roots)));
      }
     }
     (start.elapsed().as_nanos() as f64/(20*q.len()) as f64,h)
