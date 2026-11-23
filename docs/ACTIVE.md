@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Validate planted four-summand sparse-row rank coverage and balanced-sign nullspace on Prime31, as a disjoint math/validation gate for the exact S3 pair-spectrum task (ChatGPT automation, started 2026-11-23, branch automation/prime31-planted-rank-coverage-20261123; draft PR pending; no relation-solver or production Rust edits). [pcc:unverified]
+
 - [ ] Construct actual C7 Jacobian push-pull/elliptic-cover Gram matrix and a degree9 correspondence bridge, with complete geometric fibres, extension-field/infinity/ramification/basepoint controls and explicit remaining CM19 S/cost gaps (Codex, started 2026-11-23, branch lane/chained-cm19-jacobian-gram-20261123; follows merged #5026, parent #5019 artifact migration remains open). [pcc:unverified]
 - [ ] Optimize merged #5020 Prime31 RR5 dual certificate with compact triangular source-row provenance and replay controls, preserving original-Rust correctness and cold-cost holds (ChatGPT automation, started 2026-11-23, branch automation/prime31-compact-dual-provenance-20261123; draft PR #5033; source `fe10b777`, 19 authored Rust tests; mathematical-only replay passed, native Rust and PCC pending; [pcc:unverified]).
 - [ ] Binary factored S₃·S₃ oracle for even n: linear Artin–Schreier solver replacing the odd-n half-trace, general b, equivalence tests and end-to-end DLP at even n vs S₄ pairs-and-solve (claude, started 2026-11-23, branch claude/binary-factored-even-n-20261123; follows merged PR #4839)
