@@ -23,5 +23,5 @@ jobs:
         with:
           workspaces: research/prime31_ic_20261115/native
       - name: Exact signed pair-support census using existing native group law
-        timeout-minutes: 8
+        timeout-minutes: 16
         run: cargo run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_run79_exact_pair_support
