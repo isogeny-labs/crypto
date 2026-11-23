@@ -1,16 +1,6 @@
 name: Graph-IC GainDsu source-bound native test
 
 on:
-  # Bounded native qualification fallback while the repository's CT330
-  # workflow syntax breaks the usual pull_request check dispatch. Restrict
-  # this push route to the existing graph research lane and source files.
-  push:
-    branches:
-      - automation/graph-ic-captured-exact-rank-20261123
-    paths:
-      - 'src/cryptanalysis/large_prime_graph/**'
-      - tests/large_prime_graph.rs
-      - .github/workflows/graph-ic-gain-dsu-native.yml
   pull_request:
     paths:
       - src/cryptanalysis/large_prime_graph.rs
@@ -23,8 +13,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Same group for push and pull_request of one head branch: no duplicate runs.
-  group: graph-ic-source-native-${{ github.head_ref || github.ref_name }}
+  group: graph-ic-source-native-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
