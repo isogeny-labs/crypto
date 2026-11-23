@@ -7,19 +7,17 @@ standing. Every scientific result below is unsigned. [pcc:unverified]
 
 ## Next unblocked work
 
-1. Explicitly enumerate PGL2(F3) changes between the three actual models and
-   evaluate any cross-model chain. The source involution may relate the two
-   smooth kernels; this is unexecuted. Include a genuine quadratic-twist
-   extension-field/Frobenius control. Record ACTIVE-only before new code.
-2. Freeze complete cold matched costs with strongest direct elliptic reference,
-   charging field/kernel/chart/map/destination solver/replay/memory. Costs
-   remain unmeasured and original EKS/paid admission remains binding.
-3. Qualify the written genuine nonhyperelliptic genus3 plane-quartic source
-   family; original parent RREF endpoints are product PPAVs.
-4. Compute actual Weil8 on the genuine J8 basis before classifying mod8
-   isotropic kernels/chains. A compatible matrix lift is not the pairing.
-5. Keep field/curve/subgroup identities and prime-field morphism eligibility
-   exact in every broader comparison. [pcc:unverified]
+1. Track and qualify the fixed genuine nonhyperelliptic genus3 plane-quartic
+   source family in a follow-on branch/draft, ACTIVE-only before code.
+   GENUS3_PLANE_QUARTIC_SUCCESSOR.md gives the prospective250-model family,
+   exact source/Weil-factor/mod2 gates and first-lex/empty-result criteria.
+2. STRONGEST_REFERENCE_OBLIGATIONS.md records the source's six-automorphism
+   orbit. Complete native/external strongest reference and cold cost protocol
+   remain unexecuted; charge setup/maps/solver/replay/memory and keep original
+   EKS ownership/paid STOP/admission. No local benchmark substitute.
+3. Compute actual Weil8 on the genuine J8 basis, then geometric isotropic
+   kernels/chains. Generic Mathlib, product/extension-field routes and normal
+   CI/merge/custody requirements remain explicit. [pcc:unverified]
 
 ## Completed finite units — do not replay unchanged
 
@@ -30,12 +28,15 @@ standing. Every scientific result below is unsigned. [pcc:unverified]
 | Actual3 Richelot kernels,2 smooth F3 models,52 point ideals,4 degree drops | 0b292644 | result6dee5001; whole6283B stdout3599c111 | c656d1 |
 | Explicit E7 pullback and2 homogeneous Richelot chains | 269689ea | whole7401B stdout513abe4f;147 map additions/all21 outputs | 35dbcf |
 | Full rational Jacobian maps and exact dual-only next kernels | 4ae962c1 | whole37557B stdout721790e8;4 maps/1764 additions/84 exact-minus2 composites; report2pp62ebe0ab | 6b4fb5 / 4b7b49 |
+| Actual F3 model isomorphisms/cross chains/twist control | 96aa5f9c | whole42658B1f8824c9;12 isos/4 actual loops; E7 signed doubling; report2pp0de46013 | 331403 / efc6e3 |
 | Genus3 product boundary A and RREF C | 61f7b10c / 8a9247c1 | parent#5005; reportAA2/finalPDF0ccd28b3 | cb20d3 / e4e108 / b18539 |
 
 Reports: reports/run-20261123T1412Z (4pp/99026c7a/bbcce1) and
-reports/run-20261123T1438Z (2pp/62ebe0ab/4b7b49), every final page inspected.
-On each fixed smooth codomain only its dual kernel is rational; cross-model
-isomorphisms and product/extension routes remain open. [pcc:unverified]
+reports/run-20261123T1438Z (2pp/62ebe0ab/4b7b49), and
+reports/run-20261123T1509Z (2pp/0de46013/efc6e3), every final page inspected.
+On each fixed smooth codomain only its dual kernel is rational. The actual
+C0/C2 model edge now closes four loops: finite21-class actions16/5, original
+order7+2/-2; product/extension routes remain open. [pcc:unverified]
 
 The ordinary nonsplit minimal4096-Sylow fixture is absent in the fixed F3
 census; all12 nonsplit3+3 models have horizon v2=16. All485+1 models lack
