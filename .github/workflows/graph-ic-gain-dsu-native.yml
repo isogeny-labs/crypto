@@ -25,7 +25,7 @@ jobs:
         run: |
           git rev-parse HEAD
           rustc --version
-          sha256sum src/cryptanalysis/large_prime_graph.rs src/cryptanalysis/large_prime_graph/witness.rs src/cryptanalysis/large_prime_graph/projected_rank.rs src/cryptanalysis/large_prime_filter.rs src/cryptanalysis/large_prime_filter_mst.rs tests/large_prime_graph.rs
+          sha256sum src/cryptanalysis/large_prime_graph.rs src/cryptanalysis/large_prime_graph/eval.rs src/cryptanalysis/large_prime_graph/witness.rs src/cryptanalysis/large_prime_graph/projected_rank.rs src/cryptanalysis/large_prime_filter.rs src/cryptanalysis/large_prime_filter_mst.rs tests/large_prime_graph.rs
       - name: Native exact-source graph integration tests
         shell: bash
         run: |
