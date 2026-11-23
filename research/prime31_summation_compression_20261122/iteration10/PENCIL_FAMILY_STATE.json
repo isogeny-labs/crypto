@@ -69,5 +69,16 @@
     "metadata_collision_resolution": "Only our unfrozen iteration10/STATE.json renamed to PENCIL_FAMILY_STATE.json; both source sets preserved",
     "native_validation": "not established; producer symbolic checks are provenance only"
   },
-  "problem_record": "../../problems/prime31-exact-pair-spectrum-query.md"
+  "problem_record": "../../problems/prime31-exact-pair-spectrum-query.md",
+  "torus_rotation_followup": {
+    "note": "iteration10/torus_rotation_followup/NO_SINGLE_COVER_FFT.md",
+    "source_commit": "3124b9ca31bdea00266dabe5c4ba922cdea91928",
+    "source_blob": "10fa37933284834afa839d721e33aaed56f7aa1d",
+    "status": "Written corollary of October 2026 private-branch theorem; symbolic transcription checked; no native/independent test, no new PCC claim",
+    "conclusion": "Nontrivial torus rotation cannot lift to an automorphism of the single leaf quadratic cover under the odd-order and 2-power hypotheses. Explicit all-leaf multiquadratic compositum has degree 2^q; this does not lower-bound an implicit exact query.",
+    "review_gate": "Independent examination of private branch disjointness, genus-three chart, Frobenius/deck identity and special hypotheses; then original-Rust small-field fixtures if selected.",
+    "ci_gate": "Final-head PR #4977 CI on pre-note commit 0ab2b02 included failed scope (missing recovery artifact), check/current (release scope refusal and separate failure), artifacts (inherited workflow wiring/test failures), gate (inherited pcc test NameErrors). No all-required-checks pass. New head CI unassessed.",
+    "workers": "No native agent slots exposed; coordinator parallelized disjoint Github reads, mathematical review and validation preparation; no independent worker attestations.",
+    "next_step": "Seek a different exact source-specific sublinear pair-spectrum index; preserve full signed replay and ~O(D) control. Do not expand the 2^q radical compositum or treat torus FFT as an elliptic addition Fourier oracle."
+  }
 }
