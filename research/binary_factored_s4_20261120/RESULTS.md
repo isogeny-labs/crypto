@@ -161,3 +161,34 @@ change the ranking. Both S4 arms are 10³–10⁴ times rho and the gap grows
 with `n` (the oracle is Θ(2ⁿ)). The meet-in-the-middle pair-table rows
 (O(B) per target) stay 4–23× rho and are better than either S4 arm by two
 to three orders of magnitude.
+
+## 6. Even `n`: the linear Artin–Schreier solver, end to end (`raw/06_*`)
+
+For even `n` there is no half-trace. PR #5032 adds `ArtinSchreier`, a precomputed `F₂`-linear `M` with `M(c)² + M(c) = c` on the trace-0 hyperplane. It is built by eliminating over `{φ(zⁱ) : 1 ≤ i < n} ∪ {v}`, where `Tr(v) = 1`, and applied through the same byte tables as the half-trace, so a solve costs the same at either parity. `FactoredSubspaceOracle` now accepts any `n ≤ 63`.
+
+Module tests pass 6/6 on a compiling base: the #4839 head with `main`'s `binary_radical_root.rs`, because `main` does not currently parse. The tests:
+
+* `artin_schreier_solves_exactly_the_trace_zero_hyperplane`, for `n = 2..63`.
+* `factored_subspace_oracle_decides_as_subspace_oracle`, extended with `n = 12, 16, 18, 22`.
+
+The protocol is the one in §5:
+* `binary_factored_ic_e2e`, even `n` from 16 to 26, 3 repeats, 48 matched rho walks per instance.
+* A preflight decision check on about 200–250 targets per instance.
+
+| n | log₂ r | preflight | S₄ pairs-and-solve wall | factored wall | speedup (per-repeat) | factored × rho (wall) |
+|---|---|---|---|---|---|---|
+| 16 | 14.0 | identical (127/253 decompose) | 7.8 ms | 4.2 ms | 1.85× (1.45–2.25) | 121 |
+| 18 | 15.0 | identical (79/245) | 36.3 ms | 17.1 ms | 2.12× (2.01–2.21) | 416 |
+| 20 | 18.0 | identical (70/227) | 0.32 s | 0.11 s | 2.81× (2.50–3.38) | 1,590 |
+| 22 | 20.0 | identical (88/204) | 0.64 s | 0.23 s | 2.77× (2.63–2.95) | 1,629 |
+| 24 | 21.0 | identical (19/200) | 2.29 s | 0.98 s | 2.35× (2.35–2.35) | 3,531 |
+| 26 | 23.0 | identical (47/202) | 10.7 s | 3.99 s | 2.68× (2.62–2.77) | 9,283 |
+
+All 36 variant runs recovered and verified the logarithm. In each repeat both arms took identical trials and relations, so the speedup is the oracle alone. Per-pair host calibration, `ns_per_s4_pair` against `ns_per_s4f_pair`:
+
+| n | 16 | 18 | 20 | 22 | 24 | 26 |
+|---|---|---|---|---|---|---|
+| `ns_per_s4_pair` | 243.7 | 195.9 | 224.5 | 264.4 | 249.4 | 258.4 |
+| `ns_per_s4f_pair` | 171.7 | 94.5 | 100.8 | 94.5 | 99.0 | 96.9 |
+
+That is about 2.6× per pair from `n = 18` on. The ranking is the same as at odd `n`. The MITM pair-table rows are about 75–100× rho at `n = 26`, and both `S₄` arms remain 3–4 orders of magnitude above rho. Even `n` is a parity extension of a constant-factor gain, not a change in exponent. Speedups are wall-clock ratios on one host (4 vCPU container, single-threaded oracle), with the same caveat as §5 that the GAE `S` columns depend on the calibrated ns per pair.
