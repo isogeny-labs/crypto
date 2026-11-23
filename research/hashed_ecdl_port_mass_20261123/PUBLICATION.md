@@ -49,3 +49,7 @@ reports stale progress across zero visible historical records; its receipt
 is retained. No empty progress report is generated over canonical history.
 No leaderboard, runtime chart, old baseline, frozen protocol or old capsule
 is changed by this accounting component. [pcc:unverified]
+
+## Scientific commit readback addendum
+
+Commit769693473039856325d83d6d9d8797d6edaced7f publishes all254 intended paths. Exact remote bytes/SHA256/Gitblob checks pass, with tree3e2fc16eebf80b7f9ba3b8f479e5521a8c0218d8 matching the staged whitelist. Both PR metadata bodies/heads were read back exactly after linted structured updates. See REMOTE-READBACK.json and PR-READBACK.json. This addendum and subsequent leaf-guard study are postcapture additions. [pcc:unverified]

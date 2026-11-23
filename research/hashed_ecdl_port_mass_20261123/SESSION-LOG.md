@@ -1,6 +1,6 @@
 # Task-only session entries
 
-Full multi-session journal and every merge preimage remain local. This excerpt contains only this task's appended bodies whose merge receipts exist. An explicitly corrected future-dated heading is retained. [pcc:unverified]
+Full multi-session journal and merge preimages remain local. Every body below has its merge receipt and is present in the actual local journal. Corrected headings/failed appends remain explicit; later leaf/metadata entries are postcapture. [pcc:unverified]
 
 ## 2026-11-23T16:44:25.280Z — Resume actual child-size and precision source bridge
 
@@ -351,3 +351,85 @@ Full multi-session journal and every merge preimage remain local. This excerpt c
 ### Errors (what went wrong, how it was handled)
 
 - Benchmark global check is unavailable from this sparse historical registry; its exact failure is retained. No existing progress/chart/benchmark record is rewritten to make the check pass. [pcc:unverified]
+
+## 2026-11-23T18:23:35.592Z — Port study published exactly; prepare active leaf-guard instance
+
+### What was done (commands, files, features)
+
+- Scientific port study commit769693473039856325d83d6d9d8797d6edaced7f is live on PR5046. All254 paths match remote bytes,SHA256 andGitblob; remote tree equals the exact staged whitelist3e2fc16e. Shared50b95696's8paths also match. Both PR bodies were linted before structured update and independently read back exactly, including heads and draft state. [pcc:unverified]
+- Local capsule28371590bytes/SHA891e9fbb3b2aa16c4a1956cefe3a0a83cbf5a87909b1bf89b6dc777261f20d32 passes archive compare and fresh extraction:1009payloadfiles plusmanifest,130directories,allhashes/modes/paths. Capture predates publication/follow-up metadata, explicitly scoped. No S3. [pcc:unverified]
+- Full git whitespace check flagged8frozen command-record trailing spaces and1native stdout terminal blank line. Preserve exact raw evidence; production/doc scoped check passes. DIFF-CHECK receipt retains both outcomes. All historic native/proof data remain intact. [pcc:unverified]
+- Prior read: actualSetup leaf_size=s/max(k,1), first parameter return rejectsM<=leaf; exactStd Nat.div_lt_iff_lt_mul supplies s<Mq fromactivity. Existing shared precision theorem's hroot is s<=Mq. KB searches/theoremlookup each127; boundedGitHub fallback no novelty/absence claim. Wrote the six-field prospective leaf proof map before any new Lean edit. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Preserve all port source/results; publish small postcapture readback/handoff metadata separately. Continue same in-progress PR5046 lane with a Std-only consumer applying the existing division theorem and existing precision law unchanged. No new generic owner component is needed. Do not infer a lower bound from the shrinkage upper bound.
+- Keep all other precision premises explicit and add kernel-decided activity/divisor/boundary controls. This closes only a source-size comparison if checks pass; source refinement, dimensions and complete cost remain separate.
+
+### Open threads (unfinished, pick up next time)
+
+- Finish metadata readback; compile/check the planned leaf instance under unchanged limits, then source-linked status/visual publication. Default Mathlib integration and signed standing stay open. Goal active; native original run must not be repeated or overwritten.
+
+### Errors (what went wrong, how it was handled)
+
+- Executor restarted during publication preparation; wait_for_environment returnedready and existingfiles/index/checkpoint were inspected before resuming. No mutation was blindly repeated. Frozen raw whitespace was preserved rather than normalized. [pcc:unverified]
+
+## 2026-11-23T18:30:17.470Z — Active leaf-guard application passes focused qualification
+
+### What was done (commands, files, features)
+
+- Leaf phase01 completes exit0,physicalstop0,peak14373085184bytes. Seven consumer and three unchanged-owner declarations pass unchanged gates,0trusted proofs; official fresh LeafGuard replay exits0. Eight explicit axiom queries use only propext/Quot.sound, or no axioms in literal controls. Exact owner source is recompiled privately; imports are Std-only. [pcc:unverified]
+- New theorem record85abe4 binds the existing Std positive-divisor application and conditional precision consumer. The source size guard supplies hroot=s<=Mq; inherited precision and both absorption/dimension conditions remain explicit. Activity/divisor/boundary controls and one nonempty scalar application compile. No native run or source algorithm body change. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Run the existing PCC verifier for the two exact bound declarations on publication source, under the same fixed limits. This adds statement/hole/gate verification, not signed standing. Publish a source-linked report and every receipt with the prospective map; preserve previous port study and native run.
+
+### Open threads (unfinished, pick up next time)
+
+- PCC verifier, visual/report/source-custody publication, postcapture metadata and local resume checkpoint. Next mathematical gap is actual inherited precision/dimensions/whole cost, not the size comparison. Default whole-library integration and signed standing remain open.
+
+### Errors (what went wrong, how it was handled)
+
+- No failure or retry in the leaf qualification. Small scalar application is not Setup-admitted production recursion; the Nat model does not prove checked Rust branch/width refinement. [pcc:unverified]
+
+## 2026-11-23T18:35:30.465Z — Leaf verifier and visual report complete
+
+### What was done (commands, files, features)
+
+- Leaf phase02 existing PCC verifier passes both exact declaration bindings and unchanged gates:exit0,physicalstop0,peak14397984768bytes. Claim85abe4 signed standing remains unverified (exit2). Phase01 seven consumer/three unchanged-owner declarations and fresh replay stay intact, with eight standard-foundation axiom outputs. [pcc:unverified]
+- Built source-linked two-page leaf report/diagram; both final pages visually inspected, no LaTeX warnings/overfull errors. Exact source/evidence bindings and prospective six-field map accompany it. No native execution or algorithm body change. Manually fabricated Setup values in forced tests are explicitly not assumed to satisfy Setup::new's leaf invariant. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Capture a separate local leaf scientific checkpoint, verify fresh hashes/modes/paths before citing completion, then publish the leaf instance and port postcapture readback metadata on existing PR5046. Keep the original28371590-byte port capsule unchanged; later metadata is separately bound.
+
+### Open threads (unfinished, pick up next time)
+
+- Leaf capsule/publication/exact readback; inspect the prepared larger-cohort protocol and target metadata before new solver execution. Inherited precision/dimensions/complete source cost, default whole-library integration and signed standing remain open. Goal stays active.
+
+### Errors (what went wrong, how it was handled)
+
+- No new proof/compiler/PCC failure or retry. Source-level Nat proof is not a full Rust refinement, complete history or production-admission result. [pcc:unverified]
+
+- Journal append v3 stopped before writing because new main contains183260bytes of undated project entries before its first dated heading, rather than just a title. Preserve that entire prefix plus the local title; v4 verifies inclusion of every full undated prefix as well as all normalized dated block multiplicities. The original failed attempt and both input files remain. [pcc:unverified]
+
+## 2026-11-23T18:41:47.766Z — Leaf scientific checkpoint verified; retain concurrent ledger integration gap
+
+### What was done (commands, files, features)
+
+- Leaf capsule1198547bytes/SHAa5cd1e06675d609b3039ae769a7867b7f3496db5d54632efdfa343eb99f13516 passes archive compare and fresh extraction:105payloadfiles plusmanifest,25directories,exacthashes/modes/paths. Port capsule/scientific76969347 remain unchanged. Leaf publication note/receipts/integration metadata are explicitly postcapture. [pcc:unverified]
+- Branch canonical ledger1809entries is valid against parent76969347. Explicit fetched-main d86b95d56 has1815entries, with1805common-prefixrows before different later appends. Preserve both histories; no rehash/reconciliation. Earlier origin/main check referred to stale816f9c3a tracking ref, not fetched current main; ref receipt corrects that scope. [pcc:unverified]
+- Both reports are two pages and every page was visually inspected. Source math, kernel/gate/PCC outputs and snapshots are fixed. No new native/solver execution. PR5046 remains open/draft at76969347 before successor publication. [pcc:unverified]
+
+### Decisions made (and why)
+
+- Publish leaf controls/proof/report and postcapture port readback metadata on the existing branch, keep current-main ledger integration explicitly open, and do not overwrite old canonical or producer histories. Continue independent source/cohort preparation rather than treating the merge gate as a whole-research blocker.
+
+### Open threads (unfinished, pick up next time)
+
+- Exact successor publication/readback and PR-body update; inspect larger-cohort target/protocol metadata. Remaining inherited/dimension/complete-cost proof obligations and signed/default-library integration remain open. Goal active.
+
+### Errors (what went wrong, how it was handled)
+
+- A successful stale-tracking-ref check does not establish current-main prefix integrity. The explicit fetched-ref check and exact differing append counts are retained. No claim of a current-main ledger pass is made. [pcc:unverified]
