@@ -1,0 +1,9 @@
+# Separate root-library gate
+
+The single additional root command was `cargo test --release --lib --locked --offline -j 1`, from the signed-extraction worktree, with the preserved predecessor Cargo target cache. It ran under the fixed 600-second deadline, 6-GiB virtual-memory cap, one Cargo job and one test thread. The command returned **124** during dependency compilation, with the last compiler message naming `aws-sdk-s3 v1.155.0`. Stdout is empty; no compiler-error, completed-build or test-execution output was produced. This is an **incomplete root-library gate**, not a test pass. [pcc:unverified]
+
+The [outcome](outcome.json), [original command and call receipt](call/command.sh), [stderr](call/stderr.log), [toolchain](toolchain.txt), [pre-call metadata](pre-call-manifest.json) and [source inventory](source-files.txt) are retained. All 1,493 recorded input hashes were unchanged after the call; the pre/post input manifests are byte-identical and the custody exit is zero. [pcc:unverified]
+
+The [preflight](preflight.md) resolved the literal include and explicit-path source closure and hydrated 70 existing tracked files without changing their committed bytes. It covers the conservative library-source superset, local path dependencies and known compile/test includes. It does not claim to vendor registry source dependencies or cover every file opened at runtime. The cache was reused with normal Cargo fingerprints; no fingerprint or success marker was fabricated.
+
+This is the one additional gate allowed by the new signed-component protocol. It does not replace or relabel the retained predecessor timeout. No second root call or larger resource envelope was used. The standalone signed component's successful fixed native checks and separate-role readout have their own scope; they do not mark the root library passed.
