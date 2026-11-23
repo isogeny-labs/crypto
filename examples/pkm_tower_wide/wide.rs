@@ -426,12 +426,17 @@ fn dickson_torus<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::
         pp1.trailing_zeros().unwrap_or(0) >= t as u64,
         "the torus case needs 2^{t} | p + 1"
     );
-    let d = (2u64..)
-        .map(|n| f.from_u64(n))
-        .find(|&n| f.legendre(n) == -1)
-        .unwrap();
+    let minus_one = f.neg(f.one());
+    let d = if f.legendre(minus_one) == -1 {
+        minus_one
+    } else {
+        (2u64..)
+            .map(|n| f.from_u64(n))
+            .find(|&n| f.legendre(n) == -1)
+            .unwrap()
+    };
     let one = (f.one(), f.zero());
-    let minus_one = (f.neg(f.one()), f.zero());
+    let minus_one = (minus_one, f.zero());
     let zeta = loop {
         let h = torus_element(f, d, rng);
         if fp2_pow(f, d, h, &(&pp1 >> 1)) == minus_one {
