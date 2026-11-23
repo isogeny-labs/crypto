@@ -1,0 +1,112 @@
+{
+  "schema": "prime31-run65-shift-support-v1",
+  "date_utc": "2026-11-22",
+  "classification": "exact fixed-base support diagnostic; not blind extraction or complete ECDLP",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "labels": [
+    "dickson",
+    "hybrid",
+    "hybrid_m100",
+    "hybrid_m400",
+    "hybrid_m900"
+  ],
+  "support_sizes": [
+    518085,
+    916469,
+    266,
+    239920,
+    808824
+  ],
+  "intersections_by_lag": {
+    "1": [
+      124,
+      382,
+      0,
+      18,
+      328
+    ],
+    "2": [
+      124,
+      486,
+      0,
+      34,
+      356
+    ],
+    "4": [
+      136,
+      392,
+      0,
+      36,
+      332
+    ],
+    "8": [
+      114,
+      400,
+      0,
+      42,
+      322
+    ],
+    "16": [
+      96,
+      306,
+      0,
+      18,
+      204
+    ]
+  },
+  "eight_consecutive_shift_union": [
+    4141238,
+    7320436,
+    2128,
+    1918712,
+    6461726
+  ],
+  "eight_independent_marginal_expectation": [
+    4141181.93312049,
+    7320809.90400029,
+    2127.99907750764,
+    1918609.6368845,
+    6462068.52774216
+  ],
+  "relative_difference_percent": [
+    0.00135388593,
+    -0.00510741305,
+    0.00004335022,
+    0.00533527579,
+    -0.00530058975
+  ],
+  "provenance": {
+    "hybrid_base_sha256": "522747b6cf805c025be4f59d194ec3335a57aff97528fb841cf7c2b4ec2f0162",
+    "dickson_base_sha256": "fa6a97bb09d2224fb75dfd51aa84fcea0aaa28d4bf08272c2b400827b1ab3f04",
+    "synthetic_class_sha256": [
+      "71079fd09e4628bfac5c8743c9d77b33a8ea078b1cc503c551e978ccbaf15b55",
+      "034c22b3020dbdc8a69fb51069918cd2fe3f85c736704510e16c3f009d0afc95",
+      "0137c1c4cef08b60fe9b1d577ae1c0a3902a3b0d344039232a5c2ee4ab79cb92"
+    ]
+  },
+  "validation": {
+    "independent_cpp_all_lags": "PASS",
+    "independent_python_all_lags": "PASS",
+    "cpp_all_eight_shift_unions": "PASS",
+    "rust_original_crate_dickson_lags_and_eight_union": "PASS",
+    "rust_toolchain": "1.100.0",
+    "rust_workflow": "https://github.com/isogeny-labs/crypto/actions/runs/45038485619",
+    "rust_job": 137257437020,
+    "python_hybrid_eight_union": "not attempted to completion; slow pure-Python loop timed out"
+  },
+  "limitations": [
+    "synthetic successful pair graph/quotient state, not blind algebraic relation extraction",
+    "no end-to-end ECDLP logarithms or full solver cost comparison",
+    "no claim of globally independent hit events or optimizing shift stride for other supports"
+  ]
+}

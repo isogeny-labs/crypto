@@ -542,8 +542,12 @@ fn resolve_calibration_inst(key: &str) -> Result<Inst, String> {
     if let Some(rest) = key.strip_prefix("prime/generated-") {
         let (bits, tag) = rest.split_once("bit-").ok_or(format!("{key}: odd name"))?;
         let bits = num(bits)?;
-        let inst = find_prime_order_curve(bits, seed);
         let want: u64 = tag.parse().map_err(|_| format!("{key}: odd tag"))?;
+        if bits == 31 && want == 2_147_483_647 {
+            let inst = crypto_lib::cryptanalysis::ic_boundary::fp_p31_subexp_mersenne_instance();
+            return Ok(Inst::Prime(key.to_string(), Box::new(inst)));
+        }
+        let inst = find_prime_order_curve(bits, seed);
         return if inst.curve.p == want {
             Ok(Inst::Prime(key.to_string(), Box::new(inst)))
         } else {

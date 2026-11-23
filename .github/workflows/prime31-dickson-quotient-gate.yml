@@ -1,0 +1,59 @@
+name: Prime31 Dickson quotient original-lock correctness gate
+
+on:
+  push:
+    branches:
+      - lane/prime31-dickson-quotient-gate
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_dickson_quotient.rs
+      - research/prime31_ic_20261115/native/lib.rs
+      - research/prime31_ic_20261115/native/Cargo.toml
+      - research/prime31_ic_20261115/native/Cargo.lock
+      - .github/workflows/prime31-dickson-quotient-gate.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_dickson_quotient.rs
+      - .github/workflows/prime31-dickson-quotient-gate.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prime31-dickson-correctness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  original-lock-correctness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Record source and unchanged lock hashes
+        run: |
+          mkdir -p correctness-receipts
+          git rev-parse HEAD > correctness-receipts/checkout-commit.txt
+          sha256sum research/prime31_ic_20261115/native/lib.rs research/prime31_ic_20261115/native/Cargo.toml research/prime31_ic_20261115/native/Cargo.lock research/prime31_ic_20261115/native/examples/prime31_dickson_quotient.rs > correctness-receipts/source-sha256.txt
+      - name: Original native library tests with its original lock
+        run: |
+          set -euo pipefail
+          cargo test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib 2>&1 | tee correctness-receipts/library-tests.txt
+      - name: Exact Dickson quotient component tests
+        run: |
+          set -euo pipefail
+          cargo test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_quotient 2>&1 | tee correctness-receipts/component-tests.txt
+      - name: Deterministic correctness diagnostic, not a timing benchmark
+        run: |
+          set -euo pipefail
+          cargo run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_quotient > correctness-receipts/correctness-cases.json 2> correctness-receipts/diagnostic-stderr.txt
+      - name: Retain source-specific correctness receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-dickson-correctness-${{ github.sha }}
+          path: correctness-receipts/
+          retention-days: 14

@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "audit_kind": "read_only_ci_log_and_source_provenance_audit",
+  "repository": "isogeny-labs/crypto",
+  "pull_request": 4924,
+  "run_id": 45086381347,
+  "job_id": 137405842381,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45086381347",
+  "job_url": "https://github.com/isogeny-labs/crypto/actions/runs/45086381347/job/137405842381",
+  "run_status": "completed",
+  "run_conclusion": "success",
+  "run_number": 6,
+  "run_head_sha": "aa27edacb477ddc55bccd23b86d90584ce438cd1",
+  "actual_checkout_sha": "aa27edacb477ddc55bccd23b86d90584ce438cd1",
+  "runner_image_provisioner_commit": "b8a594ea514ff44cadb5342986c68b1eac6e22ed",
+  "report_snapshot_sha": "fb850179c3847fd6950dbd91015c4e3d7c6da62d",
+  "report_path": "research/trace_skew_prime31_20261122/NATIVE_F4_RUST_RUN74_20261123.md",
+  "report_blob_sha": "83f8a71d3ba9345c4c52ac5d9446424f2ce6d547",
+  "finding": "Report misidentifies Runner Image Provisioner commit as repository checkout commit.",
+  "independent_execution_performed": false,
+  "remote_writes_performed": false,
+  "source_blob_comparison": [
+    {
+      "path": "examples/prime31_trace_skew_pair.rs",
+      "tested_blob_sha": "a5050e0cc06feb203066391c7ad70d81d87dd8c9",
+      "report_snapshot_blob_sha": "a5050e0cc06feb203066391c7ad70d81d87dd8c9",
+      "same": true
+    },
+    {
+      "path": "examples/prime31_trace_moment.rs",
+      "tested_blob_sha": "7d2c0cc4c50e52f585676349ecf13901b7224615",
+      "report_snapshot_blob_sha": "7d2c0cc4c50e52f585676349ecf13901b7224615",
+      "same": true
+    },
+    {
+      "path": "examples/prime31_monic_s3_pair_oracle.rs",
+      "tested_blob_sha": "cc11ef6ee5c6b67bffb07897e7ce24f6921c00c1",
+      "report_snapshot_blob_sha": "1ed84edc5c0d70710309004fb661e6ac4b8c03b0",
+      "same": false
+    },
+    {
+      "path": "examples/prime31_trace_f4_pilot.rs",
+      "tested_blob_sha": "bade6712c12fe7b2426a206495ff7bc85befc500",
+      "report_snapshot_blob_sha": "bade6712c12fe7b2426a206495ff7bc85befc500",
+      "same": true
+    },
+    {
+      "path": ".github/workflows/prime31-trace-symmetric-rust-gate.yml",
+      "tested_blob_sha": "539779648b58add5e1233b80e7945507f2448f8a",
+      "report_snapshot_blob_sha": "6a05ba8d474f3a971ef1e2c2110b29984f984223",
+      "same": false
+    }
+  ],
+  "evidence_log_excerpts": [
+    {
+      "log_line": 2,
+      "text": "2026-11-23T00:01:48.8755598Z ##[group]Runner Image Provisioner"
+    },
+    {
+      "log_line": 3,
+      "text": "2026-11-23T00:01:48.8756304Z Hosted Compute Agent"
+    },
+    {
+      "log_line": 4,
+      "text": "2026-11-23T00:01:48.8756861Z Version: 20261111.635"
+    },
+    {
+      "log_line": 5,
+      "text": "2026-11-23T00:01:48.8757383Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed"
+    },
+    {
+      "log_line": 6,
+      "text": "2026-11-23T00:01:48.8758238Z Build Date: 2026-11-11T01:49:01Z"
+    },
+    {
+      "log_line": 111,
+      "text": "2026-11-23T00:01:50.0204188Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +aa27edacb477ddc55bccd23b86d90584ce438cd1:refs/remotes/origin/research/symmetric-pair-quotient-prime31-20261122"
+    },
+    {
+      "log_line": 112,
+      "text": "2026-11-23T00:02:32.1320712Z From https://github.com/isogeny-labs/crypto"
+    },
+    {
+      "log_line": 113,
+      "text": "2026-11-23T00:02:32.1321434Z  * [new ref]               aa27edacb477ddc55bccd23b86d90584ce438cd1 -> origin/research/symmetric-pair-quotient-prime31-20261122"
+    },
+    {
+      "log_line": 114,
+      "text": "2026-11-23T00:02:32.1324121Z ##[endgroup]"
+    },
+    {
+      "log_line": 271,
+      "text": "2026-11-23T00:03:19.1005417Z [command]/usr/bin/git log -1 --format=%H"
+    },
+    {
+      "log_line": 272,
+      "text": "2026-11-23T00:03:19.1032374Z aa27edacb477ddc55bccd23b86d90584ce438cd1"
+    },
+    {
+      "log_line": 535,
+      "text": "2026-11-23T00:12:37.1653561Z      Running unittests examples/prime31_trace_skew_pair.rs (target/release/build/crypto/b4085e2c355386eb/out/prime31_trace_skew_pair-b4085e2c355386eb)"
+    },
+    {
+      "log_line": 536,
+      "text": "2026-11-23T00:12:37.1666229Z "
+    },
+    {
+      "log_line": 537,
+      "text": "2026-11-23T00:12:37.1666362Z running 2 tests"
+    },
+    {
+      "log_line": 538,
+      "text": "2026-11-23T00:12:37.1715633Z test tests::exhaustive_small_field_scheme_and_jacobian ... ok"
+    },
+    {
+      "log_line": 539,
+      "text": "2026-11-23T00:12:37.1733855Z test tests::prime31_pair_membership_s3_and_outside_negative ... ok"
+    },
+    {
+      "log_line": 540,
+      "text": "2026-11-23T00:12:37.1734097Z "
+    },
+    {
+      "log_line": 541,
+      "text": "2026-11-23T00:12:37.1734370Z test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+    },
+    {
+      "log_line": 554,
+      "text": "2026-11-23T00:12:38.0258347Z      Running unittests examples/prime31_trace_moment.rs (target/release/build/crypto/28ac3d0adba8b06d/out/prime31_trace_moment-28ac3d0adba8b06d)"
+    },
+    {
+      "log_line": 555,
+      "text": "2026-11-23T00:12:38.0270720Z "
+    },
+    {
+      "log_line": 556,
+      "text": "2026-11-23T00:12:38.0270974Z running 2 tests"
+    },
+    {
+      "log_line": 557,
+      "text": "2026-11-23T00:12:38.0555305Z test tests::prime31_m2_to_m4_repeat_root_and_rational_base ... ok"
+    },
+    {
+      "log_line": 558,
+      "text": "2026-11-23T00:12:38.1885661Z test tests::exhaustive_f17_m2_m3_m4_with_all_negative_assignments ... ok"
+    },
+    {
+      "log_line": 559,
+      "text": "2026-11-23T00:12:38.1886070Z "
+    },
+    {
+      "log_line": 560,
+      "text": "2026-11-23T00:12:38.1886353Z test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s"
+    },
+    {
+      "log_line": 611,
+      "text": "2026-11-23T00:12:40.4905099Z      Running unittests examples/prime31_monic_s3_pair_oracle.rs (target/release/build/crypto/11900c2a81efa0a4/out/prime31_monic_s3_pair_oracle-11900c2a81efa0a4)"
+    },
+    {
+      "log_line": 612,
+      "text": "2026-11-23T00:12:40.4917355Z "
+    },
+    {
+      "log_line": 613,
+      "text": "2026-11-23T00:12:40.4917567Z running 2 tests"
+    },
+    {
+      "log_line": 614,
+      "text": "2026-11-23T00:12:40.4920184Z test tests::quotient_pair_ghost_roots_are_filtered ... ok"
+    },
+    {
+      "log_line": 615,
+      "text": "2026-11-23T00:12:40.4925789Z test tests::monic_s3_pair_oracle_exact_public_positive_and_negative_controls ... ok"
+    },
+    {
+      "log_line": 616,
+      "text": "2026-11-23T00:12:40.4926225Z "
+    },
+    {
+      "log_line": 617,
+      "text": "2026-11-23T00:12:40.4926555Z test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    },
+    {
+      "log_line": 638,
+      "text": "2026-11-23T00:12:41.5625840Z monic-t-oracle p=2147483647 B=32 z=625037715 Ddeg=63 Ndeg=64 gcd_deg=1 verified_pairs=1 online_ms=0.114 tree_build_ms=0.061 tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true"
+    },
+    {
+      "log_line": 639,
+      "text": "2026-11-23T00:12:41.5627189Z monic-t-oracle p=2147483647 B=32 z=1923055775 Ddeg=63 Ndeg=64 gcd_deg=1 verified_pairs=1 online_ms=0.107 tree_build_ms=0.058 tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true"
+    },
+    {
+      "log_line": 640,
+      "text": "2026-11-23T00:12:41.5628796Z monic-t-oracle p=2147483647 B=32 z=265866980 Ddeg=63 Ndeg=64 gcd_deg=1 verified_pairs=1 online_ms=0.099 tree_build_ms=0.058 tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true"
+    },
+    {
+      "log_line": 641,
+      "text": "2026-11-23T00:12:41.5629688Z monic-t-oracle p=2147483647 B=32 z=1344580913 Ddeg=63 Ndeg=64 gcd_deg=0 verified_pairs=0 online_ms=0.110 tree_build_ms=0.078 tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true"
+    },
+    {
+      "log_line": 642,
+      "text": "2026-11-23T00:12:41.5630426Z S3 x-roots only: full signed group checks, authentic RHS rank, cold solver and asymptotic speedup NOT established."
+    },
+    {
+      "log_line": 725,
+      "text": "2026-11-23T00:12:43.1937700Z m2 planted relation x(G)=625037715, x(2G)=1923055775, x(3G)=265866980, B=32"
+    },
+    {
+      "log_line": 726,
+      "text": "2026-11-23T00:12:43.1956876Z ordered-plus-S3 vars=2 eqs=3 terms=73 max_input_degree=32 setup_ms=0.010 f4_ms=1.881 degree=3 reached=34 cols=189 rows=73 field_ops=145604 inconsistent=false timeout=false above_bound=0"
+    },
+    {
+      "log_line": 727,
+      "text": "2026-11-23T00:12:43.1971325Z sym-raw-H-plus-S3 vars=2 eqs=3 terms=598 max_input_degree=33 setup_ms=0.094 f4_ms=1.341 degree=3 reached=33 cols=565 rows=502 field_ops=57816 inconsistent=false timeout=false above_bound=0"
+    },
+    {
+      "log_line": 728,
+      "text": "2026-11-23T00:12:43.1982581Z sym-degreeB-G-plus-S3 vars=2 eqs=3 terms=566 max_input_degree=32 setup_ms=0.079 f4_ms=1.023 degree=3 reached=33 cols=561 rows=498 field_ops=57147 inconsistent=false timeout=false above_bound=0"
+    },
+    {
+      "log_line": 729,
+      "text": "2026-11-23T00:12:43.1983712Z No complete relation rank, cold discrete-log recovery or asymptotic advantage asserted."
+    },
+    {
+      "log_line": 777,
+      "text": "2026-11-23T00:12:43.4850053Z m4 chained genuine relation G+2G+3G+4G=10G; u=x(3G), v=x(7G); B=4, 6 variables"
+    },
+    {
+      "log_line": 778,
+      "text": "2026-11-23T00:12:43.4927451Z m4-S3-ordered vars=6 eqs=7 terms=55 max_input_degree=4 setup_ms=0.013 f4_ms=8.065 degree=5 reached=7 cols=742 rows=686 field_ops=1036961 inconsistent=false timeout=false above_bound=0"
+    },
+    {
+      "log_line": 779,
+      "text": "2026-11-23T00:12:43.4993547Z m4-S3-sym-raw-H vars=6 eqs=7 terms=67 max_input_degree=5 setup_ms=0.015 f4_ms=6.550 degree=4 reached=6 cols=326 rows=294 field_ops=2182508 inconsistent=false timeout=false above_bound=0"
+    },
+    {
+      "log_line": 780,
+      "text": "2026-11-23T00:12:43.5059611Z m4-S3-sym-degreeB-G vars=6 eqs=7 terms=59 max_input_degree=4 setup_ms=0.013 f4_ms=6.557 degree=4 reached=6 cols=326 rows=294 field_ops=2182404 inconsistent=false timeout=false above_bound=0"
+    },
+    {
+      "log_line": 781,
+      "text": "2026-11-23T00:12:43.5060391Z No complete relation rank, cold discrete-log recovery or asymptotic advantage asserted."
+    }
+  ],
+  "scope_limits": [
+    "Run binds to aa27edacb477ddc55bccd23b86d90584ce438cd1, not the later report snapshot as a whole.",
+    "Monic oracle and workflow changed by report snapshot; this run cannot qualify those later bytes.",
+    "F4 timings are planted positive small controls, not complete relation extraction or ECDLP timings.",
+    "No independent PCC sign-off, complete ECDLP advantage, or asymptotic speedup established by this audit."
+  ]
+}

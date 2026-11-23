@@ -3649,7 +3649,15 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 sols
             }
             PkmEngine::F4 => {
-                if !self.trace && self.inherit && self.guess > 0 && !self.dataset_trace {
+                // The T0 quotient admits raw interval roots without base-curve
+                // preimages. Parent-basis inheritance can falsely refute one
+                // of those roots; the independent guess branches do not.
+                if !self.trace
+                    && self.inherit
+                    && self.guess > 0
+                    && !self.dataset_trace
+                    && !matches!(&self.membership, Membership::T0Bits { .. })
+                {
                     let shared_roots: Vec<u64> = self.shared_pts.iter().map(|t| t.x).collect();
                     let roots = self.shared.then_some(&shared_roots[..]);
                     match self.run_inherited_guess_leaf(curve, fb, ops, counters, point, x_r, roots)
