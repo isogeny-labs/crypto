@@ -1,0 +1,13 @@
+⚠ [1855/1856] Built SpectrumAssembly (1.8s)
+warning: SpectrumAssembly.lean:13:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+info: SpectrumAssembly.lean:23:0: 'SpectrumAssembly.toy_charpoly' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: SpectrumAssembly.lean:24:0: 'SpectrumAssembly.toy_square_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: SpectrumAssembly.lean:25:0: 'SpectrumAssembly.toy_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1856 jobs).
