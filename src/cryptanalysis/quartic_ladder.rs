@@ -46,9 +46,9 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    build_rows, mulmod, pa, peel, pm, ppow, split_order, subm, wiedemann, wiedemann_coord, Dsu,
-    Nat, Rel, REL_FB,
+    addm, build_rows, mulmod, pa, peel, pm, ppow, split_order, subm, Dsu, Nat, Rel, Row, REL_FB,
 };
+use super::ic_boundary::pivot_inversion_steps;
 use super::genus_ladder::{sge_reduce, SgeParams, SgeStats};
 use super::ic_boundary::{rho_reference_walk, CountedGroup, GroupOps, RhoWalk};
 use super::plane_quartic_pic::{
@@ -1428,6 +1428,28 @@ pub struct QIcParams {
     pub verify_relations: bool,
 }
 
+/// How the degree-3 divisor of a decomposition class is found
+/// ([`run_diem_opts`], main's C3 interface).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Decomp {
+    /// Evaluate the conics at every rational point of `C` (`O(q)`).
+    #[default]
+    Scan,
+    /// Intersect two conics of the net by a resultant (`O(log q)`;
+    /// [`QDescent::Resultant`]).
+    Algebraic,
+}
+
+/// Additive options of [`run_diem_opts`]; the default reproduces
+/// [`run_diem`] exactly.  (Kept apart from [`QIcParams`] so that existing
+/// struct literals of `QIcParams` keep compiling.)
+#[derive(Clone, Copy, Debug, Default)]
+pub struct QIcOpts {
+    pub decomp: Decomp,
+    /// Structured Gaussian elimination between the peel and Wiedemann.
+    pub sge: Option<SgeParams>,
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct QIcResult {
     pub arm: &'static str,
@@ -1483,6 +1505,21 @@ pub struct QIcResult {
     /// points in the index at the end (base point + base + large primes).
     pub fb_samples: u64,
     pub idx_points: u64,
+    /// Merge stage (inside `la`) and its statistics ([`QLinAlg::Sge`],
+    /// [`QLinAlg::SgeCoord`]); default otherwise.
+    pub la_sge: Nat,
+    pub sge: SgeStats,
+    /// Per-source split of `la` (`la_split.total() == la`).
+    pub la_split: QLaSplit,
+    /// [`QLinAlg::SgeCoord`]: attempts whose square solve did not certify
+    /// and fell back (counted) to the baseline solve of the full core.
+    pub la_fallbacks: u32,
+    /// [`QLinAlg::SgeCoord`]: size and non-zeros of the square system of
+    /// the last attempt (0 when none was formed).
+    pub sq_dim: usize,
+    pub sq_nnz: usize,
+    /// Non-zeros of the last peeled core.
+    pub core_nnz: usize,
 }
 
 impl QIcResult {
@@ -1577,6 +1614,32 @@ pub enum QDescent {
     /// square root per root, `polylog q` counted work per trial; identical
     /// output (a counted scan fallback when the net has a common component).
     Algebraic,
+    /// [`Ctx::decompose_res`] (main's C3 descent: resultant of two conics,
+    /// root finding, back-substitution; scan fallback when every
+    /// elimination is degenerate).  Enumerated factor base only.
+    Resultant,
+}
+
+/// The linear-algebra stage of a counted attempt (after the peel).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum QLinAlg {
+    /// The frozen instrument: Wiedemann on `AᵀDA x = AᵀD c` (the whole
+    /// core), sparse random projection, Horner reconstruction, residual.
+    #[default]
+    Wiedemann,
+    /// Main's C3: `sge_reduce`, then the same Wiedemann on the reduced core
+    /// (solved with a copy of the stream; the stream advances as the
+    /// unmerged solve would).
+    Sge(SgeParams),
+    /// The `2lp-sfb-sge` arm: trim the core to `cols + excess` rows (drop
+    /// the heaviest rows, never a `t` / right-hand-side row, never the last
+    /// row of a column), `sge_reduce`, choose a square subsystem the same
+    /// way, and solve for `t` alone by non-symmetric coordinate Wiedemann
+    /// (no `AᵀDA`, no Horner pass, no residual).  The answer is certified
+    /// by `[t]G = T`; if it fails, the attempt falls back (fully counted) to
+    /// [`QLinAlg::Wiedemann`] on the whole core with the very draws the
+    /// frozen solve would use, so the arm never certifies less often.
+    SgeCoord { sge: SgeParams, excess: usize },
 }
 
 /// When the relation loop asks for a counted linear-algebra attempt.
@@ -1650,6 +1713,8 @@ pub struct QDiemOpts {
     pub kick_t: bool,
     /// Factor-base construction (`DoubleLp` only).
     pub fb: QFactorBase,
+    /// Linear-algebra stage.
+    pub la: QLinAlg,
 }
 
 /// One counted attempt's diagnosis (only with [`QDiemOpts::diag`]).
@@ -1728,6 +1793,42 @@ pub fn run_diem(inst: &QInstance, prm: QIcParams) -> QIcResult {
 /// [`run_diem`] with the descent and solve policy chosen by `opts`.
 pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcResult {
     run_diem_inner(inst, prm, opts, None)
+}
+
+/// Main's C3 interface: [`run_diem`] with the resultant descent and / or
+/// SGE before Wiedemann.  The default reproduces [`run_diem`] exactly.
+pub fn run_diem_opts(inst: &QInstance, prm: QIcParams, opts: QIcOpts) -> QIcResult {
+    let o = QDiemOpts {
+        descent: match opts.decomp {
+            Decomp::Scan => QDescent::Scan,
+            Decomp::Algebraic => QDescent::Resultant,
+        },
+        la: match opts.sge {
+            None => QLinAlg::Wiedemann,
+            Some(sp) => QLinAlg::Sge(sp),
+        },
+        ..Default::default()
+    };
+    run_diem_inner(inst, prm, o, None)
+}
+
+/// Advance `rng` exactly as `wiedemann` on an `nr x ncols` system would
+/// (see `genus_ladder::skip_wiedemann_draws`), so that the relation phase
+/// after an attempt is the same whichever solver ran.
+fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense_u: bool) {
+    for _ in 0..nr {
+        let _: u64 = rng.gen_range(1..r);
+    }
+    if dense_u || ncols <= 16 {
+        for _ in 0..ncols {
+            let _: u64 = rng.gen_range(1..r);
+        }
+    } else {
+        for _ in 0..16 {
+            let _: usize = rng.gen_range(0..ncols);
+            let _: u64 = rng.gen_range(1..r);
+        }
+    }
 }
 
 /// The seeded factor-base draw of the enumerated `DoubleLp` arm: point
@@ -2003,6 +2104,11 @@ fn run_diem_inner(
                     if let PicClass::Typ(m) = &x {
                         let dec = match opts.descent {
                             QDescent::Scan => ctx.decompose(m, &mut res.rel_decomp),
+                            QDescent::Resultant => {
+                                let (d, fb) = ctx.decompose_res(m, &mut res.rel_decomp);
+                                res.decomp_fallbacks += u64::from(fb);
+                                d
+                            }
                             QDescent::Algebraic => {
                                 match ctx.decompose_alg(m, &mut drs, &mut res.rel_decomp) {
                                     Ok(d) => d,
@@ -2106,11 +2212,12 @@ fn run_diem_inner(
         let nver = dsu.parent.len();
         // ── counted attempt ──
         res.attempts += 1;
-        let mut rows = build_rows(&rels, nver, tcol, r, &mut res.la);
+        let mut rows = build_rows(&rels, nver, tcol, r, &mut res.la_split.rows);
         strip_zeros(&mut rows);
-        let (core, cc, ct) = peel(&rows, nunk, tcol, &mut res.la);
+        let (core, cc, ct) = peel(&rows, nunk, tcol, &mut res.la_split.peel);
         res.core_rows = core.len();
         res.core_cols = cc;
+        res.core_nnz = core.iter().map(|(t, _)| t.len()).sum();
         let mut dg = QAttemptDiag::default();
         if opts.diag {
             dg.core_rows = core.len();
@@ -2129,7 +2236,7 @@ fn run_diem_inner(
             let t_seen = opts.solve == QSolve::Legacy || {
                 let mut seen = false;
                 for (t, _) in &core {
-                    res.la.add += t.len() as u64;
+                    res.la_split.tscan.add += t.len() as u64;
                     if t.iter().any(|&(c, v)| c == ct && v != 0) {
                         seen = true;
                         break;
@@ -2143,11 +2250,57 @@ fn run_diem_inner(
                 dg.outcome = 4;
             } else {
                 let dense = res.attempts > 1;
-                if let Some(xs) = wiedemann(&core, cc, r, &mut rng, dense, &mut res.la) {
-                    let t = xs[ct as usize];
-                    let chk = cmul(&pq, &mut ops, &g, t);
+                let sp = &mut res.la_split;
+                let mut cand: Option<u64> = None;
+                // the square solve's answer, already certified (no second check)
+                let mut pre_cert = false;
+                match opts.la {
+                    QLinAlg::Wiedemann => {
+                        cand = wiedemann_split(&core, cc, r, &mut rng, dense, sp)
+                            .map(|xs| xs[ct as usize]);
+                    }
+                    QLinAlg::Sge(sgp) => {
+                        let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sgp, &mut sp.sge);
+                        res.sge = st;
+                        let mut wrng = rng.clone();
+                        skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                        cand = wiedemann_split(&red, rcc, r, &mut wrng, dense, sp)
+                            .map(|xs| xs[rct as usize]);
+                    }
+                    QLinAlg::SgeCoord { sge: sgp, excess } => {
+                        // the frozen solve's draws, kept for the fallback
+                        let mut wrng = rng.clone();
+                        skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                        let trimmed = select_rows(&core, cc, ct, cc + excess, &mut sp.trim);
+                        let (red, rcc, rct, st) =
+                            sge_reduce(&trimmed, cc, ct, r, sgp, &mut sp.sge);
+                        res.sge = st;
+                        let sq = select_rows(&red, rcc, rct, rcc, &mut sp.trim);
+                        res.sq_dim = rcc;
+                        res.sq_nnz = sq.iter().map(|(t, _)| t.len()).sum();
+                        let t1 = if sq.len() == rcc {
+                            coord_square_split(&sq, rcc, rct as usize, r, sp)
+                        } else {
+                            None
+                        };
+                        let ok1 = match t1 {
+                            Some(t) => cmul(&pq, &mut ops, &g, t) == tgt,
+                            None => false,
+                        };
+                        if ok1 {
+                            cand = t1;
+                            pre_cert = true;
+                        } else {
+                            res.la_fallbacks += 1;
+                            cand = wiedemann_split(&core, cc, r, &mut wrng, dense, sp)
+                                .map(|xs| xs[ct as usize]);
+                        }
+                    }
+                }
+                if let Some(t) = cand {
+                    let good = pre_cert || cmul(&pq, &mut ops, &g, t) == tgt;
                     dg.outcome = 2;
-                    if chk == tgt {
+                    if good {
                         res.recovered = Some(t);
                         res.certified = true;
                         solved = true;
@@ -2170,7 +2323,9 @@ fn run_diem_inner(
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
         want_inhom += 4;
     }
-    res.la.add += dsu.ops;
+    res.la_split.dsu.add += dsu.ops;
+    res.la_sge = res.la_split.sge;
+    res.la = res.la_split.total();
     res.idx_lookups = ctx.lookups;
     res.idx_inserts = ctx.inserts;
     res.idx_points = ctx.pts.len() as u64;
@@ -2306,6 +2461,353 @@ pub fn run_rho(inst: &QInstance, seed: u64) -> QRhoOut {
 }
 
 // ── tests ───────────────────────────────────────────────────────────────
+
+// ── linear algebra with a per-source breakdown ──────────────────────────
+//
+// `wiedemann_split` is `ic_control::wiedemann` with every `Nat` increment
+// sent to one of three buckets (matrix products / Berlekamp-Massey / vector
+// work); the sum is the same count, step for step (test
+// `wiedemann_split_equals_reference`).  `coord_square_split` is the
+// coordinate Wiedemann of `ic_control::wiedemann_coord(square = true)` on a
+// square system given row by row (no random row subset).
+
+/// Where the counted linear algebra (`la`) of a Diem run goes.  Every field
+/// is inside `la`; `la` is their sum.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct QLaSplit {
+    /// Cycle rows of the large-prime graph (`build_rows`: adjacency and
+    /// the row combinations along the breadth-first tree).
+    pub rows: Nat,
+    /// Union-find of the relation graph (finds and unions).
+    pub dsu: Nat,
+    /// Weight-one peel (`peel`).
+    pub peel: Nat,
+    /// [`QSolve::Linked`]: the scan for a core row holding `t`.
+    pub tscan: Nat,
+    /// [`QLinAlg::SgeCoord`]: row selection (trim and square choice).
+    pub trim: Nat,
+    /// Structured Gaussian elimination (`genus_ladder::sge_reduce`).
+    pub sge: Nat,
+    /// Sparse matrix-vector products: `A x`, `Aᵀ y`, the diagonal `D`,
+    /// the right-hand side `AᵀD c` and the residual check.
+    pub spmv: Nat,
+    /// Berlekamp-Massey (with its pivot inversions).
+    pub bm: Nat,
+    /// Dense vector work: projections, Horner accumulation, final scaling.
+    pub vec: Nat,
+}
+
+impl QLaSplit {
+    pub fn total(&self) -> Nat {
+        let mut t = Nat::default();
+        for n in [
+            self.rows, self.dsu, self.peel, self.tscan, self.trim, self.sge, self.spmv, self.bm,
+            self.vec,
+        ] {
+            t.merge(n);
+        }
+        t
+    }
+}
+
+/// `y = A x` with the count of `ic_control::mat_vec`.
+fn q_mat_vec(rows: &[Row], x: &[u64], y: &mut [u64], r: u64, nat: &mut Nat) {
+    for (i, (t, _)) in rows.iter().enumerate() {
+        let mut acc = 0u64;
+        for &(c, v) in t {
+            let xv = x[c as usize];
+            if v == 1 {
+                acc = addm(acc, xv, r);
+            } else if v == r - 1 {
+                acc = subm(acc, xv, r);
+            } else {
+                nat.mul += 1;
+                acc = addm(acc, mulmod(v, xv, r), r);
+            }
+            nat.add += 1;
+        }
+        y[i] = acc;
+    }
+}
+
+/// `z = Aᵀ y` with the count of `ic_control::mat_t_vec`.
+fn q_mat_t_vec(rows: &[Row], y: &[u64], z: &mut [u64], r: u64, nat: &mut Nat) {
+    z.iter_mut().for_each(|v| *v = 0);
+    for (i, (t, _)) in rows.iter().enumerate() {
+        let yv = y[i];
+        if yv == 0 {
+            continue;
+        }
+        for &(c, v) in t {
+            let term = if v == 1 {
+                yv
+            } else if v == r - 1 {
+                subm(0, yv, r)
+            } else {
+                nat.mul += 1;
+                mulmod(v, yv, r)
+            };
+            z[c as usize] = addm(z[c as usize], term, r);
+            nat.add += 1;
+        }
+    }
+}
+
+/// `out = AᵀDA v` with the count of `ic_control::m_apply`.
+fn q_m_apply(
+    rows: &[Row],
+    d: &[u64],
+    v: &[u64],
+    tmp: &mut [u64],
+    out: &mut [u64],
+    r: u64,
+    nat: &mut Nat,
+) {
+    q_mat_vec(rows, v, tmp, r, nat);
+    for (t, &di) in tmp.iter_mut().zip(d.iter()) {
+        nat.mul += 1;
+        *t = mulmod(*t, di, r);
+    }
+    q_mat_t_vec(rows, tmp, out, r, nat);
+}
+
+fn q_powm(mut a: u64, mut e: u64, r: u64) -> u64 {
+    let mut res = 1;
+    while e > 0 {
+        if e & 1 == 1 {
+            res = mulmod(res, a, r);
+        }
+        a = mulmod(a, a, r);
+        e >>= 1;
+    }
+    res
+}
+
+fn q_invm(a: u64, r: u64) -> u64 {
+    q_powm(a, r - 2, r)
+}
+
+/// Berlekamp-Massey with the count of `ic_control::berlekamp_massey`.
+fn q_berlekamp_massey(s: &[u64], r: u64, nat: &mut Nat) -> Vec<u64> {
+    let mut c = vec![1u64];
+    let mut b = vec![1u64];
+    let mut l = 0usize;
+    let mut m = 1usize;
+    let mut binv = 1u64;
+    for n in 0..s.len() {
+        let mut d = s[n];
+        for i in 1..=l.min(c.len() - 1) {
+            nat.mul += 1;
+            nat.add += 1;
+            d = addm(d, mulmod(c[i], s[n - i], r), r);
+        }
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = {
+            nat.mul += 1;
+            mulmod(d, binv, r)
+        };
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        for (i, &bv) in b.iter().enumerate() {
+            nat.mul += 1;
+            nat.add += 1;
+            c[i + m] = subm(c[i + m], mulmod(coef, bv, r), r);
+        }
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            nat.mul += pivot_inversion_steps(r);
+            binv = q_invm(d, r);
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.truncate(l + 1);
+    c.resize(l + 1, 0);
+    c
+}
+
+/// `ic_control::wiedemann` (same draws, same output, same total count)
+/// with the count split into `sp.spmv`, `sp.bm` and `sp.vec`.
+fn wiedemann_split(
+    rows: &[Row],
+    ncols: usize,
+    r: u64,
+    rng: &mut StdRng,
+    dense_u: bool,
+    sp: &mut QLaSplit,
+) -> Option<Vec<u64>> {
+    let nr = rows.len();
+    let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+    let mut tmp = vec![0u64; nr];
+    for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+        sp.spmv.mul += 1;
+        *t = mulmod(row.1, di, r);
+    }
+    let mut bp = vec![0u64; ncols];
+    q_mat_t_vec(rows, &tmp, &mut bp, r, &mut sp.spmv);
+    let mut proj: Vec<(usize, u64)> = Vec::new();
+    if dense_u || ncols <= 16 {
+        proj.extend((0..ncols).map(|i| (i, rng.gen_range(1..r))));
+    } else {
+        for _ in 0..16 {
+            proj.push((rng.gen_range(0..ncols), rng.gen_range(1..r)));
+        }
+    }
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    let mut v = bp.clone();
+    let mut w = vec![0u64; ncols];
+    for _ in 0..len {
+        let mut s = 0u64;
+        for &(i, uv) in &proj {
+            sp.vec.mul += 1;
+            sp.vec.add += 1;
+            s = addm(s, mulmod(uv, v[i], r), r);
+        }
+        seq.push(s);
+        q_m_apply(rows, &d, &v, &mut tmp, &mut w, r, &mut sp.spmv);
+        std::mem::swap(&mut v, &mut w);
+    }
+    let c = q_berlekamp_massey(&seq, r, &mut sp.bm);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    let mut acc = vec![0u64; ncols];
+    let mut v = bp.clone();
+    for j in 0..l {
+        let coef = c[l - 1 - j];
+        for (a, &vi) in acc.iter_mut().zip(v.iter()) {
+            sp.vec.mul += 1;
+            sp.vec.add += 1;
+            *a = addm(*a, mulmod(coef, vi, r), r);
+        }
+        if j + 1 < l {
+            q_m_apply(rows, &d, &v, &mut tmp, &mut w, r, &mut sp.spmv);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    sp.vec.mul += pivot_inversion_steps(r);
+    let sc = subm(0, q_invm(c[l], r), r);
+    for a in acc.iter_mut() {
+        sp.vec.mul += 1;
+        *a = mulmod(*a, sc, r);
+    }
+    let mut ax = vec![0u64; nr];
+    q_mat_vec(rows, &acc, &mut ax, r, &mut sp.spmv);
+    if ax.iter().zip(rows.iter()).all(|(a, row)| *a == row.1) {
+        Some(acc)
+    } else {
+        None
+    }
+}
+
+/// `x[ct]` for a square system `A' x = c'` (`rows.len() == ncols`) by the
+/// non-symmetric coordinate Wiedemann of
+/// `ic_control::wiedemann_coord(square = true)`: `2 ncols + 2` products by
+/// `A'`, Berlekamp-Massey, one dot product.  No residual check: the caller
+/// certifies by `[t]G = T` (a singular `A'` gives `None` or a wrong value).
+fn coord_square_split(rows: &[Row], ncols: usize, ct: usize, r: u64, sp: &mut QLaSplit) -> Option<u64> {
+    if rows.len() != ncols || ncols == 0 {
+        return None;
+    }
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    let mut v: Vec<u64> = rows.iter().map(|row| row.1).collect();
+    let mut w = vec![0u64; ncols];
+    for _ in 0..len {
+        seq.push(v[ct]);
+        q_mat_vec(rows, &v, &mut w, r, &mut sp.spmv);
+        std::mem::swap(&mut v, &mut w);
+    }
+    let c = q_berlekamp_massey(&seq, r, &mut sp.bm);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    let mut acc = 0u64;
+    for j in 0..l {
+        sp.vec.mul += 1;
+        sp.vec.add += 1;
+        acc = addm(acc, mulmod(c[l - 1 - j], seq[j], r), r);
+    }
+    sp.vec.mul += pivot_inversion_steps(r) + 1;
+    Some(mulmod(acc, subm(0, q_invm(c[l], r), r), r))
+}
+
+/// Charged cost of ordering `m` keys by a comparison sort: `m ceil(log2 m)`
+/// additions (one per comparison, an upper bound for merge sort).
+fn sort_charge(m: usize) -> u64 {
+    if m < 2 {
+        return 0;
+    }
+    m as u64 * u64::from(usize::BITS - (m - 1).leading_zeros())
+}
+
+/// Keep `keep` rows of `rows` (`ncols` columns): drop the heaviest rows
+/// first, never an anchor row (a nonzero right-hand side or a nonzero
+/// coefficient at `ct`: they carry `t` and the inhomogeneous information)
+/// and never a row whose removal would leave one of its columns empty;
+/// if that is not enough, a second pass drops the heaviest remaining
+/// non-anchor rows regardless (the caller's certificate catches a
+/// singular choice).  Counted: one addition per entry for the column
+/// weights, one per row for the anchor test and the length, [`sort_charge`]
+/// for the ordering, and one addition per entry of every row examined.
+/// Returns the kept rows in original order.
+fn select_rows(rows: &[Row], ncols: usize, ct: u32, keep: usize, nat: &mut Nat) -> Vec<Row> {
+    if rows.len() <= keep {
+        return rows.to_vec();
+    }
+    let mut w = vec![0u32; ncols];
+    for (t, _) in rows {
+        for &(c, _) in t {
+            w[c as usize] += 1;
+        }
+        nat.add += t.len() as u64;
+    }
+    nat.add += rows.len() as u64 + sort_charge(rows.len());
+    let anchor = |(t, b): &Row| *b != 0 || t.last().is_some_and(|&(c, v)| c == ct && v != 0);
+    // heaviest first, ties: later row first
+    let mut ord: Vec<(usize, usize)> = (0..rows.len())
+        .filter(|&i| !anchor(&rows[i]))
+        .map(|i| (rows[i].0.len(), i))
+        .collect();
+    ord.sort_unstable_by(|a, b| b.cmp(a));
+    let mut drop = vec![false; rows.len()];
+    let mut need = rows.len() - keep;
+    for strict in [true, false] {
+        for &(_, i) in &ord {
+            if need == 0 {
+                break;
+            }
+            if drop[i] {
+                continue;
+            }
+            let t = &rows[i].0;
+            nat.add += t.len() as u64;
+            if strict && t.iter().any(|&(c, _)| w[c as usize] <= 1) {
+                continue;
+            }
+            for &(c, _) in t {
+                w[c as usize] -= 1;
+            }
+            drop[i] = true;
+            need -= 1;
+        }
+    }
+    rows.iter()
+        .zip(drop)
+        .filter(|(_, d)| !d)
+        .map(|(row, _)| row.clone())
+        .collect()
+}
 
 #[cfg(test)]
 mod tests {
