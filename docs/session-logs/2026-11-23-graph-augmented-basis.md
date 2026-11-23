@@ -58,3 +58,25 @@
 
 ### Errors (what went wrong, how it was handled)
 - No local Rust compiler/worktree or independent agent runner. Existing root parser is out of scope. The synthetic brute-force tests cannot count as measured performance or actual prime-field ECDLP evidence.
+
+
+## 2026-11-23 18:48–18:50 UTC — min-payload native receipt and terminal branch custody
+
+### What was done (commands, files, features)
+- Inspected source-exact original Rust [GitHub Actions #45241866240](https://github.com/isogeny-labs/crypto/actions/runs/45241866240), job 137928322580, SUCCESS at `650d0fb7694f902001d2bb8745f3e4baee619205`: Rust 1.100.0, **41/41 native release graph tests PASS**, including the new source-preserving matroid-greedy minimum-payload fixture and 128 seeded exhaustive original-row subsets, plus original LP evaluator compile and seeded F101 default/opt-in/cap CLI replay PASS. Captured projected_rank SHA256 `6fc989281f606a84fd3d56d2116eed9d46a0099817e69ede89c569a6aa7602b3`, tests SHA256 `5fbdd31a368b8c98e4640715603ce1478e287af06e26d7036d20af701aa270d9`.
+- Reviewed the GitHub PR #5043 live state; observed it **merged by a separate concurrent event** 2026-11-23T18:49:30Z, merge SHA `f7a29f229c94cbae7f791738a5b2125af5e0e075`, contrary to this lane's explicit no-merge constraint. This run did not perform or authorize the merge.
+- Started a disjoint successor draft PR #5059 on `automation/graph-ic-minpayload-validation-receipt-20261123` with a reserved ACTIVE task, removed temporary branch-specific CI push fallback while keeping default pull-request check, and appended a source-exact receipt and custody record to the durable graph handoff.
+
+### Decisions made (and why)
+- Preserve the earlier PR and commit evidence and do not reopen, revert, or continue edits on terminal PR #5043. Keep #5059 draft/unmerged under the user's explicit prohibition.
+- Count 10→5 only as fixed synthetic source+coefficient entry payload; no wall-time or memory advantage established. The linear-matroid greedy theorem is exact only for the fixed additive row-weight objective.
+- Leave other sessions' worktree, root parser and unrelated CT330 YAML untouched, and do not launch paid compute or duplicate native test jobs.
+
+### Open threads
+- Obtain genuine group-verified ordinary Prime31 two-LP source stream with complete curve/G/Q/subgroup/target/replay custody, then measure charged sorting, sparse elimination and source cloning against downstream N/Z and solving wall costs alongside the best index-calculus and negation-rho baseline.
+- Full original root/native collector gate after parser ownership repair, independently signed PCC, and any root-wide source integration remain distinct validation gates.
+- Check successor PR #5059 status before any future edits; no merge without owner authorization.
+
+### Errors (what went wrong, how it was handled)
+- Concurrent large branch merge advanced the old PR unexpectedly and terminalized it; earlier atomic handoff commit attempt failed with a GitHub GraphQL transient. Used a new disjoint draft successor PR and completed the receipt without force-pushing or overwriting any other session's log.
+- KB, Conductor and worker runtime unavailable; bounded original-Rust and primary literature fallback, one coordinator only.
