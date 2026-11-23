@@ -34,3 +34,12 @@ No wall-clock measurement is preregistered here; a future authentic source/group
 ## Execution constraints
 
 This runtime exposes the connected GitHub code interface, but no Rust toolchain, research-KB API, Conductor reservation executable, or distinct worker-spawning tool. Prior search of owner repositories and the existing graph notes did not establish an admissible natural Prime31 2LP fixture. The scoped code change is to the already-owned PR #4988; no new parallel worktree or claim of additional agents. A public source-bound Actions test is the permitted bounded native check; test pass requires an observed terminal run and original-source identity, not an inferred result.
+
+
+## Source implementation and pending validation receipt (2026-11-23 UTC)
+
+- Existing owner PR: https://github.com/isogeny-labs/crypto/pull/4988, kept **draft**.
+- Source change: [`2bc8e8e`](https://github.com/isogeny-labs/crypto/commit/2bc8e8e0631fc998fda584797e005b218aae97fc), `src/cryptanalysis/large_prime_graph/witness.rs`. It factors one-component pairs at the LCA, charges `parent_path_reads` separately from actual modular `path_steps`, and leaves other row classes and forest updates unchanged. New `WitnessStats` field uses `#[serde(default)]` for backward-compatible old records.
+- Regression: [`dc2e804`](https://github.com/isogeny-labs/crypto/commit/dc2e8047746d5de0082af81e6f7911ecfdc7d7cc), followed by canonical LP-index ordering and source-ID type corrections [`6870627`](https://github.com/isogeny-labs/crypto/commit/68706276e686378da6e2303bacf7e581826cdfb4), [`db70a61`](https://github.com/isogeny-labs/crypto/commit/db70a61ab57a158711fbc6aadbeedd0a9777ebf6). Tests use the exact production Rust module; no Python research implementation.
+- [Original-source workflow run 45177691613](https://github.com/isogeny-labs/crypto/actions/runs/45177691613), created for the latest test head. **At this checkpoint the job was still in progress and is NOT a passing test receipt.** Check terminal run, job logs, source blob hashes, and fix any failures. Older 26/26 gate belongs to the previous branch head, not these changes.
+- Implementation scope: one coordinator using GitHub's file-SHA update/commit contract. No separate agent workers available, no paid compute, no PR merge. Full production root compilation, authentic Prime31 relation/group replay and independent signed PCC remain unverified. [pcc:unverified]
