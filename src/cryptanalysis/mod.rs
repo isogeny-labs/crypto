@@ -250,7 +250,6 @@ pub mod hky_fp_tower_fast;
 pub mod hky_fp_tower_fast2;
 pub mod hnp_ecdsa;
 pub mod hwcost;
-pub mod hec_dlp;
 pub mod hyperelliptic_ic_bench;
 pub mod hyperelliptic_index_calculus;
 pub mod hyperelliptic_word;
