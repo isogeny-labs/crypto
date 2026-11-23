@@ -1,0 +1,22 @@
+{
+  "schema": "native-supervisor-OS-qualification/v2",
+  "exit_code": 0,
+  "tests_passed": 5,
+  "failed": 0,
+  "ignored": 0,
+  "new_check": "abrupt supervisor death SIGKILL terminates owned frozen single-process worker via PR_SET_PDEATHSIG, with pre-exec parent PID race check",
+  "scope": "normal unprivileged fixed workers; no credential changes or disabling the guard; not a general sandbox",
+  "source_sha256": {
+    "research/relation_fusion_20261117/native-supervisor/Cargo.lock": "e100d54150c9c86b1d4e53f275854922623012a91dad4ff198375dcb0cbde810",
+    "research/relation_fusion_20261117/native-supervisor/Cargo.toml": "79fc9108d64d6ed64063a0d8673a5ded6e07c4f94590187ded65d11f9c95169b",
+    "research/relation_fusion_20261117/native-supervisor/src/bin/resource-probe.rs": "4b65ae562e1e3cf3a4163022002baad67bfbdee2da9c8ad4a4ed1b2ff5508d60",
+    "research/relation_fusion_20261117/native-supervisor/src/lib.rs": "8de3c786f287fd76e267f5d6d639ea0c7765ed814583a11b93b3e15c1dc6991c",
+    "research/relation_fusion_20261117/native-supervisor/tests/resource_boundary.rs": "c567bb2852a35ac07b37e7fd2833dc235874ac590d19e1c7abd8eea2b8b2cf79"
+  },
+  "logs": {
+    "research/relation_fusion_20261117/development-01/native-supervisor-tests-238.stdout": "551c00410b6b85932e91906f7f9edfca170c51575c84987ee501163e57100fef",
+    "research/relation_fusion_20261117/development-01/native-supervisor-tests-238.stderr": "205b7fa96afdfd98b268733ee415c8ca0970e4928eddd8e66e192276e8c1b924"
+  },
+  "supersedes_parent_death_coverage_of": "229/234; earlier contexts preserved unchanged",
+  "performance_claim": false
+}

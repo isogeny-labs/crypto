@@ -1,0 +1,26 @@
+{
+  "schema": "root-api-correctness-qualification-plan/v1",
+  "source": "ROOT_UNIT_SOURCE_348.json",
+  "filters": [
+    "cryptanalysis::ic_boundary::wwalk_table_tests::target_walk_without_collision_verify_",
+    "cryptanalysis::ec_index_calculus::tests::word_sized_pair_table_matches_biguint_build",
+    "cryptanalysis::ec_index_calculus::tests::word_sweep_matches_the_biguint_sweep",
+    "cryptanalysis::ec_index_calculus::tests::compact_pair_sum_table_matches_the_exact_table",
+    "cryptanalysis::ic_framework::pkm_semaev::tests::isogeny_tower_form_agrees_with_grid",
+    "cryptanalysis::ic_framework::pkm_semaev::tests::isogeny_tower_m3_agrees_with_grid",
+    "cryptanalysis::ic_framework::pkm_semaev::tests::trace_agrees_with_plain_f4_and_grid",
+    "cryptanalysis::ic_framework::pkm_semaev::tests::isogeny_guessing_agrees_with_grid",
+    "cryptanalysis::ic_framework::plugins::coset_mitm_tests::",
+    "cryptanalysis::ic_framework::plugins::batch_inversion_tests::",
+    "cryptanalysis::ic_framework::plugins::wwalk_binary_tests::"
+  ],
+  "scope": "Original occupied-entry/collision accounting, word/compact tables/word-sweep and existing tower form tests. Determine exact test names from compiled --list before invocation; do not count absent substring as coverage. All three restored plugin test-tail modules from308 are included before execution.",
+  "example": "prime_pair_table_check, documented args16 120 and36 512; every BigUint reference assertion retained",
+  "execution": "After350and352, CPU0/tests1/default features/opt0,no timing interpretation. No new performance instance or seed.",
+  "acceptance": "Every selected original test passes unchanged; example exits0 and identical true with word path used. Missing coverage/failure stays failure.",
+  "recorded_before_execution": true,
+  "signed_execution_verdict": false,
+  "performance_comparison": false,
+  "example_execution": "Actual original examples/prime_pair_table_check.rs as bin target of tiny root-example-tests harness; actual crypto default-features=false with byte-equal352locked dependencies apart from harness package name. Explicit opt0/noLTO/codegen16, CPU0/jobs1. This reuses actual root352library, no copied/substituted mathematics.",
+  "preceding_metadata_admission_failure": "ROOT_API_ROSTER_FAILURE_354.json"
+}

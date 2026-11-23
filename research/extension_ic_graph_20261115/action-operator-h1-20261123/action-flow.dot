@@ -1,0 +1,15 @@
+digraph action {
+  graph [rankdir=TB,bgcolor="white",fontname="DejaVu Sans",nodesep=.35,ranksep=.3,pad=.15];
+  node [shape=box,style="rounded,filled",fillcolor="#edf3f8",fontname="DejaVu Sans",fontsize=11,color="#35566d",margin=".15,.1"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#536779",arrowsize=.65];
+  basis [label="Caller-supplied valid basis + explicit action coordinate\nInput variables and monomial order stay unchanged"];
+  fast [label="Selected multiplication matrix + matching read functionals\nTransposed Krylov and exact coordinate read-out"];
+  roots [label="Returned rational roots\nOriginal coordinate order; checked against input",fillcolor="#e1f0e7"];
+  dense [label="Existing dense fallback\nRetain fast-attempt + fallback multiplication counts"];
+  pending [label="Prospective 32-system comparison: NOT RUN\nRequested Runpod execution prerequisites remain open",fillcolor="#fff1d8"];
+  basis -> fast;
+  fast -> roots [label="Some(roots), including a genuine empty set"];
+  fast -> dense [label="None: fast stage refuses"];
+  dense -> roots;
+  roots -> pending [style=dashed,label="Separate evaluation obligation"];
+}

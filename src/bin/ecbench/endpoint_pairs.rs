@@ -92,6 +92,7 @@ pub fn join(
     let expected = runner::PlanDoc {
         schema: "ecbench.plan/v1".into(),
         spec_id: planned.spec_id.clone(),
+        curve_policy: planned.spec.curve_policy.clone(),
         arms: planned.arms.clone(),
         workloads: planned.workloads.clone(),
         executions: planned.executions.clone(),

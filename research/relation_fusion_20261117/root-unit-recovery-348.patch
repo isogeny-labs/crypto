@@ -1,0 +1,302 @@
+diff --git a/src/cryptanalysis/ic_boundary.rs b/src/cryptanalysis/ic_boundary.rs
+index 38bb8aebe6..80aa1d15aa 100644
+--- a/src/cryptanalysis/ic_boundary.rs
++++ b/src/cryptanalysis/ic_boundary.rs
+@@ -1001,6 +1001,19 @@ impl OpenCoefMap {
+         Self::with_capacity(slots)
+     }
+ 
++    // Complete occupied-entry views used by the original collision-ledger tests.
++    #[cfg(test)]
++    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
++        self.keys.iter().enumerate().filter_map(move |(i, &key)| {
++            (key != 0).then(|| (key, (self.us[i], self.zs[i], self.bs[i])))
++        })
++    }
++
++    #[cfg(test)]
++    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
++        self.iter().map(|(_, value)| value)
++    }
++
+     #[inline(always)]
+     fn home(&self, key: u64) -> usize {
+         (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
+diff --git a/src/cryptanalysis/ic_framework/pkm_semaev.rs b/src/cryptanalysis/ic_framework/pkm_semaev.rs
+index b3949779fc..ea0e956ff6 100644
+--- a/src/cryptanalysis/ic_framework/pkm_semaev.rs
++++ b/src/cryptanalysis/ic_framework/pkm_semaev.rs
+@@ -4006,7 +4006,7 @@ pub fn decomposable_points(
+ mod tests {
+     use super::*;
+     use crate::cryptanalysis::ic_boundary::PrimeInstance;
+-    use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
++    use crate::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeKummerBase};
+     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
+     use rand::{rngs::StdRng, Rng, SeedableRng};
+ 
+@@ -4259,7 +4259,7 @@ mod tests {
+         let fb = b
+             .build(&ctx(&inst), &params, &mut GroupOps::default())
+             .expect("isogeny base");
+-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
++        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+         // Every zero of the rules is a zero of the chain: L(x) = c on V.
+         for &x in &tower.v {
+             assert_eq!(tower.eval(x), Some(tower.c));
+@@ -4293,7 +4293,7 @@ mod tests {
+         let fb = b
+             .build(&ctx(&inst), &params, &mut GroupOps::default())
+             .expect("isogeny base");
+-        let tower = isogeny_tower(curve.p, t, 0, &mut GroupOps::default()).unwrap();
++        let tower = isogeny_tower(curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+         let (v, c) = (tower.v.clone(), tower.c);
+         let bits_fb = prime_factor_base(&inst, 6);
+@@ -4424,7 +4424,7 @@ mod tests {
+         let fb = b
+             .build(&ctx(&inst), &params, &mut GroupOps::default())
+             .expect("isogeny base");
+-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
++        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+         let (v, c) = (tower.v.clone(), tower.c);
+         for g in [1, 2] {
+@@ -4725,7 +4725,7 @@ mod tests {
+         let fb = b
+             .build(&ctx(&inst), &params, &mut GroupOps::default())
+             .expect("isogeny base");
+-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
++        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+         let (v, c) = (tower.v.clone(), tower.c);
+         agrees_with_grid_m3(
+diff --git a/src/cryptanalysis/ic_framework/prime_tower.rs b/src/cryptanalysis/ic_framework/prime_tower.rs
+index b1f942f772..c927224e1c 100644
+--- a/src/cryptanalysis/ic_framework/prime_tower.rs
++++ b/src/cryptanalysis/ic_framework/prime_tower.rs
+@@ -1251,7 +1251,7 @@ mod tests {
+             .unwrap();
+         let p = inst.curve.p;
+         let mut tower_ops = GroupOps::default();
+-        let tower = isogeny_tower(p, t, 2, &mut tower_ops).unwrap();
++        let tower = isogeny_tower(p, t, 2, AuxFamily::Any, &mut tower_ops).unwrap();
+         let mut prebuilt_ops = GroupOps::default();
+         let prebuilt = PrebuiltPrimeIsogenyBase {
+             instance: &inst,
+diff --git a/src/cryptanalysis/ic_framework/semaev_projection_oracle.rs b/src/cryptanalysis/ic_framework/semaev_projection_oracle.rs
+index aa6928742e..a968c94623 100644
+--- a/src/cryptanalysis/ic_framework/semaev_projection_oracle.rs
++++ b/src/cryptanalysis/ic_framework/semaev_projection_oracle.rs
+@@ -214,9 +214,8 @@ mod tests {
+         let p1 = fb.points[2];
+         let p2 = fb.points[4.min(fb.points.len().saturating_sub(1))];
+         let mut ops = GroupOps::default();
+-        let target = inst
+-            .curve
+-            .add(&mut ops, inst.curve.add(&mut ops, p0, p1), p2);
++        let first_pair = inst.curve.add(&mut ops, p0, p1);
++        let target = inst.curve.add(&mut ops, first_pair, p2);
+         assert!(!target.infinity);
+ 
+         let ctx = InstanceCtx {
+diff --git a/src/cryptanalysis/koblitz_sparse_la.rs b/src/cryptanalysis/koblitz_sparse_la.rs
+index 824afc0e8a..a07bdd5be2 100644
+--- a/src/cryptanalysis/koblitz_sparse_la.rs
++++ b/src/cryptanalysis/koblitz_sparse_la.rs
+@@ -1345,6 +1345,10 @@ pub struct FilterReport {
+     pub rows_out: usize,
+     pub columns_out: usize,
+     pub nonzeros_out: usize,
++    /// Multiply-subtracts on a row entry (right-hand side included) the
++    /// merges performed: one per entry of the pivot row per combination.
++    #[serde(default, skip_serializing_if = "is_default")]
++    pub row_ops: u64,
+ }
+ 
+ /// The reduced system plus everything needed to undo the reduction.
+@@ -1461,6 +1465,7 @@ impl<W: ModWord> Workspace<W> {
+             let row = self.detach(r).expect("active");
+             let factor = row.coefficient(c).expect("member").mul(inv, &m);
+             let reduced = row.axpy(factor, &pivot, m);
++            self.report.row_ops += pivot.weight() as u64 + 1;
+             debug_assert!(reduced.coefficient(c).is_none());
+             if reduced.entries.is_empty() {
+                 if !reduced.rhs.is_zero() {
+@@ -1594,6 +1599,7 @@ impl<W: ModWord> Workspace<W> {
+                 .ok_or(Inconsistent)?;
+             let factor = originals[k].coefficient(c).expect("member").mul(inv, &m);
+             let reduced = originals[k].axpy(factor, p, m);
++            self.report.row_ops += p.weight() as u64 + 1;
+             debug_assert!(reduced.coefficient(c).is_none());
+             if reduced.entries.is_empty() {
+                 if !reduced.rhs.is_zero() {
+@@ -2056,6 +2062,18 @@ impl<W: ModWord> FilteredSystem<W> {
+         &self,
+         core_solution: &[W],
+         original_rows: &[SparseRow<W>],
++    ) -> Option<Vec<W>> {
++        self.reconstruct_counted(core_solution, original_rows, &mut 0)
++    }
++
++    /// [`Self::reconstruct`], adding to `ops` one per row entry a
++    /// back-substitution reads and, for the residual dense solve, the
++    /// Gauss–Jordan bound `rows × unknowns²`.
++    fn reconstruct_counted(
++        &self,
++        core_solution: &[W],
++        original_rows: &[SparseRow<W>],
++        ops: &mut u64,
+     ) -> Option<Vec<W>> {
+         let m = &self.modulus;
+         assert_eq!(
+@@ -2067,7 +2085,8 @@ impl<W: ModWord> FilteredSystem<W> {
+         for (&c, &v) in self.core_columns.iter().zip(core_solution) {
+             value[c as usize] = Some(v);
+         }
+-        let solve_row = |row: &SparseRow<W>, col: u32, value: &[Option<W>]| -> Option<W> {
++        let mut solve_row = |row: &SparseRow<W>, col: u32, value: &[Option<W>]| -> Option<W> {
++            *ops += row.weight() as u64;
+             let mut acc = row.rhs;
+             let mut pivot = None;
+             for &(c, v) in &row.entries {
+@@ -2146,6 +2165,7 @@ impl<W: ModWord> FilteredSystem<W> {
+                 rows.push(dense);
+                 rhs.push(b);
+             }
++            *ops += (rows.len() * unknown.len() * unknown.len()) as u64;
+             let solved = dense_solve_unique(rows, rhs, self.modulus)?;
+             for (&c, v) in unknown.iter().zip(solved) {
+                 value[c as usize] = Some(v);
+@@ -3536,6 +3556,7 @@ pub fn solve_sparse_system_seeds<W: ModWord>(
+         Err(Inconsistent) => return vec![(SparseSolveOutcome::Inconsistent, report)],
+     };
+     report.filter = filtered.report.clone();
++    report.row_ops = filtered.report.row_ops;
+     let core_cols = filtered.core_columns.len();
+     if filtered.core_rows.len() < core_cols {
+         return vec![(SparseSolveOutcome::Undetermined, report)];
+@@ -3598,6 +3619,11 @@ fn solve_filtered_core<W: ModWord>(
+         for attempt in 0..opts.attempts.max(1) {
+             report.attempts = attempt + 1;
+             let square = fold_square(&core, core_cols, modulus, opts.fold, &mut rng);
++            report.row_ops += core[core_cols.min(core.len())..]
++                .iter()
++                .map(|r| (r.weight() as u64 + 1) * opts.fold.max(1) as u64)
++                .sum::<u64>();
++            let square_nonzeros: u64 = square.iter().map(|r| r.weight() as u64).sum();
+             let a = CsrMatrix::from_rows(&square, core_cols, modulus).with_spmv(opts.spmv);
+             let b: Vec<W> = square.iter().map(|r| r.rhs).collect();
+             let x = match opts.solver {
+@@ -3607,6 +3633,8 @@ fn solve_filtered_core<W: ModWord>(
+                     else {
+                         continue;
+                     };
++                    report.row_ops +=
++                        (wr.products * wr.block_n) as u64 * (square_nonzeros + square.len() as u64);
+                     report.wiedemann = Some(wr);
+                     let t = z[core_cols];
+                     let Some(inv) = (!t.is_zero()).then(|| t.inv(m)).flatten() else {
+@@ -3619,10 +3647,12 @@ fn solve_filtered_core<W: ModWord>(
+                     else {
+                         continue;
+                     };
++                    report.row_ops += (lr.sparse_products * lr.block_size) as u64 * square_nonzeros;
+                     report.lanczos = Some(lr);
+                     x
+                 }
+             };
++            report.row_ops += report.core_nonzeros as u64;
+             if core.iter().all(|row| row.evaluate(&x, modulus) == row.rhs) {
+                 core_solution = Some(x);
+                 break;
+@@ -3632,10 +3662,11 @@ fn solve_filtered_core<W: ModWord>(
+     let Some(core_solution) = core_solution else {
+         return (SparseSolveOutcome::Undetermined, report);
+     };
+-    let Some(full) = filtered.reconstruct(&core_solution, rows) else {
++    let Some(full) = filtered.reconstruct_counted(&core_solution, rows, &mut report.row_ops) else {
+         return (SparseSolveOutcome::Undetermined, report);
+     };
+     report.reconstructed_columns = columns - core_cols;
++    report.row_ops += rows.iter().map(|r| r.weight() as u64).sum::<u64>();
+     if rows
+         .iter()
+         .all(|row| row.evaluate(&full, modulus) == row.rhs)
+diff --git a/src/cryptanalysis/pq_f4_f2.rs b/src/cryptanalysis/pq_f4_f2.rs
+index e0c3753dd5..c72e117821 100644
+--- a/src/cryptanalysis/pq_f4_f2.rs
++++ b/src/cryptanalysis/pq_f4_f2.rs
+@@ -4610,7 +4610,7 @@ mod tests {
+         guard: EarlyGuard,
+     ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
+         let before = tally::snapshot();
+-        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, true);
++        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, None, TraceMode::Off, true);
+         (gb, st, tally::snapshot().since(before))
+     }
+ 
+@@ -5068,6 +5068,7 @@ mod tests {
+                 EARLY_GUARD,
+                 None,
+                 TraceMode::Verify(&eqs),
++                fl_enabled(),
+             );
+             assert_eq!(ok.trace_verify_failures, 0, "system {k}: the basis fails");
+             assert_eq!(ok.steps, 1);
+@@ -5086,6 +5087,7 @@ mod tests {
+                 EARLY_GUARD,
+                 None,
+                 TraceMode::Verify(&eqs),
++                fl_enabled(),
+             );
+             assert_eq!(
+                 bad.trace_verify_failures, 1,
+@@ -5104,6 +5106,7 @@ mod tests {
+                     EARLY_GUARD,
+                     None,
+                     TraceMode::Verify(&eqs),
++                    fl_enabled(),
+                 );
+                 assert_eq!(
+                     bad.trace_verify_failures, 1,
+diff --git a/src/cryptanalysis/prime_root_trace.rs b/src/cryptanalysis/prime_root_trace.rs
+index b4962898cf..a95b84f1d2 100644
+--- a/src/cryptanalysis/prime_root_trace.rs
++++ b/src/cryptanalysis/prime_root_trace.rs
+@@ -3617,7 +3617,7 @@ mod tests {
+                 }
+                 let reference = vdiv(&a, &b, p).unwrap();
+                 let mut sink = |_event: &RootEvent| Ok(());
+-                let mut engine = Engine {
++                let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
+                     report: RootReport {
+                         schema: "prime-root-trace/v1".into(),
+                         p,
+@@ -4173,7 +4173,7 @@ mod round100_traced_multiplication {
+                     }
+                     let expected = trim(expected);
+                     let mut observer = |_: &RootEvent| -> Result<(), String> { Ok(()) };
+-                    let mut engine = Engine {
++                    let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
+                         report: RootReport {
+                             schema: "prime-root-trace/v1".into(),
+                             p,
+@@ -4263,7 +4263,7 @@ mod round107_inverse_chain {
+                 sink_error: None,
+                 roots: vec![],
+             };
+-            let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
++            let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 }, report, sink: &mut sink, next_id: 0 };
+             let actual = engine.inv(value).unwrap();
+             assert_eq!(actual, vpow(value, p - 2, p), "value={value}");
+             assert_eq!(vmul(actual, value, p), 1, "value={value}");
+@@ -4329,7 +4329,7 @@ mod round108_unit_monomial_fastpaths {
+                                 events: vec![], unacknowledged: None,
+                                 sink_error: None, roots: vec![],
+                             };
+-                            let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
++                            let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 }, report, sink: &mut sink, next_id: 0 };
+                             let actual = engine.mul(a, b).unwrap();
+                             assert_eq!(actual, vproduct(a, b, p),
+                                 "p={p} width={width} case={case} a={a:?} b={b:?}");

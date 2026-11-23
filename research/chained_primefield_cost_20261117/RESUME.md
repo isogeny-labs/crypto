@@ -1,3 +1,37 @@
+# Resume cost16 publication from 23 November 2026
+
+Current publication PR: crypto#4990; branch lane/chained-richelot-cost16-20261123.
+Owned isolated clone: /dev/shm/chained-transfers-resume23. Initial tracking
+71f1217d; canonical resumed-data checkpoint918120b5. Read today's journal and
+RESULT_16.md first. The completed native16 unit must not be repeated simply
+because its publication was interrupted. [pcc:unverified]
+
+The exact public128-file study was imported from7f9d552c and all blobs matched
+before report/resume edits. Actual native sourceB e7efdbf1 remains immutable.
+Current reports distinguish the historical successful unit from the missing
+full raw stdout/private packet at the recorded restart paths. The old worktree
+Gitdir/index and private tmpfs archive storage are gone. Never run the old
+helpers against its dangling .git link, and never stage or alter shared original
+objects/index or intentionally sparse raw containers. [pcc:unverified]
+
+Follow current main's append-only PCC ledger and untouched keyring/verifiers.
+Original checkpoint claims/ledger are preserved as historical data and immutable
+references, not rechained. New claims are unsigned. The full shared journal has
+17 baseline prose findings; this session's append and final reports lint clean.
+Record new state promptly in GitHub: the persistent overlay has zero available
+bytes, and /dev/shm is temporary. [pcc:unverified]
+
+Finish the old4544 final-CI/episode custody, then track the next nontrivial
+transfer/descent task before new research/code/calls. Refresh main and preserve
+other tasks and complete journal blocks. Current PR first CI read is at least
+50minutes after the latest substantive push, then4hours unchanged; normal
+MERGE and required gates remain. PaidSTOPe42949, EKS-only original full workload,
+unread VLT1-8edec422 and independent-signing/admitted-cost blockers remain.
+[pcc:unverified]
+
+<details>
+<summary>Exact older prospective resume text (historical, superseded above)</summary>
+
 # Resume prime-field inverse cost16
 
 Current worktree /workspace/crypto-chained-balanced-main; branch
@@ -55,3 +89,5 @@ VLT1-8edec422 and signed/generalformal/complete solver-cost obligations. KB and
 Conductor127 fallback recorded. After16 continue genuine chained Jacobian and
 prime-field-descent work, reviewing old six-cycle/forced-dual negatives first.
 [pcc:unverified]
+
+</details>

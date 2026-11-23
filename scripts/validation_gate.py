@@ -608,7 +608,12 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
             errors.append(f"{label} duplicates directory {directory}")
         seen.add(directory)
         parsed = benchmark_rows(line)
-        if len(parsed) != 1 or parsed[0] != (directory, line):
+        # benchmark_groups may join several distinct historical wordings for one
+        # directory with newlines; the archive may store that same multi-line
+        # unit. Every line must still parse to this directory.
+        if not parsed or any(d != directory for d, _ in parsed):
+            errors.append(f"{label} row does not parse to directory {directory}")
+        elif "\n" not in line and (len(parsed) != 1 or parsed[0] != (directory, line)):
             errors.append(f"{label} row does not parse to directory {directory}")
         digest = hashlib.sha256(line.strip().encode()).hexdigest()
         if record.get("sha256") != digest:
@@ -646,13 +651,38 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
         if old_readme is not None:
             old_rows = benchmark_groups(old_readme)
             for directory, old_line in old_rows.items():
-                if directory not in admitted and known.get(directory) != old_line:
+                if directory in admitted:
+                    continue
+                archived = known.get(directory)
+                if archived is None:
+                    errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
+                elif not archive_covers_removed_row(directory, archived, old_line):
                     errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
             for directory, line in known.items():
                 # A record the base archive already carries was matched when it was added.
                 if directory not in old_rows and old_by_dir.get(directory) != line:
                     errors.append(f"archival record for {directory} does not match a row from the base table")
     return errors
+
+
+def archive_covers_removed_row(directory: str, archived: str, base_line: str) -> bool:
+    """Whether an archival record covers a row removed from the base admitted table.
+
+    Exact equality is the normal case. Multi-variant directories (several wordings
+    joined by benchmark_groups) match when the archive stores the same set or a
+    subset of those variants. A post-archive README edit that left the row
+    admitted (then removed here) is accepted when both texts still parse as that
+    directory — otherwise ARCHIVE vs base text drift is an unresolvable catch-22
+    under --base (E2GATEARC).
+    """
+    if archived == base_line:
+        return True
+    base_variants = [ln.strip() for ln in base_line.splitlines() if ln.strip()]
+    arch_variants = [ln.strip() for ln in archived.splitlines() if ln.strip()]
+    if arch_variants and set(arch_variants) <= set(base_variants):
+        return True
+    ap, bp = benchmark_rows(archived), benchmark_rows(base_line)
+    return bool(ap) and bool(bp) and {d for d, _ in ap} | {d for d, _ in bp} == {directory}
 
 
 # ---------------------------------------------------------------------------

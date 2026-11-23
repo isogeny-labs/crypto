@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:09:01Z",
+ "id": "PCC-20261123-1989d2",
+ "kind": "measurement",
+ "producer": {
+  "commit": "0589624ea3d93b0f5876e8462dd40d94a272a900",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/ap-qualification.json",
+    "sha256": "334a6a70fbc2c64dccd6657689a1159b2f220fad886be181baf9a6033fa06b69"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/test-progression-wide.json",
+    "sha256": "024169130816ab9df4422c84be585021e19efcc4a87e3b3cf3ce703f0eff34d3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/progression.hpp",
+    "sha256": "52c95b59951ba323e09ac9c3a077eb46dde1d447fcf709947cf2e265b17ca726"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/target-ap.cpp",
+    "sha256": "ddce757a3d1032d35e56d6457aa441b7b8b2c311045877d263c497b618e10406"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Charged progression constructor passes240 no-timer public-target/AP-mode calls, checking every generated mixed label by independent affine recomputation and every attempted hit/miss/scalar against frozen pair control. Projective formulas pass47736 independent affine oracle checks including scaled, identity, double/opposite and61-bit cases. Progression pools are correlated; no iid density or novelty claim. Producer qualification only, no runtime gain or rho parity asserted."
+}
