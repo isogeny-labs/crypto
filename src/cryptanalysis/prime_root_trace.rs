@@ -2280,7 +2280,7 @@ fn vmonic(mut a: Vec<u64>, p: u64) -> Vec<u64> {
 }
 fn vgcd(mut a: Vec<u64>, mut b: Vec<u64>, p: u64) -> Result<Vec<u64>, String> {
     while !b.is_empty() {
-        let r = vdiv(&a, &b, p)?.1;
+        let r = vremainder(&a, &b, p)?;
         a = b;
         b = r;
     }
@@ -2802,6 +2802,33 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round87_remainder_only_replay_matches_independent_division() {
+        // Compare fixed-degree remainder-only reduction against the frozen
+        // Euclidean quotient-and-remainder verifier, including 61-bit fields.
+        for p in [3_u64, 5, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 3..=8 {
+                for seed in 0..32_u64 {
+                    let mut modulus: Vec<u64> = (0..degree)
+                        .map(|i| ((seed * 37 + i as u64 * 71 + 1) % (p - 1)) + 1)
+                        .collect();
+                    modulus.push(1);
+                    for extra in 0..=degree {
+                        let length = degree + extra;
+                        let dividend: Vec<u64> = (0..length)
+                            .map(|i| ((seed * 47 + i as u64 * 113 + 2) % (p - 1)) + 1)
+                            .collect();
+                        assert_eq!(
+                            vremainder(&dividend, &modulus, p).unwrap(),
+                            vdiv(&dividend, &modulus, p).unwrap().1,
+                            "p={p} degree={degree} seed={seed} extra={extra}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn round86_monic_shift_and_linear_match_independent_products() {
         // Directly exercise the source-exact traced producer arithmetic.
         // In particular, a shift must not charge scalar arithmetic events.
@@ -2836,8 +2863,6 @@ mod tests {
                         vproduct(other, &monomial, p));
                     assert_eq!(engine.square(&monomial).unwrap(),
                         vsquare(&monomial, p));
-                }
-            }
             for constant in [1, 2 % p] {
                 let linear = [constant, 1];
                 for other in [&dense, &sparse] {
@@ -2846,10 +2871,7 @@ mod tests {
                     assert_eq!(engine.mul(other, &linear).unwrap(), result);
             assert_eq!(engine.square(&[1]).unwrap(), vec![1]);
             assert!(engine.report.events.iter().any(|e| matches!(e, RootEvent::Product { .. })));
-        }
-    }
 
-    #[test]
     fn round83_inplace_roots_and_square_replay_equivalence() {
         // Compare against the established independent polynomial operations,
         // including X factors, full degree-eight products and sparse squares.
