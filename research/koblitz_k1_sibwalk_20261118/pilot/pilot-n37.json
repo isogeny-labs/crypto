@@ -1,0 +1,196 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "K1 sibling walk pilot, a=0 n=37",
+ "description": "Pilot (not confirmatory) for koblitz_k1_sibwalk_20261118: k and m per curve; separate seeds.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 37
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261118473,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "ls",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c7-m1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=7,raw_x_cap=100000000,generator_orbit=1,generator_multiples=7,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=1,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c7-m2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=7,raw_x_cap=100000000,generator_orbit=1,generator_multiples=7,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=2,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c7-m4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=7,raw_x_cap=100000000,generator_orbit=1,generator_multiples=7,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=4,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c7-m8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=7,raw_x_cap=100000000,generator_orbit=1,generator_multiples=7,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c8-m1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=1,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c8-m2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=2,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c8-m4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=4,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c8-m8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c9-m1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=9,raw_x_cap=100000000,generator_orbit=1,generator_multiples=9,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=1,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c9-m2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=9,raw_x_cap=100000000,generator_orbit=1,generator_multiples=9,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=2,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c9-m4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=9,raw_x_cap=100000000,generator_orbit=1,generator_multiples=9,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=4,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c9-m8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=9,raw_x_cap=100000000,generator_orbit=1,generator_multiples=9,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119473,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

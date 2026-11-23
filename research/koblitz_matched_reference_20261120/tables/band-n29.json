@@ -1,0 +1,170 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "log2_r": 15.373714813957372,
+      "arm": "gen-c1",
+      "runs": 144,
+      "verified": 144,
+      "mean_s": [
+        0.3977575815021714,
+        0.6566943293992387,
+        2.9871250604728403
+      ],
+      "charged_sum": 11802.0,
+      "native_sum": 76830,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 2784.0
+      },
+      "table_work_mean_counts": {
+        "table_insert_attempts": 29.0
+      }
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "log2_r": 15.373714813957372,
+      "arm": "k1-l10",
+      "runs": 144,
+      "verified": 144,
+      "mean_s": [
+        3223.0393892486045,
+        3547.2683070291987,
+        6465.32856705456
+      ],
+      "charged_sum": 95631894.0,
+      "native_sum": 96203061,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 259080.0
+      }
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "log2_r": 15.373714813957372,
+      "arm": "rho-strong",
+      "runs": 144,
+      "verified": 144,
+      "mean_s": [
+        4.521645769162054,
+        4.6302724816632965,
+        5.607912894174472
+      ],
+      "charged_sum": 134163.28399351746,
+      "native_sum": 32231,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "log2_r": 15.373714813957372,
+      "arm": "rho-v5",
+      "runs": 144,
+      "verified": 144,
+      "mean_s": [
+        0.3571797024877148,
+        0.4216459541312799,
+        1.0018422189233647
+      ],
+      "charged_sum": 10598.0,
+      "native_sum": 19128,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "jump_selections": 68.59722222222223
+      }
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "log2_r": 15.373714813957372,
+      "arm": "rho-v5-aa",
+      "runs": 144,
+      "verified": 144,
+      "mean_s": [
+        0.3571797024877148,
+        0.4216459541312799,
+        1.0018422189233647
+      ],
+      "charged_sum": 10598.0,
+      "native_sum": 19128,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "jump_selections": 68.59722222222223
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "gen-c1",
+      "b": "k1-l10",
+      "verdict": "gen-c1 < k1-l10"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "gen-c1",
+      "b": "rho-strong",
+      "verdict": "gen-c1 < rho-strong"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "gen-c1",
+      "b": "rho-v5",
+      "verdict": "rho-v5 < gen-c1"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "gen-c1",
+      "b": "rho-v5-aa",
+      "verdict": "rho-v5-aa < gen-c1"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "k1-l10",
+      "b": "rho-strong",
+      "verdict": "rho-strong < k1-l10"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "k1-l10",
+      "b": "rho-v5",
+      "verdict": "rho-v5 < k1-l10"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "k1-l10",
+      "b": "rho-v5-aa",
+      "verdict": "rho-v5-aa < k1-l10"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "rho-strong",
+      "b": "rho-v5",
+      "verdict": "rho-v5 < rho-strong"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "rho-strong",
+      "b": "rho-v5-aa",
+      "verdict": "rho-v5-aa < rho-strong"
+    },
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": "rho-v5",
+      "b": "rho-v5-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

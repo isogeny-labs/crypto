@@ -154,7 +154,7 @@ jobs:
             digest=$(sha256sum "$backend" | cut -d' ' -f1)
             jq --arg backend "$backend" --arg digest "$digest" '.arms |= map(if .method.params.backend? then .method.params.backend=$backend | .method.params.backend_sha256=$digest else . end)' \
               "$study/sessions/$run_name/spec.json" > "/tmp/cm-$run_name.json"
-            target/release/ecbench run --spec "/tmp/cm-$run_name.json" --out "/tmp/cm-$run_name" --cpus none --lock "/tmp/cm-$run_name.lock" --allow-busy --settle 0.1 --quiet
+            target/release/ecbench run --allow-legacy-spec --spec "/tmp/cm-$run_name.json" --out "/tmp/cm-$run_name" --cpus none --lock "/tmp/cm-$run_name.lock" --allow-busy --settle 0.1 --quiet
             target/release/ecbench verify --dir "/tmp/cm-$run_name" --exit-code --replay-all
           done
       - name: Browser keeps unpriced native work out of S rankings
@@ -172,26 +172,6 @@ jobs:
             /research/conductor_gap_cm_orbits_20261015/lean/
             /tools/artifacts/
             /.artifacts/
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/conductor_gap_cm_orbits_20261015 research/conductor_gap_followups_20261016
       - name: Install Lean archive dependency
         shell: bash
         run: |

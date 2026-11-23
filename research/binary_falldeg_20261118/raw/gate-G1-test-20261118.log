@@ -1,0 +1,15 @@
+7 + pub(in crate::ml_dataset::solvers) enum Custody { Search(search::ReportedSearch), BeforeSearch(()) }
+127 | impl Session {
+128 |     pub(super) fn historical(&self)->bool {ReplayMode::parse(&self.policy.mode)==Some(ReplayMode::Historical)}
+9519 |         self.owner.revalidate(dir, config, outcome, artifacts);
+help: use `let _ = ...` to ignore the resulting value
+9519 |         let _ = self.owner.revalidate(dir, config, outcome, artifacts);
+   Compiling crypto v0.1.0 (/home/user/crypto-wt/binary-ladder)
+    Finished `release` profile [optimized] target(s) in 2.22s
+     Running unittests examples/binary_falldeg_arms.rs (target/release/examples/binary_falldeg_arms-4db58a5df9791b70)
+running 4 tests
+test tests::squaring_orbit_closes ... ok
+test tests::window_basis_has_requested_dimension ... ok
+test tests::orbit_basis_is_squaring_closed ... ok
+test tests::ffd_le_last_fall_on_inconsistent_m2_cell ... ok
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.88s

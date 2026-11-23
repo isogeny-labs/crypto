@@ -22,7 +22,10 @@
   [T6], [LFD($k$) $>= 4$ for all $k >= 2$ ($t != 0$, $A != -3t^2$)], [proved (paper)],
   [T7], [LFD($k$) $<= 2k+1$ for every unit instance], [proved (paper)],
   [T8], [LFD($k$) $= 4,4,4,4,5,5,5,5$ for $k = 2..9$ with verified upper and lower replay certificates; LFD $>= 6$ for $10 <= k <= 15$ on $p = 65537$ by one certified depth-10 closure and T4], [certified (see §3)],
-  [T9], [Linear lower bound $c k - C <=$ LFD($k$), $c > 0$], [*open*; missing lemma stated],
+  [T9], [Linear lower bound $c k - C <=$ LFD($k$), $c > 0$], [*open*; reduced to Missing Lemma Π (§6)],
+  [T10], [Theorem A: if every cofactor $v$ off the top two residues with $"wt"(g v) <= c-1$ has per-coordinate popcount $<= k-3$, then $1 in.not V_c (k)$], [proved; Lean],
+  [T12], [Slope 1/4 shared by Möbius and affine couplings], [computed],
+  [T13], [Theorem A′: if every shift of a low cofactor stays off the top residues, then $1 in.not V_c (k)$; holds from $k = 4c - 8$ at $c = 4, 5$], [proved; Lean],
 )
 
 Separately: finite-depth results (§3), constant bounds $4 <= "LFD"(k) <= 2k+1$ (T6, T7), linear growth (upper slope 2 proved; lower slope open; lane-P empirical slope $1\/4$).
@@ -58,6 +61,28 @@ Ring $FF_p[y_(1,0..k-1), y_(2,0..k-1)]$, grevlex, generators $y_(s,j+1) - y_(s,j
 
 A linear lower bound needs a *locality* lemma: for $c <= alpha k - beta$, $1 in.not U_c (k)$; equivalently a co-closed family of functionals annihilating $g$ with one not annihilating $1$, or (through T5 and the observed equality $U_c = pi_k (W_c)$) that no element of the $ZZ$-exponent closure $W_c subset (S_3)$ is $equiv 1$ modulo $(x_1^N - 1, x_2^N - 1)$. The evaluation functionals at the Semaev-curve points with one coordinate in $mu_N$ are *not* the annihilator ($k = 6$, $D = 4$: 188 of 605 rows fail although $1 in.not V_4$); this counterexample is preserved in `reports/evaltest.md`.
 
+= Follow-up 2026-11-22: the cofactor reduction
+
+*Theorem A (Lean).* With $g$ a unit supported on ${0,1,2}^2$, $g_(2,2) != 0$: if every $v in Q_k$ supported on $[0, N-3]^2$ with $g v in Q_(<= c-1)$ has per-coordinate popcount $<= k-3$, then $1 in.not V_c (k)$. The subspace of weight-$<= c$ elements whose cofactor $g^(-1) u$ avoids the top two residues is closed under the degree-$c$ rule and misses 1. The boundary functionals of §4 test exactly this: they annihilate $u$ iff $S$ divides the lift $L(u)$ iff the cofactor avoids the top residues.
+
+*Missing Lemma Π.* Let Π($w$) be the largest per-coordinate popcount of a cofactor $h$ with $S h$ of binary weight $<= w$ in $FF_p [x_1, x_2]$ (no $k$, no wrap-around). A bound Π($w$) $<= alpha w + beta$ gives LFD($k$) $>= (k - 3 - beta)\/alpha + 1$.
+
+#figure(image("pi_vs_box.svg", width: 100%), caption: [Measured Π($w$) for the F2 instance against the cofactor box; dotted: counting prediction $m(w) = 6, 10, 14$. Π(3) = 6 is saturated; Π(4) $>= 10$ and Π(5) $>= 11$ still track the box edge.])
+
+The counting heuristic matches Π(3) and Π(4) exactly and grows by about 4–5 per unit of weight for $w <= 7$, which is the observed slope 1/4. Asymptotically it grows like $w log_2 w$, so if it is sharp, Missing Lemma Π fails and Theorem A alone gives only $Omega(k \/ log k)$. The closure reaches fewer cofactors than all multiples (popcount 5 at $c = 4$ against Π(3) = 6), so LFD itself may still be linear. At $c = 5$, $k = 10$ the reachable low cofactors have popcount 9 $= k-1$, above the $k-3$ that Theorem A needs, although $1 in.not V_5(10)$ and they still avoid the top residues: Theorem A is silent there, and the invariant that holds is top-residue avoidance, not a popcount bound.
+
+#figure(image("lfd_universality.svg", width: 100%), caption: [LFD($k$) for three couplings of two 2-power chains: Semaev ⌊(k+14)/4⌋, Möbius ⌊k/4⌋+3, affine ⌊(k-1)/4⌋+3.])
+
+*Depth 15.* The constant 1 enters the closure only at 84–99.7 % of full rank ($k = 4..9$); at $k = 15$, $D = 7$ that is a dense echelon of about 25 TB. A larger host does not close the gap; no paid compute was launched.
+
+= Follow-up: Theorem A′ and the threshold ladder
+
+*Theorem A′ (Lean).* Replacing the popcount hypothesis by the shift hypothesis $H'$ (every shift $x_s^(2^j)$ of a low cofactor stays off the top residues) still gives $1 in.not V_c (k)$; Theorem A becomes a corollary.
+
+#figure(image("threshold_ladder.svg", width: 90%), caption: [Depth from which each method proves $1 in.not V_c (k)$ (F2, $p = 65537$). Measured at $c = 4$; at $c = 5$ the Theorem A′ cells $k = 11$ (fails) and $k = 12$ (holds) were predicted before the runs. Theorem A at $c = 5$ is inferred from $Pi(4) = 10$. All four lines have slope 4 in $c$, i.e. LFD slope $1\/4$.])
+
+At the first depth where $1 in.not V_c$ ($k = 6$ for $c = 4$, $k = 10$ for $c = 5$) the low part of the closure equals the whole space $W$ of low-weight multiples (3,163 dimensions at $c = 5$), and every top-avoidance argument fails there. Theorem A′ is governed by $Pi(c-1) <= k - 2$; the ladder keeps slope $1\/4$ only while $Pi(w) approx 4w - 6$ ($Pi(3) = 6$, $Pi(4) = 10$ measured), so the linear lower bound stays open.
+
 = Files
 
-`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree}.lean` (Lean 4.34.1, Mathlib v4.34.1; 17 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
+`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree,Cofactor}.lean` (Lean 4.34.1, Mathlib v4.34.1; 25 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).

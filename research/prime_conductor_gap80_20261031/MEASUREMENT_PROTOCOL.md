@@ -6,6 +6,36 @@ Missing times are `null`, not zero or a partial-tile estimate.
 
 ## What prevents execution now
 
+### Status addendum, 2026-11-18
+
+The paragraphs below describe the older codomain-only implementation. The
+current [`native/complete_pipeline.cpp`](native/complete_pipeline.cpp) accepts
+GMP prime degrees and computes quotient coefficients and point images, with
+complete coverage checks demonstrated on small public inputs. Explicit baby
+windows and bounded projective walks are implemented; the earlier width and
+codomain-only limitations are not descriptions of that new source.
+
+The full frozen 80-bit target has still not been constructed or evaluated.
+The current complete schedule's work and memory feasibility remains open;
+bounded target-field coordinate prefixes are not map evaluations. See
+[`batch-walk-20261118/README.md`](batch-walk-20261118/README.md).
+
+The new [`native/paired_ecbench_export.cpp`](native/paired_ecbench_export.cpp)
+prepares transported known-answer targets and prospective ecbench inputs.
+Current ecbench `PrimeExplicit` fields are u64 with p restricted to
+`5 <= p < 2^62`; both the actual 202-bit field and 96-bit pilot require
+additional harness integration. Exact-width guards reject both before large
+construction. The small preparation/recovery controls are documented in
+[`paired-driver-20261118/README.md`](paired-driver-20261118/README.md).
+
+The prospective spec matches scalars, but alternating arms does not establish
+alternating endpoint order or matched algorithm seeds. Those, scalar timing
+integration, the strongest supported wall reference, registry identity and
+live cloud admission remain prerequisites. No recorded timing is available.
+All measurement requirements below remain in force.
+
+### Earlier implementation audit (retained history)
+
 The existing native codomain constructor
 [`sqrt_velu_batched_v4.cpp`](../conductor_gap_cm_orbits_20261015/native/sqrt_velu_batched_v4.cpp)
 reads `ell` into `uint64_t`. Its included
