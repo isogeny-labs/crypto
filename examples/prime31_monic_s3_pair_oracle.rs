@@ -231,8 +231,27 @@ fn candidate_ts(f:Fp,h0:&Pair,h1:&Pair,q:&Poly,r:&Poly,s:u64)->Vec<u64> {
                     f.mul(f.sub(f.neg(qs),y),inv2)];
     ts.sort_unstable();ts.dedup();ts
 }
-fn extract(f:Fp,w:&[u64],z:u64)->Result<(Vec<(u64,u64)>,usize,usize,usize),String>{
-    let (h0,h1,q,r,d,n,c)=construct(f,w,z);
+// Independent full elimination from the existing balanced rank-four factor
+// tree.  Unlike the Newton version, h(X) is never explicitly expanded;
+// both paths still perform exactly the SAME D/N/gcd, rational root finding,
+// and post-substitution checks.  No generic signed-pair dictionary.
+fn construct_tree_full(f:Fp,w:&[u64],z:u64)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly) {
+    let (h0,h1)=construct_balanced(f,w,z);
+    let (q,r)=coeff_s3(f,z);
+    let (b0,a0)=(&h0.0,&h0.1);
+    let (b1,a1)=(&h1.0,&h1.1);
+    let d=minus(f,&product(f,a0,b1),&product(f,a1,b0));
+    let n=plus(f,
+        &minus(f,&product(f,b0,b0),&product(f,&q,&product(f,a0,b0))),
+        &product(f,&r,&product(f,a0,a0)));
+    let c=gcd(f,d.clone(),n.clone());
+    (h0,h1,q,r,d,n,c)
+}
+fn extract_with_method(f:Fp,w:&[u64],z:u64,tree:bool)
+    ->Result<(Vec<(u64,u64)>,usize,usize,usize),String>
+{
+    let (h0,h1,q,r,d,n,c)=if tree { construct_tree_full(f,w,z) }
+                            else { construct(f,w,z) };
     if zero(&d) && zero(&n){return Err("D=N=0 identically; fallback needed".into());}
     let roots=fp_roots(f,&c)?;
     let mut pairs=BTreeSet::new();
@@ -251,6 +270,10 @@ fn extract(f:Fp,w:&[u64],z:u64)->Result<(Vec<(u64,u64)>,usize,usize,usize),Strin
     }
     Ok((pairs.into_iter().collect(),degree(&d),degree(&n),degree(&c)))
 }
+fn extract(f:Fp,w:&[u64],z:u64)->Result<(Vec<(u64,u64)>,usize,usize,usize),String>{
+    extract_with_method(f,w,z,false)
+}
+
 // Independent exhaustive verifier: NEVER passed to the non-table oracle.
 fn reference(f:Fp,w:&[u64],z:u64)->Vec<(u64,u64)> {
     let curve=Curve::new(P,A,B);
@@ -280,6 +303,47 @@ fn check(f:Fp,size:usize,z:u64)->usize {
     println!("monic-t-oracle p={P} B={size} z={z} Ddeg={ddeg} Ndeg={ndeg} gcd_deg={cdeg} verified_pairs={} online_ms={elapsed:.3} reference_scan_ms={reference_ms:.3} tree_build_ms={tree_ms:.3} tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true",got.len());
     got.len()
 }
+// End-to-end *x-only oracle* ablation on the same public-input corpus.
+// The only algorithmic difference is how H0,H1 are constructed. Timed stages
+// include symbolic construction, D/N, gcd, rational roots, validation and W
+// lookup. They exclude factor-base selection and the post-solve reference.
+// Five paired repetitions, alternate arm order; this is NOT a complete DLP.
+fn compare_construction(f:Fp,size:usize,targets:&[u64]) {
+    let w=factorbase(f,size);
+    let mut new_total=0.0f64;
+    let mut old_total=0.0f64;
+    let mut positives=0usize;
+    let mut accepted=0usize;
+    for &z in targets {
+        let expected=reference(f,&w,z); // Independent oracle AFTER public targets frozen.
+        let mut time_old=Vec::new();
+        let mut time_new=Vec::new();
+        for rep in 0..5usize {
+            for &tree in if rep%2==0 { &[false,true][..] } else { &[true,false][..] } {
+                let start=Instant::now();
+                let (got,_,_,_)=extract_with_method(f,&w,z,tree).expect("complete x-only extraction");
+                let ms=start.elapsed().as_secs_f64()*1000.0;
+                assert_eq!(got,expected,"wrong public (B,z)=({size},{z}), tree={tree}");
+                if tree {time_new.push(ms);}else{time_old.push(ms);}
+            }
+        }
+        time_old.sort_by(f64::total_cmp);
+        time_new.sort_by(f64::total_cmp);
+        let old=time_old[2];
+        let new=time_new[2];
+        new_total+=new;
+        old_total+=old;
+        if !expected.is_empty(){positives+=1;}
+        accepted+=expected.len();
+        println!("monic-compare p={P} B={size} z={z} pairs={} new_tree_median_ms={new:.6} old_newton_median_ms={old:.6} speedup_newton_over_tree={:.3} exact=pass paired_reps=5 postsolve_reference=pass",expected.len(),old/new);
+    }
+    if targets.len()==8{
+        assert_eq!(positives,3,"expected three x-only positive controls");
+        assert_eq!(accepted,3,"expected exactly one x-only pair per positive control");
+    }
+    println!("monic-compare-total p={P} B={size} cells={} old_newton_sum_median_ms={old_total:.6} new_tree_sum_median_ms={new_total:.6} speedup={:.4} positives={positives} pairs={accepted} exact=pass",targets.len(),old_total/new_total);
+}
+
 /// Fixed public affine abscissae on the same prime-order ordinary curve.
 /// No discrete-log indices are generated or passed to extract(); independent
 /// pair enumeration happens only *after* the candidate returns.
@@ -316,7 +380,8 @@ fn planted_pair_target(f:Fp,u:u64,v:u64)->u64{
 }
 fn main(){
     let f=Fp::new(P);
-    let scale=std::env::args().any(|a|a=="--scale");
+    let compare=std::env::args().any(|a|a=="--compare");
+    let scale=compare || std::env::args().any(|a|a=="--scale");
     let sizes:&[usize]=if scale { &[64,128,256,677] } else { &[3,4,8,16,32] };
     for &size in sizes {
         let mut targets:Vec<u64>=if scale {
@@ -330,7 +395,8 @@ fn main(){
         targets.sort_unstable();
         targets.dedup();
         if scale {assert_eq!(targets.len(),8,"all scale controls must be distinct");}
-        println!("native original-Rust Prime31 non-table S3 pair elimination scale={} B={} z={:?}; public-only oracle, two planted positives for grading",scale,size,targets);
+        println!("native original-Rust Prime31 non-table S3 pair elimination scale={} compare={} B={} z={:?}; public-only oracle, two planted positives for grading",scale,compare,size,targets);
+        if compare { compare_construction(f,size,&targets); continue; }
         let mut total_pairs=0usize;
         let mut positive_targets=0usize;
         for &z in &targets {
