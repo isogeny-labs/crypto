@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Cover PKM Kummer and torus towers for the NIST p-1/p+1 cases and paired 59-bit controls (Codex, completed 2026-11-22, branch codex/pkm-curve-preflight-20261121, PR #4884; 15 bounded cells, 30 checked rows in `research/pkm_nist_pm1_20261122/`)
+- [ ] Fail fast when PKM tower curve selection requests more distinct base abscissae than the tower has; verify feasible m=5 construction and correct the workspace goal trail (Codex, started 2026-11-21, branch codex/pkm-curve-preflight-20261121, PR #4884)
 - [x] Move the index-calculus relation-finder benchmark harness (csd/bench, from lfd-summation-systems PR #43, which went to the wrong repo) into this repo as research/ic_bench_20261121 with the solver modules it needs vendored at a pinned commit; tests pass here (Claude, started 2026-11-21, PR #4869; 29 tests pass; CI migrate blocked on S3 403, names red on main)
 - [x] F4 speed-up round 4 (Claude, done 2026-11-21, PR #4859): six leads measured in parallel; trace through the Hilbert guard (counted S 1.32x), u32 accumulators/byte pack/u64 scan (-12% F4 Ir), frozen replay steps (-9.8% F4 Ir); jv_cover dlp Hilbert+trace 1.231x wall pre-registered 10/10 [pcc:unverified]; open: branch traces, deterministic trace recording; research/f4_round4_leads_20261121
 - [x] F4 speed-up round 3 (Claude, done 2026-11-21, PR #4859): jemalloc default for jv_cover and jv_quartic (jv_quartic 1.45x shipped; jv_quintic 0.94x with jemalloc, so not extended); f4_fp packed interreduction, lazy columns, interning table: jv_cover dlp 1.090x pre-registered, F4 instructions -13.6% [pcc:unverified]; research/f4_alloc_round3_20261121
@@ -302,6 +304,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 
 ## Blocked / questions for the owner
 
+- PKM curve-selection preflight (Codex, PR #4884): example release tests pass 19/19, but the required `cargo test --release --locked --lib` gate reported 72 failures before it was stopped after 7,465 passes. At least one ecbench failure is a missing artifact-store `research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl` on current main; that file is not in Git. Restore the exact artifact-store inputs and rerun the full library gate before marking this PR ready.
 - Curve-transfer infrastructure continuation (Codex, PR #4697): the scoped
   curve workflow is green at exact implementation/workflow head `d8df2130...`,
   but merge/shipping remain blocked on artifact-store recovery or an approved
