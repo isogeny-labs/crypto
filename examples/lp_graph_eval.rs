@@ -4,7 +4,7 @@
 //! cargo run --release --example lp_graph_eval -- \
 //!     [--input relations.jsonl] [--modulus P] [--seed S] [--rows R] \
 //!     [--lp-columns C] [--lp-min M] [--fb-columns F] [--arity w0,w1,w2,w3] [--unit] \
-//!     [--label NAME] [--out eval.json]
+//!     [--label NAME] [--out eval.json] [--exact-forest] [--forest-max-rows 4096]
 //! ```
 //!
 //! With `--input`, each line is a `PartialRelation` JSON object
@@ -64,8 +64,18 @@ fn main() {
                 .unwrap_or_else(|| format!("synthetic {}", serde_json::to_string(&synth).unwrap())),
         ),
     };
-    let eval =
-        evaluate_stream(&label, &relations, modulus, &EvalParams::default()).expect("evaluate");
+    // Explicit opt-in avoids changing historical serialized records.
+    // Oversized or >2-LP inputs are reported as a skip by evaluate_stream.
+    let mut params = EvalParams::default();
+    params.compare_exact_forest = args.iter().any(|arg| arg == "--exact-forest");
+    if let Some(v) = get("--forest-max-rows") {
+        params.forest_max_rows = v.parse().expect("--forest-max-rows integer");
+        assert!(
+            (1..=4096).contains(&params.forest_max_rows),
+            "--forest-max-rows must be between 1 and 4096"
+        );
+    }
+    let eval = evaluate_stream(&label, &relations, modulus, &params).expect("evaluate");
     let json = serde_json::to_string_pretty(&eval).unwrap();
     match get("--out") {
         Some(path) => std::fs::write(path, json + "\n").expect("write --out"),
