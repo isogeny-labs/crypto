@@ -5434,10 +5434,12 @@ impl ProbeBudget {
     ) -> Self {
         let points = points as u128;
         let summands_scanned = if scans_summands {
-            let window = collection_window
-                .map(u128::from)
-                .unwrap_or(points)
-                .min(points);
+            // Match RelationCollector: None on the m=3 pair-table path
+            // defaults to ⌈|F|/3⌉; an explicit window ≥ |F| is the full scan.
+            let window = match collection_window {
+                Some(w) => u128::from(w).min(points),
+                None => default_m3_window(points as usize) as u128,
+            };
             (unit_trials as u128)
                 .saturating_mul(units as u128)
                 .saturating_mul(window)
@@ -5734,13 +5736,14 @@ impl PairSumTable {
     /// a degree measurable.
     ///
     /// Across widths at fixed degree the same ratio moves a great deal:
-    /// `1.33` at 3,904 points, `1.17` at 12,688, and `0.96` at 15,264,
-    /// because the compact table leaves cache while the folded one never
-    /// does.  The constants below give `1.17`, which is right at the
-    /// width they were taken at and wrong in both directions away from
-    /// it.  A width term is what this model is missing; a degree term is
-    /// not.  `docs/ic/runs/koblitz-phase-prices-20260921.json` records
-    /// both sweeps.
+    /// `1.33` at 3,904 points, `1.17` at 12,688, and `1.12` at 18,544
+    /// (`measured_ratio_by_width_at_n61` in
+    /// `docs/ic/runs/koblitz-phase-prices-20260921.json`), because the
+    /// compact table leaves cache while the folded one never does.  The
+    /// constants below give `1.17` at the calibration width;
+    /// [`Self::folded_over_compact_scan_ratio`] scales the folded probe
+    /// costs with `|F|`.  A degree term is measured unnecessary (flat
+    /// once saturated degrees are excluded).
     ///
     /// The model reproduces the cheapest of the two tiers at all four
     /// widths measured end to end; outside that range it is an
@@ -5750,6 +5753,33 @@ impl PairSumTable {
         stored as f64
             + scan * probes.summands_scanned as f64
             + blocked * probes.descent_probes as f64
+    }
+
+    /// Folded-to-compact scan-cost ratio at this base width.
+    ///
+    /// Knots are `part_2_degree_calibration.measured_ratio_by_width_at_n61`
+    /// in `docs/ic/runs/koblitz-phase-prices-20260921.json`.  Linear in
+    /// `|F|` between knots; flat outside the measured span.
+    fn folded_over_compact_scan_ratio(points: usize) -> f64 {
+        const KNOTS: &[(usize, f64)] = &[
+            (3_904, 1.33),
+            (6_832, 1.17),
+            (9_760, 1.19),
+            (12_688, 1.17),
+            (18_544, 1.12),
+        ];
+        if points <= KNOTS[0].0 {
+            return KNOTS[0].1;
+        }
+        for pair in KNOTS.windows(2) {
+            let (p0, r0) = pair[0];
+            let (p1, r1) = pair[1];
+            if points <= p1 {
+                let t = (points - p0) as f64 / (p1 - p0) as f64;
+                return r0 + t * (r1 - r0);
+            }
+        }
+        KNOTS[KNOTS.len() - 1].1
     }
 
     /// Whether the fold is the cheaper of the two representations worth
@@ -5762,11 +5792,15 @@ impl PairSumTable {
     /// stays reachable by name for a caller that needs [`Self::lookup`]
     /// to return summands.
     pub fn fold_is_cheaper(points: usize, degree: u32, orbits: usize, probes: ProbeBudget) -> bool {
-        // adds per summand scanned / per descent probe, measured
+        // adds per summand scanned / per descent probe, measured at the
+        // calibration width (~12,688 points) where the folded/compact
+        // scan ratio is 1.17.
         const COMPACT_SCAN: f64 = 2.145;
         const COMPACT_BLOCKED: f64 = 0.955;
-        const FOLDED_SCAN: f64 = 2.51;
-        const FOLDED_BLOCKED: f64 = 1.42;
+        const FOLDED_SCAN_AT_REF: f64 = 2.51;
+        const FOLDED_BLOCKED_AT_REF: f64 = 1.42;
+        const REF_RATIO: f64 = 1.17;
+        let scale = Self::folded_over_compact_scan_ratio(points) / REF_RATIO;
         let compact = Self::expected_adds(
             Self::pair_count(points),
             COMPACT_SCAN,
@@ -5775,14 +5809,14 @@ impl PairSumTable {
         );
         let folded = Self::expected_adds(
             Self::folded_pair_count(orbits, points),
-            FOLDED_SCAN,
-            FOLDED_BLOCKED,
+            FOLDED_SCAN_AT_REF * scale,
+            FOLDED_BLOCKED_AT_REF * scale,
             probes,
         );
         // Deliberately unused: measured flat in `n` over 41 to 61 once
         // saturated degrees are excluded (see above).  Kept in the
-        // signature because the width term this model needs will want
-        // the field size beside it.
+        // signature so callers that already pass the degree need no
+        // churn; the width term reads `points` instead.
         let _ = degree;
         folded < compact
     }
@@ -5947,6 +5981,11 @@ impl PairSumTable {
         let filter_bits = filter_bits_for(entries.len());
         let present_mask = (1u64 << filter_bits) - 1;
         let mut present = vec![0u64; (1usize << filter_bits) / 64];
+        // Same advice the folded builder takes: large filters are probed
+        // randomly, so transparent huge pages cut TLB misses without
+        // changing any bit or counted answer (`KIC_HUGE_PAGES=0` skips).
+        advise_huge_pages(&bucket_start);
+        advise_huge_pages(&present);
         for &(key, _, _) in &entries {
             let (word, bits) = filter_slot(pair_filter_hash(key), present_mask, FILTER_EXTRA);
             present[word] |= bits;
@@ -6015,45 +6054,62 @@ impl PairSumTable {
         let negated: Vec<FastPoint> = points.iter().map(|&p| curve.neg(p)).collect();
         let (negated_x, negated_y) = coordinate_slices(&negated);
 
-        // A counting sort in two passes over the pairs, both parallel.
-        // The bucket of a key is known before any key is compared, so
-        // nothing is sorted: counting the buckets and scattering into
-        // them puts every rest in its run, and a run is short enough to
-        // scan.  The pair sums are recomputed rather than held between
-        // the passes — holding them would cost the eight bytes a pair
-        // that this representation exists to avoid.
+        // Counting sort in two logical passes, but the packed keys are
+        // cached from the first so the second never repeats the
+        // `|F|(|F|+1)/2` Montgomery-batched additions.  Eight temporary
+        // bytes a pair is half the rest+filter footprint and is dropped
+        // before the table is returned; the witnessed builder already
+        // paid this cost and measured that the add pass dominates.
+        let mut row_start = Vec::with_capacity(n_points + 1);
+        row_start.push(0usize);
+        for i in 0..n_points {
+            row_start.push(row_start[i] + n_points - i);
+        }
+        let total = *row_start.last()?;
+        if total as u128 != pairs {
+            return None;
+        }
+        let mut cached_keys = vec![0u64; total];
+        let cache_slots = cached_keys.as_mut_ptr() as usize;
         let counts: Vec<AtomicU32> = (0..buckets + 1).map(|_| AtomicU32::new(0)).collect();
-        let each_row = |i: usize, f: &mut dyn FnMut(u64)| {
+        (0..n_points).into_par_iter().for_each(|i| {
             let mut sums = Vec::with_capacity(n_points - i);
             let mut scratch = BatchScratch::default();
             curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
-            for sum in &sums {
-                f(sum.pack());
-            }
-        };
-        (0..n_points).into_par_iter().for_each(|i| {
-            each_row(i, &mut |key| {
+            for (offset, sum) in sums.into_iter().enumerate() {
+                let key = sum.pack();
+                // SAFETY: each row owns the disjoint range measured in
+                // `row_start`, with exactly one slot per returned sum.
+                unsafe {
+                    *(cache_slots as *mut u64).add(row_start[i] + offset) = key;
+                }
                 counts[(key >> bucket_shift) as usize + 1].fetch_add(1, Ordering::Relaxed);
-            });
+            }
         });
         let mut bucket_start: Vec<u32> = counts.iter().map(|c| c.load(Ordering::Relaxed)).collect();
+        drop(counts);
         for b in 0..buckets {
             bucket_start[b + 1] += bucket_start[b];
         }
-        let total = bucket_start[buckets] as usize;
+        if bucket_start[buckets] as usize != total {
+            return None;
+        }
         let cursor: Vec<AtomicU32> = bucket_start.iter().map(|&c| AtomicU32::new(c)).collect();
         let mut rests = vec![0u32; total];
         let filter_bits = filter_bits_for(total);
         let present_mask = (1u64 << filter_bits) - 1;
         let words = (1usize << filter_bits) / 64;
+        // Advise before the scatter faults pages in: rests (and the
+        // folded path's filter) are the randomly probed arrays on the
+        // m=3 path (`KIC_HUGE_PAGES=0` skips).
+        advise_huge_pages(&bucket_start);
+        advise_huge_pages(&rests);
         let present_atomic: Vec<AtomicU64> = (0..words).map(|_| AtomicU64::new(0)).collect();
         // Each pair claims its slot with one atomic increment, and no
         // two pairs claim the same one, so the writes never overlap.
-        // The presence filter is set in the same pass: both want only
-        // the key, and a pass costs `|F|²/2` point additions.
         let slots = rests.as_mut_ptr() as usize;
         (0..n_points).into_par_iter().for_each(|i| {
-            each_row(i, &mut |key| {
+            for &key in &cached_keys[row_start[i]..row_start[i + 1]] {
                 let bucket = (key >> bucket_shift) as usize;
                 let slot = cursor[bucket].fetch_add(1, Ordering::Relaxed) as usize;
                 // SAFETY: `slot` is this pair's own index, handed out
@@ -6064,8 +6120,9 @@ impl PairSumTable {
                 }
                 let (word, bits) = filter_slot(pair_filter_hash(key), present_mask, FILTER_EXTRA);
                 present_atomic[word].fetch_or(bits, Ordering::Relaxed);
-            });
+            }
         });
+        drop(cached_keys);
         let present: Vec<u64> = present_atomic
             .iter()
             .map(|w| w.load(Ordering::Relaxed))
@@ -12490,10 +12547,11 @@ pub struct KoblitzIcOptions {
     /// as the window shrinks. The added probes are walked instead of
     /// multiplied.
     ///
-    /// Small windows eventually lose to probe arithmetic, so callers
-    /// must tune the window on a separate selection run. `None` scans
-    /// the whole base and draws every probe with its own scalar
-    /// multiplication, the behaviour before this option was added.
+    /// On the walked pair-table `m = 3` path (`can_walk`), `None` defaults
+    /// to [`default_m3_window`] (`⌈|F|/3⌉`), matching the descent walk.
+    /// Set `Some(w)` to override; `w = 0` or `w ≥ |F|` keeps the full
+    /// sweep (one scalar multiplication per probe). When the walked path
+    /// is unavailable, `None` remains a full sweep.
     pub collection_window: Option<usize>,
     /// Index of the irreducible factor of `x^n − 1` defining the
     /// factor base.
@@ -15667,12 +15725,24 @@ impl<'a> RelationCollector<'a> {
     }
 
     /// The window of factor-base summands a probe scans, and whether
-    /// probes are walked: `Some(w)` when
-    /// [`KoblitzIcOptions::collection_window`] asks for fewer summands
-    /// than the base has and the fast oracle can honour it.
+    /// probes are walked: `Some(w)` when the walked `m = 3` pair-table
+    /// path can honour a short scan.
+    ///
+    /// [`KoblitzIcOptions::collection_window`] `None` defaults to
+    /// [`default_m3_window`] when [`Self::can_walk`]; an explicit `0` or
+    /// `w ≥ |F|` keeps the full sweep.
     fn window(&self) -> Option<usize> {
-        let w = self.opts.collection_window?;
-        if !self.can_walk() || w == 0 || w >= self.fb.points.len() {
+        if !self.can_walk() {
+            return None;
+        }
+        let base = self.fb.points.len();
+        let w = match self.opts.collection_window {
+            Some(0) => return None,
+            Some(w) if w >= base => return None,
+            Some(w) => w,
+            None => default_m3_window(base),
+        };
+        if w == 0 || w >= base {
             return None;
         }
         Some(w)
@@ -17496,6 +17566,24 @@ pub struct IndividualLogSolver<'a> {
 /// [`IndividualLogSolver::solve_by_walking`]).
 pub(crate) const DESCENT_WALKS: usize = 64;
 
+/// Default third-summand window for an `m = 3` walked probe: `⌈|F|/3⌉`.
+///
+/// A cyclic window of fraction `f = 1/3` of the base catches a triple
+/// whenever any of its three indices lands in the window, so the yield
+/// per probe is about `1 − (1 − f)³ ≈ 0.70` of a full scan while the
+/// lookup cost is `f` — roughly `2.1×` relations per lookup
+/// ([`PairSumTable::decompose_fast_window`]).  Relation collection on the
+/// walked pair-table path uses the same default when
+/// [`KoblitzIcOptions::collection_window`] is `None`. Callers that set
+/// the option override it; a window at least as long as the base is the
+/// full scan.
+pub(crate) fn default_m3_window(base: usize) -> usize {
+    if base == 0 {
+        return 0;
+    }
+    base.div_ceil(3).max(1).min(base)
+}
+
 /// What turning a descent relation into `d` needs, as machine words:
 /// `r`, `h mod r`, `λᵏ mod r` for every Frobenius power a column can carry,
 /// and each column's logarithm.  Every quantity is below `r < 2⁶³`, so a
@@ -17980,14 +18068,42 @@ impl<'a> IndividualLogSolver<'a> {
                     }
                     continue;
                 }
-                let pdp = PdpAttempt::bare(
-                    pair.decompose_fast(*state, m),
-                    if (2..=4).contains(&m) {
-                        PdpOutcome::Unresolved
+                // `m = 3` (and wider) on the walked path: a cyclic third-
+                // summand window is the default.  Walked advances make
+                // probes cheap, so the window's higher relations-per-
+                // lookup beats a full scan; `collection_window` overrides
+                // the ⌈|F|/3⌉ default, and a window ≥ |F| keeps the full
+                // scan (sorted witnesses, no triple re-find).
+                let pdp = if m == 3 {
+                    let base_len = pair.points.len();
+                    let len = self
+                        .opts
+                        .collection_window
+                        .map(|w| w.max(1).min(base_len.max(1)))
+                        .unwrap_or_else(|| default_m3_window(base_len));
+                    let start = if base_len == 0 {
+                        0
                     } else {
-                        PdpOutcome::Unsupported
-                    },
-                );
+                        (*a as usize) % base_len
+                    };
+                    PdpAttempt::bare(
+                        if len == 0 || len >= base_len {
+                            pair.decompose_fast(*state, m)
+                        } else {
+                            pair.decompose_fast_window(*state, m, start, len)
+                        },
+                        PdpOutcome::Unresolved,
+                    )
+                } else {
+                    PdpAttempt::bare(
+                        pair.decompose_fast(*state, m),
+                        if (2..=4).contains(&m) {
+                            PdpOutcome::Unresolved
+                        } else {
+                            PdpOutcome::Unsupported
+                        },
+                    )
+                };
                 report.record(*a, *b, progress, observer, || pdp.clone());
                 let Some(idxs) = pdp.points else {
                     continue;
@@ -18986,6 +19102,108 @@ mod tests {
             }
         }
         assert!(switched.is_some(), "the fold never became cheaper");
+    }
+
+    #[test]
+    fn the_fold_scan_ratio_follows_the_measured_width_knots() {
+        // docs/ic/runs/koblitz-phase-prices-20260921.json
+        // part_2_degree_calibration.measured_ratio_by_width_at_n61
+        for (points, want) in [
+            (3_904usize, 1.33),
+            (6_832, 1.17),
+            (9_760, 1.19),
+            (12_688, 1.17),
+            (18_544, 1.12),
+        ] {
+            let got = PairSumTable::folded_over_compact_scan_ratio(points);
+            assert!(
+                (got - want).abs() < 1e-12,
+                "{points}: got {got}, want {want}"
+            );
+        }
+        // Midpoint between 3904 and 6832.
+        let mid = PairSumTable::folded_over_compact_scan_ratio((3_904 + 6_832) / 2);
+        assert!((mid - (1.33 + 1.17) / 2.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn the_default_m3_window_is_a_third_of_the_base() {
+        assert_eq!(default_m3_window(0), 0);
+        assert_eq!(default_m3_window(1), 1);
+        assert_eq!(default_m3_window(3), 1);
+        assert_eq!(default_m3_window(10), 4);
+        assert_eq!(default_m3_window(300), 100);
+    }
+
+    #[test]
+    fn default_collection_uses_the_m3_window_when_walkable() {
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 5, 120).unwrap();
+        let pair = PairSumTable::build(&kc, &fb).unwrap();
+        let base = fb.points.len();
+        let want = default_m3_window(base);
+        let defaulted = KoblitzIcOptions {
+            collection_window: None,
+            ..windowed_options(want)
+        };
+        let collector = RelationCollector::with_pair_table(&kc, &fb, &defaulted, Some(&pair))
+            .expect("collector");
+        assert_eq!(collector.admission_dispatch().collection_window, Some(want));
+        let full = KoblitzIcOptions {
+            collection_window: Some(base),
+            ..windowed_options(want)
+        };
+        let full_collector =
+            RelationCollector::with_pair_table(&kc, &fb, &full, Some(&pair)).expect("collector");
+        assert_eq!(full_collector.admission_dispatch().collection_window, None);
+        let overridden = windowed_options(7.min(base.saturating_sub(1)).max(1));
+        let over_collector = RelationCollector::with_pair_table(&kc, &fb, &overridden, Some(&pair))
+            .expect("collector");
+        assert_eq!(
+            over_collector.admission_dispatch().collection_window,
+            overridden.collection_window
+        );
+    }
+
+    #[test]
+    fn a_windowed_m3_walk_probe_agrees_with_the_full_scan_on_hits() {
+        // Every window hit is a full-scan hit (and verifies in the group).
+        // The converse need not hold: a window can miss a triple whose
+        // indices all lie outside it.
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 5, 120).unwrap();
+        let pair = PairSumTable::build(&kc, &fb).unwrap();
+        let fc = FastCurve::new(&kc.curve).unwrap();
+        let g = fc.lift(kc.generator());
+        let base = pair.points.len();
+        let window = default_m3_window(base);
+        let mut window_hits = 0u32;
+        let mut full_hits = 0u32;
+        for a in 1..500u64 {
+            let target = fc.mul_u64(g, a);
+            if target.infinity {
+                continue;
+            }
+            let full = pair.decompose_fast(target, 3);
+            let start = (a as usize) % base;
+            let win = pair.decompose_fast_window(target, 3, start, window);
+            if full.is_some() {
+                full_hits += 1;
+            }
+            if let Some(ref idxs) = win {
+                window_hits += 1;
+                assert!(full.is_some(), "a={a}: window hit without a full-scan hit");
+                let sum = idxs
+                    .iter()
+                    .fold(FastPoint::INFINITY, |s, &i| fc.add(s, pair.points[i]));
+                assert_eq!(sum, target, "a={a}: window witness failed");
+            }
+        }
+        assert!(full_hits > 0, "full scan should hit");
+        assert!(
+            window_hits > 0,
+            "⌈|F|/3⌉ window should hit at least once over 500 probes"
+        );
     }
 
     #[test]
@@ -24305,8 +24523,10 @@ mod tests {
         // Both scan the same number of summands, so the comparison is
         // relations bought per unit of the cost that actually dominates.
         let divisor = 16;
+        // Explicit `Some(base)` overrides the walked default and keeps the
+        // full sweep; `None` would now take ⌈|F|/3⌉.
         let full = KoblitzIcOptions {
-            collection_window: None,
+            collection_window: Some(base),
             ..windowed_options(base)
         };
         let windowed = windowed_options(base / divisor);
