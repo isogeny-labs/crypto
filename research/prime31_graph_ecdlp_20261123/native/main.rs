@@ -42,12 +42,15 @@ fn signed_sum(points: &[(u64, u64)], terms: &[(usize, i64)]) -> Point {
 }
 
 fn main() {
-    let smoke = std::env::args().nth(1).as_deref() == Some("smoke");
+    let mode = std::env::args().nth(1).unwrap_or_default();
+    let smoke = mode == "smoke";
+    let wide = mode == "wide";
+    assert!(mode.is_empty() || smoke || wide, "unknown control mode");
     let mut check_ar = Arithmetic::default();
     check_curve(CURVE, &mut check_ar).expect("registered curve is valid");
-    let points = public_points(5);
-    let base_size = 4;
-    let planted = [(0, 1), (1, -1), (2, 1), (4, 1)];
+    let base_size = if wide { 7 } else { 4 };
+    let points = public_points(base_size + 1);
+    let planted = [(0, 1), (1, -1), (2, 1), (base_size, 1)];
     let query = if smoke {
         Some((291_202_666, 1_848_813_168))
     } else {
@@ -85,6 +88,7 @@ fn main() {
         serde_json::to_string_pretty(&json!({
             "curve": {"p": CURVE.p, "a": CURVE.a, "b": CURVE.b, "n": CURVE.n, "g": CURVE.g},
             "base": &points[..base_size],
+            "base_size": base_size,
             "large_prime_pool": &points[base_size..],
             "public_query": query,
             "control_planted_terms": if smoke { None } else { Some(planted) },

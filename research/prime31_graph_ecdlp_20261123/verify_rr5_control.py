@@ -1,7 +1,7 @@
-"""Independent integer group-law replay for the five-point RR5 controls.
+"""Independent integer group-law replay for fixed RR5 controls.
 
-The exhaustive witness oracle is used only after extraction, on this fixed
-five-point correctness panel. It is not an input to the native producer.
+The exhaustive witness oracle is used only after extraction on these small
+correctness panels. It is not an input to the native producer.
 """
 
 import itertools
@@ -57,7 +57,8 @@ def verify(name):
     data = json.loads((EVIDENCE / f"{name}.json").read_text())
     assert data["curve"] == {"p": P, "a": A, "b": B, "n": N, "g": list(G)}
     points = [tuple(point) for point in data["base"] + data["large_prime_pool"]]
-    assert len(points) == 5 and len({x for x, _ in points}) == 5
+    base_size = data["base_size"]
+    assert len(points) == base_size + 1 and len({x for x, _ in points}) == len(points)
     assert all((y * y - x * x * x - A * x - B) % P == 0 for x, y in points)
     query = tuple(data["public_query"])
     assert (query[1] ** 2 - query[0] ** 3 - A * query[0] - B) % P == 0
@@ -66,9 +67,9 @@ def verify(name):
     else:
         assert signed_sum(points, data["control_planted_terms"]) == query
     witnesses = set()
-    for three in itertools.combinations(range(4), 3):
+    for three in itertools.combinations(range(base_size), 3):
         for signs in itertools.product((-1, 1), repeat=4):
-            terms = tuple(sorted(zip((*three, 4), signs)))
+            terms = tuple(sorted(zip((*three, base_size), signs)))
             if signed_sum(points, terms) == query:
                 witnesses.add(terms)
     actual = set()
@@ -84,4 +85,4 @@ def verify(name):
 
 if __name__ == "__main__":
     assert mul(N, G) is None
-    print(json.dumps([verify("positive"), verify("smoke")], indent=2))
+    print(json.dumps([verify("positive"), verify("smoke"), verify("wide")], indent=2))
