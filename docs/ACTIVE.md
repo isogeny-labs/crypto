@@ -15,6 +15,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 
 ## Active items (top = next)
 - [x] Compare native Edwards w-coordinate CSIDH-512 actions with tuned Montgomery: exact output gates and cold action timing; no established 5% gain [pcc:unverified] (Codex, completed 2026-11-22, branch research/model-isogeny-step-20261121, PR #4894)
+- [x] Certify Prime31 RR9 two-sign weighted-interpolation rank obstruction on the original curve (automation, started 2026-11-19, branch automation/prime31-rr9-two-sign-wrank-20261119, PR #4801; source-exact native Rust 40/40 + 2/2 PASS Actions #44497509496; independent signed PCC remains pending)
 - [x] Derive Prime31 RR9 public-only extractor budgets and correct historical optimized shared-BSGS frontier (automation, started 2026-11-19, branch automation/prime31-rr9-extractor-budget-gate-20261119, PR #4793; original-Rust source-bound CI PASS #44489047210; next unknown-index extraction remains with #4692)
 
 - [ ] Reproduce the genus 2–4 HEC index calculus comparison and examine the mathematical contribution (Codex, started 2026-11-18, branch research/hec-tenfold-replay, PR #4789)
