@@ -8,7 +8,7 @@ standing. Every scientific result below is unsigned. [pcc:unverified]
 ## Next unblocked work
 
 1. Finish source-first explicit E7 pullback and both homogeneous Richelot
-   chains over candidateF3^6. Code is in elliptic_chain; first A stops at format1 before arithmetic; versioned B is frozen and unexecuted.
+   chains over candidateF3^6. Completed by B source269689ea; unsigned35dbcf, complete7401B raw513abe4f. Each of3 maps passes all7/49 laws. A format1 is preserved; do not replay unchanged.
    All7 points/49 addition pairs per map, scalar-free transfer functions,
    actual F3 descent,2 source infinities,4 real degree drops, nonvacuous
    positive/negative and scale/basepoint controls are frozen before calls.
@@ -29,6 +29,7 @@ standing. Every scientific result below is unsigned. [pcc:unverified]
 | Complete76-curve F3 census | c37b4dfb | result90797e08; whole28832B stdout0700a8a4 | 0b48fa |
 | Genuine4096 J8/Frobenius classes,16384 edges | 0eac0c32 | result9b473f3a; whole2753B stdoutd68b2673 | 5bd9de |
 | Actual3 Richelot kernels,2 smooth F3 models,52 point ideals,4 degree drops | 0b292644 | result6dee5001; whole6283B stdout3599c111 | c656d1 |
+| Explicit E7 pullback and2 homogeneous Richelot chains | 269689ea | whole7401B stdout513abe4f;147 map additions/all21 outputs | 35dbcf |
 | Genus3 product boundary A and RREF C | 61f7b10c / 8a9247c1 | parent#5005; reportAA2/finalPDF0ccd28b3 | cb20d3 / e4e108 / b18539 |
 
 The ordinary nonsplit minimal4096-Sylow fixture is absent in the fixed F3
@@ -47,9 +48,9 @@ immutable. Do not execute foreign CT332/CT333 Python or repeat their abstract
 - Crypto#4990 ready/auto-merge but required failures and49 all-attempt checks
   remain held. Review12:13:48Z matches the first inventory; next unchanged
   review not before16:13:48Z. Crypto#4992 remains draft/formal-gap; next
-  unchanged review not before14:06:56Z.
+  latest-head81c95e42 review14:14Z has13 checks/12 runs, same2 required gate failures, full decoded logs retained, cd1f5f. Next unchanged review>=18:14:03Z.
 - Parent#5005 head6f6c0abb: first CI review13:32:36Z has13 all-attempt checks/12 runs, within30; validation/PCC gates fail on artifact history and3 q/reasons NameErrors in49 tests. Full logs retained; unsigned8525c4. Next unchanged review>=17:36Z. Child#5007
-  merge416f68b9: first read>=14:09Z unless a later substantive push resets
+  latest explicit-chain B269689ea: first read>=15:02Z unless a later substantive push resets
   the50-minute bound. Subsequent unchanged reads>=4h; all-attempt filter,
   <=30 latest-head budget, required gates and normal merge methods remain.
 - Child journal conflict is resolved by documented32-minute Copilot
