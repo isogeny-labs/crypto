@@ -672,10 +672,13 @@ mod tests {
                 let mut expected = vec![root, r2];
                 expected.sort_unstable();
                 expected.dedup();
-                assert_eq!(field.roots(&[product, field.sub(0, sum), 1]), expected);
+                let quadratic = [product, field.sub(0, sum), 1];
+                assert_eq!(field.roots(&quadratic), expected);
                 // Repeated roots must not be returned twice.
-                assert_eq!(field.roots(&[field.mul(root, root),
-                    field.sub(0, field.add(root, root)), 1]), vec![root]);
+                let repeated_product = field.mul(root, root);
+                let twice_root = field.add(root, root);
+                let repeated = [repeated_product, field.sub(0, twice_root), 1];
+                assert_eq!(field.roots(&repeated), vec![root]);
             }
         }
     }
