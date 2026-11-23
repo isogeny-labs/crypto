@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://isogeny-labs.example/schemas/ic-fixed-population-v1.json",
+  "title": "Index-calculus fixed yield/rank population",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "spec_digest",
+    "identity",
+    "registered_targets",
+    "targets",
+    "relations",
+    "rank_trace"
+  ],
+  "properties": {
+    "schema_version": {"const": "ic.fixed-population/v1"},
+    "spec_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "curve_id", "subgroup_order", "generator", "factor_base_id",
+        "factor_base_columns", "symmetry_quotient", "target_generator",
+        "arity", "solver_version", "checker_version", "scalar_field",
+        "budgets", "registered_scales", "row_normalization"
+      ],
+      "properties": {
+        "curve_id": {"type": "string", "minLength": 1},
+        "subgroup_order": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+        "generator": {"type": "string", "minLength": 1},
+        "factor_base_id": {"type": "string", "minLength": 1},
+        "factor_base_columns": {"type": "integer", "minimum": 1},
+        "symmetry_quotient": {"type": "string", "minLength": 1},
+        "target_generator": {"type": "string", "minLength": 1},
+        "arity": {"type": "integer", "minimum": 1},
+        "solver_version": {"type": "string", "minLength": 1},
+        "checker_version": {"type": "string", "minLength": 1},
+        "scalar_field": {"type": "string", "minLength": 1},
+        "budgets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_attempts", "max_seconds"],
+          "properties": {
+            "max_attempts": {"type": "integer", "minimum": 1},
+            "max_seconds": {"type": "integer", "minimum": 1}
+          }
+        },
+        "registered_scales": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "row_normalization": {"type": "string", "minLength": 1}
+      }
+    },
+    "registered_targets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "targets": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/target"}
+    },
+    "relations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/relation"}
+    },
+    "rank_trace": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/rankStep"}
+    }
+  },
+  "$defs": {
+    "witness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["witness_id", "summands", "chart", "multiplicity", "verified"],
+      "properties": {
+        "witness_id": {"type": "string", "minLength": 1},
+        "summands": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "chart": {"type": "string", "minLength": 1},
+        "multiplicity": {"type": "integer", "minimum": 1},
+        "verified": {"const": true}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_id", "scale", "outcome", "decomposition_count", "attempts", "witnesses", "terminal"],
+      "properties": {
+        "target_id": {"type": "string", "minLength": 1},
+        "scale": {"type": "integer", "minimum": 1},
+        "outcome": {"enum": ["verified", "zero", "solver_failure", "timeout", "rejected"]},
+        "decomposition_count": {"type": ["integer", "null"], "minimum": 0},
+        "attempts": {"type": "integer", "minimum": 0},
+        "witnesses": {"type": "array", "items": {"$ref": "#/$defs/witness"}},
+        "terminal": {"const": true}
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation_id", "source_target_id", "coefficients", "accepted", "rejection_reason"],
+      "properties": {
+        "relation_id": {"type": "string", "minLength": 1},
+        "source_target_id": {"type": "string", "minLength": 1},
+        "coefficients": {"type": "array", "items": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$"}},
+        "accepted": {"type": "boolean"},
+        "rejection_reason": {"type": ["string", "null"]}
+      }
+    },
+    "rankStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prefix", "rank", "live_columns", "dead_columns", "support_components", "duplicate_rows"],
+      "properties": {
+        "prefix": {"type": "integer", "minimum": 0},
+        "rank": {"type": "integer", "minimum": 0},
+        "live_columns": {"type": "integer", "minimum": 0},
+        "dead_columns": {"type": "integer", "minimum": 0},
+        "support_components": {"type": "integer", "minimum": 0},
+        "duplicate_rows": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

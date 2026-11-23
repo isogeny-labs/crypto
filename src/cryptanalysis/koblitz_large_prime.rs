@@ -659,7 +659,6 @@ impl<'a> MixedOrbitDomains<'a> {
         (None, stats)
     }
 
-
     pub fn first_pattern_encoding(
         &self,
         coef_a: &BigUint,

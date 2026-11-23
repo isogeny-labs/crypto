@@ -1,0 +1,7 @@
+# same workload, same binary, env toggles; F4 Ir from Collected line of *.err; counted F4 mults = sum per_test f4_muls in *.json
+variant	F4_Ir	delta_vs_default	f4_muls_sum	json_identical_nontiming
+default (F4_FP_NARROW=2 deferred u64-lazy, AVX2)	1,136,909,960	0	75,685,287	yes
+F4_FP_LAZY_SIMD=0 (scalar lazy axpy)	1,211,092,167	+74,182,207 (+6.5%)	75,685,287	yes
+F4_FP_NARROW=1 (u32, Barrett32 every update, rref32)	1,592,679,777	+455,769,817 (+40.1%)	79,900,962	no
+F4_FP_NARROW=0 (u64 wide)	1,713,272,470	+576,362,510 (+50.7%)	76,795,646	no
+F4_FP_FL_MIN_COLS=0 (force Faugere-Lachartre dense)	1,720,593,129	+583,683,169 (+51.3%)	93,872,901	no

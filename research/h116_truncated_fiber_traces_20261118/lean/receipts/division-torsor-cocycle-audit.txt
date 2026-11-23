@@ -1,0 +1,9 @@
+auditor=/workspace/h114/tools/lean/AuditAxioms.lean
+command=ELAN_HOME=/workspace/.elan-h113 /workspace/.elan-h113/bin/lake +leanprover/lean4:v4.34.1 env lean --run /workspace/h114/tools/lean/AuditAxioms.lean -- H116FiberTrace
+workdir=research/h116_truncated_fiber_traces_20261118/lean
+ok H116FiberTrace.divisionFiber_of_torsionTranslate [propext]
+ok H116FiberTrace.divisionFiber_difference_is_torsion [propext]
+ok H116FiberTrace.frobeniusCocycle_fixedTranslate [propext]
+ok H116FiberTrace.frobeniusCocycle_multiset_translate [propext, Quot.sound]
+ok H116FiberTrace.fixedPoint_frobeniusCocycle_zero [propext]
+audited 224 theorems in [H116FiberTrace]; 0 failing, 0 trusted (native_decide)

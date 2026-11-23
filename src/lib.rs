@@ -18,6 +18,11 @@
 //! | `utils`        | Modular arithmetic, randomness, encoding                |
 //! | `zk`           | Schnorr ZKP, Pedersen commitments, Chaum-Pedersen, Merkle tree |
 
+// Lets source shared with the standalone tools (which name this crate
+// `crypto_lib`) compile inside it: `ic_framework::genroot` includes the
+// generalized root-finder's solver.
+extern crate self as crypto_lib;
+
 pub mod asymmetric;
 pub mod benchfmt;
 pub mod binary_ecc;
