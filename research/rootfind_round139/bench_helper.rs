@@ -100,7 +100,8 @@ pub fn round139_independent_oracle() {
         }
         for a in 1..p {
             let curve = PrimeCurve { p, a, b: 0 };
-            let iso = find_isogeny(&curve, 3, &mut tally);
+            let mut iso_tally = FieldTally::default();
+            let iso = find_isogeny(&curve, 3, &mut iso_tally);
             if matches!(p % 12, 5 | 7) {
                 assert!(iso.is_none(), "3-isogeny without square 3 p={p} a={a}");
             }
