@@ -71,6 +71,27 @@ class ReplayChecks(unittest.TestCase):
         r=checker.validate({},self.base,None,[])
         self.assertEqual((r["first_target_prefix"],r["recovered"]),(0,0))
 
+    def test_extracted_grevlex_b8_row_stays_underdetermined(self):
+        # Exported from RR5 development09 b8-positive.stdout, not a planted
+        # synthetic relation. Its *target* is a fixed positive fixture,
+        # deliberately not an unknown-index full Prime31 target solve.
+        path=HERE/"rr5_grevlex_b8_producer_row.json"
+        data=json.loads(path.read_text())
+        base=[checker.point(v,"grevlex B8 base") for v in data["base"]]
+        q=checker.point(data["target_q"],"grevlex B8 Q")
+        report=checker.validate({},base,q,data["relations"])
+        self.assertEqual((report["authenticated_rows"],report["independent_rank"]), (1,1))
+        self.assertEqual(report["rank_without_target_column"],1)
+        self.assertIsNone(report["first_target_prefix"])
+        self.assertIsNone(report["recovered"])
+        self.assertFalse(report["scalar_replay_passed"])
+        # Both b=1 and the extracted signed leaves matter to the public
+        # equality; the checker may not trust the producer's success label.
+        bad=copy.deepcopy(data["relations"])
+        bad[0]["terms"][1][1]=1
+        with self.assertRaisesRegex(ValueError,"invalid public EC equality"):
+            checker.validate({},base,q,bad)
+
     def test_producer_receipt_checks(self):
         r1={"canonical_terms":[[0,1]],"a":1,"b":0,
             "rank_before":0,"rank_after":1,"disposition":"Independent","recovered_scalar":None}
