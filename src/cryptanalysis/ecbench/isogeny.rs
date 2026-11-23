@@ -1030,4 +1030,40 @@ mod tests {
         }
     }
 
+
+    #[test]
+    fn round137_pseudoremainder_gcd_matches_exact_field_euclid() {
+        for p in [3u64, 5, 7, 11, 101, 65_521, 1_000_000_007,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x137_2026_11_23u64;
+            for _ in 0..128 {
+                let mut next = || {
+                    state ^= state << 13;
+                    state ^= state >> 7;
+                    state ^= state << 17;
+                    state % p
+                };
+                let mut a = vec![next(), next(), next(), next(), next()];
+                let mut b = vec![next(), next(), next(), next()];
+                if a[4] == 0 { a[4] = 1; }
+                if b[3] == 0 { b[3] = 1; }
+                let mut x = a.clone();
+                let mut y = b.clone();
+                while !y.is_empty() {
+                    let r = field.rem(&x, &y);
+                    x = y;
+                    y = r;
+                }
+                let mut got = field.gcd(&a, &b);
+                if x.len() > 1 { field.make_monic(&mut x); }
+                else if !x.is_empty() { x[0] = 1; }
+                if got.len() > 1 { field.make_monic(&mut got); }
+                else if !got.is_empty() { got[0] = 1; }
+                assert_eq!(got, x, "p={p}, a={a:?}, b={b:?}");
+            }
+        }
+    }
+
 }
