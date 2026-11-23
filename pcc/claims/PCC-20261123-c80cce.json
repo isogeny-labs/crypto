@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:16:30Z",
+ "id": "PCC-20261123-c80cce",
+ "kind": "measurement",
+ "producer": {
+  "commit": "b38c11ad95b96f4c06f18ee0dfdd69f876a3b931",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/summary-holdout-a1.json",
+    "sha256": "6577576433e95ed9ec4f74424016fc884535f8478f106a7b6e3611122136fd63"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/canonical.hpp",
+    "sha256": "9f3f23c3b4890fcaef2774ff996c32fcd840f86f9710c6c01a009e7a3501e16f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Fresh holdout matrix completes5400 rows,5358 independent affine/private-answer scalar checks,3978 generation checks and900 exactly equal trial-list kernel comparisons. B128 Barrett/AP2 median0.503ms, current-module tuned8 rho0.387ms, both60/60 completed; default tuned32 rho0.558ms. Parity with fastest tested policy not reached. Current source-module/reference compatibility and one unrelated broad root-oracle test failure remain disclosed; no whole-current-root or global Pareto claim."
+}

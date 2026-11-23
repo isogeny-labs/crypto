@@ -1,0 +1,54 @@
+{
+  "schema": "prime31-discriminant-off-identity-receipt/v1",
+  "date": "2026-11-23",
+  "task_pr": 4977,
+  "input_head": "f684c35a7ba58e1bdcdf94c0526fbbefe5199a89",
+  "identity": "Disc_V(P_r)=16^D*f(r)^D*Res(H,f)*Disc(H)^2*(4f(r))^(2D(D-1))*Off_X(d(r))^2/H(r)^(8D-4)",
+  "assumptions": [
+    "characteristic>3",
+    "odd-order subgroup",
+    "X distinct signed pair abscissae",
+    "f(u)!=0 for every u in X",
+    "R nonidentity, x(R) not in X"
+  ],
+  "checks": [
+    {
+      "type": "same-coordinator symbolic",
+      "engine": "sympy",
+      "variables": [
+        "u",
+        "v",
+        "r",
+        "a",
+        "b"
+      ],
+      "test": "quadratic resultant minus cleared 2R S3 identity",
+      "outcome": "zero polynomial"
+    },
+    {
+      "type": "same-coordinator rational algebra",
+      "engine": "sympy",
+      "parameters": {
+        "a": 1,
+        "b": 1,
+        "u": 2,
+        "v": 3,
+        "r": 5
+      },
+      "test": "Disc quartic vs exact off formula",
+      "outcome": "both 133759167502286123600/531441; resultant equality exact"
+    }
+  ],
+  "workers": {
+    "algebra": "coordinator",
+    "rust": "deferred, no admitted faster query and no rustc/cargo",
+    "validation": "coordinator-prepared plan; no independent execution"
+  },
+  "status": "unverified",
+  "pcc_claim_created": false,
+  "cryptographic_runs": 0,
+  "performance_runs": 0,
+  "native_workers": 0,
+  "current_query_cost": "~O(D) derivative/gcd; factored Off direct evaluation Theta(D^2); dense Off Theta(D^2) coefficients",
+  "evidence_scope": "symbolic algebra only; not original arithmetic nor independently signed proof"
+}

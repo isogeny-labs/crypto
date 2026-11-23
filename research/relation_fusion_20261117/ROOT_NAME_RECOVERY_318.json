@@ -1,0 +1,55 @@
+{
+  "schema": "root-name-recovery/v1",
+  "previous_failure": "ROOT_BUILD_BLOCKERS_317.json",
+  "files": [
+    {
+      "path": "src/cryptanalysis/ec_index_calculus.rs",
+      "before_sha256": "e5be394572758675e0d7849027266f4f1aa0b74ddd8947810c9b572224866dbf",
+      "after_sha256": "df5a9771e293cd5f629a219a7723bcb767aa1d429b75ce81cf27974359b9e95e",
+      "parse_exit": 0
+    },
+    {
+      "path": "src/cryptanalysis/ec_index_calculus_j0.rs",
+      "before_sha256": "dc859e8a5f694f01cfbf06380efd257dd2702a25a3418c10c28b6278ce6777d7",
+      "after_sha256": "969092b6de3971e39cdd7d8fa1111825aa730b36a56b261861aec39ba69a1021",
+      "parse_exit": 0
+    },
+    {
+      "path": "src/cryptanalysis/mod.rs",
+      "before_sha256": "c23889d1db18105435b2af1d7657dc62f783156e9c669f26c6174e9c25746268",
+      "after_sha256": "5a711289723a2cd8de8fea68d23a3beb05909cdd8b237901442039ffa2e369f9",
+      "parse_exit": 0
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/methods.rs",
+      "before_sha256": "5420bce170e7efa079cbea0f70492fc38aa81eaba16492ba6460f2199516b05b",
+      "after_sha256": "32abec525231600e42ed1210a968328add73ba31c40e1a9b22fe3d788a66d083",
+      "parse_exit": 0
+    },
+    {
+      "path": "src/cryptanalysis/ic_framework/solvers.rs",
+      "before_sha256": "065e1f15ee29b3951264db783b6b38090ee4146a9980c93515b3bd71438913ba",
+      "after_sha256": "a5ba4475cae517ba2c2cf5e601c68d30712227ba4ea961a80b3f2a4cab7bddbf",
+      "parse_exit": 0
+    },
+    {
+      "path": "src/cryptanalysis/ic_framework/plugins.rs",
+      "before_sha256": "e6981abe05d97cbbb1b3847b6d1c4b3346b9ab0941088d3c3cceedeb96c4f5bb",
+      "after_sha256": "2af2de89c88738f71c6c13982431d5646630bc7cd4ddf5959f80087b461c12a7",
+      "parse_exit": 0
+    },
+    {
+      "path": "examples/prime_pair_table_check.rs",
+      "before_sha256": "0d0075e99f12d880f08d81143c0a7b1b3141050a5e3a5501615e47a0bbc0e7cb",
+      "after_sha256": "2b3ac752e3c9d2fcb073ab02f44965749519d642729ca88def9d0193fbf8d3e2",
+      "parse_exit": 0
+    }
+  ],
+  "pair_tables": "Both algorithms retained; first word-map table/builder has explicit WordPairSumTable/build_word_pair_sum_table; staged MITM and existing word regression/example select it. Compact table and its default collector unchanged.",
+  "sweep": "Restore real WordSweep construction and hoisted index when word path is admitted; IC_FAST_SWEEP=0 keeps BigUint control.",
+  "solver": "Restore imports; compatibility constants create real fresh stateful solvers; owned full-width control has persistent inner F4F2, preserving matched skeleton/trace state across calls. No solver removed.",
+  "modules": "Remove duplicate hec_dlp export, retaining original module once.",
+  "test_assertions_weakened": false,
+  "runtime_outcome": "pending",
+  "performance_claim": false
+}

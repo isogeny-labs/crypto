@@ -154,8 +154,15 @@ mod tests {
         // complete assertion in a fresh process with exactly this test.
         const ISOLATED: &str = "CRYPTO_JV_CHECKPOINT_ISOLATED";
         if std::env::var_os(ISOLATED).is_none() {
+            // This source is also included by standalone comparison examples.
+            // Strip only the crate prefix, preserving its actual module path.
+            let module = module_path!()
+                .split_once("::")
+                .expect("test module has a crate prefix")
+                .1;
+            let test = format!("{module}::actual_counted_checkpoint_has_owned_conserved_tallies");
             let result = std::process::Command::new(std::env::current_exe().unwrap())
-                .args(["--exact", "cryptanalysis::jv_sieve::two_large_prime::sparse_collection_rank::tests::actual_counted_checkpoint_has_owned_conserved_tallies", "--nocapture"])
+                .args(["--exact", test.as_str(), "--nocapture"])
                 .env(ISOLATED, "1")
                 .output()
                 .unwrap();

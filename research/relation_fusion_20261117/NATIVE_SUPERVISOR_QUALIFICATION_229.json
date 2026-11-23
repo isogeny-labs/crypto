@@ -1,0 +1,28 @@
+{
+  "scope": "native child supervisor OS qualification, not numerical performance",
+  "command": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/workspace/native-supervisor-target-229 RUST_TEST_THREADS=1 NATIVE_SUPERVISOR_QUAL_OUT=/workspace/native-supervisor-20261123-229 taskset -c 0 cargo test --release --locked --manifest-path research/relation_fusion_20261117/native-supervisor/Cargo.toml",
+  "exit_code": 0,
+  "tests_passed": 4,
+  "failed": 0,
+  "ignored": 0,
+  "source_sha256": {
+    "research/relation_fusion_20261117/native-supervisor/Cargo.lock": "e100d54150c9c86b1d4e53f275854922623012a91dad4ff198375dcb0cbde810",
+    "research/relation_fusion_20261117/native-supervisor/Cargo.toml": "79fc9108d64d6ed64063a0d8673a5ded6e07c4f94590187ded65d11f9c95169b",
+    "research/relation_fusion_20261117/native-supervisor/src/bin/resource-probe.rs": "351beb535b56bda2015e236cee3cd00bbd620452438c260b26ccae9b6514ccbe",
+    "research/relation_fusion_20261117/native-supervisor/src/lib.rs": "9f6f849d245ffff123b7f6d4d14ea46f8a92199bbf42f08981ef8ff631af94cf",
+    "research/relation_fusion_20261117/native-supervisor/tests/resource_boundary.rs": "3897b1266d2031bb3a71d67ee3763bc534f9ba136e2bb31aef98e4a6b3d61142"
+  },
+  "logs": {
+    "research/relation_fusion_20261117/development-01/native-supervisor-tests-229.stdout": "acf345feaa544680ee69c169deeafea1036ea29d940324c81d5a63364a237d77",
+    "research/relation_fusion_20261117/development-01/native-supervisor-tests-229.stderr": "c712bb5cf9c2e638469d1905ea7637be303122844e4e3bf4a0c96026bf4d6051"
+  },
+  "checks": [
+    "actual_CPU0_and_hard_AS_2GiB_and_file_16MiB_limits",
+    "OS_memory_allocation_refusal",
+    "OS_file_growth_refusal_SIGXFSZ_at16MiB",
+    "absolute_short_deadline_SIGKILL_private_group_and_descendant_cleanup",
+    "nondefault_SIGCHLD_refusal_before_launch"
+  ],
+  "performance_claim": false,
+  "previous_228_logs_preserved": true
+}

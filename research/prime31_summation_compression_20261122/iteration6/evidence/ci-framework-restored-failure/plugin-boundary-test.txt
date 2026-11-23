@@ -1,0 +1,43 @@
+[1m[92m   Compiling[0m crypto v0.1.0 (/home/runner/work/crypto/crypto)
+[1m[91merror[0m[1m: mismatched closing delimiter: `)`[0m
+   [1m[94m--> [0msrc/cryptanalysis/binary_hyperelliptic_index_calculus.rs:640:94
+    [1m[94m|[0m
+[1m[94m640[0m [1m[94m|[0m     let chunks: Vec<(Vec<HecRelation>, HecIndexCalculusReport)> = std::thread::scope(|scope| {
+    [1m[94m|[0m                                                                                     [1m[94m-[0m        [1m[91m^[0m [1m[91munclosed delimiter[0m
+    [1m[94m|[0m                                                                                     [1m[94m|[0m
+    [1m[94m|[0m                                                                                     [1m[94mclosing delimiter possibly meant for this[0m
+[1m[94m...[0m
+[1m[94m656[0m [1m[94m|[0m     });
+    [1m[94m|[0m      [1m[91m^[0m [1m[91mmismatched closing delimiter[0m
+
+[1m[91merror[0m[1m: this file contains an unclosed delimiter[0m
+    [1m[94m--> [0msrc/cryptanalysis/binary_hyperelliptic_index_calculus.rs:1233:2
+     [1m[94m|[0m
+[1m[94m  75[0m [1m[94m|[0m pub struct BhecFactorBase {
+     [1m[94m|[0m                           [1m[94m-[0m [1m[94munclosed delimiter[0m
+[1m[94m...[0m
+[1m[94m  79[0m [1m[94m|[0m impl BhecFactorBase {
+     [1m[94m|[0m                     [1m[94m-[0m [1m[94munclosed delimiter[0m
+[1m[94m...[0m
+[1m[94m  84[0m [1m[94m|[0m     pub fn is_empty(&self) -> bool {
+     [1m[94m|[0m                                    [1m[94m-[0m [1m[94munclosed delimiter[0m
+[1m[94m...[0m
+[1m[94m  87[0m [1m[94m|[0m     pub fn index_of_x(&self, x: &BigUint) -> Option<usize> {
+     [1m[94m|[0m                                                            [1m[94m-[0m [1m[94munclosed delimiter[0m
+[1m[94m...[0m
+[1m[94m 103[0m [1m[94m|[0m pub fn affine_point_for_x(curve: &HyperellipticCurve, x: &F2mElement) -> Option<F2mElement> {
+     [1m[94m|[0m                                                                                             [1m[94m-[0m [1m[94munclosed delimiter[0m
+[1m[94m...[0m
+[1m[94m 128[0m [1m[94m|[0m fn artin_schreier_solve(a: &F2mElement, irr: &IrreduciblePoly) -> Option<F2mElement> {
+     [1m[94m|[0m                                                                                      [1m[94m-[0m [1m[94manother 198 unclosed delimiters begin from here[0m
+[1m[94m...[0m
+[1m[94m 642[0m [1m[94m|[0m         for t in 0..threads {
+     [1m[94m|[0m                             [1m[94m-[0m [1m[94mthis delimiter might not be properly closed...[0m
+[1m[94m...[0m
+[1m[94m 656[0m [1m[94m|[0m     });
+     [1m[94m|[0m     [1m[94m-[0m [1m[94m...as it matches this but it has different indentation[0m
+[1m[94m...[0m
+[1m[94m1233[0m [1m[94m|[0m
+     [1m[94m|[0m [1m[91m^[0m
+
+[1m[91merror[0m: could not compile `crypto` (lib) due to 2 previous errors

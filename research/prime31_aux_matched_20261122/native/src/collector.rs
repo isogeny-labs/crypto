@@ -171,23 +171,38 @@ impl QueryStream {
 /// Accumulates A*l = alpha + beta*d. The last unknown is d, so RREF on
 /// [A|-beta] is enough to discover useful left dependencies without ever
 /// knowing a factor-base logarithm. Duplicate A rows must still be inserted.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RecoveryMode {
+    /// Retained for the frozen v1/v2 inputs and transcript comparison.
+    #[default]
+    DualMatrices,
+    /// rank(A) = rank([A|-beta]) - 1 exactly when the last column is pinned.
+    AugmentedOnly,
+}
+
 pub struct Recovery {
-    a: IncrementalGauss,
+    a: Option<IncrementalGauss>,
     augmented: IncrementalGauss,
     rows: HashSet<Vec<u64>>,
     n: u64,
     c: usize,
+    target_pinned: bool,
     pub duplicates: u64,
     pub useful_dependencies: u64,
 }
 impl Recovery {
     pub fn new(c: usize, n: u64) -> Self {
+        Self::new_with_mode(c, n, RecoveryMode::DualMatrices)
+    }
+    pub fn new_with_mode(c: usize, n: u64, mode: RecoveryMode) -> Self {
         Self {
-            a: IncrementalGauss::new(c, n),
+            a: (mode == RecoveryMode::DualMatrices).then(|| IncrementalGauss::new(c, n)),
             augmented: IncrementalGauss::new(c + 1, n),
             rows: HashSet::new(),
             n,
             c,
+            target_pinned: false,
             duplicates: 0,
             useful_dependencies: 0,
         }
@@ -204,20 +219,28 @@ impl Recovery {
             self.duplicates += 1;
         }
         let before = self.augmented.pinned(self.c);
-        let rank_status = self.a.add_row(a.clone(), 0);
+        let rank_status = self.a.as_mut().map(|g| g.add_row(a.clone(), 0));
         let mut aug = a;
         aug.push((self.n - beta) % self.n);
         if self.augmented.add_row(aug, alpha) == RowStatus::Inconsistent {
             return Err("replayed rows became inconsistent modulo the subgroup order".into());
         }
         let after = self.augmented.pinned(self.c);
-        if rank_status == RowStatus::Dependent && before.is_none() && after.is_some() {
+        self.target_pinned = after.is_some();
+        if before.is_none() && after.is_some() {
+            // A new pivot in the last column implies that the A projection
+            // of this row is dependent. Retain the old diagnostic assertion
+            // when the separately materialized A matrix is requested.
+            debug_assert!(rank_status.is_none() || rank_status == Some(RowStatus::Dependent));
             self.useful_dependencies += 1;
         }
         Ok(after)
     }
     pub fn rank_a(&self) -> usize {
-        self.a.rank()
+        self.a.as_ref().map_or_else(
+            || self.augmented.rank() - usize::from(self.target_pinned),
+            IncrementalGauss::rank,
+        )
     }
     pub fn rank_augmented(&self) -> usize {
         self.augmented.rank()
@@ -227,7 +250,20 @@ impl Recovery {
             json!({"row_mul_subs":g.row_ops,"dependent":g.dependent,
             "inconsistent":g.inconsistent,"other_counters":g.work_counters()})
         };
-        (snapshot(&self.a), snapshot(&self.augmented))
+        let a_work = self.a.as_ref().map_or_else(
+            || {
+                json!({
+                    "schema":"prime31-recovery-work/v2",
+                    "implementation":"augmented_only",
+                    "a_matrix_materialized":false,
+                    "rank_derived_from_augmented":true,
+                    "rank_rule":"rank_augmented_minus_target_pinned",
+                    "separate_matrix_counters":null
+                })
+            },
+            snapshot,
+        );
+        (a_work, snapshot(&self.augmented))
     }
 }
 
@@ -288,6 +324,39 @@ pub fn collect_with_decomposer(
         &mut GroupOps,
     ) -> Result<OracleResult, String>,
 ) -> Result<CollectionSummary, String> {
+    collect_with_decomposer_and_recovery(
+        target,
+        fb,
+        arity,
+        presentation,
+        query_seed,
+        limits,
+        backend_label,
+        RecoveryMode::DualMatrices,
+        emit,
+        oracle,
+    )
+}
+
+/// Explicit recovery implementation selection for new comparison inputs.
+/// Frozen wrappers above retain their two-matrix accounting and behavior.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_with_decomposer_and_recovery(
+    target: &PublicTarget,
+    fb: &FactorBase<PrimePoint>,
+    arity: usize,
+    presentation: Presentation,
+    query_seed: u64,
+    limits: &CollectionLimits,
+    backend_label: Option<&str>,
+    recovery_mode: RecoveryMode,
+    emit: &mut dyn FnMut(&Value) -> Result<(), String>,
+    oracle: &mut dyn FnMut(
+        PrimePoint,
+        &OracleLimits,
+        &mut GroupOps,
+    ) -> Result<OracleResult, String>,
+) -> Result<CollectionSummary, String> {
     if limits.max_queries == 0 || limits.max_seconds == 0 || !(2..=4).contains(&arity) {
         return Err("nonpositive collection cap or unsupported arity".into());
     }
@@ -300,7 +369,7 @@ pub fn collect_with_decomposer(
     let mut ops = GroupOps::default();
     target.validate(&mut ops)?;
     let mut stream = QueryStream::new(query_seed);
-    let mut recovery = Recovery::new(fb.columns, n);
+    let mut recovery = Recovery::new_with_mode(fb.columns, n, recovery_mode);
     let mut out = CollectionSummary {
         status: "query_limit".into(),
         queries: 0,
@@ -328,6 +397,9 @@ pub fn collect_with_decomposer(
         "secret_given_to_collector":false,"planted_query_selection":false});
     if let Some(backend) = backend_label {
         collection_start["oracle_backend"] = json!(backend);
+    }
+    if recovery_mode != RecoveryMode::DualMatrices {
+        collection_start["recovery_mode"] = json!(recovery_mode);
     }
     emit(&collection_start)?;
     'queries: while out.queries < limits.max_queries {

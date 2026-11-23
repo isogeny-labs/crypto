@@ -4,6 +4,8 @@ pub mod audit;
 pub mod bases;
 pub mod collector;
 pub mod cryptanalysis;
+pub mod fiber_extract;
+pub mod incumbent_control;
 pub mod kernel_fibers;
 pub mod oracle;
 pub mod pair_control;
@@ -11,6 +13,7 @@ pub mod plain_reference;
 pub mod provenance;
 pub mod replay;
 pub mod sparse_identity;
+pub mod specialized_control;
 pub mod target_transport;
 
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]

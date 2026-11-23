@@ -8,6 +8,8 @@ use std::time::Instant;
 
 mod monomial;
 use monomial::MonomialOps;
+mod flat_map;
+pub mod flat_constructor;
 pub mod packed_constructor;
 pub mod cheap;
 mod dag;

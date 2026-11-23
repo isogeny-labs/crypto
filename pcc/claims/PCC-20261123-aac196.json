@@ -1,0 +1,44 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T07:03:10Z",
+ "id": "PCC-20261123-aac196",
+ "kind": "statement",
+ "producer": {
+  "commit": "03bc5f4fadf147f6d81e45fae632ad4126d6fa5b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/NEXT_V2.md",
+    "sha256": "27dbdf5df35fa1629ff83121eccedd38bf5b8b5e6270a8be914d19de8afaf2fa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/PUBLISHING.md",
+    "sha256": "02605ab6a6b20369c42459dca514e9dded910beacdb53bdeb0b7eb170198f5fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4526-20261123/FACTS.json",
+    "sha256": "198a6ed0e2a3daf4339319f7fd2e5afc71afc8dcedac4bc2d5f1231af4c29d8f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4526-20261123/PUBLISHED_HISTORY_AUDIT.json",
+    "sha256": "8a5e325066d852e1c09eb40d2acd4a5295fb9d348ad87aaff468c6034870f80b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "section-query publication citation addendum and historical retention audit",
+ "statement": "NEXT_V2 differs from frozen NEXT only by an unsigned-scope citation tag on a negative caveat. No native source/evidence/cost criterion changes. Historical PR4526 final-head study bytes survive merge, while the earlier a511 published ledger prefix and five claim registrations are absent in final/current canonical ledgers despite byte-equal claim files; gap retained without re-registration/re-chaining. New canonical ledger is appended only."
+}

@@ -5,9 +5,11 @@
 //! fallback branches are refused before their first specialization. A degree,
 //! time, output or construction cap is explicitly incomplete, never UNSAT.
 
+use crate::b677_fixture::Hybrid677;
 use crate::relation_adapter::SignedRelation;
 use crypto_lib::cryptanalysis::f4_fp::{
-    normalise, solve_visit_traced, F4Options, Ordering, Poly, VisitEvent, VisitReport,
+    normalise, solve_visit_traced, F4Options, F4ResourceLimits, Ordering, Poly, VisitEvent,
+    VisitReport,
 };
 use crypto_lib::cryptanalysis::glv_invariant_base::poly_roots_fp_counted_until;
 use prime31_algebraic_ic::{Arithmetic, Counts, Curve, Point};
@@ -15,7 +17,7 @@ use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::time::{Duration, Instant};
 
-type MPoly = BTreeMap<Vec<u32>, u64>;
+pub(crate) type MPoly = BTreeMap<Vec<u32>, u64>;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Limits {
@@ -46,6 +48,7 @@ pub enum Status {
     Inconclusive,
     Deadline,
     OutputLimit,
+    ResourceLimit,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -81,21 +84,21 @@ pub struct ResultRow {
     pub traversal: Option<VisitReport>,
 }
 
-struct Builder {
-    p: u64,
-    variables: usize,
-    deadline: Instant,
-    term_cap: usize,
-    adds: u64,
-    muls: u64,
+pub(crate) struct Builder {
+    pub(crate) p: u64,
+    pub(crate) variables: usize,
+    pub(crate) deadline: Instant,
+    pub(crate) term_cap: usize,
+    pub(crate) adds: u64,
+    pub(crate) muls: u64,
 }
 
 impl Builder {
-    fn am(&mut self, a: u64, b: u64) -> u64 {
+    pub(crate) fn am(&mut self, a: u64, b: u64) -> u64 {
         self.adds += 1;
         (a + b) % self.p
     }
-    fn mm(&mut self, a: u64, b: u64) -> u64 {
+    pub(crate) fn mm(&mut self, a: u64, b: u64) -> u64 {
         self.muls += 1;
         ((a as u128 * b as u128) % self.p as u128) as u64
     }
@@ -108,19 +111,19 @@ impl Builder {
         }
         Ok(())
     }
-    fn c(&self, x: u64) -> MPoly {
+    pub(crate) fn c(&self, x: u64) -> MPoly {
         if x % self.p == 0 {
             MPoly::new()
         } else {
             BTreeMap::from([(vec![0; self.variables], x % self.p)])
         }
     }
-    fn var(&self, i: usize) -> MPoly {
+    pub(crate) fn var(&self, i: usize) -> MPoly {
         let mut e = vec![0; self.variables];
         e[i] = 1;
         BTreeMap::from([(e, 1)])
     }
-    fn add(&mut self, a: &MPoly, b: &MPoly) -> Result<MPoly, String> {
+    pub(crate) fn add(&mut self, a: &MPoly, b: &MPoly) -> Result<MPoly, String> {
         let mut out = a.clone();
         for (e, &c) in b {
             let v = self.am(out.get(e).copied().unwrap_or(0), c);
@@ -133,7 +136,7 @@ impl Builder {
         self.guard(out.len())?;
         Ok(out)
     }
-    fn scale(&mut self, a: &MPoly, c: u64) -> Result<MPoly, String> {
+    pub(crate) fn scale(&mut self, a: &MPoly, c: u64) -> Result<MPoly, String> {
         let mut out = MPoly::new();
         for (e, &v) in a {
             let w = self.mm(v, c);
@@ -144,7 +147,7 @@ impl Builder {
         self.guard(out.len())?;
         Ok(out)
     }
-    fn mul(&mut self, a: &MPoly, b: &MPoly) -> Result<MPoly, String> {
+    pub(crate) fn mul(&mut self, a: &MPoly, b: &MPoly) -> Result<MPoly, String> {
         let mut out = MPoly::new();
         for (e, &c) in a {
             self.guard(out.len())?;
@@ -162,7 +165,7 @@ impl Builder {
         self.guard(out.len())?;
         Ok(out)
     }
-    fn conv(&mut self, a: &[MPoly], b: &[MPoly]) -> Result<Vec<MPoly>, String> {
+    pub(crate) fn conv(&mut self, a: &[MPoly], b: &[MPoly]) -> Result<Vec<MPoly>, String> {
         let mut out = vec![MPoly::new(); a.len() + b.len() - 1];
         for (i, x) in a.iter().enumerate() {
             for (j, y) in b.iter().enumerate() {
@@ -203,7 +206,7 @@ fn eval(f: &MPoly, point: &[u64], p: u64) -> u64 {
 
 /// Public monic quartic U and h = product(X - x_i), shared by both presentations.
 /// Only the first three variables occur in U; h has scalar coefficients.
-fn public_polynomials(
+pub(crate) fn public_polynomials(
     builder: &mut Builder,
     e: Curve,
     q: (u64, u64),
@@ -277,7 +280,6 @@ fn quotient_product_equations(
     h: &[u64],
 ) -> Result<Vec<MPoly>, String> {
     let degree = h.len() - 5;
-    assert!((1..=4).contains(&degree));
     assert_eq!(builder.variables, 3 + degree);
     assert_eq!(u.len(), 5);
     assert_eq!(u[4], builder.c(1));
@@ -312,9 +314,70 @@ fn is_nonzero_constant(g: &Poly) -> bool {
 
 /// No scalar or decomposition hint is accepted by this interface.
 pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> ResultRow {
-    let use_product = (5..=8).contains(&base.len());
-    let variables = if use_product { base.len() - 1 } else { 3 };
-    let ordering = if use_product {
+    extract_internal(e, base, q, limits, Presentation::Automatic, None)
+}
+
+/// Exact public monic-cofactor reference, with explicit native allocation caps.
+pub fn extract_cofactor(
+    e: Curve,
+    base: &[(u64, u64)],
+    q: Point,
+    limits: Limits,
+    resource_limits: F4ResourceLimits,
+) -> ResultRow {
+    extract_internal(
+        e,
+        base,
+        q,
+        limits,
+        Presentation::Cofactor,
+        Some(resource_limits),
+    )
+}
+
+/// The validated original hybrid base; no scalar or decomposition enters here.
+pub fn extract_hybrid677(
+    base: &Hybrid677,
+    q: Point,
+    limits: Limits,
+    resource_limits: F4ResourceLimits,
+) -> ResultRow {
+    extract_internal(
+        prime31_algebraic_ic::PRIME31,
+        base.points(),
+        q,
+        limits,
+        Presentation::Hybrid(base),
+        Some(resource_limits),
+    )
+}
+
+#[derive(Clone, Copy)]
+enum Presentation<'a> {
+    Automatic,
+    Cofactor,
+    Hybrid(&'a Hybrid677),
+}
+
+fn extract_internal(
+    e: Curve,
+    base: &[(u64, u64)],
+    q: Point,
+    limits: Limits,
+    presentation: Presentation<'_>,
+    resource_limits: Option<F4ResourceLimits>,
+) -> ResultRow {
+    let use_product = matches!(presentation, Presentation::Cofactor)
+        || matches!(presentation, Presentation::Automatic) && (5..=8).contains(&base.len());
+    let structured = matches!(presentation, Presentation::Hybrid(_));
+    let variables = if structured {
+        crate::selector_circuit::VARIABLES
+    } else if use_product {
+        base.len().saturating_sub(1).max(3)
+    } else {
+        3
+    };
+    let ordering = if use_product || structured {
         Ordering::Grevlex
     } else {
         Ordering::Lex
@@ -325,7 +388,9 @@ pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> Resul
         relations: vec![],
         diagnostics: Diagnostics {
             base_size: base.len(),
-            presentation: if use_product {
+            presentation: if structured {
+                "structured_quartic_circuit".into()
+            } else if use_product {
                 "quotient_product".into()
             } else {
                 "expanded_remainder".into()
@@ -390,14 +455,19 @@ pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> Resul
         muls: 0,
     };
     let xs: Vec<_> = base.iter().map(|p| p.0).collect();
-    let built = public_polynomials(&mut b, e, target, &xs).and_then(|(u, h)| {
-        let equations = if use_product {
-            quotient_product_equations(&mut b, &u, &h)
-        } else {
-            expanded_remainders(&mut b, &u, &h)
-        }?;
-        Ok((u, equations))
-    });
+    let built = if let Presentation::Hybrid(fixture) = presentation {
+        crate::selector_circuit::build(&mut b, e, target, fixture)
+            .map(|circuit| (circuit.u, circuit.constraints))
+    } else {
+        public_polynomials(&mut b, e, target, &xs).and_then(|(u, h)| {
+            let equations = if use_product {
+                quotient_product_equations(&mut b, &u, &h)
+            } else {
+                expanded_remainders(&mut b, &u, &h)
+            }?;
+            Ok((u, equations))
+        })
+    };
     result.diagnostics.symbolic_additions = b.adds;
     result.diagnostics.symbolic_multiplications = b.muls;
     let (u, constraints) = match built {
@@ -432,6 +502,7 @@ pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> Resul
         .unwrap_or(0);
     let mut opts = F4Options::new(ordering, limits.max_degree);
     opts.deadline = Some(deadline);
+    opts.resource_limits = resource_limits;
     let mut assignments = Vec::new();
     let mut output_cap = false;
     let mut refused = 0usize;
@@ -454,9 +525,14 @@ pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> Resul
         },
         |event| {
             match event {
-                VisitEvent::NativeResult { generating_set, .. }
-                    if !generating_set.iter().any(is_nonzero_constant)
-                        && !generating_set.iter().any(is_univariate) =>
+                VisitEvent::NativeResult {
+                    report,
+                    generating_set,
+                    ..
+                } if report.resource_limit.is_none()
+                    && !report.timed_out
+                    && !generating_set.iter().any(is_nonzero_constant)
+                    && !generating_set.iter().any(is_univariate) =>
                 {
                     refused += 1;
                     return Err("no algebraic univariate; enumeration refused".into());
@@ -481,10 +557,15 @@ pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> Resul
     result.diagnostics.forbidden_branch_attempts = traversal.full_field_branches;
     result.diagnostics.forbidden_domain_evaluations = traversal.domain_evaluations;
     result.diagnostics.assignments_extracted = assignments.len();
-    let complete =
-        traversal.complete && !traversal.timed_out && !traversal.trace_stopped && !output_cap;
+    let complete = traversal.complete
+        && !traversal.timed_out
+        && !traversal.trace_stopped
+        && traversal.resource_limit.is_none()
+        && !output_cap;
     result.status = if output_cap {
         Status::OutputLimit
+    } else if traversal.resource_limit.is_some() {
+        Status::ResourceLimit
     } else if traversal.timed_out {
         Status::Deadline
     } else if traversal.trace_stopped || !complete {
@@ -492,13 +573,18 @@ pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> Resul
     } else {
         Status::Complete
     };
-    result.reason = traversal.trace_error.clone().unwrap_or_else(|| {
-        if complete {
-            "all algebraic branches exhausted".into()
-        } else {
-            "incomplete algebraic traversal".into()
-        }
-    });
+    result.reason = traversal
+        .resource_limit
+        .as_ref()
+        .map(ToString::to_string)
+        .or_else(|| traversal.trace_error.clone())
+        .unwrap_or_else(|| {
+            if complete {
+                "all algebraic branches exhausted".into()
+            } else {
+                "incomplete algebraic traversal".into()
+            }
+        });
     result.traversal = Some(traversal);
     let mut distinct = BTreeSet::new();
     for a in assignments {
