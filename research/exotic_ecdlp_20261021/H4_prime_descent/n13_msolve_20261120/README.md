@@ -1,0 +1,14 @@
+# H4 n13 complete Gröbner replay on the frozen planted and ordinary inputs
+
+msolve 0.11.0 completed both fixed H4 `n=13`, three-summand Boolean systems under the preregistered 300-second, 2-GiB observed process-tree gates. Its planted reduced basis has exactly the three roots independently enumerated from the original equations. Its ordinary-query basis is `[1]`, matching the zero-root enumeration. The two local solver runs took 29.966 and 28.384 seconds, respectively. This supplies complete-solver cost and exact solution evidence for the inputs whose earlier projected Macaulay profile stopped after degree 10.
+
+| Arm | Exact original roots | Reduced-basis roots | Basis length | msolve wall s | Peak process-tree RSS MiB | Rows reduced | Pairs reduced | Largest F4 matrix | Max selected-pair degree |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| Planted | 3 | 3 | 16 | 29.966 | 199.6 | 23,972 | 11,952 | 58,288 × 58,093 | 7 |
+| Ordinary query | 0 | 0 | 1 | 28.384 | 218.3 | 16,241 | 8,094 | 34,279 × 41,357 | 7 |
+
+The [frozen protocol](PROTOCOL.md) reuses the exact `n=13`, instance-5 H4 source builder and input laws from the [earlier projected profile](../followup_20261119/README.md). [prepare.py](prepare.py) imports its pinned functions, enumerates the 15-variable Boolean systems, checks the planted assignment, and serializes 13 source equations plus 15 Boolean field equations per arm. The [preparation receipt](preparation.json) preserves the field polynomial, subspace basis, curve coefficient, residual x-coordinate, exact roots, and input hashes. The checked [Sage runtime record](sage-runtime-info.json) preceded input generation and solver execution.
+
+The [run receipt](run-receipt.json) records pinned msolve and FLINT binaries, one solver thread, exact flags, wall and RSS observations, and hashes of every raw basis, stdout and stderr artifact under `runs/`. The [validation protocol](validation-protocol.json) froze the auditor before replay. [validate.py](validate.py) checks every artifact hash, enumerates all `2^15` Boolean assignments against the serialized input and returned basis, and requires exact root-set equality. Its [result](validation.json) is `PASS` for both arms.
+
+The maximum **selected-pair degree** is read from msolve's F4 round table, whose log defines it as the degree of the pairs selected in that round. It is not the solving-degree observable in the earlier projected Macaulay protocol: that protocol multiplies original equations up to a fixed degree and estimates rank by random projection, whereas this run executes dynamic F4 reductions and includes explicit Boolean field equations. The prior `D=10` quotient figures remain recorded with their projected-rank and row-cap boundary. This result measures a complete solver on two fixed inputs; a scale claim requires matched instances at larger `n` and full charged relation cost.

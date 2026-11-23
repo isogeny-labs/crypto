@@ -873,23 +873,7 @@ impl<'a> Separator<'a> {
         Ok(s)
     }
     pub fn evaluate(&self, x: &N, y: &N, z: &N) -> N {
-        let f = self.field;
-        let xy = f.mul(x, y);
-        if self.binary {
-            let pairs = f.add(&xy, &f.add(&f.mul(x, z), &f.mul(y, z)));
-            return f.add(
-                &f.add(&f.mul(&pairs, &pairs), &f.mul(&xy, z)),
-                &self.curve[2],
-            );
-        }
-        let pair = f.add(&xy, &f.add(&f.mul(x, z), &f.mul(y, z)));
-        let total = f.add(&f.add(&f.add(x, y), z), &self.curve[0]);
-        let product = f.add(&f.mul(&xy, z), &self.curve[2]);
-        let difference = f.sub(&self.curve[1], &pair);
-        f.sub(
-            &f.mul(&difference, &difference),
-            &f.mul(&(N::from(4u8) % &f.p), &f.mul(&total, &product)),
-        )
+        s3_evaluate(self.field, &self.curve, self.binary, x, y, z)
     }
     fn fiber(&mut self, x: &N, y: &N) -> Result<Vec<N>> {
         let key = if x <= y {
@@ -905,35 +889,7 @@ impl<'a> Separator<'a> {
         }
         self.calls += 1;
         let f = self.field;
-        let xy = f.mul(x, y);
-        let sum = f.add(x, y);
-        let coefficients = if self.binary {
-            vec![
-                f.add(&f.mul(&xy, &xy), &self.curve[2]),
-                xy,
-                f.mul(&sum, &sum),
-            ]
-        } else {
-            let two = N::from(2u8) % &f.p;
-            let four = N::from(4u8) % &f.p;
-            let inside = f.add(
-                &f.mul(&sum, &f.add(&xy, &self.curve[1])),
-                &f.add(
-                    &f.mul(&f.mul(&two, &self.curve[0]), &xy),
-                    &f.mul(&two, &self.curve[2]),
-                ),
-            );
-            let difference = f.sub(&self.curve[1], &xy);
-            let diff = f.sub(x, y);
-            vec![
-                f.sub(
-                    &f.mul(&difference, &difference),
-                    &f.mul(&f.mul(&four, &self.curve[2]), &f.add(&sum, &self.curve[0])),
-                ),
-                f.neg(&f.mul(&two, &inside)),
-                f.mul(&diff, &diff),
-            ]
-        };
+        let coefficients = s3_fiber_coefficients(f, &self.curve, self.binary, x, y);
         if coefficients.iter().all(N::is_zero) {
             return Err("unrestricted auxiliary fiber; completeness not established".into());
         }
@@ -1034,4 +990,344 @@ pub fn separator_json(problem: &Value, limits: &Limits) -> Result<Value> {
         "solution_count_exact":out.count,"left_records":separator.left_records,"fiber_calls":separator.calls,
         "solutions":out.solutions.iter().map(|x|x.iter().map(|a|format!("0x{}",a.to_str_radix(16))).collect::<Vec<_>>()).collect::<Vec<_>>()}),
     )
+}
+
+/// Semaev's third summation polynomial `S3(x, y, z)` in x-only form.
+/// `curve` is `[a2, a4, a6]` for `Y^2 = X^3 + a2 X^2 + a4 X + a6` in odd
+/// characteristic, and `[0, 0, b]` for the ordinary binary curve
+/// `Y^2 + XY = X^3 + a X^2 + b` (whose `S3` does not involve `a`).
+pub fn s3_evaluate(f: &Field, curve: &[N; 3], binary: bool, x: &N, y: &N, z: &N) -> N {
+    let xy = f.mul(x, y);
+    if binary {
+        let pairs = f.add(&xy, &f.add(&f.mul(x, z), &f.mul(y, z)));
+        return f.add(&f.add(&f.mul(&pairs, &pairs), &f.mul(&xy, z)), &curve[2]);
+    }
+    let pair = f.add(&xy, &f.add(&f.mul(x, z), &f.mul(y, z)));
+    let total = f.add(&f.add(&f.add(x, y), z), &curve[0]);
+    let product = f.add(&f.mul(&xy, z), &curve[2]);
+    let difference = f.sub(&curve[1], &pair);
+    f.sub(
+        &f.mul(&difference, &difference),
+        &f.mul(&(N::from(4u8) % &f.p), &f.mul(&total, &product)),
+    )
+}
+
+/// Ascending coefficients of `S3(x, y, Z)` as a polynomial in `Z`: its roots
+/// are the abscissae of `P + Q` and `P - Q` for points `P`, `Q` above `x`, `y`.
+pub fn s3_fiber_coefficients(f: &Field, curve: &[N; 3], binary: bool, x: &N, y: &N) -> Vec<N> {
+    let xy = f.mul(x, y);
+    let sum = f.add(x, y);
+    if binary {
+        return vec![f.add(&f.mul(&xy, &xy), &curve[2]), xy, f.mul(&sum, &sum)];
+    }
+    let two = N::from(2u8) % &f.p;
+    let four = N::from(4u8) % &f.p;
+    let inside = f.add(
+        &f.mul(&sum, &f.add(&xy, &curve[1])),
+        &f.add(
+            &f.mul(&f.mul(&two, &curve[0]), &xy),
+            &f.mul(&two, &curve[2]),
+        ),
+    );
+    let difference = f.sub(&curve[1], &xy);
+    let diff = f.sub(x, y);
+    vec![
+        f.sub(
+            &f.mul(&difference, &difference),
+            &f.mul(&f.mul(&four, &curve[2]), &f.add(&sum, &curve[0])),
+        ),
+        f.neg(&f.mul(&two, &inside)),
+        f.mul(&diff, &diff),
+    ]
+}
+
+fn check_curve(f: &Field, curve: &[N; 3], binary: bool) -> Result<()> {
+    for c in curve {
+        f.validate(c)?;
+    }
+    if binary {
+        if curve[2].is_zero() {
+            return Err("singular binary curve".into());
+        }
+        return Ok(());
+    }
+    let scalar = |n: u8| N::from(n) % &f.p;
+    let cubic = vec![
+        curve[2].clone(),
+        curve[1].clone(),
+        curve[0].clone(),
+        N::one(),
+    ];
+    let derivative = vec![curve[1].clone(), f.mul(&scalar(2), &curve[0]), scalar(3)];
+    if poly::gcd(f, cubic, poly::trim(derivative)).len() != 1 {
+        return Err("singular odd-characteristic cubic".into());
+    }
+    Ok(())
+}
+
+/// Exact all-roots solver for the `m`-summand `S3` chain
+///
+/// `S3(w_i, x_{i+1}, w_{i+1}) = 0` for `1 <= i < m`, with `w_1 = x_1` and
+/// `w_m = target`,
+///
+/// where every source `x_i` lies in the domain `D` and every auxiliary
+/// `w_2, ..., w_{m-1}` ranges over the whole field.  Its solutions are the
+/// abscissa tuples of the decompositions `±P_1 ± ... ± P_m = ±R` with every
+/// `P_i` above `D`.  The [`Separator`] is the case `m = 5`, `left_k = 3`.
+///
+/// Meet in the middle: `new` builds, once and independently of the target,
+/// the table of every forward partial chain `(x_1, ..., x_k) -> w_k`;
+/// `solve` walks the chain backward from the target through
+/// `x_m, ..., x_{k+1}` and looks each `w_k` up.  A fiber is two roots of a
+/// quadratic in `Z`, found by exact root-finding and replayed against `S3`.
+/// Returned tuples are `(x_1, ..., x_m, w_2, ..., w_{m-1})`, each replayed
+/// against every chain equation.  Any cap, exhausted splitting budget or
+/// unrestricted fiber is an error, never an empty solution set.
+pub struct S3Chain {
+    pub field: Field,
+    pub domain: Vec<N>,
+    curve: [N; 3],
+    binary: bool,
+    m: usize,
+    left_k: usize,
+    /// `w_k ->` every `(x_1, ..., x_k, w_2, ..., w_k)` reaching it.
+    left: BTreeMap<N, Vec<Vec<N>>>,
+    cache: BTreeMap<(N, N), Vec<N>>,
+    budget: poly::SplitBudget,
+    /// Fibers computed (root-finding calls), set-up and targets together.
+    pub calls: u64,
+    /// Fibers answered from the cache.
+    pub cache_hits: u64,
+    /// Left-table records.
+    pub left_records: usize,
+    /// Fibers computed while building the left table.
+    pub setup_calls: u64,
+    /// Left-table lookups made by `solve`.
+    pub probes: u64,
+    limits: Limits,
+}
+
+impl S3Chain {
+    pub fn new(
+        field: Field,
+        domain: Vec<N>,
+        curve: [N; 3],
+        binary: bool,
+        m: usize,
+        left_k: usize,
+        limits: &Limits,
+    ) -> Result<Self> {
+        if m < 2 || left_k == 0 || left_k >= m {
+            return Err("an S3 chain needs m >= 2 and 1 <= left_k < m".into());
+        }
+        if binary != (field.p == N::from(2u8)) {
+            return Err("curve model does not match the field characteristic".into());
+        }
+        check_curve(&field, &curve, binary)?;
+        if domain.is_empty()
+            || domain.len() > limits.max_domain
+            || domain.iter().collect::<BTreeSet<_>>().len() != domain.len()
+        {
+            return Err("invalid source domain".into());
+        }
+        for x in &domain {
+            field.validate(x)?;
+        }
+        // Every forward partial chain has at most 2^(k-1) auxiliary branches.
+        let bound = (domain.len() as u128)
+            .checked_pow(left_k as u32)
+            .and_then(|n| n.checked_mul(1u128 << (left_k - 1)));
+        if bound.is_none_or(|n| n > limits.max_table as u128) {
+            return Err("chain left-table preflight cap".into());
+        }
+        let mut chain = Self {
+            field,
+            domain,
+            curve,
+            binary,
+            m,
+            left_k,
+            left: BTreeMap::new(),
+            cache: BTreeMap::new(),
+            budget: poly::SplitBudget {
+                remaining: limits.max_trials,
+                state: limits.seed.max(1),
+            },
+            calls: 0,
+            cache_hits: 0,
+            left_records: 0,
+            setup_calls: 0,
+            probes: 0,
+            limits: limits.clone(),
+        };
+        let domain = chain.domain.clone();
+        for x1 in &domain {
+            chain.extend_left(&domain, vec![x1.clone()], vec![], x1.clone())?;
+        }
+        chain.setup_calls = chain.calls;
+        Ok(chain)
+    }
+
+    fn extend_left(&mut self, domain: &[N], xs: Vec<N>, ws: Vec<N>, w: N) -> Result<()> {
+        if xs.len() == self.left_k {
+            let mut record = xs;
+            record.extend(ws);
+            self.left.entry(w).or_default().push(record);
+            self.left_records += 1;
+            return Ok(());
+        }
+        for x in domain {
+            for next in self.fiber(&w, x)? {
+                let mut xs2 = xs.clone();
+                xs2.push(x.clone());
+                let mut ws2 = ws.clone();
+                ws2.push(next.clone());
+                self.extend_left(domain, xs2, ws2, next)?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn summands(&self) -> usize {
+        self.m
+    }
+
+    pub fn left_k(&self) -> usize {
+        self.left_k
+    }
+
+    pub fn evaluate(&self, x: &N, y: &N, z: &N) -> N {
+        s3_evaluate(&self.field, &self.curve, self.binary, x, y, z)
+    }
+
+    /// Every `z` with `S3(x, y, z) = 0`.
+    pub fn fiber(&mut self, x: &N, y: &N) -> Result<Vec<N>> {
+        let key = if x <= y {
+            (x.clone(), y.clone())
+        } else {
+            (y.clone(), x.clone())
+        };
+        if let Some(v) = self.cache.get(&key) {
+            self.cache_hits += 1;
+            return Ok(v.clone());
+        }
+        if self.calls >= self.limits.max_work {
+            return Err("chain fiber-work cap".into());
+        }
+        self.calls += 1;
+        let coefficients = s3_fiber_coefficients(&self.field, &self.curve, self.binary, x, y);
+        if coefficients.iter().all(N::is_zero) {
+            return Err("unrestricted auxiliary fiber; completeness not established".into());
+        }
+        let roots = poly::roots(&self.field, coefficients, 2, 2, &mut self.budget)?;
+        if roots.len() > 2 || roots.iter().any(|z| !self.evaluate(x, y, z).is_zero()) {
+            return Err("original S3 fiber replay failed".into());
+        }
+        if self.cache.len() < self.limits.max_table {
+            self.cache.insert(key, roots.clone());
+        }
+        Ok(roots)
+    }
+
+    /// Every solution of the chain ending at `target`.
+    pub fn solve(&mut self, target: &N) -> Result<Search> {
+        self.field.validate(target)?;
+        let mut out = Search {
+            solutions: vec![],
+            count: None,
+            lower_bound: 0,
+            complete: true,
+            work: 0,
+            method: "complete_s3_chain".into(),
+        };
+        let before = self.calls;
+        let domain = self.domain.clone();
+        self.walk_right(
+            &domain,
+            self.m,
+            target.clone(),
+            vec![],
+            vec![],
+            target,
+            &mut out,
+        )?;
+        out.solutions.sort();
+        out.count = Some(out.lower_bound);
+        out.work = self.calls - before;
+        Ok(out)
+    }
+
+    /// At level `j`, `w` is `w_j`; `xs` holds `x_{j+1}, ..., x_m` and `ws`
+    /// holds `w_{j+1}, ..., w_{m-1}`, both in decreasing index order.
+    #[allow(clippy::too_many_arguments)]
+    fn walk_right(
+        &mut self,
+        domain: &[N],
+        j: usize,
+        w: N,
+        xs: Vec<N>,
+        ws: Vec<N>,
+        target: &N,
+        out: &mut Search,
+    ) -> Result<()> {
+        if j == self.left_k {
+            self.probes += 1;
+            let Some(matches) = self.left.get(&w).cloned() else {
+                return Ok(());
+            };
+            for record in matches {
+                let (left_xs, left_ws) = record.split_at(self.left_k);
+                let mut row: Vec<N> = left_xs.to_vec();
+                row.extend(xs.iter().rev().cloned());
+                // The left record already ends with `w_k` when k >= 2; for
+                // k = 1, `w_1 = x_1` is a source, not an auxiliary.
+                row.extend(left_ws.iter().cloned());
+                row.extend(ws.iter().rev().cloned());
+                self.replay(&row, target)?;
+                add_solution(out, row, self.limits.max_solutions)?;
+            }
+            return Ok(());
+        }
+        for x in domain {
+            for previous in self.fiber(&w, x)? {
+                let mut xs2 = xs.clone();
+                xs2.push(x.clone());
+                let mut ws2 = ws.clone();
+                if j < self.m {
+                    ws2.push(w.clone());
+                }
+                self.walk_right(domain, j - 1, previous, xs2, ws2, target, out)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Check `(x_1, ..., x_m, w_2, ..., w_{m-1})` against every chain equation.
+    pub fn replay(&self, row: &[N], target: &N) -> Result<()> {
+        let m = self.m;
+        if row.len() != 2 * m - 2 {
+            return Err("chain tuple has the wrong arity".into());
+        }
+        let xs = &row[..m];
+        let ws = &row[m..];
+        if xs.iter().any(|x| !self.domain.contains(x)) {
+            return Err("chain tuple source outside the domain".into());
+        }
+        let w = |i: usize| -> &N {
+            // w_1 = x_1, w_i = ws[i - 2] for 2 <= i < m, w_m = target.
+            if i == 1 {
+                &xs[0]
+            } else if i == m {
+                target
+            } else {
+                &ws[i - 2]
+            }
+        };
+        for i in 1..m {
+            if !self.evaluate(w(i), &xs[i], w(i + 1)).is_zero() {
+                return Err("complete original chain replay failed".into());
+            }
+        }
+        Ok(())
+    }
 }

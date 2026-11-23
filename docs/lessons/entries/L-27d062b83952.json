@@ -1,0 +1,14 @@
+{
+  "action": "compare the set the script filters to with the set the frozen wording names, and re-derive what each flag means in each polynomial form before accepting a held verdict",
+  "created": "2026-11-22T03:36:34Z",
+  "evidence": [
+    "research/curve25519_wave7_untried_20261122/L4_twist_roots/validator-report.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a verdict script checks a frozen prediction over a subset of rows, or a degenerate-coefficient flag is reused across two polynomial forms",
+  "why": "wave-7 L4: P6 was checked on the EE/TT diagonals only while the ZZ diagonal violated it; the x1=x2 flag meant x1*x2=1 in the reversed S3"
+}
