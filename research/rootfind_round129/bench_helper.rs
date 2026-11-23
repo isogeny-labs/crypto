@@ -21,7 +21,41 @@ fn round129_psi3(field: &mut Fp<'_>, a: u64, b: u64) -> Vec<u64> {
     vec![field.sub(0, a2), twelve_b, six_a, 0, 3 % field.p]
 }
 
+
+fn round129_find_isogeny_benchmark(p: u64, ell: u64, repetitions: usize) -> u64 {
+    let mut state = p ^ 0x129_1511_2026;
+    let mut curves = Vec::new();
+    for _ in 0..32 {
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        let a = state % p;
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        let b = state % p;
+        curves.push(PrimeCurve { p, a, b });
+    }
+    let mut tally = FieldTally::default();
+    let mut checksum = 0u64;
+    for _ in 0..repetitions {
+        for curve in &curves {
+            let fingerprint = match find_isogeny(std::hint::black_box(curve), ell, &mut tally) {
+                Some(iso) => iso.x0.wrapping_mul(131)
+                    .wrapping_add(iso.target.a).wrapping_add(iso.target.b),
+                None => 0,
+            };
+            checksum = checksum.wrapping_add(std::hint::black_box(fingerprint));
+        }
+    }
+    checksum
+}
+
 pub fn round129_benchmark(op: &str, p: u64, repetitions: usize) -> u64 {
+    if op == "isogeny2" || op == "isogeny3" {
+        let ell = if op == "isogeny2" { 2 } else { 3 };
+        return round129_find_isogeny_benchmark(p, ell, repetitions);
+    }
     let mut tally = FieldTally::default();
     let mut field = Fp { p, tally: &mut tally };
     let mut cases = Vec::new();
