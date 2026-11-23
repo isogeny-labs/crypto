@@ -1,0 +1,53 @@
+   Compiling torus-section-compiler v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-section-compiler)
+error[E0277]: the trait bound `BigUint: From<i32>` is not satisfied
+  --> src/gates.rs:43:26
+   |
+43 |             b.constant(i.into());
+   |                          ^^^^ the trait `From<i32>` is not implemented for `BigUint`
+   |
+   = help: `BigUint` implements trait `From<T>`:
+             From<bool>
+             From<u128>
+             From<u16>
+             From<u32>
+             From<u64>
+             From<u8>
+             From<usize>
+   = note: required for `i32` to implement `Into<BigUint>`
+
+error[E0277]: the trait bound `num_bigint::BigUint: From<i32>` is not satisfied
+  --> src/gates.rs:43:26
+   |
+43 |             b.constant(i.into());
+   |                          ^^^^ the trait `From<i32>` is not implemented for `num_bigint::BigUint`
+   |
+   = help: `num_bigint::BigUint` implements trait `From<T>`:
+             From<bool>
+             From<u128>
+             From<u16>
+             From<u32>
+             From<u64>
+             From<u8>
+             From<usize>
+   = note: required for `i32` to implement `Into<num_bigint::BigUint>`
+
+error[E0277]: the trait bound `num_bigint::BigUint: From<i32>` is not satisfied
+   --> src/lib.rs:308:60
+    |
+308 | ...                   e.real((i * 7 + j * 3 + 2).into()).a
+    |                                                  ^^^^ the trait `From<i32>` is not implemented for `num_bigint::BigUint`
+    |
+    = help: `num_bigint::BigUint` implements trait `From<T>`:
+              From<bool>
+              From<u128>
+              From<u16>
+              From<u32>
+              From<u64>
+              From<u8>
+              From<usize>
+    = note: required for `i32` to implement `Into<num_bigint::BigUint>`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `torus-section-compiler` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-section-compiler` (lib test) due to 2 previous errors
