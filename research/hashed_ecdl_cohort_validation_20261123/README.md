@@ -76,9 +76,16 @@ clearance. Conductor is unavailable127; no reservation is asserted.
 
 The [draft independent-admission check](DRAFT-ADMISSION-PLAN.md) and
 [prospective addendum](ADMISSION-ADDENDUM-01.md) are preserved unchanged.
-Prospectively update worker, auditor, collector
-and canonical export identity rules together, test synthetic metadata controls,
-freeze/publish/checkpoint the new protocol and only then execute new targets.
+Expanded worker/collector/auditor qualifiers now pass their prescribed controls,
+with36additional deterministic public targets constructed and admitted. All48
+old/new headers agree across parent,candidate and C/OpenSSL; archived scalar
+controls are separate. See the [cohort preparation report](cohort/REPORT.md).
+The new cohort solver has not run. [pcc:unverified]
+
+Next complete native export identity and canonical metadata/schema controls,
+freeze/publish/checkpoint the prospective protocol and run the new solver cohort.
+The canonical harness_drawn branch skips derived seed-table checking; the native
+fixed target/seed mapping remains a separate required gate. [pcc:unverified]
 Keep original360 calls,324seed-table export findings,84-case tensor panel and
 all failed attempts unchanged. The new branch inherits the merged main ledger;
 it does not overwrite/rebase the earlier producer histories. [pcc:unverified]
