@@ -12,7 +12,7 @@ standing. Every scientific result below is unsigned. [pcc:unverified]
    All7 points/49 addition pairs per map, scalar-free transfer functions,
    actual F3 descent,2 source infinities,4 real degree drops, nonvacuous
    positive/negative and scale/basepoint controls are frozen before calls.
-2. Produce the complete native-rendered report and inspect every final page.
+2. Complete report now exists at reports/run-20261123T1412Z/REPORT.pdf:4 pages/251917B/SHA99026c7a, every final page inspected, unsignedbbcce1. Next priority: actual rational-divisor second Richelot hop and exact dual/backtracking classification, then cold matched costs.
 3. After a map pass, freeze a complete cold matched tiny cost/solver reference,
    charging setup/field/kernel/charts/maps/destination solver/replay/memory.
    Preserve losses; do not infer cryptographic advantage from tiny work.
