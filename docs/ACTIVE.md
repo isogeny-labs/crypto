@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Execute Lead 2C: Gauss-reduced prime-slope short-box hashed bases, Euclidean floor-sum cancellation, and unimodular crossing / parsimonious parity contraction in hashed-ecdl-tensor (cursor, started 2026-11-19, branch cursor/pdp-lead-2c-shortbox-parity-20261119, PR #4823; verified 5/5 unit tests floor_sum/short_box/unimodular [pcc:unverified])
+
 - [x] Execute EXP-PRIME31-RR9-D9-KERNEL-001 sparse-Wiedemann kernel extraction and 4-variable triangular reduction comparison on Prime31 RR9 (cursor, started 2026-11-19, branch cursor/pdp-lead-1c-rr9-wiedemann-20261119, PR #4822; example tests 2/2 in 95.79s [pcc:unverified])
 
 - [x] Prime-field PDP rootfind speedups, factor-base subproduct-tree multipoint evaluation, and Kaarelson Theorem 3 + §5a w_cal verification (Cursor, completed 2026-11-19, branch cursor/prime-pdp-rootfind-speedups-3858, PR #4819)
