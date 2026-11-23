@@ -61,3 +61,7 @@ One coordinator designed mathematics, wrote and executed Python, inspected both 
 The original 695/701-record Jacobian norm-reuse experiment and physically priced `C169/C13a/C13b/N2_actual/D` plus cold matched strongest optimized rho/BSGS/index calculus remain held by their separate owners. PR #5007 owns the genuine F3/E7 Rust transfers, and #4992 owns the formal two-hop subgroup gate; neither was modified. No paid/EKS compute, competitive timing, unauthorized branch merge, CI poll or new automation was launched.
 
 **Next:** separately reproduce these published dual-elliptic pullback formulas in the approved existing Rust/Cantor owner (including full subgroup kernel and exceptions); then obtain an independently signed frozen-source replay. No complete single-target advantage is inferred from this intentionally split toy curve.
+
+### Parent transition after CT340 publication
+
+The formerly stacked parent #4992 merged on 2026-11-23 and its base branch was removed during the CT340 publication sequence. GitHub changed #4997's base to `main`. #4997 is deliberately restored to **OPEN/DRAFT** pending native and independent gates. This changes PR metadata only, not the frozen CT340 source, raw result, or claims. Queue record: [#3904 comment 7107972060](https://github.com/isogeny-labs/crypto/issues/3904#issuecomment-7107972060).
