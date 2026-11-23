@@ -1,3 +1,13 @@
+## Latest398 publication COMPLETE; goal still ACTIVE
+
+Research/code/evidence378–397 are committed and pushed at b1c6da50b2fd43ba54717b1bf38a9baf1ac06e55 to same draftPR4989. Git ls-remote and GitHub PR head match; exact-commit remote393/392blob hashes equal local, PR title/body updated398. Report391/PDF, packet392, failedfull380/384raws and scoped390/393passes are published. Original15×goal NOT achieved. NO ACTIVE JOB. No new comparative timing. This handoff is metadata only; do not markgoalcomplete or PRready.
+
+Next realmeasurementneeds canonicalprotocol/access or user's explicit pending narrow waiver forpublished372. No reply yet; preselectedanswer/elapsedtime/broadcontinuation isn't a recorded protocolchoice. RequiredSKILLlink/quote and strongest/fullboundary/proof/repeat/AA/sixcase/15× obligations below remain. Do not repeatunchanged key/CIqueries without changed access, seekcredentials, weaken gates, usefreshseeds or rununregisteredtimings. LocalCPU0/onethread/zerocloud/checkpointS3waiver persists.
+
+Full8216rootruntime remains unqualified (380incomplete/2fails). Latest two actualsource modulespass7originaltests390+fresh393; no fullrootrebuild aftertestfixture/aliasedits. Existing348sourceclosure historical; only binary_radical_root cfgtestpath differs, aliasJSONordering separately389pinned. Allproductionoraclealgorithmbytes/original200case loop/asserts preserved. Need deliberatefuture fullrootcompile/runtime resourceplan; disk~62MiBfree. Preserve current389ELF, frozen350ELF andall original raw evidence/packets. Do not use frozen350ELF to claimnewfixes tested.
+
+Activegoal has independent correctness/publicationprogress thisturn, not three consecutivegloballyblockedturns. Keepgoalactive; no stop_goalcomplete. Before restarting anyjob check thatitdidn'talreadyfinish. Oldercheckpointsbelow are historical snapshots, superseded bythisentry forstatus.
+
 ## Latest392–397: root fixtures qualified; publication pending
 
 NO ACTIVE JOB. Final source389 actual-source two-module tests390 pass7/7, zero failed/ignored/filtered, and extracted393replay passes all7. Producer evidence unsigned. Original15× goal ACTIVE/UNACHIEVED. Full root8216suite UNQUALIFIED:380deliberately stopped exit-15 after995observedpass/2fail/30ignored;384exactbothfail101. All originalfailures retained. Do NOT rerun old350ELF expecting fixes; it is frozen historical source348.
