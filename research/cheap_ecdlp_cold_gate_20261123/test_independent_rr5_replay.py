@@ -120,6 +120,37 @@ class ReplayChecks(unittest.TestCase):
             self.assertNotEqual(bad.returncode,0)
             self.assertIn("terminal status/scalar contradiction",bad.stderr)
 
+    def test_opt_in_dual_target_certificate_replays_original_rows(self):
+        # Two authentic Prime31 relations imply L_0=1 and L_0-d=-4.
+        # The separating row combination is row 1 minus row 2:
+        # [C|-b|a] => [0,0,0,0,1,5]. No base logs enter this check.
+        out=checker.validate({},self.base,self.q,self.fixture["relations"],
+                             emit_dual_certificate=True)
+        cert=out["dual_target_certificate"]
+        self.assertEqual((cert["scalar"],cert["target_coefficient"],
+                          cert["first_target_prefix"]),(5,1,2))
+        self.assertEqual(cert["relation_weights"],[[1,1],[2,checker.N-1]])
+        originals={1:[1,0,0,0,0,1],
+                   2:[1,0,0,0,checker.N-1,checker.N-4]}
+        self.assertTrue(checker.verify_dual_certificate(
+            originals,cert["relation_weights"],5,4))
+        for poison in ([[1,1],[2,1]], [[1,1],[1,checker.N-1]],
+                       [[1,1],[3,checker.N-1]], [[1,0],[2,checker.N-1]]):
+            with self.assertRaisesRegex(ValueError,"dual target certificate"):
+                checker.verify_dual_certificate(originals,poison,5,4)
+        with self.assertRaisesRegex(ValueError,"dual target certificate"):
+            checker.verify_dual_certificate(
+                originals,cert["relation_weights"],6,4)
+
+        delayed=copy.deepcopy(self.fixture)
+        delayed["relations"].insert(0,{"terms":[[1,1]],"a":2,"b":0})
+        later=checker.validate({},self.base,self.q,delayed["relations"],
+                               emit_dual_certificate=True)["dual_target_certificate"]
+        self.assertEqual((later["relation_weights"],later["first_target_prefix"]),
+                         ([[2,1],[3,checker.N-1]],3))
+        self.assertIsNone(checker.validate(
+            {},self.base,None,[],emit_dual_certificate=True)["dual_target_certificate"])
+
     def test_extracted_grevlex_b8_row_stays_underdetermined(self):
         # Exported from RR5 development09 b8-positive.stdout, not a planted
         # synthetic relation. Its *target* is a fixed positive fixture,
@@ -128,7 +159,8 @@ class ReplayChecks(unittest.TestCase):
         data=json.loads(path.read_text())
         base=[checker.point(v,"grevlex B8 base") for v in data["base"]]
         q=checker.point(data["target_q"],"grevlex B8 Q")
-        report=checker.validate({},base,q,data["relations"])
+        report=checker.validate({},base,q,data["relations"],emit_dual_certificate=True)
+        self.assertIsNone(report["dual_target_certificate"])
         self.assertEqual((report["authenticated_rows"],report["independent_rank"]), (1,1))
         self.assertEqual(report["rank_without_target_column"],1)
         self.assertIsNone(report["first_target_prefix"])
