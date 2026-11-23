@@ -471,7 +471,6 @@ impl Fp<'_> {
     fn fixed_mersenne_product<const D: usize, const SQUARE: bool>(
         &mut self, a: &[u64; D], b: &[u64; D], m: &[u64; D],
     ) -> [u64; D] {
-        const P: u64 = (1u64 << 61) - 1;
         let mut acc = [0u128; 7];
         if SQUARE {
             for i in 0..D {
@@ -487,16 +486,16 @@ impl Fp<'_> {
                 }
             }
         }
-        let mut t = [0u64; 7];
-        for i in 0..2*D-1 {
-            t[i] = Self::fold_fixed_mersenne(acc[i]);
-        }
+        // m holds the canonical NEGATED non-leading coefficients.
+        // Each column has at most D convolution terms and D-1
+        // reduction terms, each at most (P-1)^2. For D <= 4 the
+        // total is < 7*2^122 and the first Mersenne fold fits in u64.
+        // Eliminate high terms from most to least significant; only
+        // fold a coefficient when it is consumed or returned.
         for j in (D..2*D-1).rev() {
-            let c = t[j];
+            let c = Self::fold_fixed_mersenne(acc[j]);
             for i in 0..D {
-                let v = Self::fold_fixed_mersenne(c as u128 * m[i] as u128);
-                let x = &mut t[j-D+i];
-                *x = if *x >= v { *x - v } else { *x + P - v };
+                acc[j-D+i] += c as u128 * m[i] as u128;
             }
         }
         // Count the actual coefficient products, including padded zeros,
@@ -504,7 +503,9 @@ impl Fp<'_> {
         self.tally.muls += (if SQUARE { D*(D+1)/2 } else { D*D }) as u64
             + (D*(D-1)) as u64;
         let mut result = [0u64; D];
-        result.copy_from_slice(&t[..D]);
+        for i in 0..D {
+            result[i] = Self::fold_fixed_mersenne(acc[i]);
+        }
         result
     }
 
@@ -515,7 +516,9 @@ impl Fp<'_> {
         let mut b = [0u64; D];
         b[..reduced.len()].copy_from_slice(&reduced);
         let mut modulus = [0u64; D];
-        modulus.copy_from_slice(&m[..D]);
+        for i in 0..D {
+            modulus[i] = if m[i] == 0 { 0 } else { self.p - m[i] };
+        }
         let mut r = [0u64; D];
         r[0] = 1;
         if e >= (1u64 << 30) && e.count_ones() >= 12 {
