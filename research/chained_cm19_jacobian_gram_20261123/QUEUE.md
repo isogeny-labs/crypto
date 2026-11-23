@@ -8,7 +8,7 @@ tracking-only externally merged5035. All scientific standing unsigned.
 
 | Priority | State | Next discriminating action / evidence |
 |---|---|---|
-| 0 | Native complete, report in progress | C7 actual cover Gram source746db916; CURRENT_RESULT_C, full12923B raw, data1ce706. Finish full source-linked visual/PDF/readback, then mark scoped task ready if its required packaging/checks permit. |
+| 0 | Native/report complete, publication checks in progress | C7 actual cover Gram source746db916; CURRENT_RESULT_C, full12923B raw, data1ce706. Finish full source-linked visual/PDF/readback, then mark scoped task ready if its required packaging/checks permit. |
 | 1 | Next unblocked research | Derive the integral relation of actual cover Gram G (det9) to unimodular CM19 H. Prospectively classify the discriminant-module gluing at3, distinguish decomposable/product candidates from actual Jacobian, and construct a typed integral bridge. Preserve ambiguity if actual3-torsion/divisor data is needed. Do not transport an arbitrary E³ matrix through a rational isogeny and call it integral. |
 | 2 | Depends on integral bridge | Real nontrivial CM19 degree64 S/adjoint chain with actual divisor maps, kernel/pairing/J4 and target models; stronger than the existing written abstract classification chain. No old finite mod4/product/H census replay. |
 | 3 | Computational admission open | Seek a quantitative mechanism beating the strongest original elliptic references with full setup/conversion/maps/solve/replay/memory accounting. Published quartic softO(p) upper bound alone does not improve rho O(sqrt(ell)) for ell about p. Same-prime F7 covers give no subfield descent. No advantage benchmark until a separately promising mechanism exists. |
