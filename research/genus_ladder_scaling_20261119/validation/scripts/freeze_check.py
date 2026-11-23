@@ -32,8 +32,11 @@ def mtime(f):
 
 
 out = {"head": git("rev-parse", "HEAD").strip(), "branch": git("rev-parse", "--abbrev-ref", "HEAD").strip()}
-out["tracked_dirty"] = git("status", "--porcelain", "--untracked-files=no", "--", REL).strip()
-out["tracked_files"] = git("ls-files", "--", REL).split()
+PRODUCER = [REL, f":(exclude){REL}/validation"]  # the validator's own outputs are not producer files
+out["tracked_dirty"] = git("status", "--porcelain", "--untracked-files=no", "--", *PRODUCER).strip()
+out["tracked_files"] = git("ls-files", "--", *PRODUCER).split()
+out["producer_files_changed_since_validated_commit"] = git("diff", "--stat", "469f5bf731", "HEAD", "--", *PRODUCER).strip()
+out["validation_dir_commits"] = git("log", "--format=%h %cI %s", "469f5bf731..HEAD", "--", f"{REL}/validation").strip().splitlines()
 out["commits"] = {c: {"sha": git("rev-parse", c).strip(), "committed": ctime(c),
                       "subject": git("log", "-1", "--format=%s", c).strip()} for c in (FREEZE, D1, SEL, RES)}
 
@@ -55,7 +58,7 @@ for line in open(os.path.join(S, "frozen.sha256")):
         ent["count_54293_freeze"] = blob.count(b"54293")
     fz[name] = ent
 out["frozen"] = fz
-out["changed_since_freeze"] = git("diff", "--stat", FREEZE, "HEAD", "--", REL).strip().splitlines()
+out["changed_since_freeze"] = git("diff", "--stat", FREEZE, "469f5bf731", "--", *PRODUCER).strip().splitlines()
 out["d1_commit_files"] = git("show", "--stat", "--format=", D1).strip().splitlines()
 out["deviations_first_commit"] = git("log", "--diff-filter=A", "--format=%h %cI", "--", f"{REL}/DEVIATIONS.md").strip()
 out["deviations_changed_after_d1"] = git("diff", "--stat", D1, "HEAD", "--", f"{REL}/DEVIATIONS.md").strip()
