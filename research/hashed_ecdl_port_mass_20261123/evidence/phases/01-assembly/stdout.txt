@@ -1,0 +1,28 @@
+Assembly.lean:6:45: error: Application type mismatch: The argument
+  Multiset.map Prod.snd edges
+has type
+  Multiset G
+but is expected to have type
+  Multiset ?m.1
+in the application
+  Multiset.count g (Multiset.map Prod.snd edges)
+Assembly.lean:17:54: error: Application type mismatch: The argument
+  Multiset.map Prod.snd edges
+has type
+  Multiset G
+but is expected to have type
+  Multiset ?m.1
+in the application
+  Multiset.count g (Multiset.map Prod.snd edges)
+Assembly.lean:26:2: error: Expected type must not contain free variables
+  ∑ g, Multiset.count g (Multiset.map Prod.fst {(0, 1), (0, 1), (1, 1)}) +
+      Multiset.count g (Multiset.map Prod.snd {(0, 1), (0, 1), (1, 1)}) =
+    6
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables
+Multiset.sum_count_eq_card.{u_1} {ι : Type u_1} [DecidableEq ι] {s : Finset ι} {m : Multiset ι} (hms : ∀ a ∈ m, a ∈ s) :
+  ∑ a ∈ s, Multiset.count a m = m.card
+Multiset.card_map.{v, u_1} {α : Type u_1} {β : Type v} (f : α → β) (s : Multiset α) : (Multiset.map f s).card = s.card
+Multiset.count_add.{u_1} {α : Type u_1} [DecidableEq α] (a : α) (s t : Multiset α) :
+  Multiset.count a (s + t) = Multiset.count a s + Multiset.count a t
+Assembly.lean:31:7: error(lean.unknownIdentifier): Unknown constant `Finset.sum_mul`

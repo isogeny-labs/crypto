@@ -126,6 +126,47 @@ impl Fp<'_> {
         f.pow(a, self.p - 2)
     }
 
+    // Variable-time binary modular inverse for PUBLIC polynomial coefficients.
+    // In make_monic(), the leading coefficient is a nonzero residue of an
+    // odd prime field. Unlike Fermat exponentiation, this uses only shifts,
+    // differences and conditional modular halves. Keep the normal inverse
+    // for other contexts (including point mapping) and 2/3 constants.
+    fn inv_monic_lead(&mut self, a: u64) -> u64 {
+        let p = self.p;
+        if a <= 3 || a >= p || (p & 1) == 0 {
+            return self.inv(a);
+        }
+        self.tally.invs += 1;
+        let (mut u, mut v) = (a, p);
+        let (mut x1, mut x2) = (1u64, 0u64);
+        // All coefficients remain canonical. The odd half formula is
+        // floor(x/2) + floor(p/2) + 1, avoiding x+p overflow.
+        let half = |x: u64| {
+            if x & 1 == 0 { x >> 1 } else { (x >> 1) + (p >> 1) + 1 }
+        };
+        let sub = |x: u64, y: u64| {
+            if x >= y { x - y } else { p - (y - x) }
+        };
+        while u != 1 && v != 1 {
+            while u & 1 == 0 {
+                u >>= 1;
+                x1 = half(x1);
+            }
+            while v & 1 == 0 {
+                v >>= 1;
+                x2 = half(x2);
+            }
+            if u >= v {
+                u -= v;
+                x1 = sub(x1, x2);
+            } else {
+                v -= u;
+                x2 = sub(x2, x1);
+            }
+        }
+        if u == 1 { x1 } else { x2 }
+    }
+
     // For an odd prime p, Jacobi(a,p) is the Legendre symbol. Selecting
     // a Tonelli-Shanks nonresidue with binary reciprocity avoids running
     // an entire p-sized modular exponentiation for every trial candidate.
@@ -313,7 +354,7 @@ impl Fp<'_> {
             return;
         }
         let degree = polynomial.len() - 1;
-        let inverse = self.inv(polynomial[degree]);
+        let inverse = self.inv_monic_lead(polynomial[degree]);
         for coefficient in &mut polynomial[..degree] {
             *coefficient = self.mul(*coefficient, inverse);
         }
@@ -751,6 +792,50 @@ impl Isogeny {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
+
+    #[test]
+    fn round141_monic_binary_inverse_matches_fermat() {
+        for p in [3u64, 5, 7, 11, 17, 101, 65_521, 1_000_000_007,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = 0x1412_0235_b8d3_u64 ^ p;
+            for _ in 0..2048 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let a = 1 + state % (p - 1);
+                let expected = f.pow(a, p - 2);
+                let actual = f.inv_monic_lead(a);
+                assert_eq!(actual, expected, "p={p}, a={a}");
+                assert_eq!(f.mul(a, actual), 1, "p={p}, a={a}");
+            }
+        }
+    }
+
+    #[test]
+    fn round141_nonmonic_quadratics_match_brute_force() {
+        for p in [3u64, 5, 7, 11, 13, 17, 19, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            for a in 1..p {
+                for b in 0..p.min(17) {
+                    for c in 0..p.min(17) {
+                        let poly = [c, b, a];
+                        let expected: Vec<u64> = (0..p)
+                            .filter(|&x| {
+                                let x2 = f.mul(x, x);
+                                let ax2 = f.mul(a, x2);
+                                let bx = f.mul(b, x);
+                                f.add(f.add(ax2, bx), c) == 0
+                            })
+                            .collect();
+                        assert_eq!(f.roots(&poly), expected, "p={p}, poly={poly:?}");
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn round139_even_quartics_match_exhaustive_roots() {

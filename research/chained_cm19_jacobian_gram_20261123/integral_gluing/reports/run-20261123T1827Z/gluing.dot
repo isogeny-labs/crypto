@@ -1,0 +1,14 @@
+digraph Gluing {
+ graph [rankdir=LR,bgcolor="white",nodesep=0.6,ranksep=1.0];
+ node [shape=box,style="rounded,filled",fillcolor="#e5f1ed",color="#254459",fontname="DejaVu Sans",fontsize=14,margin="0.16,0.12"];
+ edge [fontname="DejaVu Sans",fontsize=12,color="#38536e"];
+ covers [label="Actual cover Gram G\ndeterminant 9"];
+ signs [label="Two explicit H bases\nt = +(1+omega) or -(1+omega)\nactual sign unresolved"];
+ frozen [label="Frozen H catalogue\n144 mixed + 12 doubled maps"];
+ result [label="Both signs compatible:\n0 mixed; 12 doubled\nbounded negative",fillcolor="#fff0d8"];
+ {rank=same;covers;frozen}
+ {rank=same;signs;result}
+ covers -> signs [label="all 10 projective lines\n4 isotropic; 2 product excluded"];
+ frozen -> result [label="all 156 compatibility decisions"];
+ signs -> result [label="require both",constraint=false];
+}

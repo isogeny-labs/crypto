@@ -1,0 +1,92 @@
+{
+  "schema": "port-mass-source-and-fixture-plan-review/v1",
+  "review_id": "PORT-MASS-SOURCE-REVIEW-01",
+  "created_utc": "2026-11-23T17:01:07.189Z",
+  "reviewer_scope": "Same-root-team written source/math/control-plan review,not independent execution or formal/native qualification attestation.",
+  "evidence_manifest": {
+    "path": "port-mass-source-evidence-01.json",
+    "bytes": 5753,
+    "sha256": "0693218bf8d5c633a67bfdc9713e3b114c1c22180d1e2357bcc643f990e21a68",
+    "entries": 14
+  },
+  "disposition": {
+    "edge_mass": "VALID: for one fixedcoordinate/kernel/mode tuple andvalidpacketcoverage,fullgroupchildren have totaledgecount2M,independentlyofbeta.",
+    "weighted_mass": "VALID for a common naturalworkingprecisionp:sum(childedges*p)=2M*p. Itis a structuralaccountingquantity,not totalbitoperations.",
+    "vertex_mass": "VALID sourceextension:sumchildvertices=Vleft+Vright+r*P,whereP=packetcount. Oldisolatesareincluded andallpacketvertices arecreatedevenwithzeroports.",
+    "fixture_counts": "2080basecontexts and46560basepositivegroupconstruction cap are correct; balancedandnegativeprobes are separate as correctedaddendum states.",
+    "plan_corrections": "Tupledomain androw-onlycontrolprecisions are addressed byprospectiveaddenda; no remaining mathematical/source-count error found in reviewedplan.",
+    "execution_status": "Nativeimplementation/census andformalassembly qualification are not accepted bythissource review. No compiler/nativeexecution by reviewer."
+  },
+  "mathlib_law_fidelity": {
+    "law": "Multiset.sum_count_eq_card",
+    "exact_form": "ForFinsetsandMultisetm,if everya inmisins,then sum_{a ins}count(a,m)=card(m).",
+    "instantiation": "s=Finset.univ overFintypeG; ports=mapfst(edges)+mapsnd(edges). Supportcondition isdischarged bymem_univ.",
+    "composition": "card(ports)=card(edges)+card(edges)=2card(edges)via card_map/card_add;count_addrewritespointwise. Finset.sum_mulgivescommonweight law.",
+    "parallel_example": "The Fin2multiset{(0,1),(0,1),(1,1)}hasgroupcounts2and4,total6. Parallelmultiplicity is preserved,unlikeaFinsetedge representation.",
+    "assembly_source": "AssemblyV2 explicitlyparenthesizes whole summands andimports Ring.Finsetfor sum_mul,as initialsource addendum requires. Writtenmath is unchanged; no claim that reviewercompiled V2orverified latergates."
+  },
+  "source_binding": {
+    "assumptions": "Valid Bipartiteincidence,validlabels/radix/coordinate andsourcegeometry,packetscoverevery originaledge exactlyonce,matching modes/beta length,andallrequiredchildconstructions returnOk. This is conditional source reasoning,not a generic mechanically provedRust refinement.",
+    "packet_coverage": "pack_labels assigns originaledge IDs tolabelclasses andthenpacket slots;itsseenchecks rejectedgeomission/repetition.",
+    "child_ports": "For eachgroup,child firstselects oldleftandrightvertices bytheirlabeldigit andclones theirtensorArc/portarity. For eachpacket itcollects selectedrowandcolumnports,thenpushesoneedgepereach retainedendpoint. Row/column selection andedgepushes do notdepend onbeta.",
+    "mass": "Each originaledge occurs inonepacket andhasoneleftendpoint selectedinexactlyonegroup plusonerightendpoint selectedinexactlyonegroup. Thereforefullsum is2M evenwhenbothendpoints havethesamegroup.",
+    "beta": "Beta changes incoming/outgoing packet tensor descriptions,not topology. Wrongmodes/betalengthreturnsErrbeforeconstruction. Coefficient/zero-value behavior doesnot removeedges fromreturnedgraphs.",
+    "tensor_history": "Oldvertex.tensor isArc-cloned,retainingidentity andcreationprecision. Newpacketvertex creationprecision iskernel.ring.precision;allchildren ofonefixedt/z/betaqueryuse thatcommonworkingring. Oldstoredcreationprecision neednot equalworkingprecision.",
+    "prefix": "recursiveevaluate_at maybreakwhenproductzero andmayfail earlier. Avisited nonnegativegroup prefixhasmass<=2M; equality belongs to the fullvirtualfamily,not every actualtraversal.",
+    "corrupt_packets": "Deleting anedgeoccurrence leaves anaffected selectedoldport unattached; duplicating it overwrites theoldport back-reference andleavesanearlier childedge inconsistent. validate shouldreject foranaffectedgroup. These mutants intentionallybypasspack_labels guarantees."
+  },
+  "vertex_accounting": {
+    "source_reason": "Oldvertices areselectedonce overfullalphabet,includingzero-degreevertices. childunconditionallypushesonepacketvertexperpacketpergroup.",
+    "formula": "sum_g|Vchild(g)|=|Vleft|+|Vright|+rP.",
+    "abstract_inputs": "Separate old-vertexlabel multisetsare required. Endpointmultiset cannotencodeisolatedoldvertices; do notderivevertexcount byreinterpreting2M.",
+    "formal_composition": "Existing sum_count_eq_card countsoldvertex labels;sum_add_distrib andsumofconstantPgiveV+rP. No newgraph/typewrapper orcountingengine is needed.",
+    "cost_limit": "rPnewvertices,andmanyzerodegreepacketdescriptions,areomitted byedgemass. Countingedges orcommonprecision-weightededges alone cannotprice allocation,vertex/descriptions,modes,entry/coefficientextraction,interpolation,rationalwidths orfullbitwork."
+  },
+  "balanced_fixture": {
+    "inputs": "8192matching edges,oneoldvertexpereachsideofeachedge plus2deliberateisolates;radix64,a1,L2,array4096;rowe%64,columnfloor(e/64)%64;z0.",
+    "packing": "All4096orderedlabelclasses have2edges,height2.64diagonalpatterns make1packet each;2016offdiagonalpatterns make2each,total4096packets. Sourcepadding/packet/portbounds allhold.",
+    "edge_counts": "Eachgroup has128selectedrowports+128selectedcolumnports=256childedges. Total64*256=16384=2M. This is anexpectedsourcecount,not anobservednative result.",
+    "packet_degrees": "Per group,one diagonalpacket hasdegree4and126offdiagonalpackets havedegree2;remainingpacketvertices havedegree0. Maximumchilddegree4.",
+    "strict_edge_check": "8*256=2048<=8192. Thisseparatelychecks strictsourceedge-shrinkinequality for theforcedfixture;massconservationdoesnot implyshrinkage ingeneral.",
+    "modes": "z0 makeskernel.numerator_unit zero,henceallrowmodecoefficientszero andmodesempty;thereisonebetatuple.",
+    "vertices": {
+      "old_total": 16386,
+      "packets": 4096,
+      "groups": 64,
+      "new_packet_vertices": 262144,
+      "nonzero_port_packet_vertices": 8128,
+      "zero_port_packet_vertices": 254016,
+      "total_child_vertices": 278530,
+      "total_zero_degree_vertices_including_two_old_isolates": 254018
+    },
+    "scope": "NoProductionSetupcall,graphadmission,theorem-runtime conclusion orcompletecontractionresult isasserted."
+  },
+  "base_fixture_census": {
+    "sum_geometry_coordinates": 13,
+    "sum_radix_times_coordinates": 97,
+    "contexts_formula": "13*8Mvalues*5families*4labelschedules=2080.",
+    "base_group_call_cap_formula": "97*8*5*4*atmost3distincttuples=46560.",
+    "separate_calls": "64balancedfixturechildrenandnegativeconstructorprobeattempts are countedseparately,not withinthatbasebound.",
+    "tuples": "Originalweighted-onlymaximumcouldviolate sourceper(packet,target)row-degreebudget. Correctedmaximum ismin(floor(6/firstmodeweight),targetpacketrowbound),withselectedprefixstatesgeneratedbyactualnext_tuple anddeduplicated. Sourceadmissibility includesboth totalweight<7andper-groupusagebound. Noexhaustiveall-multivariate-tuples claim.",
+    "empty_modes": "Anemptymodelist legitimatelyhasoneallzerotuple;emptyMcontexts havezeroportedgemass andmaystill containoldisolates.",
+    "row_only_control": "ForM>0,row-onlyaggregatehasMmass anddiffersfromfull2M;requirevectorortotaldifference. Individualgroupswithnocolumnports canlegitimatelycoincide andmustnotallberequiredtodiffer."
+  },
+  "qualification_environment": {
+    "available_mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "owner_default_mathlib": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+    "lean": "4.35.0 asdeclared; sameversion doesnotmakeenvironments identical.",
+    "theorem_file_git_blob_both_pins": "1cdf5007c7c49a68a86da30d136b76c791e29a57",
+    "reviewer_identity_check": "LocalretainedMathlibHEAD is56; directGitpathidentities at56andcfcare equal for thecomplete countingtheoremfile.",
+    "transitive_scope": "Retainedconservativeimportscanrecords1352modules,76changedinclosure,460changedbetweenpins. Reviewer readreceipt anddidnotrerunscan orcompiler. Importclosurecannotbeclaimedidenticalfromonefile equality.",
+    "default_qualification": "OPEN;no defaultcfc/fullsharedlibrary qualification accepted orpinchange authorized by thisreview."
+  },
+  "primary_source": "AppendixD.4.6lines484..528alreadyconstructsonechildpergroup withonepacketvertexandretainedendpointports;packinglines115..171provideedgecoverage/balance. ExactTeXSHA256671642d7b53154d92344e8c4be0240f18929632ebcfdf73b07c3e9939b873860.",
+  "remaining_scope_limits": [
+    "Written genericcountingdoesnotmechanicallyextractRustgraphs or proveallword-size/resourceadmissionconditions. Boundedactualconstructorcontrols remainplanned.",
+    "Fixed-tupleedge/vertexmass isnotall-beta/mode/evaluation-node/recursion-historywork,anddoesnotclosebit-cost accounting.",
+    "Baseforcedradix2/3/4geometriesarenotproductionSetupcases; sourceproductionradix64andpublicrootadmission remainseparate.",
+    "No native/Rust/Lean/Mathlib/solver/test/checkerexecution orsignedattestation byreviewer. Assemblyrunning/failed/successfulstatuses beyondsourceaddendum arenotaccepted asqualificationshere.",
+    "No novelty,runtime/improvement,fullcounter/cryptanalytic,default-pin orindependentexecutionclaim. KBfallbackscope remains asprovided."
+  ],
+  "preservation": "Only newexclusive filesunder/tmp/ecdlp-port-mass-20261123/review written. Repositoryandolderrootreview01/02records untouched."
+}

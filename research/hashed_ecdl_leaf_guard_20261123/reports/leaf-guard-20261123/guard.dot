@@ -1,0 +1,12 @@
+digraph leaf {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", ranksep="0.3", nodesep="0.3"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, color="#52677b", fillcolor="#edf3f8", margin="0.16,0.1"];
+  edge [color="#52677b", arrowsize=0.7];
+  source [label="Actual size guard\nq=max(k,1)>0; reject M <= floor(s/q)", URL="https://github.com/isogeny-labs/crypto/blob/769693473039856325d83d6d9d8797d6edaced7f/crates/hashed-ecdl-tensor/src/contraction/recursive.rs"];
+  standard [label="Existing Std division theorem\nfloor(s/q) < M implies s < Mq", fillcolor="#e3f2ec", URL="https://github.com/leanprover/lean4/blob/eb6cafb7290e8bd5f2937522d8d804f58f02bafc/src/Init/Data/Nat/Div/Basic.lean#L314"];
+  premise [label="Derived precision premise\nhroot: s <= Mq", fillcolor="#e3f2ec"];
+  other [label="Still required\nInherited precision and both\nabsorption / dimension conditions", fillcolor="#fff0d9"];
+  result [label="Existing conditional34 precision law\nSame conclusion; hroot supplied by the source guard", URL="https://github.com/aburan28/crypto-lean/blob/50b95696db2e7a34b7c5f1ba47eb5408f49ca12d/CryptoLeanCore/TaperedPrecision.lean"];
+  scope [label="Nat/source-guard application\nChecked Rust refinement, admission and complete cost remain separate", shape=note, fillcolor="#fafafa", fontsize=10];
+  source -> standard -> premise -> result; other -> result; result -> scope;
+}
