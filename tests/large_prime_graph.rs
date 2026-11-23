@@ -590,7 +590,7 @@ fn evaluator_runs_every_stage_and_replays_every_relation() {
 
 #[test]
 fn forest_witness_dual_anchored_bridge_has_exact_source_coefficients() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let p = 7;
     let mut forest = ForestWitnessExtractor::new(2, p).unwrap();
     assert!(forest.add_row(&[(0, 1)]).unwrap().is_none());
@@ -614,7 +614,7 @@ fn forest_witness_dual_anchored_bridge_has_exact_source_coefficients() {
 
 #[test]
 fn forest_witness_balanced_unbalanced_and_zero_rows() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let p = 7u64;
     let rows = vec![
         vec![(0, 1), (1, 1)],
@@ -652,7 +652,7 @@ fn forest_witness_balanced_unbalanced_and_zero_rows() {
 
 #[test]
 fn forest_witness_matches_dense_rank_and_replays_all_random_certificates() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let mut rng = Rng(0x2c1b_3c6d_7b4a_9a13);
     for trial in 0..450 {
         let p = PRIMES[trial % PRIMES.len()];
@@ -678,7 +678,7 @@ fn forest_witness_matches_dense_rank_and_replays_all_random_certificates() {
 
 #[test]
 fn forest_witness_rejects_bad_rows_without_spurious_rank() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let mut f = ForestWitnessExtractor::new(3, 7).unwrap();
     assert!(f.add_row(&[(0, 1), (1, 2)]).unwrap().is_none());
     let baseline = f.stats();
@@ -710,8 +710,8 @@ fn forest_witness_rejects_bad_rows_without_spurious_rank() {
 
 #[test]
 fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
-    use crypto::cryptanalysis::large_prime_filter::replay_complete_relation;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
     let p = 7;
     let partials = vec![
         PartialRelation { id: 10, small: vec![(0, 1)], large: vec![(101, 1)], rhs: 1 },
@@ -737,8 +737,8 @@ fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
 
 #[test]
 fn forest_witness_materialization_randomized_original_replay() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
-    use crypto::cryptanalysis::large_prime_filter::replay_complete_relation;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
     let mut rng = Rng(0xba44_739c_a1d8_5501);
     for trial in 0..160 {
         let p = [3u64, 7, 1_000_003][trial % 3];
@@ -759,8 +759,8 @@ fn forest_witness_materialization_randomized_original_replay() {
 fn forest_witness_projected_small_rank_covers_existing_pivot_on_toys() {
     // This is a source-exact known-answer consistency check on synthetic
     // canonical arity<=2 streams, NOT an authentic Prime31 benchmark.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
-    use crypto::cryptanalysis::large_prime_filter::{
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_filter::{
         filter_large_primes, replay_complete_relation, CompleteRelation, LargePrimeFilterOptions,
     };
     let mut rng = Rng(0x99b6_43e7_2d4f_115c);
@@ -798,7 +798,7 @@ fn forest_witness_projected_small_rank_covers_existing_pivot_on_toys() {
 
 #[test]
 fn forest_witness_parent_paths_survive_small_component_reroots() {
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     // Two length-one trees join through *non-root* endpoints. The smaller
     // component must be rerooted before the new tree equation is attached.
     // This is the specific topology that a DSU-parent-only shortcut misses.
@@ -862,7 +862,7 @@ fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
     // An unanchored path has a long fundamental cycle, repeated many times.
     // Count *actual inverse calls*, not merely reduced adjacency traversals.
     // F101 and generated small payloads are synthetic module-level controls.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let p = 101u64;
     let vertices = 32usize;
     let repeats = 48usize;
@@ -916,7 +916,7 @@ fn forest_witness_reuses_root_anchor_and_invalidates_after_join() {
     // Exact F3/F7/F101/F1000003 controls. A full-rank three-vertex component
     // receives many dependent closing rows; the original anchor's source
     // expansion must be reused, then recomputed after a forest join.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     for p in [3u64, 7, 101, 1_000_003] {
         let mut f = ForestWitnessExtractor::new(4, p).unwrap();
         let mut equations: Vec<Vec<(usize, u64)>> = vec![
@@ -994,7 +994,7 @@ fn forest_witness_batches_endpoint_inverses_and_keeps_nonunit_refusal_atomic() {
     // One inversion per admitted arity-1 or arity-2 row, never per endpoint.
     // The exact LP witnesses remain valid when the second edge orientation
     // is reversed. This test is intentionally a tiny synthetic field oracle.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     for p in [3u64, 7, 101, 1_000_003] {
         let mut f = ForestWitnessExtractor::new(4, p).unwrap();
         assert!(f.add_row(&[]).unwrap().is_some());
@@ -1040,7 +1040,7 @@ fn forest_witness_factors_shared_lca_suffix_once() {
     // ordered-map work must skip those shared edges for balanced cycles,
     // while pointer lookups still account for both full parent paths.
     // Includes the unbalanced (root-pinning) case and exact source replay.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     for p in [3u64, 7, 101, 1_000_003] {
         let mut f = ForestWitnessExtractor::new(32, p).unwrap();
         let mut equations: Vec<Vec<(usize, u64)>> = Vec::new();
@@ -1133,7 +1133,7 @@ fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
     // Opt-in comparison against the source-exact original arm. There are
     // 31 independent bridges, 48 balanced closers, an unbalanced root pin,
     // and a reversed dependent closer. These are operation counts, not time.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     for p in [3u64, 7, 101, 1_000_003] {
         let mut rows: Vec<Vec<(usize, u64)>> = (0..30)
             .map(|v| vec![(v, 1), (v + 1, 1)])
@@ -1206,7 +1206,7 @@ fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
 fn forest_witness_lazy_rank_and_sources_match_random_streams() {
     // Bounded deterministic exact-field oracle including singleton anchors,
     // empty rows, dual-anchored bridges and original-RHS replay.
-    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let mut rng = Rng(0x1a21_9f3c_6b70_42d1);
     let mut total_skips = 0u64;
     let mut saved_anchor_inversions = 0u64;
@@ -1238,8 +1238,8 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
 
 #[test]
 fn projected_rank_distinguishes_lp_nullity_from_useful_small_rank() {
-    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
-    use crypto::cryptanalysis::large_prime_graph::witness::{
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::{
         collect_witnesses_lazy, materialize_complete_relations,
     };
     // Four genuinely LP-identical rows yield three independent LP
@@ -1276,8 +1276,8 @@ fn projected_rank_distinguishes_lp_nullity_from_useful_small_rank() {
 
 #[test]
 fn projected_rank_catches_rhs_contradiction_without_promoting_a_small_row() {
-    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
-    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
     // x_5 = 2 and x_5 = 3 cannot both hold; a zero row with rhs zero is
     // merely redundant. RHS contradiction is a diagnostic, NOT useful rank.
     let input = vec![
@@ -1296,8 +1296,8 @@ fn projected_rank_catches_rhs_contradiction_without_promoting_a_small_row() {
 
 #[test]
 fn projected_rank_matches_independent_dense_small_and_augmented_oracles() {
-    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
-    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
     use std::collections::BTreeMap;
     let mut rng = Rng(0x8c71_275e_19b3_40a1);
     for trial in 0..128 {
@@ -1351,8 +1351,8 @@ fn projected_rank_matches_independent_dense_small_and_augmented_oracles() {
 
 #[test]
 fn projected_rank_refuses_noncanonical_or_nonunit_input() {
-    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
-    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
     let row = |small, rhs| CompleteRelation { small, rhs, sources: vec![] };
     for malformed in [
         row(vec![(3, 0)], 0),
@@ -1378,8 +1378,8 @@ fn projected_rank_refuses_noncanonical_or_nonunit_input() {
 
 #[test]
 fn projected_rank_target_unknown_must_be_a_sparse_column_not_hidden_rhs() {
-    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
-    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
     // If RHS=1 secretly means 1 + beta*d with unknown target d, the
     // rank audit cannot infer inconsistency: d must be a matrix column.
     let omitted = CompleteRelation {
@@ -1447,11 +1447,11 @@ fn raw_lp_small_augmented_ranks(
 
 #[test]
 fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
-    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
-    use crypto::cryptanalysis::large_prime_graph::witness::{
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::{
         collect_witnesses_lazy, materialize_complete_relations,
     };
-    use crypto::cryptanalysis::large_prime_filter::{
+    use crypto_lib::cryptanalysis::large_prime_filter::{
         filter_large_primes, filter_large_primes_mst, replay_complete_relation,
         LargePrimeFilterOptions, MstLimits,
     };
@@ -1579,7 +1579,7 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
 
 #[test]
 fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
-    use crypto::cryptanalysis::large_prime_graph::eval::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::eval::*;
     // Algebra-only fixed source stream: NOT naturally collected elliptic
     // relations, and the F_ell coefficient field is not the coordinate field.
     let ell = 2_147_446_831u64;
@@ -1668,7 +1668,7 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
 
 #[test]
 fn evaluator_forest_same_source_seeded_rank_identity() {
-    use crypto::cryptanalysis::large_prime_graph::eval::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::eval::*;
     let mut p = EvalParams::default();
     p.compare_exact_forest = true;
     p.forest_max_rows = 64;
