@@ -17,6 +17,10 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [x] Qualify the primary-derived genuine CM19 F7 genus3 source:counts17/65/236, Weil(T2+3T+7)^3, Jac1331; actual17-point twist/Frobenius/inverse controls and checked2-page report (Codex, 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012, source0b9b506b/result89d7b471, unsigned180c4c; actual polarization/J4/kernel/target/cost follow-ups remain open). [pcc:unverified]
+
+- [x] Qualify the fixed250 F5 plane quartics:190 smooth,70 Phi3-cube mod2,0 full PE-cube sources; complete raw and checked2-page report (Codex, started 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012; stacked on completed finite lane PR #5007). [pcc:unverified]
+
 - [x] Classify all PGL2(F3) changes and evaluate scalar-free cross-model Richelot chains with an actual F9 twist/Frobenius control:12 isomorphisms,4 three-hop chains, original order7 actions+/-2, full report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, source96aa5f9c, unsigned331403/efc6e3; full costs/Weil8/formal/CI/custody separate follow-ups). [pcc:unverified]
 - [x] Qualify full rational Jacobian Richelot maps and exact raw dual -[2] on three21-class groups:4 bijections/1764 map additions/84 composites, finite dual-only kernel result and complete report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, resultdde79a33, unsigned6b4fb5/4b7b49). [pcc:unverified]
 
