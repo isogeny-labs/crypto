@@ -824,7 +824,8 @@ mod tests {
                         let poly = [c, b, a];
                         let expected: Vec<u64> = (0..p)
                             .filter(|&x| {
-                                let ax2 = f.mul(a, f.mul(x, x));
+                                let x2 = f.mul(x, x);
+                                let ax2 = f.mul(a, x2);
                                 let bx = f.mul(b, x);
                                 f.add(f.add(ax2, bx), c) == 0
                             })
