@@ -1,0 +1,11 @@
+digraph G {
+ rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#eef5fb",fontname="Helvetica",fontsize=12];
+ h[label="ACTUAL NORMALIZED PRINCIPAL FACTOR\nspan(h) = I(P)^4 J; h != 0"];
+ c[label="EXPLICIT RESIDUAL POINT CERTIFICATE\nJ = I(Q) I(R); actual Q,R in fixed B"];
+ g[label="DERIVED ACTUAL ELLIPTIC RELATION\n4P + Q + R = 0; repetitions allowed"];
+ i[label="ACTUAL CARDINAL PREMISE\ngcd(group order,4)=1 -> injective multiplication by4"];
+ b[label="ACTUAL PAIR-IMAGE CARDINAL BOUND\ncertified target count <= |B|^2"];
+ n[label="SCOPED MISSING CERTIFICATE TARGET\nIf |B|^2 < finite group order, some P lacks this certificate"];
+ o[label="OPEN OTHER ROUTES\n0/1 residual points, nonsplit fields, changing support\nPublic finder, useful labels and full expected bit cost",style="rounded,dashed,filled",fillcolor="#fff3df"];
+ h->g;c->g;g->b;i->b;b->n;n->o[style=dashed];
+}

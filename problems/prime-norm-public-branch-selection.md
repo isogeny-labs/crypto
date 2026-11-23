@@ -420,3 +420,20 @@ Next derive invertible-module finite-quotient dimension and actual
 idealproduct codimension additivity, then targetI^4dimension4/residual<=2,
 actualgroup/knownlabel coverage/publicfinder/full expectedcost.
 Original criteria, earlier failure history and public input scope unchanged.
+
+## 2026-11-23: actual residual dimension two; fixed pair certificate coverage
+
+Source073/build079/local038/PCC-20261123-6acf43 derives actualtargetresidue1,
+actualpowerquotientfinite/dimensionn and actualconstructedresidualdimension<=2.
+Source077/build083/local040/PCC-20261123-7eef03 checks197/11new since186,
+0warnings/standard foundations. Explicitactualrationalresidualpointfactors
+deriveprincipalproduct/4P+sumQ=0. Exactlytworesidualpointsin fixedB cover
+<=B.card^2targetsunderinjective4; actualcoprimegroupcardderivesinjection,
+and B.card^2<grouporder givesanactualtargetwithoutthispaircertificate.
+Scopedpairfamily only, notallresidualcases or universalECDLP lowerbound.
+All local unsigned outsidehistoricalshared53/57/fresh. [pcc:unverified]
+
+Next zero/onepoint residualcases and paddedidentity coverage, nonsplitdegree2
+field/scalar bridge, asymmetric/growingknownsupport survivingnormalization,
+then actualpublicfinder/density/retry/full expectedbitcost. Originalcriteria,
+nonscalarorigin/rank-directedWjet obligations and oldfailurehistory retained.

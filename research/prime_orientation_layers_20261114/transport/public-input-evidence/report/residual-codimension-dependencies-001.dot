@@ -1,0 +1,11 @@
+digraph G {
+ rankdir=TB; node[shape=box,style="rounded,filled",fillcolor="#eef5fb",fontname="Helvetica"]; edge[fontname="Helvetica"];
+ p[label="ACTUAL NONSINGULAR TARGET IDEAL I\nR/I is the actual residue field K; dimension 1"];
+ f[label="ACTUAL XCLASS POWER PRINCIPAL COVER\nNonzero principal quotient -> R/I^n finite"];
+ o[label="COMMITTED GENERIC IDEAL CODIMENSION LAW\nActual invertible unit; derived quotient maps and dimensions"];
+ i[label="ACTUAL POWER QUOTIENT\ndim_K R/I^4 = 4"];
+ h[label="CONSTRUCTED ACTUAL h AND J\nspan(h) = I^4 J; h != 0; norm degree <= 6"];
+ j[label="DERIVED ACTUAL RESIDUAL QUOTIENT\nR/J finite; dim_K R/J <= 2"];
+ q[label="OPEN USEFUL-RELATION BRIDGE\nResidual fields / rational point factors / known labels\nFixed-base coverage / public finder / full expected cost",style="rounded,dashed,filled",fillcolor="#fff3df"];
+ p->i;f->i;o->i;o->j;i->j;h->j;j->q[style=dashed];
+}
