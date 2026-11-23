@@ -1,5 +1,9 @@
 # Trace–skew radical pair image for Prime31 Semaev systems
 
+## Prior-lane correction (source audit, 2026-11-22)
+
+A stronger already-native S3 quotient/GCD competitor exists from **November 15, 2026**: `research/prime31_ic_20261115/native/examples/prime31_s3_quotient_gcd.rs`, protocol `S3_QUOTIENT_GCD_ORACLE_20261115.md`, original-Rust [CI #43741710811](https://github.com/isogeny-labs/crypto/actions/runs/43741710811). It has signed group validation, public-target/exceptional controls, B31/B135 experimental stage times (~0.5ms/~29ms) and m4 factorized S3 controls. **The present monic-t quotient + gcd is another presentation of an existing kind of method; not a new quotient/GCD discovery.** It must beat that incumbent at matched B, public Q, sign/exception branches and fully charged stage costs. The proposed balanced rank-four factor tree is a distinct unvalidated symbolic-construction refinement. See [MONIC_T_ELIMINATION.md](MONIC_T_ELIMINATION.md). Existing 2014 symmetric Semaev prior art also applies.
+
 ## New native CI checkpoint (2026-11-22 UTC)
 
 Original Rust 1.100.0 [CI run #45082848679](https://github.com/isogeny-labs/crypto/actions/runs/45082848679), job 137394665846, **passed** both pair/moment test targets and all four F4 example modes. Detailed original-Rust stage measurements and scope: [CI_RESULTS_20261122.md](CI_RESULTS_20261122.md). B3/B4 two-summand degree-B G uses 359/783 F4 field operations versus ordered 511/1238 (29.75%/36.75% lower), but the six-variable four-summand G chain consumes **2,182,404** operations vs ordered **1,036,961** (**2.105× worse**) at B4. A quadratic circuit is also worse than G at both B3/B4. `setup_ms` excludes construction of symbolic equations, while the F4 runner does not certify roots. **No complete solver or asymptotic advantage**.
