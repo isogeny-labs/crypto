@@ -39,6 +39,9 @@ jobs:
         run: |
           cargo test --locked --release --example prime31_monic_s3_pair_oracle
           cargo run --locked --release --example prime31_monic_s3_pair_oracle
+      - name: Monic non-table Prime31 S3 unknown-index x-controls through B677
+        timeout-minutes: 5
+        run: cargo run --locked --release --example prime31_monic_s3_pair_oracle -- --scale
       - name: Matched m2 F4 arms, planted genuine Prime31 S3
         run: cargo run --locked --release --example prime31_trace_f4_pilot
       - name: Quadratic Newton circuit versus matched F4 arms
