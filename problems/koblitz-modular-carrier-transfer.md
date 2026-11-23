@@ -8,6 +8,15 @@
 
 ## Problem
 
+Continued2026-11-23: [round02](../research/ecc2k130_jacobian_theory_20261123/round02/REPORT.md)
+gives a written necessity result that every F2-isogeny from the natural A
+to a principally polarized representative has degree divisible by
+146505763881528721. It uses the retained Artin class of the canonical
+polarization and the universal order's conductor support; the local
+260-embedding residue census is retained separately. PCC-20261123-b7901e
+is unverified. No degree-to-time inference is made. The larger-genus
+complement/gluing cases require a separate argument and remain open.
+
 2026-11-23 theory update: [principal-polarization and integral-symmetry
 study](../research/ecc2k130_jacobian_theory_20261123/REPORT.md), draft PR #5079.
 A written application of Howe's finite-field criterion, with an exact native

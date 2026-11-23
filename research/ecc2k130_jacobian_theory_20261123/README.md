@@ -2,6 +2,14 @@
 
 [Report](REPORT.md) · [PDF](report.pdf) · [diagram](routes.svg) · [proof map](PROOF_MAP.md)
 
+Continued work: [round02 report](round02/REPORT.md), [PDF](round02/report.pdf)
+and [residue census](round02/local_check.txt). The new written necessity
+result is [PCC-20261123-b7901e](../../pcc/claims/PCC-20261123-b7901e.json),
+standing **unverified**: every F2-isogeny from the natural A to a principally
+polarized representative has degree divisible by146505763881528721.
+This constrains genus130 transfers; it is not a running-time bound or a
+nonexistence result for larger-genus carriers.
+
 Written conclusions, all with PCC standing **unverified**:
 
 - [PCC-20261123-f0df24](../../pcc/claims/PCC-20261123-f0df24.json): the F2-isogeny class admits a principal polarization, using a concrete inert residue prime and Howe's theorem.

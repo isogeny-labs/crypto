@@ -2,6 +2,13 @@
 
 All mathematical deductions in REPORT.md are unsigned [pcc:unverified].
 
+Round02 adds a written Artin-obstruction argument restricting isogeny
+degrees to principally polarized representatives. Its PCC record is
+PCC-20261123-b7901e, standing unverified. The native 260-embedding residue
+census is only an arithmetic check. Full Lean formalization of coefficient
+orders, polarization-class invariance, Artin reciprocity and integral Tate
+modules is still absent; the degree-divisibility result is not Lean checked.
+
 | Report obligation | Evidence | Formal status |
 |---|---|---|
 | U131 recurrence and factorization | check.cpp/check.txt; Lucas integer recurrence | factorization only in Arithmetic.lean, uncompiled |
