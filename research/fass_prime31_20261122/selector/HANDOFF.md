@@ -22,10 +22,12 @@ Use the original protocol and repository checkpoint, runner, source/image, capac
 
 ## Publication and state
 
-The PR stays draft because current-main integration, whole-library qualification and the broader admitted comparison remain unfinished. Update its existing branch rather than opening a duplicate. Preserve the append-only main PCC prefix before registering any new claim. Never promote the producer attestation to a verified claim without the signed verdict. [pcc:unverified]
+The owner changed the lane to ready for review while publication was being reconciled; preserve that readiness state. Current-head dependency repair/requalification, whole-library qualification and the admitted comparison remain unfinished. Update its existing branch rather than opening a duplicate. Preserve the append-only main PCC prefix before registering any new claim. Never promote the producer attestation to a verified claim without the signed verdict. [pcc:unverified]
 
 Pages searches and an inventory request returned no usable result before the execution runtime reset. No Page was edited. When the connector responds, find and freshly read the existing FASS research page or ECDLP benchmark tracker before reconciling its status; do not create a duplicate from a failed lookup.
 
 There are no research runs in flight from this work.
 
 The immutable selector source/evidence commit is `883e2d2dda223ae1b8eafdc83b289a49fa178855`. The intended unsigned statement is `PCC-20261123-b6b455`; `PCC-20261123-f307d3` is retained only as a superseded administrative record with the earlier producer commit. Preserve concurrent coupled-study commit `2ac638f69c95e9966ce8dd29505b67337d6a9bba` when updating the lane. [pcc:unverified]
+
+See [PUBLICATION_UPDATE.md](PUBLICATION_UPDATE.md) for the later head, existing dependency defects and canonical ledger reconciliation. The original 15-test binding remains at source commit 883e2d2d; it is not a current-head compilation result. [pcc:unverified]
