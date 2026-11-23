@@ -1,0 +1,147 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=19mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,graphicx,amsmath,amssymb,booktabs,xcolor,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\begin{document}
+{\Large Curve25519 supplied-section quotient queries}\par
+2026-11-23\quad PR4984\quad Source \texttt{03bc5f4fad}\par
+Native PCC-20261123-be5351; prospective PCC-20261123-1aa48b.\par
+\textbf{Standing: producer unsigned/unverified.}
+
+The Rust component computes geometric products in a finite free quotient
+algebra, restricts occupied label intervals, and lifts a supplied section to
+original indexed witnesses. At the original torus parameters
+$q=213156431$, $a=60824497$, $k=20633$, one fixed control extracts
+$(j,t)=(1,0),\ldots,(6,0)$ from supplied coefficients and checks the unchanged
+six-member circuit and independently replayed indexed group row.
+
+The query API receives public Spec, $R$, $Q=[8]R$, and section coefficients
+$c$. It receives no original labels, signs, point list or witness. The control
+constructs $c$ from known points: this is supplied-section extraction, not
+coefficient discovery or a blind public-target cohort.
+
+\includegraphics[width=\linewidth]{pipeline.pdf}
+
+\textbf{Algorithm and multiplicities.}
+Use $\mathbb F_{p^2}[X]/S_c$, with monic sextic $S_c$, and adjoin
+\[
+v^2-(4T_q(\lambda)^2-2)v+1=0,\qquad\lambda=A/(2X+A).
+\]
+This monic extension stays free for repeated roots; $v$ is a unit.
+Homothety constructs baby polynomials; scalar Karatsuba convolutions implement
+chirp giant-step evaluation. Only known nonzero field scalars are inverted.
+Conjugation supplies the second product, with explicit base projection.
+
+For fixed quotient degree, the uncapped loop family has the classical upper
+bound $O(M(\sqrt{k})+\sqrt{k})$. Here
+$M(n)=O(n^{\log_2 3})$, so the exponent is
+$\alpha=\log_2(3)/2\approx0.7925$. This is a source-level arithmetic bound,
+not a measured fit or the prior hypothetical quasi-linear backend.
+
+Rational support, nonzero rational ordinate and membership retain sixth
+powers. Interval $\gcd(S_c,H_J^6)$ preserves primary factors. Bounded degree-six
+factor splitting, local Hasse orders, trace orientation and the unchanged
+HAC3.56 subgroup index decoder recover original witnesses. Resource refusals
+remain incomplete; they do not establish target absence.
+
+\textbf{Checks with exceptional structure.}
+The toy case contains the forced negative-target chart:
+$R=(21,77)$ and a leaf $(21,24)=-R$ over $\mathbb F_{101}$.
+Distinct raw columns $(1,0)$ and $(2,2)$ retain their common image $(71,71)$.
+A repeated-point section has nonzero nilpotent $H$ with $H^6=0$; support passes
+while repeated raw labels refuse. Identity-pretarget and arbitrary-sign
+coverage are not established by these fixed query controls.
+
+\newpage
+{\large Fixed native qualification}\par
+\begin{tabular}{p{10.6cm}r}
+\toprule
+Declared case family & Completed/planned\\\midrule
+Scalar convolution: two fields, seven lengths &14/14\\
+Full remainders: two fields, three degrees, eight $n$, two offsets &96/96\\
+Nilpotent;16 guards; three ordinary pipelines; alias; repeated; degree-one full length &8/8\\\midrule
+Total arms; final completion record is separate &118/118\\\bottomrule
+\end{tabular}
+
+One substantive call returned exit0 and119 JSONL records including completion.
+No final arm failed, timed out or was excluded. Transport success/collision and
+four focused release tests are separate from the118 arms.
+
+Both actual-field cases keep $q=213156431$: $k=31$ and $k=20633$.
+Actual recovered subgroup indices are fixed0; the toy alias covers1 and2.
+The full $n=20633$ direct reference is degree1. Separate degree6 full
+remainder comparisons cover $n\le31$. The actual degree6 full-$k$ pipeline has
+complete original root/circuit/row replay, not a separate degree6 full-$k$
+direct-product reference. References share field and quotient reduction
+primitives; their multiplication layouts differ.
+
+\includegraphics[width=\linewidth]{counts.pdf}
+
+\textbf{Partial diagnostic counters.}
+The plotted values are recorded new-arithmetic $\mathbb F_{p^2}$ multiplication
+calls:19691,105416,1756642. One known section per case, no statistical sampling
+or uncertainty estimate. They exclude existing field inversions, AD lifting,
+group/circuit/index work, parsing/serialization and complete allocator costs.
+They are not normalized field work, bitop/v1, time, live RAM or a speed ranking.
+Cumulative reserved coefficient slots are also partial, not peak storage.
+
+\textbf{Source and transport provenance.}
+The30-input58112-byte archive, eight compiled hashes and1533160-byte binary
+\texttt{eaa3e8c6ca42} match pre/post. The raw259139-byte JSONL is retained
+losslessly as61929-byte gzip \texttt{42d9cfbeb4eb}. Original November17
+four-test,fmt,strict Clippy/build logs and the first failed literal-type
+build source/log are preserved.
+
+A separately copied read-only qualifier and the actual wrapper's transport
+success/collision controls preceded the one180second-cap call. Raw output uses
+\texttt{create\_new}; stdout/stderr are distinct, and each arm flushes its record.
+Orchestration is shell-only. No timing/isolation receipt is inferred.
+
+\newpage
+{\large Where the exponent-bearing work remains}\par
+For $k=B^\theta$ and $B^\chi$ explicitly attempted coefficient vectors,
+the conservative seed-test upper budget is
+\[
+O(B^{\chi+\alpha\theta}),\qquad\alpha=\log_2(3)/2.
+\]
+The target $\chi+\alpha\theta<3$ is a \emph{sufficient phase budget} under the
+earlier conditional six-sum model. It is not a necessary lower bound or route
+disproof. Setup is charged to one external target. Public query generation and
+rational $[8]$-fibres, useful yield/rank, growing family, subgroup indexing,
+selection/private tags, kernel, recovery, row storage and memory still count.
+
+\textbf{Concrete successor: unknown-coefficient compilation.}
+Normalize $c_4=1$ in the finite section chart, retaining five unknown field
+coefficients. Compile these same norm-remainder, binary Chebyshev,
+homothety and Karatsuba/chirp recurrences over the unknowns, retaining every
+inverse guard and sixth-power support equation. This forms a target-conditioned
+system without constructing all signed triples.
+
+The first obligation is extension/projection correctness between compiled
+solutions and admitted sections, with original witness extraction. Circuit
+size, five inputs or quadratic gates do not establish low solving degree.
+A coefficient solver needs its own work/memory/yield analysis. A compact bulk
+operator also needs a representation and exact zero-selection/extraction bound;
+materializing a dimension-$D$ candidate algebra does not search $D$ candidates
+for free. No coefficient campaign is scheduled by this report.
+
+\textbf{Evidence and formal scope.}
+See \texttt{section-query-v1/PROTOCOL.md}, \texttt{PRECALL.json},
+\texttt{POSTCALL.json}, \texttt{SOURCE\_QUALIFICATION.json}, \texttt{FROZEN.md}
+and \texttt{NEXT.md}, with full native records and development logs.
+The earlier residual identity \texttt{IDC1h5aa2ca2649f9d3c6} and unit-cancellation
+Lean endpoint keep their original narrow scope. Neither proves the new native
+algorithm, compiler or cost chain. No new Lean pass is claimed.
+
+\textbf{Prior work.}
+Bostan--Yurkevich,\href{https://arxiv.org/pdf/2012.08656v1}{arXiv2012.08656v1},
+section2.1 Algorithms1/2; Bostan--Schost,\href{https://mathexp.eu/bostan/publications/BoSc05.pdf}{Journal of Complexity21(2005)},
+Lemma1/section5. Homothety, chirp, Karatsuba, norms and subgroup BSGS are classical.
+KB unavailability is recorded and provides no novelty clearance.
+
+Canonical scoreboard/timeline and prior criteria are unchanged: this round adds
+an implemented component and fixed correctness evidence, with no admitted
+performance value or completed overall-goal edge.
+\end{document}
