@@ -63,6 +63,7 @@ jobs:
             taskq/deploy/eks-karpenter
             tools/artifacts
             .artifacts
+            research/rootfind_k13_l2_admission_probe_20261116
       - name: Verify request, build identity and MCP contracts
         run: |
           set -euo pipefail
@@ -218,6 +219,7 @@ jobs:
             taskq/deploy/eks-karpenter
             tools/artifacts
             .artifacts
+            research/rootfind_k13_l2_admission_probe_20261116
       - name: Check out the tested norm-branch checkpoint inputs
         if: inputs.norm_branch_census
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
