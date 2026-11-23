@@ -55,6 +55,7 @@ enum Fx {
     Gls,
     Subfield,
     Fp4,
+    Fp3,
     /// `PrimeExplicit` p = 4999, order 5006 = 2 · 2503: cofactor two, so the
     /// cofactor multiplication of a hashed public point is a real doubling.
     Cofactor2,
@@ -163,6 +164,7 @@ fn spec(fx: Fx) -> CurveSpec {
             max_cofactor_ratio: 64,
         },
         Fx::Fp4 => CurveSpec::Fp4Translation { p: 29, seed: 1 },
+        Fx::Fp3 => CurveSpec::Fp3Random { p: 67, seed: 1 },
     }
 }
 
@@ -411,6 +413,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.signed_frobenius_v3", Fx::K0n19, &[]),
     ("rho.signed_frobenius_v4", Fx::K0n19, &[]),
     ("rho.signed_frobenius_v5", Fx::K0n19, &[]),
+    ("rho.signed_frobenius_v6", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong_legacy", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong_escape", Fx::K0n19, &[]),
@@ -471,6 +474,20 @@ const CASES: &[(&str, Fx, P)] = &[
     ("jacobian_image.bsgs", Fx::K0n7, &[]),
     ("jacobian_image.rho3_field_tally", Fx::K0n7, &[]),
     ("jacobian_image.bsgs_field_tally", Fx::K0n7, &[]),
+    ("jacobian_image.rho3_v2", Fx::K0n7, &[]),
+    ("jacobian_image.bsgs_v2", Fx::K0n7, &[]),
+    (
+        "jacobian_image.genus3_projected_ic_v1",
+        Fx::K0n7,
+        &[
+            ("fb_size", "32"),
+            ("extra_relations", "8"),
+            ("branches", "32"),
+            ("d_step_in", "4"),
+            ("max_trials", "200000"),
+            ("threads", "1"),
+        ],
+    ),
     ("jacobian_image.rho3", Fx::Binary11, &[]),
     ("jacobian_image.bsgs", Fx::Binary11, &[]),
     ("jacobian_image.rho3_field_tally", Fx::Binary11, &[]),
@@ -512,6 +529,16 @@ const CASES: &[(&str, Fx, P)] = &[
         "ic.k4_gaudry",
         Fx::Fp4,
         &[("base", "xline"), ("large_primes", "0"), ("c4", "97")],
+    ),
+    (
+        "ic.k3_gaudry",
+        Fx::Fp3,
+        &[("harvester", "eliminator"), ("oracle", "groebner")],
+    ),
+    (
+        "ic.k3_gaudry",
+        Fx::Fp3,
+        &[("harvester", "cycles"), ("oracle", "groebner")],
     ),
 ];
 
@@ -580,8 +607,8 @@ const UNPRICED_EXEMPT: &[(&str, &str)] = &[
 
 /// Rule 2: the phase that holds the final `[d]G = Q` check, which must
 /// charge something inside the total (a recovered run performed the check).
-/// `jacobian_image.*` is absent: it converts no operation to GAE at all
-/// (its check is counted in `jacobian_group_operations_uncharged`).
+/// Historical `jacobian_image.*` is absent: it converts no operation to GAE at
+/// all. The v2 adapters charge their source replay in `verification`.
 const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.known_log_ksum_v1", "target_recovery_check"),
     ("ic.known_log_mitm2_v1", "target_recovery_check"),
@@ -594,6 +621,9 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("rho.negation_strong", "check"),
     ("ic.koblitz_batched", "verify"),
     ("ic.koblitz_batched_v2", "verify"),
+    ("jacobian_image.rho3_v2", "verification"),
+    ("jacobian_image.bsgs_v2", "verification"),
+    ("jacobian_image.genus3_projected_ic_v1", "verification"),
 ];
 
 fn phase_gap(rep: &SolveReport) -> f64 {
@@ -791,6 +821,8 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
         ("jacobian_image.bsgs", &[], &koblitz),
         ("jacobian_image.rho3_field_tally", &[], &koblitz),
         ("jacobian_image.bsgs_field_tally", &[], &koblitz),
+        ("jacobian_image.rho3_v2", &[], &koblitz),
+        ("jacobian_image.bsgs_v2", &[], &koblitz),
         ("ic.koblitz_batched", batched, &koblitz),
         (
             "rho.negation_strong",

@@ -653,6 +653,78 @@ pub struct F4Options {
     /// Test hook for [`F4Options::checkpointing_in_step`]: stop (reported as
     /// `timed_out`) right after this many in-step snapshots.
     pub checkpoint_stop_in_rref: Option<usize>,
+    /// How the recursive visitor ([`solve_visit`] and its variants) finds the
+    /// roots of a univariate in a variable with a finite domain (a factor-base
+    /// coordinate).  Every mode returns the same roots in the same (domain)
+    /// order, so the traversal and the visitor's call sequence do not depend
+    /// on it; only the work does.  The default is the domain scan, kept as the
+    /// control.  See [`DomainRootMode`].
+    pub domain_roots: DomainRootMode,
+    /// Batched sibling extraction in the recursive visitor: at a node that
+    /// branches over a finite domain, the children are the specialisations
+    /// of one parent generating set at each domain value.  With this set,
+    /// the parent generators are rewritten once with coefficients that are
+    /// univariates in the branch variable, each sibling is specialised by
+    /// Horner evaluation, and its system is solved without F4 by triangular
+    /// back-substitution (univariate gcd, closed-form roots for degree at
+    /// most two, the counted Frobenius root finder otherwise, the shared
+    /// domain index); a child with no univariate falls back to the F4 path.
+    /// Every candidate is still checked against the original input, so the
+    /// solution set is the scan's; the order can differ where a child needs
+    /// more than one substitution.  Off by default, and never used with a
+    /// trace sink or a trace-reuse pool.
+    pub sibling_batch: bool,
+}
+
+/// Root extraction for a univariate whose variable has a finite domain `D`.
+///
+/// The roots of `g` in `D` are exactly the `F_p`-roots of `g` that lie in
+/// `D`, because the visitor requires `D ⊂ F_p`.  The scan evaluates `g` at
+/// every element of `D`: about `|D| · terms · log deg` multiplications for
+/// each univariate at each node.  [`DomainRootMode::Frobenius`] instead finds
+/// the few rational roots with the counted `gcd(g, x^p − x)` / Cantor–Zassenhaus
+/// root finder that unrestricted univariates already use (`O(log p · deg²)`
+/// multiplications, independent of `|D|`), then keeps those in `D` through a
+/// value → position index built once per traversal and shared by every node,
+/// and returns them in domain order.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum DomainRootMode {
+    /// Evaluate the univariate at every domain element (the legacy control).
+    #[default]
+    Scan,
+    /// Frobenius root extraction filtered through the domain index.
+    Frobenius,
+    /// Per univariate, whichever of the two has the smaller estimated
+    /// multiplication count ([`domain_scan_cost`] against
+    /// [`domain_frobenius_cost`]).
+    Auto,
+}
+
+/// Multiplications the domain scan spends on one univariate: for each domain
+/// element and each term, square-and-multiply `x^e` and one coefficient
+/// product.  Exact for the scan below.
+pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
+    let per_point: u64 = exponents
+        .iter()
+        .map(|&e| powmod_muls(u64::from(e)) + 1)
+        .sum();
+    per_point.saturating_mul(domain_len as u64)
+}
+
+/// An upper estimate of the Frobenius root finder's multiplications for a
+/// univariate of degree `degree`: square-and-multiply for `x^p mod g`, each
+/// step a schoolbook product and a reduction, plus the gcd.  Used only to
+/// choose between the modes in [`DomainRootMode::Auto`]; never reported.
+pub fn domain_frobenius_cost(degree: u32, p: u64) -> u64 {
+    let n = u64::from(degree) + 1;
+    let step = 2 * n * n;
+    powmod_muls(p).saturating_mul(step).saturating_add(n * n)
+}
+
+/// Multiplications of the square-and-multiply loop of [`powmod`] for exponent
+/// `e`: one squaring a bit and one product a set bit.
+fn powmod_muls(e: u64) -> u64 {
+    u64::from(64 - e.leading_zeros()) + u64::from(e.count_ones())
 }
 
 impl F4Options {
@@ -672,7 +744,21 @@ impl F4Options {
             checkpoint_stop_after: None,
             checkpoint_in_step: None,
             checkpoint_stop_in_rref: None,
+            domain_roots: DomainRootMode::Scan,
+            sibling_batch: false,
         }
+    }
+
+    /// Turn batched sibling extraction on or off ([`F4Options::sibling_batch`]).
+    pub fn with_sibling_batch(mut self, on: bool) -> Self {
+        self.sibling_batch = on;
+        self
+    }
+
+    /// Select the visitor's root extraction for finite-domain variables.
+    pub fn with_domain_roots(mut self, mode: DomainRootMode) -> Self {
+        self.domain_roots = mode;
+        self
     }
     /// Checkpoint the run to `path` and resume from it.
     ///
@@ -1276,6 +1362,222 @@ pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
     pub new_lms: Vec<Vec<u32>>,
+    /// The step's symbolic preprocessing, frozen by a replay
+    /// ([`FrozenStep`]); never serialized.
+    #[serde(skip)]
+    frozen: FrozenSlot,
+}
+
+/// A step's frozen symbolic preprocessing, shared by the replays of one
+/// trace (they run on several threads).
+#[derive(Default, Debug)]
+struct FrozenSlot(std::sync::RwLock<Option<std::sync::Arc<FrozenStep>>>);
+
+impl Clone for FrozenSlot {
+    fn clone(&self) -> Self {
+        FrozenSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+/// One replayed step's symbolic preprocessing, kept to rebuild the step's
+/// matrix on later systems without hashing a monomial.
+///
+/// Symbolic preprocessing on a replayed step depends only on the seed rows
+/// (the recorded rows, the same on every replay), the alive leading
+/// monomials (the same on every replay that reached the step: each earlier
+/// step's new leading monomials were checked) and the terms of the basis
+/// elements it reaches.  The frozen copy is taken on a system whose
+/// supports contain the current system's (term by term, a subsequence), so
+/// every monomial and reducer the current system reaches is in it, with the
+/// same column order and the same reducer (the first alive divisor of the
+/// monomial, a function of the leading monomials alone).  Walking the frozen
+/// columns from the current seed rows' terms through the frozen reducers of
+/// the columns reached gives exactly the monomials and reducer rows
+/// symbolic preprocessing would find; the columns not reached are dropped.
+/// Only the reducer rows' order can differ, and the reductions key reducers
+/// by their leading column.
+#[derive(Debug)]
+struct FrozenStep {
+    /// Every basis element the rows use, with its packed terms when frozen.
+    support: Vec<(usize, Vec<u128>)>,
+    /// The seed rows: basis element and, per frozen term, its column.
+    seeds: Vec<(usize, Vec<u32>)>,
+    /// The reducer rows: basis element, packed multiplier, column per term.
+    reducers: Vec<(usize, u128, Vec<u32>)>,
+    /// The columns, packed, in decreasing order.
+    cols: Vec<u128>,
+    /// Per column, the reducer row with that leading column (`u32::MAX`: none).
+    reducer_of: Vec<u32>,
+}
+
+/// The positions of `actual` within `frozen` when it is a subsequence of
+/// it (both in the polynomial's term order), else `None`.
+fn subsequence_positions(frozen: &[u128], actual: &[u128]) -> Option<Vec<u32>> {
+    let mut out = Vec::with_capacity(actual.len());
+    let mut j = 0;
+    for &t in actual {
+        while j < frozen.len() && frozen[j] != t {
+            j += 1;
+        }
+        if j == frozen.len() {
+            return None;
+        }
+        out.push(j as u32);
+        j += 1;
+    }
+    Some(out)
+}
+
+/// The union of two term lists of one polynomial, both in decreasing term
+/// order under `key`.
+fn merge_terms(a: &[u128], b: &[u128], key: impl Fn(u128) -> u128) -> Vec<u128> {
+    let mut out = Vec::with_capacity(a.len().max(b.len()));
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() && j < b.len() {
+        let (ka, kb) = (key(a[i]), key(b[j]));
+        if ka == kb {
+            out.push(a[i]);
+            i += 1;
+            j += 1;
+        } else if ka > kb {
+            out.push(a[i]);
+            i += 1;
+        } else {
+            out.push(b[j]);
+            j += 1;
+        }
+    }
+    out.extend_from_slice(&a[i..]);
+    out.extend_from_slice(&b[j..]);
+    out
+}
+
+/// One step's symbolic preprocessing: reducer rows, packed columns, and
+/// every row as column indices (as [`Packed::symbolic`] returns it).
+type Symbolic = (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>);
+
+impl FrozenStep {
+    fn from_symbolic(
+        terms: &[Vec<u128>],
+        seeds: &[(usize, Vec<u32>)],
+        extra: &[(usize, u128)],
+        cols: &[u128],
+        row_cols: &[Vec<u32>],
+    ) -> Self {
+        let n = seeds.len();
+        let mut reducer_of = vec![u32::MAX; cols.len()];
+        for (r, rc) in row_cols[n..].iter().enumerate() {
+            reducer_of[rc[0] as usize] = r as u32;
+        }
+        let mut used: Vec<usize> = seeds
+            .iter()
+            .map(|(i, _)| *i)
+            .chain(extra.iter().map(|&(i, _)| i))
+            .collect();
+        used.sort_unstable();
+        used.dedup();
+        FrozenStep {
+            support: used.iter().map(|&i| (i, terms[i].clone())).collect(),
+            seeds: seeds
+                .iter()
+                .zip(row_cols)
+                .map(|((i, _), rc)| (*i, rc.clone()))
+                .collect(),
+            reducers: extra
+                .iter()
+                .zip(&row_cols[n..])
+                .map(|(&(i, m), rc)| (i, m, rc.clone()))
+                .collect(),
+            cols: cols.to_vec(),
+            reducer_of,
+        }
+    }
+
+    /// The step's symbolic preprocessing for the current terms, or `None`
+    /// when some element has a term the frozen copy lacks.
+    fn rebuild(&self, terms: &[Vec<u128>]) -> Option<Symbolic> {
+        let top = self.support.last().map_or(0, |(i, _)| i + 1);
+        let mut pos: Vec<Vec<u32>> = vec![Vec::new(); top];
+        for (i, frozen) in &self.support {
+            pos[*i] = subsequence_positions(frozen, terms.get(*i)?)?;
+        }
+        let map = |i: usize, fcols: &[u32]| -> Vec<u32> {
+            pos[i].iter().map(|&k| fcols[k as usize]).collect()
+        };
+        let nc = self.cols.len();
+        let mut reached = vec![false; nc];
+        let mut done = vec![false; nc];
+        let mut stack: Vec<u32> = Vec::new();
+        let mut rows: Vec<Vec<u32>> = Vec::with_capacity(self.seeds.len() + self.reducers.len());
+        for (i, fc) in &self.seeds {
+            let rc = map(*i, fc);
+            done[rc[0] as usize] = true;
+            for &c in &rc {
+                if !reached[c as usize] {
+                    reached[c as usize] = true;
+                    stack.push(c);
+                }
+            }
+            rows.push(rc);
+        }
+        let mut used: Vec<u32> = Vec::new();
+        while let Some(c) = stack.pop() {
+            let c = c as usize;
+            if done[c] {
+                continue;
+            }
+            done[c] = true;
+            let r = self.reducer_of[c];
+            if r == u32::MAX {
+                continue;
+            }
+            let (i, _, fc) = &self.reducers[r as usize];
+            let rc = map(*i, fc);
+            for &x in &rc {
+                if !reached[x as usize] {
+                    reached[x as usize] = true;
+                    stack.push(x);
+                }
+            }
+            used.push(r);
+            rows.push(rc);
+        }
+        let mut new_index = vec![u32::MAX; nc];
+        let mut cols = Vec::new();
+        for c in 0..nc {
+            if reached[c] {
+                new_index[c] = cols.len() as u32;
+                cols.push(self.cols[c]);
+            }
+        }
+        for row in &mut rows {
+            for x in row.iter_mut() {
+                *x = new_index[*x as usize];
+            }
+        }
+        let extra = used
+            .iter()
+            .map(|&r| {
+                let (i, m, _) = &self.reducers[r as usize];
+                (*i, *m)
+            })
+            .collect();
+        Some((extra, cols, rows))
+    }
+}
+
+static FROZEN_HITS: AtomicU64 = AtomicU64::new(0);
+
+/// Replayed steps that rebuilt their matrix from frozen preprocessing.
+pub fn frozen_steps_total() -> u64 {
+    FROZEN_HITS.load(AtomicOrdering::Relaxed)
+}
+
+/// `F4_FP_FREEZE=0` makes every replay run its steps' symbolic
+/// preprocessing (the path before 2026-11-21), a same-binary control.
+fn freeze_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_FREEZE").as_deref() != Ok("0"))
 }
 
 /// The trace of one run (Joux–Vitse's "F4 remake": the useful rows of
@@ -1326,6 +1628,10 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         for v in m[r].iter_mut() {
             *v = ((*v as u128 * inv as u128) % p as u128) as u64;
         }
+        // Charged to the recording run like any other row operation (since
+        // 2026-11-21; before, the tracked elimination a recording adds was
+        // not counted at all).
+        count_ops(ncols);
         let pivot_row = m[r].clone();
         let pivot_who = who[r].clone();
         for i in 0..n {
@@ -1335,6 +1641,7 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
                 for (x, &y) in m[i].iter_mut().zip(&pivot_row) {
                     *x = ((*x as u128 + neg as u128 * y as u128) % p as u128) as u64;
                 }
+                count_ops(ncols);
                 for (a, &b) in who[i].iter_mut().zip(&pivot_who) {
                     *a |= b;
                 }
@@ -1374,17 +1681,38 @@ enum TraceMode<'a> {
     Replay(&'a F4Trace),
 }
 
+impl TraceMode<'_> {
+    /// The same mode for one more run, borrowing the trace again.
+    fn reborrow(&mut self) -> TraceMode<'_> {
+        match self {
+            TraceMode::Off => TraceMode::Off,
+            TraceMode::Record(t) => TraceMode::Record(t),
+            TraceMode::Replay(t) => TraceMode::Replay(t),
+        }
+    }
+}
+
+/// One F4 run with the run's stop rule: through [`f4_hilbert_guarded`] when
+/// `opts.stop_hilbert` is set, else [`f4_with_arithmetic`].  Recording and
+/// replaying go through here, so a traced run keeps the Hilbert rule (before
+/// 2026-11-21 they called the engine directly and silently ran without it).
+fn f4_dispatch(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    trace: TraceMode,
+) -> F4Report {
+    match opts.stop_hilbert {
+        Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, trace),
+        None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace),
+    }
+}
+
 /// [`f4`] recording the trace of the run.
 pub fn f4_record(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> (F4Report, F4Trace) {
     let mut trace = F4Trace::default();
-    let r = f4_with_arithmetic(
-        input,
-        n_vars,
-        p,
-        opts,
-        arithmetic_mode(),
-        TraceMode::Record(&mut trace),
-    );
+    let r = f4_dispatch(input, n_vars, p, opts, TraceMode::Record(&mut trace));
     (r, trace)
 }
 
@@ -1398,14 +1726,7 @@ pub fn f4_replay(
     opts: &F4Options,
     trace: &F4Trace,
 ) -> F4Report {
-    f4_with_arithmetic(
-        input,
-        n_vars,
-        p,
-        opts,
-        arithmetic_mode(),
-        TraceMode::Replay(trace),
-    )
+    f4_dispatch(input, n_vars, p, opts, TraceMode::Replay(trace))
 }
 
 fn arithmetic_mode() -> u8 {
@@ -1620,13 +1941,58 @@ fn rref_blocked<T: Copy + Default + PartialEq + Send>(
 /// monomials whose degree stays below 128 is the sum of their packings,
 /// and the top bit of every field is free to guard divisibility tests.
 fn pack(e: &[u32]) -> u128 {
-    e.iter()
-        .enumerate()
-        .fold(0u128, |acc, (i, &x)| acc | (x as u128) << (8 * i))
+    // byte per field (exponents are below 128 on the packed path, so the
+    // truncation is exact); one load instead of a shift-or per field
+    let mut b = [0u8; 16];
+    for (d, &x) in b.iter_mut().zip(e) {
+        *d = x as u8;
+    }
+    u128::from_le_bytes(b)
 }
 
 fn unpack(x: u128, n: usize) -> Vec<u32> {
-    (0..n).map(|i| ((x >> (8 * i)) & 0xff) as u32).collect()
+    x.to_le_bytes()[..n].iter().map(|&b| b as u32).collect()
+}
+
+/// The position of the first of `lms` (packed leading monomials, in basis
+/// order) that divides `m`, as `lms.iter().position(|&a| divides(a, m))`
+/// under the guard `guard`.  With at most 8 variables every field lies in
+/// the low word, so the test runs on `u64`: exponents below 128 cannot
+/// borrow across fields, and the high words are zero.  Same position, so the
+/// same reducer, rows and probe count.
+#[inline]
+fn first_alive_divisor(lms: &[u128], guard: u128, m: u128) -> Option<usize> {
+    if guard >> 64 == 0 {
+        let (g, mg) = (guard as u64, (m | guard) as u64);
+        lms.iter().position(|&a| mg.wrapping_sub(a as u64) & g == g)
+    } else {
+        lms.iter().position(|&a| ((m | guard) - a) & guard == guard)
+    }
+}
+
+/// The columns of one F4 matrix, in decreasing monomial order: packed when
+/// the run packs its monomials (unpacked only for the terms a step emits),
+/// else one exponent vector each.
+enum Cols {
+    Packed(Vec<u128>, usize),
+    Plain(Vec<Vec<u32>>),
+}
+
+impl Cols {
+    fn len(&self) -> usize {
+        match self {
+            Cols::Packed(c, _) => c.len(),
+            Cols::Plain(c) => c.len(),
+        }
+    }
+
+    /// Column `j`'s monomial as an exponent vector.
+    fn get(&self, j: usize) -> Vec<u32> {
+        match self {
+            Cols::Packed(c, n) => unpack(c[j], *n),
+            Cols::Plain(c) => c[j].clone(),
+        }
+    }
 }
 
 /// Whether large steps run symbolic preprocessing on several threads
@@ -1691,6 +2057,75 @@ type PkBuild = std::hash::BuildHasherDefault<PackedHasher>;
 type PkMap<K, V> = std::collections::HashMap<K, V, PkBuild>;
 type PkSet<K> = std::collections::HashSet<K, PkBuild>;
 
+/// Packed monomial -> id, open addressing with linear probing, for the
+/// interning of [`Packed::symbolic`]: the tables are small (a step's
+/// columns) and probed once per row term, so one multiply-shift hash and an
+/// inline probe replace a general map's entry API.  `u128::MAX` marks an
+/// empty slot: it has every guard bit set, which no packed monomial has.
+/// Ids are whatever the caller assigns, so the table does not change them.
+struct MonoTable {
+    keys: Vec<u128>,
+    vals: Vec<u32>,
+    len: usize,
+    shift: u32,
+}
+
+impl MonoTable {
+    const EMPTY: u128 = u128::MAX;
+
+    fn with_capacity(n: usize) -> Self {
+        // at most half full
+        let cap = (2 * n.max(8)).next_power_of_two();
+        Self {
+            keys: vec![Self::EMPTY; cap],
+            vals: vec![0; cap],
+            len: 0,
+            shift: 64 - cap.trailing_zeros(),
+        }
+    }
+
+    #[inline]
+    fn slot(&self, x: u128) -> usize {
+        let h = (x as u64) ^ ((x >> 64) as u64).rotate_left(29);
+        (h.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> self.shift) as usize
+    }
+
+    /// The id stored for `x`, or `next` after storing it.
+    #[inline]
+    fn get_or_insert(&mut self, x: u128, next: u32) -> u32 {
+        let mask = self.keys.len() - 1;
+        let mut i = self.slot(x);
+        loop {
+            let k = self.keys[i];
+            if k == x {
+                return self.vals[i];
+            }
+            if k == Self::EMPTY {
+                break;
+            }
+            i = (i + 1) & mask;
+        }
+        if 2 * (self.len + 1) > self.keys.len() {
+            self.grow();
+            return self.get_or_insert(x, next);
+        }
+        self.keys[i] = x;
+        self.vals[i] = next;
+        self.len += 1;
+        next
+    }
+
+    fn grow(&mut self) {
+        let mut t = Self::with_capacity(self.keys.len());
+        for (&k, &v) in self.keys.iter().zip(&self.vals) {
+            if k != Self::EMPTY {
+                t.get_or_insert(k, v);
+            }
+        }
+        *self = t;
+    }
+}
+
 /// Packed monomials of the basis for grevlex runs with at most 15
 /// variables and every degree below 128: products are additions, a
 /// divisibility test is one guarded subtraction, and hashing and sorting
@@ -1715,6 +2150,13 @@ impl Packed {
         }
     }
 
+    /// Pack one more basis element.
+    fn push(&mut self, f: &Poly) {
+        let t: Vec<u128> = f.iter().map(|(e, _)| pack(e)).collect();
+        self.lms.push(t[0]);
+        self.terms.push(t);
+    }
+
     /// Pack the basis elements added since the last call.
     fn extend(&mut self, basis: &[Poly]) {
         while self.terms.len() < basis.len() {
@@ -1725,13 +2167,6 @@ impl Packed {
             self.lms.push(t[0]);
             self.terms.push(t);
         }
-    }
-
-    /// Does `a` divide `b`?  Each field of `b | guard` minus `a`'s keeps
-    /// its guard bit exactly when it does not borrow.
-    #[inline]
-    fn divides(&self, a: u128, b: u128) -> bool {
-        ((b | self.guard) - a) & self.guard == self.guard
     }
 
     /// A key ordered as `cmp_monomial(·, ·, Grevlex)`: the degree above
@@ -1765,6 +2200,7 @@ impl Packed {
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         const UNKNOWN: u32 = u32::MAX;
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut ids: PkMap<u128, u32> = PkMap::default();
         let mut monos: Vec<u128> = Vec::new();
         let mut is_lead: Vec<bool> = Vec::new();
@@ -1867,9 +2303,7 @@ impl Packed {
                     return None;
                 }
                 let mono = monos[id];
-                let k = alive_idx
-                    .iter()
-                    .position(|&i| self.divides(self.lms[i], mono));
+                let k = first_alive_divisor(&alive_lms, self.guard, mono);
                 count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
                 k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
             };
@@ -1919,35 +2353,46 @@ impl Packed {
         &self,
         seeds: &[(usize, Vec<u32>)],
         alive: &[bool],
+        count: bool,
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         struct Interned {
-            ids: PkMap<u128, u32>,
+            ids: MonoTable,
             monos: Vec<u128>,
             done: Vec<bool>,
             queue: Vec<u32>,
         }
         impl Interned {
+            #[inline]
             fn id(&mut self, x: u128) -> u32 {
-                match self.ids.entry(x) {
-                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
-                    std::collections::hash_map::Entry::Vacant(v) => {
-                        let id = self.monos.len() as u32;
-                        v.insert(id);
-                        self.monos.push(x);
-                        self.done.push(false);
-                        self.queue.push(id);
-                        id
-                    }
+                let next = self.monos.len() as u32;
+                let id = self.ids.get_or_insert(x, next);
+                if id == next {
+                    self.monos.push(x);
+                    self.done.push(false);
+                    self.queue.push(id);
                 }
+                id
             }
         }
         let seeds: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
         let mut seen: PkSet<(usize, u128)> = seeds.iter().copied().collect();
+        // The table starts at a typical step's column count and doubles as
+        // it fills.  (Sizing it from the seed rows' total terms, an upper
+        // bound, cost more in clearing than the probes saved: the rows share
+        // most of their monomials.)  The columns and rows are the same.
+        let hint = 256;
         let mut t = Interned {
-            ids: PkMap::default(),
-            monos: Vec::new(),
-            done: Vec::new(),
-            queue: Vec::new(),
+            ids: MonoTable::with_capacity(hint),
+            monos: Vec::with_capacity(hint),
+            done: Vec::with_capacity(hint),
+            queue: Vec::with_capacity(hint),
+        };
+        // `count`: charge the probes to the native-operation counter (the F4
+        // steps do; the final interreduction never did and still does not)
+        let count_native = |n: u64| {
+            if count {
+                count_native(n)
+            }
         };
         let mut rows: Vec<Vec<u32>> = Vec::with_capacity(seeds.len());
         for &(idx, m) in &seeds {
@@ -1957,6 +2402,8 @@ impl Packed {
             rows.push(row);
         }
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        // the alive leading monomials contiguous, for the reducer scan
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut extra: Vec<(usize, u128)> = Vec::new();
         while let Some(id) = t.queue.pop() {
             if t.done[id as usize] {
@@ -1964,9 +2411,7 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            let found = alive_idx
-                .iter()
-                .position(|&i| self.divides(self.lms[i], mono));
+            let found = first_alive_divisor(&alive_lms, self.guard, mono);
             count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
             if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
@@ -2704,6 +3149,9 @@ fn rref32_deferred(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<usize>> {
+    if let Some(every) = narrow_acc_interval(fp.p) {
+        return rref32_deferred_n32(rows, fp32, fp, deadline, every);
+    }
     let _timer = MemTimer::new(1);
     let simd = lazy_simd_kind();
     let parallel = deferred_parallel();
@@ -2776,6 +3224,243 @@ fn rref32_deferred(
         let mut pending = 0usize;
         reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
         acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+    };
+    let o0 = pp_ops();
+    let spread = parallel && known.len() * n_cols > PAR_WORK;
+    let reduced: Vec<Vec<u32>> = if spread {
+        (0..known.len()).into_par_iter().map(back).collect()
+    } else {
+        (0..known.len()).map(back).collect()
+    };
+    pp_add(
+        if spread {
+            PP_DEF_BACK_PAR
+        } else {
+            PP_DEF_BACK_SER
+        },
+        pp_ops() - o0,
+    );
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
+/// For small primes the deferred elimination keeps its accumulators in
+/// 32-bit lanes: `Some(k)` when `(p - 1) + k (p - 1)^2 < 2^32` with
+/// `k >= 256`, i.e. `p <= 4097`, normalising every `k` updates (none at all
+/// on rows shorter than that).  Each value stays exact over the integers,
+/// so the reduced echelon form, and every counted operation, is the one the
+/// 64-bit accumulators give.  `F4_FP_NARROW_ACC=0` keeps the 64-bit path
+/// (also kept under `F4_FP_MEM=1`, whose fused kernel is 64-bit).
+fn narrow_acc_interval(p: u64) -> Option<usize> {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    let on = *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"));
+    if !on || mem_site(0) {
+        return None;
+    }
+    narrow_acc_interval_for(p)
+}
+
+/// The interval of [`narrow_acc_interval`] for `p`, ignoring the toggles.
+fn narrow_acc_interval_for(p: u64) -> Option<usize> {
+    if !(2..=1 << 16).contains(&p) {
+        return None;
+    }
+    let q = (p - 1) * (p - 1);
+    let k = (u64::from(u32::MAX) - (p - 1)) / q.max(1);
+    (k >= 256).then_some(k as usize)
+}
+
+#[inline(always)]
+fn add_lazy32_scalar(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    for (x, &y) in acc[from..].iter_mut().zip(&pivot[from..]) {
+        *x += factor * y;
+    }
+}
+
+/// Eight 32-bit products accumulated in 32-bit lanes; the caller's
+/// normalisation interval keeps every lane below 2^32.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn add_lazy32_avx2(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m256i, _mm256_add_epi32, _mm256_loadu_si256, _mm256_mullo_epi32, _mm256_set1_epi32,
+        _mm256_storeu_si256,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm256_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 8 <= acc.len() {
+        // SAFETY: the bounds cover eight entries of both slices; the loads
+        // and the store accept unaligned pointers.
+        let values = unsafe { _mm256_loadu_si256(pivot.as_ptr().add(i) as *const __m256i) };
+        let current = unsafe { _mm256_loadu_si256(acc.as_ptr().add(i) as *const __m256i) };
+        let updated = _mm256_add_epi32(current, _mm256_mullo_epi32(values, multiplier));
+        unsafe { _mm256_storeu_si256(acc.as_mut_ptr().add(i) as *mut __m256i, updated) };
+        i += 8;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// Sixteen 32-bit products accumulated in 32-bit lanes.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn add_lazy32_avx512(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m512i, _mm512_add_epi32, _mm512_loadu_si512, _mm512_mullo_epi32, _mm512_set1_epi32,
+        _mm512_storeu_si512,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm512_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 16 <= acc.len() {
+        // SAFETY: as in `add_lazy32_avx2`, for sixteen entries.
+        let values = unsafe { _mm512_loadu_si512(pivot.as_ptr().add(i) as *const __m512i) };
+        let current = unsafe { _mm512_loadu_si512(acc.as_ptr().add(i) as *const __m512i) };
+        let updated = _mm512_add_epi32(current, _mm512_mullo_epi32(values, multiplier));
+        unsafe { _mm512_storeu_si512(acc.as_mut_ptr().add(i) as *mut __m512i, updated) };
+        i += 16;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// [`add_lazy`] in 32-bit lanes, counted the same way.
+#[inline]
+fn add_lazy32(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32, simd: u8) {
+    debug_assert_eq!(acc.len(), pivot.len());
+    #[cfg(target_arch = "x86_64")]
+    if simd == 0 {
+        add_lazy32_scalar(acc, pivot, from, factor);
+    } else if simd == 2 {
+        // SAFETY: `lazy_simd_kind` verified AVX-512F and AVX2.
+        unsafe { add_lazy32_avx512(acc, pivot, from, factor) };
+    } else {
+        // SAFETY: `lazy_simd_kind` verified AVX2 before this call.
+        unsafe { add_lazy32_avx2(acc, pivot, from, factor) };
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = simd;
+        add_lazy32_scalar(acc, pivot, from, factor);
+    }
+    count_ops(acc.len() - from);
+}
+
+/// [`reduce_lazy_by`] in 32-bit lanes, normalising every `every` updates.
+#[inline]
+fn reduce_lazy_by32(
+    acc: &mut [u32],
+    known: &[(usize, Vec<u32>)],
+    fp32: Barrett32,
+    simd: u8,
+    pending: &mut usize,
+    every: usize,
+) {
+    for (c, pivot) in known {
+        let f = fp32.reduce(acc[*c]);
+        if f != 0 {
+            add_lazy32(acc, pivot, *c, fp32.p - f, simd);
+            *pending += 1;
+            if *pending == every {
+                for x in acc.iter_mut() {
+                    *x = fp32.reduce(*x);
+                }
+                *pending = 0;
+            }
+        }
+    }
+}
+
+/// [`rref32_deferred`] with 32-bit accumulators ([`narrow_acc_interval`]):
+/// the same chunks, order, pivots and counted operations; no widening of
+/// the rows and no 64-bit reduction when they are stored.
+fn rref32_deferred_n32(
+    rows: &mut Vec<Vec<u32>>,
+    fp32: Barrett32,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    every: usize,
+) -> Option<Vec<usize>> {
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u32>, usize) {
+            let mut acc = source.clone();
+            let mut pending = 0usize;
+            reduce_lazy_by32(&mut acc, &known, fp32, simd, &mut pending, every);
+            (acc, pending)
+        };
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u32>, usize)> = if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        let known_before = known.len();
+        for (acc, pending) in reduced.iter_mut() {
+            if known.len() > known_before {
+                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
+                reduce_lazy_by32(acc, &known, fp32, simd, pending, every);
+            }
+            let mut row = std::mem::take(acc);
+            for x in row.iter_mut() {
+                *x = fp32.reduce(*x);
+            }
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p) as u32;
+            for x in &mut row[c..] {
+                *x = fp32.reduce(*x * inv);
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at = known.partition_point(|(pc, _)| *pc < c);
+            known.insert(at, (c, row));
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc = row.clone();
+        let mut pending = 0usize;
+        reduce_lazy_by32(&mut acc, &known[i + 1..], fp32, simd, &mut pending, every);
+        for x in acc.iter_mut() {
+            *x = fp32.reduce(*x);
+        }
+        acc
     };
     let o0 = pp_ops();
     let spread = parallel && known.len() * n_cols > PAR_WORK;
@@ -4311,7 +4996,7 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         elapsed_ms: 0.0,
     });
     let report = if let Some(chunk) = opts.stop_hilbert {
-        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
+        f4_hilbert_guarded(input, n_vars, p, opts, chunk, TraceMode::Off)
     } else {
         f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
     };
@@ -4524,6 +5209,7 @@ fn f4_hilbert_guarded(
     p: u64,
     opts: &F4Options,
     chunk: usize,
+    mut trace: TraceMode,
 ) -> F4Report {
     let ops0 = field_ops_now();
     let t0 = Instant::now();
@@ -4580,7 +5266,9 @@ fn f4_hilbert_guarded(
         let mut o = plain.clone();
         o.hilbert_expect = Some(complete_intersection_hilbert(&degs));
         o.max_pairs_per_step = Some(chunk);
-        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), TraceMode::Off);
+        // the main run is the one a trace records or replays (the check
+        // on the leading forms is never traced)
+        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), trace.reborrow());
         if r.hilbert == HilbertStop::Applied {
             return F4Report {
                 field_ops: field_ops_now() - ops0,
@@ -4591,12 +5279,24 @@ fn f4_hilbert_guarded(
         }
         status = HilbertStop::Violated;
     }
-    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), TraceMode::Off);
+    // The fallback full run.  A recording keeps only this run's steps; a
+    // replay does not apply to it (the recorded run stopped by the Hilbert
+    // rule) and reports the divergence.
+    let replayed = matches!(trace, TraceMode::Replay(_));
+    let fallback = match &mut trace {
+        TraceMode::Record(t) => {
+            **t = F4Trace::default();
+            TraceMode::Record(t)
+        }
+        _ => TraceMode::Off,
+    };
+    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), fallback);
     F4Report {
         field_ops: field_ops_now() - ops0,
         ms: t0.elapsed().as_secs_f64() * 1e3,
         hilbert: status,
         hilbert_check_ops: check_ops,
+        trace_mismatch: r.trace_mismatch || replayed,
         ..r
     }
 }
@@ -5168,7 +5868,7 @@ fn f4_with_arithmetic(
             }
         }
         let n_pair_rows = rows_poly.len();
-        let (cols, sparse, tp1): (Vec<Vec<u32>>, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
+        let (cols, sparse, tp1): (Cols, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
             packed.as_mut()
         {
             pk.extend(&basis);
@@ -5183,10 +5883,62 @@ fn f4_with_arithmetic(
                 && rows_poly.len() >= min_seeds;
             pp_add(if sym_par { PP_SYM_PAR } else { PP_SYM_SEQ }, 1);
             pp_add(PP_SYM_SEEDS, rows_poly.len() as u64);
-            let (extra, cols_packed, row_cols) = if sym_par {
-                pk.symbolic_par(&rows_poly, &alive)
+            // A replayed step rebuilds its matrix from frozen preprocessing
+            // when the current terms fit the frozen ones ([`FrozenStep`]).
+            let slot = match &trace {
+                TraceMode::Replay(t) if freeze_enabled() => Some(&t.steps[replay_step - 1].frozen),
+                _ => None,
+            };
+            let frozen = slot.and_then(|f| f.0.read().unwrap().clone());
+            let rebuilt = frozen.as_ref().and_then(|fz| fz.rebuild(&pk.terms));
+            let (extra, cols_packed, row_cols) = if let Some(r) = rebuilt {
+                FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
+                r
+            } else if let (Some(f), Some(old)) = (slot, frozen.as_ref()) {
+                // Widen the frozen copy to the union of its supports and the
+                // current ones (each element's terms merged in term order),
+                // preprocess that once, and rebuild the current step from it.
+                // The supports converge to the generic ones in a few systems.
+                let mut terms = pk.terms.clone();
+                for (i, ft) in &old.support {
+                    terms[*i] = merge_terms(ft, &pk.terms[*i], |x| pk.grevlex_key(x));
+                }
+                let wide = Packed {
+                    n: pk.n,
+                    guard: pk.guard,
+                    terms,
+                    lms: pk.lms.clone(),
+                };
+                let union = wide.symbolic(&rows_poly, &alive, true);
+                let new = FrozenStep::from_symbolic(
+                    &wide.terms,
+                    &rows_poly,
+                    &union.0,
+                    &union.1,
+                    &union.2,
+                );
+                let r = new
+                    .rebuild(&pk.terms)
+                    .expect("the union contains the current supports");
+                *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                r
             } else {
-                pk.symbolic(&rows_poly, &alive)
+                let computed = if sym_par {
+                    pk.symbolic_par(&rows_poly, &alive)
+                } else {
+                    pk.symbolic(&rows_poly, &alive, true)
+                };
+                if let Some(f) = slot {
+                    let new = FrozenStep::from_symbolic(
+                        &pk.terms,
+                        &rows_poly,
+                        &computed.0,
+                        &computed.1,
+                        &computed.2,
+                    );
+                    *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                }
+                computed
             };
             pp_add(PP_SYM_NS, pp_ns(t_sym));
             let tp1 = Instant::now();
@@ -5195,7 +5947,11 @@ fn f4_with_arithmetic(
                 .map(|(i, _)| *i)
                 .chain(extra.iter().map(|&(i, _)| i))
                 .collect();
-            rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            // the reducer rows' multipliers are read back only by a recording
+            // run (its trace); elsewhere they stay packed
+            if matches!(trace, TraceMode::Record(_)) {
+                rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            }
             // Small steps (most of them, and all of `solve`'s specialised
             // runs) are cheaper on one thread than handed to the pool: the
             // hand-off wakes a worker and waits for it, which costs more than
@@ -5211,8 +5967,8 @@ fn f4_with_arithmetic(
             } else {
                 row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
             };
-            let cols = cols_packed.iter().map(|&m| unpack(m, n_vars)).collect();
-            (cols, sparse, tp1)
+            // columns stay packed: only the terms of new polynomials are unpacked
+            (Cols::Packed(cols_packed, n_vars), sparse, tp1)
         } else {
             let mut monomials: FxSet<Vec<u32>> = FxSet::default();
             let mut done: FxSet<Vec<u32>> = FxSet::default();
@@ -5293,10 +6049,10 @@ fn f4_with_arithmetic(
             } else {
                 rows_poly.iter().map(to_sparse).collect()
             };
-            (cols, sparse, tp1)
+            (Cols::Plain(cols), sparse, tp1)
         };
         let n_cols = cols.len();
-        let parallel = rows_poly.len() * n_cols > PAR_WORK;
+        let parallel = sparse.len() * n_cols > PAR_WORK;
         let tp2 = Instant::now();
         let mut input_lm = vec![false; n_cols];
         for r in &sparse {
@@ -5353,7 +6109,7 @@ fn f4_with_arithmetic(
         // Block-aware reduction: with every row in one weight class the
         // reduced pair rows split by class over the free columns.
         let block_classes: Option<Vec<u8>> = opts.weights.as_ref().and_then(|w| {
-            let col_w: Vec<u8> = cols.iter().map(|m| z3_weight(m, w)).collect();
+            let col_w: Vec<u8> = (0..n_cols).map(|j| z3_weight(&cols.get(j), w)).collect();
             let homogeneous = sparse.iter().all(|r| {
                 let cw = col_w[r[0].0 as usize];
                 r.iter().all(|&(c, _)| col_w[c as usize] == cw)
@@ -5738,12 +6494,14 @@ fn f4_with_arithmetic(
             if input_lm[free_cols[c]] {
                 continue;
             }
-            let poly: Poly = row
-                .iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols[free_cols[j]].clone(), v))
-                .collect();
+            // sized up front: a filtered collect grows by reallocation
+            let mut poly: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            poly.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v)),
+            );
             if total_degree(&poly[0].0) == 0 {
                 return report(
                     &basis,
@@ -5781,6 +6539,7 @@ fn f4_with_arithmetic(
                     }
                 }
                 t.steps.push(TraceStep {
+                    frozen: Default::default(),
                     degree: d,
                     rows: retained
                         .iter()
@@ -5936,6 +6695,19 @@ fn linear_interreduce_enabled() -> bool {
 /// interreduction was 43 % of the whole run.  `None` outside the narrow
 /// deferred arithmetic (`p ≤ 2¹⁶`), where the caller interreduces as before.
 fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> Option<Vec<Poly>> {
+    interreduce_linear_with(basis, n_vars, p, ord, packed_enabled())
+}
+
+/// [`interreduce_linear`] with the monomial representation chosen by the
+/// caller (`packed` is only a request: it needs grevlex, n <= 15 and every
+/// degree below 128).
+fn interreduce_linear_with(
+    basis: &[Poly],
+    n_vars: usize,
+    p: u64,
+    ord: Ordering,
+    packed: bool,
+) -> Option<Vec<Poly>> {
     if !linear_interreduce_enabled() || p > 1 << 16 || arithmetic_mode() != 2 || basis.is_empty() {
         return None;
     }
@@ -5952,67 +6724,100 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
         })
         .map(|(_, f)| f)
         .collect();
-    let mut rows_poly: Vec<(usize, Vec<u32>)> =
-        (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
-    let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
-    let mut monomials: FxSet<Vec<u32>> = FxSet::default();
-    let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
-    let mut queue: Vec<Vec<u32>> = Vec::new();
-    for f in &keep {
-        for (e, _) in f.iter() {
-            if monomials.insert(e.clone()) {
-                queue.push(e.clone());
-            }
+    // Packed monomials (as the F4 steps use them) when the ordering is
+    // grevlex, n <= 15 and every degree is below 128: the same rows, columns
+    // and column order as the exponent-vector path below, without a heap
+    // vector per monomial.  `F4_FP_PACKED=0` keeps the vector path.
+    let packed_ok = matches!(ord, Ordering::Grevlex)
+        && n_vars <= 15
+        && packed
+        && keep
+            .iter()
+            .all(|f| f.iter().all(|(e, _)| total_degree(e) < 128));
+    let (cols, sparse): (Cols, Vec<Vec<(u32, u64)>>) = if packed_ok {
+        let mut pk = Packed::new(n_vars);
+        for f in &keep {
+            pk.push(f);
         }
-    }
-    let mut em: Vec<u32> = vec![0; n_vars];
-    while let Some(mono) = queue.pop() {
-        if !done.insert(mono.clone()) {
-            continue;
-        }
-        if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
-            let m: Vec<u32> = mono
-                .iter()
-                .zip(&keep[idx][0].0)
-                .map(|(a, b)| a - b)
-                .collect();
-            if seen.insert((idx, m.clone())) {
-                for (e, _) in keep[idx].iter() {
-                    for (k, x) in em.iter_mut().enumerate() {
-                        *x = e[k] + m[k];
-                    }
-                    if !monomials.contains(em.as_slice()) {
-                        monomials.insert(em.clone());
-                        queue.push(em.clone());
-                    }
+        let seeds: Vec<(usize, Vec<u32>)> =
+            (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+        let (extra, cols_packed, row_cols) = pk.symbolic(&seeds, &vec![true; keep.len()], false);
+        let idxs = (0..keep.len()).chain(extra.iter().map(|&(i, _)| i));
+        let sparse = row_cols
+            .into_iter()
+            .zip(idxs)
+            .map(|(rc, idx)| {
+                rc.into_iter()
+                    .zip(keep[idx].iter())
+                    .map(|(c, (_, v))| (c, *v))
+                    .collect()
+            })
+            .collect();
+        (Cols::Packed(cols_packed, n_vars), sparse)
+    } else {
+        let mut rows_poly: Vec<(usize, Vec<u32>)> =
+            (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+        let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
+        let mut monomials: FxSet<Vec<u32>> = FxSet::default();
+        let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
+        let mut queue: Vec<Vec<u32>> = Vec::new();
+        for f in &keep {
+            for (e, _) in f.iter() {
+                if monomials.insert(e.clone()) {
+                    queue.push(e.clone());
                 }
-                rows_poly.push((idx, m));
             }
         }
-    }
-    let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
-    cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
-    let col_of: FxMap<&[u32], u32> = cols
-        .iter()
-        .enumerate()
-        .map(|(i, m)| (m.as_slice(), i as u32))
-        .collect();
-    let n_cols = cols.len();
-    let sparse: Vec<Vec<(u32, u64)>> = rows_poly
-        .iter()
-        .map(|(idx, m)| {
-            let mut em = vec![0u32; n_vars];
-            keep[*idx]
-                .iter()
-                .map(|(e, c)| {
-                    for (k, x) in em.iter_mut().enumerate() {
-                        *x = e[k] + m[k];
+        let mut em: Vec<u32> = vec![0; n_vars];
+        while let Some(mono) = queue.pop() {
+            if !done.insert(mono.clone()) {
+                continue;
+            }
+            if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
+                let m: Vec<u32> = mono
+                    .iter()
+                    .zip(&keep[idx][0].0)
+                    .map(|(a, b)| a - b)
+                    .collect();
+                if seen.insert((idx, m.clone())) {
+                    for (e, _) in keep[idx].iter() {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        if !monomials.contains(em.as_slice()) {
+                            monomials.insert(em.clone());
+                            queue.push(em.clone());
+                        }
                     }
-                    (col_of[em.as_slice()], *c)
-                })
-                .collect()
-        })
-        .collect();
+                    rows_poly.push((idx, m));
+                }
+            }
+        }
+        let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
+        cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
+        let col_of: FxMap<&[u32], u32> = cols
+            .iter()
+            .enumerate()
+            .map(|(i, m)| (m.as_slice(), i as u32))
+            .collect();
+        let sparse: Vec<Vec<(u32, u64)>> = rows_poly
+            .iter()
+            .map(|(idx, m)| {
+                let mut em = vec![0u32; n_vars];
+                keep[*idx]
+                    .iter()
+                    .map(|(e, c)| {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        (col_of[em.as_slice()], *c)
+                    })
+                    .collect()
+            })
+            .collect();
+        (Cols::Plain(cols), sparse)
+    };
+    let n_cols = cols.len();
     let (pair_rows, reducers) = sparse.split_at(keep.len());
     const NONE: u32 = u32::MAX;
     let mut reducer_at = vec![NONE; n_cols];
@@ -6043,11 +6848,14 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
     let mut out: Vec<Poly> = rows
         .iter()
         .map(|row| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols[free_cols[j]].clone(), v as u64))
-                .collect()
+            let mut f: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            f.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v as u64)),
+            );
+            f
         })
         .collect();
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
@@ -6526,6 +7334,45 @@ pub struct VisitReport {
     /// Counted coefficient multiplications in the reused root finder only.
     pub root_field_multiplications: u64,
     pub full_field_branches: u64,
+    /// Finite-domain univariates whose roots came from the Frobenius root
+    /// finder and the domain index ([`DomainRootMode`]); zero, and omitted
+    /// from serialised reports, under the default scan.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub domain_frobenius_univariates: usize,
+    /// Counted multiplications of those extractions.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_root_field_multiplications: u64,
+    /// Entries inserted into the per-traversal domain indexes.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_index_entries: u64,
+    /// Multiplications of the domain scan (exact: [`domain_scan_cost`] for
+    /// each element evaluated), so that the two [`DomainRootMode`]s can be
+    /// compared in one unit.  In-process only: never serialised, so existing
+    /// transcripts are unchanged.
+    #[serde(skip_serializing)]
+    pub domain_scan_field_multiplications: u64,
+    /// Branching nodes whose children were extracted in one batch
+    /// ([`F4Options::sibling_batch`]); zero and omitted by default.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_nodes: usize,
+    /// Children specialised and solved by the batched path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_children: usize,
+    /// Child systems with no univariate, handed back to the F4 path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_fallbacks: usize,
+    /// Counted multiplications of the batched path: Horner specialisation,
+    /// univariate gcds, square roots, root finding and substitution.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub batched_field_multiplications: u64,
+}
+
+fn is_zero_u64(v: &u64) -> bool {
+    *v == 0
+}
+
+fn is_zero_usize(v: &usize) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -6585,6 +7432,9 @@ struct VisitState<'a, F, S> {
     pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
+    /// Lazily built value → position index of each original variable's
+    /// finite domain, shared by every node of the traversal.
+    domain_index: Vec<Option<FxMap<u64, usize>>>,
 }
 
 impl<F, S> VisitState<'_, F, S>
@@ -6780,13 +7630,53 @@ where
                 continue;
             }
             let var = *vars.iter().next().unwrap();
-            let roots = if let Some(domain) = &self.domains[active[var]] {
+            let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
+                match self.opts.domain_roots {
+                    DomainRootMode::Scan => false,
+                    DomainRootMode::Frobenius => true,
+                    DomainRootMode::Auto => {
+                        let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                        let degree = exponents.iter().copied().max().unwrap_or(0);
+                        domain_frobenius_cost(degree, self.p)
+                            < domain_scan_cost(&exponents, domain.len())
+                    }
+                }
+            });
+            let roots = if frobenius {
+                let original = active[var];
+                let domain = self.domains[original]
+                    .as_ref()
+                    .expect("selected only for a finite domain");
+                if self.domain_index[original].is_none() {
+                    self.report.domain_index_entries += domain.len() as u64;
+                    self.domain_index[original] = Some(domain_position_index(domain));
+                }
+                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
+                let mut coefficients = vec![0; degree + 1];
+                for (e, c) in g {
+                    coefficients[e[var] as usize] = *c;
+                }
+                self.report.domain_frobenius_univariates += 1;
+                let Some(roots) = domain_roots_frobenius(
+                    &coefficients,
+                    self.domain_index[original].as_ref().expect("built above"),
+                    self.p,
+                    &mut self.report.domain_root_field_multiplications,
+                    self.opts.deadline,
+                ) else {
+                    return VisitEnd::TimedOut;
+                };
+                roots
+            } else if let Some(domain) = &self.domains[active[var]] {
                 let mut roots = Vec::new();
+                let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                let per_point = domain_scan_cost(&exponents, 1);
                 for &x in domain {
                     if self.expired() {
                         return VisitEnd::TimedOut;
                     }
                     self.report.domain_evaluations += 1;
+                    self.report.domain_scan_field_multiplications += per_point;
                     let value = g.iter().fold(0, |v, (e, c)| {
                         (v + mulmod(*c, powmod(x, u64::from(e[var]), self.p), self.p)) % self.p
                     });
@@ -6838,6 +7728,14 @@ where
         let full_field = !has_univariate && self.domains[active[var]].is_none();
         let mut remaining = active.to_vec();
         let original = remaining.remove(var);
+        if self.opts.sibling_batch
+            && !has_univariate
+            && !full_field
+            && self.sink.is_none()
+            && self.pool.is_none()
+        {
+            return self.batched_siblings(generating_set, var, original, &remaining, node_id);
+        }
         for value in values {
             if self.expired() {
                 return VisitEnd::TimedOut;
@@ -6871,6 +7769,179 @@ where
                 .filter(|g| !g.is_empty())
                 .collect();
             let end = self.walk(&sub, &remaining, Some(node_id));
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Build the value → position index of an original variable's domain
+    /// once per traversal.
+    fn ensure_domain_index(&mut self, original: usize) {
+        if self.domain_index[original].is_none() {
+            if let Some(domain) = &self.domains[original] {
+                self.report.domain_index_entries += domain.len() as u64;
+                self.domain_index[original] = Some(domain_position_index(domain));
+            }
+        }
+    }
+
+    /// [`F4Options::sibling_batch`]: every child of a finite-domain branching
+    /// node, from one sibling family, in domain order.
+    fn batched_siblings(
+        &mut self,
+        generating_set: &[Poly],
+        var: usize,
+        original: usize,
+        remaining: &[usize],
+        node_id: usize,
+    ) -> VisitEnd {
+        let family = sibling_family(generating_set, var);
+        let domain = self.domains[original]
+            .clone()
+            .expect("batched only over a finite domain");
+        self.report.batched_nodes += 1;
+        for value in domain {
+            if self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            self.assignment[original] = value;
+            let mut muls = 0u64;
+            let polys = specialise_family(&family, value, self.p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_children += 1;
+            let end = self.tri_solve(polys, remaining, node_id);
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Solve one child system without F4: repeatedly take a variable with a
+    /// univariate polynomial, extract the roots of the gcd of all its
+    /// univariates (restricted to its domain), substitute each and recurse.
+    /// A system with no univariate goes to the F4 path ([`Self::walk`]).
+    /// Leaves are checked against the original input as the walk's are.
+    fn tri_solve(&mut self, polys: Vec<SparsePoly>, vars: &[usize], node_id: usize) -> VisitEnd {
+        if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        // Constants: a nonzero one is inconsistent, a zero one says nothing.
+        let mut live: Vec<SparsePoly> = Vec::with_capacity(polys.len());
+        for g in polys {
+            if g.iter().all(|(e, _)| e.iter().all(|&k| k == 0)) {
+                if g.iter().fold(0u64, |s, (_, c)| (s + c) % self.p) != 0 {
+                    return VisitEnd::Complete;
+                }
+            } else {
+                live.push(g);
+            }
+        }
+        if vars.is_empty() {
+            let ok = self
+                .original
+                .iter()
+                .all(|g| eval(g, &self.assignment, self.p) == 0);
+            if !ok {
+                self.report.candidates_rejected += 1;
+                return VisitEnd::Complete;
+            }
+            self.report.solutions_visited += 1;
+            return if (self.visitor)(&self.assignment) {
+                VisitEnd::Stopped
+            } else {
+                VisitEnd::Complete
+            };
+        }
+        if vars
+            .iter()
+            .any(|&i| self.domains[i].as_ref().is_some_and(Vec::is_empty))
+        {
+            return VisitEnd::Complete;
+        }
+        // Univariates by local variable, as dense coefficient vectors.
+        let p = self.p;
+        let mut univariates: Vec<Vec<Vec<u64>>> = vec![Vec::new(); vars.len()];
+        for g in &live {
+            let mut support = None;
+            let mut single = true;
+            for (e, _) in g {
+                for (j, &k) in e.iter().enumerate() {
+                    if k > 0 {
+                        match support {
+                            None => support = Some(j),
+                            Some(s) if s != j => single = false,
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            if let (true, Some(j)) = (single, support) {
+                let degree = g.iter().map(|(e, _)| e[j]).max().unwrap_or(0) as usize;
+                let mut dense = vec![0u64; degree + 1];
+                for (e, c) in g {
+                    let k = e[j] as usize;
+                    dense[k] = (dense[k] + c) % p;
+                }
+                univariates[j].push(dense_trim(dense));
+            }
+        }
+        let mut muls = 0u64;
+        let mut best: Option<(usize, Vec<u64>)> = None;
+        for (j, us) in univariates.iter().enumerate() {
+            if us.is_empty() {
+                continue;
+            }
+            let h = us
+                .iter()
+                .skip(1)
+                .fold(us[0].clone(), |h, u| dense_gcd(&h, u, p, &mut muls));
+            let h = dense_gcd(&h, &[], p, &mut muls);
+            if h.len() <= 1 {
+                // No common root of this variable's univariates.
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::Complete;
+            }
+            if best.as_ref().is_none_or(|(_, b)| h.len() < b.len()) {
+                best = Some((j, h));
+            }
+        }
+        let Some((z, h)) = best else {
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_fallbacks += 1;
+            let normalised: Vec<Poly> = live
+                .into_iter()
+                .map(|g| normalise_owned(g, self.p, self.opts.order))
+                .filter(|g| !g.is_empty())
+                .collect();
+            return self.walk(&normalised, vars, Some(node_id));
+        };
+        let z_original = vars[z];
+        let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+            self.report.batched_field_multiplications += muls;
+            return VisitEnd::TimedOut;
+        };
+        if self.domains[z_original].is_some() {
+            self.ensure_domain_index(z_original);
+            let index = self.domain_index[z_original].as_ref().expect("built above");
+            let mut hits: Vec<(usize, u64)> = roots
+                .iter()
+                .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
+                .collect();
+            hits.sort_unstable_by_key(|&(pos, _)| pos);
+            roots = hits.into_iter().map(|(_, r)| r).collect();
+        }
+        self.report.batched_field_multiplications += muls;
+        let mut rest = vars.to_vec();
+        rest.remove(z);
+        for r in roots {
+            let mut muls = 0u64;
+            let next = substitute_var(&live, z, r, p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.assignment[z_original] = r;
+            let end = self.tri_solve(next, &rest, node_id);
             if end != VisitEnd::Complete {
                 return end;
             }
@@ -7013,6 +8084,7 @@ where
         pool,
         next_node: 0,
         report: VisitReport::default(),
+        domain_index: vec![None; n_vars],
     };
     let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
@@ -7053,6 +8125,312 @@ pub struct SolveReport {
     /// evaluation against the input keeps the verdict exact.  Non-zero only
     /// when some run of the tree was truncated.
     pub candidates_rejected: usize,
+}
+
+/// Seed of the Cantor–Zassenhaus split stream shared with the unrestricted
+/// univariate path of the visitor.  The split stream changes only the work,
+/// never the root set.
+const VISIT_ROOT_SEED: u64 = 0x4634_524f_4f54;
+
+/// Value → position of a finite domain (the visitor validates that its
+/// values are distinct and below `p`).  Built once per traversal and
+/// variable, then shared by every node.
+pub(crate) fn domain_position_index(domain: &[u64]) -> FxMap<u64, usize> {
+    let mut index = FxMap::default();
+    index.reserve(domain.len());
+    for (position, &x) in domain.iter().enumerate() {
+        index.insert(x, position);
+    }
+    index
+}
+
+/// The roots in a finite domain of the univariate `coefficients` (low to
+/// high), in domain order: the counted `F_p`-root finder
+/// ([`super::glv_invariant_base::poly_roots_fp_counted_until`]), then the
+/// domain index.  Exact because the domain lies in `F_p`; `None` only when
+/// the deadline expires.  Multiplications are added to `muls`.
+pub(crate) fn domain_roots_frobenius(
+    coefficients: &[u64],
+    index: &FxMap<u64, usize>,
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let rational = super::glv_invariant_base::poly_roots_fp_counted_until(
+        coefficients,
+        p,
+        VISIT_ROOT_SEED,
+        muls,
+        deadline,
+    )?;
+    let mut hits: Vec<(usize, u64)> = rational
+        .into_iter()
+        .filter_map(|r| index.get(&r).map(|&position| (position, r)))
+        .collect();
+    hits.sort_unstable_by_key(|&(position, _)| position);
+    Some(hits.into_iter().map(|(_, r)| r).collect())
+}
+
+/// The domain scan exactly as the visitor runs it (the control), with its
+/// multiplications counted: `terms` are `(exponent, coefficient)`.
+#[cfg(test)]
+pub(crate) fn domain_roots_scan(
+    terms: &[(u32, u64)],
+    domain: &[u64],
+    p: u64,
+    muls: &mut u64,
+) -> Vec<u64> {
+    let exponents: Vec<u32> = terms.iter().map(|&(e, _)| e).collect();
+    *muls += domain_scan_cost(&exponents, domain.len());
+    domain
+        .iter()
+        .copied()
+        .filter(|&x| {
+            terms.iter().fold(0, |v, &(e, c)| {
+                (v + mulmod(c, powmod(x, u64::from(e), p), p)) % p
+            }) == 0
+        })
+        .collect()
+}
+
+// ── Batched sibling extraction (`F4Options::sibling_batch`) ────────────────
+//
+// A sparse polynomial over the child's local variables, as the visitor's
+// `specialise` produces it (exponent vector, coefficient), without the
+// normalisation the F4 path needs.
+pub(crate) type SparsePoly = Vec<(Vec<u32>, u64)>;
+
+/// The generators of a branching node rewritten once for all its children:
+/// for each generator, its terms grouped by the exponent vector with the
+/// branch variable removed, each group's coefficient a univariate in the
+/// branch variable (low to high).  Specialising at `x = v` is one Horner
+/// evaluation per group.
+pub(crate) type SiblingFamily = Vec<Vec<(Vec<u32>, Vec<u64>)>>;
+
+pub(crate) fn sibling_family(generators: &[Poly], var: usize) -> SiblingFamily {
+    generators
+        .iter()
+        .map(|g| {
+            let mut groups: std::collections::BTreeMap<Vec<u32>, Vec<u64>> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = rest.remove(var) as usize;
+                let coeffs = groups.entry(rest).or_default();
+                if coeffs.len() <= k {
+                    coeffs.resize(k + 1, 0);
+                }
+                coeffs[k] = *c;
+            }
+            groups.into_iter().collect()
+        })
+        .collect()
+}
+
+/// The children's system at `x = v`: Horner on every coefficient group,
+/// zero terms and zero polynomials dropped.
+pub(crate) fn specialise_family(
+    family: &SiblingFamily,
+    v: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    family
+        .iter()
+        .filter_map(|groups| {
+            let terms: SparsePoly = groups
+                .iter()
+                .filter_map(|(e, coeffs)| {
+                    let mut acc = 0u64;
+                    for &c in coeffs.iter().rev() {
+                        acc = (mulmod(acc, v, p) + c) % p;
+                    }
+                    *muls += coeffs.len().saturating_sub(1) as u64;
+                    (acc != 0).then(|| (e.clone(), acc))
+                })
+                .collect();
+            (!terms.is_empty()).then_some(terms)
+        })
+        .collect()
+}
+
+/// Substitute local variable `z = r` in every polynomial and drop it from
+/// the exponent vectors; equal monomials are merged and zero polynomials
+/// dropped.
+pub(crate) fn substitute_var(
+    polys: &[SparsePoly],
+    z: usize,
+    r: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    polys
+        .iter()
+        .filter_map(|g| {
+            let mut merged: std::collections::BTreeMap<Vec<u32>, u64> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = u64::from(rest.remove(z));
+                let t = if k == 0 {
+                    *c
+                } else {
+                    *muls += powmod_muls(k) + 1;
+                    mulmod(*c, powmod(r, k, p), p)
+                };
+                let slot = merged.entry(rest).or_insert(0);
+                *slot = (*slot + t) % p;
+            }
+            let out: SparsePoly = merged.into_iter().filter(|(_, c)| *c != 0).collect();
+            (!out.is_empty()).then_some(out)
+        })
+        .collect()
+}
+
+fn dense_trim(mut v: Vec<u64>) -> Vec<u64> {
+    while v.last() == Some(&0) {
+        v.pop();
+    }
+    v
+}
+
+/// `a mod b` for dense polynomials (low to high), `b` trimmed and nonzero.
+fn dense_rem(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let mut r = dense_trim(a.to_vec());
+    let inv = inv_mod_u64(*b.last().expect("nonzero divisor"), p);
+    while r.len() >= b.len() {
+        let lead = mulmod(*r.last().expect("nonempty"), inv, p);
+        let shift = r.len() - b.len();
+        for (i, &bi) in b.iter().enumerate() {
+            r[shift + i] = (r[shift + i] + p - mulmod(lead, bi, p)) % p;
+        }
+        *muls += b.len() as u64 + 1;
+        r = dense_trim(r);
+    }
+    r
+}
+
+/// Monic gcd of two dense polynomials (either may be zero).
+pub(crate) fn dense_gcd(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let (mut x, mut y) = (dense_trim(a.to_vec()), dense_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = dense_rem(&x, &y, p, muls);
+        x = y;
+        y = r;
+    }
+    if let Some(&lead) = x.last() {
+        let inv = inv_mod_u64(lead, p);
+        *muls += x.len() as u64;
+        for c in &mut x {
+            *c = mulmod(*c, inv, p);
+        }
+    }
+    x
+}
+
+/// Square root modulo an odd prime (Tonelli–Shanks), multiplications
+/// counted; `None` for a non-residue.
+pub(crate) fn sqrt_mod_counted(n: u64, p: u64, muls: &mut u64) -> Option<u64> {
+    let n = n % p;
+    if n == 0 {
+        return Some(0);
+    }
+    let pw = |a: u64, e: u64, muls: &mut u64| {
+        *muls += powmod_muls(e);
+        powmod(a, e, p)
+    };
+    if pw(n, (p - 1) / 2, muls) != 1 {
+        return None;
+    }
+    if p % 4 == 3 {
+        return Some(pw(n, (p + 1) / 4, muls));
+    }
+    let (mut q, mut s) = (p - 1, 0u32);
+    while q % 2 == 0 {
+        q /= 2;
+        s += 1;
+    }
+    let mut z = 2u64;
+    while pw(z, (p - 1) / 2, muls) != p - 1 {
+        z += 1;
+    }
+    let (mut m, mut c, mut t, mut r) = (
+        s,
+        pw(z, q, muls),
+        pw(n, q, muls),
+        pw(n, q.div_ceil(2), muls),
+    );
+    while t != 1 {
+        let (mut i, mut tt) = (0u32, t);
+        while tt != 1 {
+            tt = mulmod(tt, tt, p);
+            *muls += 1;
+            i += 1;
+            if i == m {
+                return None;
+            }
+        }
+        let mut b = c;
+        for _ in 0..(m - i - 1) {
+            b = mulmod(b, b, p);
+            *muls += 1;
+        }
+        m = i;
+        c = mulmod(b, b, p);
+        t = mulmod(t, c, p);
+        r = mulmod(r, b, p);
+        *muls += 3;
+    }
+    Some(r)
+}
+
+/// All `F_p`-roots of the dense polynomial `h` (low to high, trimmed,
+/// degree at least one), ascending: closed form for degree one and, at an
+/// odd prime, two; the counted Frobenius root finder otherwise.  `None`
+/// only when the deadline expires.
+pub(crate) fn dense_roots_fp(
+    h: &[u64],
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let mut roots = match h.len() {
+        0 | 1 => Vec::new(),
+        2 => {
+            *muls += 1;
+            vec![mulmod((p - h[0]) % p, inv_mod_u64(h[1], p), p)]
+        }
+        3 if p % 2 == 1 => {
+            let (c0, c1, c2) = (h[0], h[1], h[2]);
+            let disc = (mulmod(c1, c1, p) + p - mulmod(4 % p, mulmod(c2, c0, p), p)) % p;
+            *muls += 4;
+            let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
+            match sqrt_mod_counted(disc, p, muls) {
+                None => Vec::new(),
+                Some(s) => {
+                    *muls += 2;
+                    let neg_b = (p - c1) % p;
+                    let r1 = mulmod((neg_b + s) % p, inv2a, p);
+                    let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
+                    if r1 == r2 {
+                        vec![r1]
+                    } else {
+                        vec![r1, r2]
+                    }
+                }
+            }
+        }
+        _ => super::glv_invariant_base::poly_roots_fp_counted_until(
+            h,
+            p,
+            VISIT_ROOT_SEED,
+            muls,
+            deadline,
+        )?,
+    };
+    roots.sort_unstable();
+    roots.dedup();
+    Some(roots)
 }
 
 /// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
@@ -8622,6 +10000,53 @@ mod tests {
     }
 
     #[test]
+    fn narrow_accumulators_match_wide_rref() {
+        let mut x = 0x0fed_cba9_8765_4321u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for p in [2u64, 3, 29, 53, 101, 251, 4093] {
+            let fp = Barrett::new(p);
+            let narrow = Barrett32::new(p);
+            // the 32-bit reduction holds on every u32, not only on p(p-1)
+            for probe in [0u32, 1, u32::MAX, u32::MAX - 1, 1 << 31] {
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            for _ in 0..10_000 {
+                let probe = next() as u32;
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            let interval = narrow_acc_interval_for(p);
+            assert!(interval.is_some_and(|k| k >= 256), "p={p}");
+            for every in [1usize, 2, 7, interval.unwrap()] {
+                for (rows, cols) in [(1, 1), (7, 9), (20, 15), (40, 33), (64, 70)] {
+                    let mut wide: Vec<Vec<u64>> = (0..rows)
+                        .map(|_| (0..cols).map(|_| next() % p).collect())
+                        .collect();
+                    let mut narrow_rows: Vec<Vec<u32>> = wide
+                        .iter()
+                        .map(|row| row.iter().map(|&v| v as u32).collect())
+                        .collect();
+                    let want = rref(&mut wide, fp, None).unwrap();
+                    let got =
+                        rref32_deferred_n32(&mut narrow_rows, narrow, fp, None, every).unwrap();
+                    assert_eq!(got, want, "p={p} every={every} {rows}x{cols}");
+                    let widened: Vec<Vec<u64>> = narrow_rows
+                        .into_iter()
+                        .map(|row| row.into_iter().map(u64::from).collect())
+                        .collect();
+                    assert_eq!(widened, wide, "p={p} every={every} {rows}x{cols}");
+                }
+            }
+        }
+        assert_eq!(narrow_acc_interval_for(4099), None);
+        assert_eq!(narrow_acc_interval_for(65_521), None);
+    }
+
+    #[test]
     fn narrow_arithmetic_matches_wide_rref() {
         let mut x = 0x0123_4567_89ab_cdefu64;
         let mut next = || {
@@ -9105,6 +10530,141 @@ mod packed_set_tests {
     /// Reduction by a set with its monomials packed against the vector one,
     /// for sets that reduce a good deal (multiples of one another).
     #[test]
+    fn first_alive_divisor_matches_the_u128_scan() {
+        let mut rng = Xs(0x5eed_0fd1_d1d0_u64);
+        for n in 1usize..=15 {
+            let guard = (0..n).fold(0u128, |g, i| g | 0x80u128 << (8 * i));
+            let mono = |rng: &mut Xs, top: u64| {
+                (0..n).fold(0u128, |a, i| a | ((rng.below(top) as u128) << (8 * i)))
+            };
+            for len in [0usize, 1, 3, 4, 5, 9, 31] {
+                let lms: Vec<u128> = (0..len).map(|_| mono(&mut rng, 3)).collect();
+                for _ in 0..200 {
+                    let m = mono(&mut rng, 6);
+                    let want = lms.iter().position(|&a| ((m | guard) - a) & guard == guard);
+                    assert_eq!(first_alive_divisor(&lms, guard, m), want, "n={n} len={len}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn frozen_replay_steps_match_fresh_ones() {
+        let mut rng = Xs(0x7eed_f00d_1234_5678);
+        let (n, p) = (3usize, 53u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics: every system has the recorded shape, except those
+        // with one coefficient forced to zero (another support)
+        let system = |rng: &mut Xs, zero: Option<usize>| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && zero == Some(i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (rec, trace) = f4_record(&system(&mut rng, None), n, p, &opts);
+        assert!(!rec.trace_mismatch);
+        let before = frozen_steps_total();
+        for t in 0..12 {
+            let zero = (t % 4 == 3).then_some(1 + t % 3);
+            let sys = system(&mut rng, zero);
+            let plain = f4(&sys, n, p, &opts);
+            // the first replay of a step freezes it, the second reuses it
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            assert_eq!(first.basis, second.basis, "system {t}");
+            assert_eq!(first.trace_mismatch, second.trace_mismatch, "system {t}");
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+            }
+        }
+        assert!(frozen_steps_total() > before, "no step was reused");
+    }
+
+    #[test]
+    fn mono_table_interns_like_a_map() {
+        let mut rng = Xs(0x0bad_cafe_dead_beef);
+        let mut t = MonoTable::with_capacity(4);
+        let mut m: std::collections::HashMap<u128, u32> = Default::default();
+        for _ in 0..20_000 {
+            // small packed monomials in 6 fields, many repeats
+            let x = (0..6).fold(0u128, |a, i| a | ((rng.below(5) as u128) << (8 * i)));
+            let next = m.len() as u32;
+            let want = *m.entry(x).or_insert(next);
+            assert_eq!(t.get_or_insert(x, next), want);
+        }
+        assert_eq!(t.len, m.len());
+    }
+
+    #[test]
+    fn packed_linear_interreduction_matches_the_vector_path() {
+        let mut rng = Xs(0x2468_ace0_1357_9bdf);
+        for (n, p) in [(3usize, 31u64), (4, 53), (5, 65_521), (6, 251)] {
+            for _ in 0..6 {
+                let monos = monomials_up_to(n, 3);
+                let gens: Vec<Poly> = (0..n + 1)
+                    .map(|_| {
+                        let k = 3 + rng.below(6) as usize;
+                        let f: Vec<_> = (0..k)
+                            .map(|_| {
+                                (
+                                    monos[rng.below(monos.len() as u64) as usize].clone(),
+                                    1 + rng.below(p - 1),
+                                )
+                            })
+                            .collect();
+                        normalise(&f, p, Ordering::Grevlex)
+                    })
+                    .filter(|f| !f.is_empty())
+                    .collect();
+                // the reduced basis with tails left unreduced (F4's alive
+                // basis before its final interreduction): g_i = f_i + c f_j
+                // for an element f_j of smaller leading monomial keeps every
+                // leading monomial, so the interreduction must give back
+                // the reduced basis
+                let basis = f4(&gens, n, p, &F4Options::new(Ordering::Grevlex, 10)).basis;
+                let mut raw = basis.clone();
+                for i in 1..raw.len() {
+                    let j = rng.below(i as u64) as usize;
+                    let c = 1 + rng.below(p - 1);
+                    let mut g = basis[i].clone();
+                    g.extend(basis[j].iter().map(|(e, v)| (e.clone(), v * c % p)));
+                    raw[i] = normalise(&g, p, Ordering::Grevlex);
+                }
+                let what = format!("n={n} p={p}");
+                let packed = interreduce_linear_with(&raw, n, p, Ordering::Grevlex, true);
+                let plain = interreduce_linear_with(&raw, n, p, Ordering::Grevlex, false);
+                assert!(packed.is_some(), "linear interreduction declined {what}");
+                assert_eq!(packed, plain, "packed vs vector {what}");
+                let mut want = basis.clone();
+                want.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, Ordering::Grevlex));
+                assert_eq!(packed.unwrap(), want, "vs the reduced basis {what}");
+                // a generating set that is not a basis: the two paths still
+                // build the same matrix
+                assert_eq!(
+                    interreduce_linear_with(&gens, n, p, Ordering::Grevlex, true),
+                    interreduce_linear_with(&gens, n, p, Ordering::Grevlex, false),
+                    "generators {what}"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn packed_reduction_matches_the_vector_reduction() {
         let mut rng = Xs(0x1357_9bdf_2468_ace0);
         for (n, p, ord) in [
@@ -9565,6 +11125,563 @@ mod packed_set_tests {
                 }
                 assert_eq!(mulmod(a % p, invmod(a, p), p), 1, "{a}^-1 mod {p}");
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod domain_root_tests {
+    //! [`DomainRootMode`]: the Frobenius extraction returns the scan's roots,
+    //! in the scan's order, so the visitor's traversal cannot tell them apart.
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    fn mul_poly(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+        let mut out = vec![0u64; a.len() + b.len() - 1];
+        for (i, &x) in a.iter().enumerate() {
+            for (j, &y) in b.iter().enumerate() {
+                out[i + j] = (out[i + j] + mulmod(x, y, p)) % p;
+            }
+        }
+        out
+    }
+
+    /// Coefficients (low to high) with a nonzero leading coefficient and
+    /// degree at least one: planted roots (some repeated, some outside the
+    /// domain), an optional random cofactor that may carry irreducible
+    /// factors, and a random scale.
+    fn random_univariate(rng: &mut StdRng, p: u64, planted: &[u64]) -> Vec<u64> {
+        let mut f = vec![1u64];
+        for &r in planted {
+            f = mul_poly(&f, &[(p - r % p) % p, 1], p);
+        }
+        if planted.is_empty() || rng.gen_bool(0.5) {
+            let d = rng.gen_range(1..=4usize);
+            let mut cof: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
+            cof.push(rng.gen_range(1..p.max(2)));
+            f = mul_poly(&f, &cof, p);
+        }
+        let scale = rng.gen_range(1..p.max(2));
+        f.iter().map(|&c| mulmod(c, scale, p)).collect()
+    }
+
+    fn terms_of(f: &[u64]) -> Vec<(u32, u64)> {
+        f.iter()
+            .enumerate()
+            .filter(|(_, &c)| c != 0)
+            .map(|(e, &c)| (e as u32, c))
+            .collect()
+    }
+
+    pub(super) fn random_domain(rng: &mut StdRng, p: u64, size: usize, must: &[u64]) -> Vec<u64> {
+        let mut seen = HashSet::new();
+        let mut d = Vec::new();
+        for &x in must {
+            if seen.insert(x % p) {
+                d.push(x % p);
+            }
+        }
+        let size = size.min(p as usize);
+        while d.len() < size {
+            let x = rng.gen_range(0..p);
+            if seen.insert(x) {
+                d.push(x);
+            }
+        }
+        // Domain order is arbitrary in the visitor; the extraction must keep it.
+        for i in (1..d.len()).rev() {
+            d.swap(i, rng.gen_range(0..=i));
+        }
+        d
+    }
+
+    fn check(f: &[u64], domain: &[u64], p: u64) {
+        let index = domain_position_index(domain);
+        let (mut scan_muls, mut frob_muls) = (0u64, 0u64);
+        let scan = domain_roots_scan(&terms_of(f), domain, p, &mut scan_muls);
+        let frob = domain_roots_frobenius(f, &index, p, &mut frob_muls, None).unwrap();
+        assert_eq!(frob, scan, "p = {p}, f = {f:?}, |D| = {}", domain.len());
+    }
+
+    #[test]
+    fn frobenius_extraction_returns_the_scans_roots_in_domain_order() {
+        let mut rng = StdRng::seed_from_u64(0x0F4D_0A1B);
+        let primes = [
+            2u64,
+            3,
+            5,
+            7,
+            13,
+            101,
+            1009,
+            65_521,
+            1_000_003,
+            2_147_483_647,
+            4_294_967_291,
+        ];
+        let mut cases = 0usize;
+        for &p in &primes {
+            for _ in 0..60 {
+                let k = rng.gen_range(0..=6usize);
+                let planted: Vec<u64> = (0..k).map(|_| rng.gen_range(0..p)).collect();
+                // Repeat a planted root now and then.
+                let mut planted = planted;
+                if !planted.is_empty() && rng.gen_bool(0.3) {
+                    planted.push(planted[0]);
+                }
+                let f = random_univariate(&mut rng, p, &planted);
+                let inside: Vec<u64> = planted
+                    .iter()
+                    .copied()
+                    .filter(|_| rng.gen_bool(0.6))
+                    .collect();
+                let size = if p <= 13 {
+                    rng.gen_range(0..=p as usize)
+                } else {
+                    rng.gen_range(0..=200usize)
+                };
+                let domain = random_domain(&mut rng, p, size, &inside);
+                check(&f, &domain, p);
+                cases += 1;
+            }
+            if p <= 13 {
+                // Degree at least p, vanishing on the whole field: x^p − x, and
+                // its product with a planted factor; full and partial domains.
+                let mut xp_x = vec![0u64; p as usize + 1];
+                xp_x[1] = p - 1;
+                xp_x[p as usize] = 1;
+                let full: Vec<u64> = (0..p).rev().collect();
+                check(&xp_x, &full, p);
+                check(&mul_poly(&xp_x, &[1, 1], p), &full[..full.len() / 2], p);
+                check(&[0, 1], &[], p);
+                cases += 3;
+            }
+        }
+        assert!(cases > 600);
+    }
+
+    #[test]
+    fn frobenius_needs_far_fewer_multiplications_on_a_large_domain() {
+        let p = 2_147_483_647u64;
+        let mut rng = StdRng::seed_from_u64(7);
+        let planted = [11u64, 23, 99_991];
+        let f = random_univariate(&mut rng, p, &planted);
+        let domain = random_domain(&mut rng, p, 1 << 14, &planted);
+        let index = domain_position_index(&domain);
+        let (mut s, mut fr) = (0u64, 0u64);
+        let a = domain_roots_scan(&terms_of(&f), &domain, p, &mut s);
+        let b = domain_roots_frobenius(&f, &index, p, &mut fr, None).unwrap();
+        assert_eq!(a, b);
+        assert_eq!(a.len(), 3);
+        assert!(fr * 10 < s, "frobenius {fr} vs scan {s}");
+    }
+
+    /// Dense random quadrics in three variables through planted points, with
+    /// finite domains on some variables: the generic F4 bases produce
+    /// univariates of degree up to eight with arbitrary roots.
+    pub(super) fn planted_system(rng: &mut StdRng, p: u64, n: usize) -> (Vec<Poly>, Vec<Vec<u64>>) {
+        let points: Vec<Vec<u64>> = (0..rng.gen_range(1..=3usize))
+            .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
+            .collect();
+        let mut monomials: Vec<Vec<u32>> = Vec::new();
+        for i in 0..n {
+            for j in i..n {
+                let mut e = vec![0u32; n];
+                e[i] += 1;
+                e[j] += 1;
+                monomials.push(e);
+            }
+            let mut e = vec![0u32; n];
+            e[i] = 1;
+            monomials.push(e);
+        }
+        let eval = |e: &[u32], x: &[u64]| {
+            e.iter().zip(x).fold(1u64, |v, (&k, &xi)| {
+                mulmod(v, powmod(xi, u64::from(k), p), p)
+            })
+        };
+        // Each equation is a random combination of monomials, with the constant
+        // chosen to vanish at the first planted point, times nothing else: the
+        // other planted points are kept only by the linear span (a degenerate
+        // system is still a valid traversal test).
+        let mut system = Vec::new();
+        for _ in 0..n {
+            let coeffs: Vec<u64> = monomials.iter().map(|_| rng.gen_range(0..p)).collect();
+            let mut terms: Vec<(Vec<u32>, u64)> = monomials
+                .iter()
+                .cloned()
+                .zip(coeffs.iter().copied())
+                .collect();
+            let at = |x: &[u64]| {
+                terms
+                    .iter()
+                    .fold(0u64, |v, (e, c)| (v + mulmod(*c, eval(e, x), p)) % p)
+            };
+            let c0 = (p - at(&points[0])) % p;
+            terms.push((vec![0u32; n], c0));
+            system.push(normalise(&terms, p, Ordering::Grevlex));
+        }
+        (system, points)
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn traverse(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12).with_domain_roots(mode);
+        let mut seen = Vec::new();
+        let mut branches = Vec::new();
+        let report = solve_visit_traced(
+            system,
+            n,
+            p,
+            &opts,
+            domains,
+            |s| {
+                seen.push(s.to_vec());
+                stop_after.is_some_and(|k| seen.len() >= k)
+            },
+            |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        (seen, branches, report)
+    }
+
+    #[test]
+    fn every_mode_gives_the_identical_traversal() {
+        let mut rng = StdRng::seed_from_u64(0xD0_4A1E);
+        let mut with_frobenius = 0usize;
+        for round in 0..40 {
+            let p = [101u64, 1009, 65_521, 1_000_003][round % 4];
+            let n = 2 + round % 2;
+            let (system, points) = planted_system(&mut rng, p, n);
+            let domains: Vec<Option<Vec<u64>>> = (0..n)
+                .map(|i| {
+                    rng.gen_bool(0.75).then(|| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        let size = rng.gen_range(must.len()..=must.len() + 300);
+                        random_domain(&mut rng, p, size, &must)
+                    })
+                })
+                .collect();
+            for stop in [None, Some(1)] {
+                let (s0, b0, r0) = traverse(&system, n, p, &domains, DomainRootMode::Scan, stop);
+                for mode in [DomainRootMode::Frobenius, DomainRootMode::Auto] {
+                    let (s1, b1, r1) = traverse(&system, n, p, &domains, mode, stop);
+                    assert_eq!(s1, s0, "solutions differ, round {round}, {mode:?}");
+                    assert_eq!(b1, b0, "branch sequence differs, round {round}, {mode:?}");
+                    assert_eq!(
+                        (
+                            r1.complete,
+                            r1.stopped_early,
+                            r1.timed_out,
+                            r1.solutions_visited
+                        ),
+                        (
+                            r0.complete,
+                            r0.stopped_early,
+                            r0.timed_out,
+                            r0.solutions_visited
+                        )
+                    );
+                    // `field_ops` is a delta of the process-wide counter (unless
+                    // `F4_FP_THREAD_OPS=1`), so tests running in parallel leak into
+                    // it; it is not compared here.  The identical branch sequence
+                    // above already fixes every F4 input, and the single-process
+                    // example `fb_domain_rootfind` asserts `field_ops` equality.
+                    assert_eq!(
+                        (r1.candidates_rejected, r1.f4_runs, r1.full_field_branches),
+                        (r0.candidates_rejected, r0.f4_runs, r0.full_field_branches)
+                    );
+                    if mode == DomainRootMode::Frobenius {
+                        assert_eq!(r1.domain_evaluations, 0);
+                        with_frobenius += r1.domain_frobenius_univariates;
+                    }
+                }
+                assert_eq!(r0.domain_frobenius_univariates, 0);
+            }
+        }
+        assert!(
+            with_frobenius > 20,
+            "only {with_frobenius} domain univariates exercised"
+        );
+    }
+
+    #[test]
+    fn default_reports_serialise_without_the_new_fields() {
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "domain_frobenius_univariates",
+            "domain_root_field_multiplications",
+            "domain_index_entries",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
+        }
+        assert_eq!(
+            F4Options::new(Ordering::Grevlex, 4).domain_roots,
+            DomainRootMode::Scan
+        );
+    }
+}
+
+#[cfg(test)]
+mod sibling_batch_tests {
+    //! [`F4Options::sibling_batch`]: the batched, F4-free child solve finds
+    //! the scan's solution set (and, for one-level univariate children, the
+    //! scan's exact sequence), and its arithmetic helpers are exact.
+    use super::domain_root_tests::{planted_system, random_domain};
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    #[test]
+    fn counted_sqrt_and_dense_roots_match_brute_force() {
+        let mut rng = StdRng::seed_from_u64(0x5157);
+        for p in [3u64, 5, 7, 11, 13, 17, 101, 1009, 65_537] {
+            for _ in 0..300 {
+                let n = rng.gen_range(0..p);
+                let mut muls = 0;
+                let euler = n == 0 || powmod(n, (p - 1) / 2, p) == 1;
+                match sqrt_mod_counted(n, p, &mut muls) {
+                    Some(r) => assert_eq!(mulmod(r, r, p), n, "sqrt({n}) mod {p}"),
+                    None => assert!(!euler, "missed square root of {n} mod {p}"),
+                }
+                assert_eq!(sqrt_mod_counted(n, p, &mut muls).is_some(), euler);
+            }
+            if p > 1009 {
+                continue;
+            }
+            for _ in 0..200 {
+                let degree = rng.gen_range(1..=6usize);
+                let mut h: Vec<u64> = (0..degree).map(|_| rng.gen_range(0..p)).collect();
+                h.push(rng.gen_range(1..p));
+                let mut muls = 0;
+                let got = dense_roots_fp(&h, p, &mut muls, None).unwrap();
+                let want: Vec<u64> = (0..p)
+                    .filter(|&x| h.iter().rev().fold(0, |v, &c| (mulmod(v, x, p) + c) % p) == 0)
+                    .collect();
+                assert_eq!(got, want, "p = {p}, h = {h:?}");
+            }
+        }
+    }
+
+    /// `S₃` in the symmetric odd-characteristic expansion (as the prime-chain
+    /// builder writes it); `None` puts the target abscissa in a slot.
+    fn s3(slots: [Option<usize>; 3], n: usize, x: u64, a: u64, b: u64, p: u64) -> Poly {
+        let neg = |v: u64| (p - v % p) % p;
+        let raw: [([u32; 3], u64); 13] = [
+            ([2, 2, 0], 1),
+            ([2, 0, 2], 1),
+            ([0, 2, 2], 1),
+            ([2, 1, 1], neg(2)),
+            ([1, 2, 1], neg(2)),
+            ([1, 1, 2], neg(2)),
+            ([1, 1, 0], neg(mulmod(2, a, p))),
+            ([1, 0, 1], neg(mulmod(2, a, p))),
+            ([0, 1, 1], neg(mulmod(2, a, p))),
+            ([1, 0, 0], neg(mulmod(4, b, p))),
+            ([0, 1, 0], neg(mulmod(4, b, p))),
+            ([0, 0, 1], neg(mulmod(4, b, p))),
+            ([0, 0, 0], mulmod(a, a, p)),
+        ];
+        let terms: Vec<(Vec<u32>, u64)> = raw
+            .iter()
+            .map(|(powers, c)| {
+                let mut e = vec![0u32; n];
+                let mut c = *c;
+                for (axis, &k) in powers.iter().enumerate() {
+                    match slots[axis] {
+                        Some(v) => e[v] += k,
+                        None => c = mulmod(c, powmod(x, u64::from(k), p), p),
+                    }
+                }
+                (e, c)
+            })
+            .collect();
+        normalise(&terms, p, Ordering::Grevlex)
+    }
+
+    fn visit(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        batch: bool,
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12)
+            .with_domain_roots(mode)
+            .with_sibling_batch(batch);
+        let mut seen = Vec::new();
+        let report = solve_visit(system, n, p, &opts, domains, |s| {
+            seen.push(s.to_vec());
+            stop_after.is_some_and(|k| seen.len() >= k)
+        })
+        .unwrap();
+        (seen, report)
+    }
+
+    fn sorted(mut v: Vec<Vec<u64>>) -> Vec<Vec<u64>> {
+        v.sort();
+        v
+    }
+
+    #[test]
+    fn one_level_children_give_the_scans_exact_sequence() {
+        let mut rng = StdRng::seed_from_u64(0xB47C);
+        let mut solutions = 0usize;
+        for round in 0..24 {
+            let p = [101u64, 103, 1009][round % 3];
+            let (a, b, x) = (
+                rng.gen_range(0..p),
+                rng.gen_range(1..p),
+                rng.gen_range(0..p),
+            );
+            let system = vec![s3([Some(0), Some(1), None], 2, x, a, b, p)];
+            let size = rng.gen_range(p as usize / 3..=p as usize);
+            let domains = vec![
+                Some(random_domain(&mut rng, p, size, &[])),
+                Some(random_domain(&mut rng, p, size, &[])),
+            ];
+            let (s0, r0) = visit(&system, 2, p, &domains, false, DomainRootMode::Scan, None);
+            for mode in [DomainRootMode::Scan, DomainRootMode::Frobenius] {
+                let (s1, r1) = visit(&system, 2, p, &domains, true, mode, None);
+                assert_eq!(s1, s0, "round {round}: sequence differs");
+                assert_eq!(r1.solutions_visited, r0.solutions_visited);
+                assert!(r1.complete);
+                assert_eq!(r1.batched_nodes, 1);
+                assert_eq!(r1.batched_children, size);
+                assert_eq!(r1.batched_fallbacks, 0);
+                assert!(r1.f4_runs < r0.f4_runs, "batched children ran F4");
+            }
+            solutions += s0.len();
+        }
+        assert!(solutions > 100, "only {solutions} solutions exercised");
+    }
+
+    #[test]
+    fn chains_and_dense_systems_give_the_scans_solution_set() {
+        let mut rng = StdRng::seed_from_u64(0xC4A1);
+        let (mut batched, mut fallbacks, mut solutions) = (0usize, 0usize, 0usize);
+        for round in 0..30 {
+            let p = [101u64, 103, 211][round % 3];
+            let (system, n, domains): (Vec<Poly>, usize, Vec<Option<Vec<u64>>>) = if round % 2 == 0
+            {
+                // m = 3 chain: S3(x0, x1, u) = 0, S3(u, x2, X) = 0, x_i in D, u free.
+                let (a, b, x) = (
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                );
+                let size = rng.gen_range(8..=24);
+                let d = random_domain(&mut rng, p, size, &[]);
+                (
+                    vec![
+                        s3([Some(0), Some(1), Some(3)], 4, x, a, b, p),
+                        s3([Some(3), Some(2), None], 4, x, a, b, p),
+                    ],
+                    4,
+                    vec![Some(d.clone()), Some(d.clone()), Some(d), None],
+                )
+            } else {
+                let n = 3;
+                let (system, points) = planted_system(&mut rng, p, n);
+                let domains = (0..n)
+                    .map(|i| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        {
+                            let size = rng.gen_range(must.len()..=40);
+                            Some(random_domain(&mut rng, p, size, &must))
+                        }
+                    })
+                    .collect();
+                (system, n, domains)
+            };
+            let (s0, r0) = visit(&system, n, p, &domains, false, DomainRootMode::Scan, None);
+            let (s1, r1) = visit(
+                &system,
+                n,
+                p,
+                &domains,
+                true,
+                DomainRootMode::Frobenius,
+                None,
+            );
+            assert_eq!(
+                sorted(s1.clone()),
+                sorted(s0.clone()),
+                "round {round}: solution sets differ"
+            );
+            assert_eq!(
+                (r1.complete, r1.solutions_visited),
+                (r0.complete, r0.solutions_visited)
+            );
+            for s in &s1 {
+                assert!(
+                    system.iter().all(|g| eval(g, s, p) == 0),
+                    "not a solution: {s:?}"
+                );
+            }
+            batched += r1.batched_children;
+            fallbacks += r1.batched_fallbacks;
+            solutions += s0.len();
+        }
+        assert!(batched > 200, "batched path barely exercised ({batched})");
+        assert!(fallbacks > 0, "the F4 fallback was never exercised");
+        assert!(solutions > 20, "only {solutions} solutions");
+    }
+
+    #[test]
+    fn stopping_early_returns_a_genuine_solution_and_default_is_off() {
+        let p = 1009;
+        let system = vec![s3([Some(0), Some(1), None], 2, 77, 3, 11, p)];
+        let domains = vec![Some((0..p).collect()), Some((0..p).collect())];
+        let (s, r) = visit(
+            &system,
+            2,
+            p,
+            &domains,
+            true,
+            DomainRootMode::Frobenius,
+            Some(1),
+        );
+        assert_eq!(s.len(), 1);
+        assert!(r.stopped_early);
+        assert_eq!(eval(&system[0], &s[0], p), 0);
+        assert!(!F4Options::new(Ordering::Grevlex, 4).sibling_batch);
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "batched_nodes",
+            "batched_children",
+            "batched_fallbacks",
+            "batched_field_multiplications",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
         }
     }
 }

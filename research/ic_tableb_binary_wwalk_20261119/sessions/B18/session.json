@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h27606d6bb053",
+  "label": "ic_tableb_binary_wwalk_20261119 B18: C = 2 wwalk on random-binary Table B vs the k-sum incumbent",
+  "spec_id": "ECS1ha84c3fb701e9",
+  "spec_sha256": "a84c3fb701e9eeb3ca9b2b402e8e61ef9477129d362157d29b2e35cd0f9c445e",
+  "env_class_id": "ECBENV3h7e5034a7877f",
+  "host_sha256": "75809df340bce0c8503348014ae217cfee0c3b8fd095c1dcc2f051a4d5e97743",
+  "plan_sha256": "9c043d926cd47504a4765ccf33b79cfb6491222218eefb04b77ce75930938d4f",
+  "binary_sha256": "93139f8e16fc25278c073ccba388d2b10f24574c0a2f3959e4767bf8126aa41d",
+  "git_commit": "ce71cfa8f1f2e56c6bd70bfe9fde2a7a96b60ee5",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1795113384915,
+  "finished_unix_ms": 1795113388746,
+  "status": "complete",
+  "executions_planned": 720,
+  "records_written": 720,
+  "records_sha256": "28aa5fb174b175da148f9e4ad533e5b89bf7fd254f4d080db01f310673009753",
+  "status_counts": {
+    "verified": 720
+  },
+  "last_seq": 719
+}
