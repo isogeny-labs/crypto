@@ -98,6 +98,16 @@ existing schema-rejection manifest and claim inputs; no historical payload
 or rejection entry was changed.
 No Rust source changed, and no new full-root test pass is claimed.
 
+The initial local artifact warning also came from incomplete sparse inputs:
+`.artifacts/config.json` was off disk, so the tool used its default policy.
+After exact tracked hydration, the current unchanged policy keeps all PDFs
+and `benchmarks/progress/progress.json`; the actual local artifact check
+passes. The official migration job on `24aae5d188` likewise reported no
+changed data files and made no commit. No migration or S3 operation is needed
+for this closeout. See [artifact-policy-correction.json](evidence/artifact-policy-correction.json).
+The earlier `local-checks.json` and `pending-artifact-migration.json` are
+retained as superseded sparse-input diagnostics, not current policy standing.
+
 The authorized stop condition is met: PR4525 is merged, its actual outcomes
 are recorded, and its follow-up stays off. PR4535 and its separate cohorts
 are outside this closeout.
