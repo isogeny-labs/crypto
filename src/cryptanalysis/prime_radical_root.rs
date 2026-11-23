@@ -42,9 +42,6 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
-    // floor(2^64/p), computed once for canonical 32-bit residues.
-    // 0 disables the reciprocal path for larger field moduli.
-    reciprocal32: u64,
     // floor(2^64 / p): quotient estimate for canonical 32-bit products.
     // Calculated once per field rather than dividing on every multiply.
     reciprocal_64: u64,
@@ -1644,9 +1641,23 @@ impl RadicalRootCtx {
             1 => ok(vec![]),
             2 => {
                 // x + c0 and a*x have roots without an inversion.
+                // Division by 2 is a canonical-field halving, not a
+                // generic modular inverse followed by multiplication.
+                // The context already computed inv(3) and inv(4) while
+                // initializing Cardano/Ferrari; reuse them for linear roots.
+                // Preserve the general Euclidean inverse for other leads.
                 let root = if c[0] == 0 { 0 }
                     else if c[1] == 1 { fp.neg(c[0]) }
-                    else { fp.mul(fp.neg(c[0]), fp.inv(c[1])) };
+                    else if c[1] == 2 { fp.half(fp.neg(c[0])) }
+                    else {
+                        let neg_c0 = fp.neg(c[0]);
+                        let inverse = match c[1] {
+                            3 => self.inv3,
+                            4 => self.inv4,
+                            _ => fp.inv(c[1]),
+                        };
+                        fp.mul(neg_c0, inverse)
+                    };
                 ok(vec![root])
             },
             3 => ok(self.quad_roots(c[2], c[1], c[0])),
@@ -1686,6 +1697,25 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round126_small_leading_linear_roots_match_independent_field_inverse() {
+        for p in [5u64, 7, 101, 65_521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
+            for a in [1u64, 2, 3, 4] {
+                for b in [0u64, 1, 2, p / 2, p - 1] {
+                    let expected = if b == 0 { 0 } else { f.mul(f.neg(b), f.inv(a)) };
+                    for coeffs in [[b, a], [b + p, a + p]] {
+                        let result = ctx.roots(&coeffs).unwrap();
+                        assert_eq!(result.roots, vec![expected],
+                            "p={p} a={a} b={b} input={coeffs:?}");
+                        assert_eq!(f.add(f.mul(a, expected), b), 0);
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn round72_imaginary_fp2_mul_matches_reference() {
