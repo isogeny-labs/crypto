@@ -1,6 +1,6 @@
 # Selector resultant continuation
 
-Parent: [PR #4921](https://github.com/isogeny-labs/crypto/pull/4921), branch `research/fass-prime31-20261122`. This is candidate C of the original FASS protocol. The original objective, matched algebraic comparisons and full cold prime-field index-calculus accounting remain open.
+Active follow-up: [PR #4936](https://github.com/isogeny-labs/crypto/pull/4936), branch `research/fass-selector-resultant-qualified-20261123`. Parent PR #4921 merged during publication and receives no further maintenance. This is candidate C of the original FASS protocol. The original objective, matched algebraic comparisons and full cold prime-field index-calculus accounting remain open.
 
 ## Delivered component
 
@@ -22,7 +22,7 @@ Use the original protocol and repository checkpoint, runner, source/image, capac
 
 ## Publication and state
 
-The owner changed the lane to ready for review while publication was being reconciled; preserve that readiness state. Current-head dependency repair/requalification, whole-library qualification and the admitted comparison remain unfinished. Update its existing branch rather than opening a duplicate. Preserve the append-only main PCC prefix before registering any new claim. Never promote the producer attestation to a verified claim without the signed verdict. [pcc:unverified]
+The parent lane was marked ready and merged by another session before the publication guard. The follow-up PR #4936 is a draft for the selector component; current-head dependency repair/requalification, whole-library qualification and the admitted comparison remain unfinished. Update its existing branch rather than opening a duplicate. Preserve the append-only main PCC prefix before registering any new claim. Never promote the producer attestation to a verified claim without the signed verdict. [pcc:unverified]
 
 Pages searches and an inventory request returned no usable result before the execution runtime reset. No Page was edited. When the connector responds, find and freshly read the existing FASS research page or ECDLP benchmark tracker before reconciling its status; do not create a duplicate from a failed lookup.
 
@@ -31,3 +31,5 @@ There are no research runs in flight from this work.
 The immutable selector source/evidence commit is `883e2d2dda223ae1b8eafdc83b289a49fa178855`. The intended unsigned statement is `PCC-20261123-b6b455`; `PCC-20261123-f307d3` is retained only as a superseded administrative record with the earlier producer commit. Preserve concurrent coupled-study commit `2ac638f69c95e9966ce8dd29505b67337d6a9bba` when updating the lane. [pcc:unverified]
 
 See [PUBLICATION_UPDATE.md](PUBLICATION_UPDATE.md) for the later head, existing dependency defects and canonical ledger reconciliation. The original 15-test binding remains at source commit 883e2d2d; it is not a current-head compilation result. [pcc:unverified]
+
+The final follow-up registration uses the prefix at tracking head `ab0fb9fb1d22170785aa9d65ae133ef34efedfb9`; its authoritative mapping is in `evidence/pcc-reconciliation-followup/receipt.json`. The prior dda2a registration mapping was a prepared, unpublished attempt and is retained as such.
