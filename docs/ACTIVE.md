@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Complete approved artifact-store migration and full remote byte replay for the82374B CM19 census raw before PR #5019 can finish packaging/merge; existing trusted artifact-autofix normal CI pending, local aws/credentials absent (Codex, 2026-11-23, branch lane/chained-cm19-hermitian-20261123; mathematical classification/report complete, no policy waiver). [pcc:unverified]
+
 - [x] Audit genuine CM19 polarized-model hypotheses and completely classify integral4-similitudes:156 maps,144 mixed(4,4,2,2),12 twice-unitary, all923-minor Smith checks; complete report and written cost-admission limit (Codex, 2026-11-23, branch lane/chained-cm19-hermitian-20261123, PR #5019, source323ece11/resultb2ce1276, unsignede78d08/fc4ef7; actual divisor alpha/maps, generic formal and strongest-reference costs remain open). [pcc:unverified]
 
 - [x] Qualify the primary-derived genuine CM19 F7 genus3 source:counts17/65/236, Weil(T2+3T+7)^3, Jac1331; actual17-point twist/Frobenius/inverse controls and checked2-page report (Codex, 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012, source0b9b506b/result89d7b471, unsigned180c4c; actual polarization/J4/kernel/target/cost follow-ups remain open). [pcc:unverified]
