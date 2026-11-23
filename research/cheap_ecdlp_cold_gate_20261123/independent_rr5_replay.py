@@ -21,6 +21,49 @@ def need_int(value, upper, label):
     return value
 
 
+# Native solver.rs advances SplitMix64 twice per public query, once for
+# each RHS label. A caller-supplied seed allows a read-only record consumer to
+# detect skipped, reordered or relabelled attempts; the producer does not yet
+# serialize this seed, so it is an EXTERNAL, opt-in reproducibility check.
+U64 = 1 << 64
+
+
+def splitmix_next(state):
+    state = (state + 0x9e3779b97f4a7c15) % U64
+    z = state
+    z = ((z ^ (z >> 30)) * 0xbf58476d1ce4e5b9) % U64
+    z = ((z ^ (z >> 27)) * 0x94d049bb133111eb) % U64
+    return state, (z ^ (z >> 31)) % N
+
+
+def verify_public_query_schedule(attempts, seed, max_queries, status):
+    """Replay the native seed-to-(a,b) stream without a target secret.
+
+    This authenticates schedule *consistency* with an independently specified
+    seed and declared cap. It does not attest that F4 was executed, that
+    deadlines were honest, or that the seed was fixed before the experiment.
+    """
+    state = need_int(seed, U64, "query seed")
+    if type(max_queries) is not int or not 0 <= max_queries:
+        raise ValueError("noncanonical maximum public-query count")
+    if not isinstance(attempts, list) or len(attempts) > max_queries:
+        raise ValueError("attempt count exceeds declared query cap")
+    if status not in ("query_limit", "solved", "solved_after_deadline",
+                      "deadline", "relation_rejected", "scalar_replay_failed"):
+        raise ValueError("unsupported native terminal status")
+    if status == "query_limit" and len(attempts) != max_queries:
+        raise ValueError("query_limit omits public attempts")
+    for i, attempt in enumerate(attempts):
+        state, expected_a = splitmix_next(state)
+        state, expected_b = splitmix_next(state)
+        if (not isinstance(attempt, dict)
+                or type(attempt.get("a")) is not int
+                or type(attempt.get("b")) is not int
+                or (attempt["a"], attempt["b"]) != (expected_a, expected_b)):
+            raise ValueError(f"attempt {i}: mismatch with source-exact SplitMix64 query schedule")
+    return len(attempts)
+
+
 def point(value, label):
     if value is None:
         return None
@@ -238,9 +281,17 @@ def main():
     parser.add_argument("--receipt", help="direct public_rr5_sample.json-style input")
     parser.add_argument("--record", help="native RR5 SolveRecord JSON")
     parser.add_argument("--base", help="public base manifest with base array for --record")
+    parser.add_argument("--seed", type=lambda x: int(x, 0),
+                        help="optional native u64 SplitMix64 query seed; requires --max-queries")
+    parser.add_argument("--max-queries", type=int,
+                        help="optional external native query cap; requires --seed")
     args = parser.parse_args()
     if bool(args.receipt) == bool(args.record) or bool(args.record) != bool(args.base):
         parser.error("provide --receipt OR both --record and --base")
+    if (args.seed is None) != (args.max_queries is None):
+        parser.error("--seed and --max-queries must be provided together")
+    if args.receipt and args.seed is not None:
+        parser.error("the public query schedule is available only with --record")
     raw, rawhash = load(args.receipt or args.record)
     if args.receipt:
         base = [point(v,"base") for v in raw["base"]]
@@ -255,6 +306,10 @@ def main():
         q = point(raw["target"],"producer target")
         rows=[]
         attempts=raw["attempts"]
+        checked_schedule = None
+        if args.seed is not None:
+            checked_schedule = verify_public_query_schedule(
+                attempts, args.seed, args.max_queries, raw.get("status"))
         extracted = 0
         for i,attempt in enumerate(attempts):
             aa=need_int(attempt["a"],N,f"attempt {i} a")
@@ -291,7 +346,10 @@ def main():
                 "producer_error":raw.get("terminal_error"),
                 "producer_deadline_exceeded":raw.get("deadline_exceeded"),
                 "extracted_candidate_rows":extracted,
-                "accepted_rows":len(rows),"extracted_but_not_accepted_rows":extracted-len(rows)}
+                "accepted_rows":len(rows),"extracted_but_not_accepted_rows":extracted-len(rows),
+                "query_schedule_checked":checked_schedule is not None,
+                "source_exact_scheduled_queries":checked_schedule,
+                "declared_max_queries":args.max_queries}
     result=validate(raw,base,q,rows,producer=bool(args.record))
     if args.record:
         if raw.get("rank") != result["independent_rank"] or raw.get("scalar") != result["recovered"]:
