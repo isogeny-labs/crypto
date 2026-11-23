@@ -1,0 +1,142 @@
+name: P192 fixed relation and complete-transfer replay
+on:
+  pull_request:
+    paths:
+      - 'research/nist_cover_three_tests_20261116/replay_20261123/**'
+      - '.github/workflows/p192-relation-replay.yml'
+  workflow_dispatch:
+    inputs:
+      source_revision:
+        description: Exact 40-character source SHA; blank uses the workflow revision
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    outputs:
+      source_revision: ${{ steps.source.outputs.revision }}
+    steps:
+      - name: Require immutable source identity
+        id: source
+        env:
+          REVISION: ${{ inputs.source_revision || github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]]
+          printf 'revision=%s\n' "$REVISION" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.source.outputs.revision }}
+          persist-credentials: false
+          sparse-checkout: research/nist_cover_three_tests_20261116
+      - name: Record native environment and source
+        env:
+          EXPECTED: ${{ steps.source.outputs.revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          c++ --version
+          openssl version
+          pkg-config --modversion openssl gmpxx
+      - name: Run immutable fixed-input correctness replay
+        shell: bash
+        env:
+          LC_ALL: C
+        run: |
+          set -euo pipefail
+          research/nist_cover_three_tests_20261116/replay_20261123/run.sh evidence/ci-replay
+      - name: Preserve raw qualification records
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p192-replay-raw-${{ github.run_id }}
+          path: research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve data reports for isolated optional signing
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p192-replay-reports-${{ github.run_id }}
+          path: |
+            research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/replay-certificate.json
+            research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/validator-report.json
+          retention-days: 14
+          if-no-files-found: error
+  sign:
+    needs: replay
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.replay.outputs.source_revision == github.sha
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/pcc/
+            /pcc/keyring.json
+            /pcc/ledger.jsonl
+      - name: Download reports as data only
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: p192-replay-reports-${{ github.run_id }}
+          path: ${{ runner.temp }}/p192-replay-reports
+      - name: Download raw results as data only
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: p192-replay-raw-${{ github.run_id }}
+          path: research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay
+      - name: Sign with the existing main-only identity
+        env:
+          PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
+          REPORTS: ${{ runner.temp }}/p192-replay-reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$PCC_SIGNING_KEY" ]; then
+            echo '::error::PCC_SIGNING_KEY is unset; replay reports remain unsigned'
+            exit 1
+          fi
+          keyfile=$(mktemp)
+          trap 'rm -f "$keyfile"' EXIT
+          chmod 600 "$keyfile"
+          printf '%s' "$PCC_SIGNING_KEY" > "$keyfile"
+          python3 tools/pcc/pcc.py sign --sign-key "$keyfile" --key-id ci-main \
+            --subject-kind replay-certificate "$REPORTS/replay-certificate.json"
+          python3 tools/pcc/pcc.py sign --sign-key "$keyfile" --key-id ci-main \
+            --subject-kind validator-report "$REPORTS/validator-report.json"
+      - name: Check both signatures and raw-data bindings with trusted PCC
+        env:
+          REPORTS: ${{ runner.temp }}/p192-replay-reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir ci-reports
+          cp "$REPORTS/"*.json ci-reports/
+          replay_sha=$(sha256sum ci-reports/replay-certificate.json | cut -d' ' -f1)
+          validator_sha=$(sha256sum ci-reports/validator-report.json | cut -d' ' -f1)
+          jq -n --arg source "$GITHUB_SHA" --arg replay "$replay_sha" --arg validator "$validator_sha" \
+            '{schema:"pcc.claim/v1",id:"PCC-20261123-000001",kind:"measurement",claim_type:"data",
+              created_at:"2026-11-23T00:00:00Z",producer:{commit:$source},
+              statement:"CI proof preview: fixed-fixture counts and public known-answer bindings only; no ledger registration or admitted performance.",
+              proofs:[{kind:"replay",path:"ci-reports/replay-certificate.json",sha256:$replay,
+                signature:{path:"ci-reports/replay-certificate.json.sig.json"}},
+              {kind:"recompute",path:"ci-reports/validator-report.json",sha256:$validator,evidence_dir:".",
+                signature:{path:"ci-reports/validator-report.json.sig.json"}}]}' > ci-reports/proof-preview.json
+          python3 tools/pcc/pcc.py verify --json ci-reports/proof-preview.json > ci-reports/proof-verdict.json
+      - name: Preserve signature sidecars
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p192-replay-signatures-${{ github.run_id }}
+          path: |
+            ci-reports/*.sig.json
+            ci-reports/proof-preview.json
+            ci-reports/proof-verdict.json
+          retention-days: 14
+          if-no-files-found: error
