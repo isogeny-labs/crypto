@@ -1,0 +1,19 @@
+[package]
+name = "torus-section-elimination"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"
+sha2 = "0.10"
+flate2 = "1"
+torus-s4 = { path = "../torus-s4" }
+torus-coset-circuit = { path = "../torus-coset-circuit" }
+torus-point-solver = { path = "../torus-point-solver" }
+torus-section-operator = { path = "../torus-section-operator" }
+torus-quotient-query = { path = "../torus-quotient-query" }
