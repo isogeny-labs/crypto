@@ -1,0 +1,16 @@
+{
+  "schema": "prime31-iteration6-report-validation/v1",
+  "status": "blocked_inherited_syntax",
+  "source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+  "gate_source_sha256": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0",
+  "identity_issuer_sha256": "b803aa70037cd95467cc0865f99fd8af5848912eb490542d8ad327b3dfa490fc",
+  "ci_summary": "Blocked before new example tests: inherited root syntax errors in ecbench/spec.rs stopped the original-lock build. New correctness tests did not execute.",
+  "identity_summary": "Native cubic-residual issuer prepared but not executed. Issuance and replay remain pending; intended certificate standing proof:null.",
+  "ci_url": "https://github.com/isogeny-labs/crypto/actions/runs/45096187034",
+  "ci_job_id": "137436389923",
+  "failure_scope": "Inherited malformed test-fixture calls and unclosed delimiters around ecbench/spec.rs lines 894-1042; no mathematical counterexample inferred.",
+  "next_action": "Repair the inherited root parse failure using a minimal history-based change, retain the failed receipt, and rerun original-lock correctness CI. Then specify the exact guarded-quadratic solver and its complete costs.",
+  "receipt_path": null,
+  "standing": "pcc:unverified",
+  "performance": "No new timing panel or asymptotic solving bound."
+}

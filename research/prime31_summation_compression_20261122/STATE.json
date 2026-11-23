@@ -7,7 +7,7 @@
   "repository": "isogeny-labs/crypto",
   "pull_request": "https://github.com/isogeny-labs/crypto/pull/4928",
   "branch": "lane/prime31-dickson-quotient-gate",
-  "tracking_commit": "50081b81e8eb3addccf5add80d6bd8f7683218a9",
+  "tracking_commit": "087744300ac8d91335f2099b72fd311743fe7d32",
   "review_base": "c6a9c98b665ce70f5c017257488b19bd324c4080",
   "curve": {
     "p": 2147483647,
@@ -93,7 +93,7 @@
       "completed": [
         "Derived triviality of homomorphisms from odd-order source subgroup to 2-power bucket group; prime-order source to any smaller finite group",
         "Proved oriented signed addition cannot be represented by a globally single-valued x-only operation on nonzero odd-order points",
-        "Specified exact signed affine x(P±Q) recurrence and identified quadratic pair enumeration obstruction",
+        "Specified exact signed affine x(P\u00b1Q) recurrence and identified quadratic pair enumeration obstruction",
         "Derived conditional full-rank necessary criterion sigma+tau<m-1 for sub-sqrt cold setup-plus-attempt work, and m=3 quadratic-linear-algebra obstruction"
       ],
       "outcome": "No algorithmic or asymptotic speedup. Narrows implicit m>=3 index target to nonhomomorphic collision-checked structures or different rank/LA architectures.",
@@ -103,21 +103,35 @@
     },
     {
       "id": 6,
-      "candidate": "All-node oriented rational S3/Dickson quadratic chain; full-Fp auxiliary purity and twist-ghost guards",
-      "scope": "frozen deterministic original-source correctness component, no relation finding and no performance",
-      "frozen_source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
-      "frozen_source": "iteration6/SOURCE_FREEZE.json",
-      "status": "hosted original-lock CI run 45096187034 failed before candidate tests due to unrelated ecbench/spec.rs syntax errors also present on main; candidate neither passed nor failed its correctness tests; PCC unverified",
-      "ci": {
-        "run_id": 45096187034,
-        "job_id": 137436389923,
-        "checkout_source": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
-        "conclusion": "failure",
-        "cause": "Rust compilation fails at src/cryptanalysis/ecbench/spec.rs:964, 1038; file blob af585eb7a0b4b8e1a63bea08d1ae6f3222c32702 identical on main and frozen head",
-        "artifact_id": 14783413661,
-        "artifact_sha256": "b161105ca2919c01fb1957e0c6dc4be5599508e3e49d6bbbbba3a835155b471a",
-        "candidate_test_count": 0,
-        "scope": "environment/upstream source gate failure; do not claim native rational-chain correctness or rerun blindly"
+      "candidate": "All-node oriented quadratic S3-Dickson system with rational auxiliary domain and free-order comb completeness",
+      "proof": "iteration6/MATHEMATICAL_NOTE.md",
+      "independent_review": "iteration6/INDEPENDENT_REVIEW.md",
+      "literature": "iteration6/LITERATURE_AUDIT.md",
+      "status": "written derivation complete; initial original-root-lock CI failed on inherited source syntax before new tests; repair active",
+      "completed": [
+        "Root-oriented rational-tree purity and full-fibre membership equivalence",
+        "Quadratic-system bijection and exact mk+3m-5 / mk+3m-4 counts for m>=2,k>=1",
+        "Explicit Mersenne and squarefree Frobenius guards on internal abscissae",
+        "Prime-order m<=n multiset completeness by free-order comb; fixed balanced topology counterexample",
+        "Frozen original-arithmetic Rust certificate verifier with 64+256 fixed tuple controls and explicit Fp2 ghost",
+        "Current integer-indexing and function-reporting applicability audit; companion reference-scan correction"
+      ],
+      "tracking_commit": "4b29204b844e806932a6473b25a34bae5dcc12cc",
+      "source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+      "source_sha256": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0",
+      "source_git_blob": "7f991783bd99d4f95ec4df1a94b50e79be693b51",
+      "scope": "Supplied-certificate verification and exact representation; not relation discovery or a solving-degree bound",
+      "ci_run_id": 45096187034,
+      "ci_job_id": 137436389923,
+      "outcome": "Compact exact representation; asymptotic root-solving/empty-query term remains unknown.",
+      "ci_failure_receipt": "iteration6/evidence/ci-inherited-build-failure/receipt.json",
+      "new_tests_executed": false,
+      "build_prerequisite": {
+        "status": "reviewed restoration frozen before rerun",
+        "source_blob": "ed85acbb242a11a1412da7c842cef70872235dcc",
+        "proof": "iteration6/evidence/inherited-spec-restoration/AUDIT.md",
+        "freeze": "iteration6/evidence/inherited-spec-restoration/SOURCE_FREEZE.json",
+        "scope": "289 restored lines, no deleted current lines; exact parent policy implementations and tests preserved; syntax only at freeze"
       }
     },
     {
@@ -160,6 +174,26 @@
       "id": "PCC-20261123-526846",
       "scope": "Original-lock hosted correctness replay and identical deterministic diagnostic",
       "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-ed96d7",
+      "scope": "Rational purity, free-order comb completeness and exact quadratic representation",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-36ec87",
+      "scope": "Scoped bucket/rank applicability and conditional full-cost exponent budget",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-184d4e",
+      "scope": "Current primary indexing/reporting literature and companion source audit",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-8c9b8a",
+      "scope": "Source-bound original-root CI failure before component execution",
+      "standing": "unverified"
     }
   ],
   "identity_certificates": {
@@ -172,9 +206,9 @@
     "scope": "Native evaluated tier over 2^61-1 plus separate checked-i128 coefficient expansion; all proof fields null; no formal kernel proof",
     "root_replay": "identity-certificates/root-replay.json"
   },
-  "next_mathematical_gate": "Construct a genuine DLP-free exact nonhomomorphic m>=3 empty-fibre oracle with fully charged setup/query/failures/memory, independent signed rank and a suitable growing ordinary-curve family; smooth p+1 field family alone now derived in iteration7, but factor-base liftability and large subgroup still open.",
-  "next_empirical_gate": "Root crypto_lib original-lock correctness currently blocked at source bf56de34 by unchanged main src/cryptanalysis/ecbench/spec.rs syntax corruption, before iteration6 tests. Obtain an authorized upstream fix and new source-matching CI, then implement/freeze Rust natural-target generator and only after admission start benchmark.",
-  "growing_family_obligation": "A fixed 31-bit prime cannot establish an asymptotic exponent. Specify growing prime fields and smooth p+1 structure without assuming infinitely many Mersenne primes, and include complete index-calculus costs.",
+  "next_mathematical_gate": "For the explicit rational quadratic representation, derive a charged exact elimination/contraction recurrence, including empty targets and Fp isolation. In the declared conventional full-rank m=4 model with setup exponent<=2 and matrix exponent2, a candidate query exponent tau<1 is needed; prove the actual solver bound and required yield/rank assumptions rather than inferring it from input degree.",
+  "next_empirical_gate": "Finish source-matched original-root-lock correctness CI for the supplied-chain verifier; then freeze a specified root solver and native natural-target generator before any admitted matched performance study. Existing verification receipts are not discovery timings.",
+  "growing_family_obligation": "Iteration7 gives a written Linnik smooth-p+1 field family without Mersenne infinitude; independent review ongoing. Large-prime-order source subgroup, adequate liftable base and a faster complete solver remain separate obligations.",
   "overlap_exclusions": [
     "#4692",
     "#4812",
@@ -185,23 +219,27 @@
   "continuation": {
     "existing_automation_id": "6b0356b62c58819095775adf491e4492",
     "cadence": "existing hourly schedule",
-    "prompt_update_status": "confirmed after original-lock CI and sibling-source audit; existing hourly schedule retained",
+    "prompt_update_status": "Existing enabled hourly task updated with iteration6 source checkpoint and confirmed Page IDs; schedule preserved",
     "prompt_source": "CONTINUATION.md",
     "next_scheduled_run_at_update": "2026-11-22T16:55:14-08:00",
     "receipt": "evidence/automation-update-receipt.json",
-    "prompt_sha256": "dfbdeb186d7e8e8dd8637e2a62212144fe39f0f454d4d41d0273ba739e5c1dfe"
+    "prompt_sha256": "dfbdeb186d7e8e8dd8637e2a62212144fe39f0f454d4d41d0273ba739e5c1dfe",
+    "space_attachment": "independent task attached to page_729b0b80bdb4819193f457c80ecabe84"
   },
   "space": {
     "name": "Prime Field Summation Polynomial Research",
-    "status": "verified established Space and progress Page via earlier interactive creation and readback; live write unavailable in this non-interactive run",
+    "creation_attempts": 2,
+    "status": "confirmed created and read back; research Page saved; existing task attached",
     "space_id": "page_space_038e4361a33c8191af04e7a127104c0f",
-    "root_page_id": "page_6b0398c4e92481918fd28c1f69875748",
     "page_id": "page_729b0b80bdb4819193f457c80ecabe84",
-    "page_url": "https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84",
-    "readback_receipt": "iteration6/space-receipt.json",
-    "last_write": "not confirmed for this iteration; connector requires user input in unattended run",
+    "instruction": "Read and update the known research Page with guarded edits. Do not recreate Space/Page. Verify committed saves and update latest state.",
+    "recovery": "Successful complete Space listing and paginated Page search found no target; subsequent create returned exact IDs and readback confirmed content",
     "prepared_content": "SPACE_PAGE.md",
-    "creation_attempts": "historical uncertain create plus confirmed new reconciliation; no duplicate attempted this run"
+    "page_creation_key": "prime31-dickson-quotient-gate-20261122",
+    "root_page_id": "page_6b0398c4e92481918fd28c1f69875748",
+    "url": "https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84",
+    "receipt": "iteration6/space-receipt.json",
+    "preview_status": "Native content readback verified; rendered preview not inspected"
   },
   "environment_limits": [
     "Local original lock could not resolve either1.19.0 offline; original manifest/lock subsequently passed hosted CI. Both historical adapter and hosted receipts are retained.",
@@ -210,10 +248,11 @@
     "No EKS/AWS execution access in this session; no paid job launched",
     "No Lean/lake/elan",
     "Partial connector materialization, no complete local Git object graph; PCC producer commit is zero and source hashes are explicit",
-    "2026-11-22 continuation: no installed cargo/rustc in local runtime, no Rust benchmark executed; signed group index is mathematical/pseudocode only."
+    "2026-11-22 continuation: no installed cargo/rustc in local runtime, no Rust benchmark executed; signed group index is mathematical/pseudocode only.",
+    "Interactive iteration6 runtime has Rust installed; partial materialization lacks a root crate checkout. New fixed correctness execution uses original-root-lock hosted CI. Prior unattended no-Rust statement describes that older runtime only."
   ],
-  "report": "REPORT.md",
-  "pdf_status": "complete: 8 pages, visually checked, 56142 bytes; covers iterations1 and2 plus original-lock CI",
+  "report": "iteration6/REPORT.md",
+  "pdf_status": "Iteration6 six-page addendum visually checked; initial inherited-build failure retained and new tests not yet executed",
   "delivery_status": "Versioned in the containing PR commit; source and CI bind109fc024e33f122fd678d2c93a18b2c0438a8668",
   "companion_lane": {
     "pull_request": "https://github.com/isogeny-labs/crypto/pull/4924",
@@ -227,7 +266,7 @@
       "job_id": 137415511884,
       "checkout_commit": "96c9101315d9f0c7ca5fee2af18cdb10d16c645d",
       "conclusion": "success",
-      "scope": "Monic-oracle source at current companion head matches CI; exact-source original-Rust tests passed, producer unverified; logged online timings not admitted benchmark",
+      "scope": "Historical source-bound result at 96c910... and byte-identical monic source at 70e048... only; later observed c4bfab5... changes source and requires a new matching receipt. Producer CI unverified, timings not admitted.",
       "current_head_change": "Only B677_MONIC_SCALING_PROTOCOL_20261123.md differs between 96c... and 70e..."
     },
     "current_change_gate": "Since source-bound 96c9101315d9f0c7ca5fee2af18cdb10d16c645d, 14 commits alter monic-oracle Rust source and workflow. Prior source-bound CI does not qualify those changed bytes; no new matching head CI found."
@@ -247,5 +286,7 @@
     "claim": "PCC-20261123-526846",
     "standing": "unverified"
   },
-  "pdf_sha256": "f274eda2ef4ccf54f7af5ec1ba4f66775146ec06f15684706f816e8fb5bf497a"
+  "pdf_sha256": "c427e37186287fe2ca56742d98729d7f749371df3c72af3af3d16570e4cd564c",
+  "prior_report": "REPORT.md",
+  "checkpoint_parent": "5fb95f63bd8a38de306abf14b93ed54f032fbe8a"
 }

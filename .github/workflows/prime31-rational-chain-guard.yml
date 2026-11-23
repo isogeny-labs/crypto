@@ -7,6 +7,7 @@ on:
     paths:
       - examples/prime31_rational_chain_guard.rs
       - examples/identity_certificate_rational_chain.rs
+      - src/cryptanalysis/ecbench/spec.rs
       - .github/workflows/prime31-rational-chain-guard.yml
   workflow_dispatch:
 
@@ -25,11 +26,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.100.0
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
       - name: Record original source and lock identities
         run: |
           mkdir -p correctness-receipts/identities
           git rev-parse HEAD > correctness-receipts/checkout-commit.txt
-          sha256sum Cargo.toml Cargo.lock src/cryptanalysis/ext_curve.rs src/cryptanalysis/semaev_prime_poly.rs src/cryptanalysis/ic_boundary.rs src/cryptanalysis/identity_certificate.rs research/prime31_ic_20261115/native/lib.rs examples/prime31_rational_chain_guard.rs examples/identity_certificate_rational_chain.rs > correctness-receipts/source-sha256.txt
+          sha256sum Cargo.toml Cargo.lock src/cryptanalysis/ext_curve.rs src/cryptanalysis/semaev_prime_poly.rs src/cryptanalysis/ic_boundary.rs src/cryptanalysis/identity_certificate.rs src/cryptanalysis/ecbench/spec.rs research/prime31_ic_20261115/native/lib.rs examples/prime31_rational_chain_guard.rs examples/identity_certificate_rational_chain.rs .github/workflows/prime31-rational-chain-guard.yml > correctness-receipts/source-sha256.txt
+      - name: Restored inherited spec regression tests
+        run: |
+          set -euo pipefail
+          cargo test --locked --release --lib cryptanalysis::ecbench::spec::tests 2>&1 | tee correctness-receipts/spec-tests.txt
       - name: Fixed rational-chain and original imported tests
         run: |
           set -euo pipefail

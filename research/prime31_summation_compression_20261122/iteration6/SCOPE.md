@@ -21,3 +21,4 @@ Freeze Rust source hash and exact commands in a separate receipt before executio
 ## Mathematical deliverables
 
 Give a written soundness proof; completeness for unordered signed decompositions with m<=n by free leaf permutation; quadratic variable/equation counts; explicit Frobenius-domain guards; comparison with Semaev 2015 rational chains and the repository's existing oriented leaf-pair example. Charge solving degree, rational extraction, misses, setup, rank and growing-family requirements. Preserve the concurrent iteration-five result and all earlier evidence.
+

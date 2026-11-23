@@ -286,10 +286,224 @@ impl Spec {
             "arms": serde_json::to_value(&self.arms).unwrap_or(Value::Null),
             "measurement": serde_json::to_value(&self.measurement).unwrap_or(Value::Null),
         });
+        if !self.curve_policy.is_legacy() {
+            view["curve_policy"] = serde_json::to_value(&self.curve_policy).unwrap_or(Value::Null);
+        }
         if let Some(profile) = &self.field_profile {
             view["field_profile"] = json!(profile);
         }
         view
+    }
+
+    /// Current CLI runs require an explicit curve classification.  Audit and
+    /// replay still parse v1 specs byte-for-byte.
+    pub fn require_current_curve_policy(&self) -> Result<(), String> {
+        if self.curve_policy.is_legacy() {
+            Err("ecbench.spec/v1 is historical: convert the spec to v2 with an explicit curve_policy, or pass --allow-legacy-spec only for reproduction".into())
+        } else {
+            Ok(())
+        }
+    }
+}
+
+fn validate_curve_policy(spec: &Spec) -> Result<(), String> {
+    match &spec.curve_policy {
+        CurvePolicy::Legacy | CurvePolicy::Smoke => Ok(()),
+        CurvePolicy::Diagnostic { off_panel_reason } => {
+            if off_panel_reason.trim().len() < 12 {
+                Err("diagnostic curve_policy needs a substantive off_panel_reason".into())
+            } else {
+                Ok(())
+            }
+        }
+        CurvePolicy::Phase { phase, lane, route } => {
+            let catalog = super::panel::catalog()?;
+            let phase_record = catalog
+                .phase(*phase)
+                .ok_or_else(|| format!("canonical panel has no phase {phase}"))?;
+            let lane_definition = catalog
+                .lane(lane)
+                .ok_or_else(|| format!("canonical panel has no benchmark lane `{lane}`"))?;
+            let lane_record = phase_record
+                .lanes
+                .iter()
+                .find(|record| record.lane_id == *lane)
+                .ok_or_else(|| format!("canonical phase {phase} has no benchmark lane `{lane}`"))?;
+            if lane_record.admission_state != "ready_to_preregister" {
+                return Err(format!(
+                    "canonical phase {phase} lane `{lane}` is {} and cannot start until its admission blockers are cleared in the panel manifest: {}",
+                    lane_record.admission_state,
+                    lane_record.blockers.join("; ")
+                ));
+            }
+            if spec.workloads.target_kind != TargetKind::Public {
+                return Err(format!(
+                    "phase {phase} lane `{lane}` requires public targets, not {:?}",
+                    spec.workloads.target_kind
+                ));
+            }
+            if spec.workloads.targets_per_curve < phase_record.minimum_public_targets_per_curve {
+                return Err(format!(
+                    "phase {phase} lane `{lane}` requires at least {} public targets per curve, not {}",
+                    phase_record.minimum_public_targets_per_curve, spec.workloads.targets_per_curve
+                ));
+            }
+            let mut selected = std::collections::BTreeSet::new();
+            match lane_definition.curve_selector.as_str() {
+                "source_panel_cells" => {
+                    if route.is_some() {
+                        return Err(format!(
+                            "phase {phase} lane `{lane}` does not accept a transfer route"
+                        ));
+                    }
+                    for curve in &spec.workloads.curves {
+                        let CurveSpec::Panel { cell } = curve else {
+                            return Err(format!(
+                                "phase {phase} lane `{lane}` curves must use {{\"kind\":\"panel\",\"cell\":...}}; copied or generated curve parameters are off-panel diagnostics"
+                            ));
+                        };
+                        if !selected.insert(cell.as_str()) {
+                            return Err(format!(
+                                "phase {phase} panel cell `{cell}` is listed twice"
+                            ));
+                        }
+                        let (actual_phase, record) = catalog
+                            .cell(cell)
+                            .ok_or_else(|| format!("`{cell}` is not a canonical panel cell"))?;
+                        if actual_phase.phase != *phase {
+                            return Err(format!(
+                                "panel cell `{cell}` belongs to phase {}, not phase {phase}",
+                                actual_phase.phase
+                            ));
+                        }
+                        if !record.runnable() {
+                            return Err(format!(
+                                "panel cell `{cell}` is {} and cannot enter a run",
+                                record.ecbench.status
+                            ));
+                        }
+                    }
+                }
+                "registered_destination_cells" => {
+                    if route.is_some() {
+                        return Err(format!(
+                            "phase {phase} lane `{lane}` does not accept a transfer route"
+                        ));
+                    }
+                    for curve in &spec.workloads.curves {
+                        let CurveSpec::PanelDestination { cell } = curve else {
+                            return Err(format!(
+                                "phase {phase} lane `{lane}` curves must use {{\"kind\":\"panel_destination\",\"cell\":...}}"
+                            ));
+                        };
+                        if !selected.insert(cell.as_str()) {
+                            return Err(format!(
+                                "phase {phase} destination cell `{cell}` is listed twice"
+                            ));
+                        }
+                        let (actual_phase, record) =
+                            catalog.destination(cell).ok_or_else(|| {
+                                format!("`{cell}` is not a canonical destination cell")
+                            })?;
+                        if actual_phase.phase != *phase {
+                            return Err(format!(
+                                "destination cell `{cell}` belongs to phase {}, not phase {phase}",
+                                actual_phase.phase
+                            ));
+                        }
+                        if !record.runnable() {
+                            return Err(format!(
+                                "destination cell `{cell}` is {} and cannot enter a run",
+                                record.ecbench.status
+                            ));
+                        }
+                        let has_arm = |method: &str, role: Role| {
+                            spec.arms
+                                .iter()
+                                .any(|arm| arm.method.id == method && arm.role == role)
+                        };
+                        if !has_arm(&record.ecbench.required_reference, Role::Reference)
+                            || !has_arm(&record.ecbench.required_reference, Role::Control)
+                        {
+                            return Err(format!(
+                                "destination cell `{cell}` requires reference and A/A control arms using `{}`",
+                                record.ecbench.required_reference
+                            ));
+                        }
+                        for method in &record.ecbench.required_candidates {
+                            if !has_arm(method, Role::Candidate) {
+                                return Err(format!(
+                                    "destination cell `{cell}` requires candidate arm `{method}`"
+                                ));
+                            }
+                        }
+                    }
+                }
+                "registered_transfer_routes" => {
+                    let route_id = route.as_deref().ok_or_else(|| {
+                        format!("phase {phase} lane `{lane}` requires a typed transfer route")
+                    })?;
+                    let transfer = catalog
+                        .transfer_route(route_id)
+                        .ok_or_else(|| format!("`{route_id}` is not a canonical transfer route"))?;
+                    if transfer.phase != *phase {
+                        return Err(format!(
+                            "transfer route `{route_id}` belongs to phase {}, not phase {phase}",
+                            transfer.phase
+                        ));
+                    }
+                    if spec.workloads.curves.len() != 1
+                        || !matches!(
+                            &spec.workloads.curves[0],
+                            CurveSpec::Panel { cell } if cell == &transfer.source_cell
+                        )
+                    {
+                        return Err(format!(
+                            "transfer route `{route_id}` requires the exact source panel cell `{}`",
+                            transfer.source_cell
+                        ));
+                    }
+                    let has_arm = |method: &str, role: Role| {
+                        spec.arms
+                            .iter()
+                            .any(|arm| arm.method.id == method && arm.role == role)
+                    };
+                    if !has_arm(&transfer.source_reference, Role::Reference)
+                        || !has_arm(&transfer.source_reference, Role::Control)
+                    {
+                        return Err(format!(
+                            "transfer route `{route_id}` requires source reference and A/A control arms using `{}`",
+                            transfer.source_reference
+                        ));
+                    }
+                    for (index, method) in transfer.destination_methods.iter().enumerate() {
+                        let role = if index == 0 {
+                            Role::Baseline
+                        } else {
+                            Role::Candidate
+                        };
+                        if !has_arm(method, role) {
+                            return Err(format!(
+                                "transfer route `{route_id}` requires destination {role:?} arm `{method}`"
+                            ));
+                        }
+                    }
+                    for method in &transfer.destination_controls {
+                        if !has_arm(method, Role::Control) {
+                            return Err(format!(
+                                "transfer route `{route_id}` requires destination control arm `{method}`"
+                            ));
+                        }
+                    }
+                }
+                other => {
+                    return Err(format!(
+                        "canonical phase {phase} lane `{lane}` has unsupported selector `{other}`"
+                    ))
+                }
+            }
+            Ok(())
+        }
     }
 }
 
@@ -891,6 +1105,7 @@ mod tests {
             .is_legacy());
     }
 
+    #[test]
     fn phase_policy_uses_panel_cells_and_enforces_public_target_count() {
         let phase = |curve: Value, targets: u64, target_kind: &str| {
             Spec::from_json(
@@ -905,6 +1120,7 @@ mod tests {
                 })
                 .to_string(),
             )
+            .unwrap()
         };
         plan(phase(
             json!({"kind": "panel", "cell": "P1-K0-23"}),
@@ -916,13 +1132,23 @@ mod tests {
                             "group_order": 7, "r": 7, "gx": 0, "gy": 1});
         assert!(plan(phase(copied, 32, "public"))
             .err()
+            .unwrap()
             .contains("must use"));
         assert!(plan(phase(
+            json!({"kind": "panel", "cell": "P1-K0-23"}),
             31,
+            "public",
+        ))
         .err()
         .unwrap()
         .contains("at least 32"));
+        assert!(plan(phase(
+            json!({"kind": "panel", "cell": "P1-K0-23"}),
+            32,
             "planted",
+        ))
+        .err()
+        .unwrap()
         .contains("requires public targets"));
 
         let blocked = Spec::from_json(
@@ -938,10 +1164,15 @@ mod tests {
             })
             .to_string(),
         )
+        .unwrap();
         assert!(plan(blocked)
+            .err()
+            .unwrap()
             .contains("phase 4 lane `elliptic_algebraic` is blocked"));
 
         let phase_hec = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
                 "label": "phase-matched hyperelliptic lane fixture",
                 "curve_policy": {"mode": "phase", "phase": 1,
                                  "lane": "hyperelliptic_jacobian"},
@@ -952,18 +1183,41 @@ mod tests {
                     {"name": "ic", "role": "candidate", "method": {"id": "ic.hyperelliptic_v2"}},
                     {"name": "rho-aa", "role": "control", "method": {"id": "rho.negation"}}
                 ],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
         plan(phase_hec).unwrap();
 
         let wrong_hec_source = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
                 "label": "wrong hyperelliptic source fixture",
+                "curve_policy": {"mode": "phase", "phase": 1,
+                                 "lane": "hyperelliptic_jacobian"},
                 "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
                 "arms": [{"name": "rho", "role": "reference", "method": {"id": "rho.negation"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
         assert!(plan(wrong_hec_source)
+            .err()
+            .unwrap()
             .contains("panel_destination"));
 
         let phase_transfer = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
                 "label": "phase-matched cover-transfer fixture",
+                "curve_policy": {"mode": "phase", "phase": 1,
                                  "lane": "cover_transfer", "route": "P1-K0-23-G3-COVER"},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
+                "arms": [
                     {"name": "source-rho", "role": "reference",
                      "method": {"id": "rho.signed_frobenius_strong"}},
                     {"name": "destination-rho", "role": "baseline",
@@ -974,27 +1228,56 @@ mod tests {
                      "method": {"id": "jacobian_image.genus3_projected_ic_v1"}},
                     {"name": "source-rho-aa", "role": "control",
                      "method": {"id": "rho.signed_frobenius_strong"}}
+                ],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
         plan(phase_transfer).unwrap();
 
         let missing_route = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
                 "label": "missing cover-transfer route fixture",
                 "curve_policy": {"mode": "phase", "phase": 1, "lane": "cover_transfer"},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
                 "arms": [{"name": "source-rho", "role": "reference",
+                    "method": {"id": "rho.signed_frobenius_strong"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
         assert!(plan(missing_route)
+            .err()
+            .unwrap()
             .contains("requires a typed transfer route"));
+    }
 
+    #[test]
     fn field_five_fixture_is_smoke_only_not_a_phase_measurement() {
         let smoke = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
                 "label": "field five smoke fixture",
                 "curve_policy": {"mode": "smoke"},
                 "workloads": {"curves": [{"kind": "prime_explicit", "p": 5, "a": 2, "b": 1,
                     "group_order": 7, "r": 7, "gx": 0, "gy": 1}],
                     "targets_per_curve": 1, "target_seed": 1},
                 "arms": [{"name": "bsgs", "role": "candidate", "method": {"id": "bsgs.textbook"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
         plan(smoke).unwrap();
+    }
 
     fn binary_groebner_spec(field_profile: Option<&str>, n: u32) -> Spec {
         let mut value = json!({
+            "schema": LEGACY_SPEC_SCHEMA,
             "label": "canonical binary Groebner fixture",
             "workloads": {
                 "curves": [{"kind": "koblitz", "a": 1, "n": n}],
@@ -1015,11 +1298,14 @@ mod tests {
                 }
             }],
             "measurement": {"rounds": 1, "warmup": 0, "seed": 19}
+        });
         if let Some(profile) = field_profile {
             value["field_profile"] = json!(profile);
         }
         Spec::from_json(&value.to_string()).unwrap()
+    }
 
+    #[test]
     fn new_binary_groebner_runs_require_the_canonical_field_profile() {
         let legacy = binary_groebner_spec(None, 17);
         // Sealed evidence remains replayable under the historical planner.
@@ -1029,6 +1315,7 @@ mod tests {
 
         let wrong_field = binary_groebner_spec(Some(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID), 19);
         let err = plan_for_new_run(wrong_field)
+            .err()
             .expect("different field refused");
         assert!(
             err.contains("requires curve") || err.contains("GF(2^17)"),
@@ -1038,5 +1325,7 @@ mod tests {
         plan_for_new_run(binary_groebner_spec(
             Some(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID),
             17,
+        ))
         .expect("canonical profile plans");
+    }
 }

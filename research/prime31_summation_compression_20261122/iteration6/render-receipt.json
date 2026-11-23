@@ -1,0 +1,57 @@
+{
+  "schema": "prime31-iteration6-render-receipt/v1",
+  "purpose": "Document layout and artifact verification only; no cryptographic calculations",
+  "pdf_pages": 6,
+  "pdf_links": 4,
+  "validation_status": "blocked_inherited_syntax",
+  "source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+  "tools": {
+    "python": "3.12.14",
+    "reportlab": "4.4.9",
+    "pypdf": "6.21.4",
+    "pymupdf": "1.26.6"
+  },
+  "files": [
+    {
+      "path": "REPORT.pdf",
+      "bytes": 52410,
+      "sha256": "c427e37186287fe2ca56742d98729d7f749371df3c72af3af3d16570e4cd564c"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 14350,
+      "sha256": "ed8b72e7f2ba574be16510a4cc668578bf5b135ffa8600d8ba80fa1b1ced47c5"
+    },
+    {
+      "path": "render_report.py",
+      "bytes": 27355,
+      "sha256": "6c2e5903943e48325d671c475209ca3dbb72afeb37555419b3a9e3d68fcd7a8a"
+    },
+    {
+      "path": "report-validation.json",
+      "bytes": 1318,
+      "sha256": "1236b19f063b868dee60a1a004fa3b4b2701ded81fb50ec2ece7ce37202f779f"
+    },
+    {
+      "path": "figures/rational-chain-topology.svg",
+      "bytes": 9738,
+      "sha256": "6c22a0058ab21809ee56b81d5d7b826c0f585c870c49eb027a7a231354504b74"
+    },
+    {
+      "path": "figures/rational-chain-topology.png",
+      "bytes": 32733,
+      "sha256": "23c92a09b3e0238f3745ddab127c6beb7ecef03add2321c8cd6ef0b0191dc0d5"
+    }
+  ],
+  "render_command": "python3 research/prime31_summation_compression_20261122/iteration6/render_report.py",
+  "qa_command": "pdftoppm -r 110 -png REPORT.pdf <external-qa-folder>/page",
+  "visual_check": {
+    "status": "passed",
+    "reviewed_pdf_sha256": "c427e37186287fe2ca56742d98729d7f749371df3c72af3af3d16570e4cd564c",
+    "pages": [1, 2, 3, 4, 5, 6],
+    "method": "Poppler 110-dpi inspection of all six pages; pages 1 and 6 reinspected after the inherited-build-blocker update. Unchanged mathematical pages retain the prior full-size inspection.",
+    "findings": "No clipping, overlap, missing glyphs, broken equations, table overflow, or margin collisions. Standalone figure inspected separately.",
+    "qa_location": "tmp/pdfs/prime31-iteration6/ outside published artifacts",
+    "scope": "Document rendering only; new correctness tests did not execute and mathematical standing remains pcc:unverified."
+  }
+}

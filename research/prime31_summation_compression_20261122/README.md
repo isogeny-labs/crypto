@@ -27,12 +27,21 @@ The original locked build needs dependencies unavailable in the current offline 
 
 The automated continuation must read `STATE.json`, the latest session log, relevant live PRs, and the current repository instructions before acting. It should retain the completed original-lock correctness check and pursue the missing exact sublinear empty-root operation. Any subsequent empirical comparison follows the prospective protocol and admission requirements. A fast evaluation circuit alone is not a fast root finder.
 
-The research Space creation request has an uncertain outcome because the Spaces service returned no receipt. Search for the exact name `Prime Field Summation Polynomial Research` before any further creation; do not make a duplicate.
+[Research progress Space](https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84) is saved and read back. The existing hourly task is attached there; use its exact Page ID for updates.
 
 ## Latest continuation
 
-The objective remains open. Four iterations are preserved: an exact tested recurrence that loses the sparse-product diagnostic; the full-curve scalar degree obstruction; a conditional tree-search bound exposing the missing empty-root predicate; and [an exact Fermat-trace root projector plus the signed group-sum index/rank tradeoff](NEXT_IMPLICIT_INDEX.md). Explicit quotient-state certification costs at least linear work in the empty root, while the exact signed tuple index gives fast online lookup only after quadratic-or-higher preprocessing. Under a declared uniform-target, full-rank model even a perfect two-summand oracle cannot give a rho-beating collection exponent. These statements are scoped to their representations and assumptions, not blanket ECDLP lower bounds. The next frontier is an implicit higher-arity representation with setup, failures, memory, outputs and rank priced. See [STATE.json](STATE.json), [NEXT_ROOT_INTERSECTION.md](NEXT_ROOT_INTERSECTION.md), and [CONTINUATION.md](CONTINUATION.md). Claims remain unsigned and unverified.
+Six iterations are preserved. [The latest mathematical note](iteration6/MATHEMATICAL_NOTE.md) gives exact full-fibre membership for rational S3 trees, an all-node quadratic representation, explicit field guards, and free-order comb completeness. A balanced tree has a separate counterexample. [The illustrated addendum](iteration6/REPORT.pdf), [source freeze](iteration6/SOURCE_FREEZE.json), [independent written review](iteration6/INDEPENDENT_REVIEW.md) and [updated literature audit](iteration6/LITERATURE_AUDIT.md) state the precise scopes. The original-root-lock supplied-certificate correctness workflow is [run45096187034](https://github.com/isogeny-labs/crypto/actions/runs/45096187034); check its retained receipt before quoting its outcome. [pcc:unverified]
+
+The relation-discovery term remains open. In the declared m=4 full-independent-row model with quadratic setup/matrix work, a useful next target is an exact empty-inclusive query exponent below one. Low-degree input equations alone do not supply that bound. Preserve the earlier adverse recurrence comparison, dense-state costs and full-sum-index setup costs. [pcc:unverified]
 
 Companion PR #4924 now has a newer matching original-Rust monic-oracle correctness receipt: [run 45089472283](https://github.com/isogeny-labs/crypto/actions/runs/45089472283) at checkout 96c9101315d9f0c7ca5fee2af18cdb10d16c645d, with the same monic source blob as head 70e04851fae933675dbc4476f22dcea25090551e. This supersedes the earlier stale-source caveat for those bytes but is neither independent signed verification nor an admitted speed benchmark. [pcc:unverified]
 
 The existing hourly task also owns [PR #4924](https://github.com/isogeny-labs/crypto/pull/4924); compare and preserve both lanes.
+
+
+The companion printed scan enumerates unordered S3 pairs quadratically; its separately checked balanced construction is not the routine used by extract. The stronger maintained O(B) group-complement scan remains a required control. [pcc:unverified]
+
+## Concurrent iteration seven
+
+The [growing-family note](iteration7/SMOOTH_TORUS_FAMILY.md) supplies a Linnik-based smooth-p+1 prime-field family and split Dickson fibre, with ordinary/large-prime-subgroup and solver obligations explicitly separate. It is undergoing independent review; standing remains unverified. [pcc:unverified]
