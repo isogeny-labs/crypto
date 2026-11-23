@@ -1575,3 +1575,136 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
     assert!(fallback.useful_small_rank <= audit.useful_small_rank);
     assert!(fallback.augmented_rank <= audit.augmented_rank);
 }
+
+
+#[test]
+fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
+    use crypto::cryptanalysis::large_prime_graph::eval::*;
+    // Algebra-only fixed source stream: NOT naturally collected elliptic
+    // relations, and the F_ell coefficient field is not the coordinate field.
+    let ell = 2_147_446_831u64;
+    let source = vec![
+        PartialRelation {
+            id: 10, small: vec![(0, 1), (u32::MAX, 1)],
+            large: vec![(101, 1)], rhs: 1,
+        },
+        PartialRelation {
+            id: 11, small: vec![(0, 2)],
+            large: vec![(102, 2)], rhs: 2,
+        },
+        PartialRelation {
+            id: 12, small: vec![(0, 1)],
+            large: vec![(101, 3), (102, 4)], rhs: 3,
+        },
+    ];
+    let idx = LpIndex::build(&source, ell).unwrap();
+    let (lp, block, augmented) = raw_lp_small_augmented_ranks(&source, &idx, ell);
+
+    let mut p = EvalParams::default();
+    p.partition_parts.clear();
+    let legacy = evaluate_stream("default", &source, ell, &p).unwrap();
+    let legacy_json = serde_json::to_string(&legacy).unwrap();
+    assert!(legacy.forest_filter.is_none());
+    assert!(legacy.forest_skip_reason.is_none());
+    assert!(!legacy_json.contains("forest_filter"));
+    assert!(!legacy_json.contains("forest_skip_reason"));
+    assert!(!legacy_json.contains("exact_projected_rank"));
+
+    p.compare_exact_forest = true;
+    p.forest_max_rows = 32;
+    let ev = evaluate_stream("same-source", &source, ell, &p).unwrap();
+    assert!(ev.forest_skip_reason.is_none());
+    let forest = ev.forest_filter.as_ref().unwrap();
+    assert!(!forest.refused);
+    assert_eq!(forest.lp_rank, lp);
+    assert_eq!(forest.lp_left_nullity, source.len() - lp);
+    assert_eq!(forest.replayed, forest.lp_left_nullity);
+    assert_eq!(forest.replay_failures, 0);
+    assert_eq!(forest.witness_stats.source_terms, 3);
+    assert_eq!(forest.source_terms, 3);
+    assert_eq!(forest.residual_columns, 2); // sparse protected target included
+    let rank = forest.exact_projected_rank.as_ref().unwrap();
+    assert_eq!(rank.useful_small_rank, block - lp);
+    assert_eq!(rank.augmented_rank, augmented - lp);
+    assert_eq!(ev.pivot_filter.replay_failures, 0);
+    assert!(ev.pivot_filter.exact_projected_rank.is_some());
+    assert!(ev.pivot_filter.rank_audit_ns.is_some());
+    if !ev.mst_filter.refused {
+        assert!(ev.mst_filter.exact_projected_rank.is_some());
+        assert!(ev.mst_filter.rank_audit_ns.is_some());
+    }
+
+    // A source cap of two rejects the one forest witness needing three
+    // original rows. Do not silently return a zero-rank 'success'.
+    p.filter_max_sources = 2;
+    let refused = evaluate_stream("refuse", &source, ell, &p).unwrap();
+    let failed_forest = refused.forest_filter.unwrap();
+    assert!(failed_forest.refused);
+    assert!(failed_forest.exact_projected_rank.is_none());
+    assert!(failed_forest.rank_audit_ns.is_none());
+    assert_eq!(failed_forest.replayed, 0);
+    assert_eq!(failed_forest.lp_left_nullity, 1);
+
+    p.filter_max_sources = 4096;
+    p.forest_max_rows = 2;
+    let capped = evaluate_stream("cap", &source, ell, &p).unwrap();
+    assert!(capped.forest_filter.is_none());
+    assert_eq!(capped.forest_skip_reason.as_deref(), Some("row_cap"));
+
+    p.forest_max_rows = 32;
+    let mut wider = source.clone();
+    wider.push(PartialRelation {
+        id: 13, small: vec![(9, 1)],
+        large: vec![(101, 1), (102, 2), (103, 3)], rhs: 0,
+    });
+    let skipped = evaluate_stream("arity3", &wider, ell, &p).unwrap();
+    assert!(skipped.forest_filter.is_none());
+    assert_eq!(skipped.forest_skip_reason.as_deref(), Some("arity_above_two"));
+}
+
+#[test]
+fn evaluator_forest_same_source_seeded_rank_identity() {
+    use crypto::cryptanalysis::large_prime_graph::eval::*;
+    let mut p = EvalParams::default();
+    p.compare_exact_forest = true;
+    p.forest_max_rows = 64;
+    p.filter_max_sources = 4096;
+    p.filter_max_small_weight = 4096;
+    p.partition_parts.clear();
+    for seed in 1..=24u64 {
+        let ell = [7u64, 101, 2_147_446_831][(seed as usize) % 3];
+        let input = synthetic_stream(
+            &SyntheticParams {
+                seed, rows: 6 + seed as usize % 19, lp_columns: 12,
+                fb_columns: 13, fb_terms: 3, arity_weights: vec![1, 2, 5],
+                ..SyntheticParams::default()
+            },
+            ell,
+        );
+        let idx = LpIndex::build(&input, ell).unwrap();
+        let (lr, block, augmented) = raw_lp_small_augmented_ranks(&input, &idx, ell);
+        let evaluated = evaluate_stream("fixed-seed", &input, ell, &p).unwrap();
+        assert!(evaluated.forest_skip_reason.is_none(), "seed {seed}");
+        let f = evaluated.forest_filter.as_ref().unwrap();
+        assert!(!f.refused, "seed {seed}");
+        assert_eq!(f.lp_rank, lr, "LP seed {seed}");
+        assert_eq!(f.lp_left_nullity, input.len() - lr, "nullity seed {seed}");
+        assert_eq!(f.replayed, f.lp_left_nullity, "source replay seed {seed}");
+        assert_eq!(f.replay_failures, 0, "seed {seed}");
+        let rank = f.exact_projected_rank.as_ref().unwrap();
+        assert_eq!(rank.useful_small_rank, block - lr, "small seed {seed}");
+        assert_eq!(rank.augmented_rank, augmented - lr, "RHS seed {seed}");
+        let pivot = evaluated.pivot_filter.exact_projected_rank.as_ref().unwrap();
+        assert!(pivot.useful_small_rank <= block - lr, "pivot small seed {seed}");
+        assert!(pivot.augmented_rank <= augmented - lr, "pivot RHS seed {seed}");
+        assert_eq!(evaluated.pivot_filter.replay_failures, 0);
+        if !evaluated.mst_filter.refused {
+            let mst = evaluated.mst_filter.exact_projected_rank.as_ref().unwrap();
+            assert!(mst.useful_small_rank <= block - lr, "MST small seed {seed}");
+            assert!(mst.augmented_rank <= augmented - lr, "MST RHS seed {seed}");
+            assert_eq!(evaluated.mst_filter.replay_failures, 0);
+        } else {
+            assert!(evaluated.mst_filter.exact_projected_rank.is_none());
+        }
+    }
+}
