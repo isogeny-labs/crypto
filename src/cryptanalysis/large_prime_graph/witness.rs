@@ -12,8 +12,11 @@
 //! graph bridge as an independent LP rank increase would be incorrect.
 
 use super::{add_mod, inv_mod, mul_mod, neg_mod, valid_modulus, LpGraphError, LpIndex};
+use crate::cryptanalysis::large_prime_filter::{
+    replay_complete_relation, CompleteRelation, PartialRelation,
+};
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 /// The first occurrence of row_index has coefficient one in `sources`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -346,4 +349,55 @@ pub fn witness_cancels_lp(index: &LpIndex, witness: &CancellationWitness) -> boo
         }
     }
     acc.is_empty()
+}
+
+/// Materialize original small-only rows and RHS using the existing replay API.
+///
+/// This is an atomic, source-verified adapter: one invalid source ID, cap,
+/// coefficient, or uncancelled large prime refuses the entire projection.
+/// `index.row_ids` and `inputs` must have identical ordering and unique IDs.
+/// This method does NOT establish that the underlying elliptic-curve source
+/// relations are valid; callers must separately check those group equations.
+pub fn materialize_complete_relations(
+    index: &LpIndex,
+    batch: &WitnessBatch,
+    inputs: &[PartialRelation],
+    max_small_weight: usize,
+    max_sources: usize,
+) -> Option<Vec<CompleteRelation>> {
+    if index.modulus != batch.modulus
+        || index.rows.len() != inputs.len()
+        || batch.stats.rows != inputs.len()
+        || batch.rank + batch.witnesses.len() != inputs.len()
+        || index.row_ids.iter().zip(inputs).any(|(id, r)| *id != r.id)
+        || index.row_ids.iter().collect::<BTreeSet<_>>().len() != inputs.len()
+    {
+        return None;
+    }
+    let mut complete = Vec::with_capacity(batch.witnesses.len());
+    for witness in &batch.witnesses {
+        if witness.sources.len() > max_sources || !witness_cancels_lp(index, witness) {
+            return None;
+        }
+        let proposed = CompleteRelation {
+            small: Vec::new(),
+            rhs: 0,
+            sources: witness
+                .sources
+                .iter()
+                .map(|&(i, a)| (index.row_ids[i], a))
+                .collect(),
+        };
+        // The existing replay kernel recomputes from canonicalized partial
+        // rows, including independently checking complete LP cancellation.
+        let replayed = replay_complete_relation(&proposed, inputs, index.modulus)?;
+        if replayed.small.len() > max_small_weight
+            || replayed.sources.len() > max_sources
+            || replayed.sources != proposed.sources
+        {
+            return None;
+        }
+        complete.push(replayed);
+    }
+    Some(complete)
 }
