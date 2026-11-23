@@ -101,7 +101,8 @@ use crate::cryptanalysis::m4gb_oracle::{
     run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
 };
 use crate::cryptanalysis::pq_f4_f2::{
-    groebner_basis_f4, groebner_basis_f4_full_width, solutions_from_reduced_basis,
+    groebner_basis_f4, groebner_basis_f4_full_width, solutions_from_reduced_basis, F4PairTrace,
+    F4Skeleton, SKELETON_DEFAULT_CAP_BYTES, TRACE_DEFAULT_CAP_BYTES,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
@@ -439,7 +440,7 @@ impl SystemSolver for F4F2FullWidth {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        F4F2.accepts(shape)
+        F4F2::default().accepts(shape)
     }
 
     fn solve(
@@ -452,7 +453,7 @@ impl SystemSolver for F4F2FullWidth {
         control
             .0
             .insert("_f4_full_width_control".into(), "1".into());
-        let (verdict, mut cost) = F4F2.solve(system, &control, budget);
+        let (verdict, mut cost) = F4F2::default().solve(system, &control, budget);
         cost.extra.insert("fl_forced_full_width".into(), 1);
         (verdict, cost)
     }
@@ -2245,7 +2246,7 @@ impl SystemSolver for Exhaustive {
 /// Every solver the framework knows, by name.
 pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
     vec![
-        Box::new(F4F2),
+        Box::new(F4F2::default()),
         Box::new(F4F2FullWidth),
         Box::new(BuchbergerF2),
         Box::new(M4gbF2),
