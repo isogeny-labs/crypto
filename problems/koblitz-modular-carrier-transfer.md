@@ -8,6 +8,21 @@
 
 ## Problem
 
+2026-11-23 theory update: [principal-polarization and integral-symmetry
+study](../research/ecc2k130_jacobian_theory_20261123/REPORT.md), draft PR #5079.
+A written application of Howe's finite-field criterion, with an exact native
+inert-prime witness, gives principal polarizability of the dimension130
+isogeny class. A separate written Torelli/tame-cover argument excludes a
+genus130 Jacobian retaining integral zeta131, hence excludes maximal
+F2-endomorphism order. The universal Frobenius order does not contain zeta,
+so this does not exclude every isogeny representative. All three deductions
+are unsigned [pcc:unverified]; full Lean geometric bridges are absent.
+The genus130 nonmaximal-order Jacobian, genus131–300 carrier and evaluated
+subgroup maps remain open. Next: classify Frobenius-stable nonmaximal
+Deligne lattices with principal forms, then test curve realization; for
+larger genus specify the complement and gluing kernel. No construction,
+destination-solver timing or improvement is claimed.
+
 The modular construction realizes the ECC2K-130 trace-zero isogeny factor,
 but no evaluated map preserving its prime subgroup or efficient IC relation
 algorithm on that factor has been constructed.
