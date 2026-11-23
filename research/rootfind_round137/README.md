@@ -32,7 +32,7 @@ Linux GitHub Actions, `rustc 1.100.0`, `-C opt-level=3 -C target-cpu=native`; tw
 | 4,294,967,291 | ψ3 quartic root query | 6,568.00 | 6,013.03 | **1.089×** |
 | 65,521 | known-root quartic | 7,054.69 | 7,114.62 | **0.988×** |
 
-The 3-isogeny and ψ3 improvements need independent native replication; some high-degree workloads are near parity. Timing includes common query preparation overhead. The GCD microbenchmark is not a forecast for complete-application speedup.
+The 3-isogeny and ψ3 improvements were independently replicated in a second native Rust execution, although some high-degree controls remain near parity. Timing includes common query preparation overhead. The GCD microbenchmark is not a forecast for complete-application speedup.
 
 ## Local Linux `perf_event_open`: before and after
 
@@ -63,6 +63,7 @@ The local full-query table includes regressions and should not be interpreted as
 * Independently compared pseudo-GCD to ordinary field Euclid, normalized, across 14 small and large primes; checked constructed common factors and evaluated every reported cubic/ψ3/quartic root.
 * Local C++ differential oracle passed (small-field exhaustive quadratics; randomized low-degree and prime-field gcd/root cases); GCC AddressSanitizer and UndefinedBehaviorSanitizer passed.
 * Source-exact native Rust A/B compiled and passed its oracle and checksum checks.
-* **Not complete:** repository-wide Rust CI, independent *native* repeat, end-to-end ECC2K relation throughput (characteristic two uses separate code), and hardware-counter profiling. Keep this PR draft/stacked until gates are complete.
+* **Independent source-exact native Rust replication passed:** [second execution](https://github.com/isogeny-labs/crypto/actions/runs/45197138340), same 13 alternating trials with independent Euclid and root oracles. GCD speedups: **5.400×, 7.406×, 8.492×, 9.480×** for the four fields above. Complete 3-isogeny speedups: **1.079×, 1.111×, 1.098×, 1.095×**. The two native runs were executed on different GitHub runner instances, so absolute nanosecond timings vary.
+* **Not complete:** repository-wide Rust CI, end-to-end ECC2K relation throughput (characteristic two uses separate code), and hardware-counter profiling. Keep this PR draft/stacked until gates are complete.
 
 Local reproduction archive is attached to the automation result; source and raw CSVs are available there.
