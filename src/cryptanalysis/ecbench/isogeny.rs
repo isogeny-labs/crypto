@@ -136,14 +136,19 @@ impl Fp<'_> {
     // Tonelli-Shanks for odd primes p = 1 (mod 4).
     //
     // Let p-1 = q*2^s, q odd. Compute h=a^((q-1)/2) only once, then
-    // r=h*a=a^((q+1)/2), t=h^2*a=a^q. An initial Euler test is redundant:
-    // for nonsquare a, t has order 2^s and the i<m search fails safely.
-    // This preserves the explicit None result for nonsquares.
+    // r=h*a=a^((q+1)/2), t=h^2*a=a^q. Use Jacobi(value,p) before the
+    // nonresidue search: otherwise nonsquare inputs perform expensive
+    // Tonelli setup and regress substantially relative to Euler rejection.
     fn sqrt_tonelli_shanks(&mut self, value: u64) -> Option<u64> {
         if value == 0 {
             return Some(0);
         }
         let p = self.p;
+        // For an odd PRIME modulus, Jacobi(value,p) = Legendre(value,p).
+        // Reject nonsquares before searching for an auxiliary nonresidue.
+        if Self::jacobi_symbol(value, p) != 1 {
+            return None;
+        }
         let s = (p - 1).trailing_zeros();
         let q = (p - 1) >> s;
         let mut z = 2u64;
