@@ -21,3 +21,20 @@
 
 - First local transcription failed 4198-byte guard before any write; exact base64 decoding plus remote Git blob check recovered the correct artifact bytes.
 - No local Rust compiler or Conductor executable. The new native execution is not claimed; no additional workflow manually dispatched. [pcc:unverified]
+
+
+## 2026-11-23 20:23 UTC — locked qualification readback
+
+### What was done
+- Exact PR head `ce568b6a07cef885986b14767e42b065a6c97237`: [native run 45249082556](https://github.com/isogeny-labs/crypto/actions/runs/45249082556), job 137953579399, completed successfully at 19:27:39 UTC. GitHub jobs API confirms every step succeeded: immutable checkout, tracked committed dependency lock, locked compilation, locked execution, final source/lock integrity, and artifact upload. Archived artifact metadata: ID 14856040426, 9056 bytes, digest sha256:75a542e52a0a9d1e2ea91e8ff89cb81f4b88509e8082c559f2e5513a0525071b, expires 2026-12-14. Raw ZIP/log retrieval is unavailable through the current connector; do not claim newly inspected per-test counts or raw receipt digests. Historical 19/19 receipt remains separate. [pcc:unverified]
+- Exact head PCC gate 45249092185 and validation gate 45249082197 succeeded; PCC signing skipped. Workflow syntax 45249082080 and separate rootfinding runs 45249082687/45249082007 failed; no causal attribution without logs. No merge readiness assertion.
+- Read AGENTS, ACTIVE, prior frozen-lock handoff, #4974 merged B677 report and source-exact workflow. Main snapshot 5403e9ab890e9b9dc92fa67c661ab7df0ea3c860. Canonical daily log exceeds connector limit; preserve it untouched. KB and Conductor unavailable in this runtime; no novelty assertion. Native agents unavailable: one coordinator, parallel independent GitHub reads for baseline/ownership, frozen Rust CI and artifact validation. No manual CI dispatch, experiment, paid compute or benchmark elapsed-time claim.
+
+### Decisions made
+- Stop verifier-only changes; locked CI outcome is a component qualification, not a new extraction or speed measurement. Keep this draft while signed evidence and remaining gate issues are unresolved. Do not launch duplicate extraction or change baseline/graph/transfer components.
+
+### Open threads
+- #4974's registered B677 extraction requires checkpoint transport, authenticated EKS admission and tested digest-pinned payload image; ACTIVE still records these as open. Obtain the owning lane's genuine blind relation stream, then reuse qualified Rust checker and charge complete cold costs. Raw locked artifact inspection and signed independent PCC remain open. No new accepted relations or scalar recovery.
+
+### Errors
+- Jobs logs endpoint rejected; binary artifact contents not accessible in this runtime. No local cargo, gh, Conductor or native agent tool. No unsupported claims about unrelated red workflows.
