@@ -8,6 +8,18 @@
 
 ## Problem
 
+Round05(2026-11-23): [hyperelliptic fiber/branch report](../research/ecc2k130_jacobian_theory_20261123/round05/REPORT.md)
+gives a written exclusion of the entire genus130 hyperelliptic isogeny
+class:2 F4-points contradict the universal lower bound3. For genus131
+hyperelliptic carriers, all elliptic complements except E0 are excluded,
+including arbitrary isogenous representatives. The survivor must be
+ordinary with branch cycles131+1, hence has the displayed normalized
+Artin–Schreier family. One specified curve matches degrees1..5 then
+fails degree6 (53 versus65); this is not an exhaustive search.
+PCC-7c96d0/a0ff27/55a9e6 are unverified. Nonhyperelliptic genus130,
+larger-genus curves and executable subgroup maps remain open.
+[pcc:unverified]
+
 Round04(2026-11-23): [explicit-basis and subfield checks](../research/ecc2k130_jacobian_theory_20261123/round04/REPORT.md)
 give the written maximal-basis discriminant7^65*131^129, replayed by
 independent exact Gram and volume calculations. The specified norm263
