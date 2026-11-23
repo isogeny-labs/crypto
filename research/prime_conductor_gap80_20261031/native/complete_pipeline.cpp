@@ -51,6 +51,7 @@ static Poly operator-(const Poly&u,const Poly&v){Poly r;fmpz_mod_poly_sub(r.z,u.
 static Poly operator*(const Poly&u,const Poly&v){Poly r;fmpz_mod_poly_mul(r.z,u.z,v.z,ctx);return r;}
 static Poly scale(const Poly&u,Z s){return u*constant(s);}
 using Jet=std::array<Poly,4>;
+#include "prepared_norm.hpp"
 static Jet identity(){Jet r;r[0]=constant(1);return r;}
 static Jet product(const Jet&u,const Jet&v){Jet r;for(int k=0;k<4;k++)for(int j=0;j<=k;j++)r[k]=r[k]+u[j]*v[k-j];return r;}
 static void ingest(std::vector<std::optional<Jet>>&bins,Jet v){size_t k=0;while(k<bins.size()&&bins[k]){v=product(*bins[k],v);bins[k].reset();k++;}if(k==bins.size())bins.emplace_back();bins[k]=std::move(v);}
@@ -74,7 +75,7 @@ struct Coverage{
  void leftover(Z ordinal){require(i==B&&j==0&&ordinal==left&&left<expected_left,"leftover coverage");left++;}
  void complete(Z n){require(i==B&&j==0&&left==expected_left&&covered+left==n,"incomplete coverage; assembly refused");}
 };
-struct Work{Z baby_products=0,baby_starts=0,baby_additions=0,giant_starts=0,giant_additions=0,leftover_starts=0,leftover_additions=0,tiles=0,norm_calls=0;WalkDiagnostics walks;};
+struct Work{Z baby_products=0,baby_starts=0,baby_additions=0,giant_starts=0,giant_additions=0,leftover_starts=0,leftover_additions=0,tiles=0,norm_calls=0,prepared_builds=0,prepared_calls=0;WalkDiagnostics walks;};
 struct Result{Z ca,cb;std::vector<Point> images;Z covered;unsigned long B,G;Work work;};
 struct RootVector{
  fmpz* data;slong size;
@@ -88,7 +89,7 @@ static Poly baby_product(Point K,Z start,unsigned long count,Point step,Work&wor
  if(count>0)work.baby_additions+=count-1;
  Poly h;fmpz_mod_poly_product_roots_fmpz_vec(h.z,roots.data,roots.size,ctx);work.baby_products++;return h;
 }
-static Result construct(Z ell,Point K,const std::vector<Point>&points,unsigned long block,unsigned long max_window=std::numeric_limits<unsigned long>::max(),Z baby_window=0,unsigned long projective_batch=0){
+static Result construct(Z ell,Point K,const std::vector<Point>&points,unsigned long block,unsigned long max_window=std::numeric_limits<unsigned long>::max(),Z baby_window=0,unsigned long projective_batch=0,bool prepared=false){
  require(ell>=3&&mpz_odd_p(ell.get_mpz_t())&&block>0,"invalid degree/block");
  Z n=(ell-1)/2,rad=n/2,bs;mpz_sqrt(bs.get_mpz_t(),rad.get_mpz_t());if(bs<1)bs=1;
  if(baby_window!=0){require(baby_window>0&&2*baby_window<=n,"baby window outside coverage range");bs=baby_window;}
@@ -100,6 +101,8 @@ static Result construct(Z ell,Point K,const std::vector<Point>&points,unsigned l
  Point baby_step=mul(K,2),giant_step=mul(K,4*Z(B));
  for(unsigned long i=0;i<B;i+=std::min(block,B-i)){
   unsigned long ni=std::min(block,B-i);Poly h=baby_product(K,2*Z(i)+1,ni,baby_step,work,projective_batch);
+  std::optional<PreparedNorm> cached;
+  if(prepared){cached.emplace(h);work.prepared_builds++;}
   for(unsigned long j=0;j<G;j+=std::min(block,G-j)){
    unsigned long nj=std::min(block,G-j);
    std::vector<std::vector<std::optional<Jet>>> bins(points.size()+1);
@@ -116,7 +119,9 @@ static Result construct(Z ell,Point K,const std::vector<Point>&points,unsigned l
    if(nj>0)work.giant_additions+=nj-1;
    for(size_t q=0;q<sums.size();q++)if(q==0||!kernel[q-1]){
      work.norm_calls++;
-     auto v=norm(h,finish(bins[q]));if(!v){require(q>0,"infinity-jet collision");kernel[q-1]=true;}else for(int k=0;k<3;k++)sums[q][k]=mod(sums[q][k]+(*v)[k]);
+     Jet jet=finish(bins[q]);
+     auto v=cached?cached->evaluate(jet):norm(h,jet);if(cached)work.prepared_calls++;
+     if(!v){require(q>0,"infinity-jet collision");kernel[q-1]=true;}else for(int k=0;k<3;k++)sums[q][k]=mod(sums[q][k]+(*v)[k]);
    }
    coverage.tile(i,ni,j,nj);work.tiles++;
   }
@@ -149,7 +154,7 @@ static bool equal(Point u,GEN v){if(u.inf)return lg(v)==2;return lg(v)==3&&integ
 static unsigned long bound(const char*s){Z n(s);require(n>0&&mpz_fits_ulong_p(n.get_mpz_t()),"invalid positive native bound");return n.get_ui();}
 static void print_point(Point P){if(P.inf)std::cout<<"null";else std::cout<<"[\""<<P.x<<"\",\""<<P.y<<"\"]";}
 // Explicitly supplied public cases only; no parameter search or timing arm.
-static void evaluate_case(unsigned long max_window,unsigned long block,bool compare,Z baby_window,unsigned long projective_batch){
+static void evaluate_case(unsigned long max_window,unsigned long block,bool compare,Z baby_window,unsigned long projective_batch,bool prepared){
  Z ell;Point K;unsigned long count;
  require(bool(std::cin>>p>>a>>b>>ell>>K.x>>K.y>>count),"case header: p a b ell Kx Ky point_count");K.inf=false;
  require(p>3&&ell>=5&&ell!=p,"invalid characteristic/degree");
@@ -168,7 +173,7 @@ static void evaluate_case(unsigned long max_window,unsigned long block,bool comp
  require(!compare||ell<=10009,"PARI direct-reference degree cap exceeded");
  fmpz_t prime;fmpz_init(prime);fmpz_set_mpz(prime,p.get_mpz_t());fmpz_mod_ctx_init(ctx,prime);
  try{
-   Result out=construct(ell,K,points,block,max_window,baby_window,projective_batch);
+   Result out=construct(ell,K,points,block,max_window,baby_window,projective_batch,prepared);
    if(compare){
      GEN E=ellinit(mkvec5(gen_0,gen_0,gen_0,gen(a),gen(b)),gen(p),DEFAULTPREC),ref=ellisogeny(E,gp(K),0,0,1);
      GEN coeff=gel(ref,1),map=gel(ref,2);
@@ -181,6 +186,7 @@ static void evaluate_case(unsigned long max_window,unsigned long block,bool comp
    const auto&w=out.work;
    std::cout<<"],\"work_counts\":{\"baby_products\":\""<<w.baby_products<<"\",\"baby_scalar_starts\":\""<<w.baby_starts<<"\",\"baby_recurrence_additions\":\""<<w.baby_additions<<"\",\"giant_scalar_starts\":\""<<w.giant_starts<<"\",\"giant_recurrence_additions\":\""<<w.giant_additions<<"\",\"leftover_scalar_starts\":\""<<w.leftover_starts<<"\",\"leftover_recurrence_additions\":\""<<w.leftover_additions<<"\",\"rectangles\":\""<<w.tiles<<"\",\"lognorm_calls\":\""<<w.norm_calls<<"\"},\"pari_direct_reference\":"<<(compare?"true":"false")<<",\"ordinary_status\":null,\"conductor_gap\":null,\"runtime_measurements\":null";
    if(projective_batch)std::cout<<",\"walk_backend\":{\"name\":\"bounded_projective\",\"batch_cap\":"<<projective_batch<<",\"batch_inverse_calls\":\""<<w.walks.batch_inverse_calls<<"\",\"projective_additions\":\""<<w.walks.projective_additions<<"\",\"projective_points\":\""<<w.walks.projective_points<<"\",\"peak_batch_points\":"<<w.walks.peak_batch_points<<"}";
+   if(prepared)std::cout<<",\"norm_backend\":{\"name\":\"prepared_flint_v1\",\"modulus_preparations\":\""<<w.prepared_builds<<"\",\"evaluations\":\""<<w.prepared_calls<<"\",\"text_conversions\":0}";
    std::cout<<"}"<<std::endl;
  }catch(...){fmpz_mod_ctx_clear(ctx);fmpz_clear(prime);throw;}
  fmpz_mod_ctx_clear(ctx);fmpz_clear(prime);
@@ -258,16 +264,17 @@ int main(int argc,char**argv){try{
    pari_init(256000000,2000000);projective_controls();pari_close();flint_cleanup();return 0;
  }
  if(argc>=4&&std::string(argv[1])=="--evaluate"){
-   bool compare=false;Z baby_window=0;unsigned long projective_batch=0;
+   bool compare=false,prepared=false;Z baby_window=0;unsigned long projective_batch=0;
    for(int i=4;i<argc;i++){
      std::string option=argv[i];
      if(option=="--pari-reference"&&!compare)compare=true;
+     else if(option=="--prepared-norm"&&!prepared)prepared=true;
      else if(option=="--baby-window"&&baby_window==0&&i+1<argc){baby_window=Z(argv[++i]);require(baby_window>0,"baby window must be positive");}
      else if(option=="--projective-batch"&&projective_batch==0&&i+1<argc){projective_batch=bound(argv[++i]);require(projective_batch<=65536,"projective batch cap exceeds 65536");}
      else throw std::runtime_error("unknown/duplicate evaluation option");
    }
    unsigned long max_window=bound(argv[2]),block=bound(argv[3]);
-   pari_init(256000000,2000000);evaluate_case(max_window,block,compare,baby_window,projective_batch);pari_close();flint_cleanup();return 0;
+   pari_init(256000000,2000000);evaluate_case(max_window,block,compare,baby_window,projective_batch,prepared);pari_close();flint_cleanup();return 0;
  }
  if(argc==2&&std::string(argv[1])=="--target80-check"){
    Z ell("729845429276318409687041"),n=(ell-1)/2,B;Z rad=n/2;mpz_sqrt(B.get_mpz_t(),rad.get_mpz_t());Z G=n/(2*B);

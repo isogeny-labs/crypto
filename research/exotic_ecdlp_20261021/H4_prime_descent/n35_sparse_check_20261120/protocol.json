@@ -1,0 +1,74 @@
+{
+  "arm_order": [
+    [
+      "dense",
+      "sparse"
+    ],
+    [
+      "sparse",
+      "dense"
+    ],
+    [
+      "dense",
+      "sparse"
+    ],
+    [
+      "sparse",
+      "dense"
+    ],
+    [
+      "dense",
+      "sparse"
+    ],
+    [
+      "sparse",
+      "dense"
+    ],
+    [
+      "dense",
+      "sparse"
+    ],
+    [
+      "sparse",
+      "dense"
+    ],
+    [
+      "dense",
+      "sparse"
+    ],
+    [
+      "sparse",
+      "dense"
+    ]
+  ],
+  "calibration": "512 point additions before and after each pair, ratio max/min",
+  "calibration_ratio_cap": 1.25,
+  "claim_boundary": "secondary paired implementation comparison on an ordinary local host; full candidate IDs distinct; no isolated-host performance promotion",
+  "controlled_change": "dense group reconstruction over all 2048 folded columns versus sparse reconstruction over at most three occupied signed columns; keep row construction, lookup, factor logs, scalar recovery, scalar replay, and frozen targets identical",
+  "fixtures": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_online_panel_20261120/fixtures.json",
+  "fixtures_sha256": "6178c1b85498e33bbc997b05f1869dcee6e1320d83793580fea8aaa2f89aec8f",
+  "full_candidate": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/candidate.json",
+  "full_candidate_sha256": "7dba2e69c56f22a626f5d9305fbcdb52f1f2d91a4c7aaa584c742d5c91a11857",
+  "full_result": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/result.json",
+  "full_result_sha256": "4c74a617cc2f600e32ad648f3690ae4170d601783dd3a73c4ee0025fb3ba66a5",
+  "full_runner": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/run.py",
+  "full_runner_sha256": "c19b76ed28c57f1e19269b493659b73cd9a4627347a77dd1f78fc544921b965f",
+  "manifest_generator_sha256": "3cc0574d81ab474503f0c296d02241f59e7ee677a94dceb231051e13ca5aa5ac",
+  "observed_rss_cap_bytes": 8589934592,
+  "online_clock": "both variants use five exclusive target phases from target-dependent query through scalar replay; include failed shifts and all relation checks",
+  "per_arm_cap_seconds": 5,
+  "process_cap_seconds": 600,
+  "question": "On the exact ten frozen n35 public points, how much online time changes when target relation reconstruction uses only occupied signed columns?",
+  "resource_envelope": "one checked Sage process, one CPU worker, ordinary local macOS host",
+  "runner_sha256": "97f28dbe5dad8485df9000c2547dca57ec9b3e32ff56e86eee426338f78842dc",
+  "schema": "h4-n35-sparse-check-panel-protocol-v1",
+  "shared_setup": "rebuild exact base and pair index, load and replay factor logs once before target clocks; retain setup separately",
+  "sparse_candidate": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_sparse_check_20261120/candidate.json",
+  "sparse_candidate_sha256": "b192d241f3d7ac128d96f77afe868bdde08518e0e2fa8db7a1481d384a1d8e71",
+  "sparse_source": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_sparse_check_20261120/sparse.py",
+  "sparse_source_sha256": "cb13f246e6784772af253c663ec697e57fd0741408dd8f8590f00c7ec3485ce5",
+  "statistics": "retain every pair, failure, cap, order, calibration, same-witness check; for verified paired scalars report median dense/sparse online ratio, geometric mean, min/max, and per-phase medians; descriptive local results only",
+  "status": "frozen before measurement",
+  "subgroup_order": 520604191,
+  "target_count": 10
+}

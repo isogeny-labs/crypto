@@ -1,0 +1,5 @@
+# Frozen adaptive projection test
+
+Use the archived 15,856-column training union and the two previously failed full-width N31 S3 row streams, `fresh_1` and `fresh_15`. The input hashes and native ranker hash are fixed in `protocol.json`. Add each case's 11 full-width pivot witnesses outside the training union in increasing original-column order. Reproject and rank after each addition; stop at the first rank 15,841, retaining every preceding rank. Include the original projection as step zero, and retain a final all-11 control if the first full-rank step is earlier.
+
+The row stream is the same 16,399-row, 18,352-column representation of the degree-four Macaulay system. The PLUQ ranker has a 30-second per-call timeout. Temporary projected streams are regenerated from the archived input, with their SHA-256 digests saved. The local times are exploratory stage diagnostics. This test measures rank preservation and projection width, not full polynomial reconstruction or a single-target PDP improvement.

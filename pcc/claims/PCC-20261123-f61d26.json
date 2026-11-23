@@ -1,0 +1,23 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T00:23:26Z",
+ "id": "PCC-20261123-f61d26",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-dickson-quotient-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/NEXT_PROOF.md",
+    "sha256": "f6080d25fcbffced725a1db739b21f8951e978881e023551766fa7f14be287a2"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Full algebraic-curve image; k>=0, R nonzero of finite odd order; no asymptotic algorithmic gain claimed",
+ "statement": "For a smooth elliptic curve over an algebraically closed field of characteristic p>3, a nonzero odd-order target R, and N=2^k, the functions D_N(x(P)) and D_N(x(R-P)) generate the full elliptic function field. Their irreducible image relation has exact bidegree (2N,2N). The written argument excludes bounded-bidegree scalar Dickson replacement only; it is not a circuit-size, finite-fibre solver or ECDLP lower bound, and has no Lean or signed PCC verdict."
+}

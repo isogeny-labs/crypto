@@ -1,0 +1,21 @@
+[package]
+name = "prime31-dickson-quotient-local-adapter"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "prime31_algebraic_ic"
+path = "../../prime31_ic_20261115/native/lib.rs"
+
+[[example]]
+name = "prime31_dickson_quotient"
+path = "../../prime31_ic_20261115/native/examples/prime31_dickson_quotient.rs"
+
+[dependencies]
+rayon = "=1.12.0"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+
+[dev-dependencies]
+rand = "=0.8.8"

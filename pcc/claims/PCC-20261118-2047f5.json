@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T21:30:32Z",
+ "id": "PCC-20261118-2047f5",
+ "kind": "statement",
+ "producer": {
+  "commit": "d72f3eb5697e4cea45e2af239bd5a5105b5118ad",
+  "model": "codex",
+  "session": "conductor-fixture-audit-20261118"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/publication/summary.json",
+    "sha256": "1cef28996340e83e30039863111561a880de29f7a02afd3d1b482170ecd5840c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/publication/pr.json",
+    "sha256": "c28fd68919d8856ead908f5a2c6123313b96bee15b8d36181c40b61032d2ec51"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/publication/remote-head.stdout",
+    "sha256": "3f145698fd61f14ffda7a3c633533ebeab9aba46c1d1763e111095776fbd5986"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/publication/rechecked-artifacts.stderr",
+    "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/publication/rechecked-artifacts.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "retained-fixture-audit-publication",
+ "statement": "The exact retained-fixture conductor audit packet d72f3eb569 is published to draft PR4723, with matching authenticated branch/PR heads and passing component-only artifact check. The earlier stacked S3 blocker and original80bit construction/measurement obligations remain open; no new cloud trial was launched."
+}

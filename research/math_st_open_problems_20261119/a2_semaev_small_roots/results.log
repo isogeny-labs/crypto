@@ -1,0 +1,294 @@
+warning: field `pm` is never read
+  --> src/copper.rs:46:9
+   |
+43 | pub struct Lattice {
+   |            ------- field in this struct
+...
+46 |     pub pm: BigInt, // p^m
+   |         ^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `abs_le_pow2` is never used
+   --> src/dd.rs:119:12
+    |
+ 32 | impl F {
+    | ------ method in this implementation
+...
+119 |     pub fn abs_le_pow2(&self, k: i64) -> bool { self.hi == 0.0 || self.e <= k }
+    |            ^^^^^^^^^^^
+
+warning: method `abs_le_pow2` is never used
+  --> src/fl.rs:34:8
+   |
+24 | pub trait Fl: Copy + std::fmt::Debug {
+   |           -- method in this trait
+...
+34 |     fn abs_le_pow2(&self, k: i64) -> bool;
+   |        ^^^^^^^^^^^
+
+warning: method `on` is never used
+   --> src/fp.rs:118:12
+    |
+108 | impl Curve {
+    | ---------- method in this implementation
+...
+118 |     pub fn on(&self, q: Pt) -> bool {
+    |            ^^
+
+warning: function `eval` is never used
+  --> src/fq.rs:33:8
+   |
+33 | pub fn eval(a: &P, x: u64) -> u64 {
+   |        ^^^^
+
+warning: `a2_semaev_small_roots` (bin "a2_semaev_small_roots") generated 5 warnings
+    Finished `release` profile [optimized] target(s) in 0.02s
+semaev identity: {"curves":5,"pass":true,"prime":101,"s3_relations_checked":87260,"s3_relations_vanishing":87260,"s3_root_set_mismatches":0,"s4_random_point_quadruples":1500,"s4_random_zero":136,"s4_relation_but_nonzero":0,"s4_relations_checked":1484,"s4_relations_vanishing":1484,"s4_zero_without_Fp_relation":0}
+trivariate control: {"X_log2":2.0,"dim":8,"instances":20,"lll_mean_s":0.00015476199999999997,"m":1,"p_bits":32,"poly":"xyz + multilinear (code-path control for 3 unknowns)","successes":20}
+trivariate control: {"X_log2":4.0,"dim":8,"instances":20,"lll_mean_s":0.0003083776,"m":1,"p_bits":64,"poly":"xyz + multilinear (code-path control for 3 unknowns)","successes":20}
+trivariate control: {"X_log2":4.0,"dim":27,"instances":20,"lll_mean_s":0.05914118015000001,"m":2,"p_bits":64,"poly":"xyz + multilinear (code-path control for 3 unknowns)","successes":20}
+trivariate control: {"X_log2":6.0,"dim":27,"instances":20,"lll_mean_s":0.04849800645,"m":2,"p_bits":64,"poly":"xyz + multilinear (code-path control for 3 unknowns)","successes":20}
+S3 p32 m1 n9 alpha 0.05: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p32 m1 n9 alpha 0.02: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p32 m1 n9 alpha 0.04: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p32 m1 n9 alpha 0.06: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p32 m1 n9 alpha 0.08: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 20
+S3 p32 m1 n9 alpha 0.10: 13/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 14
+S3 p32 m1 n9 alpha 0.12: 6/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 7
+S3 p32 m1 n9 alpha 0.14: 1/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 1
+S3 p32 m1 n9 alpha 0.16: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+S3 p32 m1 n9 alpha 0.18: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+S3 p32 m1 n9 alpha 0.20: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p32 m2 n25 alpha 0.05: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.02: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.04: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.06: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.08: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.10: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 11 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.12: 18/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 20
+S3 p32 m2 n25 alpha 0.14: 5/20  LLL mean 0.00s max 0.01s  hg>=nu 0 vanish>=nu 9
+S3 p32 m2 n25 alpha 0.16: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 2
+S3 p32 m2 n25 alpha 0.18: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 1
+S3 p32 m2 n25 alpha 0.20: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p32 m3 n49 alpha 0.05: 20/20  LLL mean 0.21s max 0.23s  hg>=nu 20 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.02: 20/20  LLL mean 0.25s max 0.31s  hg>=nu 20 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.04: 20/20  LLL mean 0.21s max 0.23s  hg>=nu 20 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.06: 20/20  LLL mean 0.20s max 0.25s  hg>=nu 20 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.08: 20/20  LLL mean 0.17s max 0.20s  hg>=nu 20 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.10: 20/20  LLL mean 0.14s max 0.16s  hg>=nu 20 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.12: 20/20  LLL mean 0.11s max 0.13s  hg>=nu 0 vanish>=nu 20
+S3 p32 m3 n49 alpha 0.14: 12/20  LLL mean 0.08s max 0.10s  hg>=nu 0 vanish>=nu 12
+S3 p32 m3 n49 alpha 0.16: 0/20  LLL mean 0.05s max 0.07s  hg>=nu 0 vanish>=nu 1
+S3 p32 m3 n49 alpha 0.18: 0/20  LLL mean 0.04s max 0.04s  hg>=nu 0 vanish>=nu 1
+S3 p32 m3 n49 alpha 0.20: 0/20  LLL mean 0.04s max 0.04s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p32 m4 n81 alpha 0.05: 20/20  LLL mean 3.05s max 3.28s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.02: 20/20  LLL mean 4.65s max 7.23s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.04: 20/20  LLL mean 3.21s max 3.36s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.06: 20/20  LLL mean 2.79s max 3.02s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.08: 20/20  LLL mean 2.32s max 2.54s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.10: 20/20  LLL mean 1.80s max 1.91s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.12: 20/20  LLL mean 1.32s max 1.45s  hg>=nu 20 vanish>=nu 20
+S3 p32 m4 n81 alpha 0.14: 17/20  LLL mean 1.00s max 1.17s  hg>=nu 0 vanish>=nu 17
+S3 p32 m4 n81 alpha 0.16: 0/20  LLL mean 0.43s max 0.50s  hg>=nu 0 vanish>=nu 1
+S3 p32 m4 n81 alpha 0.18: 0/20  LLL mean 0.36s max 0.44s  hg>=nu 0 vanish>=nu 1
+S3 p32 m4 n81 alpha 0.20: 0/20  LLL mean 0.32s max 0.37s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p32 m5 n121 alpha 0.05: 20/20  LLL mean 28.66s max 31.81s  hg>=nu 20 vanish>=nu 20
+warning: field `pm` is never read
+  --> src/copper.rs:46:9
+   |
+43 | pub struct Lattice {
+   |            ------- field in this struct
+...
+46 |     pub pm: BigInt, // p^m
+   |         ^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `abs_le_pow2` is never used
+   --> src/dd.rs:119:12
+    |
+ 32 | impl F {
+    | ------ method in this implementation
+...
+119 |     pub fn abs_le_pow2(&self, k: i64) -> bool { self.hi == 0.0 || self.e <= k }
+    |            ^^^^^^^^^^^
+
+warning: method `abs_le_pow2` is never used
+  --> src/fl.rs:34:8
+   |
+24 | pub trait Fl: Copy + std::fmt::Debug {
+   |           -- method in this trait
+...
+34 |     fn abs_le_pow2(&self, k: i64) -> bool;
+   |        ^^^^^^^^^^^
+
+warning: method `on` is never used
+   --> src/fp.rs:118:12
+    |
+108 | impl Curve {
+    | ---------- method in this implementation
+...
+118 |     pub fn on(&self, q: Pt) -> bool {
+    |            ^^
+
+warning: function `eval` is never used
+  --> src/fq.rs:33:8
+   |
+33 | pub fn eval(a: &P, x: u64) -> u64 {
+   |        ^^^^
+
+warning: `a2_semaev_small_roots` (bin "a2_semaev_small_roots") generated 5 warnings
+    Finished `release` profile [optimized] target(s) in 0.02s
+S3 p32 m5 n121 alpha 0.20: 0/20  LLL mean 2.02s max 2.20s  hg>=nu 0 vanish>=nu 0
+S3 p32 m5 n121 alpha 0.22: 0/20  LLL mean 1.98s max 2.16s  hg>=nu 0 vanish>=nu 0
+S3 p32 m5 n121 alpha 0.24: 0/20  LLL mean 1.83s max 2.12s  hg>=nu 0 vanish>=nu 0
+S3 p32 m5 n121 alpha 0.18: 0/20  LLL mean 2.16s max 2.43s  hg>=nu 0 vanish>=nu 1
+S3 p32 m5 n121 alpha 0.16: 0/20  LLL mean 2.56s max 2.89s  hg>=nu 0 vanish>=nu 1
+S3 p32 m5 n121 alpha 0.14: 18/20  LLL mean 6.56s max 7.49s  hg>=nu 0 vanish>=nu 20
+S3 p32 m5 n121 alpha 0.12: 20/20  LLL mean 9.88s max 11.07s  hg>=nu 20 vanish>=nu 20
+S3 p32 m5 n121 alpha 0.10: 20/20  LLL mean 14.32s max 15.57s  hg>=nu 20 vanish>=nu 20
+S3 p32 m5 n121 alpha 0.08: 20/20  LLL mean 19.52s max 21.01s  hg>=nu 20 vanish>=nu 20
+stop: 3 consecutive 20/20 cells going down
+S4 p32 m1 n125 alpha 0.05: 0/20  LLL mean 0.01s max 0.03s  hg>=nu 0 vanish>=nu 0
+S4 p32 m1 n125 alpha 0.02: 0/20  LLL mean 0.04s max 0.06s  hg>=nu 0 vanish>=nu 0
+S4 p32 m1 n125 alpha 0.04: 0/20  LLL mean 0.01s max 0.02s  hg>=nu 0 vanish>=nu 0
+S4 p32 m1 n125 alpha 0.06: 0/20  LLL mean 0.01s max 0.02s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p48 m1 n9 alpha 0.05: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p48 m1 n9 alpha 0.02: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p48 m1 n9 alpha 0.04: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p48 m1 n9 alpha 0.06: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p48 m1 n9 alpha 0.08: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 20
+S3 p48 m1 n9 alpha 0.10: 7/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 7
+S3 p48 m1 n9 alpha 0.12: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 1
+S3 p48 m1 n9 alpha 0.14: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+S3 p48 m1 n9 alpha 0.16: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p48 m2 n25 alpha 0.05: 20/20  LLL mean 0.01s max 0.02s  hg>=nu 20 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.02: 20/20  LLL mean 0.01s max 0.02s  hg>=nu 20 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.04: 20/20  LLL mean 0.01s max 0.02s  hg>=nu 20 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.06: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.08: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.10: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.12: 17/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 20
+S3 p48 m2 n25 alpha 0.14: 2/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 4
+S3 p48 m2 n25 alpha 0.16: 0/20  LLL mean 0.00s max 0.01s  hg>=nu 0 vanish>=nu 0
+S3 p48 m2 n25 alpha 0.18: 0/20  LLL mean 0.00s max 0.01s  hg>=nu 0 vanish>=nu 0
+S3 p48 m2 n25 alpha 0.20: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p48 m3 n49 alpha 0.05: 20/20  LLL mean 0.31s max 0.35s  hg>=nu 20 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.02: 20/20  LLL mean 0.38s max 0.42s  hg>=nu 20 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.04: 20/20  LLL mean 0.32s max 0.37s  hg>=nu 20 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.06: 20/20  LLL mean 0.31s max 0.40s  hg>=nu 20 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.08: 20/20  LLL mean 0.26s max 0.32s  hg>=nu 20 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.10: 20/20  LLL mean 0.25s max 0.36s  hg>=nu 20 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.12: 20/20  LLL mean 0.16s max 0.17s  hg>=nu 0 vanish>=nu 20
+S3 p48 m3 n49 alpha 0.14: 11/20  LLL mean 0.12s max 0.14s  hg>=nu 0 vanish>=nu 13
+S3 p48 m3 n49 alpha 0.16: 0/20  LLL mean 0.07s max 0.09s  hg>=nu 0 vanish>=nu 0
+S3 p48 m3 n49 alpha 0.18: 0/20  LLL mean 0.06s max 0.07s  hg>=nu 0 vanish>=nu 0
+S3 p48 m3 n49 alpha 0.20: 0/20  LLL mean 0.06s max 0.08s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p48 m4 n81 alpha 0.05: 20/20  LLL mean 4.52s max 4.71s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.02: 20/20  LLL mean 5.91s max 6.28s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.04: 20/20  LLL mean 4.90s max 5.09s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.06: 20/20  LLL mean 3.98s max 4.28s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.08: 20/20  LLL mean 3.32s max 3.56s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.10: 20/20  LLL mean 2.63s max 2.78s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.12: 20/20  LLL mean 2.02s max 2.19s  hg>=nu 20 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.14: 20/20  LLL mean 1.53s max 1.79s  hg>=nu 0 vanish>=nu 20
+S3 p48 m4 n81 alpha 0.16: 0/20  LLL mean 0.59s max 0.64s  hg>=nu 0 vanish>=nu 0
+S3 p48 m4 n81 alpha 0.18: 0/20  LLL mean 0.50s max 0.55s  hg>=nu 0 vanish>=nu 0
+S3 p48 m4 n81 alpha 0.20: 0/20  LLL mean 0.44s max 0.47s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S4 p48 m1 n125 alpha 0.05: 0/20  LLL mean 0.02s max 0.02s  hg>=nu 0 vanish>=nu 0
+S4 p48 m1 n125 alpha 0.02: 0/20  LLL mean 0.09s max 0.13s  hg>=nu 0 vanish>=nu 0
+S4 p48 m1 n125 alpha 0.04: 0/20  LLL mean 0.02s max 0.02s  hg>=nu 0 vanish>=nu 0
+S4 p48 m1 n125 alpha 0.06: 0/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p48 m5 n121 alpha 0.20: 0/20  LLL mean 3.23s max 3.56s  hg>=nu 0 vanish>=nu 0
+S3 p48 m5 n121 alpha 0.22: 0/20  LLL mean 3.00s max 3.38s  hg>=nu 0 vanish>=nu 0
+S3 p48 m5 n121 alpha 0.24: 0/20  LLL mean 2.90s max 3.27s  hg>=nu 0 vanish>=nu 0
+S3 p48 m5 n121 alpha 0.18: 0/20  LLL mean 3.66s max 4.29s  hg>=nu 0 vanish>=nu 0
+S3 p48 m5 n121 alpha 0.16: 0/20  LLL mean 4.12s max 4.60s  hg>=nu 0 vanish>=nu 0
+S3 p48 m5 n121 alpha 0.14: 20/20  LLL mean 10.15s max 10.82s  hg>=nu 0 vanish>=nu 20
+S3 p48 m5 n121 alpha 0.12: 20/20  LLL mean 15.97s max 17.90s  hg>=nu 20 vanish>=nu 20
+S3 p48 m5 n121 alpha 0.10: 20/20  LLL mean 23.89s max 26.38s  hg>=nu 20 vanish>=nu 20
+stop: 3 consecutive 20/20 cells going down
+S3 p64 m1 n9 alpha 0.05: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p64 m1 n9 alpha 0.02: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p64 m1 n9 alpha 0.04: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p64 m1 n9 alpha 0.06: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 20 vanish>=nu 20
+S3 p64 m1 n9 alpha 0.08: 20/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 20
+S3 p64 m1 n9 alpha 0.10: 6/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 6
+S3 p64 m1 n9 alpha 0.12: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+S3 p64 m1 n9 alpha 0.14: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 1
+S3 p64 m1 n9 alpha 0.16: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p64 m2 n25 alpha 0.05: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.02: 20/20  LLL mean 0.01s max 0.02s  hg>=nu 20 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.04: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.06: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.08: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.10: 20/20  LLL mean 0.01s max 0.01s  hg>=nu 20 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.12: 17/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 20
+S3 p64 m2 n25 alpha 0.14: 1/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 1
+S3 p64 m2 n25 alpha 0.16: 0/20  LLL mean 0.01s max 0.01s  hg>=nu 0 vanish>=nu 0
+S3 p64 m2 n25 alpha 0.18: 0/20  LLL mean 0.00s max 0.01s  hg>=nu 0 vanish>=nu 0
+S3 p64 m2 n25 alpha 0.20: 0/20  LLL mean 0.00s max 0.00s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p64 m3 n49 alpha 0.05: 20/20  LLL mean 0.39s max 0.43s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.02: 20/20  LLL mean 0.47s max 0.53s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.04: 20/20  LLL mean 0.42s max 0.49s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.06: 20/20  LLL mean 0.36s max 0.40s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.08: 20/20  LLL mean 0.31s max 0.32s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.10: 20/20  LLL mean 0.26s max 0.28s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.12: 20/20  LLL mean 0.21s max 0.22s  hg>=nu 20 vanish>=nu 20
+S3 p64 m3 n49 alpha 0.14: 7/20  LLL mean 0.16s max 0.20s  hg>=nu 0 vanish>=nu 7
+S3 p64 m3 n49 alpha 0.16: 0/20  LLL mean 0.09s max 0.10s  hg>=nu 0 vanish>=nu 0
+S3 p64 m3 n49 alpha 0.18: 0/20  LLL mean 0.08s max 0.11s  hg>=nu 0 vanish>=nu 0
+S3 p64 m3 n49 alpha 0.20: 0/20  LLL mean 0.07s max 0.08s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p64 m4 n81 alpha 0.05: 20/20  LLL mean 5.96s max 6.17s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.02: 20/20  LLL mean 7.36s max 7.85s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.04: 20/20  LLL mean 6.37s max 6.76s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.06: 20/20  LLL mean 5.46s max 6.02s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.08: 20/20  LLL mean 4.43s max 4.64s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.10: 20/20  LLL mean 3.72s max 3.92s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.12: 20/20  LLL mean 2.74s max 2.88s  hg>=nu 20 vanish>=nu 20
+S3 p64 m4 n81 alpha 0.14: 16/20  LLL mean 2.07s max 2.21s  hg>=nu 0 vanish>=nu 18
+S3 p64 m4 n81 alpha 0.16: 0/20  LLL mean 0.83s max 0.95s  hg>=nu 0 vanish>=nu 0
+S3 p64 m4 n81 alpha 0.18: 0/20  LLL mean 0.72s max 0.79s  hg>=nu 0 vanish>=nu 0
+S3 p64 m4 n81 alpha 0.20: 0/20  LLL mean 0.64s max 0.71s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S4 p64 m1 n125 alpha 0.05: 0/20  LLL mean 0.02s max 0.03s  hg>=nu 0 vanish>=nu 0
+S4 p64 m1 n125 alpha 0.02: 0/20  LLL mean 0.06s max 0.07s  hg>=nu 0 vanish>=nu 0
+S4 p64 m1 n125 alpha 0.04: 0/20  LLL mean 0.03s max 0.03s  hg>=nu 0 vanish>=nu 0
+S4 p64 m1 n125 alpha 0.06: 0/20  LLL mean 0.02s max 0.02s  hg>=nu 0 vanish>=nu 0
+stop: 3 consecutive 0/20 cells
+S3 p64 m5 n121 alpha 0.20: 0/20  LLL mean 4.50s max 5.07s  hg>=nu 0 vanish>=nu 0
+S3 p64 m5 n121 alpha 0.22: 0/20  LLL mean 4.30s max 4.95s  hg>=nu 0 vanish>=nu 0
+S3 p64 m5 n121 alpha 0.24: 0/20  LLL mean 4.20s max 4.91s  hg>=nu 0 vanish>=nu 0
+S3 p64 m5 n121 alpha 0.18: 0/20  LLL mean 4.84s max 5.78s  hg>=nu 0 vanish>=nu 0
+S3 p64 m5 n121 alpha 0.16: 0/20  LLL mean 6.17s max 7.03s  hg>=nu 0 vanish>=nu 0
+S3 p64 m5 n121 alpha 0.14: 20/20  LLL mean 17.92s max 19.81s  hg>=nu 0 vanish>=nu 20
+S3 p64 m5 n121 alpha 0.12: 20/20  LLL mean 24.67s max 27.00s  hg>=nu 20 vanish>=nu 20
+S3 p64 m5 n121 alpha 0.10: 20/20  LLL mean 33.76s max 36.98s  hg>=nu 20 vanish>=nu 20
+stop: 3 consecutive 20/20 cells going down
+DONE
+S3 p32 m5 n121 alpha 0.02: 20/20  LLL mean 32.14s max 33.81s  hg>=nu 20 vanish>=nu 20
+S3 p32 m5 n121 alpha 0.04: 20/20  LLL mean 30.64s max 32.91s  hg>=nu 20 vanish>=nu 20
+S3 p32 m5 n121 alpha 0.06: 20/20  LLL mean 24.87s max 25.97s  hg>=nu 20 vanish>=nu 20
+S3 p48 m5 n121 alpha 0.02: 20/20  LLL mean 50.60s max 53.01s  hg>=nu 20 vanish>=nu 20
+S3 p48 m5 n121 alpha 0.04: 20/20  LLL mean 47.54s max 50.76s  hg>=nu 20 vanish>=nu 20
+S3 p48 m5 n121 alpha 0.06: 20/20  LLL mean 35.84s max 37.41s  hg>=nu 20 vanish>=nu 20
+S3 p48 m5 n121 alpha 0.08: 20/20  LLL mean 29.74s max 32.40s  hg>=nu 20 vanish>=nu 20
+S3 p64 m5 n121 alpha 0.02: 20/20  LLL mean 66.74s max 71.61s  hg>=nu 20 vanish>=nu 20
+S3 p64 m5 n121 alpha 0.04: 20/20  LLL mean 64.42s max 68.72s  hg>=nu 20 vanish>=nu 20
+S3 p64 m5 n121 alpha 0.06: 20/20  LLL mean 51.73s max 55.06s  hg>=nu 20 vanish>=nu 20
+S3 p64 m5 n121 alpha 0.08: 20/20  LLL mean 45.68s max 49.17s  hg>=nu 20 vanish>=nu 20
+FILLDONE

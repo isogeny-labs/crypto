@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-selected-c2-simon-witness-protocol-v1",
+  "reason": "C2 Simon rank_bounds returned (3,3), while proof-enabled PARI with default and effort 3 returned (2,3) and mwrank_lib timed out. Retain Simon's explicit point list for audit.",
+  "fixtures_sha256": "7df5e375792c2c9cd0368ffd878e47ef268078bc14b42b6d1384fddf9cf3f0b7",
+  "effort_result_sha256": "30d95f545a4fc89aaa27b0c08e62f63aa43e208239cad19df3776857e5470f1a",
+  "source_sha256": "2c20b2ef0640bae135116ff54ac82161b1df90139f7943868f9a8f4dc83cd19e",
+  "curve": "C2",
+  "algorithm": "Sage simon_two_descent(known_points=all four selected points, limbigprime=0)",
+  "checks": ["all returned rational points lie on the frozen curve", "256-bit PARI canonical heights", "first-three height Gram determinant if at least three witnesses"],
+  "claim_boundary": "A numerical Gram determinant is diagnostic; report Simon's rank interval and the separate proof-enabled PARI and mwrank statuses"
+}

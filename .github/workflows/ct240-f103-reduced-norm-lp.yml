@@ -1,0 +1,38 @@
+name: CT240 F103 reduced norm-image two-LP finite feasibility
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct240_f103_reduced_norm_lp.py"
+      - ".github/workflows/ct240-f103-reduced-norm-lp.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-finite-f103:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct237_independent_raw_relation_replay.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct238_p103_norm_fiber_pilot.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct240_f103_reduced_norm_lp.py
+      - name: Verify exact source and run finite norm LP solver
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT240_SOURCE_SHA %H'
+          python3 --version
+          cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          python3 ct240_f103_reduced_norm_lp.py 2>&1 | tee /tmp/ct240-exact-output.log
+          test "$(grep -c '^CT240_RESULT ' /tmp/ct240-exact-output.log)" -eq 5
+          grep -q '^CT240_COMPLETE ' /tmp/ct240-exact-output.log
