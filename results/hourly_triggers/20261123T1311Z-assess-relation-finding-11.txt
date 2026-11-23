@@ -1,0 +1,7 @@
+Trigger: Assess relation finding (hourly benchmark)
+Requested UTC: 2026-11-23T13:11:49Z
+Target: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen synthetic Koblitz GF(2^23), a=0, m=2; natural=256, planted=64, proven-UNSAT=64 (NOT ECC2K-130).
+Output: append timing, verified natural relations/sec and success rate to results/hourly_log.csv, commit and push from GitHub Actions.
+Anomaly: compare against results/relation_baseline.json at absolute >20%; automatically open an issue on failure or anomaly.
