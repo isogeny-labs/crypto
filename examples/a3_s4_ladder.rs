@@ -163,12 +163,18 @@ fn main() {
         .unwrap_or(false);
 
     let t1 = Instant::now();
-    let rho = pollard_rho_ecdlp(&curve, &g, &q, rho_steps);
-    let rho_ms = t1.elapsed().as_secs_f64() * 1e3;
-    let rho_ok = rho
-        .as_ref()
-        .map(|r| g.scalar_mul(r, &a_fe) == q)
-        .unwrap_or(false);
+    // `--no-rho` skips the ladder's own single-walk rho arm.  Paired rho
+    // timing now comes from the tuned `cryptanalysis` `ca solve --alg rho`
+    // implementation (see research/prime_36bit_20261122/run_rung.sh): this
+    // walk is a fixture sanity check, not a cost baseline.
+    let skip_rho = arguments.iter().any(|a| a == "--no-rho");
+    let (rho, rho_ms) = if skip_rho {
+        (None, None)
+    } else {
+        let r = pollard_rho_ecdlp(&curve, &g, &q, rho_steps);
+        (r, Some(t1.elapsed().as_secs_f64() * 1e3))
+    };
+    let rho_ok = rho.as_ref().map(|r| g.scalar_mul(r, &a_fe) == q);
     let agree = match (&ic_recovered, &rho) {
         (Some(a), Some(b)) => a == b,
         _ => false,
@@ -217,7 +223,8 @@ fn main() {
         })
     );
 
-    if !ic_ok || !rho_ok || !agree {
+    let rho_ok_required = rho_ok.unwrap_or(true);
+    if !ic_ok || !rho_ok_required || !(agree || skip_rho) {
         std::process::exit(1);
     }
 }

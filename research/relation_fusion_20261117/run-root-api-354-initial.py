@@ -1,0 +1,11 @@
+from pathlib import Path
+import json,hashlib,subprocess,os,datetime
+repo=Path('/workspace/relation-supervisor-live');s=repo/'research/relation_fusion_20261117';assert (s/'ROOT_NATIVE_OUTCOME_352.json').is_file()
+plan=json.loads((s/'ROOT_API_QUALIFICATION_PLAN_354.json').read_text());src=json.loads((s/'ROOT_UNIT_SOURCE_348.json').read_text());assert all(hashlib.sha256((repo/p).read_bytes()).hexdigest()==h for p,h in src['source_sha256'].items());ctx=json.loads((s/'ROOT_RECOVERED_UNIT_CONTEXT_350.json').read_text());exe=Path(ctx['executable']);assert hashlib.sha256(exe.read_bytes()).hexdigest()==ctx['executable_sha256']
+filters=plan['filters'];listing=subprocess.check_output([str(exe),*filters,'--list'],cwd=repo,text=True);(s/'development-01/root-api-roster-354.stdout').write_text(listing)
+names=[l[:-6] for l in listing.splitlines() if l.endswith(': test')];coverage={f:[n for n in names if f in n] for f in filters};assert all(coverage.values()),coverage
+ctx={'schema':'root-api-correctness-execution-context/v1','source':'ROOT_UNIT_SOURCE_348.json','plan':'ROOT_API_QUALIFICATION_PLAN_354.json','executable_sha256':ctx['executable_sha256'],'coverage':coverage,'exact_selected_test_names':names,'recorded_before_execution':True,'signed_execution_verdict':False,'performance_comparison':False};(s/'ROOT_API_CONTEXT_354.json').write_text(json.dumps(ctx,indent=2)+'\n')
+env=dict(os.environ,RAYON_NUM_THREADS='1',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',RUST_TEST_THREADS='1')
+with (s/'development-01/root-api-tests-354.stdout').open('xb') as out,(s/'development-01/root-api-tests-354.stderr').open('xb') as err:r=subprocess.run(['taskset','-c','0',str(exe),*filters,'--test-threads=1'],cwd=repo,env=env,stdout=out,stderr=err)
+import re
+out=(s/'development-01/root-api-tests-354.stdout').read_text();result={'schema':'root-api-correctness-outcome/v1','source':'ROOT_UNIT_SOURCE_348.json','selected_tests':len(names),'every_filter_resolves_original_tests':True,'exit_code':r.returncode,'summary':re.findall(r'test result: ([^\n]+)',out),'failed_tests':re.findall(r'^test (.+?) \.\.\. FAILED$',out,re.M),'signed_execution_verdict':False,'performance_comparison':False,'15x_admitted':False};(s/'ROOT_API_OUTCOME_354.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result));raise SystemExit(r.returncode)

@@ -598,6 +598,10 @@ pub struct F4Options {
     pub max_degree: u32,
     /// Cooperative stop: the run returns `timed_out` once past it.
     pub deadline: Option<Instant>,
+    /// Opt-in allocation admission. `None` preserves the existing paths.
+    /// Bounded runs use exponent-vector symbolic preprocessing and guarded
+    /// polynomial interreduction; see [`F4ResourceLimits`].
+    pub resource_limits: Option<F4ResourceLimits>,
     /// Stop once the leading monomials of the basis so far leave at most
     /// this many standard monomials.
     ///
@@ -674,6 +678,142 @@ pub struct F4Options {
     /// more than one substitution.  Off by default, and never used with a
     /// trace sink or a trace-reuse pool.
     pub sibling_batch: bool,
+    /// Measure exclusive wall-time phases of the recursive visitor. Off by
+    /// default; no timing field is then serialized in [`VisitReport`]. This
+    /// observes the selected plain, traced, or trace-reuse path without
+    /// changing its arithmetic, domains, or stopping policy. Clock reads can
+    /// consume a small part of an existing cooperative deadline.
+    pub visit_timing: bool,
+}
+
+/// Conservative, per-native-call allocation admission, not a process-memory
+/// limit. Keep an external address-space limit for allocator overhead, input
+/// storage, exponent-vector width and caller-owned traces.
+///
+/// These limits also apply to recorded/replayed calls. Checkpoint, Hilbert,
+/// staircase and run-log modes are refused while limits are enabled: those
+/// paths do not yet have allocation admission. The recursive visitor refuses
+/// trace pools and sibling batching for the same reason.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct F4ResourceLimits {
+    /// Pending and above-degree pairs plus the temporary GM candidates,
+    /// before product/chain criteria can discard those candidates.
+    pub max_pairs: usize,
+    /// Each symbolic support, retained basis term population, reduction
+    /// work/output population and cumulative trace monomial population.
+    /// Repeated terms in different basis polynomials are counted separately.
+    pub max_symbolic_monomials: usize,
+    /// Conservative numeric workspace entries. Admission reserves eight
+    /// rows-by-columns arrays plus row/column scratch. Recording additionally
+    /// reserves two arrays, contributor bitsets and contributor index lists.
+    /// This deliberately exceeds the size of the eventual pair-row matrix.
+    pub max_matrix_entries: usize,
+}
+
+/// The first allocation admission that refused a native call. Such a report
+/// is incomplete, even when its returned basis is empty. `observed` saturates
+/// at `usize::MAX` on arithmetic overflow, which always refuses admission.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct F4ResourceLimit {
+    pub stage: &'static str,
+    pub resource: &'static str,
+    pub observed: usize,
+    pub limit: usize,
+    pub overflowed: bool,
+}
+
+impl std::fmt::Display for F4ResourceLimit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}: {} admission {} exceeds {}{}",
+            self.stage,
+            self.resource,
+            self.observed,
+            self.limit,
+            if self.overflowed {
+                " (count overflow)"
+            } else {
+                ""
+            }
+        )
+    }
+}
+
+impl F4ResourceLimits {
+    fn check(
+        &self,
+        stage: &'static str,
+        resource: &'static str,
+        observed: Option<usize>,
+        limit: usize,
+    ) -> Result<(), F4ResourceLimit> {
+        if observed.is_some_and(|n| n <= limit) {
+            Ok(())
+        } else {
+            Err(F4ResourceLimit {
+                stage,
+                resource,
+                observed: observed.unwrap_or(usize::MAX),
+                limit,
+                overflowed: observed.is_none(),
+            })
+        }
+    }
+
+    fn symbolic(&self, stage: &'static str, n: usize) -> Result<(), F4ResourceLimit> {
+        self.check(
+            stage,
+            "symbolic_monomials",
+            Some(n),
+            self.max_symbolic_monomials,
+        )
+    }
+
+    fn matrix(
+        &self,
+        stage: &'static str,
+        rows: usize,
+        cols: usize,
+        recording: bool,
+    ) -> Result<(), F4ResourceLimit> {
+        let entries = (|| {
+            let rectangle = rows.checked_mul(cols)?;
+            let mut n = rectangle.checked_mul(8)?;
+            n = n.checked_add(cols.checked_mul(4)?)?;
+            n = n.checked_add(rows.checked_mul(4)?)?;
+            if recording {
+                let words = rows / 64 + usize::from(rows % 64 != 0);
+                n = n.checked_add(rectangle.checked_mul(2)?)?;
+                n = n.checked_add(rows.checked_mul(words)?)?;
+                n = n.checked_add(rows.checked_mul(rows.min(cols))?)?;
+                n = n.checked_add(words)?;
+            }
+            Some(n)
+        })();
+        self.check(stage, "matrix_entries", entries, self.max_matrix_entries)
+    }
+
+    fn symbolic_step(
+        &self,
+        rows: usize,
+        cols: usize,
+        recording: bool,
+    ) -> Result<(), F4ResourceLimit> {
+        self.symbolic("symbolic_rows", rows)?;
+        self.symbolic("symbolic_support", cols)?;
+        self.matrix("symbolic_workspace", rows, cols.max(1), recording)
+    }
+}
+
+fn unsupported_resource_option(option: &'static str) -> F4ResourceLimit {
+    F4ResourceLimit {
+        stage: "options",
+        resource: option,
+        observed: 1,
+        limit: 0,
+        overflowed: false,
+    }
 }
 
 /// Root extraction for a univariate whose variable has a finite domain `D`.
@@ -733,6 +873,7 @@ impl F4Options {
             order,
             max_degree,
             deadline: None,
+            resource_limits: None,
             stop_staircase: None,
             weights: None,
             stop_hilbert: None,
@@ -746,7 +887,15 @@ impl F4Options {
             checkpoint_stop_in_rref: None,
             domain_roots: DomainRootMode::Scan,
             sibling_batch: false,
+            visit_timing: false,
         }
+    }
+
+    /// Enable or disable recursive-visitor wall phases ([`VisitTimings`]).
+    /// Native F4 calls outside a visitor are unaffected.
+    pub fn with_visit_timing(mut self, on: bool) -> Self {
+        self.visit_timing = on;
+        self
     }
 
     /// Turn batched sibling extraction on or off ([`F4Options::sibling_batch`]).
@@ -1598,10 +1747,14 @@ pub struct F4Trace {
 /// for every pivot row which input rows it is a combination of.  Returns
 /// `(pivot column, contributing input rows)` per pivot.  Used once per `p`
 /// when a trace is recorded; its cost is not part of the replays.
-fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize>)> {
+fn tracked_rref_contributors(
+    rows: &[Vec<u64>],
+    p: u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<(usize, Vec<usize>)>> {
     let n = rows.len();
     if n == 0 {
-        return Vec::new();
+        return Some(Vec::new());
     }
     let ncols = rows[0].len();
     let words = n.div_ceil(64);
@@ -1616,6 +1769,9 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
     let mut piv: Vec<(usize, usize)> = Vec::new(); // (row, col)
     let mut r = 0usize;
     for c in 0..ncols {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
         if r >= n {
             break;
         }
@@ -1635,6 +1791,9 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         let pivot_row = m[r].clone();
         let pivot_who = who[r].clone();
         for i in 0..n {
+            if deadline.is_some_and(|d| Instant::now() > d) {
+                return None;
+            }
             if i != r && m[i][c] != 0 {
                 let f = m[i][c];
                 let neg = p - f;
@@ -1650,14 +1809,16 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         piv.push((r, c));
         r += 1;
     }
-    piv.into_iter()
-        .map(|(row, col)| {
-            let contributors: Vec<usize> = (0..n)
-                .filter(|&i| who[row][i / 64] >> (i % 64) & 1 == 1)
-                .collect();
-            (col, contributors)
-        })
-        .collect()
+    Some(
+        piv.into_iter()
+            .map(|(row, col)| {
+                let contributors: Vec<usize> = (0..n)
+                    .filter(|&i| who[row][i / 64] >> (i % 64) & 1 == 1)
+                    .collect();
+                (col, contributors)
+            })
+            .collect(),
+    )
 }
 
 fn inv_mod_u64(a: u64, p: u64) -> u64 {
@@ -1703,6 +1864,9 @@ fn f4_dispatch(
     opts: &F4Options,
     trace: TraceMode,
 ) -> F4Report {
+    if opts.resource_limits.is_some() {
+        return f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace);
+    }
     match opts.stop_hilbert {
         Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, trace),
         None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace),
@@ -1830,6 +1994,10 @@ pub struct F4Report {
     pub max_cols: usize,
     pub ms: f64,
     pub timed_out: bool,
+    /// Allocation admission stopped this call. The basis is intentionally
+    /// empty on this path; it is not an emptiness or consistency certificate.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource_limit: Option<F4ResourceLimit>,
     /// Pairs dropped because their lcm degree exceeded the bound: `> 0`
     /// means the basis may be a strict truncation.
     pub pairs_above_bound: usize,
@@ -2517,7 +2685,9 @@ fn gm_update<K: PartialEq>(
     div: impl Fn(&K, &K) -> bool,
     lcmf: impl Fn(&K, &K) -> K,
     coprime: impl Fn(&K, &K) -> bool,
-) -> Vec<(usize, K)> {
+    limits: Option<&F4ResourceLimits>,
+    deadline: Option<Instant>,
+) -> Result<Vec<(usize, K)>, F4Stop> {
     // bitop/v1: criterion B tests every held pair (a divisibility and two
     // lcm compares, a packed monomial being two words each), every alive
     // element gets a divisibility, coprimality and lcm, and criteria M/F
@@ -2541,9 +2711,23 @@ fn gm_update<K: PartialEq>(
         pairs.retain(|pr| keep(pr));
         above.retain(|pr| keep(pr));
     }
+    if let Some(limits) = limits {
+        limits.check(
+            "critical_pairs",
+            "pairs",
+            pairs
+                .len()
+                .checked_add(above.len())
+                .and_then(|n| n.checked_add(alive.iter().take(k).filter(|&&a| a).count())),
+            limits.max_pairs,
+        )?;
+    }
     // the new pairs (h, g) with every alive g
     let mut cand: Vec<(usize, K, bool)> = Vec::new();
     for i in 0..k {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
         if !alive[i] {
             continue;
         }
@@ -2566,6 +2750,9 @@ fn gm_update<K: PartialEq>(
         // the last one stays.  A coprime pair is never dropped here (it may
         // drop others) and never kept below.
         for a in 0..cand.len() {
+            if deadline.is_some_and(|d| Instant::now() > d) {
+                return Err(F4Stop::Deadline);
+            }
             if cand[a].2 {
                 continue;
             }
@@ -2574,11 +2761,12 @@ fn gm_update<K: PartialEq>(
             }
         }
     }
-    cand.into_iter()
+    Ok(cand
+        .into_iter()
         .zip(kept)
         .filter(|((_, _, cp), keep)| !cp && *keep)
         .map(|((i, l, _), _)| (i, l))
-        .collect()
+        .collect())
 }
 
 fn lcm(a: &[u32], b: &[u32]) -> Vec<u32> {
@@ -4995,11 +5183,7 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         field_multiplications: 0,
         elapsed_ms: 0.0,
     });
-    let report = if let Some(chunk) = opts.stop_hilbert {
-        f4_hilbert_guarded(input, n_vars, p, opts, chunk, TraceMode::Off)
-    } else {
-        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
-    };
+    let report = f4_dispatch(input, n_vars, p, opts, TraceMode::Off);
     mem_stats_report(report.ms);
     notify_progress(F4Progress {
         event: "complete",
@@ -5315,16 +5499,6 @@ fn f4_with_arithmetic(
     let carried = std::cell::Cell::new(Duration::ZERO);
     let ops_carry = std::cell::Cell::new(0u64);
     let mut blocked_steps = 0usize;
-    if opts.checkpoint.is_some() {
-        assert!(
-            matches!(trace, TraceMode::Off)
-                && opts.hilbert_expect.is_none()
-                && opts.stop_hilbert.is_none()
-                && opts.stop_staircase.is_none()
-                && !opts.capture_run_log,
-            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
-        );
-    }
     let debug = std::env::var("F4_DEBUG").is_ok();
     let _pp_guard = par_prof().then_some(PpGuard);
     if debug {
@@ -5349,8 +5523,17 @@ fn f4_with_arithmetic(
     // Pairs over the degree bound, kept so Gebauer–Möller can retire them:
     // `pairs_above_bound` counts the ones still standing.
     let mut above: Vec<Pair> = Vec::new();
+    let mut basis_terms = 0usize;
+    let mut trace_monomials = 0usize;
+    let mut steps = 0usize;
+    let mut max_rows = 0usize;
+    let mut max_cols = 0usize;
+    let mut degree_reached = 0u32;
+    let mut solving_degree = 0u32;
+    let mut learned = (0u32, 0usize, 0usize);
     let gm = gebauer_moeller();
     let mut packed = (matches!(ord, Ordering::Grevlex)
+        && opts.resource_limits.is_none()
         && n_vars <= 15
         && opts.max_degree < 128
         && input.iter().flatten().all(|(e, _)| total_degree(e) < 128)
@@ -5380,7 +5563,11 @@ fn f4_with_arithmetic(
                 .map(|(f, _)| f.clone())
                 .collect()
         };
-        let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics && !inconsistent && !to {
+        let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics
+            && opts.resource_limits.is_none()
+            && !inconsistent
+            && !to
+        {
             hilbert_diagnostic(input, &b, n_vars, opts.deadline)
         } else {
             (None, None, None, Vec::new())
@@ -5398,6 +5585,7 @@ fn f4_with_arithmetic(
             max_cols: mc,
             ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
             timed_out: to,
+            resource_limit: None,
             pairs_above_bound: pab,
             staircase_at_stop: None,
             field_ops: ops_carry.get() + (field_ops_now() - ops0),
@@ -5412,6 +5600,85 @@ fn f4_with_arithmetic(
             hilbert_deviations: dfalls,
         }
     };
+
+    // A refused operation returns diagnostics, but no partial basis which a
+    // caller could accidentally interpret as a certificate of an empty ideal.
+    macro_rules! abort_call {
+        ($stop:expr) => {{
+            let stop: F4Stop = $stop.into();
+            let mut r = report(
+                &[],
+                &[],
+                false,
+                degree_reached,
+                solving_degree,
+                steps,
+                max_rows,
+                max_cols,
+                matches!(&stop, F4Stop::Deadline),
+                pairs_above_bound,
+                learned,
+                blocked_steps,
+            );
+            if let F4Stop::Resource(limit) = stop {
+                r.resource_limit = Some(limit);
+            }
+            return r;
+        }};
+    }
+    macro_rules! admit {
+        ($check:expr) => {
+            if let Err(stop) = $check {
+                abort_call!(stop);
+            }
+        };
+    }
+    macro_rules! bounded_deadline {
+        () => {
+            if opts.resource_limits.is_some() && opts.deadline.is_some_and(|d| Instant::now() > d) {
+                abort_call!(F4Stop::Deadline);
+            }
+        };
+    }
+    if let Some(limits) = &opts.resource_limits {
+        let incompatible = if opts.checkpoint.is_some()
+            || opts.checkpoint_stop_after.is_some()
+            || opts.checkpoint_in_step.is_some()
+            || opts.checkpoint_stop_in_rref.is_some()
+        {
+            Some("checkpoint")
+        } else if opts.stop_hilbert.is_some()
+            || opts.hilbert_expect.is_some()
+            || opts.record_hilbert_diagnostics
+        {
+            Some("hilbert")
+        } else if opts.stop_staircase.is_some() {
+            Some("staircase")
+        } else if opts.capture_run_log {
+            Some("run_log")
+        } else {
+            None
+        };
+        if let Some(option) = incompatible {
+            admit!(Err::<(), _>(unsupported_resource_option(option)));
+        }
+        admit!(limits.check(
+            "input",
+            "symbolic_monomials",
+            input.iter().try_fold(0usize, |n, f| n.checked_add(f.len())),
+            limits.max_symbolic_monomials,
+        ));
+    }
+    if opts.checkpoint.is_some() {
+        assert!(
+            matches!(trace, TraceMode::Off)
+                && opts.hilbert_expect.is_none()
+                && opts.stop_hilbert.is_none()
+                && opts.stop_staircase.is_none()
+                && !opts.capture_run_log,
+            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
+        );
+    }
 
     // add a polynomial to the basis: pairs under the Gebauer–Möller
     // criteria (or the product criterion alone, `F4_FP_GM=0`) and the
@@ -5429,7 +5696,9 @@ fn f4_with_arithmetic(
         pairs_above_bound: &mut usize,
         gm: bool,
         lmp: Option<&mut Vec<u128>>,
-    ) {
+        limits: Option<&F4ResourceLimits>,
+        deadline: Option<Instant>,
+    ) -> Result<(), F4Stop> {
         let k = basis.len();
         let n = f[0].0.len();
         let new: Vec<(usize, Vec<u32>, u128)> = match lmp {
@@ -5448,7 +5717,9 @@ fn f4_with_arithmetic(
                     |a, b| packed_divides(*a, *b),
                     |a, b| packed_lcm(*a, *b),
                     |a, b| packed_coprime(*a, *b),
-                );
+                    limits,
+                    deadline,
+                )?;
                 lmp.push(h);
                 new.into_iter().map(|(i, l)| (i, unpack(l, n), l)).collect()
             }
@@ -5466,7 +5737,9 @@ fn f4_with_arithmetic(
                     |a, b| divides(a, b),
                     |a, b| lcm(a, b),
                     |a, b| a.iter().zip(b).all(|(x, y)| *x == 0 || *y == 0),
-                );
+                    limits,
+                    deadline,
+                )?;
                 new.into_iter().map(|(i, l)| (i, l, 0)).collect()
             }
         };
@@ -5488,9 +5761,11 @@ fn f4_with_arithmetic(
         *pairs_above_bound = above.len();
         basis.push(f);
         alive.push(true);
+        Ok(())
     }
 
     for f in input {
+        bounded_deadline!();
         let f = normalise(f, p, ord);
         if f.is_empty() {
             continue;
@@ -5498,7 +5773,8 @@ fn f4_with_arithmetic(
         if total_degree(&f[0].0) == 0 {
             return report(&basis, &alive, true, 0, 0, 0, 0, 0, false, 0, (0, 0, 0), 0);
         }
-        add(
+        basis_terms += f.len();
+        admit!(add(
             f,
             &mut basis,
             &mut alive,
@@ -5508,12 +5784,17 @@ fn f4_with_arithmetic(
             &mut pairs_above_bound,
             gm,
             lm_packed.as_mut(),
-        );
+            opts.resource_limits.as_ref(),
+            opts.resource_limits.and(opts.deadline),
+        ));
     }
     let input_lms_now: Vec<Vec<u32>> = basis.iter().map(|f| f[0].0.clone()).collect();
     let mut input_mismatch = false;
     match &mut trace {
-        TraceMode::Record(t) => t.input_lms = input_lms_now,
+        TraceMode::Record(t) => {
+            trace_monomials = input_lms_now.len();
+            t.input_lms = input_lms_now;
+        }
         TraceMode::Replay(t) => {
             // other input leading monomials: not this trace's shape, a full run
             if t.input_lms != input_lms_now {
@@ -5529,13 +5810,6 @@ fn f4_with_arithmetic(
         trace = TraceMode::Off;
     }
     // interreduce the input (tails included) so the first matrix is small
-    let mut steps = 0usize;
-    let mut max_rows = 0usize;
-    let mut max_cols = 0usize;
-    let mut degree_reached = 0u32;
-    let mut solving_degree = 0u32;
-    // (solving_degree_max, max_cols_to_solution, steps_to_solution)
-    let mut learned = (0u32, 0usize, 0usize);
     let mut staircase_at_stop: Option<usize> = None;
     let mut hilbert_violated = false;
     let mut stair = StairTracker::new(n_vars);
@@ -5803,6 +6077,7 @@ fn f4_with_arithmetic(
         let mut last_snap = Instant::now();
         let mut snaps = 0usize;
         // symbolic preprocessing
+        let recording = matches!(trace, TraceMode::Record(_));
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
         let d;
@@ -5817,6 +6092,7 @@ fn f4_with_arithmetic(
             // (or ends off the recorded staircase) finishes as a full run
             // over all of them
             for (idx, m) in &step.rows {
+                bounded_deadline!();
                 if *idx >= basis.len() {
                     let mut r = report(
                         &basis,
@@ -5834,6 +6110,9 @@ fn f4_with_arithmetic(
                     );
                     r.trace_mismatch = true;
                     return r;
+                }
+                if let Some(limits) = &opts.resource_limits {
+                    admit!(limits.symbolic_step(rows_poly.len().saturating_add(1), 0, recording));
                 }
                 if seen.insert((*idx, m.clone())) {
                     rows_poly.push((*idx, m.clone()));
@@ -5854,6 +6133,7 @@ fn f4_with_arithmetic(
             }
             selected_len = selected.len();
             for pr in &selected {
+                bounded_deadline!();
                 for &idx in &[pr.i, pr.j] {
                     let m: Vec<u32> = pr
                         .lcm
@@ -5861,6 +6141,13 @@ fn f4_with_arithmetic(
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
                         .collect();
+                    if let Some(limits) = &opts.resource_limits {
+                        admit!(limits.symbolic_step(
+                            rows_poly.len().saturating_add(1),
+                            0,
+                            recording
+                        ));
+                    }
                     if seen.insert((idx, m.clone())) {
                         rows_poly.push((idx, m));
                     }
@@ -5976,11 +6263,19 @@ fn f4_with_arithmetic(
             // One scratch monomial; a heap copy only for a monomial not seen.
             let mut em: Vec<u32> = vec![0; n_vars];
             for (idx, m) in &rows_poly {
+                bounded_deadline!();
                 for (e, _) in &basis[*idx] {
                     for (k, x) in em.iter_mut().enumerate() {
                         *x = e[k] + m[k];
                     }
                     if !monomials.contains(em.as_slice()) {
+                        if let Some(limits) = &opts.resource_limits {
+                            admit!(limits.symbolic_step(
+                                rows_poly.len(),
+                                monomials.len().saturating_add(1),
+                                recording,
+                            ));
+                        }
                         monomials.insert(em.clone());
                         queue.push(em.clone());
                     }
@@ -5989,6 +6284,7 @@ fn f4_with_arithmetic(
                 done.insert(lm);
             }
             while let Some(mono) = queue.pop() {
+                bounded_deadline!();
                 if done.contains(&mono) {
                     continue;
                 }
@@ -6003,12 +6299,26 @@ fn f4_with_arithmetic(
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
                         .collect();
+                    if let Some(limits) = &opts.resource_limits {
+                        admit!(limits.symbolic_step(
+                            rows_poly.len().saturating_add(1),
+                            monomials.len(),
+                            recording,
+                        ));
+                    }
                     if seen.insert((idx, m.clone())) {
                         for (e, _) in &basis[idx] {
                             for (k, x) in em.iter_mut().enumerate() {
                                 *x = e[k] + m[k];
                             }
                             if !monomials.contains(em.as_slice()) {
+                                if let Some(limits) = &opts.resource_limits {
+                                    admit!(limits.symbolic_step(
+                                        rows_poly.len().saturating_add(1),
+                                        monomials.len().saturating_add(1),
+                                        recording,
+                                    ));
+                                }
                                 monomials.insert(em.clone());
                                 queue.push(em.clone());
                             }
@@ -6016,6 +6326,9 @@ fn f4_with_arithmetic(
                         rows_poly.push((idx, m));
                     }
                 }
+            }
+            if let Some(limits) = &opts.resource_limits {
+                admit!(limits.matrix("matrix", rows_poly.len(), monomials.len(), recording));
             }
             let tp1 = Instant::now();
             // matrix: columns in decreasing monomial order, rows sparse
@@ -6180,7 +6493,8 @@ fn f4_with_arithmetic(
             // blocks before it, then finished in order against each other.
             // Tiny steps (most of `solve`'s specialised runs) keep the
             // cascade: building `B'` there costs more than it saves.
-            let fl = fl_enabled()
+            let fl = opts.resource_limits.is_none()
+                && fl_enabled()
                 && n_cols >= fl_min_cols()
                 && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES;
             let reduced: Option<Vec<Vec<u32>>> = if fl {
@@ -6490,12 +6804,25 @@ fn f4_with_arithmetic(
         let tp3 = Instant::now();
         // new polynomials: rows whose pivot column is not an input leading monomial
         let mut new_polys: Vec<Poly> = Vec::new();
+        let mut new_terms = 0usize;
         for (row, &c) in rows.iter().zip(&pivots) {
             if input_lm[free_cols[c]] {
                 continue;
             }
             // sized up front: a filtered collect grows by reallocation
-            let mut poly: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            let terms = row.iter().filter(|&&v| v != 0).count();
+            if let Some(limits) = &opts.resource_limits {
+                admit!(limits.check(
+                    "basis_update",
+                    "symbolic_monomials",
+                    basis_terms
+                        .checked_add(new_terms)
+                        .and_then(|n| n.checked_add(terms)),
+                    limits.max_symbolic_monomials,
+                ));
+            }
+            new_terms += terms;
+            let mut poly: Poly = Vec::with_capacity(terms);
             poly.extend(
                 row.iter()
                     .enumerate()
@@ -6528,10 +6855,31 @@ fn f4_with_arithmetic(
         let learned_new = new_polys.len();
         match &mut trace {
             TraceMode::Record(t) => {
+                if let Some(limits) = &opts.resource_limits {
+                    // Count a step record even when it has no retained rows.
+                    // This check precedes both contributor recovery and copies.
+                    admit!(limits.check(
+                        "trace",
+                        "symbolic_monomials",
+                        trace_monomials
+                            .checked_add(1)
+                            .and_then(|n| n.checked_add(n_pair_rows))
+                            .and_then(|n| n.checked_add(new_polys.len())),
+                        limits.max_symbolic_monomials,
+                    ));
+                }
                 // the pair rows that the new pivots are combinations of
                 let retained: Vec<usize> = (0..n_pair_rows).filter(|&i| useful[i]).collect();
                 let mut needed = vec![false; retained.len()];
-                for (col, contributors) in tracked_rref_contributors(&rec_rows, p) {
+                let contributors = match tracked_rref_contributors(
+                    &rec_rows,
+                    p,
+                    opts.resource_limits.and(opts.deadline),
+                ) {
+                    Some(c) => c,
+                    None => abort_call!(F4Stop::Deadline),
+                };
+                for (col, contributors) in contributors {
                     if !input_lm[free_cols[col]] {
                         for i in contributors {
                             needed[i] = true;
@@ -6549,6 +6897,8 @@ fn f4_with_arithmetic(
                         .collect(),
                     new_lms: new_polys.iter().map(|f| f[0].0.clone()).collect(),
                 });
+                let step = t.steps.last().unwrap();
+                trace_monomials += 1 + step.rows.len() + step.new_lms.len();
             }
             TraceMode::Replay(t) => {
                 let expected = &t.steps[replay_step - 1].new_lms;
@@ -6565,7 +6915,8 @@ fn f4_with_arithmetic(
             TraceMode::Off => {}
         }
         for f in new_polys {
-            add(
+            basis_terms += f.len();
+            admit!(add(
                 f,
                 &mut basis,
                 &mut alive,
@@ -6575,7 +6926,9 @@ fn f4_with_arithmetic(
                 &mut pairs_above_bound,
                 gm,
                 lm_packed.as_mut(),
-            );
+                opts.resource_limits.as_ref(),
+                opts.resource_limits.and(opts.deadline),
+            ));
         }
         if let Some(ops_step0) = ops_step0 {
             let lms: Vec<&[u32]> = basis
@@ -6632,8 +6985,15 @@ fn f4_with_arithmetic(
         .collect();
     let ti = Instant::now();
     pp_dump("steps");
-    reduced = interreduce_linear(&reduced, n_vars, p, ord)
-        .unwrap_or_else(|| interreduce(&reduced, p, ord));
+    reduced = if let Some(limits) = &opts.resource_limits {
+        match interreduce_bounded(reduced, p, ord, limits, opts.deadline) {
+            Ok(reduced) => reduced,
+            Err(stop) => abort_call!(stop),
+        }
+    } else {
+        interreduce_linear(&reduced, n_vars, p, ord)
+            .unwrap_or_else(|| interreduce(&reduced, p, ord))
+    };
     if debug {
         eprintln!("f4 interreduce ms: {:.2}", ti.elapsed().as_secs_f64() * 1e3);
     }
@@ -6655,6 +7015,7 @@ fn f4_with_arithmetic(
         max_cols,
         ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
         timed_out: false,
+        resource_limit: None,
         pairs_above_bound,
         staircase_at_stop,
         field_ops: ops_carry.get() + (field_ops_now() - ops0),
@@ -7208,6 +7569,130 @@ fn make_monic(mut f: Poly, p: u64) -> Poly {
     f
 }
 
+enum F4Stop {
+    Resource(F4ResourceLimit),
+    Deadline,
+}
+
+impl From<F4ResourceLimit> for F4Stop {
+    fn from(limit: F4ResourceLimit) -> Self {
+        Self::Resource(limit)
+    }
+}
+
+/// The exponent-vector reduction above, with admission before a new pending
+/// monomial is copied into the map/heap. The default reduction is untouched.
+fn reduce_skipping_bounded(
+    f: &Poly,
+    basis: &[Poly],
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+) -> Result<Poly, F4Stop> {
+    limits.symbolic("interreduce", f.len())?;
+    let mut work: FxMap<Vec<u32>, u64> = FxMap::default();
+    let mut heap: std::collections::BinaryHeap<Keyed> = std::collections::BinaryHeap::new();
+    for (e, c) in f {
+        let v = work.entry(e.clone()).or_insert_with(|| {
+            heap.push(Keyed(e.clone(), &ord));
+            0
+        });
+        *v = (*v + c % p) % p;
+    }
+    let mut out = Vec::new();
+    let mut scratch = vec![0; f.first().map_or(0, |(e, _)| e.len())];
+    while let Some(Keyed(mono, _)) = heap.pop() {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
+        let Some(c) = work.remove(&mono) else {
+            continue;
+        };
+        if c == 0 {
+            continue;
+        }
+        let g = basis
+            .iter()
+            .enumerate()
+            .find(|&(j, g)| j != skip && divides(&g[0].0, &mono));
+        if let Some((_, g)) = g {
+            let neg = p - c;
+            for (e, gc) in &g[1..] {
+                if deadline.is_some_and(|d| Instant::now() > d) {
+                    return Err(F4Stop::Deadline);
+                }
+                for (k, x) in scratch.iter_mut().enumerate() {
+                    *x = e[k] + mono[k] - g[0].0[k];
+                }
+                if !work.contains_key(scratch.as_slice()) {
+                    limits.check(
+                        "interreduce",
+                        "symbolic_monomials",
+                        work.len()
+                            .checked_add(out.len())
+                            .and_then(|n| n.checked_add(1)),
+                        limits.max_symbolic_monomials,
+                    )?;
+                    heap.push(Keyed(scratch.clone(), &ord));
+                    work.insert(scratch.clone(), 0);
+                }
+                let v = work.get_mut(scratch.as_slice()).unwrap();
+                *v = (*v + mulmod(neg, *gc, p)) % p;
+                super::jv_bitops::row_ops(1);
+                super::jv_bitops::probes(1, 2);
+            }
+        } else {
+            out.push((mono, c));
+        }
+    }
+    Ok(out)
+}
+
+fn interreduce_bounded(
+    basis: Vec<Poly>,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+) -> Result<Vec<Poly>, F4Stop> {
+    let mut keep = Vec::new();
+    for (i, f) in basis.iter().enumerate() {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
+        keep.push(
+            !basis
+                .iter()
+                .enumerate()
+                .any(|(j, g)| j != i && divides(&g[0].0, &f[0].0) && (g[0].0 != f[0].0 || j < i)),
+        );
+    }
+    let mut out: Vec<Poly> = basis
+        .into_iter()
+        .zip(keep)
+        .filter_map(|(f, keep)| keep.then_some(f))
+        .collect();
+    let mut terms: usize = out.iter().map(Vec::len).sum();
+    limits.symbolic("interreduce_basis", terms)?;
+    for i in 0..out.len() {
+        let r = reduce_skipping_bounded(&out[i], &out, i, p, ord, limits, deadline)?;
+        if !r.is_empty() {
+            limits.check(
+                "interreduce_basis",
+                "symbolic_monomials",
+                (terms - out[i].len()).checked_add(r.len()),
+                limits.max_symbolic_monomials,
+            )?;
+            terms = terms - out[i].len() + r.len();
+            out[i] = make_monic(r, p);
+        }
+    }
+    out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
+    Ok(out)
+}
+
 /// Interreduce a basis: drop elements whose leading monomial another
 /// divides, then reduce every tail by the others.
 pub fn interreduce(basis: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
@@ -7292,6 +7777,35 @@ fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<P
 
 // ── Solving ────────────────────────────────────────────────────────
 
+/// Opt-in, exclusive wall-time phases of one recursive visitor call.
+///
+/// The four phase buckets partition `total_ns`. They measure elapsed time,
+/// not CPU time or a complete arithmetic-operation count. In particular,
+/// [`VisitReport::field_ops`] and the root multiplication counters remain
+/// their existing partial diagnostics. A trace sink runs in
+/// `traversal_other_ns`; `callback_ns` is only the solution visitor.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitTimings {
+    /// Elapsed time from entry into the shared visitor implementation through
+    /// traversal and stop classification. Caller setup, final state destruction,
+    /// and serialization of the returned report are outside this interval.
+    pub total_ns: u64,
+    /// The selected native-call path: plain F4, recorded F4, or trace-pool
+    /// dispatch including profile/statistics bookkeeping and its
+    /// learning/replay/certification work. This is not just row elimination.
+    pub native_f4_ns: u64,
+    /// Recognized-univariate processing: coefficient preparation, finite-domain
+    /// scanning or root factoring/filtering, and the batched path's univariate
+    /// gcd/root recovery. General specialization remains traversal work.
+    pub root_recovery_ns: u64,
+    /// Time inside solution-visitor callbacks, including a callback that asks
+    /// to stop. The caller can separately subdivide this bucket.
+    pub callback_ns: u64,
+    /// Remaining elapsed work: validation, traversal, specialization, candidate
+    /// checks, trace-sink callbacks, and timing/dispatch overhead.
+    pub traversal_other_ns: u64,
+}
+
 /// Observations from the opt-in streaming/domain solver. These are stage
 /// diagnostics, not complete operation accounting or a performance claim.
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -7301,6 +7815,10 @@ pub struct VisitReport {
     /// The visitor requested termination after an equation-checked witness.
     pub stopped_early: bool,
     pub timed_out: bool,
+    /// Native allocation admission stopped traversal before another branch or
+    /// callback. Such a traversal is incomplete even with zero visited roots.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource_limit: Option<F4ResourceLimit>,
     /// The fallible trace sink rejected an event; no later callback ran.
     pub trace_stopped: bool,
     /// At most 512 UTF-8 bytes of the first sink error.
@@ -7365,6 +7883,88 @@ pub struct VisitReport {
     /// univariate gcds, square roots, root finding and substitution.
     #[serde(skip_serializing_if = "is_zero_u64")]
     pub batched_field_multiplications: u64,
+    /// Wall-time accounting, only when [`F4Options::with_visit_timing`] enabled
+    /// it. Omitted when disabled, preserving existing serialized reports.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timings: Option<VisitTimings>,
+}
+
+// Interior-mutability keeps the clock independent of VisitState's mutable
+// traversal borrow. Scope guards close phases even on early return; none
+// spans recursive traversal or another measured phase.
+struct VisitClock {
+    started: Instant,
+    native_f4_ns: std::cell::Cell<u64>,
+    root_recovery_ns: std::cell::Cell<u64>,
+    callback_ns: std::cell::Cell<u64>,
+}
+
+impl VisitClock {
+    fn new() -> Self {
+        Self {
+            started: Instant::now(),
+            native_f4_ns: std::cell::Cell::new(0),
+            root_recovery_ns: std::cell::Cell::new(0),
+            callback_ns: std::cell::Cell::new(0),
+        }
+    }
+
+    fn finish(&self) -> VisitTimings {
+        let total_ns = visit_elapsed_ns(self.started);
+        let native_f4_ns = self.native_f4_ns.get();
+        let root_recovery_ns = self.root_recovery_ns.get();
+        let callback_ns = self.callback_ns.get();
+        let accounted = native_f4_ns
+            .saturating_add(root_recovery_ns)
+            .saturating_add(callback_ns);
+        debug_assert!(
+            accounted <= total_ns,
+            "visitor wall phases must not overlap"
+        );
+        VisitTimings {
+            total_ns,
+            native_f4_ns,
+            root_recovery_ns,
+            callback_ns,
+            traversal_other_ns: total_ns.saturating_sub(accounted),
+        }
+    }
+}
+
+fn visit_elapsed_ns(started: Instant) -> u64 {
+    u64::try_from(started.elapsed().as_nanos()).unwrap_or(u64::MAX)
+}
+
+enum VisitPhase {
+    NativeF4,
+    RootRecovery,
+    Callback,
+}
+
+struct VisitPhaseScope<'a> {
+    started: Instant,
+    elapsed: &'a std::cell::Cell<u64>,
+}
+
+impl Drop for VisitPhaseScope<'_> {
+    fn drop(&mut self) {
+        self.elapsed.set(
+            self.elapsed
+                .get()
+                .saturating_add(visit_elapsed_ns(self.started)),
+        );
+    }
+}
+
+fn visit_phase_scope(clock: Option<&VisitClock>, phase: VisitPhase) -> Option<VisitPhaseScope<'_>> {
+    clock.map(|clock| VisitPhaseScope {
+        started: Instant::now(),
+        elapsed: match phase {
+            VisitPhase::NativeF4 => &clock.native_f4_ns,
+            VisitPhase::RootRecovery => &clock.root_recovery_ns,
+            VisitPhase::Callback => &clock.callback_ns,
+        },
+    })
 }
 
 fn is_zero_u64(v: &u64) -> bool {
@@ -7381,6 +7981,7 @@ enum VisitEnd {
     Stopped,
     TimedOut,
     TraceStopped,
+    ResourceLimited,
 }
 
 /// Borrowed events for one depth-first traversal. `assignments` contains only
@@ -7432,6 +8033,7 @@ struct VisitState<'a, F, S> {
     pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
+    timing: Option<&'a VisitClock>,
     /// Lazily built value → position index of each original variable's
     /// finite domain, shared by every node of the traversal.
     domain_index: Vec<Option<FxMap<u64, usize>>>,
@@ -7527,7 +8129,11 @@ where
                 return VisitEnd::Complete;
             }
             self.report.solutions_visited += 1;
-            return if (self.visitor)(&self.assignment) {
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
                 VisitEnd::Stopped
             } else {
                 VisitEnd::Complete
@@ -7540,22 +8146,25 @@ where
             return VisitEnd::Complete;
         }
         let mut native_calls = 1;
-        let (r, trace) = if let Some(pool) = &mut self.pool {
-            let profile: Vec<_> = active
-                .iter()
-                .map(|&i| self.domains[i].as_ref().map(Vec::len))
-                .collect();
-            let before = pool.stats();
-            let r = pool.run(input, active.len(), self.p, self.opts, &profile);
-            let after = pool.stats();
-            native_calls = (after.learned - before.learned + after.replay_attempts
-                - before.replay_attempts) as usize;
-            (r, None)
-        } else if self.sink.is_some() {
-            let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
-            (r, Some(trace))
-        } else {
-            (f4(input, active.len(), self.p, self.opts), None)
+        let (r, trace) = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::NativeF4);
+            if let Some(pool) = &mut self.pool {
+                let profile: Vec<_> = active
+                    .iter()
+                    .map(|&i| self.domains[i].as_ref().map(Vec::len))
+                    .collect();
+                let before = pool.stats();
+                let r = pool.run(input, active.len(), self.p, self.opts, &profile);
+                let after = pool.stats();
+                native_calls = (after.learned - before.learned + after.replay_attempts
+                    - before.replay_attempts) as usize;
+                (r, None)
+            } else if self.sink.is_some() {
+                let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
+                (r, Some(trace))
+            } else {
+                (f4(input, active.len(), self.p, self.opts), None)
+            }
         };
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
@@ -7584,6 +8193,22 @@ where
                     .staircase_extinction_degree
                     .map_or(d, |c| c.max(d)),
             );
+        }
+        if let Some(limit) = &r.resource_limit {
+            self.report.resource_limit = Some(limit.clone());
+            // Preserve the diagnostic event without cloning the incoming
+            // generators or admitting root recovery from an incomplete call.
+            if let Some(trace) = &trace {
+                if !self.emit(VisitEvent::NativeResult {
+                    node_id,
+                    report: &r,
+                    trace,
+                    generating_set: input,
+                }) {
+                    return VisitEnd::TraceStopped;
+                }
+            }
+            return VisitEnd::ResourceLimited;
         }
         // An alive-only native basis can retire an input before its deferred
         // pair is processed. Preserve the exact incoming generators in the
@@ -7630,6 +8255,7 @@ where
                 continue;
             }
             let var = *vars.iter().next().unwrap();
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
             let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
                 match self.opts.domain_roots {
                     DomainRootMode::Scan => false,
@@ -7849,7 +8475,11 @@ where
                 return VisitEnd::Complete;
             }
             self.report.solutions_visited += 1;
-            return if (self.visitor)(&self.assignment) {
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
                 VisitEnd::Stopped
             } else {
                 VisitEnd::Complete
@@ -7879,6 +8509,7 @@ where
                 }
             }
             if let (true, Some(j)) = (single, support) {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
                 let degree = g.iter().map(|(e, _)| e[j]).max().unwrap_or(0) as usize;
                 let mut dense = vec![0u64; degree + 1];
                 for (e, c) in g {
@@ -7894,6 +8525,7 @@ where
             if us.is_empty() {
                 continue;
             }
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
             let h = us
                 .iter()
                 .skip(1)
@@ -7919,21 +8551,25 @@ where
             return self.walk(&normalised, vars, Some(node_id));
         };
         let z_original = vars[z];
-        let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+        let roots = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::TimedOut;
+            };
+            if self.domains[z_original].is_some() {
+                self.ensure_domain_index(z_original);
+                let index = self.domain_index[z_original].as_ref().expect("built above");
+                let mut hits: Vec<(usize, u64)> = roots
+                    .iter()
+                    .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
+                    .collect();
+                hits.sort_unstable_by_key(|&(pos, _)| pos);
+                roots = hits.into_iter().map(|(_, r)| r).collect();
+            }
             self.report.batched_field_multiplications += muls;
-            return VisitEnd::TimedOut;
+            roots
         };
-        if self.domains[z_original].is_some() {
-            self.ensure_domain_index(z_original);
-            let index = self.domain_index[z_original].as_ref().expect("built above");
-            let mut hits: Vec<(usize, u64)> = roots
-                .iter()
-                .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
-                .collect();
-            hits.sort_unstable_by_key(|&(pos, _)| pos);
-            roots = hits.into_iter().map(|(_, r)| r).collect();
-        }
-        self.report.batched_field_multiplications += muls;
         let mut rest = vars.to_vec();
         rest.remove(z);
         for r in roots {
@@ -8052,6 +8688,18 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    let timing = opts.visit_timing.then(VisitClock::new);
+    if opts.resource_limits.is_some() && (pool.is_some() || opts.sibling_batch) {
+        return Ok(VisitReport {
+            resource_limit: Some(unsupported_resource_option(if pool.is_some() {
+                "trace_pool"
+            } else {
+                "sibling_batch"
+            })),
+            timings: timing.as_ref().map(VisitClock::finish),
+            ..VisitReport::default()
+        });
+    }
     if opts.checkpoint.is_some()
         || opts.checkpoint_stop_after.is_some()
         || opts.checkpoint_in_step.is_some()
@@ -8084,13 +8732,560 @@ where
         pool,
         next_node: 0,
         report: VisitReport::default(),
+        timing: timing.as_ref(),
         domain_index: vec![None; n_vars],
     };
     let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
+    state.report.timings = timing.as_ref().map(VisitClock::finish);
     Ok(state.report)
+}
+
+// BEGIN PUBLIC F4 RESOURCE LIMIT CONTROLS
+// This public-API-only module can be selected verbatim by an exact-source
+// qualifier whose outer module re-exports `cryptanalysis::f4_fp::*`.
+#[cfg(test)]
+mod resource_limit_tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    fn options(order: Ordering) -> F4Options {
+        let mut opts = F4Options::new(order, 10);
+        opts.resource_limits = Some(F4ResourceLimits {
+            max_pairs: 128,
+            max_symbolic_monomials: 1024,
+            max_matrix_entries: 100_000,
+        });
+        opts
+    }
+
+    fn two_roots() -> Vec<Poly> {
+        // Independently: x²=1 forces x=±1; xy=1 then forces y=x in F7.
+        vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ]
+    }
+
+    #[test]
+    fn bounded_native_and_traced_positive_control() {
+        let input = two_roots();
+        let bounded = options(Ordering::Grevlex);
+        let plain = F4Options::new(Ordering::Grevlex, 10);
+        let reference = f4(&input, 2, 7, &plain);
+        let actual = f4(&input, 2, 7, &bounded);
+        assert!(actual.resource_limit.is_none() && !actual.timed_out && !actual.inconsistent);
+        assert_eq!(actual.basis, reference.basis);
+        let mut roots = Vec::new();
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &bounded,
+            &[None, None],
+            |s| {
+                roots.push(s.to_vec());
+                false
+            },
+            |_| Ok(()),
+        )
+        .unwrap();
+        roots.sort();
+        assert!(report.complete && report.resource_limit.is_none() && !report.timed_out);
+        assert_eq!(roots, vec![vec![1, 1], vec![6, 6]]);
+    }
+
+    #[test]
+    fn pair_limit_includes_above_degree_pairs_and_stops_traversal() {
+        let input = two_roots();
+        let mut opts = options(Ordering::Grevlex);
+        opts.max_degree = 1;
+        opts.resource_limits.as_mut().unwrap().max_pairs = 0;
+        let r = f4(&input, 2, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert_eq!(
+            (limit.stage, limit.resource, limit.observed, limit.limit),
+            ("critical_pairs", "pairs", 1, 0)
+        );
+        assert!(!r.inconsistent && !r.timed_out && r.basis.is_empty());
+        assert_eq!(r.steps, 0);
+        assert_eq!(solve(&input, 2, 7, &opts).verdict, Verdict::Undetermined);
+        let mut refused_native = 0;
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("a resource stop must not call the solution visitor"),
+            |event| {
+                match event {
+                    VisitEvent::NativeResult {
+                        report,
+                        generating_set,
+                        ..
+                    } => {
+                        assert!(report.resource_limit.is_some());
+                        assert_eq!(generating_set, input.as_slice());
+                        refused_native += 1;
+                    }
+                    VisitEvent::Branch { .. } | VisitEvent::Candidate { .. } => {
+                        panic!("a resource stop must not branch or produce a candidate");
+                    }
+                    _ => {}
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(refused_native, 1);
+        assert!(!report.complete && !report.stopped_early && !report.timed_out);
+        assert!(report.resource_limit.is_some());
+        assert_eq!(report.solutions_visited, 0);
+        assert_eq!(report.full_field_branches, 0);
+    }
+
+    #[test]
+    fn symbolic_closure_refuses_new_support_before_matrix_allocation() {
+        // The first two pair rows have five distinct monomials. Reducing
+        // xy^6 by the second generator adds y^11 and y^5 z^6: seven total,
+        // although the input itself contains only six terms.
+        let input = vec![
+            vec![(vec![2, 0, 0], 1), (vec![0, 7, 0], 1), (vec![0, 0, 7], 1)],
+            vec![(vec![1, 1, 0], 1), (vec![0, 6, 0], 1), (vec![0, 0, 6], 1)],
+        ];
+        let mut opts = options(Ordering::Lex);
+        opts.resource_limits
+            .as_mut()
+            .unwrap()
+            .max_symbolic_monomials = 6;
+        let r = f4(&input, 3, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert_eq!(
+            (limit.stage, limit.resource, limit.observed, limit.limit),
+            ("symbolic_support", "symbolic_monomials", 7, 6)
+        );
+        assert_eq!((r.steps, r.max_rows, r.max_cols), (0, 0, 0));
+        assert!(!r.inconsistent && !r.timed_out);
+    }
+
+    #[test]
+    fn recording_reserves_dense_copies_and_contributor_storage() {
+        // x²=0 and x²+1=0 contradict each other. The first matrix has two
+        // rows and two columns; this budget admits the ordinary workspace
+        // while refusing the additional recording workspace in advance.
+        let input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+        let mut opts = options(Ordering::Grevlex);
+        opts.resource_limits.as_mut().unwrap().max_matrix_entries = 48;
+        let plain = f4(&input, 1, 7, &opts);
+        assert!(plain.inconsistent && plain.resource_limit.is_none());
+        let (recorded, trace) = f4_record(&input, 1, 7, &opts);
+        let limit = recorded.resource_limit.unwrap();
+        assert_eq!(limit.resource, "matrix_entries");
+        assert!(limit.observed > limit.limit);
+        assert!(!recorded.inconsistent && !recorded.timed_out);
+        assert_eq!(recorded.steps, 0);
+        assert!(trace.steps.is_empty());
+    }
+
+    #[test]
+    fn replay_obeys_the_current_call_limits() {
+        let input = two_roots();
+        let mut opts = options(Ordering::Grevlex);
+        let (recorded, trace) = f4_record(&input, 2, 7, &opts);
+        assert!(recorded.resource_limit.is_none() && !recorded.timed_out);
+        let replayed = f4_replay(&input, 2, 7, &opts, &trace);
+        assert!(replayed.resource_limit.is_none() && !replayed.trace_mismatch);
+        assert_eq!(replayed.basis, recorded.basis);
+        opts.resource_limits.as_mut().unwrap().max_matrix_entries = 0;
+        let refused = f4_replay(&input, 2, 7, &opts, &trace);
+        assert_eq!(refused.resource_limit.unwrap().resource, "matrix_entries");
+        assert!(!refused.inconsistent && !refused.timed_out && refused.basis.is_empty());
+    }
+
+    #[test]
+    fn final_interreduce_cannot_expand_past_the_term_budget() {
+        // The leading terms x and y are coprime, hence there is no F4 step.
+        // Substitution in x-y^4 produces x-(z+w)^4, with six nonzero terms
+        // over F7, already more than the entire five-term input budget.
+        let input = vec![
+            vec![(vec![1, 0, 0, 0], 1), (vec![0, 4, 0, 0], 6)],
+            vec![
+                (vec![0, 1, 0, 0], 1),
+                (vec![0, 0, 1, 0], 6),
+                (vec![0, 0, 0, 1], 6),
+            ],
+        ];
+        let mut opts = options(Ordering::Lex);
+        opts.resource_limits
+            .as_mut()
+            .unwrap()
+            .max_symbolic_monomials = 5;
+        let r = f4(&input, 4, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert!(limit.stage.starts_with("interreduce"));
+        assert_eq!(limit.resource, "symbolic_monomials");
+        assert_eq!(r.steps, 0);
+        assert!(!r.inconsistent && !r.timed_out);
+    }
+
+    #[test]
+    fn bounded_calls_refuse_unguarded_optional_modes() {
+        let input = two_roots();
+        for mode in ["checkpoint", "hilbert", "staircase", "run_log"] {
+            let mut opts = options(Ordering::Grevlex);
+            match mode {
+                "checkpoint" => {
+                    opts.checkpoint = Some(("must-not-be-written".into(), Duration::ZERO))
+                }
+                "hilbert" => opts.stop_hilbert = Some(1),
+                "staircase" => opts.stop_staircase = Some(8),
+                "run_log" => opts.capture_run_log = true,
+                _ => unreachable!(),
+            }
+            let r = f4(&input, 2, 7, &opts);
+            let limit = r.resource_limit.unwrap();
+            assert_eq!((limit.stage, limit.resource), ("options", mode));
+            assert_eq!(r.steps, 0);
+            assert!(!r.inconsistent && !r.timed_out);
+        }
+        let mut opts = options(Ordering::Grevlex);
+        opts.sibling_batch = true;
+        let r = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("unsupported mode reached callback"),
+            |_| Ok(()),
+        )
+        .unwrap();
+        assert!(!r.complete && r.resource_limit.is_some());
+        opts.sibling_batch = false;
+        let mut pool = TracePool::new("resource-cap-refusal", 2, 1024).unwrap();
+        let r = solve_visit_reusing(&input, 2, 7, &opts, &[None, None], &mut pool, |_| {
+            panic!("unsupported reuse reached callback")
+        })
+        .unwrap();
+        assert!(!r.complete && r.resource_limit.is_some());
+        assert_eq!(r.f4_runs, 0);
+    }
+
+    #[test]
+    fn bounded_deadline_is_incomplete_and_distinct_from_resource_admission() {
+        let mut opts = options(Ordering::Grevlex);
+        opts.deadline = Some(Instant::now() - Duration::from_millis(1));
+        let r = f4(&two_roots(), 2, 7, &opts);
+        assert!(r.timed_out && r.resource_limit.is_none() && !r.inconsistent);
+        let r = solve_visit_traced(
+            &two_roots(),
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("expired deadline reached callback"),
+            |_| Ok(()),
+        )
+        .unwrap();
+        assert!(r.timed_out && !r.complete && r.resource_limit.is_none());
+    }
+}
+
+// END PUBLIC F4 RESOURCE LIMIT CONTROLS
+
+#[cfg(test)]
+mod visit_timing_tests {
+    use super::*;
+
+    fn partition(report: &VisitReport) -> VisitTimings {
+        let timing = report.timings.expect("opt-in wall accounting is present");
+        assert_eq!(
+            timing.total_ns,
+            timing.native_f4_ns
+                + timing.root_recovery_ns
+                + timing.callback_ns
+                + timing.traversal_other_ns,
+            "exclusive wall buckets must partition the total"
+        );
+        timing
+    }
+
+    fn diagnostics(report: &VisitReport) -> serde_json::Value {
+        let mut value = serde_json::to_value(report).unwrap();
+        let fields = value.as_object_mut().unwrap();
+        fields.remove("timings");
+        // Native row-operation counts are process-wide unless explicitly
+        // configured otherwise. Parallel tests can affect this one field.
+        fields.remove("field_ops");
+        value
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn coupled_fixture(
+        timing: bool,
+        traced: bool,
+        mode: DomainRootMode,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        // x^2=1, y=x over F7: an unrestricted root followed by a
+        // finite-domain variable exercises both kinds of root recovery.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 0], 1), (vec![0, 1], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 4)
+            .with_domain_roots(mode)
+            .with_visit_timing(timing);
+        let domains = [Some(vec![1, 2, 3, 6]), None];
+        let mut solutions = Vec::new();
+        let mut branches = Vec::new();
+        let visitor = |s: &[u64]| {
+            solutions.push(s.to_vec());
+            false
+        };
+        let report = if traced {
+            solve_visit_traced(&input, 2, 7, &opts, &domains, visitor, |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            })
+        } else {
+            solve_visit(&input, 2, 7, &opts, &domains, visitor)
+        }
+        .unwrap();
+        (solutions, branches, report)
+    }
+
+    #[test]
+    fn default_off_preserves_serialized_report_shape() {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        assert!(!opts.visit_timing);
+        assert!(
+            !opts
+                .clone()
+                .with_visit_timing(true)
+                .with_visit_timing(false)
+                .visit_timing
+        );
+        for traced in [false, true] {
+            let (_, _, report) = coupled_fixture(false, traced, DomainRootMode::Scan);
+            assert!(report.timings.is_none());
+            assert!(serde_json::to_value(&report)
+                .unwrap()
+                .get("timings")
+                .is_none());
+        }
+        assert!(serde_json::to_value(VisitReport::default())
+            .unwrap()
+            .get("timings")
+            .is_none());
+    }
+
+    #[test]
+    fn opt_in_preserves_each_visitors_solutions_branches_and_diagnostics() {
+        for traced in [false, true] {
+            for mode in [
+                DomainRootMode::Scan,
+                DomainRootMode::Frobenius,
+                DomainRootMode::Auto,
+            ] {
+                let (before, before_branches, old) = coupled_fixture(false, traced, mode);
+                let (after, after_branches, timed) = coupled_fixture(true, traced, mode);
+                assert_eq!(after, before);
+                assert_eq!(after_branches, before_branches);
+                assert_eq!(diagnostics(&timed), diagnostics(&old));
+                let mut expected = after;
+                expected.sort();
+                assert_eq!(expected, vec![vec![1, 1], vec![6, 6]]);
+                assert!(timed.complete && !timed.stopped_early && !timed.timed_out);
+                partition(&timed);
+            }
+        }
+    }
+
+    #[test]
+    fn callback_stop_retains_callback_time_without_native_work() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let mut callbacks = 0;
+        let report = solve_visit(&[], 0, 7, &opts, &[], |_| {
+            callbacks += 1;
+            // Deliberate callback work distinguishes this bucket from
+            // residual traversal without assuming the solver's speed.
+            std::thread::sleep(Duration::from_millis(2));
+            true
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert_eq!(callbacks, 1);
+        assert!(report.stopped_early && !report.complete && !report.timed_out);
+        assert_eq!(timing.native_f4_ns, 0);
+        assert_eq!(timing.root_recovery_ns, 0);
+        assert!(timing.callback_ns >= 1_000_000);
+    }
+
+    #[test]
+    fn empty_domain_and_expired_deadline_retain_zero_work_partitions() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let empty = solve_visit(&[], 1, 7, &opts, &[Some(vec![])], |_| {
+            panic!("empty domain must not visit a solution")
+        })
+        .unwrap();
+        assert!(empty.complete);
+        let expired = opts.with_budget(Duration::ZERO);
+        let timeout = solve_visit(&[], 0, 7, &expired, &[], |_| {
+            panic!("expired deadline must not visit a solution")
+        })
+        .unwrap();
+        assert!(timeout.timed_out && !timeout.complete);
+        for report in [&empty, &timeout] {
+            let timing = partition(report);
+            assert_eq!(timing.native_f4_ns, 0);
+            assert_eq!(timing.root_recovery_ns, 0);
+            assert_eq!(timing.callback_ns, 0);
+            assert_eq!(timing.total_ns, timing.traversal_other_ns);
+        }
+    }
+
+    #[test]
+    fn empty_univariate_root_set_retains_recovery_time() {
+        // -1 is not a square in F7. Native F4 leaves a univariate, whose
+        // empty field-root set returns directly from the recovery loop.
+        let input = vec![vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let report = solve_visit(&input, 1, 7, &opts, &[None], |_| {
+            panic!("x^2+1 has no F7 root")
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert!(report.complete && !report.timed_out);
+        assert_eq!(report.factored_univariates, 1);
+        assert_eq!(report.solutions_visited, 0);
+        assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+        assert_eq!(timing.callback_ns, 0);
+    }
+
+    #[test]
+    fn trace_stop_retains_prior_work_and_charges_sink_time_to_other() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        for after_roots in [false, true] {
+            let report = solve_visit_traced(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                |_| panic!("trace sink stops before the first solution"),
+                |event| {
+                    if !after_roots || matches!(event, VisitEvent::Branch { .. }) {
+                        std::thread::sleep(Duration::from_millis(2));
+                        Err("timing test sink stop".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap();
+            let timing = partition(&report);
+            assert!(report.trace_stopped && !report.complete && !report.timed_out);
+            assert_eq!(timing.callback_ns, 0);
+            assert!(timing.traversal_other_ns >= 1_000_000);
+            if after_roots {
+                assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+            } else {
+                assert_eq!(timing.native_f4_ns, 0);
+                assert_eq!(timing.root_recovery_ns, 0);
+            }
+        }
+    }
+
+    #[test]
+    fn batched_back_substitution_preserves_results_and_phase_partition() {
+        let input = vec![vec![(vec![0, 2], 1), (vec![1, 0], 6)]];
+        let domains = [Some(vec![4]), None];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 4)
+                .with_sibling_batch(true)
+                .with_visit_timing(enabled);
+            let mut solutions = Vec::new();
+            let report = solve_visit(&input, 2, 7, &opts, &domains, |s| {
+                solutions.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            assert!(report.complete && report.batched_nodes > 0);
+            if enabled {
+                let timing = partition(&report);
+                assert!(timing.root_recovery_ns > 0);
+            } else {
+                assert!(report.timings.is_none());
+            }
+            results.push((solutions, diagnostics(&report)));
+        }
+        assert_eq!(results[0], results[1]);
+        let mut solutions = results.remove(0).0;
+        solutions.sort();
+        assert_eq!(solutions, vec![vec![4, 2], vec![4, 5]]);
+    }
+
+    #[test]
+    fn cold_and_warm_trace_reuse_preserve_results_with_timing_enabled() {
+        // The native reuse module's xy=1, x^2=1 fixture exercises both
+        // learning and certified replay, with separately initialized pools.
+        let input = vec![
+            vec![(vec![1, 1], 1), (vec![0, 0], 4)],
+            vec![(vec![2, 0], 1), (vec![0, 0], 4)],
+        ];
+        let domains = [Some((0..5).collect()), Some((0..5).collect())];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 8).with_visit_timing(enabled);
+            let mut pool = TracePool::new("visit-timing-control", 4, 10_000).unwrap();
+            let mut runs = Vec::new();
+            for _ in 0..2 {
+                let mut solutions = Vec::new();
+                let report = solve_visit_reusing(&input, 2, 5, &opts, &domains, &mut pool, |s| {
+                    solutions.push(s.to_vec());
+                    false
+                })
+                .unwrap();
+                assert!(report.complete);
+                if enabled {
+                    let timing = partition(&report);
+                    assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+                } else {
+                    assert!(report.timings.is_none());
+                }
+                let mut sorted = solutions.clone();
+                sorted.sort();
+                assert_eq!(sorted, vec![vec![1, 1], vec![4, 4]]);
+                let stats = pool.stats();
+                runs.push((
+                    solutions,
+                    diagnostics(&report),
+                    stats.learned,
+                    stats.replay_attempts,
+                    stats.accepted,
+                    stats.certification_reductions,
+                ));
+            }
+            assert!(pool.stats().accepted > 0);
+            assert!(pool.stats().certification_reductions > 0);
+            results.push(runs);
+        }
+        assert_eq!(results[0], results[1]);
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -8609,6 +9804,9 @@ fn solve_rec(
     }
     if r.timed_out {
         *timed_out = true;
+        return Verdict::Undetermined;
+    }
+    if r.resource_limit.is_some() {
         return Verdict::Undetermined;
     }
     if r.inconsistent {

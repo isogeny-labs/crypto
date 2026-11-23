@@ -3,21 +3,73 @@ name: Prime31 RR5 four-leaf monic-quartic original Rust gate
 on:
   push:
     branches:
-      - lane/prime31-rr5-monic-quartic-20261122
+      - main
+      - lane/prime31-rr5-complete-controls-20261122
+      - lane/prime31-rr5-b677-circuit-20261122
     paths:
       - "examples/prime31_rr5_quartic.rs"
-      - ".github/workflows/prime31-rr5-quartic-gate.yml"
-  pull_request:
-    paths:
-      - "examples/prime31_rr5_quartic.rs"
+      - "research/prime31_four_summand_20261122/native/**"
+      - "src/cryptanalysis/f4_fp.rs"
       - ".github/workflows/prime31-rr5-quartic-gate.yml"
   workflow_dispatch:
 
 jobs:
+  rr5-component-qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CARGO_BUILD_JOBS: "2"
+      RAYON_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_four_summand_20261122/native
+      - name: Bind source and toolchain
+        run: |
+          mkdir -p rr5-receipts
+          {
+            git rev-parse HEAD
+            sha256sum examples/prime31_rr5_quartic.rs research/prime31_four_summand_20261122/native/*.rs research/prime31_four_summand_20261122/native/Cargo.lock
+            rustc -vV
+          } | tee rr5-receipts/source.txt
+      - name: Compile all component targets before execution limits
+        id: component_build
+        run: |
+          set -o pipefail
+          echo "Compilation uses two workers within the 15-minute job timeout; per-run 2 GiB and 180-second limits begin only after this stage."
+          cargo test --locked --release --all-targets --no-run --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml 2>&1 | tee rr5-receipts/build-tests.txt
+          cargo build --locked --release --bin rr5-identity-certificate --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml 2>&1 | tee rr5-receipts/build-identity.txt
+      - name: Native B4, B8 and authentic-RHS gates
+        run: |
+          set -o pipefail
+          ulimit -v 2097152
+          timeout 180 cargo test --locked --release --lib --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml -- --test-threads=1 --nocapture 2>&1 | tee rr5-receipts/native.txt
+      - name: Public example against declared production closure
+        if: ${{ always() && steps.component_build.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          ulimit -v 2097152
+          timeout 180 cargo test --locked --release --example prime31_rr5_quartic --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml -- --test-threads=1 --nocapture 2>&1 | tee rr5-receipts/example.txt
+      - name: Evaluated polynomial identity and false-expression control
+        if: ${{ always() && steps.component_build.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          ulimit -v 2097152
+          timeout 180 cargo run --locked --release --bin rr5-identity-certificate --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml > rr5-receipts/identity.json 2> rr5-receipts/identity.stderr
+      - name: Retain every qualification outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rr5-component-${{ github.sha }}
+          path: rr5-receipts/
+
   rr5-development:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
+      CARGO_BUILD_JOBS: "2"
       RAYON_NUM_THREADS: "1"
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +80,10 @@ jobs:
           git rev-parse HEAD
           sha256sum examples/prime31_rr5_quartic.rs Cargo.lock
           rustc --version
-      - name: Original Rust exact-witness tests
+      - name: Full original root-library tests
+        run: cargo test --locked --release --lib
+      - name: Original Rust exact-witness and public-input tests
+        if: always()
         run: cargo test --locked --release --example prime31_rr5_quartic -- --nocapture
       - name: B4 public-only F4 prototype (censored outcomes retained)
         timeout-minutes: 5

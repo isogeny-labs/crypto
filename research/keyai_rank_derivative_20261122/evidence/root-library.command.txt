@@ -1,0 +1,4 @@
+CARGO_TARGET_DIR=/workspace/scratch/8fc860ec28a4/keyai-root-target CARGO_BUILD_JOBS=1 timeout --signal=TERM --kill-after=10s 1200s cargo test --locked --release --lib -- --test-threads=1
+Scope: full root library. Local development gate, no performance measurement.
+Source: base 816f9c3a942efed569049618c056d12a0c56d693 plus two library modifications pinned in pre-call.txt.
+Resource limit: one Cargo job, one test thread, 1200 seconds; no paid compute.

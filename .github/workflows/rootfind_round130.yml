@@ -1,0 +1,39 @@
+name: Rootfind Round 130 source-exact performance
+on:
+  push:
+    branches:
+      - automation/rootfind-round130-owned-rem-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round129/**
+      - .github/workflows/rootfind_round130.yml
+permissions:
+  contents: read
+jobs:
+  source-exact-rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round129
+      - name: Build source-exact Round129 baseline and Round130 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=d0bece58dcad94b83e7b122cc79bd83936373672
+          git fetch --no-tags --depth=1 origin "$BASE"
+          mkdir -p /tmp/rootfind_round130
+          git show "$BASE:src/cryptanalysis/ecbench/isogeny.rs" > /tmp/rootfind_round130/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round130/optimized.rs
+          cat research/rootfind_round129/bench_helper.rs >> /tmp/rootfind_round130/baseline.rs
+          cat research/rootfind_round129/bench_helper.rs >> /tmp/rootfind_round130/optimized.rs
+          cp research/rootfind_round129/source_exact_main.rs /tmp/rootfind_round130/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round130/main.rs -o /tmp/rootfind_round130/bench
+      - name: Independent correctness and 13-trial alternating A/B source-exact Rust timings
+        run: /tmp/rootfind_round130/bench

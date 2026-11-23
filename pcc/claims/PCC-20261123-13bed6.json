@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:52:30Z",
+ "id": "PCC-20261123-13bed6",
+ "kind": "measurement",
+ "producer": {
+  "commit": "3bfaf0129adf3f3edd1ae5b3ddcb321426aaeeb9",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/summary-a1.json",
+    "sha256": "a8a745b0563f7e8fd389539a81bf0d13127567dc3c44098a51d70465f479b940"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/accelerated.cpp",
+    "sha256": "90c07f296c030dff4584cc71feecb3a2d104db6b9a9d29dac290b177bee9ef48"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "First local setup ablation completes4350 rows/2520 target-round-arm units with2370 public scalar replays and2904 generation/outcome agreements. AtB128 context hoisting gives only1.0286 median paired prior-full/optimized-full ratio; input projection materially changes the complete interval, and optimized-minimal remains2.1814 times the older rho-minimal reference cost. Minimal input is a representation scenario; full-to-minimal projection cost was not timed and cannot be treated as free conversion. Shared-local producer data, no canonical online parity."
+}

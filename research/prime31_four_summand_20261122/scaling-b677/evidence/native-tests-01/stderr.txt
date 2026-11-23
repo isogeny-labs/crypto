@@ -1,0 +1,16 @@
+
+thread 'independent_tests::b677_controls::b677_fixture_has_exact_public_selector_and_independent_curve_replay' (119) panicked at b677_controls.rs:43:38:
+frozen public hybrid fixture: "public Y7 coset 7: y0^7 differs from its frozen constant"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'independent_tests::b677_controls::b677_forced_construction_caps_do_not_claim_empty_or_complete' (120) panicked at b677_controls.rs:141:38:
+called `Result::unwrap()` on an `Err` value: "public Y7 coset 7: y0^7 differs from its frozen constant"
+
+thread 'independent_tests::b677_controls::b677_frozen_mixed_positive_and_public_walk_targets_are_valid' (121) panicked at b677_controls.rs:125:38:
+called `Result::unwrap()` on an `Err` value: "public Y7 coset 7: y0^7 differs from its frozen constant"
+
+thread 'independent_tests::b677_controls::b677_zero_native_resource_caps_fail_closed_before_algebraic_search' (122) panicked at b677_controls.rs:170:38:
+called `Result::unwrap()` on an `Err` value: "public Y7 coset 7: y0^7 differs from its frozen constant"
+
+thread 'selector_circuit::tests::b677_circuit_matches_dense_selector_and_rejects_every_auxiliary_mutation' (137) panicked at selector_circuit.rs:329:42:
+called `Result::unwrap()` on an `Err` value: "public Y7 coset 7: y0^7 differs from its frozen constant"

@@ -55,7 +55,7 @@ pub mod pq_groebner_f2 {
 }
 
 pub mod prime_fast {
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
     use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
     use std::sync::Mutex;
     use std::time::Instant;

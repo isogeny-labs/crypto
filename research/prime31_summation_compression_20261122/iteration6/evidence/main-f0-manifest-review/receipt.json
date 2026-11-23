@@ -1,0 +1,52 @@
+{
+  "scope": "Manifest text/provenance and TOML parsing only; no Cargo build or cryptographic execution",
+  "inputs": [
+    {
+      "file": "Cargo.failed-fc184.toml",
+      "bytes": 22049,
+      "sha256": "3f559087a5ef7c81357fc3e6a079c365df0ead7cbdc5e6f6710f4a921ec4bfb0",
+      "git_blob": "2c5622514938938b7c91c34629d7e2dd877c1d33"
+    },
+    {
+      "file": "Cargo.main-f0.toml",
+      "bytes": 22077,
+      "sha256": "097c73742907c4d710cb0daff8cd0eaca763e260420675d2cc29a6c8f0cbf692",
+      "git_blob": "8d6da017040e8edbb2cd8b016a94cb2e62c7d1ca"
+    }
+  ],
+  "historical_parse_error": "Cannot overwrite a value (at line 132, column 30)",
+  "current_main_tomllib_parse": "success",
+  "exact_reconstruction": {
+    "insertions": [
+      {
+        "target": "curve-transfer-sweep",
+        "inserted_header": "[[bin]]"
+      },
+      {
+        "target": "odd-transfer-catalog",
+        "inserted_header": "[[bin]]"
+      },
+      {
+        "target": "floor_crater_bridge_cost",
+        "inserted_header": "[[example]]"
+      }
+    ],
+    "added_lines": 3,
+    "deleted_lines": 0,
+    "equals_current_main_bytes": true
+  },
+  "target_inventory": {
+    "bin": {
+      "count": 37,
+      "duplicate_names": []
+    },
+    "example": {
+      "count": 56,
+      "duplicate_names": []
+    }
+  },
+  "metadata_sha256": "85beb6a947549edee047a9ee72cef15d53397d4b1cf6f0ba803c1dd60a30646a",
+  "failure_excerpt_sha256": "0950bd4e128006f0a4e690f60a91faf5c9e7184651961beea11ad9f78635c760",
+  "source_manifest_mutated": false,
+  "new_patch_required_on_pinned_main": false
+}

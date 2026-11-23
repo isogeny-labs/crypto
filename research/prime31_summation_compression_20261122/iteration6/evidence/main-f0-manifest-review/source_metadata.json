@@ -1,0 +1,68 @@
+{
+  "repository": "isogeny-labs/crypto",
+  "main": {
+    "commit": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+    "manifest_blob": "8d6da017040e8edbb2cd8b016a94cb2e62c7d1ca"
+  },
+  "failure_run": {
+    "id": 45100829948,
+    "head_sha": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+    "event": "pull_request",
+    "conclusion": "failure",
+    "head_branch": "lane/prime31-dickson-quotient-gate",
+    "created_at": "2026-11-23T02:32:48Z",
+    "updated_at": "2026-11-23T02:34:24Z",
+    "html_url": "https://github.com/isogeny-labs/crypto/actions/runs/45100829948",
+    "actual_checkout": {
+      "commit": "4a40be161b9b3e6bc4db8a8dc16864e82d754d7b",
+      "ref": "refs/remotes/pull/4928/merge",
+      "pr_number": 4928,
+      "branch_head": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+      "base": "25ae0df28cb69efc5ec077c4860e2038a451012f",
+      "manifest_blob": "2c5622514938938b7c91c34629d7e2dd877c1d33",
+      "manifest_bytes_equal_to_failed_head": true
+    }
+  },
+  "jobs": [
+    {
+      "id": 137451053331,
+      "name": "original-lock-correctness",
+      "head_sha": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+      "conclusion": "failure",
+      "failed_steps": [
+        {
+          "name": "Original native library tests with its original lock",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 6,
+          "started_at": "2026-11-23T02:34:19Z",
+          "completed_at": "2026-11-23T02:34:19Z"
+        }
+      ]
+    }
+  ],
+  "observed_pr4951": {
+    "number": 4951,
+    "head_sha": "f043ca05a338637f830e09fa19ad14d9b18a34ce",
+    "base_sha": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+    "state": "open",
+    "updated_at": "2026-11-23T04:08:55Z",
+    "manifest_blob": "8d6da017040e8edbb2cd8b016a94cb2e62c7d1ca",
+    "bytes_equal_to_main": true
+  },
+  "repair": {
+    "sha": "69fad1271054225a95d5682f5fdcd11fd2a692d7",
+    "parents": [
+      "e95645aede904b21421683d917b29b622140da1e"
+    ],
+    "date": "2026-11-23T03:23:46Z",
+    "message": "Add Dickson\u2013S3 constructors and source-bound development records",
+    "manifest_patch": "@@ -129,12 +129,14 @@ path = \"src/bin/hecx.rs\"\n \n # Finite, replayable enumeration of the explicit cover shapes implemented by\n # this repository. Empty searches retain an explicit nonexistence disclaimer.\n+[[bin]]\n name = \"curve-transfer-sweep\"\n path = \"src/bin/curve_transfer_sweep.rs\"\n \n # Deterministic export and byte-for-byte replay of the retained\n # odd-characteristic named-subgroup transfer corpus. Unsupported rows are\n # preserved and make the command exit nonzero after writing its result.\n+[[bin]]\n name = \"odd-transfer-catalog\"\n path = \"src/bin/odd_transfer_catalog.rs\"\n \n@@ -693,6 +695,7 @@ harness = false\n [[example]]\n name = \"hw_counter_ab_bench\"\n path = \"examples/hw_counter_ab_bench.rs\"\n+[[example]]\n name = \"floor_crater_bridge_cost\"\n path = \"research/floor_crater_ecdlp_gap_20261120/bridge_cost.rs\"\n ",
+    "manifest_blob": "8d6da017040e8edbb2cd8b016a94cb2e62c7d1ca"
+  },
+  "repair_parent": {
+    "commit": "e95645aede904b21421683d917b29b622140da1e",
+    "manifest_blob": "2c5622514938938b7c91c34629d7e2dd877c1d33",
+    "bytes_equal_to_failed": true
+  }
+}

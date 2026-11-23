@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T03:32:48Z",
+ "id": "PCC-20261123-68364d",
+ "kind": "statement",
+ "producer": {
+  "commit": "bbc532671f5964d4b422c212b931ae426b26dc07",
+  "model": "gpt-6-astra",
+  "session": "rr5-independent-qualification-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/qualification-initial/stdout.txt",
+    "sha256": "ee75cb9e01945071150b7a78db49b3c3cc7aadd26059119d55a3404fc08d2c8b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/qualification-initial/pre-call-binary.sha256",
+    "sha256": "b92f7a596d8989d4503187f050219b0ad05e415faca20ef0a506f66f3e4fe992"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/qualification-initial/pre-call-sources.sha256",
+    "sha256": "3aacf87d3a3525041fb0a607815c2c4ffe7f8bd487b584d9e5be89ad9ba0c344"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/qualification-initial/post-call-source-check.txt",
+    "sha256": "8951c8d4419f4de5e50b999fd8e301ea428404c6fc711b51f9e6c5f0f8cacb2a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "RR5 bounded development correctness; no signed independent/PCC verification",
+ "statement": "The inherited RR5 library test executable completed 14 development tests with exit status zero in qualification-initial; this records a local unsigned test observation only."
+}

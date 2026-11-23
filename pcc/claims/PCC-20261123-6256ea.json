@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:19:34Z",
+ "id": "PCC-20261123-6256ea",
+ "kind": "statement",
+ "producer": {
+  "commit": "e07242d35b424271d7de2fb6ba2b6551cb77ef4e",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/action-operator-h1-20261123/README.md",
+    "sha256": "ae8b9a95aea0d699b3ef0bda1ec7d1221fe5e60a51db3caa328988fe3ac0fb44"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/action-operator-h1-20261123/validation/native-tests.log",
+    "sha256": "533015278beb21e660402d61f83d5f02c558a1fca8a0bed7617daf53b058a532"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/action-operator-h1-20261123/validation/source-and-library.sha256",
+    "sha256": "db88648cea47abc183dc5fbc784e864ca92d8eb6ce1b5b7791c8e90753c3ac01"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/action-operator-h1-20261123/validation/local-binaries.sha256",
+    "sha256": "e0871ce4630f908cbae44903fceb4a89511bc16e89b6f07189e1a9d8ff113b2c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "H1 explicit action-coordinate extraction and a dense-fallback IC adapter are implemented. Scoped native regression controls report 14 passing tests with one existing throughput test ignored; default fixture outputs, non-wall counters and RNG match the pinned incumbent. The prospective saved-prefix Runpod comparison has not run and no faster coordinate or performance result is asserted."
+}

@@ -1,0 +1,15 @@
+2026-11-23T05:32:58Z
+role: separate-role same-host corrected qualifier replay; unsigned development checks
+command: timeout 180s bash -c 'ulimit -v 2097152; export RAYON_NUM_THREADS=1; exec "$1" "$2" "$3"' -- <binary> <replay2/proofs> <protocol_sha256>
+binary=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt2
+proofs=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/replay2/proofs
+protocol_sha256=6b7732995c5f6f2864d90ff0ae64d3f459c67d82bfef0ba9f69534d7fdf2211f
+limits: 180 seconds; 2097152 KiB virtual memory; RAYON_NUM_THREADS=1; no timing claim
+5f9d61a4bb9c63f226c9d90b175faa31758fb6aaf8711b51fa4767407ac6acec  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt2
+6b7732995c5f6f2864d90ff0ae64d3f459c67d82bfef0ba9f69534d7fdf2211f  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/PROTOCOL.md
+0ba412cb149482a4cf96208ee37219df78f535e9941edc9f616940f30d4cbfe9  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/CORRECTION_PROTOCOL.md
+0250383b885c4aaa6a6e3a40f3d4dbe34f49d40adb84f113217b11d27d034d6e  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/CANCELLATION_PREDICTION.md
+51d1fd2e790592d6772557714581381e500f3e195a130b6ef0bde4479f28e91f  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/replay2/source-allfiles-pre-call-sha256.txt
+30b8233a10ebbeb43c3ee3c4d4e854bd0020b5d87792d0ea1965e3b14456d5ef  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/replay2/producer-proof-files-pre-call-sha256.txt
+92d1d2d715da2cc51410f119237dbb75307a67180c9970187c407ab5e26f01c5  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/producer/attempt2/qualifier.stdout.jsonl
+-r-xr-xr-x 555 1168808 /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt2
