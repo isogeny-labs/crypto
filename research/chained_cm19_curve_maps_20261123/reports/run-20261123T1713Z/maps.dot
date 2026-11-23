@@ -1,0 +1,11 @@
+digraph maps {
+  graph [rankdir=LR,bgcolor="white",pad="0.15",nodesep="0.5",ranksep="0.48"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=13,color="#34495e",fillcolor="#e5f3ec",margin="0.15,0.12"];
+  edge [fontname="DejaVu Sans",fontsize=11,color="#52677a",arrowsize=0.7];
+  C [label="Actual C7 / F7\n6 automorphisms\n17 rational points"];
+  Q [label="Actual elliptic quartic Q\nw2 = 4u4+3u3+6u2+6u+1\nboth infinity charts checked"];
+  E [label="E7: y2=x3+2x+6\n11 rational points"];
+  C -> E [label="3 degree-2 covers\nfull identities and fibres"];
+  C -> Q [label="degree 3\nfull degree-8 identity"];
+  Q -> E [label="rational isomorphism\n11+11 inverse checks"];
+}
