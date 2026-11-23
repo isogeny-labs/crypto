@@ -1409,3 +1409,11 @@ requirements, device ordinals, batch/walk budgets, deadlines and tests.
 cargo build --release --bin ecbench
 ECBENCH=target/release/ecbench bash research/ecbench_rootfind_engine_20261012/run.sh
 ```
+
+## Licence and security policy
+
+MIT: see [`LICENSE`](LICENSE). Third-party files keep their own terms and
+are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); the
+patches in `third_party/m4gb-patches/` are GPL-3.0. How to report a
+vulnerability, what the code may be used for, and which components can be
+used to attack: [`SECURITY.md`](SECURITY.md).

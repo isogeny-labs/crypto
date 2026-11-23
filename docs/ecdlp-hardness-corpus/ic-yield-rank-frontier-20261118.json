@@ -226,7 +226,8 @@
       "objective": "Define a successor identity and fail-closed schema that retains every target, attempt, solver outcome, verified witness, normalized row and incremental support/rank record without adaptive stopping.",
       "depends_on": ["DEF-IC-YIELD-COUNT-VECTOR", "DEF-IC-RANK-SUPPORT-TRACE", "GAP-IC-STOPPING-CENSORSHIP"],
       "acceptance": "A versioned public schema, canonical serialization, hash-bound family/spec identity, validator, tiny positive/negative fixtures and explicit treatment of timeouts, failures, zero counts and duplicate rows. This target designs and tests the contract; it does not authorize the scientific run.",
-      "next_step": "Write the schema and validator against synthetic fixtures, then obtain custody/admission approval before producing a natural population.",
+      "next_step": "Independently review the implemented schema and validator, then integrate an admitted natural producer only after custody/admission approval.",
+      "notes": "The versioned fail-closed schema, standard-library validator and four synthetic positive/negative tests are implemented in research/ic_yield_rank_frontier_20261118/. The scientific producer and natural population remain deliberately outside this target and admission-blocked.",
       "source_refs": ["S-IC-YIELD-RANK-FRONTIER-2026", "S-IC-SIX-OBLIGATIONS-2026"]
     },
     {
@@ -238,6 +239,7 @@
       "depends_on": ["GAP-IC-SOLVER-VISIBLE-YIELD", "DEF-IC-YIELD-COUNT-VECTOR"],
       "acceptance": "A native producer and independent checker agree target by target after a declared symmetry quotient; the first discrepancy is preserved as a regression fixture and no missing/rejected witness is silently dropped.",
       "next_step": "Specify one prime-order curve, factor-base convention and arity-two exhaustive cell before extending to the natural higher-arity solver.",
+      "notes": "THM-IC-SOLVER-VISIBLE-BOUND now proves the generic target-wise inequality and equality under completeness; CEX-IC-SOLVER-INCOMPLETENESS refutes automatic equality. A production solver's soundness/completeness is still unaudited.",
       "source_refs": ["S-IC-YIELD-RANK-FRONTIER-2026"]
     },
     {
@@ -270,7 +272,8 @@
       "objective": "Audit each live index-calculus route as single-target left-kernel, reusable right-kernel/full-rank, or an explicitly proved alternative, and remove rank assumptions that are not load-bearing in that mode.",
       "depends_on": ["DEF-IC-KERNEL-USAGE-MODE", "GAP-IC-KERNEL-MODE-SCOPE", "THM-LEFT-KERNEL-RELATIONS"],
       "acceptance": "Every conditional IC claim has a typed edge to its actual linear-algebra success condition; no route cites reusable full rank for a valid target-dependent left-kernel extraction or applies the left-kernel theorem to an amortized table.",
-      "next_step": "Start with the 11 downstream claims currently resting on HEUR-RELATION-RANK and record their relation reuse and target dependence.",
+      "next_step": "Resolve the primary-text ambiguity for Theriault's large-prime variant, then formalize the graph-cycle closure law and the reusable right-rank conditions used by Joux--Vitse and the hashed-tensor route.",
+      "notes": "The first 11-claim census is recorded in research/ic_yield_rank_frontier_20261118/KERNEL_MODE_CENSUS_20261118.md. It separates a target-dependent left-kernel chain, reusable/right-rank routes, a graph-cycle route, transfer routes with no direct relation matrix, and one unresolved Theriault classification. Gaudry 2000 and Theriault 2003 primary texts were unavailable in this environment, so no stronger attribution is made.",
       "source_refs": ["S-IC-YIELD-RANK-FRONTIER-2026", "S-WEAKNESS-LEAN"]
     },
     {

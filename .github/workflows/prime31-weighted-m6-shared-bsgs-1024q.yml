@@ -1,0 +1,178 @@
+name: Prime31 weighted M6 versus shared BSGS on identical 1024Q
+
+on:
+  push:
+    branches:
+      - automation/prime31-weighted-slot-parity-20261118
+    paths:
+      - '.github/workflows/prime31-weighted-m6-shared-bsgs-1024q.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs'
+      - 'research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_SHARED_BSGS_FRONTIER_PROTOCOL_20261118.md'
+  pull_request:
+    paths:
+      - '.github/workflows/prime31-weighted-m6-shared-bsgs-1024q.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs'
+      - 'research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_SHARED_BSGS_FRONTIER_PROTOCOL_20261118.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matched-original-1024q:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      CARGO_BUILD_JOBS: '2'
+      RAYON_NUM_THREADS: '1'
+      RUST_BACKTRACE: '1'
+    steps:
+      - name: Checkout only candidate, public corpus source and unchanged BSGS suffix
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs
+            /research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+            /research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag
+            /research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_SHARED_BSGS_FRONTIER_PROTOCOL_20261118.md
+      - name: Checkout pinned original Prime31 Rust arithmetic and source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Pin Rust compiler and compile unchanged benchmark sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.100.0 --profile minimal
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/
+          python3 - <<'PY'
+          from pathlib import Path
+          original=Path('aps-pinned/research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs').read_text()
+          suffix=Path('research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag').read_text()
+          needle='fn main()->Result<(),String> {'
+          assert original.count(needle)==1 and original.count('fn jac_mixed(')==1
+          assert original.count('fn normalize_jac_batch(')==1
+          assert suffix.count('fn main() -> Result<(), String>')==1
+          revised=original.replace(needle,'fn original_aps_main_unused()->Result<(),String> {',1)
+          Path('aps-pinned/research/prime31_ic_20261115/native/examples/prime31_shared_bsgs_1024q.rs').write_text(revised+'\n'+suffix)
+          print('Only existing main renamed; original Jacobian and BSGS sources remain byte-identical')
+          PY
+          P=aps-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 test --release --locked --manifest-path "$P" --lib
+          cargo +1.100.0 test --release --locked --manifest-path "$P" --example prime31_weighted_m6_batch
+          cargo +1.100.0 test --release --locked --manifest-path "$P" --example prime31_shared_bsgs_1024q
+          for name in prime31_weighted_m6_batch prime31_shared_bsgs_1024q prime31_mixed_base_amortized_ic; do
+            cargo +1.100.0 build --release --locked --manifest-path "$P" --example "$name"
+          done
+      - name: Create public source corpus once outside all compared solver timers
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=aps-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 run --quiet --release --locked --manifest-path "$P" \
+            --example prime31_mixed_base_amortized_ic > prime31-original-1024.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('prime31-original-1024.json'))
+          assert x['schema']=='prime31.mixed_4p4_amortized_complete_ic.v1'
+          assert x['completed_unknown_target_logs']==1024
+          assert x['setup_rank']==61 and x['base_log_point_replays']==61
+          assert len(x['targets'])==1024
+          print('Frozen shared source corpus checked: 1024 original-curve points')
+          PY
+      - name: Run first A/B whole-program pair
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=aps-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 run --quiet --release --locked --manifest-path "$P" \
+            --example prime31_weighted_m6_batch -- prime31-original-1024.json > prime31-m6-a1.json
+          cargo +1.100.0 run --quiet --release --locked --manifest-path "$P" \
+            --example prime31_shared_bsgs_1024q -- prime31-original-1024.json > prime31-bsgs-b1.json
+      - name: Run reversed B/A whole-program pair
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=aps-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 run --quiet --release --locked --manifest-path "$P" \
+            --example prime31_shared_bsgs_1024q -- prime31-original-1024.json > prime31-bsgs-b2.json
+          cargo +1.100.0 run --quiet --release --locked --manifest-path "$P" \
+            --example prime31_weighted_m6_batch -- prime31-original-1024.json > prime31-m6-a2.json
+      - name: Fail closed on unequal targets or incorrect/incomplete logarithms
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, statistics
+          source=json.load(open('prime31-original-1024.json'))
+          rows=source['targets']
+          qs=[r['solver']['public_q'] for r in rows]
+          ks=[r['caller_only_scalar'] for r in rows]
+          assert len(qs)==1024 and len({tuple(q) for q in qs})==1024
+          result={'schema':'prime31.weighted_m6_vs_shared_bsgs.original1024.v1',
+                  'candidate_classification':'generic-equivalent 3+3 IC',
+                  'source_head':os.environ.get('GITHUB_SHA'),'pcc':'unverified',
+                  'protocol':'PRIME31_WEIGHTED_M6_SHARED_BSGS_FRONTIER_PROTOCOL_20261118.md',
+                  'corpus':'original-mixed-1024q','rows':[]}
+          for ma,bb in [('prime31-m6-a1.json','prime31-bsgs-b1.json'),
+                        ('prime31-m6-a2.json','prime31-bsgs-b2.json')]:
+            m=json.load(open(ma));b=json.load(open(bb))
+            assert m['target_corpus']=='original_mixed_1024q' and m['completed']==1024
+            assert m['train_rank']==31 and len(m['targets'])==1024
+            assert [t['public_point'] for t in m['targets']]==qs
+            assert [t['known_scalar_verifier_only'] for t in m['targets']]==ks
+            assert [t['recovered'] for t in m['targets']]==ks
+            assert m['nonenumerative_algebraic_extractor'] is False
+            assert m['generic_three_plus_three_enumeration'] is True
+            assert b['target_count']==1024 and len(b['arms'])==3
+            arms={}
+            for arm in b['arms']:
+              assert arm['complete_logs']==1024 and len(arm['cases'])==1024
+              assert all(t['caller_k_and_original_curve_match'] for t in arm['cases'])
+              assert [list(t['public_Q']) for t in arm['cases']]==qs
+              assert [t['answer']['target_log'] for t in arm['cases']]==ks
+              arms[str(arm['m'])]=int(arm['fully_charged_complete_batch_ns'])/1e6
+            assert sorted(arms)==['1048576','262144','46341']
+            m6_ms=int(m['total_ns_diagnostic'])/1e6
+            best=min(arms.values())
+            result['rows'].append({
+              'm6_file':ma,'bsgs_file':bb,'m6_complete_ms':m6_ms,
+              'best_bsgs_complete_ms':best,'reference_bsgs_arms_ms':arms,
+              'm6_over_bsgs_cost_ratio':m6_ms/best,'m6_win':m6_ms<best,
+              'train_rank':m['train_rank'],'train_calls':m['train_calls'],
+              'm6_target_attempts':m['target_attempts'],
+              'complete_log_replays':1024
+            })
+          result['median_m6_over_best_bsgs_ratio']=statistics.median(x['m6_over_bsgs_cost_ratio'] for x in result['rows'])
+          result['all_candidate_logs_replayed']=2048
+          result['all_reference_logs_replayed']=6144
+          result['claim_non_generic_ecdlp_breakthrough']=False
+          with open('prime31-m6-bsgs-abba-summary.json','w') as f:json.dump(result,f,indent=2)
+          print(json.dumps({k:v for k,v in result.items() if k!='source_head'},indent=2))
+          PY
+      - name: Preserve all source-bound, including failed, raw evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-weighted-m6-versus-shared-bsgs-1024-abba
+          path: |
+            prime31-original-1024.json
+            prime31-m6-a1.json
+            prime31-m6-a2.json
+            prime31-bsgs-b1.json
+            prime31-bsgs-b2.json
+            prime31-m6-bsgs-abba-summary.json
+          retention-days: 30
+          if-no-files-found: warn
