@@ -1107,6 +1107,7 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if p <= u32::MAX as u64 && a.len() >= 8 && b.len() >= 8 {
         return vproduct_barrett32(a, b, p);
+    }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
