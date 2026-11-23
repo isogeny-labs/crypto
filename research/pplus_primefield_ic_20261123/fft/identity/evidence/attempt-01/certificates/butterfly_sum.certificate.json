@@ -1,0 +1,85 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h202115d385061d50",
+  "statement": {
+    "name": "Line FFT: sum of butterfly outputs",
+    "source": "crypto PR #5049; fft/DERIVATION.md; identity/PROTOCOL.md. Elementary butterfly algebra and (Z^2+1)^2-2Z^2=Z^4+1. Certificate scope is only polynomial evaluations over F_(2^61-1).",
+    "variables": [
+      "E",
+      "O",
+      "X"
+    ],
+    "degree_bound": 2,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "E"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "O"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "E"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "X"
+                  },
+                  {
+                    "op": "var",
+                    "args": "O"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 2
+        },
+        {
+          "op": "var",
+          "args": "E"
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261123,
+  "value_digest": "9c76b9407520be36bb2af537f49248f59660d69a047e959f37d908b2c8f63f96",
+  "independence": "Same team and production implementation; separate issuer and checker processes; unsigned; deterministic finite evaluations only; no formal proof, independent-verifier, or PCC claim.",
+  "proof": null
+}
