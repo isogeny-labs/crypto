@@ -51,8 +51,8 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, wiedemann,
-    wiedemann_coord, CubicOracle, Dsu, Nat, Rel, Row, REL_FB,
+    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, CubicOracle, Dsu,
+    Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{
     invmod, pivot_inversion_steps, rho_walk_with_policy, CountedGroup, GroupOps, NegationClasses,
@@ -652,21 +652,36 @@ impl JCurve {
         }
         let nu = (2..p).find(|&a| !sq[a as usize]).expect("a non-residue");
         let f = &self.f;
+        assert!(p < (1 << 31), "count_points(2) wants p < 2^31");
+        // Horner over F_p[√ν] with one Barrett reduction per coordinate and
+        // step (the reference is `count_points2_reference` in the tests).
+        let m = u64::MAX / p;
+        let red = |x: u64| -> u64 {
+            let q = ((u128::from(x) * u128::from(m)) >> 64) as u64;
+            let r = x - q * p;
+            if r >= p {
+                r - p
+            } else {
+                r
+            }
+        };
+        let nub: Vec<u64> = (0..=(p - 1) / 2).map(|b| nu * b % p).collect();
         let mut n = 1u64;
         for a in 0..p {
             for b in 0..=(p - 1) / 2 {
                 let (mut ra, mut rb) = (0u64, 0u64);
+                let nb_ = nub[b as usize];
                 for i in (0..f.n).rev() {
-                    let na = (ra * a + nu * (rb * b % p)) % p;
-                    let nb = (ra * b + rb * a) % p;
-                    ra = (na + f.c[i]) % p;
+                    let na = red(ra * a + rb * nb_ + f.c[i]);
+                    let nb = red(ra * b + rb * a);
+                    ra = na;
                     rb = nb;
                 }
                 let w = if b == 0 { 1 } else { 2 };
                 if ra == 0 && rb == 0 {
                     n += w;
                 } else {
-                    let norm = (ra * ra % p + p - nu * (rb * rb % p) % p) % p;
+                    let norm = red(ra * ra + p * p - nu * red(rb * rb));
                     if sq[norm as usize] {
                         n += 2 * w;
                     }
@@ -676,18 +691,20 @@ impl JCurve {
         n
     }
 
-    /// `#J(F_p)`: the first `min(g − 1, 2)` coefficients of `L(T)` from
-    /// `N_1` (and `N_2` for `g ≥ 3`), then baby-step giant-step over the
-    /// window the Weil bounds leave for the remaining ones; every candidate
-    /// is checked on 32 random divisors and exactly one must survive.
+    /// `#J(F_p)` by the enumeration route: [`OrderMethod::Enumerate`].
     pub fn jacobian_order(&self, seed: u64) -> Result<u64, String> {
+        self.jacobian_order_with(OrderMethod::Enumerate, seed)
+    }
+
+    /// `#J(F_p)`: the first `known` coefficients of `L(T)` from point counts
+    /// (`known = min(g − 1, 2)` for `Enumerate` and `Bsgs2`, `min(g − 1, 1)`
+    /// for `Bsgs1`), then baby-step giant-step over the window the Weil
+    /// bounds leave for the remaining ones; every candidate is checked on 32
+    /// random divisors and exactly one must survive.
+    pub fn jacobian_order_with(&self, method: OrderMethod, seed: u64) -> Result<u64, String> {
         let g = self.genus as usize;
         let p = i128::from(self.k.p);
-        let known = match g {
-            1 => 0,
-            2 => 1,
-            _ => 2,
-        };
+        let known = known_coefficients(g, method);
         let s: Vec<i128> = (1..=known as u32)
             .map(|k| self.count_points(k) as i128 - p.pow(k) - 1)
             .collect();
@@ -708,17 +725,7 @@ impl JCurve {
             }
         };
         let base: i128 = (0..=known).map(|i| c[i] * coef(i)).sum();
-        let mut bound = 1i128;
-        for i in known + 1..=g {
-            let binom = (0..i as i128).fold(1i128, |acc, j| acc * (2 * g as i128 - j) / (j + 1));
-            let w = (binom as f64 * (p as f64).powf(i as f64 / 2.0)).ceil() as i128 + 1;
-            bound += w * coef(i);
-        }
-        let sp = (p as f64).sqrt();
-        let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
-            .floor()
-            .max(1.0) as i128;
-        let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
+        let (bound, lo, hi) = weil_window(self.k.p, g, known);
         let from = (base - bound).max(lo).max(1);
         let to = (base + bound).min(hi);
         if to < from {
@@ -726,7 +733,7 @@ impl JCurve {
         }
         let width = (to - from) as u64;
         let m = (((width + 1) as f64).sqrt().ceil() as u64).max(1);
-        if m > (1 << 26) {
+        if m > MAX_BSGS_TABLE {
             return Err(format!(
                 "order window too wide for baby-step giant-step (m = {m})"
             ));
@@ -791,6 +798,86 @@ impl JCurve {
             many => Err(format!("ambiguous: {} candidates", many.len())),
         }
     }
+}
+
+/// How `#J(F_p)` is obtained: which point counts are enumerated before the
+/// baby-step giant-step over the window the Weil bounds leave.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OrderMethod {
+    /// `N_1`, and `N_2` for `g ≥ 3` (O(p²) enumeration over `F_{p²}`).
+    Enumerate,
+    /// `N_1` only; the window covers every remaining coefficient.
+    Bsgs1,
+    /// `N_1` and `N_2` (the `Enumerate` window; the same counts).
+    Bsgs2,
+}
+
+impl OrderMethod {
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "enumerate" => Ok(Self::Enumerate),
+            "bsgs1" => Ok(Self::Bsgs1),
+            "bsgs2" => Ok(Self::Bsgs2),
+            _ => Err(format!(
+                "--order-method wants enumerate, bsgs1 or bsgs2, not {s}"
+            )),
+        }
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Enumerate => "enumerate",
+            Self::Bsgs1 => "bsgs1",
+            Self::Bsgs2 => "bsgs2",
+        }
+    }
+}
+
+/// The most baby steps held in the table (`2^26` entries).
+pub const MAX_BSGS_TABLE: u64 = 1 << 26;
+
+fn known_coefficients(g: usize, method: OrderMethod) -> usize {
+    let enumerated = match g {
+        1 => 0,
+        2 => 1,
+        _ => 2,
+    };
+    match method {
+        OrderMethod::Enumerate | OrderMethod::Bsgs2 => enumerated,
+        OrderMethod::Bsgs1 => enumerated.min(1),
+    }
+}
+
+/// `(bound, lo, hi)`: the half-width the Weil bounds leave for `#J` once the
+/// first `known` coefficients are fixed, and the absolute range of `#J`.
+fn weil_window(p: u64, g: usize, known: usize) -> (i128, i128, i128) {
+    let p = i128::from(p);
+    let coef = |i: usize| -> i128 {
+        if i < g {
+            1 + p.pow((g - i) as u32)
+        } else {
+            1
+        }
+    };
+    let mut bound = 1i128;
+    for i in known + 1..=g {
+        let binom = (0..i as i128).fold(1i128, |acc, j| acc * (2 * g as i128 - j) / (j + 1));
+        let w = (binom as f64 * (p as f64).powf(i as f64 / 2.0)).ceil() as i128 + 1;
+        bound += w * coef(i);
+    }
+    let sp = (p as f64).sqrt();
+    let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
+        .floor()
+        .max(1.0) as i128;
+    let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
+    (bound, lo, hi)
+}
+
+/// The baby-step table size `m` of the widest window (centre ignored, Weil
+/// range not binding) for `(p, g, method)`: the memory bound of the route.
+pub fn bsgs_table_size(p: u64, g: usize, method: OrderMethod) -> u64 {
+    let (bound, lo, hi) = weil_window(p, g, known_coefficients(g, method));
+    let width = (2 * bound).min(hi - lo) as f64;
+    (width + 1.0).sqrt().ceil() as u64
 }
 
 impl CountedGroup for JCurve {
@@ -934,8 +1021,27 @@ pub fn make_instance(
     target_seed: u64,
     max_h: u64,
 ) -> Result<Instance, String> {
+    make_instance_with(
+        p,
+        genus,
+        curve_seed,
+        target_seed,
+        max_h,
+        OrderMethod::Enumerate,
+    )
+}
+
+/// [`make_instance`] with the group order found by `method`.
+pub fn make_instance_with(
+    p: u64,
+    genus: u32,
+    curve_seed: u64,
+    target_seed: u64,
+    max_h: u64,
+    method: OrderMethod,
+) -> Result<Instance, String> {
     let curve = JCurve::new(p, genus, &random_f(p, genus, curve_seed))?;
-    let order = curve.jacobian_order(curve_seed)?;
+    let order = curve.jacobian_order_with(method, curve_seed)?;
     let (h, r) = split_order(order, max_h).ok_or_else(|| format!("#J = {order} is not h*r"))?;
     instance_from(curve, order, h, r, target_seed)
 }
@@ -1327,6 +1433,34 @@ pub struct IcResult {
     pub cycles: i64,
     pub core_rows: usize,
     pub core_cols: usize,
+    /// Relations held when the last attempt started (diagnostic).
+    pub excess_rows_collected: usize,
+    /// Rows and columns of the peeled core of the last attempt before the
+    /// row selection of [`ExcessParams`] (equal to `core_rows`/`core_cols`
+    /// without it), and the mean row weight before and after it.
+    pub core_rows_pre: usize,
+    pub core_cols_pre: usize,
+    pub mean_weight_before: f64,
+    pub mean_weight_after: f64,
+    /// Rows handed to the merge stage (= `core_rows`).
+    pub rows_kept: usize,
+    /// Non-zeros of the core before and after the merge stage.
+    pub core_nnz_before_sge: usize,
+    pub core_nnz_after_sge: usize,
+    /// The lightest-row selection ([`ExcessParams`]); zero without it.
+    /// Included in `la`.
+    pub la_sel: Nat,
+    /// Attempts whose selection left too short a core and was undone.
+    pub ex_fallback: u32,
+    /// [`BoundedParams`]: relations held when the stopping rule first
+    /// stopped, probes (attempts abandoned for a heavier core than the
+    /// target; their graph, peel and selection work is in `la`), the realised
+    /// excess of the solving attempt, and whether it ran above the target
+    /// weight because the excess cap was reached.  Zero without it.
+    pub bd_n0: u64,
+    pub bd_probes: u32,
+    pub bd_extra: f64,
+    pub bd_capped: bool,
     pub attempts: u32,
     /// [`IcExt::coord_square`] solves that returned nothing and fell back.
     pub la_fallbacks: u32,
@@ -1478,8 +1612,217 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     run_ic_ext(inst, prm, IcExt::default())
 }
 
+/// Relation excess with lightest-row selection (research/genus_ladder_light_rows_20261121).
+/// Offered through [`run_ic_ext_excess`], not as a field of [`IcParams`] (which
+/// other modules build by struct literal); `None` there is [`run_ic_ext`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ExcessParams {
+    /// Collect `(1 + extra) ×` the relations at which the stopping rule first
+    /// stops, continuing the same random stream.
+    pub extra: f64,
+    /// Fraction of the peeled core's rows kept: the lightest by weight, but at
+    /// least `cols + margin`; a row that is the only live holder of a column
+    /// is never dropped.  See [`select_light_rows`].
+    pub keep: f64,
+}
+
+/// Keep the lightest rows of a peeled core.  Rows are sorted by weight (ties
+/// by index) and dropped from the heaviest while more than
+/// `max(ceil(keep · rows), cols + margin(cols))` are alive, except a row
+/// holding a column (the target's included) of live weight one.  The
+/// survivors are peeled again.  `Err(false)` when nothing was dropped and
+/// `Err(true)` when the re-peeled core is shorter than `cols' + margin(cols')`
+/// or no longer holds the target column (the caller keeps the original
+/// core).  Counted: one addition per entry for the column weights, one per
+/// entry of a dropped row, and the re-peel as [`peel`] counts it; the sort's
+/// comparisons are free, as in `peel`/`sge_reduce`.
+pub(crate) fn select_light_rows(
+    rows: &[Row],
+    ncols: usize,
+    tcol: u32,
+    keep: f64,
+    margin: &dyn Fn(usize) -> usize,
+    nat: &mut Nat,
+) -> Result<(Vec<Row>, usize, u32), bool> {
+    let alive = light_survivors(rows, ncols, keep, margin, nat);
+    if alive.iter().all(|&a| a) {
+        return Err(false);
+    }
+    let surv: Vec<Row> = rows
+        .iter()
+        .zip(&alive)
+        .filter(|(_, &a)| a)
+        .map(|(r, _)| r.clone())
+        .collect();
+    let (core, cc, ct) = peel(&surv, ncols, tcol, nat);
+    // The re-peel may remove a row holding the target column through another
+    // column of weight one; a core that no longer holds the target is undone.
+    let holds_t = core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct));
+    if holds_t && core.len() >= cc + margin(cc) {
+        Ok((core, cc, ct))
+    } else {
+        Err(true)
+    }
+}
+
+/// The drop step of [`select_light_rows`]: which rows stay.  Every column
+/// held by some row keeps at least one holder.
+fn light_survivors(
+    rows: &[Row],
+    ncols: usize,
+    keep: f64,
+    margin: &dyn Fn(usize) -> usize,
+    nat: &mut Nat,
+) -> Vec<bool> {
+    let target = ((keep * rows.len() as f64).ceil() as usize).max(ncols + margin(ncols));
+    if target >= rows.len() {
+        return vec![true; rows.len()]; // nothing can be dropped: no work
+    }
+    let mut w = vec![0u32; ncols];
+    for (t, _) in rows {
+        for &(c, _) in t {
+            w[c as usize] += 1;
+            nat.add += 1;
+        }
+    }
+    let mut order: Vec<usize> = (0..rows.len()).collect();
+    order.sort_by_key(|&i| (rows[i].0.len(), i));
+    let mut alive = vec![true; rows.len()];
+    let mut n_alive = rows.len();
+    for &i in order.iter().rev() {
+        if n_alive <= target {
+            break;
+        }
+        if rows[i].0.iter().any(|&(c, _)| w[c as usize] < 2) {
+            continue;
+        }
+        for &(c, _) in &rows[i].0 {
+            w[c as usize] -= 1;
+            nat.add += 1;
+        }
+        alive[i] = false;
+        n_alive -= 1;
+    }
+    alive
+}
+
+/// Weight-bounded core (research/genus_ladder_bounded_core_20261122).  Offered
+/// through [`run_ic_ext_bounded`]; excludes [`ExcessParams`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct BoundedParams {
+    /// Target mean row weight of the selected core (before the merge).
+    pub target: f64,
+    /// Relations are collected in steps of `step ·` (the relations at the
+    /// rule's first stop); the first attempt is at excess `step`.
+    pub step: f64,
+    /// No further excess beyond this (relative to the first stop); the
+    /// attempt then runs above the target and is flagged.
+    pub extra_max: f64,
+    /// A row is dropped only if every column it holds keeps at least this
+    /// many live rows (1: as [`select_light_rows`], re-peeled; 2: no column
+    /// can fall to weight one, so no re-peel is needed).
+    pub cover: u32,
+}
+
+/// Greedy minimum-weight selection: drop the heaviest row (ties: higher
+/// index) whose removal leaves each of its columns, the target column
+/// included, held by at least `cover` live rows, until `cols + margin(cols)`
+/// rows are left.  Equivalent to repeatedly taking the heaviest eligible row:
+/// a row's weight is fixed and eligibility only ever turns off.  `cover = 1`
+/// re-peels the survivors and, as [`select_light_rows`], undoes a result that
+/// is too short or lost the target (`Err(true)`); `Err(false)`: nothing to
+/// drop.  Counted: one addition per entry for the column weights and one per
+/// entry of a dropped row; the sort's comparisons are free.
+pub(crate) fn select_bounded_rows(
+    rows: &[Row],
+    ncols: usize,
+    tcol: u32,
+    cover: u32,
+    margin: &dyn Fn(usize) -> usize,
+    nat: &mut Nat,
+) -> Result<(Vec<Row>, usize, u32), bool> {
+    let floor = ncols + margin(ncols);
+    if floor >= rows.len() {
+        return Err(false);
+    }
+    let mut w = vec![0u32; ncols];
+    for (t, _) in rows {
+        for &(c, _) in t {
+            w[c as usize] += 1;
+            nat.add += 1;
+        }
+    }
+    let mut order: Vec<usize> = (0..rows.len()).collect();
+    order.sort_by_key(|&i| (rows[i].0.len(), i));
+    let mut alive = vec![true; rows.len()];
+    let mut n_alive = rows.len();
+    for &i in order.iter().rev() {
+        if n_alive <= floor {
+            break;
+        }
+        if rows[i].0.iter().any(|&(c, _)| w[c as usize] < cover + 1) {
+            continue;
+        }
+        for &(c, _) in &rows[i].0 {
+            w[c as usize] -= 1;
+            nat.add += 1;
+        }
+        alive[i] = false;
+        n_alive -= 1;
+    }
+    if n_alive == rows.len() {
+        return Err(false);
+    }
+    let surv: Vec<Row> = rows
+        .iter()
+        .zip(&alive)
+        .filter(|(_, &a)| a)
+        .map(|(r, _)| r.clone())
+        .collect();
+    if cover >= 2 {
+        // Every column keeps at least two rows: the survivors are peeled
+        // already, with the same columns.
+        return Ok((surv, ncols, tcol));
+    }
+    let (core, cc, ct) = peel(&surv, ncols, tcol, nat);
+    let holds_t = core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct));
+    if holds_t && core.len() >= cc + margin(cc) {
+        Ok((core, cc, ct))
+    } else {
+        Err(true)
+    }
+}
+
 /// [`run_ic`] with the speed-ups of [`IcExt`].
 pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+    run_ic_ext_excess(inst, prm, ext, None)
+}
+
+/// [`run_ic_ext`] with the optional relation excess ([`ExcessParams`]); `None`
+/// is [`run_ic_ext`], count for count.  Ignored for [`Arm::Full`].
+pub fn run_ic_ext_excess(
+    inst: &Instance,
+    prm: IcParams,
+    ext: IcExt,
+    excess: Option<ExcessParams>,
+) -> IcResult {
+    run_ic_ext_bounded(inst, prm, ext, excess, None)
+}
+
+/// [`run_ic_ext_excess`] with the optional weight-bounded core
+/// ([`BoundedParams`], not together with `excess`); `None` is
+/// [`run_ic_ext_excess`], count for count.  Ignored for [`Arm::Full`].
+pub fn run_ic_ext_bounded(
+    inst: &Instance,
+    prm: IcParams,
+    ext: IcExt,
+    excess: Option<ExcessParams>,
+    bounded: Option<BoundedParams>,
+) -> IcResult {
+    assert!(
+        excess.is_none() || bounded.is_none(),
+        "excess and bounded exclude each other"
+    );
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1563,6 +1906,9 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     let mut since_restart = u64::MAX;
     let mut next_check = nunk as u64;
     let mut solved = false;
+    let mut excess_done = excess.is_none() || prm.arm == Arm::Full;
+    let mut bd_n0: Option<u64> = None;
+    let mut bd_level = 0u32;
 
     'outer: while !solved {
         while (rels.len() as u64) < next_check {
@@ -1706,6 +2052,27 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                 next_check = rels.len() as u64 + (need - res.cycles).max(1) as u64;
                 continue;
             }
+            if let (Some(b), None) = (bounded, bd_n0) {
+                // First stop of the rule: the first attempt is at excess `step`.
+                bd_n0 = Some(rels.len() as u64);
+                bd_level = 1;
+                res.bd_n0 = rels.len() as u64;
+                let target = (rels.len() as f64 * (1.0 + b.step)).ceil() as u64;
+                if target > rels.len() as u64 {
+                    next_check = target;
+                    continue;
+                }
+            }
+            if let (Some(ex), false) = (excess, excess_done) {
+                // First stop of the rule: go on to (1 + extra) times as many
+                // relations from the same stream, then attempt.
+                excess_done = true;
+                let target = (rels.len() as f64 * (1.0 + ex.extra)).ceil() as u64;
+                if target > rels.len() as u64 {
+                    next_check = target;
+                    continue;
+                }
+            }
         } else {
             let mut scratch = Nat::default();
             let rows = build_rows(&rels, nver, tcol, r, &mut scratch);
@@ -1731,6 +2098,68 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
             next_check = rels.len() as u64 + (nunk as u64 / 20).max(8);
             continue;
         }
+        res.excess_rows_collected = rels.len();
+        res.core_rows_pre = core.len();
+        res.core_cols_pre = cc;
+        let nnz_of = |rows: &[Row]| rows.iter().map(|(t, _)| t.len()).sum::<usize>();
+        let mean_w = |rows: &[Row]| nnz_of(rows) as f64 / rows.len().max(1) as f64;
+        res.mean_weight_before = mean_w(&core);
+        let (core, cc, ct) = match excess {
+            Some(ex) if prm.arm != Arm::Full => {
+                let mut sel = Nat::default();
+                let picked = select_light_rows(&core, cc, ct, ex.keep, &margin, &mut sel);
+                res.la_sel.merge(sel);
+                res.la.merge(sel);
+                match picked {
+                    Ok(c) => {
+                        res.core_rows = c.0.len();
+                        res.core_cols = c.1;
+                        c
+                    }
+                    Err(undone) => {
+                        res.ex_fallback += u32::from(undone);
+                        (core, cc, ct)
+                    }
+                }
+            }
+            None if prm.arm != Arm::Full && bounded.is_some() => {
+                let b = bounded.expect("checked");
+                let n0 = bd_n0.expect("set at the first stop");
+                let mut sel = Nat::default();
+                let picked = select_bounded_rows(&core, cc, ct, b.cover, &margin, &mut sel);
+                res.la_sel.merge(sel);
+                res.la.merge(sel);
+                let c = match picked {
+                    Ok(c) => {
+                        res.core_rows = c.0.len();
+                        res.core_cols = c.1;
+                        c
+                    }
+                    Err(undone) => {
+                        res.ex_fallback += u32::from(undone);
+                        (core, cc, ct)
+                    }
+                };
+                let w = mean_w(&c.0);
+                let next = bd_level + 1;
+                if w > b.target && f64::from(next) * b.step <= b.extra_max + 1e-9 {
+                    // Heavier than the target: abandon this attempt (its work
+                    // stays counted) and collect another step of relations.
+                    res.attempts -= 1;
+                    res.bd_probes += 1;
+                    bd_level = next;
+                    next_check = (n0 as f64 * (1.0 + f64::from(next) * b.step)).ceil() as u64;
+                    next_check = next_check.max(rels.len() as u64 + 1);
+                    continue;
+                }
+                res.bd_capped = w > b.target;
+                res.bd_extra = rels.len() as f64 / n0 as f64 - 1.0;
+                c
+            }
+            _ => (core, cc, ct),
+        };
+        res.rows_kept = core.len();
+        res.mean_weight_after = mean_w(&core);
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
         // UnitT solves for h·log T: one inversion of h and one product.
@@ -1764,7 +2193,14 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
             res.la_sge.merge(s_nat);
             res.la.merge(s_nat);
             res.sge = st;
+            // Opt-in dump of the reduced core for offline solver studies
+            // (research/block_lanczos_pretest_20261120); off unless the env var is set.
+            let dump = std::env::var("GENUS_LADDER_EXPORT_CORE").ok();
+            let (rng0, nat0) = (rng.clone(), w_nat);
             let t = wiedemann_coord(&red, rcc, rct as usize, r, &mut rng, true, &mut w_nat);
+            if let Some(path) = dump {
+                export_core(&path, &red, rcc, rct, r, rng0, w_nat, nat0, t, ext.unit_t, h_inv, inst);
+            }
             match t.map(to_log) {
                 Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
                 _ => res.la_fallbacks += 1,
@@ -1862,6 +2298,13 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
     res.la.add += dsu.ops;
+    (res.core_nnz_before_sge, res.core_nnz_after_sge) = match prm.sge {
+        Some(_) => (res.sge.nnz_in, res.sge.nnz_out),
+        None => {
+            let n = (res.mean_weight_after * res.rows_kept as f64).round() as usize;
+            (n, n)
+        }
+    };
     res.group = ops;
     res.walk_ops = (ops.adds + ops.doubles) - res.setup_ops - res.verify_ops;
     res.cantor_mul = curve.fmul() - fm0;
@@ -1873,6 +2316,44 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     }
     res.wall_ns = start.elapsed().as_nanos() as u64;
     res
+}
+
+/// Append one JSON line with the reduced core, the square row subset
+/// `wiedemann_coord` draws from `rng0`, its counted work and the planted log.
+#[allow(clippy::too_many_arguments)]
+fn export_core(
+    path: &str,
+    red: &[Row],
+    ncols: usize,
+    ct: u32,
+    r: u64,
+    mut rng0: StdRng,
+    after: Nat,
+    before: Nat,
+    t: Option<u64>,
+    unit_t: bool,
+    h_inv: u64,
+    inst: &Instance,
+) {
+    use std::io::Write;
+    let mut idx: Vec<usize> = (0..red.len()).collect();
+    if red.len() >= ncols {
+        for i in 0..ncols {
+            let j = rng0.gen_range(i..idx.len());
+            idx.swap(i, j);
+        }
+    }
+    let rows: Vec<serde_json::Value> =
+        red.iter().map(|(e, c)| serde_json::json!([e, c])).collect();
+    let line = serde_json::json!({
+        "p": inst.p, "g": inst.genus, "r": r, "h": inst.h, "t_secret": inst.t_secret,
+        "ncols": ncols, "ct": ct, "unit_t": unit_t, "h_inv": h_inv,
+        "subset": &idx[..ncols.min(idx.len())], "rows": rows,
+        "wied_mul": after.mul - before.mul, "wied_add": after.add - before.add,
+        "coord_out": t,
+    });
+    let mut f = std::fs::OpenOptions::new().create(true).append(true).open(path).expect("export");
+    writeln!(f, "{line}").expect("export write");
 }
 
 // ── structured Gaussian elimination before Wiedemann ────────────────────
@@ -1986,7 +2467,7 @@ impl SgeCols {
 /// multiplication (unless the multiplier is `±1`) and one addition per
 /// merged row; the index bookkeeping one addition per entry touched, as
 /// `peel` does.
-fn sge_reduce(
+pub(crate) fn sge_reduce(
     rows: &[Row],
     ncols: usize,
     tcol: u32,
@@ -2218,6 +2699,447 @@ fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense
             let _: u64 = rng.gen_range(1..r);
         }
     }
+}
+
+// ── Wiedemann with the same counts, a faster inner loop ─────────────────
+//
+// `wiedemann` and `wiedemann_coord` below replace the imports of the same
+// names from `ic_control` (kept there unchanged as the reference; the test
+// `fast_wiedemann_equals_reference` compares them).  Same signatures, same
+// random draws, same value of every `Nat` increment, same outputs: only the
+// way the residues are computed differs (research/genus_ladder_wied_speed_20261122).
+//
+// * rows are held in CSR split by entry kind: `+1`, `−1` and generic entries
+//   (generic ones carry a Shoup quotient, so `v·x mod r` is two multiplies);
+// * a row sum is accumulated unreduced in `u64` and reduced once (Barrett,
+//   `⌊(2^64−1)/r⌋`), when `(2·len+1)·r < 2^64`, else term by term as before;
+// * `Aᵀy` is a gather over the transposed CSR, the diagonal `D` is fused into `A x`;
+// * Berlekamp–Massey dot products accumulate in `u128`.
+
+#[inline(always)]
+fn mulhi(a: u64, b: u64) -> u64 {
+    ((a as u128 * b as u128) >> 64) as u64
+}
+
+/// `⌊v·2^64 / r⌋` for `v < r`.
+#[inline]
+fn shoup_pre(v: u64, r: u64) -> u64 {
+    (((v as u128) << 64) / r as u128) as u64
+}
+
+/// `v·x mod r` up to one multiple of `r`: the value is in `[0, 2r)`
+/// (`vs = shoup_pre(v, r)`, `v < r`, any `x`).
+#[inline(always)]
+fn shoup_mul(v: u64, vs: u64, x: u64, r: u64) -> u64 {
+    v.wrapping_mul(x).wrapping_sub(mulhi(vs, x).wrapping_mul(r))
+}
+
+/// `t mod r` for `t < 2r`, `r < 2^63`.
+#[inline(always)]
+fn fold(t: u64, r: u64) -> u64 {
+    t.min(t.wrapping_sub(r))
+}
+
+/// `Σ a·b mod r` over a list of pairs, accumulated in `u128` and reduced
+/// every `kmax - 1` terms (`kmax` terms of `(r-1)^2` fit 128 bits).
+fn dot_mod(init: u64, pairs: impl Iterator<Item = (u64, u64)>, r: u64) -> u64 {
+    let rm = (r - 1) as u128;
+    let kmax = (u128::MAX / (rm * rm).max(1)).clamp(2, 1 << 20) as usize;
+    let mut acc = init as u128;
+    let mut cnt = 0usize;
+    for (a, b) in pairs {
+        acc += a as u128 * b as u128;
+        cnt += 1;
+        if cnt == kmax - 1 {
+            acc %= r as u128;
+            cnt = 0;
+        }
+    }
+    (acc % r as u128) as u64
+}
+
+fn invm_fast(a: u64, r: u64) -> u64 {
+    let (mut res, mut b, mut e) = (1u64, a, r - 2);
+    while e > 0 {
+        if e & 1 == 1 {
+            res = mulmod(res, b, r);
+        }
+        b = mulmod(b, b, r);
+        e >>= 1;
+    }
+    res
+}
+
+/// Sparse lines (rows of `A`, or rows of `Aᵀ`) split by entry kind.
+struct Lines {
+    n: usize,
+    pp: Vec<u32>,
+    mp: Vec<u32>,
+    gp: Vec<u32>,
+    pc: Vec<u32>,
+    mc: Vec<u32>,
+    gc: Vec<u32>,
+    gv: Vec<u64>,
+    gs: Vec<u64>,
+    /// Entries and generic entries per line (for the counters).
+    len: Vec<u32>,
+    nonu: Vec<u32>,
+    tot_len: u64,
+    tot_nonu: u64,
+    /// The unreduced `u64` row sum cannot overflow.
+    fast: bool,
+}
+
+impl Lines {
+    fn build<'a>(lines: impl Iterator<Item = &'a [(u32, u64)]>, r: u64) -> Lines {
+        let mut s = Lines {
+            n: 0,
+            pp: vec![0],
+            mp: vec![0],
+            gp: vec![0],
+            pc: vec![],
+            mc: vec![],
+            gc: vec![],
+            gv: vec![],
+            gs: vec![],
+            len: vec![],
+            nonu: vec![],
+            tot_len: 0,
+            tot_nonu: 0,
+            fast: true,
+        };
+        let mut worst = 0u128;
+        for t in lines {
+            let g0 = s.gc.len();
+            for &(c, v) in t {
+                if v == 1 {
+                    s.pc.push(c);
+                } else if v == r - 1 {
+                    s.mc.push(c);
+                } else {
+                    let v = if v >= r { v % r } else { v };
+                    s.gc.push(c);
+                    s.gv.push(v);
+                    s.gs.push(shoup_pre(v, r));
+                }
+            }
+            s.pp.push(s.pc.len() as u32);
+            s.mp.push(s.mc.len() as u32);
+            s.gp.push(s.gc.len() as u32);
+            let ng = (s.gc.len() - g0) as u32;
+            s.len.push(t.len() as u32);
+            s.nonu.push(ng);
+            s.tot_len += t.len() as u64;
+            s.tot_nonu += ng as u64;
+            worst = worst.max(t.len() as u128 + ng as u128);
+            s.n += 1;
+        }
+        s.fast = (2 * worst + 2) * r as u128 <= u64::MAX as u128 && r < (1u64 << 63);
+        s
+    }
+
+    /// `out[i] = (Σ_k val_ik x[col_ik]) · diag[i] mod r` (no diagonal: just the sum).
+    fn apply(&self, x: &[u64], out: &mut [u64], r: u64, bar: u64, diag: Option<(&[u64], &[u64])>) {
+        for i in 0..self.n {
+            let (p0, p1) = (self.pp[i] as usize, self.pp[i + 1] as usize);
+            let (m0, m1) = (self.mp[i] as usize, self.mp[i + 1] as usize);
+            let (g0, g1) = (self.gp[i] as usize, self.gp[i + 1] as usize);
+            let mut y = if self.fast {
+                let mut sp = 0u64;
+                for &c in &self.pc[p0..p1] {
+                    sp += x[c as usize];
+                }
+                let mut sm = 0u64;
+                for &c in &self.mc[m0..m1] {
+                    sm += x[c as usize];
+                }
+                let mut sg = 0u64;
+                for k in g0..g1 {
+                    sg += shoup_mul(self.gv[k], self.gs[k], x[self.gc[k] as usize], r);
+                }
+                let tot = sp + sg + (m1 - m0) as u64 * r - sm;
+                let t = tot.wrapping_sub(mulhi(tot, bar).wrapping_mul(r));
+                fold(t, r)
+            } else {
+                let mut acc = 0u64;
+                for &c in &self.pc[p0..p1] {
+                    acc = addm(acc, x[c as usize], r);
+                }
+                for &c in &self.mc[m0..m1] {
+                    acc = subm(acc, x[c as usize], r);
+                }
+                for k in g0..g1 {
+                    acc = addm(acc, mulmod(self.gv[k], x[self.gc[k] as usize], r), r);
+                }
+                acc
+            };
+            if let Some((d, ds)) = diag {
+                y = fold(shoup_mul(d[i], ds[i], y, r), r);
+            }
+            out[i] = y;
+        }
+    }
+}
+
+/// `A`, `Aᵀ` and the modulus data of one system.
+struct Sys {
+    r: u64,
+    bar: u64,
+    a: Lines,
+    at: Option<Lines>,
+    nr: usize,
+}
+
+impl Sys {
+    fn new(rows: &[Row], ncols: usize, r: u64, transpose: bool) -> Sys {
+        let a = Lines::build(rows.iter().map(|x| x.0.as_slice()), r);
+        let at = transpose.then(|| {
+            let mut cols: Vec<Vec<(u32, u64)>> = vec![Vec::new(); ncols];
+            for (i, (t, _)) in rows.iter().enumerate() {
+                for &(c, v) in t {
+                    cols[c as usize].push((i as u32, v));
+                }
+            }
+            Lines::build(cols.iter().map(|x| x.as_slice()), r)
+        });
+        Sys {
+            r,
+            bar: u64::MAX / r,
+            a,
+            at,
+            nr: rows.len(),
+        }
+    }
+
+    /// `y = A x`, counted as `mat_vec`.
+    fn mat_vec(&self, x: &[u64], y: &mut [u64], nat: &mut Nat) {
+        self.a.apply(x, y, self.r, self.bar, None);
+        nat.add += self.a.tot_len;
+        nat.mul += self.a.tot_nonu;
+    }
+
+    /// `z = Aᵀ y`, counted as `mat_t_vec` (rows with `y = 0` are not charged).
+    fn mat_t_vec(&self, y: &[u64], z: &mut [u64], nat: &mut Nat) {
+        let at = self.at.as_ref().expect("transpose built");
+        at.apply(y, z, self.r, self.bar, None);
+        let (mut add, mut mul) = (0u64, 0u64);
+        for (i, &yv) in y.iter().enumerate() {
+            if yv != 0 {
+                add += self.a.len[i] as u64;
+                mul += self.a.nonu[i] as u64;
+            }
+        }
+        nat.add += add;
+        nat.mul += mul;
+    }
+
+    /// `out = AᵀDA v`, counted as `m_apply`.
+    fn m_apply(
+        &self,
+        d: (&[u64], &[u64]),
+        v: &[u64],
+        tmp: &mut [u64],
+        out: &mut [u64],
+        nat: &mut Nat,
+    ) {
+        self.a.apply(v, tmp, self.r, self.bar, Some(d));
+        nat.add += self.a.tot_len;
+        nat.mul += self.a.tot_nonu + self.nr as u64;
+        self.mat_t_vec(tmp, out, nat);
+    }
+}
+
+fn diag_shoup(d: &[u64], r: u64) -> Vec<u64> {
+    d.iter().map(|&x| shoup_pre(x, r)).collect()
+}
+
+/// Berlekamp–Massey, as `ic_control`'s, with `u128` dot products.
+fn berlekamp_massey(s: &[u64], r: u64, nat: &mut Nat) -> Vec<u64> {
+    let mut c = vec![1u64];
+    let mut b = vec![1u64];
+    let mut l = 0usize;
+    let mut m = 1usize;
+    let mut binv = 1u64;
+    for n in 0..s.len() {
+        let terms = l.min(c.len() - 1);
+        nat.mul += terms as u64;
+        nat.add += terms as u64;
+        let d = dot_mod(
+            s[n],
+            c[1..=terms]
+                .iter()
+                .zip(s[n - terms..n].iter().rev())
+                .map(|(&a, &b)| (a, b)),
+            r,
+        );
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = {
+            nat.mul += 1;
+            mulmod(d, binv, r)
+        };
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        let cs = shoup_pre(coef, r);
+        nat.mul += b.len() as u64;
+        nat.add += b.len() as u64;
+        for (i, &bv) in b.iter().enumerate() {
+            let prod = fold(shoup_mul(coef, cs, bv, r), r);
+            c[i + m] = subm(c[i + m], prod, r);
+        }
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            nat.mul += pivot_inversion_steps(r);
+            binv = invm_fast(d, r);
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.truncate(l + 1);
+    c.resize(l + 1, 0);
+    c
+}
+
+/// Solve `A x = c` by Wiedemann on `AᵀDA x = AᵀD c`; as `ic_control::wiedemann`.
+fn wiedemann(
+    rows: &[Row],
+    ncols: usize,
+    r: u64,
+    rng: &mut StdRng,
+    dense_u: bool,
+    nat: &mut Nat,
+) -> Option<Vec<u64>> {
+    let nr = rows.len();
+    let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+    let ds = diag_shoup(&d, r);
+    let sys = Sys::new(rows, ncols, r, true);
+    let mut tmp = vec![0u64; nr];
+    for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+        nat.mul += 1;
+        *t = mulmod(row.1, di, r);
+    }
+    let mut bp = vec![0u64; ncols];
+    sys.mat_t_vec(&tmp, &mut bp, nat);
+    let mut proj: Vec<(usize, u64)> = Vec::new();
+    if dense_u || ncols <= 16 {
+        proj.extend((0..ncols).map(|i| (i, rng.gen_range(1..r))));
+    } else {
+        for _ in 0..16 {
+            proj.push((rng.gen_range(0..ncols), rng.gen_range(1..r)));
+        }
+    }
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    let mut v = bp.clone();
+    let mut w = vec![0u64; ncols];
+    for _ in 0..len {
+        nat.mul += proj.len() as u64;
+        nat.add += proj.len() as u64;
+        seq.push(dot_mod(0, proj.iter().map(|&(i, uv)| (uv, v[i])), r));
+        sys.m_apply((&d, &ds), &v, &mut tmp, &mut w, nat);
+        std::mem::swap(&mut v, &mut w);
+    }
+    let c = berlekamp_massey(&seq, r, nat);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    let mut acc = vec![0u64; ncols];
+    let mut v = bp.clone();
+    for j in 0..l {
+        let coef = c[l - 1 - j];
+        let cs = shoup_pre(coef, r);
+        nat.mul += ncols as u64;
+        nat.add += ncols as u64;
+        for (a, &vi) in acc.iter_mut().zip(v.iter()) {
+            *a = addm(*a, fold(shoup_mul(coef, cs, vi, r), r), r);
+        }
+        if j + 1 < l {
+            sys.m_apply((&d, &ds), &v, &mut tmp, &mut w, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    nat.mul += pivot_inversion_steps(r);
+    let sc = subm(0, invm_fast(c[l], r), r);
+    let ss = shoup_pre(sc, r);
+    nat.mul += ncols as u64;
+    for a in acc.iter_mut() {
+        *a = fold(shoup_mul(sc, ss, *a, r), r);
+    }
+    let mut ax = vec![0u64; nr];
+    sys.mat_vec(&acc, &mut ax, nat);
+    if ax.iter().zip(rows.iter()).all(|(a, row)| *a == row.1) {
+        Some(acc)
+    } else {
+        None
+    }
+}
+
+/// `x[ct]` for `A x = c`; as `ic_control::wiedemann_coord`.
+fn wiedemann_coord(
+    rows: &[Row],
+    ncols: usize,
+    ct: usize,
+    r: u64,
+    rng: &mut StdRng,
+    square: bool,
+    nat: &mut Nat,
+) -> Option<u64> {
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    if square {
+        if rows.len() < ncols {
+            return None;
+        }
+        let mut idx: Vec<usize> = (0..rows.len()).collect();
+        for i in 0..ncols {
+            let j = rng.gen_range(i..idx.len());
+            idx.swap(i, j);
+        }
+        let sub: Vec<Row> = idx[..ncols].iter().map(|&i| rows[i].clone()).collect();
+        let sys = Sys::new(&sub, ncols, r, false);
+        let mut v: Vec<u64> = sub.iter().map(|row| row.1).collect();
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            sys.mat_vec(&v, &mut w, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    } else {
+        let nr = rows.len();
+        let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+        let ds = diag_shoup(&d, r);
+        let sys = Sys::new(rows, ncols, r, true);
+        let mut tmp = vec![0u64; nr];
+        for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+            nat.mul += 1;
+            *t = mulmod(row.1, di, r);
+        }
+        let mut v = vec![0u64; ncols];
+        sys.mat_t_vec(&tmp, &mut v, nat);
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            sys.m_apply((&d, &ds), &v, &mut tmp, &mut w, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    let c = berlekamp_massey(&seq, r, nat);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    nat.mul += l as u64;
+    nat.add += l as u64;
+    let acc = dot_mod(0, (0..l).map(|j| (c[l - 1 - j], seq[j])), r);
+    nat.mul += pivot_inversion_steps(r) + 1;
+    Some(mulmod(acc, subm(0, invm_fast(c[l], r), r), r))
 }
 
 // ── rho ─────────────────────────────────────────────────────────────────
@@ -3197,6 +4119,212 @@ mod tests {
         }
     }
 
+    // ── order methods (fast order study, 2026-11-21) ────────────────────
+
+    /// The enumeration of `count_points(2)` as it was before the Barrett
+    /// reduction: the reference every new count is compared with.
+    fn count_points2_reference(c: &JCurve) -> u64 {
+        let p = c.k.p;
+        let mut sq = vec![false; p as usize];
+        for y in 1..p {
+            sq[(y * y % p) as usize] = true;
+        }
+        let nu = (2..p).find(|&a| !sq[a as usize]).expect("a non-residue");
+        let f = &c.f;
+        let mut n = 1u64;
+        for a in 0..p {
+            for b in 0..=(p - 1) / 2 {
+                let (mut ra, mut rb) = (0u64, 0u64);
+                for i in (0..f.n).rev() {
+                    let na = (ra * a + nu * (rb * b % p)) % p;
+                    let nb = (ra * b + rb * a) % p;
+                    ra = (na + f.c[i]) % p;
+                    rb = nb;
+                }
+                let w = if b == 0 { 1 } else { 2 };
+                if ra == 0 && rb == 0 {
+                    n += w;
+                } else {
+                    let norm = (ra * ra % p + p - nu * (rb * rb % p) % p) % p;
+                    if sq[norm as usize] {
+                        n += 2 * w;
+                    }
+                }
+            }
+        }
+        n
+    }
+
+    #[test]
+    fn count_points2_matches_reference() {
+        for (p, g, cs) in [
+            (67u64, 3u32, 1u64),
+            (257, 3, 2),
+            (1031, 3, 3),
+            (1031, 4, 4),
+            (2053, 2, 5),
+        ] {
+            let c = JCurve::new(p, g, &random_f(p, g, cs)).unwrap();
+            assert_eq!(
+                c.count_points(2),
+                count_points2_reference(&c),
+                "p={p} g={g}"
+            );
+        }
+    }
+
+    /// `Ok(order)` or the class of the error, for comparing routes.
+    fn order_outcome(c: &JCurve, m: OrderMethod, seed: u64) -> String {
+        match c.jacobian_order_with(m, seed) {
+            Ok(n) => format!("ok {n}"),
+            Err(e) => format!("err {}", e.split(':').next().unwrap_or("")),
+        }
+    }
+
+    fn json_instances(src: &str) -> Vec<(u64, Vec<u64>, u64, u64)> {
+        let v: serde_json::Value = serde_json::from_str(src).unwrap();
+        v["instances"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|i| i["g"] == 3 && i["family"] == "hyperelliptic")
+            .map(|i| {
+                (
+                    i["p"].as_u64().unwrap(),
+                    i["f"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|x| x.as_u64().unwrap())
+                        .collect(),
+                    i["order"].as_u64().unwrap(),
+                    i["curve_seed"].as_u64().unwrap(),
+                )
+            })
+            .collect()
+    }
+
+    fn check_recorded(src: &str, p_max: u64, p_min: u64) -> usize {
+        let mut n = 0;
+        for (p, f, order, cs) in json_instances(src) {
+            if p > p_max || p < p_min {
+                continue;
+            }
+            let c = JCurve::new(p, 3, &f).unwrap();
+            assert_eq!(
+                c.jacobian_order_with(OrderMethod::Bsgs1, cs),
+                Ok(order),
+                "bsgs1 p={p} cs={cs}"
+            );
+            assert_eq!(
+                c.jacobian_order_with(OrderMethod::Enumerate, cs),
+                Ok(order),
+                "enum p={p} cs={cs}"
+            );
+            if p <= 1031 {
+                assert_eq!(c.jacobian_order_with(OrderMethod::Bsgs2, cs), Ok(order));
+            }
+            n += 1;
+        }
+        n
+    }
+
+    #[test]
+    fn bsgs1_matches_enumerate_on_recorded_instances() {
+        let a = check_recorded(
+            include_str!("../../research/genus_ladder_20261114/analysis.json"),
+            4099,
+            0,
+        );
+        assert_eq!(a, 28);
+    }
+
+    #[test]
+    #[ignore = "minutes: enumerates p = 8209, 16411 and 32771"]
+    fn bsgs1_matches_enumerate_on_scale_instances() {
+        let b = check_recorded(
+            include_str!("../../research/genus_ladder_scale_20261115/g3_analysis.json"),
+            32771,
+            0,
+        );
+        assert_eq!(b, 9);
+    }
+
+    #[test]
+    fn bsgs1_matches_enumerate_on_random_curves() {
+        let p = 1031u64;
+        let (mut ok, mut err, mut tested) = (0, 0, 0);
+        for cs in 9000..9050u64 {
+            let Ok(c) = JCurve::new(p, 3, &random_f(p, 3, cs)) else {
+                continue;
+            };
+            tested += 1;
+            let e = order_outcome(&c, OrderMethod::Enumerate, cs);
+            let b = order_outcome(&c, OrderMethod::Bsgs1, cs);
+            let b2 = order_outcome(&c, OrderMethod::Bsgs2, cs);
+            println!("RANDOM cs={cs} enumerate={e} bsgs1={b} bsgs2={b2}");
+            assert_eq!(e, b, "cs={cs}");
+            assert_eq!(e, b2, "cs={cs}");
+            if e.starts_with("ok") {
+                ok += 1;
+            } else {
+                err += 1;
+            }
+        }
+        println!("RANDOM tested={tested} ok={ok} err={err}");
+        assert!(tested >= 45);
+    }
+
+    #[test]
+    fn bsgs_table_size_is_monotone_and_bounded() {
+        assert!(bsgs_table_size(131101, 3, OrderMethod::Bsgs1) < MAX_BSGS_TABLE);
+        assert!(
+            bsgs_table_size(131101, 3, OrderMethod::Bsgs1)
+                < bsgs_table_size(262147, 3, OrderMethod::Bsgs1)
+        );
+    }
+
+    /// Timing probe: `PROBE_ORDER=p,g,method,cs cargo test --release --lib
+    /// order_probe -- --ignored --nocapture`.
+    #[test]
+    #[ignore = "manual timing probe"]
+    fn order_probe() {
+        let v = std::env::var("PROBE_ORDER").expect("PROBE_ORDER=p,g,method,cs");
+        let a: Vec<&str> = v.split(',').collect();
+        let (p, g, cs): (u64, u32, u64) = (
+            a[0].parse().unwrap(),
+            a[1].parse().unwrap(),
+            a[3].parse().unwrap(),
+        );
+        let c = JCurve::new(p, g, &random_f(p, g, cs)).unwrap();
+        if a[2] == "count2" {
+            let t = std::time::Instant::now();
+            let n = c.count_points(2);
+            println!(
+                "PROBE p={p} g={g} count_points(2)={n} wall_s={:.3}",
+                t.elapsed().as_secs_f64()
+            );
+            if a.len() > 4 {
+                let t = std::time::Instant::now();
+                let r = count_points2_reference(&c);
+                println!(
+                    "PROBE reference={r} wall_s={:.3}",
+                    t.elapsed().as_secs_f64()
+                );
+            }
+            return;
+        }
+        let m = OrderMethod::parse(a[2]).unwrap();
+        let t = std::time::Instant::now();
+        let r = c.jacobian_order_with(m, cs);
+        println!(
+            "PROBE p={p} g={g} method={} cs={cs} result={r:?} table_bound={} wall_s={:.3}",
+            m.name(),
+            bsgs_table_size(p, g as usize, m),
+            t.elapsed().as_secs_f64()
+        );
+    }
+
     /// The legacy policy is `run_rho_walk` count for count; the window-free
     /// walks (arms B and Q) certify, and the plain walk without its window is
     /// the same walk with zero compares (validator finding B13).
@@ -3228,5 +4356,648 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// `excess: None` is the frozen instrument through the new entry point,
+    /// and a selection that drops nothing (`extra = 0`, `keep = 1`) changes
+    /// no count of the run.
+    #[test]
+    fn excess_none_and_noop_reproduce_baseline_counts() {
+        let key = |o: &IcResult| {
+            (
+                o.trials,
+                o.relations,
+                o.rel,
+                o.cantor_mul,
+                o.la,
+                o.la_wied,
+                o.la_sge,
+                o.core_rows,
+                o.core_cols,
+                o.recovered,
+            )
+        };
+        // The frozen row of `sge_none_reproduces_frozen_counts` for (67, 3, DoubleLp, pre).
+        let inst = first_instance(67, 3);
+        let o = run_ic_ext_excess(
+            &inst,
+            prm(67, 3, Arm::DoubleLp, true, None),
+            IcExt::default(),
+            None,
+        );
+        assert_eq!(
+            (
+                o.trials,
+                o.relations,
+                o.rel.mul,
+                o.rel.add,
+                o.cantor_mul,
+                o.la.mul,
+                o.la.add
+            ),
+            (4272, 39, 323304, 275525, 945740, 11597, 25023)
+        );
+        assert_eq!(o.la_sel, Nat::default());
+        let noop = Some(ExcessParams {
+            extra: 0.0,
+            keep: 1.0,
+        });
+        for (p, g, sge) in [
+            (67u64, 3u32, None),
+            (131, 2, None),
+            (
+                257,
+                3,
+                Some(SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                }),
+            ),
+            (
+                131,
+                4,
+                Some(SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                }),
+            ),
+        ] {
+            let inst = first_instance(p, g);
+            let a = run_ic_ext(&inst, prm(p, g, Arm::DoubleLp, true, sge), IcExt::default());
+            let b = run_ic_ext_excess(
+                &inst,
+                prm(p, g, Arm::DoubleLp, true, sge),
+                IcExt::default(),
+                noop,
+            );
+            assert_eq!(key(&a), key(&b), "p = {p} g = {g}");
+            assert_eq!(b.la_sel.mul, 0);
+        }
+    }
+
+    /// With the excess the logarithm is still certified: 20 instances at
+    /// p in {1031, 2053}, genus 3 and 4.
+    #[test]
+    fn excess_certifies_on_twenty_instances() {
+        let mut n = 0;
+        let mut selected = 0;
+        for (p, g) in [(1031u64, 3u32), (2053, 3), (1031, 4), (2053, 4)] {
+            let mut got = 0;
+            let mut cs = 1u64;
+            while got < 5 {
+                let c = cs;
+                cs += 1;
+                let Ok(inst) = make_instance(p, g, c, 7 + c, 64) else {
+                    continue;
+                };
+                got += 1;
+                n += 1;
+                let ex = ExcessParams {
+                    extra: 0.5,
+                    keep: 0.7,
+                };
+                let sge = Some(SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                });
+                let base = run_ic_ext(&inst, prm(p, g, Arm::DoubleLp, true, sge), IcExt::default());
+                let o = run_ic_ext_excess(
+                    &inst,
+                    prm(p, g, Arm::DoubleLp, true, sge),
+                    IcExt::default(),
+                    Some(ex),
+                );
+                let tag = format!("p = {p} g = {g} curve {c}");
+                assert!(base.certified && o.certified, "{tag}");
+                assert_eq!(o.recovered, Some(inst.t_secret), "{tag}");
+                assert!(o.relations >= base.relations, "{tag}");
+                assert_eq!(o.sge.rows_in, o.core_rows, "{tag}");
+                assert_eq!(o.rows_kept, o.core_rows, "{tag}");
+                assert!(o.rows_kept <= o.core_rows_pre, "{tag}");
+                assert!(o.core_rows >= o.core_cols, "{tag}");
+                assert_eq!(
+                    o.la.mul,
+                    o.la_graph.mul + o.la_peel.mul + o.la_sel.mul + o.la_sge.mul + o.la_wied.mul,
+                    "{tag}"
+                );
+                if o.core_rows < o.core_rows_pre {
+                    selected += 1;
+                }
+            }
+        }
+        assert_eq!(n, 20);
+        assert!(selected > 0, "the selection never dropped a row");
+    }
+
+    /// The bounded selection keeps `cover` live rows on every column it held
+    /// (the target column included), never goes below `cols + margin` rows,
+    /// and its minimum-weight greedy leaves a total weight no larger than the
+    /// lightest-first selection's under the same cover.
+    #[test]
+    fn bounded_rows_keep_cover_and_t_and_are_lighter() {
+        let r = 1_000_000_007u64;
+        let (nrow, ncol) = (120usize, 30usize);
+        let tcol = (ncol - 1) as u32;
+        let mut st = 5u64;
+        let mut next = || {
+            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            mix64(st)
+        };
+        let margin = |_: usize| 2usize;
+        let mut dropped_any = false;
+        for _ in 0..8 {
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let k = 2 + next() % 9;
+                    let mut t: Vec<(u32, u64)> = (0..k)
+                        .map(|_| ((next() % ncol as u64) as u32, 1 + next() % (r - 1)))
+                        .collect();
+                    t.push((tcol, 1 + next() % (r - 1)));
+                    t.sort_unstable_by_key(|e| e.0);
+                    t.dedup_by_key(|e| e.0);
+                    (t, next() % r)
+                })
+                .collect();
+            let mut before = vec![0u32; ncol];
+            for row in &rows {
+                for &(c, _) in &row.0 {
+                    before[c as usize] += 1;
+                }
+            }
+            for cover in [1u32, 2, 3] {
+                let mut nat = Nat::default();
+                let Ok((core, cc, ct)) =
+                    select_bounded_rows(&rows, ncol, tcol, cover, &margin, &mut nat)
+                else {
+                    continue;
+                };
+                dropped_any = true;
+                assert!(core.len() < rows.len() && core.len() >= cc + margin(cc));
+                assert!(core.iter().all(|(_, b)| rows.iter().any(|(_, b0)| b0 == b)));
+                assert!(core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct)));
+                if cover >= 2 {
+                    // no re-peel: the columns are the input's, each still held
+                    // by at least `cover` rows where it was before.
+                    assert_eq!(cc, ncol);
+                    let mut after = vec![0u32; ncol];
+                    for row in &core {
+                        for &(c, _) in &row.0 {
+                            after[c as usize] += 1;
+                        }
+                    }
+                    for c in 0..ncol {
+                        assert!(
+                            before[c] < cover || after[c] >= cover.min(before[c]),
+                            "column {c} cover {cover}"
+                        );
+                    }
+                    let w = |v: &[Row]| v.iter().map(|x| x.0.len()).sum::<usize>();
+                    assert!(w(&core) < w(&rows));
+                }
+                assert!(nat.add > 0 && nat.mul == 0);
+            }
+        }
+        assert!(dropped_any);
+    }
+
+    /// The weight-bounded core certifies on 24 instances (genus 3 and 4,
+    /// p in {1031, 2053, 8209}), keeps the relation stream (at least the
+    /// plain arm's relations, the same first stop), charges every step to
+    /// `la`, and `None` is the excess path count for count.
+    #[test]
+    fn bounded_certifies_and_none_is_the_baseline() {
+        let sge = Some(SgeParams {
+            w_max: 8,
+            fill_max: 3.0,
+        });
+        let mut n = 0;
+        let (mut probed, mut selected) = (0, 0);
+        for (p, g) in [
+            (1031u64, 3u32),
+            (2053, 3),
+            (8209, 3),
+            (1031, 4),
+            (2053, 4),
+            (8209, 4),
+        ] {
+            let mut got = 0;
+            let mut cs = 1u64;
+            while got < 4 {
+                let c = cs;
+                cs += 1;
+                let Ok(inst) = make_instance(p, g, c, 7 + c, 64) else {
+                    continue;
+                };
+                got += 1;
+                n += 1;
+                let tag = format!("p = {p} g = {g} curve {c}");
+                let a = run_ic_ext_excess(
+                    &inst,
+                    prm(p, g, Arm::DoubleLp, true, sge),
+                    IcExt::default(),
+                    None,
+                );
+                let z = run_ic_ext_bounded(
+                    &inst,
+                    prm(p, g, Arm::DoubleLp, true, sge),
+                    IcExt::default(),
+                    None,
+                    None,
+                );
+                assert_eq!(
+                    (a.la, a.rel, a.trials, a.recovered),
+                    (z.la, z.rel, z.trials, z.recovered),
+                    "{tag}"
+                );
+                assert_eq!((z.bd_probes, z.bd_n0), (0, 0), "{tag}");
+                for cover in [2u32, 1] {
+                    let bd = BoundedParams {
+                        target: 6.0,
+                        step: 0.2,
+                        extra_max: 1.0,
+                        cover,
+                    };
+                    let o = run_ic_ext_bounded(
+                        &inst,
+                        prm(p, g, Arm::DoubleLp, true, sge),
+                        IcExt::default(),
+                        None,
+                        Some(bd),
+                    );
+                    let tag = format!("{tag} cover {cover}");
+                    assert!(a.certified && o.certified, "{tag}");
+                    assert_eq!(o.recovered, Some(inst.t_secret), "{tag}");
+                    assert!(o.relations >= a.relations, "{tag}");
+                    assert_eq!(o.bd_n0, a.relations, "{tag}");
+                    assert!(o.bd_extra <= bd.extra_max + 0.2, "{tag}");
+                    assert_eq!(o.sge.rows_in, o.core_rows, "{tag}");
+                    assert_eq!(o.rows_kept, o.core_rows, "{tag}");
+                    assert!(o.rows_kept <= o.core_rows_pre, "{tag}");
+                    assert!(o.core_rows >= o.core_cols, "{tag}");
+                    assert_eq!(
+                        o.la.mul,
+                        o.la_graph.mul
+                            + o.la_peel.mul
+                            + o.la_sel.mul
+                            + o.la_sge.mul
+                            + o.la_wied.mul,
+                        "{tag}"
+                    );
+                    assert!(o.attempts >= 1, "{tag}");
+                    probed += u32::from(o.bd_probes > 0);
+                    selected += u32::from(o.core_rows < o.core_rows_pre);
+                }
+            }
+        }
+        assert_eq!(n, 24);
+        assert!(probed > 0, "the target never asked for more relations");
+        assert!(selected > 0, "the selection never dropped a row");
+    }
+
+    /// The drop step keeps a holder of every column the rows hold (the target
+    /// column included), and the selected system keeps `t`.
+    #[test]
+    fn light_rows_never_uncover_a_column_and_keep_t() {
+        let r = 1_000_000_007u64;
+        let (nrow, ncol) = (90usize, 30usize);
+        let tcol = (ncol - 1) as u32;
+        let mut st = 11u64;
+        let mut next = || {
+            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            mix64(st)
+        };
+        let margin = |_: usize| 2usize;
+        let mut dropped_any = false;
+        for _ in 0..8 {
+            let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let k = 1 + next() % 6;
+                    let mut t: Vec<(u32, u64)> = (0..k)
+                        .map(|_| ((next() % ncol as u64) as u32, 1 + next() % (r - 1)))
+                        .collect();
+                    t.sort_unstable_by_key(|e| e.0);
+                    t.dedup_by_key(|e| e.0);
+                    let rhs = t
+                        .iter()
+                        .fold(0, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+                    (t, rhs)
+                })
+                .collect();
+            let mut nat = Nat::default();
+            let alive = light_survivors(&rows, ncol, 0.0, &margin, &mut nat);
+            let mut before = vec![0u32; ncol];
+            let mut after = vec![0u32; ncol];
+            for (row, &a) in rows.iter().zip(&alive) {
+                for &(c, _) in &row.0 {
+                    before[c as usize] += 1;
+                    after[c as usize] += u32::from(a);
+                }
+            }
+            for c in 0..ncol {
+                assert!(before[c] == 0 || after[c] >= 1, "column {c} uncovered");
+            }
+            dropped_any |= alive.iter().any(|&a| !a);
+            assert!(nat.add > 0);
+            let mut sel = Nat::default();
+            if let Ok((core, cc, ct)) = select_light_rows(&rows, ncol, tcol, 0.0, &margin, &mut sel)
+            {
+                // original rows only, the target column still covered
+                assert!(core.len() < rows.len());
+                assert!(core.iter().all(|(_, b)| rows.iter().any(|(_, b0)| b0 == b)));
+                assert!(
+                    before[tcol as usize] == 0
+                        || core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct))
+                );
+                assert!(cc <= ncol && core.len() >= cc + margin(cc));
+                assert!(sel.add > nat.add);
+            }
+        }
+        assert!(dropped_any);
+    }
+}
+
+/// Phase split of the linear-algebra wall time (`research/genus_ladder_kappa_20261122`):
+/// times `sge_reduce` and `wiedemann` separately on a synthetic core of the
+/// real shape and prints wall time per counted operation.  Measurement
+/// only; `cargo test --release --lib kappa_phase_split -- --ignored --nocapture`.
+#[cfg(test)]
+mod kappa_phase_split {
+    use super::*;
+    use std::time::Instant;
+
+    #[test]
+    #[ignore]
+    fn sge_and_wiedemann_wall_per_counted_op() {
+        for r in [
+            35_204_231_349_877u64,
+            562_757_240_242_147,
+            4_511_942_408_507_159,
+        ] {
+            let (nrow, ncol) = (4_100usize, 4_000usize);
+            let tcol = (ncol - 1) as u32;
+            let mut st = 11u64;
+            let mut next = || {
+                st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+                mix64(st)
+            };
+            let mut reps: Vec<[f64; 6]> = Vec::new();
+            for rep in 0..7u64 {
+                let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+                let rows: Vec<Row> = (0..nrow)
+                    .map(|i| {
+                        let k = 2 + next() % 5;
+                        let mut t: Vec<(u32, u64)> = vec![((i % (ncol - 1)) as u32, 1)];
+                        for _ in 0..k {
+                            let c = (next() % (ncol as u64 - 1)) as u32;
+                            let v = match next() % 20 {
+                                0..=1 => r - 1,
+                                2..=16 => 1,
+                                _ => 1 + next() % (r - 1),
+                            };
+                            t.push((c, v));
+                        }
+                        t.push((tcol, 1 + next() % (r - 1)));
+                        t.sort_unstable_by_key(|e| e.0);
+                        t.dedup_by_key(|e| e.0);
+                        let rhs = t
+                            .iter()
+                            .fold(0, |a, &(c, v)| addm(a, mulmod(v, x[c as usize], r), r));
+                        (t, rhs)
+                    })
+                    .collect();
+                let mut sn = Nat::default();
+                let t0 = Instant::now();
+                let (red, rc, rt, _) = sge_reduce(
+                    &rows,
+                    ncol,
+                    tcol,
+                    r,
+                    SgeParams {
+                        w_max: 8,
+                        fill_max: 3.0,
+                    },
+                    &mut sn,
+                );
+                let t_sge = t0.elapsed().as_nanos() as f64;
+                let mut rng = StdRng::seed_from_u64(rep);
+                let mut wn = Nat::default();
+                let t0 = Instant::now();
+                let sol = wiedemann(&red, rc, r, &mut rng, true, &mut wn);
+                let t_w = t0.elapsed().as_nanos() as f64;
+                if sol.map(|v| v[rt as usize]) != Some(x[tcol as usize]) {
+                    println!("r={r} rep {rep}: wiedemann returned a wrong value or None, skipped");
+                    continue;
+                }
+                reps.push([
+                    t_sge,
+                    sn.mul as f64,
+                    sn.add as f64,
+                    t_w,
+                    wn.mul as f64,
+                    wn.add as f64,
+                ]);
+            }
+            let med = |i: usize| {
+                let mut v: Vec<f64> = reps.iter().map(|x| x[i]).collect();
+                v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                v[v.len() / 2]
+            };
+            println!(
+                "kappa_phase r={r} reps={} sge_ns={:.0} sge_mul={:.0} sge_add={:.0} wied_ns={:.0} wied_mul={:.0} wied_add={:.0} wied_ns_per_mul={:.2} wied_ns_per_add={:.2}",
+                reps.len(), med(0), med(1), med(2), med(3), med(4), med(5),
+                med(3) / med(4), med(3) / med(5)
+            );
+        }
+    }
+}
+
+/// Count identity for the Wiedemann speed study
+/// (`research/genus_ladder_wied_speed_20261122`): every counted field and the
+/// recovered `t` of 24 runs equal a reference recorded from the unmodified
+/// solver.  `PROBE_WIED_GEN=<path>` writes the reference instead of checking it.
+#[cfg(test)]
+mod wied_speed {
+    use super::*;
+    use serde_json::{json, Value};
+
+    const FIXTURE: &str = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/research/genus_ladder_wied_speed_20261122/count_reference.json"
+    );
+
+    fn first_instance(p: u64, g: u32) -> Instance {
+        for cs in 1..400u64 {
+            if let Ok(i) = make_instance(p, g, cs, 7, 64) {
+                return i;
+            }
+        }
+        panic!("no instance at p = {p}, g = {g}");
+    }
+
+    fn nat(n: Nat) -> Value {
+        json!([n.mul, n.add])
+    }
+
+    fn record(o: &IcResult) -> Value {
+        json!({
+            "recovered": o.recovered, "certified": o.certified, "exhausted": o.exhausted,
+            "trials": o.trials, "relations": o.relations, "attempts": o.attempts,
+            "la_fallbacks": o.la_fallbacks, "cycles": o.cycles,
+            "cantor_mul": o.cantor_mul, "cantor_inv": o.cantor_inv,
+            "group_adds": o.group.adds, "group_doubles": o.group.doubles,
+            "rel": nat(o.rel), "la": nat(o.la), "la_graph": nat(o.la_graph),
+            "la_peel": nat(o.la_peel), "la_wied": nat(o.la_wied), "la_sge": nat(o.la_sge),
+            "la_sel": nat(o.la_sel),
+            "core_rows": o.core_rows, "core_cols": o.core_cols,
+            "core_nnz_before_sge": o.core_nnz_before_sge,
+            "core_nnz_after_sge": o.core_nnz_after_sge,
+            "sge_rows_in": o.sge.rows_in,
+        })
+    }
+
+    #[test]
+    fn wiedemann_speedup_keeps_counts_and_outputs() {
+        let mut out = serde_json::Map::new();
+        let sge = Some(SgeParams {
+            w_max: 8,
+            fill_max: 3.0,
+        });
+        for g in [3u32, 4] {
+            for p in [1031u64, 2053, 8209] {
+                let inst = first_instance(p, g);
+                for arm in [Arm::Full, Arm::DoubleLp] {
+                    for s in [None, sge] {
+                        let prm = IcParams {
+                            arm,
+                            nb: fb_size_2lp(p, g, 2.0),
+                            seed: 5,
+                            max_trials: 50_000_000,
+                            restart: RESTART,
+                            prefilter: true,
+                            verify_relations: false,
+                            sge: s,
+                        };
+                        let o = run_ic(&inst, prm);
+                        assert!(o.certified, "p={p} g={g} {arm:?}");
+                        let key = format!(
+                            "g{g}_p{p}_{arm:?}_{}",
+                            if s.is_some() { "sge" } else { "nosge" }
+                        );
+                        eprintln!(
+                            "{key} trials {} la.mul {} wall {:.1}s",
+                            o.trials,
+                            o.la.mul,
+                            o.wall_ns as f64 / 1e9
+                        );
+                        out.insert(key, record(&o));
+                    }
+                }
+            }
+        }
+        assert!(out.len() >= 20);
+        if let Ok(path) = std::env::var("PROBE_WIED_GEN") {
+            let s = serde_json::to_string_pretty(&Value::Object(out)).unwrap();
+            std::fs::write(path, s + "\n").unwrap();
+            return;
+        }
+        let want: Value =
+            serde_json::from_str(&std::fs::read_to_string(FIXTURE).expect("fixture")).unwrap();
+        let got = Value::Object(out);
+        assert_eq!(got, want);
+    }
+}
+
+/// The local Wiedemann equals `ic_control`'s (the reference) on synthetic
+/// systems: solution, counters and the random stream afterwards.
+#[cfg(test)]
+mod fast_wiedemann_oracle {
+    use super::*;
+    use crate::cryptanalysis::chained_transfer::ic_control as reference;
+
+    fn prime_below(mut x: u64) -> u64 {
+        while !is_prime_u64(x) {
+            x -= 1;
+        }
+        x
+    }
+
+    fn system(r: u64, ncol: usize, extra: usize, seed: u64) -> (Vec<Row>, usize) {
+        let mut st = seed;
+        let mut next = move || {
+            st = mix64(st.wrapping_add(0x9E37_79B9_7F4A_7C15));
+            st
+        };
+        let tcol = (ncol - 1) as u32;
+        let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+        let rows = (0..ncol + extra)
+            .map(|_| {
+                let k = 2 + (next() % 5) as usize;
+                let mut t: Vec<(u32, u64)> = (0..k)
+                    .map(|_| {
+                        let c = (next() % (ncol as u64 - 1)) as u32;
+                        let v = match next() % 5 {
+                            0 => r - 1,
+                            1 | 2 => 1,
+                            3 => 0,
+                            _ => 1 + next() % (r - 1),
+                        };
+                        (c, v)
+                    })
+                    .collect();
+                t.push((tcol, 1 + next() % (r - 1)));
+                t.sort_unstable_by_key(|e| e.0);
+                t.dedup_by_key(|e| e.0);
+                let rhs = t
+                    .iter()
+                    .fold(0, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+                (t, rhs)
+            })
+            .collect();
+        (rows, ncol)
+    }
+
+    #[test]
+    fn fast_wiedemann_equals_reference() {
+        let primes = [
+            65_537,
+            prime_below(1 << 40),
+            prime_below(1 << 50),
+            prime_below((1 << 50) + 1_000_000),
+            prime_below(1 << 52),
+            prime_below(1 << 58),
+            prime_below(1 << 62),
+            prime_below((1 << 63) - 1),
+        ];
+        let mut solved = 0;
+        for (k, &r) in primes.iter().enumerate() {
+            for (ncol, extra) in [(12usize, 5usize), (40, 12), (90, 30)] {
+                let (rows, nc) = system(r, ncol, extra, 1000 + k as u64 * 7 + ncol as u64);
+                for dense in [false, true] {
+                    let (mut ra, mut rb) = (StdRng::seed_from_u64(9), StdRng::seed_from_u64(9));
+                    let (mut na, mut nb) = (Nat::default(), Nat::default());
+                    let a = reference::wiedemann(&rows, nc, r, &mut ra, dense, &mut na);
+                    let b = wiedemann(&rows, nc, r, &mut rb, dense, &mut nb);
+                    assert_eq!(a, b, "solution r={r} nc={nc} dense={dense}");
+                    assert_eq!(na, nb, "counts r={r} nc={nc} dense={dense}");
+                    assert_eq!(ra.gen::<u64>(), rb.gen::<u64>(), "stream r={r}");
+                    solved += a.is_some() as u32;
+                }
+                for square in [false, true] {
+                    let (mut ra, mut rb) = (StdRng::seed_from_u64(4), StdRng::seed_from_u64(4));
+                    let (mut na, mut nb) = (Nat::default(), Nat::default());
+                    let ct = nc - 1;
+                    let a = reference::wiedemann_coord(&rows, nc, ct, r, &mut ra, square, &mut na);
+                    let b = wiedemann_coord(&rows, nc, ct, r, &mut rb, square, &mut nb);
+                    assert_eq!(a, b, "coord r={r} nc={nc} square={square}");
+                    assert_eq!(na, nb, "coord counts r={r} nc={nc} square={square}");
+                    assert_eq!(ra.gen::<u64>(), rb.gen::<u64>());
+                }
+            }
+        }
+        assert!(
+            solved > 0,
+            "no system solved: the comparison would be vacuous"
+        );
     }
 }

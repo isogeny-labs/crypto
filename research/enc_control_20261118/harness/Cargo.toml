@@ -1,0 +1,34 @@
+# Standalone build of examples/enc_control.rs against the f4_fp and HKY
+# engines, reusing the module set of ../../rand_vs_struct_fb_20261118/harness
+# (the root crate does not compile as a whole; see that README).
+[package]
+name = "enc-control-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+name = "crypto_lib"
+path = "../../rand_vs_struct_fb_20261118/harness/src/lib.rs"
+
+[dependencies]
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+num-integer = "0.1"
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+rayon = "1.10"
+libc = "0.2"
+certified-relations = { path = "../../../crates/certified-relations" }
+relation-replay-checker = { path = "../../../crates/relation-replay-checker" }
+
+[[example]]
+name = "enc_control"
+path = "../../../examples/enc_control.rs"
+
+[[example]]
+name = "enc_control_svg"
+path = "../../../examples/enc_control_svg.rs"

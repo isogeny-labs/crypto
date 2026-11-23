@@ -279,6 +279,8 @@ fn bsgs_find_zero_in_hasse(
     // Baby table: store j ↦ key(j·P)   for j ∈ [0, m].  We also store
     // the negated point for sign-folding so the giant-step inner test
     // costs O(1).
+    // Public CM counting uses vartime ladders; `IC_CM_CT=1` restores CT (A/B).
+    let ct = std::env::var("IC_CM_CT").as_deref() == Ok("1");
     let mut table: HashMap<[u8; 17], u64> = HashMap::with_capacity((m as usize) * 2);
     let mut j_p = Point::Infinity;
     for j in 0..=m {
@@ -288,12 +290,23 @@ fn bsgs_find_zero_in_hasse(
         // (i·m·P − j·P) and (i·m·P + j·P) both hit on a single lookup.
         let neg = j_p.neg();
         table.entry(point_key(&neg)).or_insert(j.wrapping_neg());
-        j_p = j_p.add(point, &a_fe);
+        j_p = if ct {
+            j_p.add(point, &a_fe)
+        } else {
+            j_p.add_vartime(point, &a_fe)
+        };
     }
-    // m·P.
-    let m_p = point.scalar_mul(&BigUint::from(m), &a_fe);
-    // Giant walker: start at lo·P, step by m·P.
-    let mut walker = point.scalar_mul(&BigUint::from(lo), &a_fe);
+    let (m_p, mut walker) = if ct {
+        (
+            point.scalar_mul(&BigUint::from(m), &a_fe),
+            point.scalar_mul(&BigUint::from(lo), &a_fe),
+        )
+    } else {
+        (
+            point.scalar_mul_vartime(&BigUint::from(m), &a_fe),
+            point.scalar_mul_vartime(&BigUint::from(lo), &a_fe),
+        )
+    };
     let giants_max = (width / m) + 2;
     for i in 0..=giants_max {
         if let Some(&j_signed) = table.get(&point_key(&walker)) {
@@ -316,13 +329,21 @@ fn bsgs_find_zero_in_hasse(
             };
             if ok && k_candidate >= lo && k_candidate <= hi {
                 // Verify: k·P = O.
-                let test = point.scalar_mul(&BigUint::from(k_candidate), &a_fe);
+                let test = if ct {
+                    point.scalar_mul(&BigUint::from(k_candidate), &a_fe)
+                } else {
+                    point.scalar_mul_vartime(&BigUint::from(k_candidate), &a_fe)
+                };
                 if matches!(test, Point::Infinity) {
                     return Some(k_candidate);
                 }
             }
         }
-        walker = walker.add(&m_p, &a_fe);
+        walker = if ct {
+            walker.add(&m_p, &a_fe)
+        } else {
+            walker.add_vartime(&m_p, &a_fe)
+        };
     }
     None
 }
@@ -334,6 +355,7 @@ fn refine_point_order(curve: &SmallCurve, point: &crate::ecc::point::Point, mut 
     use crate::ecc::point::Point;
     let cp = curve.to_curve_params();
     let a_fe = cp.a_fe();
+    let ct = std::env::var("IC_CM_CT").as_deref() == Ok("1");
     // Factor a separate copy: factors required by the point order remain in k.
     let mut remainder = k;
     let mut factors = Vec::new();
@@ -353,10 +375,12 @@ fn refine_point_order(curve: &SmallCurve, point: &crate::ecc::point::Point, mut 
     for q in factors {
         while k.is_multiple_of(q) {
             let candidate = k / q;
-            if matches!(
-                point.scalar_mul(&BigUint::from(candidate), &a_fe),
-                Point::Infinity
-            ) {
+            let test = if ct {
+                point.scalar_mul(&BigUint::from(candidate), &a_fe)
+            } else {
+                point.scalar_mul_vartime(&BigUint::from(candidate), &a_fe)
+            };
+            if matches!(test, Point::Infinity) {
                 k = candidate;
             } else {
                 break;

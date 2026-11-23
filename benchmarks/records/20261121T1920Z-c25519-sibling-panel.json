@@ -1,0 +1,425 @@
+{
+  "branch": "claude/sibling-panel",
+  "closed_utc": "2026-11-21T19:49:20+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "echo probe-ok"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T19:21:12+00:00",
+      "wall_s": 0.002
+    },
+    {
+      "argv": [
+        "bash",
+        "research/curve25519_autolab_20261104/sibling-panel/scripts/run_size.sh",
+        "20"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T19:23:04+00:00",
+      "wall_s": 49.454
+    },
+    {
+      "argv": [
+        "bash",
+        "research/curve25519_autolab_20261104/sibling-panel/scripts/run_size.sh",
+        "24"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T19:23:58+00:00",
+      "wall_s": 29.09
+    },
+    {
+      "argv": [
+        "bash",
+        "research/curve25519_autolab_20261104/sibling-panel/scripts/run_size.sh",
+        "28"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T19:24:28+00:00",
+      "wall_s": 34.928
+    },
+    {
+      "argv": [
+        "bash",
+        "research/curve25519_autolab_20261104/sibling-panel/scripts/run_size.sh",
+        "32"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T19:25:03+00:00",
+      "wall_s": 56.477
+    }
+  ],
+  "commit": "31a5e7bd7fdb18b92fcfdbc02f7dee58f9329062",
+  "commit_dirty": true,
+  "created_utc": "2026-11-21T19:20:31+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
+  },
+  "id": "20261121T1920Z-c25519-sibling-panel",
+  "metrics": [
+    {
+      "baseline": 69102.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibbitk20",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 43721.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 55621.0
+    },
+    {
+      "baseline": 2.459,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibsk20",
+      "note": "",
+      "reference": 1.554,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.741
+    },
+    {
+      "baseline": 54376.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibbitk20",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 43721.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 45581.0
+    },
+    {
+      "baseline": 1.958,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibsk20",
+      "note": "",
+      "reference": 1.554,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.453
+    },
+    {
+      "baseline": 75961.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibbitk24",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 48727.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 52353.0
+    },
+    {
+      "baseline": 1.964,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibsk24",
+      "note": "",
+      "reference": 1.234,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.139
+    },
+    {
+      "baseline": 61044.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibbitk24",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 48727.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 42659.0
+    },
+    {
+      "baseline": 1.585,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibsk24",
+      "note": "",
+      "reference": 1.234,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.936
+    },
+    {
+      "baseline": 93813.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibbitk28",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 55517.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 58510.0
+    },
+    {
+      "baseline": 1.822,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibsk28",
+      "note": "",
+      "reference": 1.048,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.938
+    },
+    {
+      "baseline": 74865.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibbitk28",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 55517.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 50058.0
+    },
+    {
+      "baseline": 1.456,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibsk28",
+      "note": "",
+      "reference": 1.048,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.806
+    },
+    {
+      "baseline": 118053.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibbitk32",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 64840.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 74057.0
+    },
+    {
+      "baseline": 1.775,
+      "better": "lower",
+      "n": 480,
+      "name": "c2sibsk32",
+      "note": "",
+      "reference": 0.95,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.914
+    },
+    {
+      "baseline": 91490.0,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibbitk32",
+      "note": "bitop/v1 per sqrt(r), harness work model; unit field says ops_per_s for lack of a bitops unit",
+      "reference": 64840.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ops_per_s",
+      "value": 59121.0
+    },
+    {
+      "baseline": 1.376,
+      "better": "lower",
+      "n": 480,
+      "name": "c1sibsk32",
+      "note": "",
+      "reference": 0.95,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.731
+    }
+  ],
+  "problem": "ic:curve25519-family-k20-32",
+  "raw": [
+    {
+      "bytes": 3735,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k20/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/da/da09157e404515e57b013d9a8497955e4929d067a993b23405a4dccdf780d7a4",
+      "sha256": "da09157e404515e57b013d9a8497955e4929d067a993b23405a4dccdf780d7a4",
+      "uploaded": false
+    },
+    {
+      "bytes": 575126,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k20/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f252e37ca2a883640b0ee77f7155f38f4a822e2eb8048db27d818f3c6e340ba",
+      "sha256": "1f252e37ca2a883640b0ee77f7155f38f4a822e2eb8048db27d818f3c6e340ba",
+      "uploaded": false
+    },
+    {
+      "bytes": 30893213,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k20/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/6479b82c21f08a38d01f5a958c15df2ea6dac3010029f0c9c6b80293f94d1b7f",
+      "sha256": "6479b82c21f08a38d01f5a958c15df2ea6dac3010029f0c9c6b80293f94d1b7f",
+      "uploaded": false
+    },
+    {
+      "bytes": 3499,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k20/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/79bb1a6ad7293f2b75130d999045cf44cd445d9822f1e32ebaacc543d78305d3",
+      "sha256": "79bb1a6ad7293f2b75130d999045cf44cd445d9822f1e32ebaacc543d78305d3",
+      "uploaded": false
+    },
+    {
+      "bytes": 3188,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k20/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a5/a583ceac02a5880e06a56eb07c880c3050b3886105043a34b6b4377f0899840c",
+      "sha256": "a583ceac02a5880e06a56eb07c880c3050b3886105043a34b6b4377f0899840c",
+      "uploaded": false
+    },
+    {
+      "bytes": 3735,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k24/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/af/aff836f5bf07dff12f35e9e1a6aa2e53149312b79cc986ddb085dd6b98e612ea",
+      "sha256": "aff836f5bf07dff12f35e9e1a6aa2e53149312b79cc986ddb085dd6b98e612ea",
+      "uploaded": false
+    },
+    {
+      "bytes": 576569,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k24/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e9/e91861544962d4547c4c6b3897ad5fddb61170f096c318d15352897637ab9a56",
+      "sha256": "e91861544962d4547c4c6b3897ad5fddb61170f096c318d15352897637ab9a56",
+      "uploaded": false
+    },
+    {
+      "bytes": 31481359,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k24/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/40/40edc5585e61ff532b27cdae5bb37360c203338fc56f7a36eef2510102cbc48c",
+      "sha256": "40edc5585e61ff532b27cdae5bb37360c203338fc56f7a36eef2510102cbc48c",
+      "uploaded": false
+    },
+    {
+      "bytes": 3491,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k24/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/25/25cde5915ac80dd76d62aabbc50677f9f6e2a48e4fe1807a69669fc7b0dd32f5",
+      "sha256": "25cde5915ac80dd76d62aabbc50677f9f6e2a48e4fe1807a69669fc7b0dd32f5",
+      "uploaded": false
+    },
+    {
+      "bytes": 3274,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k24/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a5/a5b8db107d944de4d1a523511baaf37b4b57d808a2446ef26035acb5698cfda2",
+      "sha256": "a5b8db107d944de4d1a523511baaf37b4b57d808a2446ef26035acb5698cfda2",
+      "uploaded": false
+    },
+    {
+      "bytes": 3735,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k28/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c5/c5c6d60d841deb1c8b727cb2f9d48ee05ede9b18315e529906cd8fce372fdf7a",
+      "sha256": "c5c6d60d841deb1c8b727cb2f9d48ee05ede9b18315e529906cd8fce372fdf7a",
+      "uploaded": false
+    },
+    {
+      "bytes": 577673,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k28/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c4/c44e7eb111901e324a4bfe3518807022086b4dec9f795bc7397885f9631cc5d2",
+      "sha256": "c44e7eb111901e324a4bfe3518807022086b4dec9f795bc7397885f9631cc5d2",
+      "uploaded": false
+    },
+    {
+      "bytes": 30976035,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k28/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/14/14ff3bd04549714ff4037caf0e6b934120db6a2e615e5b1c7452c383ca751180",
+      "sha256": "14ff3bd04549714ff4037caf0e6b934120db6a2e615e5b1c7452c383ca751180",
+      "uploaded": false
+    },
+    {
+      "bytes": 3497,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k28/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b2/b2e5921f987d33a658aefc2cb440c2cfd6304bc6581eb8f28dbd8faa05e8b546",
+      "sha256": "b2e5921f987d33a658aefc2cb440c2cfd6304bc6581eb8f28dbd8faa05e8b546",
+      "uploaded": false
+    },
+    {
+      "bytes": 3274,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k28/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/32/32bd802ab7ca08c5c14e08737939b9fd958dc4a37bf58ca83fe385aff71fda2d",
+      "sha256": "32bd802ab7ca08c5c14e08737939b9fd958dc4a37bf58ca83fe385aff71fda2d",
+      "uploaded": false
+    },
+    {
+      "bytes": 3735,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k32/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/763fe34ba872f7435c85e63b7a1b2c183f3ddc9eace8056c91bd0b28485888e9",
+      "sha256": "763fe34ba872f7435c85e63b7a1b2c183f3ddc9eace8056c91bd0b28485888e9",
+      "uploaded": false
+    },
+    {
+      "bytes": 579065,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k32/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4b/4bdaa1c7d7ca7677063d33e294f181fe9a1bce193bb2f4d58fa897b2e27b1e25",
+      "sha256": "4bdaa1c7d7ca7677063d33e294f181fe9a1bce193bb2f4d58fa897b2e27b1e25",
+      "uploaded": false
+    },
+    {
+      "bytes": 31537173,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k32/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c7/c7eb34911240c269a242e24c47681d3cea0960c0115fd2d6de32ed9e1d89acc0",
+      "sha256": "c7eb34911240c269a242e24c47681d3cea0960c0115fd2d6de32ed9e1d89acc0",
+      "uploaded": false
+    },
+    {
+      "bytes": 3507,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k32/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8d/8dbea8b0fe61ee595fbf0eaf852b5f04276e2121ee32cd5b1576be72008ccdfa",
+      "sha256": "8dbea8b0fe61ee595fbf0eaf852b5f04276e2121ee32cd5b1576be72008ccdfa",
+      "uploaded": false
+    },
+    {
+      "bytes": 3345,
+      "path": "research/curve25519_autolab_20261104/sibling-panel/sessions/k32/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/54/54fbb34ce4cb87dc62014171ee9ee98b93cc6b39f7a20c92d401b61425fc097c",
+      "sha256": "54fbb34ce4cb87dc62014171ee9ee98b93cc6b39f7a20c92d401b61425fc097c",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/sibling-panel/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/curve25519_autolab_20261104/sibling-panel/ratio.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-sibling-panel",
+  "status": "measured",
+  "summary": "Sibling-points panel, 5 curves x 4 sizes, 6 arms, all 12960 records verified: in bitop/v1 per sqrt(r), sib8 is 0.80/0.69/0.62/0.63 of the C=2 control and 0.84/0.70/0.67/0.65 of the C=1 control at k=20/24/28/32; C=1 sib8 vs rho-neg 1.04/0.88/0.90/0.91, C=2 sib8 vs rho-neg 1.27/1.07/1.05/1.14; GAE band unresolved at w=1",
+  "validation": null
+}

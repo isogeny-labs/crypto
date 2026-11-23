@@ -1,0 +1,74 @@
+{
+  "schema": "prime31-run69-genuine-rhs-target-quotient-v1",
+  "date_utc": "2026-11-22",
+  "classification": "generic table negative control: AUTHENTIC RHS + exact target partial rank, NOT a novel/non-generic ECDLP advantage",
+  "rust_source": "research/prime31_ic_20261115/native/examples/prime31_run69_genuine_partial_rank.rs",
+  "rust_source_blob_sha": "fa997afaed7d9fec915c1e6a5f53449240e8cdc6",
+  "source_created_commit": "9e8a96269539243b73fa4aa591e69aa0c64da5b4",
+  "source_specific_workflow": ".github/workflows/prime31-run69-genuine-partial-rank.yml",
+  "native_rust": "1.100.0; original prime31-algebraic-ic Arithmetic/Base/PRIME31",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "h": 1,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "cohort": "32 deterministic public targets from same 0x68B677A1D1 xorshift harness as run68; secret scalars only in post-solve harness; no secret passed to solver",
+  "relation_source": "original Rust public [k]G walk, every failed shift counted, generic 916469-key B677 signed-pair table, 88 independently EC-verified homogeneous free rows",
+  "relation_shifts": 5378231,
+  "true_rhs_pair_hits": 2272,
+  "independent_dsu_rows": 651,
+  "target_first_witness_leaves": 207113,
+  "found_32_of_32": true,
+  "unanchored_dsu_roots_before_free_specialization": 26,
+  "full_factor_base_rank": false,
+  "verified_target_logs": 32,
+  "base_logs_claimed": 0,
+  "prior_run68_same_cohort": {
+    "relation_shifts": 8267474,
+    "true_rhs_pair_hits": 3520,
+    "independent_dsu_rows": 672,
+    "full_factor_base_rank": true,
+    "verified_target_logs": 32
+  },
+  "query_reduction_fraction": 0.34947107181709913,
+  "ci_runs": [
+    {
+      "run_id": 45060772593,
+      "job_id": 137325960852,
+      "conclusion": "success",
+      "setup_ms": 224.803,
+      "target_witness_ms": 43.651,
+      "relation_and_quotient_ms": 1191.009,
+      "whole_pipeline_ms": 1618.285,
+      "matched_bsgs_setup_ms": 10.459,
+      "matched_bsgs_online_ms": 147.861,
+      "ratio_whole_to_bsgs": 10.221608135421931
+    },
+    {
+      "run_id": 45060777274,
+      "job_id": 137325975373,
+      "conclusion": "success",
+      "setup_ms": 353.121,
+      "target_witness_ms": 65.119,
+      "relation_and_quotient_ms": 1758.414,
+      "whole_pipeline_ms": 2412.716,
+      "matched_bsgs_setup_ms": 15.994,
+      "matched_bsgs_online_ms": 219.434,
+      "ratio_whole_to_bsgs": 10.248211767504289
+    }
+  ],
+  "validation": "both CI executions print RUN69 PASS; actual scalar [k]G=Q per target, post-solve secret harness match and separate same-process original-arithmetic BSGS equality; one deterministic cohort replayed on two runners, NOT independent workload sampling",
+  "limitations": [
+    "generic pair dictionary and triple lookup violate non-generic extractor admission",
+    "same-host matched BSGS reference is not best index calculus or optimized negation-map rho",
+    "full runtimes from separate run68 and run69 workflow executions are not paired same-host measurements",
+    "first witness per Q only; multiple-witness extraction could improve target coverage but is unmeasured"
+  ],
+  "pcc": "unverified"
+}

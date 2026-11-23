@@ -1,0 +1,30 @@
+name: Rootfind round86 structural-shift producer A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-structural-sparse-round86-20261121'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-exact-full-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round86_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Round86 native Rust correctness and complete solve+verify A/B
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round86_full_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round86-source-exact-ab
+          path: research/amm_digit_perf_20261118/round86_full_ab_results.csv

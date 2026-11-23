@@ -1,0 +1,18 @@
+{
+  "schema": "h116-chiral-genus3-prym-digit-launch/v1",
+  "protocol_id": "H116-CHIRAL-GENUS3-PRYM-DIGIT-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_GENUS3_PRYM_DIGIT_SOURCE_GATE.md",
+  "multipliers": [1, 2],
+  "chiral_coefficients": [1, -1],
+  "observables": ["prym_middle_weil_coefficient_mod_3", "prym_real_weil_discriminant_mod_3"],
+  "rules_per_observable": 243,
+  "family_rules": 486,
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_genus3_zeta2_digit.rs", "-o", "/tmp/h116_chiral_genus3_prym_digit"],
+    "selftest": ["/tmp/h116_chiral_genus3_prym_digit", "--selftest"],
+    "run": ["/tmp/h116_chiral_genus3_prym_digit", "--run-prym", "CHIRAL_GENUS3_PRYM_DIGIT_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_GENUS3_PRYM_DIGIT_RESULT.json", "CHIRAL_GENUS3_PRYM_DIGIT_RUN.txt", "CHIRAL_GENUS3_PRYM_DIGIT_SHA256SUMS"],
+  "measurement_scope": "all affine F3 rules separately on the elliptic-factor-removed Prym middle coefficient and real-Weil discriminant, with the full exact second-zeta oracle plus factorization and Prym Weil controls"
+}

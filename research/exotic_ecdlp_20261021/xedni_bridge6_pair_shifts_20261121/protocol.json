@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-bridge6-pair-shifts-protocol-v1",
+  "source_outcomes_sha256": "c25f8647d0b2e4a6a9df07fa4a0dbd199d83520ffd4d6e044da8e1a99fc678e0",
+  "source_result_sha256": "82c1eacc112e5948ade1ae806a2ce562389250225fb72cc15af9501ad5d3ef55",
+  "cells": "all 22 local_bridge rows from the frozen 42-pair source-policy result, in source order",
+  "coefficient_law": "for each row hold the first CRT k1,k2 fixed, use k3(t)=crt_k3+77t for every integer t, and reconstruct a4,a6 from that row's exact rational P,Q",
+  "necessary_polynomial": "primitive integer numerator N(t) of x(6Q(t))-x(P) over Q(t), paired with its primitive denominator D(t)",
+  "modular_test": "seek the first prime from 13 through 2003 inclusive at which N(t) has no root; retain all coefficients and the first certificate or explicit unresolved status",
+  "statuses": ["excluded_all_integer_t", "unresolved", "generic_identity", "producer_failure"],
+  "resource": "300-second checked local Sage process cap; preserve source/runtime receipt, ordered rows, failures and event log",
+  "claim_boundary": "22 first CRT local bridges and their fixed k1,k2 classes; no claim about other coefficient representatives, other source pairs, or an input-independent relation selector"
+}
