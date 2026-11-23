@@ -1,5 +1,12 @@
 # Monic-in-t S3 quotient: an exact alternative to generic F4 for pair factor-base relations
 
+## PRIOR-ART CORRECTION — REQUIRED comparison with existing original Rust (2026-11-15)
+
+A repository code-search audit found an **already working S3 quotient/GCD abscissa oracle**, [`research/prime31_ic_20261115/native/examples/prime31_s3_quotient_gcd.rs`](../../prime31_ic_20261115/native/examples/prime31_s3_quotient_gcd.rs), documented and CI-passed in [S3_QUOTIENT_GCD_ORACLE_20261115.md](../../prime31_ic_20261115/native/S3_QUOTIENT_GCD_ORACLE_20261115.md), [original Rust CI #43741710811](https://github.com/isogeny-labs/crypto/actions/runs/43741710811), PR #4188. That earlier method regards S3(X,Y,z) as a quadratic in Y over Fp[X]/h(X), performs target-dependent monic normalization away from X=z, takes polynomial remainder and a GCD, then independently lifts signed relations. It already handles exceptional target-abscissa collisions and produced native (not fully charged) **B31 ~0.45–0.49 ms** and **B135 ~28–29 ms** algebraic stages. Prior project work also tested m4 quotient chains and public targets.
+
+**Consequence:** an S3 quotient/GCD method, polynomial factorization, and prime31 Rust implementation are *not new*. This new symmetric `t=x1*x2` monic quotient representation removes a leading-coefficient inversion across finite s (a coordinate/presentation distinction), while the balanced rank-four factor tree is a proposed fast symbolic-construction refinement. Both remain unproven as improvements over the existing Rust method. **Compare to the source-bound November 15 GCD incumbent, not merely to F4/ordered Semaev**, before further engineering or novelty claims. The older oracle includes signed-group validation; this PR's current independent prototype checks only x-pairs and is therefore less complete. If matched candidate performance is not superior, reuse the incumbent and avoid maintaining parallel solvers.
+
+
 Date 2026-11-22. Status **mathematical derivation and independent small-instance modular arithmetic check; native implementation and speed unresolved.** This is a **different** elimination from #4922's reusable Macaulay pivot projection. Priority/novelty not established. Do not represent it as an asymptotic breakthrough.
 
 ## Core observation
