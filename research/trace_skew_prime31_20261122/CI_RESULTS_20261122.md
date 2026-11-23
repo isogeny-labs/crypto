@@ -31,6 +31,10 @@ Each arm contains three actual S3 equations, plus four membership equations, six
 
 For B=3 and B=4, the *ordered* four separated univariate membership polynomials need **0 F4 field operations** in this implementation (they are already a Gröbner basis). By contrast, raw H takes 2,985 / 16,104 ops and G takes 2,226 / 13,164 ops. G improves upon H but is not better than the correct ordered control when **no Semaev coupling is present**. Therefore membership-only degree reduction is not a meaningful stand-alone cost claim.
 
+## Older competing quotient/GCD oracle already executed on Prime31
+
+The prior [November 15 original-Rust S3 quotient/GCD](https://github.com/isogeny-labs/crypto/blob/main/research/prime31_ic_20261115/native/S3_QUOTIENT_GCD_ORACLE_20261115.md) was checked against genuine *public* x-targets and signed group lifts, unlike the present planted F4-only positive controls. Its [native CI #43741710811](https://github.com/isogeny-labs/crypto/actions/runs/43741710811) includes B31 ~0.45–0.49 ms and B135 ~28–29 ms single-sample quotient/GCD stages; setup is excluded. Neither a matched factor base nor identical sign checks are present in the new microbenchmarks. **No speed ratio is admissible between these dissimilar cells.** The newly proposed invariant monic-t quotient must compare with this prior working oracle as a stronger stage control before any claim of originality or advantage.
+
 ## Work still uncharged / validation gaps
 
 1. The printed `setup_ms` times only the **Mpoly→F4 Poly conversion** inside `run_arm`. It excludes generating h, all Newton polynomial expansions, the alternative term-system construction, global preprocessing, memory, solution extraction and EC sign checks. Therefore even these component ms figures are not complete setup-plus-solve costs.
