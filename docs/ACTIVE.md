@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Integrate the genus-3 HECDLP cover-reduction evidence and NIST P-224/P-256 transfer status, with explicit toy-scope limits and a construction-first next goal (Codex, completed 2026-11-20, branch codex/genus3-hecdlp-evidence-20261120, PR #4834) [pcc:unverified]
+
 - [ ] Benchmark folded versus unfolded prime-field summation target search on isolated EKS with certificate parity and setup/query/state accounting (Codex, started 2026-11-20, branch codex/prime-field-summation-polynomials-20261119, PR #4829)
 
 - [x] Add the literature-backed global-negation quotient to production summation-polynomial target search (Codex, completed 2026-11-20, branch codex/prime-field-summation-polynomials-20261119, PR #4829; initial library and `ic` integration completed 2026-11-19)
