@@ -116,6 +116,9 @@ SOURCES = {
     "tableb_ksum": "research/ic_tableb_ksum_20261115/summary.json",
     "tableb_binary_ksum": "research/ic_tableb_binary_ksum_20261115/summary.json",
     "ksum_prune": "research/ic_ksum_prune_20261115/summary.json",
+    "tableb_fewcol": "research/ic_tableb_fewcol_20261118/summary.json",
+    "tableb_sib": "research/ic_tableb_sib_20261119/summary.json",
+    "tableb_sib_ablation": "research/ic_tableb_sib_20261119/ablation/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -159,6 +162,10 @@ SOURCES = {
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
     "mt_fieldops_component": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
+    "genus4_followup": "research/genus4_followup_20261118/analysis.json",
+    "genus4_followup_sens": "research/genus4_followup_20261118/sensitivity.json",
+    "genus4_followup_curves": "research/genus4_followup_20261118/per_curve.json",
+    "genus4_prime_order": "research/genus4_prime_order_20261118/analysis.json",
     "fes_then_batched": "research/fes_then_batched_20261112/validation/headline.json",
     "fes_then_batched_readme": "research/fes_then_batched_20261112/README.md",
     "gpu_fes_e2e": "research/ic_gpu_e2e_20261113/results.json",
@@ -534,7 +541,9 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "benchmarks/20261115-tableb-binary-ksum",
                            "benchmarks/20261115-ksum-prune-tableb",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
-                           "benchmarks/20261115-tableb-ksum")
+                           "benchmarks/20261115-tableb-ksum",
+                           "benchmarks/20261118-genus4-followup",
+                           "benchmarks/20261118-genus4-prime-order")
 
 
 def gate_inputs(evidence: Path) -> set[str]:
@@ -2171,6 +2180,52 @@ def mt_fieldops_component() -> dict:
             "validated": not errs}
 
 
+GENUS4_FOLLOWUP_EVIDENCE = "benchmarks/20261118-genus4-followup"
+
+
+def genus4_followup_component() -> dict:
+    """Genus-4 hyperelliptic IC (genus_ladder arm x: double large prime, parity prefilter, coordinate Wiedemann,
+    unit-T walk, Ferrari quartic test, SGE; arm w without Ferrari and SGE) against window-free plain rho measured in
+    the same binary and against the ideal negation-rho bound sqrt(pi r/4), at p = 16411 on 54 targets of 3 curves
+    (research/genus4_followup_20261118, frozen protocol; validator: benchmarks/20261118-genus4-followup).  Ratios at
+    w GAE per native F_p operation; the frozen Q3 reading, the post-hoc closed-form references and the per-curve
+    split (validator finding F7) are copied from the study's JSON."""
+    an = load(SOURCES["genus4_followup"])
+    sens = load(SOURCES["genus4_followup_sens"])
+    pc = load(SOURCES["genus4_followup_curves"])
+    errs = checked_evidence_dir(REPO / GENUS4_FOLLOWUP_EVIDENCE, REPO)
+    if an.get("n_keys") != 108 or not all(an["gates"].values()):
+        raise SystemExit(f"{SOURCES['genus4_followup']}: expected 108 keys and passing gates")
+    arms = {}
+    for a in ("x", "w"):
+        v = an["arms"][a]
+        arms[a] = {"q3": {n: v[f"Q3_w{n}"] for n in ("0", "0.1", "1")}, "q4_w1": v["Q4_w1"],
+                   "plain_theory_w1": sens[a]["vs_plain_theory_w1"], "neg_ideal": {n: sens[a][f"vs_neg_ideal_w{n}"] for n in ("0.1", "1")},
+                   "seed_stability": sens[a]["q3_w1_hi_over_50_seeds"], "la_share": v["share_la"]}
+    po = load(SOURCES["genus4_prime_order"])
+    po_errs = checked_evidence_dir(REPO / "benchmarks/20261118-genus4-prime-order", REPO)
+    prime_order = {"validated": not po_errs, "tune": po["tune"], "rows": [], "slope": po["slope"],
+                   "study": "research/genus4_prime_order_20261118/",
+                   "results": "research/genus4_prime_order_20261118/RESULTS.md",
+                   "errata": "research/genus4_prime_order_20261118/ERRATA.md",
+                   "validator": "benchmarks/20261118-genus4-prime-order/validator-report.md"}
+    for pr, cell in po["primes"].items():
+        for arm, v in cell["arms"].items():
+            prime_order["rows"].append({"p": int(pr), "arm": arm,
+                                        "neg": {n: v[f"neg_w{n}"] for n in ("0", "0.1", "1")},
+                                        "below_all_w": v["below_neg_all_w"]})
+    return {"prime_order": prime_order, "arms": arms, "curves": pc["curves"], "n_targets": an["n_targets"], "n_keys": an["n_keys"],
+            "q_over_theory": an["q_mean_over_theory"], "cc_star": an["cc_star"],
+            "study": "research/genus4_followup_20261118/", "report": "research/genus4_followup_20261118/REPORT.pdf",
+            "results": "research/genus4_followup_20261118/RESULTS.md", "source": SOURCES["genus4_followup"],
+            "validator": f"{GENUS4_FOLLOWUP_EVIDENCE}/validator-report.md",
+            "class": "algorithmic variant (relation test and linear algebra)",
+            "validation": (f"validated: replay certificate, validator report and the ideal negation-rho bound with the "
+                           f"§5a band ({GENUS4_FOLLOWUP_EVIDENCE}/VALIDATION.json)") if not errs else
+                          f"not validated: the gate refuses {GENUS4_FOLLOWUP_EVIDENCE}/VALIDATION.json",
+            "validated": not errs}
+
+
 def nov13_frontier_diagnostics() -> dict:
     """Dated reconciliation of live implementations and recent diagnostics.
 
@@ -2698,6 +2753,107 @@ def tableb_binary_ksum_html(k: dict) -> str:
     return ('<section id="tableb-binary-ksum-20261115"><h2>Table B random-binary rows re-measured with the k-sum tables</h2>' + body +
             '<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) + '</tr></thead><tbody>' + rows +
             '</tbody></table></div>' + gh(SOURCES["tableb_binary_ksum"], "Analysis") + '</section>')
+
+
+TABLEB_R23 = (("fewcol", "tableb_fewcol", "research/ic_tableb_fewcol_20261118"),
+              ("sib", "tableb_sib", "research/ic_tableb_sib_20261119"),
+              ("ablation", "tableb_sib_ablation", "research/ic_tableb_sib_20261119/ablation"))
+
+
+def tableb_rounds23_component() -> dict:
+    """Table B prime rows, round 2 (prune + sib stack, FEWCOL tw2l) and round 3 (sib8-p256, with its
+    ablation addendum): counted GAE at w = 0, 0.1, 1, copied from each study's summary.json.  Each
+    study needs its validation directory's VALIDATION.json (replay certificate, validator report, matched
+    rho reference with the section 5a band)."""
+    out = {"studies": {}}
+    for key, src, study in TABLEB_R23:
+        evidence = study + "/validation" if key != "ablation" else study.replace("/ablation", "") + "/validation/ablation"
+        errs = checked_evidence_dir(REPO / evidence, REPO)
+        if errs:
+            raise SystemExit(f"{evidence}: not validated: " + "; ".join(errs))
+        out["studies"][key] = {"data": load(SOURCES[src]), "study": study + "/", "source": SOURCES[src],
+                               "evidence": evidence + "/VALIDATION.json"}
+    out["validated"] = True
+    return out
+
+
+def _f3(x) -> str:
+    return f"{x:.3f}"
+
+
+def tableb_rounds23_md(k: dict) -> list[str]:
+    st = k["studies"]
+    L = ["", "## Table B prime rows, rounds 2 and 3: FEWCOL and sibling-pool walks (2026-11-18/19, counted component improvements, outside tables A-C)", "",
+         "Three Table B prime curves (P20, P22, P24), 48 public targets each, 2 rounds, counted GAE with native work at "
+         "w = 0, 0.1, 1 (section 5a), one ecbench binary, L0. Every cell is copied from the study's `summary.json`; each study "
+         "is pinned to a `VALIDATION.json` (replay certificate, validator report, matched negation-map rho reference). "
+         "The matched-rho order does not hold across the weight band for sib8-p256, so it is reported as a distance remaining, "
+         "never as a win or a loss. [pcc:unverified]", "",
+         "### Round 2: prune + sib stack (ksum5-ps) and the C = 2 wwalk arm (tw2l)", "",
+         f"Study: [{st['fewcol']['study']}](../../{st['fewcol']['study']}); validation `{st['fewcol']['evidence']}`. "
+         "Ratios are paired `ecbench compare` ratios of recorded S (below 1 is cheaper). The headline w = 0 column "
+         "carries the 95% interval; the other weights are the band values.", "",
+         "| curve | ksum5-ps / ksum5-sib, w = 0 [95%] | w = 0.1 | w = 1 | tw2l / ksum5-sib, w = 0 [95%] | w = 0.1 | w = 1 | S rho-neg (w = 0 / 1) | S tw2l (w = 0 / 1) | distance remaining: tw2l / rho-neg, w = 0 / 0.1 / 1 |",
+         "|:--|--:|--:|--:|--:|--:|--:|:--|:--|:--|"]
+    for b in ("20", "22", "24"):
+        d = st["fewcol"]["data"][b]
+        a, f, t = d["stack"], d["fewcol"], d["tw2l_over_rho"]
+        L.append(f"| P{b} | {_f3(a['ratio'])} [{_f3(a['lo'])}, {_f3(a['hi'])}] | {_f3(a['w01'])} | {_f3(a['w1'])} | "
+                 f"{_f3(f['ratio'])} [{_f3(f['lo'])}, {_f3(f['hi'])}] | {_f3(f['w01'])} | {_f3(f['w1'])} | "
+                 f"{d['S']['rho-neg']['S0']:.2f} / {d['S']['rho-neg']['S1']:.2f} | {d['S']['tw2l']['S0']:.2f} / {d['S']['tw2l']['S1']:.2f} | "
+                 f"{t['w0']:.2f} / {t['w01']:.2f} / {t['w1']:.2f} |")
+    L += ["", "### Round 3: sibling-pool wwalk sib8-p256 against tw2l and matched rho", "",
+          f"Study: [{st['sib']['study']}](../../{st['sib']['study']}); validation `{st['sib']['evidence']}`. "
+          "sib8-p256 changes three parameters from tw2l at once (siblings, stride-generator targets, no `jumps=16`); the ablation below separates them. "
+          "The distance to matched rho is the last two columns: about 0.89-1.11x at w = 0 and 1.6-1.7x at w = 1, order unresolved inside the band at P22 and P24.", "",
+          "| curve | sib8-p256 / tw2l, w = 0 [95%] | w = 0.1 | w = 1 | band | sib8-p256 / rho-neg, w = 0 [95%] | w = 0.1 | w = 1 | band | bitop/v1 sib8-p256 / rho-neg [95%] |",
+          "|:--|--:|--:|--:|:--|--:|--:|--:|:--|:--|"]
+    for b in ("20", "22", "24"):
+        g = st["sib"]["data"][b]["gae"]; bo = st["sib"]["data"][b]["bitop"]
+        t, r, br = g["tw2l-vs-sib8-p256"], g["rho-neg-vs-sib8-p256"], bo["rho-neg-vs-sib8-p256"]
+        L.append(f"| P{b} | {_f3(t['ratio'])} [{_f3(t['lo'])}, {_f3(t['hi'])}] | {_f3(t['w01'])} | {_f3(t['w1'])} | {t['band']} | "
+                 f"{_f3(r['ratio'])} [{_f3(r['lo'])}, {_f3(r['hi'])}] | {_f3(r['w01'])} | {_f3(r['w1'])} | {r['band']} | "
+                 f"{_f3(br['ratio'])} [{_f3(br['lo'])}, {_f3(br['hi'])}] |")
+    L += ["", "S at w = 0 / w = 1:", "", "| curve | rho-neg | tw2l | sib8-p512 | sib8-p256 |", "|:--|:--|:--|:--|:--|"]
+    for b in ("20", "22", "24"):
+        S = st["sib"]["data"][b]["S"]
+        L.append(f"| P{b} | " + " | ".join(f"{S[a]['S0']:.2f} / {S[a]['S1']:.2f}" for a in ("rho-neg", "tw2l", "sib8-p512", "sib8-p256")) + " |")
+    L += ["", "### Round 3 addendum A: ablation (fresh seeds)", "",
+          f"Study: [{st['ablation']['study']}](../../{st['ablation']['study']}); validation `{st['ablation']['evidence']}`.", "",
+          "| curve | tw2l-sib / tw2l, w = 0 / 1 (band) | tw2l-sg / tw2l, w = 0 / 1 (band) | sib8-p256 / tw2l-sib, w = 0 / 1 (band) | sib8-p256 / rho-neg, w = 0 [95%] / 1 (band) | bitop/v1 sib8-p256 / rho-neg [95%] |",
+          "|:--|:--|:--|:--|:--|:--|"]
+    for b in ("20", "22", "24"):
+        g = st["ablation"]["data"][b]["gae"]; bo = st["ablation"]["data"][b]["bitop"]["rho-neg-vs-sib8-p256"]
+        def c(key):
+            x = g[key]; return f"{_f3(x['w0'])} / {_f3(x['w1'])} ({x['band']})"
+        r = g["rho-neg-vs-sib8-p256"]
+        L.append(f"| P{b} | {c('tw2l-vs-tw2l-sib')} | {c('tw2l-vs-tw2l-sg')} | {c('tw2l-sib-vs-sib8-p256')} | "
+                 f"{_f3(r['ratio'])} [{_f3(r['lo'])}, {_f3(r['hi'])}] / {_f3(r['w1'])} ({r['band']}) | {_f3(bo['ratio'])} [{_f3(bo['lo'])}, {_f3(bo['hi'])}] |")
+    L += ["", "Generic table-and-walk C = 2 track; none of these rows breaks the sqrt(r) wall. Counted cost (L0), one host. [pcc:unverified]", ""]
+    return L
+
+
+def tableb_rounds23_html(k: dict) -> str:
+    md = tableb_rounds23_md(k)
+    out, tab = [], []
+    def flush():
+        if tab:
+            hdr = [c.strip() for c in tab[0].strip("|").split("|")]
+            rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tab[2:])
+            out.append('<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) +
+                       '</tr></thead><tbody>' + rows + '</tbody></table></div>')
+            tab.clear()
+    for x in md:
+        if x.startswith("|"):
+            tab.append(x); continue
+        flush()
+        if x.startswith("### "):
+            out.append(f"<h3>{esc(x[4:])}</h3>")
+        elif x and not x.startswith("## "):
+            out.append(f"<p>{rich(x)}</p>")
+    flush()
+    return ('<section id="tableb-rounds23-20261118"><h2>Table B prime rows, rounds 2 and 3: FEWCOL and sibling-pool walks</h2>'
+            + "".join(out) + gh(SOURCES["tableb_sib"], "Analysis") + '</section>')
 
 
 KSUM_PRUNE_EVIDENCE = "benchmarks/20261115-ksum-prune-tableb"
@@ -3792,11 +3948,13 @@ def build(allow_unvalidated: bool = False) -> dict:
         "tableb_ksum_component": tableb_ksum_component(),
         "tableb_binary_ksum_component": tableb_binary_ksum_component(),
         "ksum_prune_component": ksum_prune_component(),
+        "tableb_rounds23_component": tableb_rounds23_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "aimed_gather_component": aimed_gather_component(),
         "mt_fieldops_component": mt_fieldops_component(),
+        "genus4_followup_component": genus4_followup_component(),
         "nov13_frontier_diagnostics": nov13_frontier_diagnostics(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
@@ -4015,6 +4173,96 @@ def hec_text(h: dict) -> dict:
         "slopes_note": ("Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two-stage "
                         "bootstrap 95% interval."),
     }
+
+
+def genus4_followup_lead(g: dict) -> str:
+    x = g["arms"]["x"]
+    st = x["seed_stability"]
+    return (f"Genus-4 hyperelliptic Jacobians over F_p, p = 16411 (group orders about 2^56), {g['n_targets']} targets on 3 "
+            f"curves, 2 solver seeds each ({g['n_keys']} paired runs per arm). Every run certified; one binary "
+            "(`genus_ladder`) for both IC arms and the window-free plain rho. Arm x is the double-large-prime walk with "
+            "the parity prefilter, coordinate Wiedemann, the unit-T walk, the Ferrari quartic splitting test and "
+            "structured Gaussian elimination; arm w is the same without Ferrari and SGE. Costs are group operations "
+            "plus w GAE per native F_p operation (§5a). Frozen reading Q3 against the measured plain rho; post hoc "
+            "against its expectation sqrt(pi r/2) (measured mean "
+            f"{g['q_over_theory']:.3f}x of it) and against the ideal negation bound sqrt(pi r/4), the strongest "
+            "available reference, which nothing below beats at w = 1. The frozen \"below rho at w = 1\" verdict for "
+            f"arm x is fragile: its upper bound is below 1 for only {round(st['frac_below_1'] * 50)} of 50 bootstrap "
+            "seeds. Per curve, arm x is at parity with plain rho on the two cofactor-2 curves and 0.71x on the "
+            "prime-order curve, where it equals the ideal negation bound.")
+
+
+def genus4_followup_markdown(g: dict) -> list[str]:
+    f = lambda v: f"{v['ratio']:.3f} [{v['lo']:.3f}, {v['hi']:.3f}]"
+    L = ["## Genus-4 hyperelliptic IC against plain and negation rho at p = 16411, outside tables A–C", "",
+         genus4_followup_lead(g) + f" Class: {g['class']}. {g['validation'].rstrip('.')}.", "",
+         "| arm | Q3 w=0.1 | Q3 w=1 (frozen) | Q4 w=1 | vs sqrt(pi r/2), w=1 | vs ideal negation, w=0.1 | vs ideal negation, w=1 |",
+         "|:--|--:|--:|--:|--:|--:|--:|"]
+    for a, name in (("x", "x (Ferrari + SGE)"), ("w", "w (baseline)")):
+        v = g["arms"][a]
+        L.append(f"| {name} | {f(v['q3']['0.1'])} | {f(v['q3']['1'])} | {f(v['q4_w1'])} | {f(v['plain_theory_w1'])} | "
+                 f"{f(v['neg_ideal']['0.1'])} | {f(v['neg_ideal']['1'])} |")
+    L += ["", "Per curve, arm x at w = 1 (post hoc, validator finding F7):", "",
+          "| curve seed | h | r | / sqrt(pi r/2) | / ideal negation | / measured plain rho |", "|--:|--:|--:|--:|--:|--:|"]
+    for c in g["curves"]:
+        x = c["x"]
+        L.append(f"| {c['curve_seed']} | {c['h']} | {c['r']:.3e} | {x['vs_plain_theory_w1']:.3f} | {x['vs_neg_ideal_w1']:.3f} | "
+                 f"{x['vs_measured_q_q3_w1']:.3f} |")
+    L += ["", f"Distance remaining: IC / ideal negation rho at w = 1. Factor-base size retuned on p = 8209 (frozen rule): "
+          f"cc* = {g['cc_star']}, the existing setting. Study: [{g['study']}](../../{g['study']}); "
+          f"[results](../../{g['results']}); [report](../../{g['report']}); [validator report](../../{g['validator']}).", ""]
+    po = g["prime_order"]
+    L += ["### Prime-order Jacobians at p = 16411 and 32771 (" + ("validated" if po["validated"] else "not validated") + ")", "",
+          "Five prime-order curves per prime (#J about 2^56 and 2^60), 6 targets x 2 seeds each. x is arm x at the lab "
+          f"factor base (cc 2.0); x* is arm x at cc {po['tune']['cc']}, tuned on held-out cofactor-2 curves. Ratio of IC cost "
+          "to the ideal negation-rho bound sqrt(pi r/4), every emitted native operation at w GAE; the walk's per-step "
+          "hash and coefficient additions are not counted (charging them moves x* at p = 16411 from 0.876 to 0.885). "
+          "Confirms known asymptotics (double large prime, genus 4) on this implementation; not an elliptic-curve result.", "",
+          "| p | arm | w=0 | w=0.1 | w=1 | below at all w |", "|--:|:--|--:|--:|--:|:--|"]
+    for r in po["rows"]:
+        L.append(f"| {r['p']} | {r['arm']} | {f(r['neg']['0'])} | {f(r['neg']['0.1'])} | {f(r['neg']['1'])} | {r['below_all_w']} |")
+    L += ["", f"Slope of ln(x*/ideal negation rho) in ln p: {po['slope']['x*']['ratio_vs_neg_w1']['slope']:.3f} (two primes). "
+          f"Study: [{po['study']}](../../{po['study']}); [results](../../{po['results']}); [errata](../../{po['errata']}); "
+          f"[validator report](../../{po['validator']}).", ""]
+    return L
+
+
+def genus4_followup_html(g: dict) -> str:
+    f = lambda v: f'{v["ratio"]:.3f} <span class="muted">[{v["lo"]:.3f}, {v["hi"]:.3f}]</span>'
+    gh = "https://github.com/aburan28/crypto/blob/main/"
+    rows = "".join(f'<tr><td>{esc(n)}</td><td>{f(g["arms"][a]["q3"]["0.1"])}</td><td>{f(g["arms"][a]["q3"]["1"])}</td>'
+                   f'<td>{f(g["arms"][a]["q4_w1"])}</td><td>{f(g["arms"][a]["plain_theory_w1"])}</td>'
+                   f'<td>{f(g["arms"][a]["neg_ideal"]["0.1"])}</td><td>{f(g["arms"][a]["neg_ideal"]["1"])}</td></tr>'
+                   for a, n in (("x", "x (Ferrari + SGE)"), ("w", "w (baseline)")))
+    crow = "".join(f'<tr><td class="n">{c["curve_seed"]}</td><td class="n">{c["h"]}</td><td class="n">{c["r"]:.3e}</td>'
+                   f'<td class="n">{c["x"]["vs_plain_theory_w1"]:.3f}</td><td class="n">{c["x"]["vs_neg_ideal_w1"]:.3f}</td>'
+                   f'<td class="n">{c["x"]["vs_measured_q_q3_w1"]:.3f}</td></tr>' for c in g["curves"])
+    return ('<section class="card" id="genus4-followup"><h2>Genus-4 hyperelliptic IC against plain and negation rho at '
+            'p = 16411, outside the priced tables</h2>'
+            f'<p>{esc(genus4_followup_lead(g))} Class: {esc(g["class"])}. {esc(g["validation"].rstrip("."))}.</p>'
+            '<table><thead><tr><th>arm</th><th>Q3 w=0.1</th><th>Q3 w=1 (frozen)</th><th>Q4 w=1</th>'
+            '<th>vs sqrt(&pi; r/2), w=1</th><th>vs ideal negation, w=0.1</th><th>vs ideal negation, w=1</th></tr></thead>'
+            f'<tbody>{rows}</tbody></table>'
+            '<p>Per curve, arm x at w = 1 (post hoc, validator finding F7):</p>'
+            '<table><thead><tr><th class="n">curve seed</th><th class="n">h</th><th class="n">r</th><th class="n">/ sqrt(&pi; r/2)</th>'
+            f'<th class="n">/ ideal negation</th><th class="n">/ measured plain rho</th></tr></thead><tbody>{crow}</tbody></table>'
+            f'<p>Distance remaining: IC / ideal negation rho at w = 1. Factor-base size retuned on p = 8209: cc* = {esc(g["cc_star"])}. '
+            f'<a href="{gh}{esc(g["study"])}">Study</a>; <a href="{gh}{esc(g["results"])}">results</a>; '
+            f'<a href="{gh}{esc(g["report"])}">report</a>; <a href="{gh}{esc(g["validator"])}">validator report</a>.</p>'
+            + genus4_prime_order_html(g["prime_order"], f, gh) + '</section>')
+
+
+def genus4_prime_order_html(po: dict, f, gh: str) -> str:
+    rows = "".join(f'<tr><td class="n">{r["p"]}</td><td>{esc(r["arm"])}</td><td>{f(r["neg"]["0"])}</td><td>{f(r["neg"]["0.1"])}</td>'
+                   f'<td>{f(r["neg"]["1"])}</td><td>{esc(str(r["below_all_w"]))}</td></tr>' for r in po["rows"])
+    return ('<h3>Prime-order Jacobians at p = 16411 and 32771 (' + ("validated" if po["validated"] else "not validated") + ')</h3>'
+            f'<p>Five prime-order curves per prime; x at cc 2.0, x* at cc {esc(po["tune"]["cc"])} (tuned on held-out curves). '
+            'IC cost over the ideal negation-rho bound sqrt(&pi; r/4), every emitted native operation at w GAE (per-step walk '
+            'hash and coefficient additions not counted). Confirms known asymptotics on this implementation; not an '
+            'elliptic-curve result.</p><table><thead><tr><th class="n">p</th><th>arm</th><th>w=0</th><th>w=0.1</th><th>w=1</th>'
+            f'<th>below at all w</th></tr></thead><tbody>{rows}</tbody></table>'
+            f'<p><a href="{gh}{esc(po["study"])}">Study</a>; <a href="{gh}{esc(po["results"])}">results</a>; '
+            f'<a href="{gh}{esc(po["errata"])}">errata</a>; <a href="{gh}{esc(po["validator"])}">validator report</a>.</p>')
 
 
 def markdown(doc: dict) -> str:
@@ -4269,6 +4517,7 @@ def markdown(doc: dict) -> str:
             L += tableb_ksum_markdown(doc)
             L += tableb_binary_ksum_md(doc["tableb_binary_ksum_component"])
             L += ksum_prune_md(doc["ksum_prune_component"])
+            L += tableb_rounds23_md(doc["tableb_rounds23_component"])
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
         multi = len(f["regimes"]) > 1
@@ -4891,6 +5140,7 @@ def markdown(doc: dict) -> str:
           f"v4, without native work priced: [{mt['v4']}](../../{mt['v4']}). "
           f"Earlier rows were measured against a rho without retention: IC5 (v3, [{mt['previous']}](../../{mt['previous']}); "
           f"its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [{mt['correction']}](../../{mt['correction']})).", ""]
+    L += genus4_followup_markdown(doc["genus4_followup_component"])
     d13 = doc["nov13_frontier_diagnostics"]
     census = d13["live_census"]
     ftb = d13["fes_then_batched"]
@@ -6434,6 +6684,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'v4 without native work priced: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["v4"])}">v4</a>; '
              f'earlier rows against a rho without retention: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["previous"])}">IC5 (v3)</a>, '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">IC4 (v2)</a>.</p></section>')
+    P.append(genus4_followup_html(doc["genus4_followup_component"]))
     d13 = doc["nov13_frontier_diagnostics"]
     census, ftb = d13["live_census"], d13["fes_then_batched"]
     gpu, gcomp = d13["gpu_fes_e2e"], d13["gpu_components"]
@@ -6632,6 +6883,7 @@ def page(doc: dict, standalone: bool) -> str:
 
     P.append(tableb_binary_ksum_html(doc["tableb_binary_ksum_component"]))
     P.append(ksum_prune_html(doc["ksum_prune_component"]))
+    P.append(tableb_rounds23_html(doc["tableb_rounds23_component"]))
     # Table B prime rows re-measured with the k = 5 sum table (outside tables A-C).
     tk = doc["tableb_ksum_component"]
     tt = tableb_ksum_text(tk)
