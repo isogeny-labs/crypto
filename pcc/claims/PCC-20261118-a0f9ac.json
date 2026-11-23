@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T16:48:42Z",
+ "id": "PCC-20261118-a0f9ac",
+ "kind": "statement",
+ "producer": {
+  "commit": "a1ceeeeadc82a3e86b074d17c8d758e0d8f04067",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/two-map-pre-call.sha256",
+    "sha256": "cad0470f5144a40a9ade60440c8c5d738c38924440f8c1d3caa4ce18ebcb20f1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/two-map.json",
+    "sha256": "96839cbd75b218423f43f24bf63257bd7228dfbc30b8f477c2f5792663ba9f2b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/two-map.pari",
+    "sha256": "a749453b2b2b35aad2a47d7c22f5432643a717d5e680d60ca1248dcfaebff29c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/two-map-exit.json",
+    "sha256": "8105264899a6cef65d89313cb15b88d73fd58d892a3de899d3767c0698a98cf7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118",
+ "statement": "A separate bounded degree-2 normalized Velu control on the frozen 202-bit source constructs an explicit quotient and evaluates the native rational map on 35 inputs, comprising the generator, 32 shared-scalar targets, kernel and infinity. PARI quotient/map and homomorphism checks, prime-order generator transport and a coordinate-isomorphism control pass; a cleared integer curve-equation identity is zero. No conductor gap classification, degree-80-bit target construction, large-field ECDLP solve or runtime is established."
+}
