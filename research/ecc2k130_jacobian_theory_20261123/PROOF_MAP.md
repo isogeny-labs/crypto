@@ -2,6 +2,14 @@
 
 All mathematical deductions in REPORT.md are unsigned [pcc:unverified].
 
+Round03 adds PCC-be4337 (all-degree place inequalities) and PCC-e8b7ce
+(genus131 natural-A degree34453/norm263 necessary condition), both unverified.
+The first uses finite exact degree1–19 data plus a written uniform tail bound.
+The second additionally needs polarized decomposition, coefficient-order
+Artin invariance, Torelli and the CM polarization/ideal correspondence.
+Native GMP/PARI replay does not formalize these bridges. The generator,
+glued Jacobian, curve equations and subgroup maps remain absent.
+
 Round02 adds a written Artin-obstruction argument restricting isogeny
 degrees to principally polarized representatives. Its PCC record is
 PCC-20261123-b7901e, standing unverified. The native 260-embedding residue

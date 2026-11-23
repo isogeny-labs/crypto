@@ -2,6 +2,15 @@
 
 [Report](REPORT.md) · [PDF](report.pdf) · [diagram](routes.svg) · [proof map](PROOF_MAP.md)
 
+[Round03](round03/REPORT.md) screens all five genus131 elliptic complements,
+with [exact native/PARI outputs](round03/summary_final.txt) and a
+[five-page PDF](round03/report.pdf). The written deductions reduce the
+natural-A case with optimal elliptic degree below1213355897362451 to
+degree34453 and a specific totally positive norm263 ideal-generator test.
+That test remains unresolved; its first bounded native attempt timed out.
+PCC-be4337/e8b7ce are unverified. Full raw TSV remote archival is pending,
+explicitly recorded in [RAW_STATUS.md](round03/RAW_STATUS.md).
+
 Continued work: [round02 report](round02/REPORT.md), [PDF](round02/report.pdf)
 and [residue census](round02/local_check.txt). The new written necessity
 result is [PCC-20261123-b7901e](../../pcc/claims/PCC-20261123-b7901e.json),

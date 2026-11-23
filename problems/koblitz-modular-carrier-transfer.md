@@ -8,6 +8,16 @@
 
 ## Problem
 
+Round03(2026-11-23): [elliptic-complement analysis](../research/ecc2k130_jacobian_theory_20261123/round03/REPORT.md)
+gives a written reduction of the genus131 natural-A, optimal elliptic
+degree<1213355897362451 case to E0 and degree34453, requiring a totally
+positive generator of ideal(263,u+1) in the degree130 real CM field.
+PCC-be4337/e8b7ce are unverified. A30-second native class initialization
+attempt timed out without a class vector or generator; this is not
+nonprincipality. The next discriminating implementation is an explicit
+real-cyclotomic integral basis, then exact ideal/sign checks. Other
+isogenous representatives, larger degrees and genus132–300 stay open.
+
 Continued2026-11-23: [round02](../research/ecc2k130_jacobian_theory_20261123/round02/REPORT.md)
 gives a written necessity result that every F2-isogeny from the natural A
 to a principally polarized representative has degree divisible by
