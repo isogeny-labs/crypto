@@ -110,6 +110,49 @@ impl Fp<'_> {
         f.pow(a, self.p - 2)
     }
 
+    // Tonelli-Shanks square root for odd prime fields p = 1 (mod 4).
+    // The p = 3 (mod 4) callers already use a cheaper single exponent.
+    // A nonresidue returns None; a repeated root (zero) requires no powers.
+    fn sqrt_tonelli_shanks(&mut self, value: u64) -> Option<u64> {
+        if value == 0 {
+            return Some(0);
+        }
+        let p = self.p;
+        if self.pow(value, (p - 1) / 2) != 1 {
+            return None;
+        }
+        let s = (p - 1).trailing_zeros();
+        let q = (p - 1) >> s;
+        let mut z = 2u64;
+        while self.pow(z, (p - 1) / 2) != p - 1 {
+            z += 1;
+        }
+        let mut c = self.pow(z, q);
+        let mut t = self.pow(value, q);
+        let mut r = self.pow(value, (q + 1) / 2);
+        let mut m = s;
+        while t != 1 {
+            let mut i = 0u32;
+            let mut tt = t;
+            while tt != 1 && i < m {
+                tt = self.mul(tt, tt);
+                i += 1;
+            }
+            if i == m {
+                return None;
+            }
+            let mut b = c;
+            for _ in 0..(m - i - 1) {
+                b = self.mul(b, b);
+            }
+            r = self.mul(r, b);
+            c = self.mul(b, b);
+            t = self.mul(t, c);
+            m = i;
+        }
+        Some(r)
+    }
+
     // Polynomials, lowest degree first.
     fn trim(v: &mut Vec<u64>) {
         while v.last() == Some(&0) {
@@ -224,23 +267,33 @@ impl Fp<'_> {
         if f.len() == 2 {
             return vec![self.sub(0, f[0])];
         }
-        // For p = 3 (mod 4), solve every quadratic directly. Unlike the
-        // split() shortcut, this bypasses x^p mod f and the initial GCD too.
-        // The checked square root rejects irreducible quadratics; sort and
-        // deduplicate to handle discriminant zero and the public API order.
-        if f.len() == 3 && (p & 3) == 3 {
+        // Every odd prime supports direct quadratic extraction. For
+        // p = 1 (mod 4) use Tonelli-Shanks instead of a polynomial
+        // Frobenius power, GCD, and splitting. Handle zero discriminants
+        // before exponentiation (also faster for p = 3 mod 4).
+        if f.len() == 3 && (p & 1) == 1 {
             let b_squared = self.mul(f[1], f[1]);
             let four_c = self.mul(4 % p, f[0]);
             let discriminant = self.sub(b_squared, four_c);
-            let s = self.pow(discriminant, (p + 1) / 4);
+            let neg_b = self.sub(0, f[1]);
+            // p <= 2^63-1, so odd v + p cannot overflow u64.
+            let half = |v: u64| if v & 1 == 0 { v >> 1 } else { (v + p) >> 1 };
+            if discriminant == 0 {
+                return vec![half(neg_b)];
+            }
+            let square_root = if (p & 3) == 3 {
+                Some(self.pow(discriminant, (p + 1) / 4))
+            } else {
+                self.sqrt_tonelli_shanks(discriminant)
+            };
+            let Some(s) = square_root else {
+                return Vec::new();
+            };
             if self.mul(s, s) != discriminant {
                 return Vec::new();
             }
-            let neg_b = self.sub(0, f[1]);
             let plus = self.add(neg_b, s);
             let minus = self.sub(neg_b, s);
-            // p <= 2^63-1 in the supported fields, so v + p fits in u64.
-            let half = |v: u64| if v & 1 == 0 { v >> 1 } else { (v + p) >> 1 };
             let mut roots = vec![half(plus), half(minus)];
             roots.sort_unstable();
             roots.dedup();
@@ -284,31 +337,31 @@ impl Fp<'_> {
                 out.push(root);
             }
             _ => {
-                // Once the squarefree root factor has degree two, compute
-                // its roots in F_p directly instead of running another
-                // polynomial modular exponentiation and Euclidean gcd.
-                // For p = 3 (mod 4), sqrt(d) = d^((p+1)/4) when d is a
-                // quadratic residue. Leave other characteristics and
-                // nonresidue inputs on the generic splitting path.
-                if g.len() == 3 && g[2] == 1 && p & 3 == 3 {
+                // A degree-two split factor can also be solved directly
+                // for p = 1 (mod 4), avoiding another polynomial power/GCD.
+                if g.len() == 3 && g[2] == 1 && (p & 1) == 1 {
                     let b_squared = self.mul(g[1], g[1]);
                     let four_c = self.mul(4 % p, g[0]);
                     let discriminant = self.sub(b_squared, four_c);
-                    let square_root = self.pow(discriminant, (p + 1) / 4);
-                    if self.mul(square_root, square_root) == discriminant {
-                        let minus_b = self.sub(0, g[1]);
-                        let plus = self.add(minus_b, square_root);
-                        let minus = self.sub(minus_b, square_root);
-                        // Division by 2 in an odd prime field needs no
-                        // modular multiplication or inverse. This addition
-                        // fits u64 because supported primes are <= 2^63-1.
-                        let half = |value: u64| {
-                            if value & 1 == 0 { value >> 1 }
-                            else { (value + p) >> 1 }
-                        };
-                        out.push(half(plus));
-                        out.push(half(minus));
+                    let neg_b = self.sub(0, g[1]);
+                    let half = |v: u64| {
+                        if v & 1 == 0 { v >> 1 } else { (v + p) >> 1 }
+                    };
+                    if discriminant == 0 {
+                        out.push(half(neg_b));
                         return;
+                    }
+                    let square_root = if (p & 3) == 3 {
+                        Some(self.pow(discriminant, (p + 1) / 4))
+                    } else {
+                        self.sqrt_tonelli_shanks(discriminant)
+                    };
+                    if let Some(s) = square_root {
+                        if self.mul(s, s) == discriminant {
+                            out.push(half(self.add(neg_b, s)));
+                            out.push(half(self.sub(neg_b, s)));
+                            return;
+                        }
                     }
                 }
                 loop {
@@ -680,6 +733,48 @@ mod tests {
                 let repeated = [repeated_product, field.sub(0, twice_root), 1];
                 assert_eq!(field.roots(&repeated), vec![root]);
             }
+        }
+    }
+
+    #[test]
+    fn round133_tonelli_shanks_quadratic_roots_and_nonresidues() {
+        // p=1 mod 4 exercises Tonelli-Shanks; p=3 mod 4 checks the
+        // previously-fast path and the new zero-discriminant case.
+        for p in [5u64, 13, 17, 29, 101, 65_521, 1_000_000_009,
+                  1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            for i in 0..64u64 {
+                let r1 = (3 + 139 * i) % p;
+                let r2 = (11 + 127 * i) % p;
+                let sum = f.add(r1, r2);
+                let product = f.mul(r1, r2);
+                let monic = [product, f.sub(0, sum), 1];
+                let mut expected = vec![r1, r2];
+                expected.sort_unstable();
+                expected.dedup();
+                assert_eq!(f.roots(&monic), expected, "p={p}, i={i}");
+                for scalar in [2u64, 3, 7] {
+                    let scaled = [
+                        f.mul(monic[0], scalar % p),
+                        f.mul(monic[1], scalar % p),
+                        scalar % p,
+                    ];
+                    assert_eq!(f.roots(&scaled), expected, "scaled p={p}, i={i}");
+                }
+                let repeated_coeff = f.add(r1, r1);
+                let repeated_constant = f.mul(r1, r1);
+                let double = [repeated_constant, f.sub(0, repeated_coeff), 1];
+                assert_eq!(f.roots(&double), vec![r1], "repeated p={p}, i={i}");
+            }
+            // x^2 - n must have no roots for independently selected
+            // Euler-criterion nonresidue n.
+            let mut n = 2u64;
+            while f.pow(n, (p - 1) / 2) != p - 1 {
+                n += 1;
+            }
+            let constant = f.sub(0, n);
+            assert!(f.roots(&[constant, 0, 1]).is_empty(), "nonresidue p={p}");
         }
     }
 
