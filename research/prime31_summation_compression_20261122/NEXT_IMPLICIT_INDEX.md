@@ -116,3 +116,32 @@ Therefore the genuinely open adaptation is narrower: an algebraically exploitabl
 - All mathematical statements above are written derivations only, [pcc:unverified]. No new Rust run, natural-target corpus, EKS job, Lean proof, signed PCC certificate, or performance leaderboard entry was produced in this iteration.
 
 **Next obligation:** derive and source-audit a non-enumerative, exact higher-arity/implicit sumset representation with a full P/Q/memory recurrence that is sublinear per cold emptiness query after setup; otherwise retain the explicit barriers. Then implement the already preregistered byte-exact natural-target generator before any new matched performance run, obtain original-source correctness CI, repository checkpoint and EKS admission, and measure genuine signed rank and complete recovery.
+
+
+## F. Fifth iteration (2026-11-22 Pacific): exact-bucket obstruction and m-sum exponent budget
+
+**Standing:** written mathematical derivation only; not a native-Rust test, signed PCC/Lean proof, timing benchmark, complete DLP solver, or novelty claim. [pcc:unverified] Starting state was PR #4928 head \`65f413e2ca1014a28e5ba6bb456d599f020b8f29\`, PR #4924 head \`70e04851fae933675dbc4476f22dcea25090551e\`. The earlier successful original-lock source-bound CI remains at source \`109fc024e33f122fd678d2c93a18b2c0438a8668\`, not at this subsequent documentary commit.
+
+**Obstruction 1 — exact compatible small buckets.** Let G be cyclic of order n, H finite and gcd(n,|H|)=1. For a group homomorphism h:G→H, ord(h(P)) divides both n and |H| for any generator P of G; therefore ord(h(P))=1, hence h=0. In the maintained Prime31 fixture n=2147446831 is odd, so any *exact homomorphic* bucket into a 2-power group is trivial, even if n were composite. If n is prime, any finite bucket group smaller than n is similarly ruled out. This does **not** rule out nonhomomorphic coordinate fingerprints with exact checking, randomized data structures, nonlinear elimination or representations with nontrivial collision lists. Abstractly identifying <G> with Z/nZ is not a computational route to integer modular 3SUM bucketing: the additive coordinate k of [k]G is a DLP.
+
+**Obstruction 2 — why signs cannot disappear.** In odd-order subgroups, x(Q)=x(-Q). A single-valued f(x(P),x(Q))=x(P+Q) for *all orientations* would imply x(P+Q)=x(P-Q). Since x(A)=x(B) implies A=±B, this forces 2P=O or 2Q=O. Contradiction for nonzero P,Q in an odd-order subgroup. The exact S3 pair operation is intrinsically multivalued in x, or it must carry point signs. As a concrete DLP-free fallback, for P=(x,y), Q=(u,v), x≠u, compute d=(u-x)^(-1), z_+=(d(v-y))²-x-u and z_-=(d(-v-y))²-x-u modulo p. Retain both branches and full signed witnesses; handle tangent/point-at-infinity separately. A nonhomomorphic interval label floor(K*z/p) can organize candidates with collision checking but computing all B² pairs costs Ω(B²) emissions. Batch inversion does not change the exponent. **No subquadratic index follows from this fallback.**
+
+**Optimistic full-rank exponent budget.** Specify a *growing family* of ordinary prime-field elliptic-curve groups with order n, a factor base with B unknown logs, m fixed signed summands, uniformly sampled independent public targets and at least B independent relation rows required. Expected candidate tuple count from T targets is T(2B)^m/n; it is not independent rank. Thus T=Ω(n/B^(m-1)). Suppose cold setup is Ω(B^σ), empty-inclusive query Ω(B^τ), with σ>0, 0≤τ<m-1 and with any p-dependence suppressed **only within this explicit polynomial model**. For B=n^β, an optimistic lower bound on the cold exponent is
+
+    α(β) ≥ max(σβ, 1−(m−1−τ)β).
+
+For α<1/2 to be feasible, one needs
+
+    1/[2(m−1−τ)] < β < 1/(2σ),
+
+which is possible iff **σ+τ<m−1**. For m=3, σ+τ<2; in particular σ=τ=1 fails the criterion. Balancing these two simplified terms yields β*=1/(σ+m−1−τ) and α*=σ/(σ+m−1−τ). These are conditional necessary budgets, not measured runtimes or sufficient algorithms.
+
+If this *particular full-rank architecture* also incurs Ω(B²) matrix work, include 2β. For m=3 and τ≥0:
+
+    α(β) ≥ max(1−(2−τ)β, 2β) ≥ 1/2.
+
+Hence no sub-√n **cold complete** exponent is possible in this model with quadratic matrix cost, even with a constant-time exact-empty oracle. This conditional statement does not cover subquadratic rank extraction, one-dependency methods, altered relation distributions, structured families, non-generic curves, or component-only gains. It is not an unconditional ECDLP lower bound.
+
+**Next discriminating obligation:** find a DLP-free, exact, genuinely implicit m≥3 representation that supports target-dependent empty certification and all signed original-curve independent relations. Derive complete P_m(B,p), Q_m(B,p), verification, memory, failures and rank/LA costs; m=3 under the above full-rank model needs σ+τ<2 even to be a candidate for cold sub-√n. Compare to the maintained #4829 point-complement and product-tree controls; neither dense Dickson norms nor a complete m-tuple index qualifies. Implement the precommitted exact native Rust natural-target generator from PROTOCOL.md *before* any new admitted timing corpus. No new performance corpus, benchmark or Space save was made here.
+
+**Prior art/audit:** Semaev 2004 (https://eprint.iacr.org/2004/031); Faugère et al., Symmetrized Summation Polynomials 2014 (DOI 10.1007/978-3-642-55220-5_3); Dinur–Golovnev, ICALP 2026 3SUM-Indexing (https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html, near-quadratic preprocessing, one witness). Existing repo notes NEXT_IMPLICIT_INDEX, NEXT_ROOT_INTERSECTION, #4924 monic, #4829, #4901 checked. Research-KB server unavailable in this tool context; no exhaustive novelty assertion. All PCC standing unverified.
