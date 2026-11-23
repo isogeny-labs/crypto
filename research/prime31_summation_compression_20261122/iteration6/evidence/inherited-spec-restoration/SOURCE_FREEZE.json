@@ -1,0 +1,24 @@
+{
+  "schema": "prime31-build-prerequisite-freeze/v1",
+  "frozen_at": "2026-11-23T02:01:02.454696+00:00",
+  "base_commit": "5fb95f63bd8a38de306abf14b93ed54f032fbe8a",
+  "initial_source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+  "initial_failed_run": 45096187034,
+  "changes": "Restore proven dropped parent ecbench spec code; add inherited spec regression tests and source identity recording; candidate arithmetic examples unchanged",
+  "files": {
+    "src/cryptanalysis/ecbench/spec.rs": "25c33ec0e00eb358a9ef896cc92a09c108478a43d2a061a3ac389ed9ae41c176",
+    ".github/workflows/prime31-rational-chain-guard.yml": "4148f988895d7d0419390e0634d297941d78bab368db76cc5fc5aaf5e8432f0f",
+    "examples/prime31_rational_chain_guard.rs": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0",
+    "examples/identity_certificate_rational_chain.rs": "b803aa70037cd95467cc0865f99fd8af5848912eb490542d8ad327b3dfa490fc"
+  },
+  "commands": [
+    "cargo test --locked --release --lib cryptanalysis::ecbench::spec::tests",
+    "cargo test --locked --release --example prime31_rational_chain_guard",
+    "cargo run --locked --release --example prime31_rational_chain_guard",
+    "cargo run --locked --release --example identity_certificate_rational_chain -- correctness-receipts/identities",
+    "cargo run --locked --release --example identity_certificate_rational_chain -- --check correctness-receipts/identities 6677026024"
+  ],
+  "scope": "Bounded source correctness and inherited regression checks, no performance or cryptographic experiment",
+  "before_execution": true,
+  "formal_status": "unverified; syntax parse and exact parent preservation only at freeze"
+}
