@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261123T2329Z-ecc2k-cold50-residual-profile",
+  "latest_record": "20261123T2338Z-ecc2k-cold50-candidate2-preflight",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 8,
-    "measured": 318,
+    "measured": 319,
     "open": 62
   },
   "repo": "crypto",
@@ -31220,6 +31220,18 @@
           "reference_kind": null,
           "spread": null,
           "summary": "16-call engineering pilot and three-binary calibration valid; candidate1 misses50% target (45.9443% lower in its uniform pilot). Zero primary rows; superseded by separately profiled candidate2, not an excluded primary subset.",
+          "value": 16.0
+        },
+        {
+          "commit": "07c8c78a708d",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T2338Z-ecc2k-cold50-candidate2-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Candidate2 16-call engineering preflight and three calibrations valid;49.1996% uniform pilot reduction is below50%. Primary120 rows unattempted; candidate3 tests the unchanged goal with one index visit.",
           "value": 16.0
         }
       ],
