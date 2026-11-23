@@ -1,4 +1,4 @@
-# Prime31 iteration 6: an exact quadratic relation system
+# Prime31 iterations 6-7: quadratic relations and available fibres
 
 **Research checkpoint | 22 November 2026, America/Los_Angeles | Existing PR #4928**
 
@@ -11,9 +11,9 @@ prime-order group. [M1, M2]
 
 The next task is to solve this compact system, including empty targets, at a
 lower complete cost. Equation degree and input size alone do not establish
-that bound. **The first Rust CI build is blocked by inherited root syntax;
-the new tests did not execute.** The
-mathematical derivations and their independent written review remain
+that bound. **The initial Rust CI build failed on inherited root syntax before
+new tests ran. A provenance-based restoration is committed and its original-lock
+rerun is pending.** The mathematical derivations and their independent written review remain
 **[pcc:unverified]**. [E1, M1, M2]
 
 ## 1. Inputs and the exact domain
@@ -224,8 +224,8 @@ lower bound. [R2]
 | Evidence | Current standing |
 | --- | --- |
 | Mathematical note | Written derivation, independently reviewed; [pcc:unverified] |
-| Frozen correctness source | Four new test functions and imported original tests prepared; new tests did not execute |
-| Original-root-lock CI | **Blocked by inherited root syntax** at source bf56de345c02ef6f1c55bfa047087b0e880cb09e |
+| Frozen correctness source | Four new test functions and imported original tests; execution result pending |
+| Original-root-lock CI | Initial inherited-source failure retained; repaired source a4ddc035c0c7519d6bab7a438d8a168f74ae40db is pending |
 | Centered S3/discriminant records | Existing native evaluated-tier certificates, proof:null |
 | New cubic-residual identity | Native issuer prepared but not executed; issuance and replay remain pending |
 | Performance | No new timing panel or asymptotic solving bound |
@@ -236,7 +236,12 @@ inherited `ecbench/spec.rs` test-fixture section around lines 894-1042 has
 malformed calls and unclosed delimiters. This stopped execution before the
 new example tests and before native cubic-residual identity issuance. The
 failure is a build dependency, not a mathematical counterexample. A minimal
-history-based repair and original-lock rerun are in progress. [E1]
+history-based restoration is committed at
+[a4ddc035c0c7519d6bab7a438d8a168f74ae40db](https://github.com/isogeny-labs/crypto/commit/a4ddc035c0c7519d6bab7a438d8a168f74ae40db): 289 inserted lines preserve both parent policy implementations and all 15
+distinct parent tests. The
+[original-lock rerun 45097885135](https://github.com/isogeny-labs/crypto/actions/runs/45097885135)
+was observed in progress; no new test success is asserted at this checkpoint.
+The candidate arithmetic examples, original manifest and lock are unchanged. [E1]
 
 The frozen correctness panel uses the existing depth-six N=64/B=31 fibre,
 the explicit Fp^2 ghost, repeated and corrupted certificates, the fixed-order
@@ -251,9 +256,8 @@ orientation of a final pair. This continuation adds the scoped all-node
 representation, exact field restrictions and free-permutation completeness
 accounting; literature-wide originality is unestablished. [L1, R1]
 
-**Next action:** repair the inherited root parse failure, retain the failed
-receipt and rerun source-bound correctness checks with the original lock;
-then specify an
+**Next action:** collect the source-bound original-lock rerun and retain both
+its outcome and the initial failed receipt; then specify an
 actual solver for the guarded quadratic system with exact empty-query and
 output semantics. Its recurrence must charge preparation, state dimension,
 misses, rational extraction, memory and all signed rows against the maintained
@@ -287,10 +291,125 @@ infinitely many Mersenne primes. [M1]
 
 The existing [PR #4928](https://github.com/isogeny-labs/crypto/pull/4928) and
 [research Space](https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84)
-are the continuation records. The new PDF is a six-page account of this
-iteration; all previous pinned reports and evidence remain unchanged.
+are the continuation records. The PDF is a seven-page account of the quadratic
+representation and the growing-family refinements below; previous pinned
+reports and evidence remain unchanged.
 
 **PCC records:** representation and completeness `PCC-20261123-ed96d7`;
 scoped bucket/rank and conditional exponent budget `PCC-20261123-36ec87`;
 literature/source audit `PCC-20261123-184d4e`. All remain unverified. These
 records are claim tracking, not signed mathematical or execution verdicts.
+
+
+## 7. Growing fields and available rational fibres
+
+The family and density refinements supply inputs for the quadratic strategy.
+They leave the target-solving term in Section 5 unresolved. All results in
+this section are written deductions with **[pcc:unverified]** standing.
+
+### A growing smooth p+1 family
+
+Let Q=2^k and choose the least prime p congruent to -1 modulo 4Q. Linnik's
+theorem gives p≤C(4Q)^L for absolute constants, hence Q=Ω(p^(1/L)). This
+constructs a growing family without assuming infinitely many Mersenne primes.
+Take L≥2 and let q be the largest power of two at most min(Q,√p/16). Then
+
+\[
+4q\mid p+1,\qquad q=\Omega(p^{1/L}),\qquad q\le\sqrt p/16.
+\]
+
+For a norm-one torus element z and a torus element ζ of order q, put
+c=z^q+z^(-q). If c≠±2, the q trace coordinates
+
+\[
+x_j=z\zeta^j+(z\zeta^j)^{-1},\qquad 0\le j<q,
+\]
+
+are exactly the distinct rational roots of D_q(X)-c. Enumerating them takes
+Θ(q) extension-field operations and output slots. A full torus generator is
+unnecessary; its required power-of-two part can be selected and certified
+separately. Prime finding and input certification remain setup costs. [F1, F2]
+
+### Fix the fibre and select the curve
+
+For any fixed N-element set F⊂Fp, uniform coefficient pairs (a,b) give pairwise
+independent values of x^3+ax+b at distinct x. If B counts liftable coordinates,
+including zeros at this unrestricted stage,
+
+\[
+\mathbb E B=\frac{N(p+1)}{2p},\qquad
+\operatorname{Var}B=\frac{N(p^2-1)}{4p^2}.
+\]
+
+Exactly (p^2−1)/3 monic depressed cubics are irreducible. Combining this
+count with a quadratic-character second-moment bound, without assuming
+independence after conditioning, gives a density greater than 1/12 of
+coefficient pairs whose cubic is irreducible and N/4≤B≤3N/4 when N≥16.
+These curves are nonsingular, of odd order, and ordinary. [F3]
+
+For the symmetric full Dickson fibre and p≡3 mod4, the involution
+(a,b)↦(a,−b) preserves that balance and exchanges opposite Frobenius traces.
+At least one of each pair is non-anomalous. A constructive check uses any
+nonzero rational lift P: for p≥7, Hasse's bound implies [p]P=O exactly when
+#E(Fp)=p. Switch to the twist when needed. Screening takes expected
+O(N log p) field operations, with an O(log p) group-operation anomaly check.
+These are written cost bounds, not measurements. [F3]
+
+For fixed m, remove permitted leaves of order at most m−1. This discards only
+O(m^3) points and preserves a Θ(N) base as N grows. The backward-peeling proof
+then applies, even if the whole curve group is composite. The small-order
+exclusion needs additional membership guards; it is **not included in the
+frozen iteration-six equation counts**. This selection changes the curve
+and does not supply a DLP-preserving transfer from a prescribed input. [F3]
+
+### Fix an odd-order curve and select the fibre
+
+For any already specified nonsingular curve E/Fp of odd rational order,
+let c range uniformly over the regular full q-fibres of the norm-one torus
+trace map. Write B(c) for the number of its rationally liftable coordinates.
+There are M=(p+1)/(2q)−1 such fibres. An explicit character-sum calculation gives
+
+\[
+\left|\mathbb E_c\frac{B(c)}q-\frac12\right|
+\le\frac{3\sqrt p/2+q/2+1}{(p+1)/2-q}.
+\]
+
+For p≥4096 and 4≤q≤√p/16, the bound is at most 1/8, so at least **1/6 of
+regular fibres have B(c)≥q/4**. Uniform norm-one seeds, conditioned on
+c≠±2, sample these fibres uniformly because each has exactly 2q seeds.
+The expected number of seed trials is less than seven, including exceptional
+seeds and rejected regular fibres. Enumerating and screening therefore finds
+a suitable rational base in expected O(q log p) field operations plus charged
+inversions, after the field and curve are supplied. Bit cost includes the
+chosen field-arithmetic cost. [F2]
+
+This second route keeps the original curve fixed. If that curve already has
+prime order, all its rational points belong to the required group. The
+result does not establish a growing prime-order curve family or a comparable
+density inside a prescribed proper subgroup. Cofactor clearing can change
+abscissae and destroy Dickson membership. Neither density result proves
+independent relation rank, an efficient empty-target oracle, or an asymptotic
+relation-solving speedup. [F2, F3] [pcc:unverified]
+
+### Family and availability sources
+
+- **F1:** [SMOOTH_TORUS_FAMILY.md](../iteration7/SMOOTH_TORUS_FAMILY.md),
+  the retained growing-family argument. Its initial book-title attribution
+  is corrected in F2: the source is Koukoulopoulos, *The Distribution of
+  Prime Numbers*, Chapter 27, Theorem 27.1,
+  [author's preliminary edition](https://dms.umontreal.ca/~koukoulo/documents/publications/primes.pdf).
+- **F2:** [INDEPENDENT_REVIEW.md](../iteration7/INDEPENDENT_REVIEW.md),
+  the independent family audit, and
+  [FIXED_CURVE_FIBRE_DENSITY.md](../iteration7/FIXED_CURVE_FIBRE_DENSITY.md),
+  the fixed-input-curve density refinement with the degree-five Weil
+  character-sum argument; SHA-256
+  `c1725df2f00f61a972edbb5cfee803fe97bd2c27d8f761fbb08b73385c70b7a1`.
+- **F3:** [SELECTABLE_CURVE_AVAILABILITY.md](../iteration7/SELECTABLE_CURVE_AVAILABILITY.md),
+  the exact moment, irreducible-cubic, twist-selection and small-order-leaf
+  arguments; SHA-256 `245693a861b7f40f687045ffee79637ce3b6251d29c05595f46718894d9c8da6`.
+  Ordinary prime-field classification: Waterhouse, *Abelian varieties over
+  finite fields* (1969), Theorem 4.1,
+  [primary archive](https://www.numdam.org/item/ASENS_1969_4_2_4_521_0.pdf).
+
+These notes contain the full proofs and the costs excluded from their scope.
+No new performance experiment or signed formal proof accompanies this appendix.

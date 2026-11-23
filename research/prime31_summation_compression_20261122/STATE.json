@@ -107,7 +107,7 @@
       "proof": "iteration6/MATHEMATICAL_NOTE.md",
       "independent_review": "iteration6/INDEPENDENT_REVIEW.md",
       "literature": "iteration6/LITERATURE_AUDIT.md",
-      "status": "written derivation complete; initial original-root-lock CI failed on inherited source syntax before new tests; repair active",
+      "status": "Written representation independently reviewed; supplied-witness verifier source frozen; initial root CI failure preserved; repaired root-lock rerun in progress at last observation",
       "completed": [
         "Root-oriented rational-tree purity and full-fibre membership equivalence",
         "Quadratic-system bijection and exact mk+3m-5 / mk+3m-4 counts for m>=2,k>=1",
@@ -127,11 +127,23 @@
       "ci_failure_receipt": "iteration6/evidence/ci-inherited-build-failure/receipt.json",
       "new_tests_executed": false,
       "build_prerequisite": {
-        "status": "reviewed restoration frozen before rerun",
+        "status": "committed; rerun in progress at last observation",
         "source_blob": "ed85acbb242a11a1412da7c842cef70872235dcc",
         "proof": "iteration6/evidence/inherited-spec-restoration/AUDIT.md",
         "freeze": "iteration6/evidence/inherited-spec-restoration/SOURCE_FREEZE.json",
-        "scope": "289 restored lines, no deleted current lines; exact parent policy implementations and tests preserved; syntax only at freeze"
+        "scope": "289 restored lines, no deleted current lines; exact parent policy implementations and tests preserved; syntax only at freeze",
+        "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db"
+      },
+      "repaired_ci": {
+        "run_id": 45097885135,
+        "job_id": 137441679059,
+        "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135",
+        "status": "in_progress at2026-11-23T02:10:20Z",
+        "last_observed_step": "Restored inherited spec regression tests",
+        "candidate_tests_completed_observed": false,
+        "identity_issuance_observed": false,
+        "next_action": "Collect completed source-bound logs/artifact and retain all failure or success receipts; do not infer completion from mathematical review"
       }
     },
     {
@@ -146,7 +158,22 @@
         "Separated torus smoothness from unproved E liftability, large prime subgroup, sublinear empty-root oracle and complete ECDLP"
       ],
       "standing": "written derivation only, [pcc:unverified]; no code execution, EKS, Lean or signed verification",
-      "outcome": "Resolves the numeric smooth-p+1 family existence sub-obligation only; no relation-solving or ECDLP asymptotic gain"
+      "outcome": "Growing smooth fields and dense constructible factor bases qualified at their written-proof scopes. Exact target solving, required prime-group family construction, signed rank and complete asymptotic speedup remain open.",
+      "independent_review": "iteration7/INDEPENDENT_REVIEW.md",
+      "extensions": [
+        {
+          "proof": "iteration7/FIXED_CURVE_FIBRE_DENSITY.md",
+          "review": "iteration7/FIXED_CURVE_INDEPENDENT_REVIEW.md",
+          "claim": "PCC-20261123-2d6d3e",
+          "scope": "Any supplied odd-order nonsingular curve, p>=4096, power-of-two4<=q<=sqrt(p)/16,4q|p+1; at least1/6 regularfibres B>=q/4; uniform sampling in<7 expected seeds; O(q log p) basicfield setup plus inversions andO(q)memory; no proper-subgroup or targetsolver guarantee"
+        },
+        {
+          "proof": "iteration7/SELECTABLE_CURVE_AVAILABILITY.md",
+          "review": "iteration7/INTEGRATION_REVIEW.md",
+          "claim": "PCC-20261123-0d1e17",
+          "scope": "Fixed symmetricF withN>=16 overp=3 mod4; selectable ordinary non-anomalous odd-order curve withN/4<=B<=3N/4; composite-source completeness needs charged small-order restrictions"
+        }
+      ]
     }
   ],
   "claims": [
@@ -194,6 +221,16 @@
       "id": "PCC-20261123-8c9b8a",
       "scope": "Source-bound original-root CI failure before component execution",
       "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-2d6d3e",
+      "scope": "Fixed-source-curve dense Dickson fibre, exact sampler and capped growing-field family",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-0d1e17",
+      "scope": "Selectable ordinary non-anomalous curve density and extra small-order membership guards",
+      "standing": "unverified"
     }
   ],
   "identity_certificates": {
@@ -208,7 +245,7 @@
   },
   "next_mathematical_gate": "For the explicit rational quadratic representation, derive a charged exact elimination/contraction recurrence, including empty targets and Fp isolation. In the declared conventional full-rank m=4 model with setup exponent<=2 and matrix exponent2, a candidate query exponent tau<1 is needed; prove the actual solver bound and required yield/rank assumptions rather than inferring it from input degree.",
   "next_empirical_gate": "Finish source-matched original-root-lock correctness CI for the supplied-chain verifier; then freeze a specified root solver and native natural-target generator before any admitted matched performance study. Existing verification receipts are not discovery timings.",
-  "growing_family_obligation": "Iteration7 gives a written Linnik smooth-p+1 field family without Mersenne infinitude; independent review ongoing. Large-prime-order source subgroup, adequate liftable base and a faster complete solver remain separate obligations.",
+  "growing_family_obligation": "Linnik construction with cappedq retains q=Omega(p^(1/L)); fixed-source density now proved for selectablec on supplied odd-order E. A required prime-order source family and supported optimization exponent remain unestablished.",
   "overlap_exclusions": [
     "#4692",
     "#4812",
@@ -252,8 +289,8 @@
     "Interactive iteration6 runtime has Rust installed; partial materialization lacks a root crate checkout. New fixed correctness execution uses original-root-lock hosted CI. Prior unattended no-Rust statement describes that older runtime only."
   ],
   "report": "iteration6/REPORT.md",
-  "pdf_status": "Iteration6 six-page addendum visually checked; initial inherited-build failure retained and new tests not yet executed",
-  "delivery_status": "Versioned in the containing PR commit; source and CI bind109fc024e33f122fd678d2c93a18b2c0438a8668",
+  "pdf_status": "Seven-page report visually checked, including reviewed growing-field and density appendix; latest recorded repaired CI is pending",
+  "delivery_status": "Derivations, source, failure receipts, report and state are versioned in the existing lane PR; Space page confirmed. Latest native correctness remains pending at the recorded observation.",
   "companion_lane": {
     "pull_request": "https://github.com/isogeny-labs/crypto/pull/4924",
     "branch": "research/symmetric-pair-quotient-prime31-20261122",
@@ -284,9 +321,22 @@
     "diagnostic_byte_equal_local_adapter": true,
     "receipt": "evidence/original-lock-ci/receipt.json",
     "claim": "PCC-20261123-526846",
-    "standing": "unverified"
+    "standing": "unverified",
+    "historical_scope": "Iteration1 only; does not qualify iteration6 source"
   },
-  "pdf_sha256": "c427e37186287fe2ca56742d98729d7f749371df3c72af3af3d16570e4cd564c",
+  "pdf_sha256": "d97913ceeeef9d035bfc528cf05c9995771c1cd5fcd4174998273cc1f0ba195e",
   "prior_report": "REPORT.md",
-  "checkpoint_parent": "5fb95f63bd8a38de306abf14b93ed54f032fbe8a"
+  "checkpoint_parent": "5fb95f63bd8a38de306abf14b93ed54f032fbe8a",
+  "latest_correctness_ci": {
+    "run_id": 45097885135,
+    "job_id": 137441679059,
+    "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135",
+    "status": "in_progress at2026-11-23T02:10:20Z",
+    "last_observed_step": "Restored inherited spec regression tests",
+    "candidate_tests_completed_observed": false,
+    "identity_issuance_observed": false,
+    "next_action": "Collect completed source-bound logs/artifact and retain all failure or success receipts; do not infer completion from mathematical review"
+  },
+  "last_updated_utc": "2026-11-23T02:15:40.218159+00:00"
 }

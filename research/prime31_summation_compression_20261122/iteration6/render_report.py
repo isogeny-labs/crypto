@@ -32,6 +32,7 @@ FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 VALIDATION = json.loads((ROOT / "report-validation.json").read_text())
 WIDTH = 504
+REPORT_PAGES = 7
 NAVY = colors.HexColor("#153145")
 TEAL = colors.HexColor("#087C80")
 INK = colors.HexColor("#243746")
@@ -224,7 +225,7 @@ next_action = VALIDATION.get("next_action", "Complete source-bound correctness r
 
 story = []
 # Page 1: the new representation and its domain.
-story += [p("ISOGENY LABS  /  ITERATION 6", "LabelR"),
+story += [p("ISOGENY LABS  /  ITERATIONS 6-7", "LabelR"),
           p("An exact quadratic<br/>relation system", "TitleR"),
           p("Rational S3 chains, compact Dickson membership, and the next solving gate", "BodyR"),
           caption("22 November 2026, America/Los_Angeles  |  Existing research lane: PR #4928"),
@@ -340,7 +341,28 @@ story += [table([
           p("<b>M1.</b> MATHEMATICAL_NOTE.md, unchanged proof note. <b>M2.</b> INDEPENDENT_REVIEW.md, written proof audit. <b>R2.</b> ROOT_REVIEW.md, integration and exponent-budget review. <b>E1.</b> SCOPE.md, SOURCE_FREEZE.json and report-validation.json, with the actual CI receipt when present. <b>E2.</b> ../identity-certificates/centered-s3.json and s3-discriminant.json: IDC1hf62e2402e4871a82 and IDC1h869923a46a34c70c. Evaluated identities do not certify the all-arity theorem.", "SmallR"),
           p("M1 SHA-256: 948d36ca3d72661aa4cf16786ebed30fcb2ba146afb0df4420767a91e8f35ddc", "MonoR"),
           p("PCC-20261123-ed96d7: representation; PCC-20261123-36ec87: scoped budget; PCC-20261123-184d4e: audits. All three records remain unverified.", "SmallR"),
-          caption("Continuation records: <link href='https://github.com/isogeny-labs/crypto/pull/4928' color='#087C80'>isogeny-labs/crypto PR #4928</link> and the <link href='https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84' color='#087C80'>research Space</link>. New mathematical standing remains [pcc:unverified]. Previous pinned reports and evidence are unchanged.")]
+          caption("Continuation records: <link href='https://github.com/isogeny-labs/crypto/pull/4928' color='#087C80'>isogeny-labs/crypto PR #4928</link> and the <link href='https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84' color='#087C80'>research Space</link>. New mathematical standing remains [pcc:unverified]. Previous pinned reports and evidence are unchanged."),
+          PageBreak()]
+
+# Page 7: the reviewed growing-family and factor-base availability refinements.
+story += page("6  Growing fields and available fibres", "Iteration seven supplies input availability; solving complexity remains a separate obligation.")
+story += [h("An unconditional smooth p+1 family"),
+          p("Set Q=2<super>k</super> and let p be the least prime congruent to -1 modulo 4Q. Linnik's theorem gives p≤C(4Q)<super>L</super> for absolute constants. Hence Q=Ω(p<super>1/L</super>) without assuming infinitely many Mersenne primes. Enlarge L to at least 2 and cap q at the largest power of two not exceeding min(Q,√p/16); q still has the same polynomial lower bound. [F1, F2]", "SmallR"),
+          eq("4q | (p+1), &nbsp; q=Ω(p<super>1/L</super>), &nbsp; q≤√p/16"),
+          p("For norm-one z in Fp<super>2</super> and ζ of order q, set c=z<super>q</super>+z<super>-q</super>. When c≠±2, the q values x<sub>j</sub>=zζ<super>j</super>+(zζ<super>j</super>)<super>-1</super> are exactly the distinct Fp roots of D<sub>q</sub>(X)-c. Enumerating them costs Θ(q) extension-field operations and output slots. A full torus generator is unnecessary. [F1, F2]", "SmallR"),
+          h("Two ways to obtain a usable rational base"),
+          table([
+              ["Input held fixed", "Written availability result"],
+              ["A symmetric full fibre F, |F|=N≥16; p≡3 mod4", "Vary (a,b). Pairwise-independent evaluations give a positive-density set of irreducible cubics with N/4≤B≤3N/4. These curves have odd order and are ordinary. A quadratic-twist choice removes anomalous order p. [F3]"],
+              ["Any nonsingular odd-order E/Fp", "Vary the regular Dickson fibre. If p≥4096 and 4≤q≤√p/16, at least 1/6 of the full q-fibres satisfy B≥q/4. Uniform norm-one sampling gives a uniform regular fibre after excluding c=±2. [F2]"],
+          ], [158, 346]),
+          Spacer(1, 7),
+          box("CONSTRUCTIVE SETUP, WITH ITS SCOPE", "For an already certified odd-order curve and field, fewer than seven seed trials suffice in expectation. Enumeration and liftability screening cost expected O(q log p) field operations, plus charged inversions. If E itself has prime order, these rational points belong to that group. This does not certify a growing prime-order curve family or membership in a prescribed proper subgroup. [F2]", body_style="SmallR"),
+          Spacer(1, 7),
+          p("The variable-curve route does not itself guarantee prime order. For fixed arity m, excluding leaf points of order at most m-1 preserves a Θ(N) base asymptotically and recovers the free-order peeling hypothesis. Its additional membership guards are outside the frozen counts. Subgroup size, relation rank and the exact target solver remain separately charged. [F3]", "SmallR"),
+          h("Provenance and limits"),
+          p("<b>F1.</b> ../iteration7/SMOOTH_TORUS_FAMILY.md. <b>F2.</b> ../iteration7/INDEPENDENT_REVIEW.md and FIXED_CURVE_FIBRE_DENSITY.md. <b>F3.</b> ../iteration7/SELECTABLE_CURVE_AVAILABILITY.md. Linnik: Koukoulopoulos, <i>The Distribution of Prime Numbers</i>, Chapter 27, Theorem 27.1. Ordinary traces: Waterhouse (1969), Theorem 4.1. Fixed-curve density uses the degree-five Weil character bound. [pcc:unverified]", "SmallR"),
+          caption("These are written proofs and reviewed deductions, not numerical measurements or signed formal certificates. No asymptotic relation-solving speedup is asserted.")]
 
 
 def on_page(canvas, doc):
@@ -353,11 +375,11 @@ def on_page(canvas, doc):
     canvas.drawString(54, 760, "ISOGENY LABS  /  PRIME-FIELD RELATION RESEARCH")
     canvas.setFont("ReportSans", 7.6)
     canvas.setFillColor(MUTED)
-    canvas.drawRightString(558, 760, "ITERATION 6  |  2026-11-22 PT")
+    canvas.drawRightString(558, 760, "ITERATIONS 6-7  |  2026-11-22 PT")
     canvas.line(54, 42, 558, 42)
     canvas.setFont("ReportSans", 7.4)
     canvas.drawString(54, 29, "Unsigned mathematical checkpoint  [pcc:unverified]")
-    canvas.drawRightString(558, 29, f"{doc.page}  /  6")
+    canvas.drawRightString(558, 29, f"{doc.page}  /  {REPORT_PAGES}")
     canvas.restoreState()
 
 
@@ -372,8 +394,8 @@ with fitz.open(pdf_path) as pdf:
     compact = pdf.tobytes(garbage=4, clean=True, deflate=True, deflate_fonts=True, use_objstms=1)
 pdf_path.write_bytes(compact)
 reader = pypdf.PdfReader(pdf_path)
-if len(reader.pages) != 6:
-    raise RuntimeError(f"Expected 6 pages; got {len(reader.pages)}")
+if len(reader.pages) != REPORT_PAGES:
+    raise RuntimeError(f"Expected {REPORT_PAGES} pages; got {len(reader.pages)}")
 files = [pdf_path, ROOT / "REPORT.md", Path(__file__), ROOT / "report-validation.json", svg_path, png_path]
 for path in files:
     if path.stat().st_size >= 65536:

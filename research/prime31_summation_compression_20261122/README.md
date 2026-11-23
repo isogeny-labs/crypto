@@ -45,3 +45,5 @@ The companion printed scan enumerates unordered S3 pairs quadratically; its sepa
 ## Concurrent iteration seven
 
 The [growing-family note](iteration7/SMOOTH_TORUS_FAMILY.md) supplies a Linnik-based smooth-p+1 prime-field family and split Dickson fibre, with ordinary/large-prime-subgroup and solver obligations explicitly separate. It is undergoing independent review; standing remains unverified. [pcc:unverified]
+
+The stronger [fixed-source fibre theorem](iteration7/FIXED_CURVE_FIBRE_DENSITY.md), [independent review](iteration7/FIXED_CURVE_INDEPENDENT_REVIEW.md), and [selectable-curve theorem](iteration7/SELECTABLE_CURVE_AVAILABILITY.md) now supply explicitly charged factor-base constructions. The report is seven pages and the [combined standing](CLAIM_STANDING.json) records11 unverified claims. The repaired original-lock gate is pending at its last recorded observation; see STATE.json for exact run/source. [pcc:unverified]
