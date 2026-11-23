@@ -886,7 +886,7 @@ fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
     assert_eq!(witnesses.len(), repeats);
     assert_eq!(stats.anchors, 0);
     assert_eq!(stats.tree_edges, vertices - 1);
-    assert_eq!(stats.inverse_calls, (2 * equations.len()) as u64);
+    assert_eq!(stats.inverse_calls, equations.len() as u64);
     assert!(stats.path_steps > 3 * stats.inverse_calls);
     let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
         PartialRelation {
@@ -909,4 +909,49 @@ fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
     for r in &replayed {
         assert_eq!(r.sources.len(), vertices);
     }
+}
+
+#[test]
+fn forest_witness_batches_endpoint_inverses_and_keeps_nonunit_refusal_atomic() {
+    // One inversion per admitted arity-1 or arity-2 row, never per endpoint.
+    // The exact LP witnesses remain valid when the second edge orientation
+    // is reversed. This test is intentionally a tiny synthetic field oracle.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    for p in [3u64, 7, 101, 1_000_003] {
+        let mut f = ForestWitnessExtractor::new(4, p).unwrap();
+        assert!(f.add_row(&[]).unwrap().is_some());
+        assert_eq!(f.stats().inverse_calls, 0);
+        assert!(f.add_row(&[(0, 1), (1, p - 1)]).unwrap().is_none());
+        assert_eq!(f.stats().inverse_calls, 1);
+        assert!(f.add_row(&[(2, 2)]).unwrap().is_none());
+        assert_eq!(f.stats().inverse_calls, 2);
+        let witness = f.add_row(&[(1, p - 1), (0, 1)]).unwrap().unwrap();
+        assert_eq!(witness.row_index, 3);
+        assert_eq!(f.stats().inverse_calls, 3);
+        let inputs = vec![
+            PartialRelation { id: 1, small: vec![], large: vec![], rhs: 0 },
+            PartialRelation { id: 2, small: vec![], large: vec![(100, 1), (101, p - 1)], rhs: 0 },
+            PartialRelation { id: 3, small: vec![], large: vec![(102, 2)], rhs: 0 },
+            PartialRelation { id: 4, small: vec![], large: vec![(101, p - 1), (100, 1)], rhs: 0 },
+        ];
+        let index = LpIndex::build(&inputs, p).unwrap();
+        assert!(witness_cancels_lp(&index, &witness));
+        assert_eq!(f.rank(), dense_rank(&index.rows, index.num_columns(), p).unwrap());
+    }
+    // The field theorem does not apply to F_9. Its nonunits must still fail
+    // with their actual offending input coefficient, before any state change.
+    let mut ring = ForestWitnessExtractor::new(2, 9).unwrap();
+    let before = ring.stats();
+    assert!(matches!(
+        ring.add_row(&[(0, 3), (1, 2)]),
+        Err(LpGraphError::NonInvertible { value: 3 })
+    ));
+    assert!(matches!(
+        ring.add_row(&[(0, 2), (1, 3)]),
+        Err(LpGraphError::NonInvertible { value: 3 })
+    ));
+    assert_eq!(ring.stats(), before);
+    assert!(ring.rows().is_empty());
+    assert!(ring.add_row(&[(0, 2), (1, 4)]).unwrap().is_none());
+    assert_eq!(ring.stats().inverse_calls, 1);
 }
