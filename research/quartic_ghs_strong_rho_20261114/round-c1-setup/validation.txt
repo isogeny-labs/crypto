@@ -1,0 +1,19 @@
+Corrective static checks
+========================
+
+`rg` found no `restore_counts`, `rng_before`, `field_before`,
+`walker_coeffs`, or `walker_points` in `strong_rho.rs`. The only direct
+`Walker { ... }` construction is inside `new_walker`.
+
+Paired-record validation
+========================
+
+The canonical identity projection contains the instance/target, answer and
+trajectory, all walk counts, all verification counts, setup native counts,
+and walk native counts. It excludes only arm/setup labels, setup field counts,
+and diagnostic wall time.
+
+`jq -cS '<identity projection>' q223.jsonl | sort | uniq -c` returned exactly
+two copies of one projection. Its SHA-256, including the final newline, is:
+
+24235e91f84580fc53aee3e9be4e95c5956195d267ab4a75db6c8ad3d6a655aa

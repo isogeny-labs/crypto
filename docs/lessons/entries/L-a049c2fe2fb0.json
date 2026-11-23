@@ -1,0 +1,14 @@
+{
+  "action": "check whether f is even or odd under P -> -P (x-predicates are even, y-predicates usually odd); use a real-Gaussian per-frequency null erfc(t/sqrt(2 sigma^2)) for symmetric f, and give the A/A arm random even and odd functions, not only asymmetric ones",
+  "created": "2026-11-20T21:42:52Z",
+  "evidence": [
+    "research/residue_leads_20261120/AMENDMENTS.md (Amendment 3), results/r2.json vs r2_v2.json, PR #4850"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "controlled-experiment"
+  ],
+  "trigger": "testing a point predicate f(kG) against group characters (DFT over k) or k mod m on an elliptic-curve subgroup",
+  "why": "the complex-Gaussian null is too light for symmetric f; it produced a systematic excess for every bit predicate and two false 'correlated' calls that an asymmetric A/A arm could not see"
+}

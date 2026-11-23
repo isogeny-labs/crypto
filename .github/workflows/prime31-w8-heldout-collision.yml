@@ -1,0 +1,80 @@
+name: Prime31 W8 held-out signed-weight and collision certificate
+on:
+  push:
+    branches:
+      - automation/prime31-w8-collision-certificate-heldout-20261119
+    paths:
+      - ".github/workflows/prime31-w8-heldout-collision.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_w8_heldout_collision.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_w8_heldout_collision.py"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-w8-heldout-collision.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_w8_heldout_collision.rs"
+permissions:
+  contents: read
+jobs:
+  original-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Candidate source checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pinned original Prime31 arithmetic checkout
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only the original-crate experimental example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_heldout_collision.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_w8_heldout_collision.rs
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_w8_heldout_collision.rs
+      - name: Original arithmetic regression suite
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Focused signed-weight mathematical and original-curve controls
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_w8_heldout_collision
+      - name: Execute matched public-target grading experiment
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_heldout_collision > prime31-w8-heldout-collision.json
+          jq -e '
+            .schema == "prime31.w8.heldout-collision.v1" and
+            .curve.p == 2147483647 and .curve.n == 2147446831 and
+            .formal_old.left.unique == 64737 and
+            .formal_old.right.unique == 64737 and
+            .formal_old.left.collision_pairs == 904 and
+            .formal_old.right.collision_pairs == 904 and
+            .formal_old.left.max_fiber == 16 and
+            .formal_powers_two.left.unique == 65536 and
+            .formal_powers_two.right.unique == 65536 and
+            .formal_powers_two.left.collision_pairs == 0 and
+            .formal_powers_two.right.collision_pairs == 0 and
+            .target_count == 1024 and
+            .targets_seed == "48454c444f555431" and
+            (.w1_power2_collision_certificates.halves | length) == 2 and
+            (all(.w1_power2_collision_certificates.halves[]; .unique_sums == 65496 and .accidental_duplicate_words == 40 and .formal_duplicate_words == 0)) and
+            (.per_window | length) == 4 and
+            .generic_four_plus_four_grader_only == true and
+            .public_only_algebraic_extractor_implemented == false and
+            .complete_ecdlp_solved == false and
+            .whole_solver_benchmark == false and
+            .pcc_verified == false
+          ' prime31-w8-heldout-collision.json
+          jq '.per_window, .paired_total' prime31-w8-heldout-collision.json
+          sha256sum prime31-w8-heldout-collision.json
+      - name: Independent affine collision certificate replay
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_w8_heldout_collision.py prime31-w8-heldout-collision.json
+      - name: Preserve source-specific raw JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-heldout-collision-evidence
+          path: prime31-w8-heldout-collision.json
+          if-no-files-found: error

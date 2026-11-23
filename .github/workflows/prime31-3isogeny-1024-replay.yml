@@ -7,6 +7,7 @@ on:
       - 'research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_RAW_20261117.json'
       - '.github/workflows/prime31-3isogeny-1024-replay.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_isogeny_1024_certificate_replay.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_isogeny_1024.py'
@@ -16,6 +17,7 @@ permissions:
   contents: read
 jobs:
   exact-certificate-replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
