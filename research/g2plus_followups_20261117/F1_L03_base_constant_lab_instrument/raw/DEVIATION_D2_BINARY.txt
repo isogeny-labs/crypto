@@ -1,0 +1,19 @@
+Deviation D2 (main session, 2026-11-20): the frozen PROTOCOL sec 9 names the binary at
+/home/user/crypto-c0b657b/target/release/genus_ladder, recorded in raw/binary.sha256 as
+sha256 50e5986e8e80ee98d7d80c9cbedc169f7b732c84d571bee9b74acbd123a030ff (a552dc2ee8 build).
+That path has since been rebuilt for another study, and the 50e5986e binary no longer exists.
+
+The runs use the unpatched lab build of commit fffa1b1243,
+/home/user/bin/genus_ladder_fffa1b, sha256
+128cd69bb85005c621018c1080046e97ca6be7cd204d2b7102e5bf5a79463364.
+
+Equivalence check before any decision run: the recorded pilot cell
+pilot/pilot_cc2_p1031.jsonl was re-run with the same command under the fffa1b1243
+binary (raw/D2_repro_p1031_cc2_fffa1b.jsonl). All 8 run records (2 curves x 2 seeds,
+arms c and R) are identical field for field, wall_ns excepted.
+
+The same binary reproduces a recorded genus-4 cell exactly
+(research/ic_genus2_16_speedup_20261117/P0).
+
+No arm, seed, threshold or decision rule changed. Deviation D1 (per-prime run split)
+still applies.

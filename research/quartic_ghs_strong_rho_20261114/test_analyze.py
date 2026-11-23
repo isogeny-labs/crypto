@@ -126,6 +126,48 @@ class AnalysisTests(unittest.TestCase):
         with self.assertRaisesRegex(A.Invalid, "band identity"):
             A.strong_components(row)
 
+    def test_non_authoritative_or_malformed_rho_counts_are_rejected(self) -> None:
+        for authority in (False, None, 0, "false"):
+            with self.subTest(authority=authority):
+                with self.assertRaisesRegex(A.Invalid, "non-authoritative or malformed"):
+                    A.parse_rho_record(
+                        {"rec": "rho", "arm": "fast-b8", "count_authoritative": authority},
+                        q=223,
+                        seed=1,
+                        target=17,
+                        ell=101,
+                        arm="fast-b8",
+                        expected_index=0,
+                    )
+
+        legacy = {
+            "rec": "rho",
+            "arm": "old-neg",
+            "q": 223,
+            "seed": 1,
+            "i": 0,
+            "target_kind": "ic",
+            "k": 17,
+            "ell": 101,
+            "ok": True,
+            "steps": 1,
+            "c.mul": 0,
+            "c.inv": 0,
+            "c.lmul": 0,
+            "c.hash": 0,
+            "c.cmp": 0,
+        }
+        parsed = A.parse_rho_record(
+            legacy,
+            q=223,
+            seed=1,
+            target=17,
+            ell=101,
+            arm="old-neg",
+            expected_index=0,
+        )
+        self.assertEqual(parsed.arm, "old-neg")
+
     def test_grid_and_repetitions_are_frozen(self) -> None:
         self.assertEqual(len(A.GRID), 11)
         self.assertEqual(A.GRID[-1], 4194271)
