@@ -2251,7 +2251,7 @@ fn run_diem_inner(
             } else {
                 let dense = res.attempts > 1;
                 let sp = &mut res.la_split;
-                let mut cand: Option<u64> = None;
+                let cand: Option<u64>;
                 // the square solve's answer, already certified (no second check)
                 let mut pre_cert = false;
                 match opts.la {
