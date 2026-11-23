@@ -1,0 +1,16 @@
+{
+  "schema": "h116-kummer-parity-launch/v1",
+  "protocol_id": "H116-KUMMER-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in KUMMER_PARITY_SOURCE_GATE.md",
+  "anchors": 8,
+  "maximum_subset_size": 3,
+  "rules": 184,
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_kummer_parity.rs", "-o", "/tmp/h116_kummer_parity"],
+    "selftest": ["/tmp/h116_kummer_parity", "--selftest"],
+    "run": ["/tmp/h116_kummer_parity", "--run", "KUMMER_PARITY_RESULT.json"]
+  },
+  "outputs": ["KUMMER_PARITY_RESULT.json", "KUMMER_PARITY_RUN.txt", "KUMMER_PARITY_SHA256SUMS"],
+  "measurement_scope": "bounded quadratic-Kummer cover family as a total-or-abstaining parity decoder, with family-wise curve-preserving shuffle calibration; no generic decoder or ECDLP speedup claim"
+}

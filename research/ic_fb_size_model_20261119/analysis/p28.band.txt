@@ -1,0 +1,11 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-t28201-65099091 | 28.00 | fb1024 | 16/16 | 68.195 | 75.445 | 140.699 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | fb128 | 16/16 | 35.990 | 43.057 | 106.664 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | fb2048 | 16/16 | 258.303 | 284.415 | 519.424 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | fb256 | 16/16 | 21.435 | 25.300 | 60.084 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | fb512 | 16/16 | 23.818 | 26.969 | 55.332 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | fb64 | 16/16 | 85.028 | 101.958 | 254.328 | — |
+| icv1-fp28-t28201-65099091 | 28.00 | rho | 16/16 | 0.877 | 0.962 | 1.731 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.

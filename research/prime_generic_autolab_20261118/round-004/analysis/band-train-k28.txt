@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | inc | 12/12 | 20.483 | 23.560 | 51.249 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | ksum4f-n60 | 12/12 | 271.430 | 303.858 | 595.710 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | mitm2-n342 | 12/12 | 18.827 | 21.846 | 49.019 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | mitm2-n482 | 12/12 | 23.282 | 26.484 | 55.302 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 12/12 | 1.070 | 1.175 | 2.117 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | tw2l-x20-j16-n2 | 12/12 | 1.632 | 1.793 | 3.243 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | wwalkGg-x09-sr-n2 | 12/12 | 1.838 | 2.018 | 3.639 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | inc vs ksum4f-n60 | inc < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | inc vs mitm2-n342 | mitm2-n342 < inc |
+| icv1-fp28-tm3161-380f655a | inc vs mitm2-n482 | inc < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm3161-380f655a | inc vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < inc |
+| icv1-fp28-tm3161-380f655a | inc vs wwalkGg-x09-sr-n2 | wwalkGg-x09-sr-n2 < inc |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs mitm2-n342 | mitm2-n342 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs mitm2-n482 | mitm2-n482 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs rho-neg | rho-neg < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs wwalkGg-x09-sr-n2 | wwalkGg-x09-sr-n2 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs mitm2-n482 | mitm2-n342 < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs rho-neg | rho-neg < mitm2-n342 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < mitm2-n342 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs wwalkGg-x09-sr-n2 | wwalkGg-x09-sr-n2 < mitm2-n342 |
+| icv1-fp28-tm3161-380f655a | mitm2-n482 vs rho-neg | rho-neg < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | mitm2-n482 vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | mitm2-n482 vs wwalkGg-x09-sr-n2 | wwalkGg-x09-sr-n2 < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | rho-neg vs tw2l-x20-j16-n2 | rho-neg < tw2l-x20-j16-n2 |
+| icv1-fp28-tm3161-380f655a | rho-neg vs wwalkGg-x09-sr-n2 | rho-neg < wwalkGg-x09-sr-n2 |
+| icv1-fp28-tm3161-380f655a | tw2l-x20-j16-n2 vs wwalkGg-x09-sr-n2 | tw2l-x20-j16-n2 < wwalkGg-x09-sr-n2 |

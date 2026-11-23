@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-collision-tangent-obstruction-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "reduction_screen": "../xedni_collision_reduction_screen_20261120/result.json",
+  "reduction_screen_sha256": "1854e8d8abad88b10f6a944a13687f56c0dd6b6f11f6028996b423f60e4bb11c",
+  "input_law": "all 336 ordered source pairs with distinct rational x and auxiliary x collision at 7 or 11; use the independently computed fixed-prime P+2Q bit only to classify the necessary relation gate",
+  "tangent_law": "for every fixed-prime-positive pair compute D=x1-x2, Y=y1-y2 and the exact residue Y^2 mod abs(D); D nondivisibility obstructs P+2Q on every elliptic rational curve through the pair with integral a1,a2",
+  "formal_cases": [[273, 10, -18, 1, 23], [315, 10, -18, -1, -23], [663, 17, 10, 10, -1], [703, 17, 10, -10, 1], [1160, -18, 15, 23, 16], [1202, -18, 15, -23, -16], [1500, -10, -21, 18, 8], [1542, -10, -21, -18, -8]],
+  "decision": "classify each pair by fixed-prime reduction or exact tangent divisibility; report all rows and any unclassified case; the fixed-family mathematical conclusion requires good reduction at 47 and exact source-point reduction for the first class",
+  "claim_boundary": "the 336-pair source stratum on rational elliptic curves with integral a1,a2 and the prescribed good reduction at 47; does not cover other point laws, nonintegral a1/a2, other relation words, or the distinct-auxiliary-x source stratum"
+}
