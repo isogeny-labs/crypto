@@ -1,0 +1,40 @@
+
+running 5 tests
+test tests::every_m31_selector_root_satisfies_the_ladder ... ok
+test tests::horizontal_and_twist_only_charts_are_explicit ... FAILED
+test tests::local_quadratic_blocks_match_s3 ... FAILED
+test tests::m2_m3_m4_m31_assignments_and_signed_targets ... FAILED
+test tests::matched_tiny_systems_are_actually_solved ... FAILED
+
+failures:
+
+---- tests::horizontal_and_twist_only_charts_are_explicit stdout ----
+
+thread 'tests::horizontal_and_twist_only_charts_are_explicit' (28) panicked at ../../../examples/dickson_s3_quadratic.rs:1065:36:
+called `Result::unwrap()` on an `Err` value: "a quadratic block lost the horizontal witness"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::local_quadratic_blocks_match_s3 stdout ----
+
+thread 'tests::local_quadratic_blocks_match_s3' (29) panicked at ../../../examples/dickson_s3_quadratic.rs:1060:34:
+called `Result::unwrap()` on an `Err` value: "quartic differs from production eval_s3_u64"
+
+---- tests::m2_m3_m4_m31_assignments_and_signed_targets stdout ----
+
+thread 'tests::m2_m3_m4_m31_assignments_and_signed_targets' (30) panicked at ../../../examples/dickson_s3_quadratic.rs:1075:33:
+called `Result::unwrap()` on an `Err` value: "nonzero equation: selector_0_0"
+
+---- tests::matched_tiny_systems_are_actually_solved stdout ----
+
+thread 'tests::matched_tiny_systems_are_actually_solved' (31) panicked at ../../../examples/dickson_s3_quadratic.rs:1080:28:
+called `Result::unwrap()` on an `Err` value: "nonzero equation: selector_0_0"
+
+
+failures:
+    tests::horizontal_and_twist_only_charts_are_explicit
+    tests::local_quadratic_blocks_match_s3
+    tests::m2_m3_m4_m31_assignments_and_signed_targets
+    tests::matched_tiny_systems_are_actually_solved
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
