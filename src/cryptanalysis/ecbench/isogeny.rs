@@ -46,12 +46,40 @@ struct Fp<'t> {
 impl Fp<'_> {
     fn mul(&mut self, a: u64, b: u64) -> u64 {
         self.tally.muls += 1;
+        // Root-polynomial arithmetic uses canonical residues. Keep the
+        // original wide remainder for external/noncanonical operands.
+        if a < self.p && b < self.p {
+            if self.p <= u16::MAX as u64 {
+                return ((a as u32 * b as u32) % self.p as u32) as u64;
+            }
+            if self.p <= u32::MAX as u64 {
+                return (a * b) % self.p;
+            }
+            // Fast reduction for p=2^61-1 (two end-around-carry limbs).
+            if self.p == (1u64 << 61) - 1 {
+                let product = a as u128 * b as u128;
+                let folded = ((product as u64) & self.p) + (product >> 61) as u64;
+                return if folded >= self.p {
+                    folded - self.p
+                } else {
+                    folded
+                };
+            }
+        }
         ((a as u128 * b as u128) % self.p as u128) as u64
     }
     fn add(&self, a: u64, b: u64) -> u64 {
+        // p<=2^63-1 and canonical operands imply the sum fits in u64.
+        if self.p <= u64::MAX / 2 && a < self.p && b < self.p {
+            let sum = a + b;
+            return if sum >= self.p { sum - self.p } else { sum };
+        }
         ((a as u128 + b as u128) % self.p as u128) as u64
     }
     fn sub(&self, a: u64, b: u64) -> u64 {
+        if self.p <= u64::MAX / 2 && a < self.p && b < self.p {
+            return if a >= b { a - b } else { a + self.p - b };
+        }
         ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
     }
     fn small(&self, c: u64) -> u64 {
@@ -63,8 +91,11 @@ impl Fp<'_> {
             if e & 1 == 1 {
                 r = self.mul(r, a);
             }
-            a = self.mul(a, a);
             e >>= 1;
+            // Do not square the base after consuming the final exponent bit.
+            if e != 0 {
+                a = self.mul(a, a);
+            }
         }
         r
     }
@@ -85,18 +116,48 @@ impl Fp<'_> {
             v.pop();
         }
     }
+
+    // Root extraction repeatedly reduces modulo the same polynomial.
+    // Convert it to monic once so each subsequent remainder avoids a
+    // full Fermat inversion of the leading coefficient. The zero set is
+    // unchanged because the scaling factor is nonzero in F_p.
+    fn make_monic(&mut self, polynomial: &mut Vec<u64>) {
+        if polynomial.len() <= 1 || polynomial.last() == Some(&1) {
+            return;
+        }
+        let degree = polynomial.len() - 1;
+        let inverse = self.inv(polynomial[degree]);
+        for coefficient in &mut polynomial[..degree] {
+            *coefficient = self.mul(*coefficient, inverse);
+        }
+        polynomial[degree] = 1;
+    }
+
     fn rem(&mut self, a: &[u64], m: &[u64]) -> Vec<u64> {
         let mut r = a.to_vec();
         Self::trim(&mut r);
         let dm = m.len() - 1;
-        let inv = self.inv(m[dm]);
+        // Monic moduli dominate x^p mod f and Cantor-Zassenhaus splitting.
+        // Their leading inverse is 1: avoid a Fermat inversion per remainder.
+        let monic = m[dm] == 1;
+        let inv = if monic { 1 } else { self.inv(m[dm]) };
         while r.len() > dm {
-            let c = self.mul(*r.last().unwrap(), inv);
+            let top = *r.last().unwrap();
+            let c = if monic && top < self.p {
+                top
+            } else {
+                self.mul(top, inv)
+            };
             let s = r.len() - 1 - dm;
-            for (i, &mi) in m.iter().enumerate() {
-                let t = self.mul(c, mi);
-                r[s + i] = self.sub(r[s + i], t);
+            // The leading coefficient cancels exactly, so do not multiply
+            // and subtract it. Skip zero terms in sparse divisors.
+            for (i, &mi) in m[..dm].iter().enumerate() {
+                if mi != 0 {
+                    let t = self.mul(c, mi);
+                    r[s + i] = self.sub(r[s + i], t);
+                }
             }
+            r[s + dm] = 0;
             Self::trim(&mut r);
         }
         r
@@ -121,8 +182,11 @@ impl Fp<'_> {
             if e & 1 == 1 {
                 r = self.mulmod(&r, &b, m);
             }
-            b = self.mulmod(&b, &b, m);
             e >>= 1;
+            // An unused final polynomial square is especially expensive.
+            if e != 0 {
+                b = self.mulmod(&b, &b, m);
+            }
         }
         r
     }
@@ -149,6 +213,7 @@ impl Fp<'_> {
         if f.len() <= 1 {
             return vec![];
         }
+        self.make_monic(&mut f);
         let xp = self.powmod(&[0, 1], p, &f);
         let mut h = xp;
         if h.len() < 2 {
@@ -156,11 +221,14 @@ impl Fp<'_> {
         }
         h[1] = self.sub(h[1], 1);
         Self::trim(&mut h);
-        let g = if h.is_empty() {
+        let mut g = if h.is_empty() {
             f.clone()
         } else {
             self.gcd(&f, &h)
         };
+        // Euclidean gcd does not necessarily return a monic polynomial.
+        // Normalize before all subsequent equal-degree splitting.
+        self.make_monic(&mut g);
         let mut out = Vec::new();
         self.split(g, &mut out, 0);
         out.sort_unstable();
@@ -172,11 +240,16 @@ impl Fp<'_> {
         match g.len() {
             0 | 1 => {}
             2 => {
-                // g = g1 x + g0.
-                let inv = self.inv(g[1]);
+                // Every factor emitted by roots() is monic. Preserve a
+                // fallback for nonmonic callers of this private helper.
                 let neg = self.sub(0, g[0]);
-                let r = self.mul(neg, inv);
-                out.push(r);
+                let root = if g[1] == 1 {
+                    neg
+                } else {
+                    let inv = self.inv(g[1]);
+                    self.mul(neg, inv)
+                };
+                out.push(root);
             }
             _ => loop {
                 let shift = self.small(delta);
@@ -186,22 +259,28 @@ impl Fp<'_> {
                     e = vec![0];
                 }
                 e[0] = self.sub(e[0], 1);
-                let d = self.gcd(&g, &e);
+                let mut d = self.gcd(&g, &e);
                 delta += 1;
                 if d.len() > 1 && d.len() < g.len() {
+                    // GCD factors are only defined up to a field scalar.
+                    // Make them monic before division and recursion: this
+                    // eliminates repeated inversions within both branches.
+                    self.make_monic(&mut d);
                     let other = {
-                        // g / d
+                        // Exact division g / d, where d is now monic.
                         let mut q = vec![0u64; g.len() - d.len() + 1];
                         let mut r = g.clone();
-                        let inv = self.inv(*d.last().unwrap());
                         while r.len() >= d.len() && !r.is_empty() {
-                            let c = self.mul(*r.last().unwrap(), inv);
+                            let c = *r.last().unwrap();
                             let s = r.len() - d.len();
                             q[s] = c;
-                            for (i, &di) in d.iter().enumerate() {
-                                let t = self.mul(c, di);
-                                r[s + i] = self.sub(r[s + i], t);
+                            for (i, &di) in d[..d.len() - 1].iter().enumerate() {
+                                if di != 0 {
+                                    let t = self.mul(c, di);
+                                    r[s + i] = self.sub(r[s + i], t);
+                                }
                             }
+                            r[s + d.len() - 1] = 0;
                             Self::trim(&mut r);
                         }
                         q
@@ -322,6 +401,91 @@ mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
 
+    #[test]
+    fn round128_arithmetic_matches_wide_modulo() {
+        let primes = [101u64, 65_521, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1];
+        for p in primes {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x9e37_79b9_7f4a_7c15;
+            for _ in 0..20_000 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let a = state % p;
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let b = state % p;
+                assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64);
+                assert_eq!(f.add(a, b), ((a as u128 + b as u128) % p as u128) as u64);
+                assert_eq!(f.sub(a, b), ((a as u128 + p as u128 - b as u128) % p as u128) as u64);
+            }
+        }
+    }
+
+    #[test]
+    fn round128_remainders_and_powers_match_naive_division() {
+        fn old_rem(f: &mut Fp<'_>, a: &[u64], m: &[u64]) -> Vec<u64> {
+            let mut r = a.to_vec();
+            Fp::trim(&mut r);
+            let dm = m.len() - 1;
+            let inv = f.inv(m[dm]);
+            while r.len() > dm {
+                let c = f.mul(*r.last().unwrap(), inv);
+                let shift = r.len() - 1 - dm;
+                for (i, &mi) in m.iter().enumerate() {
+                    let t = f.mul(c, mi);
+                    r[shift + i] = f.sub(r[shift + i], t);
+                }
+                Fp::trim(&mut r);
+            }
+            r
+        }
+        for p in [101u64, 65_521, 1_000_000_007, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0xabc1_2500_0000_0028;
+            for i in 0..250 {
+                let mut dividend = Vec::new();
+                for _ in 0..8 {
+                    state ^= state << 13;
+                    state ^= state >> 7;
+                    state ^= state << 17;
+                    dividend.push(state % p);
+                }
+                let modulus = match i % 4 {
+                    0 => vec![3, 0, 0, 1],
+                    1 => vec![3, 2, 4, 1],
+                    2 => vec![3, 0, 0, 2],
+                    _ => vec![3, 2, 4, 7],
+                };
+                let got = f.rem(&dividend, &modulus);
+                let expected = old_rem(&mut f, &dividend, &modulus);
+                assert_eq!(got, expected);
+                if i < 15 {
+                    let optimized = f.powmod(&[1, 1], p, &modulus);
+                    // Independent square-and-multiply with the original reducer.
+                    let mut exponent = p;
+                    let mut acc = vec![1];
+                    let mut base = old_rem(&mut f, &[1, 1], &modulus);
+                    while exponent > 0 {
+                        if exponent & 1 == 1 {
+                            let product = f.mulmod(&acc, &base, &modulus);
+                            acc = old_rem(&mut f, &product, &modulus);
+                        }
+                        exponent >>= 1;
+                        if exponent != 0 {
+                            let square = f.mulmod(&base, &base, &modulus);
+                            base = old_rem(&mut f, &square, &modulus);
+                        }
+                    }
+                    assert_eq!(optimized, acc);
+                }
+            }
+        }
+    }
+
     /// On prime-order curves with a rational 3-isogeny, φ lands on E′, is a
     /// homomorphism on ⟨G⟩, and keeps the order.
     #[test]
@@ -373,4 +537,60 @@ mod tests {
         };
         assert_eq!(f.roots(&poly), vec![3, 50]);
     }
+
+    #[test]
+    fn round129_monic_factor_roots_match_known_factors() {
+        for p in [101u64, 65_521, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for i in 0..24u64 {
+                let factors = [(3 + 7 * i) % p, (13 + 7 * i) % p,
+                    (29 + 7 * i) % p, (47 + 7 * i) % p];
+                let mut polynomial = vec![1u64];
+                for &root in &factors {
+                    let mut next = vec![0u64; polynomial.len() + 1];
+                    for (j, &coefficient) in polynomial.iter().enumerate() {
+                        let term = field.mul(coefficient, root);
+                        next[j] = field.sub(next[j], term);
+                        next[j + 1] = field.add(next[j + 1], coefficient);
+                    }
+                    polynomial = next;
+                }
+                let mut expected = factors.to_vec();
+                expected.sort_unstable();
+                expected.dedup();
+                assert_eq!(field.roots(&polynomial), expected, "monic p={p} i={i}");
+                for scalar in [2u64, 3, 7] {
+                    let scaled: Vec<u64> = polynomial.iter()
+                        .map(|&coefficient| field.mul(coefficient, scalar))
+                        .collect();
+                    assert_eq!(field.roots(&scaled), expected, "scaled p={p} i={i}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round129_isogeny_psi3_roots_match_small_field_exhaustive_search() {
+        let p = 101u64;
+        let mut tally = FieldTally::default();
+        let mut field = Fp { p, tally: &mut tally };
+        for a in 0..12u64 {
+            for b in 0..12u64 {
+                // ψ3(x) = 3 x^4 + 6 a x^2 + 12 b x - a^2.
+                let aa = field.mul(a, a);
+                let poly = vec![field.sub(0, aa), field.mul(12, b),
+                    field.mul(6, a), 0, 3];
+                let roots = field.roots(&poly);
+                let brute_force: Vec<u64> = (0..p).filter(|&x| {
+                    poly.iter().rev().fold(0u64, |acc, &c| {
+                        let prod = field.mul(acc, x);
+                        field.add(prod, c)
+                    }) == 0
+                }).collect();
+                assert_eq!(roots, brute_force, "ψ3 a={a} b={b}");
+            }
+        }
+    }
+
 }

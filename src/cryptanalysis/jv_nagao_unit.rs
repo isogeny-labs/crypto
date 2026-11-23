@@ -4,9 +4,9 @@
 //! adapter control isolates this change. The default entry point stays intact.
 use super::nagao_unit_elimination::{self as unit, Audit};
 use crate::cryptanalysis::{
-    f4_fp::F4Options,
+    f4_fp::{F4Options, Poly},
     jv_bitops as work,
-    jv_cover::{verify_dec, weil_forms, BaseEl, Ctx, Dec6, Div, Fld, NagaoCost, E2},
+    jv_cover::{verify_dec, weil_forms, BaseEl, Ctx, Dec6, Div, Fld, NagaoCost, ZeroDimStats, E2},
     jv_sieve::FpRing,
 };
 use rand::rngs::StdRng;
@@ -31,6 +31,33 @@ pub fn decompose(
     rng: &mut StdRng,
     eliminate: bool,
 ) -> Result<(Vec<Dec6>, NagaoCost, Option<Audit>), &'static str> {
+    decompose_using(ctx, base, by_x, r, opts, rng, |polys, p, opts, rng| {
+        if eliminate {
+            let (s, t, a) = unit::solve_audited(polys, p, opts, rng)?;
+            Ok((s, t, Some(a)))
+        } else {
+            let (s, t) = crate::cryptanalysis::jv_cover::solve_zero_dim(polys, 6, p, opts, rng);
+            Ok((s, t, None))
+        }
+    })
+}
+
+/// Reuse the same full-only materializer with an explicit audited backend.
+/// Solver errors are propagated; callers preserve the refused residual.
+pub fn decompose_using(
+    ctx: &Ctx,
+    base: &[BaseEl],
+    by_x: &HashMap<u64, usize>,
+    r: &Div<E2>,
+    opts: &F4Options,
+    rng: &mut StdRng,
+    solve: impl FnOnce(
+        &[Poly],
+        u64,
+        &F4Options,
+        &mut StdRng,
+    ) -> Result<(Vec<Vec<u64>>, ZeroDimStats, Option<Audit>), &'static str>,
+) -> Result<(Vec<Dec6>, NagaoCost, Option<Audit>), &'static str> {
     if ctx.trace {
         return Err("unit backend requires trace=false");
     }
@@ -49,13 +76,7 @@ pub fn decompose(
     let polys = forms.polys(&ctx.reim, p);
     f.count_public(6 * 10 * 8);
     cost.weil_muls = f.muls() - m0;
-    let (sols, st, audit) = if eliminate {
-        let (s, t, a) = unit::solve_audited(&polys, p, opts, rng)?;
-        (s, t, Some(a))
-    } else {
-        let (s, t) = crate::cryptanalysis::jv_cover::solve_zero_dim(&polys, 6, p, opts, rng);
-        (s, t, None)
-    };
+    let (sols, st, audit) = solve(&polys, p, opts, rng)?;
     cost.f4_muls = st.f4_muls;
     cost.lin_muls = st.lin_muls;
     cost.delta = st.delta;

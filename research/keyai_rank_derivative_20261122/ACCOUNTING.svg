@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="800" viewBox="0 0 1040 800" role="img" aria-labelledby="title description">
+  <title id="title">Support evidence and relation accounting</title>
+  <desc id="description">The derivative predicate checks support of a supplied polynomial. A separate extraction and lifting step is needed to obtain signed elliptic-curve witnesses. Those witnesses are normalized into rows, replayed in the public group, counted by independent rank, and combined with anchor information for target determination and scalar replay.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 Z" fill="#304f63"/></marker>
+    <marker id="gaparrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 Z" fill="#9b5c16"/></marker>
+    <style>
+      text { font-family: "DejaVu Sans", sans-serif; fill: #183341; }
+      .title { font-size: 29px; font-weight: 700; }
+      .subtitle { font-size: 17px; fill: #4e6370; }
+      .head { font-size: 22px; font-weight: 700; }
+      .body { font-size: 18px; }
+      .small { font-size: 16px; }
+      .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 18px; }
+      .edge { fill: none; stroke: #304f63; stroke-width: 2.5; marker-end: url(#arrow); }
+      .gap { fill: none; stroke: #9b5c16; stroke-width: 2.5; stroke-dasharray: 7 5; marker-end: url(#gaparrow); }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1040" height="800" fill="#ffffff"/>
+  <text x="26" y="39" class="title">Support evidence and relation accounting</text>
+  <text x="26" y="68" class="subtitle">Protocol boundaries • frozen Rust correctness controls • PCC unverified</text>
+  <rect x="26" y="101" width="325" height="167" rx="10" fill="#eaf5f3" stroke="#408d83" stroke-width="1.8"/>
+  <text x="44" y="134" class="head">Polynomial support</text>
+  <text x="44" y="163" class="mono">rem(F g′, g) = 0</text>
+  <text x="44" y="192" class="body">Prime p; 0 &lt; deg g &lt; p</text>
+  <text x="44" y="220" class="body">Monic g; nonzero F</text>
+  <text x="44" y="247" class="small">Input: a supplied polynomial g</text>
+  <rect x="26" y="290" width="325" height="143" rx="10" fill="#fff4e2" stroke="#b5772d" stroke-width="1.8"/>
+  <text x="44" y="323" class="head">Support stops here</text>
+  <text x="44" y="354" class="body">No roots or signs are returned.</text>
+  <text x="44" y="383" class="body">No elliptic-curve relation</text>
+  <text x="44" y="411" class="body">is admitted by this predicate.</text>
+  <rect x="26" y="459" width="325" height="220" rx="10" fill="#f1f4f7" stroke="#bdc9d1" stroke-width="1.5"/>
+  <text x="44" y="491" class="head">Recorded fixture</text>
+  <text x="44" y="522" class="body">32 coordinate tuples</text>
+  <text x="44" y="548" class="body">64 signed witnesses</text>
+  <text x="44" y="574" class="body">8 candidate polynomials</text>
+  <text x="44" y="600" class="body">1 normalized row; rank 1</text>
+  <text x="44" y="626" class="body">Target unpinned before anchor</text>
+  <text x="44" y="663" class="small">Source: attempt2 controls JSON</text>
+  <rect x="410" y="101" width="604" height="86" rx="10" fill="#f4f7fa" stroke="#9caebc" stroke-width="1.5"/>
+  <text x="430" y="134" class="head">1. Roots / candidate labels</text>
+  <text x="430" y="165" class="body">Extract roots; retain multiplicities and candidate provenance</text>
+  <path d="M351,143 L401,143" class="gap"/>
+  <text x="373" y="119" text-anchor="middle" class="small" fill="#9b5c16">gap</text>
+  <path d="M712,187 L712,215" class="edge"/>
+  <rect x="410" y="225" width="604" height="86" rx="10" fill="#eef6fb" stroke="#7798ae" stroke-width="1.5"/>
+  <text x="430" y="258" class="head">2. Signed witness</text>
+  <text x="430" y="289" class="body">Lift to curve points; check signs, chart, and group equation</text>
+  <path d="M712,311 L712,339" class="edge"/>
+  <rect x="410" y="349" width="604" height="86" rx="10" fill="#eef6fb" stroke="#7798ae" stroke-width="1.5"/>
+  <text x="430" y="382" class="head">3. Canonical normalized row</text>
+  <text x="430" y="413" class="body">Reduce modulo subgroup order r; replay the public relation</text>
+  <path d="M712,435 L712,463" class="edge"/>
+  <rect x="410" y="473" width="604" height="86" rx="10" fill="#eef6fb" stroke="#7798ae" stroke-width="1.5"/>
+  <text x="430" y="506" class="head">4. Independent rank</text>
+  <text x="430" y="537" class="body">Track duplicates, nonduplicate dependencies, and rank gains</text>
+  <path d="M712,559 L712,587" class="edge"/>
+  <rect x="410" y="597" width="604" height="106" rx="10" fill="#eaf5f3" stroke="#408d83" stroke-width="1.8"/>
+  <text x="430" y="630" class="head">5. Anchor / target determination</text>
+  <text x="430" y="659" class="body">Supply sufficient anchor or target-span information</text>
+  <text x="430" y="686" class="body">Replay any recovered scalar with [k]G = Q</text>
+  <line x1="26" y1="733" x2="1014" y2="733" stroke="#d4dde3"/>
+  <text x="26" y="760" class="small">Sources: report [U1-U3], [C1-C3]. The dashed bridge requires a separate extraction procedure.</text>
+  <text x="26" y="785" class="small">A coefficient-only row helper does not replace signed lifting, subgroup checks, or group replay.</text>
+</svg>

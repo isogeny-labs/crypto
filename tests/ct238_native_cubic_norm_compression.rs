@@ -550,4 +550,239 @@ mod ct241 {
             }
         }
     }
+
+    // CT327: separate public-toy source rho control. CT238/CT241 source above
+    // remains byte-for-byte unchanged. No original norm fixture or PCC claim.
+    mod ct327 {
+        use super::*;
+        use std::collections::HashMap;
+
+        const MAX_RESTARTS: usize = 64;
+        const JUMPS: usize = 16;
+        const STEPS_PER_RESTART: usize = (4 * R) as usize;
+
+        #[derive(Default, Debug)]
+        struct Tally {
+            ec_adds: u64,
+            canonicalisations: u64,
+            negations: u64,
+            walk_steps: u64,
+            collisions: u64,
+            useless_collisions: u64,
+            max_table_entries: usize,
+            max_table_capacity: usize,
+        }
+
+        fn add_counted(t: &mut Tally, a: Ec, z: Ec) -> Ec {
+            t.ec_adds += 1;
+            ec_add(a, z)
+        }
+
+        fn mul_counted(t: &mut Tally, mut scalar: i64, mut point: Ec) -> Ec {
+            assert!(scalar >= 0);
+            let mut out = None;
+            while scalar > 0 {
+                if scalar & 1 != 0 {
+                    out = add_counted(t, out, point);
+                }
+                point = add_counted(t, point, point);
+                scalar >>= 1;
+            }
+            out
+        }
+
+        fn on_curve(pt: Ec) -> bool {
+            match pt {
+                None => true,
+                Some((x,y)) => (0..P).contains(&x)
+                    && (0..P).contains(&y)
+                    && m(y*y - x*x*x - x - 24, P) == 0,
+            }
+        }
+
+        // Normalize +/-P. The same sign must transform both known
+        // coefficients of P=[a]G+[b]Q, or a collision gives a false log.
+        fn canonical(t: &mut Tally, pt: Ec, a: i64, b: i64) -> (Ec, i64, i64) {
+            t.canonicalisations += 1;
+            match pt {
+                Some((x,y)) if y > P - y => {
+                    t.negations += 1;
+                    (Some((x, P-y)), m(-a,R), m(-b,R))
+                }
+                _ => (pt, a, b),
+            }
+        }
+
+        fn partition(pt: Ec) -> usize {
+            match pt {
+                None => 0,
+                Some((x,y)) => m(131*x + 17*y, JUMPS as i64) as usize,
+            }
+        }
+
+        struct RhoSample {
+            log: i64,
+            total_ns: u128,
+            setup_ns: u128,
+            walk_ns: u128,
+            verification_ns: u128,
+            restarts: usize,
+            tally: Tally,
+        }
+
+        // This is a small deterministic diagnostic rho, NOT a claim that its
+        // tuning defeats the maintained production optimized rho.
+        fn rho_public(g: Ec, q: Ec) -> Result<RhoSample, &'static str> {
+            let initial = Instant::now();
+            let mut tally = Tally::default();
+            let check_start = Instant::now();
+            if !on_curve(g) || !on_curve(q) {
+                return Err("off-curve public input");
+            }
+            if mul_counted(&mut tally, R, g).is_some()
+                || mul_counted(&mut tally, R, q).is_some()
+                || g.is_none()
+            {
+                return Err("subgroup / generator mismatch");
+            }
+            let mut setup_ns = check_start.elapsed().as_nanos();
+            let mut walk_ns = 0u128;
+            let mut seen: HashMap<Ec, (i64,i64)> = HashMap::new();
+            for seed in 0..MAX_RESTARTS {
+                let t_setup = Instant::now();
+                let mut jumps: Vec<(i64,i64,Ec)> = Vec::with_capacity(JUMPS);
+                for j in 0..JUMPS {
+                    let a = m(1 + 17*j as i64 + 13*seed as i64, R);
+                    let b = m(1 + 29*j as i64 + 11*seed as i64, R);
+                    let left = mul_counted(&mut tally, a, g);
+                    let right = mul_counted(&mut tally, b, q);
+                    let point = add_counted(&mut tally, left, right);
+                    jumps.push((a,b,point));
+                }
+                let a0 = m(1 + 19*seed as i64, R);
+                let b0 = m(7 + 23*seed as i64, R);
+                let left = mul_counted(&mut tally, a0, g);
+                let right = mul_counted(&mut tally, b0, q);
+                let start = add_counted(&mut tally, left, right);
+                let (mut pt, mut a, mut b) = canonical(&mut tally, start, a0, b0);
+                setup_ns += t_setup.elapsed().as_nanos();
+
+                let t_walk = Instant::now();
+                for _ in 0..STEPS_PER_RESTART {
+                    if let Some(&(old_a, old_b)) = seen.get(&pt) {
+                        tally.collisions += 1;
+                        let denominator = m(old_b - b, R);
+                        if denominator != 0 {
+                            // old_a G+old_b Q = a G+b Q, so
+                            // Q=((a-old_a)/(old_b-b)) G.
+                            let answer = m((a-old_a)*inverse(denominator), R);
+                            walk_ns += t_walk.elapsed().as_nanos();
+                            let t_verify = Instant::now();
+                            let check = mul_counted(&mut tally, answer, g);
+                            if check != q {
+                                return Err("invalid collision / scalar");
+                            }
+                            let verification_ns = t_verify.elapsed().as_nanos();
+                            return Ok(RhoSample {
+                                log: answer, total_ns: initial.elapsed().as_nanos(),
+                                setup_ns, walk_ns, verification_ns,
+                                restarts: seed+1, tally,
+                            });
+                        }
+                        tally.useless_collisions += 1;
+                        break; // same deterministic tail: restart, keep prior table.
+                    }
+                    seen.insert(pt, (a,b));
+                    tally.max_table_entries = tally.max_table_entries.max(seen.len());
+                    tally.max_table_capacity = tally.max_table_capacity.max(seen.capacity());
+                    let index = partition(pt);
+                    let (da,db,delta) = jumps[index];
+                    pt = add_counted(&mut tally, pt, delta);
+                    a = m(a+da, R);
+                    b = m(b+db, R);
+                    (pt,a,b) = canonical(&mut tally, pt, a, b);
+                    tally.walk_steps += 1;
+                }
+                walk_ns += t_walk.elapsed().as_nanos();
+            }
+            Err("fixed capped rho search exhausted; no log certified")
+        }
+
+        #[test]
+        fn ct327_public_source_all_109_and_negative_controls() {
+            let g = Some((1,51));
+            assert!(on_curve(g));
+            assert!(!on_curve(Some((0,0))));
+            assert!(matches!(rho_public(g,Some((0,0))),Err("off-curve public input")));
+            let mut logs = 0usize;
+            let mut total_adds = 0u64;
+            for expected in 0..R {
+                let q = ec_mul(expected,g); // fixture generation, outside the solver.
+                let run = rho_public(g,q).expect("public F103 rho failed");
+                assert_eq!(run.log,expected,"rho returned incorrect discrete log");
+                assert_eq!(ec_mul(run.log,g),q);
+                assert_ne!(ec_mul(m(run.log+1,R),g),q,
+                    "forged off-by-one scalar accepted");
+                assert!(run.restarts<=MAX_RESTARTS);
+                assert!(run.tally.walk_steps<=
+                    (MAX_RESTARTS*STEPS_PER_RESTART) as u64);
+                total_adds += run.tally.ec_adds;
+                logs += 1;
+            }
+            assert_eq!(logs,R as usize);
+            eprintln!("CT327_CORRECTNESS_PASS logs={} mutations={} counted_adds={} [pcc:unverified]",
+                logs,logs+1,total_adds);
+        }
+
+        #[test]
+        fn ct327_same_host_f103_cold_ic_rho_bsgs_triplets() {
+            let g = Some((1,51));
+            let q = Some((42,71)); // public Q73 only; solver never receives 73.
+            for round in 0..3 {
+                let direct = || {
+                    let t = Instant::now();
+                    let (log, adds) = direct_bsgs(g,q);
+                    assert_eq!(log,73);
+                    (t.elapsed().as_nanos(),adds)
+                };
+                let rho = || {
+                    let ans = rho_public(g,q).expect("bounded rho failed Q73");
+                    assert_eq!(ans.log,73);
+                    ans
+                };
+                // Three permutations prevent every baseline from always
+                // running before or after the large original IC collector.
+                let (ic, r, bs) = match round {
+                    0 => {
+                        let c=cold(22); let r=rho(); let b=direct(); (c,r,b)
+                    }
+                    1 => {
+                        let b=direct(); let c=cold(22); let r=rho(); (c,r,b)
+                    }
+                    _ => {
+                        let r=rho(); let b=direct(); let c=cold(22); (c,r,b)
+                    }
+                };
+                assert_eq!(ic.rank,22);
+                assert_eq!(ic.candidates,381);
+                assert!(ic.ns>0 && r.total_ns>0 && bs.0>0);
+                let unclassified_ns = r.total_ns.saturating_sub(
+                    r.setup_ns+r.walk_ns+r.verification_ns);
+                let table_bytes_lower_bound = r.tally.max_table_capacity *
+                    std::mem::size_of::<(Ec,(i64,i64))>();
+                eprintln!(
+                    "CT327_MATCHED_Q73_JSON {{\"round\":{},\"arm_order\":\"{}\",\"ic_b22_cold_ns\":{},\"rho_cold_ns\":{},\"bsgs_cold_ns\":{},\"bsgs_over_ic\":{:.12},\"rho_over_ic\":{:.12},\"rho_setup_ns\":{},\"rho_walk_ns\":{},\"rho_verify_ns\":{},\"rho_unclassified_ns\":{},\"rho_ec_adds\":{},\"rho_canon\":{},\"rho_negations\":{},\"rho_steps\":{},\"rho_collisions\":{},\"rho_useless\":{},\"rho_restarts\":{},\"rho_table_entries\":{},\"rho_table_capacity\":{},\"rho_table_bytes_lower_bound\":{},\"bsgs_adds_original_scope\":{},\"ic_cantor_adds\":{},\"ic_target_adds\":{},\"vmhwm_kb_processwide\":{},\"pcc\":\"unverified\"}}",
+                    round,["IC_RHO_BSGS","BSGS_IC_RHO","RHO_BSGS_IC"][round],
+                    ic.ns,r.total_ns,bs.0,
+                    bs.0 as f64/ic.ns as f64,r.total_ns as f64/ic.ns as f64,
+                    r.setup_ns,r.walk_ns,r.verification_ns,unclassified_ns,
+                    r.tally.ec_adds,r.tally.canonicalisations,r.tally.negations,
+                    r.tally.walk_steps,r.tally.collisions,r.tally.useless_collisions,
+                    r.restarts,r.tally.max_table_entries,r.tally.max_table_capacity,
+                    table_bytes_lower_bound,bs.1,ic.cantor_adds,ic.target_adds,
+                    super::vmhwm_kb()
+                );
+            }
+        }
+    }
 }

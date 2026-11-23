@@ -1,0 +1,10 @@
+digraph G {
+  graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.25",ranksep="0.3"];
+  node [shape=box,style="rounded,filled",fillcolor="#eff5fa",fontname="Helvetica",fontsize=11];
+  edge [color="#56758b"];
+  inputs [label="Frozen 6 curves\n2 public targets / curve\nNo target scalar supplied"];
+  run [label="Existing CPU pipeline\n24 / 24 A/A calls complete\n12 distinct targets"];
+  replay [label="Native external replay\n24 / 24 original\n24 / 24 post-run"];
+  audit [label="Post-run OpenSSL point audit\n24 positives pass\n48 corruptions reject"];
+  inputs -> run -> replay -> audit;
+}

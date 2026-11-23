@@ -1,0 +1,189 @@
+{
+  "schema": "native-cpu-cohort-lossless-metadata-review/v1",
+  "review_id": "COHORT-LOSSLESS-REVIEW-07",
+  "created_utc": "2026-11-23T12:44:04.836Z",
+  "scope": "Read-only administrative exact-delta/source/receipt review. No solver,EC replay,converter,canonical checker,compiler,Clippy or test was run. Numeric tokens were protected from floating-point conversion during reviewer JSON comparison. No earlier source,export,review,manifest or other producer record was modified.",
+  "disposition": {
+    "final_metadata_view": "export-v3b.json supported_within_scope as the exact lossless metadata successor to original v1",
+    "v3": "Lossless numeric delta passes,but retain as nonfinal because caller-supplied created timestamp was incorrect",
+    "v2": "Remain preserved and rejected for exact fidelity under06; do not overwrite or relabel its five measurement changes",
+    "original_cohort": "Original05 artifact-consistency scope and24calls/12target outcomes remain unchanged",
+    "independent_execution": "Not established by this same-root-team unsigned review; no fresh independent-session experiment.review/v1 assertion",
+    "publication_binding": "Pending exact committed source/evidence publication",
+    "new_blocking_findings": []
+  },
+  "preserved_reviews": {
+    "review05_sha256": "841fae26a3c2f44350baeb084b28f1a469ee1d17e7a848c6e96259f0a8a2831d",
+    "manifest05_sha256": "1f90ef79635f5e2e709814976975cabd1b3a5bfd58a87fbeedbdaf7f1843a491",
+    "review06_sha256": "aae6a4de44e6b4fd550ced3c8bd92e6e8b2c84df6bd904f930d1a96a225af495",
+    "manifest06_sha256": "ba2ba0ef0aa08891891cad522c92c102a2babcfde26d5214362d2dfdd724de7c",
+    "rechecked_entries": {
+      "manifest05": 301,
+      "manifest06": 39,
+      "total_entries": 340
+    },
+    "interpretation": "All entries across both earlier manifests still hash correctly; some paths overlap. Reviews05/06 and original exporters/exports remain unchanged. This supplements rather than rewrites either review."
+  },
+  "artifacts": {
+    "export.json": {
+      "sha256": "ec8e0e8dd6865c543ce088886ddff3e2c044163a5a12e7ac911010637d0adb19",
+      "bytes": 121658,
+      "role": "unchanged original raw-faithful export"
+    },
+    "export-v2.json": {
+      "sha256": "60e735e394ab0425028dfcf185b9a8516311341e04fda9dda434782e47baa242",
+      "bytes": 122947,
+      "role": "retained numeric-drift failure"
+    },
+    "export-v3.json": {
+      "sha256": "82fb4ed2fdc8b91abd4a81f772e1e1d2547aeaf7847719db5cfdf20e0d924303",
+      "bytes": 123081,
+      "role": "retained incorrect-created view"
+    },
+    "export-v3b.json": {
+      "sha256": "07a7f73eeecf1ed24cfb203233982135235e90b82822bc896ccefdabe1e5d208",
+      "bytes": 123081,
+      "role": "recommended final metadata view"
+    }
+  },
+  "exact_delta": {
+    "reference": "export.json",
+    "recommended": "export-v3b.json",
+    "method": "Token-aware JSON parsing replaces all numeric lexemes with tagged strings before recursive structural comparison. Thus no IEEE rounding or tolerance can hide measurement-number changes.",
+    "v1_to_v3_changes": 39,
+    "v1_to_v3b_changes": 39,
+    "only_allowed_changes": true,
+    "allowed_categories": {
+      "export_id_and_created": 2,
+      "one_appended_note": 1,
+      "seed202_replicate0_to1": 12,
+      "added_native_replicate_zero": 24
+    },
+    "unexpected_fields": 0,
+    "changed_measurement_number_lexemes": 0,
+    "all_original_measurements_outcomes_statuses_seeds_artifacts_inputs_protocol_exact": true,
+    "note": "Existing measurements/counters retain all original fields/numeric text; only the explicitly allowed native_replicate0 metadata counter is added. Protocol,flow,source,arms,run_ids,certificates and artifact references are otherwise identical. The five fractional fields that failed in v2 are exactly preserved.",
+    "v3_to_v3b": {
+      "changes": 1,
+      "path": "/created",
+      "before": "2026-11-23T12:40:00Z",
+      "after": "2026-11-23T12:39:21Z"
+    },
+    "timestamp_scope": "Phase09 actually ran12:38:40–12:38:41 with manually supplied12:40:00 created. Its bytes are retained.09b used the same frozen binary,input digest and content with created12:39:21,matching its recorded12:39:21 start/end. This is recorded clock consistency,not independent time attestation."
+  },
+  "canonical_identity": {
+    "rule": "(arm,instance_id,replicate,warmup)",
+    "unique_execution_cells": 24,
+    "logical_public_targets": 12,
+    "declared_mapping": "seed101->slot0;seed202->slot1; native CSV replicate0 retained as counters.native_replicate0",
+    "semantics": "Slots0/1 identify DISTINCT PUBLIC TARGETS within each curve. They are not repeat observations of one target,extra statistical replicates,new solver calls or new logical cases. Identicalu/x A/A remains separate from the seed-slot distinction.",
+    "captured_checks": "Existing logs report0findings for bothv3 andv3b. The canonical checker was not rerun by this reviewer and no fresh-current live canonical access is asserted."
+  },
+  "source_review": {
+    "package": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_scale_20261123/independent/export-lossless",
+    "package_sha256": "fafbd8efdb30a5622e2092de27a979238bd89d88d8279b45986705b0c231813c",
+    "lock_sha256": "b1f245c1ec99c5d4395c47cdb2a234dfeeafb910ea4fbfae713a7d752c2d1c3c",
+    "source_sha256": "a7a3ccbf307b08e299ef1c816196fe02c21a93a5841a320815120f2a0da86c72",
+    "qualified_binary_sha256": "57cf8e6a9f7b5d19f3d48287704af534cb90f617dbef127bd6190dc35ede0c7b",
+    "implementation": "Separate standalone workspace enables serde_json arbitrary_precision. It hashes/checks the original input,requires a new output,changes only the documented metadata,then applies recursive exact_delta checks both before serialization and after serialized readback before exclusive output creation. The code imports no process launcher,solver or EC operation.",
+    "whitelist": "Restores only export_id,created,one appended note,per-run seed ordinal and added native_replicate0 when comparing against original. Existing note prefix andrun count/order are checked. Every remaining Value,including arbitrary-precision Number text,must match exactly. Reviewer independent token comparison confirms this property on actual v3b."
+  },
+  "recorded_qualification": {
+    "initial08": "Retained exit101/physical-stop0; raw unit suite6passed/1failed. Failure occurred in fractional preservation fixture that omitted original export_id/created,causing exact_delta to reject unauthorized shape changes. This is not a solver failure or discarded data result.",
+    "final08b": "Recorded exit0/physical-stop0; seven metadata tests,strict all-target Clippy and release build pass. No check was rerun by reviewer.",
+    "tests": "Seven tests include four cell/state guards plus five reported fractional-number positions round-tripped exactly,explicit rounding rejection and arbitrary unlisted-field rejection. Five fractional positions are covered by one test,not five additional tests.",
+    "calls09_and09b": "Both recorded exit0/physical-stop0 with the same separately copied qualifier and expected original ec8e0e8d... input digest. Source/package/lock/binary pre-call manifest and current hashes match; post-call check reports all four OK. These calls only emit metadata views and add no solver or EC audit execution.",
+    "stage_records": [
+      {
+        "phase": "08-lossless-metadata-adapter-build",
+        "started_at": "2026-11-23T12:37:38Z",
+        "finished_at": "2026-11-23T12:37:44Z",
+        "exit_code": 101,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13403725824,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "08b-final-lossless-metadata-adapter-build",
+        "started_at": "2026-11-23T12:38:15Z",
+        "finished_at": "2026-11-23T12:38:19Z",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13365878784,
+        "stdout_sha256": "78cad236d49ed512756caf6a5a9986d32309baebfb6f6144a12f96b1964fad3f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "09-lossless-export-metadata-only",
+        "started_at": "2026-11-23T12:38:40Z",
+        "finished_at": "2026-11-23T12:38:41Z",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13310992384,
+        "stdout_sha256": "826b82dd9324dfc432c3789872ecf3eb489dd9d39d31e96764f85d5297e66ebd",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "09b-lossless-export-current-utc",
+        "started_at": "2026-11-23T12:39:21Z",
+        "finished_at": "2026-11-23T12:39:21Z",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13311336448,
+        "stdout_sha256": "826b82dd9324dfc432c3789872ecf3eb489dd9d39d31e96764f85d5297e66ebd",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "old-snapshots",
+      "result": "pass",
+      "detail": "All340 entries in05/06 manifests rechecked and original review/export/source hashes match."
+    },
+    {
+      "id": "v3b-lossless-whitelist",
+      "result": "pass",
+      "detail": "Actual original-vs-final lexical-number comparison has exactly39permitted changes and0extra changes,including no measurement drift."
+    },
+    {
+      "id": "v3-created-correction",
+      "result": "pass_with_retained_error",
+      "detail": "V3andv3b differ only in created. Recommend onlyv3b as final view; retain erroneous v3timestamp and phase09record."
+    },
+    {
+      "id": "canonical-cell-flow",
+      "result": "pass",
+      "detail": "24unique canonical cells;12distinct public targets; original24planned/completed,nofailed/excluded/interrupted/resumed flow unchanged. Separate captured checker logs each report0findings."
+    },
+    {
+      "id": "test-and-source-scope",
+      "result": "pass_as_recorded",
+      "detail": "Separate arbitrary-precision source and seven-test finalqualification fit metadata correction scope; retained initial fixture failure is visible. No scientific rerun or crypto tool execution by reviewer."
+    },
+    {
+      "id": "execution-provenance",
+      "result": "not_covered",
+      "detail": "Artifact/source consistency and producer post-run local checks do not provide independently authenticated execution,signed PCC standing or an official independent-session review."
+    }
+  ],
+  "recommendation": {
+    "action": "use_v3b_for_metadata_pending_publication_binding",
+    "reason": "V3b preserves original JSON data and numeric tokens exactly while resolving canonical cell identities. Retainv1/v2/v3 and all failures/reviews; no additional solver/EC replay is warranted for this metadata correction."
+  },
+  "retained_limits": [
+    "All oversized exports remain local-only unless separately published under the established artifact policy; this review does not rename or compress data into Git.",
+    "No new performance comparison,counter-cost calibration,asymptotic result,novelty,largest global feasible scale or cryptographic-size claim follows.",
+    "The cohort remains12fixed targets on6curves with24identical-arm calls; field and prime-order bit labels retain05 distinctions.",
+    "Independent authenticated execution,full-root/MSRV/general mathematical gates and the frozen84-case comparison remain outside this metadata review."
+  ],
+  "asserts_nothing_about": [
+    "official research status",
+    "fresh independent-session provenance",
+    "independently authenticated execution",
+    "new solver or cryptographic observations"
+  ],
+  "evidence_manifest": "cohort-lossless-evidence-07.sha256",
+  "evidence_manifest_sha256": "4f109a2508b31c0366fc6f7172c4606b2f30731efee9bed30cc518b1f66ea2c5"
+}

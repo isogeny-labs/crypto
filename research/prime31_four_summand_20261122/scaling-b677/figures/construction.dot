@@ -1,0 +1,35 @@
+digraph construction {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", fontsize=11,
+         pad=0.12, nodesep=0.22, ranksep=0.30, splines=polyline, labelloc=b,
+         label="32 native + 8 public-example tests passed\n686 circuit terms; 476 auxiliary mutations rejected\nRegistered B677 extraction remains unexecuted"];
+  node [shape=box, style="rounded,filled", fillcolor="#F2F6FA", color="#526B82",
+        fontcolor="#142C40", fontname="DejaVu Sans", fontsize=11,
+        margin="0.10,0.08", penwidth=1.1];
+  edge [color="#657D91", penwidth=1.1, arrowsize=0.65,
+        fontname="DejaVu Sans", fontsize=10];
+
+  input [label="Canonical base and public target R\n509 Dickson + 168 Y7 abscissae\nMonic RR5 quartic U(b,c,d)"];
+  raw [label="Split squarefree selector H\nDegree 1192"];
+  filtered [label="Filtered base polynomial h\nDegree 677"];
+  input -> raw;
+  input -> filtered;
+  {rank=same; raw; filtered;}
+
+  circuit [label="Structured modular circuit\n122 variables / 123 quadratics",
+           fillcolor="#E6F3F1", color="#248071"];
+  cofactor [label="Exact monic cofactor\n676 variables / 677 cubics"];
+  raw -> circuit;
+  filtered -> cofactor;
+  {rank=same; circuit; cofactor;}
+
+  equivalence [label="Same admitted affine RR5 chart\nFour-leaf anti-Frobenius exclusion\nExact monic gate graph extensions"];
+  circuit -> equivalence [dir=none];
+  cofactor -> equivalence [dir=none];
+
+  solver [label="Bounded F4 and algebraic roots\nPair, support and workspace admission\nAwaiting checkpoint and EKS access",
+          fillcolor="#FFF1D6", color="#B77B1F", style="rounded,dashed,filled"];
+  equivalence -> solver [style=dashed, label="registered calls pending"];
+  replay [label="Required extraction evidence\nSigned replay to R; authentic RHS\nUseful rank and complete accounting",
+          style="rounded,dashed", fillcolor="white"];
+  solver -> replay [style=dashed];
+}
