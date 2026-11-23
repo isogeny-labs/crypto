@@ -52,6 +52,84 @@ pub struct RankAudit {
     pub receipts: Vec<RowReceipt>,
 }
 
+impl RankAudit {
+    /// Whether the accepted, consistent equations determine the target column.
+    ///
+    /// The kernel has no free target component exactly when deleting that
+    /// column lowers rank by one. A row-rank increase alone is insufficient.
+    /// Invalid rows fail this check even when the accepted subset would pin the
+    /// target. Deserialized reports must still pass [`replay`]: this accessor is
+    /// a rank diagnostic, not authentication of a receipt or a scalar solution.
+    pub fn target_is_determined(&self) -> bool {
+        let Some(base_columns) = self.column_keys.len().checked_sub(1) else {
+            return false;
+        };
+        self.invalid_rows == 0
+            && self.base_rank <= base_columns
+            && self.rank <= self.column_keys.len()
+            && self.base_rank.checked_add(1) == Some(self.rank)
+    }
+}
+
+/// Normalize a signed fixed-target witness into a row with target coefficient -1.
+///
+/// For `sum P_i + target_sign * Q = O`, the factor-base convention is
+/// `[h]P_i = [coef_of[i]]B_col`. The returned base part is therefore
+/// `-target_sign * h^(-1) * sum coef_of[i]` modulo the subgroup order `ctx.r`.
+/// Repeated columns are added before normalization, so opposite point pairs
+/// cancel. The last entry is `r-1`, and the equation's right-hand side is zero.
+/// Global negation of both the witness and its target sign gives the same row.
+///
+/// This function performs coefficient normalization only. The caller must
+/// replay the actual signed points against Q, then pass this row to
+/// [`AuditedMatrix::add_row`] (via [`RelationSolver`]) for the public group check.
+/// It does not turn raw witness counts into independent relations, remove rows,
+/// or provide a general-purpose cross-target deduplication key. In particular,
+/// a varying-target collector must preserve its full equation and RHS.
+pub fn fixed_target_row<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    fb: &FactorBase<G::Elt>,
+    indices: &[usize],
+    target_sign: i8,
+) -> Result<Vec<u64>, String> {
+    if target_sign != 1 && target_sign != -1 {
+        return Err("fixed-target sign must be +1 or -1".into());
+    }
+    let r = ctx.r;
+    if r <= 2 || !crate::cryptanalysis::challenge_ladder::is_prime_u64(r) {
+        return Err("fixed-target row requires an odd prime subgroup order".into());
+    }
+    if fb.columns == 0
+        || fb.columns > 4096
+        || fb.points.len() != fb.col_of.len()
+        || fb.points.len() != fb.coef_of.len()
+        || fb.col_of.iter().any(|&col| col >= fb.columns)
+    {
+        return Err("invalid fixed-target factor-base column map".into());
+    }
+    let inverse_cofactor =
+        invmod(ctx.cofactor % r, r).ok_or("fixed-target cofactor is not invertible")?;
+    let scale = if target_sign == 1 {
+        r - inverse_cofactor
+    } else {
+        inverse_cofactor
+    };
+    let mut row = vec![0; fb.columns + 1];
+    for &index in indices {
+        let &col = fb
+            .col_of
+            .get(index)
+            .ok_or("fixed-target point index outside factor base")?;
+        row[col] =
+            ((u128::from(row[col]) + u128::from(fb.coef_of[index] % r)) % u128::from(r)) as u64;
+    }
+    for coefficient in &mut row[..fb.columns] {
+        *coefficient = (u128::from(*coefficient) * u128::from(scale) % u128::from(r)) as u64;
+    }
+    row[fb.columns] = r - 1;
+    Ok(row)
+}
+
 /// Replay includes base-column and subgroup checks. The caller supplies the
 /// exact archived base and workload (G,Q,r,h); a transcript is not self-authenticating.
 pub fn replay<G: CountedGroup>(
