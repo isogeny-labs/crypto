@@ -21,7 +21,7 @@ files named, not pcc-certified claims.
 
 | item | status | what it would take |
 |---|---|---|
-| Lean, A1 envelope and A3 (A)/(B) | done (crypto-lean `claude/math-st-closures`) | none |
+| Lean, A1 envelope and A3 (A)/(B) | done (aburan28/crypto-lean PR #37; proof gate passed, 348 theorems, 0 failing) | none |
 | Lean, A1 upper bound $R\le L+O(\log n)$ | not attempted: no proof exists on paper | a proof first |
 | Lean, A3 (C) | not attempted | a generic-group-model framework in crypto-lean |
 | P3.3 native medians | done (`p33_native/`) | none |
