@@ -41,9 +41,15 @@ pub struct WitnessStats {
     pub reroot_steps: u64,
     /// Tree edge steps used while reducing original or anchor rows.
     pub path_steps: u64,
-    /// Actual successful-stream modular inversions: one per nonempty input row\n    /// (paired endpoint inverses share one inversion), plus anchor normalization.
-    /// Tree-path hops reuse the cached inverses of admitted equation edges.
+    /// Successful-stream modular inversions: one per nonempty input row,
+    /// plus one per anchor cache miss. Parent hops reuse edge inverses.
     pub inverse_calls: u64,
+    /// Times a rooted anchor reduction was reused without traversing its tree.
+    #[serde(default)]
+    pub anchor_cache_hits: u64,
+    /// Anchor projections and inversions computed for a previously uncached root.
+    #[serde(default)]
+    pub anchor_cache_misses: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -63,6 +69,15 @@ struct Reduced {
     basis: BTreeMap<usize, u64>,
     scans: u64,
     steps: u64,
+}
+
+/// A root-normalized anchor plus its original-tree-edge source combination.
+/// Valid only while the equation forest of this root remains unchanged.
+#[derive(Clone, Debug)]
+struct CachedAnchor {
+    row_index: usize,
+    inv_root_coefficient: u64,
+    basis: BTreeMap<usize, u64>,
 }
 
 fn add_term(map: &mut BTreeMap<usize, u64>, key: usize, value: u64, p: u64) {
@@ -92,10 +107,10 @@ fn coeff_at(row: &[(usize, u64)], vertex: usize) -> u64 {
 /// reroot work is O(V log V). For R rows, maximum forest depth D and L
 /// emitted source terms, the conservative ordered-map work is
 /// O((R D + V log V) log(R+2) + L), excluding modular inverse bit costs.
-/// Inverses for each independent tree edge's two endpoints are computed via
-/// one product inversion at admission, not per path hop: at most R + A
-/// inversions on accepted rows, for R nonempty inputs and A anchor
-/// normalizations. Refused rows may perform additional uncounted diagnostics.
+/// Endpoint inverses are computed via one product inversion per nonempty
+/// input row. Root-normalized anchors are cached until a component changes:
+/// inversions are U+C on accepted rows (U nonempty rows, C anchor cache misses),
+/// rather than U+A (A uses of anchored roots). Refusal work remains separate.
 /// D may be V, and witness materialization may dominate; no complete-cost
 /// or asymptotic ECDLP advantage is assumed.
 #[derive(Clone, Debug)]
@@ -110,6 +125,9 @@ pub struct ForestWitnessExtractor {
     tree_parent_edge: Vec<Option<usize>>,
     /// Exactly one independent anchor row, if pinned, per root.
     anchor: Vec<Option<usize>>,
+    /// At most one cached source-expanded root-normalized anchor per component.
+    /// Joining components invalidates both relevant root cache slots.
+    anchor_cache: Vec<Option<CachedAnchor>>,
     /// Every admitted row is retained for source reconstruction.
     rows: Vec<Vec<(usize, u64)>>,
     /// Exact inverses of both coefficients for each independent tree edge.
@@ -130,6 +148,7 @@ impl ForestWitnessExtractor {
             tree_parent: (0..vertices).collect(),
             tree_parent_edge: vec![None; vertices],
             anchor: vec![None; vertices],
+            anchor_cache: vec![None; vertices],
             rows: Vec::new(),
             edge_inverses: Vec::new(),
             stats: WitnessStats::default(),
@@ -284,19 +303,36 @@ impl ForestWitnessExtractor {
         let mut scans = projection.scans;
         let mut steps = projection.steps;
         let mut inversions = inversions;
+        let mut new_anchor_caches = Vec::new();
+        let mut cache_hits = 0u64;
         for (&root, &gamma) in &projection.roots {
             if let Some(anchor_idx) = self.anchor[root] {
-                let anchor_projection = self.project(&self.rows[anchor_idx])?;
-                scans += anchor_projection.scans;
-                steps += anchor_projection.steps;
-                let alpha = anchor_projection.roots.get(&root).copied().unwrap_or(0);
-                let inverse = inv_mod(alpha, p).ok_or(LpGraphError::NonInvertible {
-                    value: alpha,
-                })?;
-                inversions += 1;
-                let factor = neg_mod(mul_mod(gamma, inverse, p), p);
+                let normalization = if let Some(cached) = self.anchor_cache[root]
+                    .as_ref()
+                    .filter(|cache| cache.row_index == anchor_idx)
+                {
+                    cache_hits += 1;
+                    cached.clone()
+                } else {
+                    let anchor_projection = self.project(&self.rows[anchor_idx])?;
+                    scans += anchor_projection.scans;
+                    steps += anchor_projection.steps;
+                    let alpha = anchor_projection.roots.get(&root).copied().unwrap_or(0);
+                    let inverse = inv_mod(alpha, p).ok_or(LpGraphError::NonInvertible {
+                        value: alpha,
+                    })?;
+                    inversions += 1;
+                    let cached = CachedAnchor {
+                        row_index: anchor_idx,
+                        inv_root_coefficient: inverse,
+                        basis: anchor_projection.basis,
+                    };
+                    new_anchor_caches.push((root, cached.clone()));
+                    cached
+                };
+                let factor = neg_mod(mul_mod(gamma, normalization.inv_root_coefficient, p), p);
                 add_term(&mut source, anchor_idx, factor, p);
-                for (i, a) in anchor_projection.basis {
+                for (i, a) in normalization.basis {
                     add_term(&mut source, i, mul_mod(factor, a, p), p);
                 }
             } else {
@@ -307,6 +343,11 @@ impl ForestWitnessExtractor {
         self.stats.adjacency_scans += scans;
         self.stats.path_steps += steps;
         self.stats.inverse_calls += inversions;
+        self.stats.anchor_cache_hits += cache_hits;
+        self.stats.anchor_cache_misses += new_anchor_caches.len() as u64;
+        for (root, cache) in new_anchor_caches {
+            self.anchor_cache[root] = Some(cache);
+        }
         self.stats.rows += 1;
         self.rows.push(terms.to_vec());
         // Only independent bridges can become parent edges. Keep the inverses
@@ -348,6 +389,10 @@ impl ForestWitnessExtractor {
                 self.size[big] += self.size[small];
                 self.anchor[big] = self.anchor[u].or(self.anchor[v]);
                 self.anchor[small] = None;
+                // A new tree edge changes the root representation for the
+                // attached component. Conservatively invalidate both caches.
+                self.anchor_cache[big] = None;
+                self.anchor_cache[small] = None;
                 self.stats.tree_edges += 1;
             }
             _ => {
@@ -355,6 +400,7 @@ impl ForestWitnessExtractor {
                 let root = outstanding[0];
                 debug_assert!(self.anchor[root].is_none());
                 self.anchor[root] = Some(row_idx);
+                self.anchor_cache[root] = None;
                 self.stats.anchors += 1;
             }
         }
