@@ -174,3 +174,28 @@ Only the final already-scheduled administrative check remains. It may assess
 a compatible upstream repair and actual required results; the three-occurrence
 schedule will not be extended. Both scientific studies and the completed local
 numerical goal retain their earlier scope and standing.
+
+## Terminal bounded check — November 23
+
+Inspected head `4d2afb37af` remains OPEN/MERGEABLE with auto-merge off and
+no reviews, comments or unresolved threads. Its required `gate`, `size` and
+`artifacts` jobs now conclude success. Five other jobs fail. The successful
+contexts do not establish a clean global test run or independent scientific
+standing: PCC verification/prose and artifact-recovery substeps still emit
+errors. The jobs ran on synthetic merge `6fc80b6e5c` into then-main
+`143a0b91fb`; PR4987 itself has not merged. See the
+[terminal snapshot](evidence/terminal-followup-20261123.json) [pcc:unverified].
+
+The other failures concern unavailable frozen backend output, historical curve
+names, unrecorded environment switches and unrelated Rust delimiters. Current
+main `7d61e3b45d` includes a delimiter repair, while the four enforcement files
+reviewed above remain byte-identical to `143a0b91fb`. The recorded no-weakening
+conflict therefore persists; no main merge or auto-merge reenabling occurred
+[pcc:unverified].
+
+This was the third and final scheduled occurrence. The bounded automation is
+OFF, with no extension, successor or recursive receipt PR. PR4987 remains open
+under the recorded hold. A future explicitly resumed task can reassess a
+compatible enforcement repair or an owner revision of the constraint and the
+then-current checks/reviews. No benchmark, replay, local test, S3 operation,
+cloud experiment or scientific promotion occurred in this terminal check.
