@@ -136,3 +136,59 @@ fn inherited_ignored_sigchld_is_refused_before_launch() {
     assert_eq!(err.kind(), io::ErrorKind::InvalidInput);
     assert!(fs::read(path.join("stdout")).unwrap().is_empty());
 }
+
+#[test]
+fn abrupt_supervisor_death_kills_the_owned_worker() {
+    let path = case("parent-death");
+    let mut helper = Command::new(env!("CARGO_BIN_EXE_resource-probe"));
+    helper
+        .arg("supervise")
+        .arg(&path)
+        .stdin(Stdio::null())
+        .stdout(Stdio::from(
+            fs::File::options()
+                .write(true)
+                .create_new(true)
+                .open(path.join("helper.stdout"))
+                .unwrap(),
+        ))
+        .stderr(Stdio::from(
+            fs::File::options()
+                .write(true)
+                .create_new(true)
+                .open(path.join("helper.stderr"))
+                .unwrap(),
+        ));
+    let mut helper = helper.spawn().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(2);
+    let child = loop {
+        if let Ok(text) = fs::read_to_string(path.join("child.stdout")) {
+            if let Ok(pid) = text.trim().parse::<u32>() {
+                break pid;
+            }
+        }
+        if Instant::now() >= deadline {
+            let _ = helper.kill();
+            let _ = helper.wait();
+            panic!("owned worker did not start");
+        }
+        std::thread::sleep(Duration::from_millis(2));
+    };
+    helper.kill().unwrap();
+    helper.wait().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(2);
+    loop {
+        match fs::read_to_string(format!("/proc/{child}/stat")) {
+            Err(e) if e.kind() == io::ErrorKind::NotFound => break,
+            Ok(v) if v.rsplit_once(") ").unwrap().1.starts_with('Z') => break,
+            Ok(_) => {
+                assert!(
+                    Instant::now() < deadline,
+                    "worker survived supervisor death"
+                );
+                std::thread::sleep(Duration::from_millis(2));
+            }
+            Err(e) => panic!("{e}"),
+        }
+    }
+}

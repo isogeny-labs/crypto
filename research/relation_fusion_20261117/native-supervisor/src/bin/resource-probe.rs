@@ -60,6 +60,36 @@ fn main() -> io::Result<()> {
             io::stdout().flush()?;
             std::thread::sleep(Duration::from_secs(10));
         }
+        Some("sleep-pid") => {
+            println!("{}", std::process::id());
+            io::stdout().flush()?;
+            std::thread::sleep(Duration::from_secs(10));
+        }
+        Some("supervise") => {
+            let directory = std::path::Path::new(&a[2]);
+            let mut c = Command::new(std::env::current_exe()?);
+            c.arg("sleep-pid")
+                .stdin(Stdio::null())
+                .stdout(Stdio::from(
+                    std::fs::File::options()
+                        .write(true)
+                        .create_new(true)
+                        .open(directory.join("child.stdout"))?,
+                ))
+                .stderr(Stdio::from(
+                    std::fs::File::options()
+                        .write(true)
+                        .create_new(true)
+                        .open(directory.join("child.stderr"))?,
+                ));
+            let result = relation_native_supervisor::run(
+                &mut c,
+                relation_native_supervisor::Limits::default(),
+            )?;
+            if !result.status.success() {
+                return Err(io::Error::other("supervised child failed"));
+            }
+        }
         Some("sleep") => std::thread::sleep(Duration::from_secs(10)),
         _ => return Err(io::Error::other("probe mode")),
     }

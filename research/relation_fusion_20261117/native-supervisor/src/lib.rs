@@ -102,6 +102,9 @@ impl Drop for ChildOwner {
 /// Owns and reaps one child. No other thread or signal handler may reap this child.
 /// Timeout kills the whole private process group; every error also cleans up.
 /// Native pidfd support is mandatory; an unsupported host is explicitly refused.
+/// A frozen single-process worker is killed if this supervising process dies.
+/// Workers must not execute privileged files, change credentials or disable the
+/// guard. This research helper is not a confinement mechanism for arbitrary code.
 pub fn run(command: &mut Command, limits: Limits) -> io::Result<Outcome> {
     admission()?;
     command.process_group(0);
@@ -110,10 +113,29 @@ pub fn run(command: &mut Command, limits: Limits) -> io::Result<Outcome> {
         .env("OMP_NUM_THREADS", "1")
         .env("OPENBLAS_NUM_THREADS", "1")
         .env("RUST_TEST_THREADS", "1");
+    let parent_pid = std::process::id() as libc::pid_t;
     // SAFETY: after fork this hook uses only Linux resource syscalls and OS-error
     // construction; no allocation, logging, locks, formatting or panics occur.
     unsafe {
-        command.pre_exec(|| {
+        command.pre_exec(move || {
+            // Frozen workers are normal unprivileged executables that do not
+            // change credentials. Linux preserves this signal across their exec.
+            if libc::prctl(
+                libc::PR_SET_PDEATHSIG,
+                libc::SIGKILL as libc::c_ulong,
+                0 as libc::c_ulong,
+                0 as libc::c_ulong,
+                0 as libc::c_ulong,
+            ) < 0
+            {
+                return Err(io::Error::last_os_error());
+            }
+            // A parent that died before prctl would not generate a later signal.
+            // Reject that fork-to-registration race without allocating after fork.
+            if libc::getppid() != parent_pid {
+                return Err(io::Error::from_raw_os_error(libc::ECHILD));
+            }
+
             let memory = libc::rlimit {
                 rlim_cur: 2147483648,
                 rlim_max: 2147483648,
