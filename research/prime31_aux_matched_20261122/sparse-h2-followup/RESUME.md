@@ -23,7 +23,8 @@ source/image, live budget/capacity and original absolute deadline before dispatc
 
 ## State
 
-Implementation is qualified on lane/prime31-sparse-h2, PR #4945: 76 optimized
+Implementation PR #4945 is merged; MERGE_STATUS.json records its state. The
+native source remains on lane/prime31-sparse-h2: 76 optimized
 native tests passed across 17 immutable executables, with no failures or ignored
 tests. Standing remains unverified under PCC-20261123-f873fd. The PDF and exact
 source are published in the continuation after tracking-only PR #4937 merged.

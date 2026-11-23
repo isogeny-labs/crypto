@@ -1,9 +1,12 @@
 # Sparse H2, fair plain controls, and staged recovery
 
 Follow-up to merged [PR #4923](https://github.com/isogeny-labs/crypto/pull/4923),
-recorded in [PR #4945](https://github.com/isogeny-labs/crypto/pull/4945).
+merged in [PR #4945](https://github.com/isogeny-labs/crypto/pull/4945).
 Initial tracking PR #4937 merged while implementation was being completed;
-it contained only the task entry. The code and evidence are in the continuation.
+it contained only the task entry. The implementation continuation merged at
+commit `333370a3f7b840f86984f1e770d4c7ecaf7e7ca8`.
+[MERGE_STATUS.json](MERGE_STATUS.json) records the observed state. Merging did
+not supply a signed verdict, a green full integration result, or execution admission.
 
 **Implementation and development qualification are complete; campaign execution
 is blocked before launch.** The retained optimized native suite reports 76

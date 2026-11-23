@@ -213,3 +213,8 @@ card hash and schema revalidation. Both records retain the narrower scope of
 this metadata fallback and leave native backlog validation open.
 It is not a `backlog validate` pass, experiment verification, runner admission,
 or permission to launch.
+
+PR #4945 subsequently merged the implementation. The completed PR-review blocker
+is removed; `validation-v3.json` binds the current card. Checkpoint, authenticated
+runner, live budget/capacity, canonical selection and source-image admission remain
+open. Merging the implementation does not authorize a run.
