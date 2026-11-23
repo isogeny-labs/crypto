@@ -1,0 +1,54 @@
+[package]
+name = "prime31-aux-matched"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+autobins = false
+autoexamples = false
+autobenches = false
+
+[workspace]
+
+[lib]
+name = "prime31_aux_matched"
+path = "src/lib.rs"
+test = false
+doctest = false
+
+[[bin]]
+name = "prime31-aux-matched"
+path = "src/main.rs"
+test = false
+bench = false
+
+[[bin]]
+name = "prime31-isogeny-choices"
+path = "src/choice_main.rs"
+test = false
+bench = false
+
+[features]
+default = []
+wide-vars = []
+
+[dependencies]
+certified-relations = { path = "../../../crates/certified-relations" }
+relation-replay-checker = { path = "../../../crates/relation-replay-checker" }
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+rand = { version = "0.8", features = ["small_rng"] }
+rayon = "1.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+sha2 = "0.10"
+
+[build-dependencies]
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+sha2 = "0.10"
+
+[profile.release]
+opt-level = 3
+debug = 0
+lto = false
+codegen-units = 16

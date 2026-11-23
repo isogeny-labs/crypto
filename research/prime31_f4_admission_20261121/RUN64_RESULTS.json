@@ -1,0 +1,191 @@
+{
+  "schema": "prime31-run64-component/v1",
+  "date_utc": "2026-11-22",
+  "scope": "fixed public Semaev S3 pair zero-test component; no unknown-index roots, no complete ECDLP",
+  "workflow_run": "https://github.com/isogeny-labs/crypto/actions/runs/45032930310",
+  "tested_source_commit": "41644f56ae334d7498d49f28753f51bd315b1895",
+  "branch": "research/prime31-f4-admission-run51-20261121",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "input": {
+    "public_factor_base": "original Rust depth-10 Dickson 509 canonical points",
+    "fixed_pairs": 16,
+    "query_steps_per_arm_repetition": 250000,
+    "repetitions": 5,
+    "batch_affine_x": 256
+  },
+  "validation": {
+    "python_s3_sums": "5625/5625",
+    "python_projective": "4096/4096",
+    "rust_group_law_steps": "7680/7680",
+    "rust_homogeneous_identities": "122848/122848",
+    "rust_factor_base_sums": "16/16",
+    "rust_doubling": "16/16",
+    "all_benchmark_endpoints": true
+  },
+  "arm_labels": [
+    "shift_only",
+    "projective_s3_1",
+    "projective_s3_4",
+    "projective_s3_16",
+    "batch_affine_s3_1",
+    "batch_affine_s3_4",
+    "batch_affine_s3_16"
+  ],
+  "attempts": [
+    {
+      "job_id": 137240289733,
+      "status": "success",
+      "medians_ns": [
+        14.108636,
+        14.664392,
+        16.297256,
+        34.623848,
+        19.812996,
+        23.825324,
+        39.890028
+      ],
+      "raw_ns": [
+        [
+          14.108636,
+          14.24636,
+          14.132868,
+          14.068856,
+          14.03232
+        ],
+        [
+          14.664392,
+          14.664952,
+          14.647368,
+          14.654056,
+          14.68158
+        ],
+        [
+          16.297256,
+          16.39692,
+          16.259356,
+          16.256632,
+          16.415432
+        ],
+        [
+          34.744148,
+          34.621484,
+          34.623848,
+          34.614676,
+          34.624528
+        ],
+        [
+          19.932096,
+          19.80382,
+          19.808828,
+          19.822408,
+          19.812996
+        ],
+        [
+          23.883048,
+          23.899756,
+          23.81006,
+          23.825324,
+          23.799808
+        ],
+        [
+          39.893632,
+          39.868516,
+          39.906492,
+          39.890028,
+          39.876768
+        ]
+      ],
+      "homogeneous_over_affine": [
+        0.74014,
+        0.68403,
+        0.86798
+      ]
+    },
+    {
+      "job_id": 137240814780,
+      "status": "success",
+      "rerun_of_same_workflow_and_source": true,
+      "medians_ns": [
+        22.927676,
+        22.56968,
+        27.885864,
+        58.792784,
+        31.499076,
+        38.079404,
+        63.952756
+      ],
+      "raw_ns": [
+        [
+          23.011312,
+          22.96314,
+          22.927676,
+          22.895976,
+          22.902104
+        ],
+        [
+          22.586152,
+          22.530604,
+          22.557856,
+          22.56968,
+          22.659928
+        ],
+        [
+          27.821504,
+          27.880216,
+          27.975872,
+          27.885864,
+          27.987332
+        ],
+        [
+          58.7584,
+          58.842276,
+          58.792784,
+          58.73704,
+          58.963268
+        ],
+        [
+          31.591812,
+          31.451428,
+          31.420972,
+          31.499076,
+          31.758688
+        ],
+        [
+          38.142484,
+          38.079404,
+          38.758484,
+          37.935416,
+          37.840236
+        ],
+        [
+          63.952756,
+          63.856372,
+          68.804704,
+          63.877696,
+          64.020604
+        ]
+      ],
+      "homogeneous_over_affine": [
+        0.71652,
+        0.73231,
+        0.91932
+      ]
+    }
+  ],
+  "warnings": [
+    "paired within-attempt component comparisons only: different runners differ materially in absolute timing",
+    "fixed public-pair S3 evaluation is not a blind relation oracle; pair roots could be precomputed in a generic table",
+    "no unknown-index Semaev/RR9/F4 roots or actual DLP logs were recovered",
+    "no complete cold solver setup, failures, rank, memory, or same-host optimized IC/BSGS/rho measured; pcc unverified"
+  ]
+}

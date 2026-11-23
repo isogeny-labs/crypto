@@ -154,7 +154,7 @@ jobs:
             digest=$(sha256sum "$backend" | cut -d' ' -f1)
             jq --arg backend "$backend" --arg digest "$digest" '.arms |= map(if .method.params.backend? then .method.params.backend=$backend | .method.params.backend_sha256=$digest else . end)' \
               "$study/sessions/$run_name/spec.json" > "/tmp/cm-$run_name.json"
-            target/release/ecbench run --spec "/tmp/cm-$run_name.json" --out "/tmp/cm-$run_name" --cpus none --lock "/tmp/cm-$run_name.lock" --allow-busy --settle 0.1 --quiet
+            target/release/ecbench run --allow-legacy-spec --spec "/tmp/cm-$run_name.json" --out "/tmp/cm-$run_name" --cpus none --lock "/tmp/cm-$run_name.lock" --allow-busy --settle 0.1 --quiet
             target/release/ecbench verify --dir "/tmp/cm-$run_name" --exit-code --replay-all
           done
       - name: Browser keeps unpriced native work out of S rankings

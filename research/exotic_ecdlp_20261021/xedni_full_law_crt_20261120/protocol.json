@@ -1,0 +1,14 @@
+{
+  "schema": "xedni-full-law-crt-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1,722 ordered distinct nonidentity pairs on fixed E(F_47), centered rational coordinate lifts; the reduced-relation flag is excluded from construction decisions",
+  "local_policy": "if centered x coordinates differ over Q, F_7, F_11 and both point-incidence rows have rank 2, enumerate all a1,a2,a3 residues at each auxiliary prime, solve a4,a6 locally, retain all nonsingular order-4 curves at 7 and order-6 curves at 11",
+  "skip_policy": "retain same-x, local-x-collision and local-incidence-rank failures as explicit source rows with zero CRT candidates",
+  "crt_policy": "for every lexicographically ordered pair of local gate witnesses, choose the unique centered k1,k2,k3 in [-38,38] with a_i=47*k_i matching both primes; solve a4,a6 rationally from both lifted-point equations",
+  "rational_representatives_per_local_pair": 1,
+  "checks": "exact coefficient congruences at 47,7,11; rational curve equation and discriminant; auxiliary group orders; rational P1+2P2 relation; source reduced relation used only for analysis",
+  "record": "one row per source pair with every exclusion and local/CRT count, first rational-relation certificate, and complete CRT candidate-stream digest; gzip exact raw rows",
+  "resource": "complete uncapped finite enumeration under this target-independent policy, no wall-time performance claim",
+  "claim_boundary": "centered CRT representative policy on locally distinct x pairs; coefficient shifts and local-x collisions are separate amendments"
+}

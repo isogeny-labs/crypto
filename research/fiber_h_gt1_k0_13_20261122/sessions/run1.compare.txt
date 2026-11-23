@@ -1,0 +1,20 @@
+ops (ok): ic-fiber-closed / ic-counted = 2.4274 [2.396, 2.459] (linearised_t, df 7) over 24 pairs on 8 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2.7029, w=0.1: 2.1051, w=1: 0.8241): unresolved inside the band; wall: admitted ns/GAE ic-fiber-closed/ic-counted 0.5925 [0.513, 0.684], bias-corrected 0.5919 [0.450, 0.778] (A/A 1.0011, includes the reference arm), outside noise; end-to-end wall 1.4383 [1.247, 1.659]; ns/GAE of ic-fiber-closed is an upper bound on its cost per operation (GAE is a lower bound)
+table work priced with the unpriced counters (the default since 2026-11-08): table_insert_attempts
+measurement quality: 0 / 100; paired attempts 24, verified 24, admitted 0; levels {"L0": 24}; p95 foreign busy unknown%, p95 run queue unknown%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-counted: verified 24/24 (0 censored); max/median S 1.12, top run 5% of total; unpriced: none; table work (priced): table_insert_attempts=1224
+arm ic-fiber-closed: verified 24/24 (0 censored); max/median S 1.05, top run 4% of total; unpriced: fiber_cofactor_uncharged=96, fiber_samples_uncharged=624, fiber_size_uncharged=24, fiber_table_entries_uncharged=240; table work (priced): table_insert_attempts=1248
+| curve | log2 r | workloads | ic-fiber-closed / ic-counted | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m13-t181-515ee569 | 10.97 | 8 | 2.4274 | [2.3965, 2.4588] | linearised_t |
+
+| workload | curve | log2 r | ic-counted mean S | ic-fiber-closed mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W16d731e1f374 | icv1-f2m13-t181-515ee569 | 10.97 | 5.8081 | 14.3245 | 2.4663 |
+| W35d890a5fe9f | icv1-f2m13-t181-515ee569 | 10.97 | 6.0365 | 14.5529 | 2.4108 |
+| W3e4704f6581c | icv1-f2m13-t181-515ee569 | 10.97 | 5.9690 | 14.4854 | 2.4268 |
+| W450815f4b95c | icv1-f2m13-t181-515ee569 | 10.97 | 6.0706 | 14.5870 | 2.4029 |
+| W879851b26f7c | icv1-f2m13-t181-515ee569 | 10.97 | 6.0334 | 14.5498 | 2.4115 |
+| W9910d651c83f | icv1-f2m13-t181-515ee569 | 10.97 | 5.9049 | 14.4213 | 2.4423 |
+| Wc84998d9db48 | icv1-f2m13-t181-515ee569 | 10.97 | 5.7080 | 14.2243 | 2.4920 |
+| We408481b2d1b | icv1-f2m13-t181-515ee569 | 10.97 | 6.1988 | 14.7152 | 2.3739 |

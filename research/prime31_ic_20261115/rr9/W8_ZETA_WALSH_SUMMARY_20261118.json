@@ -1,0 +1,54 @@
+{
+  "schema": "prime31.w8.zeta-walsh.summary.v1",
+  "date_utc": "2026-11-18",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "group_order": 2147446831,
+    "cofactor": 1
+  },
+  "factor_base_size": 31,
+  "weights": [
+    1,
+    3,
+    5,
+    7,
+    11,
+    13,
+    17,
+    19
+  ],
+  "source_crate_sha": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "candidate_commit_sha": "5d82f7b39ab4e04d08eff94a7c86b11aebdd769b",
+  "ci_run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44391371316",
+  "ci_result": "success",
+  "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44391371316/artifacts/14468601894",
+  "scope": "supplied-eight-positive-slot-xy; public target; all 256 sign decisions; not unknown index extraction",
+  "target_cases": 32,
+  "decisions": 8192,
+  "planted_positives": 16,
+  "shifted_negatives": 16,
+  "rust_original_library_tests_passed": 40,
+  "rust_new_test_passed": 1,
+  "independent_python_bigint_residue_checks": 8192,
+  "independent_python_original_curve_group_checks": 8192,
+  "direct_gaussian": {
+    "fp_multiplications": 6159408,
+    "fp_inversions": 65520
+  },
+  "prior_fourier": {
+    "fp_multiplications": 179200,
+    "fp_inversions": 0
+  },
+  "zeta_walsh": {
+    "fp_multiplications": 44800,
+    "fp_inversions": 0
+  },
+  "new_over_prior_multiplication_count_ratio": 0.25,
+  "unknown_x_index_extractions": 0,
+  "unknown_public_ecdlp_logs_solved": 0,
+  "independent_signed_pcc": "unverified",
+  "failed_predecessor_run": "https://github.com/isogeny-labs/crypto/actions/runs/44390771119",
+  "qualification": "producer CI and independent arithmetic checker; component-only; no full solver performance assertion"
+}
