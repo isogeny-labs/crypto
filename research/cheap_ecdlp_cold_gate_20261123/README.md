@@ -244,3 +244,67 @@ measurements merely by landing in main. The distinct genuine RR5 B8
 fixed-positive witness above likewise does not establish a cold-cost
 comparison. These are repository-status observations, not new timings or
 performance conclusions. [pcc:unverified]
+
+## 2026-11-23 11:23 UTC — fail-closed natural-record denominator admission
+
+The [independent Python RR5 replay](independent_rr5_replay.py) at new commits
+[`3aead7b`](https://github.com/isogeny-labs/crypto/commit/3aead7b91df7895e58c8f5b36ee00e6f772c27ae) and
+[`01f3bc2`](https://github.com/isogeny-labs/crypto/commit/01f3bc2f84eb47cfc7dcf53d66072ef5c0f3fbbf)
+has two deliberately narrow hardening changes, without changing RR5 production or the Rust relation engine:
+
+1. **Factor-base contract parity:** the callable replay function now rejects an
+   identity/infinity factor-base leaf and noncanonical/off-curve points even
+   when invoked outside its CLI's strict point parser; a legitimate identity
+   **target** remains allowed. This matches the original Rust adapter's
+   nonidentity base contract and prevents an invalid zero point from being
+   mistaken for a useful linear-algebra variable.
+2. **Preserve discarded extraction work:** a producer `SolveRecord` report now
+   explicitly distinguishes `extracted_candidate_rows`, `accepted_rows`,
+   `extracted_but_not_accepted_rows` and
+   `attempts_without_accepted_rows`. Receipt count exceeding recorded
+   extraction count is rejected. Producer `solved`/`solved_after_deadline`
+   status must agree with independently recovered, point-replayed scalar.
+   These fields are **reported producer counts**, not verified F4 timings
+   or proof that extraction was algebraic. Every row used for rank still
+   passes the existing independent public EC equality and canonical
+   coefficient checks.
+
+[The test suite](test_independent_rr5_replay.py) has **11 authored tests**,
+including a forged zero-admission, three-extraction-row `SolveRecord` that
+must report rank zero and all three extracted rows unaccepted, a spoofed
+`solved` status that must fail, and identity/off-curve base poison tests.
+The two new tests were **not executed in this run**. They must be executed
+against the exact new Git blobs in Python, followed by native Rust replay on
+the same frozen records; none of this qualifies as PCC validation.
+`[pcc:unverified]`
+
+The useful mathematical target-recovery certificate remains a left-nullspace
+witness: for authenticated rows `C L - b d = a` modulo prime `n`,
+a vector `u` with `u^T C=0` and `u^T b != 0` gives
+`d = -(u^T a)/(u^T b) mod n`. Such a witness is a proposed compact
+cross-check for future genuine B677 record replay, **not** an additional
+implemented extraction method or measured cost saving. If no accepted rows
+yield such a witness, the target is not recovered regardless of the number
+of F4 candidates reported. This scope is disjoint from the RR5 producer,
+graph/sparse-LA, S3, and transfer lanes.
+
+**CI triage at prior frozen PR head `4d4d796`:** the
+[pcc-gate run 45155651851](https://github.com/isogeny-labs/crypto/actions/runs/45155651851)
+failed three `NameError` tests (`reasons` twice, `q` once), also observed
+in RR5 #4974. The exact `tools/pcc/test_pcc.py` Git blob
+`47be6b2e761d0ca77423be7351e94ac8a6aebbbe` is identical on main and
+this branch; no shared PCC-file repair was attempted. A separate
+[validation-gate run 45155651946](https://github.com/isogeny-labs/crypto/actions/runs/45155651946)
+failed while pulling approved artifact-store inputs absent from its local
+Git-history cache; the log explicitly says S3 was not contacted. Neither
+failure certifies or disproves this isolated Python change, nor is either a
+substitute for exact-source Rust compilation. No new runner/job was launched.
+
+**Next admitted steps:** (i) run the 11 source-frozen Python tests; (ii) run
+the original-arithmetic Rust tests and independent CLI fixture comparison
+on an authorized runner after its build reservation clears; (iii) ingest
+a complete unknown-index B677 `SolveRecord` and separately attest every
+natural extraction, accepted row, rejected row, rank increment and target
+recovery; (iv) only then collect matched complete cold T=1 comparisons.
+No signed PCC standing, native Rust execution, blind Prime31 target solve
+or measured advantage is established by this change. `[pcc:unverified]`
