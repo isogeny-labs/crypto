@@ -1,0 +1,102 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=160",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=136",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "mitm2-n136",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=192",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "mitm2-n192",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "tw2l-x20-j16-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x09-sr-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=24",
+          "oracle": "ksum:m=4,free=1"
+        }
+      },
+      "name": "ksum4f-n24",
+      "role": "candidate"
+    }
+  ],
+  "description": "research/prime_generic_autolab_20261118/round-004/PROTOCOL.md (frozen before data), train screen. Public synthetic generic prime-order E(F_p) curve and targets; no security claim. In-sample selection; promotion_eligible=false.",
+  "label": "ic_autolab round 4 train, generic track, k = 24",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate_measured",
+    "rounds": 1,
+    "seed": 2026114431,
+    "timeout_seconds": 300,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "bits": 24,
+        "kind": "prime_search",
+        "seed": 59297
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026114424,
+    "targets_per_curve": 12
+  }
+}
