@@ -41,6 +41,11 @@ the store" and "Model tiers" before acting.
   producer's script compares record fields, check that every key it reads
   exists in the records (index with `[]`, not `.get`); a missing key compares
   `None == None` and the check passes silently.
+- **Bind the binary before anything rebuilds it** (adopted lesson L-3f39e1d8b3a9):
+  at dispatch, hash and copy `target/release/ecbench` and compare it with the
+  sessions' `binary_sha256`. If it already differs, report the binary-to-commit
+  binding as unverifiable and replay with a binary built from a clean known
+  commit.
 - Check the reporting contract: one table, one unit, progress stated as a
   ratio, phases separated, all arms priced including the reference, and the
   m=83 / ECC2K-130 disclosure rules respected.

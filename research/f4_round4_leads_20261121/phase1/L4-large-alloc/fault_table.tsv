@@ -1,0 +1,29 @@
+label	threads	minflt	majflt	maxrss_MB	sys_s	user_s	config
+glibc_t1	1	753335	1	380	1.38	23.01	
+je_t1	1	1315031	8	526	2.11	22.73	JE
+g_trim	1	96490	0	380	0.28	23.08	MALLOC_TRIM_THRESHOLD_=17179869184 MALLOC_TOP_PAD_=268435456
+g_mmap	1	936894	0	380	1.56	23.13	MALLOC_MMAP_THRESHOLD_=33554432
+g_all	1	85580	0	337	0.22	22.67	MALLOC_MMAP_THRESHOLD_=33554432 MALLOC_TRIM_THRESHOLD_=17179869184 MALLOC_TOP_PAD_=268435456 MALLOC_ARENA_MAX=1
+g_arena1	1	109676	0	337	0.22	22.47	MALLOC_ARENA_MAX=1
+je_nodecay	1	1547961	0	5132	3.59	22.77	JE MALLOC_CONF=retain:true,dirty_decay_ms:-1,muzzy_decay_ms:-1
+je_thp	1	144740	0	555	0.96	22.16	JE MALLOC_CONF=thp:always,metadata_thp:always
+je_nodecay_ovs	1	1548049	0	5132	2.91	22.27	JE MALLOC_CONF=retain:true,dirty_decay_ms:-1,muzzy_decay_ms:-1,oversize_threshold:0
+je_stats	1	1339416	2	517	2.01	23.09	JE MALLOC_CONF=stats_print:true
+je_n1	1	1164816	0	511	1.81	23.36	JE MALLOC_CONF=narenas:1
+je_n1_nodecay	1	1335204	0	4344	2.57	23.18	JE MALLOC_CONF=narenas:1,dirty_decay_ms:-1,muzzy_decay_ms:-1
+je_notcache_nodecay	1	1745609	0	5818	3.55	25.07	JE MALLOC_CONF=tcache:false,dirty_decay_ms:-1,muzzy_decay_ms:-1
+je_nodecay_stats	1	1548367	0	5133	3.05	24.14	JE MALLOC_CONF=dirty_decay_ms:-1,muzzy_decay_ms:-1,stats_print:true
+g_t4	4	234417	0	430	0.83	29.22	
+g_t4_trim	4	110280	0	425	0.67	28.40	MALLOC_TRIM_THRESHOLD_=17179869184 MALLOC_TOP_PAD_=268435456
+je_t4	4	1366941	0	612	2.83	27.48	JE
+je_t4_thp	4	108710	0	723	1.42	27.18	JE MALLOC_CONF=thp:always,metadata_thp:always
+shim_g	1	753522	0	381	1.26	24.31	F4_DEBUG=1 LD_PRELOAD=/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/shim/bigalloc.so
+je_decay60s	1	1282205	0	605	2.05	24.30	JE MALLOC_CONF=dirty_decay_ms:60000,muzzy_decay_ms:60000
+je_fit10_nodecay	1	373807	0	518	0.68	23.65	JE MALLOC_CONF=lg_extent_max_active_fit:10,dirty_decay_ms:-1,muzzy_decay_ms:-1
+je_hpa	1	1368152	0	305	2.12	23.05	JE MALLOC_CONF=hpa:true
+cov_new3	1	833	0	13	0.04	0.41	
+cov_new3_nodecay	1	828	0	13	0.03	0.45	_RJEM_MALLOC_CONF=dirty_decay_ms:-1,muzzy_decay_ms:-1
+cov_base_glibc	1	856	48	13	0.02	0.43	
+cov_base_glibc_trim	1	855	0	13	0.02	0.40	MALLOC_ARENA_MAX=1
+je_fit16_nodecay_n1	1	325287	0	333	0.59	24.53	JE MALLOC_CONF=narenas:1,lg_extent_max_active_fit:16,dirty_decay_ms:-1,muzzy_decay_ms:-1
+je_t4_fit10_nodecay	4	238412	0	543	0.82	28.15	JE MALLOC_CONF=lg_extent_max_active_fit:10,dirty_decay_ms:-1,muzzy_decay_ms:-1

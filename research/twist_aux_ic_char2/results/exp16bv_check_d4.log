@@ -1,0 +1,19 @@
+# exp16bv_check: d=4 (Q=16), K=GF(2^16), seed 2027
+(1) S3 vanishes at (x(P1),x(P2),x(P1+P2)) for 20 random pairs on y^2+xy=x^3+a x^2+b (a!=0): True
+    S5 built: 729 terms, degrees [8, 8, 8, 8, 8] (cpu 0.3s)
+    S5 vanishes on 10 random (P1..P4, P1+..+P4): True
+    Lemma 1, m=4 (b in GF(2^16)): x_jF_j - x0F0 == 0 exactly for j=1..4: [True, True, True, True]
+(2) G(E1..E4) at x0=x_R by normal form: 68 terms; odd-exponent counts E1..E4: [0, 0, 0, 35] (cpu 0.1s)
+(3) e_k(c0+u w) formula check on 5 random cases: True
+# kind | span dim | odd counts s1..s4 | dim U (pred) | ideal deg (cpu) | odd counts adapted y1..y4 | reduced deg (cpu) | ratio
+through0 | 1 | [0, 0, 0, 128] | 3 (pred 3) | build 0.0s | 4096 (0.5s) | [0, 0, 0, 128] | 512 (0.5s) | 8.0
+c0=u*z | 1 | [130, 130, 130, 130] | 3 (pred 3) | build 0.0s | 4096 (8.9s) | [0, 0, 0, 130] | 512 (0.6s) | 8.0
+r in F_Q^2\F_Q | 2 | [128, 134, 136, 129] | 2 (pred 2) | build 0.0s | 4096 (42.4s) | [0, 0, 133, 135] | 1024 (4.3s) | 4.0
+r generic #0 | 4 | [135, 133, 128, 132] | 0 (pred 0) | build 0.0s
+r generic #1 | 4 | [130, 134, 132, 133] | 0 (pred 0) | build 0.0s
+(4) m=5 trial 0: F(x1, c2..c5, x0) degrees (16,16), x1F1 - x0F0 == 0: True; == 0 mod F: True (cpu 0.1s)
+(4) m=5 trial 1: F(x1, c2..c5, x0) degrees (16,16), x1F1 - x0F0 == 0: True; == 0 mod F: True (cpu 0.1s)
+(4) m=6 trial 0: F(x1, c2..c6, x0) degrees (32,32), x1F1 - x0F0 == 0: True; == 0 mod F: True (cpu 3.1s)
+(4) m=6 trial 1: F(x1, c2..c6, x0) degrees (32,32), x1F1 - x0F0 == 0: True; == 0 mod F: True (cpu 3.1s)
+DONE
+EXIT 0

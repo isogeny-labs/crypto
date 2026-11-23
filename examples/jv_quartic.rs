@@ -16,6 +16,14 @@ use crypto_lib::cryptanalysis::jv_quartic::{
 };
 use serde::Serialize;
 
+/// jemalloc is the global allocator under the default `jemalloc` feature: the
+/// three-point tests run small F4 systems whose per-term allocations made glibc
+/// the bottleneck (`--exp cprime` 1.40x faster with jemalloc, 4/4 rounds,
+/// research/f4_alloc_round3_20261121). `--no-default-features` restores glibc.
+#[cfg(feature = "jemalloc")]
+#[global_allocator]
+static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
 #[derive(Serialize)]
 #[serde(untagged)]
 #[allow(clippy::large_enum_variant)]

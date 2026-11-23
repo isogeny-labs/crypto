@@ -1,0 +1,139 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Sibling-points panel k = 20: sib=8,pool=64 on the C = 2 and C = 1 target walks vs the incumbents and rho-neg, five fresh family curves",
+ "description": "research/curve25519_autolab_20261104/sibling-panel: Stage 1 panel of the sibling-points mechanism (ideas/SIBLING-POINTS-20261110.md; Stage 0 siblings/STAGE0.md; smokes siblings/SMOKE.md), frozen before data (PROTOCOL.md). Public synthetic targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wsum:coef=15,free=1",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-lazy",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-lazy-sib8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-lazy",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-lazy-sib8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 8,
+  "seed": 20261141,
+  "timeout_seconds": 3600,
+  "warmup": 1
+ },
+ "workloads": {
+  "curves": [
+   {
+    "a": 88607,
+    "b": 585530,
+    "gx": 843,
+    "gy": 233392,
+    "group_order": 1048888,
+    "p": 1047989,
+    "r": 131111,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 821384,
+    "b": 972474,
+    "gx": 349895,
+    "gy": 279173,
+    "group_order": 1049192,
+    "p": 1047941,
+    "r": 131149,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 957688,
+    "b": 264532,
+    "gx": 698997,
+    "gy": 350792,
+    "group_order": 1049368,
+    "p": 1047701,
+    "r": 131171,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 525700,
+    "b": 559179,
+    "gx": 939,
+    "gy": 394388,
+    "group_order": 1048808,
+    "p": 1047589,
+    "r": 131101,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 140034,
+    "b": 681489,
+    "gx": 557,
+    "gy": 306933,
+    "group_order": 1049032,
+    "p": 1047533,
+    "r": 131129,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261151,
+  "targets_per_curve": 12
+ }
+}

@@ -3,6 +3,7 @@ name: conductor-gap-replication
 # Recheck archived synthetic data; never launches a new measured campaign.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/conductor_gap_replication_20261025/**'
       - 'src/cryptanalysis/ic_framework/cm_orbit.rs'
@@ -30,6 +31,7 @@ concurrency:
 
 jobs:
   archive-replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:
