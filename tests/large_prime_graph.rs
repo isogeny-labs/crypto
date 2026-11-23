@@ -208,7 +208,11 @@ fn gain_dsu_direct_admission_is_atomic_and_preserves_rank() {
     for row in &accepted {
         dsu.add_row(row).unwrap();
     }
-    let rows = [vec![(0, 1), (1, 2)], accepted[0].clone(), accepted[1].clone()];
+    let rows = [
+        vec![(0, 1), (1, 2)],
+        accepted[0].clone(),
+        accepted[1].clone(),
+    ];
     assert_eq!(dsu.snapshot().rows, rows.len());
     assert_eq!(dsu.rank(), dense_rank(&rows, 3, 7).unwrap());
     assert_eq!(dsu.rank(), 3);
@@ -587,7 +591,6 @@ fn evaluator_runs_every_stage_and_replays_every_relation() {
     }
 }
 
-
 #[test]
 fn forest_witness_dual_anchored_bridge_has_exact_source_coefficients() {
     use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
@@ -600,9 +603,24 @@ fn forest_witness_dual_anchored_bridge_has_exact_source_coefficients() {
     let w = forest.add_row(&[(0, 3), (1, 4)]).unwrap().unwrap();
     assert_eq!(w.sources, vec![(0, 4), (1, 5), (2, 1)]);
     let stream = vec![
-        PartialRelation { id: 0, small: vec![], large: vec![(10, 1)], rhs: 0 },
-        PartialRelation { id: 1, small: vec![], large: vec![(11, 2)], rhs: 0 },
-        PartialRelation { id: 2, small: vec![], large: vec![(10, 3), (11, 4)], rhs: 0 },
+        PartialRelation {
+            id: 0,
+            small: vec![],
+            large: vec![(10, 1)],
+            rhs: 0,
+        },
+        PartialRelation {
+            id: 1,
+            small: vec![],
+            large: vec![(11, 2)],
+            rhs: 0,
+        },
+        PartialRelation {
+            id: 2,
+            small: vec![],
+            large: vec![(10, 3), (11, 4)],
+            rhs: 0,
+        },
     ];
     let idx = LpIndex::build(&stream, p).unwrap();
     assert!(witness_cancels_lp(&idx, &w));
@@ -635,18 +653,26 @@ fn forest_witness_balanced_unbalanced_and_zero_rows() {
     assert_eq!(f.stats().tree_edges, 2);
     assert_eq!(f.stats().anchors, 1);
     assert_eq!(dependent.len(), 3);
-    assert_eq!(dependent.iter().map(|w| w.row_index).collect::<Vec<_>>(), vec![2, 4, 5]);
+    assert_eq!(
+        dependent.iter().map(|w| w.row_index).collect::<Vec<_>>(),
+        vec![2, 4, 5]
+    );
     let mut stream = Vec::new();
     for (i, row) in rows.iter().enumerate() {
         stream.push(PartialRelation {
-            id: i as u64, small: vec![],
+            id: i as u64,
+            small: vec![],
             large: row.iter().map(|&(j, c)| (100 + j as u64, c)).collect(),
             rhs: 0,
         });
     }
     let idx = LpIndex::build(&stream, p).unwrap();
     for w in &dependent {
-        assert!(witness_cancels_lp(&idx, w), "bad witness at row {}", w.row_index);
+        assert!(
+            witness_cancels_lp(&idx, w),
+            "bad witness at row {}",
+            w.row_index
+        );
     }
 }
 
@@ -671,7 +697,11 @@ fn forest_witness_matches_dense_rank_and_replays_all_random_certificates() {
         assert_eq!(output.stats.dependent_rows, rows - dense);
         assert_eq!(output.stats.tree_edges + output.stats.anchors, dense);
         for w in &output.witnesses {
-            assert!(witness_cancels_lp(&index, w), "trial {trial} row {}", w.row_index);
+            assert!(
+                witness_cancels_lp(&index, w),
+                "trial {trial} row {}",
+                w.row_index
+            );
         }
     }
 }
@@ -707,16 +737,30 @@ fn forest_witness_rejects_bad_rows_without_spurious_rank() {
     assert_eq!(f.stats().dependent_rows, 1);
 }
 
-
 #[test]
 fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
-    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let p = 7;
     let partials = vec![
-        PartialRelation { id: 10, small: vec![(0, 1)], large: vec![(101, 1)], rhs: 1 },
-        PartialRelation { id: 11, small: vec![(0, 2)], large: vec![(102, 2)], rhs: 2 },
-        PartialRelation { id: 12, small: vec![(0, 1)], large: vec![(101, 3), (102, 4)], rhs: 3 },
+        PartialRelation {
+            id: 10,
+            small: vec![(0, 1)],
+            large: vec![(101, 1)],
+            rhs: 1,
+        },
+        PartialRelation {
+            id: 11,
+            small: vec![(0, 2)],
+            large: vec![(102, 2)],
+            rhs: 2,
+        },
+        PartialRelation {
+            id: 12,
+            small: vec![(0, 1)],
+            large: vec![(101, 3), (102, 4)],
+            rhs: 3,
+        },
     ];
     let index = LpIndex::build(&partials, p).unwrap();
     let batch = collect_witnesses(&index).unwrap();
@@ -726,8 +770,11 @@ fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
     assert_eq!(out.len(), 1);
     assert_eq!(out[0].sources, vec![(10, 4), (11, 5), (12, 1)]);
     assert_eq!(out[0].small, vec![(0, 1)]); // 4*1 + 5*2 + 1*1 = 15 ≡ 1 (mod 7)
-    assert_eq!(out[0].rhs, 3);             // 4*1 + 5*2 + 1*3 = 17 ≡ 3 (mod 7)
-    assert_eq!(replay_complete_relation(&out[0], &partials, p).unwrap(), out[0]);
+    assert_eq!(out[0].rhs, 3); // 4*1 + 5*2 + 1*3 = 17 ≡ 3 (mod 7)
+    assert_eq!(
+        replay_complete_relation(&out[0], &partials, p).unwrap(),
+        out[0]
+    );
     assert!(materialize_complete_relations(&index, &batch, &partials, 4, 2).is_none());
     assert!(materialize_complete_relations(&index, &batch, &partials, 0, 4).is_none());
     let mut duplicate = partials.clone();
@@ -737,8 +784,8 @@ fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
 
 #[test]
 fn forest_witness_materialization_randomized_original_replay() {
-    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let mut rng = Rng(0xba44_739c_a1d8_5501);
     for trial in 0..160 {
         let p = [3u64, 7, 1_000_003][trial % 3];
@@ -754,20 +801,25 @@ fn forest_witness_materialization_randomized_original_replay() {
     }
 }
 
-
 #[test]
 fn forest_witness_projected_small_rank_covers_existing_pivot_on_toys() {
     // This is a source-exact known-answer consistency check on synthetic
     // canonical arity<=2 streams, NOT an authentic Prime31 benchmark.
-    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     use crypto_lib::cryptanalysis::large_prime_filter::{
         filter_large_primes, replay_complete_relation, CompleteRelation, LargePrimeFilterOptions,
     };
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     let mut rng = Rng(0x99b6_43e7_2d4f_115c);
     fn small_rank(rows: &[CompleteRelation], p: u64) -> usize {
-        let sparse = rows.iter().map(|r| {
-            r.small.iter().map(|&(i, a)| (i as usize, a)).collect::<Vec<_>>()
-        }).collect::<Vec<_>>();
+        let sparse = rows
+            .iter()
+            .map(|r| {
+                r.small
+                    .iter()
+                    .map(|&(i, a)| (i as usize, a))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
         dense_rank(&sparse, 50, p).unwrap()
     }
     for trial in 0..96 {
@@ -780,8 +832,13 @@ fn forest_witness_projected_small_rank_covers_existing_pivot_on_toys() {
             .expect("source-exact forest projection");
         let (pivot_rows, _) = filter_large_primes(
             source.clone(),
-            &LargePrimeFilterOptions { modulus: p, max_small_weight: 4096, max_sources: 4096 },
-        ).unwrap();
+            &LargePrimeFilterOptions {
+                modulus: p,
+                max_small_weight: 4096,
+                max_sources: 4096,
+            },
+        )
+        .unwrap();
         for row in &pivot_rows {
             let replay = replay_complete_relation(row, &source, p).unwrap();
             assert_eq!(replay.small, row.small);
@@ -829,17 +886,22 @@ fn forest_witness_parent_paths_survive_small_component_reroots() {
         assert_eq!(stats.tree_edges, 3);
         assert_eq!(stats.anchors, 1);
         assert!(stats.reroot_steps > 0, "reroot path was not exercised");
-        assert!(stats.path_steps > 0, "nontrivial parent path was not walked");
+        assert!(
+            stats.path_steps > 0,
+            "nontrivial parent path was not walked"
+        );
         assert_eq!(stats.adjacency_scans, 0, "parent-path arm did a BFS scan");
 
-        let source: Vec<PartialRelation> = rows.iter().enumerate().map(|(i, row)| {
-            PartialRelation {
+        let source: Vec<PartialRelation> = rows
+            .iter()
+            .enumerate()
+            .map(|(i, row)| PartialRelation {
                 id: 10 + i as u64,
                 small: vec![(i as u32, 1)],
                 large: row.iter().map(|&(j, c)| (100 + j as u64, c)).collect(),
                 rhs: i as u64 % p,
-            }
-        }).collect();
+            })
+            .collect();
         let index = LpIndex::build(&source, p).unwrap();
         let batch = collect_witnesses(&index).unwrap();
         assert_eq!(batch.rank, dense_rank(&index.rows, 4, p).unwrap());
@@ -855,7 +917,6 @@ fn forest_witness_parent_paths_survive_small_component_reroots() {
         }
     }
 }
-
 
 #[test]
 fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
@@ -888,14 +949,16 @@ fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
     assert_eq!(stats.tree_edges, vertices - 1);
     assert_eq!(stats.inverse_calls, equations.len() as u64);
     assert!(stats.path_steps > 3 * stats.inverse_calls);
-    let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
-        PartialRelation {
+    let inputs: Vec<PartialRelation> = equations
+        .iter()
+        .enumerate()
+        .map(|(i, row)| PartialRelation {
             id: 4000 + i as u64,
             small: vec![(i as u32, 1)],
             large: row.iter().map(|&(j, a)| (500 + j as u64, a)).collect(),
             rhs: i as u64 % p,
-        }
-    }).collect();
+        })
+        .collect();
     let index = LpIndex::build(&inputs, p).unwrap();
     let batch = collect_witnesses(&index).unwrap();
     assert_eq!(batch.witnesses, witnesses);
@@ -967,19 +1030,27 @@ fn forest_witness_reuses_root_anchor_and_invalidates_after_join() {
             Err(LpGraphError::NonCanonicalRow { .. })
         ));
         assert_eq!(f.stats(), unchanged); // atomic refusal with a warm cache
-        let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
-            PartialRelation {
+        let inputs: Vec<PartialRelation> = equations
+            .iter()
+            .enumerate()
+            .map(|(i, row)| PartialRelation {
                 id: i as u64,
                 small: vec![(i as u32, 1)],
                 large: row.iter().map(|&(j, a)| (3000 + j as u64, a)).collect(),
                 rhs: i as u64 % p,
-            }
-        }).collect();
+            })
+            .collect();
         let index = LpIndex::build(&inputs, p).unwrap();
         assert_eq!(index.rows, equations);
-        assert_eq!(f.rank(), dense_rank(&index.rows, index.num_columns(), p).unwrap());
+        assert_eq!(
+            f.rank(),
+            dense_rank(&index.rows, index.num_columns(), p).unwrap()
+        );
         for w in &witnesses {
-            assert!(witness_cancels_lp(&index, w), "invalid cached witness p={p}");
+            assert!(
+                witness_cancels_lp(&index, w),
+                "invalid cached witness p={p}"
+            );
         }
         let batch = collect_witnesses(&index).unwrap();
         assert_eq!(batch.witnesses, witnesses);
@@ -1007,14 +1078,37 @@ fn forest_witness_batches_endpoint_inverses_and_keeps_nonunit_refusal_atomic() {
         assert_eq!(witness.row_index, 3);
         assert_eq!(f.stats().inverse_calls, 3);
         let inputs = vec![
-            PartialRelation { id: 1, small: vec![], large: vec![], rhs: 0 },
-            PartialRelation { id: 2, small: vec![], large: vec![(100, 1), (101, p - 1)], rhs: 0 },
-            PartialRelation { id: 3, small: vec![], large: vec![(102, 2)], rhs: 0 },
-            PartialRelation { id: 4, small: vec![], large: vec![(101, p - 1), (100, 1)], rhs: 0 },
+            PartialRelation {
+                id: 1,
+                small: vec![],
+                large: vec![],
+                rhs: 0,
+            },
+            PartialRelation {
+                id: 2,
+                small: vec![],
+                large: vec![(100, 1), (101, p - 1)],
+                rhs: 0,
+            },
+            PartialRelation {
+                id: 3,
+                small: vec![],
+                large: vec![(102, 2)],
+                rhs: 0,
+            },
+            PartialRelation {
+                id: 4,
+                small: vec![],
+                large: vec![(101, p - 1), (100, 1)],
+                rhs: 0,
+            },
         ];
         let index = LpIndex::build(&inputs, p).unwrap();
         assert!(witness_cancels_lp(&index, &witness));
-        assert_eq!(f.rank(), dense_rank(&index.rows, index.num_columns(), p).unwrap());
+        assert_eq!(
+            f.rank(),
+            dense_rank(&index.rows, index.num_columns(), p).unwrap()
+        );
     }
     // The field theorem does not apply to F_9. Its nonunits must still fail
     // with their actual offending input coefficient, before any state change.
@@ -1078,12 +1172,18 @@ fn forest_witness_factors_shared_lca_suffix_once() {
         equations.push(unbalanced);
         assert_eq!(f.rank(), 32);
         assert_eq!(f.stats().path_steps, before_pin.path_steps + 31);
-        assert_eq!(f.stats().parent_path_reads, before_pin.parent_path_reads + 60);
+        assert_eq!(
+            f.stats().parent_path_reads,
+            before_pin.parent_path_reads + 60
+        );
 
         // A reversed balanced closer must still have the same exact source
         // size and does not traverse the common suffix during elimination.
         let reverse = vec![(31, p - 1), (30, 1)];
-        let witness = f.add_row(&reverse).unwrap().expect("reversed balanced cycle");
+        let witness = f
+            .add_row(&reverse)
+            .unwrap()
+            .expect("reversed balanced cycle");
         assert_eq!(witness.sources.len(), 3);
         witnesses.push(witness);
         equations.push(reverse);
@@ -1096,14 +1196,16 @@ fn forest_witness_factors_shared_lca_suffix_once() {
         ));
         assert_eq!(f.stats(), before_refusal);
 
-        let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
-            PartialRelation {
+        let inputs: Vec<PartialRelation> = equations
+            .iter()
+            .enumerate()
+            .map(|(i, row)| PartialRelation {
                 id: 7000 + i as u64,
                 small: vec![(i as u32, 1)],
                 large: row.iter().map(|&(j, a)| (9000 + j as u64, a)).collect(),
                 rhs: i as u64 % p,
-            }
-        }).collect();
+            })
+            .collect();
         let index = LpIndex::build(&inputs, p).unwrap();
         // LpIndex deliberately sorts the reversed final input row.
         let mut normalized = equations.clone();
@@ -1121,12 +1223,19 @@ fn forest_witness_factors_shared_lca_suffix_once() {
             .expect("original sources reproduce every small row and RHS");
         assert_eq!(replay.len(), 49);
         for (w, row) in witnesses.iter().zip(replay.iter()) {
-            assert_eq!(row.sources.iter().map(|(id, a)| (*id - 7000, *a)).collect::<Vec<_>>(),
-                       w.sources.iter().map(|&(i, a)| (i as u64, a)).collect::<Vec<_>>());
+            assert_eq!(
+                row.sources
+                    .iter()
+                    .map(|(id, a)| (*id - 7000, *a))
+                    .collect::<Vec<_>>(),
+                w.sources
+                    .iter()
+                    .map(|&(i, a)| (i as u64, a))
+                    .collect::<Vec<_>>()
+            );
         }
     }
 }
-
 
 #[test]
 fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
@@ -1135,9 +1244,7 @@ fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
     // and a reversed dependent closer. These are operation counts, not time.
     use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
     for p in [3u64, 7, 101, 1_000_003] {
-        let mut rows: Vec<Vec<(usize, u64)>> = (0..30)
-            .map(|v| vec![(v, 1), (v + 1, 1)])
-            .collect();
+        let mut rows: Vec<Vec<(usize, u64)>> = (0..30).map(|v| vec![(v, 1), (v + 1, 1)]).collect();
         rows.push(vec![(29, 1), (31, 1)]);
         for _ in 0..48 {
             rows.push(vec![(30, 1), (31, p - 1)]);
@@ -1165,7 +1272,10 @@ fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
         assert_eq!(legacy.stats().path_steps, 593);
         assert_eq!(lazy.stats().path_steps, 129);
         assert_eq!(legacy.stats().path_steps - lazy.stats().path_steps, 464);
-        assert_eq!(legacy.stats().parent_path_reads - lazy.stats().parent_path_reads, 464);
+        assert_eq!(
+            legacy.stats().parent_path_reads - lazy.stats().parent_path_reads,
+            464
+        );
         assert_eq!(legacy.stats().inverse_calls, lazy.stats().inverse_calls);
         assert_eq!(legacy.stats().dependent_rows, lazy.stats().dependent_rows);
         assert_eq!(legacy.stats().source_terms, lazy.stats().source_terms);
@@ -1178,22 +1288,26 @@ fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
         ));
         assert_eq!(lazy.stats(), before);
 
-        let inputs: Vec<PartialRelation> = rows.iter().enumerate().map(|(i, row)| {
-            PartialRelation {
+        let inputs: Vec<PartialRelation> = rows
+            .iter()
+            .enumerate()
+            .map(|(i, row)| PartialRelation {
                 id: 80_000 + i as u64,
                 small: vec![(i as u32, 1)],
                 large: row.iter().map(|&(j, a)| (10_000 + j as u64, a)).collect(),
                 rhs: i as u64 % p,
-            }
-        }).collect();
+            })
+            .collect();
         let index = LpIndex::build(&inputs, p).unwrap();
         let old_batch = collect_witnesses(&index).unwrap();
         let new_batch = collect_witnesses_lazy(&index).unwrap();
         assert_eq!(new_batch.rank, dense_rank(&index.rows, 32, p).unwrap());
         assert_eq!(old_batch.witnesses, emitted);
         assert_eq!(new_batch.witnesses, old_batch.witnesses);
-        let old_rows = materialize_complete_relations(&index, &old_batch, &inputs, 128, 128).unwrap();
-        let new_rows = materialize_complete_relations(&index, &new_batch, &inputs, 128, 128).unwrap();
+        let old_rows =
+            materialize_complete_relations(&index, &old_batch, &inputs, 128, 128).unwrap();
+        let new_rows =
+            materialize_complete_relations(&index, &new_batch, &inputs, 128, 128).unwrap();
         assert_eq!(new_rows, old_rows);
         assert_eq!(new_rows.len(), 49);
         for w in &new_batch.witnesses {
@@ -1218,8 +1332,14 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
         let old = collect_witnesses(&index).unwrap();
         let lazy = collect_witnesses_lazy(&index).unwrap();
         assert_eq!(old.rank, lazy.rank, "rank mismatch at trial {trial}");
-        assert_eq!(lazy.rank, dense_rank(&index.rows, index.num_columns(), p).unwrap());
-        assert_eq!(old.witnesses, lazy.witnesses, "witness mismatch at trial {trial}");
+        assert_eq!(
+            lazy.rank,
+            dense_rank(&index.rows, index.num_columns(), p).unwrap()
+        );
+        assert_eq!(
+            old.witnesses, lazy.witnesses,
+            "witness mismatch at trial {trial}"
+        );
         // The old arm needlessly normalizes an anchor on some independent
         // anchored-to-unanchored joins. The lazy arm must never use MORE
         // inversions, but can avoid those unnecessary cache misses.
@@ -1232,8 +1352,14 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
         let b = materialize_complete_relations(&index, &lazy, &source, 512, 512).unwrap();
         assert_eq!(a, b, "small-payload replay mismatch at trial {trial}");
     }
-    assert!(total_skips > 0, "random workload missed independent-row fast path");
-    assert!(saved_anchor_inversions > 0, "random workload missed redundant anchor inversion");
+    assert!(
+        total_skips > 0,
+        "random workload missed independent-row fast path"
+    );
+    assert!(
+        saved_anchor_inversions > 0,
+        "random workload missed redundant anchor inversion"
+    );
 }
 
 #[test]
@@ -1281,9 +1407,21 @@ fn projected_rank_catches_rhs_contradiction_without_promoting_a_small_row() {
     // x_5 = 2 and x_5 = 3 cannot both hold; a zero row with rhs zero is
     // merely redundant. RHS contradiction is a diagnostic, NOT useful rank.
     let input = vec![
-        CompleteRelation { small: vec![(5, 1)], rhs: 2, sources: vec![(10, 1)] },
-        CompleteRelation { small: vec![(5, 1)], rhs: 3, sources: vec![(11, 1)] },
-        CompleteRelation { small: vec![], rhs: 0, sources: vec![(12, 1)] },
+        CompleteRelation {
+            small: vec![(5, 1)],
+            rhs: 2,
+            sources: vec![(10, 1)],
+        },
+        CompleteRelation {
+            small: vec![(5, 1)],
+            rhs: 3,
+            sources: vec![(11, 1)],
+        },
+        CompleteRelation {
+            small: vec![],
+            rhs: 0,
+            sources: vec![(12, 1)],
+        },
     ];
     let audit = audit_projected_rank(&input, 7).unwrap();
     assert_eq!(audit.useful_small_rank, 1);
@@ -1325,27 +1463,50 @@ fn projected_rank_matches_independent_dense_small_and_augmented_oracles() {
         }
         let audit = audit_projected_rank(&relations, p).unwrap();
         let sparse = |row: &CompleteRelation| {
-            row.small.iter().map(|&(c, a)| (c as usize, a)).collect::<Vec<_>>()
+            row.small
+                .iter()
+                .map(|&(c, a)| (c as usize, a))
+                .collect::<Vec<_>>()
         };
         let small: Vec<_> = relations.iter().map(&sparse).collect();
         let exact = dense_rank(&small, columns, p).unwrap();
-        let augmented: Vec<_> = relations.iter().map(|r| {
-            let mut s = sparse(r);
-            if r.rhs != 0 { s.push((columns, r.rhs)); }
-            s
-        }).collect();
+        let augmented: Vec<_> = relations
+            .iter()
+            .map(|r| {
+                let mut s = sparse(r);
+                if r.rhs != 0 {
+                    s.push((columns, r.rhs));
+                }
+                s
+            })
+            .collect();
         let exact_augmented = dense_rank(&augmented, columns + 1, p).unwrap();
-        let selected: Vec<_> = audit.independent_row_indices.iter()
-            .map(|&i| sparse(&relations[i])).collect();
+        let selected: Vec<_> = audit
+            .independent_row_indices
+            .iter()
+            .map(|&i| sparse(&relations[i]))
+            .collect();
         assert_eq!(audit.useful_small_rank, exact, "small rank trial {trial}");
-        assert_eq!(audit.augmented_rank, exact_augmented, "aug rank trial {trial}");
-        assert_eq!(dense_rank(&selected, columns, p).unwrap(), exact, "selected rank trial {trial}");
+        assert_eq!(
+            audit.augmented_rank, exact_augmented,
+            "aug rank trial {trial}"
+        );
+        assert_eq!(
+            dense_rank(&selected, columns, p).unwrap(),
+            exact,
+            "selected rank trial {trial}"
+        );
         assert_eq!(audit.independent_row_indices.len(), exact);
-        assert_eq!(audit.inconsistent_row_indices.is_empty(), exact_augmented == exact);
-        assert_eq!(audit.input_rows,
+        assert_eq!(
+            audit.inconsistent_row_indices.is_empty(),
+            exact_augmented == exact
+        );
+        assert_eq!(
+            audit.input_rows,
             audit.independent_row_indices.len()
-            + audit.redundant_row_indices.len()
-            + audit.inconsistent_row_indices.len());
+                + audit.redundant_row_indices.len()
+                + audit.inconsistent_row_indices.len()
+        );
     }
 }
 
@@ -1353,7 +1514,11 @@ fn projected_rank_matches_independent_dense_small_and_augmented_oracles() {
 fn projected_rank_refuses_noncanonical_or_nonunit_input() {
     use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
     use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
-    let row = |small, rhs| CompleteRelation { small, rhs, sources: vec![] };
+    let row = |small, rhs| CompleteRelation {
+        small,
+        rhs,
+        sources: vec![],
+    };
     for malformed in [
         row(vec![(3, 0)], 0),
         row(vec![(3, 7)], 0),
@@ -1404,7 +1569,6 @@ fn projected_rank_target_unknown_must_be_a_sparse_column_not_hidden_rhs() {
     assert_eq!(exact.independent_row_indices, vec![0]);
 }
 
-
 /// Independent reference oracle for source relations, BEFORE constructing LP
 /// cancellation witnesses. The identity checked below is:
 ///   rank(W S) = rank([L | S]) - rank(L)
@@ -1447,13 +1611,13 @@ fn raw_lp_small_augmented_ranks(
 
 #[test]
 fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
-    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
-    use crypto_lib::cryptanalysis::large_prime_graph::witness::{
-        collect_witnesses_lazy, materialize_complete_relations,
-    };
     use crypto_lib::cryptanalysis::large_prime_filter::{
         filter_large_primes, filter_large_primes_mst, replay_complete_relation,
         LargePrimeFilterOptions, MstLimits,
+    };
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::{
+        collect_witnesses_lazy, materialize_complete_relations,
     };
     let mut rng = Rng(0x8e41_4bbc_729c_1605);
     let limits = MstLimits {
@@ -1484,8 +1648,7 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
             }
         }
         let index = LpIndex::build(&source, ell).unwrap();
-        let (lp_rank, block_rank, full_rank) =
-            raw_lp_small_augmented_ranks(&source, &index, ell);
+        let (lp_rank, block_rank, full_rank) = raw_lp_small_augmented_ranks(&source, &index, ell);
         let target_small_rank = block_rank - lp_rank;
         let target_aug_rank = full_rank - lp_rank;
         assert!(target_aug_rank >= target_small_rank);
@@ -1543,9 +1706,24 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
     // all LP-cancelled rows have small-coordinate rank zero. These are
     // algebraic inconsistent-constant fixtures, not group-valid ECDLP rows.
     let source = vec![
-        PartialRelation { id: 90, small: vec![], large: vec![(77, 1)], rhs: 0 },
-        PartialRelation { id: 91, small: vec![], large: vec![(77, 1)], rhs: 1 },
-        PartialRelation { id: 92, small: vec![], large: vec![(77, 1)], rhs: 2 },
+        PartialRelation {
+            id: 90,
+            small: vec![],
+            large: vec![(77, 1)],
+            rhs: 0,
+        },
+        PartialRelation {
+            id: 91,
+            small: vec![],
+            large: vec![(77, 1)],
+            rhs: 1,
+        },
+        PartialRelation {
+            id: 92,
+            small: vec![],
+            large: vec![(77, 1)],
+            rhs: 2,
+        },
     ];
     let index = LpIndex::build(&source, 7).unwrap();
     assert_eq!(raw_lp_small_augmented_ranks(&source, &index, 7), (1, 1, 2));
@@ -1562,9 +1740,14 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
         max_sources: 32,
     };
     let refused = filter_large_primes_mst(
-        source.clone(), &options,
-        &MstLimits { max_rows: 1, ..MstLimits::default() },
-    ).unwrap();
+        source.clone(),
+        &options,
+        &MstLimits {
+            max_rows: 1,
+            ..MstLimits::default()
+        },
+    )
+    .unwrap();
     assert!(refused.relations.is_none(), "MST must refuse atomically");
     assert!(refused.stats.budget_refusals > 0);
     let (pivot_fallback, _) = filter_large_primes(source.clone(), &options).unwrap();
@@ -1576,7 +1759,6 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
     assert!(fallback.augmented_rank <= audit.augmented_rank);
 }
 
-
 #[test]
 fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
     use crypto_lib::cryptanalysis::large_prime_graph::eval::*;
@@ -1585,16 +1767,22 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
     let ell = 2_147_446_831u64;
     let source = vec![
         PartialRelation {
-            id: 10, small: vec![(0, 1), (u32::MAX, 1)],
-            large: vec![(101, 1)], rhs: 1,
+            id: 10,
+            small: vec![(0, 1), (u32::MAX, 1)],
+            large: vec![(101, 1)],
+            rhs: 1,
         },
         PartialRelation {
-            id: 11, small: vec![(0, 2)],
-            large: vec![(102, 2)], rhs: 2,
+            id: 11,
+            small: vec![(0, 2)],
+            large: vec![(102, 2)],
+            rhs: 2,
         },
         PartialRelation {
-            id: 12, small: vec![(0, 1)],
-            large: vec![(101, 3), (102, 4)], rhs: 3,
+            id: 12,
+            small: vec![(0, 1)],
+            large: vec![(101, 3), (102, 4)],
+            rhs: 3,
         },
     ];
     let idx = LpIndex::build(&source, ell).unwrap();
@@ -1656,12 +1844,17 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
     p.forest_max_rows = 32;
     let mut wider = source.clone();
     wider.push(PartialRelation {
-        id: 13, small: vec![(9, 1)],
-        large: vec![(101, 1), (102, 2), (103, 3)], rhs: 0,
+        id: 13,
+        small: vec![(9, 1)],
+        large: vec![(101, 1), (102, 2), (103, 3)],
+        rhs: 0,
     });
     let skipped = evaluate_stream("arity3", &wider, ell, &p).unwrap();
     assert!(skipped.forest_filter.is_none());
-    assert_eq!(skipped.forest_skip_reason.as_deref(), Some("arity_above_two"));
+    assert_eq!(
+        skipped.forest_skip_reason.as_deref(),
+        Some("arity_above_two")
+    );
     assert!(skipped.pivot_filter.exact_projected_rank.is_none());
     assert!(skipped.mst_filter.exact_projected_rank.is_none());
 }
@@ -1679,8 +1872,12 @@ fn evaluator_forest_same_source_seeded_rank_identity() {
         let ell = [7u64, 101, 2_147_446_831][(seed as usize) % 3];
         let input = synthetic_stream(
             &SyntheticParams {
-                seed, rows: 6 + seed as usize % 19, lp_columns: 12,
-                fb_columns: 13, fb_terms: 3, arity_weights: vec![1, 2, 5],
+                seed,
+                rows: 6 + seed as usize % 19,
+                lp_columns: 12,
+                fb_columns: 13,
+                fb_terms: 3,
+                arity_weights: vec![1, 2, 5],
                 ..SyntheticParams::default()
             },
             ell,
@@ -1698,9 +1895,19 @@ fn evaluator_forest_same_source_seeded_rank_identity() {
         let rank = f.exact_projected_rank.as_ref().unwrap();
         assert_eq!(rank.useful_small_rank, block - lr, "small seed {seed}");
         assert_eq!(rank.augmented_rank, augmented - lr, "RHS seed {seed}");
-        let pivot = evaluated.pivot_filter.exact_projected_rank.as_ref().unwrap();
-        assert!(pivot.useful_small_rank <= block - lr, "pivot small seed {seed}");
-        assert!(pivot.augmented_rank <= augmented - lr, "pivot RHS seed {seed}");
+        let pivot = evaluated
+            .pivot_filter
+            .exact_projected_rank
+            .as_ref()
+            .unwrap();
+        assert!(
+            pivot.useful_small_rank <= block - lr,
+            "pivot small seed {seed}"
+        );
+        assert!(
+            pivot.augmented_rank <= augmented - lr,
+            "pivot RHS seed {seed}"
+        );
         assert_eq!(evaluated.pivot_filter.replay_failures, 0);
         if !evaluated.mst_filter.refused {
             let mst = evaluated.mst_filter.exact_projected_rank.as_ref().unwrap();
