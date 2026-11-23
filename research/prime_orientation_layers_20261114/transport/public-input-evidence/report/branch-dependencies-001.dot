@@ -1,0 +1,11 @@
+digraph G {
+ graph[rankdir=TB,bgcolor="white",ranksep=.28];
+ node[shape=box,fontname="Helvetica",fontsize=11,style="rounded,filled",fillcolor="#edf4fa"];
+ point[label="ACTUAL CURVE POINT\ny^2=f(x), 2y nonzero"];
+ root[label="DERIVED FORMAL BRANCH\ns^2=f(x+T), s=y+T*u\nOwner2audit + public052/local026"];
+ jets[label="ACTUAL OLD FULL MIXED JETS\nAll coefficients below totalr vanish"];
+ order[label="EXPLICIT TRANSLATED EVALUATION\nActual low coefficients -> T^rdivisibility\nOwner1audit + public054/local027"];
+ gap[label="OPEN: EXACT EVALUATION EQUALITY\nTranslation composition versus original p\nat (Cx+T,Cy+T*u)",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ norm[label="OPEN: original helper order / norm8and4factors\nResidual / divisor / scalar / growing finder / full cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ point->root;jets->order;root->gap[style=dashed];order->gap[style=dashed];gap->norm[style=dashed];
+}
