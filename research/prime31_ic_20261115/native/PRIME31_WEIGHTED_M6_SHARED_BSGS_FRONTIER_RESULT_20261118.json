@@ -1,0 +1,112 @@
+{
+  "schema": "prime31.m6_vs_shared_bsgs.20261118.v1",
+  "classification": "matched_source_specific_producer_only",
+  "standing": "pcc:unverified",
+  "date": "2026-11-18",
+  "source_commit": "87e3f0a1607cd2b1f22af79cff5f83e614d2aff8",
+  "protocol_commit": "755d3b62b48d8d0fece5800a6894125407801daa",
+  "original_curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "corpus": "original native mixed 1024 public targets, source identical across M6, BSGS and mixed IC",
+  "baselines": {
+    "m6": "B31 six weights 1,3,5,7,11,13; generic 3+3",
+    "bsgs": "unchanged m=46341, 262144, 1048576 shared baby table",
+    "mixed_ic": "unchanged native mixed first-x/Dickson generic 4+4, source-corpus generator"
+  },
+  "run_data": [
+    {
+      "run_id": 44305053128,
+      "artifact_id": 14427043131,
+      "artifact_sha256": "aa61631b9298b2c6acc0d677282d702a2e88489f6af53a09c28f5b0194c58879",
+      "mixed_ic_source_whole_ms": 1897.579028,
+      "mixed_ic_setup_ms": 1096.334549,
+      "mixed_ic_online_ms": 801.244479,
+      "paired": [
+        {
+          "order": "A then B",
+          "m6_ms": 3359.596688,
+          "bsgs_best_ms": 144.048879,
+          "bsgs_ms_by_m": {
+            "46341": 833.466226,
+            "262144": 190.079597,
+            "1048576": 144.048879
+          },
+          "m6_over_bsgs_ratio": 23.322615985092117
+        },
+        {
+          "order": "B then A",
+          "m6_ms": 3391.540843,
+          "bsgs_best_ms": 157.859326,
+          "bsgs_ms_by_m": {
+            "46341": 849.111714,
+            "262144": 189.873685,
+            "1048576": 157.859326
+          },
+          "m6_over_bsgs_ratio": 21.484576989768726
+        }
+      ]
+    },
+    {
+      "run_id": 44305062836,
+      "artifact_id": 14428240804,
+      "artifact_sha256": "9a3fe05ebe162198c519ca287937607bfe590cac2315977073ad081bbdf109c0",
+      "mixed_ic_source_whole_ms": 2841.305335,
+      "mixed_ic_setup_ms": 1785.604659,
+      "mixed_ic_online_ms": 1055.700676,
+      "paired": [
+        {
+          "order": "A then B",
+          "m6_ms": 5301.731825,
+          "bsgs_best_ms": 250.565406,
+          "bsgs_ms_by_m": {
+            "46341": 1287.283108,
+            "262144": 287.480999,
+            "1048576": 250.565406
+          },
+          "m6_over_bsgs_ratio": 21.159073431709086
+        },
+        {
+          "order": "B then A",
+          "m6_ms": 5330.526879,
+          "bsgs_best_ms": 255.661096,
+          "bsgs_ms_by_m": {
+            "46341": 1277.09237,
+            "262144": 282.170277,
+            "1048576": 255.661096
+          },
+          "m6_over_bsgs_ratio": 20.849972727176294
+        }
+      ]
+    }
+  ],
+  "observed_controls": {
+    "source_original_unknown_q": 1024,
+    "candidate_recovered_per_arm": 1024,
+    "reference_recovered_per_m_per_arm": 1024,
+    "mixed_ic_recovered_per_run": 1024,
+    "m6_training_rank": 31,
+    "m6_training_calls": 106,
+    "m6_training_odd": 31,
+    "m6_shift_queries": 3660,
+    "m6_target_query_ec_additions": 109090357,
+    "m6_target_query_fp_inversions": 56909,
+    "m6_target_query_fp_multiplications": 657872289
+  },
+  "conclusion": "M6 generic-equivalent IC costs 20.85–23.32x best same-runner shared BSGS and 1.77–1.88x same-host native generic mixed 4+4 IC (the mixed arm is one earlier source-corpus run, not ABBA paired). No non-generic ECDLP advantage.",
+  "caveats": [
+    "Only two ABBA pairs on two GitHub-hosted runners; no host isolation or statistical population inference",
+    "M6 timed total includes B2 self-test; external caller known-answer corpus validation occurs outside both solver timing intervals",
+    "Mixed IC baseline was measured once per runner during frozen corpus construction, not alternated",
+    "Original native and BSGS are generic-equivalent; further nonenumerative RR9/F4 algebraic relation extraction not attempted",
+    "No independent signed PCC verification or calibrated optimized rho in this run"
+  ]
+}
