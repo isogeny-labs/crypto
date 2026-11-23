@@ -381,12 +381,19 @@ fn main() -> ExitCode {
             .iter()
             .map(|e| json!({"extra": e.extra, "keep": e.keep}))
             .collect::<Vec<_>>());
+    }
     if !cfg.bounded.is_empty() {
+        // Only with the flag, so a run without it writes the frozen layout.
         config["bounded"] = json!(cfg
             .bounded
+            .iter()
             .map(|b| json!({"target": b.target, "step": b.step, "extra_max": b.extra_max, "cover": b.cover}))
+            .collect::<Vec<_>>());
+    }
     if cfg.order_method != gl::OrderMethod::Enumerate {
+        // Only with the flag, so a run without it writes the frozen layout.
         config["order_method"] = json!(cfg.order_method.name());
+    }
     emit(config);
 
     // ── instance search, one cell per (p, g) and one per quartic prime ──

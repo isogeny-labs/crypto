@@ -14,6 +14,7 @@
 //! [`SolveReport::unpriced`]; a report with any unpriced work is a lower
 //! bound and says so.
 
+use crate::cryptanalysis::ic_framework::plugins::{ResidualSweepOracle, CosetMitmOracle};
 use super::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -865,14 +866,26 @@ pub fn registry() -> &'static [MethodDecl] {
             summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
             entry: "ecbench::diem_kgrow::solve",
             params: DIEM_KGROW_PARAMS,
+            family: "ic",
+            applies: Applies::Any,
+        },
+        MethodDecl {
             id: "ic.growing_arity",
             summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
             entry: "ecbench::growing_arity::solve",
             params: GROWING_ARITY_PARAMS,
+            family: "ic",
+            applies: Applies::Any,
+        },
+        MethodDecl {
             id: "ic.aux_tower_solver",
             summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
             entry: "ecbench::aux_tower_solver::solve",
             params: AUX_TOWER_SOLVER_PARAMS,
+            family: "ic",
+            applies: Applies::Any,
+        },
+        MethodDecl {
             id: "rho.cubic",
             family: "rho",
             summary: "tuned walk on {±ζ₃^i(P)} (A = 6), the rational order-3 automorphism of a j = 0 curve with p ≡ 1 (mod 3) and 3 | r − 1; Wiener–Zuccherato look-ahead and cycle escape; refuses any curve without the structure",

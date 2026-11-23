@@ -2380,7 +2380,7 @@ fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(
 /// sign is not stored: the probe tests both `R − F_k` and `R + F_k` and
 /// [`try_finalise_s4`] resolves the eight sign patterns in the group, so
 /// an `x` collision (two pair sums `±S`) only costs one failed verify.
-pub struct PairSumTable {
+pub struct WordPairSumTable {
     by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>>,
     /// Word-sized mirror of `by_x` for `p < 2^63`; empty otherwise.
     by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>>,
@@ -2396,7 +2396,7 @@ pub struct PairSumTable {
     pub build_additions: usize,
 }
 
-impl PairSumTable {
+impl WordPairSumTable {
     /// `true` when the table was built in word arithmetic.
     pub fn uses_word_path(&self) -> bool {
         !self.by_x_u64.is_empty() && self.by_x.is_empty()
@@ -2424,7 +2424,7 @@ impl PairSumTable {
 }
 
 /// Build the pair-sum table for `factor_base` (`B(B+1)/2` additions).
-pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_word_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> WordPairSumTable {
     let a_fe = curve.a_fe();
     let n = factor_base.len();
     let p_u64 = if curve.p.bits() <= 63 {
@@ -2493,7 +2493,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
             }
         }
     }
-    PairSumTable {
+    WordPairSumTable {
         by_x,
         by_x_u64,
         fb_u64,
@@ -2506,7 +2506,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
 
 /// **Meet-in-the-middle 3-decomposition**: the third factor-base point is
 /// enumerated (both signs), and the remaining two-point sum is answered by
-/// one hash probe into [`PairSumTable`] instead of the `B²` pair sweep of
+/// one hash probe into [`WordPairSumTable`] instead of the `B²` pair sweep of
 /// [`find_one_relation_s4_via_s3_counted`].
 ///
 /// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
@@ -2521,7 +2521,7 @@ pub fn find_one_relation_s4_via_mitm_counted(
     g: &Point,
     q: &Point,
     factor_base: &[FactorBaseEntry],
-    table: &PairSumTable,
+    table: &WordPairSumTable,
     max_trials: usize,
 ) -> Option<(Relation, usize)> {
     use crate::utils::random::random_scalar;
@@ -4319,7 +4319,12 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     // the old per-attempt rebuild for A/A comparison (ignored with
     // `IC_FAST_SWEEP=1`, whose word loop always takes the hoisted index);
     // `IC_HOIST_SWEEP=1` is accepted and is the default.
-    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
+    let word_sweep = if !use_table && std::env::var("IC_FAST_SWEEP").as_deref() != Ok("0") {
+        WordSweep::new(curve, &fb)
+    } else {
+        None
+    };
+    let fast_sweep = word_sweep.is_some();
     let hoist_sweep = fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() != Ok("0");
     let hoisted_index = if !use_table && hoist_sweep {
         Some(factor_base_x_index(&fb))
@@ -4666,7 +4671,7 @@ pub fn ec_index_calculus_dlp_s4_mitm_staged(
         max_trials_per_relation,
         max_relation_attempts,
         |fb| {
-            let table = build_pair_sum_table(curve, fb);
+            let table = build_word_pair_sum_table(curve, fb);
             move |curve: &CurveParams,
                   g: &Point,
                   q: &Point,
@@ -4704,7 +4709,7 @@ pub fn ec_index_calculus_dlp_s4_mitm_staged_with_la(
         max_trials_per_relation,
         max_relation_attempts,
         |fb| {
-            let table = build_pair_sum_table(curve, fb);
+            let table = build_word_pair_sum_table(curve, fb);
             move |curve: &CurveParams,
                   g: &Point,
                   q: &Point,
@@ -4943,7 +4948,7 @@ mod tests {
             .expect("16-bit a=-3 fixture");
         let fb = build_factor_base(&curve, 20);
         let a_fe = curve.a_fe();
-        let table = build_pair_sum_table(&curve, &fb);
+        let table = build_word_pair_sum_table(&curve, &fb);
         assert!(!table.by_x_u64.is_empty(), "word path took the table");
         assert!(
             table.by_x.is_empty(),

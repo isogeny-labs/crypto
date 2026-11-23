@@ -5379,6 +5379,7 @@ mod round37_frobenius_tests {
     }
 }
 
+
 #[cfg(test)]
 mod round114_mersenne_sqrt_and_unit_inverse {
     use super::*;
@@ -5401,6 +5402,7 @@ mod round114_mersenne_sqrt_and_unit_inverse {
         }
     }
 
+    #[test]
     fn mersenne_jacobi_bypass_matches_complete_sqrt() {
         let ctx = RadicalRootCtx::new(MAX_PRIME).expect("Mersenne context");
         let p = MAX_PRIME;
@@ -5415,40 +5417,66 @@ mod round114_mersenne_sqrt_and_unit_inverse {
             }))
         {
             assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "a={a}");
+        }
+    }
 
+    #[test]
     fn mersenne_sqrt_power_matches_independent_wide_reference() {
+        let p = MAX_PRIME;
         let f = Fp::new(p);
         let mut state = 0x917a_c5db_7102_637du64;
         for a in [0, 1, 2, p - 1, p, p + 1, u64::MAX]
+            .into_iter()
+            .chain((0..2048).map(|_| {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
                 state
+            }))
+        {
             let mut expected = a % p;
             for _ in 0..59 {
                 expected = ((expected as u128 * expected as u128) % p as u128) as u64;
+            }
             assert_eq!(f.powm(a, 1u64 << 59), expected, "a={a}");
+        }
+    }
 }
 
+#[cfg(test)]
 mod round115_barrett_regressions {
     use super::Fp;
+    #[test]
     fn canonical_products_match_independent_wide_remainder() {
         let primes = [5u64, 7, 11, 31, 257, 65_521, 1_000_000_007, 4_294_967_291];
         let mut checked = 0usize;
         for p in primes {
+            let f = Fp::new(p);
             let mut seed = p ^ 0xb7d4_218c_517f_3a9d;
             for &a in &[0, 1, 2, p / 2, p - 2, p - 1] {
                 for &b in &[0, 1, 2, p / 2, p - 2, p - 1] {
                     assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64);
                     checked += 1;
+                }
+            }
             for _ in 0..100_000 {
                 seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
                 let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
                 let b = seed % p;
                 assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64, "p={p} a={a} b={b}");
                 checked += 1;
+            }
+        }
         assert_eq!(checked, 800_288);
+    }
+}
 
+#[cfg(test)]
 mod round116_coefficient_normalization_tests {
     use super::RadicalRootCtx;
 
+    #[test]
     fn padded_noncanonical_coefficients_match_independent_modulo_normalization() {
         let mut seed = 0x7df4_1159_c2e5_ba08u64;
         for p in [5u64, 7, 101, 65_521, 1_000_000_007, (1u64 << 61) - 1] {
@@ -5467,6 +5495,7 @@ mod round116_coefficient_normalization_tests {
                         _ => 3 * p + x,
                     };
                     polynomial.push(value);
+                }
                 // Ensure nonzero degree for the comparison, even if
                 // a random leading coefficient was congruent to zero.
                 polynomial[degree] = if i & 1 == 0 { 1 } else { p + 1 };
@@ -5474,35 +5503,52 @@ mod round116_coefficient_normalization_tests {
                 // necessarily zero as machine words.
                 if i & 3 == 0 {
                     polynomial.extend_from_slice(&[p, 2 * p, 0, p]);
+                }
                 let mut normalized: Vec<u64> =
                     polynomial.iter().map(|x| x % p).collect();
                 while normalized.last() == Some(&0) {
                     normalized.pop();
+                }
                 assert_eq!(
                     ctx.roots(&polynomial),
                     ctx.roots(&normalized),
                     "p={p}, i={i}, polynomial={polynomial:?}"
                 );
+            }
             for zero in [&[][..], &[p][..], &[0, p, 2 * p][..]] {
                 assert_eq!(ctx.roots(zero), ctx.roots(&[]));
+            }
             assert!(ctx.roots(&[1, 0, 0, 0, 0, 1]).is_err());
+        }
+    }
+}
 
+#[cfg(test)]
 mod round117_sqrt_chain_and_discriminant_tests {
+    use super::*;
     fn next(seed: &mut u64) -> u64 {
         *seed ^= *seed << 13;
         *seed ^= *seed >> 7;
         *seed ^= *seed << 17;
         *seed
+    }
+    #[test]
     fn special_square_root_chain_matches_independent_binary_power() {
         let f = Fp::new(4_294_967_291);
         let mut seed = 0xb199_117a_d947_62e1u64;
         for a in [0, 1, 2, 3, f.p - 2, f.p - 1]
+            .into_iter()
             .chain((0..16_384).map(|_| next(&mut seed) % f.p))
+        {
             assert_eq!(f.sqrt_power_4294967291(a), f.powm(a, (f.p + 1) / 4),
                        "a={a}");
+        }
+    }
+    #[test]
     fn discriminant_character_matches_independent_euler_character() {
         let mut seed = 0x117e_2026_1122_80abu64;
         for p in [1_000_000_007u64, 4_294_967_291] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
             let f = &ctx.f;
             for i in 0..8_192 {
                 let mut a = next(&mut seed) % p;
@@ -5512,16 +5558,27 @@ mod round117_sqrt_chain_and_discriminant_tests {
                 assert_eq!(root.is_some(), is_square, "p={p}, a={a}");
                 if let Some(r) = root { assert_eq!(f.sqr(r), a, "p={p}, a={a}"); }
                 assert_eq!(root, ctx.sqrt(a), "p={p}, a={a}");
+            }
             for a in [p, p + 1, p + 2, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "p={p}, a={a}");
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round120_five_mod_eight_discriminant_regressions {
+    use super::*;
+    #[test]
     fn jacobi_prefilter_matches_standalone_sqrt_and_euler_criterion() {
         let mut state = 0x120a_2026_1122_5abdu64;
         for p in [13u64, 101, 1_000_000_021, 4_294_967_197,
                   2_305_843_009_213_693_693] {
             let ctx = RadicalRootCtx::new(p).expect("p is prime");
             for i in 0..2_048 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
                 let x = state % p;
                 let a = if i & 1 == 0 { ctx.f.sqr(x) } else { x };
                 let old = ctx.sqrt(a);
@@ -5532,16 +5589,32 @@ mod round120_five_mod_eight_discriminant_regressions {
                            "Euler criterion p={p} a={a}");
                 if let Some(r) = filtered {
                     assert_eq!(ctx.f.sqr(r), a, "p={p} a={a}");
+                }
+            }
             for a in [p, p + 1, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round121_narrow_jacobi_and_sparse_extension_tests {
+    use super::*;
 
+    fn next(seed: &mut u64) -> u64 {
+        *seed ^= *seed << 13;
+        *seed ^= *seed >> 7;
+        *seed ^= *seed << 17;
+        *seed
+    }
 
+    #[test]
     fn embedded_prime_field_multiplication_matches_schoolbook() {
         let mut seed = 0x1210_2026_1122_ff20u64;
         let mut count = 0usize;
         for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            let f = Fp::new(p);
             let q = Fq2 { f, n: 2 };
             for i in 0..50_000 {
                 let x = (next(&mut seed) % p,
@@ -5552,27 +5625,47 @@ mod round121_narrow_jacobi_and_sparse_extension_tests {
                 let expected = (
                     f.add(f.mul(x.0, y.0), f.mul(2, f.mul(x.1, y.1))),
                     f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
+                );
                 assert_eq!(got, expected, "p={p} i={i}");
                 count += 1;
+            }
+        }
         assert_eq!(count, 150_000);
+    }
 
+    #[test]
     fn narrow_jacobi_matches_full_square_root_and_euler_criterion() {
         let mut seed = 0x1210_2026_1122_abb5u64;
         for p in [101u64, 1_000_000_021, 4_294_967_197, 4_294_967_291,
+                  2_305_843_009_213_693_693] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
             for i in 0..4_096 {
                 let x = next(&mut seed) % p;
                 let a = if i % 2 == 0 { ctx.f.sqr(x) } else { x };
                 let got = ctx.sqrt_discriminant(a);
                 assert_eq!(got, ctx.sqrt(a), "p={p} a={a}");
                 assert_eq!(got.is_some(),
+                           a == 0 || ctx.f.powm(a, (p - 1) / 2) == 1,
                            "p={p} a={a}");
                 if let Some(r) = got { assert_eq!(ctx.f.sqr(r), a); }
+            }
+            for a in [p, p + 1, u64::MAX] {
+                assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round122_cube_cofactor_cache_tests {
+    use super::*;
+    #[test]
     fn cached_3_coprime_cofactor_matches_group_orders_and_cube_roots() {
         let mut seed = 0x1220_2026_f00d_1a72u64;
         for p in [5u64, 7, 31, 97, 109, 487, 65_521,
                   1_000_000_007, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
             for (order, cofactor, factor, one) in [
                 (ctx.cube_p.n, ctx.cube_p.cofactor, ctx.cube_p.p3s, ctx.cube_p.cofactor_mod3_eq1),
                 (ctx.cube_q.n, ctx.cube_q.cofactor, ctx.cube_q.p3s, ctx.cube_q.cofactor_mod3_eq1),
@@ -5580,6 +5673,7 @@ mod round122_cube_cofactor_cache_tests {
                 assert_eq!(cofactor * factor, order, "p={p}");
                 assert_ne!(cofactor % 3, 0, "p={p}");
                 assert_eq!(one, cofactor % 3 == 1, "p={p}");
+            }
             for _ in 0..32 {
                 seed ^= seed << 13;
                 seed ^= seed >> 7;
@@ -5588,19 +5682,31 @@ mod round122_cube_cofactor_cache_tests {
                 let y = (seed >> 21) % p;
                 if let Some(root) = ctx.cube_p.root(x) {
                     assert_eq!(f.mul(f.sqr(root), root), x, "Fp p={p}");
+                }
                 if let Some(root) = ctx.cube_q.root((x, y)) {
                     let q = &ctx.cube_q.r;
                     assert_eq!(q.mul(q.sqr(root), root), (x, y), "Fp2 p={p}");
+                }
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round73_mersenne_single_fold {
+    use super::*;
 
     // Test the actual production arithmetic against an independent wide oracle.
+    #[test]
     fn canonical_mersenne_products_match_wide_modulo() {
+        let p = MAX_PRIME;
         let field = Fp::new(p);
         let edges = [0, 1, 2, p / 2, p - 2, p - 1];
         for &a in &edges {
             for &b in &edges {
                 assert_eq!(field.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+            }
+        }
         let mut state = 0x2026_1120_0073_0001u64;
         for _ in 0..16_384 {
             state ^= state >> 12;
@@ -5610,17 +5716,26 @@ mod round73_mersenne_single_fold {
             state = state.wrapping_mul(2_685_821_657_736_338_717);
             let b = state % p;
             assert_eq!(field.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+        }
+    }
 
+    #[test]
     #[ignore = "native Rust A/B microbenchmark; release mode recommended"]
     fn benchmark_canonical_mersenne_fold() {
         use std::hint::black_box;
         use std::time::Instant;
+        let p = MAX_PRIME;
+        let f = Fp::new(p);
         let mut state = 0x73_2026_1120_0001u64;
         let mut xs = Vec::with_capacity(8_192);
         for _ in 0..8_192 {
             state = state.wrapping_mul(6_364_136_223_846_793_005)
                 .wrapping_add(1_442_695_040_888_963_407);
+            let a = state % p;
+            state = state.wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
             xs.push((a, state % p));
+        }
         let original = |a: u64, b: u64| {
             let product = a as u128 * b as u128;
             let folded = ((product as u64) & p) + (product >> 61) as u64;
@@ -5635,18 +5750,25 @@ mod round73_mersenne_single_fold {
                 for &(a,b) in &xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if before { original(a,b) } else { f.mul(a,b) };
+                }
+            }
             black_box(checksum);
             start.elapsed().as_nanos() as f64 / (64 * xs.len()) as f64
+        };
         let (mut before, mut after) = (Vec::new(), Vec::new());
         for i in 0..13 {
             if i % 2 == 0 {
                 before.push(measure(true)); after.push(measure(false));
             } else {
                 after.push(measure(false)); before.push(measure(true));
+            }
+        }
         before.sort_by(f64::total_cmp);
         after.sort_by(f64::total_cmp);
         println!("round73 rust p={p} before_ns={} after_ns={} speedup={}",
                  before[6], after[6], before[6] / after[6]);
+    }
+}
 
 #[cfg(test)]
 mod round125_canonical_trim_tests {

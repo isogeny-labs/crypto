@@ -102,6 +102,9 @@ use crate::cryptanalysis::m4gb_oracle::{
 };
 use crate::cryptanalysis::pq_f4_f2::{
     groebner_basis_f4, groebner_basis_f4_full_width, solutions_from_reduced_basis,
+    F4Skeleton, F4PairTrace, SKELETON_DEFAULT_CAP_BYTES, TRACE_DEFAULT_CAP_BYTES,
+    groebner_basis_f4_skeleton, groebner_basis_f4_skeleton_full_width,
+    groebner_basis_f4_traced, groebner_basis_f4_traced_full_width,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
@@ -217,6 +220,14 @@ pub struct F4F2 {
     trace: std::sync::Mutex<Option<F4PairTrace>>,
 }
 
+// Preserve the former unit-value constructor API while each owned solver
+// retains its actual per-run skeleton/trace state.
+#[allow(non_upper_case_globals)]
+pub const F4F2: F4F2 = F4F2 {
+    skeleton: std::sync::Mutex::new(None),
+    trace: std::sync::Mutex::new(None),
+};
+
 impl SystemSolver for F4F2 {
     fn name(&self) -> &str {
         "f4-f2"
@@ -260,11 +271,54 @@ impl SystemSolver for F4F2 {
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
         let tally_before = bitop_tally::snapshot();
-        let (gb, st) = if params.get("_f4_full_width_control") == Some("1") {
-            groebner_basis_f4_full_width(system.equations.clone(), system.n_vars, budget)
+        let full_width = params.get("_f4_full_width_control") == Some("1");
+        let use_skeleton = params.u64_or("skeleton", 0).unwrap_or(0) != 0;
+        let cap_bytes = params
+            .u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)
+            .unwrap_or(SKELETON_DEFAULT_CAP_BYTES >> 20)
+            .saturating_mul(1 << 20);
+        let use_trace = params.u64_or("trace", 0).unwrap_or(0) != 0;
+        let trace_cap = params
+            .u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)
+            .unwrap_or(TRACE_DEFAULT_CAP_BYTES >> 20)
+            .saturating_mul(1 << 20);
+        // A solve that finds the skeleton (or the trace) in use by another
+        // thread runs the plain path: same basis, its own (plain) count.
+        let mut guard = if use_skeleton {
+            self.skeleton.try_lock().ok()
         } else {
-            groebner_basis_f4(system.equations.clone(), system.n_vars, budget)
+            None
         };
+        let mut trace_guard = if use_trace && !use_skeleton {
+            self.trace.try_lock().ok()
+        } else {
+            None
+        };
+        let (gb, st) = match (guard.as_deref_mut(), trace_guard.as_deref_mut()) {
+            (None, Some(slot)) => {
+                let store = slot.get_or_insert_with(|| F4PairTrace::with_cap(trace_cap));
+                if full_width {
+                    groebner_basis_f4_traced_full_width(system.equations.clone(), system.n_vars, budget, store)
+                } else {
+                    groebner_basis_f4_traced(system.equations.clone(), system.n_vars, budget, store)
+                }
+            }
+            (Some(slot), _) => {
+                let skeleton = slot.get_or_insert_with(|| F4Skeleton::with_cap(cap_bytes));
+                if full_width {
+                    groebner_basis_f4_skeleton_full_width(system.equations.clone(), system.n_vars, budget, skeleton)
+                } else {
+                    groebner_basis_f4_skeleton(system.equations.clone(), system.n_vars, budget, skeleton)
+                }
+            }
+            (None, None) => if full_width {
+                groebner_basis_f4_full_width(system.equations.clone(), system.n_vars, budget)
+            } else {
+                groebner_basis_f4(system.equations.clone(), system.n_vars, budget)
+            },
+        };
+        drop(guard);
+        drop(trace_guard);
         let mut tests = 0u64;
         let mut extra = BTreeMap::new();
         for (k, v) in [
@@ -426,7 +480,12 @@ impl SystemSolver for F4F2 {
 
 /// Same-binary control for [`F4F2`] with only the Faugère–Lachartre
 /// reducer/free-column split disabled.
-pub struct F4F2FullWidth;
+#[derive(Default)]
+pub struct F4F2FullWidth {
+    inner: F4F2,
+}
+#[allow(non_upper_case_globals)]
+pub const F4F2FullWidth: F4F2FullWidth = F4F2FullWidth { inner: F4F2 };
 
 impl SystemSolver for F4F2FullWidth {
     fn name(&self) -> &str {
@@ -439,7 +498,7 @@ impl SystemSolver for F4F2FullWidth {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        F4F2.accepts(shape)
+        self.inner.accepts(shape)
     }
 
     fn solve(
@@ -452,7 +511,7 @@ impl SystemSolver for F4F2FullWidth {
         control
             .0
             .insert("_f4_full_width_control".into(), "1".into());
-        let (verdict, mut cost) = F4F2.solve(system, &control, budget);
+        let (verdict, mut cost) = self.inner.solve(system, &control, budget);
         cost.extra.insert("fl_forced_full_width".into(), 1);
         (verdict, cost)
     }

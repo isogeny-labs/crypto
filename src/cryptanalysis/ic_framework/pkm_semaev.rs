@@ -1055,7 +1055,7 @@ impl PkmSemaevOracle {
         spec: &super::PipelineSpec,
         inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
     ) -> Result<Self, String> {
-        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxKind};
+        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxKind, AuxFamily};
         let fb = &spec.factor_base_params;
         let oracle = match spec.factor_base.as_str() {
             "prime-kummer" => Self::new(m, fb.u64("t")? as u32, fb.u64_or("g", 1)?),
@@ -1066,7 +1066,7 @@ impl PkmSemaevOracle {
                 let kind = AuxKind::parse(fb.get("aux").unwrap_or("ordinary"), p)?;
                 let mut scratch = GroupOps::default();
                 let tower = if kind == AuxKind::Ordinary {
-                    isogeny_tower(p, t, seed, &mut scratch)?
+                    isogeny_tower(p, t, seed, AuxFamily::parse(fb.get("family").unwrap_or("any"))?, &mut scratch)?
                 } else {
                     supersingular_tower(p, t, seed, kind, &mut scratch)?
                 };
