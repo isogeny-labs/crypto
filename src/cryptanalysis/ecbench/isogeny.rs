@@ -46,12 +46,40 @@ struct Fp<'t> {
 impl Fp<'_> {
     fn mul(&mut self, a: u64, b: u64) -> u64 {
         self.tally.muls += 1;
+        // Root-polynomial arithmetic uses canonical residues. Keep the
+        // original wide remainder for external/noncanonical operands.
+        if a < self.p && b < self.p {
+            if self.p <= u16::MAX as u64 {
+                return ((a as u32 * b as u32) % self.p as u32) as u64;
+            }
+            if self.p <= u32::MAX as u64 {
+                return (a * b) % self.p;
+            }
+            // Fast reduction for p=2^61-1 (two end-around-carry limbs).
+            if self.p == (1u64 << 61) - 1 {
+                let product = a as u128 * b as u128;
+                let folded = ((product as u64) & self.p) + (product >> 61) as u64;
+                return if folded >= self.p {
+                    folded - self.p
+                } else {
+                    folded
+                };
+            }
+        }
         ((a as u128 * b as u128) % self.p as u128) as u64
     }
     fn add(&self, a: u64, b: u64) -> u64 {
+        // p<=2^63-1 and canonical operands imply the sum fits in u64.
+        if self.p <= u64::MAX / 2 && a < self.p && b < self.p {
+            let sum = a + b;
+            return if sum >= self.p { sum - self.p } else { sum };
+        }
         ((a as u128 + b as u128) % self.p as u128) as u64
     }
     fn sub(&self, a: u64, b: u64) -> u64 {
+        if self.p <= u64::MAX / 2 && a < self.p && b < self.p {
+            return if a >= b { a - b } else { a + self.p - b };
+        }
         ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
     }
     fn small(&self, c: u64) -> u64 {
@@ -63,8 +91,11 @@ impl Fp<'_> {
             if e & 1 == 1 {
                 r = self.mul(r, a);
             }
-            a = self.mul(a, a);
             e >>= 1;
+            // Do not square the base after consuming the final exponent bit.
+            if e != 0 {
+                a = self.mul(a, a);
+            }
         }
         r
     }
@@ -89,14 +120,27 @@ impl Fp<'_> {
         let mut r = a.to_vec();
         Self::trim(&mut r);
         let dm = m.len() - 1;
-        let inv = self.inv(m[dm]);
+        // Monic moduli dominate x^p mod f and Cantor-Zassenhaus splitting.
+        // Their leading inverse is 1: avoid a Fermat inversion per remainder.
+        let monic = m[dm] == 1;
+        let inv = if monic { 1 } else { self.inv(m[dm]) };
         while r.len() > dm {
-            let c = self.mul(*r.last().unwrap(), inv);
+            let top = *r.last().unwrap();
+            let c = if monic && top < self.p {
+                top
+            } else {
+                self.mul(top, inv)
+            };
             let s = r.len() - 1 - dm;
-            for (i, &mi) in m.iter().enumerate() {
-                let t = self.mul(c, mi);
-                r[s + i] = self.sub(r[s + i], t);
+            // The leading coefficient cancels exactly, so do not multiply
+            // and subtract it. Skip zero terms in sparse divisors.
+            for (i, &mi) in m[..dm].iter().enumerate() {
+                if mi != 0 {
+                    let t = self.mul(c, mi);
+                    r[s + i] = self.sub(r[s + i], t);
+                }
             }
+            r[s + dm] = 0;
             Self::trim(&mut r);
         }
         r
@@ -121,8 +165,11 @@ impl Fp<'_> {
             if e & 1 == 1 {
                 r = self.mulmod(&r, &b, m);
             }
-            b = self.mulmod(&b, &b, m);
             e >>= 1;
+            // An unused final polynomial square is especially expensive.
+            if e != 0 {
+                b = self.mulmod(&b, &b, m);
+            }
         }
         r
     }
@@ -321,6 +368,87 @@ impl Isogeny {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
+
+    #[test]
+    fn round128_arithmetic_matches_wide_modulo() {
+        let primes = [101u64, 65_521, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1];
+        for p in primes {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x9e37_79b9_7f4a_7c15;
+            for _ in 0..20_000 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let a = state % p;
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let b = state % p;
+                assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64);
+                assert_eq!(f.add(a, b), ((a as u128 + b as u128) % p as u128) as u64);
+                assert_eq!(f.sub(a, b), ((a as u128 + p as u128 - b as u128) % p as u128) as u64);
+            }
+        }
+    }
+
+    #[test]
+    fn round128_remainders_and_powers_match_naive_division() {
+        fn old_rem(f: &mut Fp<'_>, a: &[u64], m: &[u64]) -> Vec<u64> {
+            let mut r = a.to_vec();
+            Fp::trim(&mut r);
+            let dm = m.len() - 1;
+            let inv = f.inv(m[dm]);
+            while r.len() > dm {
+                let c = f.mul(*r.last().unwrap(), inv);
+                let shift = r.len() - 1 - dm;
+                for (i, &mi) in m.iter().enumerate() {
+                    let t = f.mul(c, mi);
+                    r[shift + i] = f.sub(r[shift + i], t);
+                }
+                Fp::trim(&mut r);
+            }
+            r
+        }
+        for p in [101u64, 65_521, 1_000_000_007, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0xabc1_2500_0000_0028;
+            for i in 0..250 {
+                let mut dividend = Vec::new();
+                for _ in 0..8 {
+                    state ^= state << 13;
+                    state ^= state >> 7;
+                    state ^= state << 17;
+                    dividend.push(state % p);
+                }
+                let modulus = match i % 4 {
+                    0 => vec![3, 0, 0, 1],
+                    1 => vec![3, 2, 4, 1],
+                    2 => vec![3, 0, 0, 2],
+                    _ => vec![3, 2, 4, 7],
+                };
+                assert_eq!(f.rem(&dividend, &modulus), old_rem(&mut f, &dividend, &modulus));
+                if i < 15 {
+                    let optimized = f.powmod(&[1, 1], p, &modulus);
+                    // Independent square-and-multiply with the original reducer.
+                    let mut exponent = p;
+                    let mut acc = vec![1];
+                    let mut base = old_rem(&mut f, &[1, 1], &modulus);
+                    while exponent > 0 {
+                        if exponent & 1 == 1 {
+                            acc = old_rem(&mut f, &f.mulmod(&acc, &base, &modulus), &modulus);
+                        }
+                        exponent >>= 1;
+                        if exponent != 0 {
+                            base = old_rem(&mut f, &f.mulmod(&base, &base, &modulus), &modulus);
+                        }
+                    }
+                    assert_eq!(optimized, acc);
+                }
+            }
+        }
+    }
 
     /// On prime-order curves with a rational 3-isogeny, φ lands on E′, is a
     /// homomorphism on ⟨G⟩, and keeps the order.
