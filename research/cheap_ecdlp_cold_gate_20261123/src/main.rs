@@ -211,6 +211,33 @@ mod tests {
         assert_eq!(result.targets[1].recovered,None);
     }
     #[test]
+    fn shifted_unknown_public_target_recovers_subtracted_offset(){
+        let mut c=sample();
+        // Q=G, Q+[1]G=2G=P1. Neither the fixture secret nor a
+        // post-recovery claim is provided to the verifier.
+        c.targets=vec![Target{
+            q:Some([PRIME31.g.0,PRIME31.g.1]),
+            offset:1,terms:vec![[1,1]],claimed_log:None,
+        }];
+        let out=verify(&c).expect("valid shifted target");
+        assert_eq!(out.determined_targets,1);
+        assert_eq!(out.targets[0].recovered,Some(1));
+    }
+    #[test]
+    fn signed_negation_and_identity_target_group_replays(){
+        let mut c=sample();
+        let mut ar=Arithmetic::default();
+        let neg=ar.neg(PRIME31,Some(PRIME31.g)).map(|(x,y)|[x,y]);
+        c.targets=vec![
+            Target{q:neg,offset:0,terms:vec![[0,-1]],claimed_log:None},
+            Target{q:None,offset:0,terms:vec![[0,1],[0,-1]],claimed_log:None},
+        ];
+        let out=verify(&c).expect("negative and point-at-infinity equations");
+        assert_eq!(out.determined_targets,2);
+        assert_eq!(out.targets[0].recovered,Some(N-1));
+        assert_eq!(out.targets[1].recovered,Some(0));
+    }
+    #[test]
     fn reject_false_rhs(){let mut c=sample();c.relations[0].rhs=2;assert!(verify(&c).is_err());}
     #[test]
     fn reject_false_target_witness(){let mut c=sample();c.targets[0].offset=1;assert!(verify(&c).is_err());}
