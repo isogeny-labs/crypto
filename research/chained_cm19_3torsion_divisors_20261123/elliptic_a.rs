@@ -4,9 +4,7 @@ use std::collections::BTreeSet;
 pub type Point = Option<(F, F)>;
 
 pub fn valid(p: Point) -> bool {
-    p.is_none_or(|(x, y)| {
-        y.power(2) == x.power(3).plus(F::c(2).times(x)).plus(F::c(6))
-    })
+    p.is_none_or(|(x, y)| y.power(2) == x.power(3).plus(F::c(2).times(x)).plus(F::c(6)))
 }
 
 pub fn negative(p: Point) -> Point {
@@ -15,12 +13,17 @@ pub fn negative(p: Point) -> Point {
 
 pub fn add(p: Point, q: Point) -> Point {
     assert!(valid(p) && valid(q));
-    let (Some((x, y)), Some((u, v))) = (p, q) else { return p.or(q) };
+    let (Some((x, y)), Some((u, v))) = (p, q) else {
+        return p.or(q);
+    };
     if x == u && y.plus(v) == ZERO {
         return None;
     }
     let slope = if x == u {
-        F::c(3).times(x.power(2)).plus(F::c(2)).over(F::c(2).times(y))
+        F::c(3)
+            .times(x.power(2))
+            .plus(F::c(2))
+            .over(F::c(2).times(y))
     } else {
         v.minus(y).over(u.minus(x))
     };
@@ -40,7 +43,8 @@ pub fn frobenius(p: Point) -> Point {
 }
 
 pub fn division(x: F) -> F {
-    F::c(3).times(x.power(4))
+    F::c(3)
+        .times(x.power(4))
         .plus(F::c(5).times(x.power(2)))
         .plus(F::c(2).times(x))
         .plus(F::c(3))

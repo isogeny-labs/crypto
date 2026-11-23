@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Determine actual C7 cover gluing sign from complete E7[3] and principal-divisor conic certificates over fixed F7^4, retaining both signs/all cohort degeneracies and validating scheme multiplicities/nonvanishing/Macaulay degree; construct divided integral basis only if geometric kernel certificates succeed (Codex, started 2026-11-23, branch lane/chained-cm19-3torsion-divisors-20261123, PR #5062; follows externally merged #5056, prior bounded negative complete). [pcc:unverified]
+- [ ] Determine actual C7 cover gluing sign from complete E7[3] and principal-divisor conic certificates over fixed F7^4, retaining both signs/all cohort degeneracies and validating scheme multiplicities/nonvanishing/Macaulay degree; construct divided integral basis only if geometric kernel certificates succeed (Codex, started 2026-11-23, branch lane/chained-cm19-3torsion-continue-20261123, PR #5072; #5062 tracking-only merge did not complete task; complete locked source794447 awaiting first qualification). [pcc:unverified]
 
 - [x] Derive and test the integral3-primary cover-G/CM19-H bridge for actual C7 Jacobian correspondences: classify discriminant gluing, preserve sign ambiguity, filter frozen existing similitudes for compatibility without replaying the old enumeration, and retain empty/negative outcomes (Codex, started 2026-11-23, branch lane/chained-cm19-gluing-evidence-20261123, PR #5056; source in externally merged #5042, bounded negative/result/report preserved, preceding actual degree9 Gram unit complete). [pcc:unverified]
 

@@ -19,11 +19,17 @@ impl Ring {
     }
 
     pub fn scalar(self, value: F) -> A {
-        A { ring: self, values: [value, ZERO, ZERO] }
+        A {
+            ring: self,
+            values: [value, ZERO, ZERO],
+        }
     }
 
     pub fn variable(self) -> A {
-        A { ring: self, values: [ZERO, ONE, ZERO] }
+        A {
+            ring: self,
+            values: [ZERO, ONE, ZERO],
+        }
     }
 
     pub fn modulus(self) -> Vec<F> {
@@ -37,11 +43,17 @@ impl Ring {
 impl A {
     pub fn plus(self, rhs: Self) -> Self {
         assert_eq!(self.ring, rhs.ring);
-        Self { ring: self.ring, values: std::array::from_fn(|i| self.values[i].plus(rhs.values[i])) }
+        Self {
+            ring: self.ring,
+            values: std::array::from_fn(|i| self.values[i].plus(rhs.values[i])),
+        }
     }
 
     pub fn negative(self) -> Self {
-        Self { ring: self.ring, values: self.values.map(F::negative) }
+        Self {
+            ring: self.ring,
+            values: self.values.map(F::negative),
+        }
     }
 
     pub fn minus(self, rhs: Self) -> Self {
@@ -61,7 +73,10 @@ impl A {
             product[k - degree] = product[k - degree].plus(product[k].times(self.ring.constant));
             product[k] = ZERO;
         }
-        Self { ring: self.ring, values: std::array::from_fn(|i| product[i]) }
+        Self {
+            ring: self.ring,
+            values: std::array::from_fn(|i| product[i]),
+        }
     }
 
     pub fn power(self, n: u8) -> Self {
@@ -69,7 +84,10 @@ impl A {
     }
 
     pub fn scale(self, value: F) -> Self {
-        Self { ring: self.ring, values: self.values.map(|x| x.times(value)) }
+        Self {
+            ring: self.ring,
+            values: self.values.map(|x| x.times(value)),
+        }
     }
 }
 
