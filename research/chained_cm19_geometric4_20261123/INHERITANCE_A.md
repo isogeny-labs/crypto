@@ -12,7 +12,7 @@
 | f4 local etaleness | actual f0/f1/f3 and integral Hom identity | native actual polynomial/jet leaf plus written differential argument; formal curve bridge open |
 
 Shared library pin: aburan28/crypto-lean b0c73236f22b988feba0a73e58e57e0b5272bbad;
-Lean4.35.0, Mathlib cfc55 (exact full pin retained in inherited proof maps).
+Lean4.35.0, Mathlib cfc55fc58714a59dc06e6e79edc6d1d95140d3c2.
 No new generic group law is introduced here. The existing generic actual
 AddMonoid UniqueDouble target remains source-only after bounded Mathlib
 ENOMEM; it is not cited as compiled evidence. New arithmetic lives on
