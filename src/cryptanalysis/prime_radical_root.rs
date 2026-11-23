@@ -937,6 +937,9 @@ pub struct RadicalRootCtx {
     inv4: u64,
     inv27: u64,
     inv_n: u64,
+    // Small public leading-coefficient inverses. A single range check
+    // avoids repeated Euclidean inversion for 3..=7.
+    small_leading_inverse: [u64; 8],
     #[cfg(test)]
     n: u64, // quadratic non-residue
     s2: u32,
@@ -965,6 +968,11 @@ impl RadicalRootCtx {
         // Inverses 2,3,4,27,n are fixed per prime and only require
         // two products plus, at most, one Euclidean inversion.
         let (_i2, i3, i4, i27, in_) = f.small_inverses(n);
+        // Entries are indexed only by canonical, nonzero leading coefficients.
+        // Values for a >= p never participate in a root query.
+        let small_leading_inverse = [
+            0, 1, _i2, i3, i4, f.inv(5), f.inv(6), f.inv(7),
+        ];
         Ok(RadicalRootCtx {
             f,
             #[cfg(test)]
@@ -973,6 +981,7 @@ impl RadicalRootCtx {
             inv4: i4,
             inv27: i27,
             inv_n: in_,
+            small_leading_inverse,
             #[cfg(test)]
             n,
             s2,
@@ -1162,9 +1171,7 @@ impl RadicalRootCtx {
     #[inline]
     fn inv_leading(&self, a: u64) -> u64 {
         match a {
-            2 => self.inv2,
-            3 => self.inv3,
-            4 => self.inv4,
+            2..=7 => self.small_leading_inverse[a as usize],
             _ => self.f.inv(a),
         }
     }
@@ -1649,12 +1656,10 @@ impl RadicalRootCtx {
                     else if c[1] == 1 { fp.neg(c[0]) }
                     else {
                         let neg_c0 = fp.neg(c[0]);
-                        let inverse = if fp.p >= (1u64 << 20) {
-                            match c[1] {
-                                3 => self.inv3,
-                                4 => self.inv4,
-                                _ => fp.inv(c[1]),
-                            }
+                        let inverse = if fp.p >= (1u64 << 20)
+                            && (3..=7).contains(&c[1])
+                        {
+                            self.small_leading_inverse[c[1] as usize]
                         } else {
                             fp.inv(c[1])
                         };
@@ -5678,6 +5683,43 @@ mod round125_canonical_trim_tests {
                 assert!(ctx.roots(&zero).is_err(), "p={p}, zero={zero:?}");
             }
             assert!(ctx.roots(&[1, 0, 0, 0, 0, 1]).is_err());
+        }
+    }
+}
+
+// Round 127: compare cached inverses with Euclidean inversion and verify
+// complete linear and zero-constant quadratic root equations. This targets
+// public coefficients only; there is no secret-dependent use of the cache.
+#[cfg(test)]
+mod round127_small_leading_inverse_tests {
+    use super::*;
+
+    #[test]
+    fn cached_small_inverses_match_euclid_and_root_equations() {
+        for p in [5u64, 7, 65_521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for a in 2..=7 {
+                if a >= p { continue; }
+                let expected_inverse = ctx.f.inv(a);
+                assert_eq!(ctx.small_leading_inverse[a as usize], expected_inverse,
+                           "p={p}, a={a}");
+                assert_eq!(ctx.f.mul(a, expected_inverse), 1);
+                for b in [1u64, 2, p / 2, p - 1] {
+                    let root = ctx.f.mul(ctx.f.neg(b), expected_inverse);
+                    let actual = ctx.roots(&[b, a]).unwrap().roots;
+                    assert_eq!(actual, vec![root], "linear p={p}, a={a}, b={b}");
+                    if a >= 3 {
+                        let mut quadratic = ctx.quad_roots(a, b, 0);
+                        quadratic.sort_unstable();
+                        quadratic.dedup();
+                        let mut expected = vec![0, root];
+                        expected.sort_unstable();
+                        expected.dedup();
+                        assert_eq!(quadratic, expected,
+                                   "zero-constant quadratic p={p}, a={a}, b={b}");
+                    }
+                }
+            }
         }
     }
 }
