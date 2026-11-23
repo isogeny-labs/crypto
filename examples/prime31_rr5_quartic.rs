@@ -246,6 +246,43 @@ fn signed_lift(q:PrimePoint,base:&[PrimePoint],params:[u64;3])
     if sum!=q{return None;}
     row.sort_unstable();Some(row)
 }
+/// Sparse signed factors become an exact RHS-bearing row, with the unknown
+/// target log in the final variable: SUM(sign_i * log(P_i)) - log(Q) = k.
+/// For query Q+[k]G supply k; this pilot's k=0. No known factor logs enter.
+const N:u64=2_147_446_831;
+struct RelationRank { width:usize, pivots:BTreeMap<usize,Vec<u64>> }
+impl RelationRank {
+    fn new(base_size:usize)->Self {Self{width:base_size+1,pivots:BTreeMap::new()}}
+    fn ingest(&mut self,terms:&[(usize,i8)],shift:u64)->Result<bool,String> {
+        let f=Fp::new(N);
+        let mut row=vec![0;self.width+1];
+        for &(i,sign) in terms {
+            if i>=self.width-1 || ![-1,1].contains(&sign){
+                return Err("malformed signed coefficient".into());
+            }
+            row[i]=f.add(row[i],if sign>0 {1}else{f.neg(1)});
+        }
+        row[self.width-1]=f.neg(1);
+        row[self.width]=shift%N;
+        for (&j,pivot) in &self.pivots {
+            let t=row[j];
+            if t==0{continue;}
+            for k in j..=self.width {
+                row[k]=f.sub(row[k],f.mul(t,pivot[k]));
+            }
+        }
+        let Some(j)=(0..self.width).find(|&j|row[j]!=0) else {
+            if row[self.width]!=0{return Err("inconsistent genuine RHS".into());}
+            return Ok(false);
+        };
+        let inv=f.inv(row[j]);
+        for k in j..=self.width {row[k]=f.mul(row[k],inv);}
+        self.pivots.insert(j,row);
+        Ok(true)
+    }
+    fn rank(&self)->usize{self.pivots.len()}
+}
+
 fn main(){
     // Known-answer pilot exercises original prime-order curve only;
     // G multiples must not be used for production index-calculus timing.
@@ -255,7 +292,9 @@ fn main(){
         Ok((params,f4_mul,root_mul))=>{
             let rows=params.into_iter().filter_map(|p|signed_lift(q,&base,p))
                 .collect::<BTreeSet<_>>();
-            println!("PRIME31_RR5 p={P} B=4 algebraic_complete=true signed_rows={} f4_muls={f4_mul} root_muls={root_mul} (development, no cold ECDLP)",rows.len());
+            let mut rank=RelationRank::new(base.len());
+            for row in &rows { rank.ingest(row,0).expect("verified relation rank"); }
+            println!("PRIME31_RR5 p={P} B=4 algebraic_complete=true signed_rows={} independent_rank={} f4_muls={f4_mul} root_muls={root_mul} (development, no cold ECDLP)",rows.len(),rank.rank());
         }
         Err(reason)=>println!("PRIME31_RR5 p={P} B=4 status=undetermined reason={reason}"),
     }
@@ -293,6 +332,10 @@ mod tests{
         assert!(s.iter().all(|p|poly_eval(p,z,f)==0));
         let row=signed_lift(q,&base,z).unwrap();
         assert_eq!(row,vec![(0,1),(1,1),(2,1),(3,1)]);
+        let mut rank=RelationRank::new(base.len());
+        assert_eq!(rank.ingest(&row,0),Ok(true));
+        assert_eq!(rank.ingest(&row,0),Ok(false));
+        assert_eq!(rank.rank(),1);
     }
     #[test]
     fn poisoning_changes_public_equations(){
