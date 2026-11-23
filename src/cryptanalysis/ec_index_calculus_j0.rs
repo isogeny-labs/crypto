@@ -91,7 +91,8 @@
 
 use crate::cryptanalysis::ec_index_calculus::{
     factor_base_x_index, find_one_relation_with_index, gaussian_eliminate_mod_n_particular,
-    semaev_s3, semaev_s3_in_x3, sqrt_mod_p, FactorBaseEntry,
+    ic_padd, ic_smul, refresh_ic_ct_flag, semaev_s3, semaev_s3_in_x3, sqrt_mod_p,
+    FactorBaseEntry,
 };
 use crate::ecc::curve::CurveParams;
 use crate::ecc::field::FieldElement;

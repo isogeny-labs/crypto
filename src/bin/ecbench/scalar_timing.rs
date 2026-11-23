@@ -62,6 +62,7 @@ pub fn run(spec_path: &Path, out: &Path, batch: u64, lock: &str) -> Result<(), S
     let doc = runner::PlanDoc {
         schema: "ecbench.plan/v1".into(),
         spec_id: plan.spec_id.clone(),
+        curve_policy: plan.spec.curve_policy.clone(),
         arms: plan.arms.clone(),
         workloads: plan.workloads.clone(),
         executions: plan.executions.clone(),
