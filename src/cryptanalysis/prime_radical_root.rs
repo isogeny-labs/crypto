@@ -1108,18 +1108,6 @@ impl RadicalRootCtx {
         if c == 0 {
             return if b == 0 { vec![0] } else { vec![0, f.neg(b)] };
         }
-        // R123_MONIC_BZERO_BEGIN
-        // For x^2+c, solve s^2=-c directly. Avoid constructing b^2-4c,
-        // halving both quadratic-formula numerators and extra field adds.
-        // Only public coefficients; the general discriminant path is unchanged.
-        if b == 0 {
-            return match self.sqrt_discriminant(f.neg(c)) {
-                None => vec![],
-                Some(0) => vec![0],
-                Some(s) => vec![s, f.neg(s)],
-            };
-        }
-        // R123_MONIC_BZERO_END
         // Four times c needs only two reduced doublings, not a
         // generic base-field multiply (wide remainder on most p).
         let twice_c = f.add(c, c);
@@ -1163,22 +1151,6 @@ impl RadicalRootCtx {
                 vec![0, f.mul(f.neg(b), self.inv_leading(a))]
             };
         }
-        // R123_SMALL_LEADING_BZERO_BEGIN
-        // For a*x^2+c with a in {2,3,4}, a^{-1} is cached in the
-        // root context. Take sqrt(-c/a) and its negation directly.
-        // This avoids the discriminant calculation, inverse(2a)
-        // and two final field products. Keep arbitrary a on the old path.
-        if b == 0 && (2..=4).contains(&a) {
-            let s = match self.sqrt_discriminant(f.mul(f.neg(c), self.inv_leading(a))) {
-                Some(s) => s,
-                None => return vec![],
-            };
-            let mut roots = if s == 0 { vec![0] } else { vec![s, f.neg(s)] };
-            roots.sort_unstable();
-            roots.dedup();
-            return roots;
-        }
-        // R123_SMALL_LEADING_BZERO_END
         // Test b^2-4ac before inverting 2a. For a nonresidue
         // discriminant, skip the expensive modular inversion entirely.
         let ac = f.mul(a, c);
