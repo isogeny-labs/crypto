@@ -51,6 +51,8 @@ fn bench(p:u64,kind:&str) {
 fn main() {
     baseline::round141_oracle();
     optimized::round141_oracle();
+    baseline::round142_powmod_oracle();
+    optimized::round142_powmod_oracle();
     println!("native Rust independent correctness oracles PASS");
     for p in [65_521u64,1_000_000_007,4_294_967_291,(1u64<<61)-1] {
         for kind in ["powmod_dense","normalize_random","quadratic_random_scaled",
