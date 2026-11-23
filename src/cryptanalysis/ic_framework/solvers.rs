@@ -103,6 +103,8 @@ use crate::cryptanalysis::m4gb_oracle::{
 use crate::cryptanalysis::pq_f4_f2::{
     groebner_basis_f4, groebner_basis_f4_full_width, solutions_from_reduced_basis, F4PairTrace,
     F4Skeleton, SKELETON_DEFAULT_CAP_BYTES, TRACE_DEFAULT_CAP_BYTES,
+    groebner_basis_f4_skeleton, groebner_basis_f4_skeleton_full_width,
+    groebner_basis_f4_traced, groebner_basis_f4_traced_full_width,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,

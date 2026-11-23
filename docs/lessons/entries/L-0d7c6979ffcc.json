@@ -1,0 +1,14 @@
+{
+  "action": "estimate each admitted curve's admission time from the cell row (search_wall_s / tried x the seed's rank in the tried list); recompute every cell without the curves the cap would have excluded (and with/without a borderline one) and report both beside the claim",
+  "created": "2026-11-23T17:57:38Z",
+  "evidence": [
+    "research/quartic_diem_ladder_20261121: even 131101 process 144 seeds in 8335 s (57.9 s/seed); curve 288 (144th) admitted at ~139 min, 228 (114th) at ~110.0 min against the 110-min cap; RESULTS deviation 4 said both would be kept; research/quartic_diem_ladder_20261121/validation/cap_subsets.py: verdicts unchanged, sfb w=0.1 cell 0.746-0.781 vs 0.775"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a protocol caps a curve search by wall time with a stop-and-rerun-with-admitted-curves rule, the cap was not enforced, and the report says the data are unaffected",
+  "why": "an un-enforced cap admits curves the frozen rule would have dropped; the claim 'a rerun would use the same curves' is checkable from the cell row"
+}
