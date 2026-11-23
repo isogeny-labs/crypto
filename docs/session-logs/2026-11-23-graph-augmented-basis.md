@@ -21,3 +21,21 @@
 ## Errors (what went wrong, how it was handled)
 - GitHub connector returns empty content for large canonical `docs/session-logs/2026-11-23.md`; preserved it and wrote this scoped dated log rather than overwrite concurrent sessions.
 - No research-KB or Conductor/agent-spawn tools and no Cargo/local repository checkout in this runtime; recorded bounded source fallback and used existing free native CI without claiming unexecuted tests.
+
+
+## 2026-11-23 18:20 UTC — terminal original-source CI receipt
+
+### What was done (commands, files, features)
+- Inspected exact-head GitHub workflow [#45236967753](https://github.com/isogeny-labs/crypto/actions/runs/45236967753), job 137911163999, including full native job log. **SUCCESS**: 39/39 original-source release Rust integration tests, including both new affine-basis regressions, original evaluator example compile and 36-row F101 same-stream default/opt-in/row-cap smoke with new basis-index/count assertions. Exact native job source SHA-256 for `projected_rank.rs` `ae8857539189fd3aed5ddbeee9c28169d2d318508a6e77db6ba21cdad78ce557`.
+- Updated the durable lane handoff and draft PR #5043 with this terminal result.
+
+### Decisions made (and why)
+- Promote **only** original-module synthetic correctness status from authored/pending to PASS. Preserve the earlier unrelated full-root parser failure and missing collector compilation. Do not promote a performance or signed PCC claim.
+- Keep exact echelon charge explicit; copying a minimal augmented row basis after already doing full elimination may regress cold solve wall time, even if rows and Z decrease.
+
+### Open threads
+- Qualify unshimmed root and authentic binary-curve collector after the out-of-lane parser repair; then group-replay actual captured relations.
+- Obtain a source-verified ordinary Prime31 two-LP stream and matched full cold system comparison. If the exact selector is expensive, test an inexpensive sparse prefilter instead of claiming a gain.
+
+### Errors (what went wrong, how it was handled)
+- Earlier source/test CI runs were superseded/canceled as branch updates triggered concurrency; the final job above, not canceled predecessors, supplies the terminal receipt. No paid jobs or conflicting worktree edits.
