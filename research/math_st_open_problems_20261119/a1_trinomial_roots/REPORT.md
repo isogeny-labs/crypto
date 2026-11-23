@@ -99,8 +99,14 @@ room** for the input shape $(g,g^x,g^{x^d})$.
 
 **Open, and not claimed.** A proof that $R(n,d)\le L(n,d)+O(\log n)$ for all
 primes $n$. Known trinomial root bounds (Kelley–Owen and others; check) are
-far weaker in general. Such a proof would make this a theorem. It is the
-natural Lean target once a toolchain is available. Inputs with more powers of
+far weaker in general. Such a proof would make this a theorem. It is not
+attempted.
+
+**Lean (2026-11-23).** The lower envelope $R\ge L$ is proved in Lean 4
+(`aburan28/crypto-lean` branch `claude/math-st-closures`, file `CryptoLean/Group/MathStClosures.lean`). Over $\mathbb F_n$ with $n$ prime, `card_roots_X_pow_sub_one` shows
+$X^d-1$ has exactly $\gcd(n-1,d)$ roots ($d\ge1$), and `card_roots_X_pow_sub_X`
+shows $X^d-X$ has exactly $1+\gcd(n-1,d-1)$ roots ($d\ge2$). The upper bound
+$R\le L+10$ is measured only, as stated above. Inputs with more powers of
 $x$ (Cheon's $n+1$ case, Satoh's $\Phi_k$ generalization; check) are outside
 this experiment.
 

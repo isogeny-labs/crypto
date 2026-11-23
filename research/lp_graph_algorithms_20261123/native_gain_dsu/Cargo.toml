@@ -18,3 +18,9 @@ path = "src/lib.rs"
 [[test]]
 name = "large_prime_graph"
 path = "../../../tests/large_prime_graph.rs"
+
+# Build the ORIGINAL evaluator CLI against the same source-exact graph modules,
+# independently of unrelated root-crate parse errors.
+[[example]]
+name = "lp_graph_eval"
+path = "../../../examples/lp_graph_eval.rs"
