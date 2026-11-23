@@ -96,6 +96,7 @@ outputs. One report-only root-relative path failed from the report directory
 without edits; corrected to the actual directory. Initial prose lint caught
 an unsigned citation beside a broad cost word; wording now states scoped
 native counts and open routes. No fabricated verified standing.
+[pcc:unverified]
 
 One lane helper fetch silently failed and fell back to main, producing the
 old journal conflict. Actual remote/API still had0c9c; an explicit diagnostic
