@@ -27,6 +27,18 @@ The initial 24-cell protocol had only `GX` as a guaranteed positive per B; the f
 
 Updated 32 total cells: B=64/128/256/677 x 8 distinct targets (GX, X10G, 4 LCG curve-x, 2 algebraically planted positives). An independently written Python EC/S3 grader of the initial source found all four LCG x targets negative for these B values (i.e., prior panel would exercise mostly empty sets). The expansion was made openly **after** the first `--scale` workflow launch; it is not represented as originally preregistered. Newly triggered source-bound CI required. The original 24-cell historical run remains separately attributable.
 
+### Frozen independently computed expected roots (negative and planted-positive controls)
+A separate integer-arithmetic exhaustive reference calculation (not the candidate Rust solver) found **exactly three positive x targets containing one unordered pair each, and five target x values with no pair, for each B**. These expectations are now *asserted by the original Rust scaling code* (commit `96c9101315d9f0c7ca5fee2af18cdb10d16c645d`) rather than treating any arbitrary empty candidate result as progress. All 32 cells together thus contain **12 true-positive and 20 true-negative tests** in the reference data, without claiming uniform random hits.
+
+| B | Last base x | Planted positive targets (not including GX) | Planted witness x-pairs |
+|---:|---:|---|---|
+| 64 | 132 | 1710951623, 1616344405 | (37,66), (22,129) |
+| 128 | 261 | 942334308, 463575699 | (86,134), (66,257) |
+| 256 | 513 | 571194808, 1709560212 | (182,263), (134,509) |
+| 677 | 1337 | 418734043, 1895847733 | (457,682), (352,1333) |
+
+The additional always-positive control `z=GX=625037715` is witnessed by `(GX,X2G)`. The consistently negative controls are `z=X10G=1344580913` and the fixed four curve-valid LCG abscissae `477136123,1903513535,182731700,1009683372`. This reference is **x-only**; full signed ECDLP relation recovery and end-to-end costs remain unmeasured.
+
 ## Success and failure interpretation
 **Correctness pass:** every one of the 32 (B,z) cells has exact pair-set agreement, including true empty cells, no hidden generic pair dictionary in the candidate. A correct returned x pair still requires a signed group certificate to qualify as an ECDLP relation.
 
