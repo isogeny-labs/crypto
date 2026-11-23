@@ -65,3 +65,10 @@ The exact local normal and optimized JSON streams matched byte-for-byte. Six mut
 **Not executed:** original EKS-only authenticated 695/701 model or `C169/C13a/C13b/N2_actual/D` physical prices, same-host cold strongest rho/BSGS/IC, whole EKS fixture custody, ordinary-source DLP transfer, signed PCC, large-field timings or resource-spend action. No competing benchmark reservation, paid compute, protected merge or new automation. [pcc:unverified]
 
 **Next:** source-pinned independently owned Rust/Cantor replay of the complete finite-Jacobian census and off-image classes, with projective/nonsplit/ramified exceptional controls and actual scalar recovery. Keep the original cold benchmark owner/reservations intact.
+
+
+## Independent-language arithmetic addendum (same coordinator)
+
+After the first full Python result was frozen, a separate, self-contained Node.js implementation enumerated the **10,609** elements of F103², built a square-root multiplicity table without importing CT339 or CT341, counted the genus-two odd model and both elliptic cubic models, and independently recovered `#C(F103)=88`, `#C(F103²)=10862`, `#Eplus=92`, `#Eminus=100`, `e2=254`, `#J=9200`. Its F103² square set has **5,305** elements and exactly five zeros of the odd quintic. This independently corroborates the mathematical correction of the original 2300 cardinality hypothesis, but the complete 9200-group dual-map identities were still verified by one imported Cantor implementation, not a signed independent validator.
+
+Command: `node ct341_independent_zeta.cjs > /tmp/ct341_independent_zeta.json && cmp /tmp/ct341_independent_zeta.json CT341_INDEPENDENT_ZETA.json`. The source [ct341_independent_zeta.cjs](ct341_independent_zeta.cjs) has SHA-256 `56e84a2b186427393fa6b57fb001d0abed4aac2c96481eddd6ba5894edcbf335`, Git blob `9ed104606efc07b4c8f571fe5ed3be2b9891167e`; frozen [CT341_INDEPENDENT_ZETA.json](CT341_INDEPENDENT_ZETA.json) has SHA-256 `b06d861207ac5cca2c6e92d31581cc966c8f1f891c5e111a77f5e26b1716e058`, Git blob `ed77a2c08feec011ba48b8a6d20fb894e7b02c42`. Both GitHub blob IDs were reread and matched local objects. [pcc:unverified]
