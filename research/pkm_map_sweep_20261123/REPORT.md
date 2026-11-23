@@ -1,0 +1,23 @@
+# PKM auxiliary-isogeny map sweep: first bounded rung
+
+2026-11-23. Local component benchmark on Apple M4 Pro, arm64, Python 3.12.8. Protocol and raw rows: [PROTOCOL.md](PROTOCOL.md), [results.jsonl](results.jsonl). Code: [sweep.py](sweep.py). All empirical statements here are `[pcc:unverified]`.
+
+## Maps and workload
+
+The two source maps are genuine PKM auxiliary-curve Vélu chains over `F_1000003`, not the earlier Dickson `p+1` arm. The CM map has low degrees `(2,2,2,2,2,2,2,11)` and high degree 1408, with `c=219899`; the Method 1 map has `(2,2,2,2,3,3,5)` and high degree 720, with `c=234701`. Each candidate precomposes its high map with `x -> x-delta` for one of `delta=0,1,2,4,8,16,32,64`. A translation changes fiber placement and adds a degree-one step; it does **not** constitute a new subgroup or improve the underlying isogeny chain.
+
+The target curve is `E: y²=x³+2x+3`. Each candidate uses all its fiber abscissae that lift to `E`, both point signs. Its interval control uses exactly the same number of lifting abscissae. The 144 fixed target points are independent of the bases; 48 are for screening and 96 for confirmation. The query enumerates verified two-point decompositions by subtraction and set membership. It is a relation-yield and query-component screen, not the PKM F4 algebraic relation solver or linear algebra.
+
+## Observed results
+
+All 16 candidate fibers passed the full recorded-fiber evaluation and degree/uniqueness checks. The run produced 16 candidate rows and 15 size-matched control rows (one size was reused). None met the prespecified confirmation gate. The most favorable CM screening count was `shift=16`: 36/48 target successes against 29/48 for the 688-abscissa interval, followed by 62/96 against 59/96 on confirmation (paired one-sided `p=0.3804`). The Method 1 `shift=2` row had 29/96 confirmation successes against 20/96 for its 366-abscissa control, but its screen was 12/48 against 17/48 and its paired confirmation `p=0.0939`. Both are far above the 0.000625 multiplicity gate.
+
+The CM `shift=0` query took 0.303 s CPU for all 144 targets against 0.255 s for its size-matched interval; the base/map check took 0.014 s CPU. The Method 1 `shift=2` query took 0.144 s versus 0.136 s for its matched interval; its base/map check took 0.008 s. These are single-host Python timings, useful for the local screen only. Original source-curve search and isogeny construction were unavailable from the stored artifacts and **not charged**. The interval and isogeny bases also have different algebraic presentations, so query CPU here is not an F4 solver comparison.
+
+The sweeper writes and fsyncs each row, then skips completed candidate IDs on resume. A second invocation left the result SHA-256 unchanged: `4699ac0117ec09541b9044cb7e652d8641bc7af16731bd1fc0f61ad9d1d9bd7e`. An independent exhaustive ordered-pair enumeration for CM `shift=0`, target index 2 `(852315,17757)`, returned two decompositions, matching the sweeper. A zero-relation target at index 0 also matched. Every reported hit is re-added to the target by the sweeper.
+
+## Interpretation and next discriminating rung
+
+This rung found no confirmed placement gain. The next experiment should vary **genuine low-degree map chains or auxiliary curves**, not merely translate the same two fibers, with the same target/size-matched controls and a frozen cost metric. `docs/ic/SWEEPER.md` already provides a `prime-algebraic` F4 space for ordinary auxiliary 2-isogeny towers; a second rung can feed its generated maps through this component gate, then use that F4 space for any candidate that passes. P-192 and the 59-bit fields need their own frozen workload and cannot inherit this field's measured yield. A claimed faster map needs a cold setup-charged, same-target comparison to proceed beyond component status.
+
+Sources checked: Petit–Kosters–Messeng, [Algebraic approaches for the ECDLP over prime fields](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf), §§3.1–3.4; the repository `docs/ic/SWEEPER.md` and `research/isogeny_vs_mu_factor_base_20261102/`; KB `source:81a446d8a0f88023cfe934a2fcb608bb` (existing prime-algebraic sweep and its provisional baseline).
