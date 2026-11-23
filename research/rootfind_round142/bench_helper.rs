@@ -173,3 +173,35 @@ pub fn round141_oracle() {
     }
     println!("round141 independent inversion and quadratic oracles PASS");
 }
+
+pub fn round142_powmod_oracle() {
+    for p in [3u64, 5, 7, 17, 101, 65_521, 1_000_000_007,
+              4_294_967_291, (1u64<<61)-1] {
+        let mut tally=FieldTally::default();
+        let mut f=Fp {p,tally:&mut tally};
+        let mut state=p^0x142_2026_11_23u64;
+        for degree in [3usize,4] {
+            for _ in 0..64 {
+                let mut modulus=Vec::with_capacity(degree+1);
+                for _ in 0..degree {
+                    state^=state<<13; state^=state>>7; state^=state<<17;
+                    modulus.push(state%p);
+                }
+                modulus.push(1);
+                for exponent in [0u64,1,2,3,11,31,257,(p-1)/2,p-1,p] {
+                    let observed=f.powmod(&[0,1],exponent,&modulus);
+                    let mut wanted=vec![1];
+                    let mut base=f.rem(&[0,1],&modulus);
+                    let mut e=exponent;
+                    while e!=0 {
+                        if e&1==1 { wanted=f.mulmod(&wanted,&base,&modulus); }
+                        e>>=1;
+                        if e!=0 { base=f.mulmod(&base,&base,&modulus); }
+                    }
+                    assert_eq!(observed,wanted,"p={p} degree={degree} exp={exponent}");
+                }
+            }
+        }
+    }
+    println!("round142 independent polynomial exponentiation oracle PASS");
+}
