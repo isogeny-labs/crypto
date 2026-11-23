@@ -158,6 +158,8 @@ pub struct OracleResult {
     pub polynomial_build_ns: u64,
     pub reason: Option<String>,
     pub accounting: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub backend_work: Option<serde_json::Value>,
 }
 
 #[derive(Clone, Copy)]
@@ -797,7 +799,7 @@ pub fn decompose(
     let norm_before = f4_fp::norm_ops_total();
     let mut output=OracleResult{status:OracleStatus::CompleteNegative,complete:false,positive:false,
         presentation,summands:m,relations:vec![],charts:vec![],counters:OracleCounters::default(),elapsed_ns:0,
-        polynomial_build_ns:0,reason:None,
+        polynomial_build_ns:0,reason:None,backend_work:None,
         accounting:"Production F4 elimination and root counters plus explicit polynomial construction and signed group replay. F4 symbolic/native counters are incomplete diagnostics; allocation, hashing and sorting are not a complete operation total. Deadline is cooperative; dense memory requires an external process envelope.".into()};
     output.counters.validation_field_multiplications = validation_field_multiplications;
     let mut rows = BTreeSet::new();

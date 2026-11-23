@@ -1,0 +1,40 @@
+name: CT232 exact CT231 native single-large-prime cost audit
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - '.github/workflows/ct232-single-lp-cost-audit.yml'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_native_panel.jsonl'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_cost_audit.py'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT232_SINGLE_LP_NATIVE_ADJUDICATION.md'
+  pull_request:
+    paths:
+      - '.github/workflows/ct232-single-lp-cost-audit.yml'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_native_panel.jsonl'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_cost_audit.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-record-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_native_panel.jsonl
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_cost_audit.py
+      - name: Independent exact-record arithmetic and eleven negative controls
+        run: |
+          set -euo pipefail
+          PYTHONPATH='' python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_cost_audit.py --self-test
+          PYTHONPATH='' python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_cost_audit.py --self-test
+          PYTHONPATH='' python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_cost_audit.py
+          sha256sum research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct232_single_lp_native_panel.jsonl

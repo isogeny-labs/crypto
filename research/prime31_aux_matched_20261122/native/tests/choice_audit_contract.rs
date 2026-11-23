@@ -212,6 +212,7 @@ fn positive_records(arm: TargetArm) -> Vec<Value> {
     let mut row = vec![0; base.canonical_points.len()];
     row[column] = 2 * sign;
     let oracle = OracleResult {
+        backend_work: None,
         status: OracleStatus::FoundFirst,
         complete: false,
         positive: true,

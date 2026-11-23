@@ -10,7 +10,7 @@ use serde_json::{json, Value};
 use crate::cryptanalysis::ic_boundary::{
     CountedGroup, FactorBase, GroupOps, IncrementalGauss, PrimeCurve, PrimePoint, RowStatus,
 };
-use crate::oracle::{decompose, OracleLimits, Presentation, TowerDescription};
+use crate::oracle::{decompose, OracleLimits, OracleResult, Presentation, TowerDescription};
 use crate::replay;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -243,6 +243,51 @@ pub fn collect(
     limits: &CollectionLimits,
     emit: &mut dyn FnMut(&Value) -> Result<(), String>,
 ) -> Result<CollectionSummary, String> {
+    collect_with_decomposer(
+        target,
+        fb,
+        arity,
+        presentation,
+        query_seed,
+        limits,
+        None,
+        emit,
+        &mut |r, oracle_limits, ops| {
+            decompose(
+                &target.curve(),
+                target.order,
+                fb,
+                values,
+                tower,
+                r,
+                arity,
+                presentation,
+                oracle_limits,
+                ops,
+            )
+        },
+    )
+}
+
+/// Same public-query stream, signed-row replay and recovery for a separately
+/// prepared oracle. The oracle's cold setup belongs to the caller's setup
+/// interval. A backend label adds metadata without changing legacy receipts.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_with_decomposer(
+    target: &PublicTarget,
+    fb: &FactorBase<PrimePoint>,
+    arity: usize,
+    presentation: Presentation,
+    query_seed: u64,
+    limits: &CollectionLimits,
+    backend_label: Option<&str>,
+    emit: &mut dyn FnMut(&Value) -> Result<(), String>,
+    oracle: &mut dyn FnMut(
+        PrimePoint,
+        &OracleLimits,
+        &mut GroupOps,
+    ) -> Result<OracleResult, String>,
+) -> Result<CollectionSummary, String> {
     if limits.max_queries == 0 || limits.max_seconds == 0 || !(2..=4).contains(&arity) {
         return Err("nonpositive collection cap or unsupported arity".into());
     }
@@ -278,11 +323,13 @@ pub fn collect(
         oracle_counters: json!({}),
         error: None,
     };
-    emit(
-        &json!({"event":"collection_start","public_target":target,"query_seed":query_seed,
+    let mut collection_start = json!({"event":"collection_start","public_target":target,"query_seed":query_seed,
         "arity":arity,"presentation":presentation,"limits":limits,"columns":fb.columns,
-        "secret_given_to_collector":false,"planted_query_selection":false}),
-    )?;
+        "secret_given_to_collector":false,"planted_query_selection":false});
+    if let Some(backend) = backend_label {
+        collection_start["oracle_backend"] = json!(backend);
+    }
+    emit(&collection_start)?;
     'queries: while out.queries < limits.max_queries {
         if start.elapsed().as_secs() >= limits.max_seconds {
             out.status = "wall_limit".into();
@@ -320,18 +367,7 @@ pub fn collect(
             break;
         }
         oracle_limits.timeout_ms = oracle_limits.timeout_ms.min(remaining_ms as u64);
-        let oracle = match decompose(
-            &curve,
-            n,
-            fb,
-            values,
-            tower,
-            r,
-            arity,
-            presentation,
-            &oracle_limits,
-            &mut ops,
-        ) {
+        let oracle = match oracle(r, &oracle_limits, &mut ops) {
             Ok(v) => v,
             Err(error) => {
                 out.unknown_queries += 1;

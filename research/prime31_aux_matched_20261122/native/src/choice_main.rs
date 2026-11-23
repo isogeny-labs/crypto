@@ -8,8 +8,12 @@ use std::time::Instant;
 use prime31_aux_matched::bases::{build_plain_control, prime31_fixture};
 use prime31_aux_matched::collector::{self, CollectionLimits, PublicTarget};
 use prime31_aux_matched::cryptanalysis::{ic_boundary, prime_fast};
-use prime31_aux_matched::kernel_fibers::{build_fiber, KernelChoice};
+use prime31_aux_matched::kernel_fibers::{
+    build_fiber_with_factorization, KernelChoice, KernelFactorization,
+};
 use prime31_aux_matched::oracle::{DomainRoots, OracleLimits, Presentation};
+use prime31_aux_matched::pair_control::{PairControl, PairMode};
+use prime31_aux_matched::plain_reference::{frozen_plain_reference, PlainReferenceBinding};
 use prime31_aux_matched::replay::Point;
 use prime31_aux_matched::target_transport::{self as transfer, TargetArm, TransferWork};
 use prime31_aux_matched::{GroupOps, SOURCE_MANIFEST};
@@ -26,20 +30,48 @@ enum Method {
     RhoFast,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum ComparisonStage {
+    Screening,
+    CompleteRecovery,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum OracleBackend {
+    #[default]
+    Polynomial,
+    PairTable,
+}
+impl OracleBackend {
+    fn is_polynomial(&self) -> bool {
+        *self == Self::Polynomial
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct ChoiceCell {
+pub(crate) struct ChoiceCell {
     schema: String,
     cell_id: String,
     method: Method,
     source_target: PublicTarget,
     kernel: KernelChoice,
+    #[serde(default, skip_serializing_if = "KernelFactorization::is_standard")]
+    factorization: KernelFactorization,
     coset_scalar: u64,
     target_arm: TargetArm,
     arity: usize,
     presentation: Presentation,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    stage: Option<ComparisonStage>,
+    #[serde(default, skip_serializing_if = "OracleBackend::is_polynomial")]
+    oracle_backend: OracleBackend,
     #[serde(default)]
     plain_control: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    plain_reference: Option<PlainReferenceBinding>,
     #[serde(default = "plain_seed")]
     plain_seed: u64,
     #[serde(default = "plain_max_trials")]
@@ -69,11 +101,13 @@ fn emit(value: &Value) -> Result<(), String> {
     writeln!(output).map_err(|e| e.to_string())?;
     output.flush().map_err(|e| e.to_string())
 }
-fn read_cell(path: &str) -> Result<(ChoiceCell, Vec<u8>), String> {
+pub(crate) fn read_cell(path: &str) -> Result<(ChoiceCell, Vec<u8>), String> {
     let bytes = fs::read(path).map_err(|e| e.to_string())?;
     let cell: ChoiceCell = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
     let (e, n, g) = prime31_fixture();
-    if cell.schema != "prime31-isogeny-choice.cell/v1"
+    let legacy = cell.schema == "prime31-isogeny-choice.cell/v1";
+    let staged = cell.schema == "prime31-isogeny-choice.cell/v2";
+    if (!legacy && !staged)
         || cell.cell_id.is_empty()
         || (
             cell.source_target.p,
@@ -91,7 +125,7 @@ fn read_cell(path: &str) -> Result<(ChoiceCell, Vec<u8>), String> {
         || cell.memory_mib != 4096
         || cell.collection.max_seconds > cell.execution_seconds
         || cell.collection.max_queries == 0
-        || cell.collection.max_queries > 4096
+        || cell.collection.max_queries > if legacy { 4096 } else { 65_536 }
         || cell.collection.oracle.max_variables > 64
         || cell.collection.oracle.max_input_terms > 100_000
         || cell.collection.oracle.max_degree < 1024
@@ -108,6 +142,52 @@ fn read_cell(path: &str) -> Result<(ChoiceCell, Vec<u8>), String> {
             && cell.presentation != Presentation::Dense)
     {
         return Err("invalid, mismatched, or unbounded isogeny-choice cell".into());
+    }
+    if legacy {
+        if cell.stage.is_some()
+            || !cell.factorization.is_standard()
+            || cell.plain_reference.is_some()
+            || cell.oracle_backend != OracleBackend::Polynomial
+        {
+            return Err("v1 cells cannot carry v2 comparison semantics".into());
+        }
+    } else {
+        let cap = match cell.stage {
+            Some(ComparisonStage::Screening) => 64,
+            Some(ComparisonStage::CompleteRecovery) => 65_536,
+            None => return Err("v2 requires an explicit comparison stage".into()),
+        };
+        if cell.collection.max_queries != cap
+            || cell.collection.max_seconds != 110
+            || !cell.collection.oracle.stop_after_first
+            || cell.collection.oracle.max_degree != 1024
+            || cell.collection.oracle.max_pairs_per_step != 32
+            || cell.collection.oracle.timeout_ms != 2000
+            || cell.collection.oracle.max_solutions != 4096
+            || cell.collection.oracle.max_signed_lift_attempts != 1_000_000
+            || cell.collection.oracle.max_variables != 48
+            || cell.collection.oracle.max_input_terms != 100_000
+            || cell.collection.oracle.domain_roots != DomainRoots::Auto
+            || !cell.collection.oracle.sibling_batch
+            || (!cell.factorization.is_standard() && cell.kernel != KernelChoice::AminusH2)
+            || (cell.oracle_backend == OracleBackend::PairTable
+                && (cell.method != Method::Ic || cell.presentation != Presentation::Dense))
+        {
+            return Err("v2 stage, factorization, or backend contract mismatch".into());
+        }
+        if cell.plain_control {
+            let expected = frozen_plain_reference(
+                cell.kernel,
+                cell.coset_scalar,
+                cell.factorization,
+                cell.target_arm,
+            )?;
+            if cell.plain_reference.as_ref() != Some(&expected) {
+                return Err("v2 plain control must bind the exact frozen reference".into());
+            }
+        } else if cell.plain_reference.is_some() {
+            return Err("only v2 plain controls may carry a frozen reference".into());
+        }
     }
     Ok((cell, bytes))
 }
@@ -263,69 +343,149 @@ fn run(path: &str) -> Result<i32, String> {
         return run_rho(&cell, cold);
     }
     let setup = Instant::now();
-    let mut ops = GroupOps::default();
-    let fiber = match build_fiber(cell.kernel, cell.coset_scalar, &mut ops) {
-        Ok(fiber) => fiber,
-        Err(error) => {
-            emit(
-                &json!({"event":"setup_failure","stage":"kernel","error":error,
-                "partial_group_work":collector::group_ledger(&ops),"map_work":null,
-                "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}),
-            )?;
-            return Ok(3);
-        }
-    };
-    emit(&json!({"event":"choice_kernel","fiber":fiber}))?;
-    let prepared = match transfer::prepare(&fiber, &cell.source_target, cell.target_arm) {
-        Ok(base) => base,
-        Err(error) => {
-            emit(
-                &json!({"event":"setup_failure","stage":"target_base","error":error,
-                "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}),
-            )?;
-            return Ok(3);
-        }
-    };
-    let reference_fb = prepared.factor_base()?;
-    let reference_setup_seconds = setup.elapsed().as_secs_f64();
-    emit(
-        &json!({"event":"choice_prepared","base":prepared,"factor_base_index_work":reference_fb.cost,
-        "setup_seconds_diagnostic":reference_setup_seconds}),
-    )?;
-    let (fb, selected_v, selected_tower) = if cell.plain_control {
+    let (public_target, fb, selected_v, selected_tower, reference_setup_seconds) = if cell.schema
+        == "prime31-isogeny-choice.cell/v2"
+        && cell.plain_control
+    {
+        // The frozen binding is public experimental design input. Reconstructing
+        // its auxiliary fiber belongs to reference preparation and independent
+        // audit, never to the plain algorithm's timed setup.
+        let reference = cell
+            .plain_reference
+            .as_ref()
+            .ok_or("missing frozen plain reference")?;
+        emit(
+            &json!({"event":"choice_plain_reference","reference":reference,
+            "study_reference_preparation_seconds_diagnostic":null,
+            "study_reference_preparation_cost":null,
+            "preparation_cost_status":"historical_matching_work_unmeasured_not_zero"}),
+        )?;
+        let mut transfer_work = TransferWork {
+            costs_partial: true,
+            ..Default::default()
+        };
+        let target = rho_target(&cell, &mut transfer_work)?;
+        let mut validation = GroupOps::default();
+        cell.source_target.validate(&mut validation)?;
+        target.validate(&mut validation)?;
         let plain_setup = Instant::now();
         let plain = match build_plain_control(
-            &prepared.public_target.curve(),
-            prepared.public_target.order,
-            reference_fb.columns,
+            &target.curve(),
+            target.order,
+            reference.columns,
             cell.plain_seed,
             cell.max_plain_x_trials,
         ) {
             Ok(base) => base,
             Err(error) => {
-                emit(
-                    &json!({"event":"setup_failure","stage":"plain_base","error":error.message,
-                    "partial_cost":error.cost,"reference_columns":reference_fb.columns,
-                    "reference_setup_seconds_diagnostic":reference_setup_seconds,
-                    "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}),
-                )?;
+                emit(&json!({"event":"setup_failure","stage":"plain_base",
+                    "error":error.message,"partial_cost":error.cost,
+                    "reference_columns":reference.columns,
+                    "reference_setup_seconds_diagnostic":null,
+                    "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}))?;
                 return Ok(3);
             }
         };
         let plain_fb = plain.factor_base()?;
-        if plain_fb.columns != reference_fb.columns || plain.tower.is_some() {
-            return Err("plain control lost its exact usable-column match".into());
+        if plain_fb.columns != reference.columns || plain.tower.is_some() {
+            return Err("plain control lost its frozen usable-column match".into());
         }
         emit(
             &json!({"event":"choice_plain","base":plain,"seed":cell.plain_seed,
+            "max_x_trials":cell.max_plain_x_trials,"reference_columns":reference.columns,
+            "reference_setup_seconds_diagnostic":null,
+            "plain_setup_seconds_diagnostic":plain_setup.elapsed().as_secs_f64(),
+            "public_target":target,"target_setup_transfer_work":transfer_work,
+            "target_validation_work":collector::group_ledger(&validation),
+            "factor_base_index_work":plain_fb.cost}),
+        )?;
+        (target, plain_fb, plain.v, None, None)
+    } else {
+        let mut ops = GroupOps::default();
+        let fiber = match build_fiber_with_factorization(
+            cell.kernel,
+            cell.coset_scalar,
+            cell.factorization,
+            &mut ops,
+        ) {
+            Ok(fiber) => fiber,
+            Err(error) => {
+                emit(
+                    &json!({"event":"setup_failure","stage":"kernel","error":error,
+                "partial_group_work":collector::group_ledger(&ops),"map_work":null,
+                "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}),
+                )?;
+                return Ok(3);
+            }
+        };
+        emit(&json!({"event":"choice_kernel","fiber":fiber}))?;
+        let prepared = match transfer::prepare(&fiber, &cell.source_target, cell.target_arm) {
+            Ok(base) => base,
+            Err(error) => {
+                emit(
+                    &json!({"event":"setup_failure","stage":"target_base","error":error,
+                "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}),
+                )?;
+                return Ok(3);
+            }
+        };
+        let reference_fb = prepared.factor_base()?;
+        let reference_setup_seconds = setup.elapsed().as_secs_f64();
+        emit(
+            &json!({"event":"choice_prepared","base":prepared,"factor_base_index_work":reference_fb.cost,
+        "setup_seconds_diagnostic":reference_setup_seconds}),
+        )?;
+        let (fb, selected_v, selected_tower) = if cell.plain_control {
+            let plain_setup = Instant::now();
+            let plain = match build_plain_control(
+                &prepared.public_target.curve(),
+                prepared.public_target.order,
+                reference_fb.columns,
+                cell.plain_seed,
+                cell.max_plain_x_trials,
+            ) {
+                Ok(base) => base,
+                Err(error) => {
+                    emit(
+                        &json!({"event":"setup_failure","stage":"plain_base","error":error.message,
+                    "partial_cost":error.cost,"reference_columns":reference_fb.columns,
+                    "reference_setup_seconds_diagnostic":reference_setup_seconds,
+                    "cold_seconds_diagnostic":cold.elapsed().as_secs_f64()}),
+                    )?;
+                    return Ok(3);
+                }
+            };
+            let plain_fb = plain.factor_base()?;
+            if plain_fb.columns != reference_fb.columns || plain.tower.is_some() {
+                return Err("plain control lost its exact usable-column match".into());
+            }
+            emit(
+                &json!({"event":"choice_plain","base":plain,"seed":cell.plain_seed,
             "max_x_trials":cell.max_plain_x_trials,"reference_columns":reference_fb.columns,
             "reference_setup_seconds_diagnostic":reference_setup_seconds,
             "plain_setup_seconds_diagnostic":plain_setup.elapsed().as_secs_f64(),
             "factor_base_index_work":plain_fb.cost}),
-        )?;
-        (plain_fb, plain.v, None)
+            )?;
+            (plain_fb, plain.v, None)
+        } else {
+            (reference_fb, prepared.v.clone(), prepared.tower.clone())
+        };
+        (
+            prepared.public_target,
+            fb,
+            selected_v,
+            selected_tower,
+            Some(reference_setup_seconds),
+        )
+    };
+    let selected_curve = public_target.curve();
+    let mut pair = if cell.oracle_backend == OracleBackend::PairTable {
+        let preparation =
+            PairControl::prepare(&selected_curve, public_target.order, &fb, PairMode::Batched)?;
+        emit(&json!({"event":"choice_pair_setup","setup":preparation.setup_report()}))?;
+        Some(preparation)
     } else {
-        (reference_fb, prepared.v.clone(), prepared.tower.clone())
+        None
     };
     let setup_seconds = setup.elapsed().as_secs_f64();
     let remaining = cell
@@ -340,17 +500,33 @@ fn run(path: &str) -> Result<i32, String> {
     }
     let mut limits = cell.collection.clone();
     limits.max_seconds = limits.max_seconds.min(remaining);
-    let result = collector::collect(
-        &prepared.public_target,
-        &fb,
-        &selected_v,
-        selected_tower.as_ref(),
-        cell.arity,
-        cell.presentation,
-        cell.query_seed,
-        &limits,
-        &mut emit,
-    )?;
+    let result = if let Some(pair) = pair.as_mut() {
+        collector::collect_with_decomposer(
+            &public_target,
+            &fb,
+            cell.arity,
+            cell.presentation,
+            cell.query_seed,
+            &limits,
+            Some("pair_table"),
+            &mut emit,
+            &mut |target, oracle_limits, ops| {
+                pair.decompose(target, oracle_limits, cell.presentation, ops)
+            },
+        )?
+    } else {
+        collector::collect(
+            &public_target,
+            &fb,
+            &selected_v,
+            selected_tower.as_ref(),
+            cell.arity,
+            cell.presentation,
+            cell.query_seed,
+            &limits,
+            &mut emit,
+        )?
+    };
     let original_scalar_replay = match result.recovered_scalar {
         Some(d) => {
             cell.source_target
@@ -363,14 +539,25 @@ fn run(path: &str) -> Result<i32, String> {
     if result.recovery_replayed != original_scalar_replay {
         return Err("IC scalar failed original-target independent replay".into());
     }
-    emit(
-        &json!({"event":"cell_summary","status":result.status,"recovered":result.recovery_replayed,
+    let cold_seconds = cold.elapsed().as_secs_f64();
+    let mut summary = json!({"event":"cell_summary","status":result.status,"recovered":result.recovery_replayed,
         "collection":result,"setup_seconds_diagnostic":setup_seconds,
         "reference_setup_seconds_diagnostic":reference_setup_seconds,
         "plain_control":cell.plain_control,"selected_columns":fb.columns,
         "original_scalar_replay":original_scalar_replay,
-        "cold_seconds_diagnostic":cold.elapsed().as_secs_f64(),"timing_admitted":false}),
-    )?;
+        "cold_seconds_diagnostic":cold_seconds,"timing_admitted":false});
+    if cell.schema == "prime31-isogeny-choice.cell/v2" {
+        summary["stage"] = json!(cell.stage);
+        summary["oracle_backend"] = json!(cell.oracle_backend);
+        summary["algorithm_cold_seconds_diagnostic"] = json!(cold_seconds);
+        summary["study_reference_preparation_seconds_diagnostic"] = Value::Null;
+        summary["study_reference_preparation_cost_status"] = json!(if cell.plain_control {
+            "historical_matching_work_unmeasured_not_zero"
+        } else {
+            "auxiliary_construction_included_in_algorithm_cold"
+        });
+    }
+    emit(&summary)?;
     Ok(if result.status == "oracle_error" {
         1
     } else if result.recovery_replayed {
@@ -380,7 +567,7 @@ fn run(path: &str) -> Result<i32, String> {
     })
 }
 
-fn panel(directory: &str) -> Result<(), String> {
+pub(crate) fn panel(directory: &str) -> Result<(), String> {
     let directory = Path::new(directory);
     if directory.exists() {
         return Err("panel destination must not already exist".into());
@@ -394,11 +581,15 @@ fn panel(directory: &str) -> Result<(), String> {
             method: Method::Ic,
             source_target: source_target(),
             kernel: KernelChoice::AplusCyclic,
+            factorization: KernelFactorization::Standard,
             coset_scalar: 1,
             target_arm: TargetArm::Original,
             arity: 3,
             presentation: Presentation::Dense,
+            stage: None,
+            oracle_backend: OracleBackend::Polynomial,
             plain_control: false,
+            plain_reference: None,
             plain_seed: plain_seed(),
             max_plain_x_trials: plain_max_trials(),
             query_seed: 4188,
@@ -518,11 +709,201 @@ fn panel(directory: &str) -> Result<(), String> {
     emit(&json!({"event":"panel_prepared","cells":manifest["planned"],"experiment_executed":false}))
 }
 
+/// Prospective inputs only. The recovery directory is a candidate pool: its
+/// admitted subset must be frozen after the pilot, before any recovery run.
+pub(crate) fn staged_panel(directory: &str) -> Result<(), String> {
+    let root = Path::new(directory);
+    if root.exists() {
+        return Err("panel destination must not already exist".into());
+    }
+    fs::create_dir_all(root).map_err(|e| e.to_string())?;
+    let seeds = [4188, 104_729, 130_363, 169_087, 224_737];
+    for stage in [
+        ComparisonStage::Screening,
+        ComparisonStage::CompleteRecovery,
+    ] {
+        let (label, stage_seeds, cap) = match stage {
+            ComparisonStage::Screening => ("screening", &seeds[..1], 64),
+            ComparisonStage::CompleteRecovery => ("recovery-candidates", &seeds[..], 65_536),
+        };
+        let directory = root.join(label);
+        fs::create_dir(&directory).map_err(|e| e.to_string())?;
+        let mut index = Vec::new();
+        for (round, &seed) in stage_seeds.iter().enumerate() {
+            let base = ChoiceCell {
+                schema: "prime31-isogeny-choice.cell/v2".into(),
+                cell_id: String::new(),
+                method: Method::Ic,
+                source_target: source_target(),
+                kernel: KernelChoice::AplusCyclic,
+                factorization: KernelFactorization::Standard,
+                coset_scalar: 1,
+                target_arm: TargetArm::Original,
+                arity: 3,
+                presentation: Presentation::Dense,
+                stage: Some(stage),
+                oracle_backend: OracleBackend::Polynomial,
+                plain_control: false,
+                plain_reference: None,
+                plain_seed: plain_seed(),
+                max_plain_x_trials: plain_max_trials(),
+                query_seed: seed,
+                collection: CollectionLimits {
+                    max_queries: cap,
+                    max_seconds: 110,
+                    oracle: OracleLimits {
+                        max_degree: 1024,
+                        max_pairs_per_step: 32,
+                        timeout_ms: 2000,
+                        max_solutions: 4096,
+                        max_signed_lift_attempts: 1_000_000,
+                        stop_after_first: true,
+                        max_variables: 48,
+                        max_input_terms: 100_000,
+                        domain_roots: DomainRoots::Auto,
+                        sibling_batch: true,
+                    },
+                },
+                execution_seconds: 120,
+                memory_mib: 4096,
+                round: round as u32,
+                rho_max_steps: 2_000_000,
+                rho_seed: seed,
+            };
+            let mut ic = Vec::new();
+            for kernel in [
+                KernelChoice::AplusCyclic,
+                KernelChoice::AminusH0,
+                KernelChoice::AminusH1,
+                KernelChoice::AminusH2,
+            ] {
+                for arm in [
+                    TargetArm::Original,
+                    TargetArm::IsogenousNative,
+                    TargetArm::IsogenousTransported,
+                ] {
+                    let mut matched = base.clone();
+                    matched.kernel = kernel;
+                    matched.target_arm = arm;
+                    for route in [
+                        KernelFactorization::Standard,
+                        KernelFactorization::FullTwoTorsionFirst,
+                    ] {
+                        if !route.is_standard() && kernel != KernelChoice::AminusH2 {
+                            continue;
+                        }
+                        for presentation in [
+                            Presentation::Dense,
+                            Presentation::Tower,
+                            Presentation::Tower4,
+                        ] {
+                            if arm == TargetArm::IsogenousTransported
+                                && presentation != Presentation::Dense
+                            {
+                                continue;
+                            }
+                            let mut cell = matched.clone();
+                            cell.factorization = route;
+                            cell.presentation = presentation;
+                            ic.push(cell);
+                        }
+                    }
+                    let mut pair = matched.clone();
+                    pair.oracle_backend = OracleBackend::PairTable;
+                    ic.push(pair);
+                    for backend in [OracleBackend::Polynomial, OracleBackend::PairTable] {
+                        let mut plain = matched.clone();
+                        plain.plain_control = true;
+                        plain.oracle_backend = backend;
+                        plain.plain_reference = Some(frozen_plain_reference(
+                            kernel,
+                            1,
+                            KernelFactorization::Standard,
+                            arm,
+                        )?);
+                        ic.push(plain);
+                    }
+                }
+            }
+            let mut rho = Vec::new();
+            for arm in [TargetArm::Original, TargetArm::IsogenousNative] {
+                for method in [Method::RhoNegation, Method::RhoV6, Method::RhoFast] {
+                    let mut cell = base.clone();
+                    cell.method = method;
+                    cell.target_arm = arm;
+                    rho.push(cell);
+                }
+            }
+            if ic.len() != 71 || rho.len() != 6 {
+                return Err("staged panel shape changed".into());
+            }
+            let mut ordered = Vec::new();
+            let mut rho = rho.into_iter();
+            for (i, cell) in ic.into_iter().enumerate() {
+                ordered.push(cell);
+                if (i + 1) % 11 == 0 {
+                    if let Some(cell) = rho.next() {
+                        ordered.push(cell);
+                    }
+                }
+            }
+            ordered.extend(rho);
+            ordered.rotate_left((9 * round) % 77);
+            if round & 1 == 1 {
+                ordered.reverse();
+            }
+            for (position, mut cell) in ordered.into_iter().enumerate() {
+                cell.cell_id = format!("p31-sparse-{label}-s{round}-{position:02}");
+                let name = format!("{}.json", cell.cell_id);
+                let bytes = serde_json::to_vec_pretty(&cell).map_err(|e| e.to_string())?;
+                let path = directory.join(&name);
+                fs::write(&path, &bytes).map_err(|e| e.to_string())?;
+                read_cell(path.to_str().ok_or("non-UTF8 output path")?)?;
+                index.push(
+                    json!({"file":name,"sha256":hash(&bytes),"position":index.len(),
+                    "round_position":position,"round":round,"query_seed":seed,
+                    "method":cell.method,"kernel":kernel_name(cell.kernel),
+                    "factorization":cell.factorization,"target_arm":cell.target_arm,
+                    "presentation":cell.presentation,"oracle_backend":cell.oracle_backend,
+                    "plain_control":cell.plain_control}),
+                );
+            }
+        }
+        let manifest = json!({"schema":"prime31-isogeny-choice.panel/v2", "stage":stage,
+            "status":if stage == ComparisonStage::Screening {"draft_unadmitted_pilot"} else {"prospective_unselected_candidate_pool"},
+            "prepared_cells":index.len(),"attempted":0,"completed":0,"selected_for_execution":0,
+            "cells_per_stream":77,"auxiliary_polynomial_per_stream":35,"auxiliary_pair_table_per_stream":12,
+            "plain_polynomial_per_stream":12,"plain_pair_table_per_stream":12,"rho_per_stream":6,
+            "query_seeds":stage_seeds,"coset_scalar":1,"max_queries":cap,
+            "collection_seconds":110,"execution_seconds":120,"memory_mib":4096,
+            "first_hit_per_query":true,"streams_are_paired_on_one_fixed_public_target":true,
+            "query_streams_are_not_independent_targets":true,
+            "timing_replicates_and_AA_admission":"must be registered separately before timing claims",
+            "selection_requirement":"Freeze explicit subset, budget headroom, original absolute deadline and source/image binding before dispatch; generation authorizes no run.",
+            "order_rule":"71 IC cells in kernel/target/route/presentation order; insert successive rho after each 11 IC; rotate left9*stream mod77; reverse odd streams",
+            "cells":index});
+        fs::write(
+            directory.join("index.json"),
+            serde_json::to_vec_pretty(&manifest).unwrap(),
+        )
+        .map_err(|e| e.to_string())?;
+    }
+    emit(
+        &json!({"event":"staged_panel_prepared","screening_cells":77,
+        "recovery_candidates":385,"experiment_executed":false}),
+    )
+}
+
+fn kernel_name(kernel: KernelChoice) -> Value {
+    serde_json::to_value(kernel).expect("kernel serializes")
+}
+
 fn main_result() -> Result<i32, String> {
     let args: Vec<String> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
         Some("run") if args.len() == 3 => run(&args[2]),
         Some("panel") if args.len() == 3 => { panel(&args[2])?; Ok(0) },
+        Some("staged-panel") if args.len() == 3 => { staged_panel(&args[2])?; Ok(0) },
         Some("validate-cell") if args.len() == 3 => { let (c, _) = read_cell(&args[2])?;
             emit(&json!({"cell_id":c.cell_id,"input_valid":true,"experiment_executed":false}))?; Ok(0) },
         Some("source-manifest") => { println!("{SOURCE_MANIFEST}"); Ok(0) },
@@ -533,7 +914,7 @@ fn main_result() -> Result<i32, String> {
             let file = fs::File::open(&args[2]).map_err(|e| e.to_string())?;
             emit(&prime31_aux_matched::audit::audit_jsonl(io::BufReader::new(file))?)?; Ok(0)
         }
-        _ => Err("usage: prime31-isogeny-choices run|panel|validate-cell|source-check|replay PATH | source-manifest".into()),
+        _ => Err("usage: prime31-isogeny-choices run|panel|staged-panel|validate-cell|source-check|replay PATH | source-manifest".into()),
     }
 }
 fn main() {

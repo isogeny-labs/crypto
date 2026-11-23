@@ -5,7 +5,7 @@ pub mod bitops;
 // A mod.rs copy preserves F4's implicit child-module resolution. Every file is
 // copied byte-for-byte and inventoried by build.rs; no declaration is rewritten.
 include!(concat!(env!("OUT_DIR"), "/f4_binding.rs"));
-#[path = "../../../../src/cryptanalysis/fp_backend.rs"]
+#[path = "../../sparse-h2-followup/upstream/fp_backend.rs"]
 pub mod fp_backend;
 #[path = "../../../../src/cryptanalysis/fx_hash.rs"]
 pub(crate) mod fx_hash;

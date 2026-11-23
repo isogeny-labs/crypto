@@ -6,9 +6,20 @@ pub mod collector;
 pub mod cryptanalysis;
 pub mod kernel_fibers;
 pub mod oracle;
+pub mod pair_control;
+pub mod plain_reference;
 pub mod provenance;
 pub mod replay;
+pub mod sparse_identity;
 pub mod target_transport;
+
+#[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
+pub mod identity_certificate;
+#[path = "../../../../src/hash/sha256.rs"]
+pub mod sha256_source;
+pub mod hash {
+    pub use crate::sha256_source as sha256;
+}
 
 pub use cryptanalysis::ic_boundary::{
     pivot_inversion_steps, rho_reference, CountedGroup, FactorBase, GroupOps, IncrementalGauss,
