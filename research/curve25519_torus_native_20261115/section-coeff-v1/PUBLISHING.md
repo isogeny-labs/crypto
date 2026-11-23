@@ -30,3 +30,20 @@ negative full-proof caveat. Its original bytes remain unchanged. SOURCES_V2.md
 adds the missing unsigned tag; this is a citation-only current status, not a
 new native input or a claim that whole-prose lint passed. No policy exemption
 or frozen-subject edit is used to conceal the diagnostic. [pcc:unverified]
+
+## Terminal PR update,2026-11-23
+
+PR4984 merged16:33:36Z with both archive bytes still tracked, not store
+receipts. Its actual final-head trusted migrate137843787991 failed after merge
+on HeadObject HTTP403 for both expected hashes. No trusted upload or absent-key
+diagnosis is inferred. Full decoded log and actual merge custody readbacks are
+in ../pr-closure-4984-20261123; PR5022 owns publication follow-through. Backend
+restoration or an owner-approved supported store is required; no unchanged
+manual rerun or policy workaround is used. [pcc:unverified]
+
+The complete failed-job log gzip is also selected by the actual data policy:
+../pr-closure-4984-20261123/migrate-137843787991.decoded.log.gz,82727bytes.
+MIGRATE_LOG.json pins its hash and complete628339-byte decoded UTF8 stream.
+This is not a raw-server-byte or signed execution receipt. Keep all inspected
+bytes until genuine trusted hash/size receipts permit pointer adoption using
+the maintained helpers. [pcc:unverified]
