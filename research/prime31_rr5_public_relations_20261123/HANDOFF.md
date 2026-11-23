@@ -9,6 +9,7 @@ and optimized negation-map rho.
 
 - Worktree: /workspace/scratch/22854d1d6689/crypto-rr5-integration.
 - Branch: lane/prime31-rr5-public-relations-integration-20261123.
+- Draft PR: https://github.com/isogeny-labs/crypto/pull/4970.
 - Study: research/prime31_rr5_public_relations_20261123.
 - Integration base: e51060051c6963b8852f86844f1ec53dc61f895f.
 - Publication base: 816f9c3a942efed569049618c056d12a0c56d693; all 41 qualified
@@ -51,12 +52,13 @@ issued. The receipt is reports/pcc-registration.json.
 
 ## Next actions
 
-Finish publication of the unsigned registration and concrete draft PR. Preserve
+The producer and unsigned registration are published in draft PR #4970. The
+registration commit is baaa7b04f60fe10802f1a04e4facaf999cfa0691. Preserve
 all earlier branches, evidence and concurrent main work. The copied
 reports/development-export observation is historical and must not be registered
 as a current-checkout artifact.
 
-Pursue actual B677 roots and complete public recovery, the remaining
+Continue with actual B677 roots and complete public recovery, the remaining
 charts, complete phase accounting and supported EKS image/checkpoint integration.
 The cold comparison has not run; no speed ratio, GAE or exponent is established.
 
