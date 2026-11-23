@@ -271,7 +271,7 @@ def setup_styles():
     pdfmetrics.registerFont(TTFont("Mono", findfont(FontProperties(family="DejaVu Sans Mono"))))
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle("ReportBody", fontName="Body", fontSize=9.3,
-        leading=13.6, textColor=colors.HexColor(INK), spaceAfter=8,
+        leading=12.7, textColor=colors.HexColor(INK), spaceAfter=8,
         allowWidows=0, allowOrphans=0, splitLongWords=1))
     styles.add(ParagraphStyle("ReportTitle", parent=styles["ReportBody"],
         fontName="BodyBold", fontSize=22, leading=27, spaceAfter=12, keepWithNext=True))
@@ -335,7 +335,11 @@ def markdown_story(source: str, styles):
             png = path.with_suffix(".png")
             with PILImage.open(png) as img:
                 ratio = img.height / img.width
-            picture = Image(str(png), width=CONTENT_W, height=CONTENT_W * ratio)
+            # Fit the structure overview with its opening contract while
+            # preserving the source figure; the data chart keeps full width.
+            picture_width = CONTENT_W * 0.84 if path.stem == "structure" else CONTENT_W
+            picture = Image(str(png), width=picture_width, height=picture_width * ratio,
+                            hAlign="CENTER")
             if path.stem == "structure":
                 caption = ("Figure 1. The finite-prefix quotient and separate identity-prefix chart cover "
                     "the signed three-summand contract. The identity target uses the actual base-coordinate "
@@ -377,7 +381,9 @@ def markdown_story(source: str, styles):
                 ("TOPPADDING", (0, 0), (-1, -1), 6),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
             ]))
-            story.extend([table, Spacer(1, 9)])
+            # Both report tables are short comparisons; a page split obscures
+            # the fixed panel or the four-target comparison.
+            story.append(KeepTogether([table, Spacer(1, 9)]))
             continue
         heading = re.match(r"^(#{1,3}) (.*)$", line)
         if heading:
