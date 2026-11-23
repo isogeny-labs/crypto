@@ -2511,7 +2511,7 @@ pub fn build_word_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseE
 ///
 /// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
 /// `≈ p/B²` probes after the `B²` table is built; `B` relations then cost
-/// `≈ B² + p/B` — balanced at `B ≈ p^{1/4}` for `≈ p^{3/4}` total, against
+/// `≈ B² + p/B` — balanced at `B ≈ p^{1/3}` for `≈ p^{2/3}` total, against
 /// the `≈ p` of every enumeration sweep.  The decided relation family is
 /// identical (three signed factor-base points summing to `R`), so the
 /// yield per draw is unchanged and correctness is checked by the same

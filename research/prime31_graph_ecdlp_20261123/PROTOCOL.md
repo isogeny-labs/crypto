@@ -1,0 +1,86 @@
+# Ordinary elliptic Prime31 graph relation gate
+
+## Frozen source group
+
+The exact registered instance is
+`docs/ic/research/fp_p31_subexp_calibration_20261121/CURVE.json`:
+`p=2147483647`, `E: y²=x³-3x+21`, prime group order
+`n=2147487637`, and generator
+`G=(1391443431,177979044)`. The public smoke target in that file is
+`Q=(291202666,1848813168)`, with validation scalar 987654321 kept outside
+any solver input. This is an elliptic-curve group, unlike the genus-four
+Picard Jacobian in PR #5090.
+
+## First mechanism and falsifier
+
+For a factor base of `B` distinct points, draw a uniform public-group point
+`R=aG+bQ`. For each factor-base point `F_i`, compute `L_i=R-F_i` and retain
+the partial equation only when `L_i` belongs to a fixed external pool of
+size `S`. A repeated `L_i` cancels exactly and yields a full relation;
+every candidate must be replayed as a point equation before rank insertion.
+This is the simplest sound one-large-prime graph producer. It has no
+special curve-decomposition oracle: `L_i` is computed by a group addition.
+
+Before a native implementation, screen its optimistic uniform-occupancy
+model. Residuals from the same draw `R` are distinct because the `F_i` are
+distinct. For two independent draws and two fixed factor-base indices, the
+probability of a common residual in the pool is exactly `S/n²`.
+For `T` random `R` draws, the expected number of cross-draw collision pairs
+is therefore `T(T-1)B²S/(2n²)`. Giving **every** collision one independent
+equation, choose the least integer `T` whose expected count reaches `B+1`.
+Testing all `B` points costs `TB` group additions. This optimistic count
+excludes target point generation, factor-base
+construction, storage, graph processing, row rank, linear algebra and
+failures. The best permitted `S` is `n`; smaller pools increase this count.
+At `S=n`, this is approximately `sqrt(2n(B+1))` group additions, versus
+`sqrt(pi*n/2)` expected generic collision steps for the same subgroup.
+
+`generic_lp_gate.py` computes the discrete collision target and this
+optimistic cost for `B=1,16,64,256,1024` and `S=n,n/16,n/256`. The gate
+rejects **this producer** if even the optimistic source work exceeds a
+matched rho run; that is not a lower bound on algebraic point-decomposition
+or other graph-assisted producers. A successor needs a source-verified
+partial producer with non-generic yield before applying the repository's
+gain-aware DSU, two-core, low-stretch, MST, matching/DM or block-Wiedemann
+machinery.
+
+The calculated best-case pool `S=n` gives the following source-addition
+counts. They are derived occupancy expectations, not measured timings or
+certified useful rank. The rho column uses the *unfolded* birthday
+expectation `sqrt(pi*n/2)` (~58,075 steps), which is generous to this
+graph source compared with optimized negation-map rho.
+
+| Base size B | Random R draws | Optimistic source additions | Ratio to unfolded rho steps |
+| ---: | ---: | ---: | ---: |
+| 1 | 92,683 | 92,683 | 1.596 |
+| 16 | 16,889 | 270,224 | 4.653 |
+| 64 | 8,257 | 528,448 | 9.099 |
+| 256 | 4,105 | 1,050,880 | 18.094 |
+| 1,024 | 2,050 | 2,099,200 | 36.143 |
+
+The row count requirement and collision-rank optimism make the larger-B
+ratios a screen against this *uniform residual* producer. An algebraic
+producer with a measurably different conditional LP distribution could
+change the conclusion and needs its own frozen experiment.
+
+## Prior work and claim boundary
+
+- Semaev, [*Summation polynomials and the discrete logarithm problem on
+  elliptic curves*](https://eprint.iacr.org/2004/031.pdf), defines the
+  prime-field relation problem but conditions its advantage on solving the
+  bounded polynomial systems efficiently.
+- Amadori, Pintore and Sala, [*On the discrete logarithm problem for
+  prime-field elliptic curves*](https://eprint.iacr.org/2017/609.pdf),
+  distinguish the prime-field decomposition problem from the extension-field
+  subspace construction.
+- Shoup, [*Lower bounds for discrete logarithms and related
+  problems*](https://www.shoup.net/papers/dlbounds1.pdf), gives generic-group
+  bounds. The occupancy screen here is a specific model calculation, not a
+  reproof of that theorem.
+- The repository already implements graph filtering and diagnostics in
+  `src/cryptanalysis/large_prime_graph.rs`,
+  `src/cryptanalysis/large_prime_filter.rs`, and
+  `docs/ic/graph-algorithms/README.md`. Graph processing alone cannot
+  substitute for the missing ordinary-elliptic partial-relation source.
+
+No same-target scalar or performance claim is admitted by this screen.
