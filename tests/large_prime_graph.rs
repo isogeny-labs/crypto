@@ -1453,7 +1453,7 @@ fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
     };
     use crypto::cryptanalysis::large_prime_filter::{
         filter_large_primes, filter_large_primes_mst, replay_complete_relation,
-        CompleteRelation, LargePrimeFilterOptions, MstLimits,
+        LargePrimeFilterOptions, MstLimits,
     };
     let mut rng = Rng(0x8e41_4bbc_729c_1605);
     let limits = MstLimits {
