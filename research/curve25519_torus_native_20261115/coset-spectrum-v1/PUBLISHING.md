@@ -33,3 +33,20 @@ operation, public-only unknown-root discovery, actual formal/native spectral
 binding and original family/yield/rank/recovery/memory costs. No scientific
 worker or campaign remains running. The same CI-only checker resumes on the
 actual final5071 head after publication and does none of that research.
+
+## Introduced record-binding failure and complete companion
+
+At actual1ef head the first PCC job137952785754 fails the newly introduced
+8d8628 record: all three lean proofs omit decl_sha256. Source kernel checks
+passed, but that did not validate the serialized record. The original file
+and ledger event are byte-identical to the published head. This is producer
+error, not baseline CI. Correct companioncd1904 includes maintained declaration
+hashes and passes actual local pcc verification (three Lean proofs/overall
+pass, unsigned). Erratum2ff3d0 pins the complete old/new packet. [pcc:unverified]
+
+The companion does not withdraw the old active record. The maintained CLI
+has no withdrawal/supersession command; a supported canonical correction
+path remains needed before claiming this gate repaired. No policy, keyring,
+workflow, verifier, old claim or frozen proof/report was changed. See
+record-correction-v2/ERRATA.md and the named problem. Current new-head hosted
+gate outcomes must be observed, not carried forward from1ef.
