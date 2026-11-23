@@ -491,6 +491,21 @@ impl Fp<'_> {
             let cube_root = self.pow(target, (2 * p - 1) / 3);
             return vec![cube_root];
         }
+        // An even quartic q(x) = x^4 + b*x^2 + c is quadratic in y=x^2.
+        // Solve the two lower-degree problems instead of performing
+        // degree-four Frobenius exponentiation, GCD and equal-degree splits.
+        // The recursive quadratic solver returns every root in F_p, so this
+        // also handles repeated roots and irreducible factors correctly.
+        if f.len() == 5 && f[1] == 0 && f[3] == 0 && (p & 1) == 1 {
+            let y_roots = self.roots(&[f[0], f[2], 1]);
+            let mut out = Vec::new();
+            for y in y_roots {
+                out.extend(self.roots(&[self.sub(0, y), 0, 1]));
+            }
+            out.sort_unstable();
+            out.dedup();
+            return out;
+        }
         let xp = self.powmod(&[0, 1], p, &f);
         let mut h = xp;
         if h.len() < 2 {
@@ -620,6 +635,14 @@ pub fn find_isogeny(e: &PrimeCurve, ell: u64, tally: &mut FieldTally) -> Option<
     let p = e.p;
     let mut f = Fp { p, tally };
     let (a, b) = (e.a % p, e.b % p);
+    // If b=0 and a!=0, psi3/3 = x^4 + 2a*x^2 - a^2/3.
+    // The quadratic in y=x^2 has discriminant (16/3)*a^2.
+    // For odd primes p>3, (3/p) = -1 exactly when p%12 is 5 or 7:
+    // then even y does not exist and there is no rational 3-kernel.
+    // This constant-time rejection avoids all polynomial factorization.
+    if ell == 3 && p > 3 && b == 0 && a != 0 && matches!(p % 12, 5 | 7) {
+        return None;
+    }
     // The smallest rational kernel root is known without factoring:
     // ψ₂=x(x²+a) when b=0, and ψ₃=3x(x³+4b) when a=0.
     // Guard characteristic 2/3 and singular curves; preserve the generic
@@ -711,6 +734,86 @@ impl Isogeny {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
+
+    #[test]
+    fn round139_even_quartics_match_exhaustive_roots() {
+        for p in [3u64, 5, 7, 11, 13, 17, 19, 23, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for c0 in 0..p.min(23) {
+                for c2 in 0..p.min(23) {
+                    for scale in [1u64, 2, 3] {
+                        let s = scale % p;
+                        if s == 0 {
+                            continue;
+                        }
+                        let poly = [
+                            field.mul(s, c0), 0,
+                            field.mul(s, c2), 0, s,
+                        ];
+                        let expected: Vec<u64> = (0..p).filter(|&x| {
+                            let mut value = 0;
+                            for &coefficient in poly.iter().rev() {
+                                value = field.add(field.mul(value, x), coefficient);
+                            }
+                            value == 0
+                        }).collect();
+                        assert_eq!(field.roots(&poly), expected, "p={p}, poly={poly:?}");
+                    }
+                }
+            }
+        }
+        for p in [65_521u64, 1_000_000_007, 1_000_000_009,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for i in 1..65u64 {
+                let r = (i.wrapping_mul(7_919).wrapping_add(3)) % p;
+                let s = (i.wrapping_mul(13_127).wrapping_add(11)) % p;
+                let rsq = field.mul(r, r);
+                let ssq = field.mul(s, s);
+                let poly = [
+                    field.mul(rsq, ssq), 0,
+                    field.sub(0, field.add(rsq, ssq)), 0, 1,
+                ];
+                let mut expected = vec![r, field.sub(0, r), s, field.sub(0, s)];
+                expected.sort_unstable();
+                expected.dedup();
+                assert_eq!(field.roots(&poly), expected, "p={p}, i={i}");
+            }
+        }
+    }
+
+    #[test]
+    fn round139_no_rational_three_kernel_when_three_nonsquare() {
+        for p in [5u64, 7, 17, 19, 29, 31, 1_000_000_007,
+                  (1u64 << 61) - 1] {
+            assert!(matches!(p % 12, 5 | 7));
+            for a in 1..64u64 {
+                let mut tally = FieldTally::default();
+                let curve = PrimeCurve { p, a, b: 0 };
+                assert!(find_isogeny(&curve, 3, &mut tally).is_none(),
+                    "p={p}, a={a}");
+            }
+        }
+        // Positive controls: the no-kernel optimization must not be
+        // applied when 3 is a quadratic residue.
+        for p in [11u64, 13, 23, 37, 65_521, 4_294_967_291] {
+            assert!(!matches!(p % 12, 5 | 7));
+            for a in 1..32u64 {
+                let mut tally = FieldTally::default();
+                let mut field = Fp { p, tally: &mut tally };
+                let poly = [
+                    field.sub(0, field.mul(a, a)), 0,
+                    field.mul(6 % p, a), 0, 3,
+                ];
+                let roots = field.roots(&poly);
+                let iso = find_isogeny(&PrimeCurve { p, a, b: 0 }, 3, &mut tally);
+                assert_eq!(iso.map(|x| x.x0), roots.first().copied(),
+                           "p={p}, a={a}");
+            }
+        }
+    }
 
     #[test]
     fn round138_sparse_polynomial_roots_match_bruteforce() {
