@@ -115,6 +115,11 @@ impl GaussJordan {
 }
 fn signed_sum(ar:&mut Arithmetic,base:&[Point],terms:&[[i64;2]])->Result<(Point,Vec<u64>),String>{
     if terms.len()>4 {return Err("more than four signed entries".into());}
+    // Reject oversized signed multiplicities BEFORE summing their absolute
+    // values; arbitrary i64 JSON must never overflow a development checker.
+    if terms.iter().any(|x|x[1]==0 || !(-4..=4).contains(&x[1])) {
+        return Err("invalid signed multiplicity".into());
+    }
     let leaves: u64=terms.iter().map(|x|x[1].unsigned_abs()).sum();
     if leaves>4 {return Err("more than four signed leaves".into());}
     let mut lhs=None;
@@ -135,10 +140,18 @@ fn verify(data:&Receipt)->Result<Report,String>{
        data.relations.len()>65_536 {return Err("receipt exceeds fixed caps".into());}
     let mut ar=Arithmetic::default();
     check_curve(PRIME31,&mut ar)?;
+    if let Some([x,y])=data.target_q {
+        if x>=PRIME31.p || y>=PRIME31.p {
+            return Err("public Q coordinates are not canonical field elements".into());
+        }
+    }
     let q=point(data.target_q);
     if !ar.on_curve(PRIME31,q) {return Err("public Q is off curve".into());}
     let mut base=Vec::with_capacity(data.base.len());
     for (i,&xy) in data.base.iter().enumerate(){
+        if xy[0]>=PRIME31.p || xy[1]>=PRIME31.p {
+            return Err(format!("base[{i}] coordinates are noncanonical"));
+        }
         if !ar.on_curve(PRIME31,Some((xy[0],xy[1]))) {
             return Err(format!("base[{i}] is off curve"));
         }
@@ -260,7 +273,7 @@ mod tests {
     #[test]
     fn malformed_point_is_rejected() {
         let mut f=fixture();
-        f.target_q=Some([1,1]);
+        f.target_q=Some([PRIME31.p,1]);
         assert!(verify(&f).is_err());
     }
     #[test]
@@ -282,6 +295,18 @@ mod tests {
         let out=verify(&f).unwrap();
         assert_eq!(out.recovered,Some(0));
         assert_eq!(out.first_determined_relation_prefix,Some(0));
+    }
+    #[test]
+    fn reject_i64_min_without_overflow_or_panic() {
+        let mut f=fixture();
+        f.relations[0].terms=vec![[0,i64::MIN],[1,i64::MIN]];
+        assert!(verify(&f).is_err());
+    }
+    #[test]
+    fn reject_noncanonical_factor_base_coordinates() {
+        let mut f=fixture();
+        f.base[0][0]=PRIME31.p;
+        assert!(verify(&f).is_err());
     }
     #[test]
     fn reject_more_than_four_signed_leaves() {
