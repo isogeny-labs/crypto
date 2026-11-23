@@ -1,0 +1,54 @@
+{
+  "schema": "prime31-planted-rank-coverage-receipt/v1",
+  "date": "2026-11-23",
+  "status": "producer-side exact combinatorial replay; PCC unverified",
+  "base_commit": "bd20b95dce44a91d7f74a1367853e724f280a3b6",
+  "tracking_commit": "4e4572877bb6e43a2d075197fd683c8dc7e1b905",
+  "pr": 5048,
+  "model": "B=31 iid planted four-leaf labels (WR and four-distinct NR), one selected row per target",
+  "methods": [
+    "inclusion-exclusion vs Stirling surjection",
+    "inclusion-exclusion vs occupancy Markov DP"
+  ],
+  "rows_checked": [
+    1,
+    20,
+    25,
+    31,
+    40,
+    42,
+    43,
+    44,
+    45,
+    50,
+    60
+  ],
+  "exact_method_agreement": true,
+  "results_R31": {
+    "WR": "0.573804207996253726",
+    "NR": "0.641077520354504114"
+  },
+  "results_R44": {
+    "WR": "0.907025274046564259",
+    "NR": "0.930904267816860845"
+  },
+  "first_rows_for_coverage_probability_at_least_90pct": {
+    "WR": 44,
+    "NR": 42
+  },
+  "native_rust_tested": false,
+  "cryptographic_computations": false,
+  "independently_signed": false,
+  "workers": {
+    "native_spawned": 0,
+    "coordinator": 1
+  },
+  "budget": "no EKS/paid jobs",
+  "content_blobs": {
+    "docs/ACTIVE.md": "e561c219d84388a249184ecd7011669893e4887b",
+    "research/prime31_summation_compression_20261122/iteration12/PLANTED_RANK_OCCUPANCY.md": "24f2457a29779b20b060c222b5fd41cea6427b99",
+    "research/prime31_summation_compression_20261122/iteration12/coverage_oracle.py": "600f383f96aa9164f5ef06dbc9374c42019b52f7",
+    "research/prime31_summation_compression_20261122/iteration12/HANDOFF_20261123.md": "76cf6f1d71bb15c6168953b7ce44e46ff01435a3"
+  },
+  "provenance": "Exact Python fractions exit 0 in isolated local mathematical check; not original-root Rust"
+}
