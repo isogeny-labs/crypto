@@ -1,0 +1,38 @@
+name: Rootfind Round 133 Tonelli-Shanks source-exact A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-round133-tonelli-shanks-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round133/**
+      - .github/workflows/rootfind_round133.yml
+permissions:
+  contents: read
+jobs:
+  native-rust-a-b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round133
+      - name: Build production baseline and candidate modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin automation/rootfind-round132-direct-low-degree-20261123
+          mkdir -p /tmp/rootfind_round133
+          git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round133/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round133/optimized.rs
+          cat research/rootfind_round133/bench_helper.rs >> /tmp/rootfind_round133/baseline.rs
+          cat research/rootfind_round133/bench_helper.rs >> /tmp/rootfind_round133/optimized.rs
+          cp research/rootfind_round133/source_exact_main.rs /tmp/rootfind_round133/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round133/main.rs -o /tmp/rootfind_round133/bench
+      - name: Independent quadratic and higher-degree correctness; 13-trial A/B
+        run: /tmp/rootfind_round133/bench

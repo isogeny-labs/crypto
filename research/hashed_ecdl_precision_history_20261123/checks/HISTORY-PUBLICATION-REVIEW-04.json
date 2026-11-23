@@ -1,0 +1,155 @@
+{
+  "schema": "finite-precision-history-publication-review/v1",
+  "created_utc": "2026-11-23T11:20:40.350Z",
+  "scope": "Read-only binding to exact committed Git objects, source/manifest checks and administrative parsing of existing proof outputs. No Lean, build, verifier, proof gate, native test, solver experiment, cloud/S3 action, cache restore or secret read was run. Original reviews, snapshots, source and committed files were not changed.",
+  "publication": {
+    "repository": "isogeny-labs/crypto",
+    "pr": 4996,
+    "commit": "970469fc6fb9066d990794983bdb869c41660cea",
+    "tree": "d7dece3e3caf0989c302b788ba00ce1918ec3020",
+    "parent": "ca7023cd857557d181008b141b9c793f3b39cae6",
+    "study": "research/hashed_ecdl_precision_history_20261123",
+    "observed_remote_tracking_ref": "970469fc6fb9066d990794983bdb869c41660cea"
+  },
+  "disposition": {
+    "committed_artifact_consistency": "supported_within_scope; no new discrepancy found",
+    "numeric_history_math_review": "HISTORY-REVIEW-03 remains applicable to identical frozen13c/16 source bytes",
+    "recorded_fresh_qualification": "Phase22 passes within the recorded outer-worker-lock protocol; phase20 remains disqualified as isolated qualification",
+    "independent_execution_provenance": "unestablished; read-only artifact review and unsigned local verification are not execution attestation",
+    "pcc_standing": "dc026e and8bf465 remain unsigned/unverified; malformedf665ec remains unusable"
+  },
+  "preserved_review": {
+    "review_sha256": "c92d8a479a714972436bb54c74060e1718db27a13a1b083b0dbf1cbb174f925c",
+    "evidence_manifest_sha256": "69a565c57bb2ff0f57437b6969129d0cd89fe108d27e56abfb1e04f7ea34b3d9",
+    "published_copies_match_originals": true,
+    "all80_original_input_entries_rechecked": true,
+    "original_snapshot_scope": "Original03 covers finite-history source/controls and recorded results through18. This new addendum binds later19–22 and publication without relabeling03."
+  },
+  "checks": [
+    {
+      "requirement": "Complete committed study manifest",
+      "status": "pass_within_scope",
+      "detail": "188 study files are committed. All187 SHA256SUMS entries match exact Git blobs, and cover every study file except SHA256SUMS itself. All188 working-study files equal their committed copies; local repository status was clean at review."
+    },
+    {
+      "requirement": "Exact source/statement binding",
+      "status": "pass_within_scope",
+      "detail": "History SHA2560a23557953ddc0f74205b6812689bd400d6044c0ae0c607c1805aa09a70cd4b4 matches frozen13c; controls SHA256a2dc575b5d2d9f2d27c440e0b7fe7a5848ef377a4fe7032d8f7493d315bff001 matches frozen16. Shared core remains SHA25692e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a at3e47fb77. Endpoint declaration SHA25694e6d3b3d053f6c67f8014c4fb8a1ebd158dd58dfc7dcbba9aa13dfbce9afc8d remains unchanged. Native Rust crate, proof gate, auditor, trust list, PCC verifier and keyring are unchanged from main816f9c3a."
+    },
+    {
+      "requirement": "Raw phase/qualification consistency",
+      "status": "pass_within_scope",
+      "detail": "Every phase in qualification.json agrees with committed raw exit, physical-stop, sampled cgroup peak, timestamps and stdout/stderr hashes. Failures13 and19 remain retained.20 has successful raw proof outputs but its start11:03:54 precedes19 end11:03:55 by one second, so its isolation rejection is preserved."
+    },
+    {
+      "requirement": "Phase22 fresh raw/source binding",
+      "status": "pass_as_recorded_output",
+      "detail": "All20 published fresh-isolated-22 raw files match their original local copies. Four before-input hashes match published core/history/control/axiom sources; all four post-input checks are OK. Core/history/control build stdout and stderr are empty. Fresh axiom output is byte-identical to phase17 and names all11 previously reviewed statements. The local PCC verifier JSON reports pass and binds the current canonical claim digest; no signature is present."
+    },
+    {
+      "requirement": "Exact control census",
+      "status": "pass_within_scope",
+      "detail": "Raw phase22 audit names exactly8 NativePrecisionHistoryControls theorem declarations plus CryptoLeanCore.TaperedPrecision.childPrecision.eq_1. It reports9 audited declarations,0 failing,0 trusted(native_decide). This is8 logical numeric control instances plus a definitional equation, not9 independent controls or another solver cohort. The audit hash365f65c4e1659eb124ad893624c96b6c01cfc3fd8d87e08796f8e8dca9be3adc agrees with qualification.json. Its String.mk deprecation warning remains visible."
+    },
+    {
+      "requirement": "Outer lock and fixed resource contract",
+      "status": "consistent_as_recorded",
+      "detail": "Published locked launcher differs from the retained unlocked launcher only by adding flock on the shared lean-worker.lock around the command inside the same600-second timeout. Source/native proof gate, physical stop15032385536, kill grace and body remain unchanged. Fresh search path contains the new output library, explicit existing Mathlib56 dependency paths and pinned standard library, with no prior study/check directory. Recorded22 starts11:07:46 after21 ended11:06:35, ends11:08:25, exit0/stop0, peak14740750336bytes. These establish internally consistent cooperative worker-serialization records, not independent global process or L2 hardware isolation attestation."
+    },
+    {
+      "requirement": "Ledger and claims",
+      "status": "pass_for_append_only_binding; unsigned",
+      "detail": "Parentca7023cd ledger bytes are an exact prefix. Exactly3 claim entries append in order f665ec,8bf465,dc026e; their prev links, sequence numbers, entry hashes and canonical claim digests match. No verdict row or signature was appended. dc026e canonical claim digest89f25a0ea25d5f465832f97477378f4a1c8ed94cb112d66bf176bc8405f380d9 matches phase22 local verdict and standing record. The local verdict retains producer registration commitca7023cd; this addendum separately binds actual published bytes to970469fc."
+    },
+    {
+      "requirement": "Malformed registration preserved",
+      "status": "correctly_rejected",
+      "detail": "f665ec bytes remain pinned by the unchanged03 evidence manifest. Published malformed-proof-verdict.json matches original local failed output: absolute JSON-file project reference escapes repository. It is not theorem evidence. Corrected structured claimdc026e is a new record, not a rewrite."
+    },
+    {
+      "requirement": "README/report scope",
+      "status": "consistent",
+      "detail": "Published prose explicitly distinguishes actual rootM0=s=2E from helperE<=2E and synthetic positiveM0=E/increasing scale. It discloses unlinked currenta(d), retained failures,20 rejection,9 declaration census, unsigned standing and outstanding actual-source path/guard/cost obligations. PDF bytes match publication-preflight hash; no fresh visual PDF inspection was performed by this reviewer."
+    }
+  ],
+  "new_protocol_records": [
+    {
+      "phase": "19-history-controls-gate",
+      "exit_code": 143,
+      "physical_stop": 1,
+      "peak_whole_cgroup_bytes": 15044239360,
+      "started_at": "2026-11-23T11:03:38Z",
+      "finished_at": "2026-11-23T11:03:55Z",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "20-fresh-history-reproduction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 15021883392,
+      "started_at": "2026-11-23T11:03:54Z",
+      "finished_at": "2026-11-23T11:04:41Z",
+      "stdout_sha256": "692cfac4c3e850f34764054fac15181d035279d2689ba46c8c7134d80422c0ce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "21-unused-external-cache-compaction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13476474880,
+      "started_at": "2026-11-23T11:06:24Z",
+      "finished_at": "2026-11-23T11:06:35Z",
+      "stdout_sha256": "983280aaf6708b138b8dfe1a2dc15705c491c28f1c0bd6f90f6583b74c5ab7c6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "22-isolated-fresh-history-reproduction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14740750336,
+      "started_at": "2026-11-23T11:07:46Z",
+      "finished_at": "2026-11-23T11:08:25Z",
+      "stdout_sha256": "692cfac4c3e850f34764054fac15181d035279d2689ba46c8c7134d80422c0ce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cache_compaction": {
+    "published_receipt_matches_original": true,
+    "files": 1001,
+    "uncompressed_bytes": 383844664,
+    "archive_bytes": 124223078,
+    "archive_sha256": "1149b1366f5f363be980608ab07dfa13827b49970552056ff6ee0650409763fb",
+    "reviewer_check": "Standard streaming SHA256 of the retained local archive matches the published receipt. Local manifest digest, file count and byte total also agree. Comparing selected paths against all inventoried Mathlib source-derived private-cache paths finds zero intersection. The compactor source excludes that inventoried closure and selects only bounded external .olean.private cache paths.",
+    "limits": "Archive payload/manifest remain local-only. Historical full pre-compaction byte comparison is a producer record, not independently replayed here. Other caches remain compacted; restore required dependencies and preflight memory before broader Mathlib work. Availability of external cached proof dependencies changed, while this source/review is unchanged. No execution/mathematical/performance attestation follows."
+  },
+  "retained_math_scope": [
+    "Finite numeric inherited-history81 and its composed34 endpoint are the established component statements under their explicit hypotheses. They are no longer merely a written numeric-history proposal.",
+    "Actual Rust successful histories,2E root extraction,checked-arithmetic refinement,past/current cumulative scale and valuation laws,source-guard absorption,packet/mode/construction precision,allocation unions,rational widths and entry bit-work remain separate obligations.",
+    "Synthetic composed positive is not an extracted/native-admitted path; currenta(d) is specified throughhnext and not identified with the past exponent array.",
+    "Mathlib56a005855ea17e0b0958f73ec801ae140b0a1679 is explicitly the standalone public-proof runtime; shared crypto-lean Mathlibcfc55 remains unchanged. Whole-library/current-root CI is not discharged.",
+    "The same8 logical controls are requalified; repeated builds do not create new independent cases. No solver/timing experiment,84-case completion,ECDLP algorithm improvement,challenge scalar,L2 performance,asymptotic improvement or novelty clearance is established.",
+    "Original80-entry manifest remains a local absolute-path snapshot; this new manifest explicitly names committed publication inputs. Source/artifact consistency does not authenticate producer execution or create signed PCC standing."
+  ],
+  "important_hashes": {
+    "SHA256SUMS": "8ade6c63d9ad9f7c746c1d8f5c53d6d2669cd0e06224f76e073cd5b40e93b3f4",
+    "formal/PrecisionHistory.lean": "0a23557953ddc0f74205b6812689bd400d6044c0ae0c607c1805aa09a70cd4b4",
+    "formal/PrecisionHistoryControls.lean": "a2dc575b5d2d9f2d27c440e0b7fe7a5848ef377a4fe7032d8f7493d315bff001",
+    "checks/HISTORY-REVIEW-03.json": "c92d8a479a714972436bb54c74060e1718db27a13a1b083b0dbf1cbb174f925c",
+    "checks/history-evidence-03.sha256": "69a565c57bb2ff0f57437b6969129d0cd89fe108d27e56abfb1e04f7ea34b3d9",
+    "checks/qualification.json": "fc5e6a5d6369a8ca8edf7a02d31f6a11a6090f82187a3bd98b2596ea1c74c16e",
+    "checks/fresh-isolated-22/input-before.sha256": "0b3bd8c6e152a8a5ac393587160c3ebb5efa19433afa7e7c7963efba02a89b5e",
+    "checks/fresh-isolated-22/axioms.stdout": "9c0d765f634d52fa1983b6146cecbf70a07147cd202d0b258896c6c7be5c02ff",
+    "checks/fresh-isolated-22/pcc-verdict.json": "13ab7199fa9eb34b13729e27af195d369af7ce7019244cb900d1d07ee7109b55",
+    "checks/fresh-isolated-22/control-gate-receipts/research_hashed_ecdl_precision_history_20261123_formal_PrecisionHistoryControls_lean/audit.log": "365f65c4e1659eb124ad893624c96b6c01cfc3fd8d87e08796f8e8dca9be3adc",
+    "checks/pcc-standing.json": "4c1fa29ef2b99cc2a41bb2850d2326477761637213afd8704bf911bacd14a9f1",
+    "checks/malformed-proof-verdict.json": "556af2e34c9729759fb87c37236739cb877f314f7f787ba409d934b02774d50c",
+    "checks/unused-cache-compaction.json": "646366d7dfc50c87278c1355b9d1c928c2193c1686aa93d5a4f73819f2537060",
+    "reproduction/original-locked-launcher.sh": "ff12e65e1f6fc144aaa3162538e69afc2708cd284ac5d99ddc95a659013967e0",
+    "reproduction/check.sh": "527a19211a2acb58c1421b8a76fca77c967c9e43e1c6d87cdb6b0f679ac19d53",
+    "README.md": "d334abc12c1e7fffa4b802fe22eacbd6ac624a72a79486e451bddbcd09057e70",
+    "report.pdf": "fff4420366cdb6ed0c6d07c490289de747183778c8c15aa84c317d2a32c57774"
+  },
+  "publication_evidence_manifest": "history-publication-evidence-04.sha256",
+  "publication_evidence_manifest_sha256": "9a93aebbbf7a33e685e4cedde41d700277662369db975981deef8ba225b8a42a"
+}

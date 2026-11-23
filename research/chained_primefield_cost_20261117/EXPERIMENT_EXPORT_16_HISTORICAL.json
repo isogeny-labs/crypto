@@ -1,0 +1,455 @@
+{
+  "schema": "experiment.export/v1",
+  "created_for": "Historical cost16 publication, no new run",
+  "protocol_commit": "dd6223faae3ff638eb2582e8f40ceca41c5a142c",
+  "source_commits": {
+    "A": "8f3d314c9f6ba549f27d660776888b65b63e29f1",
+    "B": "e7efdbf14d97ef061a5e8ba707bb8cc803313d17"
+  },
+  "flow": {
+    "planned": [
+      "A exact-public-source guard and frozen native16 unit"
+    ],
+    "attempted": [
+      "A setup, failed before copy/compile/native",
+      "B exact unchanged native/oracle/population after metadata-only publication repair"
+    ],
+    "completed": [
+      "B recorded native16 fixed unit"
+    ],
+    "excluded_by_rule": [],
+    "still_unexecuted_requirements": [
+      "admitted timing",
+      "complete solver/cost comparison",
+      "independent signed replay",
+      "full original EKS-only workloads"
+    ]
+  },
+  "historical_B_phases": [
+    {
+      "name": "init",
+      "recorded": "2026-11-17T12:35:12.208217+00:00",
+      "kind": "metadata-control",
+      "exit": 0,
+      "expected_exit": 0,
+      "detail": {
+        "RAM_free": 10711040,
+        "scratch_free": 10842112,
+        "exact_public_copied_source_files": 28,
+        "original_files": 85,
+        "full_prebuilt_dependencies": 3
+      }
+    },
+    {
+      "name": "rustc-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:12.271156+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustc",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "rustc-version.stdout",
+      "stderr": "rustc-version.stderr",
+      "finished": "2026-11-17T12:35:12.377411+00:00"
+    },
+    {
+      "name": "clippy-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:12.432704+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "clippy-version.stdout",
+      "stderr": "clippy-version.stderr",
+      "finished": "2026-11-17T12:35:12.509709+00:00"
+    },
+    {
+      "name": "rustfmt-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:12.569173+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "rustfmt-version.stdout",
+      "stderr": "rustfmt-version.stderr",
+      "finished": "2026-11-17T12:35:12.643886+00:00"
+    },
+    {
+      "name": "clippy-positive",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:12.699482+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "sentinel_positive",
+        "--edition=2021",
+        "--emit=metadata",
+        "-D",
+        "clippy::eq_op",
+        "config/clippy-positive.rs",
+        "-o",
+        "/dev/shm/ct812-first-cost16B/clippy-positive.rmeta"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "clippy-positive.stdout",
+      "stderr": "clippy-positive.stderr",
+      "finished": "2026-11-17T12:35:12.888264+00:00"
+    },
+    {
+      "name": "clippy-negative",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:12.952343+00:00",
+      "expected_exit": 1,
+      "exit": 1,
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "sentinel_negative",
+        "--edition=2021",
+        "--emit=metadata",
+        "-D",
+        "clippy::eq_op",
+        "config/clippy-negative.rs",
+        "-o",
+        "/dev/shm/ct812-first-cost16B/clippy-negative.rmeta"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "clippy-negative.stdout",
+      "stderr": "clippy-negative.stderr",
+      "finished": "2026-11-17T12:35:13.059014+00:00"
+    },
+    {
+      "name": "frontend",
+      "recorded": "2026-11-17T12:35:13.121645+00:00",
+      "kind": "metadata-control",
+      "exit": 0,
+      "expected_exit": 0,
+      "detail": {
+        "Rust_version_and_canonical_negative_diagnostic_match": true
+      }
+    },
+    {
+      "name": "compile-only",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:13.190243+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustc",
+        "--crate-name",
+        "chained_primefield_cost_16",
+        "--test",
+        "--edition=2021",
+        "src/lib.rs",
+        "-L",
+        "dependency=/dev/shm/ct812-first-cost16B/deps",
+        "--extern",
+        "num_bigint=/dev/shm/ct812-first-cost16B/deps/libnum_bigint-93482e592bbb622c.rlib",
+        "--extern",
+        "num_traits=/dev/shm/ct812-first-cost16B/deps/libnum_traits-8dbbb3fc7f5ad84e.rlib",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "strip=symbols",
+        "-o",
+        "/dev/shm/ct812-first-cost16B/compiler-output"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "compile-only.stdout",
+      "stderr": "compile-only.stderr",
+      "finished": "2026-11-17T12:35:21.155425+00:00"
+    },
+    {
+      "name": "strict-clippy",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:21.228105+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "chained_primefield_cost_16",
+        "--test",
+        "--edition=2021",
+        "src/lib.rs",
+        "-L",
+        "dependency=/dev/shm/ct812-first-cost16B/deps",
+        "--extern",
+        "num_bigint=/dev/shm/ct812-first-cost16B/deps/libnum_bigint-93482e592bbb622c.rlib",
+        "--extern",
+        "num_traits=/dev/shm/ct812-first-cost16B/deps/libnum_traits-8dbbb3fc7f5ad84e.rlib",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "strip=symbols",
+        "--emit=metadata",
+        "-D",
+        "warnings",
+        "-o",
+        "/dev/shm/ct812-first-cost16B/strict-clippy.rmeta"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "strict-clippy.stdout",
+      "stderr": "strict-clippy.stderr",
+      "finished": "2026-11-17T12:35:22.088575+00:00"
+    },
+    {
+      "name": "format",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:22.143099+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--check",
+        "--edition",
+        "2021",
+        "src/lib.rs",
+        "vendor/fp_poly.rs"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "format.stdout",
+      "stderr": "format.stderr",
+      "finished": "2026-11-17T12:35:22.273592+00:00"
+    },
+    {
+      "name": "pre-call",
+      "recorded": "2026-11-17T12:35:22.389817+00:00",
+      "kind": "metadata-control",
+      "exit": 0,
+      "expected_exit": 0,
+      "detail": {
+        "recorded_before_any_qualifier_call": "2026-11-17T12:35:22.388068+00:00",
+        "public_source_commit": "e7efdbf14d97ef061a5e8ba707bb8cc803313d17",
+        "qualifier": "/dev/shm/ct812-first-cost16B/immutable-qualifier",
+        "bytes": 1393984,
+        "sha256": "d9db82db01befe97bdeb85881f8730eb507409a37132554656ec0b76dad97c3f",
+        "mode": 365,
+        "all_original_copied_dependencies_tools_equal": true,
+        "BUILD_manifest_sha256": "51fda9dd0dcf0178fed4b2c1c6b5f332fdb7eb98dbabbc801b8097d1ec9a25b8"
+      }
+    },
+    {
+      "name": "list-tests",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:22.447198+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "/dev/shm/ct812-first-cost16B/immutable-qualifier",
+        "--list"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "list-tests.stdout",
+      "stderr": "list-tests.stderr",
+      "finished": "2026-11-17T12:35:22.509243+00:00"
+    },
+    {
+      "name": "test-inventory",
+      "recorded": "2026-11-17T12:35:22.561862+00:00",
+      "kind": "metadata-control",
+      "exit": 0,
+      "expected_exit": 0,
+      "detail": {
+        "new_exact_filter_present_once": true,
+        "tests_compiled": 16,
+        "old_tests_not_executed_by_listing": true
+      }
+    },
+    {
+      "name": "first-native-unit",
+      "kind": "subprocess",
+      "started": "2026-11-17T12:35:22.620953+00:00",
+      "expected_exit": 0,
+      "exit": 0,
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "/dev/shm/ct812-first-cost16B/immutable-qualifier",
+        "nonsplit::map::tests_14::frozen_prime_cost_16",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/dev/shm/ct812-first-cost16B/source",
+      "complete_whitelisted_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct812-cost16B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct812-first-cost16B/source"
+      },
+      "stdout": "first-native-unit.stdout",
+      "stderr": "first-native-unit.stderr",
+      "finished": "2026-11-17T12:35:23.253778+00:00"
+    },
+    {
+      "name": "finish",
+      "recorded": "2026-11-17T12:35:23.362681+00:00",
+      "kind": "metadata-control",
+      "exit": 0,
+      "expected_exit": 0,
+      "detail": {
+        "primary": {
+          "full_original_hashes_equal": 85
+        },
+        "copied": {
+          "all_copied_sources_equal": 28
+        },
+        "dependencies": {
+          "all_full_dependency_hashes_equal": 3
+        },
+        "tools": {
+          "all_full_tool_hashes_equal": 3
+        },
+        "qualifier_full_hash_and_mode_equal": true
+      }
+    }
+  ],
+  "native_aggregate_source": "first-native-B-success-04/ACTUAL_FIRST16B_SUCCESS_AND_NATIVE_AGGREGATES.json",
+  "raw_current_custody": "Full raw stdout and private whole archive absent at inspected restart paths; exact path record and original hashes retained. No new timing ratio.",
+  "report": "reports/actual-cost16/REPORT.md",
+  "unsigned_current_claim": "PCC-20261123-2eba0e"
+}

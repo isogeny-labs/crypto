@@ -1,0 +1,306 @@
+{
+  "schema": "native-cpu-main-readiness-evidence/v1",
+  "review_id": "MAIN-READINESS-REVIEW-12",
+  "created_utc": "2026-11-23T14:10:26.565Z",
+  "reference_preparation_commit": "0430733269dc2128185adc5b3c068470b1449ea1",
+  "method": "Read-only source snapshot, administrative hashes, existing logs and directory-digest readback. No tests,compilation,solver,Native replay,OpenSSL,canary or metadata checker executed by reviewer.",
+  "entry_count": 39,
+  "entries": [
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/native/Cargo.toml",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/Cargo.toml",
+      "bytes": 198,
+      "sha256": "2d6dfc9e947f30f1397208c5efa711ab00487d207c210f3c078a68ddd626674c",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/native/Cargo.lock",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/Cargo.lock",
+      "bytes": 4867,
+      "sha256": "850ce57b4e4d96bcadd0f5254d9563bdc18980b49184796b467208c4002a5eb3",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/native/src/bin/panel-v2.rs",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/src/bin/panel-v2.rs",
+      "bytes": 20508,
+      "sha256": "fb8269af1d4b7e7059f07ab2cb09f0db514f84b06e8ddbba731992b66e3055df",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/native/src/bin/point-audit-v2.rs",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/src/bin/point-audit-v2.rs",
+      "bytes": 5559,
+      "sha256": "1f2f36d4b5506604515e699146615d089b9ca2ebfdfe1bf0c25339902c6fdf65",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/invoke-worker-v2.sh",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/invoke-worker-v2.sh",
+      "bytes": 256,
+      "sha256": "c156bd55d65aaecd624a8f139f4ec1ce1b15e7b3a2799ac8c6363ccd279ca69f",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/reproduction/run-stage-v2.sh",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/reproduction/run-stage-v2.sh",
+      "bytes": 1515,
+      "sha256": "d14043b416af951f4d27a3555537c65cb690d051279d6e9cf27b4463c09d8e40",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/reproduction/run-main-v2.sh",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/reproduction/run-main-v2.sh",
+      "bytes": 1361,
+      "sha256": "92812a509f2ce582881145755d2b520f26cbf594baf44ee7fdd3246522ed3f2f",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/reproduction/finalize-main-v2.sh",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/reproduction/finalize-main-v2.sh",
+      "bytes": 474,
+      "sha256": "4840aca29dba8f26f42fa504aa751582674800a5e9eb1f2f25c50c6a715061bd",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/reproduction/control-fail-worker.sh",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/reproduction/control-fail-worker.sh",
+      "bytes": 103,
+      "sha256": "0fc2aabf75b781247b2dd615aa5ac7cad7b8e6e5f616edea1e30dde4ddf54d47",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/reproduction/control-process-tree.sh",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/reproduction/control-process-tree.sh",
+      "bytes": 648,
+      "sha256": "95d66895af54cf503d732d710b06dc3eef791d488f60b4eaf44d62568cff2c9f",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "exclusive_review_source_snapshot",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12/protocol.draft.json",
+      "origin": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/protocol.draft.json",
+      "bytes": 22448,
+      "sha256": "76dc6bb9ca86d39dcd12a2d87a0176d403ad104dc2b1cd4ef807956682cdffe5",
+      "timing": "Review-time source snapshot; not a reconstructed pre-build/pre-unit receipt"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/build-v2.sh",
+      "bytes": 1319,
+      "sha256": "1acb349850acbf7f19f61c27e50b4a11fd4f787fa9acf1c0cec52478b9ea0f5c"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualify-v2.sh",
+      "bytes": 596,
+      "sha256": "9605abe8445e97ec077f016aa5dab7f5d25a52b094ac3338e5f4310933c321b0"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/v2-pre-call.json",
+      "bytes": 1443,
+      "sha256": "36f8fc8bcfd20f2ff5bfeb4d101cae60564f8cef43d64bc0c06ec6bd0e051c66"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/v2-before-units.sha256",
+      "bytes": 522,
+      "sha256": "2db3dceb6fbabdd6881083807b362cb8937c1a8ac74d4fea9f9269b5196db593"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/v2-post-controls-binary-check.log",
+      "bytes": 274,
+      "sha256": "dba131e287020204125d3360f8590d5fc3cae334bc03e94a63a5d27633d1203c"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/v2-unit-schedule.tsv",
+      "bytes": 154,
+      "sha256": "6c1996582cde6ce7c42c3409864f36fba346d3e0d7cb7b5811b153fbd259abd0"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight-preserved-after-v2-controls.log",
+      "bytes": 23984,
+      "sha256": "944ab5edd3a04961a7e663cdb9d9ce60a92bf5af78a1cf969ff99332cbc9b982"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/main-protocol-draft-check.log",
+      "bytes": 1227,
+      "sha256": "60cc40b0e34eea3d296764780676d70820fb186663b909d980c658af40652c18"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/main-protocol-draft-check-v2.log",
+      "bytes": 173,
+      "sha256": "4f9d05052fb893bbb606d5cfca6d25bed1f2873e1441b76e9e47b89b66045f59"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/main-protocol-draft-check-v3.log",
+      "bytes": 104,
+      "sha256": "0ed05fb7d70581df07426b1ce535581a291ee29a694af379af86776f9917a09a"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/SOURCE-RECONCILIATION-10.json",
+      "bytes": 16136,
+      "sha256": "aa79df295fb683828b16b4fb6f7fc07d2d7db0aa44748a1d20dfb175d34d8d90"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/source-reconciliation-evidence-10.json",
+      "bytes": 13805,
+      "sha256": "dffe60256a01a95d86d7b0dc500e86d0c0d3dd1c92830324cb8fe4282ed82a00"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/PREFLIGHT-DESIGN-REVIEW-11.json",
+      "bytes": 14072,
+      "sha256": "623085c77a300861a83bb29a90014170abddb1a0a8edd850d0358c225584bfe0"
+    },
+    {
+      "kind": "local_file",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/review/preflight-design-evidence-11.json",
+      "bytes": 55415,
+      "sha256": "b87ee2c2c7f8bb084ba60190416c7da385fe86977c19603b0349aa588c9a9b57"
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/06-v2-native-build",
+      "files": 8,
+      "bytes": 185,
+      "sha256": "a6afdeb5e145a7335ec58f40f6394917e31659faeef282c36e7709febb38f5ad",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/06b-v2-native-qualification",
+      "files": 8,
+      "bytes": 176,
+      "sha256": "e99c0f6bffd2b74b0172eea753f4f6280c193f82d23d99158435cfd723ddea38",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/06c-v2-valid-preflight-analysis",
+      "files": 8,
+      "bytes": 257,
+      "sha256": "388bccf457ee1216a4bd652a748f8d7497e7f94f86789f16e1ca99973b29d643",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/driver-v2-build",
+      "files": 6,
+      "bytes": 38434,
+      "sha256": "a78c93034a397c91bcb10b003ff290f7f0d10507fa059432a3787ac0cf9ccfb0",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/v2-unit-outputs",
+      "files": 6,
+      "bytes": 1356,
+      "sha256": "fb72b5d91847aaee83267b58e821716d9111261622239d73d18b66a3afc35555",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/failure-finalization-canary",
+      "files": 36,
+      "bytes": 105478,
+      "sha256": "2ee9ad23338c43e230492ef6789ec4ca1b0e354cb32f12a054ed972fbab74580",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_directory_digest",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/process-group-canary",
+      "files": 16,
+      "bytes": 3024,
+      "sha256": "fc8c49199cbcfc183f2ac6dd0fa72b9de4bcb12a9cecf2ccab3660e14c1aa2bd",
+      "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+      "published_in_git": false
+    },
+    {
+      "kind": "local_dry_analysis_output",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight-v2-analysis-readback/analysis.json",
+      "bytes": 37052,
+      "sha256": "8af5ab6f48b3027d26a490fe02d1d9b12e5c608710cc60951ffb1ed18fe691d1",
+      "same_bytes_as": "/tmp/ecdlp-cpu-comparison-20261123/preflight/analysis.json"
+    },
+    {
+      "kind": "local_dry_analysis_output",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight-v2-analysis-readback/summary.csv",
+      "bytes": 213,
+      "sha256": "47ba66a0790fc57923ec3aeaee80e6ac801fc134801c073ed6124079e0b1070f",
+      "same_bytes_as": "/tmp/ecdlp-cpu-comparison-20261123/preflight/summary.csv"
+    },
+    {
+      "kind": "local_dry_analysis_output",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight-v2-analysis-readback/latency.svg",
+      "bytes": 382,
+      "sha256": "547e2a7df94bc9f1db73bb8b73acc4ae889d84489a8ddef71f3f872c0c972d4d",
+      "same_bytes_as": "/tmp/ecdlp-cpu-comparison-20261123/preflight/latency.svg"
+    },
+    {
+      "kind": "qualified_native_binary",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified-v2/test-point-audit-v2",
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver-v2/release/deps/point_audit_v2-cb63f9950ae16799",
+      "bytes": 1074312,
+      "sha256": "c80a00578c1e0be370e5b2e6ac95bc08b4f9bd00bb2881df77518f1b84159256",
+      "test": true,
+      "mode": "0500",
+      "published_in_git": false
+    },
+    {
+      "kind": "qualified_native_binary",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified-v2/test-panel-v2",
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver-v2/release/deps/panel_v2-3ec95f33f718d7ff",
+      "bytes": 1462424,
+      "sha256": "1533314b133421e8ca1eec1d56a8f0556ebc90e6defd1afb62bf9f3339336570",
+      "test": true,
+      "mode": "0500",
+      "published_in_git": false
+    },
+    {
+      "kind": "qualified_native_binary",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified-v2/bin-point-audit-v2",
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver-v2/release/point-audit-v2",
+      "bytes": 714184,
+      "sha256": "5a75ec32cb4018ea8b63a1aed6e693f9dc5912f2b92c3b8ec0ea0d6b0bc5322f",
+      "test": false,
+      "mode": "0500",
+      "published_in_git": false
+    },
+    {
+      "kind": "qualified_native_binary",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified-v2/bin-panel-v2",
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver-v2/release/panel-v2",
+      "bytes": 862048,
+      "sha256": "6945b355333ec994b9bf341143990d34919f0564facb522513036278280fc803",
+      "test": false,
+      "mode": "0500",
+      "published_in_git": false
+    }
+  ]
+}

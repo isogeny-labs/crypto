@@ -1,0 +1,12 @@
+digraph source {
+  graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.35",ranksep="0.5"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#34495e",fillcolor="#edf2f7",margin="0.13,0.10"];
+  edge [color="#52677a",arrowsize=0.7,fontname="DejaVu Sans",fontsize=10];
+  C [label="Actual smooth C7 / F7\n17,65,236 points\nJacobian order 1331",fillcolor="#e5f3ec"];
+  E [label="Actual quotient E7\ny2=x3+2x+6\norder 11",fillcolor="#e5f3ec"];
+  twist [label="Actual cover twist over F49\n17 valid distinct images\n16 nonfixed + 1 fixed branch",fillcolor="#e5f3ec"];
+  module [label="Polarized E7-cube model\nsame Weil polynomial\nactual identification / J4 / maps OPEN",fillcolor="#fff0df"];
+  C -> E [label="degree-2 cover"];
+  C -> twist [label="z maps to z/gamma\nactual inverse checked"];
+  C -> module [style=dashed];
+}

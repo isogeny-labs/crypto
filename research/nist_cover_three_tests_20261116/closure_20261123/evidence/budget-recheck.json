@@ -1,0 +1,20 @@
+{
+  "standing": "producer observation of a read-only admission probe",
+  "run_id": 45219644370,
+  "source_revision": "5ca465dd7bbb4e97eaf9a2ec3225be1bfc818ca4",
+  "job_id": 137850127626,
+  "run_conclusion": "failure",
+  "checkout_conclusion": "success",
+  "existing_role_configuration_outcome": "success",
+  "credential_step_conclusion": "success",
+  "credential_step_actual_outcome": "failure",
+  "credential_error": "Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity",
+  "credential_conclusion_caution": "continue-on-error makes the step conclusion success; its actual outcome and final workflow gate correctly retain failure",
+  "budget_read_outcome": "skipped",
+  "budget_amount_observed": false,
+  "capacity_observed": false,
+  "launch_admitted": false,
+  "aws_compute_started": false,
+  "reason_for_new_probe": "The script-only read-only workflow correction from PR4983 is now deployed on main, removing the earlier archive hydration failure.",
+  "retrieval": "authenticated GitHub job logs; retained only the error and non-secret outcomes, not role credentials or signed artifact URLs"
+}

@@ -1,0 +1,16 @@
+digraph family {
+  graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.30",ranksep="0.40"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,color="#34495e",fillcolor="#edf2f7",margin="0.13,0.10"];
+  edge [color="#52677a",arrowsize=0.7];
+  all [label="250 fixed F5 equations\nnot isomorphism classes"];
+  singular [label="60 singular\nretained",fillcolor="#fff0df"];
+  smooth [label="190 smooth genus 3\ndirect = fibre counts",fillcolor="#e5f3ec"];
+  phi [label="70 have mod-2 Phi3 cubed\nfirst fixture: #J = 91",fillcolor="#e5f3ec"];
+  other [label="120 other smooth rows"];
+  none [label="0 have full PE cubed\nno E-cube source in family",fillcolor="#fff0df"];
+  all -> singular;
+  all -> smooth;
+  smooth -> phi;
+  smooth -> other;
+  phi -> none;
+}
