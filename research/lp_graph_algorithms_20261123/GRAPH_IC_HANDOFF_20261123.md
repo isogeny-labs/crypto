@@ -26,7 +26,7 @@ An additive, not-yet-source-qualified continuation of draft #4988 was preregiste
 
 Coordination: same current #4988 lane, no edits to PQ uniqueness #4972, scalar Wiedemann #4960 or `ic_graph`. Neighbor PRs #4972/#4960 are now merged, but this task retains an explicit no-merge/no-paid-compute restriction. KB MCP, local Rust, Conductor and agent-spawn unavailable; bounded fallback original Rust, current AGENTS/ACTIVE/log, cryptanalysis k3 harvester, autoresearcher search, Diem (2006), Cavallar (2000). One coordinator only. All prior 35 passing native tests apply to the predecessor, **not** the new 37-test expected revision. Hosted PR workflows may execute automatically; do not start duplicates. Group-verified ordinary Prime31 two-LP source, full root crate, PCC and matched cold solver remain blockers.
 
-## Successor after merged #4988 — captured-stream exact-rank CLI bridge (#5043), 2026-11-23 17:xx UTC
+## Successor after merged #4988 — captured-stream exact-rank CLI bridge (#5043), 2026-11-23 UTC
 
 **Ownership/status correction:** Previous paragraphs freeze historical observations while #4988 was a draft. Fresh GitHub PR metadata says #4988 was merged 2026-11-23T17:20:47Z as `658f6136762a40a816eb88815f47340a2d801c2e`. #4929, #4917 and #4905 are also merged. **Do not maintain terminal PRs.** This continuation has its own draft PR [#5043](https://github.com/isogeny-labs/crypto/pull/5043), branch `automation/graph-ic-captured-exact-rank-20261123`, disjoint from existing solver/collector worktrees.
 
@@ -37,3 +37,5 @@ Coordination: same current #4988 lane, no edits to PQ uniqueness #4972, scalar W
 **Next executable step:** check current PR #5043 source SHA and CI workflow terminal status; fix example compile or test issues on this same branch and rerun the frozen diagnostic. After passing, capture ≤4096 authentic binary-curve rows with the original Rust collector and verify their group/provenance, as a strictly binary-field component control. A separate ordinary Prime31 group-verified two-LP source is necessary before the requested ECDLP cost comparison. Unshimmed all-target production build and independently signed PCC remain distinct gates.
 
 **Coordination/KB fallback:** AGENTS/ACTIVE/current logs/catalog/research notes and both repository neighbors inspected. No research-KB MCP, checkout-based wrapper, Conductor or independent worker spawn in this runtime. One coordinator only. Other sessions' worktrees untouched, no merges or spend.
+
+**Unrelated CI failure preserved:** repository-wide Workflow syntax run #45232685419 failed on `.github/workflows/ct330-f103-rho-bsgs-paired.yml` line 99, an out-of-scope workflow unrelated to graph-IC. Do not edit that concurrently owned file. The graph-specific source-bound workflow run #45232685589 had its existing native integration tests succeed while the original-examples compile and CLI checks were still in progress at the recorded check; do not promote them until terminal.
