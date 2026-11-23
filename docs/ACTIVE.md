@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Prime-field PDP rootfind speedups, factor-base subproduct-tree multipoint evaluation, and Kaarelson Theorem 3 + §5a w_cal verification (Cursor, completed 2026-11-19, branch cursor/prime-pdp-rootfind-speedups-3858, PR #4819)
+
 - [x] Execute Lead 1B: curve-precomputed parametric elementary-symmetric PKM X_R-split quotient on tower F4 (cursor, started 2026-11-19, branch cursor/pdp-lead-1b-symmetric-pkm-20261119, PR #4818; GQuadTowerRing/symmetric_blocks cargo check --lib ok on rustc 1.99.1; ParamS5 core on #4820 [pcc:unverified])
 - [x] Prime31 RR9 non-enumerative 4-variable Wiedemann / shared-coefficient remainder tower extraction and prime-field auxiliary cover / Deuring vertical-isogeny rarity closures (Cursor, started 2026-11-19, completed 2026-11-19, branch cursor/prime31-rr9-and-cover-closures-3858, PR #4816; report & deterministic receipts in research/prime31_rr9_and_closures_20261119/{REPORT.md,RESULTS.json})
 

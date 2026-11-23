@@ -1759,20 +1759,90 @@ pub struct FastRelation {
     pub entries: Vec<(u32, i8)>,
 }
 
-fn merge_entries(mut entries: Vec<(u32, i8)>) -> Vec<(u32, i8)> {
-    entries.sort_unstable_by_key(|e| e.0);
-    let mut merged: Vec<(u32, i8)> = Vec::with_capacity(entries.len());
-    for (idx, s) in entries {
-        if let Some(last) = merged.last_mut() {
-            if last.0 == idx {
-                last.1 += s;
-                continue;
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+struct SmallEntries {
+    len: u8,
+    items: [(u32, i8); 3],
+}
+
+impl SmallEntries {
+    #[inline(always)]
+    fn one(i0: u32, s0: i8) -> Self {
+        if s0 == 0 {
+            return Self {
+                len: 0,
+                items: [(0, 0); 3],
+            };
+        }
+        Self {
+            len: 1,
+            items: [(i0, s0), (0, 0), (0, 0)],
+        }
+    }
+
+    #[inline(always)]
+    fn two(i0: u32, s0: i8, i1: u32, s1: i8) -> Self {
+        Self::from_raw(&[(i0, s0), (i1, s1)])
+    }
+
+    #[inline(always)]
+    fn three(i0: u32, s0: i8, i1: u32, s1: i8, i2: u32, s2: i8) -> Self {
+        Self::from_raw(&[(i0, s0), (i1, s1), (i2, s2)])
+    }
+
+    #[inline]
+    fn from_raw(raw: &[(u32, i8)]) -> Self {
+        let mut buf = [(0u32, 0i8); 3];
+        let n = raw.len().min(3);
+        buf[..n].copy_from_slice(&raw[..n]);
+        if n >= 2 && buf[0].0 > buf[1].0 {
+            buf.swap(0, 1);
+        }
+        if n == 3 {
+            if buf[1].0 > buf[2].0 {
+                buf.swap(1, 2);
+            }
+            if buf[0].0 > buf[1].0 {
+                buf.swap(0, 1);
             }
         }
-        merged.push((idx, s));
+        let mut out = [(0u32, 0i8); 3];
+        let mut m = 0usize;
+        for &(idx, s) in &buf[..n] {
+            if s == 0 {
+                continue;
+            }
+            if m > 0 && out[m - 1].0 == idx {
+                out[m - 1].1 += s;
+                if out[m - 1].1 == 0 {
+                    out[m - 1] = (0, 0);
+                    m -= 1;
+                }
+            } else {
+                out[m] = (idx, s);
+                m += 1;
+            }
+        }
+        Self {
+            len: m as u8,
+            items: out,
+        }
     }
-    merged.retain(|e| e.1 != 0);
-    merged
+
+    #[inline(always)]
+    fn as_slice(&self) -> &[(u32, i8)] {
+        &self.items[..self.len as usize]
+    }
+
+    #[inline(always)]
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    #[inline]
+    fn to_vec(self) -> Vec<(u32, i8)> {
+        self.as_slice().to_vec()
+    }
 }
 
 /// Fail-closed check: re-add the decomposition in the group.
@@ -1825,7 +1895,8 @@ pub fn collect_relations(
     let mut d = vec![0u64; b_len];
     let mut degenerate = vec![false; b_len];
     let mut scratch = Vec::with_capacity(b_len);
-    let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
+    let mut seen: HashSet<SmallEntries> = HashSet::with_capacity(8);
+    let mut found: Vec<SmallEntries> = Vec::with_capacity(8);
 
     let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
         loop {
@@ -1847,13 +1918,13 @@ pub fn collect_relations(
         }
         f.batch_inv(&mut d, &mut scratch);
         seen.clear();
-        let mut found: Vec<Vec<(u32, i8)>> = Vec::new();
+        found.clear();
         for i in 0..b_len {
             let fi = fb.pts[i];
             if degenerate[i] {
                 // R = ±F_i outright.
                 let s = if r.y == fi.y { 1i8 } else { -1 };
-                found.push(vec![(i as u32, s)]);
+                found.push(SmallEntries::one(i as u32, s));
                 continue;
             }
             let inv = d[i];
@@ -1870,7 +1941,7 @@ pub fn collect_relations(
                         let y = f.sub(f.mul(lam, f.sub(r.x, x3)), r.y);
                         y3 = Some(y);
                         let tau = if y == fb.pts[j].y { 1i8 } else { -1 };
-                        found.push(vec![(i as u32, eps), (j as u32, tau)]);
+                        found.push(SmallEntries::two(i as u32, eps, j as u32, tau));
                     }
                 }
                 if let Some(pairs) = pairs {
@@ -1889,23 +1960,29 @@ pub fn collect_relations(
                             let y =
                                 *y3.get_or_insert_with(|| f.sub(f.mul(lam, f.sub(r.x, x3)), r.y));
                             let tau = if y == pjk.y { 1i8 } else { -1 };
-                            found.push(vec![(i as u32, eps), (j, tau), (k as u32, tau * sigma)]);
+                            found.push(SmallEntries::three(
+                                i as u32,
+                                eps,
+                                j,
+                                tau,
+                                k as u32,
+                                tau * sigma,
+                            ));
                         }
                     }
                 }
             }
         }
         let mut productive = false;
-        for entries in found {
-            let merged = merge_entries(entries);
-            if merged.is_empty() || !seen.insert(merged.clone()) {
+        for &merged in &found {
+            if merged.is_empty() || !seen.insert(merged) {
                 continue;
             }
-            if !relation_holds(curve, fb, r, &merged) {
+            if !relation_holds(curve, fb, r, merged.as_slice()) {
                 stats.rejected += 1;
                 continue;
             }
-            match merged.len() {
+            match merged.len {
                 1 => stats.rows_one += 1,
                 2 => stats.rows_two += 1,
                 _ => stats.rows_three += 1,
@@ -1913,7 +1990,7 @@ pub fn collect_relations(
             rels.push(FastRelation {
                 a,
                 b,
-                entries: merged,
+                entries: merged.to_vec(),
             });
             productive = true;
             if rels.len() >= needed {
@@ -1966,6 +2043,8 @@ pub fn collect_relations_table(
     let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
     let mut stats = CollectStats::default();
     let max_pair_x = pairs.max_x();
+    let mut found: Vec<SmallEntries> = Vec::with_capacity(8);
+    let mut seen: HashSet<SmallEntries> = HashSet::with_capacity(8);
 
     let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
         loop {
@@ -1981,10 +2060,10 @@ pub fn collect_relations_table(
     while rels.len() < needed && stats.targets < max_targets {
         stats.targets += 1;
         let xc = f.from_mont(r.x);
-        let mut found: Vec<Vec<(u32, i8)>> = Vec::new();
+        found.clear();
         if let Some(j) = fb.lookup(xc) {
             let s = if r.y == fb.pts[j].y { 1i8 } else { -1 };
-            found.push(vec![(j as u32, s)]);
+            found.push(SmallEntries::one(j as u32, s));
         }
         if xc <= max_pair_x {
             for &(_, j, k_raw) in pairs.lookup(xc) {
@@ -1996,21 +2075,20 @@ pub fn collect_relations_table(
                     continue;
                 };
                 let tau = if r.y == pjk.y { 1i8 } else { -1 };
-                found.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                found.push(SmallEntries::two(j, tau, k as u32, tau * sigma));
             }
         }
         let mut productive = false;
-        let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
-        for entries in found {
-            let merged = merge_entries(entries);
-            if merged.is_empty() || !seen.insert(merged.clone()) {
+        seen.clear();
+        for &merged in &found {
+            if merged.is_empty() || !seen.insert(merged) {
                 continue;
             }
-            if !relation_holds(curve, fb, r, &merged) {
+            if !relation_holds(curve, fb, r, merged.as_slice()) {
                 stats.rejected += 1;
                 continue;
             }
-            match merged.len() {
+            match merged.len {
                 1 => stats.rows_one += 1,
                 2 => stats.rows_two += 1,
                 _ => stats.rows_three += 1,
@@ -2018,7 +2096,7 @@ pub fn collect_relations_table(
             rels.push(FastRelation {
                 a,
                 b,
-                entries: merged,
+                entries: merged.to_vec(),
             });
             productive = true;
             if rels.len() >= needed {
@@ -2293,7 +2371,8 @@ fn collect_setup_batched(
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5E70_BA7C);
     let max_pair_x = pairs.max_x();
     let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
-    let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
+    let mut seen: HashSet<SmallEntries> = HashSet::with_capacity(needed * 2);
+    let mut cands: Vec<SmallEntries> = Vec::with_capacity(8);
     let fresh = |rng: &mut StdRng| -> (u64, Pt) {
         loop {
             let a = rng.gen_range(1..n);
@@ -2322,10 +2401,10 @@ fn collect_setup_batched(
                 continue;
             };
             let xc = curve.f.from_mont(r.x);
-            let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+            cands.clear();
             if let Some(j) = fb.lookup(xc) {
                 let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
-                cands.push(vec![(j as u32, sg)]);
+                cands.push(SmallEntries::one(j as u32, sg));
             }
             if xc <= max_pair_x {
                 for &(_, j, k_raw) in pairs.lookup(xc) {
@@ -2337,22 +2416,21 @@ fn collect_setup_batched(
                         continue;
                     };
                     let tau = if r.y == pjk.y { 1i8 } else { -1 };
-                    cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                    cands.push(SmallEntries::two(j, tau, k as u32, tau * sigma));
                 }
             }
             let mut productive = false;
-            for entries in cands {
-                let merged = merge_entries(entries);
-                if merged.is_empty() || !seen.insert(merged.clone()) {
+            for &merged in &cands {
+                if merged.is_empty() || !seen.insert(merged) {
                     continue;
                 }
-                if !relation_holds(curve, fb, r, &merged) {
+                if !relation_holds(curve, fb, r, merged.as_slice()) {
                     continue;
                 }
                 rels.push(FastRelation {
                     a: a_l[l],
                     b: 0,
-                    entries: merged,
+                    entries: merged.to_vec(),
                 });
                 productive = true;
                 if rels.len() >= needed {
@@ -2541,13 +2619,17 @@ pub fn ic_multi_solve_ex(
         }
         let mut res: Vec<Option<u64>> = vec![None; m];
         let mut act: Vec<usize> = (0..m).collect();
+        let mut act2: Vec<usize> = Vec::with_capacity(m);
+        let mut cur2: Vec<Option<Pt>> = Vec::with_capacity(m);
+        let gv: Vec<Option<Pt>> = vec![Some(g); m];
+        let mut cands: Vec<SmallEntries> = Vec::with_capacity(8);
         let mut scratch = BatchAddScratch::default();
         let mut walked = vec![0u64; m];
         let mut round = 0u64;
         while !act.is_empty() && round < max_walk {
             round += 1;
-            let mut act2: Vec<usize> = Vec::with_capacity(act.len());
-            let mut cur2: Vec<Option<Pt>> = Vec::with_capacity(act.len());
+            act2.clear();
+            cur2.clear();
             for (pos, &t) in act.iter().enumerate() {
                 walked[t] += 1;
                 let (a, b) = ab[t];
@@ -2559,10 +2641,10 @@ pub fn ic_multi_solve_ex(
                     continue;
                 };
                 let xc = curve.f.from_mont(r.x);
-                let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+                cands.clear();
                 if let Some(j) = fb.lookup(xc) {
                     let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
-                    cands.push(vec![(j as u32, sg)]);
+                    cands.push(SmallEntries::one(j as u32, sg));
                 }
                 if xc <= max_pair_x {
                     for &(_, j, k_raw) in pairs.lookup(xc) {
@@ -2574,24 +2656,24 @@ pub fn ic_multi_solve_ex(
                             continue;
                         };
                         let tau = if r.y == pjk.y { 1i8 } else { -1 };
-                        cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                        cands.push(SmallEntries::two(j, tau, k as u32, tau * sigma));
                     }
                 }
                 let mut done = false;
                 let mut restart = false;
-                for entries in cands {
-                    let merged = merge_entries(entries);
-                    if merged.is_empty() || !relation_holds(curve, &fb, r, &merged) {
+                for &merged in &cands {
+                    let slice = merged.as_slice();
+                    if slice.is_empty() || !relation_holds(curve, &fb, r, slice) {
                         continue;
                     }
                     let usable =
-                        b % n != 0 && merged.iter().all(|&(j, _)| logs[j as usize].is_some());
+                        b % n != 0 && slice.iter().all(|&(j, _)| logs[j as usize].is_some());
                     if !usable {
                         restart = true;
                         continue;
                     }
                     let mut sum = 0u64;
-                    for &(j, sg) in &merged {
+                    for &(j, sg) in slice {
                         let x = logs[j as usize].unwrap() % n;
                         let term = if sg < 0 { neg_mod(x, n) } else { x };
                         let term = fnum.from_mont(fnum.mul(
@@ -2624,10 +2706,10 @@ pub fn ic_multi_solve_ex(
                 }
             }
             // every lane in act2 now holds R = a*G + b*Q - G... i.e. a has been incremented to match R + G below
-            let gv: Vec<Option<Pt>> = vec![Some(g); cur2.len()];
-            curve.add_many_batched(&mut cur2, &gv, &mut scratch);
-            act = act2;
-            cur = cur2;
+            let cur2_len = cur2.len();
+            curve.add_many_batched(&mut cur2, &gv[..cur2_len], &mut scratch);
+            std::mem::swap(&mut act, &mut act2);
+            std::mem::swap(&mut cur, &mut cur2);
         }
         let total_ms = t0.elapsed().as_secs_f64() * 1e3;
         let m_f = m.max(1) as f64;
@@ -2759,6 +2841,1498 @@ pub fn ic_solve_table(
             total_ms: t0.elapsed().as_secs_f64() * 1e3,
             factor_base_size: fb.len(),
             pair_table_entries: pairs.len(),
+            relations: rels.len(),
+            targets: stats.targets,
+            rows_one: stats.rows_one,
+            rows_two: stats.rows_two,
+            rows_three: stats.rows_three,
+        },
+    ))
+}
+
+// ── Shared factor-base subproduct tree & lock-step multi-walker IC ────
+
+/// Default crossover factor-base size `B*` at/above which top-down
+/// remainder-tree multipoint evaluation on `P_V(X)` replaces direct `Fp64`
+/// Horner evaluation over `V`.
+pub const DEFAULT_MULTIPOINT_CROSSOVER_B: usize = 64;
+
+/// Default crossover factor-base size `B*` at/above which batched candidate
+/// product-tree + `P_V(X)` remainder-tree evaluation replaces direct small-`B`
+/// `Fp64` Horner evaluation over `V`.
+pub const DEFAULT_BATCH_SUBPRODUCT_CROSSOVER_B: usize = 96;
+
+/// Leaf subtree width at/below which remainder-tree multipoint evaluation
+/// switches to direct Horner evaluation in cache.
+const MULTIPOINT_LEAF_WIDTH: usize = 16;
+
+#[inline]
+fn poly_trim_mont(p: &mut Vec<u64>) {
+    while p.last() == Some(&0) {
+        p.pop();
+    }
+}
+
+#[inline]
+fn max_lazy_terms(p: u64) -> usize {
+    (((1u128 << 64) / (p as u128)) as usize).max(1)
+}
+
+/// Lazy-`u128` schoolbook polynomial multiplication in Montgomery form.
+/// Every output coefficient performs at most `ceil(min_deg / max_lazy_terms(p))`
+/// Montgomery reductions (`1` reduction per output term whenever `p < 2^52`
+/// and `min_len <= 4096`).
+fn poly_mul_schoolbook_mont(f: &Fp64, a: &[u64], b: &[u64], out: &mut Vec<u64>) {
+    if a.is_empty() || b.is_empty() {
+        out.clear();
+        return;
+    }
+    let na = a.len();
+    let nb = b.len();
+    let out_len = na + nb - 1;
+    out.clear();
+    out.resize(out_len, 0);
+    let max_lazy = max_lazy_terms(f.p);
+    let one_u128 = f.one as u128;
+    for k in 0..out_len {
+        let i_lo = k.saturating_sub(nb - 1);
+        let i_hi = k.min(na - 1);
+        let mut acc: u128 = 0;
+        let mut cnt = 0usize;
+        for i in i_lo..=i_hi {
+            acc += (a[i] as u128) * (b[k - i] as u128);
+            cnt += 1;
+            if cnt == max_lazy {
+                let red = f.reduce(acc);
+                acc = (red as u128) * one_u128;
+                cnt = 1;
+            }
+        }
+        out[k] = f.reduce(acc);
+    }
+    poly_trim_mont(out);
+}
+
+/// Polynomial multiplication in Montgomery form: lazy-`u128` schoolbook below
+/// 48 coefficients, Karatsuba above.
+pub fn poly_mul_mont(f: &Fp64, a: &[u64], b: &[u64], out: &mut Vec<u64>) {
+    let mut aa = a;
+    while aa.last() == Some(&0) {
+        aa = &aa[..aa.len() - 1];
+    }
+    let mut bb = b;
+    while bb.last() == Some(&0) {
+        bb = &bb[..bb.len() - 1];
+    }
+    if aa.is_empty() || bb.is_empty() {
+        out.clear();
+        return;
+    }
+    if aa.len().min(bb.len()) < 48 {
+        poly_mul_schoolbook_mont(f, aa, bb, out);
+        return;
+    }
+    let split = aa.len().max(bb.len()) / 2;
+    let (a0, a1) = if split < aa.len() {
+        aa.split_at(split)
+    } else {
+        (aa, &[][..])
+    };
+    let (b0, b1) = if split < bb.len() {
+        bb.split_at(split)
+    } else {
+        (bb, &[][..])
+    };
+    let mut z0 = Vec::new();
+    let mut z2 = Vec::new();
+    poly_mul_mont(f, a0, b0, &mut z0);
+    poly_mul_mont(f, a1, b1, &mut z2);
+
+    let sa_len = a0.len().max(a1.len());
+    let mut sa = Vec::with_capacity(sa_len);
+    for i in 0..sa_len {
+        let x = a0.get(i).copied().unwrap_or(0);
+        let y = a1.get(i).copied().unwrap_or(0);
+        sa.push(f.add(x, y));
+    }
+    let sb_len = b0.len().max(b1.len());
+    let mut sb = Vec::with_capacity(sb_len);
+    for i in 0..sb_len {
+        let x = b0.get(i).copied().unwrap_or(0);
+        let y = b1.get(i).copied().unwrap_or(0);
+        sb.push(f.add(x, y));
+    }
+    let mut z1 = Vec::new();
+    poly_mul_mont(f, &sa, &sb, &mut z1);
+    let z1_need = z1.len().max(z0.len()).max(z2.len());
+    if z1.len() < z1_need {
+        z1.resize(z1_need, 0);
+    }
+    for (i, &v) in z0.iter().enumerate() {
+        z1[i] = f.sub(z1[i], v);
+    }
+    for (i, &v) in z2.iter().enumerate() {
+        z1[i] = f.sub(z1[i], v);
+    }
+    poly_trim_mont(&mut z1);
+
+    let out_len = aa.len() + bb.len() - 1;
+    out.clear();
+    out.resize(out_len, 0);
+    for (i, &v) in z0.iter().enumerate() {
+        out[i] = v;
+    }
+    for (i, &v) in z1.iter().enumerate() {
+        if i + split < out_len {
+            out[i + split] = f.add(out[i + split], v);
+        }
+    }
+    for (i, &v) in z2.iter().enumerate() {
+        if i + 2 * split < out_len {
+            out[i + 2 * split] = f.add(out[i + 2 * split], v);
+        }
+    }
+    poly_trim_mont(out);
+}
+
+/// Remainder `a(X) mod d(X)` for monic `d(X)` (`*d.last() == Some(&f.one)`) in
+/// Montgomery form using lazy-`u128` Knuth division (zero field inversions, one
+/// Montgomery reduction per quotient term and per remainder term).
+pub fn poly_rem_monic_mont(
+    f: &Fp64,
+    a: &[u64],
+    d: &[u64],
+    rem_u128: &mut Vec<u128>,
+    out: &mut Vec<u64>,
+) {
+    debug_assert!(!d.is_empty() && *d.last().unwrap() == f.one);
+    let m = d.len() - 1;
+    if m == 0 {
+        out.clear();
+        return;
+    }
+    let mut aa = a;
+    while aa.last() == Some(&0) {
+        aa = &aa[..aa.len() - 1];
+    }
+    if aa.len() <= m {
+        out.clear();
+        out.extend_from_slice(aa);
+        return;
+    }
+    let n = aa.len() - 1;
+    let one_u128 = f.one as u128;
+    let max_lazy = max_lazy_terms(f.p);
+    rem_u128.clear();
+    rem_u128.reserve(n + 1);
+    for &c in aa {
+        rem_u128.push((c as u128) * one_u128);
+    }
+    let mut ops_in_window = 1usize;
+    let d_low = &d[..m];
+    for k in (m..=n).rev() {
+        let lead = f.reduce(rem_u128[k]);
+        if lead != 0 {
+            if ops_in_window == max_lazy {
+                for slot in &mut rem_u128[..k] {
+                    *slot = (f.reduce(*slot) as u128) * one_u128;
+                }
+                ops_in_window = 1;
+            }
+            let neg_lead = (f.p - lead) as u128;
+            let base = k - m;
+            for j in 0..m {
+                rem_u128[base + j] += neg_lead * (d_low[j] as u128);
+            }
+            ops_in_window += 1;
+        }
+    }
+    out.clear();
+    out.reserve(m);
+    for &slot in &rem_u128[..m] {
+        out.push(f.reduce(slot));
+    }
+    poly_trim_mont(out);
+}
+
+#[inline]
+fn poly_eval_horner_mont(f: &Fp64, coeffs_mont: &[u64], x_mont: u64) -> u64 {
+    let mut acc = 0u64;
+    for &c in coeffs_mont.iter().rev() {
+        acc = f.add(f.mul(acc, x_mont), c);
+    }
+    acc
+}
+
+fn poly_make_monic_mont(f: &Fp64, p: &mut Vec<u64>) {
+    poly_trim_mont(p);
+    let Some(&lead) = p.last() else {
+        return;
+    };
+    if lead == f.one {
+        return;
+    }
+    let inv = f.inv(lead);
+    let last = p.len() - 1;
+    for c in &mut p[..last] {
+        *c = f.mul(*c, inv);
+    }
+    p[last] = f.one;
+}
+
+fn poly_gcd_mont(f: &Fp64, a_in: &[u64], b_in: &[u64], rem_u128: &mut Vec<u128>) -> Vec<u64> {
+    let mut a = a_in.to_vec();
+    let mut b = b_in.to_vec();
+    poly_make_monic_mont(f, &mut a);
+    poly_make_monic_mont(f, &mut b);
+    let mut next = Vec::new();
+    while !b.is_empty() {
+        poly_rem_monic_mont(f, &a, &b, rem_u128, &mut next);
+        poly_make_monic_mont(f, &mut next);
+        a = std::mem::take(&mut b);
+        b = std::mem::take(&mut next);
+    }
+    a
+}
+
+fn poly_pow_mod_mont(
+    f: &Fp64,
+    base_in: &[u64],
+    mut exp: u64,
+    modulus_monic: &[u64],
+    rem_u128: &mut Vec<u128>,
+) -> Vec<u64> {
+    if modulus_monic.len() <= 1 {
+        return Vec::new();
+    }
+    let mut acc = vec![f.one];
+    let mut base = Vec::new();
+    poly_rem_monic_mont(f, base_in, modulus_monic, rem_u128, &mut base);
+    let mut prod = Vec::new();
+    let mut rem = Vec::new();
+    while exp > 0 {
+        if exp & 1 == 1 {
+            poly_mul_schoolbook_mont(f, &acc, &base, &mut prod);
+            poly_rem_monic_mont(f, &prod, modulus_monic, rem_u128, &mut rem);
+            std::mem::swap(&mut acc, &mut rem);
+        }
+        exp >>= 1;
+        if exp > 0 {
+            poly_mul_schoolbook_mont(f, &base, &base, &mut prod);
+            poly_rem_monic_mont(f, &prod, modulus_monic, rem_u128, &mut rem);
+            std::mem::swap(&mut base, &mut rem);
+        }
+    }
+    acc
+}
+
+/// Split a monic squarefree polynomial `g_monic` (in Montgomery form) whose
+/// irreducible factors over `F_p` are all linear, returning canonical sorted
+/// roots in `[0, p)`.
+fn split_totally_linear_monic_mont(
+    f: &Fp64,
+    g_monic: &[u64],
+    inv_two_mont: u64,
+    rem_u128: &mut Vec<u128>,
+    rng_state: &mut u64,
+    out_canonical: &mut Vec<u64>,
+) {
+    if g_monic.len() <= 1 {
+        return;
+    }
+    let mut queue: Vec<Vec<u64>> = vec![g_monic.to_vec()];
+    let half_p = (f.p - 1) / 2;
+    let mut next_rand = || -> u64 {
+        let mut s = *rng_state;
+        s ^= s << 13;
+        s ^= s >> 7;
+        s ^= s << 17;
+        *rng_state = s;
+        f.to_mont(s % f.p)
+    };
+    while let Some(h) = queue.pop() {
+        let deg = h.len() - 1;
+        if deg == 0 {
+            continue;
+        }
+        if deg == 1 {
+            out_canonical.push(f.from_mont(f.neg(h[0])));
+            continue;
+        }
+        if deg == 2 {
+            // h(X) = X^2 + c1 X + c0 splits over F_p.
+            let half_c1 = f.mul(h[1], inv_two_mont);
+            let disc = f.sub(f.sqr(half_c1), h[0]);
+            if let Some(s) = f.sqrt(disc) {
+                let r0 = f.from_mont(f.sub(s, half_c1));
+                let r1 = f.from_mont(f.neg(f.add(s, half_c1)));
+                out_canonical.push(r0);
+                if r1 != r0 {
+                    out_canonical.push(r1);
+                }
+            }
+            continue;
+        }
+        loop {
+            let delta = next_rand();
+            // (X + delta)^((p-1)/2) - 1 mod h(X)
+            let lin = [delta, f.one];
+            let mut pow = poly_pow_mod_mont(f, &lin, half_p, &h, rem_u128);
+            if pow.is_empty() {
+                pow.push(f.neg(f.one));
+            } else {
+                pow[0] = f.sub(pow[0], f.one);
+                poly_trim_mont(&mut pow);
+            }
+            if pow.is_empty() {
+                continue;
+            }
+            let factor = poly_gcd_mont(f, &h, &pow, rem_u128);
+            let f_deg = factor.len().saturating_sub(1);
+            if f_deg > 0 && f_deg < deg {
+                // Divide h by monic `factor` via exact monic quotient.
+                let q = poly_div_exact_monic_mont(f, &h, &factor);
+                queue.push(factor);
+                queue.push(q);
+                break;
+            }
+        }
+    }
+    out_canonical.sort_unstable();
+    out_canonical.dedup();
+}
+
+fn poly_div_exact_monic_mont(f: &Fp64, a: &[u64], d_monic: &[u64]) -> Vec<u64> {
+    let m = d_monic.len() - 1;
+    let n = a.len() - 1;
+    if n < m {
+        return Vec::new();
+    }
+    let mut rem = a.to_vec();
+    let q_len = n - m + 1;
+    let mut q = vec![0u64; q_len];
+    for k in (m..=n).rev() {
+        let lead = rem[k];
+        q[k - m] = lead;
+        if lead != 0 {
+            for j in 0..m {
+                rem[k - m + j] = f.sub(rem[k - m + j], f.mul(lead, d_monic[j]));
+            }
+        }
+    }
+    poly_trim_mont(&mut q);
+    q
+}
+
+/// Native Montgomery `Fp64` Cantor–Zassenhaus root finder over `F_p` (`p < 2^62`).
+/// Returns all distinct roots in `F_p` sorted in canonical `[0, p)` order,
+/// matching [`crate::cryptanalysis::ec_index_calculus::find_roots_fp_fast`]
+/// (`Vec::new()` on the zero or nonzero constant polynomial).
+pub fn find_roots_fp64_cz(f: &Fp64, coeffs_canonical: &[u64]) -> Vec<u64> {
+    let mut poly: Vec<u64> = coeffs_canonical
+        .iter()
+        .map(|&c| f.to_mont(c % f.p))
+        .collect();
+    poly_make_monic_mont(f, &mut poly);
+    if poly.len() <= 1 {
+        return Vec::new();
+    }
+    let inv_two = f.inv(f.add(f.one, f.one));
+    if poly.len() == 2 {
+        return vec![f.from_mont(f.neg(poly[0]))];
+    }
+    if poly.len() == 3 {
+        let half_c1 = f.mul(poly[1], inv_two);
+        let disc = f.sub(f.sqr(half_c1), poly[0]);
+        let Some(s) = f.sqrt(disc) else {
+            return Vec::new();
+        };
+        let r0 = f.from_mont(f.sub(s, half_c1));
+        let r1 = f.from_mont(f.neg(f.add(s, half_c1)));
+        let mut out = if r0 == r1 { vec![r0] } else { vec![r0, r1] };
+        out.sort_unstable();
+        return out;
+    }
+    let mut rem_u128 = Vec::with_capacity(poly.len() * 2);
+    // X^p - X mod poly(X)
+    let x_poly = [0u64, f.one];
+    let mut xp = poly_pow_mod_mont(f, &x_poly, f.p, &poly, &mut rem_u128);
+    if xp.len() < 2 {
+        xp.resize(2, 0);
+    }
+    xp[1] = f.sub(xp[1], f.one);
+    poly_trim_mont(&mut xp);
+    let g = if xp.is_empty() {
+        poly
+    } else {
+        poly_gcd_mont(f, &poly, &xp, &mut rem_u128)
+    };
+    if g.len() <= 1 {
+        return Vec::new();
+    }
+    let mut out = Vec::with_capacity(g.len() - 1);
+    let mut seed = f.p ^ 0xA55A_9E37_79B9_7F4A;
+    split_totally_linear_monic_mont(f, &g, inv_two, &mut rem_u128, &mut seed, &mut out);
+    out
+}
+
+/// Reusable scratch buffers for [`FactorBaseSubproductTree::roots_in_base_batch`].
+#[derive(Default, Clone, Debug)]
+pub struct SubproductBatchScratch {
+    rem_u128: Vec<u128>,
+    cand_levels: Vec<Vec<Vec<u64>>>,
+    rem_curr: Vec<Vec<u64>>,
+    rem_next: Vec<Vec<u64>>,
+    gcd_a: Vec<Vec<u64>>,
+    denoms: Vec<u64>,
+    denom_idx: Vec<usize>,
+    prefix: Vec<u64>,
+}
+
+/// Precomputed factor-base subproduct tree `P_V(X) = prod_{x in V} (X - x)`
+/// over `Fp64`, supporting:
+/// 1. Fast top-down remainder-tree multipoint evaluation (`eval_all`), and
+/// 2. Crossover-gated factor-base root extraction for single polynomials
+///    (`roots_in_base`) and multi-polynomial candidate batches
+///    (`roots_in_base_batch`), eliminating the `O(d^2 log p)` per-candidate
+///    `gcd(X^p - X, g(X))` squaring ladder on non-`V`-splitting polynomials.
+#[derive(Clone, Debug)]
+pub struct FactorBaseSubproductTree {
+    pub f: Fp64,
+    /// Sorted deduplicated canonical abscissae `x in V`.
+    pub xs: Vec<u64>,
+    /// Montgomery-form abscissae aligned with `xs`.
+    xs_mont: Vec<u64>,
+    /// Binary product tree levels in Montgomery form (`levels[0]` are leaves
+    /// `[ -x_i, 1 ]` or leaf blocks, `levels.last()[0]` is `P_V(X)`).
+    levels: Vec<Vec<Vec<u64>>>,
+    /// `(2)^(-1)` in Montgomery form.
+    inv_two_mont: u64,
+    /// Fast membership table when `max_x <= 262_144`, else `HashSet`.
+    dense_membership: Vec<u64>,
+    max_x: u64,
+    sparse_membership: HashSet<u64>,
+    pub multipoint_crossover_b: usize,
+    pub batch_crossover_b: usize,
+}
+
+impl FastFactorBase {
+    /// Build the shared factor-base subproduct tree `P_V(X) = prod_{x in FB} (X - x)`
+    /// once during preparation.
+    pub fn prepare_subproduct_tree(&self, curve: &FastCurve) -> FactorBaseSubproductTree {
+        FactorBaseSubproductTree::prepare(curve.f, &self.xs)
+    }
+}
+
+impl FactorBaseSubproductTree {
+    /// Precompute `P_V(X) = prod_{x in V} (X - x)` once per factor base.
+    pub fn prepare(f: Fp64, base_xs: &[u64]) -> Self {
+        Self::prepare_with_crossovers(
+            f,
+            base_xs,
+            DEFAULT_MULTIPOINT_CROSSOVER_B,
+            DEFAULT_BATCH_SUBPRODUCT_CROSSOVER_B,
+        )
+    }
+
+    pub fn prepare_with_crossovers(
+        f: Fp64,
+        base_xs: &[u64],
+        multipoint_crossover_b: usize,
+        batch_crossover_b: usize,
+    ) -> Self {
+        let mut xs: Vec<u64> = base_xs.iter().map(|&x| x % f.p).collect();
+        xs.sort_unstable();
+        xs.dedup();
+        let xs_mont: Vec<u64> = xs.iter().map(|&x| f.to_mont(x)).collect();
+        let max_x = xs.last().copied().unwrap_or(0);
+        let (dense_membership, sparse_membership) = if !xs.is_empty() && max_x <= 262_144 {
+            let words = (max_x as usize / 64) + 1;
+            let mut bits = vec![0u64; words];
+            for &x in &xs {
+                bits[x as usize >> 6] |= 1u64 << (x & 63);
+            }
+            (bits, HashSet::new())
+        } else {
+            (Vec::new(), xs.iter().copied().collect())
+        };
+
+        let mut levels: Vec<Vec<Vec<u64>>> = Vec::new();
+        if !xs_mont.is_empty() {
+            let lvl0: Vec<Vec<u64>> = xs_mont.iter().map(|&xm| vec![f.neg(xm), f.one]).collect();
+            levels.push(lvl0);
+            while levels.last().unwrap().len() > 1 {
+                let prev = levels.last().unwrap();
+                let mut next = Vec::with_capacity(prev.len().div_ceil(2));
+                for pair in prev.chunks(2) {
+                    if pair.len() == 2 {
+                        let mut prod = Vec::new();
+                        poly_mul_mont(&f, &pair[0], &pair[1], &mut prod);
+                        next.push(prod);
+                    } else {
+                        next.push(pair[0].clone());
+                    }
+                }
+                levels.push(next);
+            }
+        }
+        let inv_two_mont = f.inv(f.add(f.one, f.one));
+        Self {
+            f,
+            xs,
+            xs_mont,
+            levels,
+            inv_two_mont,
+            dense_membership,
+            max_x,
+            sparse_membership,
+            multipoint_crossover_b,
+            batch_crossover_b,
+        }
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.xs.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.xs.is_empty()
+    }
+
+    /// Monic factor-base vanishing polynomial `P_V(X)` in Montgomery form.
+    pub fn root_poly_mont(&self) -> &[u64] {
+        self.levels
+            .last()
+            .and_then(|lvl| lvl.first())
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
+    }
+
+    #[inline]
+    pub fn contains_x(&self, x_canonical: u64) -> bool {
+        if self.xs.is_empty() || x_canonical > self.max_x {
+            return false;
+        }
+        if !self.dense_membership.is_empty() {
+            (self.dense_membership[x_canonical as usize >> 6] >> (x_canonical & 63)) & 1 == 1
+        } else {
+            self.sparse_membership.contains(&x_canonical)
+        }
+    }
+
+    /// Evaluate `poly_canonical` at every `x in V`, writing canonical values
+    /// aligned with `self.xs` into `out_canonical`.
+    pub fn eval_all(&self, poly_canonical: &[u64], out_canonical: &mut Vec<u64>) {
+        out_canonical.clear();
+        let b = self.xs.len();
+        if b == 0 {
+            return;
+        }
+        let mut poly_mont: Vec<u64> = poly_canonical
+            .iter()
+            .map(|&c| self.f.to_mont(c % self.f.p))
+            .collect();
+        poly_trim_mont(&mut poly_mont);
+        if poly_mont.is_empty() {
+            out_canonical.resize(b, 0);
+            return;
+        }
+        let deg = poly_mont.len() - 1;
+        out_canonical.resize(b, 0);
+        if b < self.multipoint_crossover_b || deg <= MULTIPOINT_LEAF_WIDTH {
+            for (i, &xm) in self.xs_mont.iter().enumerate() {
+                let val = poly_eval_horner_mont(&self.f, &poly_mont, xm);
+                out_canonical[i] = self.f.from_mont(val);
+            }
+            return;
+        }
+        let mut rem_u128 = Vec::with_capacity(poly_mont.len().max(b) + 2);
+        let top_level = self.levels.len() - 1;
+        let mut root_rem = Vec::new();
+        poly_rem_monic_mont(
+            &self.f,
+            &poly_mont,
+            &self.levels[top_level][0],
+            &mut rem_u128,
+            &mut root_rem,
+        );
+        self.eval_subtree_mont(top_level, 0, 0, b, &root_rem, &mut rem_u128, out_canonical);
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn eval_subtree_mont(
+        &self,
+        level: usize,
+        node_idx: usize,
+        leaf_lo: usize,
+        leaf_hi: usize,
+        poly_mont: &[u64],
+        rem_u128: &mut Vec<u128>,
+        out_canonical: &mut [u64],
+    ) {
+        let span = leaf_hi - leaf_lo;
+        if span == 0 {
+            return;
+        }
+        if poly_mont.is_empty() {
+            out_canonical[leaf_lo..leaf_hi].fill(0);
+            return;
+        }
+        if span <= MULTIPOINT_LEAF_WIDTH
+            || poly_mont.len() <= MULTIPOINT_LEAF_WIDTH + 1
+            || level == 0
+        {
+            for idx in leaf_lo..leaf_hi {
+                let v = poly_eval_horner_mont(&self.f, poly_mont, self.xs_mont[idx]);
+                out_canonical[idx] = self.f.from_mont(v);
+            }
+            return;
+        }
+        let child_level = level - 1;
+        let left_node = 2 * node_idx;
+        let right_node = left_node + 1;
+        let left_span = 1usize << child_level;
+        let mid = (leaf_lo + left_span).min(leaf_hi);
+
+        let mut left_rem = Vec::new();
+        poly_rem_monic_mont(
+            &self.f,
+            poly_mont,
+            &self.levels[child_level][left_node],
+            rem_u128,
+            &mut left_rem,
+        );
+        self.eval_subtree_mont(
+            child_level,
+            left_node,
+            leaf_lo,
+            mid,
+            &left_rem,
+            rem_u128,
+            out_canonical,
+        );
+
+        if mid < leaf_hi {
+            let mut right_rem = Vec::new();
+            poly_rem_monic_mont(
+                &self.f,
+                poly_mont,
+                &self.levels[child_level][right_node],
+                rem_u128,
+                &mut right_rem,
+            );
+            self.eval_subtree_mont(
+                child_level,
+                right_node,
+                mid,
+                leaf_hi,
+                &right_rem,
+                rem_u128,
+                out_canonical,
+            );
+        }
+    }
+
+    /// Find all sorted distinct roots of `poly_canonical` inside `V`, gated so
+    /// small-`B` and low-degree single queries never regress.
+    pub fn roots_in_base(&self, poly_canonical: &[u64]) -> Vec<u64> {
+        let b = self.xs.len();
+        if b == 0 {
+            return Vec::new();
+        }
+        let mut poly_mont: Vec<u64> = poly_canonical
+            .iter()
+            .map(|&c| self.f.to_mont(c % self.f.p))
+            .collect();
+        poly_trim_mont(&mut poly_mont);
+        if poly_mont.len() <= 1 {
+            return Vec::new();
+        }
+        let deg = poly_mont.len() - 1;
+        if deg == 1 {
+            let inv = self.f.inv(poly_mont[1]);
+            let r = self.f.from_mont(self.f.neg(self.f.mul(poly_mont[0], inv)));
+            return if self.contains_x(r) {
+                vec![r]
+            } else {
+                Vec::new()
+            };
+        }
+        let p_bits = (64 - self.f.p.leading_zeros()) as usize;
+        let cz_est_ops = deg * deg * p_bits * 2;
+        let horner_ops = b * deg;
+        // For high-degree single polynomials over large V, use the remainder tree.
+        if b >= self.multipoint_crossover_b && deg > MULTIPOINT_LEAF_WIDTH && cz_est_ops > b * 12 {
+            let mut vals = Vec::with_capacity(b);
+            self.eval_all(poly_canonical, &mut vals);
+            let mut roots = Vec::new();
+            for (i, &v) in vals.iter().enumerate() {
+                if v == 0 {
+                    roots.push(self.xs[i]);
+                }
+            }
+            return roots;
+        }
+        // Small B: direct cache-hot Horner scan over V beats O(d^2 log p) squarings.
+        if horner_ops <= cz_est_ops {
+            let mut roots = Vec::new();
+            for (i, &xm) in self.xs_mont.iter().enumerate() {
+                if poly_eval_horner_mont(&self.f, &poly_mont, xm) == 0 {
+                    roots.push(self.xs[i]);
+                }
+            }
+            return roots;
+        }
+        // Single low-degree query on large B: native Fp64 CZ + O(1) V-filter.
+        let mut roots = find_roots_fp64_cz(&self.f, poly_canonical);
+        roots.retain(|&r| self.contains_x(r));
+        roots
+    }
+
+    /// Batched factor-base root extraction across candidate polynomials
+    /// `polys_canonical` (`coeffs[i]` = coeff of `X^i`).
+    ///
+    /// - When `B < self.batch_crossover_b` (small factor base), uses direct
+    ///   `Fp64` Horner evaluation over `V` (with zero tree overhead) so small-`B`
+    ///   cells never regress.
+    /// - When `B >= self.batch_crossover_b`, normalizes candidate polynomials in
+    ///   one shared `Fp64::batch_inv`, builds a candidate product tree `Q(X)`
+    ///   chunked so `deg(Q) >= B + 1` (making top-level `P_V mod Q = P_V` free),
+    ///   propagates `P_V(X)` down `Q`'s remainder tree to obtain
+    ///   `r_k(X) = P_V(X) mod g_k(X)`, computes `h_k = gcd(g_k, r_k)` in
+    ///   lock-step via `Fp64::batch_inv`, and extracts the exact roots in `V`.
+    pub fn roots_in_base_batch(
+        &self,
+        polys_canonical: &[Vec<u64>],
+        scratch: &mut SubproductBatchScratch,
+    ) -> Vec<Vec<u64>> {
+        let mut out = vec![Vec::new(); polys_canonical.len()];
+        let b = self.xs.len();
+        if b == 0 || polys_canonical.is_empty() {
+            return out;
+        }
+        if b < self.batch_crossover_b {
+            for (idx, poly) in polys_canonical.iter().enumerate() {
+                out[idx] = self.roots_in_base(poly);
+            }
+            return out;
+        }
+
+        // Convert candidates to Montgomery form and batch-invert leading coefficients.
+        scratch.gcd_a.clear();
+        scratch.gcd_a.reserve(polys_canonical.len());
+        scratch.denoms.clear();
+        scratch.denom_idx.clear();
+        let mut active_orig_idx: Vec<usize> = Vec::with_capacity(polys_canonical.len());
+
+        for (orig_i, poly_c) in polys_canonical.iter().enumerate() {
+            let mut pm: Vec<u64> = poly_c
+                .iter()
+                .map(|&c| self.f.to_mont(c % self.f.p))
+                .collect();
+            poly_trim_mont(&mut pm);
+            if pm.len() <= 1 {
+                continue;
+            }
+            let lead = *pm.last().unwrap();
+            let d_idx = if lead == self.f.one {
+                usize::MAX
+            } else {
+                let k = scratch.denoms.len();
+                scratch.denoms.push(lead);
+                k
+            };
+            scratch.denom_idx.push(d_idx);
+            scratch.gcd_a.push(pm);
+            active_orig_idx.push(orig_i);
+        }
+        if active_orig_idx.is_empty() {
+            return out;
+        }
+        if !scratch.denoms.is_empty() {
+            self.f.batch_inv(&mut scratch.denoms, &mut scratch.prefix);
+        }
+        for (k, pm) in scratch.gcd_a.iter_mut().enumerate() {
+            let d_idx = scratch.denom_idx[k];
+            if d_idx != usize::MAX {
+                let inv = scratch.denoms[d_idx];
+                let last = pm.len() - 1;
+                for c in &mut pm[..last] {
+                    *c = self.f.mul(*c, inv);
+                }
+                pm[last] = self.f.one;
+            }
+        }
+
+        // Process active monic polynomials in chunks whose total degree exceeds B
+        // (so top-level `P_V mod Q_root = P_V` costs zero divisions) while keeping
+        // the candidate tree inside L2 cache.
+        let pv_mont = self.root_poly_mont();
+        let mut rng_state = self.f.p ^ 0x517C_C1B7_2722_0A95;
+        let mut cursor = 0usize;
+        while cursor < active_orig_idx.len() {
+            let start = cursor;
+            let mut sum_deg = 0usize;
+            let target_deg = (b + 1).max(128);
+            while cursor < active_orig_idx.len() && (sum_deg < target_deg || cursor == start) {
+                sum_deg += scratch.gcd_a[cursor].len() - 1;
+                cursor += 1;
+            }
+            let count = cursor - start;
+            if count <= 2 {
+                for pos in start..cursor {
+                    let orig_i = active_orig_idx[pos];
+                    out[orig_i] = self.roots_in_base(&polys_canonical[orig_i]);
+                }
+                continue;
+            }
+
+            // Build candidate binary product tree `cand_levels`.
+            scratch.cand_levels.clear();
+            let lvl0: Vec<Vec<u64>> = scratch.gcd_a[start..cursor].to_vec();
+            scratch.cand_levels.push(lvl0);
+            while scratch.cand_levels.last().unwrap().len() > 1 {
+                let prev = scratch.cand_levels.last().unwrap();
+                let mut next = Vec::with_capacity(prev.len().div_ceil(2));
+                for pair in prev.chunks(2) {
+                    if pair.len() == 2 {
+                        let mut prod = Vec::new();
+                        poly_mul_mont(&self.f, &pair[0], &pair[1], &mut prod);
+                        next.push(prod);
+                    } else {
+                        next.push(pair[0].clone());
+                    }
+                }
+                scratch.cand_levels.push(next);
+            }
+
+            // Propagate `P_V(X)` top-down through `cand_levels`.
+            let top = scratch.cand_levels.len() - 1;
+            let mut root_rem = Vec::new();
+            poly_rem_monic_mont(
+                &self.f,
+                pv_mont,
+                &scratch.cand_levels[top][0],
+                &mut scratch.rem_u128,
+                &mut root_rem,
+            );
+            scratch.rem_curr.clear();
+            scratch.rem_curr.push(root_rem);
+            for lvl in (0..top).rev() {
+                let nodes = &scratch.cand_levels[lvl];
+                scratch.rem_next.clear();
+                scratch.rem_next.reserve(nodes.len());
+                for (parent_i, parent_rem) in scratch.rem_curr.iter().enumerate() {
+                    let left_i = 2 * parent_i;
+                    let mut lrem = Vec::new();
+                    poly_rem_monic_mont(
+                        &self.f,
+                        parent_rem,
+                        &nodes[left_i],
+                        &mut scratch.rem_u128,
+                        &mut lrem,
+                    );
+                    scratch.rem_next.push(lrem);
+                    let right_i = left_i + 1;
+                    if right_i < nodes.len() {
+                        let mut rrem = Vec::new();
+                        poly_rem_monic_mont(
+                            &self.f,
+                            parent_rem,
+                            &nodes[right_i],
+                            &mut scratch.rem_u128,
+                            &mut rrem,
+                        );
+                        scratch.rem_next.push(rrem);
+                    }
+                }
+                std::mem::swap(&mut scratch.rem_curr, &mut scratch.rem_next);
+            }
+
+            // Lock-step batched Euclidean GCD across all `count` leaves:
+            // `h_k = gcd(g_k, r_k)` with shared `Fp64::batch_inv` per GCD step!
+            let mut a_lanes: Vec<Vec<u64>> = scratch.cand_levels[0].clone();
+            let mut b_lanes: Vec<Vec<u64>> = std::mem::take(&mut scratch.rem_curr);
+            loop {
+                scratch.denoms.clear();
+                scratch.denom_idx.clear();
+                let mut any_active = false;
+                for bl in &mut b_lanes {
+                    poly_trim_mont(bl);
+                    if let Some(&lead) = bl.last() {
+                        any_active = true;
+                        if lead == self.f.one {
+                            scratch.denom_idx.push(usize::MAX);
+                        } else {
+                            let idx = scratch.denoms.len();
+                            scratch.denoms.push(lead);
+                            scratch.denom_idx.push(idx);
+                        }
+                    } else {
+                        scratch.denom_idx.push(usize::MAX - 1);
+                    }
+                }
+                if !any_active {
+                    break;
+                }
+                if !scratch.denoms.is_empty() {
+                    self.f.batch_inv(&mut scratch.denoms, &mut scratch.prefix);
+                }
+                for lane in 0..count {
+                    let tag = scratch.denom_idx[lane];
+                    if tag == usize::MAX - 1 {
+                        continue;
+                    }
+                    if tag != usize::MAX {
+                        let inv = scratch.denoms[tag];
+                        let bl = &mut b_lanes[lane];
+                        let last = bl.len() - 1;
+                        for c in &mut bl[..last] {
+                            *c = self.f.mul(*c, inv);
+                        }
+                        bl[last] = self.f.one;
+                    }
+                    let mut next_rem = Vec::new();
+                    poly_rem_monic_mont(
+                        &self.f,
+                        &a_lanes[lane],
+                        &b_lanes[lane],
+                        &mut scratch.rem_u128,
+                        &mut next_rem,
+                    );
+                    a_lanes[lane] = std::mem::take(&mut b_lanes[lane]);
+                    b_lanes[lane] = next_rem;
+                }
+            }
+
+            // Extract roots from each monic `h_k = a_lanes[lane]` (every factor of
+            // `h_k` divides `P_V(X)` and therefore splits completely in `V`).
+            for (lane, hk) in a_lanes.iter().enumerate() {
+                let orig_i = active_orig_idx[start + lane];
+                let deg_h = hk.len().saturating_sub(1);
+                if deg_h == 0 {
+                    continue;
+                }
+                let dst = &mut out[orig_i];
+                if deg_h == 1 {
+                    dst.push(self.f.from_mont(self.f.neg(hk[0])));
+                } else if deg_h == 2 {
+                    let half_c1 = self.f.mul(hk[1], self.inv_two_mont);
+                    let disc = self.f.sub(self.f.sqr(half_c1), hk[0]);
+                    if let Some(s) = self.f.sqrt(disc) {
+                        let r0 = self.f.from_mont(self.f.sub(s, half_c1));
+                        let r1 = self.f.from_mont(self.f.neg(self.f.add(s, half_c1)));
+                        dst.push(r0);
+                        if r1 != r0 {
+                            dst.push(r1);
+                        }
+                        dst.sort_unstable();
+                    }
+                } else {
+                    split_totally_linear_monic_mont(
+                        &self.f,
+                        hk,
+                        self.inv_two_mont,
+                        &mut scratch.rem_u128,
+                        &mut rng_state,
+                        dst,
+                    );
+                }
+            }
+        }
+        out
+    }
+}
+
+/// Decomposition strategy for [`collect_relations_lockstep`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LockStepMode {
+    /// `O(1)` lookup per walker in `fb` (1-term) and `PairTable` (2-term),
+    /// sharing one `Fp64::batch_inv` across all `W` walkers' `R_w <- R_w + G`
+    /// steps each round.
+    PairTable2,
+    /// Direct subtraction sweep (`R_w ∓ F_i` across all `W` walkers and `B`
+    /// factor-base points, optionally matching `PairTable` for 3-term rows)
+    /// sharing `Fp64::batch_inv` over both subtraction denominators and
+    /// walker step denominators.
+    DirectSweep,
+}
+
+/// Reusable SoA buffers for [`collect_relations_lockstep`]: zero heap
+/// allocations occur inside the target-collection loop once sized for `W`.
+#[derive(Default, Clone, Debug)]
+pub struct LockStepCollectScratch {
+    rx: Vec<u64>,
+    ry: Vec<u64>,
+    ra: Vec<u64>,
+    rb: Vec<u64>,
+    denoms: Vec<u64>,
+    prefix: Vec<u64>,
+    degenerate: Vec<bool>,
+    found: Vec<SmallEntries>,
+    lane_seen: HashSet<SmallEntries>,
+    global_seen: HashSet<(u64, u64, SmallEntries)>,
+}
+
+/// Lock-step multi-walker relation collector (`W = 64..256` walkers):
+/// - Initializes and restarts walkers via cheap stride additions `T_0 + k*S`
+///   (falling back to `combine` only on identity/zero-`b` hits);
+/// - Reuses [`LockStepCollectScratch`] across rounds and calls with zero
+///   per-target heap allocations (`SmallEntries` stack representation);
+/// - Batches all `W` walker advances `R_w <- R_w + G` in a single
+///   [`Fp64::batch_inv`] per round (and batches `W * B` subtraction
+///   denominators in [`LockStepMode::DirectSweep`]).
+#[allow(clippy::too_many_arguments)]
+pub fn collect_relations_lockstep(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb: &FastFactorBase,
+    pairs: Option<&PairTable>,
+    needed: usize,
+    max_targets: u64,
+    walkers: usize,
+    mode: LockStepMode,
+    seed: u64,
+    scratch: &mut LockStepCollectScratch,
+) -> (Vec<FastRelation>, CollectStats) {
+    let f = curve.f;
+    let n = curve.n;
+    let w_len = walkers.max(1);
+    let b_len = fb.len();
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x10C4_57E9_2026_1119);
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut stats = CollectStats::default();
+    if b_len == 0 || needed == 0 || max_targets == 0 {
+        return (rels, stats);
+    }
+
+    // Stride-based walker start generator: two scalar combines initially,
+    // then 1 affine addition per new start/restart!
+    let fresh_combine = |rng: &mut StdRng| -> (u64, u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            let b = rng.gen_range(1..n);
+            if let Some(pt) = curve.combine(g, q, a, b) {
+                return (a, b, pt);
+            }
+        }
+    };
+    let (sa, sb, stride_pt) = fresh_combine(&mut rng);
+    let (mut cur_a, mut cur_b, mut cur_pt) = fresh_combine(&mut rng);
+    let mut next_start = |rng: &mut StdRng| -> (u64, u64, Pt) {
+        cur_a = add_mod(cur_a, sa, n);
+        cur_b = add_mod(cur_b, sb, n);
+        if cur_b != 0 {
+            if let Some(pt) = curve.add(Some(cur_pt), Some(stride_pt)) {
+                cur_pt = pt;
+                return (cur_a, cur_b, pt);
+            }
+        }
+        let (na, nb, npt) = fresh_combine(rng);
+        cur_a = na;
+        cur_b = nb;
+        cur_pt = npt;
+        (na, nb, npt)
+    };
+
+    scratch.rx.clear();
+    scratch.ry.clear();
+    scratch.ra.clear();
+    scratch.rb.clear();
+    scratch.rx.reserve(w_len);
+    scratch.ry.reserve(w_len);
+    scratch.ra.reserve(w_len);
+    scratch.rb.reserve(w_len);
+    for _ in 0..w_len {
+        let (a, b, pt) = next_start(&mut rng);
+        scratch.rx.push(pt.x);
+        scratch.ry.push(pt.y);
+        scratch.ra.push(a);
+        scratch.rb.push(b);
+    }
+    scratch.global_seen.clear();
+    scratch.global_seen.reserve(needed * 2);
+
+    let max_pair_x = pairs.map(PairTable::max_x).unwrap_or(0);
+
+    'rounds: while rels.len() < needed && stats.targets < max_targets {
+        let rem_budget = (max_targets - stats.targets) as usize;
+        let active_w = w_len.min(rem_budget);
+
+        match mode {
+            LockStepMode::PairTable2 => {
+                let pairs_ref = pairs.expect("LockStepMode::PairTable2 requires PairTable");
+                for lane in 0..active_w {
+                    stats.targets += 1;
+                    let r = Pt {
+                        x: scratch.rx[lane],
+                        y: scratch.ry[lane],
+                    };
+                    let xc = f.from_mont(r.x);
+                    scratch.found.clear();
+                    if let Some(j) = fb.lookup(xc) {
+                        let s = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                        scratch.found.push(SmallEntries::one(j as u32, s));
+                    }
+                    if xc <= max_pair_x {
+                        for &(_, j, k_raw) in pairs_ref.lookup(xc) {
+                            let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                            let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                            let fk = fb.pts[k];
+                            let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                            let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                                continue;
+                            };
+                            let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                            scratch
+                                .found
+                                .push(SmallEntries::two(j, tau, k as u32, tau * sigma));
+                        }
+                    }
+                    if !scratch.found.is_empty() {
+                        scratch.lane_seen.clear();
+                        let mut productive = false;
+                        for idx in 0..scratch.found.len() {
+                            let merged = scratch.found[idx];
+                            if merged.is_empty()
+                                || !scratch.lane_seen.insert(merged)
+                                || !scratch.global_seen.insert((
+                                    scratch.ra[lane],
+                                    scratch.rb[lane],
+                                    merged,
+                                ))
+                            {
+                                continue;
+                            }
+                            if !relation_holds(curve, fb, r, merged.as_slice()) {
+                                stats.rejected += 1;
+                                continue;
+                            }
+                            match merged.len {
+                                1 => stats.rows_one += 1,
+                                2 => stats.rows_two += 1,
+                                _ => stats.rows_three += 1,
+                            }
+                            rels.push(FastRelation {
+                                a: scratch.ra[lane],
+                                b: scratch.rb[lane],
+                                entries: merged.to_vec(),
+                            });
+                            productive = true;
+                            break;
+                        }
+                        if productive {
+                            if rels.len() >= needed {
+                                break 'rounds;
+                            }
+                            let (na, nb, npt) = next_start(&mut rng);
+                            scratch.rx[lane] = npt.x;
+                            scratch.ry[lane] = npt.y;
+                            scratch.ra[lane] = na;
+                            scratch.rb[lane] = nb;
+                        }
+                    }
+                }
+            }
+            LockStepMode::DirectSweep => {
+                // Batch all `active_w * b_len` subtraction denominators `(R_w.x - F_i.x)`
+                // in cache-hot chunks of up to 1024 entries!
+                let lanes_per_chunk = (1024 / b_len.max(1)).clamp(1, active_w);
+                let mut lane_base = 0usize;
+                while lane_base < active_w {
+                    let chunk_w = (active_w - lane_base).min(lanes_per_chunk);
+                    let total_den = chunk_w * b_len;
+                    scratch.denoms.clear();
+                    scratch.degenerate.clear();
+                    scratch.denoms.reserve(total_den);
+                    scratch.degenerate.reserve(total_den);
+                    for off in 0..chunk_w {
+                        let rx = scratch.rx[lane_base + off];
+                        for i in 0..b_len {
+                            let dd = f.sub(rx, fb.pts[i].x);
+                            let deg = dd == 0;
+                            scratch.degenerate.push(deg);
+                            scratch.denoms.push(if deg { f.one } else { dd });
+                        }
+                    }
+                    f.batch_inv(&mut scratch.denoms, &mut scratch.prefix);
+
+                    for off in 0..chunk_w {
+                        let lane = lane_base + off;
+                        stats.targets += 1;
+                        let r = Pt {
+                            x: scratch.rx[lane],
+                            y: scratch.ry[lane],
+                        };
+                        let row_off = off * b_len;
+                        scratch.found.clear();
+                        for i in 0..b_len {
+                            let fi = fb.pts[i];
+                            if scratch.degenerate[row_off + i] {
+                                let s = if r.y == fi.y { 1i8 } else { -1 };
+                                scratch.found.push(SmallEntries::one(i as u32, s));
+                                continue;
+                            }
+                            let inv = scratch.denoms[row_off + i];
+                            let lam_minus = f.mul(f.add(r.y, fi.y), inv);
+                            let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
+                            for (eps, lam) in [(1i8, lam_minus), (-1i8, lam_plus)] {
+                                let x3 = f.sub(f.sub(f.sqr(lam), r.x), fi.x);
+                                let xc = f.from_mont(x3);
+                                let mut y3: Option<u64> = None;
+                                if let Some(j) = fb.lookup(xc) {
+                                    if j >= i {
+                                        let y = f.sub(f.mul(lam, f.sub(r.x, x3)), r.y);
+                                        y3 = Some(y);
+                                        let tau = if y == fb.pts[j].y { 1i8 } else { -1 };
+                                        scratch
+                                            .found
+                                            .push(SmallEntries::two(i as u32, eps, j as u32, tau));
+                                    }
+                                }
+                                if let Some(pairs_ref) = pairs {
+                                    if xc <= max_pair_x {
+                                        for &(_, j, k_raw) in pairs_ref.lookup(xc) {
+                                            if (j as usize) < i {
+                                                continue;
+                                            }
+                                            let sigma =
+                                                if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                                            let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                                            let fk = fb.pts[k];
+                                            let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                                            let Some(pjk) =
+                                                curve.add(Some(fb.pts[j as usize]), Some(fk))
+                                            else {
+                                                continue;
+                                            };
+                                            let y = *y3.get_or_insert_with(|| {
+                                                f.sub(f.mul(lam, f.sub(r.x, x3)), r.y)
+                                            });
+                                            let tau = if y == pjk.y { 1i8 } else { -1 };
+                                            scratch.found.push(SmallEntries::three(
+                                                i as u32,
+                                                eps,
+                                                j,
+                                                tau,
+                                                k as u32,
+                                                tau * sigma,
+                                            ));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if !scratch.found.is_empty() {
+                            scratch.lane_seen.clear();
+                            let mut productive = false;
+                            for idx in 0..scratch.found.len() {
+                                let merged = scratch.found[idx];
+                                if merged.is_empty()
+                                    || !scratch.lane_seen.insert(merged)
+                                    || !scratch.global_seen.insert((
+                                        scratch.ra[lane],
+                                        scratch.rb[lane],
+                                        merged,
+                                    ))
+                                {
+                                    continue;
+                                }
+                                if !relation_holds(curve, fb, r, merged.as_slice()) {
+                                    stats.rejected += 1;
+                                    continue;
+                                }
+                                match merged.len {
+                                    1 => stats.rows_one += 1,
+                                    2 => stats.rows_two += 1,
+                                    _ => stats.rows_three += 1,
+                                }
+                                rels.push(FastRelation {
+                                    a: scratch.ra[lane],
+                                    b: scratch.rb[lane],
+                                    entries: merged.to_vec(),
+                                });
+                                productive = true;
+                                break;
+                            }
+                            if productive {
+                                if rels.len() >= needed {
+                                    break 'rounds;
+                                }
+                                let (na, nb, npt) = next_start(&mut rng);
+                                scratch.rx[lane] = npt.x;
+                                scratch.ry[lane] = npt.y;
+                                scratch.ra[lane] = na;
+                                scratch.rb[lane] = nb;
+                            }
+                        }
+                    }
+                    lane_base += chunk_w;
+                }
+            }
+        }
+
+        if stats.targets >= max_targets {
+            break;
+        }
+
+        // Advance all `w_len` walkers simultaneously: `R_w <- R_w + G` with ONE
+        // shared `Fp64::batch_inv` and zero heap allocations!
+        scratch.denoms.clear();
+        scratch.degenerate.clear();
+        scratch.denoms.reserve(w_len);
+        scratch.degenerate.reserve(w_len);
+        for lane in 0..w_len {
+            let dd = f.sub(g.x, scratch.rx[lane]);
+            let deg = dd == 0;
+            scratch.degenerate.push(deg);
+            scratch.denoms.push(if deg { f.one } else { dd });
+        }
+        f.batch_inv(&mut scratch.denoms, &mut scratch.prefix);
+        for lane in 0..w_len {
+            if scratch.degenerate[lane] {
+                let r = Pt {
+                    x: scratch.rx[lane],
+                    y: scratch.ry[lane],
+                };
+                match curve.add(Some(r), Some(g)) {
+                    Some(nr) => {
+                        scratch.rx[lane] = nr.x;
+                        scratch.ry[lane] = nr.y;
+                        scratch.ra[lane] = add_mod(scratch.ra[lane], 1, n);
+                    }
+                    None => {
+                        let (na, nb, npt) = next_start(&mut rng);
+                        scratch.rx[lane] = npt.x;
+                        scratch.ry[lane] = npt.y;
+                        scratch.ra[lane] = na;
+                        scratch.rb[lane] = nb;
+                    }
+                }
+            } else {
+                let rx = scratch.rx[lane];
+                let ry = scratch.ry[lane];
+                let lam = f.mul(f.sub(g.y, ry), scratch.denoms[lane]);
+                let x3 = f.sub(f.sub(f.sqr(lam), rx), g.x);
+                let y3 = f.sub(f.mul(lam, f.sub(rx, x3)), ry);
+                scratch.rx[lane] = x3;
+                scratch.ry[lane] = y3;
+                scratch.ra[lane] = add_mod(scratch.ra[lane], 1, n);
+            }
+        }
+    }
+
+    stats.relations = rels.len();
+    (rels, stats)
+}
+
+/// End-to-end single-target discrete-log solver using [`collect_relations_lockstep`]
+/// (`W = 64..256` walkers, zero-allocation scratch reuse) and fail-closed
+/// `[d]G == Q` verification.
+#[allow(clippy::too_many_arguments)]
+pub fn ic_solve_lockstep(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb_size: usize,
+    extra_relations: usize,
+    walkers: usize,
+    mode: LockStepMode,
+    max_targets: u64,
+    seed: u64,
+) -> Option<(u64, IcReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    let factor_base_ms = t0.elapsed().as_secs_f64() * 1e3;
+    if fb.is_empty() {
+        return None;
+    }
+    let t1 = Instant::now();
+    let pairs = match mode {
+        LockStepMode::PairTable2 => Some(PairTable::build(curve, &fb)),
+        LockStepMode::DirectSweep => None,
+    };
+    let pair_table_ms = t1.elapsed().as_secs_f64() * 1e3;
+    let needed = fb.len() + extra_relations;
+    let t2 = Instant::now();
+    let mut scratch = LockStepCollectScratch::default();
+    let (mut rels, mut stats) = collect_relations_lockstep(
+        curve,
+        g,
+        q,
+        &fb,
+        pairs.as_ref(),
+        needed,
+        max_targets,
+        walkers,
+        mode,
+        seed,
+        &mut scratch,
+    );
+    let mut relations_ms = t2.elapsed().as_secs_f64() * 1e3;
+    if rels.len() < needed {
+        return None;
+    }
+    let mut linear_algebra_ms = 0.0;
+    let mut topup_epoch = 1u64;
+    let topup_step = (fb.len() / 4).clamp(16, 64);
+    let d = loop {
+        let t3 = Instant::now();
+        let sol = solve_relations(curve, fb.len(), &rels);
+        linear_algebra_ms += t3.elapsed().as_secs_f64() * 1e3;
+        if let Some(d_found) = sol {
+            break d_found;
+        }
+        if stats.targets >= max_targets || topup_epoch > 8 {
+            return None;
+        }
+        let rem_budget = max_targets - stats.targets;
+        let t_more = Instant::now();
+        let (more_rels, more_stats) = collect_relations_lockstep(
+            curve,
+            g,
+            q,
+            &fb,
+            pairs.as_ref(),
+            topup_step,
+            rem_budget,
+            walkers,
+            mode,
+            seed.wrapping_add(topup_epoch.wrapping_mul(0x9E37_79B9_7F4A_7C15)),
+            &mut scratch,
+        );
+        relations_ms += t_more.elapsed().as_secs_f64() * 1e3;
+        stats.targets += more_stats.targets;
+        stats.rows_one += more_stats.rows_one;
+        stats.rows_two += more_stats.rows_two;
+        stats.rows_three += more_stats.rows_three;
+        stats.rejected += more_stats.rejected;
+        if more_rels.is_empty() {
+            return None;
+        }
+        rels.extend(more_rels);
+        stats.relations = rels.len();
+        topup_epoch += 1;
+    };
+    let t4 = Instant::now();
+    if curve.mul(Some(g), d) != Some(q) {
+        return None;
+    }
+    let verify_ms = t4.elapsed().as_secs_f64() * 1e3;
+    Some((
+        d,
+        IcReport {
+            factor_base_ms,
+            pair_table_ms,
+            relations_ms,
+            linear_algebra_ms,
+            verify_ms,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            pair_table_entries: pairs.as_ref().map(PairTable::len).unwrap_or(0),
             relations: rels.len(),
             targets: stats.targets,
             rows_one: stats.rows_one,
@@ -3423,6 +4997,131 @@ mod tests {
             res.ops.cycles_2 + res.ops.cycles_4 + res.ops.cycles_other,
             0
         );
+    }
+
+    #[test]
+    fn subproduct_tree_matches_find_roots_fp_fast_zero_mismatches() {
+        use crate::cryptanalysis::ec_index_calculus::find_roots_fp_fast;
+        for &p in &[65_537u64, 1_048_573, 2_147_483_647] {
+            let f = Fp64::new(p);
+            let p_big = BigUint::from(p);
+            let mut rng = StdRng::seed_from_u64(p ^ 0xCAFE_BABE);
+            for &b_size in &[16usize, 64, 160] {
+                let mut base_xs = Vec::with_capacity(b_size);
+                let mut x = 1u64;
+                while base_xs.len() < b_size && x < p {
+                    base_xs.push(x);
+                    x += 1 + (rng.gen_range(0..3));
+                }
+                let tree = FactorBaseSubproductTree::prepare(f, &base_xs);
+
+                // Mix of random non-split, partially-in-V, fully-in-V, repeated-root,
+                // quadratic, quartic, and octic polynomials.
+                let mut batch: Vec<Vec<u64>> = Vec::new();
+                batch.push(vec![]);
+                batch.push(vec![7]);
+                for case in 0..80usize {
+                    let deg = match case % 5 {
+                        0 => 1,
+                        1 => 2,
+                        2 => 4,
+                        3 => 4,
+                        _ => 6,
+                    };
+                    let poly = if case % 3 == 0 {
+                        // Construct from linear factors (some inside V, some outside V, plus repeated).
+                        let mut cur = vec![f.one];
+                        for t in 0..deg {
+                            let r = if t % 2 == 0 {
+                                tree.xs[rng.gen_range(0..tree.len())]
+                            } else {
+                                rng.gen_range(0..p)
+                            };
+                            let lin = [f.neg(f.to_mont(r)), f.one];
+                            let mut next = Vec::new();
+                            poly_mul_schoolbook_mont(&f, &cur, &lin, &mut next);
+                            cur = next;
+                        }
+                        let scale = f.to_mont(rng.gen_range(1..p));
+                        cur.into_iter()
+                            .map(|c| f.from_mont(f.mul(c, scale)))
+                            .collect()
+                    } else {
+                        let mut coeffs: Vec<u64> = (0..deg).map(|_| rng.gen_range(0..p)).collect();
+                        coeffs.push(rng.gen_range(1..p));
+                        coeffs
+                    };
+                    batch.push(poly);
+                }
+
+                let mut scratch = SubproductBatchScratch::default();
+                let batch_roots = tree.roots_in_base_batch(&batch, &mut scratch);
+
+                for (idx, poly) in batch.iter().enumerate() {
+                    let fe_coeffs: Vec<FieldElement> = poly
+                        .iter()
+                        .map(|&c| FieldElement::new(BigUint::from(c), p_big.clone()))
+                        .collect();
+                    let mut want: Vec<u64> = find_roots_fp_fast(&fe_coeffs, &p_big)
+                        .into_iter()
+                        .map(|fe| biguint_to_u64(&fe.value).unwrap_or(0))
+                        .filter(|&r| tree.contains_x(r))
+                        .collect();
+                    want.sort_unstable();
+                    want.dedup();
+
+                    let single = tree.roots_in_base(poly);
+                    assert_eq!(single, want, "single mismatch p={p} B={b_size} idx={idx}");
+                    assert_eq!(
+                        batch_roots[idx], want,
+                        "batch mismatch p={p} B={b_size} idx={idx}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn lockstep_collectors_and_solver_recover_exact_dlog_against_rho() {
+        for bits in [16u32, 20, 24] {
+            let (fc, g) = ladder(bits);
+            let mut rng = StdRng::seed_from_u64(0x10C4 + bits as u64);
+            let k = rng.gen_range(1..fc.n);
+            let q = fc.mul(Some(g), k).expect("target");
+            let rho_cfg = RhoConfig::tuned(fc.n);
+            let rho_res = rho_parallel(&fc, g, q, &rho_cfg).expect("rho solves");
+            assert_eq!(rho_res.log, k);
+
+            for walkers in [64usize, 128, 256] {
+                let (d_tbl, _) = ic_solve_lockstep(
+                    &fc,
+                    g,
+                    q,
+                    96,
+                    16,
+                    walkers,
+                    LockStepMode::PairTable2,
+                    50_000_000,
+                    77 + walkers as u64,
+                )
+                .unwrap_or_else(|| panic!("lockstep table failed bits={bits} W={walkers}"));
+                assert_eq!(d_tbl, rho_res.log, "bits={bits} W={walkers}");
+                assert_eq!(fc.mul(Some(g), d_tbl), Some(q));
+            }
+            let (d_swp, _) = ic_solve_lockstep(
+                &fc,
+                g,
+                q,
+                64,
+                12,
+                64,
+                LockStepMode::DirectSweep,
+                50_000_000,
+                99,
+            )
+            .unwrap_or_else(|| panic!("lockstep sweep failed bits={bits}"));
+            assert_eq!(d_swp, k);
+        }
     }
 }
 

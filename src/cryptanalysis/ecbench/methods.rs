@@ -92,6 +92,7 @@ use crate::cryptanalysis::ic_framework::plugins::{
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
+use crate::cryptanalysis::ic_framework::semaev_projection_oracle::SemaevProjectionOracle;
 use crate::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
 use crate::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
 use crate::cryptanalysis::ic_framework::shared_rank::{
@@ -8019,6 +8020,8 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
+    let mut semaev_projection = SemaevProjectionOracle::new(ms);
+    let mut residual_sweep = ResidualSweepOracle::new();
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     let mut rootfind_floor = RootfindFloorOracle::new(ms, inst);
     let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(ms, inst);
@@ -8048,6 +8051,8 @@ fn solve_ic_prime(
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
+        "semaev-projection" => &mut semaev_projection,
+        "residual-sweep" => &mut residual_sweep,
         "rootfind-subtract" => &mut rootfind,
         "rootfind-floor" => &mut rootfind_floor,
         "rootfind-kmitm" => &mut rootfind_kmitm,
