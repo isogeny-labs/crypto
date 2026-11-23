@@ -476,3 +476,450 @@ mod graph_tests {
         }
     }
 }
+
+
+// --- Rank-one row-replacement gate: see RR9_RANKONE_UPDATE_PROTOCOL_20261119.md ---
+// This changes chart construction ONLY. It does NOT enumerate unknown indices
+// nonexhaustively; it never calls an EC group table during the candidate test.
+fn inv_a_block(rows:&[Row;4])->Option<Graph4> {
+    let mut a=[[0u64;8];4];
+    for i in 0..4 {
+        for k in 0..4 {a[i][k]=rows[i][k];}
+        a[i][4+i]=1;
+    }
+    for k in 0..4 {
+        let pivot=(k..4).find(|&i|a[i][k]!=0)?;
+        if pivot!=k {a.swap(k,pivot);}
+        let ip=inv(a[k][k]);
+        for t in k..8 {a[k][t]=mul(a[k][t],ip);}
+        for i in 0..4 {
+            if i==k {continue;}
+            let c=a[i][k];
+            if c==0 {continue;}
+            for t in k+1..8 {a[i][t]=sub(a[i][t],mul(c,a[k][t]));}
+            a[i][k]=0;
+        }
+    }
+    Some(std::array::from_fn(|i|std::array::from_fn(|k|a[i][k+4])))
+}
+
+// A' = A + e_j (a'_j-a_j), B' = B + e_j (b'_j-b_j).
+// Let u=A^-1 e_j, d=1+(a'_j-a_j)u. Then
+// M' = M + (u/d) (b'_j-a'_j M), for d != 0.
+// d=0 is exactly the singular A' case; NEVER silently accept it.
+fn row_replace_chart(
+    old_m:&Graph4, old_inv_a:&Graph4, old_row:&Row,
+    new_row:&Row, j:usize
+)->Option<Graph4> {
+    assert!(j<4);
+    let mut d=1u64;
+    for k in 0..4 {
+        d=add(d,mul(sub(new_row[k],old_row[k]),old_inv_a[k][j]));
+    }
+    if d==0 {return None;}
+    let id=inv(d);
+    let mut v=[0u64;4];
+    for k in 0..4 {
+        let mut t=new_row[k+4];
+        for i in 0..4 {t=sub(t,mul(new_row[i],old_m[i][k]));}
+        v[k]=t;
+    }
+    let mut m=*old_m;
+    for i in 0..4 {
+        let ui=mul(old_inv_a[i][j],id);
+        for k in 0..4 {
+            m[i][k]=add(m[i][k],mul(ui,v[k]));
+        }
+    }
+    Some(m)
+}
+
+struct RowUpdateContext {
+    target:Point,
+    old_points:[Point;4],
+    right_points:[Point;4],
+    old_rows:[Row;4],
+    right_rows:[Row;4],
+    choices:[Vec<(Point,Row)>;4],
+}
+
+fn rowupdate_contexts()->Vec<RowUpdateContext> {
+    let mut ar=Arithmetic::default();
+    let base=canonical_base(&mut ar,8);
+    let slots=supports(&mut ar,&base);
+    let planted=replay(&mut ar,&slots,[0u8;8]);
+    assert_ne!(planted,None);
+    assert_ne!(planted,G);
+    let mut out=Vec::new();
+    for target in [G,planted] {
+        let old_points=std::array::from_fn(|i|slots[i][0]);
+        let right_points=std::array::from_fn(|i|slots[i+4][0]);
+        let old_rows=std::array::from_fn(|i|row(old_points[i],target));
+        let right_rows=std::array::from_fn(|i|row(right_points[i],target));
+        let choices=std::array::from_fn(|j|
+            slots[j].iter().copied().map(|q|(q,row(q,target))).collect());
+        out.push(RowUpdateContext{
+            target,old_points,right_points,old_rows,right_rows,choices
+        });
+    }
+    out
+}
+
+fn rowupdate_original_curve_cases(
+    contexts:&[RowUpdateContext]
+)->Vec<serde_json::Value> {
+    let mut out=Vec::new();
+    for ctx in contexts {
+        let old_m=graph_chart(ctx.old_rows).expect("base chart must be valid").0;
+        let inv_a=inv_a_block(&ctx.old_rows).expect("base A must be invertible");
+        let (right_m,right_det)=graph_chart(ctx.right_rows)
+            .expect("right chart must be valid");
+        for j in 0..4 {
+            for (choice,(point,new_row)) in ctx.choices[j].iter().enumerate() {
+                let mut changed=ctx.old_rows;
+                changed[j]=*new_row;
+                let direct=graph_chart(changed);
+                let updated=row_replace_chart(
+                    &old_m,&inv_a,&ctx.old_rows[j],new_row,j);
+                assert_eq!(direct.map(|x|x.0),updated,"rank-one chart mismatch");
+                let (chart,det_l)=direct.expect("original B8 fixture must be nonsingular");
+                let mut all=[[0u64;8];8];
+                all[..4].copy_from_slice(&changed);
+                all[4..].copy_from_slice(&ctx.right_rows);
+                let exact=det8(all);
+                let schur=mul(mul(det_l,right_det),
+                              det_graph_difference(&chart,&right_m));
+                assert_eq!(exact,schur,"8x8 residue mismatch");
+                out.push(json!({
+                    "target":ctx.target,"row":j,"choice":choice,
+                    "old_left_points":ctx.old_points,
+                    "right_points":ctx.right_points,
+                    "new_leaf":point,
+                    "updated_chart":updated,
+                    "fresh_chart":chart,
+                    "det8":exact,
+                    "schur":schur
+                }));
+            }
+        }
+    }
+    out
+}
+
+fn benchmark_rowupdates(
+    ctxs:&[RowUpdateContext], use_update:bool, reps:usize
+)->(f64,u64) {
+    let start=Instant::now();
+    let mut digest=0u64;
+    for _ in 0..reps {
+        for ctx in ctxs {
+            if use_update {
+                // Charge base chart AND old inverse once per 64 sibling updates.
+                let m=graph_chart(ctx.old_rows).unwrap().0;
+                let ia=inv_a_block(&ctx.old_rows).unwrap();
+                for j in 0..4 {
+                    for (_,r) in &ctx.choices[j] {
+                        let next=row_replace_chart(
+                            &m,&ia,&ctx.old_rows[j],r,j).unwrap();
+                        digest=add(digest,std::hint::black_box(next[0][0]));
+                    }
+                }
+            } else {
+                for j in 0..4 {
+                    for (_,r) in &ctx.choices[j] {
+                        let mut changed=ctx.old_rows;
+                        changed[j]=*r;
+                        let next=graph_chart(changed).unwrap().0;
+                        digest=add(digest,std::hint::black_box(next[0][0]));
+                    }
+                }
+            }
+        }
+    }
+    std::hint::black_box(digest);
+    (start.elapsed().as_secs_f64()*1000.0,digest)
+}
+
+pub(crate) fn prime31_rowupdate_main() {
+    let contexts=rowupdate_contexts();
+    let cases=rowupdate_original_curve_cases(&contexts);
+    assert_eq!(cases.len(),128);
+    const REPS:usize=500;
+    let a1=benchmark_rowupdates(&contexts,false,REPS);
+    let b1=benchmark_rowupdates(&contexts,true,REPS);
+    let b2=benchmark_rowupdates(&contexts,true,REPS);
+    let a2=benchmark_rowupdates(&contexts,false,REPS);
+    assert_eq!(a1.1,b1.1);
+    assert_eq!(a1.1,b2.1);
+    assert_eq!(a1.1,a2.1);
+    println!("{}",serde_json::to_string_pretty(&json!({
+        "scope":"B8 Prime31 RR9 rank-one four-chart preprocessing-only gate",
+        "p":P,"group_order":2_147_446_831u64,
+        "public_only":true,
+        "generic_group_table_in_candidate":false,
+        "full_b8_pair_comparisons_unchanged":16u64.pow(8),
+        "public_residuals":2,
+        "original_curve_swaps_checked":cases.len(),
+        "bench_repetitions":REPS,
+        "timings_order":"fresh,updated,updated,fresh",
+        "timings_ms":[a1.0,b1.0,b2.0,a2.0],
+        "digest":a1.1,
+        "updated_setup_charged_once_per_64_replacements":true,
+        "candidate_exhaustive_unknown_index":true,
+        "complete_solver_speedup_claim":false,
+        "pcc":"unverified",
+        "cases":cases
+    })).unwrap());
+}
+
+#[cfg(test)]
+mod rowupdate_tests {
+    use super::*;
+    #[test]
+    fn synthetic_rankone_and_singular_gate() {
+        let mut s=0x24b16822u64;
+        let mut checked=0usize;
+        for t in 0..128usize {
+            let mut next=||{s=s.wrapping_mul(6364136223846793005).wrapping_add(1); (s>>32)%P};
+            let mut rows=[[0u64;8];4];
+            for rr in &mut rows {for a in rr { *a=next(); }}
+            let Some((m,_))=graph_chart(rows) else {continue;};
+            let ia=inv_a_block(&rows).unwrap();
+            let j=t%4;
+            let mut changed=rows;
+            for k in 0..8 {changed[j][k]=next();}
+            assert_eq!(
+                row_replace_chart(&m,&ia,&rows[j],&changed[j],j),
+                graph_chart(changed).map(|c|c.0));
+            checked+=1;
+        }
+        assert_eq!(checked,128);
+        // Force an exact duplicate row in A, so the rank-one denominator is zero.
+        let mut x=[[0u64;8];4];
+        for i in 0..4 {x[i][i]=1;}
+        let m=graph_chart(x).unwrap().0;
+        let ia=inv_a_block(&x).unwrap();
+        let mut changed=x;
+        changed[0]=x[1];
+        assert!(row_replace_chart(&m,&ia,&x[0],&changed[0],0).is_none());
+        assert!(graph_chart(changed).is_none());
+    }
+    #[test]
+    fn original_prime31_b8_rankone_128_cases() {
+        let ctxs=rowupdate_contexts();
+        assert_eq!(rowupdate_original_curve_cases(&ctxs).len(),128);
+        let a=benchmark_rowupdates(&ctxs,false,1);
+        let b=benchmark_rowupdates(&ctxs,true,1);
+        assert_eq!(a.1,b.1);
+    }
+}
+
+
+// --- Preregistered target-independent Vandermonde/barycentric B8 half tables ---
+// RR9 H=[diag(x-r)V | diag(y+s)V] yields
+// M=V^{-1} diag((y+s)/(x-r)) V.  The unsigned x-coordinate tuple
+// is independent of target and of the sign of each original EC leaf.
+// Cache the four rank-one outer-product bases ONCE for each unsigned tuple.
+// Online per target: only 4*B field inversions per half, no chart inversions.
+// This speeds half-table BUILDING, not the exhaustive 16^8 pair search.
+struct CachedVandermondeEntry {
+    det_v: u64,
+    xs: [u64;4],
+    outer: [Graph4;4],
+}
+struct CachedVandermondeHalf {
+    b: usize,
+    items: Vec<CachedVandermondeEntry>,
+}
+fn cached_vandermonde_setup(slots:&[Vec<Point>],start:usize)
+    ->Option<CachedVandermondeHalf> {
+    let b=slots[start].len()/2;
+    if b==0 || 2*b != slots[start].len() {return None;}
+    let mut items=Vec::with_capacity(b.pow(4));
+    for a in 0..b {for c in 0..b {for d in 0..b {for e in 0..b {
+        let digits=[a,c,d,e];
+        let xs=std::array::from_fn(|i|slots[start+i][digits[i]].unwrap().0);
+        let mut vrows=[[0u64;8];4];
+        for i in 0..4 {
+            let mut p=1u64;
+            for k in 0..4 {vrows[i][k]=p; p=mul(p,xs[i]);}
+        }
+        // This is target-independent, and computed once per unsigned tuple.
+        let ia=inv_a_block(&vrows)?;
+        let mut det_v=1u64;
+        for i in 0..4 {for j in i+1..4 {
+            if xs[i]==xs[j] {return None;}
+            det_v=mul(det_v,sub(xs[j],xs[i]));
+        }}
+        // M=sum_i z_i * outer_i, outer_i=(column i of V^-1)*(row i of V).
+        let mut outer=[[[0u64;4];4];4];
+        for i in 0..4 {for j in 0..4 {for k in 0..4 {
+            outer[i][j][k]=mul(ia[j][i],vrows[i][k]);
+        }}}
+        items.push(CachedVandermondeEntry{det_v,xs,outer});
+    }}}}
+    Some(CachedVandermondeHalf{b,items})
+}
+fn cached_vandermonde_halves(
+    slots:&[Vec<Point>], target:Point, start:usize,
+    cache:&CachedVandermondeHalf
+)->Option<Vec<(Word,Graph4,u64)>> {
+    let (rx,ry)=target?;
+    let b=cache.b;
+    if slots.len()!=8 || cache.items.len()!=b.pow(4) {return None;}
+    let mut z=[Vec::new(),Vec::new(),Vec::new(),Vec::new()];
+    for i in 0..4 {
+        if slots[start+i].len()!=2*b {return None;}
+        let mut di=Vec::with_capacity(b);
+        for k in 0..b {
+            let x=slots[start+i][k]?.0;
+            let delta=sub(x,rx);
+            if delta==0 {return None;} // singular A chart; fail closed.
+            di.push(inv(delta));
+        }
+        for k in 0..2*b {
+            let (x,y)=slots[start+i][k]?;
+            if x!=slots[start+i][k%b]?.0 {return None;}
+            z[i].push(mul(add(y,ry),di[k%b]));
+        }
+    }
+    let mut out=Vec::with_capacity((2*b).pow(4));
+    for a in 0..2*b {for c in 0..2*b {for d in 0..2*b {for e in 0..2*b {
+        let digits=[a,c,d,e];
+        let unsigned=digits.map(|k|k%b);
+        let ix=(((unsigned[0]*b+unsigned[1])*b+unsigned[2])*b)+unsigned[3];
+        let entry=&cache.items[ix];
+        let mut m=[[0u64;4];4];
+        let mut det_a=entry.det_v;
+        for i in 0..4 {
+            let zi=z[i][digits[i]];
+            det_a=mul(det_a,sub(entry.xs[i],rx));
+            for j in 0..4 {for k in 0..4 {
+                m[j][k]=add(m[j][k],mul(zi,entry.outer[i][j][k]));
+            }}
+        }
+        out.push(([a as u8,c as u8,d as u8,e as u8],m,det_a));
+    }}}}
+    Some(out)
+}
+fn half_digest(entries:&[(Word,Graph4,u64)])->u64 {
+    let mut sum=0u64;
+    for (word,m,det) in entries {
+        let mut z=*det;
+        for k in 0..4 {z=add(z,m[k][(word[k] as usize)%4]);}
+        sum=add(sum,z);
+    }
+    std::hint::black_box(sum)
+}
+pub(crate) fn cached_vandermonde_main() {
+    let mut ar=Arithmetic::default();
+    let base=canonical_base(&mut ar,8);
+    assert_eq!(base.iter().map(|p|p.unwrap().0).collect::<Vec<_>>(),
+                vec![0,1,2,3,5,6,8,9]);
+    let slots=supports(&mut ar,&base);
+    let planted=replay(&mut ar,&slots,[0;8]);
+    let targets=[("G",G),("planted",planted)];
+    let started=Instant::now();
+    let l=cached_vandermonde_setup(&slots,0).expect("left cache setup");
+    let r=cached_vandermonde_setup(&slots,4).expect("right cache setup");
+    let cache_ms=started.elapsed().as_secs_f64()*1000.;
+    let contexts:Vec<Vec<Vec<Row>>>=targets.iter().map(|(_,target)|
+        slots.iter().map(|s|s.iter().map(|&q|row(q,*target)).collect()).collect()
+    ).collect();
+    let mut runs=Vec::new();
+    for (arm,mode) in [("A1","fresh"),("B1","cached"),
+                       ("B2","cached"),("A2","fresh")] {
+        let started=Instant::now();
+        let mut digest=0u64;
+        for ctx in 0..2 {
+            for side in 0..2 {
+                let entries=if mode=="fresh" {
+                    graph_halves(&contexts[ctx],side*4).expect("fresh chart nonsingular")
+                } else {
+                    cached_vandermonde_halves(&slots,targets[ctx].1,side*4,
+                                              if side==0 {&l} else {&r})
+                        .expect("cached chart nonsingular")
+                };
+                digest=add(digest,half_digest(&entries));
+            }
+        }
+        runs.push(json!({"arm":arm,"mode":mode,
+                         "elapsed_ms":started.elapsed().as_secs_f64()*1000.,
+                         "digest":digest,"half_charts":4u64*16u64.pow(4)}));
+    }
+    // Export 32 deterministically chosen real-curve half charts per target/half.
+    // The Python checker reconstructs V^-1 diag(z)V independently from these.
+    let mut samples=Vec::new();
+    for (ci,(_,target)) in targets.iter().enumerate() {
+        for side in 0..2 {
+            let entries=cached_vandermonde_halves(&slots,*target,side*4,
+                                                  if side==0 {&l} else {&r}).unwrap();
+            let indices=[0usize,1,7,15,16,17,31,63,127,255,511,1023,2047,
+                4095,4096,8191,8192,10000,12000,16383,16384,20000,24575,
+                30000,32767,32768,40000,49151,55000,60000,65534,65535];
+            for &ix in &indices {
+                let (word,m,det)=&entries[ix];
+                let points:Vec<Point>=(0..4).map(|j|
+                    slots[side*4+j][word[j] as usize]).collect();
+                samples.push(json!({"target":target,"target_id":ci,
+                    "half":side,"word":word,"points":points,"m":m,"det_a":det}));
+            }
+        }
+    }
+    println!("{}",serde_json::to_string_pretty(&json!({
+        "scope":"Prime31 B8 cached Vandermonde half-table build ONLY; still exhaustive pair search",
+        "field_prime":P,"group_order":2_147_446_831u64,
+        "curve_a":847514846u64,"curve_b":2087444724u64,
+        "base_x":[0,1,2,3,5,6,8,9],"weights":W,
+        "cache_unsigned_tables":2*b4(8),"target_independent_cache_ms":cache_ms,
+        "signed_halves_per_target":2u64*16u64.pow(4),
+        "target_field_inversions_for_denominators":64,
+        "fresh_gauss_pivot_inversions_per_target":2u64*16u64.pow(4)*4,
+        "B8_full_pair_tests_unchanged":16u64.pow(8),
+        "generic_group_tables_in_candidate":false,
+        "candidate_extracts_unknown_indices":false,
+        "external_pcc":"unverified",
+        "runs":runs,"independent_python_samples":samples
+    })).unwrap());
+}
+fn b4(b:usize)->usize{b.pow(4)}
+
+#[cfg(test)]
+mod cached_vandermonde_tests {
+    use super::*;
+    #[test]
+    fn full_b8_two_targets_two_halves_exact_equality() {
+        let mut ar=Arithmetic::default();
+        let base=canonical_base(&mut ar,8);
+        let slots=supports(&mut ar,&base);
+        let planted=replay(&mut ar,&slots,[0;8]);
+        let left=cached_vandermonde_setup(&slots,0).unwrap();
+        let right=cached_vandermonde_setup(&slots,4).unwrap();
+        assert_eq!(left.items.len(),4096);
+        assert_eq!(right.items.len(),4096);
+        for target in [G,planted] {
+            let rows:Vec<Vec<Row>>=slots.iter()
+                .map(|s|s.iter().map(|&q|row(q,target)).collect()).collect();
+            for (start,cache) in [(0,&left),(4,&right)] {
+                let fresh=graph_halves(&rows,start).unwrap();
+                let new=cached_vandermonde_halves(&slots,target,start,cache).unwrap();
+                assert_eq!(fresh.len(),65536);
+                assert_eq!(new.len(),65536);
+                for (a,b) in fresh.iter().zip(new.iter()) {
+                    assert_eq!(a.0,b.0,"signed slot tuple drift");
+                    assert_eq!(a.1,b.1,"Vandermonde chart differs from Gaussian");
+                    assert_eq!(a.2,b.2,"det(A) differs from Gaussian");
+                }
+            }
+        }
+    }
+    #[test]
+    fn denominator_zero_is_explicit_chart_failure() {
+        let mut ar=Arithmetic::default();
+        let base=canonical_base(&mut ar,8);
+        let slots=supports(&mut ar,&base);
+        let c=cached_vandermonde_setup(&slots,0).unwrap();
+        let one=slots[0][0];
+        assert!(cached_vandermonde_halves(&slots,one,0,&c).is_none());
+    }
+}

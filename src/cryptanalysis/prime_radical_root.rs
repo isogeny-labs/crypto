@@ -42,6 +42,9 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
+    // floor(2^64/p), computed once for canonical 32-bit residues.
+    // 0 disables the reciprocal path for larger field moduli.
+    reciprocal32: u64,
     // floor(2^64 / p): quotient estimate for canonical 32-bit products.
     // Calculated once per field rather than dividing on every multiply.
     reciprocal_64: u64,
@@ -354,6 +357,25 @@ impl Ring for Fq2 {
     }
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // Multiplication by an Fp scalar takes two base-field products.
+        // Preserve the fast dense Karatsuba formula for generic inputs.
+        if x.1 == 0 {
+            return (f.mul(x.0, y.0), f.mul(x.0, y.1));
+        }
+        if y.1 == 0 {
+            return (f.mul(x.0, y.0), f.mul(x.1, y.0));
+        }
+        // Pure-imaginary factors require just one or two Fp products
+        // instead of three Karatsuba products. This is public-input,
+        // variable-time arithmetic. Keep both real-scalar paths above.
+        if x.0 == 0 || y.0 == 0 {
+            let real = self.mul_nonresidue(f.mul(x.1, y.1));
+            if x.0 == 0 {
+                return if y.0 == 0 { (real, 0) }
+                       else { (real, f.mul(x.1, y.0)) };
+            }
+            return (real, f.mul(x.0, y.1));
+        }
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
         // The first quadratic non-residue is commonly 2 or 3.
@@ -372,6 +394,13 @@ impl Ring for Fq2 {
     // Saves additions/subtractions versus generic Karatsuba multiply.
     fn sqr(&self, x: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // Sparse squares lie in Fp. Avoid three full products.
+        if x.1 == 0 {
+            return (f.sqr(x.0), 0);
+        }
+        if x.0 == 0 {
+            return (self.mul_nonresidue(f.sqr(x.1)), 0);
+        }
         let aa = f.sqr(x.0);
         let bb = f.sqr(x.1);
         let nbb = match self.n {
@@ -386,6 +415,12 @@ impl Ring for Fq2 {
     // Uses four Fp products, versus six for squaring then multiplying.
     fn cube(&self, x: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // Pure Fp elements cube with only one square and one product.
+        // Do not branch on imaginary-only elements: local dense controls
+        // showed worse throughput with that additional check.
+        if x.1 == 0 {
+            return (f.mul(f.sqr(x.0), x.0), 0);
+        }
         let aa = f.sqr(x.0);
         let nbb = self.mul_nonresidue(f.sqr(x.1));
         let three_nbb = f.add(nbb, f.add(nbb, nbb));
@@ -1565,8 +1600,16 @@ impl RadicalRootCtx {
         // Preserve the original short-poly normalization, which avoids a
         // 6-15% end-to-end regression observed in native Rust trials.
         let mut n = f.len();
-        while n > 0 && f[n - 1].is_multiple_of(fp.p) {
-            n -= 1;
+        // Canonical leading coefficients are the common case. Testing
+        // x < p first avoids a 64-bit remainder in the degree scan.
+        // Noncanonical multiples of p remain polynomial zeros.
+        while n > 0 {
+            let x = f[n - 1];
+            if x == 0 || (x >= fp.p && x % fp.p == 0) {
+                n -= 1;
+            } else {
+                break;
+            }
         }
         if n > 5 {
             return Err("radical root finder supports degree <= 4".into());
@@ -1580,27 +1623,14 @@ impl RadicalRootCtx {
                 c[j] = f[j] % fp.p;
             }
         } else {
-            // Reuse the reduced leading coefficient from degree trimming.
-            // Canonical coefficients avoid division entirely.
-            let mut leading = 0u64;
-            while n > 0 {
-                let x = f[n - 1];
-                let reduced = if x < fp.p { x } else { x % fp.p };
-                if reduced != 0 {
-                    leading = reduced;
-                    break;
-                }
-                n -= 1;
-            }
-            if n > 5 {
-                return Err("radical root finder supports degree <= 4".into());
-            }
-            for j in 0..n.saturating_sub(1) {
+            // The first scan already proved that the leading coefficient
+            // is nonzero modulo p. Recheck neither its degree nor its value.
+            // Canonical inputs still avoid remainder division throughout.
+            let leading = f[n - 1];
+            c[n - 1] = if leading < fp.p { leading } else { leading % fp.p };
+            for j in 0..n - 1 {
                 let x = f[j];
                 c[j] = if x < fp.p { x } else { x % fp.p };
-            }
-            if n != 0 {
-                c[n - 1] = leading;
             }
         }
         let ok = |roots: Vec<u64>| {
@@ -1656,6 +1686,43 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round72_imaginary_fp2_mul_matches_reference() {
+        // Independently expand (a+bi)(c+di) for canonical and zero
+        // components. The same arithmetic works for small and 61-bit p.
+        for p in [5u64, 7, 11, 17, 97, 998_244_353,
+                  1_000_000_007, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let mut state = p ^ 0x72ac_6c6e_34fc_0017u64;
+            for i in 0..512usize {
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let mut x = (state % p, state.rotate_left(19) % p);
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let mut y = (state % p, state.rotate_left(37) % p);
+                match i % 8 {
+                    0 => x.0 = 0,
+                    1 => y.0 = 0,
+                    2 => { x.0 = 0; y.0 = 0; },
+                    3 => x.1 = 0,
+                    4 => y.1 = 0,
+                    5 => { x.0 = 0; x.1 = 0; },
+                    _ => {}
+                }
+                let ac = f.mul(x.0, y.0);
+                let bd = f.mul(x.1, y.1);
+                let expected = (
+                    f.add(ac, q.mul_nonresidue(bd)),
+                    f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
+                );
+                assert_eq!(q.mul(x, y), expected,
+                    "p={p} n={} i={i} x={x:?} y={y:?}", q.n);
+            }
+        }
+    }
 
     #[test]
     fn round70_frobenius_reduction_matches_independent_binary_power() {
@@ -5543,3 +5610,42 @@ mod round73_mersenne_single_fold {
         after.sort_by(f64::total_cmp);
         println!("round73 rust p={p} before_ns={} after_ns={} speedup={}",
                  before[6], after[6], before[6] / after[6]);
+
+#[cfg(test)]
+mod round125_canonical_trim_tests {
+    use super::*;
+
+    #[test]
+    fn canonical_and_noncanonical_padded_polynomials_preserve_roots() {
+        for p in [5u64, 7, 65_521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let examples = [
+                vec![0, 1],
+                vec![p - 2, 1],
+                vec![2, p - 3, 1],
+                vec![0, 2, p - 3, 1],
+                vec![0, 0, 2, p - 3, 1],
+                vec![0, 0, 0, 0, 1],
+            ];
+            for canonical in examples {
+                let expected = ctx.roots(&canonical).unwrap();
+                let mut noncanonical: Vec<_> = canonical.iter().map(|&x| x + p).collect();
+                // Degree trimming must remove both canonical zero and
+                // large noncanonical multiples of the prime.
+                noncanonical.extend([0, p, 2 * p, 0]);
+                let actual = ctx.roots(&noncanonical).unwrap();
+                assert_eq!(actual, expected, "p={p}, poly={canonical:?}");
+                for &root in &actual.roots {
+                    let value = canonical.iter().rev().fold(0u64, |acc, &a| {
+                        ctx.f.add(ctx.f.mul(acc, root), a)
+                    });
+                    assert_eq!(value, 0, "p={p}, root={root}");
+                }
+            }
+            for zero in [vec![], vec![0], vec![p], vec![2 * p, p, 0]] {
+                assert!(ctx.roots(&zero).is_err(), "p={p}, zero={zero:?}");
+            }
+            assert!(ctx.roots(&[1, 0, 0, 0, 0, 1]).is_err());
+        }
+    }
+}
