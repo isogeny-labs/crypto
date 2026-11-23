@@ -453,3 +453,20 @@ survivingorientedknownpoint factors, then growingpublickernel/nonzeroimage/
 degree/group/knownscalarfinder/completeexpectedcost. Classinvariance does
 notpreventchangingrepresentatives/factorizations or proveuniversalbarrier.
 Originalcriteria/nonscalarorigin/rank-directedWjet and oldhistory unchanged.
+
+## 2026-11-23: actual asymmetric normalization retains prescribed point powers
+
+088/build094/local046/PCC-20261123-1d0e6d checks217/12new since205,
+0warnings/standardfoundations. Actualunequalmixedbranchorders andmin m
+constructdivByMoniccoefficients/localFunction; actualcoordinate/opposite
+coprimeideal/unitcancellation derivesconstructednonzeroquotient and
+span(localFunction)=Ip^(rplus-m)*Im^(rminus-m)*J withactualintegralJ.
+Nonzerooriginalcoordinateclass remains explicitpremise; no suppliedJ,
+no exactvaluation/gcd or newgrowingkernel/finder/cost result. Localunsigned
+outsidehistoricalshared53/57/fresh. [pcc:unverified]
+
+Nextactualgrowingbranch-jet map needsderivedactualkernelI^n/finitejet
+algebradimension/surjectivity beforebranchonlyconstraintsreplaceoriginal
+mixedjetpremises. Thenactualgrowingbasis/kernel/nonzeroimage/degree/
+knownscalarfinder/coverage/retry/full expectedbitcost. Originalcriteria,
+nonscalarorigin/rank-directedWjet and allpriorfailurehistory unchanged.

@@ -1,0 +1,10 @@
+digraph G {
+ rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#eef5fb",fontname="Helvetica",fontsize=12];
+ a[label="ACTUAL OPPOSITE MIXED-JET ORDERS\nrplus, rminus; nonzero2/y; actual curve point"];
+ b[label="ACTUAL COEFFICIENT COMMON FACTOR\nD=(X-x)^m; m=min(rplus,rminus)\nConstruct localA=A div D, localB=B div D"];
+ c[label="ACTUAL BRANCH RECONSTRUCTION\noriginal branch = T^m * localBranch\nremaining orders >= rplus-m, rminus-m"];
+ d[label="ACTUAL COORDINATE / POINT IDEALS\nspan(XClass)=Iplus*Iminus\nactualoriginal in Iplus^rplus * Iminus^rminus"];
+ e[label="DERIVED NORMALIZED IDEAL FACTOR\nspan(localFunction)=Iplus^(rplus-m) Iminus^(rminus-m) J\nJ integral and constructed; quotient nonzero under stated input"];
+ o[label="OPEN GROWING PUBLIC CONSTRUCTION\nconstraint map / nonzero image / actual jet interface\nknown scalar finder / coverage / complete expected bit cost",style="rounded,dashed,filled",fillcolor="#fff3df"];
+ a->b;a->d;b->c;b->d;d->e;e->o[style=dashed];c->o[style=dashed];
+}
