@@ -1,0 +1,19 @@
+Command: cargo test --release --lib
+Status: NOT COMPLETED; scoped lane controls are authoritative.
+
+Attempt 1 exited 101 before compilation because the sparse checkout omitted
+the crates/certified-relations path dependency.
+
+Attempt 2 exited 101 after path dependencies were materialized because the
+sparse checkout omitted 31 src modules.
+
+Attempt 3 materialized src and reached the root library. It emitted missing
+include_str!/include_bytes! fixture errors from omitted research/docs/gpu/test
+paths and an unrelated duplicate test name in
+src/cryptanalysis/ic_framework/plugins.rs. It was explicitly bounded and
+interrupted (exit 130) rather than expanding this isolated lane into a full
+repository checkout.
+
+These failures do not exercise the standalone GHS strong-rho driver. The
+scoped release build, deterministic selftest, paired q=223 control and
+optimized-IR removal gate all pass and are recorded separately.

@@ -1,0 +1,118 @@
+{
+ "binary_sha256": "b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0",
+ "gaps": [
+  {
+   "gap": "No second host, no EKS/S3 in this container: the replays ran on the same container and CPU class as the producer (L0, 4 shared cores). Counted cost does not depend on the host, so the replays are valid; the wall-time columns (ns/GAE, end-to-end wall) are not independently reproduced.",
+   "id": "G1-no-second-host"
+  },
+  {
+   "gap": "Every replay used target/release/ecbench (sha256 b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0), the binary that produced the sessions. No cargo build was allowed, so there is no from-source rebuild as in research/ic_tableb_binary_ksum_20261115/validator. The independent checks are (a) a re-execution of all 480 deterministic runs per session by a different session than the producer's, (b) the validator's own Python prime-field arithmetic ([recovered]G == target for every record), and (c) an own recompute of every headline from records.jsonl.",
+   "id": "G2-same-binary"
+  },
+  {
+   "gap": "No pcc claim filed and no keyring signature on the certificate or the report: every statement here is [pcc:unverified]. AGENTS.md 'Sabotage is assumed' asks for signed artifacts; none could be produced in this container.",
+   "id": "G3-no-pcc-or-keyring"
+  },
+  {
+   "gap": "bitop/v1 ratios are recomputed from each record's own work.bitops_per_sqrt_r field; the per-primitive bitop widths behind that field were not re-derived (the unit's definition is the producer's).",
+   "id": "G4-bitop-not-rederived"
+  },
+  {
+   "gap": "L0 runs, no isolation tier and no native L2/replay/A/A admission: valid for counted cost only; no wall-time or L2 claim is validated.",
+   "id": "G5-no-isolation"
+  }
+ ],
+ "independence": {
+  "independent_of_producer": [
+   "replay run by the validator session, after publication, with fresh invocations",
+   "own Python curve arithmetic for every scalar",
+   "own recompute of every headline (recompute.py), written without reading plot.py, summary.json, compare-*.txt or the README tables"
+  ],
+  "named_gaps": [
+   "G1-no-second-host",
+   "G2-same-binary",
+   "G3-no-pcc-or-keyring",
+   "G4-bitop-not-rederived",
+   "G5-no-isolation"
+  ],
+  "not_independent": [
+   "same ecbench binary (sha256 b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0)",
+   "same container and CPU class (counted cost is host independent)"
+  ]
+ },
+ "independent": true,
+ "method": "ecbench verify --replay-all --out <receipt> on each committed session (no copies; the session files were not modified), 3 sessions, every measured deterministic run re-executed and compared with its record (480 candidate runs per session), every recorded scalar checked by ecbench against its target; then, independently of ecbench, every record's [recovered]G == target re-checked with the validator's own Python affine arithmetic on the prime curve (generator order r checked, target on the curve).",
+ "paths_relative_to": "this file's directory",
+ "runs": [
+  {
+   "auditor_binary_sha256": "b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0",
+   "exit_code": 0,
+   "ok": true,
+   "problems": [],
+   "receipt": "replay-receipt-P20.json",
+   "receipt_sha256": "4dec296138d435080f41f33880ea25a606f49b4910895dca4235128bb8e7278c",
+   "records": 720,
+   "replay_candidates": 480,
+   "replay_selection": "all",
+   "replays_reproduced": 480,
+   "run": "research/ic_tableb_fewcol_20261118/sessions/P20",
+   "session_id": "ECBS1h847baa541db1",
+   "verified_records": 720
+  },
+  {
+   "auditor_binary_sha256": "b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0",
+   "exit_code": 0,
+   "ok": true,
+   "problems": [],
+   "receipt": "replay-receipt-P22.json",
+   "receipt_sha256": "90f4645b8594d1db95cb4f24c7ec6af1c25fccb967c9398c2b2b181b1a2e0c2f",
+   "records": 720,
+   "replay_candidates": 480,
+   "replay_selection": "all",
+   "replays_reproduced": 480,
+   "run": "research/ic_tableb_fewcol_20261118/sessions/P22",
+   "session_id": "ECBS1h28d57d172b8a",
+   "verified_records": 720
+  },
+  {
+   "auditor_binary_sha256": "b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0",
+   "exit_code": 0,
+   "ok": true,
+   "problems": [],
+   "receipt": "replay-receipt-P24.json",
+   "receipt_sha256": "632e2a9f7b2dc4e42d7fd87daf4c0f86bebddb7921c16a57b96e84c6dc32f879",
+   "records": 720,
+   "replay_candidates": 480,
+   "replay_selection": "all",
+   "replays_reproduced": 480,
+   "run": "research/ic_tableb_fewcol_20261118/sessions/P24",
+   "session_id": "ECBS1h8ad05b013b8b",
+   "verified_records": 720
+  }
+ ],
+ "scalar_certificates": {
+  "method": "own affine prime-field double-and-add: [recovered]G == target, target on y^2 = x^3 + ax + b, [r]G = O with r prime",
+  "per_session": {
+   "P20": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   },
+   "P22": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   },
+   "P24": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   }
+  }
+ },
+ "scalars_verified": true,
+ "schema": "ecbench.replay-certificate/v1",
+ "status": "verified",
+ "study": "research/ic_tableb_fewcol_20261118",
+ "validated_commit": "afc9a49d36dee4e9ef5074d9a2aa03bc72513ba7"
+}
