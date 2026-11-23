@@ -1,0 +1,362 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-18T16:58:29+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_lean_sib_confirm_20261118/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T16:53:01+00:00",
+      "wall_s": 110.395
+    }
+  ],
+  "commit": "2d671985762e722be172c0d21ee63ab4c328502c",
+  "commit_dirty": false,
+  "created_utc": "2026-11-18T16:52:57+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/koblitz_lean_sib_confirm_20261118"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T1652Z-koblitz-lean-sib-confirm",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_sp_c4_d5_n23_w0",
+      "note": "pcc:unverified; primary, K1 n23, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.75,
+        0.79
+      ],
+      "unit": "ratio",
+      "value": 0.77
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_sp_c4_d5_n23_w0.1",
+      "note": "pcc:unverified; primary, K1 n23, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.734,
+        0.772
+      ],
+      "unit": "ratio",
+      "value": 0.753
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_sp_c4_d5_n23_w1",
+      "note": "pcc:unverified; primary, K1 n23, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.704,
+        0.736
+      ],
+      "unit": "ratio",
+      "value": 0.72
+    },
+    {
+      "baseline": 0.532,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_s_n23_w0.1",
+      "note": "pcc:unverified; pooled band S at w=0.1; baseline sp-c4-d5; reference rho-strong (v5 0.245)",
+      "reference": 0.956,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.4
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_gen_c1_n29_w0",
+      "note": "pcc:unverified; primary, K1 n29, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.801,
+        0.826
+      ],
+      "unit": "ratio",
+      "value": 0.814
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_gen_c1_n29_w0.1",
+      "note": "pcc:unverified; primary, K1 n29, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.622,
+        0.656
+      ],
+      "unit": "ratio",
+      "value": 0.639
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_gen_c1_n29_w1",
+      "note": "pcc:unverified; primary, K1 n29, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.417,
+        0.446
+      ],
+      "unit": "ratio",
+      "value": 0.432
+    },
+    {
+      "baseline": 0.649,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_s_n29_w0.1",
+      "note": "pcc:unverified; pooled band S at w=0.1; baseline gen-c1; reference rho-strong (v5 0.396)",
+      "reference": 4.626,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.415
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_sp_c8_d5_n37_w0",
+      "note": "pcc:unverified; primary, K1 n37, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.686,
+        0.721
+      ],
+      "unit": "ratio",
+      "value": 0.703
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_sp_c8_d5_n37_w0.1",
+      "note": "pcc:unverified; primary, K1 n37, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.717,
+        0.746
+      ],
+      "unit": "ratio",
+      "value": 0.732
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_over_sp_c8_d5_n37_w1",
+      "note": "pcc:unverified; primary, K1 n37, pooled 3 sessions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.787,
+        0.805
+      ],
+      "unit": "ratio",
+      "value": 0.796
+    },
+    {
+      "baseline": 0.343,
+      "better": "lower",
+      "n": 432,
+      "name": "ls_s_n37_w0.1",
+      "note": "pcc:unverified; pooled band S at w=0.1; baseline sp-c8-d5; reference rho-strong (v5 0.165)",
+      "reference": 0.315,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.251
+    }
+  ],
+  "problem": "ecdlp:koblitz_small_rows_ic_gen_orbit",
+  "raw": [
+    {
+      "bytes": 101117,
+      "path": "research/koblitz_lean_sib_confirm_20261118/results.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f9/f9c8b53a8d8ee7ad79b5d6494019dedb8e43bf551510dde8e5f8af664a7beadf",
+      "sha256": "f9c8b53a8d8ee7ad79b5d6494019dedb8e43bf551510dde8e5f8af664a7beadf",
+      "uploaded": false
+    },
+    {
+      "bytes": 91925,
+      "path": "research/koblitz_lean_sib_confirm_20261118/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/97/979826939a97fb79e1b8fd060d9ec4ef18e0eebbbe3be2eb0613bad44d7c6065",
+      "sha256": "979826939a97fb79e1b8fd060d9ec4ef18e0eebbbe3be2eb0613bad44d7c6065",
+      "uploaded": false
+    },
+    {
+      "bytes": 27956,
+      "path": "research/koblitz_lean_sib_confirm_20261118/tables/records-n23.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8e/8ef4bd80253c58a9d8e77b2c4899ee33e2aec1975257bd8329304d2d7a2c973b",
+      "sha256": "8ef4bd80253c58a9d8e77b2c4899ee33e2aec1975257bd8329304d2d7a2c973b",
+      "uploaded": false
+    },
+    {
+      "bytes": 22274,
+      "path": "research/koblitz_lean_sib_confirm_20261118/tables/records-n29.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a19a45ba2cd182bec3bbf3f6ff1acc6aefbebcd06cda4b31e8ee576af39c5fc7",
+      "sha256": "a19a45ba2cd182bec3bbf3f6ff1acc6aefbebcd06cda4b31e8ee576af39c5fc7",
+      "uploaded": false
+    },
+    {
+      "bytes": 31331,
+      "path": "research/koblitz_lean_sib_confirm_20261118/tables/records-n37.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/cef09f9a7e137ff8c0771300668c1d0b136bb4c41a5c442ab9e7e5730248d8f2",
+      "sha256": "cef09f9a7e137ff8c0771300668c1d0b136bb4c41a5c442ab9e7e5730248d8f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 5359,
+      "path": "research/koblitz_lean_sib_confirm_20261118/tables/band-n23-pooled.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c0/c074e703a48c4721393db36895edec85d890dfca0a62cddaade268ff17de9fec",
+      "sha256": "c074e703a48c4721393db36895edec85d890dfca0a62cddaade268ff17de9fec",
+      "uploaded": false
+    },
+    {
+      "bytes": 5310,
+      "path": "research/koblitz_lean_sib_confirm_20261118/tables/band-n29-pooled.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/63/639ea4098f28ea894bb62481a435d8c4d1826d1d585867e9ad0a02f5132225e0",
+      "sha256": "639ea4098f28ea894bb62481a435d8c4d1826d1d585867e9ad0a02f5132225e0",
+      "uploaded": false
+    },
+    {
+      "bytes": 5426,
+      "path": "research/koblitz_lean_sib_confirm_20261118/tables/band-n37-pooled.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/8352e3f71cae8979098399a48bd0e4b3478c3362dbde7e75c174ae7fb9ce4f45",
+      "sha256": "8352e3f71cae8979098399a48bd0e4b3478c3362dbde7e75c174ae7fb9ce4f45",
+      "uploaded": false
+    },
+    {
+      "bytes": 10879,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n23-r1.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/82/8245518c12bf0ade52634264accc8af5b7b8c6a58e836a3e4613e630ae1294a0",
+      "sha256": "8245518c12bf0ade52634264accc8af5b7b8c6a58e836a3e4613e630ae1294a0",
+      "uploaded": false
+    },
+    {
+      "bytes": 10894,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n23-r2.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/eb/eb6b42b4a42edff0d2828ce08260fd2090e54f0de35b1af2444bb18d63138b40",
+      "sha256": "eb6b42b4a42edff0d2828ce08260fd2090e54f0de35b1af2444bb18d63138b40",
+      "uploaded": false
+    },
+    {
+      "bytes": 10889,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n23-r3.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/5824a1689c74c8a33f82041c58c217493066218780b0e6b7b78d7e49e2e90a85",
+      "sha256": "5824a1689c74c8a33f82041c58c217493066218780b0e6b7b78d7e49e2e90a85",
+      "uploaded": false
+    },
+    {
+      "bytes": 10889,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n29-r1.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4de4b5707b312d8b20cff6e9945fad678269be3786525aeff49ea77068d409c8",
+      "sha256": "4de4b5707b312d8b20cff6e9945fad678269be3786525aeff49ea77068d409c8",
+      "uploaded": false
+    },
+    {
+      "bytes": 10908,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n29-r2.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d6/d67c99b1eb044fd75ea8e62582472b5c99e8a1a2765ddea98e760423cd8032e7",
+      "sha256": "d67c99b1eb044fd75ea8e62582472b5c99e8a1a2765ddea98e760423cd8032e7",
+      "uploaded": false
+    },
+    {
+      "bytes": 10859,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n29-r3.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d2/d2cfd340e83696d5ca3ab903fae3953258d12631a76ce139e265c26729152462",
+      "sha256": "d2cfd340e83696d5ca3ab903fae3953258d12631a76ce139e265c26729152462",
+      "uploaded": false
+    },
+    {
+      "bytes": 10867,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n37-r1.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/af/af5f5b346aa8f976c4d71c3c7f823bf257972348ded829607b8f4456400c4242",
+      "sha256": "af5f5b346aa8f976c4d71c3c7f823bf257972348ded829607b8f4456400c4242",
+      "uploaded": false
+    },
+    {
+      "bytes": 10913,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n37-r2.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/11/1186ad8f6d06d41572e65c4aaede3bf5dabbdc62a36fe6ce87e4706525dd1d14",
+      "sha256": "1186ad8f6d06d41572e65c4aaede3bf5dabbdc62a36fe6ce87e4706525dd1d14",
+      "uploaded": false
+    },
+    {
+      "bytes": 10878,
+      "path": "research/koblitz_lean_sib_confirm_20261118/audits/audit-n37-r3.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9d/9d50bc4b84f543dfac6a0414e13caf7e55cc10df3df6f53e51404b8e2bde1628",
+      "sha256": "9d50bc4b84f543dfac6a0414e13caf7e55cc10df3df6f53e51404b8e2bde1628",
+      "uploaded": false
+    },
+    {
+      "bytes": 231269,
+      "path": "research/koblitz_lean_sib_confirm_20261118/REPORT.pdf",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/13/13b70483779515e53c66e9bbc3e0e16867f2726cc16754ba956b6b44a66a7737",
+      "sha256": "13b70483779515e53c66e9bbc3e0e16867f2726cc16754ba956b6b44a66a7737",
+      "uploaded": false
+    },
+    {
+      "bytes": 150176,
+      "path": "research/koblitz_lean_sib_confirm_20261118/figures/fig1-phases-band.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6aa0a7c0713e0b56578f9a84ea668963c481c259948528b80f0b4182fe82287d",
+      "sha256": "6aa0a7c0713e0b56578f9a84ea668963c481c259948528b80f0b4182fe82287d",
+      "uploaded": false
+    },
+    {
+      "bytes": 237749,
+      "path": "research/koblitz_lean_sib_confirm_20261118/figures/fig2-ratios.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8b1af6de9b4be7f1397d3d1e815ecc76604324b0417c5705e726702bae49d4f6",
+      "sha256": "8b1af6de9b4be7f1397d3d1e815ecc76604324b0417c5705e726702bae49d4f6",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/koblitz_lean_sib_confirm_20261118/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/koblitz_lean_sib_confirm_20261118/figures/fig1-phases-band.svg",
+      "research/koblitz_lean_sib_confirm_20261118/figures/fig2-ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "koblitz-lean-sib-confirm",
+  "status": "measured",
+  "summary": "lean_layout=1 + sib=1 (tau off) vs incumbent, pooled 3 sessions: n23 ls/sp-c4-d5 0.770/0.753/0.720, n29 ls/gen-c1 0.814/0.639/0.432, n37 ls/sp-c8-d5 0.703/0.732/0.796 at w=0/0.1/1; all pass (upper<1 pooled and per replicate). pcc:unverified",
+  "validation": null
+}

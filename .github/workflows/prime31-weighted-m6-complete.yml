@@ -1,0 +1,98 @@
+name: Prime31 original-curve weighted M6 complete-solver control
+
+on:
+  push:
+    branches:
+      - automation/prime31-weighted-slot-parity-20261118
+    paths:
+      - '.github/workflows/prime31-weighted-m6-complete.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_m6_complete.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_m6_complete.py'
+      - 'research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_COMPLETE_PROTOCOL_20261118.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-prime31-m6:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Sparse checkout candidate and protocol
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_weighted_m6_complete.rs
+            research/prime31_ic_20261115/native/verify_prime31_weighted_m6_complete.py
+            research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_COMPLETE_PROTOCOL_20261118.md
+          sparse-checkout-cone-mode: false
+
+      - name: Sparse checkout immutable native Rust implementation
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+
+      - name: Rust pinned toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+
+      - name: Overlay candidate while preserving original curve and manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C native-pinned rev-parse HEAD)" = "1df714645aa683cf975bc76fcacb9842cb4780fd"
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_m6_complete.rs native-pinned/research/prime31_ic_20261115/native/examples/
+          echo "Candidate source $GITHUB_SHA; arithmetic source 1df714645aa683cf975bc76fcacb9842cb4780fd"
+
+      - name: Original native Rust library regression
+        run: cargo +1.100.0 test --release --locked --lib --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+
+      - name: Exhaustive B2 weighted parity and rank regression
+        run: cargo +1.100.0 test --release --locked --example prime31_weighted_m6_complete --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+
+      - name: Fully charged 31-column training and 1024 blinded public targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --release --locked --example prime31_weighted_m6_complete --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml > prime31-weighted-m6-complete.json
+          python3 -m json.tool prime31-weighted-m6-complete.json > /dev/null
+          python3 - <<'PY'
+          import json
+          r=json.load(open("prime31-weighted-m6-complete.json",encoding="utf-8"))
+          assert r["source_p"]==2**31-1
+          assert r["source_n"]==2147446831
+          assert r["weights"]==[1,3,5,7,11,13]
+          assert r["target_limit"]==1024 and r["shift_cap"]==64
+          assert r["train_calls"]<=512 and r["train_rank"]<=31
+          assert not r["nonenumerative_algebraic_extractor"]
+          assert r["generic_three_plus_three_enumeration"]
+          print("Measured original-curve Rust control: rank",r["train_rank"],"positive",r["train_odd"],"calls",r["train_calls"],
+                "targets recovered",r["completed"],"/1024","attempts",r["target_attempts"])
+          print("Measured costs:",json.dumps({k:r[k] for k in ("setup_ns","setup_cost","train_ns","train_cost","total_ns_diagnostic")},sort_keys=True))
+          assert r["pcc"]=="unverified"
+          PY
+
+      - name: Independent integer-field reproduction of original-curve log recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/prime31_ic_20261115/native/verify_prime31_weighted_m6_complete.py prime31-weighted-m6-complete.json | tee prime31-weighted-m6-independent.json
+
+      - name: Retain full result including negative/censored outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-weighted-m6-complete-source-specific
+          path: |
+            prime31-weighted-m6-complete.json
+            prime31-weighted-m6-independent.json
+          retention-days: 30
+          if-no-files-found: warn

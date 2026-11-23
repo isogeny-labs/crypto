@@ -1,0 +1,16 @@
+{
+  "schema": "h116-signed-kummer-parity-launch/v1",
+  "protocol_id": "H116-SIGNED-KUMMER-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in SIGNED_KUMMER_PARITY_SOURCE_GATE.md",
+  "anchors": 8,
+  "maximum_subset_size": 3,
+  "rules": 184,
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_signed_kummer_parity.rs", "-o", "/tmp/h116_signed_kummer_parity"],
+    "selftest": ["/tmp/h116_signed_kummer_parity", "--selftest"],
+    "run": ["/tmp/h116_signed_kummer_parity", "--run", "SIGNED_KUMMER_PARITY_RESULT.json"]
+  },
+  "outputs": ["SIGNED_KUMMER_PARITY_RESULT.json", "SIGNED_KUMMER_PARITY_RUN.txt", "SIGNED_KUMMER_PARITY_SHA256SUMS"],
+  "measurement_scope": "bounded nonsymmetric signed-y quadratic-cover family as an abstaining parity decoder, with family-wise curve-preserving shuffle calibration; no generic decoder or ECDLP speedup claim"
+}
