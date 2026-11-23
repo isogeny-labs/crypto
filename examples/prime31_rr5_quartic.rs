@@ -7,7 +7,7 @@
 //! This first implementation caps B at 8: dense symbolic remainders
 //! are not an acceptable B677 complexity claim.
 
-use crypto_lib::cryptanalysis::f4_fp::{f4,F4Options,Ordering,Poly};
+use crypto_lib::cryptanalysis::f4_fp::{f4,normalise,F4Options,Ordering,Poly};
 use crypto_lib::cryptanalysis::glv_invariant_base::poly_roots_fp_counted_until;
 use crypto_lib::cryptanalysis::ic_boundary::{PrimeCurve,PrimePoint,GroupOps};
 use crypto_lib::cryptanalysis::semaev_prime_poly::Fp;
@@ -125,8 +125,10 @@ fn system(q:PrimePoint,base:&[PrimePoint])->Result<Vec<Poly>,String>{
             t[i-4+j]=sub(&t[i-4+j],&mul(&a,&m[j],f)?,f);
         }
     }
-    Ok(t.iter().take(4).map(|x|
-        x.iter().map(|(e,&k)|(e.to_vec(),k)).collect()).collect())
+    Ok(t.iter().take(4).map(|x| {
+        let poly:Poly=x.iter().map(|(e,&k)|(e.to_vec(),k)).collect();
+        normalise(&poly,P,Ordering::Lex)
+    }).collect())
 }
 fn poly_eval(poly:&Poly,z:[u64;3],f:Fp)->u64 {
     poly.iter().fold(0,|sum,(e,&a)|{
