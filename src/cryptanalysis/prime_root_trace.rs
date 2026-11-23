@@ -5,7 +5,6 @@
 //! A separate arithmetic checker verifies the certificate without root finding.
 //! Counters measure native field operations, including inverse exponentiation;
 //! primality validation, serialization, and certificate replay are excluded.
-use std::collections::HashMap;
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
@@ -210,6 +209,27 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
     }
     v
 }
+/// Return k for the canonical monomial X^k (k>=1).
+/// Most dense polynomials fail the cheap first/last coefficient check.
+#[inline]
+fn monic_x_shift(a: &[u64]) -> Option<usize> {
+    if a.len() < 2 || a[0] != 0 || *a.last().unwrap() != 1 {
+        return None;
+    }
+    if a[1..a.len() - 1].iter().all(|&c| c == 0) {
+        Some(a.len() - 1)
+    } else {
+        None
+}
+
+// A monic power X^k has exactly one nonzero coefficient. Its products
+// are coefficient shifts, requiring no finite-field arithmetic.
+fn monic_power_degree(poly: &[u64]) -> Option<usize> {
+    if poly.len() < 2 || poly[0] != 0 || *poly.last()? != 1
+        || poly[1..poly.len() - 1].iter().any(|&c| c != 0)
+    {
+    Some(poly.len() - 1)
+
 /// Accelerated arithmetic for canonical public field elements emitted by
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
@@ -329,6 +349,12 @@ impl Engine<'_> {
     }
     fn event(&mut self, event: RootEvent) -> Work<()> {
         self.room()?;
+        self.event_after_room(event)
+    }
+    // A Field operation has already checked the event budget in field().
+    // Do not repeat that check for every modular operation. There is no
+    // intervening event between the check and this emission.
+    fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         self.report.counters.observe(&event);
         if let Err(error) = (self.sink)(&event) {
             self.report.unacknowledged = Some(event);
@@ -421,6 +447,58 @@ impl Engine<'_> {
             })?;
             return Ok(product);
         }
+        // The independent verifier will check every Product event. For a
+        // monic X^k, the exact polynomial product is just a coefficient shift.
+        // Neither field operations nor field-work budget are consumed.
+        if let Some(shift) = monic_power_degree(a).or_else(|| monic_power_degree(b)) {
+            let other = if monic_power_degree(a).is_some() { b } else { a };
+            let mut product = if other.is_empty() {
+                Vec::new()
+            } else {
+                let mut output = vec![0; shift + other.len()];
+                output[shift..].copy_from_slice(other);
+                output
+            };
+            product = trim(product);
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            return Ok(product);
+        }
+        // A monic linear factor (X+c) can be multiplied in one coefficient
+        // pass, using at most n finite-field multiplies, rather than 2n.
+        // Avoid scalar operations on zeros and preserve the separate Product
+        // certificate, which the independent verifier checks by convolution.
+        // Only use this for lengths large enough to amortize dispatch.
+        let monic_linear = if a.len() == 2 && a[1] == 1 && a[0] != 0 && b.len() >= 7 {
+            Some((a[0], b))
+        } else if b.len() == 2 && b[1] == 1 && b[0] != 0 && a.len() >= 7 {
+            Some((b[0], a))
+        } else {
+            None
+        };
+        if let Some((constant, other)) = monic_linear {
+            let mut product = vec![0; other.len() + 1];
+            if other[0] != 0 {
+                product[0] = self.field(FieldOp::Mul, constant, other[0])?;
+            }
+            for i in 1..other.len() {
+                let scaled = if other[i] != 0 {
+                    self.field(FieldOp::Mul, constant, other[i])?
+                } else {
+                    0
+                };
+                product[i] = if scaled == 0 {
+                    other[i - 1]
+                } else if other[i - 1] == 0 {
+                    scaled
+                    self.field(FieldOp::Add, scaled, other[i - 1])?
+            product[other.len()] = *other.last().unwrap();
+            let product = trim(product);
+                a: a.to_vec(), b: b.to_vec(), product: product.clone(),
+        // General polynomial convolution with zero coefficient pruning.
         // The source-exact root benchmarks found a 2-3% gain on 65,521
         // but repeatable larger-prime full-solver regressions. Restrict this
         // small-field identity specialization to its measured benefit region;
@@ -428,7 +506,6 @@ impl Engine<'_> {
         if self.report.p <= 65_521 && (a.len() <= 2 || b.len() <= 2) {
             if let Some(result) = self.mul_shortcut(a, b)? {
                 return Ok(result);
-            }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -526,8 +603,8 @@ impl Engine<'_> {
             Ok(None)
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
-        // Euclidean GCD often ends with a unit divisor; dividing by 1
-        // is a coefficient copy, not a degree-by-degree long division.
+        // A unit divisor and a smaller-degree dividend require no field
+        // arithmetic or quotient buffer; keep the Division certificate.
         if b == [1] {
             let quotient = trim(a.to_vec());
             self.event(RootEvent::Division {
@@ -569,14 +646,56 @@ impl Engine<'_> {
                 r = trim(r);
             }
         }
+        // Division by X^k is a coefficient split. Neither long division
+        // nor synthetic field operations are necessary.
+        if b.len() > 1 && b[0] == 0 && *b.last().unwrap() == 1
+            && b[1..b.len() - 1].iter().all(|&x| x == 0)
+        {
+            let shift = b.len() - 1;
+            let quotient = trim(a[shift..].to_vec());
+            let remainder = trim(a[..shift].to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: quotient.clone(),
+                remainder: remainder.clone(),
+            })?;
+            return Ok((quotient, remainder));
+        }
+        let mut r = a.to_vec();
+        let mut q = vec![0; a.len() - b.len() + 1];
+        let lead = *b.last().unwrap();
+        let inv = if lead == 1 { 1 } else { self.inv(lead)? };
+        // Descending fixed-degree elimination avoids repeated tail scans
+        // and allocations from trim(r) for every quotient coefficient.
+        // A zero high term would already have been trimmed by the old
+        // implementation; skip it without emitting field events.
+        for shift in (0..q.len()).rev() {
+            let highest = r[shift + b.len() - 1];
+            if highest == 0 { continue; }
+            let c = if lead == 1 {
+                highest
+            } else {
+                self.field(FieldOp::Mul, highest, inv)?
+            };
+            q[shift] = c;
+            for (k, &v) in b[..b.len() - 1].iter().enumerate() {
+                if v == 0 { continue; }
+                let product = self.field(FieldOp::Mul, c, v)?;
+                r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
+            }
+            r[shift + b.len() - 1] = 0;
+        }
+        r.truncate(b.len() - 1);
+        let r = trim(r);
         let q = trim(q);
         self.event(RootEvent::Division {
             a: a.to_vec(),
             b: b.to_vec(),
-            quotient: q.clone(),
-            remainder: r.clone(),
+            quotient: quotient.clone(),
+            remainder: remainder.clone(),
         })?;
-        Ok((q, r))
+        Ok((quotient, remainder))
     }
     fn pow(&mut self, base: &[u64], mut exponent: u64, modulus: &[u64]) -> Work<Vec<u64>> {
         let id = self.next_id;
@@ -620,14 +739,19 @@ impl Engine<'_> {
             // base equal to the last useful base. The verifier supports both
             // this shorter trace and legacy traces with the terminal square.
             exponent >>= 1;
+            // The base is dead after the final exponent bit. Avoid the last
+            // polynomial square, reduction, and their field/certificate events.
+            // PowerStep records the unchanged base when exponent reaches zero.
             if exponent != 0 {
+                let product = self.square(&b)?;
+                b = self.div(&product, modulus)?.1;
+            }
                 let product = self.mul(&b, &b)?;
                 b = if product.len() < modulus.len() {
                     product
                 } else {
                     self.div(&product, modulus)?.1
                 };
-            }
             self.event(RootEvent::PowerStep {
                 id,
                 exponent,
@@ -990,10 +1114,60 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Keep the wide 32-bit arithmetic in its own cold-to-other-fields code
+// region. Inlining it into the generic verifier perturbs even the unchanged
+// 61-bit hot path and gave measurable code-layout regressions.
+#[inline(never)]
+fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    debug_assert!(p > 1 && p <= u32::MAX as u64);
+    let reciprocal = u64::MAX / p;
+    let mut result = vec![0; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 { continue; }
+        for (j, &y) in b.iter().enumerate() {
+            if y == 0 { continue; }
+            let term = result[i + j] + x * y;
+            let quotient = ((term as u128 * reciprocal as u128) >> 64) as u64;
+            let remainder = term - quotient * p;
+            result[i + j] = if remainder >= p { remainder - p } else { remainder };
+        }
+    }
+    trim(result)
+}
+
+// Build the monic product of distinct linear factors in place. Completing
+// root certificates previously allocated an intermediate Vec at every root,
+// even though multiplying by (X-r) needs only a backward coefficient pass.
+// The independent verifier still checks this product against f or the
+// Frobenius/GCD certificate; this is not an acceptance shortcut.
+fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    let mut product = Vec::with_capacity(roots.len() + 1);
+    product.push(1);
+    let mut previous = None;
+    for &root in roots {
+        if root >= p || previous.is_some_and(|a| a >= root) {
+            return Err("noncanonical or repeated root".into());
+        previous = Some(root);
+        let c = if root == 0 { 0 } else { p - root };
+        let n = product.len();
+        // The new leading coefficient is the old leading coefficient;
+        // no zero multiplication or modular reduction is necessary.
+        product.push(product[n - 1]);
+        if c == 0 {
+            product.copy_within(0..n, 1);
+            product[0] = 0;
+            continue;
+        // Descending updates preserve the old coefficients until read.
+        // The sum is < 2p <= 2^62, so one conditional subtraction suffices.
+        for i in (1..n).rev() {
+            let sum = product[i - 1] + vmul(product[i], c, p);
+            product[i] = if sum >= p { sum - p } else { sum };
+        product[0] = vmul(product[0], c, p);
+    Ok(product)
+
 // Fast path for c + d*x^k (k >= 5), with c,d both nonzero. This is
 // separate from monomial multiplication, which is handled earlier.
 #[cold]
-#[inline(never)]
 fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>> {
     if binomial.len() < 6 || binomial[0] == 0
         || binomial[1] != 0 || binomial[2] != 0
@@ -1001,13 +1175,11 @@ fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>
         || binomial[3..binomial.len() - 1].iter().any(|&x| x != 0)
     {
         return None;
-    }
     let shift = binomial.len() - 1;
     let low = binomial[0];
     let high = binomial[shift];
     let mut out = vec![0; binomial.len() + other.len() - 1];
     for (i, &x) in other.iter().enumerate() {
-        if x == 0 { continue; }
         // All caller coefficients are canonical. Two additions cannot
         // overflow u64 because p <= 2^61 - 1.
         let product = vmul(x, low, p);
@@ -1019,23 +1191,16 @@ fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>
         } else {
             let product = vmul(x, high, p);
             let sum = out[i + shift] + product;
-            out[i + shift] = if sum >= p { sum - p } else { sum };
-        }
-    }
     Some(trim(out))
-}
 // Used only for independently replaying recorded Product events. Do not
 // alter the generic vproduct hot path: production Rust A/B showed 5-12%
 // regressions from even guarded binomial dispatch on ordinary operands.
 fn vverified_product(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
         if let Some(result) = vbinomial_product(a, b, p) { return result; }
-    }
     if b.len() >= 6 && b[1] == 0 && b[2] == 0 {
         if let Some(result) = vbinomial_product(b, a, p) { return result; }
-    }
     vproduct(a, b, p)
-}
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -1048,8 +1213,39 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
         if scalar == 1 { return trim(other.to_vec()); }
         return trim(other.iter().map(|&x| vmul(x, scalar, p)).collect());
     }
+    // A monic linear factor (x + c) is common in completeness proofs.
+    // For f(x)*(x+c), coefficient k is c*f[k] + f[k-1].
+    // This needs one field product per coefficient, not two convolution
+    // products, and has no inner-loop allocation or degree dispatch.
+    if (a.len() == 2 && a[1] == 1 && b.len() >= 5)
+        || (b.len() == 2 && b[1] == 1 && a.len() >= 5)
+    {
+        let (linear, other) = if a.len() == 2 && a[1] == 1 {
+            (a, b)
+        } else {
+            (b, a)
+        };
+        let mut result = vec![0; other.len() + 1];
+        let c = linear[0];
+        if c == 0 {
+            result[1..].copy_from_slice(other);
+            return trim(result);
+        }
+        result[0] = vmul(other[0], c, p);
+        for i in 1..other.len() {
+            // Both summands are canonical, and p <= 2^61-1, so u64
+            // addition cannot overflow and needs one correction.
+            let sum = vmul(other[i], c, p) + other[i - 1];
+            result[i] = if sum >= p { sum - p } else { sum };
+        }
+        result[other.len()] = *other.last().unwrap();
+        return trim(result);
+    }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
+    if p <= u32::MAX as u64 && a.len() >= 8 && b.len() >= 8 {
+        return vproduct_barrett32(a, b, p);
+    }
     // A wide dense convolution can accumulate each output coefficient in u64
     // and perform ONE modular reduction per coefficient, not one per pair.
     // The bound is checked in u128, so no intermediate u64 overflow is possible.
@@ -1072,7 +1268,6 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
             *coefficient = sum % p;
         }
         return trim(result);
-    }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
@@ -2153,7 +2348,7 @@ fn vmonic(mut a: Vec<u64>, p: u64) -> Vec<u64> {
 }
 fn vgcd(mut a: Vec<u64>, mut b: Vec<u64>, p: u64) -> Result<Vec<u64>, String> {
     while !b.is_empty() {
-        let r = vdiv(&a, &b, p)?.1;
+        let r = vremainder(&a, &b, p)?;
         a = b;
         b = r;
     }
@@ -2177,6 +2372,14 @@ struct PowerState {
     // An exact split-base/exponent/modulus binding is just as strong as
     // recomputing the full Cantor-Zassenhaus power at SplitEnd.
     split_power: bool,
+}
+
+// Computation identifiers are consecutive and bounded by the event limit.
+// A flat slot table avoids hashing every modular-power step while retaining
+// the original live-state checks (and detecting wrong-kind or reused IDs).
+enum TraceComputation {
+    Power(PowerState),
+    Gcd((Vec<u64>, Vec<u64>)),
 }
 
 /// Checks each supplied arithmetic state, the terminal distinct-root certificate,
@@ -2374,7 +2577,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(accumulator, p)?;
                 canonical(base, p)?;
-                let state = powers.get_mut(id).ok_or("missing power begin")?;
+                let Some(Some(TraceComputation::Power(state))) =
+                    computations.get_mut(*id as usize)
+                else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent == 0 {
                     return Err("power continued after completion".into());
                 }
@@ -2409,7 +2616,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::PowerEnd { id, value } => {
                 canonical(value, p)?;
-                let state = powers.remove(id).ok_or("missing power begin")?;
+                let state = computations.get_mut(*id as usize)
+                    .and_then(Option::take)
+                    .ok_or("missing power begin")?;
+                let TraceComputation::Power(state) = state else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
@@ -2486,7 +2698,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
-                let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+                let state = computations.get_mut(*id as usize)
+                    .and_then(Option::take)
+                    .ok_or("missing gcd begin")?;
+                let TraceComputation::Gcd((a, b)) = state else {
+                    return Err("missing gcd begin".into());
+                };
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
                 }
@@ -2528,6 +2745,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 s[0] = (s[0] + p - 1) % p;
                 let g = vgcd(h.clone(), trim(s), p)?;
                 let valid = g.len() > 1 && g.len() < h.len();
+                let quotient_matches = if valid {
+                    let (verified_quotient, verified_remainder) = vdiv(&h, &g, p)?;
+                    verified_remainder.is_empty() && verified_quotient == *quotient
+                } else {
+                    quotient.is_empty()
+                };
                 let split_quotient_valid = if valid {
                     if reuse_divisions {
                         match verified_division.take() {
@@ -2541,9 +2764,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     } else {
                         vdiv(&h, &g, p)? == (quotient.clone(), vec![])
                     }
-                } else {
                     true
-                };
                 if h != *polynomial
                     || g != *factor
                     || valid != *accepted
@@ -2557,7 +2778,14 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(polynomial, p)?;
                 if polynomial.len() != 2
                     || *root >= p
-                    || { let sum = vmul(polynomial[1], *root, p) + polynomial[0]; sum != 0 && sum != p }
+                    || (if polynomial[1] == 1 {
+                        // For x+c, root == -c mod p. Compare the
+                        // independent identity without a field product.
+                        *root != if polynomial[0] == 0 { 0 } else { p - polynomial[0] }
+                    } else {
+                        let sum = vmul(polynomial[1], *root, p) + polynomial[0];
+                        sum != 0 && sum != p
+                    })
                 {
                     return Err("linear root identity failed".into());
                 }
@@ -2574,7 +2802,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [xp_mod_f, linear_part] {
                     canonical(v, p)?;
                 }
-                if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+                if computations.iter().any(Option::is_some)
+                    || inverse.is_some() || split.is_some()
+                {
                     return Err("unfinished native computation".into());
                 }
                 let acknowledged = index < report.events.len();
@@ -2626,11 +2856,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         if r >= p || previous.is_some_and(|a| a >= r) {
                             return Err("noncanonical or repeated root".into());
                         }
-                        previous = Some(r);
-                        product = vproduct(&product, &[(p - r) % p, 1], p);
-                    }
-                    if g != *linear_part || product != g {
-                        return Err("distinct-root completeness failed".into());
                     }
                 }
                 finished = true;
@@ -2669,6 +2894,302 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round78_division_paths_match_independent_euclid_and_certify() {
+        for p in [17, 65521, 1_000_000_007, MAX_PRIME] {
+            let dividends = [
+                vec![1, 2, 3, 4, 5, 6, 7, 8, 1],
+                vec![3, 5],
+                vec![1, 0, 0, 0, 1],
+                vec![],
+            ];
+            let divisors = [
+                vec![1], vec![0, 1], vec![0, 0, 1],
+                vec![2, 1], vec![p - 1, 1], vec![1, 2, 3, 1],
+                vec![1, 2, 3, 4, 5], vec![1, 0, 0, 0, 1],
+            for dividend in &dividends {
+                for divisor in &divisors {
+                    let mut sink = |_: &RootEvent| Ok(());
+                    let mut engine = Engine {
+                        report: RootReport {
+                            schema: "prime-root-trace/v1".into(),
+                            p,
+                            polynomial: vec![],
+                            seed: 0,
+                            limits: RootLimits {
+                                field_work: MAX_WORK,
+                                split_attempts: 1000,
+                                events: MAX_EVENTS,
+                                degree: MAX_DEGREE,
+                            },
+                            stop: RootStop::WorkLimit,
+                            counters: RootCounters::default(),
+                            events: vec![],
+                            unacknowledged: None,
+                            sink_error: None,
+                            roots: vec![],
+                        },
+                        sink: &mut sink,
+                        next_id: 0,
+                        reciprocal32: if p <= u32::MAX as u64 {
+                            ((1u128 << 64) / p as u128) as u64
+                        } else { 0 },
+                    };
+                    let actual = engine.div(dividend, divisor).unwrap();
+                    let expected = vdiv(dividend, divisor, p).unwrap();
+                    assert_eq!(actual, expected, "p={p} a={dividend:?} b={divisor:?}");
+                    assert!(matches!(
+                        engine.report.events.last(),
+                        Some(RootEvent::Division { quotient, remainder, .. })
+                        if (quotient, remainder) == (&actual.0, &actual.1)
+                    ));
+                }
+            }
+            // Full producer and independent verifier, including linear roots.
+            for f in [
+                vec![p - 1, 1],
+                vproduct(&[p - 1, 1], &[p - 2, 1], p),
+                vproduct(&[p - 1, 1], &[1, 0, 0, 1], p),
+            ] {
+                let report = run(&f, p);
+                assert!(report.complete(), "p={p}, f={f:?}, stop={:?}", report.stop);
+                verify(&report).unwrap();
+                assert!(report.roots.contains(&1));
+        }
+    }
+
+    #[test]
+    fn round85_fixed_division_matches_independent_euclidean_remainder() {
+        // Test degrees, sparse/monomial/linear and nonmonic divisors,
+        // including short dividends and the maximum admitted field.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            for da in 0..=8usize {
+                for db in 0..=8usize {
+                    for variant in 0..4u64 {
+                        let mut a: Vec<u64> = (0..=da)
+                            .map(|i| (i as u64 * 13 + variant * 17 + 1) % p).collect();
+                        if da == 0 && variant == 3 { a.clear(); }
+                        if !a.is_empty() && *a.last().unwrap() == 0 {
+                            *a.last_mut().unwrap() = 1;
+                        }
+                        let mut b: Vec<u64> = (0..=db)
+                            .map(|i| (i as u64 * 7 + variant * 11 + 1) % p).collect();
+                        if variant == 0 {
+                            b.fill(0);
+                            b[db] = 1; // X^db, with constant one at db=0
+                        } else if variant == 1 && db > 0 {
+                            b[0] = 1;
+                            b[db] = 1; // monic binomial
+                        } else if *b.last().unwrap() == 0 {
+                            *b.last_mut().unwrap() = 1;
+                        let expected = vdiv(&a, &b, p).unwrap();
+                        let mut sink = |_: &RootEvent| Ok(());
+                        let mut engine = Engine {
+                            report: RootReport {
+                                schema: "prime-root-trace/v1".into(),
+                                p, polynomial: vec![1], seed: 0,
+                                limits: RootLimits {
+                                    field_work: MAX_WORK, split_attempts: MAX_EVENTS,
+                                    events: MAX_EVENTS, degree: MAX_DEGREE,
+                                },
+                                stop: RootStop::Complete,
+                                counters: RootCounters::default(), events: vec![],
+                                unacknowledged: None, sink_error: None, roots: vec![],
+                            sink: &mut sink, next_id: 0,
+                            reciprocal32: if p <= u32::MAX as u64 {
+                                ((1u128 << 64) / p as u128) as u64
+                            } else { 0 },
+                        };
+                        let actual = engine.div(&a, &b).unwrap();
+                        assert_eq!(actual, expected, "p={p}, a={a:?}, b={b:?}");
+                        assert!(matches!(engine.report.events.last(),
+                            Some(RootEvent::Division {..})));
+                    }
+
+
+    fn round84_indexed_replay_rejects_forged_computation_ids() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let polynomial = vproduct(&[p - 2, 1], &[p - 5, 1], p);
+            let report = run(&polynomial, p);
+            assert!(report.complete(), "p={p}, stop={:?}", report.stop);
+            verify(&report).unwrap();
+            for target in 0..4 {
+                let mut forged = report.clone();
+                let changed = forged.events.iter_mut().find_map(|event| match (target, event) {
+                    (0, RootEvent::PowerStep { id, .. })
+                    | (1, RootEvent::PowerEnd { id, .. })
+                    | (2, RootEvent::GcdStep { id, .. })
+                    | (3, RootEvent::GcdEnd { id, .. }) => { *id = u64::MAX; Some(()) },
+                    _ => None,
+                });
+                assert!(changed.is_some());
+                assert!(verify(&forged).is_err(), "forged id accepted p={p} target={target}");
+
+    fn round88_dense_barrett_product_matches_reference_convolution() {
+        let mut state = 0x8422_26d3_1214_6587u64;
+        // The oracle uses independent u128 remainder arithmetic.
+        for p in [3u64, 65521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            for alen in 2..=12 {
+                for blen in 2..=12 {
+                    for case in 0..24 {
+                        let mut a = vec![0; alen];
+                        let mut b = vec![0; blen];
+                        for x in a.iter_mut().chain(b.iter_mut()) {
+                            state = state.wrapping_mul(6364136223846793005)
+                                .wrapping_add(1442695040888963407);
+                            *x = state % p;
+                        if case % 6 == 0 { a[0] = 0; b[blen - 1] = 0; }
+                        if case % 7 == 0 { a[alen - 1] = p - 1; b[0] = p - 1; }
+                        let mut expected = vec![0u64; alen + blen - 1];
+                        for (i, &x) in a.iter().enumerate() {
+                            for (j, &y) in b.iter().enumerate() {
+                                expected[i + j] = ((expected[i + j] as u128
+                                    + x as u128 * y as u128) % p as u128) as u64;
+                            }
+                        assert_eq!(vproduct(&a, &b, p), trim(expected),
+                            "p={p} alen={alen} blen={blen} case={case}");
+
+    fn round87_remainder_only_replay_matches_independent_division() {
+        // Compare fixed-degree remainder-only reduction against the frozen
+        // Euclidean quotient-and-remainder verifier, including 61-bit fields.
+        for p in [3_u64, 5, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 3..=8 {
+                for seed in 0..32_u64 {
+                    let mut modulus: Vec<u64> = (0..degree)
+                        .map(|i| ((seed * 37 + i as u64 * 71 + 1) % (p - 1)) + 1)
+                        .collect();
+                    modulus.push(1);
+                    for extra in 0..=degree {
+                        let length = degree + extra;
+                        let dividend: Vec<u64> = (0..length)
+                            .map(|i| ((seed * 47 + i as u64 * 113 + 2) % (p - 1)) + 1)
+                            .collect();
+                        assert_eq!(
+                            vremainder(&dividend, &modulus, p).unwrap(),
+                            vdiv(&dividend, &modulus, p).unwrap().1,
+                            "p={p} degree={degree} seed={seed} extra={extra}"
+                        );
+
+    fn round86_monic_shift_and_linear_match_independent_products() {
+        // Directly exercise the source-exact traced producer arithmetic.
+        // In particular, a shift must not charge scalar arithmetic events.
+            let mut sink = |_event: &RootEvent| Ok(());
+            let mut engine = Engine {
+                report: RootReport {
+                    schema: "prime-root-trace/v1".into(), p,
+                    polynomial: vec![1, 1], seed: 7,
+                    limits: RootLimits {field_work: MAX_WORK, split_attempts: 1000,
+                        events: MAX_EVENTS, degree: MAX_DEGREE},
+                    stop: RootStop::WorkLimit,
+                    counters: RootCounters::default(), events: Vec::new(),
+                    unacknowledged: None, sink_error: None, roots: Vec::new(),
+                },
+                sink: &mut sink, next_id: 0,
+                reciprocal32: if p <= u32::MAX as u64 {
+                    ((1u128 << 64) / p as u128) as u64
+                } else { 0 },
+            };
+            let dense = vec![1, 2 % p, 3 % p, 4 % p, 5 % p, 6 % p, 7 % p, 8 % p];
+            let sparse = vec![1, 0, 2 % p, 0, 3 % p, 0, 4 % p, 1];
+            for other in [&dense, &sparse] {
+                for shift in 1..=4 {
+                    let mut monomial = vec![0; shift + 1];
+                    monomial[shift] = 1;
+                    let before = engine.report.counters.field_work();
+                    assert_eq!(engine.mul(&monomial, other).unwrap(),
+                        vproduct(&monomial, other, p));
+                    assert_eq!(engine.report.counters.field_work(), before);
+                    assert_eq!(engine.mul(other, &monomial).unwrap(),
+                        vproduct(other, &monomial, p));
+                    assert_eq!(engine.square(&monomial).unwrap(),
+                        vsquare(&monomial, p));
+            for constant in [1, 2 % p] {
+                let linear = [constant, 1];
+                for other in [&dense, &sparse] {
+                    let result = engine.mul(&linear, other).unwrap();
+                    assert_eq!(result, vproduct(&linear, other, p));
+                    assert_eq!(engine.mul(other, &linear).unwrap(), result);
+            assert_eq!(engine.square(&[1]).unwrap(), vec![1]);
+            assert!(engine.report.events.iter().any(|e| matches!(e, RootEvent::Product { .. })));
+
+    fn round83_inplace_roots_and_square_replay_equivalence() {
+        // Compare against the established independent polynomial operations,
+        // including X factors, full degree-eight products and sparse squares.
+            for degree in 0..=MAX_DEGREE {
+                if degree as u64 > p { continue; }
+                for seed in 0..64u64 {
+                    let mut roots: Vec<_> = (0..degree as u64)
+                        .map(|j| (seed * 137 + j * 31) % p).collect();
+                    roots.sort_unstable();
+                    roots.dedup();
+                    let expected = roots.iter().fold(vec![1], |f, &r| {
+                        vproduct(&f, &[(p - r) % p, 1], p)
+                    });
+                    assert_eq!(vroot_product(&roots, p).unwrap(), expected,
+                               "p={p} degree={degree} seed={seed}");
+            assert!(vroot_product(&[p], p).is_err());
+            assert!(vroot_product(&[1, 1], p).is_err());
+            assert!(vroot_product(&[2, 1], p).is_err());
+            for degree in 1..=MAX_DEGREE {
+                    let mut f: Vec<_> = (0..=degree)
+                        .map(|j| ((seed * 127 + j as u64 * 71) % p)).collect();
+                    if f[degree] == 0 { f[degree] = 1; }
+                    for j in (1..degree).step_by(3) { f[j] = 0; }
+                    assert_eq!(vsquare(&f, p), vproduct(&f, &f, p),
+                               "square p={p} degree={degree} seed={seed}");
+
+    fn round82_full_split_frobenius_certificate_and_tampering() {
+        // A full split proves X^p-X divisibility, including nonmonic f.
+        // Sparse, repeated-root, and partial-split certificates still use
+        // the general Frobenius/GCD replay and must continue verifying.
+            let cases = if p == 3 {
+                vec![vec![p - 1, 1], vec![0, 1]]
+            } else {
+                let split = [2u64, 3, 5, 7].iter().fold(vec![1], |a, &r| {
+                    vproduct(&a, &[(p - r) % p, 1], p)
+                let scaled = split.iter().map(|&x| vmul(x, 3, p)).collect();
+                vec![vec![p - 1, 1], vec![0, 1], split, scaled]
+            for polynomial in cases {
+                let report = solve(&polynomial, p, 7, RootLimits {
+                    field_work: MAX_WORK, split_attempts: 1000,
+                    events: MAX_EVENTS, degree: MAX_DEGREE,
+                }, &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "p={p} polynomial={polynomial:?}");
+                if let Some(RootEvent::Finish { xp_mod_f, .. }) = forged.events.last_mut() {
+                    *xp_mod_f = vec![p - 1];
+                assert!(verify(&forged).is_err(), "forged Frobenius at p={p}");
+                if let Some(RootEvent::Finish { linear_part, .. }) = forged.events.last_mut() {
+                    *linear_part = vec![1];
+                assert!(verify(&forged).is_err(), "forged linear part at p={p}");
+
+    fn round81_monic_linear_certificate_product_matches_convolution() {
+        let mut seed = 0x8120_2611_2020_0001u64;
+            for degree in 1..=8 {
+                for _ in 0..128 {
+                    let mut other = vec![0u64; degree + 1];
+                    for coefficient in &mut other {
+                        seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *coefficient = seed % p;
+                    other[degree] = 1;
+                    // Includes a pure x factor, x+1, and general x+c.
+                    for c in [0, 1, p - 1, 2 % p] {
+                        let linear = [c, 1u64];
+                        let mut reference = vec![0u64; other.len() + 1];
+                        for (i, &a) in other.iter().enumerate() {
+                            for (j, &b) in linear.iter().enumerate() {
+                                reference[i + j] = ((reference[i + j] as u128
+                                    + a as u128 * b as u128) % p as u128) as u64;
+                        let reference = trim(reference);
+                        assert_eq!(vproduct(&other, &linear, p), reference);
+                        assert_eq!(vproduct(&linear, &other, p), reference);
+
+    fn round81_linear_and_quartic_certificates_still_verify() {
+            let a = vproduct(&[p - 3, 1], &[p - 5, 1], p);
+            let quartic = vproduct(&a, &[1, 0, 1], p);
+            for polynomial in [vec![p - 3, 1], a, quartic] {
+                let report = run(&polynomial, p);
+                assert!(report.complete(), "p={p} stop={:?}", report.stop);
+                assert!(report.roots.contains(&3));
+
     fn round76_identity_pruning_preserves_root_certificates() {
         // Exercise monic and nonmonic divisors, dense products, sparse
         // products, and monic GCD normalization through the full solver.
@@ -3549,6 +4070,128 @@ mod round77_producer_regression {
     }
 }
 
+
+#[cfg(test)]
+mod round79_terminal_power_regression {
+    use super::*;
+    use std::collections::HashMap;
+
+    #[test]
+    fn terminal_base_elision_preserves_results_and_legacy_certificates() {
+        for p in [101, 65_521, 1_000_000_007, MAX_PRIME] {
+            let limits = RootLimits {
+                field_work: MAX_WORK,
+                split_attempts: 512,
+                events: MAX_EVENTS,
+                degree: MAX_DEGREE,
+            };
+            let polynomials = [
+                vec![p - 2, 1],
+                vproduct(&[p - 2, 1], &[p - 3, 1], p),
+                vec![p - 1, 0, 0, 1],
+            ];
+            for f in polynomials {
+                let report = solve(&f, p, 79, limits.clone(), &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "incomplete p={p} f={f:?}");
+                verify(&report).unwrap();
+
+                let mut moduli = HashMap::new();
+                let mut legacy = report.clone();
+                let mut terminal_steps = 0;
+                for event in &mut legacy.events {
+                    match event {
+                        RootEvent::PowerBegin { id, modulus, .. } => {
+                            moduli.insert(*id, modulus.clone());
+                        }
+                        RootEvent::PowerStep { id, exponent: 0, base, .. } => {
+                            terminal_steps += 1;
+                            let modulus = moduli.get(id).unwrap();
+                            // Reconstruct the historical v1 terminal step.
+                            *base = vdiv(&vproduct(base, base, p), modulus, p).unwrap().1;
+                        _ => {}
+                    }
+                }
+                assert!(terminal_steps > 0);
+                // Old stored certificates still pass, despite the optimized
+                // producer no longer spending work on dead terminal squares.
+                verify(&legacy).unwrap();
+
+                // An unrelated terminal base is not a valid certificate.
+                let mut malformed = report.clone();
+                let target = malformed.events.iter_mut().find(|event| matches!(
+                    event, RootEvent::PowerStep { exponent: 0, .. }
+                )).unwrap();
+                if let RootEvent::PowerStep { base, .. } = target {
+                    base.push(1);
+                assert!(verify(&malformed).is_err());
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round80_identity_arithmetic {
+    use super::*;
+
+    fn test_limits() -> RootLimits {
+        RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: MAX_EVENTS,
+            degree: MAX_DEGREE,
+        }
+    }
+
+    #[test]
+    fn identity_reduction_and_first_power_bit_preserve_verified_roots() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            // Include a monic linear, split quadratic, irreducible
+            // quadratic, and a quartic with two known distinct roots.
+            let polynomials = [
+                vec![p - 3, 1],
+                vec![6, p - 5, 1],
+                vec![1, 0, 1],
+                vec![6, p - 5, 7, p - 5, 1],
+                vec![1],
+            ];
+            for (i, f) in polynomials.iter().enumerate() {
+                let mut sink = |_event: &RootEvent| Ok(());
+                let report = solve(f, p, 0x8080 + i as u64, test_limits(), &mut sink).unwrap();
+                assert!(report.complete(), "p={p} f={f:?}: {:?}", report.stop);
+                verify(&report).expect("full independent certificate");
+                for &r in &report.roots {
+                    let mut value = 0u64;
+                    for &c in f.iter().rev() {
+                        value = ((value as u128 * r as u128 + c as u128) % p as u128) as u64;
+                    }
+                    assert_eq!(value, 0, "root must satisfy polynomial");
+                }
+            }
+
+    fn smallest_odd_primes_and_constant_modulus_preserve_certificates() {
+        for p in [3u64, 5, 7, 11] {
+            for f in [vec![p - 2, 1], vec![1], vec![0, 1]] {
+                let report = solve(&f, p, 4, test_limits(), &mut sink).unwrap();
+                assert!(report.complete(), "p={p} f={f:?}");
+                verify(&report).unwrap();
+
+    fn limited_work_and_sink_failures_remain_verifiable() {
+        for p in [65_521, MAX_PRIME] {
+            let mut sink = |_event: &RootEvent| Ok(());
+            let limited = RootLimits { field_work: 12, ..test_limits() };
+            let r = solve(&[6, p - 5, 1], p, 123, limited, &mut sink).unwrap();
+            assert_eq!(r.stop, RootStop::WorkLimit);
+            verify(&r).expect("work-limit prefix");
+            let mut received = 0usize;
+            let mut failing = |_event: &RootEvent| {
+                received += 1;
+                if received == 3 { Err("sink failed".into()) } else { Ok(()) }
+            };
+            let s = solve(&[6, p - 5, 1], p, 123, test_limits(), &mut failing).unwrap();
+            assert_eq!(s.stop, RootStop::SinkFailure);
+            verify(&s).expect("failed-sink prefix");
+}
+
 mod round89_column_accumulators {
 
     // Independent wide-arithmetic oracle. Never uses vproduct or vsquare.
@@ -3576,7 +4219,6 @@ mod round89_column_accumulators {
                     } else if case % 3 == 1 {
                         a[0] = p - 1;
                         b[width - 1] = p - 1;
-                    }
                     assert_eq!(vproduct(&a, &b, p), reference_product(&a, &b, p),
                         "product: p={p}, width={width}, case={case}");
                     assert_eq!(vsquare(&a, p), reference_product(&a, &a, p),
@@ -3601,10 +4243,6 @@ mod round89_column_accumulators {
                         "right binomial p={p} width={width} case={case}");
 
     fn certificate_replay_matches_solver_after_clone_elimination() {
-            field_work: MAX_WORK,
-            split_attempts: 1000,
-            events: MAX_EVENTS,
-            degree: MAX_DEGREE,
             for polynomial in [vec![p - 3, 1], vec![6, p - 5, 1]] {
                 let report = solve(&polynomial, p, 13, limits.clone(),
                     &mut |_| Ok(())).unwrap();
@@ -3784,7 +4422,6 @@ mod round100_traced_multiplication {
                         for (j, &y) in b.iter().enumerate() {
                             expected[i + j] = ((expected[i + j] as u128
                                 + x as u128 * y as u128) % p as u128) as u64;
-                        }
                     let expected = trim(expected);
                     let mut observer = |_: &RootEvent| -> Result<(), String> { Ok(()) };
                     let mut engine = Engine {
@@ -3824,9 +4461,6 @@ mod round100_traced_multiplication {
             field_work: MAX_WORK, split_attempts: 1000,
         for p in [13u64, 65_521, 1_000_000_007, MAX_PRIME] {
             for f in [
-                vec![p - 3, 1],
-                vec![6, p - 5, 1],
-                vec![1, 0, 1],
                 let report = solve(&f, p, 17, limits.clone(),
                 assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
 
@@ -3853,7 +4487,6 @@ mod round107_inverse_chain {
                 unacknowledged: None,
                 sink_error: None,
                 roots: vec![],
-            };
             let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
             let actual = engine.inv(value).unwrap();
             assert_eq!(actual, vpow(value, p - 2, p), "value={value}");

@@ -58,6 +58,7 @@ bound `|t| ≤ 2√q` before any trace is classified. The implementation is
 | `subgroup` | prime subgroup order `r` and cofactor | the registry representation, else the largest prime of `#E` |
 | `embedding` | `ord_r(q)` and the bit length of `(r − 1)/k` | exact from the factorisation of `r − 1`; else `q^k ≢ 1` for `k ≤ 1000` gives a bound |
 | `twist` | the quadratic twist's order `q + 1 + t`, its largest prime and cofactor | factored with the same budget |
+| `transfer` | the same-field genus-2 hyperelliptic cover of a prime-field curve, and the leading exponent of the destination solver (see "Hyperelliptic transfer") | `prime_quadratic_pullback_v1` from [`COVERS.md`](COVERS.md); exponent comparison only, no map or measurement |
 | `dissect` | the DiSSECT trait families this module can define exactly (see "DiSSECT families") | |
 | `keys` | the grouping keys below | |
 
@@ -405,6 +406,7 @@ own code is not claimed. Every value carries the order check's status
 | `pow_distance` | `pow_distance` | `#E` and `r` against the nearest power of 2 |
 | `x962_invariant` | `x962_invariant` | `a³/b² mod p` |
 | `hamming_x[w]` | `hamming_x` | how many `x` of Hamming weight `w` are x-coordinates of points, where at most 600 values are tried |
+| `transfer` | `hyperelliptic_transfer` (locally defined; not upstream DiSSECT) | the same-field genus-2 cover of a prime-field curve: least shift `c`, map degree 2, genus 2, whether `gcd(r, 2) = 1`, and the destination/rho leading exponents with `route_class = boundary` |
 
 Frobenius on `E[ℓ]` is fixed up to conjugacy by `X² − tX + q mod ℓ` except
 at a double root, where the volcano level decides between the scalar and a
@@ -415,6 +417,38 @@ are written `2^2·3·p250`: a large prime as `p<bits>`, an unsplit
 composite as `c<bits>`. `not_evaluated_families` in the file lists the
 families left out and why (`brainpool_overlap`, `multiples_x`, `q_torsion`,
 `square_4p1`, class-number bounds, `weierstrass`).
+
+### Hyperelliptic transfer
+
+`transfer` is a locally defined family, not an upstream DiSSECT one. For a
+prime-field model `E: y² = x³ + ax + b` with `p > 3`,
+[`COVERS.md`](COVERS.md) constructs the same-field cover
+
+```text
+H: v² = F(u² + c),   F(x) = x³ + ax + b,   (u, v) ↦ (u² + c, v),
+```
+
+where `c` is the least of `0, 1, 2, 3` with `F(c) ≠ 0` (one exists: a cubic
+has at most three roots). The map has degree 2 and `H` is a genus-2
+hyperelliptic curve. `transfer.prime_quadratic` records `shift = c`,
+`map_degree = 2`, `genus = 2`, and `subgroup_coprime_to_degree`, which is
+`gcd(r, 2) = 1` and is only a necessary condition for the pullback to be
+injective on the prime subgroup (`null` when `r` is unknown).
+
+`route_class` compares leading exponents, not costs. Genus-2 index calculus
+on `Jac(H)` leads with `2 − 2/g = 1`; rho on `E` leads with `1/2`. The
+destination exponent is larger, so the route is a `boundary` at the exponent
+level: no constant factor on this route crosses rho. Measured instances agree
+(8.0–47.1× matched rho at `p = 211 … 64,007`,
+[`research/chained_prime_transfer_20261111/`](../../research/chained_prime_transfer_20261111/)),
+but this trait copies the geometry and the exponent comparison only. It does
+not construct the map, transfer a subgroup element, collect a relation or
+measure a solve, and a non-`boundary` class would need that evidence.
+
+The family is defined for every prime curve with `p > 3`, so it does not
+distinguish one such curve from another; it records whether the attack class
+applies and what its leading term is. Binary and `GF(p^k)` models carry
+`not_applicable` with the reason.
 
 ## Factor hints
 
