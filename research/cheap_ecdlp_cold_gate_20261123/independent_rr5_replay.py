@@ -105,6 +105,18 @@ def canonical_key(row):
 def validate(data, base, q, rows, producer=None):
     if not 0 < len(base) <= 4096 or len(rows) > 65536:
         raise ValueError("unsupported row/base size")
+    # Enforce the original Rust adapter's base contract even when validate()
+    # is invoked programmatically rather than through the CLI point parser.
+    # Infinity is allowed as a public target, never as a factor-base leaf.
+    for ix, pt in enumerate(base):
+        if pt is None:
+            raise ValueError(f"base[{ix}]: identity is not an admissible factor-base point")
+        if (not isinstance(pt, tuple) or len(pt) != 2
+                or point(list(pt), f"base[{ix}]") != pt):
+            raise ValueError(f"base[{ix}]: noncanonical factor-base point")
+    if q is not None and (not isinstance(q, tuple) or len(q) != 2
+                          or point(list(q), "target Q") != q):
+        raise ValueError("target Q is not a canonical curve point")
     if len(set(base)) != len(base):
         raise ValueError("duplicate factor-base points")
     bsize = len(base)
@@ -220,18 +232,28 @@ def main():
                 raise ValueError(f"attempt {i}: public query point mismatch")
             for row in attempt["receipts"]:
                 rows.append(row)
+        # Preserve the producer's total extraction denominator, including
+        # algebraic rows it could not accept before a cap or early success.
+        extracted = sum(len(a.get("extraction", {}).get("relations", [])) for a in attempts)
+        if extracted < len(rows):
+            raise ValueError("accepted receipts exceed recorded extracted rows")
         extras={"input_sha256":rawhash,"base_sha256":basehash,
                 "input_type":"producer_SolveRecord","attempts_included":len(attempts),
+                "attempts_without_accepted_rows":sum(not a["receipts"] for a in attempts),
                 "producer_status":raw.get("status"),"producer_final_replay":raw.get("final_replay_passed"),
                 "producer_error":raw.get("terminal_error"),
                 "producer_deadline_exceeded":raw.get("deadline_exceeded"),
-                "extracted_candidate_rows":sum(len(a.get("extraction",{}).get("relations",[])) for a in attempts)}
+                "extracted_candidate_rows":extracted,
+                "accepted_rows":len(rows),"extracted_but_not_accepted_rows":extracted-len(rows)}
     result=validate(raw,base,q,rows,producer=bool(args.record))
     if args.record:
         if raw.get("rank") != result["independent_rank"] or raw.get("scalar") != result["recovered"]:
             raise ValueError("producer terminal rank/scalar mismatch")
         if raw.get("final_replay_passed") != result["scalar_replay_passed"]:
             raise ValueError("producer final_replay_passed mismatch")
+        solved_status = raw.get("status") in ("solved", "solved_after_deadline")
+        if solved_status != result["scalar_replay_passed"]:
+            raise ValueError("producer terminal status/scalar contradiction")
     print(json.dumps({**result,**extras},sort_keys=True,indent=2))
 
 
