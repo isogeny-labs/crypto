@@ -1,0 +1,35 @@
+name: Prime31 RR5 four-leaf monic-quartic original Rust gate
+
+on:
+  push:
+    branches:
+      - lane/prime31-rr5-monic-quartic-20261122
+    paths:
+      - "examples/prime31_rr5_quartic.rs"
+      - ".github/workflows/prime31-rr5-quartic-gate.yml"
+  pull_request:
+    paths:
+      - "examples/prime31_rr5_quartic.rs"
+      - ".github/workflows/prime31-rr5-quartic-gate.yml"
+  workflow_dispatch:
+
+jobs:
+  rr5-development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      RAYON_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Bind tested source
+        run: |
+          git rev-parse HEAD
+          sha256sum examples/prime31_rr5_quartic.rs Cargo.lock
+          rustc --version
+      - name: Original Rust exact-witness tests
+        run: cargo test --locked --release --example prime31_rr5_quartic -- --nocapture
+      - name: B4 public-only F4 prototype (censored outcomes retained)
+        timeout-minutes: 5
+        run: cargo run --locked --release --example prime31_rr5_quartic

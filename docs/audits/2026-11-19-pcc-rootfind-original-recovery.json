@@ -1,0 +1,65 @@
+{
+  "schema": "engineering.pcc-rootfind-original-recovery/v1",
+  "at": "2026-11-20T00:50:26.283327+00:00",
+  "baseline_head": "d109d07fece5f94424b4e7486d1eac5534e2c9f9",
+  "objects": [
+    {
+      "path": "research/rootfind_dense_binary_pilot_20261116/sessions/local-custody-rerun-202611160401/records.jsonl",
+      "sha256": "0be204a394b2ef7ef223cb30960f12747ea30f736a135f46c2c0d76ecf0dbbde",
+      "bytes": 1718893,
+      "bundle": "0be204a394b2ef7ef223cb30960f12747ea30f736a135f46c2c0d76ecf0dbbde-pcc-rootfind-records.jsonl.gz",
+      "compressed_bytes": 132438
+    },
+    {
+      "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl",
+      "sha256": "dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44",
+      "bytes": 453126,
+      "bundle": "dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44-pcc-rootfind-records.jsonl.gz",
+      "compressed_bytes": 34568
+    }
+  ],
+  "source": "Verified original bytes in the existing user content-addressed cache; no generation, repair or inference.",
+  "cold_controls": {
+    "rows": [
+      {
+        "claim_id": "PCC-20261116-007049",
+        "baseline_exit": 1,
+        "baseline_verdict": "fail",
+        "candidate_exit": 2,
+        "candidate_verdict": "not_covered",
+        "raw_sha256": "0be204a394b2ef7ef223cb30960f12747ea30f736a135f46c2c0d76ecf0dbbde",
+        "raw_bytes": 1718893
+      },
+      {
+        "claim_id": "PCC-20261116-3b7488",
+        "baseline_exit": 1,
+        "baseline_verdict": "fail",
+        "candidate_exit": 2,
+        "candidate_verdict": "not_covered",
+        "raw_sha256": "dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44",
+        "raw_bytes": 453126
+      }
+    ],
+    "pull_exit": 0,
+    "initial_cache_empty": true,
+    "aws_executable_absent": true,
+    "s3_access": false,
+    "claim_payloads_changed": false,
+    "signed_standing_promoted": false
+  },
+  "canonical_artifact_reader_sha256": "93bec2944d358cc45c8fd3322095f1b5256dd73aa1888abab744b0a5aa5d4e37",
+  "pcc_verifier_sha256": "79f69ea92d5ce4225b295f44e5b8e7734259af2a3cc95effa4f9f929cfb54c69",
+  "workflow_changes": {
+    "only_two_identical_hydration_steps_added": true,
+    "gate_and_sign_original_steps_unchanged": true,
+    "gate_acceptance_policy_unchanged": true,
+    "permissions_and_triggers_unchanged": true
+  },
+  "baseline_corpus_failure_count": 302,
+  "expected_reduction_from_local_controls": 2,
+  "new_full_corpus_count_observed": false,
+  "remaining_original_custody_and_invalid_records": "Remain open; no exception or negative-disposition policy is activated.",
+  "frozen_claim_report_or_raw_payloads_rewritten": false,
+  "scientific_measurement": false,
+  "performance_claim": null
+}
