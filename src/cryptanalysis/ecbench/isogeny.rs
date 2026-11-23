@@ -160,7 +160,8 @@ impl Fp<'_> {
             let v_squared = self.mul(v, v);
             let i = self.mul(twice, v_squared);
             let av = self.mul(value, v);
-            let candidate = self.mul(av, self.sub(i, 1));
+            let factor = self.sub(i, 1);
+            let candidate = self.mul(av, factor);
             return if self.mul(candidate, candidate) == value {
                 Some(candidate)
             } else {
