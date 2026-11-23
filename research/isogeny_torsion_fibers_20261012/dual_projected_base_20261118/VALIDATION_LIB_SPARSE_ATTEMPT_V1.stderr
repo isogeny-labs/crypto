@@ -1,0 +1,620 @@
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree)
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/binary_field_basis.rs:281:62
+    |
+281 |           let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+    |  ______________________________________________________________^
+282 | |             env!("CARGO_MANIFEST_DIR"),
+283 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+284 | |         )))
+    | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+   --> src/cryptanalysis/binary_field_basis.rs:349:22
+    |
+349 |           let points = include_str!(concat!(
+    |  ______________________^
+350 | |             env!("CARGO_MANIFEST_DIR"),
+351 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+352 | |         ));
+    | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1635:21
+     |
+1635 |           let bytes = include_bytes!(concat!(
+     |  _____________________^
+1636 | |             env!("CARGO_MANIFEST_DIR"),
+1637 | |             "/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz"
+1638 | |         ));
+     | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1734:62
+     |
+1734 |           let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+     |  ______________________________________________________________^
+1735 | |             env!("CARGO_MANIFEST_DIR"),
+1736 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+1737 | |         )))
+     | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1815:22
+     |
+1815 |           let points = include_str!(concat!(
+     |  ______________________^
+1816 | |             env!("CARGO_MANIFEST_DIR"),
+1817 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+1818 | |         ));
+     | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/isogeny-dual-price-worktree/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1911:71
+     |
+1911 |           let frozen_manifest: serde_json::Value = serde_json::from_str(include_str!(concat!(
+     |  _______________________________________________________________________^
+1912 | |             env!("CARGO_MANIFEST_DIR"),
+1913 | |             "/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json"
+1914 | |         )))
+     | |__________^
+
+error: couldn't read `src/cryptanalysis/../../docs/units/bitop-v1.vectors.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/bitops.rs:598:34
+    |
+598 |             serde_json::from_str(include_str!("../../docs/units/bitop-v1.vectors.json"))
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/units/bitop-v2.vectors.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/bitops.rs:607:34
+    |
+607 |             serde_json::from_str(include_str!("../../docs/units/bitop-v2.vectors.json"))
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/certicom_dlp/../../../gpu/certicom/emulator.cpp`: No such file or directory (os error 2)
+  --> src/cryptanalysis/certicom_dlp/device_tests.rs:33:21
+   |
+33 |                     include_bytes!("../../../gpu/certicom/emulator.cpp"),
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/certicom_dlp/../../../gpu/certicom/wire.hpp`: No such file or directory (os error 2)
+  --> src/cryptanalysis/certicom_dlp/device_tests.rs:35:30
+   |
+35 |                 ("wire.hpp", include_bytes!("../../../gpu/certicom/wire.hpp")),
+   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/certicom_dlp/../../../gpu/certicom/arithmetic.h`: No such file or directory (os error 2)
+  --> src/cryptanalysis/certicom_dlp/device_tests.rs:38:21
+   |
+38 |                     include_bytes!("../../../gpu/certicom/arithmetic.h"),
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/chained_transfer/../../../research/chained_transfer_next_20261115/select_only.tsv`: No such file or directory (os error 2)
+    --> src/cryptanalysis/chained_transfer/quartic_ic.rs:2539:9
+     |
+2539 |         include_str!("../../../research/chained_transfer_next_20261115/select_only.tsv");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../research/curve25519_index_calculus_20261102/montgomery-translation.identity.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/curve25519_ic.rs:459:62
+    |
+459 |           let cert: IdentityCertificate = serde_json::from_str(include_str!(
+    |  ______________________________________________________________^
+460 | |             "../../research/curve25519_index_calculus_20261102/montgomery-translation.identity.json"
+461 | |         ))
+    | |_________^
+
+error: couldn't read `src/cryptanalysis/../../research/curve25519_index_calculus_20261102/model.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/curve25519_ic.rs:472:65
+    |
+472 |           let committed: serde_json::Value = serde_json::from_str(include_str!(
+    |  _________________________________________________________________^
+473 | |             "../../research/curve25519_index_calculus_20261102/model.json"
+474 | |         ))
+    | |_________^
+
+error: couldn't read `src/cryptanalysis/curve_traits/../../../research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/curve_traits/query.rs:172:17
+    |
+172 |                 include_str!("../../../research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json"),
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+172 |                 include_str!("../../../../../research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json"),
+    |                                        ++++++
+
+error: couldn't read `src/cryptanalysis/curve_traits/../../../research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/curve_traits/query.rs:176:17
+    |
+176 |                 include_str!("../../../research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json"),
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+176 |                 include_str!("../../../../../research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json"),
+    |                                        ++++++
+
+error: couldn't read `src/cryptanalysis/curve_traits/../../../docs/curves/ic/curves.yaml`: No such file or directory (os error 2)
+   --> src/cryptanalysis/curve_traits/query.rs:178:44
+    |
+178 |             ("docs/curves/ic/curves.yaml", include_str!("../../../docs/curves/ic/curves.yaml")),
+    |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+178 |             ("docs/curves/ic/curves.yaml", include_str!("../../../../../docs/curves/ic/curves.yaml")),
+    |                                                                   ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/aps/../../../../research/aps_measurement_20261029/spec-controls.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/aps/tests.rs:427:9
+    |
+427 |         include_str!("../../../../research/aps_measurement_20261029/spec-controls.json"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/aps/../../../../research/aps_measurement_20261029/spec-orbit-controls.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/aps/tests.rs:428:9
+    |
+428 |         include_str!("../../../../research/aps_measurement_20261029/spec-orbit-controls.json"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2186:13
+     |
+2186 |             include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json"),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a file with the same name in a different directory
+     |
+2186 |             include_str!("../../../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json"),
+     |                                    ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2190:13
+     |
+2190 |             include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json"),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a file with the same name in a different directory
+     |
+2190 |             include_str!("../../../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json"),
+     |                                    ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2194:13
+     |
+2194 |             include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json"),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a file with the same name in a different directory
+     |
+2194 |             include_str!("../../../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json"),
+     |                                    ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2198:13
+     |
+2198 |             include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json"),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a file with the same name in a different directory
+     |
+2198 |             include_str!("../../../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json"),
+     |                                    ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2202:13
+     |
+2202 |             include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl"),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a file with the same name in a different directory
+     |
+2202 |             include_str!("../../../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl"),
+     |                                    ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/session.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2361:13
+     |
+2361 | /             include_str!(
+2362 | |                 "../../../research/ecbench_factor_bases_20261013/sessions/prime20/session.json"
+2363 | |             ),
+     | |_____________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2362 |                 "../../../../../research/ecbench_factor_bases_20261013/sessions/prime20/session.json"
+     |                           ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/spec.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2367:13
+     |
+2367 | /             include_str!(
+2368 | |                 "../../../research/ecbench_factor_bases_20261013/sessions/prime20/spec.json"
+2369 | |             ),
+     | |_____________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2368 |                 "../../../../../research/ecbench_factor_bases_20261013/sessions/prime20/spec.json"
+     |                           ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/plan.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2373:13
+     |
+2373 | /             include_str!(
+2374 | |                 "../../../research/ecbench_factor_bases_20261013/sessions/prime20/plan.json"
+2375 | |             ),
+     | |_____________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2374 |                 "../../../../../research/ecbench_factor_bases_20261013/sessions/prime20/plan.json"
+     |                           ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/host.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2379:13
+     |
+2379 | /             include_str!(
+2380 | |                 "../../../research/ecbench_factor_bases_20261013/sessions/prime20/host.json"
+2381 | |             ),
+     | |_____________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2380 |                 "../../../../../research/ecbench_factor_bases_20261013/sessions/prime20/host.json"
+     |                           ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/audit.rs:2385:13
+     |
+2385 | /             include_str!(
+2386 | |                 "../../../research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl"
+2387 | |             ),
+     | |_____________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2386 |                 "../../../../../research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl"
+     |                           ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/band.rs:1140:20
+     |
+1140 |           let text = include_str!(
+     |  ____________________^
+1141 | |             "../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json"
+1142 | |         );
+     | |_________^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/band.rs:1170:20
+     |
+1170 |           let text = include_str!(
+     |  ____________________^
+1171 | |             "../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json"
+1172 | |         );
+     | |_________^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_f1_targetwalk_20261108/data/band-k20-s0.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/band.rs:1218:65
+     |
+1218 |           let committed: serde_json::Value = serde_json::from_str(include_str!(
+     |  _________________________________________________________________^
+1219 | |             "../../../research/curve25519_f1_targetwalk_20261108/data/band-k20-s0.json"
+1220 | |         ))
+     | |_________^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_f1_targetwalk_20261108/data/band-k20-s0.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/band.rs:1288:65
+     |
+1288 |           let committed: serde_json::Value = serde_json::from_str(include_str!(
+     |  _________________________________________________________________^
+1289 | |             "../../../research/curve25519_f1_targetwalk_20261108/data/band-k20-s0.json"
+1290 | |         ))
+     | |_________^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/claim.rs:2198:36
+     |
+2198 |           let records: Vec<Record> = include_str!(
+     |  ____________________________________^
+2199 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+2200 | |         )
+     | |_________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2199 |             "../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+     |                       ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/compare/../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/compare/pooled.rs:616:27
+    |
+616 |       const SESSION: &str = include_str!(
+    |  ___________________________^
+617 | |         "../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json"
+618 | |     );
+    | |_____^
+    |
+help: there is a file with the same name in a different directory
+    |
+617 |         "../../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json"
+    |                      ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/compare/../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/compare/pooled.rs:619:27
+    |
+619 |       const RECORDS: &str = include_str!(
+    |  ___________________________^
+620 | |         "../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+621 | |     );
+    | |_____^
+    |
+help: there is a file with the same name in a different directory
+    |
+620 |         "../../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+    |                      ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/compare.rs:2193:49
+     |
+2193 |           let mut v: Value = serde_json::from_str(include_str!(
+     |  _________________________________________________^
+2194 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json"
+2195 | |         ))
+     | |_________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2194 |             "../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json"
+     |                       ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/compare.rs:2215:20
+     |
+2215 |           let line = include_str!(
+     |  ____________________^
+2216 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+2217 | |         )
+     | |_________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2216 |             "../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+     |                       ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m2.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/compare.rs:2710:51
+     |
+2710 |   ...   let v1: Comparison = serde_json::from_str(include_str!(
+     |  _________________________________________________^
+2711 | | ...       "../../../research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m...
+2712 | | ...   ))
+     | |_______^
+     |
+help: there is a file with the same name in a different directory
+     |
+2711 |             "../../../../../research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m2.json"
+     |                       ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/runner.rs:2008:27
+     |
+2008 |           let record_line = include_str!(
+     |  ___________________________^
+2009 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+2010 | |         )
+     | |_________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2009 |             "../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+     |                       ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench_large_prime/../../../tests/fixtures/ecbench_manifest_small.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench_large_prime/orbit.rs:217:29
+    |
+217 |     const MANIFEST: &[u8] = include_bytes!("../../../tests/fixtures/ecbench_manifest_small.json");
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+217 |     const MANIFEST: &[u8] = include_bytes!("../../../../../tests/fixtures/ecbench_manifest_small.json");
+    |                                                      ++++++
+
+error: couldn't read `src/cryptanalysis/../../tests/fixtures/ecbench_manifest_small.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench_large_prime.rs:2011:9
+     |
+2011 |         include_bytes!("../../tests/fixtures/ecbench_manifest_small.json");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a file with the same name in a different directory
+     |
+2011 |         include_bytes!("../../../../tests/fixtures/ecbench_manifest_small.json");
+     |                               ++++++
+
+error[E0428]: the name `the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e` is defined multiple times
+    --> src/cryptanalysis/ic_framework/plugins.rs:5322:5
+     |
+5285 |     fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
+     |     --------------------------------------------------------------- previous definition of the value `the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e` here
+...
+5322 |     fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e` redefined here
+     |
+     = note: `the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e` must be defined only once in the value namespace of this module
+
+error: couldn't read `src/cryptanalysis/../../docs/identity-certificates/schoenhage-10mult.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/identity_certificate.rs:832:20
+    |
+832 |         let text = include_str!("../../docs/identity-certificates/schoenhage-10mult.json");
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+832 |         let text = include_str!("../../../../docs/identity-certificates/schoenhage-10mult.json");
+    |                                        ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/f4_linear_algebra_20260914/contract.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/f4_rref_tests.rs:814:60
+    |
+814 |       let contract: serde_json::Value = serde_json::from_str(include_str!(
+    |  ____________________________________________________________^
+815 | |         "../../research/f4_linear_algebra_20260914/contract.json"
+816 | |     ))
+    | |_____^
+    |
+help: there is a file with the same name in a different directory
+    |
+815 |         "../../../../research/f4_linear_algebra_20260914/contract.json"
+    |                ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/plane_quartic_pic.rs:2251:20
+     |
+2251 |           let text = include_str!(
+     |  ____________________^
+2252 | |             "../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl"
+2253 | |         );
+     | |_________^
+     |
+help: there is a file with the same name in a different directory
+     |
+2252 |             "../../../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl"
+     |                    ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/plane_quartic_pic.rs:3495:17
+     |
+3495 | /                 include_str!(
+3496 | |                     "../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl"
+3497 | |                 ),
+     | |_________________^
+
+error: couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/plane_quartic_pic.rs:3501:17
+     |
+3501 | /                 include_str!(
+3502 | |                     "../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl"
+3503 | |                 ),
+     | |_________________^
+
+error: couldn't read `src/cryptanalysis/../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/plane_quartic_pic.rs:3507:17
+     |
+3507 | /                 include_str!(
+3508 | |                     "../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl"
+3509 | |                 ),
+     | |_________________^
+
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/prepared_sat_control.rs:620:24
+    |
+620 | ...r = include_str!("../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json");
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+620 |     const PREP: &str = include_str!("../../../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json");
+    |                                            ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/prepared_sat_control.rs:621:28
+    |
+621 | ... = include_str!("../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+621 |     const MANIFEST: &str = include_str!("../../../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json");
+    |                                                ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf`: No such file or directory (os error 2)
+   --> src/cryptanalysis/prepared_sat_control.rs:622:23
+    |
+622 | ... = include_str!("../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+622 |     const ANF: &str = include_str!("../../../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf");
+    |                                           ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf`: No such file or directory (os error 2)
+   --> src/cryptanalysis/prepared_sat_control.rs:623:23
+    |
+623 | ... = include_str!("../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+623 |     const CNF: &str = include_str!("../../../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf");
+    |                                           ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/prepared_sat_control.rs:624:25
+    |
+624 | ... = include_str!("../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a file with the same name in a different directory
+    |
+624 |     const MODEL: &str = include_str!("../../../../research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json");
+    |                                             ++++++
+
+error: couldn't read `src/ml_dataset/../../research/ml_dataset_cli_generator_preservation_20261101/fixtures/root-systems.json`: No such file or directory (os error 2)
+    --> src/ml_dataset/prime_chain_prefix.rs:1121:30
+     |
+1121 |           serde_json::from_str(include_str!(
+     |  ______________________________^
+1122 | |             "../../research/ml_dataset_cli_generator_preservation_20261101/fixtures/root-systems.json"
+1123 | |         )).unwrap()
+     | |_________^
+
+error: couldn't read `src/prime_ecc/efd/../../../research/efd_coordinate_charts_20261108/Charts.lean`: No such file or directory (os error 2)
+   --> src/prime_ecc/efd/tests.rs:920:16
+    |
+920 |     let lean = include_str!("../../../research/efd_coordinate_charts_20261108/Charts.lean");
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/prime_ecc/efd/tests.rs:960:10
+    |
+960 |     for (id, family) in entries {
+    |          ^^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+    = note: all local variables must have a statically known size
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/prime_ecc/efd/tests.rs:960:25
+    |
+960 |     for (id, family) in entries {
+    |                         ^^^^^^^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+    = note: only the last element of a tuple may have a dynamically sized type
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/prime_ecc/efd/tests.rs:961:48
+    |
+961 |         assert_eq!(family, chart_family(&id), "{id}");
+    |                                                ^^^^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+
+warning: variable does not need to be mutable
+    --> src/cryptanalysis/gf2_elim.rs:1390:25
+     |
+1390 |                     let mut variants = vec![SimdKind::Scalar];
+     |                         ----^^^^^^^^
+     |                         |
+     |                         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+Some errors have detailed explanations: E0277, E0428.
+For more information about an error, try `rustc --explain E0277`.
+warning: `crypto` (lib test) generated 1 warning
+error: could not compile `crypto` (lib test) due to 59 previous errors; 1 warning emitted

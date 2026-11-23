@@ -1,0 +1,729 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "study": "research/genus4_followup_20261118",
+ "commit_validated": "6213ecbc0da0ed4917ab75805258201d6629b477",
+ "freeze_commit": "ae36cdc6e47d374389a65b9d93e4c2f31a2a3741",
+ "pr": "isogeny-labs/crypto#4693",
+ "validator": "Validator subagent (Claude Opus 5.5), 2026-11-18; recompute, certificates and replay comparison with the validator's own code in research/genus4_followup_20261118/validation/scripts",
+ "raw_data_base": "benchmarks/20261118-genus4-followup",
+ "raw_data": [
+  {
+   "path": "../../research/genus4_cheap_ic_20261117/p16411.jsonl.gz",
+   "sha256": "d5d399bb77dec6773280d1fa1281217831268bd0bd7691c1349421b1712abf45"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/a_cc0.5.jsonl.gz",
+   "sha256": "8fa56f57d52917f95804a3bf31fabdfa107fefe53c376e53ace749f74059bb49"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/a_cc0.7.jsonl.gz",
+   "sha256": "c6214ab1b55c75b10316e5a67312341d2f1acff253ed767e8bdc36c0f2f37577"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/a_cc1.0.jsonl.gz",
+   "sha256": "d9116c11c395cc046a6332d998c09798d6eea668d9a77708ec9fdc19732b4c89"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/a_cc1.4.jsonl.gz",
+   "sha256": "44b52cf99b5bd53e7e8d3f79b2ddbf2558109a37ef6e92b0935cb70ebb5a3d0a"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/a_cc2.0.jsonl.gz",
+   "sha256": "b692f0c1f1a47fb9428bd34ce7abb91f0b14a08c9ac474573e4cfce68ab62aba"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/b_q.jsonl.gz",
+   "sha256": "ed9ce7be5a9bb011a6f0a3e991c061880cb13826525d40412913d9e3f17c013c"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/b_q.jsonl.r1.gz",
+   "sha256": "aa4efe1918d13db934b35e20c441168fcc8bf8fc46c68db4e874ce2fd637ec22"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/b_q_g3.jsonl.gz",
+   "sha256": "2015ed534c67f674308dc0195220ce8a86ea1f5506362ab407fc6ba5984e5524"
+  },
+  {
+   "path": "../../research/genus4_followup_20261118/b_wx.jsonl.gz",
+   "sha256": "93b828692674845218852760d48dec855e2ac635ee0b787016d2ed8d042153dc"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411.jsonl",
+   "sha256": "380b8855cfaa2fbf118b586bd0c97d001d7459afb3188e35f43560b819a459e9"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411_c172.jsonl",
+   "sha256": "a9893788e5fd31db2cf4c0b5711affe363fae5dd88de6a4a3227e257aa838cea"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411_c172_r2.jsonl",
+   "sha256": "e0805fb5cca877b0bc9070237577945d22a5c0d71da1171d3b03e77d95c8d168"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411_c180_r2.jsonl",
+   "sha256": "ccc828d4d230f3d3ed14b04f499c44167906d9ab3a73c5c045adb2f1c08a1826"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411_c2640.jsonl",
+   "sha256": "45dbf7816ddeabbb0010154c26463423a3bcc646b39c55bb99682a98b586862a"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411_c2640_r2.jsonl",
+   "sha256": "479396c68a05870fdce561339def88b12dadc1ef9fe3ed05dfe1cf3f633bcabc"
+  },
+  {
+   "path": "../../research/genus4_lean_rho_20261116/p16411_resume.jsonl",
+   "sha256": "98c186c112f72f97c745145517a16becef871542af641ad2097d9f53b8ae0753"
+  }
+ ],
+ "headline": [
+  {
+   "name": "arm x / plain rho Q, Q3_w1, ratio",
+   "claimed": 0.8739540805782668,
+   "recomputed": 0.8739540805782667,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w1, lo",
+   "claimed": 0.7665850552234417,
+   "recomputed": 0.7665850552234417,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w1, hi",
+   "claimed": 0.9995964682040759,
+   "recomputed": 0.999596468204076,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q4_w1, ratio",
+   "claimed": 0.21849881267906776,
+   "recomputed": 0.21849881267906773,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q4_w1, lo",
+   "claimed": 0.19165527268927052,
+   "recomputed": 0.19165527268927052,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q4_w1, hi",
+   "claimed": 0.24991093545621057,
+   "recomputed": 0.2499109354562106,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w0.1, ratio",
+   "claimed": 0.08880710258596386,
+   "recomputed": 0.08880710258596385,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w0.1, lo",
+   "claimed": 0.07789589758450209,
+   "recomputed": 0.07789589758450209,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w0.1, hi",
+   "claimed": 0.1015768727361766,
+   "recomputed": 0.1015768727361766,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q4_w0.1, ratio",
+   "claimed": 0.0683141459843098,
+   "recomputed": 0.0683141459843098,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q4_w0.1, lo",
+   "claimed": 0.059920787870059895,
+   "recomputed": 0.059920787870059895,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q4_w0.1, hi",
+   "claimed": 0.07813719531940004,
+   "recomputed": 0.07813719531940004,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w0, ratio",
+   "claimed": 0.0015685494757079726,
+   "recomputed": 0.0015685494757079726,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w0, lo",
+   "claimed": 0.0013734183582967087,
+   "recomputed": 0.0013734183582967087,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / plain rho Q, Q3_w0, hi",
+   "claimed": 0.0017955229381051774,
+   "recomputed": 0.0017955229381051774,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q3_w1, ratio",
+   "claimed": 1.605299112898569,
+   "recomputed": 1.605299112898569,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q3_w1, lo",
+   "claimed": 1.4069768481258627,
+   "recomputed": 1.4069768481258624,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q3_w1, hi",
+   "claimed": 1.8373388144562997,
+   "recomputed": 1.8373388144562997,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q4_w1, ratio",
+   "claimed": 0.4013436837905881,
+   "recomputed": 0.4013436837905881,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q4_w1, lo",
+   "claimed": 0.35176073151791587,
+   "recomputed": 0.3517607315179158,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q4_w1, hi",
+   "claimed": 0.45935640001223454,
+   "recomputed": 0.45935640001223454,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q3_w0.1, ratio",
+   "claimed": 0.1619412447749128,
+   "recomputed": 0.16194124477491278,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q3_w0.1, lo",
+   "claimed": 0.14193622981492288,
+   "recomputed": 0.14193622981492288,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w / plain rho Q, Q3_w0.1, hi",
+   "claimed": 0.18535307096404294,
+   "recomputed": 0.18535307096404294,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / Q, Q3_w1_new_only, ratio",
+   "claimed": 0.8734817275259577,
+   "recomputed": 0.8734817275259577,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / Q, Q3_w1_new_only, lo",
+   "claimed": 0.7616599622409415,
+   "recomputed": 0.7616599622409415,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / Q, Q3_w1_new_only, hi",
+   "claimed": 1.0134856598114343,
+   "recomputed": 1.0134856598114343,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / Q, Q3_w1_curve_boot, ratio",
+   "claimed": 0.8739540805782668,
+   "recomputed": 0.8739540805782667,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / Q, Q3_w1_curve_boot, lo",
+   "claimed": 0.6713294193228174,
+   "recomputed": 0.6713294193228174,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x / Q, Q3_w1_curve_boot, hi",
+   "claimed": 1.1504512723921436,
+   "recomputed": 1.1504512723921434,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x vs_plain_theory_w1 (post hoc), ratio",
+   "claimed": 0.8771397175361018,
+   "recomputed": 0.8771397175361018,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_plain_theory_w1 (post hoc), lo",
+   "claimed": 0.8378986170323657,
+   "recomputed": 0.8378986170323657,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_plain_theory_w1 (post hoc), hi",
+   "claimed": 0.9198857619006059,
+   "recomputed": 0.9198857619006059,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_neg_ideal_w1 (post hoc), ratio",
+   "claimed": 1.240462884635661,
+   "recomputed": 1.240462884635661,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_neg_ideal_w1 (post hoc), lo",
+   "claimed": 1.1849675881008317,
+   "recomputed": 1.1849675881008317,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_neg_ideal_w1 (post hoc), hi",
+   "claimed": 1.3009149203137447,
+   "recomputed": 1.3009149203137444,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_neg_ideal_w0.1 (post hoc), ratio",
+   "claimed": 0.12605000319585355,
+   "recomputed": 0.12605000319585355,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_neg_ideal_w0.1 (post hoc), lo",
+   "claimed": 0.12040597859594034,
+   "recomputed": 0.12040597859594035,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_neg_ideal_w0.1 (post hoc), hi",
+   "claimed": 0.1321973098707403,
+   "recomputed": 0.1321973098707403,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_plain_theory_w0.1 (post hoc), ratio",
+   "claimed": 0.08913081202837403,
+   "recomputed": 0.08913081202837403,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_plain_theory_w0.1 (post hoc), lo",
+   "claimed": 0.0851398839605917,
+   "recomputed": 0.08513988396059172,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x vs_plain_theory_w0.1 (post hoc), hi",
+   "claimed": 0.09347761426421979,
+   "recomputed": 0.09347761426421979,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm w vs_neg_ideal_w1 (post hoc), ratio",
+   "claimed": 2.2785109796290888,
+   "recomputed": 2.2785109796290888,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm w vs_neg_ideal_w1 (post hoc), lo",
+   "claimed": 2.1753351353800996,
+   "recomputed": 2.1753351353800996,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm w vs_neg_ideal_w1 (post hoc), hi",
+   "claimed": 2.393809917201651,
+   "recomputed": 2.393809917201651,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x Q3 w=1 upper bound over 50 bootstrap seeds: min",
+   "claimed": 0.9940045638638747,
+   "recomputed": 0.9940045638638747,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x Q3 w=1 upper bound over 50 bootstrap seeds: median (sorted[25])",
+   "claimed": 1.002955695004,
+   "recomputed": 1.002955695004,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x Q3 w=1 upper bound over 50 bootstrap seeds: max",
+   "claimed": 1.0122858046162468,
+   "recomputed": 1.0122858046162468,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "arm x Q3 w=1 upper bound over 50 bootstrap seeds: fraction below 1",
+   "claimed": 0.36,
+   "recomputed": 0.36,
+   "claimed_source": "research/genus4_followup_20261118/sensitivity.json"
+  },
+  {
+   "name": "measured Q mean group ops / mean sqrt(pi r/2)",
+   "claimed": 1.0036450850549574,
+   "recomputed": 1.0036450850549574,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x mean cost at w=1 (GAE per key)",
+   "claimed": 238230980.9814815,
+   "recomputed": 238230980.9814815,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm x LA share of cost at w=1",
+   "claimed": 0.764966542286971,
+   "recomputed": 0.764966542286971,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "arm w mean cost at w=1 (GAE per key)",
+   "claimed": 437588187.9074074,
+   "recomputed": 437588187.9074074,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "part A (p=8209) arm x mean cost at cc=0.5",
+   "claimed": 306133158.1666667,
+   "recomputed": 306133158.1666667,
+   "claimed_source": "research/genus4_followup_20261118/select.json"
+  },
+  {
+   "name": "part A (p=8209) arm x mean cost at cc=0.7",
+   "claimed": 182392758.94444445,
+   "recomputed": 182392758.94444445,
+   "claimed_source": "research/genus4_followup_20261118/select.json"
+  },
+  {
+   "name": "part A (p=8209) arm x mean cost at cc=1.0",
+   "claimed": 117829421.47222222,
+   "recomputed": 117829421.47222222,
+   "claimed_source": "research/genus4_followup_20261118/select.json"
+  },
+  {
+   "name": "part A (p=8209) arm x mean cost at cc=1.4",
+   "claimed": 93901335.66666667,
+   "recomputed": 93901335.66666667,
+   "claimed_source": "research/genus4_followup_20261118/select.json"
+  },
+  {
+   "name": "part A (p=8209) arm x mean cost at cc=2.0",
+   "claimed": 90896438.08333333,
+   "recomputed": 90896438.08333333,
+   "claimed_source": "research/genus4_followup_20261118/select.json"
+  },
+  {
+   "name": "part A selected cc*",
+   "claimed": 2.0,
+   "recomputed": 2.0,
+   "claimed_source": "research/genus4_followup_20261118/select.json"
+  },
+  {
+   "name": "keys compared at p=16411",
+   "claimed": 108,
+   "recomputed": 108,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "targets at p=16411",
+   "claimed": 54,
+   "recomputed": 54,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "G2 rows compared",
+   "claimed": 36,
+   "recomputed": 36,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  },
+  {
+   "name": "G3 rows compared",
+   "claimed": 1,
+   "recomputed": 1,
+   "claimed_source": "research/genus4_followup_20261118/analysis.json"
+  }
+ ],
+ "headline_max_rel_diff": 1.9300652731108895e-16,
+ "checks": [
+  {
+   "id": "C1",
+   "requirement": "frozen files hash to frozen.sha256 and were committed (ae36cdc6e4) before any data commit",
+   "pass": true,
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/freeze_check.json",
+    "research/genus4_followup_20261118/validation/scripts/freeze_check.sh"
+   ]
+  },
+  {
+   "id": "C2",
+   "requirement": "producer binary equals binary.sha256; validator rebuild from git archive of the freeze commit has identical code sections",
+   "pass": true,
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/binary_diff.txt",
+    "research/genus4_followup_20261118/validation/out/archive_paths.sha256.txt"
+   ],
+   "note": "rebuild sha256 90128561... != 74f02ea1...: build-id and the .llvm.<hash> suffix of 35 promoted local symbols differ (build-path dependent); .text/.rodata/.data/.data.rel.ro/.eh_frame/.gcc_except_table/.got and all symbol addresses identical"
+  },
+  {
+   "id": "C3",
+   "requirement": ">= 10 arm-x and >= 5 arm-w rows at p=16411, >= 3 part-A rows at different cc, 2-4 Q rows replayed with the validator build: every field except wall_ns identical",
+   "pass": true,
+   "counts": {
+    "x_16411": 16,
+    "w_16411": 16,
+    "partA": 10,
+    "partA_cc_values": [
+     "cc0.5",
+     "cc0.7",
+     "cc1.0",
+     "cc1.4",
+     "cc2.0"
+    ],
+    "Q": 4,
+    "instance_rows": 16
+   },
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/replay_compare.json",
+    "research/genus4_followup_20261118/validation/out/plan.json",
+    "research/genus4_followup_20261118/validation/out/nonce.txt",
+    "research/genus4_followup_20261118/validation/out/replay/"
+   ]
+  },
+  {
+   "id": "C4",
+   "requirement": "independent certificates: f, r prime, order = h r inside Hasse-Weil with r > width, [order]D = 0, [r]G = 0, [t]G = T for every target; strongest symmetry",
+   "pass": true,
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/certs.json",
+    "research/genus4_followup_20261118/validation/scripts/certs.py",
+    "research/genus4_followup_20261118/validation/scripts/jac.py",
+    "research/genus4_followup_20261118/validation/out/automorphism_selftest.txt"
+   ]
+  },
+  {
+   "id": "C5",
+   "requirement": "producer's instances (f, G, T, t) and recovered logarithms equal the validator's arithmetic: recovered = t and [recovered]G = T",
+   "pass": true,
+   "counts": {
+    "instances": 54,
+    "ic_runs": 32,
+    "q_runs": 1
+   },
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/verify_dump_main.json",
+    "research/genus4_followup_20261118/validation/out/verify_dump_rho.json",
+    "research/genus4_followup_20261118/validation/out/verify_dump_tamper_control.txt",
+    "research/genus4_followup_20261118/validation/scripts/val_fudump.rs"
+   ]
+  },
+  {
+   "id": "C6",
+   "requirement": "headline numbers recomputed from the raw rows by the validator's own code (ratios, bootstrap of PROTOCOL section 6, part A selection, post-hoc theory ratios, 50-seed stability)",
+   "pass": true,
+   "max_rel_diff": 1.9300652731108895e-16,
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/recompute.json",
+    "research/genus4_followup_20261118/validation/out/compare_claims.json",
+    "research/genus4_followup_20261118/validation/scripts/recompute.py"
+   ]
+  },
+  {
+   "id": "C7",
+   "requirement": "gates G1-G3 and the resume duplicate identity, with real keys",
+   "pass": true,
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/recompute.json"
+   ]
+  },
+  {
+   "id": "C8",
+   "requirement": "section 5a band with the strongest reference (negation), and every listed unpriced counter",
+   "pass": true,
+   "evidence": [
+    "research/genus4_followup_20261118/validation/out/band.json",
+    "research/genus4_followup_20261118/validation/scripts/band.py"
+   ]
+  },
+  {
+   "id": "C9",
+   "requirement": "claims of RESULTS.md, including its caveats",
+   "pass": true,
+   "note": "every number recomputes; findings F1, F2 need errata, F3-F7 are pricing, interpretation and wording notes; none changes a headline number or the frozen verdicts",
+   "evidence": [
+    "benchmarks/20261118-genus4-followup/validator-report.md"
+   ]
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "minor (prose)",
+   "text": "PROTOCOL section 7 P1 and RESULTS ('because the 9-target rho mean was high') state the 9-target Q mean was about 14% above sqrt(pi r/2). The 18 Q rows at k = 0..2 (lean-rho study) give 1.0009 (ratio of means) and 0.976 (mean of per-run ratios). The premise is unsupported; the conclusion drawn from it ('the old ratio was not a product of an unlucky rho sample') is consistent with the data. Needs an ERRATA.md line (PROTOCOL.md is frozen)."
+  },
+  {
+   "id": "F2",
+   "severity": "minor (record)",
+   "text": "benchmarks/records/20261118T0710Z-genus4-followup.json metric w_over_plain_rho_q3_w1_p16411 says 1.6046 [1.4069, 1.8371]; analysis.json and the validator's recompute give 1.6053 [1.4070, 1.8373]. No computation tried reproduces 1.6046. The record is also still open (status open, closed_utc null, commit_dirty true, raw uploaded false, reports empty)."
+  },
+  {
+   "id": "F3",
+   "severity": "minor (pricing symmetry)",
+   "text": "Q4 charges rho one partition hash and two coefficient additions per step, but the IC walk performs the same per-step work (genus_ladder.rs lines 1508-1512 at ae36cdc6e4: mix64 of the key and two addm per step) and is not charged for it. Charging it as 3 x trials moves arm x Q4 w=1 from 0.2185 to 0.2197 and w=0.1 from 0.0683 to 0.0687; no verdict changes. Q3 is symmetric (neither side charged)."
+  },
+  {
+   "id": "F4",
+   "severity": "interpretation",
+   "text": "'Below rho at w = 1' holds only against the measured plain rho Q, and in Q3 only at Monte Carlo margin: upper end 0.99960 at the frozen seed, 0.99946 with an interleaved (targets-then-seeds, drawn per target) resampling order, 0.99962 with interpolated quantiles, below 1 for 18 of 50 seeds. Q4 is robust (0.218 [0.192, 0.250]). Against the strongest available reference, negation (the curves' only F_p-automorphisms are the identity and the hyperelliptic involution), the ideal floor sqrt(pi r/4) puts arm x at 0.0022 / 0.126 / 1.240 at w = 0 / 0.1 / 1: the order does not hold across the band, so arm x is not ranked against negation rho. RESULTS.md states the fragility and the 1.24x distance correctly."
+  },
+  {
+   "id": "F5",
+   "severity": "note",
+   "text": "resume.sh's statement that it was written before any Q row was read is not verifiable from git (the rows were on disk, uncommitted). Consistent with it: the 2 re-computed keys equal the first run in every field, and the validator replay of a resumed-block key (2640, k=9) is identical."
+  },
+  {
+   "id": "F6",
+   "severity": "note",
+   "text": "RESULTS headline row 'w = 0.1, measured rho 0.089' does not name the reading; it is Q3 (Q4 gives 0.068)."
+  },
+  {
+   "id": "F7",
+   "severity": "interpretation",
+   "text": "The pooled ratio depends on the curve mix. Arm x's cost hardly depends on r (coefficient of variation 1.2% over the 108 keys) while rho scales as sqrt(r). Per curve at w = 1, arm x / sqrt(pi r/2) is 0.998 (172, h = 2), 0.998 (180, h = 2) and 0.707 (2640, h = 1); against the negation floor 1.412, 1.412 and 1.000; against measured Q (Q3) 1.150, 0.907 and 0.685. 'Below plain rho at w = 1' therefore rests on the one prime-order Jacobian; on the two h = 2 curves arm x is at parity with the plain-rho expectation. RESULTS gives h and r per curve but not this decomposition; the preregistered curve-level bootstrap [0.671, 1.150] reflects it."
+  }
+ ],
+ "rho_reference_assessment": {
+  "measured_reference": "plain rho Q is the cheapest measured rho on these curves: on the 18 keys at k = 0..2 the measured negation walk B costs 1.36 / 1.89 / 6.64 x Q (Q3) and 2.64 x Q at w = 1 (Q4); B's steps are 1.85 x sqrt(pi r/4) with 3.00 compares per step. Q's steps are 1.0036 x sqrt(pi r/2). Q does no canonicalisation (PointClasses::trivial), so pricing its C at 0 is right; its 'native' field is only the one-per-step floor.",
+  "strongest_reference": "negation (A = 2): validator scan finds no F_p-automorphism of y^2 = f besides the identity and the hyperelliptic involution on any of the 3 curves (affine maps and maps swapping infinity with a rational root; positive controls detect planted ones); Frobenius is the identity on J(F_p). VALIDATION.json uses the ideal floor sqrt(pi r/4) with nothing charged, the strongest reference.",
+  "band_x": {
+   "0": {
+    "ic_x": 427570.6111111111,
+    "neg_floor": 192050067.7063408,
+    "neg_model_q3": 192050067.7063408,
+    "neg_model_q4": 192050067.7063408,
+    "Q_Q3": 272589814.8148148,
+    "Q_Q4": 272589814.8148148
+   },
+   "0.1": {
+    "ic_x": 24207911.64814815,
+    "neg_floor": 192050067.7063408,
+    "neg_model_q3": 211255074.4769749,
+    "neg_model_q4": 268870094.78887707,
+    "Q_Q3": 272589814.8148148,
+    "Q_Q4": 354361623.0481481
+   },
+   "1": {
+    "ic_x": 238230980.9814815,
+    "neg_floor": 192050067.7063408,
+    "neg_model_q3": 384100135.4126816,
+    "neg_model_q4": 960250338.5317041,
+    "Q_Q3": 272589814.8148148,
+    "Q_Q4": 1090307897.148148
+   }
+  },
+  "band_w": {
+   "0": {
+    "ic_w": 427461.25925925927,
+    "neg_floor": 192050067.7063408,
+    "Q_Q3": 272589814.8148148,
+    "Q_Q4": 272589814.8148148
+   },
+   "0.1": {
+    "ic_w": 44143533.924074076,
+    "neg_floor": 192050067.7063408,
+    "Q_Q3": 272589814.8148148,
+    "Q_Q4": 354361623.0481481
+   },
+   "1": {
+    "ic_w": 437588187.9074074,
+    "neg_floor": 192050067.7063408,
+    "Q_Q3": 272589814.8148148,
+    "Q_Q4": 1090307897.148148
+   }
+  },
+  "order": {
+   "ic_x vs neg_floor": [
+    -1,
+    -1,
+    1
+   ],
+   "ic_x vs neg_model_q3": [
+    -1,
+    -1,
+    -1
+   ],
+   "ic_x vs neg_model_q4": [
+    -1,
+    -1,
+    -1
+   ],
+   "ic_x vs Q_Q3": [
+    -1,
+    -1,
+    -1
+   ],
+   "ic_x vs Q_Q4": [
+    -1,
+    -1,
+    -1
+   ],
+   "ic_w vs neg_floor": [
+    -1,
+    -1,
+    1
+   ],
+   "ic_w vs neg_model_q3": [
+    -1,
+    -1,
+    1
+   ],
+   "ic_w vs neg_model_q4": [
+    -1,
+    -1,
+    -1
+   ],
+   "ic_w vs Q_Q3": [
+    -1,
+    -1,
+    1
+   ],
+   "ic_w vs Q_Q4": [
+    -1,
+    -1,
+    -1
+   ]
+  },
+  "unpriced_counters_listed": {
+   "IC arms": "rel_mul, rel_add, la_mul, la_add (priced); per-step walk hash + 2 coefficient additions not emitted (F3)",
+   "Q": "compares_uncharged = 0, hash_uncharged = steps, coef_adds_uncharged = 2 steps (priced in Q4 only); canonicalisations 0 (native field = floor)",
+   "negation floor": "none charged (lower bound)"
+  }
+ },
+ "lessons_applied": [
+  "L-546d37ca7750",
+  "L-99ee952350b2",
+  "L-527c1f013131",
+  "L-7f8877029be4",
+  "L-ce5e4e4b764b",
+  "L-ca1840e60dc0",
+  "L-b0626ec2a4c0",
+  "L-3f39e1d8b3a9",
+  "L-26895912385b",
+  "L-e33c4f6ece95"
+ ]
+}

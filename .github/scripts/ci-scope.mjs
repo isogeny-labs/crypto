@@ -31,6 +31,12 @@ const isogenyEmbeddedInputs = new Set([
   'research/p192_p224_large_degree_isogenies_20261009/verification_poly.rs',
   'research/p192_p224_large_degree_isogenies_20261009/verification_kernel.rs',
 ]);
+// The odd-transfer release binary compile-time embeds this conditional Lean
+// artifact. Keep the release classification explicit as a fail-safe in
+// addition to automatic include_str! discovery.
+const oddTransferEmbeddedInputs = new Set([
+  'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean',
+]);
 const prose = /\.(md|rst|txt|pdf|svg|png|jpg|jpeg|gif)$/i;
 const control = /^\.github\/scripts\/.*ci-scope.*$/;
 // These trees are copied into every Rust release archive. Documentation is
@@ -59,7 +65,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || rustReleasePayload.test(file) || rustReleaseRootPayload.test(file)
       || releaseAttributes || embedded.has(file)
       || isogenyCliRust.test(file) || isogenyAlgosInputs.test(file)
-      || isogenyEmbeddedInputs.has(file);
+      || isogenyEmbeddedInputs.has(file) || oddTransferEmbeddedInputs.has(file);
     // Both Makefile targets compile src/main.cu against include/ and the
     // committed generated headers; research benchmark sources are separate.
     const client = file === 'ecc2k130/src/main.cu' || file === 'ecc2k130/Makefile'

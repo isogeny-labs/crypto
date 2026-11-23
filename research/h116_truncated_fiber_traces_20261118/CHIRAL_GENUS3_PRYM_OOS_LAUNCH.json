@@ -1,0 +1,23 @@
+{
+  "schema": "h116-chiral-genus3-prym-oos-launch/v1",
+  "protocol_id": "H116-CHIRAL-GENUS3-PRYM-OOS-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_GENUS3_PRYM_OOS_SOURCE_GATE.md",
+  "curve_slugs": [
+    "h116-prym-oos-fp607-a1-b7-r577",
+    "h116-prym-oos-fp617-a1-b32-r647",
+    "h116-prym-oos-fp631-a1-b5-r619"
+  ],
+  "targets": 1840,
+  "observable": "prym_real_weil_discriminant_mod_3",
+  "coefficients": [0, 2, 0, 2],
+  "offset": 2,
+  "rules": 1,
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_genus3_zeta2_digit.rs", "-o", "/tmp/h116_chiral_genus3_prym_oos"],
+    "selftest": ["/tmp/h116_chiral_genus3_prym_oos", "--selftest"],
+    "run": ["/tmp/h116_chiral_genus3_prym_oos", "--run-prym-oos", "CHIRAL_GENUS3_PRYM_OOS_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_GENUS3_PRYM_OOS_RESULT.json", "CHIRAL_GENUS3_PRYM_OOS_RUN.txt", "CHIRAL_GENUS3_PRYM_OOS_SHA256SUMS"],
+  "measurement_scope": "one unchanged Prym real-Weil discriminant rule on 1840 fresh targets, with the complete exact quadratic-extension/Prym oracle, fixed-rule shuffles and byte replay"
+}
