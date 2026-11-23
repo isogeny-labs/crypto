@@ -84,8 +84,10 @@ fn coeff_at(row: &[(usize, u64)], vertex: usize) -> u64 {
 /// Streaming frame-matroid row basis plus exact left-kernel witnesses.
 ///
 /// The deterministic BFS path reconstruction deliberately charges up to
-/// O(R*(V+E)+L) operations, including full forest-search scans, for R rows,
-/// V LP vertices, E accepted tree edges and L emitted source coefficients.
+/// O(R*(V+E)*log(R+2)+L) conservatively including balanced-map
+/// updates, for R rows, V LP vertices, E tree edges and L emitted terms.
+/// Modular inversions and their bit complexity are additionally charged;
+/// stored input rows require O(R) space even when no witness is emitted.
 /// Its benefit is explicit correct certificates and a testable comparator,
 /// NOT an asymptotic speedup. Forest paths may be long and dense.
 #[derive(Clone, Debug)]
