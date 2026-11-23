@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Construct actual C7 projective automorphisms and explicit degree2/3 elliptic quotient maps, with complete frame/coefficient classification, working point/fibre/infinity/inverse controls and explicit remaining Jacobian/cost gaps (Codex, started 2026-11-23, branch lane/chained-cm19-curve-maps-20261123; stacked on #5019, artifact prerequisite there remains open). [pcc:unverified]
+- [ ] Construct actual C7 projective automorphisms and explicit degree2/3 elliptic quotient maps, with complete frame/coefficient classification, working point/fibre/infinity/inverse controls and explicit remaining Jacobian/cost gaps (Codex, started 2026-11-23, branch lane/chained-cm19-curve-maps-20261123, PR #5026; stacked on #5019, artifact prerequisite there remains open). [pcc:unverified]
 
 - [ ] Complete approved artifact-store migration and full remote byte replay for the82374B CM19 census raw before PR #5019 can finish packaging/merge; existing trusted artifact-autofix normal CI pending, local aws/credentials absent (Codex, 2026-11-23, branch lane/chained-cm19-hermitian-20261123; mathematical classification/report complete, no policy waiver). [pcc:unverified]
 
