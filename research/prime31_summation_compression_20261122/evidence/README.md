@@ -54,3 +54,10 @@ The root replay command was executed against the previously built scratch adapte
 The native example is a development correctness and operation-count diagnostic. It is not an isolated benchmark. `../PROTOCOL.md` describes prospective matched, complete per-query accounting. No EKS job or paid compute was launched. No failed query, preprocessing, extraction, or membership work may be removed from a later performance comparison.
 
 PCC claims pin the source, receipts and written arguments as unsigned attestations. The local workspace is a partial materialization through the GitHub connector, without a complete Git object graph; a zero producer commit in these claims means no local Git HEAD was available. Remote tracking commit `087744300ac8d91335f2099b72fd311743fe7d32` and the frozen source hashes supply the separate source provenance. Neither a fabricated Git object nor a substitute formal proof is used.
+
+
+## Subsequent original-lock CI
+
+The later hosted original-lock run 45089569480/job 137415823110 passed 41 library tests and all 5 component tests at checkout `109fc024e33f122fd678d2c93a18b2c0438a8668`. The artifact's source hashes match the original library/manifest/lock and new example. Its deterministic JSON is byte-identical to the earlier local-adapter JSON. Complete retained receipts are in `original-lock-ci/`; claim `PCC-20261123-526846` remains unverified. This resolves the component's original-lock replay gap but does not convert producer CI into a signed independent execution proof or performance benchmark. [pcc:unverified]
+
+The downloaded ZIP had SHA-256 `04bb2bf9b87115287837430d403c53f31860bc15bfa1cb7cb7e3c775328fcd69`, matching GitHub's artifact digest. Its six extracted files are retained here so the evidence survives artifact expiration. The raw job log and compact receipt were added separately. The source commit is taken from the checkout action and `git log`, not the hosted runner provisioner version.

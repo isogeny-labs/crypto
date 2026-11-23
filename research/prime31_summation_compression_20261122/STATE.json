@@ -48,7 +48,7 @@
         "outcome": "Recurrence loses to sparse-product control in this cell; no runtime or complete-solver claim"
       },
       "corrected_schoolbook_bound": "O(B^2 * (1 + log^+(N/B))); O(B^2) when N/B is bounded",
-      "test_scope": "5 component tests; 25 original-curve fixtures; 41 unchanged library tests; 12 instrumented cases; cached-dependency adapter, not original lock",
+      "test_scope": "5 component tests;25 original-curve fixtures;41 unchanged library tests;12 instrumented cases. Both qualified local adapter and later original-lock hosted CI; no signed independent execution proof.",
       "source_sha256": "b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1",
       "source_git_blob": "750eb4ed1ea511cc70b0e7a4af413a8bf7ebeeab",
       "correctness_json_sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb"
@@ -90,6 +90,11 @@
       "id": "PCC-20261123-87f011",
       "scope": "Conditional node count, scalar norm degree and scoped empty-block work obstruction",
       "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-526846",
+      "scope": "Original-lock hosted correctness replay and identical deterministic diagnostic",
+      "standing": "unverified"
     }
   ],
   "identity_certificates": {
@@ -115,8 +120,11 @@
   "continuation": {
     "existing_automation_id": "6b0356b62c58819095775adf491e4492",
     "cadence": "existing hourly schedule",
-    "prompt_update_status": "pending final published checkpoint",
-    "prompt_source": "CONTINUATION.md"
+    "prompt_update_status": "confirmed after original-lock CI and sibling-source audit; existing hourly schedule retained",
+    "prompt_source": "CONTINUATION.md",
+    "next_scheduled_run_at_update": "2026-11-22T16:55:14-08:00",
+    "receipt": "evidence/automation-update-receipt.json",
+    "prompt_sha256": "dfbdeb186d7e8e8dd8637e2a62212144fe39f0f454d4d41d0273ba739e5c1dfe"
   },
   "space": {
     "name": "Prime Field Summation Polynomial Research",
@@ -125,10 +133,12 @@
     "space_id": null,
     "page_id": null,
     "instruction": "Find the exact Space before any retry; do not create a duplicate or report a confirmed save without a returned receipt and readback",
-    "recovery": "Connector reads timed out; one browser read returned no UI and was interrupted; no recovery-agent writes and no known IDs"
+    "recovery": "Connector reads timed out; one browser read returned no UI and was interrupted; no recovery-agent writes and no known IDs",
+    "prepared_content": "SPACE_PAGE.md",
+    "page_creation_key": "prime31-dickson-quotient-gate-20261122"
   },
   "environment_limits": [
-    "Original locked packages unavailable offline; separate adapter records eight version deviations",
+    "Local original lock could not resolve either1.19.0 offline; original manifest/lock subsequently passed hosted CI. Both historical adapter and hosted receipts are retained.",
     "No Conductor binary; documented fail-open warning used for isolated paths",
     "No research KB tools; bounded direct primary-source and repository audit",
     "No EKS/AWS execution access in this session; no paid job launched",
@@ -136,18 +146,29 @@
     "Partial connector materialization, no complete local Git object graph; PCC producer commit is zero and source hashes are explicit"
   ],
   "report": "REPORT.md",
-  "pdf_status": "complete: 8 pages, visually checked, 55998 bytes; covers iterations 1 and 2",
-  "delivery_status": "Versioned in the containing PR commit; consult the PR head for latest publication",
+  "pdf_status": "complete: 8 pages, visually checked, 56142 bytes; covers iterations1 and2 plus original-lock CI",
+  "delivery_status": "Versioned in the containing PR commit; source and CI bind109fc024e33f122fd678d2c93a18b2c0438a8668",
   "companion_lane": {
     "pull_request": "https://github.com/isogeny-labs/crypto/pull/4924",
     "branch": "research/symmetric-pair-quotient-prime31-20261122",
     "observed_head": "fb850179c3847fd6950dbd91015c4e3d7c6da62d",
     "scope": "Symmetric radical moments, monic-product quotient and rank-four factor tree",
-    "continuation": "Preserve and compare this existing hourly-task lane; resolve source-checkout discrepancy in Run74 note before importing results"
+    "continuation": "Source provenance resolved: aa27edac is repository checkout; b8a594 is runner provisioner. Monic source changed by fb850179, so require matching CI for later bytes. See evidence/SIBLING_CI_AUDIT.md."
   },
   "original_lock_ci": {
     "workflow": ".github/workflows/prime31-dickson-quotient-gate.yml",
-    "status": "queued by publication when GitHub triggers; no result yet",
-    "scope": "Correctness and deterministic diagnostics only, not timing benchmark"
-  }
+    "status": "completed success; original manifest and lock",
+    "scope": "Correctness and deterministic diagnostics only, not timing benchmark",
+    "run_id": 45089569480,
+    "job_id": 137415823110,
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45089569480",
+    "source_commit": "109fc024e33f122fd678d2c93a18b2c0438a8668",
+    "library_tests_passed": 41,
+    "component_tests_passed": 5,
+    "diagnostic_byte_equal_local_adapter": true,
+    "receipt": "evidence/original-lock-ci/receipt.json",
+    "claim": "PCC-20261123-526846",
+    "standing": "unverified"
+  },
+  "pdf_sha256": "f274eda2ef4ccf54f7af5ec1ba4f66775146ec06f15684706f816e8fb5bf497a"
 }

@@ -218,12 +218,12 @@ story += [p("ISOGENY LABS  /  RESEARCH CHECKPOINT", "LabelR"),
           p("Dickson membership, exact S3 resultants, and the next proof obligation", "BodyR"),
           footnote("November 22, 2026 (America/Los_Angeles)  |  Research lane: PR #4928"),
           Spacer(1,10),
-          box("OUTCOME AT THIS CHECKPOINT", "A denominator-free resultant component is implemented in Rust and passes the retained development checks. On the recorded B=31 cell, it uses <b>17,923</b> field multiplications against <b>8,816</b> for the sparse-product control. The component has exact algebraic structure; the stronger control wins this diagnostic. [pcc:unverified]"),
+          box("OUTCOME AT THIS CHECKPOINT", "A denominator-free resultant component is implemented in Rust and passes the original-lock hosted tests. On the recorded B=31 cell, it uses <b>17,923</b> field multiplications against <b>8,816</b> for the sparse-product control. The component has exact algebraic structure; the stronger control wins this diagnostic. [pcc:unverified]"),
           Spacer(1,15),
           table([
               ["Delivered", "Evidence and standing"],
               ["Composed membership evaluation", "Four quotient products per Dickson level; exact exceptional-point coverage. Mathematical derivation and unsigned native identity checks."],
-              ["Reusable Rust component", "Existing Arithmetic, Base and PRIME31 sources reused unchanged. Five new tests and 41 source-library tests pass through a qualified dependency adapter."],
+              ["Reusable Rust component", "Five new tests and 41 native library tests pass with the original manifest and lockfile in hosted CI. Its diagnostic JSON matches the earlier local adapter byte for byte. [E4]"],
               ["Independent session review", "A distinct agent reviewed the algebra and replayed the five tests. This is not a signed PCC verdict or a formal proof-kernel result."],
               ["Successor degree theorem", "The full scalar-Dickson image has exact bidegree (2N,2N) under the stated hypotheses. It blocks a fixed-degree replacement, while leaving succinct representations open."],
           ],[168,336]),
@@ -319,29 +319,26 @@ footnote("[T1; G1-G3] A prime-to-p degree does not justify assuming every ramifi
 h("What this excludes, and what remains open"),
 p("A scalar replacement that keeps one full-image equation at constant bidegree cannot work along growing k. The theorem does not bound arithmetic-circuit size, monomial sparsity, finite-fibre predicates, vector auxiliary states, or common-root extraction. It is not a lower bound for ECDLP. The successor must specify which surviving representation it exploits and price its extraction algorithm."),PageBreak()]
 # 7: evidence
-story += page("6  Evidence and reproducibility", "The retained checks support a component checkpoint with explicit build qualifications.")
+story += page("6  Evidence and reproducibility", "The original manifest and lockfile now pass hosted replay; the CI record is producer evidence.")
 story += [table([
     ["Evidence", "Retained outcome"],
-    ["New example tests", "5 passed; 25 original-curve cases across depths 2-6, plus synthetic exceptional cases"],
-    ["Existing library tests", "41 passed through unchanged upstream sources in the separate dependency adapter"],
-    ["Correctness instrument", "12 cases: exact coefficient, support, signed relation and oriented-recovery equality"],
+    ["New example tests", "5 passed in original-lock CI and the local adapter; 25 source-curve cases plus synthetic exceptions"],
+    ["Existing library tests", "41 passed in original-lock CI, matching the prior adapter pass on the same native sources"],
+    ["Correctness instrument", "12 cases; hosted JSON is byte-identical to the local record, including all deterministic counters"],
     ["Independent session replay", "Distinct algebra reviewer reran the five tests and reviewed source; no correctness defect found"],
     ["Identity records", "Four native identity.certificate/v1 records, each proof:null; 32 evaluations over 2<super>61</super>-1 and additional replay/checked-integer expansion"],
 ],[168,336]),
-h("Dependency qualification"),
-p("The original offline locked build failed because required versions were absent from the local cache. The original library, manifest and lockfile were preserved. A separate adapter resolved cached dependencies; its eight package-version deviations are retained. This is not an original-lock, repository-wide test pass. [E2]"),
-table([
-    ["Package", "Original", "Adapter", "Package", "Original", "Adapter"],
-    ["either", "1.19.0", "1.18.0", "itoa", "1.0.19", "1.0.18"],
-    ["libc", "0.2.191", "0.2.190", "serde_json", "1.0.154", "1.0.151"],
-    ["syn", "3.0.10", "3.0.6", "unicode-ident", "1.0.27", "1.0.26"],
-    ["zerocopy", "0.8.63", "0.8.60", "zerocopy-derive", "0.8.63", "0.8.60"],
-],[85,74,64,105,91,85]),
+h("Successful original-lock hosted replay"),
+p("<link href='https://github.com/isogeny-labs/crypto/actions/runs/45089569480' color='#087C80'>Run 45089569480</link>, job 137415823110, succeeded at checkout 109fc024e33f122fd678d2c93a18b2c0438a8668. The original native manifest and lockfile were used. Retained logs record 41 library and 5 component tests passing. [E4]","SmallR"),
+p("Hosted and local diagnostic SHA-256:<br/>2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb","MonoR"),
+p("This resolves the original-lock replay question. It supplies CI producer evidence, with no independent signed execution verdict, admitted timing benchmark, or repository-wide test claim. [E4]","SmallR"),
+h("Earlier local build qualification retained"),
+p("The first offline locked build failed because required versions were absent from the local cache. Its failure receipt and the separate adapter's eight package-version deviations remain in the evidence. The original library, manifest, lockfile and component source were preserved. The later hosted success is recorded separately. [E2, E4]","SmallR"),
 h("Native reproduction entry points"),
-p("From the study directory, use the committed adapter for the retained dependency qualification. The primary implementation remains the new example in the existing native crate.","SmallR"),
-p("cargo test --offline --locked --release \\\n  --manifest-path development-adapter/Cargo.toml \\\n  --example prime31_dickson_quotient".replace("\n","<br/>"),"MonoR"),
-p("cargo test --offline --locked --release \\\n  --manifest-path development-adapter/Cargo.toml --lib".replace("\n","<br/>"),"MonoR"),
-    p("PCC records: recurrence PCC-20261123-5f10b5; development diagnostic PCC-20261123-acf74d; degree theorem PCC-20261123-f61d26. Canonical standing is <b>unverified</b> for all three.","SmallR"),
+p("From the repository root, these are the original-lock CI test entry points:","SmallR"),
+p("cargo test --locked --release \\\n  --manifest-path research/prime31_ic_20261115/native/Cargo.toml \\\n  --example prime31_dickson_quotient".replace("\n","<br/>"),"MonoR"),
+p("cargo test --locked --release \\\n  --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib".replace("\n","<br/>"),"MonoR"),
+    p("PCC records: recurrence PCC-20261123-5f10b5; development diagnostic PCC-20261123-acf74d; degree theorem PCC-20261123-f61d26; hosted replay PCC-20261123-526846. Canonical standing is <b>unverified</b> for all four.","SmallR"),
     p("Final example SHA-256:<br/>b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1","MonoR"),
 footnote("Identity ids [E3]: centered S3 IDC1hf62e2402e4871a82; discriminant IDC1h869923a46a34c70c; trace IDC1hd3786f53034b6b9d; norm IDC1h3366a93945da9204. These do not certify the function-field proof. Lean, lake and elan were unavailable."),PageBreak()]
 # 8: next and citations
@@ -351,13 +348,13 @@ Spacer(1,10),
 p("The prospective component protocol freezes depths 2-10, natural targets and separate planted controls; compares filtered Horner, both recurrence domains, sparse product, batch group scanning and a fast-polynomial reference; and charges cold setup, misses, extraction and normalization. It remains queued behind the repository's execution and checkpoint gates. [P1]"),
 p("Higher-arity integration must supply actual unknown-index relations, useful independent rank, and a checked cold scalar recovery. A growing-field argument must not assume infinitely many Mersenne primes. The final matched controls remain the applicable index-calculus frontier and optimized negation-map Pollard rho. [R1, P1]"),
 h("Local evidence and proof sources"),
-p("<b>R1</b> REPORT.md; <b>R2</b> native/lib.rs at snapshot 26cc445bdc6b0b3518535d5f7b8b4ec6cc08fb19; <b>R3</b> native/examples/prime31_dickson_quotient.rs. <b>E1</b> evidence/correctness-cases-final.stdout. <b>E2</b> evidence/independent_review.md, source-manifest.json, dependency-differences.json, and test receipts. <b>E3</b> identity-certificates/*.json. <b>T1</b> NEXT_PROOF.md. <b>P1</b> PROTOCOL.md.","SmallR"),
+p("<b>R1</b> REPORT.md; <b>R2</b> native/lib.rs at snapshot 26cc445bdc6b0b3518535d5f7b8b4ec6cc08fb19; <b>R3</b> native/examples/prime31_dickson_quotient.rs. <b>E1</b> evidence/correctness-cases-final.stdout. <b>E2</b> evidence/independent_review.md, source-manifest.json, dependency-differences.json, and local test receipts. <b>E3</b> identity-certificates/*.json. <b>E4</b> evidence/original-lock-ci/: receipt.json, source-sha256.txt, library-tests.txt, component-tests.txt, correctness-cases.json and job.log. <b>T1</b> NEXT_PROOF.md. <b>P1</b> PROTOCOL.md.","SmallR"),
 h("Primary literature and mathematical inputs"),
 p("<b>L1.</b> Semaev (2015), linked S3 chain: <link href='https://arxiv.org/pdf/1504.01175' color='#087C80'>arXiv:1504.01175</link>. <b>L2.</b> Petit, Kosters, Messeng (2016), composed factor-base maps and prime-field root finding: <link href='https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf' color='#087C80'>PKC paper</link>. <b>L3.</b> Amadori, Pintore, Sala (2018), one-dependency architecture: <link href='https://pure.tue.nl/ws/files/91158650/609.pdf' color='#087C80'>author manuscript</link>. <b>L4.</b> Kosters and Yeo (2015), first-fall-degree limitations: <link href='https://arxiv.org/pdf/1503.08001' color='#087C80'>arXiv:1503.08001</link>.","SmallR"),
 p("<b>G1.</b> Stacks Project, separable Riemann-Hurwitz with different: <link href='https://stacks.math.columbia.edu/tag/0C1B' color='#087C80'>Tag 0C1B</link>. <b>G2.</b> Stein, elliptic curves and Pic<super>0</super>: <link href='https://www.wstein.org/books/ant/ant/node65.html' color='#087C80'>Abelian Groups Attached to Elliptic Curves</link>. <b>G3.</b> Lynn, Weierstrass pole divisor: <link href='https://crypto.stanford.edu/pbc/notes/elliptic/divisor.html' color='#087C80'>Zeroes and Poles</link>. The degree theorem is an application of these standard inputs, not attributed to them as a previously stated result.","SmallR"),
 h("Prior-work and overlap boundary"),
 p("Discriminant factorization, signed coordinates, quotient/GCD elimination, Dickson fibres and Brent-Kung acceleration already exist in the repositories. The linked S3 chain is prior art. This bounded audit supports no global novelty claim. PR #4901 and the extraction work in #4692/#4812/#4822 remain separate dependencies. PR #4829 maintains summation-root machinery. [R1]","SmallR"),
-footnote("Research record: <link href='https://github.com/isogeny-labs/crypto/pull/4928' color='#087C80'>isogeny-labs/crypto PR #4928</link>. No paid run, admitted performance row, signed PCC verdict or asymptotic speedup is asserted by this report.")]
+footnote("Research record: <link href='https://github.com/isogeny-labs/crypto/pull/4928' color='#087C80'>isogeny-labs/crypto PR #4928</link>. Hosted original-lock correctness replay succeeded. No admitted timing benchmark, independent signed execution verdict, signed PCC standing or asymptotic speedup is asserted.")]
 
 def on_page(canvas,doc):
     canvas.saveState()
@@ -388,5 +385,5 @@ pages=len(PdfReader(ROOT/"REPORT.pdf").pages)
 if pages != 8: raise RuntimeError(f"Expected 8 pages; got {pages}")
 print(json.dumps({"pdf":str(ROOT/"REPORT.pdf"),"pages":pages,
     "bytes":(ROOT/"REPORT.pdf").stat().st_size,
-    "source":"REPORT.md and NEXT_PROOF.md; recorded Rust diagnostic only",
+    "source":"REPORT.md, NEXT_PROOF.md, recorded Rust diagnostic, and retained original-lock CI evidence",
     "figures":[str(p.relative_to(ROOT)) for p in sorted(FIG.iterdir())]},indent=2))

@@ -21,11 +21,11 @@ cargo +1.100.0 test --locked --release \
   --example prime31_dickson_quotient
 ```
 
-The original locked build needs dependencies unavailable in the current offline cache. Development checks therefore use a separately recorded cached-dependency adapter with the original source bytes. That qualification does not establish success under the original lock. EKS admission, independent external replay, signed PCC standing and formal Lean verification remain pending. [pcc:unverified]
+The original locked build needs dependencies unavailable in the current offline cache. Development checks therefore use a separately recorded cached-dependency adapter with the original source bytes. A later [original-lock CI replay](https://github.com/isogeny-labs/crypto/actions/runs/45089569480) passed 41 library tests and all 5 component tests at source commit `109fc024e33f122fd678d2c93a18b2c0438a8668`; the diagnostic JSON matches the local output byte-for-byte. EKS admission for performance work, independent signed execution standing and formal Lean verification remain pending. [pcc:unverified]
 
 ## Scope and continuation
 
-The automated continuation must read `STATE.json`, the latest session log, relevant live PRs, and the current repository instructions before acting. It should complete the original-lock check, run the frozen complete component comparison after admission, then either integrate a gain or record the loss and pursue a materially different compressed root-intersection method. A fast evaluation circuit alone is not a fast root finder.
+The automated continuation must read `STATE.json`, the latest session log, relevant live PRs, and the current repository instructions before acting. It should retain the completed original-lock correctness check and pursue the missing exact sublinear empty-root operation. Any subsequent empirical comparison follows the prospective protocol and admission requirements. A fast evaluation circuit alone is not a fast root finder.
 
 The research Space creation request has an uncertain outcome because the Spaces service returned no receipt. Search for the exact name `Prime Field Summation Polynomial Research` before any further creation; do not make a duplicate.
 

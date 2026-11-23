@@ -1,6 +1,6 @@
 # Report rendering and visual verification
 
-This is the editable rendering record for the eight-page `REPORT.pdf`. The report covers the first two iterations: the exact Dickson/S3 resultant component, its retained negative operation diagnostic, and the full-image bidegree theorem. All mathematical and computational standing remains `pcc:unverified`.
+This is the editable rendering record for the eight-page `REPORT.pdf`. The report covers the first two iterations: the exact Dickson/S3 resultant component, its retained negative operation diagnostic, and the full-image bidegree theorem. It now also includes the successful hosted replay with the original native manifest and lockfile. All mathematical and computational standing remains `pcc:unverified`.
 
 ## Deliverables
 
@@ -31,4 +31,12 @@ Python is used only for document layout, plotting existing recorded counts, and 
 
 All eight pages were rendered and visually inspected. The final report has legible native text and exponents, adequate formula spacing, aligned tables, complete chart labels, and unobstructed page margins. Both exported figure PNGs were also inspected. A standard-font substitution problem in an early draft was corrected by embedding font subsets; the final file was compressed without rasterizing its text or equations.
 
-The PDF preserves the source qualifications: the stronger sparse-product control wins the recorded scalar-operation diagnostic; kernel counts omit setup and extraction; development tests used a separate cached-dependency adapter; identity records and in-session review do not provide a signed PCC verdict. No novelty or asymptotic speedup is asserted.
+The PDF preserves the source qualifications: the stronger sparse-product control wins the recorded scalar-operation diagnostic; kernel counts omit setup and extraction; the first development checks used a separate cached-dependency adapter after a local cache failure; later hosted CI passed the same component and library tests using the original manifest and lockfile. Identity records, in-session review and CI producer evidence do not provide a signed PCC verdict. No novelty or asymptotic speedup is asserted.
+
+## Original-lock CI update
+
+Pages 1, 7 and 8 now record run `45089569480`, job `137415823110`, at checked-out source `109fc024e33f122fd678d2c93a18b2c0438a8668`. The retained logs show 41 native library tests and 5 component tests passing. `cmp` confirmed the hosted deterministic JSON is byte-identical to the local diagnostic, whose SHA-256 remains `2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb`. The component source hash also remains unchanged.
+
+The original local cache failure and the adapter's eight dependency differences remain historical evidence. The later original-lock check is successful, and claim `PCC-20261123-526846` remains unverified because the CI record is producer evidence rather than an independent signed execution verdict. The PDF retains its first-two-iterations scope; the third mathematical note remains separate.
+
+All eight pages were rerendered after this update. The three changed pages were inspected at full size, followed by both contact sheets covering all eight pages. The updated PDF is 56,142 bytes and contains 10 links. Its current SHA-256 and the regenerated figure/source hashes are recorded in `render-receipt.json`.
