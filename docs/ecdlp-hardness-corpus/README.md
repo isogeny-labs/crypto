@@ -10,9 +10,9 @@ and every edge says how one claim depends on or limits another.
 
 ## Current snapshot
 
-- 643 claim nodes (33 refuted; 45 kernel-checked, 6 native-exact)
-- 1,059 typed dependency edges
-- 243 source records (83 primary texts read and hashed)
+- 654 claim nodes (37 refuted; 55 kernel-checked, 6 native-exact)
+- 1,073 typed dependency edges
+- 244 source records (83 primary texts read and hashed)
 - 66 prioritized research targets
 - 717 labeled results and 375 numbered sections in the Galbraith book inventory
 
