@@ -469,6 +469,28 @@ impl Fp<'_> {
             roots.dedup();
             return roots;
         }
+        // A zero constant coefficient gives a known root x=0.
+        // Strip its entire multiplicity before expensive Frobenius powers.
+        // The public API reports distinct roots, not multiplicities.
+        if f.len() >= 4 && f[0] == 0 {
+            let mut valuation = 1usize;
+            while valuation < f.len() - 1 && f[valuation] == 0 {
+                valuation += 1;
+            }
+            let mut out = self.roots(&f[valuation..]);
+            out.push(0);
+            out.sort_unstable();
+            out.dedup();
+            return out;
+        }
+        // x^3 = c has exactly one solution over F_p when p = 2 mod 3,
+        // since gcd(3,p-1)=1. The inverse of 3 modulo p-1 is (2p-1)/3.
+        // The modulus is at most 2^63-1 in this implementation.
+        if f.len() == 4 && f[1] == 0 && f[2] == 0 && p % 3 == 2 {
+            let target = self.sub(0, f[0]);
+            let cube_root = self.pow(target, (2 * p - 1) / 3);
+            return vec![cube_root];
+        }
         let xp = self.powmod(&[0, 1], p, &f);
         let mut h = xp;
         if h.len() < 2 {
@@ -598,19 +620,24 @@ pub fn find_isogeny(e: &PrimeCurve, ell: u64, tally: &mut FieldTally) -> Option<
     let p = e.p;
     let mut f = Fp { p, tally };
     let (a, b) = (e.a % p, e.b % p);
-    let psi: Vec<u64> = match ell {
-        2 => vec![b, a, 0, 1],
+    // The smallest rational kernel root is known without factoring:
+    // ψ₂=x(x²+a) when b=0, and ψ₃=3x(x³+4b) when a=0.
+    // Guard characteristic 2/3 and singular curves; preserve the generic
+    // root solver for every other parameter set.
+    let x0 = match ell {
+        2 if p > 3 && b == 0 && a != 0 => 0,
+        3 if p > 3 && a == 0 && b != 0 => 0,
+        2 => *f.roots(&[b, a, 0, 1]).first()?,
         3 => {
             let a2 = f.mul(a, a);
             let c12 = f.small(12);
             let c6 = f.small(6);
             let t1 = f.mul(c12, b);
             let t2 = f.mul(c6, a);
-            vec![f.sub(0, a2), t1, t2, 0, f.small(3)]
+            *f.roots(&[f.sub(0, a2), t1, t2, 0, f.small(3)]).first()?
         }
         _ => return None,
     };
-    let x0 = *f.roots(&psi).first()?;
     let x02 = f.mul(x0, x0);
     let c3 = f.small(3);
     let t3 = f.mul(c3, x02);
@@ -684,6 +711,65 @@ impl Isogeny {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
+
+    #[test]
+    fn round138_sparse_polynomial_roots_match_bruteforce() {
+        for p in [5u64, 7, 11, 13, 17, 19, 23, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            for c in 0..p {
+                let polynomials = [
+                    vec![c, 0, 0, 1], // binomial cubic
+                    vec![0, c, 0, 0, 1], // ψ3-like, known zero root
+                    vec![0, 0, c, 0, 1], // repeated zero root
+                    vec![0, 0, 0, c, 1],
+                    vec![0, 0, 0, 0, 1],
+                ];
+                for poly in polynomials {
+                    let found = f.roots(&poly);
+                    let mut expected = Vec::new();
+                    for x in 0..p {
+                        let mut value = 0;
+                        for &coefficient in poly.iter().rev() {
+                            let product = f.mul(value, x);
+                            value = f.add(product, coefficient);
+                        }
+                        if value == 0 {
+                            expected.push(x);
+                        }
+                    }
+                    assert_eq!(found, expected, "p={p}, poly={poly:?}");
+                }
+            }
+        }
+        for p in [1_000_000_007u64, 4_294_967_291] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            assert_eq!(p % 3, 2);
+            for c in 0..1000u64 {
+                let roots = f.roots(&[c, 0, 0, 1]);
+                assert_eq!(roots.len(), 1);
+                let r = roots[0];
+                let r2 = f.mul(r, r);
+                let r3 = f.mul(r2, r);
+                assert_eq!(f.add(r3, c), 0);
+            }
+        }
+    }
+
+    #[test]
+    fn round138_known_isogeny_kernel_is_zero() {
+        for p in [5u64, 7, 11, 13, 17, 101, 65_521] {
+            for t in 1..p.min(20) {
+                for (ell, a, b) in [(2u64, t, 0u64), (3, 0, t)] {
+                    let mut tally = FieldTally::default();
+                    let iso = find_isogeny(&PrimeCurve { p, a, b }, ell, &mut tally)
+                        .expect("nonsingular curve has rational kernel");
+                    assert_eq!(iso.x0, 0, "p={p}, ell={ell}");
+                }
+            }
+        }
+    }
 
     #[test]
     fn round128_arithmetic_matches_wide_modulo() {
