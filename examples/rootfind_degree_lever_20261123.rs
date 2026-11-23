@@ -68,7 +68,7 @@ fn cell_seed(master: u64, tag: &str, n: u32, ell: usize, m: usize, draw: usize) 
 #[derive(Clone)]
 struct Field {
     n: u32,
-    low: u64, // f = x^n + low
+    low: u64,     // f = x^n + low
     sq: Vec<u64>, // sq[j] = z^{2j} mod f, j < n
 }
 
@@ -208,7 +208,11 @@ fn pmul(a: &Poly, b: &Poly) -> Poly {
             *e = !*e;
         }
     }
-    let mut out: Vec<u64> = acc.into_iter().filter(|(_, v)| *v).map(|(k, _)| k).collect();
+    let mut out: Vec<u64> = acc
+        .into_iter()
+        .filter(|(_, v)| *v)
+        .map(|(k, _)| k)
+        .collect();
     out.sort_unstable();
     out
 }
@@ -219,7 +223,9 @@ struct Sym(Vec<Poly>);
 
 impl Sym {
     fn constant(v: u64, n: u32) -> Sym {
-        Sym((0..n).map(|k| if (v >> k) & 1 == 1 { vec![0] } else { vec![] }).collect())
+        Sym((0..n)
+            .map(|k| if (v >> k) & 1 == 1 { vec![0] } else { vec![] })
+            .collect())
     }
     fn subspace(basis: &[u64], off: usize, n: u32) -> Sym {
         Sym((0..n)
@@ -239,7 +245,12 @@ impl Sym {
         Sym((0..n as usize).map(|k| vec![1u64 << (off + k)]).collect())
     }
     fn add(&self, o: &Sym) -> Sym {
-        Sym(self.0.iter().zip(o.0.iter()).map(|(a, b)| padd(a, b)).collect())
+        Sym(self
+            .0
+            .iter()
+            .zip(o.0.iter())
+            .map(|(a, b)| padd(a, b))
+            .collect())
     }
     fn mul(&self, o: &Sym, f: &Field) -> Sym {
         let n = f.n as usize;
@@ -308,7 +319,9 @@ fn chain_system(basis: &[u64], x_r: u64, m: usize, f: &Field) -> (Vec<Poly>, u32
     if m == 2 {
         eqs.extend(sym_s3(&s[0], &s[1], &t, f));
     } else {
-        let inter: Vec<Sym> = (0..m - 2).map(|i| Sym::free(m * ell + i * n as usize, n)).collect();
+        let inter: Vec<Sym> = (0..m - 2)
+            .map(|i| Sym::free(m * ell + i * n as usize, n))
+            .collect();
         eqs.extend(sym_s3(&s[0], &s[1], &inter[0], f));
         for i in 0..m - 3 {
             eqs.extend(sym_s3(&inter[i], &s[i + 2], &inter[i + 1], f));
@@ -322,19 +335,59 @@ fn chain_system(basis: &[u64], x_r: u64, m: usize, f: &Field) -> (Vec<Poly>, u32
 
 /// `plain_terms(3)`: S4 in x over (x1,x2,x3,xR), b = 1, all coefficients 1.
 const PLAIN3: [[u32; 4]; 24] = [
-    [4, 4, 4, 0], [4, 4, 0, 4], [4, 0, 4, 4], [0, 4, 4, 4], [4, 2, 2, 2], [3, 3, 3, 1],
-    [3, 3, 1, 3], [3, 1, 3, 3], [2, 4, 2, 2], [2, 2, 4, 2], [2, 2, 2, 4], [1, 3, 3, 3],
-    [3, 1, 1, 1], [2, 2, 2, 0], [2, 2, 0, 2], [2, 0, 2, 2], [1, 3, 1, 1], [1, 1, 3, 1],
-    [1, 1, 1, 3], [0, 2, 2, 2], [4, 0, 0, 0], [0, 4, 0, 0], [0, 0, 4, 0], [0, 0, 0, 4],
+    [4, 4, 4, 0],
+    [4, 4, 0, 4],
+    [4, 0, 4, 4],
+    [0, 4, 4, 4],
+    [4, 2, 2, 2],
+    [3, 3, 3, 1],
+    [3, 3, 1, 3],
+    [3, 1, 3, 3],
+    [2, 4, 2, 2],
+    [2, 2, 4, 2],
+    [2, 2, 2, 4],
+    [1, 3, 3, 3],
+    [3, 1, 1, 1],
+    [2, 2, 2, 0],
+    [2, 2, 0, 2],
+    [2, 0, 2, 2],
+    [1, 3, 1, 1],
+    [1, 1, 3, 1],
+    [1, 1, 1, 3],
+    [0, 2, 2, 2],
+    [4, 0, 0, 0],
+    [0, 4, 0, 0],
+    [0, 0, 4, 0],
+    [0, 0, 0, 4],
 ];
 /// `symmetrised_terms(2)` over (w1, w2, wR, s).
-const SYM2: [[u32; 4]; 5] = [[1, 1, 1, 0], [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
+const SYM2: [[u32; 4]; 5] = [
+    [1, 1, 1, 0],
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+];
 /// `symmetrised_terms(3)` over (w1, w2, w3, wR, s).
 const SYM3: [[u32; 5]; 18] = [
-    [2, 2, 2, 0, 0], [2, 2, 0, 2, 0], [2, 0, 2, 2, 0], [0, 2, 2, 2, 0], [2, 1, 1, 1, 0],
-    [1, 2, 1, 1, 0], [1, 1, 2, 1, 0], [1, 1, 1, 2, 0], [1, 1, 1, 1, 1], [2, 0, 0, 0, 0],
-    [0, 2, 0, 0, 0], [0, 0, 2, 0, 0], [0, 0, 0, 2, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0],
-    [0, 0, 1, 0, 0], [0, 0, 0, 1, 0], [0, 0, 0, 0, 1],
+    [2, 2, 2, 0, 0],
+    [2, 2, 0, 2, 0],
+    [2, 0, 2, 2, 0],
+    [0, 2, 2, 2, 0],
+    [2, 1, 1, 1, 0],
+    [1, 2, 1, 1, 0],
+    [1, 1, 2, 1, 0],
+    [1, 1, 1, 2, 0],
+    [1, 1, 1, 1, 1],
+    [2, 0, 0, 0, 0],
+    [0, 2, 0, 0, 0],
+    [0, 0, 2, 0, 0],
+    [0, 0, 0, 2, 0],
+    [1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1],
 ];
 
 fn eval_terms(f: &Field, vals: &[u64], terms: &[&[u32]]) -> u64 {
@@ -419,7 +472,10 @@ fn direct_system(basis: &[u64], x_r: u64, m: usize, f: &Field) -> (Vec<Poly>, u3
             let p = [&pw[a & lm], &pw[(a >> ell) & lm], &pw[a >> (2 * ell)]];
             let mut acc = 0u64;
             for t in PLAIN3.iter() {
-                let q = f.mul(f.mul(p[0][t[0] as usize], p[1][t[1] as usize]), f.mul(p[2][t[2] as usize], r[t[3] as usize]));
+                let q = f.mul(
+                    f.mul(p[0][t[0] as usize], p[1][t[1] as usize]),
+                    f.mul(p[2][t[2] as usize], r[t[3] as usize]),
+                );
                 acc ^= q;
             }
             tt[a] = acc;
@@ -486,7 +542,11 @@ impl Space {
         for n in 0..=nv as usize {
             binom[n][0] = 1;
             for k in 1..=c as usize + 1 {
-                binom[n][k] = if n == 0 { 0 } else { binom[n - 1][k - 1] + binom[n - 1][k] };
+                binom[n][k] = if n == 0 {
+                    0
+                } else {
+                    binom[n - 1][k - 1] + binom[n - 1][k]
+                };
             }
         }
         let mut off = vec![0usize; c as usize + 2];
@@ -508,7 +568,13 @@ impl Space {
             }
         }
         let words = total.div_ceil(64);
-        Space { c, binom, off, monos, words }
+        Space {
+            c,
+            binom,
+            off,
+            monos,
+            words,
+        }
     }
     #[inline]
     fn col(&self, m: u64) -> usize {
@@ -598,14 +664,20 @@ impl Basis {
 fn closure(eqs: &[Poly], nv: u32, c: u32, deadline: Instant) -> (usize, usize, u32, bool) {
     let sp = Space::new(nv, c);
     let total = sp.monos.len();
-    let mut basis = Basis { piv: vec![None; total], dim: 0 };
+    let mut basis = Basis {
+        piv: vec![None; total],
+        dim: 0,
+    };
     enum Src {
         Mac(usize, u64),
         Mul(usize, u32),
     }
     let bases: Vec<Option<Vec<u64>>> = eqs
         .iter()
-        .map(|f| (!f.is_empty() && f.iter().map(|m| m.count_ones()).max().unwrap_or(0) <= c).then(|| sp.row(f)))
+        .map(|f| {
+            (!f.is_empty() && f.iter().map(|m| m.count_ones()).max().unwrap_or(0) <= c)
+                .then(|| sp.row(f))
+        })
         .collect();
     let mut srcs: Vec<Src> = vec![];
     for (k, f) in eqs.iter().enumerate() {
@@ -613,7 +685,12 @@ fn closure(eqs: &[Poly], nv: u32, c: u32, deadline: Instant) -> (usize, usize, u
             continue;
         }
         let df = f.iter().map(|m| m.count_ones()).max().unwrap_or(0);
-        srcs.extend(sp.monos.iter().filter(|m| m.count_ones() <= c - df).map(|&m| Src::Mac(k, m)));
+        srcs.extend(
+            sp.monos
+                .iter()
+                .filter(|m| m.count_ones() <= c - df)
+                .map(|&m| Src::Mac(k, m)),
+        );
     }
     let mut plain = None;
     let mut rounds = 0u32;
@@ -673,7 +750,10 @@ fn closure(eqs: &[Poly], nv: u32, c: u32, deadline: Instant) -> (usize, usize, u
         if new_low.is_empty() {
             return (plain.unwrap(), basis.dim, rounds, false);
         }
-        srcs = new_low.iter().flat_map(|&t| (0..nv).map(move |i| Src::Mul(t, i))).collect();
+        srcs = new_low
+            .iter()
+            .flat_map(|&t| (0..nv).map(move |i| Src::Mul(t, i)))
+            .collect();
     }
 }
 
@@ -690,13 +770,23 @@ fn cols_upto(nv: u32, c: u32) -> u64 {
 }
 
 /// `d_F` with censoring. Returns (d_F, censor_reason, per-degree json).
-fn last_fall(eqs: &[Poly], nv: u32, cmax: u32, max_cols: u64, budget: f64) -> (Option<u32>, Option<String>, String) {
+fn last_fall(
+    eqs: &[Poly],
+    nv: u32,
+    cmax: u32,
+    max_cols: u64,
+    budget: f64,
+) -> (Option<u32>, Option<String>, String) {
     let deadline = Instant::now() + std::time::Duration::from_secs_f64(budget);
     let mut per = vec![];
     for c in 2..=cmax {
         let cols = cols_upto(nv, c);
         if cols > max_cols {
-            return (None, Some(format!("cols>{max_cols} at c={c}")), per.join(","));
+            return (
+                None,
+                Some(format!("cols>{max_cols} at c={c}")),
+                per.join(","),
+            );
         }
         let t0 = Instant::now();
         let (plain, closed, rounds, timed_out) = closure(eqs, nv, c, deadline);
@@ -737,13 +827,20 @@ fn semireg_dreg(k: u32, degs: &[u32]) -> u32 {
 }
 
 fn sys_degree(eqs: &[Poly]) -> u32 {
-    eqs.iter().flat_map(|p| p.iter()).map(|m| m.count_ones()).max().unwrap_or(0)
+    eqs.iter()
+        .flat_map(|p| p.iter())
+        .map(|m| m.count_ones())
+        .max()
+        .unwrap_or(0)
 }
 
 // ─────────────────────────────── drivers ───────────────────────────────
 
 fn getflag(args: &[String], k: &str) -> Option<String> {
-    args.iter().position(|a| a == k).and_then(|i| args.get(i + 1)).cloned()
+    args.iter()
+        .position(|a| a == k)
+        .and_then(|i| args.get(i + 1))
+        .cloned()
 }
 
 fn random_basis_with_one(f: &Field, ell: usize, rng: &mut Rng) -> Vec<u64> {
@@ -864,10 +961,18 @@ fn run(args: &[String]) {
             }
             kept += 1;
             for (arm, eqs, nv, b) in &sys {
-                let cm = if arm.starts_with("xchain") && m >= 3 { cmax_chain } else { cmax };
+                let cm = if arm.starts_with("xchain") && m >= 3 {
+                    cmax_chain
+                } else {
+                    cmax
+                };
                 let deg = sys_degree(eqs);
                 let neq = eqs.iter().filter(|e| !e.is_empty()).count();
-                let degs: Vec<u32> = eqs.iter().filter(|e| !e.is_empty()).map(|e| sys_degree(std::slice::from_ref(e))).collect();
+                let degs: Vec<u32> = eqs
+                    .iter()
+                    .filter(|e| !e.is_empty())
+                    .map(|e| sys_degree(std::slice::from_ref(e)))
+                    .collect();
                 let sr = semireg_dreg(*nv, &degs);
                 let t0 = Instant::now();
                 let (d_f, cens, per) = last_fall(eqs, *nv, cm, max_cols, budget);
@@ -906,7 +1011,11 @@ fn posctl(args: &[String]) {
                 .collect();
             let eqs: Vec<Poly> = (0..e)
                 .map(|_| {
-                    let mut pl: Poly = monos.iter().copied().filter(|_| r.next() & 1 == 1).collect();
+                    let mut pl: Poly = monos
+                        .iter()
+                        .copied()
+                        .filter(|_| r.next() & 1 == 1)
+                        .collect();
                     pl.sort_unstable();
                     pl.dedup();
                     pl
@@ -917,7 +1026,8 @@ fn posctl(args: &[String]) {
             }
             // consistency by exhaustive evaluation
             let consistent = (0u64..(1u64 << k)).any(|a| {
-                eqs.iter().all(|p| p.iter().filter(|&&m| m & !a == 0).count() % 2 == 0)
+                eqs.iter()
+                    .all(|p| p.iter().filter(|&&m| m & !a == 0).count() % 2 == 0)
             });
             if consistent {
                 continue;
