@@ -1,0 +1,111 @@
+{
+  "schema": "keyai-qualifier-pre-call/v1",
+  "created_utc": "2026-11-23T06:41:45.286Z",
+  "write_once": true,
+  "build_plan_sha256": "56734ae62f3ce4b432a3396f91f4f420371264209b4bcab00f0ce894f217f3e4",
+  "build_result_sha256": "e3b06b0a9bda9eeed2354ca7a2e5c3c3975ab0cf2627f3ddb2b30e87165be534",
+  "source_manifest_sha256": "1efc3edbd4e209c3566e59de9b6ec7253c9f984b71bac9d9aa886a6a0173c154",
+  "source_hashes": {
+    "src/cryptanalysis/bitops.rs": "f4c15d1d79fe4752c32c9b46bb4fdecaebad7d41ffcaed1832dec3dc06fb28f0",
+    "src/cryptanalysis/challenge_ladder.rs": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+    "src/cryptanalysis/ic_boundary.rs": "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce",
+    "src/cryptanalysis/ic_framework/stages.rs": "5fd68aafe8bc17468c11359552dd98ba3ddaedce31e5bdef7cac00fa8d2e8eae",
+    "src/cryptanalysis/ic_framework/useful_rank.rs": "38037290feb8974626e7de8632bfcd8c1b16500c296149f820b782058ba33e9e",
+    "src/cryptanalysis/ic_measurement.rs": "b2bc883f7a7cfc194ebcba78991b9aca901285acebf01187f56bd3e6fe57f980",
+    "src/cryptanalysis/jv_bitops.rs": "03b8215cd9f6bfed125a7d32e5b2ab765a2315c49097546b65d1da9f133a41f7",
+    "src/cryptanalysis/jv_bitops_uniform.rs": "3f15f1145e24378dd90f19d5aef5cd08db3a0ddfb4ee526dccba02d4c6eb22bc",
+    "src/cryptanalysis/prime_fast.rs": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+    "src/cryptanalysis/residual_walk.rs": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+    "src/cryptanalysis/semaev_prime_poly.rs": "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
+    "src/prime_hyperelliptic/ops.rs": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+    "examples/keyai_rank_derivative_controls.rs": "64299e12deeb21bc74ed9a57bd93a1ac1be6125dcae5acc0fd6f7a91d383bef3",
+    "research/keyai_rank_derivative_20261122/qualifier/Cargo.toml": "b73e9e8705e78fa1c0f655bbf97248ad8301fa7f972497b9adf84d44492c8c6f",
+    "research/keyai_rank_derivative_20261122/qualifier/Cargo.lock": "c5039ac663d45e4aa0101964e353428e21ddb699827724977ed8a6c81073c520",
+    "research/keyai_rank_derivative_20261122/qualifier/build.rs": "abe72385977b36278912921ceac906499c07e492c2cea2961e528721be59ed3c",
+    "research/keyai_rank_derivative_20261122/qualifier/source-pins.json": "445250d3a6a44cd2d9d14dd3fe6c7c873f15dd5944d93388631f1a3b5e07a4c1",
+    "research/keyai_rank_derivative_20261122/qualifier/README.md": "9ffbd9d205de1dfbdcbe45f303dcf71423c8cd872690a61ff9b29146a5f4b73f",
+    "research/keyai_rank_derivative_20261122/qualifier/src/lib.rs": "9fca4377dfd368a726b51be61b6c0ba0916fd782b7c61fa2b1aa5933bccf3d4c",
+    "research/keyai_rank_derivative_20261122/qualifier/src/cryptanalysis.rs": "c8d1fc5cfa08596f29dc4f7d13ae6b8be1eddf30af4e8ab393cc811064e0fffe",
+    "research/keyai_rank_derivative_20261122/qualifier/src/ic_framework.rs": "5991cfd3cf8181f5237d94d6cbc34ec7f53f72e7d1656d351f05d1436ec76b3b",
+    "research/keyai_rank_derivative_20261122/qualifier/src/source_manifest.rs": "cd029f6e657a7cffda9814319b48a7ef46f4b433e3509f2ca23499844d81d69a",
+    "research/keyai_rank_derivative_20261122/qualifier/src/adversarial.rs": "af528e135640a5c63063e3d6ef389d336f350d8dd77a595204e9722f4bdc42b7",
+    "research/keyai_rank_derivative_20261122/qualifier/src/support_module_tests.rs": "49e6932614ab14bc088f2feecc05ef44bc94ddfbb57d595337237faa4c43e4b5"
+  },
+  "binaries": {
+    "controls": {
+      "path": "/workspace/scratch/8fc860ec28a4/keyai-qualification/attempt2/bin/controls",
+      "source_build_artifact": "/workspace/scratch/99b214ce852d/build/release/keyai-rank-derivative-controls",
+      "sha256": "f0480232bb9579478fbbfe1be97a6c20919d10e418d03c1c0e657379aed887b1",
+      "bytes": 1315688
+    },
+    "example-tests": {
+      "path": "/workspace/scratch/8fc860ec28a4/keyai-qualification/attempt2/bin/example-tests",
+      "source_build_artifact": "/workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/6926666c2245f1d1/out/keyai_rank_derivative_controls-6926666c2245f1d1",
+      "sha256": "cc372b539c581e1a781ea302f16b3b25f3aa7618a0c0f7c658ff287c9adffb09",
+      "bytes": 1933816
+    },
+    "adversarial-tests": {
+      "path": "/workspace/scratch/8fc860ec28a4/keyai-qualification/attempt2/bin/adversarial-tests",
+      "source_build_artifact": "/workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/ffc4f2c67d14787f/out/adversarial-ffc4f2c67d14787f",
+      "sha256": "f1e9f319ef3ce198edeee93cc58540fb8a41d82390475e069015069e04d20e72",
+      "bytes": 1737432
+    },
+    "support-module-tests": {
+      "path": "/workspace/scratch/8fc860ec28a4/keyai-qualification/attempt2/bin/support-module-tests",
+      "source_build_artifact": "/workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/a2531f889611ba40/out/support_module_tests-a2531f889611ba40",
+      "sha256": "bdb91f32045aa7b0287f45c5705c5b2f49d8f0e32db0a7783123df077f483038",
+      "bytes": 1405640
+    },
+    "source-manifest": {
+      "path": "/workspace/scratch/8fc860ec28a4/keyai-qualification/attempt2/bin/source-manifest",
+      "source_build_artifact": "/workspace/scratch/99b214ce852d/build/release/keyai-rank-derivative-source-manifest",
+      "sha256": "33def7e383074ecfb6c2718c22e3210d3f9b16acb5ec56a3c3f9555002fcf536",
+      "bytes": 509136
+    }
+  },
+  "commands": [
+    {
+      "name": "example-tests",
+      "argv": [
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "deadline_seconds": 90,
+      "expected_tests": 4
+    },
+    {
+      "name": "adversarial-tests",
+      "argv": [
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "deadline_seconds": 90,
+      "expected_tests": 5
+    },
+    {
+      "name": "support-module-tests",
+      "argv": [
+        "support",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "deadline_seconds": 90,
+      "expected_tests": 6
+    },
+    {
+      "name": "controls",
+      "argv": [],
+      "deadline_seconds": 90,
+      "expected_output": "complete deterministic public fixture audit JSON"
+    },
+    {
+      "name": "source-manifest",
+      "argv": [],
+      "deadline_seconds": 10,
+      "expected_output": "embedded build source manifest"
+    }
+  ],
+  "correctness_only": true,
+  "no_performance_comparison": true,
+  "full_root_library_gate": false
+}

@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:12:06Z",
+ "id": "PCC-20261123-fbbe76",
+ "kind": "statement",
+ "producer": {
+  "commit": "3e51a55a65fb66e91708235d1813944a20b8c077",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/ci-observation.json",
+    "sha256": "c0c0aa354372809c9fae7435235caa2a68791887fc435f605e176b9446a64b4c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/public-export.sha256",
+    "sha256": "0ea0ff75531c73e527f4ae48b07071f5beb4aa459f87e46211b46b0a464728b2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/replay-certificate.json",
+    "sha256": "6911fab790fceb917bc6a5de56378ed98a3f97a802145b134e4b6dd45b56e9cc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/validator-report.json",
+    "sha256": "06d2cb9dfc4fb355a51cb653cc40f44a54979c1dcd07837da443619c5a692952"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/unsigned-proof-verdict.json",
+    "sha256": "75212184aa299aacc92d0474e88ad94ec3f7ccf8ff84fdbba566da2c21525667"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/pipeline-clock.json",
+    "sha256": "2cce9a2a48f8c121b093e224ab3ad71462b587b9c4ea397a91b1b7ea298f4755"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/certificate-clock.json",
+    "sha256": "263c6910f2600a41161a7c36bb7a00a624d3487a1a34ed365f517b11e049ce3c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-independent-replay",
+ "statement": "Exact-source CI replay45128902122 at3e51a55a65 passes all four original workers,typed comparison and the known-scalar/rank certificate adapter. Seventeen public records were recovered through the authenticated job log and individually SHA256 checked after artifact redirects failed403. CI OpenSSL3.0.13 differs from the original3.5.7;declared semantic comparison and all six public bindings/relations pass. Reports remain unsigned;proof preview has no content/hash error and is not_covered only for missing signatures. Not universal geometric verification or admitted performance."
+}

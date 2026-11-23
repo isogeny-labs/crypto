@@ -1,0 +1,14 @@
+error: field `roots` is never read
+  --> /dev/shm/ct23-model-isomorphism-first-B/source/research/chained_realcurve_torsion_20261123/model_isomorphism/../elliptic_chain/chart_b.rs:34:9
+   |
+31 | pub struct Chart<'a> {
+   |            ----- field in this struct
+...
+34 |     pub roots: Vec<u32>,
+   |         ^^^^^
+   |
+   = note: `-D dead-code` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: aborting due to 1 previous error
+

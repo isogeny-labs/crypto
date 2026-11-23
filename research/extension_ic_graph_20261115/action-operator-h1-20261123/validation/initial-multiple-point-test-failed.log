@@ -1,0 +1,33 @@
+
+running 15 tests
+test fx_hash::tests::maps_behave_like_std_maps ... ok
+test fx_hash::tests::mask_hash_spreads_masks_without_low_bits ... ok
+test tests::every_coordinate_reads_out_in_original_order ... ok
+test tests::incumbent_default_preserves_outputs_counters_and_rng ... ok
+test tests::invalid_coordinate_does_not_consume_rng_or_become_an_empty_answer ... ok
+test tests::multiple_point_requires_fallback ... FAILED
+test tests::no_rational_roots_is_distinct_from_refusal ... ok
+test tests::nonseparating_coordinate_refuses_then_dense_fallback_recovers ... ok
+test zero_dim_la::tests::allocation_free_powering_matches_the_reference ... ok
+test zero_dim_la::tests::barrett_reduction_matches_the_remainder ... ok
+test zero_dim_la::tests::berlekamp_massey_finds_fibonacci_mod_p ... ok
+test zero_dim_la::tests::dot4_matches_four_dots ... ok
+test zero_dim_la::tests::karatsuba_and_barrett_match_the_schoolbook ... ok
+test zero_dim_la::tests::kernel_throughput ... ignored
+test zero_dim_la::tests::roots_in_fp_finds_planted_roots_for_small_and_large_p ... ok
+
+failures:
+
+---- tests::multiple_point_requires_fallback stdout ----
+
+thread 'tests::multiple_point_requires_fallback' (3509) panicked at examples/jv_sieve_action_operator_check.rs:386:13:
+assertion failed: zero_dim_la::fast_stage_with_action(&basis, &basis, 2, 11, action, &mut rng,
+        &mut stats).is_none()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::multiple_point_requires_fallback
+
+test result: FAILED. 13 passed; 1 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

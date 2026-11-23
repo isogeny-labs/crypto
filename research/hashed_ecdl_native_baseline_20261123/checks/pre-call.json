@@ -1,0 +1,737 @@
+{
+  "schema": "native-source-qualification/v1",
+  "created_utc": "2026-11-23T09:10:54.860Z",
+  "scope": "Unchanged current standalone Rust crate regression qualification; no runtime or algorithmic gain inference",
+  "source_head": "1f71987723a5c2d069e22abd4f99fc3303f51fee",
+  "source_manifest_sha256": "8090c1767895e7b2139e7fb611214e337cba21b235ad19fe8cfd27a82ba221b3",
+  "build_log_sha256": "fbae4715bfd75f041fa53363b3e7f972b23bcb1f1e873b657f7736370dd2ea9e",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "executables": [
+    {
+      "name": "prepared_root_diagnostics",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/prepared_root_diagnostics-f295e81d57700a67",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/prepared_root_diagnostics-f295e81d57700a67",
+      "sha256": "34e2022f8f95886aa9ec7edad5beb75cda40e7ddb341bac2805d2f9bab4de84d",
+      "bytes": 1649904
+    },
+    {
+      "name": "tensor-e1-quotient-panel",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_e1_quotient_panel-acc81271ed3240ed",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_quotient_panel-acc81271ed3240ed",
+      "sha256": "b7c99f1f47305bade05c7d75ede3916df5ebd40a824e5cdcf3bf43ed789b2910",
+      "bytes": 1074368
+    },
+    {
+      "name": "tensor-admission-audit",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-admission-audit",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-admission-audit",
+      "sha256": "a15dc406c54dace8eb61c1778b76493f4f39e7414939ef440676e1c9ed6c6464",
+      "bytes": 715976
+    },
+    {
+      "name": "tensor-guards",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_guards-5dbac7d09db83d9a",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_guards-5dbac7d09db83d9a",
+      "sha256": "b737fe522b85775a1cb2159d8df71cecc9baa059fd34dccae35f1ac325b6cc76",
+      "bytes": 1074312
+    },
+    {
+      "name": "tensor-admission-audit",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_admission_audit-bc54dc5046173b4d",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_admission_audit-bc54dc5046173b4d",
+      "sha256": "e6b5df801a3752b21917ec64fe37628077280c9edf4fd1e96781fc48200e48fe",
+      "bytes": 1074352
+    },
+    {
+      "name": "hashed-ecdl-panel",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/hashed_ecdl_panel-843047c4e8c1cf5f",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed_ecdl_panel-843047c4e8c1cf5f",
+      "sha256": "4c11eb52d3235d1ae5b9b05926a288d687954677a4b44940e25543ce536182fa",
+      "bytes": 1921496
+    },
+    {
+      "name": "tensor-census",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_census-2f40034991f7eb5b",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_census-2f40034991f7eb5b",
+      "sha256": "43eb08ba2bec08e81110b84841c5b539100e2e5303bc4bbfce17f750b089979e",
+      "bytes": 1074312
+    },
+    {
+      "name": "hashed_ecdl_tensor",
+      "kind": [
+        "lib"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/hashed_ecdl_tensor-d87b0f63f89c6a96",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed_ecdl_tensor-d87b0f63f89c6a96",
+      "sha256": "8fb6a5fe076b8a48d986b0aba782577a2df6d8063b6112d34132e0fe3085b349",
+      "bytes": 4779432
+    },
+    {
+      "name": "tensor-treewidth",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_treewidth-3066321bdd2f508d",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_treewidth-3066321bdd2f508d",
+      "sha256": "0926442e8522139b02b2431c64277055a7eeb6019d15bacc320f6834f6e5640d",
+      "bytes": 1074320
+    },
+    {
+      "name": "hashed-ecdl",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/hashed-ecdl",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed-ecdl",
+      "sha256": "1c8162338b05e7c3e2f32ec4c8ffe3f9238266b48b2017e7b58a0f21ddf68f18",
+      "bytes": 2604112
+    },
+    {
+      "name": "tensor-structured",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-structured",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-structured",
+      "sha256": "e0e8a166a31b21a177c56055cc40619d06161d28cff2f321ffd937063c10b465",
+      "bytes": 2118416
+    },
+    {
+      "name": "tensor-treewidth",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-treewidth",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-treewidth",
+      "sha256": "dcebbd0a626c8e6cda35846a13a0982a28e685460dc9276d5a06306e00e98807",
+      "bytes": 1639840
+    },
+    {
+      "name": "hashed-ecdl-panel",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/hashed-ecdl-panel",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed-ecdl-panel",
+      "sha256": "9c4e61055f9c8d1fca330fe5ea1701ce9287cacb55098029e1456a449c6b0275",
+      "bytes": 1694968
+    },
+    {
+      "name": "hashed-ecdl",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/hashed_ecdl-b6e70f1d2ad65163",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed_ecdl-b6e70f1d2ad65163",
+      "sha256": "d5296248fdac38e59c8e6356e1619604e8cbbd494dd93afbb2c26b93cdbdbfd9",
+      "bytes": 1588448
+    },
+    {
+      "name": "panel_driver",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/panel_driver-19c8867ce47a0c66",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/panel_driver-19c8867ce47a0c66",
+      "sha256": "04518c51dff1b78c464cf560500decc23eec92714da9cc6dcdbdc4ecc88dadff",
+      "bytes": 1300680
+    },
+    {
+      "name": "tensor-guards",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-guards",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-guards",
+      "sha256": "1abc0bac6023b53b9d38616272a5fc2042f1e16b01afabdbe330d52512759394",
+      "bytes": 772808
+    },
+    {
+      "name": "finite_extensions",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/finite_extensions-e226c6f764150786",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/finite_extensions-e226c6f764150786",
+      "sha256": "0c84d99b912f2f92d213ccf45408abd916fff7acf25951785d82a3fe7c4d5c46",
+      "bytes": 2781728
+    },
+    {
+      "name": "prepare-certified-hash",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/examples/prepare-certified-hash",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/prepare-certified-hash",
+      "sha256": "8afe8a830c8c0a005c3f7cbcb140a6294bf59739b353d876e3aad7c98f5c8ab3",
+      "bytes": 936568
+    },
+    {
+      "name": "strict_json",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/strict_json-aaa60742e8bfa712",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/strict_json-aaa60742e8bfa712",
+      "sha256": "3108572bfad9e6eadc63e38e9c9a1c44599940bf04650f03167084c74819b82c",
+      "bytes": 1582960
+    },
+    {
+      "name": "tensor-factor",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-factor",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-factor",
+      "sha256": "8ca6908210bc8b5d8271762a833d291ba99c95a16805e7fee8bceb4995f177a9",
+      "bytes": 1316976
+    },
+    {
+      "name": "joint_addition_diagnostics",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/joint_addition_diagnostics-3182a78cff737345",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/joint_addition_diagnostics-3182a78cff737345",
+      "sha256": "e6e70dd5356e4087540c10f73725102149d0face7e5a6956a7739c7ee9c1ad0c",
+      "bytes": 1829080
+    },
+    {
+      "name": "joint_targets",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/joint_targets-d02c87ee4abbc639",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/joint_targets-d02c87ee4abbc639",
+      "sha256": "decbc3212f6ffd58b242253a27b8e05576ef958201d004e8e56b133c160870a1",
+      "bytes": 1931768
+    },
+    {
+      "name": "width_extensions",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/width_extensions-e1288a7b4ce9d84a",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/width_extensions-e1288a7b4ce9d84a",
+      "sha256": "260e2f3e5b01beefd4900cb59a957ca9fa56343f2b4dc6c2907660cbd26b032c",
+      "bytes": 1476464
+    },
+    {
+      "name": "structured_cli",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/structured_cli-05894866e8515b77",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/structured_cli-05894866e8515b77",
+      "sha256": "bda7ea7b2ee50b2ed0d9635c2aee5d07a72ef13800479e0380f329316f45934e",
+      "bytes": 1284864
+    },
+    {
+      "name": "tensor-e1-typed-rewire",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-e1-typed-rewire",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-e1-typed-rewire",
+      "sha256": "5b5a7eb3f389b2e872bd40c938be23e863c19bdb6ad40f195bddc8ffde3ab95c",
+      "bytes": 1716032
+    },
+    {
+      "name": "certified_hash_prime",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/certified_hash_prime-f931347ab59b3129",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/certified_hash_prime-f931347ab59b3129",
+      "sha256": "5056d0686478b892b6575d6d00eec516a28fc46db11fcc506fd8bf28b59844fa",
+      "bytes": 2575864
+    },
+    {
+      "name": "prepared_pairs",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/prepared_pairs-58ac1b716b06fa04",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/prepared_pairs-58ac1b716b06fa04",
+      "sha256": "d2388e5935eec6587d31b91b335e521c8691fd8ab419e8531ea5ae34bfbe228f",
+      "bytes": 2026464
+    },
+    {
+      "name": "tensor-e1-typed-rewire",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_e1_typed_rewire-302e3a2f528ea6a6",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_typed_rewire-302e3a2f528ea6a6",
+      "sha256": "52203535945b398ebb23a5294296d9906e6dce5e162a40eb379ba072037da41f",
+      "bytes": 1074352
+    },
+    {
+      "name": "tensor-structured",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_structured-d8271088b6eea7b3",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_structured-d8271088b6eea7b3",
+      "sha256": "9dfce5965f480fbafea49c107e24f35dc61bd14da14bf1f07ba2ecd1bf3ecb3e",
+      "bytes": 1074328
+    },
+    {
+      "name": "tensor-e1-sparse-null",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-e1-sparse-null",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-e1-sparse-null",
+      "sha256": "6135726400f3e1580494d5875f0378b0c4121fda06d385059abe324211e24321",
+      "bytes": 924600
+    },
+    {
+      "name": "tensor-e1-shape",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-e1-shape",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-e1-shape",
+      "sha256": "1a21d8e8f514fbb7a600d52ed5d363dee9ccafd2581a32f42a4859c6d86fb11d",
+      "bytes": 1617616
+    },
+    {
+      "name": "five_leads",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/five_leads-8abb47addd9de490",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/five_leads-8abb47addd9de490",
+      "sha256": "6a20cdedf305f2a3dae28cb4e2956e45ba8f2677e7df495399aeace423609bec",
+      "bytes": 2089440
+    },
+    {
+      "name": "tensor-e1-sparse-null",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_e1_sparse_null-012f29cdcc9de700",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_sparse_null-012f29cdcc9de700",
+      "sha256": "4d5a6efc470d91402e628bf349c546c935169b00763d06eb81e93891456e2e20",
+      "bytes": 1074352
+    },
+    {
+      "name": "tensor-factor",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_factor-f0327c8f7d337b92",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_factor-f0327c8f7d337b92",
+      "sha256": "89c3952a918325969d98aa2f86d1f63c421a70eafa59b58091301b982b17c200",
+      "bytes": 1074304
+    },
+    {
+      "name": "structured",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/structured-415d65ba9ae127e3",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/structured-415d65ba9ae127e3",
+      "sha256": "b532453358dfb4038dab6cbc445d24dabd743804a8232b9ffb24b16f24d2086f",
+      "bytes": 2445752
+    },
+    {
+      "name": "tensor-e1-shape",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_e1_shape-952123afd0313022",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_shape-952123afd0313022",
+      "sha256": "4474fd283428c7ccfc613a144df34dc5fe46faee025c4b0d0b387bfc6cc9f2bb",
+      "bytes": 1074320
+    },
+    {
+      "name": "tensor-e1-rewire-dose",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-e1-rewire-dose",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-e1-rewire-dose",
+      "sha256": "f8959dfc59d99e9447ab8ee75aae21b1872aa725775af4e8d6b86ab365b557d6",
+      "bytes": 1713848
+    },
+    {
+      "name": "optimized_cli",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/optimized_cli-49a7373ed60be21b",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/optimized_cli-49a7373ed60be21b",
+      "sha256": "70b33a54b0d1d570c808dd06d3c8ebee1c30a28f822633fa8049a01052d4a121",
+      "bytes": 1260456
+    },
+    {
+      "name": "tensor-e1-rewire-dose",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/tensor_e1_rewire_dose-2d5ddaa3d2265d03",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_rewire_dose-2d5ddaa3d2265d03",
+      "sha256": "12da05f8fedcdefed349918ec1ba64a4380e9377380ead6268a0d193dca6c40f",
+      "bytes": 1074352
+    },
+    {
+      "name": "tensor-census",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-census",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-census",
+      "sha256": "fc9d5daa8934318fd96b2dfb1ad1a8ef4e58d6491c664ee9dbde814c09b2017d",
+      "bytes": 995608
+    },
+    {
+      "name": "tensor-e1-quotient-panel",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/tensor-e1-quotient-panel",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor-e1-quotient-panel",
+      "sha256": "7acb72c5a063f360dfcd7b44ef06c0ca5bf97f1edb7cc6cb504473bd193f3d54",
+      "bytes": 1671360
+    },
+    {
+      "name": "factoring_cli",
+      "kind": [
+        "test"
+      ],
+      "test": true,
+      "original": "/tmp/ecdlp-native-tools-20261123/target/release/deps/factoring_cli-77cc034735dbb129",
+      "qualified_copy": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/factoring_cli-77cc034735dbb129",
+      "sha256": "86d1fd00f07cbfe481e2d212eadfc8047a4e76e6f0913aece36a4d5e836ee6a7",
+      "bytes": 1171176
+    }
+  ],
+  "schedule": [
+    {
+      "index": 0,
+      "name": "hashed_ecdl_tensor",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed_ecdl_tensor-d87b0f63f89c6a96",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 1,
+      "name": "certified_hash_prime",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/certified_hash_prime-f931347ab59b3129",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 2,
+      "name": "factoring_cli",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/factoring_cli-77cc034735dbb129",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 3,
+      "name": "finite_extensions",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/finite_extensions-e226c6f764150786",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 4,
+      "name": "five_leads",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/five_leads-8abb47addd9de490",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 5,
+      "name": "hashed-ecdl",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed_ecdl-b6e70f1d2ad65163",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 6,
+      "name": "hashed-ecdl-panel",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/hashed_ecdl_panel-843047c4e8c1cf5f",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 7,
+      "name": "joint_addition_diagnostics",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/joint_addition_diagnostics-3182a78cff737345",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 8,
+      "name": "joint_targets",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/joint_targets-d02c87ee4abbc639",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 9,
+      "name": "optimized_cli",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/optimized_cli-49a7373ed60be21b",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 10,
+      "name": "panel_driver",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/panel_driver-19c8867ce47a0c66",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 11,
+      "name": "prepared_pairs",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/prepared_pairs-58ac1b716b06fa04",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 12,
+      "name": "prepared_root_diagnostics",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/prepared_root_diagnostics-f295e81d57700a67",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 13,
+      "name": "strict_json",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/strict_json-aaa60742e8bfa712",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 14,
+      "name": "structured",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/structured-415d65ba9ae127e3",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 15,
+      "name": "structured_cli",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/structured_cli-05894866e8515b77",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 16,
+      "name": "tensor-admission-audit",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_admission_audit-bc54dc5046173b4d",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 17,
+      "name": "tensor-census",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_census-2f40034991f7eb5b",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 18,
+      "name": "tensor-e1-quotient-panel",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_quotient_panel-acc81271ed3240ed",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 19,
+      "name": "tensor-e1-rewire-dose",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_rewire_dose-2d5ddaa3d2265d03",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 20,
+      "name": "tensor-e1-shape",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_shape-952123afd0313022",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 21,
+      "name": "tensor-e1-sparse-null",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_sparse_null-012f29cdcc9de700",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 22,
+      "name": "tensor-e1-typed-rewire",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_e1_typed_rewire-302e3a2f528ea6a6",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 23,
+      "name": "tensor-factor",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_factor-f0327c8f7d337b92",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 24,
+      "name": "tensor-guards",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_guards-5dbac7d09db83d9a",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 25,
+      "name": "tensor-structured",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_structured-d8271088b6eea7b3",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 26,
+      "name": "tensor-treewidth",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/tensor_treewidth-3066321bdd2f508d",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    },
+    {
+      "index": 27,
+      "name": "width_extensions",
+      "binary": "/tmp/ecdlp-native-bootstrap-20261123/qualification/bin/width_extensions-e1288a7b4ce9d84a",
+      "args": [
+        "--test-threads=1"
+      ],
+      "working_directory": "/tmp/ecdlp-native-crypto-20261123/crates/hashed-ecdl-tensor"
+    }
+  ],
+  "limits": {
+    "global_wall_seconds": 600,
+    "per_test_executable_wall_seconds": 300,
+    "cgroup_memory_stop_bytes": 15032385536,
+    "threads": 1
+  },
+  "S3_used": false,
+  "additional_external_spend_usd": 0,
+  "retries": 0,
+  "scientific_panel": false
+}

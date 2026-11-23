@@ -1,12 +1,15 @@
 //! Exact finite-field S3 relation extraction on every sequential-prefix chart.
 //! The membership set is the complete V in every presentation. Original point
 //! signs and every finite/infinite prefix are replayed before accepting a row.
+//! The opt-in prepared oracle validates fixed inputs once and restricts only
+//! the leaf solving domains to the already-validated signed factor base.
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use crate::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
+use crate::fiber_extract::{self, FiberIndex, FiberIndexReport, FiberLimits};
 use crate::{CountedGroup, FactorBase, GroupOps, PrimeCurve, PrimePoint};
 
 // The inherited engine exposes process-wide diagnostic counters. Serialize
@@ -117,6 +120,10 @@ pub struct OracleCounters {
     pub original_equation_check_multiplications: u64,
     pub f4_field_operations: u64,
     pub root_field_multiplications: u64,
+    /// Additional arithmetic in the opt-in fiber driver, outside the retained
+    /// F4 and root-core counters. Absent on legacy serialized results.
+    #[serde(default, skip_serializing_if = "zero_counter")]
+    pub fiber_extraction_field_multiplications: u64,
     pub domain_evaluations: u64,
     pub full_field_branches: u64,
     pub f4_runs: usize,
@@ -131,6 +138,10 @@ pub struct OracleCounters {
     /// Incomplete lower-bound diagnostics from the production F4 driver.
     pub symbolic_native_operations: u64,
     pub normalization_operations: u64,
+}
+
+fn zero_counter(value: &u64) -> bool {
+    *value == 0
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -160,6 +171,332 @@ pub struct OracleResult {
     pub accounting: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub backend_work: Option<serde_json::Value>,
+}
+
+/// Cold setup for the opt-in prepared polynomial oracle. These costs belong to
+/// the cell's setup interval and must be added to its query and recovery work.
+/// The multiplication counter covers the original full-tower validation only;
+/// it does not pretend to count allocation, indexing, primality or point checks.
+#[derive(Clone, Debug, Serialize)]
+pub struct PreparedOracleSetup {
+    pub backend: &'static str,
+    pub mode: &'static str,
+    pub presentation: Presentation,
+    pub summands: usize,
+    pub full_membership_values: usize,
+    pub leaf_domain_values: usize,
+    pub signed_points: usize,
+    pub validated_tower_depth: usize,
+    pub fixed_validation_passes: u64,
+    pub validation_field_multiplications: u64,
+    pub validation_point_checks: usize,
+    pub logical_leaf_domain_payload_bytes: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiber_index: Option<FiberIndexReport>,
+    pub elapsed_ns: u64,
+    pub accounting: &'static str,
+}
+
+/// A validated immutable problem, prepared once inside a cold cell. Private
+/// fields and immutable borrows prevent changing V, the tower or the factor
+/// base after validation. This type deliberately has no deserializer.
+///
+/// Membership equations still use all of V. The smaller leaf domain is exact
+/// for signed relations on this factor base: any accepted relation must lift
+/// each leaf to a point indexed by `fb.x_index`. Internal S3 prefix coordinates
+/// remain unrestricted; no auxiliary-group symmetry is imposed on the target.
+pub struct PreparedOracle<'a> {
+    curve: PrimeCurve,
+    order: u64,
+    base: &'a FactorBase<PrimePoint>,
+    values: &'a [u64],
+    tower: Option<&'a TowerDescription>,
+    summands: usize,
+    presentation: Presentation,
+    leaf_domain: Vec<u64>,
+    fiber: Option<FiberIndex>,
+    setup: PreparedOracleSetup,
+}
+
+/// Opaque evidence of the original full-V validation pass. Only this module
+/// can create it, after checking the field, sorted full fiber, every original
+/// map denominator and every terminal. The block paths include each leaf and
+/// the terminal; their metadata cannot be replaced by a constructor caller.
+/// There is deliberately no public constructor, Clone or Deserialize.
+pub(crate) struct ValidatedTowerPaths {
+    p: u64,
+    depth: usize,
+    block_width: usize,
+    terminal: u64,
+    paths: Vec<Vec<u64>>,
+}
+
+impl ValidatedTowerPaths {
+    pub(crate) fn into_parts(self) -> (u64, usize, usize, u64, Vec<Vec<u64>>) {
+        (
+            self.p,
+            self.depth,
+            self.block_width,
+            self.terminal,
+            self.paths,
+        )
+    }
+}
+
+/// A temporary buffer is not validation evidence. It is promoted to the
+/// opaque token only after the complete original validation succeeds.
+struct TowerPathCapture {
+    block_width: usize,
+    paths: Vec<Vec<u64>>,
+}
+
+impl<'a> PreparedOracle<'a> {
+    #[allow(clippy::too_many_arguments)]
+    pub fn prepare(
+        curve: &PrimeCurve,
+        subgroup_order: u64,
+        fb: &'a FactorBase<PrimePoint>,
+        values: &'a [u64],
+        tower: Option<&'a TowerDescription>,
+        summands: usize,
+        presentation: Presentation,
+    ) -> Result<Self, String> {
+        Self::prepare_impl(
+            curve,
+            subgroup_order,
+            fb,
+            values,
+            tower,
+            summands,
+            presentation,
+            false,
+        )
+        .map(|(prepared, _)| prepared)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn prepare_impl(
+        curve: &PrimeCurve,
+        subgroup_order: u64,
+        fb: &'a FactorBase<PrimePoint>,
+        values: &'a [u64],
+        tower: Option<&'a TowerDescription>,
+        summands: usize,
+        presentation: Presentation,
+        capture_paths: bool,
+    ) -> Result<(Self, Option<ValidatedTowerPaths>), String> {
+        let started = Instant::now();
+        if !valid_fixed_problem(curve, subgroup_order, values, summands) {
+            return Err("invalid curve/order, sorted V, or arity (requires m=2..4)".into());
+        }
+        validate_factor_base(curve, subgroup_order, fb, values)?;
+        let mut validation_field_multiplications = 0;
+        let mut capture = if capture_paths {
+            if presentation == Presentation::Dense {
+                return Err("validated paths require a retained tower presentation".into());
+            }
+            Some(TowerPathCapture {
+                block_width: if presentation == Presentation::Tower4 {
+                    2
+                } else {
+                    1
+                },
+                paths: Vec::new(),
+            })
+        } else {
+            None
+        };
+        validate_tower_problem_captured(
+            curve,
+            values,
+            tower,
+            presentation,
+            &mut validation_field_multiplications,
+            capture.as_mut(),
+        )?;
+        let validated_paths = capture.map(|capture| {
+            let tower = tower.expect("captured validated tower presentation");
+            let terminal = match tower {
+                TowerDescription::Velu { terminal, .. }
+                | TowerDescription::Dickson { terminal, .. } => *terminal,
+            };
+            ValidatedTowerPaths {
+                p: curve.p,
+                depth: tower.depth(),
+                block_width: capture.block_width,
+                terminal,
+                paths: capture.paths,
+            }
+        });
+
+        // Iterate in the original sorted V order. Do not compute another set
+        // of square roots or infer liftability from the auxiliary curve.
+        let leaf_domain: Vec<u64> = values
+            .iter()
+            .copied()
+            .filter(|x| fb.x_index.contains_key(x))
+            .collect();
+        if leaf_domain.len() != fb.abscissae {
+            return Err("validated factor base does not match its leaf domain".into());
+        }
+        let setup = PreparedOracleSetup {
+            backend: "polynomial",
+            mode: "prepared_target_liftable_domains",
+            presentation,
+            summands,
+            full_membership_values: values.len(),
+            leaf_domain_values: leaf_domain.len(),
+            signed_points: fb.points.len(),
+            validated_tower_depth: if presentation == Presentation::Dense {
+                0
+            } else {
+                tower.expect("validated tower presentation").depth()
+            },
+            fixed_validation_passes: 1,
+            validation_field_multiplications,
+            validation_point_checks: fb.points.len(),
+            logical_leaf_domain_payload_bytes: leaf_domain.len() * std::mem::size_of::<u64>(),
+            fiber_index: None,
+            elapsed_ns: started.elapsed().as_nanos().min(u128::from(u64::MAX)) as u64,
+            accounting: "Cold setup includes the original fixed-input and full-tower validation plus construction of target-liftable leaf domains. validation_field_multiplications counts only the original tower arithmetic; point checks, primality, map/index work, allocation and sorting are not a complete operation total. The payload count excludes allocator and container overhead. Add this setup once to every complete cold result; no query receives free unreported preparation.",
+        };
+        Ok((
+            Self {
+                curve: curve.clone(),
+                order: subgroup_order,
+                base: fb,
+                values,
+                tower,
+                summands,
+                presentation,
+                leaf_domain,
+                fiber: None,
+                setup,
+            },
+            validated_paths,
+        ))
+    }
+
+    /// Separate opt-in construction: the plain prepared oracle never builds
+    /// or pays for this index or its path buffer. The original validation pass
+    /// captures every block path; indexing reuses it without reevaluating maps.
+    /// Its allocation, structural checks and index work remain charged setup.
+    #[allow(clippy::too_many_arguments)]
+    pub fn prepare_fiber(
+        curve: &PrimeCurve,
+        subgroup_order: u64,
+        fb: &'a FactorBase<PrimePoint>,
+        values: &'a [u64],
+        tower: Option<&'a TowerDescription>,
+        summands: usize,
+        presentation: Presentation,
+    ) -> Result<Self, String> {
+        if presentation == Presentation::Dense {
+            return Err("fiber extraction requires a retained tower presentation".into());
+        }
+        let started = Instant::now();
+        let (mut prepared, paths) = Self::prepare_impl(
+            curve,
+            subgroup_order,
+            fb,
+            values,
+            tower,
+            summands,
+            presentation,
+            true,
+        )?;
+        let fiber = FiberIndex::from_validated_paths(
+            paths.expect("fiber preparation captured validated paths"),
+            &prepared.leaf_domain,
+        )?;
+        prepared.setup.mode = "prepared_fiber_triangular";
+        prepared.setup.fiber_index = Some(fiber.setup_report().clone());
+        prepared.setup.elapsed_ns = started.elapsed().as_nanos().min(u128::from(u64::MAX)) as u64;
+        prepared.fiber = Some(fiber);
+        Ok(prepared)
+    }
+
+    pub fn setup_report(&self) -> &PreparedOracleSetup {
+        &self.setup
+    }
+
+    /// Per-query checks and the solver remain inside the cooperative query
+    /// deadline. The fixed validation reported above is not repeated here.
+    pub fn decompose(
+        &self,
+        target: PrimePoint,
+        limits: &OracleLimits,
+        ops: &mut GroupOps,
+    ) -> Result<OracleResult, String> {
+        self.decompose_prepared(target, limits, ops, None)
+    }
+
+    pub fn decompose_fiber(
+        &self,
+        target: PrimePoint,
+        limits: &OracleLimits,
+        ops: &mut GroupOps,
+    ) -> Result<OracleResult, String> {
+        let fiber = self
+            .fiber
+            .as_ref()
+            .ok_or("fiber index was not prepared in cold setup")?;
+        self.decompose_prepared(target, limits, ops, Some(fiber))
+    }
+
+    fn decompose_prepared(
+        &self,
+        target: PrimePoint,
+        limits: &OracleLimits,
+        ops: &mut GroupOps,
+        fiber: Option<&FiberIndex>,
+    ) -> Result<OracleResult, String> {
+        let _guard = ORACLE_LOCK.lock().map_err(|_| "F4 study lock poisoned")?;
+        let started = Instant::now();
+        if !valid_query_target(&self.curve, target) {
+            return Err("invalid curve/target/order, sorted V, or arity (requires m=2..4)".into());
+        }
+        validate_query_limits(limits)?;
+        let mut result = solve_query(
+            &self.curve,
+            self.order,
+            self.base,
+            self.values,
+            &self.leaf_domain,
+            self.tower,
+            target,
+            self.summands,
+            self.presentation,
+            limits,
+            ops,
+            started,
+            0,
+            fiber,
+        )?;
+        let mode = if fiber.is_some() {
+            "prepared_fiber_triangular"
+        } else {
+            "prepared_target_liftable_domains"
+        };
+        result.backend_work = Some(serde_json::json!({
+            "backend": "polynomial",
+            "mode": mode,
+            "full_membership_values": self.values.len(),
+            "leaf_domain_values": self.leaf_domain.len(),
+            "fixed_validation_repeated": false,
+            "target_point_checks": 1,
+            "setup_accounting": "separate_prepared_setup_record_required"
+        }));
+        if fiber.is_some() {
+            result.backend_work.as_mut().unwrap()["fiber_limits"] =
+                serde_json::to_value(FiberLimits::default()).map_err(|e| e.to_string())?;
+            result.backend_work.as_mut().unwrap()["effective_policy"] =
+                serde_json::to_value(fiber_extract::effective_policy())
+                    .map_err(|e| e.to_string())?;
+        }
+        result.accounting.push_str(" Fixed full-tower validation and leaf-domain preparation are charged once in the separate PreparedOracleSetup record; this query validates its target and retains the original full-V equations and signed replay. Leaf-domain pruning can change traversal and first-witness order.");
+        Ok(result)
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -315,6 +652,7 @@ struct ChartSystem {
 fn build_chart(
     curve: &PrimeCurve,
     values: &[u64],
+    leaf_domain: &[u64],
     tower: Option<&TowerDescription>,
     target: PrimePoint,
     m: usize,
@@ -473,7 +811,7 @@ fn build_chart(
     }
     let mut domains = vec![None; n];
     for d in domains.iter_mut().take(m) {
-        *d = Some(values.to_vec());
+        *d = Some(leaf_domain.to_vec());
     }
     Ok(Some(ChartSystem {
         equations,
@@ -514,6 +852,37 @@ fn counted_power(mut x: u64, mut exponent: u64, p: u64, count: &mut u64) -> u64 
         }
     }
     result
+}
+
+fn valid_fixed_problem(curve: &PrimeCurve, order: u64, values: &[u64], m: usize) -> bool {
+    (2..=4).contains(&m)
+        && order > 2
+        && !values.is_empty()
+        && values.iter().all(|&x| x < curve.p)
+        && values.windows(2).all(|w| w[0] < w[1])
+        && curve.p >= 5
+        && curve.p < (1u64 << 32)
+        && curve.a < curve.p
+        && curve.b < curve.p
+        && crate::cryptanalysis::residual_walk::is_prime_u64(curve.p)
+}
+
+fn valid_query_target(curve: &PrimeCurve, target: PrimePoint) -> bool {
+    // The pinned curve predicate accepts every infinity flag, while signed
+    // replay compares points structurally. Require its canonical identity so
+    // an impossible encoding cannot be reported as a complete negative query.
+    if target.infinity {
+        target == PrimePoint::INFINITY
+    } else {
+        target.x < curve.p && target.y < curve.p && curve.is_on_curve(target)
+    }
+}
+
+fn validate_query_limits(limits: &OracleLimits) -> Result<(), String> {
+    if limits.max_degree == 0 || limits.max_pairs_per_step == 0 || limits.max_variables == 0 {
+        return Err("solver degree, pair batch and variable cap must be positive".into());
+    }
+    Ok(())
 }
 
 fn validate_factor_base(
@@ -581,18 +950,30 @@ fn validate_tower_values(
     values: &[u64],
     tower: &TowerDescription,
     count: &mut u64,
+    mut capture: Option<&mut TowerPathCapture>,
 ) -> Result<(), String> {
     for &leaf in values {
+        let mut path = capture.as_ref().map(|capture| {
+            let mut path = Vec::with_capacity(tower.depth().div_ceil(capture.block_width) + 1);
+            path.push(leaf);
+            path
+        });
+        let width = capture.as_ref().map_or(1, |capture| capture.block_width);
         let (result, terminal) = match tower {
             TowerDescription::Velu { steps, terminal } => {
                 let mut x = leaf;
-                for &(xi, tau) in steps {
+                for (step, &(xi, tau)) in steps.iter().enumerate() {
                     let denominator = sub(x, xi, curve.p);
                     if denominator == 0 {
                         return Err("V contains a pole of the retained tower".into());
                     }
                     let inverse = counted_power(denominator, curve.p - 2, curve.p, count);
                     x = (x + counted_product(tau, inverse, curve.p, count)) % curve.p;
+                    if let Some(path) = path.as_mut() {
+                        if (step + 1) % width == 0 || step + 1 == steps.len() {
+                            path.push(x);
+                        }
+                    }
                 }
                 (x, *terminal)
             }
@@ -602,8 +983,13 @@ fn validate_tower_values(
                 terminal,
             } => {
                 let mut x = sub(leaf, *shift, curve.p);
-                for _ in 0..*depth {
+                for step in 0..*depth {
                     x = sub(counted_product(x, x, curve.p, count), 2, curve.p);
+                    if let Some(path) = path.as_mut() {
+                        if (step + 1) % width == 0 || step + 1 == *depth {
+                            path.push(x);
+                        }
+                    }
                 }
                 (x, *terminal)
             }
@@ -611,8 +997,57 @@ fn validate_tower_values(
         if result != terminal {
             return Err("V is not the complete retained-tower fibre".into());
         }
+        if let (Some(capture), Some(path)) = (capture.as_mut(), path) {
+            capture.paths.push(path);
+        }
     }
     Ok(())
+}
+
+fn validate_tower_problem(
+    curve: &PrimeCurve,
+    values: &[u64],
+    tower: Option<&TowerDescription>,
+    presentation: Presentation,
+    count: &mut u64,
+) -> Result<(), String> {
+    validate_tower_problem_captured(curve, values, tower, presentation, count, None)
+}
+
+fn validate_tower_problem_captured(
+    curve: &PrimeCurve,
+    values: &[u64],
+    tower: Option<&TowerDescription>,
+    presentation: Presentation,
+    count: &mut u64,
+    capture: Option<&mut TowerPathCapture>,
+) -> Result<(), String> {
+    if presentation == Presentation::Dense {
+        return Ok(());
+    }
+    let t = tower.ok_or("tower presentation requires a tower")?;
+    if t.depth() == 0 || t.depth() >= usize::BITS as usize || values.len() != 1usize << t.depth() {
+        return Err("complete tower V must contain exactly 2^depth distinct coordinates".into());
+    }
+    match t {
+        TowerDescription::Velu { steps, terminal } => {
+            if *terminal >= curve.p
+                || steps
+                    .iter()
+                    .any(|&(x, t)| x >= curve.p || t == 0 || t >= curve.p)
+            {
+                return Err("invalid canonical Velu coefficients".into());
+            }
+        }
+        TowerDescription::Dickson {
+            shift, terminal, ..
+        } => {
+            if *shift >= curve.p || *terminal >= curve.p {
+                return Err("invalid canonical Dickson coefficients".into());
+            }
+        }
+    }
+    validate_tower_values(curve, values, t, count, capture)
 }
 
 /// Public diagnostic for independently checking original equations and chart
@@ -632,6 +1067,7 @@ pub fn equations_for_chart(
     }
     Ok(build_chart(
         curve,
+        values,
         values,
         tower,
         target,
@@ -743,55 +1179,57 @@ pub fn decompose(
     let _guard = ORACLE_LOCK.lock().map_err(|_| "F4 study lock poisoned")?;
     let started = Instant::now();
     let mut validation_field_multiplications = 0;
-    if !(2..=4).contains(&m)
-        || subgroup_order <= 2
-        || values.is_empty()
-        || values.iter().any(|&x| x >= curve.p)
-        || values.windows(2).any(|w| w[0] >= w[1])
-        || curve.p < 5
-        || curve.p >= (1u64 << 32)
-        || curve.a >= curve.p
-        || curve.b >= curve.p
-        || !crate::cryptanalysis::residual_walk::is_prime_u64(curve.p)
-        || (!target.infinity && (target.x >= curve.p || target.y >= curve.p))
-        || !curve.is_on_curve(target)
+    if !valid_fixed_problem(curve, subgroup_order, values, m) || !valid_query_target(curve, target)
     {
         return Err("invalid curve/target/order, sorted V, or arity (requires m=2..4)".into());
     }
     validate_factor_base(curve, subgroup_order, fb, values)?;
-    if limits.max_degree == 0 || limits.max_pairs_per_step == 0 || limits.max_variables == 0 {
-        return Err("solver degree, pair batch and variable cap must be positive".into());
-    }
-    if presentation != Presentation::Dense {
-        let t = tower.ok_or("tower presentation requires a tower")?;
-        if t.depth() == 0
-            || t.depth() >= usize::BITS as usize
-            || values.len() != 1usize << t.depth()
-        {
-            return Err(
-                "complete tower V must contain exactly 2^depth distinct coordinates".into(),
-            );
-        }
-        match t {
-            TowerDescription::Velu { steps, terminal } => {
-                if *terminal >= curve.p
-                    || steps
-                        .iter()
-                        .any(|&(x, t)| x >= curve.p || t == 0 || t >= curve.p)
-                {
-                    return Err("invalid canonical Velu coefficients".into());
-                }
-            }
-            TowerDescription::Dickson {
-                shift, terminal, ..
-            } => {
-                if *shift >= curve.p || *terminal >= curve.p {
-                    return Err("invalid canonical Dickson coefficients".into());
-                }
-            }
-        }
-        validate_tower_values(curve, values, t, &mut validation_field_multiplications)?;
-    }
+    validate_query_limits(limits)?;
+    validate_tower_problem(
+        curve,
+        values,
+        tower,
+        presentation,
+        &mut validation_field_multiplications,
+    )?;
+    solve_query(
+        curve,
+        subgroup_order,
+        fb,
+        values,
+        values,
+        tower,
+        target,
+        m,
+        presentation,
+        limits,
+        ops,
+        started,
+        validation_field_multiplications,
+        None,
+    )
+}
+
+/// Both callers hold ORACLE_LOCK and validate their respective inputs before
+/// entering here. The legacy caller supplies V as its leaf domain; only the
+/// private prepared object can supply its validated target-liftable subset.
+#[allow(clippy::too_many_arguments)]
+fn solve_query(
+    curve: &PrimeCurve,
+    subgroup_order: u64,
+    fb: &FactorBase<PrimePoint>,
+    values: &[u64],
+    leaf_domain: &[u64],
+    tower: Option<&TowerDescription>,
+    target: PrimePoint,
+    m: usize,
+    presentation: Presentation,
+    limits: &OracleLimits,
+    ops: &mut GroupOps,
+    started: Instant,
+    validation_field_multiplications: u64,
+    fiber: Option<&FiberIndex>,
+) -> Result<OracleResult, String> {
     let deadline = started
         .checked_add(Duration::from_millis(limits.timeout_ms))
         .ok_or("deadline overflow")?;
@@ -823,6 +1261,7 @@ pub fn decompose(
         let built = build_chart(
             curve,
             values,
+            leaf_domain,
             tower,
             target,
             m,
@@ -866,58 +1305,84 @@ pub fn decompose(
         opts.max_pairs_per_step = Some(limits.max_pairs_per_step);
         let mut cap_hit = false;
         let mut invalid_equation = false;
-        let report = f4_fp::solve_visit(
-            &chart.equations,
-            chart.n_vars,
-            curve.p,
-            &opts,
-            &chart.domains,
-            |point| {
-                if output.counters.coordinate_solutions >= limits.max_solutions {
-                    cap_hit = true;
-                    return true;
-                }
-                output.counters.coordinate_solutions += 1;
-                if point.len() != chart.n_vars
-                    || chart.equations.iter().any(|p| {
-                        poly_eval(
-                            p,
-                            point,
-                            curve.p,
-                            &mut output.counters.original_equation_check_multiplications,
-                        ) != 0
-                    })
-                {
-                    invalid_equation = true;
-                    return true;
-                }
-                let before = output.relations.len();
-                let stop = LiftContext {
-                    curve,
-                    fb,
-                    order: subgroup_order,
-                    target,
-                    point,
-                    prefixes: &chart.prefixes,
-                    m,
-                    ops,
-                    counters: &mut output.counters,
-                    limits,
-                    rows: &mut rows,
-                    relations: &mut output.relations,
-                    cap_hit: &mut cap_hit,
-                }
-                .visit(&mut Vec::with_capacity(m));
-                if before == output.relations.len() {
-                    output.counters.rejected_coordinate_solutions += 1;
-                }
-                stop
-            },
-        );
+        let mut visitor = |point: &[u64]| {
+            if output.counters.coordinate_solutions >= limits.max_solutions {
+                cap_hit = true;
+                return true;
+            }
+            output.counters.coordinate_solutions += 1;
+            if point.len() != chart.n_vars
+                || chart.equations.iter().any(|p| {
+                    poly_eval(
+                        p,
+                        point,
+                        curve.p,
+                        &mut output.counters.original_equation_check_multiplications,
+                    ) != 0
+                })
+            {
+                invalid_equation = true;
+                return true;
+            }
+            let before = output.relations.len();
+            let stop = LiftContext {
+                curve,
+                fb,
+                order: subgroup_order,
+                target,
+                point,
+                prefixes: &chart.prefixes,
+                m,
+                ops,
+                counters: &mut output.counters,
+                limits,
+                rows: &mut rows,
+                relations: &mut output.relations,
+                cap_hit: &mut cap_hit,
+            }
+            .visit(&mut Vec::with_capacity(m));
+            if before == output.relations.len() {
+                output.counters.rejected_coordinate_solutions += 1;
+            }
+            stop
+        };
+        // The old visitor remains byte-for-byte upstream. The optional driver
+        // has its own closure report and never calls its enumeration fallback.
+        let report = if let Some(index) = fiber {
+            fiber_extract::solve_visit(
+                &chart.equations,
+                chart.n_vars,
+                curve.p,
+                &opts,
+                index,
+                m,
+                FiberLimits::default(),
+                &mut visitor,
+            )
+            .and_then(|report| {
+                let extra = report.stats.filter_multiplications
+                    + report.stats.substitution_multiplications
+                    + report.stats.original_equation_multiplications;
+                let json = serde_json::to_value(&report).map_err(|e| e.to_string())?;
+                Ok((report.common, Some(json), report.reason, extra))
+            })
+        } else {
+            f4_fp::solve_visit(
+                &chart.equations,
+                chart.n_vars,
+                curve.p,
+                &opts,
+                &chart.domains,
+                &mut visitor,
+            )
+            .map(|report| (report, None, None, 0))
+        };
         let (status, visit) = match report {
-            Ok(report) => {
+            Ok((report, fiber_report, fiber_reason, extraction_multiplications)) => {
                 output.counters.f4_field_operations += report.field_ops;
                 output.counters.root_field_multiplications += report.root_field_multiplications;
+                output.counters.fiber_extraction_field_multiplications +=
+                    extraction_multiplications;
                 output.counters.domain_evaluations += report.domain_evaluations;
                 output.counters.full_field_branches += report.full_field_branches;
                 output.counters.f4_runs += report.f4_runs;
@@ -952,14 +1417,20 @@ pub fn decompose(
                     } else {
                         OracleStatus::UnknownLimit
                     };
-                    output.reason = Some("production F4 visitor did not exhaust chart".into());
+                    output.reason =
+                        Some(fiber_reason.unwrap_or_else(|| {
+                            "production F4 visitor did not exhaust chart".into()
+                        }));
                     "incomplete"
                 } else {
                     "complete"
                 };
                 (
                     status.to_owned(),
-                    serde_json::to_value(report).map_err(|e| e.to_string())?,
+                    match fiber_report {
+                        Some(report) => report,
+                        None => serde_json::to_value(report).map_err(|e| e.to_string())?,
+                    },
                 )
             }
             Err(error) => {

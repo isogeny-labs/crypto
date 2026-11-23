@@ -65,6 +65,7 @@ pub mod deferred_pair_graph;
 mod extension_deferred_pair_dlp;
 pub use extension_deferred_pair_dlp::{
     run_extension_adapted_deferred_pair_dlp_on, run_extension_deferred_pair_dlp_on,
+    run_extension_fast_unit_deferred_pair_dlp_on, run_extension_traced_deferred_pair_dlp_on,
     run_extension_unit_deferred_pair_dlp_on, DeferredPairDlpOptions,
 };
 

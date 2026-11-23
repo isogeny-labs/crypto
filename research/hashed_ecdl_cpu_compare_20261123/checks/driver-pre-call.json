@@ -1,0 +1,59 @@
+{
+  "scope": "Before first native driver unit/solver invocation",
+  "bins": [
+    {
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver/release/deps/point_audit-6c5887d16c534561",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-00-point-audit",
+      "sha256": "223583c83c37c7144da5e26bd6b65aeecd089497e583e5ed723647c011d9841d",
+      "name": "point-audit",
+      "test": true
+    },
+    {
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver/release/deps/cpu_scratch_panel-813f6f001207b3a0",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-01-cpu-scratch-panel",
+      "sha256": "d4a498fb825c8c4e4da9c5d4389f4f8ab45ad20bd3201e6c7776d2cc569d91f7",
+      "name": "cpu-scratch-panel",
+      "test": true
+    },
+    {
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver/release/point-audit",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-02-point-audit",
+      "sha256": "fe742c3eb5675d2e6b456a38c66027315743cc0cfede836768a42156154fdb57",
+      "name": "point-audit",
+      "test": false
+    },
+    {
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-driver/release/cpu-scratch-panel",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-03-cpu-scratch-panel",
+      "sha256": "727315c6d3444ed8ade4f0f7d7790410aabd8380ebb2772fe967aad7347d6880",
+      "name": "cpu-scratch-panel",
+      "test": false
+    }
+  ],
+  "paths": {
+    "point-audit": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-02-point-audit",
+    "cpu-scratch-panel": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-03-cpu-scratch-panel"
+  },
+  "sources": [
+    {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/Cargo.toml",
+      "sha256": "2d6dfc9e947f30f1397208c5efa711ab00487d207c210f3c078a68ddd626674c"
+    },
+    {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/Cargo.lock",
+      "sha256": "850ce57b4e4d96bcadd0f5254d9563bdc18980b49184796b467208c4002a5eb3"
+    },
+    {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/src/main.rs",
+      "sha256": "6cddd6606475c62bba2f469e2eaefa1d9c7c7a77ad4ede2c318afbfcfa638c4e"
+    },
+    {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/native/src/bin/point-audit.rs",
+      "sha256": "ef4dce95e8f84afa82e7f4d3d464a7a0ed1aef8b3ffba0209dedc75f9ec0b85c"
+    },
+    {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_compare_20261123/invoke-worker.sh",
+      "sha256": "2f16ac89e174aed5e3f7e20a83502bb7edca1d50574bb8c28e68d4a4e5da1e61"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+digraph chain {
+ graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.32", ranksep="0.52", fontname="DejaVu Sans", label="Actual F3 morphisms; finite E(F3) cohort qualified, unsigned", labelloc=t, fontsize=13];
+ node [shape=box, style="rounded,filled", fillcolor="#edf3f9", color="#344f6f", fontname="DejaVu Sans", fontsize=11, margin="0.13,0.10"];
+ edge [fontname="DejaVu Sans", fontsize=10, color="#344f6f"];
+ e [label="E / F3\nY^2 = X^3 + 2X + 1\nsource subgroup: all 7 points"];
+ c [label="Jac(C) / F3\ny^2 = x^6+x^5+x^2+1\n7 pullback images"];
+ c0 [label="Jac(C0) / F3\ny^2 = x^6+x^5+x^3+x^2+1\n7 chain images"];
+ c2 [label="Jac(C2) / F3\ny^2 = 2x^6+x^5+2x^3+x^2+1\n7 chain images"];
+ prod [label="Product endpoint\nactual determinant = 0\nrejected by smooth-curve caller", fillcolor="#f8ece8", color="#a44f3d"];
+ e -> c [label="degree-2 cover pullback\n49 addition pairs"];
+ c -> c0 [label="degree-4 Richelot, kernel 0\n49 chain addition pairs"];
+ c -> c2 [label="degree-4 Richelot, kernel 2\n49 chain addition pairs"];
+ c -> prod [style=dashed, color="#a44f3d", label="kernel 1"];
+}

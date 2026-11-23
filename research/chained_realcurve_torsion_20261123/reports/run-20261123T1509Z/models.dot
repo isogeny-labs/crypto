@@ -1,0 +1,16 @@
+digraph models {
+ graph [rankdir=LR, bgcolor="white", pad="0.12", nodesep="0.42", ranksep="0.75", fontname="DejaVu Sans", fontsize=13, label="Actual F3 model edge and divisor-consuming cross chains; unsigned", labelloc=t];
+ node [shape=box, style="rounded,filled", fillcolor="#edf3f9", color="#34536d", fontname="DejaVu Sans", fontsize=12, margin="0.13,0.1"];
+ edge [fontname="DejaVu Sans", fontsize=10, color="#34536d"];
+ c [label="Jac(C) / F3\ny^2=x^6+x^5+x^2+1\n21 rational classes"];
+ a [label="Jac(C0) / F3\ny^2=x^6+x^5+x^3+x^2+1"];
+ b [label="Jac(C2) / F3\ny^2=2x^6+x^5+2x^3+x^2+1"];
+ tw [label="Actual twist: y^2=2 f_C\nF9 map gamma=27\n20 nonidentity images fail F3 descent", fillcolor="#fbefeb", color="#a34e37"];
+ {rank=same;c;tw;}
+ c -> a [label="Richelot 0"];
+ c -> b [label="Richelot 2"];
+ a -> c [label="raw dual 0", color="#99612f"];
+ b -> c [label="raw dual 2", color="#99612f"];
+ a -> b [dir=both, penwidth=2, color="#267753", label="ACTUAL F3 ISOMORPHISMS\nM=(1,0;1,2), e=1 or2", constraint=false];
+ c -> tw [style=dashed, color="#a34e37", label="extension-field control\n21 valid inverse roundtrips", constraint=false];
+}

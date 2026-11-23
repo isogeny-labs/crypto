@@ -1001,6 +1001,19 @@ impl OpenCoefMap {
         Self::with_capacity(slots)
     }
 
+    // Complete occupied-entry views used by the original collision-ledger tests.
+    #[cfg(test)]
+    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
+        self.keys.iter().enumerate().filter_map(move |(i, &key)| {
+            (key != 0).then(|| (key, (self.us[i], self.zs[i], self.bs[i])))
+        })
+    }
+
+    #[cfg(test)]
+    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
+        self.iter().map(|(_, value)| value)
+    }
+
     #[inline(always)]
     fn home(&self, key: u64) -> usize {
         (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
