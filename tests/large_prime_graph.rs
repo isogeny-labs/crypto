@@ -1919,3 +1919,136 @@ fn evaluator_forest_same_source_seeded_rank_identity() {
         }
     }
 }
+
+
+#[test]
+fn augmented_basis_selects_original_rows_and_preserves_affine_span() {
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::select_augmented_basis;
+
+    let mk = |small: Vec<(u32, u64)>, rhs: u64, id: u64| CompleteRelation {
+        small,
+        rhs,
+        sources: vec![(id, 1)],
+    };
+    // A rank-two small system with multiple contradictory RHS residuals.
+    // The augmented basis needs exactly ONE original contradictory row.
+    let input = vec![
+        mk(vec![(0, 1)], 1, 40),
+        mk(vec![(0, 2)], 2, 41),
+        mk(vec![(1, 1)], 0, 42),
+        mk(vec![(0, 1), (1, 1)], 2, 43),
+        mk(vec![(0, 2), (1, 1)], 4, 44),
+        mk(vec![], 0, 45),
+        mk(vec![], 9, 46),
+    ];
+    let (kept, audit) = select_augmented_basis(&input, 101).unwrap();
+    assert_eq!(audit.useful_small_rank, 2);
+    assert_eq!(audit.augmented_rank, 3);
+    assert_eq!(audit.augmented_basis_row_indices, vec![0, 2, 3]);
+    assert_eq!(kept, vec![input[0].clone(), input[2].clone(), input[3].clone()]);
+    assert_eq!(audit.augmented_basis_nonzeros, 4);
+    assert_eq!(audit.augmented_basis_source_terms, 3);
+    // Invalid rows must be refused without returning partially pruned data.
+    assert!(select_augmented_basis(&[mk(vec![(0, 1), (0, 2)], 0, 47)], 101).is_err());
+    assert!(select_augmented_basis(&[mk(vec![(0, 3)], 0, 48)], 9).is_err());
+
+    // All-zero small/RHS rows retain nothing; a pure known-RHS contradiction
+    // retains one unchanged original row and still has no solution.
+    let zeros = vec![mk(vec![], 0, 50), mk(vec![], 0, 51)];
+    let (kept_zeros, zero_audit) = select_augmented_basis(&zeros, 101).unwrap();
+    assert!(kept_zeros.is_empty());
+    assert_eq!(zero_audit.augmented_rank, 0);
+    let incompatible = vec![mk(vec![], 1, 52), mk(vec![], 2, 53)];
+    let (kept_bad, bad_audit) = select_augmented_basis(&incompatible, 101).unwrap();
+    assert_eq!(kept_bad, vec![incompatible[0].clone()]);
+    assert_eq!(bad_audit.useful_small_rank, 0);
+    assert_eq!(bad_audit.augmented_rank, 1);
+}
+
+#[test]
+fn augmented_basis_randomized_original_rank_and_source_conservation() {
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::select_augmented_basis;
+
+    // Independent dense rank oracle on ORIGINAL augmented rows, not the
+    // selected sparse-echelons or the graph's own witness rank.
+    fn dense_matrix(
+        rows: &[CompleteRelation],
+        ncols: usize,
+        rhs_column: bool,
+    ) -> Vec<Vec<(usize, u64)>> {
+        rows.iter()
+            .map(|row| {
+                let mut terms: Vec<_> = row
+                    .small
+                    .iter()
+                    .map(|&(col, coefficient)| (col as usize, coefficient))
+                    .collect();
+                if rhs_column && row.rhs != 0 {
+                    terms.push((ncols, row.rhs));
+                }
+                terms
+            })
+            .collect()
+    }
+    let mut rng = Rng(0xeab5_1d0c_2026_1123);
+    for trial in 0..160usize {
+        let ell = [3u64, 7, 101, 2_147_446_831][trial % 4];
+        let ncols = 1 + rng.below(9) as usize;
+        let nrows = 1 + rng.below(26) as usize;
+        let mut input = Vec::new();
+        for row in 0..nrows {
+            let mut small = Vec::new();
+            for col in 0..ncols {
+                if rng.below(4) == 0 {
+                    small.push((col as u32, 1 + rng.below(ell - 1)));
+                }
+            }
+            // Multiple source coefficients test that selection does not
+            // mutate provenance even in a contradictory affine system.
+            input.push(CompleteRelation {
+                small,
+                rhs: rng.below(ell),
+                sources: vec![(row as u64 + 1000, 1), (row as u64 + 9000, 2 % ell)],
+            });
+        }
+        let original_small = dense_rank(&dense_matrix(&input, ncols, false), ncols, ell).unwrap();
+        let original_augmented =
+            dense_rank(&dense_matrix(&input, ncols, true), ncols + 1, ell).unwrap();
+        let (kept, audit) = select_augmented_basis(&input, ell).unwrap();
+        assert_eq!(audit.useful_small_rank, original_small, "small trial {trial}");
+        assert_eq!(audit.augmented_rank, original_augmented, "augmented trial {trial}");
+        assert_eq!(kept.len(), original_augmented, "basis size trial {trial}");
+        assert_eq!(
+            dense_rank(&dense_matrix(&kept, ncols, false), ncols, ell).unwrap(),
+            original_small,
+            "retained small trial {trial}"
+        );
+        assert_eq!(
+            dense_rank(&dense_matrix(&kept, ncols, true), ncols + 1, ell).unwrap(),
+            original_augmented,
+            "retained augmented trial {trial}"
+        );
+        assert!(
+            audit.augmented_basis_row_indices.windows(2).all(|w| w[0] < w[1]),
+            "indices must be strictly increasing trial {trial}"
+        );
+        assert_eq!(
+            kept,
+            audit.augmented_basis_row_indices
+                .iter()
+                .map(|&i| input[i].clone())
+                .collect::<Vec<_>>(),
+            "original witness/row conservation trial {trial}"
+        );
+        assert_eq!(
+            audit.augmented_basis_nonzeros,
+            kept.iter().map(|row| row.small.len()).sum::<usize>()
+        );
+        assert_eq!(
+            audit.augmented_basis_source_terms,
+            kept.iter().map(|row| row.sources.len()).sum::<usize>()
+        );
+    }
+}
