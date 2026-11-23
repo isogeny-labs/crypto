@@ -179,7 +179,10 @@ fn summarize_output(
     inputs: &[PartialRelation],
     modulus: u64,
 ) -> (usize, usize, usize, usize, usize, usize) {
-    let cols: BTreeSet<u32> = out.iter().flat_map(|r| r.small.iter().map(|&(c, _)| c)).collect();
+    let cols: BTreeSet<u32> = out
+        .iter()
+        .flat_map(|r| r.small.iter().map(|&(c, _)| c))
+        .collect();
     let z = out.iter().map(|r| r.small.len()).sum();
     let src = out.iter().map(|r| r.sources.len()).sum();
     let wmax = out.iter().map(|r| r.small.len()).max().unwrap_or(0);
@@ -210,7 +213,12 @@ pub fn evaluate_stream(
     }
 
     // --- Rank: gain DSU on the two-entry domain, with audits.
-    let domain: Vec<Vec<(usize, u64)>> = index.rows.iter().filter(|row| row.len() <= 2).cloned().collect();
+    let domain: Vec<Vec<(usize, u64)>> = index
+        .rows
+        .iter()
+        .filter(|row| row.len() <= 2)
+        .cloned()
+        .collect();
     let t = Instant::now();
     let mut dsu = GainDsu::new(c, modulus)?;
     for row in &domain {
@@ -231,7 +239,10 @@ pub fn evaluate_stream(
             Some(b.snapshot().large_rank_lower_bound)
         })
         .flatten();
-    let domain_support: Vec<Vec<usize>> = domain.iter().map(|row| row.iter().map(|&(col, _)| col).collect()).collect();
+    let domain_support: Vec<Vec<usize>> = domain
+        .iter()
+        .map(|row| row.iter().map(|&(col, _)| col).collect())
+        .collect();
     let matching_rank = hopcroft_karp(domain.len(), c, &domain_support).size;
     let rank = RankAudit {
         two_entry_rows: domain.len(),
@@ -301,8 +312,8 @@ pub fn evaluate_stream(
         max_sources: params.filter_max_sources,
     };
     let t = Instant::now();
-    let (pivot_out, pivot_report) =
-        filter_large_primes(relations.to_vec(), &options).map_err(|_| LpGraphError::InvalidModulus)?;
+    let (pivot_out, pivot_report) = filter_large_primes(relations.to_vec(), &options)
+        .map_err(|_| LpGraphError::InvalidModulus)?;
     let pivot_ns = ns(t);
     let (n_res, z_res, src, wmax, ok, bad) = summarize_output(&pivot_out, relations, modulus);
     let pivot_filter = FilterSummary {
@@ -324,8 +335,8 @@ pub fn evaluate_stream(
         max_active_coefficients: params.mst_max_active_coefficients,
     };
     let t = Instant::now();
-    let attempt =
-        filter_large_primes_mst(relations.to_vec(), &options, &limits).map_err(|_| LpGraphError::InvalidModulus)?;
+    let attempt = filter_large_primes_mst(relations.to_vec(), &options, &limits)
+        .map_err(|_| LpGraphError::InvalidModulus)?;
     let mst_ns = ns(t);
     let mst_out = attempt.relations.clone().unwrap_or_default();
     let (n2, z2, src2, w2, ok2, bad2) = summarize_output(&mst_out, relations, modulus);
@@ -356,7 +367,8 @@ pub fn evaluate_stream(
         .map(|row| row.small.iter().map(|&(col, _)| col_of[&col]).collect())
         .collect();
     let t = Instant::now();
-    let (col_graph, skipped) = column_interaction_graph(&residual_rows, col_of.len(), params.column_graph_max_row);
+    let (col_graph, skipped) =
+        column_interaction_graph(&residual_rows, col_of.len(), params.column_graph_max_row);
     let residual_elimination = minimum_degree(&col_graph, params.max_fill);
     let residual_elimination_ns = ns(t);
     let partitions = params
@@ -366,7 +378,14 @@ pub fn evaluate_stream(
         .map(|&k| {
             let block = block_partition(&residual_rows, col_of.len(), k);
             let t = Instant::now();
-            let fm = fm_partition(&residual_rows, col_of.len(), FmParams { parts: k, ..params.fm });
+            let fm = fm_partition(
+                &residual_rows,
+                col_of.len(),
+                FmParams {
+                    parts: k,
+                    ..params.fm
+                },
+            );
             PartitionSummary {
                 parts: k,
                 block_connectivity_minus_one: block.connectivity_minus_one,
@@ -399,7 +418,8 @@ pub fn evaluate_stream(
 }
 
 /// A seeded synthetic relation stream. Large primes are drawn log-uniformly
-/// from `1..=lp_columns` (density `∝ 1/q`, the usual large-prime shape); LP
+/// from `lp_min..=lp_columns` (density `∝ 1/q`, the usual large-prime shape;
+/// `lp_min = 0` means `lp_columns / 32`, standing in for the factor-base bound); LP
 /// arity follows `arity_weights`; coefficients are uniform nonzero mod `ℓ`.
 /// Synthetic streams test the algorithms, not ECDLP relation statistics.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -408,6 +428,8 @@ pub struct SyntheticParams {
     pub seed: u64,
     pub rows: usize,
     pub lp_columns: u64,
+    /// Smallest large prime; `0` means `lp_columns / 32`.
+    pub lp_min: u64,
     pub fb_columns: u32,
     pub fb_terms: usize,
     /// Weights of LP arity 0, 1, 2, 3, ...
@@ -422,6 +444,7 @@ impl Default for SyntheticParams {
             seed: 1,
             rows: 4000,
             lp_columns: 20_000,
+            lp_min: 0,
             fb_columns: 2000,
             fb_terms: 4,
             arity_weights: vec![1, 6, 12, 2],
@@ -447,6 +470,13 @@ impl SplitMix {
 pub fn synthetic_stream(params: &SyntheticParams, modulus: u64) -> Vec<PartialRelation> {
     let mut rng = SplitMix(params.seed);
     let total: u64 = params.arity_weights.iter().sum::<u64>().max(1);
+    let hi = params.lp_columns.max(1) as f64;
+    let lo = if params.lp_min == 0 {
+        (params.lp_columns / 32).max(1)
+    } else {
+        params.lp_min.min(params.lp_columns)
+    }
+    .max(1) as f64;
     (0..params.rows)
         .map(|i| {
             let mut x = rng.next() % total;
@@ -460,13 +490,22 @@ pub fn synthetic_stream(params: &SyntheticParams, modulus: u64) -> Vec<PartialRe
             }
             let large = (0..arity)
                 .map(|_| {
-                    let q = (params.lp_columns as f64).powf(rng.unit()).floor().max(1.0) as u64;
-                    let coef = if params.unit_coefficients { 1 } else { 1 + rng.next() % (modulus - 1) };
+                    let q = (lo * (hi / lo).powf(rng.unit())).floor().max(1.0) as u64;
+                    let coef = if params.unit_coefficients {
+                        1
+                    } else {
+                        1 + rng.next() % (modulus - 1)
+                    };
                     (q, coef)
                 })
                 .collect();
             let small = (0..params.fb_terms)
-                .map(|_| ((rng.next() % params.fb_columns.max(1) as u64) as u32, 1 + rng.next() % (modulus - 1)))
+                .map(|_| {
+                    (
+                        (rng.next() % params.fb_columns.max(1) as u64) as u32,
+                        1 + rng.next() % (modulus - 1),
+                    )
+                })
                 .collect();
             PartialRelation {
                 id: i as u64,

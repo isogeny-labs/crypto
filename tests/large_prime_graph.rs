@@ -19,7 +19,13 @@ impl Rng {
 
 const PRIMES: [u64; 4] = [3, 7, 1_000_003, (1u64 << 61) - 1];
 
-fn random_lp_stream(rng: &mut Rng, rows: usize, cols: u64, max_arity: u64, p: u64) -> Vec<PartialRelation> {
+fn random_lp_stream(
+    rng: &mut Rng,
+    rows: usize,
+    cols: u64,
+    max_arity: u64,
+    p: u64,
+) -> Vec<PartialRelation> {
     (0..rows)
         .map(|i| {
             let arity = rng.below(max_arity + 1);
@@ -79,7 +85,13 @@ fn gain_dsu_balanced_cycles_with_scaled_gains() {
                 }
             }
             let effect = dsu.add_row(&[(len - 1, a), (0, b)]).unwrap();
-            assert_eq!(effect, GainRowEffect::Cycle { balanced, rank_increment: u8::from(!balanced) });
+            assert_eq!(
+                effect,
+                GainRowEffect::Cycle {
+                    balanced,
+                    rank_increment: u8::from(!balanced)
+                }
+            );
             assert_eq!(dsu.rank(), len - usize::from(balanced));
         }
     }
@@ -111,8 +123,15 @@ fn catalog_triangle_and_bridge() {
         assert_eq!(dsu.snapshot().left_nullity, 0);
         assert_eq!(dense_rank(&tri, 3, p).unwrap(), 3);
         // Two triangles joined by the bridge cd: one dependency, which needs the bridge.
-        let rows: Vec<Vec<(usize, u64)>> =
-            vec![edge(0, 1), edge(1, 2), edge(2, 0), edge(3, 4), edge(4, 5), edge(5, 3), edge(2, 3)];
+        let rows: Vec<Vec<(usize, u64)>> = vec![
+            edge(0, 1),
+            edge(1, 2),
+            edge(2, 0),
+            edge(3, 4),
+            edge(4, 5),
+            edge(5, 3),
+            edge(2, 3),
+        ];
         let mut dsu = GainDsu::new(6, p).unwrap();
         for r in &rows {
             dsu.add_row(r).unwrap();
@@ -128,16 +147,35 @@ fn catalog_triangle_and_bridge() {
 
 #[test]
 fn gain_dsu_refuses_wide_rows_and_bad_modulus() {
-    let stream = vec![PartialRelation { id: 0, small: vec![], large: vec![(1, 1), (2, 1), (3, 1)], rhs: 0 }];
+    let stream = vec![PartialRelation {
+        id: 0,
+        small: vec![],
+        large: vec![(1, 1), (2, 1), (3, 1)],
+        rhs: 0,
+    }];
     let index = LpIndex::build(&stream, 7).unwrap();
-    assert!(matches!(gain_dsu_rank(&index), Err(LpGraphError::RowTooWide { entries: 3, .. })));
-    assert_eq!(GainDsu::new(3, 8).unwrap_err(), LpGraphError::InvalidModulus);
-    assert_eq!(LpIndex::build(&stream, 1).unwrap_err(), LpGraphError::InvalidModulus);
+    assert!(matches!(
+        gain_dsu_rank(&index),
+        Err(LpGraphError::RowTooWide { entries: 3, .. })
+    ));
+    assert_eq!(
+        GainDsu::new(3, 8).unwrap_err(),
+        LpGraphError::InvalidModulus
+    );
+    assert_eq!(
+        LpIndex::build(&stream, 1).unwrap_err(),
+        LpGraphError::InvalidModulus
+    );
 }
 
 #[test]
 fn lp_index_combines_repeats_and_drops_zeros() {
-    let stream = vec![PartialRelation { id: 9, small: vec![], large: vec![(5, 3), (5, 4), (8, 2)], rhs: 0 }];
+    let stream = vec![PartialRelation {
+        id: 9,
+        small: vec![],
+        large: vec![(5, 3), (5, 4), (8, 2)],
+        rhs: 0,
+    }];
     let index = LpIndex::build(&stream, 7).unwrap();
     assert_eq!(index.columns, vec![5, 8]);
     assert_eq!(index.rows, vec![vec![(1, 2)]]); // 3 + 4 = 0 mod 7 drops column 5
@@ -146,7 +184,13 @@ fn lp_index_combines_repeats_and_drops_zeros() {
 
 fn random_graph(rng: &mut Rng, n: usize, m: usize) -> Vec<(usize, usize, usize)> {
     (0..m)
-        .map(|k| (rng.below(n as u64) as usize, rng.below(n as u64) as usize, k))
+        .map(|k| {
+            (
+                rng.below(n as u64) as usize,
+                rng.below(n as u64) as usize,
+                k,
+            )
+        })
         .filter(|&(u, v, _)| u != v)
         .collect()
 }
@@ -183,7 +227,12 @@ fn core_numbers_match_peeling() {
 }
 
 fn kuhn(n_left: usize, n_right: usize, adj: &[Vec<usize>]) -> usize {
-    fn try_aug(l: usize, adj: &[Vec<usize>], seen: &mut [bool], mate: &mut [Option<usize>]) -> bool {
+    fn try_aug(
+        l: usize,
+        adj: &[Vec<usize>],
+        seen: &mut [bool],
+        mate: &mut [Option<usize>],
+    ) -> bool {
         for &r in &adj[l] {
             if !seen[r] {
                 seen[r] = true;
@@ -196,7 +245,9 @@ fn kuhn(n_left: usize, n_right: usize, adj: &[Vec<usize>]) -> usize {
         false
     }
     let mut mate = vec![None; n_right];
-    (0..n_left).filter(|&l| try_aug(l, adj, &mut vec![false; n_right], &mut mate)).count()
+    (0..n_left)
+        .filter(|&l| try_aug(l, adj, &mut vec![false; n_right], &mut mate))
+        .count()
 }
 
 #[test]
@@ -210,7 +261,11 @@ fn hopcroft_karp_and_dulmage_mendelsohn() {
         let index = LpIndex::build(&stream, p).unwrap();
         let sup = index.row_supports();
         let m = hopcroft_karp(index.num_rows(), index.num_columns(), &sup);
-        assert_eq!(m.size, kuhn(index.num_rows(), index.num_columns(), &sup), "trial {trial}");
+        assert_eq!(
+            m.size,
+            kuhn(index.num_rows(), index.num_columns(), &sup),
+            "trial {trial}"
+        );
         for (l, r) in m.mate_left.iter().enumerate() {
             if let Some(r) = r {
                 assert!(sup[l].contains(r));
@@ -220,10 +275,19 @@ fn hopcroft_karp_and_dulmage_mendelsohn() {
         // Structural rank bounds field rank from above.
         assert!(m.size >= dense_rank(&index.rows, index.num_columns(), p).unwrap());
         let dm = dulmage_mendelsohn(&sup, index.num_columns(), &m);
-        assert_eq!(dm.over_rows + dm.well_size + dm.under_rows, index.num_rows());
-        assert_eq!(dm.over_columns + dm.well_size + dm.under_columns, index.num_columns());
+        assert_eq!(
+            dm.over_rows + dm.well_size + dm.under_rows,
+            index.num_rows()
+        );
+        assert_eq!(
+            dm.over_columns + dm.well_size + dm.under_columns,
+            index.num_columns()
+        );
         assert_eq!(dm.over_rows - dm.over_columns, index.num_rows() - m.size);
-        assert_eq!(dm.under_columns - dm.under_rows, index.num_columns() - m.size);
+        assert_eq!(
+            dm.under_columns - dm.under_rows,
+            index.num_columns() - m.size
+        );
         assert_eq!(dm.fine_blocks.iter().sum::<usize>(), dm.well_size);
         // No edge from an over-determined row leaves the over-determined columns.
         for (i, r) in sup.iter().enumerate() {
@@ -238,7 +302,10 @@ fn hopcroft_karp_and_dulmage_mendelsohn() {
 fn catalog_structural_rank_example() {
     // [[1,1],[1,1]]: matching of size two, field rank one.
     let rows = vec![vec![(0usize, 1u64), (1, 1)], vec![(0, 1), (1, 1)]];
-    let sup: Vec<Vec<usize>> = rows.iter().map(|r| r.iter().map(|&(c, _)| c).collect()).collect();
+    let sup: Vec<Vec<usize>> = rows
+        .iter()
+        .map(|r| r.iter().map(|&(c, _)| c).collect())
+        .collect();
     assert_eq!(hopcroft_karp(2, 2, &sup).size, 2);
     assert_eq!(dense_rank(&rows, 2, 7).unwrap(), 1);
 }
@@ -270,11 +337,25 @@ fn forests_are_spanning_and_cycles_counted() {
         let n = 1 + rng.below(40) as usize;
         let m = rng.below(120) as usize;
         let edges: Vec<_> = (0..m)
-            .map(|k| (rng.below(n as u64) as usize, rng.below(n as u64) as usize, k))
+            .map(|k| {
+                (
+                    rng.below(n as u64) as usize,
+                    rng.below(n as u64) as usize,
+                    k,
+                )
+            })
             .collect(); // self-loops and parallel edges allowed
         let c = components(n, &edges);
-        for forest in [bfs_forest(n, &edges), low_stretch_forest(n, &edges, LowStretchParams::default())] {
-            let tree: Vec<_> = edges.iter().zip(&forest.tree_edge).filter(|(_, &t)| t).map(|(e, _)| *e).collect();
+        for forest in [
+            bfs_forest(n, &edges),
+            low_stretch_forest(n, &edges, LowStretchParams::default()),
+        ] {
+            let tree: Vec<_> = edges
+                .iter()
+                .zip(&forest.tree_edge)
+                .filter(|(_, &t)| t)
+                .map(|(e, _)| *e)
+                .collect();
             assert_eq!(tree.len(), n - c);
             assert_eq!(components(n, &tree), c);
             assert_eq!(forest.components, c);
@@ -309,9 +390,16 @@ fn low_stretch_beats_bfs_on_a_grid() {
     }
     let n = w * w;
     let bfs = fundamental_cycle_length(n, &edges, &bfs_forest(n, &edges));
-    let ls = fundamental_cycle_length(n, &edges, &low_stretch_forest(n, &edges, LowStretchParams::default()));
+    let ls = fundamental_cycle_length(
+        n,
+        &edges,
+        &low_stretch_forest(n, &edges, LowStretchParams::default()),
+    );
     assert_eq!(bfs.cycles, ls.cycles);
-    eprintln!("grid {w}x{w}: L bfs {} low-stretch {}", bfs.total_length, ls.total_length);
+    eprintln!(
+        "grid {w}x{w}: L bfs {} low-stretch {}",
+        bfs.total_length, ls.total_length
+    );
 }
 
 #[test]
@@ -329,7 +417,9 @@ fn minimum_degree_on_trees_and_cycles() {
     let s = minimum_degree(&adjacency(n, &ring), usize::MAX);
     assert_eq!((s.fill_edges, s.width), (n - 3, 2));
     // Clique K5: width 4, no fill.
-    let k5: Vec<_> = (0..5).flat_map(|a| (a + 1..5).map(move |b| (a, b, 0))).collect();
+    let k5: Vec<_> = (0..5)
+        .flat_map(|a| (a + 1..5).map(move |b| (a, b, 0)))
+        .collect();
     let s = minimum_degree(&adjacency(5, &k5), usize::MAX);
     assert_eq!((s.fill_edges, s.width), (0, 4));
 }
@@ -359,14 +449,34 @@ fn fm_partition_is_valid_and_not_worse_than_contiguous_bisection() {
             })
             .collect();
         let base = block_partition(&rows, cols, 2);
-        let fm = fm_partition(&rows, cols, FmParams { parts: 2, ..FmParams::default() });
+        let fm = fm_partition(
+            &rows,
+            cols,
+            FmParams {
+                parts: 2,
+                ..FmParams::default()
+            },
+        );
         assert_eq!(fm.part_sizes.iter().sum::<usize>(), n);
-        assert_eq!(connectivity_minus_one(&rows, cols, &fm.part).0, fm.connectivity_minus_one);
+        assert_eq!(
+            connectivity_minus_one(&rows, cols, &fm.part).0,
+            fm.connectivity_minus_one
+        );
         assert!(fm.connectivity_minus_one <= base.connectivity_minus_one);
         for &s in &fm.part_sizes {
-            assert!(s <= ((n.div_ceil(2)) as f64 * 1.03).ceil() as usize + 1, "side {s} of {n}");
+            assert!(
+                s <= ((n.div_ceil(2)) as f64 * 1.03).ceil() as usize + 1,
+                "side {s} of {n}"
+            );
         }
-        let k4 = fm_partition(&rows, cols, FmParams { parts: 4, ..FmParams::default() });
+        let k4 = fm_partition(
+            &rows,
+            cols,
+            FmParams {
+                parts: 4,
+                ..FmParams::default()
+            },
+        );
         assert_eq!(k4.part_sizes.len(), 4);
         assert_eq!(k4.part_sizes.iter().sum::<usize>(), n);
     }
@@ -377,7 +487,14 @@ fn evaluator_runs_every_stage_and_replays_every_relation() {
     use crypto::cryptanalysis::large_prime_graph::eval::*;
     let p = (1u64 << 61) - 1;
     for (seed, weights) in [(1u64, vec![1, 6, 12, 0]), (2, vec![1, 6, 12, 3])] {
-        let synth = SyntheticParams { seed, rows: 600, lp_columns: 3000, fb_columns: 300, arity_weights: weights, ..Default::default() };
+        let synth = SyntheticParams {
+            seed,
+            rows: 600,
+            lp_columns: 3000,
+            fb_columns: 300,
+            arity_weights: weights,
+            ..Default::default()
+        };
         let stream = synthetic_stream(&synth, p);
         let e = evaluate_stream("test", &stream, p, &EvalParams::default()).unwrap();
         assert_eq!(e.rows, 600);
@@ -389,10 +506,16 @@ fn evaluator_runs_every_stage_and_replays_every_relation() {
         assert_eq!(e.rank.exact_for_stream, seed == 1);
         assert_eq!(e.pivot_filter.replay_failures, 0);
         assert_eq!(e.mst_filter.replay_failures, 0);
-        assert_eq!(e.pivot_filter.replayed, e.pivot_filter.report.complete_relations);
+        assert_eq!(
+            e.pivot_filter.replayed,
+            e.pivot_filter.report.complete_relations
+        );
         assert_eq!(e.trees.bfs.cycles, e.trees.low_stretch.cycles);
         for part in &e.partitions {
-            assert_eq!(part.fm.part_sizes.iter().sum::<usize>(), e.pivot_filter.report.complete_relations);
+            assert_eq!(
+                part.fm.part_sizes.iter().sum::<usize>(),
+                e.pivot_filter.report.complete_relations
+            );
         }
         // Round-trips as JSON.
         let json = serde_json::to_string(&e).unwrap();

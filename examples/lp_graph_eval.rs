@@ -3,7 +3,7 @@
 //! ```text
 //! cargo run --release --example lp_graph_eval -- \
 //!     [--input relations.jsonl] [--modulus P] [--seed S] [--rows R] \
-//!     [--lp-columns C] [--fb-columns F] [--arity w0,w1,w2,w3] [--unit] \
+//!     [--lp-columns C] [--lp-min M] [--fb-columns F] [--arity w0,w1,w2,w3] [--unit] \
 //!     [--label NAME] [--out eval.json]
 //! ```
 //!
@@ -12,12 +12,19 @@
 //! generated. The output is one `lp-graph-eval/v1` JSON record.
 
 use crypto::cryptanalysis::large_prime_filter::PartialRelation;
-use crypto::cryptanalysis::large_prime_graph::eval::{evaluate_stream, synthetic_stream, EvalParams, SyntheticParams};
+use crypto::cryptanalysis::large_prime_graph::eval::{
+    evaluate_stream, synthetic_stream, EvalParams, SyntheticParams,
+};
 use std::io::BufRead;
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let get = |flag: &str| args.iter().position(|a| a == flag).and_then(|i| args.get(i + 1)).cloned();
+    let get = |flag: &str| {
+        args.iter()
+            .position(|a| a == flag)
+            .and_then(|i| args.get(i + 1))
+            .cloned()
+    };
     // 2^61 - 1, a Mersenne prime.
     let modulus: u64 = get("--modulus").map_or((1u64 << 61) - 1, |v| v.parse().expect("--modulus"));
     let mut synth = SyntheticParams::default();
@@ -29,6 +36,9 @@ fn main() {
     }
     if let Some(v) = get("--lp-columns") {
         synth.lp_columns = v.parse().expect("--lp-columns");
+    }
+    if let Some(v) = get("--lp-min") {
+        synth.lp_min = v.parse().expect("--lp-min");
     }
     if let Some(v) = get("--fb-columns") {
         synth.fb_columns = v.parse().expect("--fb-columns");
@@ -50,10 +60,12 @@ fn main() {
         }
         None => (
             synthetic_stream(&synth, modulus),
-            get("--label").unwrap_or_else(|| format!("synthetic {}", serde_json::to_string(&synth).unwrap())),
+            get("--label")
+                .unwrap_or_else(|| format!("synthetic {}", serde_json::to_string(&synth).unwrap())),
         ),
     };
-    let eval = evaluate_stream(&label, &relations, modulus, &EvalParams::default()).expect("evaluate");
+    let eval =
+        evaluate_stream(&label, &relations, modulus, &EvalParams::default()).expect("evaluate");
     let json = serde_json::to_string_pretty(&eval).unwrap();
     match get("--out") {
         Some(path) => std::fs::write(path, json + "\n").expect("write --out"),

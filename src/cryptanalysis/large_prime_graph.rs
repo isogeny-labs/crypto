@@ -80,10 +80,17 @@ fn valid_modulus(p: u64) -> bool {
 pub enum LpGraphError {
     InvalidModulus,
     /// A gain-DSU row had more than two nonzero LP coefficients.
-    RowTooWide { row: usize, entries: usize },
+    RowTooWide {
+        row: usize,
+        entries: usize,
+    },
     /// A coefficient was not invertible: the modulus is not prime.
-    NonInvertible { value: u64 },
-    ColumnOutOfRange { column: usize },
+    NonInvertible {
+        value: u64,
+    },
+    ColumnOutOfRange {
+        column: usize,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -311,7 +318,9 @@ impl GainDsu {
                     self.pinned[r] = true;
                     self.unflagged -= 1;
                 }
-                GainRowEffect::Singleton { rank_increment: inc }
+                GainRowEffect::Singleton {
+                    rank_increment: inc,
+                }
             }
             [(u, a), (v, b)] => {
                 let (ru, pu) = self.find(u);
@@ -413,7 +422,11 @@ pub fn gain_dsu_rank(index: &LpIndex) -> Result<GainDsuSnapshot, LpGraphError> {
 
 /// Reference rank by dense Gaussian elimination over `F_ℓ`, `O(R C min(R, C))`.
 /// For audits at small sizes only.
-pub fn dense_rank(rows: &[Vec<(usize, u64)>], columns: usize, modulus: u64) -> Result<usize, LpGraphError> {
+pub fn dense_rank(
+    rows: &[Vec<(usize, u64)>],
+    columns: usize,
+    modulus: u64,
+) -> Result<usize, LpGraphError> {
     let p = modulus;
     let mut m: Vec<Vec<u64>> = rows
         .iter()
@@ -431,7 +444,9 @@ pub fn dense_rank(rows: &[Vec<(usize, u64)>], columns: usize, modulus: u64) -> R
             continue;
         };
         m.swap(rank, piv);
-        let inv = inv_mod(m[rank][col], p).ok_or(LpGraphError::NonInvertible { value: m[rank][col] })?;
+        let inv = inv_mod(m[rank][col], p).ok_or(LpGraphError::NonInvertible {
+            value: m[rank][col],
+        })?;
         let pivot_row = m[rank].clone();
         for (i, row) in m.iter_mut().enumerate() {
             if i != rank && row[col] != 0 {
@@ -662,7 +677,12 @@ pub struct DmDecomposition {
 /// Dulmage–Mendelsohn decomposition from a maximum matching, `O(R + C + I)`.
 /// `rows[i]` lists the columns of row `i`. Coefficient singularities may
 /// remain: the decomposition is structural (catalog §2).
-pub fn dulmage_mendelsohn(rows: &[Vec<usize>], n_cols: usize, matching: &Matching) -> DmDecomposition {
+#[allow(clippy::needless_range_loop)]
+pub fn dulmage_mendelsohn(
+    rows: &[Vec<usize>],
+    n_cols: usize,
+    matching: &Matching,
+) -> DmDecomposition {
     let n_rows = rows.len();
     let mut col_rows = vec![Vec::new(); n_cols];
     for (i, r) in rows.iter().enumerate() {
@@ -718,10 +738,26 @@ pub fn dulmage_mendelsohn(rows: &[Vec<usize>], n_cols: usize, matching: &Matchin
         }
     }
     let row_class: Vec<u8> = (0..n_rows)
-        .map(|i| if row_over[i] { 0 } else if row_under[i] { 2 } else { 1 })
+        .map(|i| {
+            if row_over[i] {
+                0
+            } else if row_under[i] {
+                2
+            } else {
+                1
+            }
+        })
         .collect();
     let column_class: Vec<u8> = (0..n_cols)
-        .map(|c| if col_over[c] { 0 } else if col_under[c] { 2 } else { 1 })
+        .map(|c| {
+            if col_over[c] {
+                0
+            } else if col_under[c] {
+                2
+            } else {
+                1
+            }
+        })
         .collect();
     // Fine decomposition of the well part: directed graph on well columns,
     // c -> c' when the row matched to c has an entry in c' (also well).
@@ -867,7 +903,9 @@ pub struct LowStretchParams {
 
 impl Default for LowStretchParams {
     fn default() -> Self {
-        Self { boundary_ratio: 0.5 }
+        Self {
+            boundary_ratio: 0.5,
+        }
     }
 }
 
@@ -921,7 +959,9 @@ pub fn low_stretch_forest(
                     .filter(|&&(y, _)| assign[y] == usize::MAX)
                     .count();
                 if boundary == 0
-                    || (volume > 0 && boundary as f64 <= params.boundary_ratio * volume as f64 && ball.len() > 1)
+                    || (volume > 0
+                        && boundary as f64 <= params.boundary_ratio * volume as f64
+                        && ball.len() > 1)
                 {
                     break;
                 }
@@ -1132,7 +1172,11 @@ pub fn minimum_degree(adj: &[Vec<usize>], max_fill: usize) -> EliminationStats {
 
 /// Column interaction graph (pattern of `AᵀA`): columns adjacent when they
 /// share a row. Rows wider than `max_row` are skipped (counted in the return).
-pub fn column_interaction_graph(rows: &[Vec<usize>], n_cols: usize, max_row: usize) -> (Vec<Vec<usize>>, usize) {
+pub fn column_interaction_graph(
+    rows: &[Vec<usize>],
+    n_cols: usize,
+    max_row: usize,
+) -> (Vec<Vec<usize>>, usize) {
     let mut sets = vec![BTreeSet::new(); n_cols];
     let mut skipped = 0;
     for r in rows {
@@ -1149,7 +1193,10 @@ pub fn column_interaction_graph(rows: &[Vec<usize>], n_cols: usize, max_row: usi
             }
         }
     }
-    (sets.into_iter().map(|s| s.into_iter().collect()).collect(), skipped)
+    (
+        sets.into_iter().map(|s| s.into_iter().collect()).collect(),
+        skipped,
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -1171,7 +1218,11 @@ pub struct Partition {
 }
 
 /// `Σ_j (λ_j − 1)` and the number of cut nets for row partition `part`.
-pub fn connectivity_minus_one(rows: &[Vec<usize>], n_cols: usize, part: &[usize]) -> (usize, usize) {
+pub fn connectivity_minus_one(
+    rows: &[Vec<usize>],
+    n_cols: usize,
+    part: &[usize],
+) -> (usize, usize) {
     let mut parts_of: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); n_cols];
     for (i, r) in rows.iter().enumerate() {
         for &c in r {
@@ -1197,7 +1248,14 @@ pub fn block_partition(rows: &[Vec<usize>], n_cols: usize, k: usize) -> Partitio
     finish_partition(rows, n_cols, part, k, 0, 0)
 }
 
-fn finish_partition(rows: &[Vec<usize>], n_cols: usize, part: Vec<usize>, k: usize, passes: usize, moves: usize) -> Partition {
+fn finish_partition(
+    rows: &[Vec<usize>],
+    n_cols: usize,
+    part: Vec<usize>,
+    k: usize,
+    passes: usize,
+    moves: usize,
+) -> Partition {
     let mut part_sizes = vec![0; k];
     for &p in &part {
         part_sizes[p] += 1;
@@ -1247,7 +1305,17 @@ pub fn fm_partition(rows: &[Vec<usize>], n_cols: usize, params: FmParams) -> Par
     let mut moves = 0;
     let k = params.parts.max(1);
     let all: Vec<usize> = (0..n).collect();
-    recurse(rows, n_cols, &all, 0, k, params, &mut part, &mut passes, &mut moves);
+    recurse(
+        rows,
+        n_cols,
+        &all,
+        0,
+        k,
+        params,
+        &mut part,
+        &mut passes,
+        &mut moves,
+    );
     finish_partition(rows, n_cols, part, k, passes, moves)
 }
 
@@ -1272,10 +1340,32 @@ fn recurse(
     let k_left = k / 2;
     let target_left = verts.len() * k_left / k;
     let side = fm_bisect(rows, n_cols, verts, target_left, params, passes, moves);
-    let left: Vec<usize> = verts.iter().zip(&side).filter(|(_, &s)| s == 0).map(|(&v, _)| v).collect();
-    let right: Vec<usize> = verts.iter().zip(&side).filter(|(_, &s)| s == 1).map(|(&v, _)| v).collect();
-    recurse(rows, n_cols, &left, first, k_left, params, part, passes, moves);
-    recurse(rows, n_cols, &right, first + k_left, k - k_left, params, part, passes, moves);
+    let left: Vec<usize> = verts
+        .iter()
+        .zip(&side)
+        .filter(|(_, &s)| s == 0)
+        .map(|(&v, _)| v)
+        .collect();
+    let right: Vec<usize> = verts
+        .iter()
+        .zip(&side)
+        .filter(|(_, &s)| s == 1)
+        .map(|(&v, _)| v)
+        .collect();
+    recurse(
+        rows, n_cols, &left, first, k_left, params, part, passes, moves,
+    );
+    recurse(
+        rows,
+        n_cols,
+        &right,
+        first + k_left,
+        k - k_left,
+        params,
+        part,
+        passes,
+        moves,
+    );
 }
 
 /// One FM bisection of `verts` (side per local vertex), target `target_left`
@@ -1340,7 +1430,8 @@ fn fm_bisect(
                 }
             }
         }
-        let mut heaps: [BinaryHeap<(i64, Reverse<usize>)>; 2] = [BinaryHeap::new(), BinaryHeap::new()];
+        let mut heaps: [BinaryHeap<(i64, Reverse<usize>)>; 2] =
+            [BinaryHeap::new(), BinaryHeap::new()];
         for v in 0..n {
             heaps[side[v] as usize].push((gain[v], Reverse(v)));
         }
@@ -1361,7 +1452,7 @@ fn fm_bisect(
                         heaps[f].pop();
                         continue;
                     }
-                    if choice.map_or(true, |(bg, _)| g > bg) {
+                    if choice.is_none_or(|(bg, _)| g > bg) {
                         choice = Some((g, v));
                     }
                     break;
@@ -1430,4 +1521,3 @@ fn fm_bisect(
     }
     side
 }
-
