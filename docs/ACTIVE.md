@@ -17,7 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] In progress: qualify actual rational Jacobian-divisor Richelot maps and a second Jacobian hop; classify the smooth codomains' rational kernels and exact raw dual -[2] sign (Codex, started 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007; explicit E7 chains/report complete6b926f50, unsigned35dbcf/bbcce1; actual Weil8/full-cost/CI/custody remain open). [pcc:unverified]
+- [ ] In progress: classify all PGL2(F3) model changes for the three genuine curves and evaluate scalar-free cross-model Richelot chains, with an actual quadratic-twist/Frobenius control (Codex, started 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007; rational-divisor maps/result/report complete atdde79a33; full costs/Weil8/CI/custody open). [pcc:unverified]
+- [x] Qualify full rational Jacobian Richelot maps and exact raw dual -[2] on three21-class groups:4 bijections/1764 map additions/84 composites, finite dual-only kernel result and complete report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, resultdde79a33, unsigned6b4fb5/4b7b49). [pcc:unverified]
 
 - [x] Qualify real genus-two F3 Frobenius sectors, elliptic-factor eligibility and exact extension-order constraints before selecting a genuine mod8 Jacobian fixture (Codex, started 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007; stacked on native validation #5005).
 - [x] Publish completed Chained Transfers Richelot inverse cost16 results and document restart custody gaps; reports/queue and closed-PR4544 CI episode recorded (Codex, started 2026-11-23, branch lane/chained-richelot-cost16-20261123, PR #4990).
