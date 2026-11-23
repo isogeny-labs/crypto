@@ -68,6 +68,22 @@
       "proof": "NEXT_ROOT_INTERSECTION.md",
       "missing_lemma": "Exact sublinear empty-root certification including target setup and all node costs",
       "status": "written argument only; no faster predicate implemented"
+    },
+    {
+      "id": 4,
+      "candidate": "Exact split-algebra Fermat idempotent for zero count; after dense-state obstruction, exact signed group-sum dictionary and conventional full-rank rank/attempt tradeoff",
+      "proof": "NEXT_IMPLICIT_INDEX.md",
+      "completed": [
+        "Derived exact idempotent e=1-g^(p-1) and zero-count trace formula with split/squarefree/M<p assumptions",
+        "Specified complete quotient/Dickson/power/trace recurrences and showed explicit dense-state Omega(N) empty-root setup",
+        "Derived exact recurrence I_(h+1) from I_h and signed A, with no false negatives, group identity and duplicates preserved",
+        "Charged L^m preprocessing, memory, verification, child labels and amortization; exact E[output tuples]=T*L^m/n for uniform targets",
+        "Derived conditional full-rank m=2 Omega(B+n/B), and explicit complete m-sum dictionary exponent m/(2m-1)>1/2; not an unconditional ECDLP lower bound",
+        "Reconciled #4924 monic oracle newer source to successful original-Rust CI run 45089472283 at checkout 96c910...; current head 70e... changes only a protocol Markdown file"
+      ],
+      "outcome": "Fermat-trace normal form cannot deliver sublinear cold empty queries because it materializes dimension N. Complete signed sum index gives exact O(1) expected ONLINE emptiness but Omega(B^m) charged setup; its optimistic full-rank exponent remains above rho. No asymptotic gain.",
+      "status": "written mathematical derivation only; unverified; no code/benchmarks",
+      "source_commit": "ad1daae2543553aafe2bd58991dd1557f87d2909"
     }
   ],
   "claims": [
@@ -107,8 +123,8 @@
     "scope": "Native evaluated tier over 2^61-1 plus separate checked-i128 coefficient expansion; all proof fields null; no formal kernel proof",
     "root_replay": "identity-certificates/root-replay.json"
   },
-  "next_mathematical_gate": "An output-sensitive common-root isolation algorithm on succinct Dickson/S3 circuits with a bound on all surviving branches, including failures; account for setup, membership, extraction and witnesses. Explicitly avoid claiming a short circuit is already a fast solver.",
-  "next_empirical_gate": "Implement and freeze the byte-level natural-target generator and matched controls in PROTOCOL.md; obtain repository checkpoint/EKS admission before any performance experiment; compare against sparse products, fast product trees and maintained group-complement scan.",
+  "next_mathematical_gate": "Design and prove a non-enumerative higher-arity S3/implicit signed m-sum index with exact zero certification and a sublinear CHARGED setup/query/failed-branch/memory tradeoff. The explicit Fermat-trace state and full signed sum dictionary have failed the cold criterion. See NEXT_IMPLICIT_INDEX.md.",
+  "next_empirical_gate": "Commit the exact Rust hash-to-curve natural-target generator and freeze source/corpus before performance work, then obtain repository checkpoint/EKS admission and compare strongest maintained scan/product-tree controls; no benchmark launched.",
   "growing_family_obligation": "A fixed 31-bit prime cannot establish an asymptotic exponent. Specify growing prime fields and smooth p+1 structure without assuming infinitely many Mersenne primes, and include complete index-calculus costs.",
   "overlap_exclusions": [
     "#4692",
@@ -129,7 +145,7 @@
   "space": {
     "name": "Prime Field Summation Polynomial Research",
     "creation_attempts": 1,
-    "status": "uncertain write receipt; repeated read timeouts; reconciliation required",
+    "status": "Exact list_spaces and find_pages reconciliation both blocked by interactive authorization in non-interactive run; creation outcome still uncertain; no new create or save",
     "space_id": null,
     "page_id": null,
     "instruction": "Find the exact Space before any retry; do not create a duplicate or report a confirmed save without a returned receipt and readback",
@@ -143,7 +159,8 @@
     "No research KB tools; bounded direct primary-source and repository audit",
     "No EKS/AWS execution access in this session; no paid job launched",
     "No Lean/lake/elan",
-    "Partial connector materialization, no complete local Git object graph; PCC producer commit is zero and source hashes are explicit"
+    "Partial connector materialization, no complete local Git object graph; PCC producer commit is zero and source hashes are explicit",
+    "2026-11-22 continuation: no installed cargo/rustc in local runtime, no Rust benchmark executed; signed group index is mathematical/pseudocode only."
   ],
   "report": "REPORT.md",
   "pdf_status": "complete: 8 pages, visually checked, 56142 bytes; covers iterations1 and2 plus original-lock CI",
@@ -151,9 +168,18 @@
   "companion_lane": {
     "pull_request": "https://github.com/isogeny-labs/crypto/pull/4924",
     "branch": "research/symmetric-pair-quotient-prime31-20261122",
-    "observed_head": "fb850179c3847fd6950dbd91015c4e3d7c6da62d",
+    "observed_head": "70e04851fae933675dbc4476f22dcea25090551e",
     "scope": "Symmetric radical moments, monic-product quotient and rank-four factor tree",
-    "continuation": "Source provenance resolved: aa27edac is repository checkout; b8a594 is runner provisioner. Monic source changed by fb850179, so require matching CI for later bytes. See evidence/SIBLING_CI_AUDIT.md."
+    "continuation": "Source provenance resolved: aa27edac is repository checkout; b8a594 is runner provisioner. Monic source changed by fb850179, so require matching CI for later bytes. See evidence/SIBLING_CI_AUDIT.md.",
+    "validated_monic_source_blob": "ec949fa765aee1686ba01a74f420f8f2f0a77df3",
+    "newer_original_rust_ci": {
+      "run_id": 45089472283,
+      "job_id": 137415511884,
+      "checkout_commit": "96c9101315d9f0c7ca5fee2af18cdb10d16c645d",
+      "conclusion": "success",
+      "scope": "Monic-oracle source at current companion head matches CI; exact-source original-Rust tests passed, producer unverified; logged online timings not admitted benchmark",
+      "current_head_change": "Only B677_MONIC_SCALING_PROTOCOL_20261123.md differs between 96c... and 70e..."
+    }
   },
   "original_lock_ci": {
     "workflow": ".github/workflows/prime31-dickson-quotient-gate.yml",
