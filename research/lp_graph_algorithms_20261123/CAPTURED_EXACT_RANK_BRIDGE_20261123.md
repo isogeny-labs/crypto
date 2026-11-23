@@ -21,6 +21,13 @@ The identity is exact but applies to the **full cancellation space**, not an arb
 
 `lp_graph_collect` currently collects naturally generated **binary-curve** `ecbench_large_prime` relations, not ordinary Prime31 relations. Previous real binary records at `results_real/` are 20,000–120,000 rows, above the present 4096-row exact-audit cap; they are background evidence, **not** eligible full-stream exact-rank measurements. New capped real captures and an ordinary Prime31 collector/stream are different future prerequisites. The immutable ordinary Prime31 reference parameters elsewhere in the repository are `p=2147483647, a=847514846, b=2087444724, ell=2147446831, G=(625037715,2100627251)` (cofactor one).
 
+
+### Root compile blocker and exact-source fallback (executed)
+
+[Native run #45232685589](https://github.com/isogeny-labs/crypto/actions/runs/45232685589) finished with **the standalone original-module graph integration test step passing**, then an **unshimmed root example compilation failure** before the CLI smoke could execute. The compiler error was `src/cryptanalysis/prime_root_trace.rs:4372:3`: an unclosed delimiter originating at `fn vproduct` near line 1071 (with `if` at 1108), in a file untouched by this lane. This is **not** successful whole-root validation and no candidate CLI tests ran in that job. Concurrent repository-wide workflow-syntax gate [#45232685419](https://github.com/isogeny-labs/crypto/actions/runs/45232685419) separately failed due out-of-scope `ct330-f103-rho-bsgs-paired.yml:99`.
+
+Instead of editing other sessions' compiler-source files, use the existing source-exact native harness `research/lp_graph_algorithms_20261123/native_gain_dsu/`, which symlinks original production graph/filter modules and intentionally shims only unrelated operation meters. Add the **original** `examples/lp_graph_eval.rs` as an explicit Cargo example in the isolated harness; run the same frozen default/opt-in/cap commands using its `--manifest-path`. This qualifies only the evaluator CLI and graph modules, **not** the root crate, the binary-curve collector CLI (which depends on unshimmed `ecbench_large_prime`), or any Prime31 relation collector. The root error and missing coverage remain visible in the handoff. Source revisions `8c5d173c` (harness target), `8ec25dd6` (workflow). New terminal run pending, not a passed test. [pcc:unverified]
+
 ## Frozen correctness test before execution
 
 Hypothesis: the opt-in bridge can run the existing same-stream forest/pivot/MST exact useful-rank auditor from the native frontends; default serialization remains backwards compatible; unsupported/capped inputs cannot silently report an exact rank.
@@ -31,13 +38,14 @@ Required: compare source-invariant fields `modulus, rows, lp_columns, incidences
 
 Commands embedded in `.github/workflows/graph-ic-gain-dsu-native.yml`:
 ```sh
-cargo check --locked --release --example lp_graph_eval --example lp_graph_collect
-cargo run --locked --release --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --out /tmp/graph-default.json
-cargo run --locked --release --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 64 --out /tmp/graph-exact.json
-cargo run --locked --release --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 8 --out /tmp/graph-capped.json
+bash research/lp_graph_algorithms_20261123/native_gain_dsu/run.sh
+cargo check --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval
+cargo run --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --out /tmp/graph-default.json
+cargo run --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 64 --out /tmp/graph-exact.json
+cargo run --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 8 --out /tmp/graph-capped.json
 ```
 
-No isolation-grade timing/peak-RSS measurement, cold solve, or optimized-rho comparison is claimed by this CLI check. Only one standard hosted correctness job, 15-minute timeout, no paid compute. The existing source-bound `tests/large_prime_graph.rs` regression already checks 128 original-block rank identities over five `F_ell` fields and 24 seeded same-stream cases, but this new job specifically tests the actual example admission bridge. **Record the native run's terminal outcome before calling it passing.**
+No isolation-grade timing/peak-RSS measurement, cold solve, or optimized-rho comparison is claimed by this CLI check. Only one standard hosted correctness job, 12-minute timeout, no paid compute. The existing source-bound `tests/large_prime_graph.rs` regression already checks 128 original-block rank identities over five `F_ell` fields and 24 seeded same-stream cases, but this new job specifically tests the actual example admission bridge. **Record the native run's terminal outcome before calling it passing.**
 
 A subsequent bounded *real binary* collector invocation (not executed here) is:
 ```sh
