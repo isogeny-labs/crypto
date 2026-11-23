@@ -795,3 +795,63 @@ fn forest_witness_projected_small_rank_covers_existing_pivot_on_toys() {
         );
     }
 }
+
+#[test]
+fn forest_witness_parent_paths_survive_small_component_reroots() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    // Two length-one trees join through *non-root* endpoints. The smaller
+    // component must be rerooted before the new tree equation is attached.
+    // This is the specific topology that a DSU-parent-only shortcut misses.
+    let rows: Vec<Vec<(usize, u64)>> = vec![
+        vec![(0, 1), (1, 1)],
+        vec![(2, 1), (3, 1)],
+        vec![(1, 1), (3, 1)],
+        vec![(0, 1), (2, 1)], // balanced four-edge cycle
+        vec![(2, 1)],         // an independent anchor
+        vec![(3, 1)],         // dependent after anchoring
+        vec![],               // zero LP row: independent witness
+    ];
+    for p in [3u64, 7, 101, 1_000_003] {
+        let mut forest = ForestWitnessExtractor::new(4, p).unwrap();
+        let mut witnesses = Vec::new();
+        for row in &rows {
+            if let Some(w) = forest.add_row(row).unwrap() {
+                witnesses.push(w);
+            }
+        }
+        assert_eq!(forest.rank(), 4);
+        assert_eq!(witnesses.len(), 3);
+        assert_eq!(
+            witnesses.iter().map(|w| w.row_index).collect::<Vec<_>>(),
+            vec![3, 5, 6]
+        );
+        let stats = forest.stats();
+        assert_eq!(stats.tree_edges, 3);
+        assert_eq!(stats.anchors, 1);
+        assert!(stats.reroot_steps > 0, "reroot path was not exercised");
+        assert!(stats.path_steps > 0, "nontrivial parent path was not walked");
+        assert_eq!(stats.adjacency_scans, 0, "parent-path arm did a BFS scan");
+
+        let source: Vec<PartialRelation> = rows.iter().enumerate().map(|(i, row)| {
+            PartialRelation {
+                id: 10 + i as u64,
+                small: vec![(i as u32, 1)],
+                large: row.iter().map(|&(j, c)| (100 + j as u64, c)).collect(),
+                rhs: i as u64 % p,
+            }
+        }).collect();
+        let index = LpIndex::build(&source, p).unwrap();
+        let batch = collect_witnesses(&index).unwrap();
+        assert_eq!(batch.rank, dense_rank(&index.rows, 4, p).unwrap());
+        assert_eq!(batch.witnesses, witnesses);
+        for w in &batch.witnesses {
+            assert!(witness_cancels_lp(&index, w));
+        }
+        let replay = materialize_complete_relations(&index, &batch, &source, 32, 32).unwrap();
+        assert_eq!(replay.len(), 3);
+        for row in &replay {
+            assert!(row.sources.len() <= 7);
+            assert!(row.small.len() <= 7);
+        }
+    }
+}
