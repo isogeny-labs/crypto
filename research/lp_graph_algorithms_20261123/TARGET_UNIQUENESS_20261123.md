@@ -1,6 +1,6 @@
 # Graph-IC target uniqueness under sparse elimination
 
-Status: **implementation + authored native Rust regression tests, awaiting original-source execution and independent validation**. [pcc:unverified]  
+Status: **source-bound native Rust regression tests passed 30/30; root-crate and authentic-stream gates outstanding**. [pcc:unverified]  
 PR: https://github.com/isogeny-labs/crypto/pull/4972  
 Scope: `src/cryptanalysis/pq_sparse_la.rs` only; the existing `ic_graph` and `pq_wiedemann` paths are unchanged.
 
@@ -51,7 +51,7 @@ The source patch adds:
 
 Existing broad random tests that previously compared arbitrary free-variable-zero values to a second solver were corrected to allow only conservative `None` refinements; whenever this solver returns `Some`, its value must still equal the historical reference. The exhaustive F7 oracle independently adjudicates both `Some` and `None` and prevents the relaxed comparison from masking incorrect uniqueness on its registered fixtures.
 
-Existing exact-source regression suite, including finite-field Wiedemann tests, remains necessary. The existing `.github/workflows/graph-ic-gram-native.yml` triggers when `pq_sparse_la.rs` changes; it compiles the **original production source** through a standalone Cargo shim that does not qualify the entire root crate. This session's container has neither `cargo` nor `rustc` and cannot reach the Rust installer. Do not report native success without the completed hosted job receipt, pinned source SHA, job outcome and test totals. The root crate was reported unbuildable on the default branch in merged graph PR #4968; its current exact status must be rechecked rather than inherited as a universal fact.
+Existing exact-source regression suite, including finite-field Wiedemann tests, remains necessary. The existing `.github/workflows/graph-ic-gram-native.yml` triggers when `pq_sparse_la.rs` changes; it compiles the **original production source** through a standalone Cargo shim that does not qualify the entire root crate. This session's container has neither `cargo` nor `rustc`; native execution used the completed hosted source-bound job recorded below. The root crate was reported unbuildable on the default branch in merged graph PR #4968; its current exact status must be rechecked rather than inherited as a universal fact.
 
 ## Inputs / acceptance protocol
 
@@ -72,3 +72,18 @@ Hypothesis: target-uniqueness can be proved through exact elimination of free-co
 3. Only then use an authentic public collector stream to test that target columns are reported as determined if and only if the row span contains the corresponding unit coordinate, with independent signed witness replay. Record rank, retained outputs, extra cost and complete cold comparison at the actual scope.
 
 No paid compute, merge, auto-merge, leaderboard/PCC promotion, or new scientific measurement was performed by this patch. [pcc:unverified]
+
+
+## Completed original-source native Rust qualification (not full crate)
+
+[Source-bound workflow run 45119651578](https://github.com/isogeny-labs/crypto/actions/runs/45119651578), job `137510261133`, completed **success** on November 23, 2026 UTC. Hosted `rustc 1.100.0` compiled the original production `pq_sparse_la.rs` and `pq_wiedemann.rs` through the existing isolated `native_pq_gram` Cargo harness. The job log reports **30 passed, 0 failed, 0 ignored**, including the exact cancellation, ambiguous/free target, distant compressed-column and independent exhaustive 96-case F7 oracle tests. [pcc:unverified]
+
+Pinned tested **code commit** `84354082ebc728e650d0e5f77f093f13e77a7618`; original source SHA-256 at run: `pq_sparse_la.rs` `401f29da80e2f1f7296aedcce7a8ea11b0e396708214028ead953b9630b6eca5`; `pq_wiedemann.rs` `541c5279fe2f12cf89db2ddc6cfbfdc02cb2f4a20714a801b3ac5ebd812cc680`. The workflow uses explicit shims for unrelated root dependencies and **does not prove the unshimmed full-crate compiles**.
+
+Preserved development failures rather than erasing them: first source gate [45119255067](https://github.com/isogeny-labs/crypto/actions/runs/45119255067) compiled, 26/29 passed with three old reference tests comparing free-variable-zero representatives, which do not establish uniqueness. Intermediate source gate [45119409456](https://github.com/isogeny-labs/crypto/actions/runs/45119409456) compiled, 28/29 passed, with the old arbitrary-particular-value solved-count threshold failing: 53 genuinely determined targets versus prior threshold >60. The subsequent exact-source gate with exhaustive test [45119555225](https://github.com/isogeny-labs/crypto/actions/runs/45119555225) compiled and 29/30 passed, same threshold. The threshold was corrected to >40, with the observed 53 retained in the comment; exact uniqueness is separately checked exhaustively in F7. Run 45119651578 then passed 30/30. This is a correctness improvement and removal of false-positive target certificates, not measured wall-time or independent PCC verification.
+
+### Remaining gates
+
+- Build unshimmed production root crate on coherent main; review any legacy build obstacles without broad unrelated repair.
+- Independently replay arbitrary *authentic* public relation streams, match computed row span and target identity, charge output and graph/map expansion costs, and check recovered elliptic scalar against `[x]G=Q`.
+- Record `ell` separate from coordinate prime `p=2^31-1`; do not generalize F7 fixture reliability to Prime31 measured performance.
