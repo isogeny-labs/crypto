@@ -8,66 +8,66 @@ Date: 2026-11-23. Lane: [PR #4977](https://github.com/isogeny-labs/crypto/pull/4
 
 Work over `F_8`. The smooth genus-two Artin–Schreier curve
 
-[
- C:qquad y^2+y=x^5+x+1
-]
+$
+ C:\q\quad y^2+y=x^5+x+1
+$
 
 has one rational point at infinity. It is smooth because the `y` partial derivative is `1`, and has genus two because the right-hand side has odd degree five.
 
 For `F_{2^m}`, `y^2+y=z` has two solutions iff `Tr_{2^m/2}(z)=0`. For any `x` in `F_8^*`, the trace of `x^5+x` is
 
-[
+$
 x+x^2+x^3+x^4+x^5+x^6,
-]
+$
 
 which equals 0 when `x=1` and equals 1 for the other six nonzero values (use `x^7=1` and the seven-term geometric sum). At `x=0` it is also 0. Since `Tr_{8/2}(1)=1`, exactly the six values `x\in F_8\setminus\{0,1\}` lift, hence
 
-[
+$
 N_1=#C(F_8)=1+2(6)=13.
-]
+$
 
 For `F_{64}`, select `t` with `t^8=t+1`; write `t^2+t=\delta\in F_8` and `x=a+bt`, `a,b\in F_8`. Such `t` exists because the relative trace `F_{64}\to F_8` is surjective. The absolute trace of the constant 1 is zero. Since
 
-[
-t^4=t+\delta+\delta^2,qquad
+$
+t^4=t+\delta+\delta^2,\q\quad
 t^5=(1+\delta+\delta^2)t+\delta,
-]
+$
 
 taking the relative trace of `x^5+x+1` and then the `F_8/F_2` trace yields
 
-[
+$
 Q(a,b)=\operatorname{Tr}_{8/2}
  \bigl(a^4b+ab^4+b^5(1+\delta+\delta^2)+b\bigr).
-]
+$
 
 Use `Tr(a^4b)=Tr(ab^2)`, giving the `a` coefficient `b^2+b^4`. At `b=0`, every one of eight `a` values gives trace zero. At `b=1`, the constant is `\operatorname{Tr}(\delta+\delta^2)=0`, so again all eight do. For each of the six remaining nonzero `b`, `b^2+b^4\ne0`; the resulting nonzero linear functional in `a` is balanced, hence four of the eight `a` values give zero. Exactly `8+8+6(4)=40` abscissae lift, proving
 
-[
+$
 N_2=#C(F_{64})=1+2(40)=81.
-]
+$
 
 The standard genus-two Newton/zeta formula gives
 
-[
+$
 #J(F_q)=\frac{N_1^2+N_2}{2}-q,
-qquad
+\q\quad
 #J(F_8)=\frac{13^2+81}{2}-8=117=3^2\cdot13.
-]
+$
 
 ## Prove cyclicity, rather than assuming it
 
 Here `t_1=q+1-N_1=-4`, `t_2=q^2+1-N_2=-16`, and `e_2=(t_1^2-t_2)/2=16`. The Frobenius characteristic polynomial is exactly
 
-[
+$
 P(T)=T^4+4T^3+16T^2+32T+64
 =(T^2+8)(T^2+4T+8).
-]
+$
 
-The two quadratic factors have resultant `128` and are thus coprime in `Z_3[T]`. The rank-four 3-adic Tate module splits into rank-two Frobenius-stable summands for these factors. On the `T^2+4T+8` summand, `\det(1-F)=13` is a 3-adic unit, so this summand contributes no rational 3-torsion. The other rank-two summand has Frobenius trace zero. Were the order-nine 3-primary rational subgroup `(Z/3)^2`, Frobenius would act as identity on its entire two-dimensional mod-3 summand, forcing trace `2 mod 3`, contradicting trace `0 mod 3`. Hence the 3-primary subgroup is `Z/9`, while the 13-primary subgroup necessarily is `Z/13`. Therefore
+The two \quadratic factors have resultant `128` and are thus coprime in `Z_3[T]`. The rank-four 3-adic Tate module splits into rank-two Frobenius-stable summands for these factors. On the `T^2+4T+8` summand, `\det(1-F)=13` is a 3-adic unit, so this summand contributes no rational 3-torsion. The other rank-two summand has Frobenius trace zero. Were the order-nine 3-primary rational subgroup `(Z/3)^2`, Frobenius would act as identity on its entire two-dimensional mod-3 summand, forcing trace `2 mod 3`, contradicting trace `0 mod 3`. Hence the 3-primary subgroup is `Z/9`, while the 13-primary subgroup necessarily is `Z/13`. Therefore
 
-[
-oxed{J(F_8)\simeq \mathbf Z/117\mathbf Z}.
-]
+$
+\boxed{J(F_8)\simeq \mathbf Z/117\mathbf Z}.
+$
 
 **There exists a divisor class of exact order 117.** This is an existence theorem, not an executed construction of an explicit Mumford representative. It is also stronger for BSGS than the previous `y^2+y=x^5+x^3` example of Jacobian cardinality 169, which by itself did not determine a divisor-order failure.
 
@@ -81,10 +81,10 @@ The `divisor_order_bsgs` implementation sets
 `steps=ceil(sqrt(width))+1=10`,
 `giant_max=floor(width/steps)+2=10`, and its verified candidate-multiple check ranges over
 
-[
-m=\operatorname{lo}+i\cdot\operatorname{steps}+j,quad
-0\le i\le10,quad 0\le j<10,
-]
+$
+m=\operatorname{lo}+i\cdot\operatorname{steps}+j,\quad
+0\le i\le10,\quad 0\le j<10,
+$
 
 so **every candidate lies in `[1,110]`**, including a bounded overshoot beyond `hi=81`. The previous 169-order example should not be called a BSGS failure merely because its group order exceeds 81.
 
