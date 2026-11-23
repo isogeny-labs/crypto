@@ -30,6 +30,9 @@ fn run_optimized(op: &str, p: u64, n: usize) -> (u64, f64) {
     (checksum, t.elapsed().as_secs_f64() * 1e9 / (n * 32) as f64)
 }
 fn main() {
+    baseline::round128_independent_oracle();
+    optimized::round128_independent_oracle();
+    println!("independent oracle: PASS (both sources, 5 prime fields)");
     println!("compiler: {:?}", option_env!("RUSTC_VERSION"));
     for p in [65_521u64, 1_000_000_007, 4_294_967_291] {
         for op in ["mul", "add", "sub", "pow", "rem", "powmod", "roots"] {
