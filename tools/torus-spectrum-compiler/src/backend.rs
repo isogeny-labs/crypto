@@ -37,25 +37,33 @@ fn execute(exe: &Path, input: &str) -> Result<(String, String)> {
     }
     Ok((stdout, stderr))
 }
-fn scalar_model(text: &str) -> Result<BigUint> {
+fn scalar_model(text: &str, p: &BigUint) -> Result<BigUint> {
     let tokens: Vec<_> = text
         .split(|c: char| c.is_whitespace() || c == '(' || c == ')')
         .filter(|s| !s.is_empty())
         .collect();
-    if tokens.first() != Some(&"sat") {
+    if tokens.len() != 3 || tokens[0] != "sat" || tokens[1] != "x" {
         return Err("backend did not return SAT".into());
     }
-    let ff: Vec<_> = tokens.iter().filter_map(|t| t.strip_prefix("ff")).collect();
-    if ff.len() != 1 || ff[0].is_empty() || !ff[0].bytes().all(|b| b.is_ascii_digit()) {
+    // The pinned native release prints #f<value>m<modulus> for get-value.
+    let (value, modulus) = tokens[2]
+        .strip_prefix("#f")
+        .and_then(|s| s.split_once('m'))
+        .ok_or("unsupported field-model dialect")?;
+    if value.is_empty() || !value.bytes().all(|b| b.is_ascii_digit()) || modulus != p.to_string() {
         return Err("malformed scalar field model".into());
     }
-    BigUint::parse_bytes(ff[0].as_bytes(), 10).ok_or("bad scalar model decimal".into())
+    let x = BigUint::parse_bytes(value.as_bytes(), 10).ok_or("bad scalar model decimal")?;
+    if &x >= p {
+        return Err("noncanonical scalar model".into());
+    }
+    Ok(x)
 }
 pub fn admit(exe: &Path, out: &mut impl Write) -> Result<()> {
     for p in [BigUint::from(101u32), torus_s4::curve25519_prime()] {
         let query=format!("(set-logic QF_FF)\n(set-option :produce-models true)\n(define-sort F () (_ FiniteField {p}))\n(declare-const x F)\n(assert (= (ff.mul x x) (as ff9 F)))\n(check-sat)\n(get-value (x))\n");
         let (stdout, stderr) = execute(exe, &query)?;
-        let x = scalar_model(&stdout)?;
+        let x = scalar_model(&stdout, &p)?;
         if x >= p || (&x * &x) % &p != BigUint::from(9u32) {
             return Err("native scalar replay rejected backend model".into());
         }
@@ -86,8 +94,19 @@ mod tests {
     use super::*;
     #[test]
     fn model_parser_refuses_unknown_and_ambiguous() {
-        assert!(scalar_model("unknown").is_err());
-        assert!(scalar_model("sat ((x (as ff3 F)) (y (as ff4 F)))").is_err());
-        assert!(scalar_model("sat ((x (as ff-3 F)))").is_err());
+        let p = 101u32.into();
+        assert_eq!(
+            scalar_model("sat\n((x #f3m101))", &p).unwrap(),
+            BigUint::from(3u32)
+        );
+        for text in [
+            "unknown",
+            "sat ((x #f3m101) (y #f4m101))",
+            "sat ((x #f-3m101))",
+            "sat ((x #f3m103))",
+            "sat ((x #f101m101))",
+        ] {
+            assert!(scalar_model(text, &p).is_err());
+        }
     }
 }
