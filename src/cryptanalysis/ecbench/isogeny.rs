@@ -411,6 +411,49 @@ impl Fp<'_> {
     fn powmod(&mut self, base: &[u64], mut e: u64, m: &[u64]) -> Vec<u64> {
         let mut r = vec![1];
         let mut b = self.rem(base, m);
+        // A dense, large exponent spends most of its time multiplying
+        // polynomials during the Frobenius and equal-degree split steps.
+        // Width-three sliding windows replace roughly three multiply-by-base
+        // operations with one precomputed odd power. Only use the window
+        // for degree >= 3 and sufficiently dense >= 31-bit exponents:
+        // shorter/sparse exponents do not amortize the three precomputations.
+        if e >= (1u64 << 30) && e.count_ones() >= 12 && m.len() >= 4 {
+            let base_squared = self.mulmod(&b, &b, m);
+            let mut odd = [b.clone(), Vec::new(), Vec::new(), Vec::new()];
+            for i in 1..4 {
+                odd[i] = self.mulmod(&odd[i - 1], &base_squared, m);
+            }
+            let mut bit = 63i32 - e.leading_zeros() as i32;
+            let mut started = false;
+            while bit >= 0 {
+                if ((e >> bit) & 1) == 0 {
+                    if started {
+                        r = self.mulmod(&r, &r, m);
+                    }
+                    bit -= 1;
+                    continue;
+                }
+                let mut low = (bit - 2).max(0);
+                while ((e >> low) & 1) == 0 {
+                    low += 1;
+                }
+                let width = (bit - low + 1) as u32;
+                let value = ((e >> low) & ((1u64 << width) - 1)) as usize;
+                if started {
+                    for _ in low..=bit {
+                        r = self.mulmod(&r, &r, m);
+                    }
+                    r = self.mulmod(&r, &odd[(value - 1) / 2], m);
+                } else {
+                    // Initialize from the first odd window, skipping the
+                    // otherwise mandatory multiplication by the identity.
+                    r = odd[(value - 1) / 2].clone();
+                }
+                started = true;
+                bit = low - 1;
+            }
+            return r;
+        }
         while e > 0 {
             if e & 1 == 1 {
                 r = self.mulmod(&r, &b, m);
@@ -792,6 +835,46 @@ impl Isogeny {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
+
+    #[test]
+    fn round142_dense_polynomial_powmod_matches_binary_reference() {
+        for p in [3u64, 5, 7, 17, 101, 65_521, 1_000_000_007,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x142_2026_11_23u64;
+            for degree in [3usize, 4] {
+                for _ in 0..64 {
+                    let mut modulus = Vec::with_capacity(degree + 1);
+                    for _ in 0..degree {
+                        state ^= state << 13;
+                        state ^= state >> 7;
+                        state ^= state << 17;
+                        modulus.push(state % p);
+                    }
+                    modulus.push(1);
+                    for exponent in [0u64, 1, 2, 3, 11, 31, 257,
+                                     (p - 1) / 2, p - 1, p] {
+                        let observed = field.powmod(&[0, 1], exponent, &modulus);
+                        let mut expected = vec![1];
+                        let mut base = field.rem(&[0, 1], &modulus);
+                        let mut e = exponent;
+                        while e != 0 {
+                            if e & 1 != 0 {
+                                expected = field.mulmod(&expected, &base, &modulus);
+                            }
+                            e >>= 1;
+                            if e != 0 {
+                                base = field.mulmod(&base, &base, &modulus);
+                            }
+                        }
+                        assert_eq!(observed, expected,
+                            "powmod mismatch p={p}, degree={degree}, exponent={exponent}");
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn round141_monic_binary_inverse_matches_fermat() {
