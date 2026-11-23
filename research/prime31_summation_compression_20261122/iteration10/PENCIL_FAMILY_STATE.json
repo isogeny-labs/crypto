@@ -204,5 +204,74 @@
     "cryptographic_benchmarks": 0,
     "pcc": "unverified",
     "next_step": "independently verify cyclicity and loop limits, then authorized original-Rust source-frozen concrete divisor regression; preserve both parents and original tests"
+  },
+  "explicit_q8_mumford_generator_regression": {
+    "note": "iteration10/source_reconstruction_followup/HASSE_Q8_EXPLICIT_GENERATOR_REGRESSION.md",
+    "source_commit": "3c67a96da060978cc66c142b3e9a0ed6157082c7",
+    "note_blob": "7a36dd405e362c0a9a84cdeebdbd060caad90b29",
+    "base_field": "F2[z]/(z^3+z+1), elements encoded 0..7",
+    "curve": "y^2+y=x^5+x+1 over F8",
+    "mumford_generator": {
+      "u": [
+        2,
+        1
+      ],
+      "v": [
+        6
+      ],
+      "order": 117
+    },
+    "multiples": {
+      "k9": {
+        "u": [
+          5,
+          1,
+          1
+        ],
+        "v": [
+          4,
+          5
+        ]
+      },
+      "k13": {
+        "u": [
+          4,
+          1,
+          1
+        ],
+        "v": [
+          6,
+          5
+        ]
+      },
+      "k39": {
+        "u": [
+          1,
+          1,
+          1
+        ],
+        "v": []
+      },
+      "k78": {
+        "u": [
+          1,
+          1,
+          1
+        ],
+        "v": [
+          1
+        ]
+      },
+      "k117": {
+        "u": [
+          1
+        ],
+        "v": []
+      }
+    },
+    "math_check": "117 distinct producer-side Cantor powers; repeated-add vs binary-scalar comparison at all k; 289 sampled addition identities",
+    "status": "source-bound exact finite-field mathematical producer calculation; no compiled original Rust, signed validation, or benchmark; PCC unverified",
+    "worker_roles": "one coordinator handled algebra and validation preparation; native workers unavailable; Rust implementer deferred pending an authorized source-frozen root repair",
+    "next_gate": "independent arithmetic/oracle review, original-root m3 g2 exact divisor test and before/after divisor_order_bsgs regression after both-parent union repair; Prime31 empty-inclusive S3 sublinear query remains open"
   }
 }
