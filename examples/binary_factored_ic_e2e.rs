@@ -1,7 +1,7 @@
 //! **End-to-end binary index calculus: `S₄` pairs-and-solve against the
 //! factored `S₃·S₃` oracle, through to the discrete logarithm.**
 //!
-//! For each odd `n` this runs the boundary ledger's char-2 instance
+//! For each `n` (either parity) this runs the boundary ledger's char-2 instance
 //! (`ic_boundary::run_char2_instance`): a random curve `y² + xy = x³ + ax² + b`
 //! over `F_{2ⁿ}` with cofactor ≤ 8, the low-order subspace base of
 //! dimension `⌈n/3⌉`, and every variant through the same relation loop,
@@ -64,7 +64,7 @@ fn main() {
         let basis: Vec<u64> = (0..l).map(|i| 1u64 << i).collect();
         let base = SubspaceOracle::new(&basis, inst.b, &inst.gf);
         let Some(fac) = FactoredSubspaceOracle::new(&basis, inst.b, &inst.gf) else {
-            println!("n={n}: factored oracle needs odd n");
+            println!("n={n}: factored oracle unavailable (n > 63 or dependent basis)");
             continue;
         };
         let mut rng = StdRng::seed_from_u64(0xe2e ^ n as u64);
