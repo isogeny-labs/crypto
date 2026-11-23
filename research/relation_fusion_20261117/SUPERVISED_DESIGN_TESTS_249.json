@@ -1,0 +1,23 @@
+{
+  "schema": "supervised-design-test-qualification/v1",
+  "scope": "synthetic roster/statistical-clock control tests only; no native-launcher performance calls",
+  "command": "RUST_TEST_THREADS=1 CARGO_BUILD_JOBS=1 RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 taskset -c 0 cargo test --release --locked --manifest-path research/relation_fusion_20261117/Cargo.toml --bin supervised-compare --bin supervised-analyze -- --test-threads=1",
+  "exit_code": 0,
+  "analyzer_tests_passed": 8,
+  "collector_tests_passed": 3,
+  "distinct_test_definitions": 8,
+  "roster_tests_repeated_in_each_binary": 3,
+  "source_sha256": {
+    "research/relation_fusion_20261117/src/supervised_roster.rs": "afa8409ca412aeaa152b69214c659a71cb97e294c5545f763b459852552f6855",
+    "research/relation_fusion_20261117/src/bin/supervised-compare.rs": "7cc7be164055401b27b86b95117beddecba3b9fb489bf809c23292fa07f21336",
+    "research/relation_fusion_20261117/src/bin/supervised-analyze.rs": "f40c49a843de35770ffd68e45b92e29c0aef77299c9fbcf40db042a3a9497178"
+  },
+  "logs_sha256": {
+    "research/relation_fusion_20261117/development-01/supervised-design-tests-249.stdout": "e924ca04111045048c2d58b79396418b3241c82433b4fc4e728521cefeb8580d",
+    "research/relation_fusion_20261117/development-01/supervised-design-tests-249.stderr": "aca464d9ad0540e84ba7f14741a180e3de8d94b9fe1a6fe739aff8930eeac1a2"
+  },
+  "performance_observations_collected": 0,
+  "canonical_protocol_export_validation": "pending",
+  "15x_admitted": false,
+  "signed_execution_verdict": false
+}

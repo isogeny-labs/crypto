@@ -1,0 +1,14 @@
+{
+  "schema": "artifact-failure-correction/v1",
+  "corrects_claim": "PCC-20261123-e89520",
+  "correction": "Five failed requests identify four distinct keys, not five distinct objects; one key is repeated. Original incorrect unsigned claim is retained, not relied on.",
+  "failed_requests": [
+    "store/sha256/64/64ef9bfd5a47d52b4645f0207b905782b14f52eee4ca3780ee4d784d65d9227e",
+    "store/sha256/d5/d5a2ea1728c54d07ea29797e3d527f66ae710c67be02914f7e2d35142c31aa2d",
+    "store/sha256/b8/b89233ffc337e84f2ffc01cc080e7e353db7c599115146fa64c04c1e0a81ed36",
+    "store/sha256/d5/d5a2ea1728c54d07ea29797e3d527f66ae710c67be02914f7e2d35142c31aa2d",
+    "store/sha256/a4/a43711eacaa1e69017a799ecca86b51c16e8f64be4a43d6ea3d60b322b636874"
+  ],
+  "source_log_sha256": "a2d229005583f2bdbfa0f795f751f72b53b2aac01517d2ead05e75f80a94b912",
+  "cause": "unknown; no object absence inferred"
+}

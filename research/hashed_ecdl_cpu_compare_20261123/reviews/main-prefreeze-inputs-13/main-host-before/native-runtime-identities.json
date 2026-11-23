@@ -1,0 +1,164 @@
+{
+  "schema": "main-native-runtime-identities/v1",
+  "created_utc": "2026-11-23T14:22:25.067Z",
+  "scope": "Resolved native programs,thin runtime tools and their ldd ELF dependencies. Kernel/vdso and execution authenticity are not attested.",
+  "programs": [
+    {
+      "role": "parent_worker",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-00-scale",
+      "sha256": "abd2bd503e39073c33c2725a4bd4f8dc88a146d88e0a90a0cafbb45bfd4094ca",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2",
+        "/lib/x86_64-linux-gnu/libgcc_s.so.1"
+      ]
+    },
+    {
+      "role": "candidate_worker",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-03-scale",
+      "sha256": "2a648031cf8f02c6dc6f69f4cd457941b907411e743ed0e36d67a8d52ccaee69",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2",
+        "/lib/x86_64-linux-gnu/libgcc_s.so.1"
+      ]
+    },
+    {
+      "role": "external_native_verifier",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-05-hashed-ecdl-cpu",
+      "sha256": "e4adb5d7c164c09c980772f3b53d1abf7acaf221696cccb3c4e74f8f2e3f2712",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2",
+        "/lib/x86_64-linux-gnu/libgcc_s.so.1"
+      ]
+    },
+    {
+      "role": "driver",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified-v2-final/bin-panel-v2",
+      "sha256": "6945b355333ec994b9bf341143990d34919f0564facb522513036278280fc803",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "point_auditor",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified-v2-final/bin-point-audit-v2",
+      "sha256": "5a75ec32cb4018ea8b63a1aed6e693f9dc5912f2b92c3b8ec0ea0d6b0bc5322f",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "point_checker",
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/qualified/openssl-point-check",
+      "sha256": "2cabda898c4ac6d37660a96e9357c881d46d43828b44ed316d7311da0edbf853",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libcrypto.so.3",
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib/x86_64-linux-gnu/libz.so.1",
+        "/lib/x86_64-linux-gnu/libzstd.so.1",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "tool_bash",
+      "path": "/usr/bin/bash",
+      "sha256": "223fe8564b60636bc738b6178d3ba9a50ef7d791266b0efae6363bb716e4c47f",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libtinfo.so.6",
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "tool_timeout",
+      "path": "/usr/bin/timeout",
+      "sha256": "6ca1891dfc0b05d7680770c2884c0391b92467c7bb6500a5c84677e6481739f1",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "tool_setsid",
+      "path": "/usr/bin/setsid",
+      "sha256": "3b63f0ac8f72fffabd0b1ac7160a931b7cf09d21bd3676ba3e8dd8e1db029702",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "tool_flock",
+      "path": "/usr/bin/flock",
+      "sha256": "231d0d5879ff18acd8edcedb791be807cc7507df4dcfd7a17269d54bbeef21e1",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "tool_taskset",
+      "path": "/usr/bin/taskset",
+      "sha256": "0c34de807bc9c617406360836fca2c7505eb86ede4df5a34854bde6eeddad9f3",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    },
+    {
+      "role": "tool_sha256sum",
+      "path": "/usr/bin/sha256sum",
+      "sha256": "89f8c1d1ba3c76138f3771e1a91e2796ade6180b1c1e4258c04698ff32787c97",
+      "dependencies": [
+        "/lib/x86_64-linux-gnu/libcrypto.so.3",
+        "/lib/x86_64-linux-gnu/libc.so.6",
+        "/lib/x86_64-linux-gnu/libz.so.1",
+        "/lib/x86_64-linux-gnu/libzstd.so.1",
+        "/lib64/ld-linux-x86-64.so.2"
+      ]
+    }
+  ],
+  "libraries": [
+    {
+      "path": "/lib/x86_64-linux-gnu/libc.so.6",
+      "bytes": 1995216,
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libcrypto.so.3",
+      "bytes": 6517312,
+      "sha256": "8bb5f3fdffe280d4453eb79a4663c2c47af70b7c247fe2e94e2da703cee1fd3d"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "bytes": 182856,
+      "sha256": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libtinfo.so.6",
+      "bytes": 220464,
+      "sha256": "4013e7651ac68f547d8333517def25b2366c97eec7de7f06e105dbf3444ffebf"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libz.so.1",
+      "bytes": 125376,
+      "sha256": "85590dd58edf5445e18bc7193e5ebc01ac5841f1ae187e97705a662e90c6421e"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libzstd.so.1",
+      "bytes": 825336,
+      "sha256": "27f07c9a49c2c956bcfb64cd4712976586a66facbf15fc7f09bc37413b5f2b21"
+    },
+    {
+      "path": "/lib64/ld-linux-x86-64.so.2",
+      "bytes": 225672,
+      "sha256": "c8438e4fde1934e61c88311633f00949ff645d5c04cdb8671fa3d78164d2f307"
+    }
+  ]
+}

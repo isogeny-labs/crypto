@@ -2425,6 +2425,8 @@ pub fn groebner_basis_f4(
         None,
         max_matrix_words(),
         EARLY_GUARD,
+        None,
+        TraceMode::Off,
         fl_enabled(),
     )
 }
@@ -2446,19 +2448,31 @@ pub fn groebner_basis_f4_full_width(
         None,
         max_matrix_words(),
         EARLY_GUARD,
+        None,
+        TraceMode::Off,
         false,
     )
+}
+
+pub fn groebner_basis_f4_skeleton(initial: Vec<F2BoolPoly>, n_vars: usize, budget: Option<Duration>, skeleton: &mut F4Skeleton) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_skeleton_with_fl(initial, n_vars, budget, skeleton, fl_enabled())
+}
+
+/// Complete same-cache path with the FL split disabled for a matched control.
+pub fn groebner_basis_f4_skeleton_full_width(initial: Vec<F2BoolPoly>, n_vars: usize, budget: Option<Duration>, skeleton: &mut F4Skeleton) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_skeleton_with_fl(initial, n_vars, budget, skeleton, false)
 }
 
 /// [`groebner_basis_f4`] reading and extending a [`F4Skeleton`] shared
 /// with the earlier systems of the run.  The basis and every decision are
 /// those of [`groebner_basis_f4`]; only the symbolic work differs, and the
 /// stats count what was done.
-pub fn groebner_basis_f4_skeleton(
+fn groebner_basis_f4_skeleton_with_fl(
     initial: Vec<F2BoolPoly>,
     n_vars: usize,
     budget: Option<Duration>,
     skeleton: &mut F4Skeleton,
+    allow_fl: bool,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
     let (basis, mut st) = groebner_basis_f4_inner(
         initial,
@@ -2469,6 +2483,8 @@ pub fn groebner_basis_f4_skeleton(
         EARLY_GUARD,
         Some(&mut *skeleton),
         TraceMode::Off,
+        allow_fl,
+        fl_enabled(),
     );
     st.skeleton_bytes = skeleton.bytes;
     (basis, st)
@@ -2494,6 +2510,15 @@ fn trace_shape(inputs: &[F2BoolPoly], n_vars: usize) -> TraceShape {
     )
 }
 
+pub fn groebner_basis_f4_traced(initial: Vec<F2BoolPoly>, n_vars: usize, budget: Option<Duration>, store: &mut F4PairTrace) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_traced_with_fl(initial, n_vars, budget, store, fl_enabled())
+}
+
+/// Complete same-cache path with the FL split disabled for a matched control.
+pub fn groebner_basis_f4_traced_full_width(initial: Vec<F2BoolPoly>, n_vars: usize, budget: Option<Duration>, store: &mut F4PairTrace) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_traced_with_fl(initial, n_vars, budget, store, false)
+}
+
 /// [`groebner_basis_f4`] through a [`F4PairTrace`] shared with the earlier
 /// systems of the run: replay the trace of the system's shape when there
 /// is one, verify, and fall back to the plain computation (which records
@@ -2501,11 +2526,12 @@ fn trace_shape(inputs: &[F2BoolPoly], n_vars: usize) -> TraceShape {
 /// plain path's; the stats sum the work of every run made — replay,
 /// verification and fallback — and their outcome fields are those of the
 /// run whose basis is returned.
-pub fn groebner_basis_f4_traced(
+fn groebner_basis_f4_traced_with_fl(
     initial: Vec<F2BoolPoly>,
     n_vars: usize,
     budget: Option<Duration>,
     store: &mut F4PairTrace,
+    allow_fl: bool,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
     let started = Instant::now();
     let remaining = || budget.map(|b| b.saturating_sub(started.elapsed()));
@@ -2519,6 +2545,8 @@ pub fn groebner_basis_f4_traced(
             EARLY_GUARD,
             None,
             mode,
+            allow_fl,
+            fl_enabled(),
         )
     };
     let inputs: Vec<F2BoolPoly> = initial.into_iter().filter(|p| !p.is_zero()).collect();
@@ -4584,7 +4612,7 @@ mod tests {
         guard: EarlyGuard,
     ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
         let before = tally::snapshot();
-        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, true);
+        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, None, TraceMode::Off, true);
         (gb, st, tally::snapshot().since(before))
     }
 
@@ -5042,6 +5070,7 @@ mod tests {
                 EARLY_GUARD,
                 None,
                 TraceMode::Verify(&eqs),
+                fl_enabled(),
             );
             assert_eq!(ok.trace_verify_failures, 0, "system {k}: the basis fails");
             assert_eq!(ok.steps, 1);
@@ -5060,6 +5089,7 @@ mod tests {
                 EARLY_GUARD,
                 None,
                 TraceMode::Verify(&eqs),
+                fl_enabled(),
             );
             assert_eq!(
                 bad.trace_verify_failures, 1,
@@ -5078,6 +5108,7 @@ mod tests {
                     EARLY_GUARD,
                     None,
                     TraceMode::Verify(&eqs),
+                    fl_enabled(),
                 );
                 assert_eq!(
                     bad.trace_verify_failures, 1,

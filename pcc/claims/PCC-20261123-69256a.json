@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T05:30:37Z",
+ "id": "PCC-20261123-69256a",
+ "kind": "statement",
+ "producer": {
+  "commit": "240f04abc38fcea95930971376331c1ac5082069",
+  "model": "gpt-6-astra",
+  "session": "fass-quotient-query-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/root-gate/attempt1/pre-call-manifest.json",
+    "sha256": "3feffe9d2b0028b7cb9515c1e34fa8c786f7db74552420beb7271ff9671d9035"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/root-gate/attempt1/post-call-manifest.json",
+    "sha256": "df451fbea8bc49e7419e3d0b5e6b9ebfbfec270a17cbb641abf4f4700abd35b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/root-gate/attempt1/stderr.log",
+    "sha256": "fa79bd69c8e40ea335d89eb7b84ef2977b96e6f1f2b2ab39851b51b0a4fdcd87"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Source-bound local root-gate/attempt1 at working head240f04abc38fcea95930971376331c1ac5082069; input inventory does not claim all2192 listed unmaterialized trackedpaths are compiled dependencies.",
+ "statement": "The one bounded full-root release library command ended with cargo exit124 at its600-second deadline while dependency compilation was still in progress. Its stdout is empty, the retained stderr has no compiler-error or build-finished event, and no root library tests ran. All1769 recorded materialized inputs retained their hashes. This is an incomplete separate gate, not a library pass or a component correctness failure."
+}

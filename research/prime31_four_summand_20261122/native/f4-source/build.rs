@@ -423,6 +423,10 @@ fn main() {
             "candidate module bindings",
         ),
         (
+            "research/prime31_four_summand_20261122/native/build.rs",
+            "verbatim selector for the actual production F4 public resource-limit tests",
+        ),
+        (
             "research/prime31_four_summand_20261122/native/extractor.rs",
             "RR5 candidate source",
         ),
@@ -437,6 +441,30 @@ fn main() {
         (
             "research/prime31_four_summand_20261122/native/independent_tests.rs",
             "independent integer group-law oracle and extractor-to-adapter tests",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/b677_fixture.rs",
+            "validated original B509 plus Y7 public hybrid base and exact selector certificates",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/b677_controls.rs",
+            "independent B677 fixture, frozen input and forced construction-stop controls",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/selector_circuit.rs",
+            "quadratic quartic-modular membership circuit and independent dense-selector controls",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/b677_gate.rs",
+            "fixed bounded extraction driver with independent signed replay and authentic-RHS adapter",
+        ),
+        (
+            "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv",
+            "unchanged exact public Y7 base input included in the compiled fixture",
+        ),
+        (
+            "research/prime31_four_summand_20261122/scaling-b677/PROTOCOL.md",
+            "prospective frozen bounds, targets, controls, admission rules and interpretation",
         ),
         (
             "research/prime31_four_summand_20261122/native/identity_certificate.rs",
