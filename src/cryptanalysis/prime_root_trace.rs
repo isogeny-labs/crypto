@@ -329,6 +329,12 @@ impl Engine<'_> {
     }
     fn event(&mut self, event: RootEvent) -> Work<()> {
         self.room()?;
+        self.event_after_room(event)
+    }
+    // A Field operation has already checked the event budget in field().
+    // Do not repeat that check for every modular operation. There is no
+    // intervening event between the check and this emission.
+    fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         self.report.counters.observe(&event);
         if let Err(error) = (self.sink)(&event) {
             self.report.unacknowledged = Some(event);
@@ -995,6 +1001,39 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Build the monic product of distinct linear factors in place. Completing
+// root certificates previously allocated an intermediate Vec at every root,
+// even though multiplying by (X-r) needs only a backward coefficient pass.
+// The independent verifier still checks this product against f or the
+// Frobenius/GCD certificate; this is not an acceptance shortcut.
+fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    let mut product = Vec::with_capacity(roots.len() + 1);
+    product.push(1);
+    let mut previous = None;
+    for &root in roots {
+        if root >= p || previous.is_some_and(|a| a >= root) {
+            return Err("noncanonical or repeated root".into());
+        }
+        previous = Some(root);
+        let c = if root == 0 { 0 } else { p - root };
+        let n = product.len();
+        // The new leading coefficient is the old leading coefficient;
+        // no zero multiplication or modular reduction is necessary.
+        product.push(product[n - 1]);
+        if c == 0 {
+            product.copy_within(0..n, 1);
+            product[0] = 0;
+            continue;
+        // Descending updates preserve the old coefficients until read.
+        // The sum is < 2p <= 2^62, so one conditional subtraction suffices.
+        for i in (1..n).rev() {
+            let sum = product[i - 1] + vmul(product[i], c, p);
+            product[i] = if sum >= p { sum - p } else { sum };
+        product[0] = vmul(product[0], c, p);
+    }
+    Ok(product)
+}
+
 // Fast path for c + d*x^k (k >= 5), with c,d both nonzero. This is
 // separate from monomial multiplication, which is handled earlier.
 #[cold]
@@ -1006,7 +1045,6 @@ fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>
         || binomial[3..binomial.len() - 1].iter().any(|&x| x != 0)
     {
         return None;
-    }
     let shift = binomial.len() - 1;
     let low = binomial[0];
     let high = binomial[shift];
@@ -1024,23 +1062,16 @@ fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>
         } else {
             let product = vmul(x, high, p);
             let sum = out[i + shift] + product;
-            out[i + shift] = if sum >= p { sum - p } else { sum };
-        }
-    }
     Some(trim(out))
-}
 // Used only for independently replaying recorded Product events. Do not
 // alter the generic vproduct hot path: production Rust A/B showed 5-12%
 // regressions from even guarded binomial dispatch on ordinary operands.
 fn vverified_product(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
         if let Some(result) = vbinomial_product(a, b, p) { return result; }
-    }
     if b.len() >= 6 && b[1] == 0 && b[2] == 0 {
         if let Some(result) = vbinomial_product(b, a, p) { return result; }
-    }
     vproduct(a, b, p)
-}
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -1052,6 +1083,34 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
         if scalar == 0 { return vec![]; }
         if scalar == 1 { return trim(other.to_vec()); }
         return trim(other.iter().map(|&x| vmul(x, scalar, p)).collect());
+    }
+    // A monic linear factor (x + c) is common in completeness proofs.
+    // For f(x)*(x+c), coefficient k is c*f[k] + f[k-1].
+    // This needs one field product per coefficient, not two convolution
+    // products, and has no inner-loop allocation or degree dispatch.
+    if (a.len() == 2 && a[1] == 1 && b.len() >= 5)
+        || (b.len() == 2 && b[1] == 1 && a.len() >= 5)
+    {
+        let (linear, other) = if a.len() == 2 && a[1] == 1 {
+            (a, b)
+        } else {
+            (b, a)
+        };
+        let mut result = vec![0; other.len() + 1];
+        let c = linear[0];
+        if c == 0 {
+            result[1..].copy_from_slice(other);
+            return trim(result);
+        }
+        result[0] = vmul(other[0], c, p);
+        for i in 1..other.len() {
+            // Both summands are canonical, and p <= 2^61-1, so u64
+            // addition cannot overflow and needs one correction.
+            let sum = vmul(other[i], c, p) + other[i - 1];
+            result[i] = if sum >= p { sum - p } else { sum };
+        }
+        result[other.len()] = *other.last().unwrap();
+        return trim(result);
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
@@ -2533,6 +2592,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 s[0] = (s[0] + p - 1) % p;
                 let g = vgcd(h.clone(), trim(s), p)?;
                 let valid = g.len() > 1 && g.len() < h.len();
+                let quotient_matches = if valid {
+                    let (verified_quotient, verified_remainder) = vdiv(&h, &g, p)?;
+                    verified_remainder.is_empty() && verified_quotient == *quotient
+                } else {
+                    quotient.is_empty()
+                };
                 let split_quotient_valid = if valid {
                     if reuse_divisions {
                         match verified_division.take() {
@@ -2546,9 +2611,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     } else {
                         vdiv(&h, &g, p)? == (quotient.clone(), vec![])
                     }
-                } else {
                     true
-                };
                 if h != *polynomial
                     || g != *factor
                     || valid != *accepted
@@ -2562,7 +2625,14 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(polynomial, p)?;
                 if polynomial.len() != 2
                     || *root >= p
-                    || { let sum = vmul(polynomial[1], *root, p) + polynomial[0]; sum != 0 && sum != p }
+                    || (if polynomial[1] == 1 {
+                        // For x+c, root == -c mod p. Compare the
+                        // independent identity without a field product.
+                        *root != if polynomial[0] == 0 { 0 } else { p - polynomial[0] }
+                    } else {
+                        let sum = vmul(polynomial[1], *root, p) + polynomial[0];
+                        sum != 0 && sum != p
+                    })
                 {
                     return Err("linear root identity failed".into());
                 }
@@ -2631,11 +2701,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         if r >= p || previous.is_some_and(|a| a >= r) {
                             return Err("noncanonical or repeated root".into());
                         }
-                        previous = Some(r);
-                        product = vproduct(&product, &[(p - r) % p, 1], p);
-                    }
-                    if g != *linear_part || product != g {
-                        return Err("distinct-root completeness failed".into());
                     }
                 }
                 finished = true;
@@ -2672,6 +2737,122 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round83_inplace_roots_and_square_replay_equivalence() {
+        // Compare against the established independent polynomial operations,
+        // including X factors, full degree-eight products and sparse squares.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 0..=MAX_DEGREE {
+                if degree as u64 > p { continue; }
+                for seed in 0..64u64 {
+                    let mut roots: Vec<_> = (0..degree as u64)
+                        .map(|j| (seed * 137 + j * 31) % p).collect();
+                    roots.sort_unstable();
+                    roots.dedup();
+                    let expected = roots.iter().fold(vec![1], |f, &r| {
+                        vproduct(&f, &[(p - r) % p, 1], p)
+                    });
+                    assert_eq!(vroot_product(&roots, p).unwrap(), expected,
+                               "p={p} degree={degree} seed={seed}");
+                }
+            }
+            assert!(vroot_product(&[p], p).is_err());
+            assert!(vroot_product(&[1, 1], p).is_err());
+            assert!(vroot_product(&[2, 1], p).is_err());
+            for degree in 1..=MAX_DEGREE {
+                for seed in 0..64u64 {
+                    let mut f: Vec<_> = (0..=degree)
+                        .map(|j| ((seed * 127 + j as u64 * 71) % p)).collect();
+                    if f[degree] == 0 { f[degree] = 1; }
+                    for j in (1..degree).step_by(3) { f[j] = 0; }
+                    assert_eq!(vsquare(&f, p), vproduct(&f, &f, p),
+                               "square p={p} degree={degree} seed={seed}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round82_full_split_frobenius_certificate_and_tampering() {
+        // A full split proves X^p-X divisibility, including nonmonic f.
+        // Sparse, repeated-root, and partial-split certificates still use
+        // the general Frobenius/GCD replay and must continue verifying.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let cases = if p == 3 {
+                vec![vec![p - 1, 1], vec![0, 1]]
+            } else {
+                let split = [2u64, 3, 5, 7].iter().fold(vec![1], |a, &r| {
+                    vproduct(&a, &[(p - r) % p, 1], p)
+                });
+                let scaled = split.iter().map(|&x| vmul(x, 3, p)).collect();
+                vec![vec![p - 1, 1], vec![0, 1], split, scaled]
+            };
+            for polynomial in cases {
+                let report = solve(&polynomial, p, 7, RootLimits {
+                    field_work: MAX_WORK, split_attempts: 1000,
+                    events: MAX_EVENTS, degree: MAX_DEGREE,
+                }, &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "p={p} polynomial={polynomial:?}");
+                verify(&report).unwrap();
+                let mut forged = report.clone();
+                if let Some(RootEvent::Finish { xp_mod_f, .. }) = forged.events.last_mut() {
+                    *xp_mod_f = vec![p - 1];
+                }
+                assert!(verify(&forged).is_err(), "forged Frobenius at p={p}");
+                let mut forged = report.clone();
+                if let Some(RootEvent::Finish { linear_part, .. }) = forged.events.last_mut() {
+                    *linear_part = vec![1];
+                }
+                assert!(verify(&forged).is_err(), "forged linear part at p={p}");
+            }
+        }
+    }
+
+    #[test]
+    fn round81_monic_linear_certificate_product_matches_convolution() {
+        let mut seed = 0x8120_2611_2020_0001u64;
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 1..=8 {
+                for _ in 0..128 {
+                    let mut other = vec![0u64; degree + 1];
+                    for coefficient in &mut other {
+                        seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *coefficient = seed % p;
+                    }
+                    other[degree] = 1;
+                    // Includes a pure x factor, x+1, and general x+c.
+                    for c in [0, 1, p - 1, 2 % p] {
+                        let linear = [c, 1u64];
+                        let mut reference = vec![0u64; other.len() + 1];
+                        for (i, &a) in other.iter().enumerate() {
+                            for (j, &b) in linear.iter().enumerate() {
+                                reference[i + j] = ((reference[i + j] as u128
+                                    + a as u128 * b as u128) % p as u128) as u64;
+                            }
+                        }
+                        let reference = trim(reference);
+                        assert_eq!(vproduct(&other, &linear, p), reference);
+                        assert_eq!(vproduct(&linear, &other, p), reference);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round81_linear_and_quartic_certificates_still_verify() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let a = vproduct(&[p - 3, 1], &[p - 5, 1], p);
+            let quartic = vproduct(&a, &[1, 0, 1], p);
+            for polynomial in [vec![p - 3, 1], a, quartic] {
+                let report = run(&polynomial, p);
+                assert!(report.complete(), "p={p} stop={:?}", report.stop);
+                verify(&report).unwrap();
+                assert!(report.roots.contains(&3));
+            }
+        }
+    }
 
     #[test]
     fn round76_identity_pruning_preserves_root_certificates() {
