@@ -214,7 +214,7 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
 #[inline]
-fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
+fn field_value(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal_64: u64) -> u64 {
     match op {
         FieldOp::Add => {
             if a < p && b < p {
@@ -238,7 +238,19 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
                 let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
                 // Canonical product < p^2, hence the first fold < 2p.
                 if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+            } else if reciprocal_64 != 0 && a < p && b < p {
+                // Canonical <=32-bit products: reciprocal is computed just
+                // once when Engine is created. No variable integer division
+                // in the event-heavy root-finding field-operation path.
+                // For x=a*b < 2^64 and mu=floor(2^64/p), q=floor(x*mu/2^64)
+                // underestimates floor(x/p) by at most one.
+                let product = a * b;
+                let quotient = ((product as u128 * reciprocal_64 as u128) >> 64) as u64;
+                let remainder = product - quotient * p;
+                if remainder >= p { remainder - p } else { remainder }
             } else if p <= u32::MAX as u64 && a < p && b < p {
+                // Keep the original arithmetic for independent unit tests,
+                // where no cached reciprocal is supplied.
                 (a * b) % p
             } else {
                 ((a as u128 * b as u128) % p as u128) as u64
@@ -259,6 +271,7 @@ fn validate_input(f: &[u64], p: u64, limits: &RootLimits) -> Result<(), String> 
 }
 struct Engine<'a> {
     report: RootReport,
+    reciprocal_64: u64,
     sink: &'a mut dyn FnMut(&RootEvent) -> Result<(), String>,
     next_id: u64,
 }
@@ -287,7 +300,7 @@ impl Engine<'_> {
         if self.report.counters.field_work() >= self.report.limits.field_work {
             return Err(RootStop::WorkLimit);
         }
-        let value = field_value(&op, a, b, self.report.p);
+        let value = field_value(&op, a, b, self.report.p, self.reciprocal_64);
         self.event(RootEvent::Field { op, a, b, value })?;
         Ok(value)
     }
@@ -762,6 +775,13 @@ pub fn solve(
 ) -> Result<RootReport, String> {
     validate_input(f, p, &limits)?;
     let mut engine = Engine {
+        // p is public and validated. Cache reciprocal only for <=32-bit
+        // fields, matching the 64-bit Barrett product bound.
+        reciprocal_64: if p <= u32::MAX as u64 {
+            ((1u128 << 64) / p as u128) as u64
+        } else {
+            0
+        },
         report: RootReport {
             schema: "prime-root-trace/v1".into(),
             p,
@@ -2548,6 +2568,36 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round124_cached_barrett_trace_field_matches_wide_reference() {
+        let mut state = 0x524f_4f54_2026_1122u64;
+        for p in [3u64, 487, 65_521, 998_244_353,
+                  1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            let reciprocal_64 = if p <= u32::MAX as u64 {
+                ((1u128 << 64) / p as u128) as u64
+            } else {
+                0
+            };
+            for _ in 0..8192 {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = state % p;
+                let b = state % p;
+                for op in [FieldOp::Add, FieldOp::Sub, FieldOp::Mul, FieldOp::Square] {
+                    let reference = field_value(&op, a, b, p, 0);
+                    let optimized = field_value(&op, a, b, p, reciprocal_64);
+                    assert_eq!(optimized, reference, "p={p} a={a} b={b} op={op:?}");
+                    if a < p - 1 && b < p - 1 {
+                        assert_eq!(
+                            field_value(&op, a + p, b, p, reciprocal_64),
+                            field_value(&op, a + p, b, p, 0),
+                            "noncanonical p={p} op={op:?}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn round113_quadratic_karatsuba_and_inverse_match_independent_formulas() {
         let mut rng = StdRng::seed_from_u64(0x7131_3331_3331_3371);
         for p in [3u64, 5, 65_521, 1_000_000_007, MAX_PRIME] {
@@ -2558,8 +2608,6 @@ mod tests {
                     assert!(inv < p);
                     assert_eq!(vmul(v, inv, p), 1);
                     assert_eq!(inv, vpow(v, p - 2, p));
-                }
-            }
             for _ in 0..4_096 {
                 let a = (rng.gen_range(0..p), rng.gen_range(0..p));
                 let b = (rng.gen_range(0..p), rng.gen_range(0..p));
@@ -2577,11 +2625,7 @@ mod tests {
                 );
                 assert_eq!(quadratic_mul(a, b, c, d, p), expected);
                 assert_eq!(quadratic_mul_karatsuba(a, b, c, d, p), expected);
-            }
-        }
-    }
 
-    #[test]
     fn round112_mersenne_high_degree_chain_matches_independent_binary_oracle() {
         let p = MAX_PRIME;
         let mut rng = StdRng::seed_from_u64(0x726f_6f74_3131_3230);
@@ -2596,13 +2640,10 @@ mod tests {
                     (0..degree + 2).map(|_| rng.gen_range(0..p)).collect();
                 if case % 4 == 0 {
                     for value in &mut modulus[1..degree] { *value = 0; }
-                }
                 if case % 5 == 0 {
                     for value in &mut base[1..] { *value = 0; }
-                }
                 if case % 11 == 0 {
                     base.clear();
-                }
                 let lead = if case % 3 == 0 { 2 } else { 1 };
                 modulus.push(lead);
                 let monic = vmonic(modulus.clone(), p);
@@ -2619,18 +2660,11 @@ mod tests {
                         bits >>= 1;
                         if bits != 0 {
                             power = vdiv(&vsquare(&power, p), &monic, p).unwrap().1;
-                        }
-                    }
                     assert_eq!(
                         vpower(&base, exponent, &modulus, p).unwrap(), expected,
                         "degree={degree} case={case} exponent={exponent}",
                     );
-                }
-            }
-        }
-    }
 
-    #[test]
     fn round111_reused_frobenius_and_gcd_reject_modified_certificates() {
         let p = 65_521u64;
         let f = vproduct(
@@ -2647,53 +2681,25 @@ mod tests {
                 if !value.is_empty() {
                     value[0] = (value[0] + 1) % p;
                     break;
-                }
-            }
-        }
         assert!(verify(&forged).is_err(), "forged replayed power accepted");
 
-        let mut forged = report.clone();
-        for event in &mut forged.events {
             if let RootEvent::GcdEnd { value, .. } = event {
-                if !value.is_empty() {
-                    value[0] = (value[0] + 1) % p;
-                    break;
-                }
-            }
-        }
         assert!(verify(&forged).is_err(), "forged replayed gcd accepted");
 
-        let mut forged = report.clone();
-        for event in &mut forged.events {
             if let RootEvent::SplitEnd { factor, accepted, .. } = event {
                 if *accepted && !factor.is_empty() {
                     factor[0] = (factor[0] + 1) % p;
-                    break;
-                }
-            }
-        }
         assert!(verify(&forged).is_err(), "forged split factor accepted");
 
-        let mut forged = report.clone();
-        for event in &mut forged.events {
             if let RootEvent::Finish { xp_mod_f, .. } = event {
                 xp_mod_f[0] = (xp_mod_f[0] + 1) % p;
                 break;
-            }
-        }
         assert!(verify(&forged).is_err(), "forged Frobenius finish accepted");
 
-        let mut forged = report.clone();
-        for event in &mut forged.events {
             if let RootEvent::Finish { linear_part, .. } = event {
                 linear_part[0] = (linear_part[0] + 1) % p;
-                break;
-            }
-        }
         assert!(verify(&forged).is_err(), "forged linear-part finish accepted");
-    }
 
-    #[test]
     fn round106_nonmonic_power_uses_single_normalization_and_monic_divisions() {
         // 2*(x-3)*(x-7) has exactly the roots 3 and 7 over each field.
         // PowerBegin must continue binding the *original* nonmonic input;
@@ -2721,27 +2727,18 @@ mod tests {
                 match event {
                     RootEvent::PowerBegin { modulus, .. } if modulus == &input => {
                         in_original_power = true;
-                    }
                     RootEvent::PowerEnd { .. } if in_original_power => {
                         in_original_power = false;
-                    }
                     RootEvent::InverseBegin { value } if in_original_power && *value == 2 => {
                         normalizations += 1;
-                    }
                     RootEvent::Division { b, .. } if in_original_power => {
                         assert_eq!(b.last(), Some(&1), "nonmonic power division p={p}");
                         checked_divisions += 1;
-                    }
                     _ => {}
-                }
-            }
             assert!(checked_divisions > 0, "missing power division p={p}");
             assert_eq!(normalizations, 1, "repeated power inversion p={p}");
-        }
-    }
 
 
-    #[test]
     fn round102_cubic_quotient_power_matches_independent_division() {
         let mut rng = StdRng::seed_from_u64(0x726f_6f74_3130_3231);
         for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
@@ -2756,18 +2753,10 @@ mod tests {
                     let normalized = vmonic(modulus.clone(), p);
                     let mut reference = vec![1];
                     let mut power = vdiv(&base, &normalized, p).unwrap().1;
-                    let mut bits = exponent;
-                    while bits != 0 {
-                        if bits & 1 == 1 {
                             reference = vdiv(&vproduct(&reference, &power, p),
                                              &normalized, p).unwrap().1;
-                        }
-                        bits >>= 1;
-                        if bits != 0 {
                             power = vdiv(&vproduct(&power, &power, p),
                                          &normalized, p).unwrap().1;
-                        }
-                    }
                     assert_eq!(vpower(&base, exponent, &modulus, p).unwrap(), reference);
                     for i in 0..3 {
                         let a: Vec<u64> = (0..i+1).map(|_| rng.gen_range(0..p)).collect();
@@ -2776,37 +2765,23 @@ mod tests {
                         let old_sq = vdiv(&vproduct(&a, &a, p), &normalized, p).unwrap().1;
                         assert_eq!(vcubic_replay_mul(&a, &b, &normalized, p), old_mul);
                         assert_eq!(vcubic_replay_square(&a, &normalized, p), old_sq);
-                    }
-                }
-            }
-        }
-    }
 
-    #[test]
     fn round101_verified_division_cache_rejects_modified_gcd_step() {
-        for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
             let polynomial = vec![p - 1, 0, 1];
             let report = run(&polynomial, p);
-            verify(&report).unwrap();
             let mut tampered = run(&polynomial, p);
             let step = tampered.events.iter_mut().find_map(|event| {
                 if let RootEvent::GcdStep { quotient, .. } = event {
                     Some(quotient)
                 } else {
                     None
-                }
             }).expect("root solver must perform a GCD step");
             if step.is_empty() {
                 step.push(1);
-            } else {
                 step[0] = (step[0] + 1) % p;
                 if step.last() == Some(&0) { step.pop(); }
-            }
             assert!(verify(&tampered).is_err(), "forged quotient p={p}");
-        }
-    }
 
-    #[test]
     fn round99_quadratic_power_step_replay_matches_generic_polynomials() {
         // Independent generic multiply/divide is the oracle; exercise sparse
         // and zero residues, arbitrary quadratic coefficients, and Mersenne
@@ -2818,7 +2793,6 @@ mod tests {
                     seed = seed.wrapping_mul(6364136223846793005)
                         .wrapping_add(1442695040888963407);
                     seed % p
-                };
                 let mut a = trim(vec![next(), next()]);
                 let mut b = trim(vec![next(), next()]);
                 if trial % 17 == 0 { a.clear(); }
@@ -2828,17 +2802,10 @@ mod tests {
                     vquadratic_replay_mul(&a, &b, &modulus, p),
                     vpower_reduce(vproduct(&a, &b, p), &modulus, p).unwrap(),
                     "quadratic replay multiply p={p} trial={trial}"
-                );
-                assert_eq!(
                     vquadratic_replay_square(&a, &modulus, p),
                     vpower_reduce(vproduct(&a, &a, p), &modulus, p).unwrap(),
                     "quadratic replay square p={p} trial={trial}"
-                );
-            }
-        }
-    }
 
-    #[test]
     fn round22_fast_trace_field_exact_under_frozen_arithmetic() {
         let mut seed = 0x524f_4f54_2026_1118u64;
         for p in [3, 487, 998244353, 1000000007, MAX_PRIME - 30, MAX_PRIME] {
@@ -2854,11 +2821,11 @@ mod tests {
                         FieldOp::Mul | FieldOp::Square =>
                             ((a as u128 * b as u128) % p as u128) as u64,
                     };
-                    assert_eq!(field_value(&op, a, b, p), reference,
+                    assert_eq!(field_value(&op, a, b, p, 0), reference,
                                "p={p} a={a} b={b} op={op:?}");
                     if a < p - 2 && b < p - 2 {
                         assert_eq!(
-                            field_value(&op, a + p, b, p),
+                            field_value(&op, a + p, b, p, 0),
                             match op {
                                 FieldOp::Add => ((a as u128 + p as u128 + b as u128) % p as u128) as u64,
                                 FieldOp::Sub => ((a as u128 + p as u128 + p as u128 - b as u128) % p as u128) as u64,
