@@ -10181,8 +10181,11 @@ mod coset_mitm_tests {
         g: &'a BinaryGroup<'a>,
         q: FastPoint,
     ) -> InstanceCtx<'a, BinaryGroup<'a>> {
+        InstanceCtx {
             target: q,
             ..ctx(inst, g)
+        }
+    }
 
     /// A char2 instance with the wanted cofactor.
     fn char2(n: u32, max_h: u64, h: u64) -> BinaryInstance {
@@ -10192,7 +10195,9 @@ mod coset_mitm_tests {
                     return inst;
                 }
             }
+        }
         panic!("no cofactor-{h} instance at n = {n}");
+    }
 
     /// The decompositions of `samples` subgroup targets by `mitm` and by
     /// `mitm-coset` on one base: identical witnesses, identical lookups
@@ -10200,6 +10205,7 @@ mod coset_mitm_tests {
     /// no more additions.  Returns `(plain, coset)` table-build adds and
     /// the number of hits.
     fn compare(
+        inst: &BinaryInstance,
         fb: &FactorBase<FastPoint>,
         spec: &str,
         samples: u64,
@@ -10227,9 +10233,11 @@ mod coset_mitm_tests {
             );
             let b = DecompositionOracle::<BinaryGroup>::decompose(
                 &mut coset, &c, fb, &mut dc, &mut cc, target,
+            );
             assert_eq!(a, b, "{spec}: k = {k}");
             hits += usize::from(a.is_some());
             k += step;
+        }
         assert!(
             cc.lookups <= cp.lookups,
             "lookups {} > {}",
@@ -10238,6 +10246,7 @@ mod coset_mitm_tests {
         );
         assert_eq!(dc, dp, "the probes' verifying additions differ");
         (adds_p, adds_c, hits, coset.coset.clone())
+    }
 
     /// char2, cofactor 2 (the free trace label) and cofactor 4 or 8 (the
     /// charged `[r]P` labels), folded and unfolded: same witnesses as
@@ -10258,14 +10267,19 @@ mod coset_mitm_tests {
                     coset < plain,
                     "h = {h} {spec}: {coset} vs {plain} additions"
                 );
+            }
+        }
+    }
 
     /// Koblitz K_1 / F_2^17, cofactor 2: a divisor base containing x + 1
     /// (index 0) straddles both classes and is filtered; the (x + 1)-free
     /// divisor puts the whole base in one class, so the filter keeps
     /// every pair and builds exactly the plain table.
+    #[test]
     fn mitm_coset_agrees_with_mitm_on_koblitz_and_is_inert_without_x_plus_1() {
         let inst = koblitz_instance(1, 17).expect("K1 n17");
         assert_eq!(inst.cofactor, 2);
+        let g = BinaryGroup(&inst.fast);
         let c = ctx(&inst, &g);
         let build = |divisor: &str| {
             let (_, p) = Params::parse_spec(&format!("koblitz-orbit:divisor={divisor}")).unwrap();
@@ -10280,13 +10294,18 @@ mod coset_mitm_tests {
         assert!(coset < plain, "mixed base: {coset} vs {plain}");
         let free = build("1");
         let (plain, coset, hits, report) = compare(&inst, &free, "mitm:m=2", 400);
+        assert!(hits > 0);
         assert_eq!(report.classes, 1, "{report:?}");
         assert_eq!(coset, plain, "a one-class base must keep every pair");
+    }
 
     /// The flag-free oracle at `m = 3` labels nothing and builds the
     /// plain table; `mitm`'s own table is unchanged by this work.
+    #[test]
     fn mitm_coset_is_inert_at_three_summands() {
         let inst = char2(15, 2, 2);
+        let g = BinaryGroup(&inst.fast);
+        let c = ctx(&inst, &g);
         let fb = binary_subspace_factor_base(&inst, &[1, 2, 4, 8, 16]);
         let (mut a, mut b) = (MitmOracle::new(3), CosetMitmOracle::new(3));
         let (mut oa, mut ob) = (GroupOps::default(), GroupOps::default());
@@ -10296,16 +10315,19 @@ mod coset_mitm_tests {
         assert_eq!(b.coset.mode, "off");
         assert_eq!(oa, ob);
         assert!(DecompositionOracle::<BinaryGroup>::setup_native(&b).is_empty());
+    }
 
     /// Trace labels are free of group operations and counted: the oracle
     /// reports its field squarings as an uncharged counter, and the
     /// scalar labels are charged to the setup ledger.
+    #[test]
     fn labelling_is_counted_trace_uncharged_scalar_charged() {
         let basis = [1u64, 2, 4, 8, 16, 32];
         for (h, scalar) in [(2u64, false), (4, true)] {
             let inst = char2(15, h, h);
             let g = BinaryGroup(&inst.fast);
             let c = ctx(&inst, &g);
+            let fb = binary_subspace_factor_base(&inst, &basis);
             let mut o = CosetMitmOracle::new(2);
             let mut ops = GroupOps::default();
             o.prepare(&c, &fb, &Params::default(), &mut ops).unwrap();
@@ -10319,12 +10341,18 @@ mod coset_mitm_tests {
                 assert_eq!(
                     native["mitm_coset_label_field_squarings_uncharged"],
                     fb.points.len() as u64 * 2 * u64::from(inst.n - 1)
+                );
                 assert_eq!(ops, table.build_ops);
+            }
+        }
+    }
 
     /// End to end through the pipeline, same seed: identical relation
     /// counts and targets, both verified, set-up additions fewer.
+    #[test]
     fn mitm_coset_pipeline_matches_mitm_relations() {
         let inst = char2(17, 2, 2);
+        let g = BinaryGroup(&inst.fast);
         let planted = 12_345 % inst.r;
         let q = g.mul(&mut GroupOps::default(), inst.generator, planted);
         let c = ctx_q(&inst, &g, q);
@@ -10332,6 +10360,7 @@ mod coset_mitm_tests {
             ns_per_add: 1.0,
             ns_per_double: 1.0,
             ..Default::default()
+        };
         let mut reps = Vec::new();
         for oracle in ["mitm", "mitm-coset"] {
             let (fb_name, fb_params) = Params::parse_spec("binary-subspace:dimension=7").unwrap();
@@ -10350,7 +10379,9 @@ mod coset_mitm_tests {
             let mut coset = CosetMitmOracle::new(2);
             let o: &mut dyn DecompositionOracle<BinaryGroup> = if oracle == "mitm" {
                 &mut plain
+            } else {
                 &mut coset
+            };
             let rep = run_pipeline(
                 &c,
                 &ps,
@@ -10363,21 +10394,27 @@ mod coset_mitm_tests {
             .unwrap();
             assert!(rep.verified && rep.recovered == Some(planted), "{oracle}");
             reps.push(rep);
+        }
         let (a, b) = (&reps[0], &reps[1]);
         assert_eq!(
             a.decomposition.relations_found,
             b.decomposition.relations_found
+        );
         assert_eq!(a.decomposition.targets_tried, b.decomposition.targets_tried);
+        assert_eq!(
             a.decomposition.cost.group_ops,
             b.decomposition.cost.group_ops
+        );
         assert!(b.decomposition.setup.group_ops.adds < a.decomposition.setup.group_ops.adds);
         assert!(b.total_gae < a.total_gae);
+    }
 }
 
 /// `subtract` and `mitm` with `batch=1` (the default, one field inversion a
 /// block) against `batch=0` (one an addition): the same relations in the
 /// same order, the same charged additions and lookups, fewer inversions.
 mod batch_inversion_tests {
+    use super::*;
     use crate::cryptanalysis::ic_boundary::roster_prime_instance;
     use rand::Rng;
 
@@ -10393,11 +10430,18 @@ mod batch_inversion_tests {
         let ctx = InstanceCtx {
             group: &inst.curve,
             generator: g,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
             field_degree: None,
+        };
         let mut fb_params = Params::default();
         fb_params.set("size", "40");
         let fb = PrimeAbscissaBase { instance: &inst }
             .build(&ctx, &fb_params, &mut setup)
+            .unwrap();
         let mut params = params.clone();
         params.set("batch", batch);
         let mut ops = GroupOps::default();
@@ -10412,8 +10456,10 @@ mod batch_inversion_tests {
             let qb = inst.curve.mul(&mut t, q, b);
             let target = inst.curve.add(&mut t, ga, qb);
             out.push(oracle.decompose(&ctx, &fb, &mut ops, &mut counters, target));
+        }
         let hits = out.iter().filter(|r| r.is_some()).count();
         (out, ops, counters.lookups, hits)
+    }
 
     fn assert_same(
         name: &str,
@@ -10422,16 +10468,23 @@ mod batch_inversion_tests {
     ) {
         assert!(serial.3 > 0, "{name}: the panel must find relations");
         assert_eq!(serial.0, batched.0, "{name}: relations differ");
+        assert_eq!(
             serial.1.adds, batched.1.adds,
             "{name}: charged additions differ"
+        );
         assert_eq!(serial.1.doubles, batched.1.doubles);
         assert_eq!(serial.2, batched.2, "{name}: lookups differ");
+        assert!(
             batched.1.field_ops.invs < serial.1.field_ops.invs,
             "{name}: batching must cut inversions ({} vs {})",
             batched.1.field_ops.invs,
             serial.1.field_ops.invs
+        );
+    }
 
+    #[test]
     fn batched_subtract_and_mitm_find_the_serial_relations() {
+        let none = Params::default();
         let s0 = run(SubtractOracle::with_batch(false), &none, "0");
         let s1 = run(SubtractOracle::default(), &none, "1");
         assert_same("subtract", &s0, &s1);
@@ -10441,10 +10494,15 @@ mod batch_inversion_tests {
             let m0 = run(MitmOracle::new(m), params, "0");
             let m1 = run(MitmOracle::new(m), params, "1");
             assert_same(&format!("mitm m={m} {:?}", params.0), &m0, &m1);
+        }
+    }
+}
 
 mod wwalk_binary_tests {
+    use super::*;
     use crate::cryptanalysis::ic_boundary::Calibration;
     use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
     use crate::cryptanalysis::koblitz_fast::FastPoint;
 
     /// Table B curve B15 (`research/ic_tableb_binary_ksum_20261115/specs/B15-r1.json`).
@@ -10453,13 +10511,24 @@ mod wwalk_binary_tests {
             15, 32771, 1, 21067, 32638, 16319, 31539, 28502,
         )
         .unwrap()
+    }
 
     /// One run; returns (verified, total GAE).
     fn run(inst: &BinaryInstance, oracle: &str, s: u64) -> (bool, f64) {
+        let g = BinaryGroup(&inst.fast);
         let planted = (1234 + 7919 * s) % inst.r;
+        let mut ops = GroupOps::default();
         let q = g.mul(&mut ops, inst.generator, planted);
+        let ctx = InstanceCtx {
             group: &g,
+            generator: inst.generator,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
             name: "B15".into(),
+            field_degree: Some(inst.n),
+        };
         let (name, oracle_params) = Params::parse_spec(&format!("{oracle},seed={s}")).unwrap();
         let (_, fbp) = Params::parse_spec("binary-multiplier:size=2,mult=1").unwrap();
         let ps = PipelineSpec {
@@ -10471,6 +10540,8 @@ mod wwalk_binary_tests {
             linalg: "incremental-gauss".into(),
             max_trials: 5_000_000,
             seed: s,
+            ..Default::default()
+        };
         let mut o = WWalkOracle::<FastPoint>::new();
         let rep = run_pipeline(
             &ctx,
@@ -10481,15 +10552,19 @@ mod wwalk_binary_tests {
             &Calibration {
                 ns_per_add: 1.0,
                 ns_per_double: 1.0,
+                ..Default::default()
             },
             None,
+        )
         .unwrap();
         // [d]G = Q, checked here independently of the pipeline.
         let d = rep.recovered.expect("a recovered log");
         let mut o2 = GroupOps::default();
         assert!(g.mul(&mut o2, inst.generator, d) == q, "[d]G != Q");
         (rep.verified && d == planted, rep.total_gae)
+    }
 
+    #[test]
     fn wwalk_solves_b15_plain_and_target_walk() {
         let inst = b15();
         for spec in [
@@ -10500,3 +10575,7 @@ mod wwalk_binary_tests {
                 let (ok, ops) = run(&inst, spec, s);
                 assert!(ok, "{spec} s={s}: planted log not recovered");
                 assert!(ops > 0.0);
+            }
+        }
+    }
+}
