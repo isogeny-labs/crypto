@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Independently validate the actual CM19 genus3 polarized-model bridge and classify integral4-similitudes/mixed kernels with exact native Hermitian arithmetic, retaining empty outcomes and actual-Jacobian-map/full-cost gaps (Codex, started 2026-11-23, branch lane/chained-cm19-hermitian-20261123, PR #5019; stacked on completed source PR #5012). [pcc:unverified]
+- [x] Audit genuine CM19 polarized-model hypotheses and completely classify integral4-similitudes:156 maps,144 mixed(4,4,2,2),12 twice-unitary, all923-minor Smith checks; complete report and written cost-admission limit (Codex, 2026-11-23, branch lane/chained-cm19-hermitian-20261123, PR #5019, source323ece11/resultb2ce1276, unsignede78d08/fc4ef7; actual divisor alpha/maps, generic formal and strongest-reference costs remain open). [pcc:unverified]
 
 - [x] Qualify the primary-derived genuine CM19 F7 genus3 source:counts17/65/236, Weil(T2+3T+7)^3, Jac1331; actual17-point twist/Frobenius/inverse controls and checked2-page report (Codex, 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012, source0b9b506b/result89d7b471, unsigned180c4c; actual polarization/J4/kernel/target/cost follow-ups remain open). [pcc:unverified]
 
