@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Prime31 RR9 non-enumerative 4-variable Wiedemann / shared-coefficient remainder tower extraction and prime-field auxiliary cover / Deuring vertical-isogeny rarity closures (Cursor, started 2026-11-19, completed 2026-11-19, branch cursor/prime31-rr9-and-cover-closures-3858, PR #4816; report & deterministic receipts in research/prime31_rr9_and_closures_20261119/{REPORT.md,RESULTS.json})
+
 - [ ] Execute GHS frontier workstreams 3–7 in parallel: isolated rho, candidate composition, matched IC/rho, live solver coverage, and fail-closed publication (Codex, started 2026-11-19, branch codex/ghs-frontier-3-7-20261119, stacked PR #4814 on #4757)
 
 - [x] Prime31 certify x-only [16] Kummer permutation on curve/twist, eliminate phantom chain branching (automation, started 2026-11-19, branch automation/prime31-kummer-doubling-twist-20261119, PR #4810; source-specific Rust CI passed; extractor/speedup still open)
