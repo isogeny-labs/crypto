@@ -633,7 +633,8 @@ mod tests {
             for a in 1..p {
                 for b in 0..p {
                     let expected: Vec<u64> = (0..p).filter(|&x| {
-                        field.add(field.mul(a, x), b) == 0
+                        let ax = field.mul(a, x);
+                        field.add(ax, b) == 0
                     }).collect();
                     assert_eq!(field.roots(&[b, a, 0, 0]), expected,
                         "linear p={p} a={a} b={b}");
