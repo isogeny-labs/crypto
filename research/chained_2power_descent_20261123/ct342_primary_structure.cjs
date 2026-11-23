@@ -62,7 +62,6 @@ function main(){const mutant=(process.argv[2]||'').replace(/^--/,'');need(!mutan
  need(plus.count*minus.count===9200,'product count not CT341 baseline');
  need(plus.count/plus.primary[2].cardinality*minus.count/minus.primary[2].cardinality===575,'odd-primary order');
  const report={schema:'ct342-primary-structure/v1',field:p,source_jacobian_order:9200,target_order:plus.count*minus.count,odd_primary_order:575,two_primary_source_structure:'(Z/2)^4',two_primary_target_structure:'(Z/2)^4',dual_map_kernel_2_size:4,dual_map_2_rank:2,dual_map_cokernel_2_structure:'(Z/2)^2',plus,minus};
- process.stdout.write(JSON.stringify(report)+'
-');
+ process.stdout.write(JSON.stringify(report)+'\n');
 }
 try{main();}catch(e){console.error('CT342 FAIL:',e.stack||e);process.exitCode=1;}
