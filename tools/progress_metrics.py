@@ -1082,6 +1082,48 @@ def trace_local_runtime(ref, since):
                  source=source)
 
 
+
+def trace_complete_cost(ref, since):
+    """Copy native stored observations; shared-host wall data are provisional."""
+    root = "research/trace_incidence_20261116/setup_20261123/results"
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    for stage, filename in (("setup", "summary-a1.json"),
+                            ("target", "summary-target-a1.json"),
+                            ("progression", "summary-ap-a1.json"),
+                            ("holdout", "summary-holdout-a1.json"),
+                            ("flat", "summary-flat-a1.json")):
+        path = f"{root}/{filename}"
+        for date, commit, text in file_history(ref, path, since_day):
+            data = json.loads(text)
+            source = f"{path}@{commit}"
+            for group, row in data.get("groups", {}).items():
+                if not group.endswith("/128"):
+                    continue
+                arm = group.rsplit("/", 1)[0].replace("/", "_").replace("-", "_")
+                prefix = f"trace.complete.{stage}.b128.{arm}"
+                emit(prefix + ".wall_s", row["complete_wall_s"]["median"],
+                     date=date, problem="prime-labelled-pool-recovery",
+                     unit="wall_s", better="neutral",
+                     label="Stored complete-adapter median; includes bounded censors; local PCC unverified",
+                     source=source)
+                emit(prefix + ".censored", row.get("censored"), date=date,
+                     problem="prime-labelled-pool-recovery", unit="target-round units",
+                     better="neutral", label="Retained bounded censors; PCC unverified",
+                     source=source)
+            for group, row in data.get("target_cluster_mean_ratios", {}).items():
+                if not group.endswith("_over_current-tuned8/128"):
+                    continue
+                arm = group.split("_over_", 1)[0].replace("-", "_")
+                prefix = f"trace.complete.flat.b128.{arm}.over_rho8"
+                for suffix, field in (("mean_ratio", "ratio"),
+                                      ("upper95", "bootstrap_q95")):
+                    emit(prefix + "." + suffix, row[field], date=date,
+                         problem="prime-labelled-pool-recovery", unit="cost_ratio",
+                         better="neutral",
+                         label="Stored native cluster ratio; fixed curves, bounded costs; PCC unverified",
+                         source=source)
+
+
 def relation_fusion_observations(ref, since):
     """Export raw declared-call observations, without computing ratios."""
     path = "research/relation_fusion_20261117/CANDIDATE_SUMMARY_84.json"
@@ -1223,6 +1265,7 @@ def main():
     vieta_component(a.ref, a.since)
     vieta_native_speedup(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
+    trace_complete_cost(a.ref, a.since)
     relation_fusion_observations(a.ref, a.since)
     relation_fusion_repeated(a.ref, a.since)
     relation_fusion_root_dag(a.ref, a.since)
