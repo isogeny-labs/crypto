@@ -29,3 +29,16 @@ Run the unchanged existing hosted source-exact Rust 1.100.0 release test workflo
 ## Evidence ledger
 
 - Protocol frozen before implementation. No new native test or timing receipt.
+
+## Implemented source and pending qualification — 2026-11-23 UTC
+
+- Preregistered protocol at commit `db5554f2d18c1304b3d73756590fee52ac2736c5`.
+- Opt-in evaluator Rust code at `be1a32b7`, guarded audit refinement `20588c6c`: `src/cryptanalysis/large_prime_graph/eval.rs`. Default evaluator JSON omits new nullable fields; `compare_exact_forest` is false by default. Extra pivot/MST rank audits and the forest arm are **all** subject to the same arity<=2 and `forest_max_rows` gate. Unsupported/oversized inputs record a reason instead of a false zero-output pass.
+- Native original Rust tests added `d4bb33d9`, skip-gate assertions `8c782306d8d14081f8fc61a5f74d56f1f85c3744`: one fixed subgroup-order F_2147446831 stream with explicit high target column, witness source count, full matrix-rank oracle, strict atomic source-cap refusal and arity/row-cap skips; plus 24 deterministic seeded arity<=2 streams over F7/F101/F2147446831 comparing the independent raw rank identity against full forest reconstruction and bounding pivot/MST outcomes.
+- Workflow's source inventory now includes original `eval.rs` (`1805b05a`). The existing native Rust 1.100.0 release job should run from the final PR checkout; **no final passing CI receipt or performance measurement is claimed here until checked.** Branch currently has source and tests; local compiler, worker/conductor and KB service were unavailable. All data are algebra-only fixtures, not naturally collected elliptic relations. [pcc:unverified]
+- The diagnostic record distinguishes `witness_ns`, `materialization_ns`, `rank_audit_ns`, `summary_and_replay_ns`, LP rank/left-nullity, materialized N/Z, source terms, refused/skipped status and exact projected ranks; metadata/root index setup, compiler caches and full cold ECDLP remain separately charged in a future matched study. No controlled wall-time claim from unisolated CI clocks.
+
+## Open gates
+1. Obtain terminal hosted native run on source/test revision `8c782306`; record job/run/sha and preserve failures before describing the candidate as source-tested. Need no duplicate native job.
+2. Freeze authenticated original Prime31 two-LP natural source with group-point receipts and collector IDs; replay three arms with equal caps, rank/RHS identity, phase and memory accounting.
+3. Unshimmed production crate and independently signed PCC; complete cold ECDLP against best reproducible IC and optimized negation-map rho remain outstanding. No merge/paid compute.
