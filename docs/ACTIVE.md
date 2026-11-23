@@ -352,7 +352,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 - [ ] Publish two-hop finite-kernel native/Lean evidence and reports; complete inherited generic formal-instance review before acceptance; preserve written geometry and rational-endpoint/morphism distinctions (Codex, started 2026-11-23, branch lane/chained-twohop-descent-20261123, PR #4992).
 
-- [ ] Investigate longer 2-power Jacobian descent with absent rational two-torsion; audit characteristic kernel layers and rational Richelot factorization before selecting a new native/formal unit (Codex / CT337 coordinator, started 2026-11-23, branch lane/chained-2power-descent-20261123, PR #4997; CT337 generic effective genus-two→elliptic Mumford pushforward plus 36 fiber/627 split/20 nonsplit controls; unsigned, native Cantor and complete cold DLP held). [pcc:unverified]
+- [ ] Investigate longer 2-power Jacobian descent, actual Prime31 bielliptic quotient and Cantor/Jacobian bridge (Codex / CT338 coordinator, started 2026-11-23, branch lane/chained-2power-descent-20261123, PR #4997; CT338 native C++ 576/576 homomorphism checks, incl. 24 doubles and 4 split collisions; native Rust, independent PCC, extensions and complete cold model still held). [pcc:unverified]
 
 ## Blocked / questions for the owner
 
