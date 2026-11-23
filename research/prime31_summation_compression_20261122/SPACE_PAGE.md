@@ -57,4 +57,19 @@ All current PCC claims remain unverified. Four native identity certificates have
 
 ## Publication instruction
 
-This file is the prepared Page content. It is not evidence of a completed Space write. Reconcile the single uncertain create request for the exact Space name Prime Field Summation Polynomial Research, read that Space's root, then create or update one research Page using a retained idempotency key. Record returned IDs and readback before labeling synchronization complete.
+This file is prepared Page content, not proof of a new Page edit. The existing verified Space is `page_space_038e4361a33c8191af04e7a127104c0f`; its research progress Page is [Prime31 progress](https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84), ID `page_729b0b80bdb4819193f457c80ecabe84`. The historical uncertain creation was reconciled and superseded by readback (`iteration6/space-receipt.json`). In this non-interactive run a guarded Page read required user input, so **the iteration-seven update has not been synchronized**. Reread the existing Page and use guarded edits when access resumes. Never create a duplicate.
+
+
+## New iteration-seven result: growing smooth torus, not a growing ECDLP speedup
+
+A growing prime-field family with polynomially large, power-of-two Dickson degree **does** exist unconditionally, without assuming infinitely many Mersenne primes. For k≥2 let q_k=2^k and choose p_k as the least prime congruent to −1 modulo 4q_k. By Linnik's theorem there are absolute C,L such that 4q_k | (p_k+1) and q_k ≥ (p_k/(C4^L))^(1/L). This fills the smooth-p+1 existence sub-obligation, not the full curve-family or security requirement. [pcc:unverified]
+
+In the norm-one torus over F_(p_k²), choose ζ of exact order q_k and z with z^(2q_k) ≠1. The q traces x_j=zζ^j+(zζ^j)^−1 are **distinct F_(p_k)-roots** of D_(q_k)(X)−c, where c=z^q_k+z^−q_k. The exact recurrence D_(2^(j+1))(X)=D_(2^j)(X)²−2 generates the polynomial *circuit*, but extracting all q roots still incurs Ω(q) output work. S3 membership on an ordinary E requires independent rational lifts and signed group checks. [pcc:unverified]
+
+For any E/F_p with Frobenius trace t, gcd(q_k,#E(F_p))=gcd(q_k,t). In particular, for **odd** trace t, no nontrivial homomorphic transfer to q_k-torsion of this smooth torus exists. A rational split Dickson fibre does not establish that many of its x-values lift into a large prime-order E-subgroup, or that an exact target-dependent empty-root oracle runs sublinearly. These remain open. The complete written derivation is [iteration7/SMOOTH_TORUS_FAMILY.md](https://github.com/isogeny-labs/crypto/blob/lane/prime31-dickson-quotient-gate/research/prime31_summation_compression_20261122/iteration7/SMOOTH_TORUS_FAMILY.md). [pcc:unverified]
+
+## Current correctness and companion-source gates
+
+The frozen iteration-six rational-S3 certificate is a witness verifier, **not** a relation finder. Original-lock CI [run 45096187034](https://github.com/isogeny-labs/crypto/actions/runs/45096187034), checkout bf56de345c02ef6f1c55bfa047087b0e880cb09e, failed *before the new tests ran*: the unchanged main `src/cryptanalysis/ecbench/spec.rs` fails Rust parsing (mismatched delimiters around lines 964/1038). It is not evidence that iteration-six algebra failed or succeeded; the prior five-test run at 109fc024... remains valid only for those earlier bytes. [pcc:unverified]
+
+Companion #4924 has advanced to c4bfab5de0af0e8f0a4e5bea1be056859d0ec273, with Rust monic-oracle changes beyond the previously validated 96c910... checkout; its old two passing tests cannot cover the changed source. No matched current-head receipt, signed PCC verification, complete ECDLP recovery, EKS timing or asymptotic speedup is claimed. [pcc:unverified]
