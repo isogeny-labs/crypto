@@ -1,12 +1,12 @@
 # Planted four-leaf relation coverage and a balanced-sign rank obstruction
 
-2026-11-23. Source checkpoint: \`isogeny-labs/crypto\` main \`bd20b95dce44a91d7f74a1367853e724f280a3b6\`; tracking PR #5048. Mathematical/validation-preparation only; **PCC unverified**.
+2026-11-23. Source checkpoint: `isogeny-labs/crypto` main `bd20b95dce44a91d7f74a1367853e724f280a3b6`; tracking PR #5048. Mathematical/validation-preparation only; **PCC unverified**.
 
 ## Scope
 
 This is a **classical coupon-collector and linear-algebra application**, not a new Semaev elimination algorithm. It supplies a necessary rank-admission gate for *planted-positive* four-leaf relation fixtures. It does not describe uniform natural targets, guarantee useful rank, or imply a faster Prime31 ECDLP solver. It is disjoint from active PR #5044's Frobenius-sector Semaev decomposition, from original Rust arithmetic, and from the immutable iteration6/iteration10 evidence.
 
-Use the inherited ordinary Prime31 fixture \`p=2147483647\`, \`n=2147446831\`, \`B=31\` distinct abscissae, and signed lifts \`±P_i\`. For each of \`R\` independent **planted** four-leaf trials, choose index labels \`I_{t,1},…,I_{t,4}\` uniformly in \`[B]\` and arbitrary signs \`e_{t,j}∈{±1}\`. The coefficient row has entries
+Use the inherited ordinary Prime31 fixture `p=2147483647`, `n=2147446831`, `B=31` distinct abscissae, and signed lifts `±P_i`. For each of `R` independent **planted** four-leaf trials, choose index labels `I_{t,1},…,I_{t,4}` uniformly in `[B]` and arbitrary signs `e_{t,j}∈{±1}`. The coefficient row has entries
 
 \[
 c_{t,i}=\sum_{j=1}^4 e_{t,j}{\bf1}_{I_{t,j}=i}.
@@ -41,7 +41,7 @@ where a binomial coefficient with upper argument below four is zero for positive
 | 20 | 0.072352147204 | 0.104672283634 |
 | 31 | 0.573804207996 | 0.641077520355 |
 | 40 | 0.847159084759 | 0.882459223354 |
-| 42 | 0.880572570337 | 0.909744182991 |
+| 42 | 0.880572570338 | 0.909744182991 |
 | 44 | 0.907025274047 | 0.930904267817 |
 | 45 | 0.918056342218 | 0.939597851991 |
 
@@ -69,12 +69,12 @@ Consequently \(C{\bf1}=0\), so \(\mathrm{rank}(C)\le B-1\) over any field. Arbit
 
 ## Independent arithmetic checks and explicit acceptance criteria
 
-\`coverage_oracle.py\` uses exact integer/rational arithmetic, not elliptic-curve calculations. It compares WR inclusion–exclusion with the independently evaluated Stirling-number surjection count \(B!S(4R,B)/B^{4R}\), and NR inclusion–exclusion with a separate Markov DP on the number of previously touched columns. All selected cells, and the exact 90% threshold inequalities for B=31, agree. This is one coordinator performing two algorithms, **not** independent worker verification or a signed proof.
+`coverage_oracle.py` uses exact integer/rational arithmetic, not elliptic-curve calculations. It compares WR inclusion–exclusion with the independently evaluated Stirling-number surjection count \(B!S(4R,B)/B^{4R}\), and NR inclusion–exclusion with a separate Markov DP on the number of previously touched columns. All selected cells, and the exact 90% threshold inequalities for B=31, agree. This is one coordinator performing two algorithms, **not** independent worker verification or a signed proof.
 
 For a future source-frozen original-Rust extractor, retain for every returned row: the target-creation mode (natural versus planted), exact four index/sign labels, signed coefficient vector after cancellation, nonzero support bitset, duplicate canonical key, group-sum replay, RHS/target column, and exact projected useful rank. Check identity subtotals, repeated leaves, \(P,P,P,-P\), rationality of all S3 auxiliaries and zero/nonzero total separately. The pass condition is equality of replayed rows and an independently recomputed rank, not merely high coverage. Compute time, hash/proof traffic, failed targets and memory are still charged. Do not run new timed measurements without the shared reservation and EKS admission.
 
 ## Prior art, checks, and boundaries
 
-The mathematical model inherits the signed-group-semiring exact control and uniform-target warning in \`iteration8/EXACT_CONTRACTION_AND_YIELD.md\`, and the stronger pair-spectrum support review in \`iteration10/parallel_review/REVIEW.md\`. Inclusion–exclusion, occupancy and \(C{\bf1}=0\) are elementary prior mathematics. Semaev auxiliary-chain prior art: https://eprint.iacr.org/2015/310 ; generic indexing tradeoffs are not elliptic reduction algorithms: https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html . The shared research-KB MCP and its repository-wrapper execution were not available in this tool environment; these source reads and primary references are the documented fallback. No novelty claim for the underlying combinatorics is made.
+The mathematical model inherits the signed-group-semiring exact control and uniform-target warning in `iteration8/EXACT_CONTRACTION_AND_YIELD.md`, and the stronger pair-spectrum support review in `iteration10/parallel_review/REVIEW.md`. Inclusion–exclusion, occupancy and \(C{\bf1}=0\) are elementary prior mathematics. Semaev auxiliary-chain prior art: https://eprint.iacr.org/2015/310 ; generic indexing tradeoffs are not elliptic reduction algorithms: https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html . The shared research-KB MCP and its repository-wrapper execution were not available in this tool environment; these source reads and primary references are the documented fallback. No novelty claim for the underlying combinatorics is made.
 
 Open gate: prove and implement an *actual* exact sublinear empty-inclusive query for the Dickson-derived Prime31 pair spectrum with near-linear charged setup and full signed output; this note improves the **validation** admission criterion only. [pcc:unverified]
