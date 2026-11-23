@@ -6,6 +6,7 @@ on:
       - 'research/prime31_ic_20261115/native/examples/prime31_cm_degree_gate.rs'
       - '.github/workflows/prime31-cm-degree-gate.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_cm_degree_gate.rs'
       - '.github/workflows/prime31-cm-degree-gate.yml'
@@ -14,6 +15,7 @@ permissions:
   contents: read
 jobs:
   exact-cm:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:

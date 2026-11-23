@@ -1,0 +1,47 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_binary_generic_incumbent_20261119 B21 rho reference replicate 1",
+ "description": "Matched rho reference and target source for lane B. Public synthetic curve; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 21,
+    "modulus": 2097157,
+    "a": 1,
+    "b": 1797947,
+    "group_order": 2094562,
+    "r": 1047281,
+    "gx": 232919,
+    "gy": 1480205
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261119211,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261119711,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

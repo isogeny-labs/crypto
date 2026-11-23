@@ -1,0 +1,14 @@
+{
+  "schema": "xedni-two-generator-lift-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "curve_coefficients": [94, 0, 188, 1738, 3805],
+  "Q": [-4, 19],
+  "R": ["52242961/137641", "-1907191742616/51064811"],
+  "reduction_prime": 47,
+  "coefficient_box": [-4, 4],
+  "input_law": "all 42 nonidentity E(F47) source points; no target scalar read in the lift table construction",
+  "enumeration": "compute aQ+bR for every integer a,b in the centered 9x9 box, including identity; reduce at47 and verify against aG+bRbar",
+  "height_metric": "maximum bit length of absolute numerators and positive denominators of x and y; identity has null height",
+  "comparison": "for each nonidentity public point, compare smallest metric among box representatives with the frozen known-multiple kQ table; both construction counts reported",
+  "claim_boundary": "finite coverage and exact coordinate-size comparison on one rank-two rational witness; no general cost or end-to-end speed claim"
+}

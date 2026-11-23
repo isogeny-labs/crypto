@@ -609,7 +609,7 @@ mod tests {
         let nn = n as u64;
         let Some(ell) = (3..nn)
             .rev()
-            .find(|&l| nn % l == 0 && factor(l).len() == 1 && factor(l)[0].0 == l)
+            .find(|&l| nn.is_multiple_of(l) && factor(l).len() == 1 && factor(l)[0].0 == l)
         else {
             return;
         };
