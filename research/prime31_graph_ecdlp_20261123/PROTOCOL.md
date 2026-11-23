@@ -148,7 +148,11 @@ producer never receives the positive witness indices. The separate
 `verify_rr5_control.py` uses its own integer group law and exhaustive
 64- and 560-tuple one-LP oracles **after** extraction; it found exactly one
 witness for each positive and zero for the smoke query, matching all native
-outputs. The raw JSON and build stderr are in `evidence/rr5-control-01/`.
+outputs. A second eight-point positive query shares the same external point;
+the native extractor completed it with one one-LP row in 131 ms. The
+independent checker subtracts the two extracted point equations, cancels the
+external point, and replays the resulting six-term factor-base-only equation.
+The raw JSON and build stderr are in `evidence/rr5-control-01/`.
 
 The build uses the existing RR5 source closure. Its two whole-source pins
 were refreshed after reviewing current-main changes: `ic_boundary.rs` gained
@@ -156,8 +160,11 @@ test-only map views and binary-group provenance fields; `semaev_prime_poly.rs`
 gained support diagnostics and factored `poly_mulmod` through `poly_mul`.
 The selected source ranges and current hashes are checked at build time.
 The native diagnostics report incomplete phase accounting. This is a
-planted correctness controls at `B=4,S=1` and `B=7,S=1`, not evidence of random-query
-yield, useful graph rank, cold solve cost, or a speed advantage.
+planted correctness controls at `B=4,S=1` and `B=7,S=1`, not evidence of
+random-query yield, useful graph rank, cold solve cost, or a speed advantage.
+The cycle control only has public point queries; their IC scalars `a,b` are
+not supplied, so it validates graph cancellation without becoming a target
+discrete-log solve.
 
 ## Prior work and claim boundary
 

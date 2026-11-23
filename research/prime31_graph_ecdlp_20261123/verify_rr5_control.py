@@ -83,6 +83,32 @@ def verify(name):
     return {"control": name, "independent_witnesses": len(witnesses), "replay_ok": True}
 
 
+def verify_cycle():
+    left = json.loads((EVIDENCE / "wide.json").read_text())
+    right = json.loads((EVIDENCE / "wide2.json").read_text())
+    assert left["base"] == right["base"]
+    assert left["large_prime_pool"] == right["large_prime_pool"]
+    assert left["status"] == right["status"] == "Complete"
+    assert len(left["partials"]) == len(right["partials"]) == 1
+    base_size = left["base_size"]
+    coefficients = [0] * (base_size + 1)
+    for i, sign in left["partials"][0]["terms"]:
+        coefficients[i] += sign
+    for i, sign in right["partials"][0]["terms"]:
+        coefficients[i] -= sign
+    assert coefficients[base_size] == 0
+    terms = [(i, coefficient) for i, coefficient in enumerate(coefficients[:base_size]) if coefficient]
+    assert all(abs(coefficient) == 1 for _, coefficient in terms)
+    points = [tuple(point) for point in left["base"] + left["large_prime_pool"]]
+    left_query = tuple(left["public_query"])
+    right_query = tuple(right["public_query"])
+    difference = add(left_query, (right_query[0], (-right_query[1]) % P))
+    assert signed_sum(points, terms) == difference
+    return {"control": "wide_cycle", "cancelled_lp_index": base_size,
+            "factor_base_terms": terms, "point_replay_ok": True}
+
+
 if __name__ == "__main__":
     assert mul(N, G) is None
-    print(json.dumps([verify("positive"), verify("smoke"), verify("wide")], indent=2))
+    print(json.dumps([verify("positive"), verify("smoke"),
+                      verify("wide"), verify("wide2"), verify_cycle()], indent=2))

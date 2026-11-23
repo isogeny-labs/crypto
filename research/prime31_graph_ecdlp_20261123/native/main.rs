@@ -44,13 +44,17 @@ fn signed_sum(points: &[(u64, u64)], terms: &[(usize, i64)]) -> Point {
 fn main() {
     let mode = std::env::args().nth(1).unwrap_or_default();
     let smoke = mode == "smoke";
-    let wide = mode == "wide";
+    let wide = mode == "wide" || mode == "wide2";
     assert!(mode.is_empty() || smoke || wide, "unknown control mode");
     let mut check_ar = Arithmetic::default();
     check_curve(CURVE, &mut check_ar).expect("registered curve is valid");
     let base_size = if wide { 7 } else { 4 };
     let points = public_points(base_size + 1);
-    let planted = [(0, 1), (1, -1), (2, 1), (base_size, 1)];
+    let planted = if mode == "wide2" {
+        [(3, 1), (4, -1), (5, 1), (base_size, 1)]
+    } else {
+        [(0, 1), (1, -1), (2, 1), (base_size, 1)]
+    };
     let query = if smoke {
         Some((291_202_666, 1_848_813_168))
     } else {
