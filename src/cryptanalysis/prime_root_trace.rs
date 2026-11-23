@@ -5,7 +5,6 @@
 //! A separate arithmetic checker verifies the certificate without root finding.
 //! Counters measure native field operations, including inverse exponentiation;
 //! primality validation, serialization, and certificate replay are excluded.
-use std::collections::HashMap;
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
@@ -2324,6 +2323,14 @@ struct PowerState {
     split_power: bool,
 }
 
+// Computation identifiers are consecutive and bounded by the event limit.
+// A flat slot table avoids hashing every modular-power step while retaining
+// the original live-state checks (and detecting wrong-kind or reused IDs).
+enum TraceComputation {
+    Power(PowerState),
+    Gcd((Vec<u64>, Vec<u64>)),
+}
+
 /// Checks each supplied arithmetic state, the terminal distinct-root certificate,
 /// canonical inputs, recorded-event counter tallies and caps. This is not a proof
 /// that every operation in a native execution was recorded. Incomplete reports
@@ -2519,7 +2526,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(accumulator, p)?;
                 canonical(base, p)?;
-                let state = powers.get_mut(id).ok_or("missing power begin")?;
+                let Some(Some(TraceComputation::Power(state))) =
+                    computations.get_mut(*id as usize)
+                else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent == 0 {
                     return Err("power continued after completion".into());
                 }
@@ -2554,7 +2565,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::PowerEnd { id, value } => {
                 canonical(value, p)?;
-                let state = powers.remove(id).ok_or("missing power begin")?;
+                let state = computations.get_mut(*id as usize)
+                    .and_then(Option::take)
+                    .ok_or("missing power begin")?;
+                let TraceComputation::Power(state) = state else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
@@ -2631,7 +2647,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
-                let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+                let state = computations.get_mut(*id as usize)
+                    .and_then(Option::take)
+                    .ok_or("missing gcd begin")?;
+                let TraceComputation::Gcd((a, b)) = state else {
+                    return Err("missing gcd begin".into());
+                };
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
                 }
@@ -2730,7 +2751,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [xp_mod_f, linear_part] {
                     canonical(v, p)?;
                 }
-                if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+                if computations.iter().any(Option::is_some)
+                    || inverse.is_some() || split.is_some()
+                {
                     return Err("unfinished native computation".into());
                 }
                 let acknowledged = index < report.events.len();
@@ -2820,6 +2843,28 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round84_indexed_replay_rejects_forged_computation_ids() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let polynomial = vproduct(&[p - 2, 1], &[p - 5, 1], p);
+            let report = run(&polynomial, p);
+            assert!(report.complete(), "p={p}, stop={:?}", report.stop);
+            verify(&report).unwrap();
+            for target in 0..4 {
+                let mut forged = report.clone();
+                let changed = forged.events.iter_mut().find_map(|event| match (target, event) {
+                    (0, RootEvent::PowerStep { id, .. })
+                    | (1, RootEvent::PowerEnd { id, .. })
+                    | (2, RootEvent::GcdStep { id, .. })
+                    | (3, RootEvent::GcdEnd { id, .. }) => { *id = u64::MAX; Some(()) },
+                    _ => None,
+                });
+                assert!(changed.is_some());
+                assert!(verify(&forged).is_err(), "forged id accepted p={p} target={target}");
+            }
+        }
+    }
+
+    #[test]
     fn round88_dense_barrett_product_matches_reference_convolution() {
         let mut state = 0x8422_26d3_1214_6587u64;
         // The oracle uses independent u128 remainder arithmetic.
@@ -2846,11 +2891,7 @@ mod tests {
                             "p={p} alen={alen} blen={blen} case={case}");
                     }
                 }
-            }
-        }
-    }
 
-    #[test]
     fn round87_remainder_only_replay_matches_independent_division() {
         // Compare fixed-degree remainder-only reduction against the frozen
         // Euclidean quotient-and-remainder verifier, including 61-bit fields.
@@ -3906,6 +3947,7 @@ mod round77_producer_regression {
 #[cfg(test)]
 mod round79_terminal_power_regression {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn terminal_base_elision_preserves_results_and_legacy_certificates() {
