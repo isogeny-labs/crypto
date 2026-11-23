@@ -1,0 +1,30 @@
+{
+  "schema": "trace-final-checks/v1",
+  "frozen_source_manifests": "all eight pass without rewriting pinned subjects",
+  "final_native_analysis": {
+    "rows": 24192,
+    "scalar_replays": 24192,
+    "generation_checks": 10632,
+    "exact_trial_and_pair_scan_comparisons": 6720,
+    "every_arm_completed": true
+  },
+  "extracted_replay_by_producer": {
+    "native_affine_private_answer_and_bootstrap_replay": "passed",
+    "summary_byte_equal": true,
+    "original_summary_sha256": "b84a89f12c5c657ee038c34908b8b852487c66607ec826c758699327a4929ddc",
+    "replayed_summary_sha256": "b84a89f12c5c657ee038c34908b8b852487c66607ec826c758699327a4929ddc"
+  },
+  "progress_metrics": {
+    "full_export_completed_under_60second_cap": true,
+    "scoped_committed_observations": 361,
+    "neutral_only": true,
+    "reads_committed_state_only": true
+  },
+  "report_copies": {
+    "matching_artifacts": 29,
+    "byte_equal": true,
+    "visual_inspection": "combined first/frontier pages and run8 continuation tables inspected"
+  },
+  "required_root_gate": "failed before unit tests on unchanged-main syntax; see root-cargo-gate-final.json",
+  "signed_independent_validation": false
+}
