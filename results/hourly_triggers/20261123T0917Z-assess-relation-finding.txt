@@ -1,0 +1,4 @@
+Automated hourly relation-finding benchmark trigger at 2026-11-23T09:17Z.
+Run the existing frozen Koblitz n=23 a=0 m=2 control via scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900.
+Record wall_seconds, verified relations_per_sec and success_rate in results/hourly_log.csv; push result to hourly-runs; report anomalies against results/relation_baseline.json (>20%) by GitHub issue.
+Note: this control does not measure ECC2K-130.
