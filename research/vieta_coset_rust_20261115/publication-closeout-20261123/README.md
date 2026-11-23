@@ -144,3 +144,33 @@ The change does not confer independent scientific standing [pcc:unverified].
 The remaining bounded checks follow actual head changes and required results.
 No merge is authorized with failed or pending required checks, and no
 numerical goal or measurement is reactivated by this administrative follow-up.
+
+## Second bounded check — upstream enforcement review
+
+At head `e73c899630`, required size passed, while artifact-tool tests and
+validation input recovery still failed. The earlier PR-owned prose issue is
+resolved: PCC CI now reports the same 17 journal findings as the base. No
+reviews, comments or unresolved threads appeared [pcc:unverified].
+
+Current main `143a0b91fb` now includes [PR5001](https://github.com/isogeny-labs/crypto/pull/5001),
+which repairs the artifact generator's undefined names and the PCC test/
+subgroup-verifier issues. Reviewing the complete upstream changes also found
+`continue-on-error` added to artifact recovery, a unit expectation changed to
+accept that tolerance, and archive matching broadened beyond exact removed-row
+text equality. The relevant source excerpts and hashes are retained in the
+[upstream enforcement review](evidence/upstream-enforcement-review-20261123T1200Z.json).
+The older equality receipt against main `816f9c3a94` is historical and does not
+describe these newly changed tools [pcc:unverified].
+
+The proposed main merge was conditional on preserving the checks. The combined
+bundle does not satisfy this task's explicit no-weakening constraint, so it
+was not merged or selectively patched here. MERGE auto-merge is paused while
+that conflict remains. This is a review of the named enforcement changes,
+not an assertion that every later validation step would pass or fail open.
+No workflow, policy, verifier, historical claim or protected evidence was
+edited by this follow-up [pcc:unverified].
+
+Only the final already-scheduled administrative check remains. It may assess
+a compatible upstream repair and actual required results; the three-occurrence
+schedule will not be extended. Both scientific studies and the completed local
+numerical goal retain their earlier scope and standing.
