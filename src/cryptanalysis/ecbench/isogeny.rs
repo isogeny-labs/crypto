@@ -521,7 +521,39 @@ impl Fp<'_> {
         }
         let mut r = [0u64; D];
         r[0] = 1;
-        if e >= (1u64 << 30) && e.count_ones() >= 12 {
+        // The two exact exponents used by Frobenius and equal-degree
+        // splitting on this Mersenne field have short addition chains.
+        // b_k denotes base^(2^k-1); b_(i+j) = b_i^(2^j)*b_j.
+        // This preserves exact ring exponentiation even for zero divisors.
+        if e == (1u64 << 60) - 1 || e == (1u64 << 61) - 1 {
+            let extend = |field: &mut Self, mut a: [u64; D], tail: &[u64; D], k: usize| {
+                for _ in 0..k {
+                    a = field.fixed_mersenne_product::<D, true>(&a, &a, &modulus);
+                }
+                field.fixed_mersenne_product::<D, false>(&a, tail, &modulus)
+            };
+            let b2 = extend(self, b, &b, 1);
+            let b3 = extend(self, b2, &b, 1);
+            let b6 = extend(self, b3, &b3, 3);
+            let b12 = extend(self, b6, &b6, 6);
+            let b15 = extend(self, b12, &b3, 3);
+            let b30 = extend(self, b15, &b15, 15);
+            r = extend(self, b30, &b30, 30);
+            if e == (1u64 << 61) - 1 {
+                if b[0] == 0 && b[1] == 1 && b[2..].iter().all(|&x| x == 0) {
+                    // Multiply by x directly, using x^D = sum modulus[i] x^i.
+                    r = self.fixed_mersenne_product::<D, true>(&r, &r, &modulus);
+                    let top = r[D-1];
+                    for i in (1..D).rev() {
+                        r[i] = Self::fold_fixed_mersenne(top as u128 * modulus[i] as u128 + r[i-1] as u128);
+                    }
+                    r[0] = Self::fold_fixed_mersenne(top as u128 * modulus[0] as u128);
+                    self.tally.muls += D as u64;
+                } else {
+                    r = extend(self, r, &b, 1);
+                }
+            }
+        } else if e >= (1u64 << 30) && e.count_ones() >= 12 {
             let b2 = self.fixed_mersenne_product::<D, true>(&b, &b, &modulus);
             let mut odd = [[0u64; D]; 4];
             odd[0] = b;
