@@ -3449,6 +3449,12 @@ mod tests {
 
     #[test]
     fn supervised_owner_lease_shares_the_original_nonce_charges_and_exclusive_lock() {
+        // Unrelated concurrent test forks must not retain this journal lease.
+        if crate::test_process::parent_runs_isolated_case(
+            "ml_dataset::budget::tests::supervised_owner_lease_shares_the_original_nonce_charges_and_exclusive_lock",
+        ) {
+            return;
+        }
         let temp = Temp::new();
         let (policy, grant, parent) = session(&temp.0);
         activate_mock(&parent);
