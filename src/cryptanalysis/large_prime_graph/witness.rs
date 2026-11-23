@@ -300,7 +300,8 @@ impl ForestWitnessExtractor {
                 } else {
                     (terms[1].0, terms[0].0)
                 };
-                self.stats.reroot_steps += self.reroot_smaller_tree(small_endpoint);
+                let reversals = self.reroot_smaller_tree(small_endpoint);
+                self.stats.reroot_steps += reversals;
                 self.tree_parent[small_endpoint] = big_endpoint;
                 self.tree_parent_edge[small_endpoint] = Some(row_idx);
                 self.parent[small] = big;
