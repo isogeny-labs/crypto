@@ -296,17 +296,40 @@ fn public_curve_x_controls(f:Fp,count:usize)->Vec<u64>{
     }
     xs
 }
+/// Produce a known-valid x-only S3 target from public W elements for grading.
+/// The extractor receives only z and W, never pair indices or any DLP scalar.
+/// This is a PLANTED correctness control, not a blind random-target experiment.
+fn planted_pair_target(f:Fp,u:u64,v:u64)->u64{
+    assert_ne!(u,v,"nonexceptional S3 pair");
+    let s=f.add(u,v);
+    let t=f.mul(u,v);
+    let delta=f.sub(u,v);
+    let d=f.mul(delta,delta);
+    let mid=f.add(f.mul(s,f.add(t,A)),f.mul(2,B));
+    let c=f.sub(f.mul(f.sub(t,A),f.sub(t,A)),f.mul(f.mul(4,B),s));
+    let disc=f.sub(f.mul(mid,mid),f.mul(d,c));
+    let sqrt=sqrt31(f,disc).expect("rational planted S3 target");
+    let z=f.mul(f.add(mid,sqrt),f.inv(d));
+    assert_eq!(Curve::new(P,A,B).s3(u,v,z),0);
+    z
+}
 fn main(){
     let f=Fp::new(P);
     let scale=std::env::args().any(|a|a=="--scale");
     let sizes:&[usize]=if scale { &[64,128,256,677] } else { &[3,4,8,16,32] };
-    let targets:Vec<u64>=if scale {
-        let mut x=vec![GX,X10G];
-        x.extend(public_curve_x_controls(f,4));
-        x
-    } else { vec![GX,X2G,X3G,X10G] };
-    println!("native original-Rust Prime31 non-table S3 pair elimination scale={} B={:?} z={:?}; no secret target indices supplied",scale,sizes,targets);
     for &size in sizes {
+        let mut targets:Vec<u64>=if scale {
+            let mut x=vec![GX,X10G];
+            x.extend(public_curve_x_controls(f,4));
+            let base=factorbase(f,size);
+            x.push(planted_pair_target(f,base[size/3],base[size/2]));
+            x.push(planted_pair_target(f,base[size/4],base[size-3]));
+            x
+        } else { vec![GX,X2G,X3G,X10G] };
+        targets.sort_unstable();
+        targets.dedup();
+        if scale {assert_eq!(targets.len(),8,"all scale controls must be distinct");}
+        println!("native original-Rust Prime31 non-table S3 pair elimination scale={} B={} z={:?}; public-only oracle, two planted positives for grading",scale,size,targets);
         for &z in &targets{check(f,size,z);}
     }
     println!("S3 x-roots only: full signed group checks, authentic RHS rank, cold solver and asymptotic speedup NOT established.");
