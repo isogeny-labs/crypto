@@ -36,10 +36,13 @@ maximum RSS. The resulting vector has 25,000 entries.
 79,642,974 nonzero coefficients, including 998 rows outside the solve input.
 `verify_source_scalar.py` checked the factor-base file and transfer parameters,
 then tested the derived scalar on the original source Jacobian. The source
-group equation holds for scalar **81985529216486895**. The two receipts are
+group equation holds for scalar **81985529216486895**. The row and Sage receipts are
 [`all_rows_26000_receipt.json`](all_rows_26000_receipt.json) and
 [`source_scalar_receipt.json`](source_scalar_receipt.json). The kernel hash is
 `1c2df63b8659d98d5244c2c41ede4c9544ba593f1e236e22b86f08c67a9c6a02`.
+An independent pure-Python Cantor composition and reduction check reached
+the same scalar without Sage or a fixture scalar; its receipt is
+[`source_integer_receipt.json`](source_integer_receipt.json).
 
 ## Reproduction and data custody
 
@@ -56,6 +59,8 @@ On a machine with the retained data and Sage, the independent checks are:
 python3 tools/ic/p31_graph/verify_all_rows.py /Volumes/SSD990-2/research_notes \
   --kernel tools/ic/p31_graph/receipts/graph_kernel_24999.json
 sage -python tools/ic/p31_graph/verify_source_scalar.py /Volumes/SSD990-2/research_notes \
+  --kernel tools/ic/p31_graph/receipts/graph_kernel_24999.json
+python3 tools/ic/p31_graph/verify_source_integer.py /Volumes/SSD990-2/research_notes \
   --kernel tools/ic/p31_graph/receipts/graph_kernel_24999.json
 ```
 
