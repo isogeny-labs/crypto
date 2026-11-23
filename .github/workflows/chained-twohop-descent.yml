@@ -5,9 +5,9 @@ on:
     paths:
       - 'research/chained_twohop_descent_20261123/src/**'
       - 'research/chained_twohop_descent_20261123/formal/**'
-      - 'research/chained_twohop_descent_20261123/run_first_A.sh'
-      - 'research/chained_twohop_descent_20261123/custody_metadata.py'
-      - 'research/chained_twohop_descent_20261123/SOURCE_LOCK_A.json'
+      - 'research/chained_twohop_descent_20261123/run_first_B.sh'
+      - 'research/chained_twohop_descent_20261123/custody_metadata_B.py'
+      - 'research/chained_twohop_descent_20261123/SOURCE_LOCK_B.json'
       - '.github/workflows/chained-twohop-descent.yml'
 permissions:
   contents: read
@@ -34,7 +34,7 @@ jobs:
           LEAN4_BIN: ${{ runner.temp }}/lean-4.35.0-linux/bin/lean
         run: |
           set -euo pipefail
-          bash research/chained_twohop_descent_20261123/run_first_A.sh \
+          bash research/chained_twohop_descent_20261123/run_first_B.sh \
             "$GITHUB_SHA" "$RUNNER_TEMP/twohop-custody" "$RUNNER_TEMP/twohop-compiler-temp"
       - name: Preserve complete source, both ELFs and every recorded stream
         if: always()
