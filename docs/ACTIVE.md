@@ -15,6 +15,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 
 ## Active items (top = next)
 - [x] Prepare a native bridge for transported endpoint ecbench workloads, scalar-input manifests, coordinate/A-A controls and explicit target-field compatibility guards; local correctness/planning component complete, large-field harness and measured sessions remain open (Codex, started 2026-11-18, branch research/conductor-paired-driver-20261118, PR #4721 stacked on #4703)
+- [ ] Integrate the graph-algorithms catalog (#4917, §8 queue) into the large-prime pipeline: exact gain-aware DSU rank, core numbers, Hopcroft–Karp structural rank + Dulmage–Mendelsohn, BFS vs low-stretch trees (cycle length L), minimum-degree fill/width, FM hypergraph partitioning (λ−1), and a frozen-stream evaluator pairing pivot vs MST filtering; gain-forest harvester stays with #4905 (Claude Code, started 2026-11-23, branch claude/lp-graph-algorithms-20261123)
 - [x] Certify Prime31 RR9 two-sign weighted-interpolation rank obstruction on the original curve (automation, started 2026-11-19, branch automation/prime31-rr9-two-sign-wrank-20261119, PR #4801; source-exact native Rust 40/40 + 2/2 PASS Actions #44497509496; independent signed PCC remains pending)
 - [x] Derive Prime31 RR9 public-only extractor budgets and correct historical optimized shared-BSGS frontier (automation, started 2026-11-19, branch automation/prime31-rr9-extractor-budget-gate-20261119, PR #4793; original-Rust source-bound CI PASS #44489047210; next unknown-index extraction remains with #4692)
 
