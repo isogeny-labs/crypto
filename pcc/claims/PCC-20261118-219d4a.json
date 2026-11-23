@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:12:31Z",
+ "id": "PCC-20261118-219d4a",
+ "kind": "statement",
+ "producer": {
+  "commit": "cf4adde4b2449af89c1ecf6eec8679eb90cc3eba",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/final-summary.json",
+    "sha256": "2508ee91a2d1b71d73793b0dd3c9c6c37f4fe9d85927eaa7693f0b30f5ab4f20"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v4-tests.stdout",
+    "sha256": "cd47888425ac023ae19a5dc97f94b3add23647cb3565f619e0f6cc1e7ddae14b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v4-cli-summary.json",
+    "sha256": "0de755211a29344d284d0d410504ecad05d976e9c9fa7b086bbfe5ace6ae9d21"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v4-paired.json",
+    "sha256": "837ac87e4d26034d88e53fdad7ca8666a579a49802762994b8d3db48c507896a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/v4-full.json",
+    "sha256": "9b7e044fb8b792ffe9bf5be1ce04823a59a7b8ef7dad359169d8b813bfec6828"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/build-v4-inputs.sha256",
+    "sha256": "20432d2646b9502c5d9af42c35fe500fd231f3bfc84b065160daadf821ecf23e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/test-v4-pre-call.sha256",
+    "sha256": "f8dda3ffe74fbd5303f87224fe192d8a39bc4cfe056a67e032735c451341196d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/cli-v4-pre-call.sha256",
+    "sha256": "6e41884ef8f79aff0cb65db0eaa745e2f6f394de422d6f8634c278e66a8d9e32"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/paired-schedule-20261118",
+ "statement": "Corrected v4 actual ecbench planner passes all eleven focused tests and root/focused clippy with warnings denied. Its unchanged CLI produces byte-identical legacy v2 and paired v3 plans, qualifies 12 workloads/252 planned executions and a full 192 workloads/4032 planned executions, and rejects four invalid admissions. No performance session, endpoint-statistics join, wide-field IC or 80-bit crossing is established. The full legacy unit suite remains separately blocked by its pre-existing duplicate test. This is unsigned producer development-qualification evidence."
+}

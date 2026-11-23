@@ -111,8 +111,12 @@ generic-field engine `f4_tower_generic`
 now runs the Kummer tower at the P-224 prime and the Dickson torus tower at
 the P-192 and P-256 primes. It gives the recorded small-prime `D`, width and
 step count in all 82 cells run (§0.1). The isogeny tower has an auxiliary
-curve and a built `V` at the P-192 prime (PR #1925, §0.2), but **no F4 run at
-P-192 yet**: its system builder is still `u64`. Both are stage diagnostics of
+curve and a built `V` at the P-192 prime (PR #1925, §0.2), and since
+2026-11-01 a **wide system builder** (`prime_tower_wide.rs`, generic over
+`fp_backend::PrimeField`): the supersingular auxiliary curve at P-192 and
+solved F4 cells on the isogeny tower at NIST primes
+(`research/pkm_isogeny_wide_p192_20261101/`); the `u64` pilot remains the
+small-prime instrument. Both are stage diagnostics of
 the solver or of the construction. Neither family has a priced relation phase
 (`S`, ratio to rho) at a NIST size; the `prime-kummer` and `prime-isogeny`
 plug-ins work in `u64` (`prime_tower.rs`, and `primitive_two_power_root`
@@ -518,8 +522,10 @@ its twist, `ss-j0`, `ss-j0-twist`). Three pre-registered questions:
 only, `N ≤ 20`. Priced end to end in ecbench at 20–28 bits (PRs #1889, #1947;
 accounting: no gain over a plain base for a table oracle). At P-192 the
 auxiliary curve and `V` are built (PR #1925), and the supersingular curve
-makes the auxiliary search free (PR #1947); no F4 run or relation phase has
-run at P-192, because the plug-in and the isogeny system builder are `u64`.
+makes the auxiliary search free (PR #1947); solved F4 cells on the isogeny
+tower at P-192 exist since 2026-11-01 (`prime_tower_wide`,
+`research/pkm_isogeny_wide_p192_20261101/`), but no relation phase: the
+priced `prime-isogeny` plug-in (ecbench) is still `u64`.
 The autoresearcher program cites the construction (`AR:KN-LIT-025`) but never
 built it: `AR:H-RELN-96e3ba` calls the PKM arm "unmaterialised".
 The P-192 `t = 48` auxiliary search card (§8) is abandoned as superseded
@@ -1666,11 +1672,17 @@ this round.
      plain base of its size unresolved on two curves and not held on the
      third. "The 11-core-year ordinary search buys nothing these experiments
      can see."
-   - **Still open:** an F4 run and a relation phase at P-192 (the isogeny
-     system builder and the plug-in are `u64`), and the decision the backlog
-     card records: whether a supersingular `E'` is acceptable (the card is
-     abandoned as superseded since the 2026-10-16 claim audit). Lead 1 remains
-     the gate for all of it.
+   - **2026-11-01/03 update:** the wide system builder
+     (`prime_tower_wide.rs`, generic over `fp_backend::PrimeField`) runs
+     solved F4 cells on the isogeny tower at the P-192 prime itself —
+     `m = 2` `D = 5` at `N = 8 … 18` and `D = 6` at `N = 20, 22` (matching
+     the Kummer ladder at `p₀` cell for cell), `m = 3` `D = 6` at
+     `N = 12` and `D = 7` at `N = 15` (the small-prime `m = 3` staircase),
+     `m = 4` `D = 7` at `N = 12` — with every row exhaustively verified
+     ([`research/pkm_isogeny_wide_p192_20261101/`](../../../research/pkm_isogeny_wide_p192_20261101/README.md)).
+     Random-target yield there is 0/20, as `|V|^m/p` predicts at toy `t`.
+     Still open: the relation phase at P-192 (the priced ecbench plug-in
+     is `u64`), and lead 1 remains the gate for all of it.
 3. **The Dickson torus case** (`2^t | p + 1`) — **measured; H_same** (PR #1893,
    [`research/pkm_dickson_torus_20261015/`](../../../research/pkm_dickson_torus_20261015/README.md);
    A5c). The torus tower, which exists on P-192 (`t ≤ 64`) and P-256

@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:49:41Z",
+ "id": "PCC-20261118-941ba4",
+ "kind": "statement",
+ "producer": {
+  "commit": "a70a2c8d7be57b214d6325c313b60073831d77fc",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/proof/primitive.json",
+    "sha256": "4f5fb496f7ed05668f3824a44cb028ecb16dba9f9398b0fc36630ded8ac04afc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/pre-call.sha256",
+    "sha256": "ee2d72e0e62b494b3732a69cd30739ab56328dc896645e6a4630b9acb6a1f8c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/results/attempt-a/default-fixtures.jsonl",
+    "sha256": "dfd44f832ae1b1d6f6e8696673f1a20ca32fdc06d351dae75696631c78a52bba"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/prepared-norm-20261118",
+ "statement": "The prepared native context passes the direct-root unit checker: 96 prepared moduli across three fields, 768 valid/reuse evaluations, 384 collision controls and six invalid-modulus rejections, including the frozen 202/96-bit fields. The unchanged default fixture bytes match the preserved receipt. Whole pipeline qualifier remains active and is not yet passed; no target construction or timing result is established."
+}

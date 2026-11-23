@@ -1,0 +1,14 @@
+{
+  "action": "extract the sources with git show <sha>:<path> into scratch, hash them against source.sha256 and read only those copies; re-check git status before citing line numbers",
+  "created": "2026-11-21T04:08:10Z",
+  "evidence": [
+    "research/quartic_diem_precheck2_20261121/validation/validator-report.md (header, F14)"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "validating a committed study in a shared worktree where another agent may be editing src/",
+  "why": "during this validation another agent rewrote src/cryptanalysis/quartic_ladder.rs in the working tree (fac0a5da -> 7ce83dd8, 2393 -> 2846 lines) at 03:46Z; a Read of the working tree then showed different code at the same line numbers"
+}

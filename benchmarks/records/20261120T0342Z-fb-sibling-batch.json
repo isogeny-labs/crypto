@@ -1,0 +1,329 @@
+{
+  "branch": "claude/fb-domain-rootfind-20261119",
+  "closed_utc": "2026-11-20T03:45:29+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/examples/fb_domain_rootfind"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-20T03:42:10+00:00",
+      "wall_s": 13.354
+    }
+  ],
+  "commit": "52484bc191041e8c9f13dffcd3267ffd1c70fff8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-20T03:42:04+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261120-fb-sibling-batch"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
+  },
+  "id": "20261120T0342Z-fb-sibling-batch",
+  "metrics": [
+    {
+      "baseline": 527504.0,
+      "better": "lower",
+      "n": 16,
+      "name": "total_fmul_batched_m2_p16_d64",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 71950.0
+    },
+    {
+      "baseline": 0.008,
+      "better": "lower",
+      "n": 16,
+      "name": "wall_s_batched_m2_p16_d64",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001
+    },
+    {
+      "baseline": 8401040.0,
+      "better": "lower",
+      "n": 16,
+      "name": "total_fmul_batched_m2_p16_d256",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 287347.0
+    },
+    {
+      "baseline": 0.063,
+      "better": "lower",
+      "n": 16,
+      "name": "wall_s_batched_m2_p16_d256",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.005
+    },
+    {
+      "baseline": 8388608.0,
+      "better": "lower",
+      "n": 16,
+      "name": "total_fmul_batched_m2_p20_d256",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 360588.0
+    },
+    {
+      "baseline": 0.054,
+      "better": "lower",
+      "n": 16,
+      "name": "wall_s_batched_m2_p20_d256",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.005
+    },
+    {
+      "baseline": 67108864.0,
+      "better": "lower",
+      "n": 8,
+      "name": "total_fmul_batched_m2_p20_d1024",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 721176.0
+    },
+    {
+      "baseline": 0.366,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_batched_m2_p20_d1024",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.01
+    },
+    {
+      "baseline": 67108864.0,
+      "better": "lower",
+      "n": 8,
+      "name": "total_fmul_batched_m2_p24_d1024",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 835668.0
+    },
+    {
+      "baseline": 0.378,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_batched_m2_p24_d1024",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.012
+    },
+    {
+      "baseline": 67108864.0,
+      "better": "lower",
+      "n": 8,
+      "name": "total_fmul_batched_m2_p31_d1024",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 868408.0
+    },
+    {
+      "baseline": 0.421,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_batched_m2_p31_d1024",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.017
+    },
+    {
+      "baseline": 536870912.0,
+      "better": "lower",
+      "n": 4,
+      "name": "total_fmul_batched_m2_p31_d4096",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 1736732.0
+    },
+    {
+      "baseline": 3.176,
+      "better": "lower",
+      "n": 4,
+      "name": "wall_s_batched_m2_p31_d4096",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.03
+    },
+    {
+      "baseline": 742021.0,
+      "better": "lower",
+      "n": 8,
+      "name": "total_fmul_batched_m3_p16_d16",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 644404.0
+    },
+    {
+      "baseline": 0.1,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_batched_m3_p16_d16",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.022
+    },
+    {
+      "baseline": 3609216.0,
+      "better": "lower",
+      "n": 6,
+      "name": "total_fmul_batched_m3_p20_d32",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 2185596.0
+    },
+    {
+      "baseline": 0.258,
+      "better": "lower",
+      "n": 6,
+      "name": "wall_s_batched_m3_p20_d32",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.056
+    },
+    {
+      "baseline": 3609216.0,
+      "better": "lower",
+      "n": 6,
+      "name": "total_fmul_batched_m3_p31_d32",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 2510460.0
+    },
+    {
+      "baseline": 0.323,
+      "better": "lower",
+      "n": 6,
+      "name": "wall_s_batched_m3_p31_d32",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.071
+    },
+    {
+      "baseline": 17935872.0,
+      "better": "lower",
+      "n": 4,
+      "name": "total_fmul_batched_m3_p31_d64",
+      "note": "batched sibling extraction, every counted multiplication (F4 + root step + batched); baseline = domain scan; same solution set",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 6664872.0
+    },
+    {
+      "baseline": 0.891,
+      "better": "lower",
+      "n": 4,
+      "name": "wall_s_batched_m3_p31_d64",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.175
+    }
+  ],
+  "problem": "kernel:f4_fp_domain_roots",
+  "raw": [
+    {
+      "bytes": 4202,
+      "path": "research/fb_sibling_batch_20261120/data/console.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38da74c9ee30d41f478de1604b0f3c6c88cfd1435bc87d7340b44a71a1bad574",
+      "sha256": "38da74c9ee30d41f478de1604b0f3c6c88cfd1435bc87d7340b44a71a1bad574",
+      "uploaded": false
+    },
+    {
+      "bytes": 5881,
+      "path": "research/fb_sibling_batch_20261120/data/fb_domain_rootfind.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/790d9b05b114e3450faaf16689904cc2ffd81e049c74e8a7648365ebc412ce56",
+      "sha256": "790d9b05b114e3450faaf16689904cc2ffd81e049c74e8a7648365ebc412ce56",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261120-fb-sibling-batch/report.pdf",
+    "png": [
+      "benchmarks/20261120-fb-sibling-batch/sibling_batch.png"
+    ],
+    "svg": [
+      "benchmarks/20261120-fb-sibling-batch/sibling_batch.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fb-sibling-batch",
+  "status": "measured",
+  "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+  "validation": null
+}
