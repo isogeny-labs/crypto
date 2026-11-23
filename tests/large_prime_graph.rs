@@ -1126,3 +1126,106 @@ fn forest_witness_factors_shared_lca_suffix_once() {
         }
     }
 }
+
+
+#[test]
+fn forest_witness_lazy_join_admission_skips_deep_independent_projection() {
+    // Opt-in comparison against the source-exact original arm. There are
+    // 31 independent bridges, 48 balanced closers, an unbalanced root pin,
+    // and a reversed dependent closer. These are operation counts, not time.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    for p in [3u64, 7, 101, 1_000_003] {
+        let mut rows: Vec<Vec<(usize, u64)>> = (0..30)
+            .map(|v| vec![(v, 1), (v + 1, 1)])
+            .collect();
+        rows.push(vec![(29, 1), (31, 1)]);
+        for _ in 0..48 {
+            rows.push(vec![(30, 1), (31, p - 1)]);
+        }
+        rows.push(vec![(30, 1), (31, 1)]);
+        rows.push(vec![(31, p - 1), (30, 1)]);
+
+        let mut legacy = ForestWitnessExtractor::new(32, p).unwrap();
+        let mut lazy = ForestWitnessExtractor::new(32, p)
+            .unwrap()
+            .with_lazy_independent_admission();
+        let mut emitted = Vec::new();
+        for row in &rows {
+            let old = legacy.add_row(row).unwrap();
+            let new = lazy.add_row(row).unwrap();
+            assert_eq!(old, new, "source coefficients changed for p={p}");
+            if let Some(w) = old {
+                emitted.push(w);
+            }
+        }
+        assert_eq!(legacy.rank(), 32);
+        assert_eq!(legacy.rank(), lazy.rank());
+        assert_eq!(legacy.stats().independent_projection_skips, 0);
+        assert_eq!(lazy.stats().independent_projection_skips, 31);
+        assert_eq!(legacy.stats().path_steps, 593);
+        assert_eq!(lazy.stats().path_steps, 129);
+        assert_eq!(legacy.stats().path_steps - lazy.stats().path_steps, 464);
+        assert_eq!(legacy.stats().parent_path_reads - lazy.stats().parent_path_reads, 464);
+        assert_eq!(legacy.stats().inverse_calls, lazy.stats().inverse_calls);
+        assert_eq!(legacy.stats().dependent_rows, lazy.stats().dependent_rows);
+        assert_eq!(legacy.stats().source_terms, lazy.stats().source_terms);
+
+        // Preserve atomic refusal even when an independent fast path exists.
+        let before = lazy.stats();
+        assert!(matches!(
+            lazy.add_row(&[(0, 1), (0, 1)]),
+            Err(LpGraphError::NonCanonicalRow { .. })
+        ));
+        assert_eq!(lazy.stats(), before);
+
+        let inputs: Vec<PartialRelation> = rows.iter().enumerate().map(|(i, row)| {
+            PartialRelation {
+                id: 80_000 + i as u64,
+                small: vec![(i as u32, 1)],
+                large: row.iter().map(|&(j, a)| (10_000 + j as u64, a)).collect(),
+                rhs: i as u64 % p,
+            }
+        }).collect();
+        let index = LpIndex::build(&inputs, p).unwrap();
+        let old_batch = collect_witnesses(&index).unwrap();
+        let new_batch = collect_witnesses_lazy(&index).unwrap();
+        assert_eq!(new_batch.rank, dense_rank(&index.rows, 32, p).unwrap());
+        assert_eq!(old_batch.witnesses, emitted);
+        assert_eq!(new_batch.witnesses, old_batch.witnesses);
+        let old_rows = materialize_complete_relations(&index, &old_batch, &inputs, 128, 128).unwrap();
+        let new_rows = materialize_complete_relations(&index, &new_batch, &inputs, 128, 128).unwrap();
+        assert_eq!(new_rows, old_rows);
+        assert_eq!(new_rows.len(), 49);
+        for w in &new_batch.witnesses {
+            assert!(witness_cancels_lp(&index, w));
+        }
+    }
+}
+
+#[test]
+fn forest_witness_lazy_rank_and_sources_match_random_streams() {
+    // Bounded deterministic exact-field oracle including singleton anchors,
+    // empty rows, dual-anchored bridges and original-RHS replay.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    let mut rng = Rng(0x1a21_9f3c_6b70_42d1);
+    let mut total_skips = 0u64;
+    for trial in 0..150 {
+        let p = [3u64, 7, 101, 1_000_003][trial % 4];
+        let count = 1 + rng.below(42) as usize;
+        let source = random_lp_stream(&mut rng, count, 12, 2, p);
+        let index = LpIndex::build(&source, p).unwrap();
+        let old = collect_witnesses(&index).unwrap();
+        let lazy = collect_witnesses_lazy(&index).unwrap();
+        assert_eq!(old.rank, lazy.rank, "rank mismatch at trial {trial}");
+        assert_eq!(lazy.rank, dense_rank(&index.rows, index.num_columns(), p).unwrap());
+        assert_eq!(old.witnesses, lazy.witnesses, "witness mismatch at trial {trial}");
+        assert_eq!(old.stats.inverse_calls, lazy.stats.inverse_calls);
+        assert!(lazy.stats.path_steps <= old.stats.path_steps);
+        assert!(lazy.stats.parent_path_reads <= old.stats.parent_path_reads);
+        total_skips += lazy.stats.independent_projection_skips;
+        let a = materialize_complete_relations(&index, &old, &source, 512, 512).unwrap();
+        let b = materialize_complete_relations(&index, &lazy, &source, 512, 512).unwrap();
+        assert_eq!(a, b, "small-payload replay mismatch at trial {trial}");
+    }
+    assert!(total_skips > 0, "random workload missed independent-row fast path");
+}
