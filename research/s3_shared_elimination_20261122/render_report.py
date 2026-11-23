@@ -96,7 +96,7 @@ def render():
             flush()
         elif line.startswith("!["):
             flush()
-            story.append(Paragraph("<b>Figure 1.</b> The shared and fresh numerical paths are shown on the following landscape figure page.", body))
+            story.append(Paragraph("<b>Figure 1.</b> The Original, Fresh and Shared recovery paths are shown on the following landscape figure page.", body))
         elif line.startswith("# "):
             flush()
             story.append(Paragraph(inline(line[2:]), title))
@@ -158,8 +158,9 @@ def render():
         figure = fitz.open(stream=svg.convert_to_pdf(), filetype="pdf")
         page = result.new_page(pno=1, width=A4[1], height=A4[0])
         page.show_pdf_page(fitz.Rect(25, 68, A4[1] - 25, A4[0] - 80), figure, 0)
-        page.insert_text((30, 36), "Figure 1 | Exact row-space reuse and its fresh reference",
-                         fontsize=15, color=(.09, .17, .27))
+        page.insert_font(fontname="ReportSans", fontfile=str(FONT_ROOT / "DejaVuSans.ttf"))
+        page.insert_text((30, 36), "Figure 1 | Matched preparation and public-input recovery",
+                         fontname="ReportSans", fontsize=15, color=(.09, .17, .27))
         for number, page in enumerate(result, 1):
             page.insert_text((page.rect.width - 65, page.rect.height - 28),
                              f"{number} / {len(result)}", fontsize=8,

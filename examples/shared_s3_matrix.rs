@@ -10,8 +10,9 @@
 //! cargo run --release --example shared_s3_matrix -- --plan
 //! cargo run --release --example shared_s3_matrix -- --check
 //! cargo run --release --example shared_s3_matrix -- --check-prime31
+//! cargo run --release --example shared_s3_matrix -- --check-prime31-recovery-arms
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::exact_modular_matrix::{Backend, ModMatrix32};
@@ -46,6 +47,60 @@ struct FamilyFixture {
     factor_x: Vec<u64>,
     common: Vec<Poly>,
     pencil: Vec<Vec<Poly>>,
+}
+
+#[derive(Clone, Copy, Debug)]
+enum RecoveryStrategy {
+    Original,
+    Fresh(Backend),
+    Shared(Backend),
+}
+
+const RECOVERY_ARMS: [RecoveryStrategy; 7] = [
+    RecoveryStrategy::Original,
+    RecoveryStrategy::Fresh(Backend::Integer),
+    RecoveryStrategy::Fresh(Backend::Fma),
+    RecoveryStrategy::Fresh(Backend::Split16),
+    RecoveryStrategy::Shared(Backend::Integer),
+    RecoveryStrategy::Shared(Backend::Fma),
+    RecoveryStrategy::Shared(Backend::Split16),
+];
+
+impl RecoveryStrategy {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Original => "original",
+            Self::Fresh(_) => "fresh",
+            Self::Shared(_) => "shared",
+        }
+    }
+
+    fn backend(self) -> Option<Backend> {
+        match self {
+            Self::Original => None,
+            Self::Fresh(backend) | Self::Shared(backend) => Some(backend),
+        }
+    }
+
+    fn identity(self) -> Value {
+        json!({"strategy":self.name(),"preconditioner_backend":self.backend().map(Backend::name)})
+    }
+}
+
+#[derive(Clone, Copy)]
+struct RecoveryPolicy {
+    max_attempts: u64,
+    /// A correctness control, never a measured elapsed-time sample.
+    expire_f4_deadline: bool,
+}
+
+impl RecoveryPolicy {
+    fn standard(max_attempts: u64) -> Self {
+        Self {
+            max_attempts,
+            expire_f4_deadline: false,
+        }
+    }
 }
 
 fn mul(a: u64, b: u64, p: u64) -> u64 {
@@ -168,6 +223,36 @@ impl FamilyFixture {
             backend,
         )
         .map_err(|e| e.to_string())
+    }
+
+    /// Specialize the original pencil without preparing any Macaulay object.
+    /// This common integer construction is used by every recovery arm; its
+    /// arithmetic, allocations and polynomial copies are explicitly uncounted.
+    fn original_equations(&self, parameter: u64) -> Result<Vec<Poly>, String> {
+        if parameter >= self.curve.p {
+            return Err("target abscissa must be canonical".into());
+        }
+        let mut equations = self.common.clone();
+        for generator in &self.pencil {
+            let mut terms = BTreeMap::<Vec<u32>, u64>::new();
+            let mut power = 1;
+            for block in generator {
+                for (exponents, coefficient) in block {
+                    let entry = terms.entry(exponents.clone()).or_default();
+                    *entry = (*entry + mul(*coefficient, power, self.curve.p)) % self.curve.p;
+                }
+                power = mul(power, parameter, self.curve.p);
+            }
+            let polynomial: Poly = terms
+                .into_iter()
+                .filter(|(_, coefficient)| *coefficient != 0)
+                .collect();
+            if !polynomial.is_empty() {
+                equations.push(polynomial);
+            }
+        }
+        equations.retain(|polynomial| !polynomial.is_empty());
+        Ok(equations)
     }
 
     fn domains(&self) -> Vec<Option<Vec<u64>>> {
@@ -619,55 +704,527 @@ fn signed_witness_check(fixture: &FamilyFixture) -> Result<Value, String> {
     )
 }
 
+enum RecoveryPreparation {
+    Original,
+    Fresh(FreshMacaulay),
+    Shared(SharedMacaulay),
+}
+
+impl RecoveryPreparation {
+    fn prepare(fixture: &FamilyFixture, strategy: RecoveryStrategy) -> Result<Self, String> {
+        match strategy {
+            RecoveryStrategy::Original => Ok(Self::Original),
+            RecoveryStrategy::Fresh(backend) => fixture.fresh(backend).map(Self::Fresh),
+            RecoveryStrategy::Shared(backend) => fixture.shared(backend).map(Self::Shared),
+        }
+    }
+
+    fn setup_report(&self) -> Value {
+        match self {
+            Self::Original => json!({
+                "status":"prepared","strategy":"original","fresh":null,"shared":null,
+                "numerical_elimination_performed":false,"numerical_projection_performed":false,
+                "macaulay_object_constructed":false,"cost_counter_coverage_complete":false
+            }),
+            Self::Fresh(fresh) => json!({
+                "status":"prepared","strategy":"fresh","fresh":fresh.setup_report(),"shared":null,
+                "macaulay_object_constructed":true,"cost_counter_coverage_complete":false
+            }),
+            Self::Shared(shared) => json!({
+                "status":"prepared","strategy":"shared","fresh":null,"shared":shared.setup_report(),
+                "macaulay_object_constructed":true,"cost_counter_coverage_complete":false
+            }),
+        }
+    }
+
+    fn specialize(&self, parameter: u64) -> Result<Option<PreparedTarget>, String> {
+        match self {
+            Self::Original => Ok(None),
+            Self::Fresh(fresh) => fresh
+                .specialize(parameter)
+                .map(Some)
+                .map_err(|e| e.to_string()),
+            Self::Shared(shared) => shared
+                .specialize(parameter)
+                .map(Some)
+                .map_err(|e| e.to_string()),
+        }
+    }
+}
+
+fn group_phase(ops: GroupOps) -> Value {
+    // GroupOps deliberately skips its field ledger during serialization.
+    json!({
+        "group_operations":ops,"group_field_operations":ops.field_ops,
+        "montgomery_reductions":ops.montgomery_reductions,
+        "cost_counter_coverage_complete":false
+    })
+}
+
+struct RelationAttempt {
+    status: &'static str,
+    witness: Option<Vec<usize>>,
+    report: Value,
+    lifting_ops: GroupOps,
+}
+
+/// Every return retains work already performed, including a preparation error
+/// or an interrupted visitor. No complete-chart decision is inferred here.
 fn find_relation(
     fixture: &FamilyFixture,
-    shared: &SharedMacaulay,
+    preparation: &RecoveryPreparation,
     fb: &FactorBase<PrimePoint>,
     target: PrimePoint,
-    ops: &mut GroupOps,
-) -> Result<(Option<Vec<usize>>, PreparedTarget, VisitReport), String> {
-    fixture.declared_group()?;
-    if target.infinity {
-        return Err("fixture relation request is outside the finite target chart".into());
-    }
-    let original = shared
-        .original_equations(target.x)
-        .map_err(|e| e.to_string())?;
-    let prepared = shared.specialize(target.x).map_err(|e| e.to_string())?;
+    policy: RecoveryPolicy,
+) -> RelationAttempt {
+    let mut call = RelationAttempt {
+        status: "original_equation_error",
+        witness: None,
+        report: json!({
+            "original_equations":null,"preconditioning":null,"f4":null,
+            "original_equation_construction_invoked":true,
+            "preconditioning_invoked":false,"f4_invoked":false,
+            "original_equations_retained":false,"relation":null,
+            "accepted_assignment":null,"accepted_factor_base_indices":null,
+            "error":null,"cost_counter_coverage_complete":false
+        }),
+        lifting_ops: GroupOps::default(),
+    };
+    let original = match fixture.original_equations(target.x) {
+        Ok(original) => original,
+        Err(error) => {
+            call.report["error"] = json!(error);
+            return call;
+        }
+    };
+    call.report["original_equations"] = json!({
+        "equations":original.len(),"terms":original.iter().map(Vec::len).sum::<usize>(),
+        "arithmetic_counters":null,"construction_arithmetic_counted":false
+    });
+    call.report["original_equations_retained"] = json!(true);
+    call.report["preconditioning_invoked"] =
+        json!(!matches!(preparation, RecoveryPreparation::Original));
+    let prepared = match preparation.specialize(target.x) {
+        Ok(prepared) => prepared,
+        Err(error) => {
+            call.status = "specialization_error";
+            call.report["error"] = json!(error);
+            call.report["preconditioning"] = json!({
+                "status":"failed","partial_arithmetic_counters":null,
+                "reason":"preparation API returns no partial target report on error"
+            });
+            return call;
+        }
+    };
     let mut equations = original.clone();
-    equations.extend(prepared.consequences.iter().cloned());
-    let mut witness = None;
-    let report = f4_fp::solve_visit(
+    if let Some(prepared) = prepared {
+        call.report["preconditioning"] = json!(prepared.report);
+        call.report["consequence_count"] = json!(prepared.consequences.len());
+        if matches!(preparation, RecoveryPreparation::Shared(_)) {
+            // Compatibility with the historical Shared-only correctness output.
+            call.report["shared_target_report"] = json!(prepared.report);
+        }
+        equations.extend(prepared.consequences);
+    } else {
+        call.report["consequence_count"] = json!(0);
+    }
+    let mut options = solver_options();
+    if policy.expire_f4_deadline {
+        options.deadline = Some(Instant::now());
+    }
+    call.report["f4_invoked"] = json!(true);
+    let outcome = f4_fp::solve_visit(
         &equations,
         VARIABLES,
         fixture.curve.p,
-        &solver_options(),
+        &options,
         &fixture.domains(),
         |point| {
-            if equations_satisfied(&original, point, fixture.curve.p) {
-                witness = lift_chain(&fixture.curve, fb, point, target, ops);
+            if point.len() == VARIABLES
+                && point.iter().all(|&x| x < fixture.curve.p)
+                && point[..3].iter().all(|x| fixture.factor_x.contains(x))
+                && equations_satisfied(&original, point, fixture.curve.p)
+            {
+                call.witness = lift_chain(&fixture.curve, fb, point, target, &mut call.lifting_ops);
+                if let Some(indices) = &call.witness {
+                    call.report["accepted_assignment"] = json!(point);
+                    call.report["accepted_factor_base_indices"] = json!(indices);
+                }
             }
-            // Stop only after the original equations and exact group lift
-            // have supplied a valid relation.
-            witness.is_some()
+            // A verified witness permits stopping; it does not prove exhaustion.
+            call.witness.is_some()
         },
-    )?;
-    if witness.is_none()
-        && (!report.complete || report.timed_out || report.trace_stopped || report.stopped_early)
+    );
+    let report = match outcome {
+        Ok(report) => report,
+        Err(error) => {
+            call.status = "f4_error";
+            call.report["error"] = json!(error);
+            call.report["f4_report_unavailable"] = json!(true);
+            return call;
+        }
+    };
+    call.status = if call.witness.is_some() {
+        "found"
+    } else if report.complete && !report.timed_out && !report.trace_stopped && !report.stopped_early
     {
-        return Err(format!(
-            "relation extraction interrupted; finite-chart exhaustion is unknown: {}",
-            json!({"target":point_value(target),"shared_target_report":prepared.report,"f4":report})
-        ));
-    }
-    Ok((witness, prepared, report))
+        "finite_chart_exhausted"
+    } else {
+        call.report["error"] =
+            json!("relation extraction interrupted; finite-chart exhaustion is unknown");
+        "f4_incomplete"
+    };
+    call.report["f4"] = json!(report);
+    call
 }
 
-/// Solver receives the public Q, generator, subgroup order and bounded query
-/// policy. It receives neither the target scalar, factor-base logarithms,
-/// reference solutions nor a point-sum lookup table. Its only initial scalar
-/// relation is the explicit G anchor. All later rows come from the actual F4
-/// visitor and signed group replay; relation arithmetic uses `order`, not p.
+struct RecoveryRecord {
+    report: Value,
+    attempts: Vec<Value>,
+    admission: GroupOps,
+    queries: GroupOps,
+    lifting: GroupOps,
+    replay: GroupOps,
+    verification: GroupOps,
+    original_calls: u64,
+    preconditioner_calls: u64,
+    f4_calls: u64,
+    relations: u64,
+    skipped: u64,
+}
+
+impl RecoveryRecord {
+    fn new(
+        fixture: &FamilyFixture,
+        q: PrimePoint,
+        g: PrimePoint,
+        order: u64,
+        policy: RecoveryPolicy,
+        strategy: RecoveryStrategy,
+    ) -> Self {
+        Self {
+            report: json!({
+                "strategy":strategy.name(),
+                "preconditioner_backend":strategy.backend().map(Backend::name),
+                "coordinate_modulus":fixture.curve.p,"modulus":order,
+                "curve":fixture.curve,"generator":point_value(g),"public_target":point_value(q),
+                "factor_base_x":fixture.factor_x,"factor_coordinate_domains":fixture.domains(),
+                "auxiliary_domain":"full Fp (None in production visitor)",
+                "family":{"variables":["x1","x2","x3","u"],"degree":DEGREE,
+                    "common_equations":fixture.common,"target_pencil":fixture.pencil},
+                "attempt_limit":policy.max_attempts,
+                "query_policy":"Q + [a]G, a=0..attempt_limit; recompute [a]G with counted group mul",
+                "solver_policy":{"ordering":"Grevlex","max_degree":DEGREE,"max_pairs_per_step":32,
+                    "deadline_guard_seconds":10,"forced_expired_deadline":policy.expire_f4_deadline},
+                "f4_backend":"unchanged production integer F4 visitor",
+                "relation_linear_algebra":"existing integer IncrementalGauss modulo subgroup order",
+                "admission":{"status":"not_completed"},
+                "factor_base_construction":{"status":"not_run","arithmetic_counters":null},
+                "setup":{"status":"not_run","fresh":null,"shared":null},
+                "linear_algebra_phase":{"status":"not_run","work_counters":null},
+                "rank":0,"anchor_relations":0,
+                "known_answer_passed_to_solver":false,"reference_solutions_passed_to_solver":false,
+                "uniform_random_target_tested":false,"benchmark_executed":false,
+                "complete_point_decomposition_coverage":false,"cost_counter_coverage_complete":false,
+                "scope":"declared structured public-target/base fixtures and finite-chart F4 relations"
+            }),
+            attempts: Vec::new(),
+            admission: GroupOps::default(),
+            queries: GroupOps::default(),
+            lifting: GroupOps::default(),
+            replay: GroupOps::default(),
+            verification: GroupOps::default(),
+            original_calls: 0,
+            preconditioner_calls: 0,
+            f4_calls: 0,
+            relations: 0,
+            skipped: 0,
+        }
+    }
+
+    fn matrix(&mut self, gauss: &IncrementalGauss) {
+        // Merely reporting the matrix must not call pinned(), whose scans count.
+        self.report["rank"] = json!(gauss.rank());
+        self.report["linear_algebra_row_ops"] = json!(gauss.row_ops);
+        self.report["linear_algebra_work"] = json!(gauss.work_counters());
+        self.report["linear_algebra_phase"] = json!({
+            "status":"started","rank":gauss.rank(),"row_ops":gauss.row_ops,
+            "dependent_rows":gauss.dependent,"inconsistent_rows":gauss.inconsistent,
+            "pivot_inversions":gauss.pivot_inversions,"work_counters":gauss.work_counters(),
+            "coverage":"row_ops includes normalization; pivot_inversion_steps is the existing 2w model, not an executed-loop count",
+            "cost_counter_coverage_complete":false
+        });
+    }
+
+    fn finish(mut self, status: &str, error: Option<&str>, recovered: Option<u64>) -> Value {
+        let mut total = GroupOps::default();
+        for phase in [
+            self.admission,
+            self.queries,
+            self.lifting,
+            self.replay,
+            self.verification,
+        ] {
+            total.merge(phase);
+        }
+        self.report["status"] = json!(status);
+        self.report["stop_reason"] = json!(status);
+        self.report["error"] = json!(error);
+        self.report["recovered_scalar"] = json!(recovered);
+        self.report["answer_checked_in_group"] = json!(status == "recovered");
+        self.report["relation_count"] = json!(self.relations);
+        self.report["skipped_exceptional_or_base_queries"] = json!(self.skipped);
+        self.report["actual_queries"] = json!(self.attempts.len());
+        self.report["group_operations"] = json!(total);
+        self.report["group_field_operations"] = json!(total.field_ops);
+        self.report["group_count_scope"] = json!("target admission, query generation, sign lifting, relation replay and final scalar check; factor-base construction excluded");
+        self.report["phase_ledger"] = json!({
+            "admission":group_phase(self.admission),
+            "factor_base_construction":self.report["factor_base_construction"],
+            "preparation":self.report["setup"],
+            "query_generation":group_phase(self.queries),
+            "original_equation_construction":{"calls":self.original_calls,"arithmetic_counters":null},
+            "preconditioning":{"calls":self.preconditioner_calls,"reports":"attempts[].preconditioning"},
+            "f4":{"calls":self.f4_calls,"reports":"attempts[].f4"},
+            "sign_lifting":group_phase(self.lifting),
+            "relation_replay":group_phase(self.replay),
+            "relation_linear_algebra":self.report["linear_algebra_phase"],
+            "final_verification":group_phase(self.verification),
+            "counter_relationships":[
+                "group scalar_mults overlaps the adds/doubles used inside scalar multiplication",
+                "group field muls and sqrs are separate categories; invs excludes inversion internals",
+                "Macaulay logical_products already includes kernel field products; nested kernels are detail, not an additional total",
+                "F4 field_ops counts row-reduction products; root_field_multiplications is separate; domain_evaluations counts events"
+            ],
+            "counter_exclusions":[
+                "is_on_curve/rhs, field additions/subtractions/negations/comparisons and inversion internals",
+                "factor-base roots, curve RHS work, sign/index construction and lookup comparisons",
+                "original-equation specialization and polynomial copies/normalization/evaluation for signed witness admission",
+                "preparation validation/primality testing, monomial enumeration, sorting, allocation and unreturned partial error costs",
+                "floating quotient floors, conditional remainder corrections and other uncounted instructions",
+                "complete F4 and extraction cost, relation-row assembly, process memory and complete CPU work"
+            ],
+            "cold_boundary_exclusions":[
+                "FamilyFixture construction precedes each recovery invocation and has no per-arm cost counters",
+                "caller-only target construction and correctness/reference checks are outside recovery"
+            ],
+            "memory_scope":"Macaulay payload bounds and F4 dimensions are not measured process RSS",
+            "timing_samples_collected":false,"cost_counter_coverage_complete":false
+        });
+        self.report["attempts"] = json!(self.attempts);
+        self.report
+    }
+}
+
+/// Public-input recovery shared by all preparation strategies. Expected scalars,
+/// factor-base logarithms and reference roots never enter this boundary.
+fn recover_public_arm(
+    fixture: &FamilyFixture,
+    q: PrimePoint,
+    g: PrimePoint,
+    order: u64,
+    policy: RecoveryPolicy,
+    strategy: RecoveryStrategy,
+) -> Value {
+    let curve = &fixture.curve;
+    let mut record = RecoveryRecord::new(fixture, q, g, order, policy, strategy);
+    match fixture.declared_group() {
+        Ok(declared) if declared == (g, order) => {}
+        _ => {
+            return record.finish(
+                "admission_error",
+                Some("generator/order differs from the declared fixture"),
+                None,
+            )
+        }
+    }
+    if policy.max_attempts == 0 || policy.max_attempts > 32 || policy.max_attempts > order {
+        return record.finish(
+            "admission_error",
+            Some("fixture requires an explicit attempt bound between 1 and min(32, order)"),
+            None,
+        );
+    }
+    if g.infinity
+        || g.x >= curve.p
+        || g.y >= curve.p
+        || !curve.is_on_curve(g)
+        || !curve.mul(&mut record.admission, g, order).infinity
+    {
+        return record.finish("admission_error", Some("invalid fixture generator"), None);
+    }
+    if q.infinity
+        || q.x >= curve.p
+        || q.y >= curve.p
+        || !curve.is_on_curve(q)
+        || !curve.mul(&mut record.admission, q, order).infinity
+    {
+        return record.finish("admission_error", Some("invalid public target"), None);
+    }
+    record.report["admission"] = json!({"status":"passed","canonical_public_coordinates":true});
+    let fb = match factor_base(curve, &fixture.factor_x, order) {
+        Ok(fb) => fb,
+        Err(error) => {
+            record.report["factor_base_construction"] =
+                json!({"status":"failed","error":error,"partial_arithmetic_counters":null});
+            return record.finish("factor_base_error", Some(&error), None);
+        }
+    };
+    record.report["factor_base_construction"] = json!({
+        "status":"completed","abscissae":fixture.factor_x.len(),"points":fb.points.len(),
+        "columns":fb.columns,"arithmetic_counters":null,
+        "coverage":"construction performed independently in this arm; its arithmetic and indexing are uncounted"
+    });
+    record.report["factor_base_points"] = json!(fb
+        .points
+        .iter()
+        .copied()
+        .map(point_value)
+        .collect::<Vec<_>>());
+    record.report["factor_base_columns"] = json!(fb.col_of);
+    record.report["factor_base_coefficients"] = json!(fb.coef_of);
+    record.report["target_column"] = json!(fb.columns);
+    let preparation = match RecoveryPreparation::prepare(fixture, strategy) {
+        Ok(preparation) => preparation,
+        Err(error) => {
+            record.report["setup"] = json!({
+                "status":"failed","strategy":strategy.name(),"error":error,
+                "fresh":null,"shared":null,"partial_arithmetic_counters":null,
+                "reason":"setup API returns no partial report on error"
+            });
+            return record.finish("setup_error", Some(&error), None);
+        }
+    };
+    record.report["setup"] = preparation.setup_report();
+    record.report["scoped_setup_report"] = match &preparation {
+        RecoveryPreparation::Original => preparation.setup_report(),
+        RecoveryPreparation::Fresh(fresh) => json!(fresh.setup_report()),
+        RecoveryPreparation::Shared(shared) => json!(shared.setup_report()),
+    };
+    let target_column = fb.columns;
+    let mut gauss = IncrementalGauss::new(fb.columns + 1, order);
+    let Some(&gi) = fb.point_index.get(&curve.key(&g)) else {
+        record.matrix(&gauss);
+        return record.finish("anchor_error", Some("missing G anchor"), None);
+    };
+    let mut anchor = vec![0; fb.columns + 1];
+    anchor[fb.col_of[gi]] = fb.coef_of[gi];
+    let anchor_status = gauss.add_row(anchor, 1);
+    record.matrix(&gauss);
+    if anchor_status == RowStatus::Inconsistent {
+        return record.finish("anchor_error", Some("G anchor contradicted itself"), None);
+    }
+    record.report["anchor_relations"] = json!(1);
+    record.report["anchor_column"] = json!(fb.col_of[gi]);
+    record.report["anchor_coefficient"] = json!(fb.coef_of[gi]);
+    for a in 0..policy.max_attempts {
+        let mut query_ops = GroupOps::default();
+        let ag = curve.mul(&mut query_ops, g, a);
+        let target = curve.add(&mut query_ops, ag, q);
+        record.queries.merge(query_ops);
+        let rank_before = gauss.rank();
+        if target.infinity || fb.point_index.contains_key(&curve.key(&target)) {
+            record.skipped += 1;
+            record.attempts.push(json!({
+                "a":a,"b":1,"target":point_value(target),
+                "status":if target.infinity {"skipped_identity"} else {"skipped_direct_base"},
+                "rank_before":rank_before,"rank_after":rank_before,
+                "query_generation":group_phase(query_ops),"relation":null,"preconditioning":null,"f4":null,
+                "reason":"direct/exceptional lookup is excluded from this finite-chart three-term fixture"
+            }));
+            continue;
+        }
+        let RelationAttempt {
+            status,
+            witness,
+            mut report,
+            lifting_ops,
+        } = find_relation(fixture, &preparation, &fb, target, policy);
+        record.original_calls +=
+            u64::from(report["original_equation_construction_invoked"] == true);
+        record.preconditioner_calls += u64::from(report["preconditioning_invoked"] == true);
+        record.f4_calls += u64::from(report["f4_invoked"] == true);
+        record.lifting.merge(lifting_ops);
+        report["a"] = json!(a);
+        report["b"] = json!(1);
+        report["target"] = point_value(target);
+        report["status"] = json!(status);
+        report["rank_before"] = json!(rank_before);
+        report["rank_after"] = json!(rank_before);
+        report["query_generation"] = group_phase(query_ops);
+        report["sign_lifting"] = group_phase(lifting_ops);
+        if !matches!(status, "found" | "finite_chart_exhausted") {
+            let error = report["error"]
+                .as_str()
+                .unwrap_or("relation extraction failed")
+                .to_owned();
+            record.attempts.push(report);
+            record.matrix(&gauss);
+            return record.finish(status, Some(&error), None);
+        }
+        if let Some(indices) = witness {
+            let mut row = vec![0; fb.columns + 1];
+            let mut replay_ops = GroupOps::default();
+            let mut replay = curve.identity();
+            for &index in &indices {
+                row[fb.col_of[index]] = (row[fb.col_of[index]] + fb.coef_of[index]) % order;
+                replay = curve.add(&mut replay_ops, replay, fb.points[index]);
+            }
+            record.replay.merge(replay_ops);
+            report["relation_replay"] = group_phase(replay_ops);
+            report["replayed_point"] = point_value(replay);
+            report["replay_passed"] = json!(replay == target);
+            report["candidate_factor_row"] = json!(row);
+            if replay != target {
+                record.attempts.push(report);
+                record.matrix(&gauss);
+                return record.finish(
+                    "relation_error",
+                    Some("relation failed point-sum replay before linear algebra"),
+                    None,
+                );
+            }
+            row[target_column] = order - 1;
+            report["relation"] = json!({"factor_base_indices":indices,"row":row,"rhs":a});
+            let row_status = gauss.add_row(row, a);
+            report["row_status"] = json!(format!("{row_status:?}"));
+            report["rank_after"] = json!(gauss.rank());
+            record.relations += 1;
+            if row_status == RowStatus::Inconsistent {
+                record.attempts.push(report);
+                record.matrix(&gauss);
+                return record.finish(
+                    "relation_error",
+                    Some("relation matrix inconsistent modulo subgroup order"),
+                    None,
+                );
+            }
+        }
+        // Exactly one decision call, then capture its scan work in the ledger.
+        let recovered = gauss.pinned(target_column);
+        record.matrix(&gauss);
+        record.attempts.push(report);
+        if let Some(recovered) = recovered {
+            if curve.mul(&mut record.verification, g, recovered) != q {
+                record.report["candidate_scalar"] = json!(recovered);
+                return record.finish(
+                    "verification_error",
+                    Some("recovered scalar failed public target check"),
+                    None,
+                );
+            }
+            return record.finish("recovered", None, Some(recovered));
+        }
+    }
+    record.matrix(&gauss);
+    record.finish(
+        "query_budget_exhausted",
+        Some("bounded fixture relations did not determine the target logarithm"),
+        None,
+    )
+}
+
+/// Preserve the historical Shared-only entry point and Result contract.
 fn recover_public(
     fixture: &FamilyFixture,
     q: PrimePoint,
@@ -676,128 +1233,262 @@ fn recover_public(
     max_attempts: u64,
     backend: Backend,
 ) -> Result<Value, String> {
-    let curve = &fixture.curve;
-    if fixture.declared_group()? != (g, order) {
-        return Err("generator/order differs from the declared fixture".into());
+    let report = recover_public_arm(
+        fixture,
+        q,
+        g,
+        order,
+        RecoveryPolicy::standard(max_attempts),
+        RecoveryStrategy::Shared(backend),
+    );
+    if report["status"] == "recovered" {
+        Ok(report)
+    } else {
+        Err(format!(
+            "{}; retained_attempts and full report: {}",
+            report["error"].as_str().unwrap_or("public recovery failed"),
+            report
+        ))
     }
-    if max_attempts == 0 || max_attempts > 32 || max_attempts > order {
-        return Err(
-            "fixture requires an explicit attempt bound between 1 and min(32, order)".into(),
+}
+
+/// The matched arm's enclosing boundary includes family construction. A future
+/// cold timer may enclose this whole call; this fixture records no timing.
+#[allow(clippy::too_many_arguments)]
+fn recover_public_arm_from_parameters(
+    curve: PrimeCurve,
+    factor_x: &[u64],
+    q: PrimePoint,
+    g: PrimePoint,
+    order: u64,
+    policy: RecoveryPolicy,
+    strategy: RecoveryStrategy,
+) -> Value {
+    let fixture = match FamilyFixture::new(curve.clone(), factor_x.to_vec()) {
+        Ok(fixture) => fixture,
+        Err(error) => {
+            return json!({
+                "status":"family_construction_error","stop_reason":"family_construction_error",
+                "error":error,"strategy":strategy.name(),
+                "preconditioner_backend":strategy.backend().map(Backend::name),
+                "coordinate_modulus":curve.p,"modulus":order,"public_target":point_value(q),
+                "attempt_limit":policy.max_attempts,"attempts":[],"recovered_scalar":null,
+                "answer_checked_in_group":false,"known_answer_passed_to_solver":false,
+                "setup":{"status":"not_run","fresh":null,"shared":null},
+                "phase_ledger":{"family_construction":{"status":"failed","partial_arithmetic_counters":null}},
+                "benchmark_executed":false,"cost_counter_coverage_complete":false
+            });
+        }
+    };
+    let mut report = recover_public_arm(&fixture, q, g, order, policy, strategy);
+    report["phase_ledger"]["family_construction"] = json!({
+        "status":"completed_inside_arm_entry","arithmetic_counters":null,
+        "coverage":"S3 pencil and factor membership polynomials constructed in this arm; arithmetic and allocation unpriced"
+    });
+    report["phase_ledger"]["cold_boundary_exclusions"] = json!([
+        "caller-only target construction and correctness/reference checks are outside recovery"
+    ]);
+    report["cold_enclosing_entry"] = json!("public parameters -> family construction -> admission -> factor base -> preparation -> queries/relations/LA -> verification");
+    report
+}
+
+#[allow(clippy::too_many_arguments)]
+fn execute_recovery_arms(
+    curve: PrimeCurve,
+    factor_x: &[u64],
+    q: PrimePoint,
+    g: PrimePoint,
+    order: u64,
+    policies: &[RecoveryPolicy; RECOVERY_ARMS.len()],
+) -> Vec<Value> {
+    // No early propagation or success-dependent scheduling: a failed arm
+    // cannot suppress another arm. Calls are sequential for F4 counters.
+    RECOVERY_ARMS
+        .iter()
+        .copied()
+        .zip(policies.iter().copied())
+        .enumerate()
+        .map(|(index, (strategy, policy))| {
+            let mut report = recover_public_arm_from_parameters(
+                curve.clone(),
+                factor_x,
+                q,
+                g,
+                order,
+                policy,
+                strategy,
+            );
+            report["planned_arm_index"] = json!(index);
+            report
+        })
+        .collect()
+}
+
+fn compare_query_prefixes(arms: &[Value]) -> Value {
+    let mut identities = BTreeMap::new();
+    let mut consistent = true;
+    let mut repeated_query_checks = 0;
+    let lengths: Vec<_> = arms
+        .iter()
+        .map(|arm| arm["attempts"].as_array().map_or(0, Vec::len))
+        .collect();
+    for arm in arms {
+        if let Some(attempts) = arm["attempts"].as_array() {
+            for (index, attempt) in attempts.iter().enumerate() {
+                let identity =
+                    json!({"a":attempt["a"],"b":attempt["b"],"target":attempt["target"]});
+                consistent &= attempt["a"].as_u64() == Some(index as u64) && attempt["b"] == 1;
+                if let Some(prior) = identities.insert(index, identity.clone()) {
+                    repeated_query_checks += 1;
+                    consistent &= prior == identity;
+                }
+            }
+        }
+    }
+    json!({
+        "same_identity_at_each_overlapping_query":consistent,
+        "repeated_query_checks":repeated_query_checks,
+        "actual_query_counts":lengths,
+        "identical_stopping_prefix_lengths":lengths.windows(2).all(|pair| pair[0] == pair[1]),
+        "qualification":"same policy and overlapping queries; valid witnesses may change rank progress and stopping prefixes"
+    })
+}
+
+fn arm_structure_valid(index: usize, arm: &Value) -> bool {
+    let strategy = RECOVERY_ARMS[index];
+    arm["planned_arm_index"].as_u64() == Some(index as u64)
+        && arm["strategy"] == strategy.name()
+        && arm["preconditioner_backend"] == json!(strategy.backend().map(Backend::name))
+        && arm["known_answer_passed_to_solver"] == false
+        && arm["cost_counter_coverage_complete"] == false
+        && (matches!(strategy, RecoveryStrategy::Shared(_)) || arm["setup"]["shared"].is_null())
+}
+
+fn checked_recovery_panel(label: &str, arms: Vec<Value>, expected: u64) -> Value {
+    // The held answer is used only here, after all public-input calls finish.
+    let query_comparison = compare_query_prefixes(&arms);
+    let passed = arms.len() == RECOVERY_ARMS.len()
+        && arms.iter().enumerate().all(|(index, arm)| {
+            arm_structure_valid(index, arm)
+                && arm["status"] == "recovered"
+                && arm["recovered_scalar"].as_u64() == Some(expected)
+                && arm["answer_checked_in_group"] == true
+        })
+        && query_comparison["same_identity_at_each_overlapping_query"] == true;
+    json!({
+        "label":label,"passed":passed,"caller_only_expected_scalar":expected,
+        "planned_arm_count":RECOVERY_ARMS.len(),"retained_arm_count":arms.len(),
+        "query_comparison":query_comparison,"arms":arms
+    })
+}
+
+fn checked_failure_control(
+    label: &str,
+    arms: Vec<Value>,
+    expected_first_status: &str,
+    expected_other_scalar: u64,
+) -> Value {
+    let query_comparison = compare_query_prefixes(&arms);
+    let passed = arms.len() == RECOVERY_ARMS.len()
+        && arms.iter().enumerate().all(|(index, arm)| {
+            arm_structure_valid(index, arm)
+                && if index == 0 {
+                    arm["status"] == expected_first_status
+                        && arm["recovered_scalar"].is_null()
+                        && arm["answer_checked_in_group"] == false
+                        && arm["attempts"]
+                            .as_array()
+                            .is_some_and(|calls| !calls.is_empty())
+                        && (expected_first_status != "f4_incomplete"
+                            || (arm["attempts"][0]["f4"]["timed_out"] == true
+                                && arm["attempts"][0]["f4"]["complete"] == false
+                                && arm["attempts"][0]["status"] != "finite_chart_exhausted"))
+                } else {
+                    arm["status"] == "recovered"
+                        && arm["recovered_scalar"].as_u64() == Some(expected_other_scalar)
+                        && arm["answer_checked_in_group"] == true
+                }
+        })
+        && query_comparison["same_identity_at_each_overlapping_query"] == true;
+    json!({
+        "label":label,"passed":passed,"expected_first_status":expected_first_status,
+        "caller_only_expected_other_scalar":expected_other_scalar,
+        "planned_arm_count":RECOVERY_ARMS.len(),"retained_arm_count":arms.len(),
+        "query_comparison":query_comparison,"arms":arms
+    })
+}
+
+fn run_matched_recovery_checks() -> Value {
+    let standard = [RecoveryPolicy::standard(P31_ATTEMPTS); RECOVERY_ARMS.len()];
+    let mut prime31 = Vec::new();
+    for (label, target, expected) in [
+        ("positive_public_target", p31_public_target(), 7),
+        (
+            "negated_public_target",
+            p31_curve().neg(p31_public_target()),
+            P31_ORDER - 7,
+        ),
+    ] {
+        let arms = execute_recovery_arms(
+            p31_curve(),
+            &P31_BASE_X,
+            target,
+            p31_generator(),
+            P31_ORDER,
+            &standard,
         );
+        prime31.push(checked_recovery_panel(label, arms, expected));
     }
-    let mut ops = GroupOps::default();
-    if g.infinity || !curve.is_on_curve(g) || !curve.mul(&mut ops, g, order).infinity {
-        return Err("invalid fixture generator".into());
-    }
-    if q.infinity
-        || q.x >= curve.p
-        || q.y >= curve.p
-        || !curve.is_on_curve(q)
-        || !curve.mul(&mut ops, q, order).infinity
-    {
-        return Err("invalid public target".into());
-    }
-    let shared = fixture.shared(backend)?;
-    let fb = factor_base(curve, &fixture.factor_x, order)?;
-    let target_column = fb.columns;
-    let mut gauss = IncrementalGauss::new(fb.columns + 1, order);
-    let gi = *fb
-        .point_index
-        .get(&curve.key(&g))
-        .ok_or("missing G anchor")?;
-    let mut anchor = vec![0; fb.columns + 1];
-    anchor[fb.col_of[gi]] = fb.coef_of[gi];
-    if gauss.add_row(anchor, 1) == RowStatus::Inconsistent {
-        return Err("G anchor contradicted itself".into());
-    }
-    let mut attempts = Vec::new();
-    let mut relations = 0;
-    let mut skipped_exceptional_or_base = 0;
-    for a in 0..max_attempts {
-        let ag = curve.mul(&mut ops, g, a);
-        let target = curve.add(&mut ops, ag, q);
-        // Avoid counting a direct collision or one-point lookup as a three-term
-        // algebraic relation in this deliberately scoped fixture.
-        if target.infinity || fb.point_index.contains_key(&curve.key(&target)) {
-            skipped_exceptional_or_base += 1;
-            continue;
-        }
-        let (witness, prepared, report) =
-            find_relation(fixture, &shared, &fb, target, &mut ops).map_err(|error| {
-                format!(
-                    "bounded recovery interrupted: {}",
-                    json!({"error":error,"backend":backend.name(),"a":a,"attempt_limit":max_attempts,"retained_attempts":attempts})
-                )
-            })?;
-        let rank_before = gauss.rank();
-        let mut relation = Value::Null;
-        let status = if let Some(indices) = witness {
-            let mut row = vec![0; fb.columns + 1];
-            let mut replay = curve.identity();
-            for &index in &indices {
-                row[fb.col_of[index]] = (row[fb.col_of[index]] + fb.coef_of[index]) % order;
-                replay = curve.add(&mut ops, replay, fb.points[index]);
-            }
-            if replay != target {
-                return Err("relation failed point-sum replay before linear algebra".into());
-            }
-            row[target_column] = order - 1;
-            relation = json!({"factor_base_indices":indices,"row":row,"rhs":a});
-            if gauss.add_row(row, a) == RowStatus::Inconsistent {
-                return Err("relation matrix inconsistent modulo subgroup order".into());
-            }
-            relations += 1;
-            "found"
-        } else {
-            "finite_chart_exhausted"
-        };
-        attempts.push(json!({"a":a,"b":1,"target":point_value(target),"status":status,"relation":relation,"rank_before":rank_before,"rank_after":gauss.rank(),"shared_target_report":prepared.report,"f4":report}));
-        if let Some(recovered) = gauss.pinned(target_column) {
-            if curve.mul(&mut ops, g, recovered) != q {
-                return Err("recovered scalar failed public target check".into());
-            }
-            return Ok(json!({
-                "modulus": order,
-                "coordinate_modulus": curve.p,
-                "preconditioner_backend": backend.name(),
-                "f4_backend": "unchanged production integer F4 visitor",
-                "relation_linear_algebra": "existing integer IncrementalGauss modulo subgroup order",
-                "generator": point_value(g),
-                "factor_base_x": fixture.factor_x,
-                "factor_base_points": fb.points.iter().copied().map(point_value).collect::<Vec<_>>(),
-                "factor_base_columns": fb.col_of,
-                "factor_base_coefficients": fb.coef_of,
-                "target_column": target_column,
-                "recovered_scalar": recovered,
-                "public_target": point_value(q),
-                "relation_count": relations,
-                "anchor_relations": 1,
-                "anchor_column": fb.col_of[gi],
-                "anchor_coefficient": fb.coef_of[gi],
-                "attempt_limit": max_attempts,
-                "rank": gauss.rank(),
-                "scoped_setup_report": shared.setup_report(),
-                "attempts": attempts,
-                "skipped_exceptional_or_base_queries": skipped_exceptional_or_base,
-                "linear_algebra_row_ops": gauss.row_ops,
-                "linear_algebra_work": gauss.work_counters(),
-                "group_operations": ops,
-                "group_field_operations": ops.field_ops,
-                "group_count_scope": "target admission, query generation, sign lifting, relation replay and final scalar check; factor-base construction excluded",
-                "answer_checked_in_group": true,
-                "known_answer_passed_to_solver": false,
-                "reference_solutions_passed_to_solver": false,
-                "uniform_random_target_tested": false,
-                "benchmark_executed": false,
-                "cost_counter_coverage_complete": false,
-                "scope": "structured known-answer target/base; public-Q recovery with finite-chart F4 relations; no uniform random-target or complete-cost conclusion"
-            }));
-        }
-    }
-    Err(format!(
-        "bounded fixture relations did not determine the target logarithm: {}",
-        json!({"attempt_limit":max_attempts,"backend":backend.name(),"rank":gauss.rank(),"relation_count":relations,"retained_attempts":attempts,"skipped_exceptional_or_base_queries":skipped_exceptional_or_base})
-    ))
+    let mut capped = standard;
+    capped[0].max_attempts = 1;
+    let cap_control = checked_failure_control(
+        "first_arm_query_budget_then_remaining_normal_arms",
+        execute_recovery_arms(
+            p31_curve(),
+            &P31_BASE_X,
+            p31_public_target(),
+            p31_generator(),
+            P31_ORDER,
+            &capped,
+        ),
+        "query_budget_exhausted",
+        7,
+    );
+    let mut interrupted = standard;
+    interrupted[0].expire_f4_deadline = true;
+    let interruption_control = checked_failure_control(
+        "first_arm_expired_deadline_then_remaining_normal_arms",
+        execute_recovery_arms(
+            p31_curve(),
+            &P31_BASE_X,
+            p31_public_target(),
+            p31_generator(),
+            P31_ORDER,
+            &interrupted,
+        ),
+        "f4_incomplete",
+        7,
+    );
+    let passed = prime31.iter().all(|panel| panel["passed"] == true)
+        && cap_control["passed"] == true
+        && interruption_control["passed"] == true;
+    json!({
+        "schema":"shared-s3-matrix.matched-public-recovery/v1",
+        "status":if passed {"passed"} else {"incomplete_or_failed"},
+        "evidence_status":"producer correctness qualification; PCC-unverified",
+        "coordinate_modulus":P31,"subgroup_modulus":P31_ORDER,
+        "planned_arms":RECOVERY_ARMS.iter().copied().map(RecoveryStrategy::identity).collect::<Vec<_>>(),
+        "all_planned_arm_outcomes_retained":true,"prime31":prime31,
+        "exhaustive_F17":{"execution":"separate unit test, not executed by this CLI mode",
+            "test":"matched_arms_recover_every_nonidentity_f17_public_target",
+            "identity_policy":"rejected by the strict public-target admission boundary"},
+        "controls":{"query_budget":cap_control,"interruption":interruption_control},
+        "scope":"matched correctness on the declared structured Prime31 public targets and base",
+        "floating_point_role":"preconditioner only; F4 and relation LA remain integer",
+        "complete_point_decomposition_coverage":false,"uniform_random_target_tested":false,
+        "benchmark_executed":false,"timing_samples_collected":false,
+        "complete_cost_comparison":false,"cost_counter_coverage_complete":false
+    })
 }
 
 fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> {
@@ -1036,7 +1727,31 @@ fn run_prime31_checks() -> Result<Value, String> {
 }
 
 fn plan() -> Value {
-    json!({"schema":"shared-s3-matrix.fixture-plan/v2","status":"planned","mode":"correctness-only","primary_coordinate_modulus":P31,"variables":["x1","x2","x3","u"],"common":["S3(x1,x2,u)","membership(x1)","membership(x2)","membership(x3)"],"parameterized":"S3(u,x3,t)","macaulay_degree":DEGREE,"limits":fixture_limits(),"backends":["integer","fma","split16"],"p31":{"curve":p31_curve(),"subgroup_order":P31_ORDER,"generator":point_value(p31_generator()),"public_target":point_value(p31_public_target()),"factor_base_x":P31_BASE_X,"auxiliary_domain":"full Fp","attempt_limit":P31_ATTEMPTS,"scope":"structured known-answer target/base; no uniform random-target or complete-cost conclusion"},"p17":{"role":"retained exhaustive diagnostic","curve":{"p":17,"a":2,"b":2},"subgroup_order":19,"generator":{"x":5,"y":1},"factor_base_x":TOY_BASE_X,"auxiliary_domain":"full F17","exhaustive_parameters":17,"assignments_per_parameter":459},"checks":["p31 original/fresh/shared F4 solution sets and independent signed-pair reference","p31 public-Q recovery modulo subgroup order with each preconditioner backend","p31 signed finite-prefix replay and historical point witness","retained exhaustive p17 identities and diagnostics"],"benchmark_executed":false,"native_blas_or_gpu":false,"complete_cost_comparison":false,"next_run":"--check-prime31","all_diagnostics":"--check"})
+    json!({
+        "schema":"shared-s3-matrix.fixture-plan/v3","status":"planned","mode":"correctness-only",
+        "primary_coordinate_modulus":P31,"variables":["x1","x2","x3","u"],
+        "common":["S3(x1,x2,u)","membership(x1)","membership(x2)","membership(x3)"],
+        "parameterized":"S3(u,x3,t)","macaulay_degree":DEGREE,"limits":fixture_limits(),
+        "backends":["integer","fma","split16"],
+        "p31":{"curve":p31_curve(),"subgroup_order":P31_ORDER,
+            "generator":point_value(p31_generator()),"public_target":point_value(p31_public_target()),
+            "factor_base_x":P31_BASE_X,"auxiliary_domain":"full Fp","attempt_limit":P31_ATTEMPTS,
+            "scope":"structured known-answer target/base; no uniform random-target or complete-cost conclusion"},
+        "p17":{"role":"retained exhaustive diagnostic","curve":{"p":17,"a":2,"b":2},
+            "subgroup_order":TOY_ORDER,"generator":point_value(toy_generator()),"factor_base_x":TOY_BASE_X,
+            "auxiliary_domain":"full F17","exhaustive_parameters":17,"assignments_per_parameter":459},
+        "checks":["p31 original/fresh/shared F4 solution sets and independent signed-pair reference",
+            "matched Original/Fresh/Shared public-Q recovery, both signs and cap/interruption controls",
+            "p31 signed finite-prefix replay and historical point witness",
+            "retained exhaustive p17 identities and diagnostics",
+            "separate unit test: all 18 nonidentity F17 public targets across seven recovery arms"],
+        "planned_recovery_arms":RECOVERY_ARMS.iter().copied().map(RecoveryStrategy::identity).collect::<Vec<_>>(),
+        "benchmark_executed":false,"native_blas_or_gpu":false,"complete_cost_comparison":false,
+        "next_run":"--check-prime31-recovery-arms",
+        "legacy_diagnostics":"--check",
+        "all_diagnostics":["--check","--check-prime31-recovery-arms",
+            "cargo test --release --example shared_s3_matrix -- --test-threads=1 --nocapture"]
+    })
 }
 
 fn run_checks() -> Result<Value, String> {
@@ -1071,10 +1786,25 @@ fn main() {
         [flag] if flag == "--plan" => Ok(plan()),
         [flag] if flag == "--check" => run_checks(),
         [flag] if flag == "--check-prime31" => run_prime31_checks(),
-        _ => Err("usage: shared_s3_matrix [--plan|--check|--check-prime31]; timing/benchmark execution is not implemented in this correctness fixture".into()),
+        [flag] if flag == "--check-prime31-recovery-arms" => Ok(run_matched_recovery_checks()),
+        _ => Err("usage: shared_s3_matrix [--plan|--check|--check-prime31|--check-prime31-recovery-arms]; timing/benchmark execution is not implemented in this correctness fixture".into()),
     };
     match result {
-        Ok(value) => println!("{}", serde_json::to_string_pretty(&value).unwrap()),
+        Ok(value) => {
+            // Full matched-arm records are emitted even on a failed check.
+            // Compact JSON changes only whitespace, not evidence or outcomes.
+            if arguments
+                .first()
+                .is_some_and(|arg| arg == "--check-prime31-recovery-arms")
+            {
+                println!("{}", serde_json::to_string(&value).unwrap());
+            } else {
+                println!("{}", serde_json::to_string_pretty(&value).unwrap());
+            }
+            if value["status"] == "incomplete_or_failed" {
+                std::process::exit(1);
+            }
+        }
         Err(error) => {
             println!(
                 "{}",
@@ -1088,6 +1818,47 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn assert_retained_assignments(fixture: &FamilyFixture, arm: &Value, order: u64) {
+        let fb = factor_base(&fixture.curve, &fixture.factor_x, order).unwrap();
+        for attempt in arm["attempts"].as_array().unwrap() {
+            if attempt["status"] != "found" {
+                continue;
+            }
+            let assignment: Vec<u64> =
+                serde_json::from_value(attempt["accepted_assignment"].clone()).unwrap();
+            let indices: Vec<usize> =
+                serde_json::from_value(attempt["accepted_factor_base_indices"].clone()).unwrap();
+            assert_eq!(assignment.len(), VARIABLES);
+            assert_eq!(indices.len(), 3);
+            assert!(assignment.iter().all(|&x| x < fixture.curve.p));
+            for (position, &index) in indices.iter().enumerate() {
+                assert_eq!(fb.points[index].x, assignment[position]);
+            }
+            let target = PrimePoint::affine(
+                attempt["target"]["x"].as_u64().unwrap(),
+                attempt["target"]["y"].as_u64().unwrap(),
+            );
+            let original = fixture.original_equations(target.x).unwrap();
+            assert!(equations_satisfied(&original, &assignment, fixture.curve.p));
+            let mut ops = GroupOps::default();
+            let prefix = fixture
+                .curve
+                .add(&mut ops, fb.points[indices[0]], fb.points[indices[1]]);
+            assert!(!prefix.infinity);
+            assert_eq!(prefix.x, assignment[3]);
+            assert_eq!(
+                fixture.curve.add(&mut ops, prefix, fb.points[indices[2]]),
+                target
+            );
+            assert_eq!(attempt["replayed_point"], attempt["target"]);
+            assert_eq!(attempt["replay_passed"], true);
+            assert_eq!(
+                attempt["relation"]["factor_base_indices"],
+                attempt["accepted_factor_base_indices"]
+            );
+        }
+    }
 
     #[test]
     fn complete_toy_solution_sets_match_all_backends() {
@@ -1261,5 +2032,169 @@ mod tests {
         let failure = visit_solutions_with_options(&fixture, &original, &[], &options).unwrap_err();
         assert!(failure.contains("no exhaustion conclusion"));
         assert!(failure.contains("\"timed_out\":true"));
+    }
+
+    #[test]
+    fn matched_prime31_arms_recover_both_signs_and_retain_control_failures() {
+        let report = run_matched_recovery_checks();
+        let fixture = p31_fixture();
+        assert_eq!(report["status"], "passed", "{report}");
+        assert_eq!(report["all_planned_arm_outcomes_retained"], true);
+        for panel in report["prime31"].as_array().unwrap() {
+            for arm in panel["arms"].as_array().unwrap() {
+                assert_retained_assignments(&fixture, arm, P31_ORDER);
+                assert_eq!(
+                    arm["phase_ledger"]["family_construction"]["status"],
+                    "completed_inside_arm_entry"
+                );
+                assert_eq!(arm["coordinate_modulus"], P31);
+                assert_eq!(arm["modulus"], P31_ORDER);
+                assert_eq!(arm["cost_counter_coverage_complete"], false);
+            }
+        }
+        let interrupted = &report["controls"]["interruption"]["arms"][0];
+        assert_eq!(interrupted["attempts"][0]["f4"]["f4_runs"], 0);
+        assert_eq!(interrupted["attempts"][0]["f4"]["solutions_visited"], 0);
+        assert_eq!(interrupted["attempts"][0]["f4"]["stopped_early"], false);
+    }
+
+    #[test]
+    fn matched_arms_recover_every_nonidentity_f17_public_target() {
+        let curve = PrimeCurve { p: 17, a: 2, b: 2 };
+        let policies = [RecoveryPolicy::standard(TOY_ORDER); RECOVERY_ARMS.len()];
+        let mut panels = Vec::new();
+        // Retain and finish every panel before asserting; the expected scalar
+        // is used only by the caller after all seven public-input calls.
+        for expected in 1..TOY_ORDER {
+            let q = curve.mul(&mut GroupOps::default(), toy_generator(), expected);
+            let panel = checked_recovery_panel(
+                "finite_public_F17_target",
+                execute_recovery_arms(
+                    curve.clone(),
+                    &TOY_BASE_X,
+                    q,
+                    toy_generator(),
+                    TOY_ORDER,
+                    &policies,
+                ),
+                expected,
+            );
+            let outcomes: Vec<_> = panel["arms"].as_array().unwrap().iter().map(|arm| {
+                json!({"arm":arm["planned_arm_index"],"status":arm["status"],
+                    "recovered_scalar":arm["recovered_scalar"],"rank":arm["rank"],
+                    "actual_queries":arm["actual_queries"],"verified":arm["answer_checked_in_group"]})
+            }).collect();
+            println!(
+                "{}",
+                json!({"f17_caller_expected":expected,"passed":panel["passed"],
+                "outcomes":outcomes,"query_comparison":panel["query_comparison"]})
+            );
+            panels.push(panel);
+        }
+        assert_eq!(panels.len(), (TOY_ORDER - 1) as usize);
+        let failures: Vec<_> = panels
+            .iter()
+            .filter(|panel| panel["passed"] != true)
+            .collect();
+        assert!(
+            failures.is_empty(),
+            "failed F17 panels with full outcomes: {}",
+            json!(failures)
+        );
+        let fixture = toy_fixture();
+        for panel in &panels {
+            for arm in panel["arms"].as_array().unwrap() {
+                assert_retained_assignments(&fixture, arm, TOY_ORDER);
+            }
+        }
+    }
+
+    #[test]
+    fn matched_prepared_arms_keep_setup_on_interruption() {
+        let mut policy = RecoveryPolicy::standard(P31_ATTEMPTS);
+        policy.expire_f4_deadline = true;
+        let arms: Vec<_> = [
+            RecoveryStrategy::Fresh(Backend::Integer),
+            RecoveryStrategy::Shared(Backend::Integer),
+        ]
+        .into_iter()
+        .map(|strategy| {
+            recover_public_arm_from_parameters(
+                p31_curve(),
+                &P31_BASE_X,
+                p31_public_target(),
+                p31_generator(),
+                P31_ORDER,
+                policy,
+                strategy,
+            )
+        })
+        .collect();
+        // Both calls finish before validation; retain complete interrupted
+        // preparation records even though native F4 never starts.
+        for arm in &arms {
+            println!("prepared_interruption_control={arm}");
+        }
+        for arm in &arms {
+            assert_eq!(arm["status"], "f4_incomplete", "{arm}");
+            assert_eq!(arm["setup"]["status"], "prepared");
+            assert_eq!(arm["attempts"][0]["f4"]["f4_runs"], 0);
+            assert_eq!(arm["attempts"][0]["f4"]["timed_out"], true);
+            assert!(!arm["attempts"][0]["preconditioning"].is_null());
+            if arm["strategy"] == "fresh" {
+                assert!(arm["setup"]["shared"].is_null());
+                assert!(!arm["setup"]["fresh"].is_null());
+            } else {
+                assert!(arm["setup"]["fresh"].is_null());
+                assert!(!arm["setup"]["shared"].is_null());
+            }
+        }
+    }
+
+    #[test]
+    fn matched_arm_admission_errors_do_not_suppress_other_arms() {
+        let policies = [RecoveryPolicy::standard(P31_ATTEMPTS); RECOVERY_ARMS.len()];
+        let arms = execute_recovery_arms(
+            p31_curve(),
+            &P31_BASE_X,
+            p31_public_target(),
+            p31_generator(),
+            P31,
+            &policies,
+        );
+        assert_eq!(arms.len(), RECOVERY_ARMS.len());
+        for (index, arm) in arms.iter().enumerate() {
+            assert!(arm_structure_valid(index, arm));
+            assert_eq!(arm["status"], "admission_error");
+            assert_eq!(arm["setup"]["status"], "not_run");
+            assert_eq!(arm["actual_queries"], 0);
+            assert_eq!(arm["answer_checked_in_group"], false);
+        }
+    }
+
+    #[test]
+    fn matched_arm_family_errors_keep_all_planned_identities() {
+        let policies = [RecoveryPolicy::standard(P31_ATTEMPTS); RECOVERY_ARMS.len()];
+        let arms = execute_recovery_arms(
+            p31_curve(),
+            &[],
+            p31_public_target(),
+            p31_generator(),
+            P31_ORDER,
+            &policies,
+        );
+        assert_eq!(arms.len(), RECOVERY_ARMS.len());
+        for (index, arm) in arms.iter().enumerate() {
+            assert!(arm_structure_valid(index, arm));
+            assert_eq!(arm["status"], "family_construction_error");
+            assert_eq!(
+                arm["phase_ledger"]["family_construction"]["status"],
+                "failed"
+            );
+            assert!(
+                arm["phase_ledger"]["family_construction"]["partial_arithmetic_counters"].is_null()
+            );
+            assert_eq!(arm["attempts"].as_array().unwrap().len(), 0);
+        }
     }
 }

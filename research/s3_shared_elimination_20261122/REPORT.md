@@ -10,10 +10,11 @@ before reducing each target's residual matrix. The default F4 dispatcher is
 unchanged. These are established algebraic constructions implemented behind
 checked Rust interfaces; this report makes no novelty claim.
 
-The current correctness entry point, `--check-prime31`, uses the requested
-Fp with p = 2^31 - 1 = 2147483647. Its actual F4 relation extraction and
-public-input known-answer recovery are recorded in section 7. The original
-F17 checks remain exhaustive regression controls.
+The current matched correctness entry point, `--check-prime31-recovery-arms`,
+uses the requested Fp with p = 2^31 - 1 = 2147483647. It compares Original,
+Fresh and Shared public-input recovery and retains every scheduled outcome
+(section 8). The earlier `--check-prime31` evidence remains in section 7.
+The F17 checks remain exhaustive regression controls.
 
 The shared component is a finite-degree preconditioner. It returns polynomial
 consequences and exposes all original equations. It does not assert that the
@@ -21,7 +22,7 @@ chosen degree completes a Groebner basis. Factor-base membership, full original
 equations, domains, point lifting, signs, and scalar verification remain the
 downstream solver's responsibility. Resource refusal is an error, not UNSAT.
 
-![Shared row-space projection and fresh reference](projection.svg)
+![Three preparation strategies and their common public-input recovery path](projection.svg)
 
 ### Requirements and evidence
 
@@ -30,6 +31,7 @@ downstream solver's responsibility. Resource refusal is an error, not UNSAT.
 | Exact floating-point modular matrices | Three bounded backends; matrix product, subtract-product, scalar and row operations | Independent integer-oracle tests; final command receipts recorded below |
 | Shared elimination across relation targets | Common RREF, union-support envelope, projected coefficient matrices, target recombination | Source-row and rank-drop tests; S3 integration checks |
 | A fair reference | `FreshMacaulay` prepares metadata without numerical elimination or projection | Fresh and shared use the same envelope and exact reduction policy |
+| Matched public-input recovery | Original plus Fresh/Shared with three backends; independent setup per arm | Seventeen example tests; both Prime31 target signs and exhaustive nonidentity F17 recovery (section 8) |
 | Relation correctness | Original equations retained alongside consequences | Small-field polynomial and signed-point fixtures; finite auxiliary chart scoped explicitly |
 | Full relation-solving and cold ECDLP cost | Prospective design in `PROTOCOL.md` | Admitted performance execution and full pipeline adapter remain open |
 | Reproducible publication | PR #4922, source, development logs, diagram, report source | PCC standing must come from signed CI, not these producer checks |
@@ -321,3 +323,105 @@ The existing row-space diagram now labels the two Prime31 arithmetic contexts.
 Canonical performance graphs and the leaderboard remain unchanged because no
 new performance observation was collected. The existing source-linked report
 and PDF are refreshed together; the initial development evidence is preserved.
+
+## 8. Matched public recovery on the requested field
+
+The common Rust driver now connects Original F4, Fresh Macaulay elimination
+and Shared Macaulay elimination to the same public-input recovery loop.
+Original runs once; Fresh and Shared each run with Integer, FMA and Split16,
+for seven arms. The fixed input remains the declared ordinary curve and
+structured G/2G/4G base from section 7. The recovery function receives Q,
+public curve/base parameters, G, r and an explicit query policy. Expected
+scalars and the independent reference solutions stay in the calling checks.
+
+Original specializes only the original equations and never constructs a
+Macaulay object. Fresh invokes its own metadata constructor without building
+Shared. Every arm constructs its own polynomial family and signed factor base
+inside its public-parameter entry. Shared pays its own common reduction and
+coefficient projection once for that recovery. This establishes an explicit
+boundary for a later cold measurement; this run does not measure that cost.
+
+All arms use Q+[a]G in ascending a, with the same normal attempt bound of 16,
+original equations, factor-coordinate domains, unrestricted auxiliary domain
+and production F4 options. The actual queries, accepted F4 assignments,
+signed indices, replayed points, relation rows and rank changes are retained.
+Different valid witnesses could change a stopping prefix; equal query policy
+is checked rather than assumed to imply equal work.
+
+### Observed outcomes and flow
+
+The [matched development receipt](matched_recovery/development-receipt.json)
+binds the separately retained raw outputs, source manifests and immutable
+executables. These are local producer observations. [pcc:unverified]
+
+| Check | Recorded result | Interpretation |
+| --- | --- | --- |
+| Full example suite | 17 passed; zero failed, ignored or filtered | Twelve retained cases and five new matched cases |
+| Positive Prime31 target, seven arms | k=7; three queries; three independent relation rows; rank four | Every arm verifies kG=Q after the explicit G anchor |
+| Negated Prime31 target, seven arms | k=2147446824; five queries; four accepted relation rows; rank four | One relation is dependent; one direct-base query is skipped; both remain in the record |
+| Query-budget control | First arm stops incomplete after one query; all six later arms recover | Retains query_budget_exhausted without suppressing the remaining schedule |
+| Expired-deadline control | First arm records f4_incomplete with zero F4 runs; all six later arms recover | An interruption is not finite-chart exhaustion |
+| Prepared interruption unit test | Fresh and Shared retain setup and specialization with zero F4 runs | Work before interruption remains visible |
+| Exhaustive nonidentity F17 recovery | All 18 targets across seven arms recover: 126 outcomes | Caller-only scalar checks plus retained-assignment/group replay on this diagnostic curve |
+
+The CLI planned, attempted and retained 28 arms: 26 recovered scalars, one
+expected query-budget outcome and one expected interruption. No arm was
+omitted. The F17 unit test is separate from this CLI and prints all 126
+condensed outcomes; full failed panels would be emitted on a failed check.
+The two prepared-interruption controls print their full records. These test
+and CLI executions are separate correctness calls, not repeated timing samples.
+
+For each target sign, all seven observed query sequences have identical
+identities and stopping lengths. For -Q, a=2 produces a dependent row and
+Q+[3]G is a direct-base query that the finite-chart fixture skips. Recovery
+finishes at a=4. The raw records preserve these events rather than dropping
+them from an apparent success denominator.
+
+### Review, source binding and accounting
+
+The [same-team independent review](matched_recovery/REVIEW.md) found and
+corrected a provenance gap before execution: accepted polynomial assignments
+were discarded, and a replay-error return could lose its candidate witness.
+The callback now retains the exact (x1,x2,x3,u) tuple and signed indices at
+acceptance. Replay results and the candidate row are recorded before failure
+returns. Tests check original equations, canonical coordinates, the finite
+signed prefix and its u coordinate, and the signed sum against the query.
+
+The reviewed example SHA-256 is
+`dd965d7116f387ed9cd61cf79fedcee8230af768f3352a503d3da563d69d0868`.
+
+The receipt SHA-256 is
+`13014e0abf1b1e5333e6d7902bcf819ec1ff158e82c904f0161bc8fbcf27ec81`.
+
+The native source manifest binds 51 source/input files; pre-call and post-call
+checks confirm unchanged source and copied executable bytes. The test and CLI
+builds use the same actual-source closure and development opt-level 0.
+Their 14 existing unused-code warnings are retained. The qualifier omits
+legacy module tests and is not a full root-library pass or a hermetic build.
+
+The phase ledger separates admission, family and factor-base construction,
+preparation, queries, original equations, preconditioning, F4, signed lifting,
+relation replay, subgroup linear algebra and final verification. It preserves
+raw reports and explicitly marks unpriced work. Group/field operations overlap;
+Macaulay logical products already contain their kernel field products. F4's
+available counters do not cover its complete work. Payload bounds are not RSS.
+The final LA snapshot includes the actual pinned() decision scans. No
+complete-cost total or speed ratio is formed from these partial counters.
+
+### Remaining execution and implementation gates
+
+The [execution-gates record](../../problems/shared-s3-prime31-execution-gates.md)
+separates the observed compiler termination, access gaps and implementation
+work. The maintained manual full-library workflow is available as a different
+validation route, but the exposed connector has no dispatch operation, gh has
+no authenticated host and the reached browser page requires sign-in. No CI
+job was launched. The canonical protocol remains VLT1 binary through the
+available source route, and live supported EKS admission is unestablished.
+
+The original complete cold comparison remains open: production public-target
+integration and full chart dispatch, complete accounting, exact matched inputs
+and holdouts, a bound IC incumbent, readable frozen protocol, supported runner
+admission and full-library evidence are still required. The next code step is
+the production DecompositionOracle adapter with these recovery and outcome
+contracts. This fixture supplies a checked comparison boundary, not a uniform
+public-target benchmark or a general full-chart solver.

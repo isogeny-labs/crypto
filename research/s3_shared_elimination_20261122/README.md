@@ -5,11 +5,13 @@ target-independent part of a finite-degree Macaulay matrix. It is the separate
 cross-target caching study deferred by [PR #4920](https://github.com/isogeny-labs/crypto/pull/4920),
 tracked in [PR #4922](https://github.com/isogeny-labs/crypto/pull/4922).
 
-The current principal correctness command is `--check-prime31`, using
+The current principal correctness command is `--check-prime31-recovery-arms`, using
 Fp with p=2147483647 and subgroup arithmetic modulo 2147446831. It exercises
-actual F4 extraction and structured public-input known-answer recovery with
-the existing Rust implementations. See [REPORT.md, section 7](REPORT.md) and
-the [Prime31 receipt](prime31/development-receipt.json). [pcc:unverified]
+Original and independently prepared Fresh/Shared recovery with the existing
+Rust F4, signed lifting and relation matrix implementations. See
+[REPORT.md, section 8](REPORT.md), the [matched recovery receipt](matched_recovery/development-receipt.json)
+and its [source review](matched_recovery/REVIEW.md). The earlier
+[Prime31 receipt](prime31/development-receipt.json) is preserved. [pcc:unverified]
 
 - [REPORT.md](REPORT.md): construction, correctness scope, prior work, and evidence.
 - [PROTOCOL.md](PROTOCOL.md): prospective matched performance design and admission dependencies.
@@ -54,3 +56,11 @@ three preconditioner backends recover k=7 for the fixed public Q using three
 F4 relations and the G anchor, followed by the group check. This structured
 target/base is a correctness fixture, not a uniform-target benchmark; F4 and
 relation Gaussian elimination themselves remain integer code. [pcc:unverified]
+
+The matched continuation reports seventeen passing example tests. All seven
+Original/Fresh/Shared arms recover both signs of the Prime31 public target;
+all 18 nonidentity F17 targets recover across seven arms. The full Prime31 CLI
+retains 28 planned outcomes, including the deliberately incomplete cap and
+deadline controls. Phase records retain unpriced setup work and counter
+exclusions. No timing samples or complete-cost ratio were collected.
+[pcc:unverified]

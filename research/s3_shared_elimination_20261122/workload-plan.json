@@ -11,7 +11,19 @@
     "plan": ["shared-s3-matrix", "--plan"],
     "correctness": ["shared-s3-matrix", "--check"],
     "prime31_correctness": ["shared-s3-matrix", "--check-prime31"],
+    "matched_recovery_correctness": ["shared-s3-matrix", "--check-prime31-recovery-arms"],
+    "exhaustive_f17_recovery_test": "matched_arms_recover_every_nonidentity_f17_public_target",
     "benchmark": null
+  },
+  "matched_recovery_development_evidence": {
+    "receipt": "matched_recovery/development-receipt.json",
+    "example_sha256": "dd965d7116f387ed9cd61cf79fedcee8230af768f3352a503d3da563d69d0868",
+    "example_tests_passed": 17,
+    "prime31_arms_per_panel": 7,
+    "prime31_panels": 4,
+    "f17_finite_targets": 18,
+    "development_only": true,
+    "complete_cost_comparison": false
   },
   "prospective_solver_arms": [
     {"id": "original-f4", "preconditioner": "none", "downstream": "existing F4"},

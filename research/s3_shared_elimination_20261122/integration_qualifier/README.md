@@ -106,3 +106,25 @@ from passing these tests.
 
 Until a separately recorded execution succeeds, this directory establishes
 only an authored qualification path. Evidence remains PCC-unverified.
+
+## Matched recovery continuation
+
+The next source revision adds Original, independently prepared Fresh, and
+Shared recovery arms over the same public parameters. The new
+`--check-prime31-recovery-arms` mode retains complete Prime31 arm records for
+both target signs and the query-cap/interruption controls, including a
+nonzero exit for failed checks. Its JSON is compactly serialized without
+omitting any Prime31 arm outcome. Each arm constructs its own family and
+factor base; their unpriced work is explicitly recorded.
+
+The separate `matched_arms_recover_every_nonidentity_f17_public_target` unit
+test runs all 18 nonidentity F17 targets with all seven arms. With `--nocapture`
+it prints every target/arm outcome and query-prefix comparison; an assertion
+failure additionally retains the full failed panels. This test is not run by
+the Prime31-only CLI mode. Run the example's tests sequentially because
+production F4 diagnostics use process-global counters.
+
+The acceptance and evidence contract is
+[../matched_recovery/PLAN.md](../matched_recovery/PLAN.md). This continuation
+still collects no elapsed-time samples and does not replace the full root
+library or experiment-admission gates.

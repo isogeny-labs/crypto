@@ -132,3 +132,12 @@ and the distinction between floating-point preconditioning and unchanged
 integer F4/relation linear algebra. The source explicitly limits the new
 recovery to a structured known-answer correctness fixture. Runtime evidence
 is recorded separately under `prime31/`.
+
+## Matched public-recovery continuation
+
+The subsequent seven-arm driver is reviewed separately in
+[matched_recovery/REVIEW.md](matched_recovery/REVIEW.md), including its exact
+source hashes and the accepted-assignment/replay-failure retention fixes.
+The associated development receipt records execution after that review. The
+initial review and failures above remain historical evidence for their own
+source revisions; they are not silently retargeted to the changed example.
