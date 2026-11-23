@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T17:49:59Z",
+ "id": "PCC-20261119-dfbdac",
+ "kind": "statement",
+ "producer": {
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "model": "codex",
+  "session": "conductor-local-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pilot-result.json",
+    "sha256": "eeafa05ff7391ec77316407e79bb81ed0c0961cb1be9a902de0c754b0e7cb1b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/results/pilot-l0/session.json",
+    "sha256": "eaadb27083ae530d578e90397fa8012413d54c8c7cccfaf4a406424bcdcc14e7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pre-call.sha256",
+    "sha256": "ce86fde6072ea5141b43eb9f252102a485bbcca57f2ef96c1c16301d961e9bec"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pilot-auto.stderr",
+    "sha256": "0624a52a2fa2089c75de7d35fb1d79a1e9d97dc3735cdde09423574987dda304"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "local-ecdLP-capacity-pilot",
+ "statement": "Explicitly authorized local diagnostic completes12 parent-verified ECDLP runs on two actual202bit-field endpoints of the conductor-ratio2 control. Reserved-core admission refuses unavailable PSI; L0 measurements are not admitted wall evidence. This distinct one-target/two-round pilot does not satisfy the original80bit crossing. Exact replays are pending and benchmark bookkeeping was initialized postpilot."
+}

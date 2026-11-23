@@ -1,0 +1,21 @@
+{
+  "schema": "xedni-height-coverage-profile-v1",
+  "frozen_at_utc_date": "2026-11-21",
+  "curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "generator_Q": ["17", "10"],
+  "reduction_prime": 47,
+  "reduced_subgroup_order": 43,
+  "candidate_law": "For nonidentity rational points x=a/b^2 in lowest terms, b>0 and H=max(abs(a),b)",
+  "height_cap": "2^130",
+  "finite_range": "All signed nonzero n with abs(n)<=20; x(-nQ)=x(nQ)",
+  "tail_rule": "For abs(n)>=21, combine x(65Q) numerator length 2894, canonical-height quadraticity and the model-specific Silverman difference bound B<14 to prove H(nQ)>2^130",
+  "predicted_eligible_multipliers": "n in {-13,...,-1,1,...,13}",
+  "predicted_covered_targets": 26,
+  "target_law": "All 42 nonidentity points of the order-43 reduced subgroup, each counted once; 0 is excluded because the affine x-height law does not apply to it",
+  "source_generator_result_sha256": "53fd653948c4376920c4d0ee2d53f2db275ebd7be5004d50f73d5d68986ade4e",
+  "source_height_result_sha256": "ae3173327e63bbf730c0a7f1b6920dff18fe43a6e8a6140a65a0521ad532264f",
+  "source_height_audit_sha256": "7ea931aa5fc48449fec874e865cbba1304620ed7f4d2846a0453317ff37bcdb3",
+  "source_finite_order_lean_sha256": "3cd296c2b8165d80738d83ab00392dbda958d214797b826527b60f79b194ee00",
+  "verification": "Exact Python Fraction multiplication and square-denominator checks for n=1..20; independent checked-Sage coordinate and reduction replay; Lean tail and count implications with explicit curve-specific prerequisites; retain source/runtime/process receipts",
+  "resource_cap": "Local Python and checked Sage only, 120 seconds each; no cloud spend or benchmark speedup claim"
+}

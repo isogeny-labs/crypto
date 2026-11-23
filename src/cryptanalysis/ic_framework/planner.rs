@@ -18,7 +18,7 @@
 //! |:--|:--|:--|:--|:--|
 //! | prime (any `j`) | `prime-abscissa`, `round(#E^{1/3}/2)` abscissae | `mitm-prime-blocked:m=2` (`p < 2^62`), else `mitm:m=2,negation_folded=1` | `incremental-gauss` (target pinned); `sparse-cado` for a log database | `walk` |
 //! | random binary | `binary-subspace`, dimension `round(log2 #E / 3)` | `mitm:m=2,negation_folded=1` | as above | `walk` |
-//! | Koblitz, odd `n < 64` | `compact-orbit-scan`, `max(1, round(0.6 (r/n³)^{1/3}))` orbit columns | `mitm-frobenius-counted:m=2` | as above | `stride-renew` for `log2 r ≤ 21`, else `walk` |
+//! | Koblitz, odd `n < 64` | `compact-orbit-scan`, `max(1, round(0.6 (r/n³)^{1/3}))` orbit columns | `mitm-frobenius-counted:m=2` when `h = 1`; `mitm-frobenius-fiber:fiber=closed,m=2` when `h > 1` | as above | `stride-renew` for `log2 r ≤ 21`, else `walk` |
 //!
 //! Anything else (extension fields, even-degree or wide Koblitz curves, genus
 //! 2) has no measured `ic.pipeline` recipe: the plan names the rho reference
@@ -32,7 +32,7 @@ use crate::cryptanalysis::ic_boundary::{BinaryInstance, PrimeInstance};
 
 /// The planner's rule set.  A spec that pins a plan names this version; a
 /// change to any rule or calibration constant changes it.
-pub const PLANNER_VERSION: &str = "ic-planner/4";
+pub const PLANNER_VERSION: &str = "ic-planner/5";
 
 /// What kind of curve the plan is for: the classes the evidence separates.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -320,6 +320,10 @@ const E_DESCENT_ROUTING: Evidence = Evidence {
 const E_FROB_PROTOCOL: Evidence = Evidence {
     path: "research/ecbench_frobenius_orbit_vs_rho_20261014/PROTOCOL.md",
     claim: "chosen orbit columns per curve (lowest S of the counts tried): 1, 1, 2, 3, 1, 2, 8, 90 at n13–n41; model optimum c ∝ (r/n³)^{1/3}",
+};
+const E_FIBER_H_GT1: Evidence = Evidence {
+    path: "research/fiber_h_gt1_k0_13_20261122/REPORT.md",
+    claim: "K0-13 h=4 matched panel: compact-orbit-scan columns=1 + stride-renew; mitm-frobenius-counted:m=2 mean S 5.966 [5.837, 6.098] vs mitm-frobenius-fiber:fiber=closed,m=2 mean S 14.483 [14.353, 14.613], both 24/24 verified (session ECBS1hbaa236332ada); fiber/counted ops 2.427 [2.396, 2.459]; no S-win claim",
 };
 
 // ── Rules ──────────────────────────────────────────────────────────
@@ -750,11 +754,40 @@ fn koblitz_choices(
         },
         Choice {
             stage: "oracle",
-            value: "mitm-frobenius-counted:m=2".into(),
-            rule: "koblitz.oracle.frobenius-table",
-            reason: "pair table stored modulo Frobenius, with its set-up counted natively".into(),
-            support,
-            evidence: vec![E_FROB],
+            value: if profile.cofactor > 1 {
+                "mitm-frobenius-fiber:fiber=closed,m=2".into()
+            } else {
+                "mitm-frobenius-counted:m=2".into()
+            },
+            rule: if profile.cofactor > 1 {
+                "koblitz.oracle.frobenius-fiber"
+            } else {
+                "koblitz.oracle.frobenius-table"
+            },
+            reason: if profile.cofactor > 1 {
+                format!(
+                    "cofactor h = {}: fiber-closed Frobenius pair table (ic_framework::fiber \
+                     closed mode) so a hit on any lift T+K counts; lifts/combined stay \
+                     selectable by name. Yield, not ns/probe; ns/probe recipe for h = 1 \
+                     remains mitm-frobenius-counted:m=2",
+                    profile.cofactor
+                )
+            } else {
+                "pair table stored modulo Frobenius, with its set-up counted natively".into()
+            },
+            // Fiber default on h > 1 is priced by the matched K0-13 capsule
+            // (docs/ic/FIBER_H_GT1_VALIDATION.md); Measured there does not
+            // claim an S win over counted (fiber was ~2.43× counted S).
+            support: if profile.cofactor > 1 {
+                Support::Measured
+            } else {
+                support
+            },
+            evidence: if profile.cofactor > 1 {
+                vec![E_FIBER_H_GT1, E_FROB]
+            } else {
+                vec![E_FROB]
+            },
         },
         Choice {
             stage: "targets",
@@ -1088,6 +1121,38 @@ mod tests {
         let pl = plan(&prime(32.0, 4_294_967_291), &opts);
         assert_eq!(pl.get("factor_base"), Some("prime-abscissa:size=500"));
         assert!(!pl.warnings.is_empty());
+    }
+
+    #[test]
+    fn koblitz_oracle_uses_fiber_when_cofactor_exceeds_one() {
+        let h1 = CurveProfile {
+            class: CurveClass::Koblitz,
+            p: None,
+            n: Some(17),
+            group_order: 65_587.0,
+            r: 65_587.0,
+            cofactor: 1,
+        };
+        let h4 = CurveProfile {
+            cofactor: 4,
+            group_order: 65_587.0 * 4.0,
+            ..h1.clone()
+        };
+        let p1 = plan(&h1, &PlanOptions::default());
+        let p4 = plan(&h4, &PlanOptions::default());
+        assert_eq!(p1.get("oracle"), Some("mitm-frobenius-counted:m=2"));
+        assert_eq!(
+            p4.get("oracle"),
+            Some("mitm-frobenius-fiber:fiber=closed,m=2")
+        );
+        assert_eq!(
+            p4.choices
+                .iter()
+                .find(|c| c.stage == "oracle")
+                .unwrap()
+                .support,
+            Support::Measured
+        );
     }
 
     #[test]

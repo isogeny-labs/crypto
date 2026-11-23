@@ -34,14 +34,18 @@ const EXPECTED_PDF_PATH: &str =
     "research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf";
 const EXPECTED_DIAGRAM_PATH: &str = "docs/ecdlp-audit/program-dependencies.svg";
 const EXPECTED_VALIDATOR_PATH: &str = "src/bin/ecdlp_audit.rs";
-const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
+const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 23] = [
     ("WS1-D1", "artifact_replay", None),
     (
         "WS1-D2",
         "review_receipt",
         Some("research/cover_transfer_assessment_20261013/README.md"),
     ),
-    ("WS2-D1", "implementation", None),
+    (
+        "WS2-D1",
+        "implementation",
+        Some("src/prime_hyperelliptic/cover_transfer.rs"),
+    ),
     (
         "WS2-D2",
         "implementation",
@@ -50,9 +54,33 @@ const EXPECTED_DELIVERABLE_BINDINGS: [(&str, &str, Option<&str>); 19] = [
     (
         "WS2-D3",
         "certificate_corpus",
-        Some("problems/catalog-cover-subgroup-certificates-incomplete.md"),
+        Some("docs/curves/binary-subgroup-transfer-certificates.json"),
     ),
-    ("WS2-D4", "independent_oracle", None),
+    (
+        "WS2-D4",
+        "independent_oracle",
+        Some("tests/prime_cover_transfer_oracle.rs"),
+    ),
+    (
+        "WS2-D5",
+        "independent_oracle",
+        Some("tests/binary_cover_transfer_f2_source_oracle.rs"),
+    ),
+    (
+        "WS2-D6",
+        "independent_oracle",
+        Some("tests/binary_cover_transfer_oracle.rs"),
+    ),
+    (
+        "WS2-D7",
+        "certificate_corpus",
+        Some("docs/curves/odd-subgroup-transfer-certificates.json"),
+    ),
+    (
+        "WS2-D8",
+        "implementation",
+        Some("src/prime_hyperelliptic/normalized_cover_transfer.rs"),
+    ),
     ("WS3-D1", "schema_and_ledger", None),
     ("WS3-D2", "semantic_verifier", None),
     (
