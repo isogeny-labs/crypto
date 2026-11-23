@@ -129,14 +129,27 @@ impl GaussJordan {
         self.pivots.last().and_then(|row|row.as_ref()).map(|r|r[self.pivots.len()])
     }
 }
-// Construct the target-separation witness independently from authenticated
-// full RHS rows [C | -b | a]. Gaussian elimination is done on the B base
-// columns only; a row whose base projection vanishes and target coordinate
-// is nonzero gives a public certificate after normalization.
+// Construct a target-separation witness from authenticated [C | -b | a]
+// rows without retaining a dense source-identity vector at every pivot.
 //
-// This code never reads secret base logs, the RR5 producer row-space state,
-// or producer success flags. It is optional and retains *all* nonzero source
-// coefficients, so the certificate can be checked against original rows.
+// Each normalized projected-base pivot is a linear combination of its own
+// source row and earlier, lower-column pivots. Save only that triangular
+// dependency DAG. At first target visibility, expand it in descending column
+// order, obtaining the original source-row coefficients. Recombine every
+// original column to independently check the returned certificate.
+//
+// With B base columns and M rows, the extra projected-base pass costs
+// O(M*B^2) modular work and O(B^2+M) auxiliary memory, rather than the old
+// O(B*M^2) dense-provenance elimination and O(B*M) pivot provenance memory.
+// This is a checker-overhead improvement, not a faster relation extractor.
+struct DualPivot {
+    row: Vec<u64>,
+    source_index: usize,
+    source_inverse: u64,
+    // Coefficient of an earlier normalized basis row in this pivot.
+    // Dependency columns are strictly less than this pivot column.
+    earlier_pivots: Vec<(usize,u64)>,
+}
 fn dual_from_rows(rows:&[Vec<u64>], base_size:usize, expected:u64)
     ->Result<DualCertificate,String>
 {
@@ -144,30 +157,33 @@ fn dual_from_rows(rows:&[Vec<u64>], base_size:usize, expected:u64)
     if count==0 || base_size>1024 || count>4096 {
         return Err("dual certificate exceeds explicit development caps".into());
     }
-    let mut pivots:Vec<Option<(Vec<u64>,Vec<u64>)>>=vec![None;base_size];
+    let mut pivots:Vec<Option<DualPivot>>=
+        std::iter::repeat_with(||None).take(base_size).collect();
     for (index,source) in rows.iter().enumerate() {
         if source.len()!=base_size+2 || source.iter().any(|&x|x>=N) {
             return Err("dual source row is malformed".into());
         }
         let mut row=source.clone();
-        let mut weights=vec![0;count];
-        weights[index]=1;
+        let mut eliminated=Vec::<(usize,u64)>::new();
         let mut base_pivot_installed=false;
         for col in 0..base_size {
             if row[col]==0 {continue;}
-            if let Some((basis,source_weights))=&pivots[col] {
+            if let Some(pivot)=&pivots[col] {
                 let factor=row[col];
                 for j in col..base_size+2 {
-                    row[j]=sub(row[j],mul(factor,basis[j]));
+                    row[j]=sub(row[j],mul(factor,pivot.row[j]));
                 }
-                for j in 0..count {
-                    weights[j]=sub(weights[j],mul(factor,source_weights[j]));
-                }
+                eliminated.push((col,factor));
             } else {
                 let inverse=pow(row[col],N-2);
                 for entry in &mut row[col..] {*entry=mul(*entry,inverse);}
-                for entry in &mut weights {*entry=mul(*entry,inverse);}
-                pivots[col]=Some((row,weights));
+                let earlier_pivots=eliminated.iter().map(|&(prior,factor)|
+                    (prior,neg(mul(factor,inverse)))
+                ).collect();
+                pivots[col]=Some(DualPivot{
+                    row,source_index:index,source_inverse:inverse,
+                    earlier_pivots,
+                });
                 base_pivot_installed=true;
                 break;
             }
@@ -180,11 +196,34 @@ fn dual_from_rows(rows:&[Vec<u64>], base_size:usize, expected:u64)
             continue;
         }
         let inverse=pow(row[base_size],N-2);
-        for entry in &mut weights {*entry=mul(*entry,inverse);}
         let d=mul(row[base_size+1],inverse);
-        if d!=expected {return Err("dual recovered scalar differs from primal gate".into());}
-        // Replay the *entire* row combination, including every base column.
-        // This check is logically separate from the elimination calculation.
+        if d!=expected {
+            return Err("dual recovered scalar differs from primal gate".into());
+        }
+        let mut weights=vec![0;count];
+        weights[index]=inverse;
+        let mut pivot_weights=vec![0;base_size];
+        for &(col,factor) in &eliminated {
+            pivot_weights[col]=sub(pivot_weights[col],mul(factor,inverse));
+        }
+        // A normalized base pivot depends only on lower-column pivots. Thus
+        // descending-column expansion visits each dependency after its owner.
+        for col in (0..base_size).rev() {
+            let factor=pivot_weights[col];
+            if factor==0 {continue;}
+            let pivot=pivots[col].as_ref().ok_or(
+                "dual dependency references a missing projected-base pivot"
+            )?;
+            weights[pivot.source_index]=add(
+                weights[pivot.source_index],mul(factor,pivot.source_inverse)
+            );
+            for &(prior,dependency) in &pivot.earlier_pivots {
+                pivot_weights[prior]=add(
+                    pivot_weights[prior],mul(factor,dependency)
+                );
+            }
+        }
+        // Replay the entire row combination, including every base column.
         let mut sum=vec![0;base_size+2];
         for (weight,source) in weights.iter().zip(rows) {
             if *weight==0 {continue;}
@@ -196,9 +235,9 @@ fn dual_from_rows(rows:&[Vec<u64>], base_size:usize, expected:u64)
             || sum[base_size]!=1 || sum[base_size+1]!=d {
             return Err("dual source-row recombination failed".into());
         }
-        let source_row_weights=weights.iter().enumerate().filter_map(|(j,&weight)|{
+        let source_row_weights=weights.iter().enumerate().filter_map(|(j,&weight)|
             if weight==0 {None} else {Some([(j+1) as u64,weight])}
-        }).collect();
+        ).collect();
         return Ok(DualCertificate{
             source_row_weights,
             first_determined_relation_prefix:index+1,
@@ -509,4 +548,42 @@ mod tests {
         f.relations[0].terms=vec![[0,4],[1,1]];
         assert!(verify(&f).is_err());
     }
+    #[test]
+    fn opt_in_dual_reconstructs_out_of_order_column_pivots() {
+        let mut receipt=fixture();
+        receipt.emit_dual_certificate=true;
+        // Pivot order 2,0, then target visibility; source indices and pivot
+        // column order differ.
+        receipt.relations=vec![
+            MixedRow{terms:vec![[2,1]],a:3,b:0},
+            MixedRow{terms:vec![[0,1]],a:1,b:0},
+            MixedRow{terms:vec![[0,1],[2,1]],a:N-1,b:1},
+        ];
+        let out=verify(&receipt).unwrap();
+        assert_eq!(out.first_determined_relation_prefix,Some(3));
+        let dual=out.dual_target_certificate.unwrap();
+        assert_eq!(dual.recovered,5);
+        assert_eq!(dual.source_row_weights,vec![[1,1],[2,1],[3,N-1]]);
+    }
+    #[test]
+    fn opt_in_dual_reconstructs_transitive_dependencies() {
+        let mut receipt=fixture();
+        receipt.emit_dual_certificate=true;
+        // Base pivots at columns 3,0,1,2; the last two recursively depend
+        // on lower-column pivots. Every source row is needed in the witness.
+        receipt.relations=vec![
+            MixedRow{terms:vec![[3,1]],a:4,b:0},
+            MixedRow{terms:vec![[0,1],[3,1]],a:5,b:0},
+            MixedRow{terms:vec![[1,1],[0,1]],a:3,b:0},
+            MixedRow{terms:vec![[2,1],[1,1]],a:5,b:0},
+            MixedRow{terms:vec![[2,1]],a:N-2,b:1},
+        ];
+        let out=verify(&receipt).unwrap();
+        assert_eq!(out.first_determined_relation_prefix,Some(5));
+        let dual=out.dual_target_certificate.unwrap();
+        assert_eq!(dual.recovered,5);
+        assert_eq!(dual.source_row_weights,
+            vec![[1,N-1],[2,1],[3,N-1],[4,1],[5,N-1]]);
+    }
+
 }

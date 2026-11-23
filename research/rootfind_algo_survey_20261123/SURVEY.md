@@ -103,3 +103,36 @@ against an unmatched rho; its own correction says the matched rho wins by
   non-generic.
 - **Prime and Koblitz decomposition oracles.** Only constant-factor work
   is left, and the lab has mined it extensively.
+
+## Addendum: the binary F4 direction (owner's choice, same day)
+
+A second read covered the binary algebraic program
+(`ic_m3_algebraic_vs_mitm_20261014`, `first_fall_closure_20261111`,
+`binary_falldeg_20261118`, `hky_engine_speed*_20261117`,
+`ic_algebraic_crossover_20261023`). It already holds the answer to that
+direction's main question, under a frozen protocol:
+
+- **Does any algebraic decomposition grow more slowly in n than the
+  meet-in-the-middle floor?** On Koblitz m = 3 and m = 4, no.
+  - These arms grow faster than the floor, with the 95 % slope-difference
+    interval above 0: F4 on the S₃ chain, F6-IC, the unsplit-S₄ hybrids,
+    and the wide chain solver at m = 4.
+  - SAT and the S₃+S₄ split hybrid are undetermined, censored early. Their
+    lower bounds sit 10⁶–10⁷ above the floor.
+- **First fall degree.** The questions are closed
+  (`first_fall_closure_20261111`): the Kosters–Yeo trace relation is
+  Lean-checked, an exact count of degree-≤1 relations is proved, and the
+  Kousidis–Wiemers bound `d_ff ≤ m² − m + 1` is reduced to a rank condition
+  at m = 3. By owner decision (2026-11-11) no more measurement time goes to
+  the first fall degree.
+- **Frobenius-orbit against random bases.** The fall degree is under study
+  in `binary_falldeg_20261118`; its data so far are pilot rows.
+
+This agrees with the literature: Diem's subexponential results for binary
+curves rest on a first-fall-degree assumption that Huang–Kosters–Yeo and
+others give evidence against. A new structural lever here would have to
+change the degree behaviour itself, not the solver.
+
+The one recorded gap is a measurement gap: program B (exact all-roots S3
+solving) has never been run against a genuine matched F4/F5/F6 arm, and
+its 2×/8× gates are unscored.

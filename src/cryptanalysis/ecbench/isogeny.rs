@@ -101,7 +101,23 @@ impl Fp<'_> {
     }
     fn inv(&mut self, a: u64) -> u64 {
         self.tally.invs += 1;
-        // Fermat, counted as one inversion (not as its multiplications).
+        // The 2- and 3-inverses occur frequently when normalizing
+        // quadratic factors and the 3-division polynomial. These are
+        // exact inverses in the odd prime fields used by this solver and
+        // avoid a full Fermat exponentiation (O(log p) field products).
+        // Compute via quotient/remainder to avoid 2*p+1 overflow.
+        if a == 2 && self.p > 2 {
+            return self.p / 2 + 1;
+        }
+        if a == 3 && self.p > 3 {
+            return if self.p % 3 == 1 {
+                2 * (self.p / 3) + 1
+            } else {
+                self.p / 3 + 1
+            };
+        }
+        // Other inverses keep the original Fermat behavior; tally counts
+        // an inversion, independently of how it is implemented.
         let mut scratch = FieldTally::default();
         let mut f = Fp {
             p: self.p,
@@ -1256,5 +1272,23 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn round140_small_constant_inverses_match_fermat() {
+        // Include both p=1 and p=2 (mod 3), 32-bit and 61-bit primes.
+        for p in [3u64, 5, 7, 11, 13, 17, 19, 23, 31, 101,
+                  65_521, 1_000_000_007, 1_000_000_009,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for a in [2u64, 3] {
+                if a >= p { continue; }
+                let got = field.inv(a);
+                assert_eq!(got, field.pow(a, p - 2), "p={p}, a={a}");
+                assert_eq!(field.mul(a, got), 1, "p={p}, a={a}");
+            }
+        }
+    }
+
 
 }

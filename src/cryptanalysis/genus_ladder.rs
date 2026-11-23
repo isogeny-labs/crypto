@@ -2256,45 +2256,6 @@ pub fn run_ic_ext_bounded(
             solved = true;
             continue;
         }
-        if answer.is_none() {
-            let sol = match prm.sge {
-                None => wiedemann(
-                    &core,
-                    cc,
-                    r,
-                    &mut rng,
-                    dense || ext.coord_square,
-                    &mut w_nat,
-                )
-                .map(|x| x[ct as usize]),
-                Some(sp) => {
-                    let mut s_nat = Nat::default();
-                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
-                    res.la_sge.merge(s_nat);
-                    res.la.merge(s_nat);
-                    res.sge = st;
-                    // The merged system is solved with a copy of the stream; the
-                    // stream itself advances as the unmerged solve would, so a
-                    // failed attempt resumes the relation phase identically.
-                    let mut wrng = rng.clone();
-                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
-                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
-                }
-            };
-            if let Some(t) = sol.map(to_log) {
-                if certify(t, &mut ops, &mut res.verify_ops) {
-                    answer = Some(t);
-                }
-            }
-        }
-        res.la_wied.merge(w_nat);
-        res.la.merge(w_nat);
-        if let Some(t) = answer {
-            res.recovered = Some(t);
-            res.certified = true;
-            solved = true;
-            continue;
-        }
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
     res.la.add += dsu.ops;
@@ -3015,6 +2976,72 @@ fn wiedemann(
     dense_u: bool,
     nat: &mut Nat,
 ) -> Option<Vec<u64>> {
+    let n0 = *nat;
+    let out = wiedemann_solve(rows, ncols, r, rng, dense_u, nat);
+    la_hook(n0, *nat, out)
+}
+
+/// The identity outside tests; under `cfg(test)`, [`la_test_hook`] records
+/// each solve's work and can drop its answer to force the fallback path.
+#[cfg(not(test))]
+#[inline(always)]
+fn la_hook<T>(_n0: Nat, _n1: Nat, out: Option<T>) -> Option<T> {
+    out
+}
+
+#[cfg(test)]
+fn la_hook<T>(n0: Nat, n1: Nat, out: Option<T>) -> Option<T> {
+    la_test_hook::after(n0, n1, out)
+}
+
+/// Test hook on the solves of [`run_ic_ext`] (per thread, off by default):
+/// every solve's native work is summed as it is performed, and the first
+/// `FAIL` solves have their answer dropped after doing (and counting) the
+/// work, as a solve that found no solution would.
+#[cfg(test)]
+mod la_test_hook {
+    use super::Nat;
+    use std::cell::Cell;
+
+    thread_local! {
+        pub static FAIL: Cell<u32> = const { Cell::new(0) };
+        pub static CALLS: Cell<u32> = const { Cell::new(0) };
+        pub static WORK: Cell<Nat> = const { Cell::new(Nat { mul: 0, add: 0 }) };
+    }
+
+    /// Arm the hook: the next `fail` solves fail; counters reset.
+    pub fn arm(fail: u32) {
+        FAIL.with(|f| f.set(fail));
+        CALLS.with(|c| c.set(0));
+        WORK.with(|w| w.set(Nat::default()));
+    }
+
+    pub fn after<T>(n0: Nat, n1: Nat, out: Option<T>) -> Option<T> {
+        CALLS.with(|c| c.set(c.get() + 1));
+        WORK.with(|w| {
+            let mut x = w.get();
+            x.mul += n1.mul - n0.mul;
+            x.add += n1.add - n0.add;
+            w.set(x);
+        });
+        FAIL.with(|f| match f.get() {
+            0 => out,
+            k => {
+                f.set(k - 1);
+                None
+            }
+        })
+    }
+}
+
+fn wiedemann_solve(
+    rows: &[Row],
+    ncols: usize,
+    r: u64,
+    rng: &mut StdRng,
+    dense_u: bool,
+    nat: &mut Nat,
+) -> Option<Vec<u64>> {
     let nr = rows.len();
     let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
     let ds = diag_shoup(&d, r);
@@ -3083,6 +3110,20 @@ fn wiedemann(
 
 /// `x[ct]` for `A x = c`; as `ic_control::wiedemann_coord`.
 fn wiedemann_coord(
+    rows: &[Row],
+    ncols: usize,
+    ct: usize,
+    r: u64,
+    rng: &mut StdRng,
+    square: bool,
+    nat: &mut Nat,
+) -> Option<u64> {
+    let n0 = *nat;
+    let out = wiedemann_coord_solve(rows, ncols, ct, r, rng, square, nat);
+    la_hook(n0, *nat, out)
+}
+
+fn wiedemann_coord_solve(
     rows: &[Row],
     ncols: usize,
     ct: usize,
@@ -3242,6 +3283,70 @@ pub fn run_rho_policy(inst: &Instance, seed: u64, walk: RhoWalk, policy: WalkPol
 
 #[cfg(test)]
 mod tests {
+
+    /// A failed solve falls back once per attempt, and the Wiedemann work of
+    /// the attempt is counted once (research/block_lanczos_pretest_20261120:
+    /// a duplicated fallback block re-ran the solve and merged the cumulative
+    /// `w_nat` twice).  The hook fails the first solves of the run, so each
+    /// path below fails its first attempt outright and certifies later.
+    #[test]
+    fn failed_solve_counts_wiedemann_work_once() {
+        let inst = first_instance(131, 3);
+        let sge = Some(SgeParams {
+            w_max: 4,
+            fill_max: 1.5,
+        });
+        let coord = IcExt {
+            coord_square: true,
+            ..IcExt::default()
+        };
+        let sge_coord = IcExt {
+            sge_coord: true,
+            ..coord
+        };
+        // (label, sge, ext, solves per attempt: coordinate + fallback, or one)
+        for (label, sge, ext, per_attempt) in [
+            ("plain", None, IcExt::default(), 1u32),
+            ("sge", sge, IcExt::default(), 1),
+            ("coord", None, coord, 2),
+            ("sge_coord", sge, sge_coord, 2),
+        ] {
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(131, 3, 2.0),
+                seed: 5,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: false,
+                sge,
+            };
+            la_test_hook::arm(per_attempt);
+            let x = run_ic_ext(&inst, prm, ext);
+            la_test_hook::FAIL.with(|f| f.set(0));
+            let calls = la_test_hook::CALLS.with(|c| c.get());
+            let work = la_test_hook::WORK.with(|w| w.get());
+            assert!(x.certified, "{label}");
+            assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r, "{label}");
+            assert!(x.attempts >= 2, "{label}: the first attempt must fail");
+            if per_attempt == 2 {
+                assert!(x.la_fallbacks >= 1, "{label}");
+            }
+            // One fallback per failed attempt, no second solve: a certifying
+            // run has per_attempt solves for every failed attempt, then one
+            // or two in the attempt that certified.
+            let failed = x.attempts - 1;
+            assert!(
+                calls >= per_attempt * failed + 1 && calls <= per_attempt * x.attempts,
+                "{label}: {calls} solves over {} attempts",
+                x.attempts
+            );
+            // The tally is the work performed, counted once.
+            assert_eq!(x.la_wied, work, "{label}");
+            let parts = [x.la_graph, x.la_peel, x.la_sel, x.la_sge, x.la_wied];
+            assert_eq!(x.la.mul, parts.iter().map(|n| n.mul).sum::<u64>(), "{label}");
+        }
+    }
 
     /// The default extension is the frozen instrument: every count equal.
     #[test]
