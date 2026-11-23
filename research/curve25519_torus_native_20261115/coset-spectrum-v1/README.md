@@ -1,5 +1,11 @@
 # Curve25519 coset-spectrum assessment
 
+**Record correction:** initial8d8628 omits required declaration hashes and
+fails PCC verification. The correctly bound companioncd1904 passes local
+verification; signed standing remains unverified. The original record stays
+unchanged and remains an active gate blocker pending a supported correction
+path. Read [the erratum](record-correction-v2/ERRATA.md). [pcc:unverified]
+
 [Two-page report](report.pdf), [full written review](REVIEW.md),
 [sources](SOURCES.md), [formal fidelity map](PROOF_MAP.md),
 [editable mechanism diagram](diagram.dot),
