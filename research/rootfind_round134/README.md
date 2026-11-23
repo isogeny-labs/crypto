@@ -1,36 +1,50 @@
-# Root finding Round 134 (2026-11-23)
+# Root-finding Round 134: faster Tonelli-Shanks over prime fields (2026-11-23)
 
-Stacked on [Round 133 PR #5002](https://github.com/isogeny-labs/crypto/pull/5002). Production source: `src/cryptanalysis/ecbench/isogeny.rs`.
+Production file: `src/cryptanalysis/ecbench/isogeny.rs`. Draft stacked on [PR #5002](https://github.com/isogeny-labs/crypto/pull/5002).
 
-## Three improvements evaluated and implemented together
+## Candidates evaluated and retained
 
-1. **Binary Jacobi nonresidue search:** for odd prime p, Jacobi(z,p)=Legendre(z,p). Avoid one Fermat modular power for every tested Tonelli-Shanks nonresidue candidate.
-2. **Shared Tonelli-Shanks powers:** with p-1=q*2^s, q odd, compute h=a^((q-1)/2), t=h²a=a^q, r=ha=a^((q+1)/2). Avoid one of two separate modular exponentiations.
-3. **Omit redundant Euler precheck:** when a is nonsquare, t=a^q has order exactly 2^s, so the i<m search returns None. The parent roots() verifies the returned root.
+1. **Jacobi nonresidue selection**: for **prime** p, Jacobi(z,p) = Legendre(z,p). Binary reciprocity selects a Tonelli-Shanks auxiliary nonresidue without repeated Fermat exponentiations.
+2. **Shared exponentiation**: with p−1=q·2^s (q odd), calculate h=a^((q−1)/2); then t=h²·a=a^q and r=h·a=a^((q+1)/2). Saves one full field exponentiation.
+3. **Jacobi input rejection**: determine Jacobi(a,p) before Tonelli setup. Reject nonsquares with integer arithmetic, rather than a Fermat exponentiation.
 
-The C++ reproductions benchmarked Jacobi alone, Jacobi plus exponent fusion, and all three; only the combined optimization is committed in production Rust.
+**Rejected candidate:** Completely deleting the initial residuosity test made a first source-exact Rust benchmark faster on residues but **0.28–0.72× on nonsquares** (up to 3.6× slower). It was replaced by Jacobi input rejection. The final candidate is the three changes above.
 
-## Local Linux perf: **C++ reproduction, not Rust**
+## Local Linux perf measurements
 
-Intel Xeon Platinum 8573C; GCC/Clang -O3 -march=native; CPU pinned; Linux perf_event_open software task-clock counters **available**. 4 independent runs (two seeds/compiler), 11 alternating A/B pairs/run, first 2 warmups, median of remaining 9 within-pair ratios. 12 preconstructed inputs repeated 40 times per trial.
+CPU: Intel Xeon Platinum 8573C. GCC and Clang `-O3 -march=native`, CPU pinned; **Linux perf_event_open software task-clock available**. Two independent seeds/compiler, 11 alternating A/B pairs each, first two pairs excluded as warmup; median of nine within-pair ratios. Values below are C++ algorithmic reproductions, **not Rust**; hardware cycles/cache counters were unavailable.
 
-| Complete root query | Example GCC before → after (ns) | Paired speedup across four runs |
+| Complete C++ operation | Example GCC before → after | Paired speedup across four executions |
 | --- | ---: | ---: |
-| Constructed quadratic p=65,521 | 1,454 → 304 | **4.78–5.69×** |
-| Constructed quadratic p=998,244,353 | 1,888 → 895 | **1.66–2.09×** |
-| Constructed quadratic p=1,000,000,009 | 3,198 → 555 | **5.50–5.86×** |
-| Constructed quadratic p=2,013,265,921 | 2,747 → 848 | **3.17–3.43×** |
-| Constructed cubic p=1,000,000,009 | 11,031 → 8,052 | **1.27–1.40×** |
-| Constructed quartic p=1,000,000,009 | 21,188 → 17,086 | **1.22–1.25×** |
-| Random ψ3 p=65,521 | 4,141 → 4,225 | 0.99–1.09× |
-| Repeated quadratic p=65,521 | 38.6 → 37.3 | 0.95–1.02× |
+| Quadratic, p=65,521 | 1,688 → 321 ns | **4.64–5.34×** |
+| Quadratic, p=998,244,353 | 2,074 → 1,404 ns | **1.38–1.61×** |
+| Quadratic, p=1,000,000,009 | 2,763 → 499 ns | **5.20–5.96×** |
+| Quadratic, p=2,013,265,921 | 2,967 → 999 ns | **2.62–3.09×** |
+| Nonsquare square-root query, p=1,000,000,009 | 178 → 18.4 ns | **9.70–10.75×** |
+| Constructed cubic, p=1,000,000,009 | 11,264 → 8,344 ns | **1.30–1.36×** |
+| Constructed quartic, p=1,000,000,009 | 20,498 → 17,209 ns | **1.16–1.26×** |
+| Random ψ3, p=65,521 | 3,681 → 3,970 ns | **0.97–1.04×** |
 
-Jacobi alone improved constructed quadratic queries 3.14–4.19× at 65,521 or 1,000,000,009 (field/run dependent); Jacobi + fused powers yielded 3.76–4.24×. Hardware PMU cycles/cache were unavailable, so results use software task-clock; the raw local CSVs are provided separately.
+Small control workloads, including repeated roots and p=1,000,000,007 quadratics, were near parity or sometimes regressed. The best combined local speedups are localized and are not whole-workload guarantees. Earlier ablations show Jacobi selection alone and shared exponentiation also improved constructed quadratics.
 
-## Validation
+## Source-exact optimized Rust run
 
-Local exhaustive monic quadratics over p=3,5,7,11,13,19,23,31,101 and large-field differential tests passed for baseline and all candidate variants. GCC ASan/UBSan passed. Native Rust source-exact A/B workflow in `.github/workflows/rootfind_round134.yml` compiles baseline Round133 and this branch, runs independent square-root oracles (including p=998244353 and p=2013265921), and collects 13 alternating paired trials on complete roots, direct sqrt and isogeny controls. **Do not infer native Rust gain from C++ figures until that workflow passes and its timings are inspected.**
+[GitHub Actions native A/B](https://github.com/isogeny-labs/crypto/actions/runs/45166204719) **passed** (rustc 1.100.0, optimized, independent Euler-criterion oracles, 13 alternating A/B trials). Actual production module compiled twice, with baseline from Round133. Medians and paired ratios:
 
-## Gate
+| Complete native Rust operation | Baseline → candidate ns | Paired speedup |
+| --- | ---: | ---: |
+| Distinct quadratic, p=65,521 | 1,242 → 301 | **4.14×** |
+| Distinct quadratic, p=998,244,353 | 1,113 → 719 | **1.55×** |
+| Distinct quadratic, p=1,000,000,009 | 2,145 → 441 | **4.87×** |
+| Distinct quadratic, p=2,013,265,921 | 2,346 → 909 | **2.58×** |
+| Nonsquare direct root, p=1,000,000,009 | 151 → 35.5 | **4.25×** |
+| Cubic, p=1,000,000,009 | 11,731 → 10,196 | **1.15×** |
+| Complete 3-isogeny, p=1,000,000,009 | 7,125 → 7,046 | **1.01×**, near parity |
 
-Keep draft until native source-exact correctness/performance and broad repo CI pass. Some controls are near parity/regressive; no claim for complete 3-isogeny discovery or ECC2K relation-finding throughput.
+p=1,000,000,007 complete quadratic control was **0.99×**, slightly slower. No overall isogeny or ECC2K throughput speedup is claimed.
+
+## Correctness and gates
+
+C++ exhaustive small-prime quadratic enumeration (p=3,5,7,11,13,19,23,31,101), randomized differential polynomial arithmetic, and GCC ASan/UBSan passed for the final candidate. Production Rust source-exact oracle verified roots and nonsquares across p=5,17,97,257,65,521,998,244,353,1,000,000,009,2,013,265,921. The independent tests assume input modulus is an odd prime.
+
+**Still draft** until an independent Rust replication and broad repository CI, and a suitable non-constructed/range-of-input benchmark, pass. These improvements target a prime-field isogeny polynomial root solver; no ECC2K-130 relation-finding throughput comparison has yet been performed.
