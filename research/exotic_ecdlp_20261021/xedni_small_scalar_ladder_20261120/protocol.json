@@ -1,0 +1,22 @@
+{
+  "schema": "xedni-small-scalar-ladder-protocol-v1",
+  "source_family_result": "research/exotic_ecdlp_20261021/xedni_public_lift_curve_family_20261120/result.json",
+  "source_family_result_sha256": "9732c85ffa7a70659da269f73f66d3805405d679e04dff09991dba11c78ebcd4",
+  "source_family_selection": "research/exotic_ecdlp_20261021/xedni_public_lift_curve_family_20261120/selection-rows.jsonl",
+  "source_family_selection_sha256": "bbaae1d6d258e1d5ced7a33ef6be61bec5a0cfd7e9ff4ff0a84859969cddf76b",
+  "source_lift_search": "research/exotic_ecdlp_20261021/xedni_public_lift_curve_family_20261120/run_sage.py",
+  "source_lift_search_sha256": "676ed46acb29b1a39ada3806d23c38b52fb628a87d1f53d2d35715efc189f1f3",
+  "source_rho": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/run_sage.py",
+  "source_rho_sha256": "b35b225581e7994121e60277c1956c37eaa0b132ab8a84c3fbf50da3344b2907",
+  "curves": [{"p":1009,"t":5,"q":1039},{"p":1009,"t":9,"q":1033},{"p":1013,"t":38,"q":1033},{"p":1013,"t":54,"q":977}],
+  "rational_curve": "E_t: y^2=x^3+t*x+1, Q=(0,1), integral short Weierstrass model; rational kQ coordinate height is max(abs(numerator(x)),sqrt(denominator(x))) in reduced x=a/b^2, recorded outside arm timers",
+  "scalars": [1,2,3,4,5,6,7,8,9,10,11,12],
+  "target_law": "for each frozen curve and scalar k ascending, construct reduced public T=k*Qbar outside timers; lift arm receives only T coordinates; record known rational kQ height separately and do not pass it to the lift arm",
+  "height_cap": 4096,
+  "lift_law": "reuse pinned public-coordinate lift search: x=a/b^2,y=c/b^3, increasing H=max(abs(a),b), then b,a; modular x filter, coprime a,b, exact integral square, first full public-point match",
+  "arm_order": "for odd k lift then rho; for even k rho then lift",
+  "lift_wall_cap_seconds": 120,
+  "rho_wall_cap_seconds": 120,
+  "measurement_boundary": "ordinary-host diagnostic, setup and fixture construction excluded; all target-dependent lift attempts charged to that point, same-point rho through scalar verification; rational lift and verified scalar are distinct outputs",
+  "claim_boundary": "exact finite small-scalar height ladder on four selected curves, with complete capped rows and separate known-rational-height comparison"
+}

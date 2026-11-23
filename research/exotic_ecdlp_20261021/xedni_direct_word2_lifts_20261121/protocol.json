@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-direct-word2-lifts-protocol-v1",
+  "bridge_result_sha256": "207aabe462cf5f90bb48e239cd652d3ac119c20522053ae9a1b8a55caf684c8d",
+  "field_prime": 47,
+  "reduced_curve_a_invariants": [0, 0, 0, -1, -2],
+  "target_source_indices": [2, 85, 201, 353, 511],
+  "coordinate_law": "least_nonnegative_integer_representatives_of_recorded_P_Q",
+  "construction": "lambda=(yP-yQ)/(xP-xQ); a1=a3=0; a2=lambda^2-2*xQ-xP; a4=2*yQ*lambda-3*xQ^2-2*a2*xQ; a6=yQ^2-xQ^3-a2*xQ^2-a4*xQ",
+  "eligibility": "xP_minus_xQ_nonzero_mod_47_and_rational_curve_nonsingular",
+  "required_checks": ["rational_points_on_curve", "rational_P_plus_2Q_identity", "coefficient_reduction", "good_reduction_47", "reduced_order_43", "reduced_point_relation", "folded_rank_20_with_selected_rows"],
+  "status_law": "retain_every_target_with_success_or_exact_failure"
+}

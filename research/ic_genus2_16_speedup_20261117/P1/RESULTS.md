@@ -38,7 +38,7 @@ Every solve in the table is certified (`[t]G = T` on a planted log).
   - At g=10 p=11, E is worse than D by 50x and loses to `c`'s lower bound on one
     pair (0.88).
 - **P-b (at g=6 the gain falls as p grows): holds.** The best arm over `c`
-  goes 9.7x -> 4.4x -> 2.4x -> 1.29x for p = 31, 53, 101, 211, roughly as p^-1 (log-log slope -1.05).
+  goes 9.7x -> 4.4x -> 2.4x -> 1.29x for p = 31, 53, 101, 211, roughly as p^-1 (a two-point endpoint slope of -1.05, from p=31 to p=211).
   The extrapolated crossover for E is near p ~ 270 at g = 6. Past it, the lab's
   degree-1 base is the better choice at genus 6.
 - **P-c (g=6: E cheaper than D with LA at g^2, p >= 53): holds**, by 6x at
@@ -47,7 +47,7 @@ Every solve in the table is certified (`[t]G = T` on a planted log).
 
 ## Mechanism (`analyze` side computation, per arm)
 
-- At g=6 the lab arm needs about 1100-1700 walk steps per relation (the 1/g!
+- At g=6 the lab arm needs about 900-1700 walk steps per relation, about 900 at p=211 (the 1/g!
   split probability plus the falling-factorial penalty at small p). D needs about
   10 and E about 13.
 - E pays in relation count instead. Its degree-2 large primes live in a graph of
@@ -75,7 +75,9 @@ Every solve in the table is certified (`[t]G = T` on a planted log).
   grows. At g=7 and 8 the gain is large on every p measured, but the same decay
   must be expected; it is not measured here.
 - **Wall time.** Counted operations only. D's dense column table and E's
-  large-prime bookkeeping (DSU operations, counted in `la_add`) are charged.
+  large-prime bookkeeping are charged as table set-up multiplications only. The DSU operations
+  (counted in `la_add`) and all additions (`rel_add`, `la_add`) are recorded in the raw data but
+  NOT included in FPM_1 (erratum E1, validator 2026-11-20).
   Memory is not.
 - **Standing.** No independent replay, no pcc claim, no benchmark record. The
   lab's `tools/benchrec.py` and `scripts/checkpoint.sh` are not on this branch's
@@ -91,5 +93,36 @@ Every solve in the table is certified (`[t]G = T` on a planted log).
      the timed-out cell had admitted, with a 3600 s limit.
    - The protocol's g=10 clause allowed "not run"; running was better.
    - g=8 p=31 has 1 curve (2 pairs). g=10 p=13 admitted no curve in 1700 s: not run.
+   - g=10 p=11: the 3-curve cell admitted curves 7, 12 and 27. Only 7 and 12 were rerun, so
+     the row has 4 pairs. Seed 27 was never run (erratum E3).
 3. **Pilot binaries** (g16, g16b, g16c) differ from g16d only in curve-admission
    logic. Pilot data is kept in `pilot*/` and not used in the table.
+
+## Validation (2026-11-20)
+
+An independent validator subagent, using its own code, checked this file against the committed
+raw data (`../VALIDATION_P1P2.md`; scripts in `../validation/`). Verdict: **validated-with-errata**.
+
+What it checked:
+- every table value re-derived to within 0.38%;
+- all 32 group orders checked against PARI `hyperellcharpoly` and an independent implementation;
+- a determinism replay of 3 cells (2457 fields identical);
+- a Monte Carlo split probability matching the trials-per-relation ratios.
+
+What it could not check: the discrete-log certificates. The run records carry only
+`certified`/`ok` flags, not G, T or the recovered t. Until they do, no row here is admissible to
+the leaderboard or a `VALIDATION.json`.
+
+Errata, folded in above or noted here:
+- **E1:** additions and DSU work are not in FPM_1.
+- **E2, the §5a band.** The validator priced the unpriced operations on every arm, rho included,
+  at 0, 0.1 and 1 per operation. Every arm-versus-rho ordering holds across the band. One ranking
+  does not: at g=6 p=211 the best arm's gain over `c` is 1.29x, 1.24x and 0.995x. That cell is
+  therefore a tie with the lab arm, not a gain.
+- **E3:** g=10 p=11 seed 27 was not run.
+- **E4:** see `DESIGN.md`. In 14 of 32 instances `order` is an exponent multiple; r is prime and
+  exactly divides #J in all 32.
+- **E5:** the range of walk steps per relation now includes p=211.
+- **E6:** the slopes are two-point endpoint slopes.
+- **E7:** the P2 crossover cells used a 2e7 trial cap against 5e6 here. This is immaterial at
+  g=7 p=101.

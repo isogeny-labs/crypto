@@ -2745,6 +2745,26 @@ pub enum StopMode {
     Hilbert(usize),
 }
 
+/// Whether a traced run may replay F4 under `mode`.  A replay never
+/// consumes the pairs it skips, so without a stop rule (`StopMode::Full`)
+/// every replay ends with a full run over all of them: the 2026-11-21 pilot
+/// measured `--trace` with `Full` at +25 % counted operations and slower
+/// than no trace (research/f4_round4_leads_20261121).  Tracing is therefore
+/// refused there, with a warning; with a stop rule it is kept.
+pub fn trace_for_mode(trace: bool, mode: StopMode) -> bool {
+    if trace && matches!(mode, StopMode::Full) {
+        static WARNED: std::sync::Once = std::sync::Once::new();
+        WARNED.call_once(|| {
+            eprintln!(
+                "jv_cover: --trace needs a stop rule (--stop K or --stop hilbert:C); \
+                 tracing is off for this full-F4 run"
+            )
+        });
+        return false;
+    }
+    trace
+}
+
 pub fn opts_for_mode(max_degree: u32, budget_secs: f64, mode: StopMode) -> F4Options {
     match mode {
         StopMode::Full => jv_options(max_degree, budget_secs),
@@ -3471,6 +3491,7 @@ pub fn run_cover_ccov_mode(
     };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
+    let trace = trace_for_mode(trace, mode);
     let ctx = Ctx::with_trace(&spec, trace);
     let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
     let base = factor_base(&ctx, &mut rng);
@@ -3749,6 +3770,7 @@ pub fn run_cover_dlp_mode(
         (spec, None)
     };
     let line_muls = fb_line.as_ref().map_or(0, |r| r.muls);
+    let trace = trace_for_mode(trace, mode);
     let ctx = Ctx::with_trace(&spec, trace);
     let jac = ctx.jac();
     assert!(
