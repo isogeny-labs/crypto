@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:47:49Z",
+ "id": "PCC-20261123-9df5c3",
+ "kind": "statement",
+ "producer": {
+  "commit": "66c6e49f3c19f95023f76581932a75327ffd91d3",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/evidence/budget-recheck.json",
+    "sha256": "734ae4115b119f8155e0e49bc41feffb76c67740fa8f98a9130bc2606c9cc037"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-admission-and-closure",
+ "statement": "Changed main read-only telemetry run45219644370 at5ca465dd7b reaches configured-role authentication, which fails Not authorized to perform sts:AssumeRoleWithWebIdentity. continue-on-error presents a success conclusion while actual credential outcome is failure; budget read skipped and final workflow fails. No budget or capacity observed and no AWS compute launched."
+}
