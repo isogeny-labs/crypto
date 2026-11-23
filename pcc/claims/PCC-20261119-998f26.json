@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T05:21:24Z",
+ "id": "PCC-20261119-998f26",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4c9294df99c2db8f05a230455a4a45ff294dd98a",
+  "model": "Codex",
+  "session": "dilation-root-count-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d634499c478d34d4ec47f45fefdc4d9f4fad8b24a58d2a0c187637328e58b2e2",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.inverseSquarePolynomialCertificate_card_le"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This checks the elementary inverse-square fibre and polynomial root-count reduction used by DilationNondeg. It does not construct the specialized Semaev polynomials or prove their nonvanishing; those curve-specific algebraic obligations and the collector/runtime assembly remain open.",
+ "statement": "For any tuple-indexed bad-dilation predicate over a finite field, if every tuple has a nonzero univariate polynomial of degree at most D that vanishes at u^(-2) for every bad nonzero dilation u, then every tuple has at most 2D bad dilations."
+}

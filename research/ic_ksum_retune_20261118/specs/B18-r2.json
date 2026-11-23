@@ -1,0 +1,73 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ksum_retune_20261118 B18-r2",
+ "description": "Confirmatory: rule-sized k-sum (k=5, N=7) against the producer-sized -psr incumbent (k=4, N=7); prune=1, split=1, stride-renew. Generic decomposition track (bounded by sqrt(r); cannot beat rho). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 18,
+    "modulus": 262153,
+    "a": 0,
+    "b": 25863,
+    "group_order": 261752,
+    "r": 32719,
+    "gx": 215757,
+    "gy": 240931
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261118642,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "incumbent",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "retuned",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261118742,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

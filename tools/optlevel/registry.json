@@ -304,6 +304,20 @@
    "note": ""
   },
   {
+   "id": "crypto.rootfind.probe",
+   "repository": "isogeny-labs/crypto",
+   "path": "src/cryptanalysis/ic_framework/rootfind_{kmitm,floor,gpu}.rs; examples/rootfind_optlevel_probe.rs",
+   "device": "cpu",
+   "op_class": "modmuladd_p62",
+   "ops_counter": {
+    "kind": "emitted",
+    "what": "GroupOps.field_ops.muls+sqrs on the probe path (prepare excluded); IFMA path charges honest lane-Montgomery muls"
+   },
+   "measure": "tools/optlevel/run.sh measure --repeat 5 --out R.json -- target/release/examples/rootfind_optlevel_probe --arm kmitm:m=4 --mode ifma --bits 32 --size 32 --targets 4096 --seconds 1.2",
+   "status": "ready",
+   "note": "Study dir research/rootfind_optlevel_20261121/. Attainment is not a speed claim. INTENSITY_UNKNOWN until bytes_declared is set."
+  },
+  {
    "id": "cryptanalysis.rho.c",
    "repository": "isogeny-labs/cryptanalysis",
    "path": "src/rho.c, src/group_ec.c, src/group_zp.c; tools/ca_perfbench.c",

@@ -1,0 +1,14 @@
+{
+  "action": "prefer scalar lanes over AVX2; keep AVX2 only as an explicit optlevel/mode=avx2 path; stop after three fail-closed ticks",
+  "created": "2026-11-22T20:03:33Z",
+  "evidence": [
+    "research/rootfind_optlevel_20261121/README.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "optlevel"
+  ],
+  "trigger": "when rootfind AVX2 mul_epu32 lanes score D below scalar 8-wide on T-timing",
+  "why": ""
+}
