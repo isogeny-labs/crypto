@@ -175,16 +175,22 @@ def bad_matching():
         raise AssertionError('duplicate-root matching rejected')
 
 
+def require_valid_plane(plane):
+    """Reject malformed isotropic-plane images instead of signaling success."""
+    if len(plane) != 3 or len(set(plane)) != 3 or any(x == 0 for x in plane) or plane not in PLANES:
+        raise ValueError('invalid isotropic plane')
+
+
 def bad_plane_image():
     p = canonical_permutation((1, 5))
     plane = PLANES[0]
     corrupted = tuple(sorted((image_plane(plane, p)[0],) * 3))
-    if corrupted in PLANES:
-        raise AssertionError('corrupt 2-plane accepted')
-    raise AssertionError('corrupt 2-plane rejected')
+    require_valid_plane(corrupted)
 
 
 def main():
+    # Positive sensitivity control: legitimate images must not be rejected.
+    require_valid_plane(PLANES[0])
     census = {}
     class_counts = collections.Counter()
     for p in itertools.permutations(range(6)):
