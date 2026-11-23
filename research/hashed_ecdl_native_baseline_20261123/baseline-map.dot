@@ -1,0 +1,14 @@
+digraph baseline_map {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.45", label="Source qualification and comparator scope; no measured gain", labelloc=t, fontsize=14];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f8", fontname="Helvetica", fontsize=11, margin="0.14,0.10"];
+  edge [fontname="Helvetica", fontsize=10, color="#516579"];
+  current [label="Current tensor source\nmain 816f9c3a\nno Rust edits"];
+  qualify [label="Frozen native qualification\n28 test executables\n245 passes; 0 failures", fillcolor="#e0efe5"];
+  old [label="Historical tensor comparison\nd188c5a6 / c866ee97\n84-case acceptance still open"];
+  cpu [label="Distinct CPU implementation\nlater component panels\nreconcile actual source/arms"];
+  next [label="Next algorithm study\nsource-bound applicable baseline\nproof + full costs + controls", fillcolor="#fff0d6"];
+  current -> qualify [label="copy + hash"];
+  qualify -> next [label="qualified software"];
+  old -> next [label="historical reference"];
+  cpu -> next [label="separate comparator"];
+}

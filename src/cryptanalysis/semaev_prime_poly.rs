@@ -419,7 +419,11 @@ pub fn poly_rem(f: Fp, a: &[u64], m: &[u64]) -> Vec<u64> {
     r
 }
 
-pub fn poly_mulmod(f: Fp, a: &[u64], b: &[u64], m: &[u64]) -> Vec<u64> {
+/// Product of ascending-coefficient polynomials; zero is returned as `[0]`.
+pub fn poly_mul(f: Fp, a: &[u64], b: &[u64]) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return vec![0];
+    }
     let mut prod = vec![0u64; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         if x == 0 {
@@ -429,7 +433,11 @@ pub fn poly_mulmod(f: Fp, a: &[u64], b: &[u64], m: &[u64]) -> Vec<u64> {
             prod[i + j] = f.add(prod[i + j], f.mul(x, y));
         }
     }
-    poly_rem(f, &prod, m)
+    trim(prod)
+}
+
+pub fn poly_mulmod(f: Fp, a: &[u64], b: &[u64], m: &[u64]) -> Vec<u64> {
+    poly_rem(f, &poly_mul(f, a, b), m)
 }
 
 /// `base^e mod m`.
@@ -546,6 +554,110 @@ pub fn derivative(f: Fp, a: &[u64]) -> Vec<u64> {
     )
 }
 
+fn validate_poly_support_inputs(
+    f: Fp,
+    support: &[u64],
+    candidate: &[u64],
+) -> Result<usize, String> {
+    // As elsewhere in this module, primality is a caller precondition. Check
+    // representation and characteristic bounds before using field arithmetic.
+    if f.p <= 2 || f.p >= (1 << 62) || f.p.is_multiple_of(2) {
+        return Err("support tests require an odd prime field below 2^62".into());
+    }
+    if support.is_empty() || candidate.is_empty() {
+        return Err("support tests require nonempty polynomial representations".into());
+    }
+    if support.iter().chain(candidate).any(|&c| c >= f.p) {
+        return Err("support tests require coefficients reduced modulo p".into());
+    }
+    if support.iter().all(|&c| c == 0) {
+        return Err("support polynomial must be nonzero".into());
+    }
+    if candidate.len() < 2 || candidate.last() != Some(&1) {
+        return Err("candidate polynomial must be monic of positive degree".into());
+    }
+    let degree = candidate.len() - 1;
+    if degree as u128 >= u128::from(f.p) {
+        return Err("candidate degree must be strictly below the characteristic".into());
+    }
+    Ok(degree)
+}
+
+/// `rem(F * g', g)`, for a nonzero support polynomial `F` and monic `g`.
+///
+/// When `q = deg(g) < p`, this vanishes exactly when `g` divides `F^q`,
+/// equivalently when every algebraic root of `g` is a root of `F`. Repeated
+/// roots of `g` are retained: neither polynomial must be squarefree, and `F`
+/// need not split over the base field. This is a coefficient-only membership
+/// test for a supplied `g`; it does not find a target relation or its signs.
+///
+/// Inputs use ascending coefficients reduced modulo `p`. `F` may have trailing
+/// zero coefficients; `g` must have a literal leading one and positive degree.
+/// The zero polynomial `F` and `q >= p` are rejected. Primality of `f.p` is the
+/// same caller precondition as for [`Fp`]; it is not tested here.
+///
+/// The multiplicity-aware derivative formulation is also used in the KeyAI
+/// [M16 September 10 notes](https://github.com/KeyAIGit/ecdlp-lean-verification/blob/74390a6d11dbb57608d503c443a7283667ab2505/release_candidates/m16-20260910/THEOREMS.md).
+pub fn poly_support_residual(
+    f: Fp,
+    support: &[u64],
+    candidate: &[u64],
+) -> Result<Vec<u64>, String> {
+    validate_poly_support_inputs(f, support, candidate)?;
+    Ok(poly_mulmod(
+        f,
+        support,
+        &derivative(f, candidate),
+        candidate,
+    ))
+}
+
+/// Whether the supplied monic candidate is supported on the roots of `support`.
+/// See [`poly_support_residual`] for the characteristic and input contract.
+pub fn poly_support_holds(f: Fp, support: &[u64], candidate: &[u64]) -> Result<bool, String> {
+    Ok(poly_support_residual(f, support, candidate)? == [0])
+}
+
+/// Coefficient Jacobian of `g -> rem(F * g', g)` at a supported monic `g`.
+///
+/// For `q = deg(g)`, the returned matrix has `q` rows and columns. Entry `(i,j)`
+/// is the derivative of residual coefficient `X^i` with respect to coefficient
+/// `X^j` of `g`; its leading monic coefficient is fixed. Writing `H = F*g'/g`,
+/// column `j` is `rem(F * (X^j)' - H * X^j, g)`.
+///
+/// This diagnostic accepts nonsquarefree `F`, so singular cases remain visible.
+/// Under the prime-field and `q < p` contract, the matrix is nonsingular if
+/// `gcd(g, F') = 1`; squarefree `F` is a sufficient condition. It does not imply
+/// a bound on global solving degree or on the cost of finding `g`. A candidate
+/// whose support residual is nonzero is rejected rather than treated as a root.
+pub fn poly_support_jacobian_at_root(
+    f: Fp,
+    support: &[u64],
+    candidate: &[u64],
+) -> Result<Vec<Vec<u64>>, String> {
+    let degree = validate_poly_support_inputs(f, support, candidate)?;
+    let numerator = poly_mul(f, support, &derivative(f, candidate));
+    if poly_rem(f, &numerator, candidate) != [0] {
+        return Err("support Jacobian requires a candidate with zero residual".into());
+    }
+    // poly_div_exact's caller must establish divisibility first. Only H mod g
+    // contributes to the columns, so discard its higher-degree part once.
+    let quotient = poly_rem(f, &poly_div_exact(f, &numerator, candidate), candidate);
+    let mut matrix = vec![vec![0; degree]; degree];
+    for j in 0..degree {
+        let mut basis = vec![0; j + 1];
+        basis[j] = 1;
+        let mut left = poly_mulmod(f, support, &derivative(f, &basis), candidate);
+        let mut right = poly_mulmod(f, &quotient, &basis, candidate);
+        left.resize(degree, 0);
+        right.resize(degree, 0);
+        for i in 0..degree {
+            matrix[i][j] = f.sub(left[i], right[i]);
+        }
+    }
+    Ok(matrix)
+}
+
 /// Degrees of the irreducible factors of a squarefree `g` over `F_p`
 /// (distinct-degree factorisation); `None` if `g` is not squarefree.
 pub fn factor_degrees(f: Fp, g: &[u64]) -> Option<Vec<usize>> {
@@ -656,6 +768,122 @@ pub fn structure_check(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn derivative_support_matches_powered_membership_with_multiplicity() {
+        let f = Fp::new(7);
+        let support = [2, 4, 1]; // (X-1)(X-2)
+        let cases = [
+            (vec![6, 1], true),        // X-1
+            (vec![1, 5, 1], true),     // (X-1)^2
+            (vec![5, 5, 3, 1], true),  // (X-1)^2(X-2)
+            (vec![6, 3, 4, 1], true),  // (X-1)^3
+            (vec![4, 0, 2, 1], false), // (X-1)^2(X-3)
+            (vec![1, 0, 1], false),    // X^2+1, irreducible over F_7
+        ];
+        for (candidate, expected) in cases {
+            let degree = (candidate.len() - 1) as u64;
+            let powered = poly_powmod(f, &support, degree, &candidate) == [0];
+            assert_eq!(powered, expected);
+            assert_eq!(
+                poly_support_holds(f, &support, &candidate).unwrap(),
+                powered,
+                "candidate {candidate:?}"
+            );
+        }
+        // The contract is algebraic support, without an F_p-splitting assumption.
+        assert!(poly_support_holds(f, &[1, 0, 1], &[1, 0, 2, 0, 1]).unwrap());
+        // A nonzero constant support has no roots; scaling/trailing zeros do
+        // not change the root set of a nonconstant support polynomial.
+        assert!(!poly_support_holds(f, &[3], &[6, 1]).unwrap());
+        assert!(poly_support_holds(f, &[4, 1, 2, 0], &[1, 5, 1]).unwrap());
+    }
+
+    #[test]
+    fn derivative_support_accepts_degree_sixteen_over_prime31() {
+        let f = Fp::new(2_147_483_647);
+        let support = [2, f.p - 3, 1];
+        let mut candidate = vec![1];
+        for i in 0..16 {
+            let root = if i < 9 { 1 } else { 2 };
+            candidate = poly_mul(f, &candidate, &[f.neg(root), 1]);
+        }
+        assert_eq!(candidate.len(), 17);
+        assert!(poly_support_holds(f, &support, &candidate).unwrap());
+        assert_eq!(poly_powmod(f, &support, 16, &candidate), [0]);
+    }
+
+    #[test]
+    fn support_jacobian_retains_repeated_root_directions() {
+        let f = Fp::new(7);
+        // g=(X-1)^2, F=X-1 gives H=2. The columns are -2 and -1-X.
+        assert_eq!(
+            poly_support_jacobian_at_root(f, &[6, 1], &[1, 5, 1]).unwrap(),
+            vec![vec![5, 6], vec![0, 6]]
+        );
+        // g=(X-1)^2(X-2), F=(X-1)(X-2), H=3X-5. This matrix has
+        // determinant -2=5 mod 7 even though g has a repeated root.
+        assert_eq!(
+            poly_support_jacobian_at_root(f, &[2, 4, 1], &[5, 5, 3, 1]).unwrap(),
+            vec![vec![5, 2, 5], vec![4, 2, 2], vec![0, 5, 2]]
+        );
+    }
+
+    #[test]
+    fn nonsquarefree_support_does_not_imply_a_nonsingular_jacobian() {
+        let f = Fp::new(7);
+        let repeated_support = [1, 5, 1]; // (X-1)^2
+        assert!(poly_support_holds(f, &repeated_support, &[6, 3, 4, 1]).unwrap());
+        assert_eq!(
+            poly_support_jacobian_at_root(f, &repeated_support, &[6, 1]).unwrap(),
+            vec![vec![0]]
+        );
+        // Repetition away from g's roots causes no singularity: F=(X-1)(X-2)^2.
+        assert_eq!(
+            poly_support_jacobian_at_root(f, &[3, 1, 2, 1], &[6, 1]).unwrap(),
+            vec![vec![6]]
+        );
+        assert!(poly_support_jacobian_at_root(f, &[6, 1], &[5, 1]).is_err());
+    }
+
+    #[test]
+    fn derivative_support_rejects_inseparable_characteristic_counterexample() {
+        let f = Fp::new(3);
+        let support = [2, 1]; // X-1
+        let candidate = [0, 0, 0, 1]; // X^3 has zero derivative in characteristic 3.
+        assert_eq!(
+            poly_mulmod(f, &support, &derivative(f, &candidate), &candidate),
+            [0]
+        );
+        assert_ne!(poly_powmod(f, &support, 3, &candidate), [0]);
+        assert!(poly_support_residual(f, &support, &candidate).is_err());
+        assert!(poly_support_holds(f, &support, &candidate).is_err());
+        assert!(poly_support_jacobian_at_root(f, &support, &candidate).is_err());
+    }
+
+    #[test]
+    fn derivative_support_rejects_malformed_polynomials_before_arithmetic() {
+        let f = Fp::new(7);
+        for (support, candidate) in [
+            (vec![], vec![6, 1]),
+            (vec![6, 1], vec![]),
+            (vec![0, 0], vec![6, 1]),
+            (vec![6, 1], vec![1]),
+            (vec![6, 1], vec![0]),
+            (vec![6, 1], vec![6, 2]),
+            (vec![6, 1], vec![6, 1, 0]),
+            (vec![7, 1], vec![6, 1]),
+            (vec![6, 1], vec![7, 1]),
+        ] {
+            assert!(poly_support_residual(f, &support, &candidate).is_err());
+            assert!(poly_support_jacobian_at_root(f, &support, &candidate).is_err());
+        }
+        // Fp's public field can be constructed without Fp::new; these obvious
+        // invalid field representations must not reach modular arithmetic.
+        for p in [0, 1, 2, 4, 1 << 62] {
+            assert!(poly_support_residual(Fp { p }, &[1, 1], &[1, 1]).is_err());
+        }
+    }
 
     /// The frontier campaign's 40-bit curve, `icv1-fp40-tm924137-0ecaaeb9`.
     fn c40() -> Curve {

@@ -1,0 +1,286 @@
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:66:
+         if line.starts_with(&format!("RATIONAL_CLASS label={label} ")) {
+             let id = integer_field(line, "id");
+             assert_eq!(id, classes.len());
+-            let list = line.split_once(" divisor=[").unwrap().1.split_once(']').unwrap().0;
++            let list = line
++                .split_once(" divisor=[")
++                .unwrap()
++                .1
++                .split_once(']')
++                .unwrap()
++                .0;
+             let encoded = numbers(list);
+             let nu = encoded[0] as usize;
+             let nv = encoded[nu + 1] as usize;
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:105:
+         assert!(i < points.len() && j < points.len() && c < classes.len());
+     }
+     println!("FROZEN_FIXTURE label={label} actual_classes=21 actual_points=12 effective_pairs=24 raw_sha256=721790e8aa9c7ea0da5151a2bb48da03a4578a871f627ec503c71a0947c195c4 constructor_not_replayed=pass");
+-    Fixture { classes, index, points, pairs }
++    Fixture {
++        classes,
++        index,
++        points,
++        pairs,
++    }
+ }
+ 
+ fn determinant(f: &Field, m: [u32; 4]) -> u32 {
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:174:
+         f.add(&f.mul(&adjugate[2], &b), &f.mul(&adjugate[3], &d)),
+     ];
+     assert_eq!(product, [t, 0, 0, t]);
+-    Iso { matrix: adjugate, scale: f.mul(&f.pow(t, 3), &f.inv(&iso.scale)) }
++    Iso {
++        matrix: adjugate,
++        scale: f.mul(&f.pow(t, 3), &f.inv(&iso.scale)),
++    }
+ }
+ 
+ fn geometric_support(source: &Chart<'_>, d: &Divisor) -> [(u32, u32, u32); 2] {
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:182:
+     let f = source.h.f;
+     assert_eq!(d.u[2], 1);
+     let discriminant = f.sub(&f.mul(&d.u[1], &d.u[1]), &d.u[0]);
+-    let root = f.sqrt(discriminant).expect("selected geometric support must split in F729");
++    let root = f
++        .sqrt(discriminant)
++        .expect("selected geometric support must split in F729");
+     let roots = [root, f.neg(&root)].map(|s| f.mul(&f.sub(&s, &d.u[1]), &2));
+     roots.map(|t| {
+         assert_eq!(peval(f, &d.u, &t), 0);
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:216:
+ }
+ 
+ fn scalar_action(chart: &Chart<'_>, classes: &[Divisor], images: &[Divisor]) -> u32 {
+-    let matches: Vec<_> = (0..21).filter(|&n| {
+-        classes.iter().zip(images).all(|(d, image)| chart.h.mul(d, u128::from(n)) == *image)
+-    }).collect();
++    let matches: Vec<_> = (0..21)
++        .filter(|&n| {
++            classes
++                .iter()
++                .zip(images)
++                .all(|(d, image)| chart.h.mul(d, u128::from(n)) == *image)
++        })
++        .collect();
+     assert_eq!(matches.len(), 1);
+     matches[0]
+ }
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:238:
+     }
+ }
+ 
+-fn qualify_iso(label: &str, source: &Chart<'_>, a: &Fixture, target: &Chart<'_>, b: &Fixture, iso: Iso) {
++fn qualify_iso(
++    label: &str,
++    source: &Chart<'_>,
++    a: &Fixture,
++    target: &Chart<'_>,
++    b: &Fixture,
++    iso: Iso,
++) {
+     let f = source.h.f;
+     assert!(compatible(f, &source.model, &target.model, iso));
+     assert_eq!(f.pow(iso.scale, 3), iso.scale);
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:245:
+     let inv = inverse(f, iso);
+     assert!(compatible(f, &target.model, &source.model, inv));
+-    let images: Vec<_> = a.classes.iter().map(|d| isomorphism(source, target, iso, d)).collect();
++    let images: Vec<_> = a
++        .classes
++        .iter()
++        .map(|d| isomorphism(source, target, iso, d))
++        .collect();
+     let mut distinct = BTreeSet::new();
+     for (i, d) in a.classes.iter().enumerate() {
+         let k = key(&images[i]);
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:252:
+         assert!(distinct.insert(k.clone()));
+         assert_eq!(isomorphism(target, source, inv, &images[i]), *d);
+         if iso.matrix == IDENTITY && source.model == target.model {
+-            assert_eq!(images[i], if iso.scale == 1 { d.clone() } else { source.h.neg(d) });
++            assert_eq!(
++                images[i],
++                if iso.scale == 1 {
++                    d.clone()
++                } else {
++                    source.h.neg(d)
++                }
++            );
+         }
+         println!("ISO_IMAGE map={label} source={i} target={destination} divisor={k:?}");
+     }
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:270:
+     println!("ISO_RESULT map={label} matrix={:?} ordinate={} classes=21 bijective=pass addition_pairs=441 scalar_controls=441 independent_effective_pairs=24 exact_roundtrips=21 F3_fixed=21 scalar_labels_used_by_map=0", iso.matrix, iso.scale);
+ }
+ 
+-fn cross_chain(label: &str, original: &Chart<'_>, a: &Fixture, endpoints: (&Chart<'_>, &Chart<'_>), kernels: (&kernel::Kernel, &kernel::Kernel), iso: Iso) {
++fn cross_chain(
++    label: &str,
++    original: &Chart<'_>,
++    a: &Fixture,
++    endpoints: (&Chart<'_>, &Chart<'_>),
++    kernels: (&kernel::Kernel, &kernel::Kernel),
++    iso: Iso,
++) {
+     let (first_target, second_target) = endpoints;
+     let (first, dual) = kernels;
+-    let images: Vec<_> = a.classes.iter().map(|d| {
+-        let first_image = kernel::map(original, first_target, first, d);
+-        let middle = isomorphism(first_target, second_target, iso, &first_image);
+-        kernel::map(second_target, original, dual, &middle)
+-    }).collect();
++    let images: Vec<_> = a
++        .classes
++        .iter()
++        .map(|d| {
++            let first_image = kernel::map(original, first_target, first, d);
++            let middle = isomorphism(first_target, second_target, iso, &first_image);
++            kernel::map(second_target, original, dual, &middle)
++        })
++        .collect();
+     assert_eq!(images.iter().map(key).collect::<BTreeSet<_>>().len(), 21);
+     map_laws(original, a, original, &images);
+     let action = scalar_action(original, &a.classes, &images);
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:292:
+             plus2_equal += usize::from(*image == twice);
+             minus2_equal += usize::from(*image == original.h.neg(&twice));
+         }
+-        println!("CROSS_IMAGE map={label} source={i} divisor={:?}", key(image));
++        println!(
++            "CROSS_IMAGE map={label} source={i} divisor={:?}",
++            key(image)
++        );
+     }
+     assert_eq!(order7_points, 7);
+     println!("CROSS_RESULT map={label} actual_hops=3 classes=21 bijective=pass addition_pairs=441 full_rational_mod21={action} order7_mod7={} order7_points=7 equal_plus2={plus2_equal} equal_minus2={minus2_equal} scalar_labels_used_by_chain=0", action % 7);
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:308:
+     assert_eq!(f.pow(gamma, 3), f.neg(&gamma));
+     assert_ne!(f.pow(gamma, 3), gamma);
+     for e in [1, 2] {
+-        assert!(!compatible(f, &source.model, &target.model, Iso { matrix: IDENTITY, scale: e }));
++        assert!(!compatible(
++            f,
++            &source.model,
++            &target.model,
++            Iso {
++                matrix: IDENTITY,
++                scale: e
++            }
++        ));
+     }
+-    let iso = Iso { matrix: IDENTITY, scale: gamma };
++    let iso = Iso {
++        matrix: IDENTITY,
++        scale: gamma,
++    };
+     assert!(compatible(f, &source.model, &target.model, iso));
+     let inv = inverse(f, iso);
+     assert!(compatible(f, &target.model, &source.model, inv));
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:343:
+     for chart in &charts {
+         chart.controls();
+     }
+-    let fixtures: Vec<_> = LABELS.iter().zip(&charts).map(|(label, chart)| fixture(label, chart)).collect();
++    let fixtures: Vec<_> = LABELS
++        .iter()
++        .zip(&charts)
++        .map(|(label, chart)| fixture(label, chart))
++        .collect();
+     let matrices = projective_matrices(&f);
+     let mut routes = Vec::new();
+     for (i, source) in charts.iter().enumerate() {
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:350:
+         for (j, target) in charts.iter().enumerate() {
+-            let scales: Vec<_> = matrices.iter().map(|&m| coefficient_scale(&f, &source.model, &target.model, m)).collect();
++            let scales: Vec<_> = matrices
++                .iter()
++                .map(|&m| coefficient_scale(&f, &source.model, &target.model, m))
++                .collect();
+             println!("FULL_COEFFICIENT_CLASSIFICATION source={} target={} all24_scales_or_zero={scales:?}", LABELS[i], LABELS[j]);
+             for (&matrix, &scale) in matrices.iter().zip(&scales) {
+                 if scale == 1 {
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:360:
+                     }
+                 } else if scale == 2 {
+                     for e in [1, 2] {
+-                        assert!(!compatible(&f, &source.model, &target.model, Iso { matrix, scale: e }));
++                        assert!(!compatible(
++                            &f,
++                            &source.model,
++                            &target.model,
++                            Iso { matrix, scale: e }
++                        ));
+                     }
+                 }
+             }
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:367:
+-            assert!(!compatible(&f, &source.model, &target.model, Iso { matrix: [0; 4], scale: 1 }));
+-            assert!(!compatible(&f, &source.model, &target.model, Iso { matrix: IDENTITY, scale: 0 }));
++            assert!(!compatible(
++                &f,
++                &source.model,
++                &target.model,
++                Iso {
++                    matrix: [0; 4],
++                    scale: 1
++                }
++            ));
++            assert!(!compatible(
++                &f,
++                &source.model,
++                &target.model,
++                Iso {
++                    matrix: IDENTITY,
++                    scale: 0
++                }
++            ));
+         }
+     }
+     for i in 0..3 {
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:372:
+         for e in [1, 2] {
+-            assert!(routes.iter().any(|&(a, b, iso)| a == i && b == i && iso.matrix == IDENTITY && iso.scale == e));
++            assert!(routes
++                .iter()
++                .any(|&(a, b, iso)| a == i && b == i && iso.matrix == IDENTITY && iso.scale == e));
+         }
+     }
+     for e in [1, 2] {
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:377:
+-        assert!(routes.iter().any(|&(a, b, iso)| a == 0 && b == 0 && iso.matrix == INVOLUTION && iso.scale == e));
++        assert!(routes
++            .iter()
++            .any(|&(a, b, iso)| a == 0 && b == 0 && iso.matrix == INVOLUTION && iso.scale == e));
+     }
+     let first0 = kernel::Kernel::new(&f, &MODELS[0], G0.map(|p| p.to_vec())).unwrap();
+     let first2 = kernel::Kernel::new(&f, &MODELS[0], G2.map(|p| p.to_vec())).unwrap();
+Diff in /dev/shm/ct23-model-isomorphism-first-A/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_a.rs:383:
+     let mut cross_count = 0;
+     for &(i, j, iso) in &routes {
+         if (i == 1 && j == 2) || (i == 2 && j == 1) {
+-            let (first, dual) = if i == 1 { (&first0, &dual2) } else { (&first2, &dual0) };
+-            let label = format!("C_via_{}_iso_{}_rawdual_M{:?}_e{}", LABELS[i], LABELS[j], iso.matrix, iso.scale);
+-            cross_chain(&label, &charts[0], &fixtures[0], (&charts[i], &charts[j]), (first, dual), iso);
++            let (first, dual) = if i == 1 {
++                (&first0, &dual2)
++            } else {
++                (&first2, &dual0)
++            };
++            let label = format!(
++                "C_via_{}_iso_{}_rawdual_M{:?}_e{}",
++                LABELS[i], LABELS[j], iso.matrix, iso.scale
++            );
++            cross_chain(
++                &label,
++                &charts[0],
++                &fixtures[0],
++                (&charts[i], &charts[j]),
++                (first, dual),
++                iso,
++            );
+             cross_count += 1;
+         }
+     }

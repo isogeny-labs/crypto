@@ -1,0 +1,21 @@
+error[E0603]: struct `PolyRing` is private
+  --> examples/../src/cryptanalysis/zero_dim_la.rs:55:27
+   |
+55 | use super::gaudry_cubic::{PolyRing, UPoly};
+   |                           ^^^^^^^^ private struct
+   |
+note: the struct `PolyRing` is defined here
+  --> src/cryptanalysis/gaudry_cubic.rs:709:0
+
+error[E0603]: struct `UPoly` is private
+  --> examples/../src/cryptanalysis/zero_dim_la.rs:55:37
+   |
+55 | use super::gaudry_cubic::{PolyRing, UPoly};
+   |                                     ^^^^^ private struct
+   |
+note: the struct `UPoly` is defined here
+  --> src/cryptanalysis/gaudry_cubic.rs:700:0
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0603`.

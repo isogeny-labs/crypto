@@ -1,0 +1,97 @@
+{
+  "schema": "native-cpu-scoped-prelaunch-review/v1",
+  "review_id": "PRELAUNCH-REVIEW-14",
+  "created_utc": "2026-11-23T14:40:23.499Z",
+  "repository": "isogeny-labs/crypto",
+  "pr": 4996,
+  "scope": "Final closure of the manifest,freeze/publication/readback and local checkpoint gates remaining after review13. Same-root-team source/artifact consistency review. No new optional control,build,test,solver,Native/OpenSSL replay,archive extraction or authenticated execution review.",
+  "disposition": {
+    "remaining_administrative_gates": "Closed within the checked snapshot and local record-consistency scope.",
+    "readiness": "Ready for the single frozen main attempt using the exact pinned main-command.json,provided pins remain unchanged at invocation and the supervisor marker/output root remain absent.",
+    "new_discrepancies": [],
+    "scientific_outcome": "No main execution or360-cell result is accepted by this prelaunch review.",
+    "standing": "Authenticated independent execution and signed PCCstanding remain unestablished. This readiness record is neither an execution attestation nor a change to prior review limitations."
+  },
+  "binding": {
+    "source_preparation_commit": "b4997f9ef62a8d7c7fcfd19c85e49eb5333246a3",
+    "frozen_packet_commit": "51ac3d745a0a7512ef3622f87fa536ae165c8cec",
+    "frozen_packet_tree": "889c2289e7bd6e78381df40dae707aaeb9f17ea6",
+    "frozen_file": "research/hashed_ecdl_cpu_compare_20261123/protocol.frozen.json",
+    "protocol_file_sha256": "bc2f72e7ffe7bf1fb271fe15c38cae15e3f34d28c0c0f8e79dc5335835465e0e",
+    "protocol_canonical_sha256": "5bcd31006a76336912ac3687a371d4bc3f291feeb1cb4058d07e0f2f0645d625",
+    "freeze": {
+      "status": "frozen",
+      "protocol_sha256": "5bcd31006a76336912ac3687a371d4bc3f291feeb1cb4058d07e0f2f0645d625",
+      "commit": "b4997f9ef62a8d7c7fcfd19c85e49eb5333246a3",
+      "frozen_at": "2026-11-23T14:30:46Z",
+      "filed_before_affected_data": true
+    },
+    "main_manifest_sha256": "65a179354eed5095e09a0dfd9eac578164127206e99c55c9f27551ff750a737a",
+    "main_manifest_entries": 295,
+    "pre_call_created_utc": "2026-11-23T14:30:46.853Z"
+  },
+  "evidence_manifest": {
+    "path": "prelaunch-evidence-14.json",
+    "bytes": 8345,
+    "sha256": "36282ed241269727132aea553a2dc3fa9ede51f0da68a8fcc17c3dfe11b8e05d",
+    "entries": 29
+  },
+  "gate_closure": [
+    {
+      "id": "G14-1",
+      "gate": "Exact main source/binary/guard/config/host/runtime manifest",
+      "status": "closed_within_scope",
+      "evidence": "Exact committed295-entry manifest equals local pre-call manifest. Reviewer expanded every entry and verified currentSHA256,including108parent+108candidate inputs,finalV2qualifiers,worker binaries/verifier/checker,source/wrapper/guard/supervisor/finalizer,host/runtime/tool identities,config/command and actualfrozenprotocol. main-pre-call pins this manifest hash and0executed calls. After-checkpoint log contains295OKlines."
+    },
+    {
+      "id": "G14-2",
+      "gate": "Freeze and committed publication readback",
+      "status": "closed_within_scope",
+      "evidence": "Frozen packet51ac/tree889 is the fetched clean checkout; directparent is source/controlb499. All9freeze publication filebytes match exactGitobjects;7-entrySHA256SUMS-main-freeze covers its declaredpayload. Canonical hash independently recalculated per captured metadata contract: sorted compactUTF8JSON with freeze block excluded. Result5bcd3100matches freeze/pre-call/publication/checkpointrecords. No schema checker was rerun."
+    },
+    {
+      "id": "G14-3",
+      "gate": "Chronology and preservation",
+      "status": "closed_within_scope",
+      "evidence": "Source/controlb499 precedes frozen51ac. Freeze14:30:46UTC,zero-callpre-call14:30:46.853UTC,andpublishedcommit14:32:59UTC precede the checkpoint receipts14:36:20.963/14:37:15.664UTC. At reviewer check main root and supervisor start marker are absent. Both reviewed draftfiles and reviews10..13remainpreserved; newacceptedprotocol has distinctfilename. Journal/ledger at51ac retain exactb499prefix plus suppliedappend; PCC34f63bis an unsignedstatement with emptyproofs."
+    },
+    {
+      "id": "G14-4",
+      "gate": "Local checkpoint/input coverage",
+      "status": "closed_as_receipt_mapping_and_archive_identity_review",
+      "evidence": "Archive exactsize28,366,016bytes andSHA256d00ef84b21ba48ff61631a162da529d804b4294082411f4c95a7b641563d373cmatchreceipt. Existing native readback log contains302OKpayloadlines. Mapping has300unique source/payloadentries:all295main inputs plus5declaredextras; review compared each current source size/hash to mapping. Paths are relative,unique and contain no..traversal. INPUT-MAPPINGandRESUMEadd2payloadfiles;PAYLOAD.sha256is additionalmanifest. Reviewer did not recreate or re-extract archive,or repeat302payloadverification."
+    }
+  ],
+  "checkpoint": {
+    "archive": "/tmp/ecdlp-main-prerun-20261123.tar.gz",
+    "bytes": 28366016,
+    "sha256": "d00ef84b21ba48ff61631a162da529d804b4294082411f4c95a7b641563d373c",
+    "receipt_created_utc": "2026-11-23T14:37:15.664Z",
+    "payload_files": 302,
+    "additional_manifest_files": 1,
+    "mapping_entries": 300,
+    "all295main_inputs_covered": true,
+    "extra_sources": [
+      "main-pre-call.json",
+      "main-execution-before.sha256",
+      "main-freeze-publication-readback.json",
+      "PCC-20261123-34f63b.json",
+      "existing independent/openssl_point_check.c"
+    ],
+    "resume_scope": "External tool/runtime bytes are inspection material and are not automatically restored tosystem paths. Installed toolchain,full dependency caches andgeneratedtargetdirectories remain outsidecapsule and separately retained. No resume/retry of an interrupted main is licensed by this archive."
+  },
+  "execution_contract_retained": {
+    "census": "360calls,12publictargets,3arms,36warmups/324measured,n9perarm/target; nopreflight/historical/syntheticpooling.",
+    "attempts": "One new supervised main attempt; marker protects againstre-execution. No retries/resume,silentcensusreduction or concurrentbuilds/tests.",
+    "limits": "Separately enforced1500/120/120s phases plus10sgraceeach;1800nominalplanning envelope,not hardoverallwatchdog.120sworker/60sNative replay,worker-only4GiBvirtual limit,sampled15,032,385,536-bytewholecgroupguard.",
+    "finalization": "Alwaysattempt finalization afterdriverterminal; preserve refusals/timeouts and originaldrivercode. Accept later result only with supervisor/analysis/audit/posthash disposition together.",
+    "scientific_scope": "Exact recovery/certificate/counter/pointcontrol census anddescriptiveL0clocks only; noS/rho/rankedtiming/exponent/novelty/full84-case or generalproof inference."
+  },
+  "prior_review_status": "Reviews10..13remain immutable historical scopes. New source-custody reproduction does not backdate originalV2receipts; successful preflight/canaries do not establish RAM/virtual enforcement or authenticated execution.",
+  "open_gates": "No remaining prelaunch administrative discrepancy found in this requested scope. Actualexecution,terminaloutcomevalidation,rawresultpublication andany laterindependent/signedexecutionstanding are futurework.",
+  "not_performed": [
+    "No build,test,solver,Native/OpenSSL replay or metadata checker invocation",
+    "No new control,archive generation,extraction or repeatedpayloadcheck",
+    "No cloud/S3,secretread,sourceedit or old-record mutation"
+  ]
+}

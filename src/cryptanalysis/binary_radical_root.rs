@@ -1246,6 +1246,62 @@ mod tests {
             assert!(yes > 20 && no > 20, "n={n}: yes={yes} no={no}");
         }
     }
+    // Deterministic rational-point sums give genuine positive controls without
+    // changing the original seeded stream. Counts here are correctness coverage,
+    // not a relation-yield estimate. Require distinct inputs/targets outside V.
+    fn geometric_positive_controls(span: &[u64], b: u64, gf: &Gf2) -> Vec<([u64; 3], u64)> {
+        use crate::cryptanalysis::ic_boundary::ArtinSchreier;
+        use crate::cryptanalysis::koblitz_ic_leads::lambda::add;
+        use std::collections::BTreeSet;
+        let ash = ArtinSchreier::new(gf);
+        let on_curve =
+            |(x, y): (u64, u64)| gf.sqr(y) ^ gf.mul(x, y) == gf.mul(gf.sqr(x), x) ^ gf.sqr(x) ^ b;
+        let mut points = vec![];
+        for &x in span.iter().filter(|&&x| x != 0) {
+            let rhs = x ^ 1 ^ gf.mul(b, gf.sqr(gf.inv(x)));
+            if let Some(z) = ash.solve(rhs) {
+                let y = gf.mul(x, z);
+                assert!(on_curve((x, y)) && on_curve((x, y ^ x)));
+                points.push((x, y));
+                points.push((x, y ^ x));
+            }
+        }
+        let mut seen = BTreeSet::new();
+        let mut out = vec![];
+        for i in 0..points.len() {
+            for j in i + 1..points.len() {
+                for k in j + 1..points.len() {
+                    let (p, q, r) = (points[i], points[j], points[k]);
+                    if p.0 == q.0 || p.0 == r.0 || q.0 == r.0 {
+                        continue;
+                    }
+                    let sum = add(gf, 1, add(gf, 1, Some(p), Some(q)), Some(r));
+                    if let Some(t) = sum {
+                        assert!(on_curve(t));
+                        if span.contains(&t.0) || !seen.insert(t.0) {
+                            continue;
+                        }
+                        assert_eq!(
+                            crate::cryptanalysis::semaev_decomp::eval_s4_general(
+                                p.0, q.0, r.0, t.0, b, gf
+                            ),
+                            0
+                        );
+                        out.push(([p.0, q.0, r.0], t.0));
+                        if out.len() == 12 {
+                            return out;
+                        }
+                    }
+                }
+            }
+        }
+        panic!(
+            "not enough distinct nondegenerate geometric controls: n={} count={}",
+            gf.n,
+            out.len()
+        );
+    }
+
     #[test]
     fn factored_subspace_oracle_decides_as_subspace_oracle() {
         use crate::cryptanalysis::semaev_decomp::{eval_s4_general, SubspaceOracle};
@@ -1270,7 +1326,7 @@ mod tests {
                 let fac = FactoredSubspaceOracle::new(&basis, b, &gf).unwrap();
                 let (mut yes, mut no) = (0, 0);
                 for i in 0..200 {
-                    // Plant targets as x of an S₄ root over the base, half the time.
+                    // Attempt a bounded S₄-root scan over the base, half the time.
                     let xr = if i % 2 == 0 {
                         let pick = |rng: &mut StdRng| base.span[rng.gen_range(0..base.span.len())];
                         let (x1, x2, x3) = (pick(&mut rng), pick(&mut rng), pick(&mut rng));
@@ -1300,6 +1356,18 @@ mod tests {
                         assert_eq!(pairs, k * (k + 1) / 2);
                         no += 1;
                     }
+                }
+                // The bounded scan above can miss every rational root at larger n.
+                // Add genuine positives after all original cases and RNG draws.
+                for (xs, xr) in geometric_positive_controls(&base.span, b, &gf) {
+                    assert_eq!(eval_s4_general(xs[0], xs[1], xs[2], xr, b, &gf), 0);
+                    let (want, _) = base.decompose(xr, &gf);
+                    let (got, _) = fac.decompose(xr, &gf);
+                    assert!(want.is_some(), "geometric control missing in original oracle");
+                    let [a, c, d] = got.expect("geometric control missing in factored oracle");
+                    assert!(fac.contains(a) && fac.contains(c) && fac.contains(d));
+                    assert_eq!(eval_s4_general(a, c, d, xr, b, &gf), 0);
+                    yes += 1;
                 }
                 assert!(yes > 10 && no > 10, "n={n}: yes={yes} no={no}");
             }

@@ -1,0 +1,39 @@
+name: Rootfind Round 132 source-exact low-degree roots A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-round132-direct-low-degree-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round132/**
+      - .github/workflows/rootfind_round132.yml
+permissions:
+  contents: read
+jobs:
+  native-rust-a-b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round132
+      - name: Build source-exact baseline and candidate modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=dfca7d664ee445e8d9fabbd9b9490209591d968a
+          git fetch --no-tags --depth=1 origin "$BASE"
+          mkdir -p /tmp/rootfind_round132
+          git show "$BASE:src/cryptanalysis/ecbench/isogeny.rs" > /tmp/rootfind_round132/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round132/optimized.rs
+          cat research/rootfind_round132/bench_helper.rs >> /tmp/rootfind_round132/baseline.rs
+          cat research/rootfind_round132/bench_helper.rs >> /tmp/rootfind_round132/optimized.rs
+          cp research/rootfind_round132/source_exact_main.rs /tmp/rootfind_round132/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round132/main.rs -o /tmp/rootfind_round132/bench
+      - name: Independent oracles and 13-trial alternating source-exact timing
+        run: /tmp/rootfind_round132/bench
