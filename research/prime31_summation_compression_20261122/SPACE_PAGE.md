@@ -37,3 +37,9 @@ The latest[original-root run](https://github.com/isogeny-labs/crypto/actions/run
 For an actual pair-spectrum sizeD=Theta(B^2), construct a target-independent exact index with near-linear setup inD and empty-inclusive query costD^theta for a fixedtheta<1/2. Include rational witness recovery, zero subtotals, failed targets, storage, signed output and any certificate cost. The rank-three value representation identifies the structure to exploit; it does not establish this bound. [pcc:unverified]
 
 The existing research task continues the same objective, preserves adverse results and advances one concrete mathematical or correctness gate at a time. No asymptotic relation-solving speedup is asserted at this checkpoint. [pcc:unverified]
+
+## Later reviewed annexes
+
+PR #4979 at head1a9f3e3 contains the related double-resultant and multiset count. The independent integration review in PR #4977 removes cancellation duplicates, giving cap (B^4+5B^2)/3, or309442 atB31. The leaf-norm identity R_M J_M=kappa C_M^2 is exact; a regular F7 example rejects automatic uniform D2 folding. Both are written, unverified results; neither provides a faster query. [pcc:unverified]
+
+The component objective is an asymptotic reduction from the quasi-linear-in-D exact query baseline with comparable charged setup and output. The stronger fixed exponenttheta<1/2 belongs to a separate conditional pipeline model. Eighteen lane claims remain unverified. See the annexes, state and named problem in PR #4977. [pcc:unverified]

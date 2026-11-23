@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Exact Prime31 pair-spectrum queries](prime31-exact-pair-spectrum-query.md) | open | sublinear empty-inclusive solving on the actual Dickson-derived pair spectrum; original-root native gate | exact component cost below the named quasi-linear-in-D baseline with charged setup/output; separate stronger pipeline exponent and original-source validation |
 | [Shared-S3 Prime31 validation and measurement access](shared-s3-prime31-execution-gates.md) | open | full-library compiler termination, authenticated dispatch, readable canonical protocol and complete production accounting | source-bound full-library pass; reviewed adapter; frozen protocol and live supported-runner admission |
 | [Quartic matched-rho overpricing](quartic-matched-rho-overpricing.md) | open; review requested from quartic-row owners | trusting the IC/rho gap on existing plane-quartic IC rows (may be ~1.73x too favourable to IC) | an executed negation-walk and `<rho>`-class-walk rho on the same Jacobians, under the validation gate, then a row correction |
 | [Curve25519 target-conditioned section coefficients](curve25519-section-coefficient-selection.md) | investigating | converting structured membership into exponent-moving discovery | biased coefficient constructor with complete attempt/yield/cold-cost and original-row bounds; native quotient query and actual-object proofs |

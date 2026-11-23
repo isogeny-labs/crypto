@@ -1,0 +1,73 @@
+{
+  "iteration": 10,
+  "parent_state": "../STATE.json",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/4977",
+  "mathematical_status": "Reviewed written derivation; no proved faster relation solver",
+  "claims": [
+    {
+      "id": "PCC-20261123-f0209c",
+      "returncode": 2,
+      "output": {
+        "claim_id": "PCC-20261123-f0209c",
+        "claim_sha256": "56b70ff371b9a8069542e9ef6865a5a7e8de80e99efd551fc7da7aba97a6f4a7",
+        "standing": "unverified",
+        "verdicts": []
+      },
+      "stderr": ""
+    },
+    {
+      "id": "PCC-20261123-391a91",
+      "returncode": 2,
+      "output": {
+        "claim_id": "PCC-20261123-391a91",
+        "claim_sha256": "e8dd85a658529f284f44d25169fd8cfbb02209ad33b5e0ce6314c3c305286368",
+        "standing": "unverified",
+        "verdicts": []
+      },
+      "stderr": ""
+    }
+  ],
+  "next_step": "Exploit the actual leaf norm R_M J_M=kappa C_M^2 without a quadratic-in-D target table. Seek an exact empty-inclusive query with comparable charged setup/output. Fixed theta<1 is a sufficient component exponent target versus the quasi-linear-in-D baseline; theta<1/2 is the stronger conditional pipeline target when D=Theta(B^2), setup is quasi-linear-in-D and the declared uniform/full-row model applies. Logarithmic gains also count at their actual component scope. No such algorithm is established.",
+  "source_input_hashes": {
+    "S3_PENCIL_INDEPENDENT_REVIEW.md": "51556612f43c8beec330ea24328bb1f8b45a5f06d4b669a197d90bdd1688a0b3",
+    "S3_PENCIL_CONTRACTION.md": "9e9e64e76208202d05957794e7bd9371f9e427b2a5dded9f88aceb3ca40588ed",
+    "FAMILY_SIZE_INDEPENDENT_REVIEW.md": "d02eff6a0f5582dc9e190ee779e3688f116d4344d7f614c3707f3c8692d64539",
+    "ROOT_REVIEW.md": "1a5c448ea822b29f0258fff0fcdd3074eacd5c24d05855716d047ab9ded6c99e",
+    "FAMILY_SIZE_CORRECTION.md": "841704b12548a1ab4c2e35062cff9b48a8a9229dd83d2e7b3426a629501c996d"
+  },
+  "source_commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+  "followup_claims": [
+    {
+      "id": "PCC-20261123-19eed1",
+      "returncode": 2,
+      "output": {
+        "claim_id": "PCC-20261123-19eed1",
+        "claim_sha256": "89baae6468e3e7cfa74112699ee3da9d65771f345d53db1feefdbedd2eddadf9",
+        "standing": "unverified",
+        "verdicts": []
+      },
+      "stderr": ""
+    },
+    {
+      "id": "PCC-20261123-ad740c",
+      "returncode": 2,
+      "output": {
+        "claim_id": "PCC-20261123-ad740c",
+        "claim_sha256": "aa4e610f17c7067709684009b8ae157572338bf84aa9d910c4e24f8cd8aac3bb",
+        "standing": "unverified",
+        "verdicts": []
+      },
+      "stderr": ""
+    }
+  ],
+  "parallel_result": {
+    "pull_request": 4979,
+    "head": "1a9f3e3c6966258f1a94068d95ec3f3e337b7196",
+    "observed_state": "open draft, unmerged",
+    "source_state": "https://github.com/isogeny-labs/crypto/blob/1a9f3e3c6966258f1a94068d95ec3f3e337b7196/research/prime31_summation_compression_20261122/iteration10/STATE.json",
+    "review": "iteration10/parallel_review/REVIEW.md",
+    "metadata_collision_resolution": "Only our unfrozen iteration10/STATE.json renamed to PENCIL_FAMILY_STATE.json; both source sets preserved",
+    "native_validation": "not established; producer symbolic checks are provenance only"
+  },
+  "problem_record": "../../problems/prime31-exact-pair-spectrum-query.md"
+}

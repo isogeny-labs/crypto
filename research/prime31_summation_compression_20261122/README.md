@@ -27,3 +27,9 @@ For the actual Dickson-derived pair spectrumX, seek an index for zero components
 ## Ongoing record
 
 The existing research task remains enabled on its unchanged schedule. The [research Space](https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84) was initially saved and read back; its latest update is unconfirmed because reconciliation reads did not complete. [The intended content](SPACE_PAGE.md) and [sync status](iteration10/SPACE_SYNC_STATUS.json) are retained here. Do not recreate the Page or replay an uncertain write.
+
+## Source-bound follow-up annexes
+
+The [parallel-result review](iteration10/parallel_review/REVIEW.md) reconciles PR #4979 and gives the cancellation-reduced support cap (B^4+5B^2)/3, including repeated leaves. The [leaf-norm review](iteration10/quotient_followup/DICKSON_PAIR_NORM_REVIEW.md) derives R_M J_M=kappa C_M^2 and exhibits a regular F7 fibre whose pair support lacks a uniform normalized D2 tower. These are independently checked written results with unverified PCC standing, claims19eed1 andad740c. [pcc:unverified]
+
+A component exponent below the current quasi-linear-in-D query cost is distinct from the stronger conditional pipeline target theta<1/2. Exact criteria are in [the named problem](../../problems/prime31-exact-pair-spectrum-query.md). Our mutable iteration10 state is [PENCIL_FAMILY_STATE.json](iteration10/PENCIL_FAMILY_STATE.json), leaving the sibling STATE path available. The core report covers sixteen claims; current lane standing includes eighteen. [pcc:unverified]
