@@ -1,6 +1,7 @@
 name: Prime31 public RR9 B8 Macaulay degree-six control (Rust 1.100)
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay_d6.rs'
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   degree-six-public-only:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

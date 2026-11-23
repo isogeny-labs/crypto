@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h1a8253a8e9a2",
+  "label": "ic_tableb_binary_sg_20261120 B27: stride-generator targets on the binary wwalk incumbent",
+  "spec_id": "ECS1hd26cd4d7627e",
+  "spec_sha256": "d26cd4d7627e5f8a156d0b969534f8e98cacb96bc68292b70539ee62e5a0f15d",
+  "env_class_id": "ECBENV3hdfc0a52a39cc",
+  "host_sha256": "27b83c20b2e7e5980718d819fed10a6f0941008277d5fa92eb7314bb19530c75",
+  "plan_sha256": "bb86c8ed01215138c7d20c102a881c55211966e912c929b2735d8f2eeb85d286",
+  "binary_sha256": "93139f8e16fc25278c073ccba388d2b10f24574c0a2f3959e4767bf8126aa41d",
+  "git_commit": "d2e129ceac40100b0d75b632a19c5f8a0da7b4a8",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1795148493669,
+  "finished_unix_ms": 1795148516162,
+  "status": "complete",
+  "executions_planned": 720,
+  "records_written": 720,
+  "records_sha256": "ce852e9278cee19e0e1e4875ae6cada7353d2b1c44cc584da209014490ac423f",
+  "status_counts": {
+    "verified": 720
+  },
+  "last_seq": 719
+}
