@@ -15,9 +15,7 @@
 //! cases.txt lines: `id p M t0 t1 t2 u0 u1 u2` (decimal).  Each case is solved
 //! `copies` times (to match program B's five-case batch); all copies must agree.
 //! Output: one JSON object per case on stdout.
-use crypto_lib::cryptanalysis::f4_fp::{
-    normalise, solve_visit, F4Options, Ordering, Poly,
-};
+use crypto_lib::cryptanalysis::f4_fp::{normalise, solve_visit, F4Options, Ordering, Poly};
 use std::time::{Duration, Instant};
 
 fn md(x: i128, p: u64) -> u64 {
@@ -90,7 +88,10 @@ fn domain_poly(p: u64, m: u64, var: usize) -> Poly {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    assert!(args.len() == 5, "usage: <ideal|visit> <cases> <copies> <budget_s>");
+    assert!(
+        args.len() == 5,
+        "usage: <ideal|visit> <cases> <copies> <budget_s>"
+    );
     let mode = args[1].clone();
     assert!(mode == "ideal" || mode == "visit");
     let text = std::fs::read_to_string(&args[2]).expect("cases");
@@ -126,8 +127,7 @@ fn main() {
                     Ordering::Grevlex
                 };
                 let sys: Vec<Poly> = sys.iter().map(|f| normalise(f, p, ord)).collect();
-                let opts = F4Options::new(ord, dmax)
-                    .with_budget(Duration::from_secs_f64(budget));
+                let opts = F4Options::new(ord, dmax).with_budget(Duration::from_secs_f64(budget));
                 // DEVIATION 2 (PROTOCOL.md): `solve` finds univariate roots by scanning all
                 // of F_p (O(p) at p ~ 2^32); `solve_visit` with no domains is the same F4
                 // with Frobenius root extraction. The domain is imposed only by D(x),D(y),D(z).
@@ -139,7 +139,8 @@ fn main() {
                 if !r.complete || r.timed_out {
                     complete = false;
                 }
-                ops = r.field_ops + r.root_field_multiplications
+                ops = r.field_ops
+                    + r.root_field_multiplications
                     + r.domain_root_field_multiplications;
                 deg = r.solving_degree;
                 rows = r.max_rows;
@@ -158,7 +159,8 @@ fn main() {
                 if !r.complete || r.timed_out {
                     complete = false;
                 }
-                ops = r.field_ops + r.root_field_multiplications
+                ops = r.field_ops
+                    + r.root_field_multiplications
                     + r.domain_root_field_multiplications;
                 deg = r.solving_degree;
                 rows = r.max_rows;
