@@ -2,10 +2,13 @@
 
 Date 2026-11-23. Code: `src/cryptanalysis/large_prime_graph.rs`,
 `src/cryptanalysis/large_prime_graph/eval.rs`, `examples/lp_graph_eval.rs`,
-`tests/large_prime_graph.rs`. Catalog: PR #4917 ("Graph algorithms and
+`tests/large_prime_graph.rs`; follow-up (2026-11-23): `large_prime_graph/block_wiedemann.rs`,
+`examples/block_wiedemann_eval.rs`, `examples/lp_graph_collect.rs`,
+`tests/block_wiedemann.rs`. Catalog: PR #4917 ("Graph algorithms and
 asymptotic costs for ECDLP index calculus"), section 8.
 
-**Standing: implementation with exact cross-checks on synthetic streams.
+**Standing: implementation with exact cross-checks on synthetic streams and
+on real `ecbench_large_prime` relation streams.
 No ECDLP speed claim, no benchmark row, no leaderboard change.** Wall times
 below are single local runs (4-core cloud VM, release build) for
 orientation only.
@@ -19,7 +22,7 @@ orientation only.
 | 3. BFS vs low-stretch trees | **new** `bfs_forest`, `low_stretch_forest` (AKPW-style heuristic), `fundamental_cycle_length` | `large_prime_graph.rs` |
 | 4. Matching, DM and width | **new** `hopcroft_karp`, `dulmage_mendelsohn` (coarse + SCC fine blocks), `minimum_degree` (fill, width = treewidth upper bound), `core_numbers` | `large_prime_graph.rs` |
 | 5. Hypergraph partitioning for SpMV | **new** `fm_partition` (recursive FM bisection, column-net model), `connectivity_minus_one` | `large_prime_graph.rs` |
-| 6. Krylov block and generator tuning | **not done**: crypto has only scalar Wiedemann (`pq_wiedemann`); a block Wiedemann / matrix Berlekamp–Massey solver is a separate implementation task | — |
+| 6. Krylov block and generator tuning | **new** block Wiedemann: block Krylov sequence, σ-basis matrix generator, verified kernel vectors, bordered `A x = b` with preconditioned retry; block-size schedule measured below | `large_prime_graph/block_wiedemann.rs` |
 
 Not integrated, by design: the k=3 gain-forest harvester and coset-filtered
 MITM (PR #4905 owns them); catalog families with no role in the LP pipeline
@@ -45,14 +48,16 @@ which runs the `debug_assert` FM cut check). The tests include:
 - FM never worse than its contiguous start at k = 2 and keeps balance;
 - the evaluator replays **every** relation from both filters against the input.
 
-**Build caveat.** `main` at `d45ac8de4` and at `021cd64a4` does not compile:
-`src/cryptanalysis/ecbench/spec.rs` (test module) and
-`src/cryptanalysis/ic_framework/mod.rs:561` have unclosed delimiters from a
-merge. The tests above were run in a standalone crate that compiles the real
-`large_prime_filter.rs`, `large_prime_filter_mst.rs`, `large_prime_filter/`,
-`jv_large_prime_rank_bound.rs` and the new files unchanged, with a no-op
-`jv_bitops` (operation counters only). CI on this PR cannot pass until
-`main` is repaired.
+**Build status.** When #4929 landed, `main` did not compile (unclosed
+delimiters in `ecbench/spec.rs` and `ic_framework/mod.rs:561`), so its tests
+were run in a standalone crate. After the repair (#5009, `main` at
+`7d61e3b45`) the real crate's library compiles and, in the real crate,
+`tests/large_prime_graph.rs` passes 13/13 and `tests/block_wiedemann.rs` 5/5
+(`cargo test --release`). That run stubbed `src/bin/hecx.rs` locally,
+because that binary still has unclosed delimiters on `main` (lines 160, 327,
+597, 766) and cargo builds every binary for integration tests; the stub was
+not committed. The #4929 tests and examples imported `crypto::`, but this
+crate's library is `crypto_lib`; the follow-up fixes the imports.
 
 ## Measurements (frozen synthetic streams)
 
@@ -101,14 +106,80 @@ Observations (each limited to these synthetic streams):
    `t = o(√N / log N)` regime in which the catalog's `O(N t² log² N)` route
    would beat `O(NZ + N²)`; at R = 32000 elimination hit the 5 M fill cap.
 
+## Real relation streams (`ecbench_large_prime`)
+
+`examples/lp_graph_collect` runs the binary-curve collector
+(`ecbench_large_prime::solve_with_options`, two large primes, 4 summands,
+target `[7]G`) with the new opt-in `SolveOptions::capture_relations`, which
+copies the exact `PartialRelation` batch handed to `filter_large_primes`, and
+evaluates it. Generic curves are `ic_boundary::random_binary_instance(n,
+20261123, 16)`; Koblitz curves are `koblitz_instance_best(n)`, run with the
+plain (`filter`) and the signed-Frobenius-orbit (`orbit`) large-prime graph.
+Every run recovered the logarithm 7. Records: `results_real/`.
+
+| stream | R | C | rank / left nullity | balanced / unbalanced cycles | pivot out | MST | L BFS / low-stretch | residual N | min-degree width |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| generic n=16 | 20000 | 57 | 57 / 19943 | 9153 / 3951 | 19933 | refused | 47615 / 47615 | 13 | 11 |
+| generic n=20 | 60000 | 228 | 228 / 59772 | 26816 / 26813 | 59771 | refused | 193194 / 241716 | 14 | 13 |
+| generic n=24 | 120000 | 965 | 965 / 119035 | 55828 / 55228 | 119035 | refused | 494523 / 494523 | 33 | 32 |
+| Koblitz n=17 plain | 29726 | 57 | 57 / 29669 | 6873 / 20294 | 29669 | refused | 80587 / 80587 | 6 | 5 |
+| Koblitz n=17 orbit | 29757 | 54 | 54 / 29703 | 4891 / 22285 | 29703 | refused | 80559 / 80559 | 6 | 5 |
+| Koblitz n=19 plain | 60000 | 231 | 231 / 59769 | 25719 / 25741 | 59769 | refused | 180413 / 214813 | 18 | 17 |
+| Koblitz n=19 orbit | 60000 | 228 | 228 / 59772 | 20331 / 31122 | 59772 | refused | 189415 / 223297 | 18 | 17 |
+| Koblitz n=23 plain | 120000 | 982 | 982 / 119018 | 56262 / 56359 | 119018 | refused | 499207 / 499207 | 27 | 26 |
+| Koblitz n=23 orbit | 120000 | 966 | 966 / 119034 | 12886 / 99745 | 119034 | refused | 493361 / 493361 | 27 | 26 |
+
+Observations (these instances; trial caps far above what the solve needed):
+
+1. **Exact DSU = existing filter on real data.** Every stream has LP arity
+   ≤ 2, and on every one the DSU left nullity equals the pivot filter's
+   complete-relation count, except generic n=16 and n=20, where the filter
+   output is 10 and 1 lower: exactly the duplicate relations it removes
+   before elimination (`report.duplicate_relations`; no fill rejections). Dense rank agreed where computed
+   (n=16, 17). DSU time 1.2–6.5 ms against 33–259 ms for the filter.
+2. **Real LP blocks are tiny and dense:** C = 54–982 columns for 20k–120k
+   rows, so the LP graph is far past its cycle threshold. With `±1`
+   coefficients about half of all cycles are balanced; the signed-Frobenius
+   orbit graph makes balanced cycles rarer (12886 vs 56262 at n=23), the
+   cyclic-gain effect measured in workspace note `graph-theory-ic-20261121`.
+3. **MST filter refuses every real stream** (column degree above its 64
+   limit, and above 4096 rows). **Low-stretch trees tie or lose** against BFS
+   (up to 25 % worse at n=20). **Residual matrices are N = 6–33 columns and
+   dense** (min-degree width N−1, FM equal to contiguous): partitioning and the
+   treewidth route have nothing to act on at these sizes.
+
+## Block Wiedemann schedule (`block_wiedemann/`)
+
+`examples/block_wiedemann_eval --dim N --weight 6 --dead 4 --seed 1`, modulus
+`2^61−1`, `m = n = b`; every run found a verified kernel vector with the first
+seed.
+
+| N | b | products (sequence) | sequential rounds 2N/b | projection mults | generator mults | generator degree | wall |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2000 | 1 | 6000 (4008) | 4008 | 8.0 M | 16.0 M | 1991 | 0.77 s |
+| 2000 | 4 | 4531 (4032) | 1008 | 32.3 M | 64.5 M | 498 | 1.22 s |
+| 2000 | 16 | 4253 (4128) | 258 | 132.1 M | 266.0 M | 124 | 3.76 s |
+| 8000 | 1 | 23979 (16008) | 16008 | 128.1 M | 255.2 M | 7970 | 11.2 s |
+| 8000 | 4 | 18026 (16032) | 4008 | 513.0 M | 1023.2 M | 1993 | 20.1 s |
+| 8000 | 16 | 16627 (16128) | 1008 | 2064.4 M | 4125.0 M | 498 | 62.1 s |
+
+As the catalog states, the block size changes scheduling, not total product
+work: sequence products stay ≈ 2N for every `b`, while the number of
+sequential rounds falls as `2N/b`. Projection (`O(N² b)`) and this quadratic
+σ-basis grow linearly in `b`, so on one thread wall time *rises* with `b`;
+the gain needs the `b` products of a round to run in parallel (or a fast
+`Õ(N b^{ω−1})` generator, not implemented). Horner reconstruction and
+kernel search add `≈ N/b` products, the difference between the two product
+columns.
+
 ## Next
 
-- Run the evaluator on real collector streams (`--input relations.jsonl`,
-  one `PartialRelation` per line) from the prime-field and Gaudry-cubic lanes;
-  synthetic coefficient statistics are not ECDLP statistics.
-- Block Wiedemann (item 6) as its own task.
-- Any speed claim from items 2 or 5 needs the repository's benchmark protocol
-  (`ecbench`, bench records, validation gate) and complete cold solves.
+- Prime-field and Gaudry-cubic collectors through `--input` JSONL (only the
+  binary-curve collector exposes its stream so far).
+- A parallel block-Wiedemann product loop and a fast matrix generator before
+  any block-size speed claim.
+- Any speed claim needs the repository's benchmark protocol (`ecbench`, bench
+  records, validation gate) and complete cold solves.
 
 Sources checked (KB): research-kb MCP not available in this session; fallback
 was the #4917 catalog and the six source files it pins, plus the modules read

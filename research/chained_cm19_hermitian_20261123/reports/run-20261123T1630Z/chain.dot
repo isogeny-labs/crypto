@@ -1,0 +1,14 @@
+digraph chain {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.38",ranksep="0.5"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=13,color="#34495e",fillcolor="#e5f3ec",margin="0.14,0.11"];
+  edge [fontname="DejaVu Sans",fontsize=11,color="#52677a",arrowsize=0.7];
+  left [label="CM19 source A\nA = (E7 cubed,H)"];
+  middle [label="A / ker S = A\nker (4,4,2,2)"];
+  right [label="A\ncomposite [4]"];
+  {rank=min; left; middle; right;}
+  left -> middle [label="S, degree64\nnative"];
+  middle -> right [label="R, degree64\nwritten adjoint",style=dashed];
+  actual [label="Actual J(C7) divisor coordinates\nalpha / evaluated maps OPEN",fillcolor="#fff0df"];
+  {rank=max; actual;}
+  left -> actual [style=dashed,dir=back,label="existence bridge\ncited and audited"];
+}
