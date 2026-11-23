@@ -26,7 +26,7 @@ No changes to generic polynomial arithmetic, the binary-field ECC2K solver, or e
 | Complete 3-isogeny, `b=0` | 1,000,000,007 | 3,816.8 | 856.5 | **4.453×** |
 | Complete 3-isogeny, `b=0` | 2⁶¹−1 | 10,042.5 | 10.1 | **983.133×** |
 
-The extreme last row is a **negative kernel-existence query** (no kernel can exist in this family over that field), not an isogeny construction win. Source-exact Rust independent small-field exhaustive root oracles and checksum equality across all 40 field/workload comparisons passed. Generic `ψ₃` and random quartic controls were at **1.006–1.044×** in the first CI execution; they are essentially unchanged. A rerun was requested to check repeatability.
+The extreme last row is a **negative kernel-existence query** (no kernel can exist in this family over that field), not an isogeny construction win. Source-exact Rust independent small-field exhaustive root oracles and checksum equality across all 40 field/workload comparisons passed. Generic `ψ₃` and random quartic controls were at **1.006–1.044×** in the first CI execution; they are essentially unchanged. **Independent rerun also passed**, with corresponding speedups of 6.002× (even four roots, p=65,521), 7.617× (p=1,000,000,007), 24.422× (p=2⁶¹−1), 18.443× (ψ₃, b=0, p=2⁶¹−1), and 926.351× (complete negative-kernel search, p=2⁶¹−1). Generic controls ranged from 0.961× to 1.061× in the rerun, so no claim of generic improvement is made.
 
 ## Local Linux perf, separate C++ reproduction
 
@@ -47,6 +47,6 @@ Local C++ differential and exhaustive brute-force oracles: **8,000 checks across
 
 ## Status and remaining gates
 
-- Source-exact Rust compiler and first benchmark/oracle execution passed; second execution has been requested.
+- Source-exact Rust compiler, two successful benchmark executions, checksum comparisons, and both independent small-field oracles passed; individual runtime effects still need broad-repo integration validation.
 - Draft stacked PR; broad repository CI and interactions with other transfer accounting are not yet confirmed.
 - No ECC2K binary-field index-calculus relations/sec improvement is claimed.
