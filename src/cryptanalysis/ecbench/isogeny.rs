@@ -149,6 +149,24 @@ impl Fp<'_> {
         if Self::jacobi_symbol(value, p) != 1 {
             return None;
         }
+        // Atkin's single-exponent square-root formula for p ≡ 5 (mod 8).
+        // For a quadratic residue a, with v=(2a)^((p-5)/8),
+        // i=2a*v² is a square root of -1, and r=a*v*(i-1)
+        // satisfies r²=a. Keep Jacobi rejection before this branch:
+        // computing a candidate for nonsquares is a severe regression.
+        if p & 7 == 5 {
+            let twice = self.mul(2 % p, value);
+            let v = self.pow(twice, (p - 5) / 8);
+            let v_squared = self.mul(v, v);
+            let i = self.mul(twice, v_squared);
+            let av = self.mul(value, v);
+            let candidate = self.mul(av, self.sub(i, 1));
+            return if self.mul(candidate, candidate) == value {
+                Some(candidate)
+            } else {
+                None
+            };
+        }
         let s = (p - 1).trailing_zeros();
         let q = (p - 1) >> s;
         let mut z = 2u64;
