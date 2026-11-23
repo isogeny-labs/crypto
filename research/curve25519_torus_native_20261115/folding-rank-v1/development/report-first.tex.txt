@@ -1,0 +1,112 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{amsmath,amssymb,graphicx,booktabs,xcolor,hyperref}
+\definecolor{ink}{HTML}{253C59}
+\hypersetup{colorlinks=true,urlcolor=ink,linkcolor=ink}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+{\Large\bfseries\color{ink} Original-coset interpolation rank}\par
+{\small 23 November 2026 \quad Native finite-template certificates and a separate integer gate}
+
+\textbf{Recorded result.} All 42 declared low-degree spaces have full column
+rank in both sign orientations (84 cases) on original actual-$q$ torus-coset
+rows. The capture retains 108 original parameters and 216 signed membership/
+index/cofactor checks, full matrices, selected original minors, determinants
+and determinant inverses. Gaussian and separate Bareiss recurrences agree;
+84 corrupted determinants refuse. [pcc:PCC-20261123-4b28f6]
+
+\textbf{Original domain.} Parameters remain $p=2^{255}-19$, $A=486662$,
+$a=60824497$, $q=213156431$, $K=20633$, $j=1$, $t=0,\ldots,107$.
+The original map inspects both rational branches and requires one admitted
+nonzero-$v$ branch, with canonical smaller raw-$v$ root and its negative.
+No $q=1$ substitution, planted target or supplied section is used. Set
+\[
+ z_t=h^{1+at},\qquad\gamma=h^a,\qquad r_t=-x_ty_t.
+\]
+Original Circuit witnesses, IndexTable labels and independent raw-point/
+eightfold-image replay agree. All prefix parameters are retained with no
+bad-position skipping. [pcc:PCC-20261123-4b28f6]
+
+\textbf{Declared interpolation space.} For $1\le s\le m\le6$, $D\in\{0,1\}$,
+\[
+ Q(X,Y)=A_0(X)+\sum_{i=1}^s A_i(X)Y_i,
+ \quad \deg A_0\le D+4,\quad\deg A_i\le D.
+\]
+Each matrix row contains $z_t^d$ for $0\le d\le D+4$, then
+$z_t^d r_{t+i}$ for $0\le i<s$, $0\le d\le D$. Natural aligned starts are
+$t=bm+u$, $0\le u\le m-s$, complete blocks only. No wrap or reordering.
+Unknown count $(D+1)(s+1)+4$ ranges from 6 to 18. Global sign reversal is
+column scaling; determinant parity agrees. The two signs are checks per
+space, not independent experiments. [pcc:PCC-20261123-4b28f6]
+
+\begin{center}\begin{tabular}{lll}\toprule
+$(m,s,D)$ & Declared rows & Columns/rank, both signs\\\midrule
+$(1,1,0)$&108&6/6\\
+$(1,1,1)$&108&8/8\\
+$(3,3,1)$&36&12/12\\
+$(6,6,1)$&18&18/18\\\bottomrule
+\end{tabular}\end{center}
+
+\textbf{Conditional interpretation.} Full-column-rank prefix rows leave
+only the zero homogeneous solution in this specific space. Adding rows
+containing that prefix cannot supply a nonzero solution. This closes the
+defined rank-dependent escape subject to correctness of the retained native
+field/matrix computations. It is not a general decoder lower bound.
+Both recurrences share field primitives and producer custody; independently
+signed or formal native-rank validation remains open. [pcc:unverified]
+
+\newpage
+{\large\bfseries\color{ink} Coverage, evidence and the next structural question}
+\begin{center}\includegraphics[width=\linewidth,height=1.8in,keepaspectratio]{diagram.pdf}\end{center}
+
+\textbf{Separate integer gate.} Core Lean checks
+\[
+ L\le m,\quad am\le6,\quad D+4<aL\quad\Longrightarrow\quad D\le1.
+\]
+The final focused gate has one named endpoint and zero trusted-native
+endpoints; maintained local verification passes, with propext only.
+The first gate ran while the source was untracked and reports no sources;
+its bound logs stay unchanged, separate from the final successful gate.
+No proof-source edit was needed. This endpoint establishes no native rank,
+geometry, compiler/group or code-applicability theorem.
+[pcc:PCC-20261123-6a18e8]
+
+\textbf{Reproducibility.} One qualified 600-second/2-GiB-cap call exits 0.
+Three release unit tests, fmt and strict all-target Clippy pass before
+qualification. Small controls cover polynomial-stream rank 5 and an explicit
+kernel, swaps, singular/zero/extension matrices and eight refusal cases.
+Initial annotation/Clippy source and logs are retained. No native source edit
+or source-test rerun after qualification. Native 101-input context is four
+constituent archives; compiled four hashes and binary pre/post identity match,
+with write-once qualification and actual shell positive/collision controls.
+[pcc:PCC-20261123-4b28f6]
+
+\textbf{Full raw publication pending.} The complete 9,739,410-byte capture
+roundtrips through one 537,824-byte archive, selected by actual artifact
+policy. It remains inspected locally and untracked pending genuine storage
+access/receipt. The statement binds source/summary/raw inventory, not
+unavailable remote bytes. Earlier selected archives, immutable-record remedy
+and journal integration obligations remain open. No invented receipt/pointer,
+policy exemption or credential export. All attestations are unsigned;
+local Lean pass is separate from independently signed standing.
+
+\textbf{Outside scope.} Other cosets, alignments/orderings, signs chosen per
+position, coordinates/trivializations, weights/degrees and nonlinear/partial/
+list interpolation remain separate. Polynomial-message applicability to the
+actual elliptic section code is uninstantiated. The next discriminator is to
+derive the original received-symbol curve ideal, remove universal identities,
+then require an informative residue with a correct divisor/root-count bridge
+and explicit $q,K$ search cost. That successor is not implemented or scheduled.
+Useful-yield/family/selection/rank/kernel/recovery, cold work, memory and setup
+remain open. No decoder, unknown-root search, benchmark or paid/backend
+campaign occurred. [pcc:unverified]
+
+\textbf{Primary sources.} Guruswami,
+\href{https://arxiv.org/pdf/1106.0436}{1106.0436}, section 2.2, equations 4--8,
+and section 2.3/Theorem 7; official
+\href{https://flintlib.org/doc/fmpz_mat/index.html}{FLINT fmpz\_mat}
+fraction-free minor/determinant documentation. Additive locator record709111
+corrects the earlier frozen report's sections3.1--3.2 reference without
+editing old bytes. AMS Bareiss PDF403 was not read. KB and Conductor
+unavailable as recorded in PROTOCOL.md. No novelty for classical primitives.
+\end{document}
