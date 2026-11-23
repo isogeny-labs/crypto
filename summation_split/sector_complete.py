@@ -90,7 +90,7 @@ def circuit(p, a, b, m, *, field_lift=False):
     field_lift=True enforces each leaf x_i,y_i in Fp even over Fpbar.
     This recovers the Fp zero SET of S_(m+1), not its principal ideal.
     """
-    if p <= 3 or (4*a**3+27*b*b) % p == 0 or m < 2:
+    if not sp.isprime(p) or p <= 3 or (4*a**3+27*b*b) % p == 0 or m < 2:
         raise ValueError('requires nonsingular odd-prime curve and m>=2')
     d = nonsquare(p)
     leaves, eq, plus, minus, gates = [], [], [], [], []
