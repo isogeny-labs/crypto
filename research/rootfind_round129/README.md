@@ -26,6 +26,20 @@ Workflow: [Round129 native Rust run](https://github.com/isogeny-labs/crypto/acti
 
 Independent oracle PASS on both exact Rust modules for 5 prime fields, using known-root cubic/quartic checks (monic and nonmonic), evaluation of discovered psi3 roots, and exhaustive psi3 checks for p=101. All native A/B checksums match. No full-crate build claim.
 
+
+### Independent native Rust replication
+
+The successful [re-run of the source-exact job](https://github.com/isogeny-labs/crypto/actions/runs/45125645100) used the same exact Rust sources and benchmark cases, with a new CI execution. Median paired speedups remained positive:
+
+| p | find_isogeny(2) run 1 / run 2 | find_isogeny(3) run 1 / run 2 | psi3 roots run 1 / run 2 |
+| --- | ---: | ---: | ---: |
+| 65,521 | 1.349x / 1.457x | 1.805x / 1.990x | 1.678x / 1.763x |
+| 1,000,000,007 | 1.262x / 1.253x | 2.328x / 2.496x | 2.280x / 2.543x |
+| 4,294,967,291 | 1.486x / 1.499x | 2.606x / 2.721x | 2.653x / 2.845x |
+| 2^61 - 1 | 1.471x / 1.465x | 2.699x / 2.646x | 2.900x / 2.827x |
+
+The two native executions passed their independent correctness oracles and paired checksums. Absolute timing changed between CI attempts, so report paired ratios rather than claiming clock-stable nanoseconds.
+
 ## Local Linux perf task-clock: PASS
 
 AMD EPYC 9V74, CPU 0 affinity, GCC 14.2 and Clang 17, `-O3 -march=native`, `perf_event_open(PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK)`. 9 alternating A/B trials, *two different-seed runs*; below is the median paired **speedup range across two runs** for the C++ reproduction of the production algorithm.
