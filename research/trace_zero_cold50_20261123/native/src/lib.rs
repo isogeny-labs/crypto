@@ -113,7 +113,7 @@ pub fn execute(case: &Case, arm: &str) -> Value {
         ..Limits::default()
     };
     macro_rules! projected_pack {($l:expr)=>{{let l=$l;(l.relation,json!({"source_dimension":l.source_dimension,"product_dimension":l.product_dimension,"linear_columns":l.linear_columns,"systems":l.systems,"maximum_rank":l.maximum_rank,"maximum_nullity":l.maximum_nullity}),json!({"columns":l.projected_columns,"systems":l.projected_systems,"rows":l.projected_rows,"inconsistent":l.projected_inconsistent}))}};}
-    assert!(["baseline", "baseline-aa", "elimination"].contains(&arm));
+    assert!(["baseline", "baseline-aa", "incumbent", "elimination"].contains(&arm));
     let (r, common, projected) = projected_pack!(
         cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized(
             &v, &b, &target, limits

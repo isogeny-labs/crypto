@@ -30,7 +30,7 @@
       "description": "Original scalar-chain baseline with original parser/kernel, same new harness",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "f0345f2e2a115ca426e568589458ba16ccc738e3",
         "build": [
           [
             "cargo",
@@ -44,7 +44,7 @@
             "legacy-halftrace"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "6fa5377027309c61ccf03886bc9d0efd9de5d134739b0d24bd260083025955a1",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -64,7 +64,7 @@
       "description": "Previous exact-half-trace incumbent, original parser and multiplication kernel",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "f0345f2e2a115ca426e568589458ba16ccc738e3",
         "build": [
           [
             "cargo",
@@ -78,7 +78,7 @@
             "incumbent"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "45523ffeb592c9b6620ea56890e0d356f228b454762ccd62107fa56a80346cff",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -98,7 +98,7 @@
       "description": "Exact-half-trace plus direct ASCII field parsing and unrolled two/three-limb PCLMUL; legacy parser and other multiplication paths retained",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "f0345f2e2a115ca426e568589458ba16ccc738e3",
         "build": [
           [
             "cargo",
@@ -110,7 +110,7 @@
             "research/trace_zero_cold50_20261123/native/Cargo.toml"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "c89f88ed68ff4db620fca68e61c97ea72d5ddd9f5e5c339e763d23dffe458602",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -130,7 +130,7 @@
       "description": "Original scalar-chain baseline with original parser/kernel, same new harness",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "f0345f2e2a115ca426e568589458ba16ccc738e3",
         "build": [
           [
             "cargo",
@@ -144,7 +144,7 @@
             "legacy-halftrace"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "6fa5377027309c61ccf03886bc9d0efd9de5d134739b0d24bd260083025955a1",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -216,7 +216,7 @@
       {
         "name": "host",
         "treatment": "measured",
-        "how": "Current Intel Xeon Platinum8573C x86 host; CPU0,2GiB; Callgrind instructions only. No old-host absolute ratio."
+        "how": "Current Intel Xeon Platinum8573C x86 host; CPU0,2GiB; Callgrind instructions only. No old-host absolute ratio. Broad root release compilation is a separately guarded development process onCPU0; only counted instructions are compared, with no native time or isolation claim."
       },
       {
         "name": "cache_and_layout",
@@ -285,7 +285,7 @@
   },
   "randomization": {
     "arm_order": "interleaved",
-    "arm_order_reason": "Three-arm rotation by field/kind/repetition.",
+    "arm_order_reason": "Four-arm rotation by field/kind/repetition; fixed five rounds.",
     "seed_derivation": {
       "method": "harness_drawn",
       "note": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation."
@@ -459,7 +459,6 @@
     "comparison_ids": [
       "oracle",
       "cold",
-      "aa",
       "incremental"
     ],
     "statistic": "Per-cell five-repeat min/median/max; exact paired median ratios, six A/A discrepancies and explicit no-regression checks",
@@ -476,7 +475,7 @@
   "analysis_plan": {
     "script": {
       "path": "native/src/main.rs",
-      "sha256": null
+      "sha256": "2fa1b6653fb57f56615b5bfa37988c4c3d59ee32462edd9f7093954198fe2770"
     },
     "inputs": [
       "rows.jsonl"
