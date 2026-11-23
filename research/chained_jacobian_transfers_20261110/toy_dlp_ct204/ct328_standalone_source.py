@@ -9,7 +9,7 @@ import hashlib
 import re
 from pathlib import Path
 
-EXPECTED_BLOB = "20ff945271d98415f077a74db13bcb18a14e4730"
+EXPECTED_BLOB = "234e14f2aea35b8ef3203065a5e2468aae9eb71f"
 FN_NAMES = ("m", "power", "ec_add", "ec_mul", "inverse")
 
 
