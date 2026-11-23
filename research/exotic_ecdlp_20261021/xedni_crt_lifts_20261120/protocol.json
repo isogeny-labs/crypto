@@ -1,0 +1,16 @@
+{
+  "schema": "xedni-crt-lifts-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "local_packet": "../xedni_local_residue_20261120",
+  "local_candidate_stream_sha256": "dc2a6da85361266fff6c9a4520a9c6f2280d2727fb33705e5dbe87563cf4397f",
+  "input": "all 14 reduced-event pairs with at least one order-4 and relation-compatible residue at 7 and order-6 and relation-compatible residue at 11",
+  "residue_policy": "enumerate all two relation-compatible residues at each prime per pair, cartesian product, lexicographic order; 56 residue pairs",
+  "crt_policy": "for a1,a2,a3, require a_i=47*k_i and use CRT for k_i modulo 77 matching the selected residues at 7 and 11; choose centered representative k_i in [-38,38]",
+  "representatives": "for each of three k coordinates add 77*s_i, s_i in {-1,0,1}; enumerate 27 lexicographic shifts for each residue pair",
+  "curve_rule": "solve rational a4,a6 exactly from both centered lifted-point equations; require nonzero discriminant and reduction to the fixed curve at 47",
+  "verify": "all 1512 rational curves: point equations, smoothness, local coefficient residues, orders 4 and 6, local relation, reduced relation at 47, rational relation, coefficient bit heights",
+  "record": "compressed per-curve rows, exact source and row hashes, all statuses and first rational-relation witness if present",
+  "resource": "complete 14*2*2*27 construction; exact arithmetic, no wall-time performance claim",
+  "claim_boundary": "bounded CRT representative set for the strict local survivors; no inference to all rational coefficients in the same residue classes"
+}

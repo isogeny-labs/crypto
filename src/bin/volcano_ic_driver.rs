@@ -109,7 +109,7 @@ fn spec(row: &Value, mode: &str) -> Value {
         }
     }
     arms.push(arm("raw-control","baseline","ic.pipeline_counted",json!({"factor_base":format!("prime-abscissa:size={}",if ctl {2}else{64}),"oracle":"mitm","targets":"walk","linalg":"incremental-gauss-full-rank-checked","max_trials":trials.to_string()})));
-    json!({"schema":"ecbench.spec/v1","label":format!("volcano-{mode}-{}",row["id"].as_str().unwrap()),"description":"Execution addendum: bounded diagnostic unless full. Public one-target workloads; no runtime promotion.","workloads":{"curves":[row["input"]["curve"].clone()],"targets_per_curve":if full {8}else{2},"target_seed":20261017,"target_kind":"public"},"arms":arms,"measurement":{"rounds":if full {5}else{1},"warmup":if full {1}else{0},"order":"alternate","seed":1,"isolation_required":"L2","timeout_seconds":if ctl {10}else if full {600}else{3}}})
+    json!({"schema":"ecbench.spec/v2","curve_policy":{"mode":"diagnostic","off_panel_reason":"volcano execution addendum requires the exact generated curve under diagnosis"},"label":format!("volcano-{mode}-{}",row["id"].as_str().unwrap()),"description":"Execution addendum: bounded diagnostic unless full. Public one-target workloads; no runtime promotion.","workloads":{"curves":[row["input"]["curve"].clone()],"targets_per_curve":if full {8}else{2},"target_seed":20261017,"target_kind":"public"},"arms":arms,"measurement":{"rounds":if full {5}else{1},"warmup":if full {1}else{0},"order":"alternate","seed":1,"isolation_required":"L2","timeout_seconds":if ctl {10}else if full {600}else{3}}})
 }
 fn control() -> Value {
     let c = PrimeCurve {

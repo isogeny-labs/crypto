@@ -1,0 +1,134 @@
+{
+  "schema": "research.render-receipt/v1",
+  "created_utc": "2026-11-23T00:30:37.441206+00:00",
+  "standing": "pcc:unverified",
+  "scope": "Document and figure rendering of the first two research iterations, updated with retained original-lock hosted CI producer evidence; rendering performs no cryptographic computation or performance run.",
+  "commands": [
+    "python3 repo-audit/research/prime31_summation_compression_20261122/render_report.py",
+    "mkdir -p pdf-qa-prime31",
+    "pdftoppm -r 110 -png repo-audit/research/prime31_summation_compression_20261122/REPORT.pdf pdf-qa-prime31/page"
+  ],
+  "command_working_directory": "/workspace/scratch/2f841b0b9a19",
+  "pdf": {
+    "page_count": 8,
+    "page_size_points": [
+      612,
+      792
+    ],
+    "link_count": 10,
+    "embedded_fonts": [
+      "Liberation Sans regular subset",
+      "Liberation Sans bold subset"
+    ],
+    "all_pages_labeled_unverified": true
+  },
+  "visual_qa": {
+    "pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "render_dpi": 110,
+    "raster_pattern": "/workspace/scratch/2f841b0b9a19/pdf-qa-prime31/page-{1..8}.png",
+    "checks": [
+      "readable native-text equations and exponents",
+      "no clipped text or overlapping formula lines",
+      "table alignment and figure labels",
+      "complete source, build and cost qualifications",
+      "page numbering and margin clearance"
+    ],
+    "method": "Initial full-page inspection of all eight pages and both figure PNGs. Latest update: rerendered all eight pages, visually inspected modified pages 1, 7 and 8 at full size, then both contact sheets covering all eight pages. Raster QA remains scratch-only."
+  },
+  "render_dependencies": {
+    "reportlab": "4.4.9",
+    "matplotlib": "3.10.8",
+    "pypdf": "6.21.4",
+    "PyMuPDF": "1.26.6",
+    "Pillow": "13.0.0"
+  },
+  "artifacts": [
+    {
+      "path": "REPORT.pdf",
+      "bytes": 56142,
+      "sha256": "f274eda2ef4ccf54f7af5ec1ba4f66775146ec06f15684706f816e8fb5bf497a"
+    },
+    {
+      "path": "render_report.py",
+      "bytes": 32057,
+      "sha256": "68e3e4c65a07d5b56c73d87024ce2dcf41f5fe56ae57b426bdda812d1eae3fcd"
+    },
+    {
+      "path": "figures/dickson-resultant-flow.svg",
+      "bytes": 6034,
+      "sha256": "2a5a25358977c935f98e57ee63a651171dd56bb595471f29c1348497c0a26078"
+    },
+    {
+      "path": "figures/dickson-resultant-flow.png",
+      "bytes": 53304,
+      "sha256": "f899c8e42074ce17398c4cb2e9d3fa9b6b489837c68e348eceda1d628696efef"
+    },
+    {
+      "path": "figures/kernel-counts.svg",
+      "bytes": 6641,
+      "sha256": "329a84247aa083b4212f9af698d91fe264f531353507f247914c2cc915f0427b"
+    },
+    {
+      "path": "figures/kernel-counts.png",
+      "bytes": 25277,
+      "sha256": "3a77dfd88c4d03785a53942f49fd2ea5984b7210c0c6dab0dbfd664eed1c0daf"
+    },
+    {
+      "path": "figures/kernel-counts.json",
+      "bytes": 589,
+      "sha256": "e02c025cc076907d86dfb5b8f66b34059d1799a4a109a79692d3c12c3394339b"
+    },
+    {
+      "path": "RENDERING.md",
+      "bytes": 4303,
+      "sha256": "cee724688fb4bb254c8fcfd115264cac95784068586931e603ccca0cacdd801d"
+    }
+  ],
+  "diagnostic_data_source": {
+    "path": "evidence/correctness-cases-final.stdout",
+    "sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb"
+  },
+  "storage_note": "All listed deliverables are below 65536 bytes. Omit scratch QA rasters and runtime caches from publication.",
+  "updated_utc": "2026-11-23T00:40:52.383862+00:00",
+  "revision": {
+    "reason": "Original-lock hosted replay succeeded; update PDF pages 1, 7, and 8",
+    "supersedes_pdf_sha256": "c3d682fe05fc36186509d3a7155511d5822fa22aeae157bcf864deba9d6db64c",
+    "full_size_pages_inspected": [
+      1,
+      7,
+      8
+    ],
+    "contact_sheet_pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ]
+  },
+  "original_lock_ci_update": {
+    "run_id": 45089569480,
+    "job_id": 137415823110,
+    "checkout_commit": "109fc024e33f122fd678d2c93a18b2c0438a8668",
+    "library_tests_passed": 41,
+    "component_tests_passed": 5,
+    "source_sha256": "b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1",
+    "diagnostic_sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb",
+    "diagnostic_byte_equal_local_adapter": true,
+    "claim_id": "PCC-20261123-526846",
+    "standing": "unverified",
+    "receipt_sha256": "c2e156832b498d744d296281394f622b1c9a72bcc7020484f60dea8e50cd6d72"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-direct-bridge-ranks-protocol-v1",
+  "source_result_sha256": "b73c86494fb382740747590cf838e73ef402f731ebef5a40221c539b84280ca1",
+  "source_indices": [2, 85, 201, 353, 511],
+  "methods_in_order": ["simon_two_descent", "pari_proof_rank"],
+  "simon_parameters": {"known_point": "Q", "limbigprime": 0},
+  "pari_parameters": {"use_database": false, "proof": true, "algorithm": "pari", "only_use_mwrank": true},
+  "per_method_wall_cap_seconds": 25,
+  "status_law": "Preserve complete exact rank, completed lower/upper bounds, error, and wall cap for each curve and method; do not infer exact rank from incomplete bounds",
+  "resource": "local checked Sage launcher; sequential workers; ordinary Darwin arm64 host",
+  "rank_premise": "d<2 requires a proved upper bound at most one for the rational Mordell-Weil rank"
+}

@@ -1,8 +1,9 @@
 # Rigorous boundary-rank bounds
 
-Date: 2026-11-01
-Status: architecture-level bounds proved and finite certificates implemented;
-hashed-ECDLP family lower bound open; no E1 production data
+Date: 2026-11-01; semantic-family follow-up 2026-11-18
+Status: architecture-level bounds and finite certificates implemented;
+all-seed and nonnegligible-probability semantic relation-rank lower bounds refuted at PCC-unverified scope;
+low-level BTNIR family bound open; no new E1 production data [pcc:unverified]
 
 ## Result
 
@@ -29,9 +30,17 @@ Therefore a nonzero `k × k` minor proves `k <= d` for every exact linear
 message that factors this boundary. For a balanced split, a nonzero minor of
 order `2^floor(w/2)` meets (1), proves full flattening rank, and rules out any
 linear separator message smaller than the complete smaller-side table.
+[pcc:unverified]
 
 This is a rigorous lower bound for one precisely named architecture. It is not
 a lower bound for arbitrary ECDLP algorithms.
+
+Lean additionally formalizes the universal goal as a predicate parameterized
+by which work functions belong to correct ECDLP solvers.  A theorem checks
+that an exponential work lower bound for every such solver would establish
+the goal.  A separate countermodel shows that the semantic rank/count premises
+alone cannot establish it. [pcc:unverified] See
+[`NO_SUBEXPONENTIAL_ECDLP_GOAL.md`](NO_SUBEXPONENTIAL_ECDLP_GOAL.md).
 
 ## Family and work corollary
 
@@ -54,11 +63,38 @@ If there is a positive integer `c` with `c n <= e(n)`, then
 not subexponential in `n`.
 
 The formal theorem uses natural-number functions and states these hypotheses
-directly. It does not smuggle in a cost model. At present hypothesis 1 is not
-proved for the production hashed prime-field family, and hypotheses 2–3 must
-be established for each proposed contraction implementation. The exact open
-obligation is tracked in
+directly. It does not smuggle in a cost model. For the encoding-independent
+semantic slot relation, hypothesis 1 cannot hold uniformly over all seeds or
+with nonnegligible seed probability: its expected rank is below two under the
+source threshold in the stated asymptotic regime. An exceptional selected
+seed sequence is not excluded. The low-level
+BTNIR edge-flattening family is a different matrix, and hypotheses 1–3 remain
+open for that representation. [pcc:unverified] The narrowed obligation is tracked in
 [`problems/hashed-ecdl-boundary-rank-family-lower-bound.md`](../../problems/hashed-ecdl-boundary-rank-family-lower-bound.md).
+
+## Semantic family obstruction
+
+Partition the hashed factor-base slots and let `A_S` be the zero-one matrix
+whose entries are the complete decompositions of one target. Then
+
+```text
+rank_Q(A_S) <= number of complete decompositions D_S(R).
+```
+
+For the threshold of Bochum v0.2 Lemma 13, when `r^(1/m) >= 10m` and
+`r >= 100`, Lemma 9 and direct tuple counting give
+
+```text
+E_S[D_S(R)] < (100/99) exp(1/10) < 2.
+```
+
+Therefore `Pr(rank_Q(A_S) >= K) <= 2/K` for `K > 0`, and a rank floor that
+holds for every seed is less than two. An exponential lower bound uniform over
+all seeds, or holding with nonnegligible probability for a uniformly sampled
+seed, is false for this semantic matrix at the stated parameters. The argument
+does not exclude an exceptional selected seed sequence. [pcc:unverified]
+The full derivation, scope split, visual and PCC claim ids are in
+[`SEMANTIC_RANK_BOUND.md`](SEMANTIC_RANK_BOUND.md).
 
 ## Recomputable finite certificates
 
@@ -75,7 +111,7 @@ fraction-free Bareiss elimination. It does not call or trust the rank routine.
 A determinant mismatch, duplicate/out-of-range index, singular minor, or
 nonexact division fails closed. A valid order-`k` certificate proves only the
 lower bound (2); maximality comes from matching the universal upper bound or
-from the separately tested exact-rank computation.
+from the separately tested exact-rank computation. [pcc:unverified]
 
 The deterministic property control covers 1,152 integer matrices of sizes
 `1 × 1` through `6 × 6`: the fraction-free rank agrees with independent
@@ -100,6 +136,11 @@ Source: [`lean/TensorBoundaryBounds.lean`](lean/TensorBoundaryBounds.lean)
 | Pointwise family bound | `exponentialRankForcesExponentialMessage` | transitivity of the two exposed hypotheses |
 | Linear-exponent message bound | `linearExponentForcesExponentialMessage` | monotonicity of powers plus the pointwise theorem |
 | Work bound | `linearExponentForcesExponentialWork` | explicit `message <= work` hypothesis |
+| Semantic rank versus matched rows | `decompositionRelationRankLeMatchedLeft` | Mathlib row-support rank theorem |
+| Matched rows versus full decompositions | `matchedLeftCardLeDecompositions` | witness-selection injection |
+| Semantic rank versus decompositions | `decompositionRelationRankLeDecompositions` | preceding two bounds |
+| Finite high-rank seed bound | `highRankSeedCountBound` | finite sums and threshold filtering |
+| Uniform-average obstruction | `uniformRankLeAverageSolutionBound` | nonempty seed-space cardinality and cancellation |
 
 The project pins Lean `v4.35.0`, `aburan28/crypto-lean` revision
 `148f5dc389b341401e06d76abe7783c4ccf42f2e`, and through it Mathlib revision
@@ -145,7 +186,8 @@ integer boundary matrices, not a novelty claim for rank factorization.
 | Requested requirement | Acceptance evidence | Status |
 | --- | --- | --- |
 | Establish rigorous finite-instance rank lower bounds | Recomputable nonzero-minor certificates checked against the exact BTNIR tensor | Implemented and locally tested; no production certificate yet |
-| Prove the separator-message implication | Readable proof and kernel-checked Lean theorem | Proved |
-| Prove the asymptotic cost bridge | Conditional Lean theorem with rank, separator and work hypotheses exposed | Proved conditionally |
-| Bound the actual hashed prime-field family | Uniform nonzero-minor or equivalent rank theorem for every member of the frozen family | Open |
+| Prove the separator-message implication [pcc:unverified] | Readable proof and kernel-checked Lean theorem | Locally checked; PCC standing unverified |
+| Prove the asymptotic cost bridge [pcc:unverified] | Conditional Lean theorem with rank, separator and work hypotheses exposed | Locally checked conditionally; PCC standing unverified |
+| Bound the semantic hashed prime-field relation family | Rank at most decomposition count; source-threshold expectation below two | Derived upper bound; all-seed and nonnegligible-probability exponential lower bounds refuted at PCC-unverified scope; exceptional selected seeds remain possible [pcc:unverified] |
+| Bound the low-level BTNIR boundary family | Uniform nonzero-minor or equivalent theorem for the frozen representation | Open |
 | Disprove every subexponential prime-field ECDLP algorithm | Lower bound covering arbitrary algorithms | Not established; outside this method's scope |
