@@ -5,7 +5,8 @@ fn round129_linear_factors(field: &mut Fp<'_>, roots: &[u64]) -> Vec<u64> {
     for &root in roots {
         let mut next = vec![0u64; polynomial.len() + 1];
         for (j, &coefficient) in polynomial.iter().enumerate() {
-            next[j] = field.sub(next[j], field.mul(coefficient, root));
+            let product = field.mul(coefficient, root);
+            next[j] = field.sub(next[j], product);
             next[j + 1] = field.add(next[j + 1], coefficient);
         }
         polynomial = next;
@@ -14,13 +15,10 @@ fn round129_linear_factors(field: &mut Fp<'_>, roots: &[u64]) -> Vec<u64> {
 }
 
 fn round129_psi3(field: &mut Fp<'_>, a: u64, b: u64) -> Vec<u64> {
-    vec![
-        field.sub(0, field.mul(a, a)),
-        field.mul(12 % field.p, b),
-        field.mul(6 % field.p, a),
-        0,
-        3 % field.p,
-    ]
+    let a2 = field.mul(a, a);
+    let twelve_b = field.mul(12 % field.p, b);
+    let six_a = field.mul(6 % field.p, a);
+    vec![field.sub(0, a2), twelve_b, six_a, 0, 3 % field.p]
 }
 
 pub fn round129_benchmark(op: &str, p: u64, repetitions: usize) -> u64 {
