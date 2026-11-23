@@ -1,0 +1,15 @@
+2026-11-23T05:15:20Z
+role: separate-role reviewer, same host and immutable binary; unsigned development correctness replay
+command: timeout 180s bash -c 'ulimit -v 2097152; export RAYON_NUM_THREADS=1; exec "$1" "$2" "$3"' -- <binary> <replay1/proofs> <protocol_sha256>
+binary=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt1
+proofs=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/replay1/proofs
+protocol_sha256=6b7732995c5f6f2864d90ff0ae64d3f459c67d82bfef0ba9f69534d7fdf2211f
+limits: 180 seconds; 2097152 KiB virtual memory; one process, RAYON_NUM_THREADS=1; no timing claim
+b78202639890aedf2b1afb971ec6d6d0186d5f0182be3e6eedfb9b514b94c75c  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt1
+6b7732995c5f6f2864d90ff0ae64d3f459c67d82bfef0ba9f69534d7fdf2211f  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/PROTOCOL.md
+0250383b885c4aaa6a6e3a40f3d4dbe34f49d40adb84f113217b11d27d034d6e  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/CANCELLATION_PREDICTION.md
+ee30e8b00e41709eb6e0a6d270e2ba2f6be75da57e23310e29ef105bf7559213  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/replay1/source-allfiles-pre-call-sha256.txt
+b90921a24f757c14b2f5d73e7c93325e27eec16f3ad0e8b85f2580ab6c870ca1  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/source-sha256.txt
+f19a4806299fa117bb24fda0a2da4bf599fe22337ea5732e4dba7763f4d23ef3  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/qualifier.stdout.jsonl
+-r-xr-xr-x 555 1047992 /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt1
+240f04abc38fcea95930971376331c1ac5082069
