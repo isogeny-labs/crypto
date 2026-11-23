@@ -1,0 +1,213 @@
+{
+ "rule": "C8: the AGENTS.md section 5a band for every (prime, arm), from out/recompute.json (lesson L-546d37ca7750: the\nband is recomputed with the canonical rule, every listed unpriced operation counter priced at w on every arm).\n\nThese are genus_ladder rows, not ecbench sessions, so `ecbench band` does not apply; the rule is applied directly:\n  IC arm:   U = rel_mul + rel_add + la_mul + la_add (the counters the rows list), cost = group_ops + w U.\n            Not emitted by the walk (listed, and priced in a second reading): one mix64 partition hash and two\n            coefficient additions mod r per walk step (genus_ladder.rs 1590-1594), counted as 3 walk_ops; the\n            large-prime table lookups per relation (HashMap/DSU) are not emitted either (about 1.5e4 relations per run).\n  Reference: the ideal negation bound sqrt(pi r / 4), nothing charged (strongest available: identity and the\n            hyperelliptic involution are the only F_p-automorphisms, certs.json; Frobenius is trivial on J(F_p)).\n  Calibrated weight (owner rule 2026-11-12): no w_cal was measured; the break-even w at which the IC mean equals\n            the reference is reported, so any w_cal with 10 w_cal below it keeps the order.\nWrites out/band.json.",
+ "cells": {
+  "16411 x": {
+   "mean_group_ops": 426887.61666666664,
+   "mean_native_U": 238482204.86666667,
+   "mean_walk_ops": 426564.2166666667,
+   "mean_R_neg": 239230091.84442943,
+   "mean_R_plain": 338322440.4141532,
+   "band": {
+    "0": {
+     "ic": 426887.61666666664,
+     "rho_neg": 239230091.84442943,
+     "ic_over_rho_neg": 0.0017844227428724573,
+     "ic_over_rho_plain_expect": 0.0012617774219886137,
+     "ci_hi_over_rho_neg": 0.0017952812712150425
+    },
+    "0.1": {
+     "ic": 24275108.103333335,
+     "rho_neg": 239230091.84442943,
+     "ic_over_rho_neg": 0.10147180029140883,
+     "ic_over_rho_plain_expect": 0.07175139808526228,
+     "ci_hi_over_rho_neg": 0.10184457998355866
+    },
+    "1": {
+     "ic": 238909092.48333335,
+     "rho_neg": 239230091.84442943,
+     "ic_over_rho_neg": 0.9986581982282362,
+     "ic_over_rho_plain_expect": 0.7061579840547253,
+     "ci_hi_over_rho_neg": 1.0023446412815091
+    }
+   },
+   "band_with_walk_hash_coef": {
+    "0": {
+     "ic": 426887.61666666664,
+     "ic_over_rho_neg": 0.0017844227428724573
+    },
+    "0.1": {
+     "ic": 24403077.368333336,
+     "ic_over_rho_neg": 0.10200672156328301
+    },
+    "1": {
+     "ic": 240188785.13333336,
+     "ic_over_rho_neg": 1.004007410946978
+    }
+   },
+   "break_even_w_vs_neg": 1.0013460097002858,
+   "break_even_w_la_with_rel_w1": 1.0017541543957604,
+   "break_even_w_la_with_rel_w0": 1.304979826088702,
+   "cantor_inv_per_group_op": 6.999220677011128,
+   "cantor_mul_per_group_op": 393.7596394320332,
+   "order_below_at_all_w_point": true,
+   "order_below_at_all_w_ci_hi": false,
+   "order_below_with_walk_hash_coef": false
+  },
+  "16411 x*": {
+   "mean_group_ops": 704935.3333333334,
+   "mean_native_U": 208840633.65,
+   "mean_walk_ops": 704611.9333333333,
+   "mean_R_neg": 239230091.84442943,
+   "mean_R_plain": 338322440.4141532,
+   "band": {
+    "0": {
+     "ic": 704935.3333333334,
+     "rho_neg": 239230091.84442943,
+     "ic_over_rho_neg": 0.00294668337038365,
+     "ic_over_rho_plain_expect": 0.00208361979320791,
+     "ci_hi_over_rho_neg": 0.002963499717884285
+    },
+    "0.1": {
+     "ic": 21588998.698333334,
+     "rho_neg": 239230091.84442943,
+     "ic_over_rho_neg": 0.09024365844566323,
+     "ic_over_rho_plain_expect": 0.06381190284601113,
+     "ci_hi_over_rho_neg": 0.0906348733261903
+    },
+    "1": {
+     "ic": 209545568.98333335,
+     "rho_neg": 239230091.84442943,
+     "ic_over_rho_neg": 0.8759164341231794,
+     "ic_over_rho_plain_expect": 0.6193664503212402,
+     "ci_hi_over_rho_neg": 0.8797115608352073
+    }
+   },
+   "band_with_walk_hash_coef": {
+    "0": {
+     "ic": 704935.3333333334,
+     "ic_over_rho_neg": 0.00294668337038365
+    },
+    "0.1": {
+     "ic": 21800382.278333332,
+     "ic_over_rho_neg": 0.09112725790579077
+    },
+    "1": {
+     "ic": 211659404.78333336,
+     "ic_over_rho_neg": 0.8847524287244549
+    }
+   },
+   "break_even_w_vs_neg": 1.142139593920429,
+   "break_even_w_la_with_rel_w1": 1.2530633888306386,
+   "break_even_w_la_with_rel_w0": 2.033449710831147,
+   "cantor_inv_per_group_op": 6.9992144905963,
+   "cantor_mul_per_group_op": 393.74669459042576,
+   "order_below_at_all_w_point": true,
+   "order_below_at_all_w_ci_hi": true,
+   "order_below_with_walk_hash_coef": true
+  },
+  "32771 x": {
+   "mean_group_ops": 1078377.7833333334,
+   "mean_native_U": 730977773.4333333,
+   "mean_walk_ops": 1078048.3166666667,
+   "mean_R_neg": 951599497.9335594,
+   "mean_R_plain": 1345764915.925068,
+   "band": {
+    "0": {
+     "ic": 1078377.7833333334,
+     "rho_neg": 951599497.9335594,
+     "ic_over_rho_neg": 0.0011332265156455826,
+     "ic_over_rho_plain_expect": 0.0008013121538333947,
+     "ci_hi_over_rho_neg": 0.0011392538663538621
+    },
+    "0.1": {
+     "ic": 74176155.12666667,
+     "rho_neg": 951599497.9335594,
+     "ic_over_rho_neg": 0.07794892209142973,
+     "ic_over_rho_plain_expect": 0.05511821139703183,
+     "ci_hi_over_rho_neg": 0.07819809750235626
+    },
+    "1": {
+     "ic": 732056151.2166666,
+     "rho_neg": 951599497.9335594,
+     "ic_over_rho_neg": 0.7692901822734869,
+     "ic_over_rho_plain_expect": 0.5439703045858177,
+     "ci_hi_over_rho_neg": 0.7717819199761331
+    }
+   },
+   "band_with_walk_hash_coef": {
+    "0": {
+     "ic": 1078377.7833333334,
+     "ic_over_rho_neg": 0.0011332265156455826
+    },
+    "0.1": {
+     "ic": 74499569.62166667,
+     "ic_over_rho_neg": 0.07828878617889752
+    },
+    "1": {
+     "ic": 735290296.1666666,
+     "ic_over_rho_neg": 0.7726888231481649
+    }
+   },
+   "break_even_w_vs_neg": 1.3003420277551239,
+   "break_even_w_la_with_rel_w1": 1.3719029336818909,
+   "break_even_w_la_with_rel_w0": 1.6101676429589828,
+   "cantor_inv_per_group_op": 6.999609506050191,
+   "cantor_mul_per_group_op": 393.8058590536925,
+   "order_below_at_all_w_point": true,
+   "order_below_at_all_w_ci_hi": true,
+   "order_below_with_walk_hash_coef": true
+  },
+  "32771 x*": {
+   "mean_group_ops": 1834120.6166666667,
+   "mean_native_U": 607063522.95,
+   "mean_walk_ops": 1833791.15,
+   "mean_R_neg": 951599497.9335594,
+   "mean_R_plain": 1345764915.925068,
+   "band": {
+    "0": {
+     "ic": 1834120.6166666667,
+     "rho_neg": 951599497.9335594,
+     "ic_over_rho_neg": 0.0019274081382446514,
+     "ic_over_rho_plain_expect": 0.0013628833646669315,
+     "ci_hi_over_rho_neg": 0.0019327209279236764
+    },
+    "0.1": {
+     "ic": 62540472.91166668,
+     "rho_neg": 951599497.9335594,
+     "ic_over_rho_neg": 0.06572142277026848,
+     "ic_over_rho_plain_expect": 0.046472063710084804,
+     "ci_hi_over_rho_neg": 0.06587851040025702
+    },
+    "1": {
+     "ic": 608897643.5666667,
+     "rho_neg": 951599497.9335594,
+     "ic_over_rho_neg": 0.6398675544584828,
+     "ic_over_rho_plain_expect": 0.45245468681884565,
+     "ci_hi_over_rho_neg": 0.6413844341589613
+    }
+   },
+   "band_with_walk_hash_coef": {
+    "0": {
+     "ic": 1834120.6166666667,
+     "ic_over_rho_neg": 0.0019274081382446514
+    },
+    "0.1": {
+     "ic": 63090610.256666675,
+     "ic_over_rho_neg": 0.06629954134451599
+    },
+    "1": {
+     "ic": 614399017.0166668,
+     "ic_over_rho_neg": 0.645648740200958
+    }
+   },
+   "break_even_w_vs_neg": 1.5645238783275055,
+   "break_even_w_la_with_rel_w1": 1.9311854542674296,
+   "break_even_w_la_with_rel_w0": 2.580691329955485,
+   "cantor_inv_per_group_op": 6.999607032387374,
+   "cantor_mul_per_group_op": 393.8004682843605,
+   "order_below_at_all_w_point": true,
+   "order_below_at_all_w_ci_hi": true,
+   "order_below_with_walk_hash_coef": true
+  }
+ }
+}

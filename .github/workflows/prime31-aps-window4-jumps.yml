@@ -8,6 +8,7 @@ on:
       - research/prime31_ic_20261115/native/**
       - .github/workflows/prime31-aps-window4-jumps.yml
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/**
       - .github/workflows/prime31-aps-window4-jumps.yml
@@ -15,6 +16,7 @@ on:
 
 jobs:
   native-window4:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
