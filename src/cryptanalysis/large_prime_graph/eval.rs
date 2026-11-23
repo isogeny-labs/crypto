@@ -50,6 +50,11 @@ pub struct EvalParams {
     pub mst_max_column_degree: usize,
     pub mst_max_edge_evaluations: usize,
     pub mst_max_active_coefficients: usize,
+    /// Opt in to a same-stream exact two-LP forest vs pivot/MST rank comparison.
+    /// Default evaluator output and all historical filters remain unchanged.
+    pub compare_exact_forest: bool,
+    /// Absolute row cap for the opt-in witness/materialization arm.
+    pub forest_max_rows: usize,
 }
 
 impl Default for EvalParams {
@@ -69,6 +74,8 @@ impl Default for EvalParams {
             mst_max_column_degree: m.max_column_degree,
             mst_max_edge_evaluations: m.max_edge_evaluations,
             mst_max_active_coefficients: m.max_active_coefficients,
+            compare_exact_forest: false,
+            forest_max_rows: 4096,
         }
     }
 }
@@ -135,6 +142,33 @@ pub struct FilterSummary {
     pub max_row_weight: usize,
     pub replayed: usize,
     pub replay_failures: usize,
+    /// Only populated in the opt-in exact comparison, charged separately.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exact_projected_rank: Option<projected_rank::ProjectedRankAudit>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rank_audit_ns: Option<u128>,
+}
+
+/// Two-LP forest arm on the exact same input, without a pivot fallback.
+/// Refusal is atomic and reports no complete output or useful rank.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ForestFilterSummary {
+    pub lp_rank: usize,
+    pub lp_left_nullity: usize,
+    pub witness_stats: witness::WitnessStats,
+    pub witness_ns: u128,
+    pub materialization_ns: u128,
+    pub refused: bool,
+    pub exact_projected_rank: Option<projected_rank::ProjectedRankAudit>,
+    pub rank_audit_ns: Option<u128>,
+    /// Time includes output support/source counting and source-witness replay.
+    pub summary_and_replay_ns: Option<u128>,
+    pub residual_columns: usize,
+    pub residual_nonzeros: usize,
+    pub source_terms: usize,
+    pub max_row_weight: usize,
+    pub replayed: usize,
+    pub replay_failures: usize,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -163,6 +197,12 @@ pub struct LpGraphEvaluation {
     pub trees: TreeSummary,
     pub pivot_filter: FilterSummary,
     pub mst_filter: FilterSummary,
+    /// Optional new arm; absent from historical JSON unless requested/eligible.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forest_filter: Option<ForestFilterSummary>,
+    /// Requested but skipped: 'row_cap' or 'arity_above_two'.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forest_skip_reason: Option<String>,
     /// Minimum-degree ordering on the residual column graph of the pivot filter's output.
     pub residual_elimination: EliminationStats,
     pub residual_elimination_ns: u128,
@@ -239,6 +279,11 @@ pub fn evaluate_stream(
             Some(b.snapshot().large_rank_lower_bound)
         })
         .flatten();
+    // The same bounded admission gate controls *all* extra exact audits.
+    // Otherwise requesting the forest on an unsupported/oversized stream
+    // could unexpectedly run unbounded pivot/MST sparse elimination.
+    let compare_exact_forest =
+        params.compare_exact_forest && r <= params.forest_max_rows && domain.len() == r;
     let domain_support: Vec<Vec<usize>> = domain
         .iter()
         .map(|row| row.iter().map(|&(col, _)| col).collect())
@@ -315,6 +360,13 @@ pub fn evaluate_stream(
     let (pivot_out, pivot_report) = filter_large_primes(relations.to_vec(), &options)
         .map_err(|_| LpGraphError::InvalidModulus)?;
     let pivot_ns = ns(t);
+    let (pivot_exact_rank, pivot_rank_ns) = if compare_exact_forest {
+        let t = Instant::now();
+        let rank = projected_rank::audit_projected_rank(&pivot_out, modulus)?;
+        (Some(rank), Some(ns(t)))
+    } else {
+        (None, None)
+    };
     let (n_res, z_res, src, wmax, ok, bad) = summarize_output(&pivot_out, relations, modulus);
     let pivot_filter = FilterSummary {
         report: pivot_report,
@@ -327,6 +379,8 @@ pub fn evaluate_stream(
         max_row_weight: wmax,
         replayed: ok,
         replay_failures: bad,
+        exact_projected_rank: pivot_exact_rank,
+        rank_audit_ns: pivot_rank_ns,
     };
     let limits = MstLimits {
         max_rows: params.mst_max_rows,
@@ -338,7 +392,14 @@ pub fn evaluate_stream(
     let attempt = filter_large_primes_mst(relations.to_vec(), &options, &limits)
         .map_err(|_| LpGraphError::InvalidModulus)?;
     let mst_ns = ns(t);
-    let mst_out = attempt.relations.clone().unwrap_or_default();
+    let mst_out = attempt.relations.as_deref().unwrap_or(&[]);
+    let (mst_exact_rank, mst_rank_ns) = if compare_exact_forest && attempt.relations.is_some() {
+        let t = Instant::now();
+        let rank = projected_rank::audit_projected_rank(mst_out, modulus)?;
+        (Some(rank), Some(ns(t)))
+    } else {
+        (None, None)
+    };
     let (n2, z2, src2, w2, ok2, bad2) = summarize_output(&mst_out, relations, modulus);
     let mst_filter = FilterSummary {
         report: attempt.report,
@@ -351,7 +412,63 @@ pub fn evaluate_stream(
         max_row_weight: w2,
         replayed: ok2,
         replay_failures: bad2,
+        exact_projected_rank: mst_exact_rank,
+        rank_audit_ns: mst_rank_ns,
     };
+
+    // --- Opt-in exact two-LP forest, with separately charged stages.
+    // Do not quietly run a subset of the stream or pretend a refusal is an
+    // empty successful output. These are single-run diagnostic wall times.
+    let mut forest_filter = None;
+    let mut forest_skip_reason = None;
+    if params.compare_exact_forest {
+        if r > params.forest_max_rows {
+            forest_skip_reason = Some("row_cap".to_string());
+        } else if domain.len() != r {
+            forest_skip_reason = Some("arity_above_two".to_string());
+        } else {
+            let t = Instant::now();
+            let batch = witness::collect_witnesses_lazy(&index)?;
+            let witness_ns = ns(t);
+            let t = Instant::now();
+            let produced = witness::materialize_complete_relations(
+                &index, &batch, relations,
+                params.filter_max_small_weight, params.filter_max_sources,
+            );
+            let materialization_ns = ns(t);
+            let refused = produced.is_none();
+            let mut exact_projected_rank = None;
+            let mut rank_audit_ns = None;
+            let mut summary_and_replay_ns = None;
+            let mut output = (0, 0, 0, 0, 0, 0);
+            if let Some(ref relations_out) = produced {
+                let t = Instant::now();
+                exact_projected_rank =
+                    Some(projected_rank::audit_projected_rank(relations_out, modulus)?);
+                rank_audit_ns = Some(ns(t));
+                let t = Instant::now();
+                output = summarize_output(relations_out, relations, modulus);
+                summary_and_replay_ns = Some(ns(t));
+            }
+            forest_filter = Some(ForestFilterSummary {
+                lp_rank: batch.rank,
+                lp_left_nullity: batch.witnesses.len(),
+                witness_stats: batch.stats,
+                witness_ns,
+                materialization_ns,
+                refused,
+                exact_projected_rank,
+                rank_audit_ns,
+                summary_and_replay_ns,
+                residual_columns: output.0,
+                residual_nonzeros: output.1,
+                source_terms: output.2,
+                max_row_weight: output.3,
+                replayed: output.4,
+                replay_failures: output.5,
+            });
+        }
+    }
 
     // --- Residual structure: minimum degree and partitioning.
     let col_of: BTreeMap<u32, usize> = pivot_out
@@ -410,6 +527,8 @@ pub fn evaluate_stream(
         trees,
         pivot_filter,
         mst_filter,
+        forest_filter,
+        forest_skip_reason,
         residual_elimination,
         residual_elimination_ns,
         residual_rows_skipped_for_width: skipped,
