@@ -36,6 +36,9 @@ struct Report {
     unchecked_tail_rows: usize,
     independent_augmented_rank: usize,
     dependent_rows: usize,
+    // Partial linear-algebra diagnostics, NOT a full cost model:
+    gauss_jordan_row_mul_sub_pairs: u64,
+    gauss_jordan_inversions: u64,
     first_determined_relation_prefix: Option<usize>,
     recovered: Option<u64>,
     scalar_replay_passed: bool,
@@ -196,7 +199,10 @@ fn verify(data:&Receipt)->Result<Report,String>{
         submitted_rows:data.relations.len(),authenticated_rows:checked,
         unchecked_tail_rows:data.relations.len()-checked,
         independent_augmented_rank:matrix.rank,
-        dependent_rows:dependent,first_determined_relation_prefix:first,
+        dependent_rows:dependent,
+        gauss_jordan_row_mul_sub_pairs:matrix.row_mul_sub_pairs,
+        gauss_jordan_inversions:matrix.inversions,
+        first_determined_relation_prefix:first,
         recovered,scalar_replay_passed:recovered.is_some(),
         stop_when_target_determined:data.stop_when_target_determined,
         arithmetic_diagnostic:ar.counts,
@@ -248,13 +254,14 @@ mod tests {
         assert!(!out.scalar_replay_passed);
     }
     #[test]
-    fn order_changes_first_visibility_not_scalar() {
+    fn unrelated_early_row_delays_visibility_not_scalar() {
         let mut f=fixture();
         let original=verify(&f).unwrap();
-        f.relations.swap(0,1);
-        let swapped=verify(&f).unwrap();
-        assert_eq!(original.recovered,swapped.recovered);
-        assert_eq!(swapped.first_determined_relation_prefix,Some(2));
+        f.relations.insert(0,MixedRow{terms:vec![[1,1]],a:2,b:0});
+        let delayed=verify(&f).unwrap();
+        assert_eq!(original.recovered,delayed.recovered);
+        assert_eq!(original.first_determined_relation_prefix,Some(2));
+        assert_eq!(delayed.first_determined_relation_prefix,Some(3));
     }
     #[test]
     fn signed_duplicate_keeps_rank_and_replay() {
