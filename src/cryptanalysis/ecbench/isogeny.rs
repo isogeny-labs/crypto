@@ -630,8 +630,10 @@ pub fn find_isogeny(e: &PrimeCurve, ell: u64, tally: &mut FieldTally) -> Option<
         2 => *f.roots(&[b, a, 0, 1]).first()?,
         3 => {
             let a2 = f.mul(a, a);
-            let t1 = f.mul(f.small(12), b);
-            let t2 = f.mul(f.small(6), a);
+            let c12 = f.small(12);
+            let c6 = f.small(6);
+            let t1 = f.mul(c12, b);
+            let t2 = f.mul(c6, a);
             *f.roots(&[f.sub(0, a2), t1, t2, 0, f.small(3)]).first()?
         }
         _ => return None,
