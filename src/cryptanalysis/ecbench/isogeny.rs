@@ -399,6 +399,53 @@ impl Fp<'_> {
         if a.is_empty() || b.is_empty() {
             return vec![];
         }
+        // For the Mersenne field and degree <= 4, accumulate at most four
+        // canonical products per coefficient in u128 (< 2^124). Reduce once
+        // per coefficient, then perform monic long division on a stack buffer.
+        // Other fields, nonmonic moduli and noncanonical inputs use the
+        // original exact path. Keep the logical field multiplication tally.
+        if self.p == (1u64 << 61) - 1
+            && (3..=5).contains(&m.len())
+            && m.last() == Some(&1)
+            && a.len() < m.len()
+            && b.len() < m.len()
+            && a.iter().all(|&x| x < self.p)
+            && b.iter().all(|&x| x < self.p)
+        {
+            let mut acc = [0u128; 7];
+            for (i, &x) in a.iter().enumerate() {
+                for (j, &y) in b.iter().enumerate() {
+                    acc[i + j] += x as u128 * y as u128;
+                }
+            }
+            self.tally.muls += (a.len() * b.len()) as u64;
+            let mut t = [0u64; 7];
+            let mut len = a.len() + b.len() - 1;
+            let degree = m.len() - 1;
+            for i in 0..len {
+                // Two folds suffice even for a sum of four products.
+                let x = ((acc[i] as u64) & self.p) + (acc[i] >> 61) as u64;
+                let x = (x & self.p) + (x >> 61);
+                t[i] = if x >= self.p { x - self.p } else { x };
+            }
+            while len > degree {
+                let c = t[len - 1];
+                let shift = len - 1 - degree;
+                if c != 0 {
+                    for (i, &mi) in m[..degree].iter().enumerate() {
+                        if mi != 0 {
+                            let product = self.mul(c, mi);
+                            t[shift + i] = self.sub(t[shift + i], product);
+                        }
+                    }
+                }
+                len -= 1;
+            }
+            while len > 0 && t[len - 1] == 0 {
+                len -= 1;
+            }
+            return t[..len].to_vec();
+        }
         let mut t = vec![0u64; a.len() + b.len() - 1];
         for (i, &x) in a.iter().enumerate() {
             for (j, &y) in b.iter().enumerate() {
@@ -1179,6 +1226,47 @@ mod tests {
             found >= 5,
             "only {found} curves of 60 had a rational 3-isogeny"
         );
+    }
+
+    #[test]
+    fn round143_fused_product_matches_exact_convolution() {
+        let p = (1u64 << 61) - 1;
+        let mut tally = FieldTally::default();
+        let mut f = Fp { p, tally: &mut tally };
+        let mut state = 0xfedcba987654321u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state % p
+        };
+        for degree in 2usize..=4 {
+            for i in 0usize..20_000 {
+                let mut m: Vec<u64> = (0..degree).map(|_| next()).collect();
+                m.push(1);
+                let mut a: Vec<u64> = (0..i % (degree + 1))
+                    .map(|_| if i % 7 == 0 { p - 1 } else if i % 11 == 0 { 0 } else { next() })
+                    .collect();
+                let b: Vec<u64> = (0..(i / (degree + 1)) % (degree + 1))
+                    .map(|_| if i % 13 == 0 { p - 1 } else if i % 17 == 0 { 0 } else { next() })
+                    .collect();
+                if i % 19 == 0 && !a.is_empty() {
+                    a[0] = p + 2;
+                }
+                let expected = if a.is_empty() || b.is_empty() {
+                    Vec::new()
+                } else {
+                    let mut t = vec![0u64; a.len() + b.len() - 1];
+                    for (j, &x) in a.iter().enumerate() {
+                        for (k, &y) in b.iter().enumerate() {
+                            t[j+k] = ((t[j+k] as u128 + x as u128 * y as u128) % p as u128) as u64;
+                        }
+                    }
+                    f.rem_owned(t, &m)
+                };
+                assert_eq!(f.mulmod(&a, &b, &m), expected, "degree={degree}, i={i}");
+            }
+        }
     }
 
     #[test]
