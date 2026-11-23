@@ -687,6 +687,42 @@ mod tests {
         }
     }
 
+    #[test]
+    fn independent_integer_oracle_aggregate_counts() {
+        let c = PrimeCurve { p: 101, a: 7, b: 4 };
+        let sem = SemaevCurve::new(c.p, c.a, c.b);
+        let mut targets = vec![PrimePoint::INFINITY];
+        for x in 0..c.p {
+            if let Some(y) = c.sqrt(c.rhs(x)) {
+                targets.push(PrimePoint::affine(x, y));
+                if y != 0 {
+                    targets.push(PrimePoint::affine(x, c.p - y));
+                }
+            }
+        }
+        assert_eq!(targets.len(), 97);
+        for (m, size, expected_successes, expected_rows) in [
+            (3, 4, 58, 96),
+            (3, 8, 97, 704),
+            (4, 4, 85, 225),
+            (4, 8, 97, 2945),
+        ] {
+            let base = factor_base(&c, size);
+            let table = build_s3_pairs(&c, &sem, &base, &mut Stats::default());
+            let right = right_summands(&c, &base, m, &mut Stats::default());
+            let rows: Vec<_> = targets
+                .iter()
+                .copied()
+                .map(|target| all_s3_rows(&c, &base, target, &right, &table, &mut Stats::default()))
+                .collect();
+            assert_eq!(
+                rows.iter().filter(|result| !result.is_empty()).count(),
+                expected_successes
+            );
+            assert_eq!(rows.iter().map(BTreeSet::len).sum::<usize>(), expected_rows);
+        }
+    }
+
     fn brute(c: &PrimeCurve, base: &[PrimePoint], target: PrimePoint) -> bool {
         let mut ops = GroupOps::default();
         for &p in base {
