@@ -167,18 +167,50 @@ class EvidenceDir(Scratch):
             e = self.headline(self.evidence(f"runs/t{n}"), rel_tol=tol)
             self.assertTrue(any("rel_tol" in x for x in e), tol)
 
-    def test_rel_tol_above_the_maximum_is_refused_once_the_cap_is_enforced(self):
-        wide = (1e300, 1e-3, 2 * g.HEADLINE_REL_TOL_MAX)
-        self.assertFalse(g.HEADLINE_REL_TOL_ENFORCE_MAX, "the cap is an owner decision; see the gate's comment")
-        for n, tol in enumerate(wide):
-            self.assertEqual(self.headline(self.evidence(f"runs/l{n}"), rel_tol=tol), [], tol)
-        g.HEADLINE_REL_TOL_ENFORCE_MAX = True
-        try:
-            for n, tol in enumerate(wide):
-                e = self.headline(self.evidence(f"runs/t{n}"), rel_tol=tol)
-                self.assertTrue(any("rel_tol" in x for x in e), tol)
-        finally:
-            g.HEADLINE_REL_TOL_ENFORCE_MAX = False
+    def test_rel_tol_above_the_maximum_is_refused(self):
+        self.assertTrue(g.HEADLINE_REL_TOL_ENFORCE_MAX)
+        for n, tol in enumerate((1e300, 1e-3, 2 * g.HEADLINE_REL_TOL_MAX)):
+            e = self.headline(self.evidence(f"runs/t{n}"), rel_tol=tol)
+            self.assertTrue(any("rel_tol" in x and "maximum" in x for x in e), tol)
+
+    def pre_cap(self, d: Path) -> str:
+        """List d's validator report as pre-cap; return its digest."""
+        digest = g.report_digest(json.loads((d / "validator-report.json").read_text()))
+        dump(self.repo / g.REL_TOL_PRE_CAP, {"schema": g.REL_TOL_PRE_CAP_SCHEMA,
+                                             "reports": {digest: "runs/toy/validator-report.json"}})
+        return digest
+
+    def test_a_report_listed_as_pre_cap_keeps_its_stated_tolerance(self):
+        d = self.evidence()
+        self.assertTrue(self.headline(d, recomputed=1.25 * 1.0005, rel_tol=1e-3))
+        self.pre_cap(d)
+        self.assertEqual(self.errors(d), [])
+        # The comparison still runs, at the stated tolerance: a larger disagreement fails.
+        d2 = self.evidence("runs/far")
+        self.headline(d2, recomputed=1.25 * 1.5, rel_tol=1e-3)
+        self.pre_cap(d2)
+        self.assertIn("recomputed", self.errors(d2)[0])
+
+    def test_editing_a_pre_cap_report_puts_it_under_the_cap(self):
+        d = self.evidence()
+        self.headline(d, recomputed=1.25 * 1.0005, rel_tol=1e-3)
+        self.pre_cap(d)
+        self.assertEqual(self.errors(d), [])
+        self.edit(d, "validator-report.json", lambda r: r["headline"][0].update(rel_tol=2e-3))
+        self.repin(d, "validator_report", "validator-report.json")
+        self.assertTrue(any("maximum" in x for x in self.errors(d)))
+
+    def test_nan_and_infinity_are_refused_even_for_a_pre_cap_report(self):
+        for n, tol in enumerate((float("nan"), float("inf"), -1.0)):
+            d = self.evidence(f"runs/n{n}")
+            self.headline(d, rel_tol=tol)
+            self.pre_cap(d)
+            self.assertTrue(any("rel_tol" in x for x in self.errors(d)), tol)
+
+    def test_the_pre_cap_list_names_every_wide_committed_report_and_nothing_else(self):
+        listed = g.load_rel_tol_pre_cap(REPO)
+        self.assertEqual(g.rel_tol_pre_cap_reports(REPO), listed)
+        self.assertTrue(listed)
 
     def test_rel_tol_up_to_the_maximum_is_honoured(self):
         d = self.evidence()
@@ -507,6 +539,25 @@ class CiCheck(Scratch):
         r = copy.deepcopy(r)
         r["validation"] = {"status": status}
         return r
+
+    def test_the_pre_cap_list_may_only_shrink_against_the_base(self):
+        self.tree([], [])
+        base = {"schema": g.REL_TOL_PRE_CAP_SCHEMA, "reports": {"a" * 64: "x/validator-report.json"}}
+
+        def show(ref, rel):
+            return json.dumps(base) if rel == g.REL_TOL_PRE_CAP else None
+
+        with unittest.mock.patch.object(g, "base_resolves", return_value=True), \
+                unittest.mock.patch.object(g, "git_show", side_effect=show):
+            dump(self.repo / g.REL_TOL_PRE_CAP, base)
+            self.assertEqual(g.check(self.repo, base="origin/main"), [])
+            dump(self.repo / g.REL_TOL_PRE_CAP, dict(base, reports={}))
+            self.assertEqual(g.check(self.repo, base="origin/main"), [])  # shrinking is allowed
+            dump(self.repo / g.REL_TOL_PRE_CAP, dict(base, reports={"a" * 64: "x/validator-report.json",
+                                                                     "b" * 64: "y/validator-report.json"}))
+            problems = g.check(self.repo, base="origin/main")
+            self.assertEqual(len(problems), 1)
+            self.assertIn("pre-cap list may only shrink", problems[0])
 
     def test_negative_new_leaderboard_row_fails(self):
         self.tree([self.annotated(row(), g.PRE_GATE)], [])

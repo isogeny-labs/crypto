@@ -1,0 +1,147 @@
+name: Prime31 weighted M6 complete Rust AB BA batch comparison
+
+on:
+  push:
+    branches:
+      - automation/prime31-weighted-slot-parity-20261118
+    paths:
+      - '.github/workflows/prime31-weighted-m6-batch.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_m6_complete.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_m6_complete.py'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_m6_batch.py'
+      - 'research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_BATCH_PROTOCOL_20261118.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-prime31-m6-batched:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Sparse checkout two original-curve candidate arms
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_weighted_m6_complete.rs
+            research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs
+            research/prime31_ic_20261115/native/verify_prime31_weighted_m6_complete.py
+            research/prime31_ic_20261115/native/verify_prime31_weighted_m6_batch.py
+            research/prime31_ic_20261115/native/PRIME31_WEIGHTED_M6_BATCH_PROTOCOL_20261118.md
+          sparse-checkout-cone-mode: false
+
+      - name: Immutable original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+
+      - name: Overlay both candidates and show exact source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C native-pinned rev-parse HEAD)" = "1df714645aa683cf975bc76fcacb9842cb4780fd"
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_m6_complete.rs native-pinned/research/prime31_ic_20261115/native/examples/
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_m6_batch.rs native-pinned/research/prime31_ic_20261115/native/examples/
+          echo "Candidate HEAD $GITHUB_SHA; immutable original source 1df714645aa683cf975bc76fcacb9842cb4780fd"
+
+      - name: Run original Rust unit regressions
+        run: cargo +1.100.0 test --release --locked --lib --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+
+      - name: Run scalar and batched B2 exhaustive parity controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          for arm in prime31_weighted_m6_complete prime31_weighted_m6_batch; do
+            cargo +1.100.0 test --release --locked --example "$arm" --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          done
+
+      - name: Matched A B then B A complete 1024 target Rust executions
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANIFEST=native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          # Ensure both examples are built before timing either order.
+          cargo +1.100.0 build --locked --release --example prime31_weighted_m6_complete --example prime31_weighted_m6_batch --manifest-path "$MANIFEST"
+          for arm in prime31_weighted_m6_complete prime31_weighted_m6_batch prime31_weighted_m6_batch prime31_weighted_m6_complete; do
+            case "$arm" in
+              prime31_weighted_m6_complete) label=scalar ;;
+              prime31_weighted_m6_batch) label=batched ;;
+            esac
+            if test "$arm" = prime31_weighted_m6_complete && test ! -f scalar-1.json; then iteration=1
+            elif test "$arm" = prime31_weighted_m6_complete; then iteration=2
+            elif test ! -f batched-1.json; then iteration=1
+            else iteration=2
+            fi
+            cargo +1.100.0 run --release --locked --example "$arm" --manifest-path "$MANIFEST" > "$label-$iteration.json"
+            python3 -m json.tool "$label-$iteration.json" > /dev/null
+          done
+
+      - name: Independent original-curve full arithmetic replay and exact arm agreement
+        shell: bash
+        run: |
+          set -euo pipefail
+          for j in 1 2; do
+            python3 research/prime31_ic_20261115/native/verify_prime31_weighted_m6_complete.py "scalar-$j.json" >> independent-replay.jsonl
+            python3 research/prime31_ic_20261115/native/verify_prime31_weighted_m6_batch.py "batched-$j.json" >> independent-replay.jsonl
+          done
+          python3 - <<'PY' | tee prime31-weighted-m6-batch-abba-summary.json
+          import json, statistics
+          rows={(arm,j):json.load(open(f"{arm}-{j}.json",encoding="utf-8"))
+                for arm in ("scalar","batched") for j in (1,2)}
+          invariant_fields=("source_p","source_a","source_b","source_n","generator",
+                            "weights","base","left_odd_keys","right_odd_keys",
+                            "train_seed","target_seed","train_calls","train_odd",
+                            "train_rank","training","target_limit","shift_cap",
+                            "completed","target_attempts","base_logs","targets")
+          source=rows["scalar",1]
+          for (arm,j),r in rows.items():
+            assert all(r[k]==source[k] for k in invariant_fields),(arm,j,"loss of deterministic parity/witness equivalence")
+            assert r["train_rank"]==31 and r["completed"]==1024
+            assert r["target_attempts"]==3717 and r["train_calls"]==106
+            assert r["pcc"]=="unverified"
+          t={a:[rows[a,j]["total_ns_diagnostic"]/1e6 for j in (1,2)] for a in ("scalar","batched")}
+          speed=[t["scalar"][i]/t["batched"][i] for i in range(2)]
+          result={
+            "source_head":"GitHub Actions GITHUB_SHA",
+            "method":"exact same 1024 blinded Prime31 Q; A B B A alternating control",
+            "original_curve_p":2**31-1,"n":2147446831,
+            "all_runs_rank":31,"all_runs_logs":1024,"all_runs_attempts":3717,
+            "complete_program_ms":t,
+            "paired_speedup":speed,
+            "median_speedup":statistics.median(speed),
+            "operation_counts":{
+              arm:{k:rows[arm,1][k] for k in ("setup_cost","train_cost","query_cost")}
+              for arm in ("scalar","batched")
+            },
+            "pcc":"unverified",
+            "nonenumerative_index_calculus":False,
+            "external_shared_BSGS_rho_IC_frontier_compared":False
+          }
+          print(json.dumps(result,sort_keys=True))
+          PY
+
+      - name: Publish full raw AB BA and independent replay
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-weighted-m6-batch-abba
+          path: |
+            scalar-*.json
+            batched-*.json
+            independent-replay.jsonl
+            prime31-weighted-m6-batch-abba-summary.json
+          if-no-files-found: warn
+          retention-days: 30

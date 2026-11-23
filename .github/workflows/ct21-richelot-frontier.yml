@@ -1,6 +1,7 @@
 name: CT21 rational Richelot frontier regression
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/ct21_richelot_neighbors.py'
       - 'research/chained_jacobian_transfers_20261110/CT21_RICHELOT_FRONTIER.md'
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   bounded-oracle:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
