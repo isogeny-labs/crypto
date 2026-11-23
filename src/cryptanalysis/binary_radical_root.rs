@@ -141,7 +141,7 @@ impl ArtinSchreier {
             // distinct pivots; M(x) is then read off by reducing x.
             let v = basis[trace_mask.trailing_zeros() as usize];
             let mut rows: Vec<(u64, u64)> = Vec::with_capacity(n as usize);
-            let mut push = |mut vec: u64, mut img: u64, rows: &mut Vec<(u64, u64)>| {
+            let push = |mut vec: u64, mut img: u64, rows: &mut Vec<(u64, u64)>| {
                 for &(rv, ri) in rows.iter() {
                     let p = 63 - rv.leading_zeros();
                     if vec >> p & 1 == 1 {
@@ -707,14 +707,7 @@ impl RowRoots {
 /// Roots of `A·X² + B·X + C` (`A·B ≠ 0`, `ab_inv = 1/(A·B)`), by one
 /// Artin–Schreier step: `X = (B/A)·t` with `t² + t = A·C/B²`.
 #[inline(always)]
-fn as_roots<S: AsSolver>(
-    a: u64,
-    b: u64,
-    c: u64,
-    ab_inv: u64,
-    r: &S,
-    gf: &Gf2,
-) -> Option<[u64; 2]> {
+fn as_roots<S: AsSolver>(a: u64, b: u64, c: u64, ab_inv: u64, r: &S, gf: &Gf2) -> Option<[u64; 2]> {
     let (inv_a, inv_b) = (gf.mul(b, ab_inv), gf.mul(a, ab_inv));
     let w = gf.mul(gf.mul(a, c), gf.sqr(inv_b));
     if r.tr(w) != 0 {
@@ -1556,7 +1549,10 @@ mod tests {
                     assert_eq!(eval_s4_general(xs[0], xs[1], xs[2], xr, b, &gf), 0);
                     let (want, _) = base.decompose(xr, &gf);
                     let (got, _) = fac.decompose(xr, &gf);
-                    assert!(want.is_some(), "geometric control missing in original oracle");
+                    assert!(
+                        want.is_some(),
+                        "geometric control missing in original oracle"
+                    );
                     let [a, c, d] = got.expect("geometric control missing in factored oracle");
                     assert!(fac.contains(a) && fac.contains(c) && fac.contains(d));
                     assert_eq!(eval_s4_general(a, c, d, xr, b, &gf), 0);
