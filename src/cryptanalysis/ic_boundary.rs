@@ -1655,12 +1655,24 @@ pub trait CountedGroup {
     }
     /// A key that identifies the element (both walks must agree on it).
     fn key(&self, p: &Self::Elt) -> u64;
+    /// The class of `p` in `E / 2E` when the group reads it without a
+    /// group operation (`None` otherwise).  On an ordinary binary curve
+    /// `y² + xy = x³ + ax² + b` a point lies in `2E` exactly when
+    /// `Tr(x) = Tr(a)`, so the class is `Tr(x) + Tr(a)`.  With cofactor 2
+    /// the index-`r` subgroup is `2E`, so this is the full coset class.
+    /// The field squarings one call performs are
+    /// [`Self::coset_parity_squarings`].
+    fn coset_parity(&self, _p: &Self::Elt) -> Option<u8> {
+        None
+    }
+    /// Field squarings one [`Self::coset_parity`] call performs (the
+    /// `mitm-coset` oracle counts them, uncharged).
+    fn coset_parity_squarings(&self) -> u64 {
+        0
     /// Exclusive upper bound on abscissa-style table keys (`x + 1`), when
     /// every key the walk stores is below it — enables a dense array map.
     /// `None` (default) keeps open-addressing.
     fn abscissa_key_bound(&self) -> Option<u64> {
-        None
-    }
     /// An opt-in addition path for the relation walk.  The closure lives for
     /// one solve, so an implementation may retain native field state between
     /// steps.  Other group operations keep their established accounting.
@@ -7958,11 +7970,27 @@ impl CountedGroup for BinaryGroup<'_> {
     fn key(&self, p: &FastPoint) -> u64 {
         p.pack()
     }
+    fn coset_parity(&self, p: &FastPoint) -> Option<u8> {
+        if p.infinity {
+            return Some(0);
+        }
+        let f = &self.0.field;
+        let tr = |v: u64| -> u64 {
+            let (mut acc, mut t) = (v, v);
+            for _ in 1..self.0.n {
+                t = f.sqr(t);
+                acc ^= t;
+            }
+            debug_assert!(acc == 0 || acc == 1);
+            acc
+        };
+        Some((tr(p.x) ^ tr(self.0.a)) as u8)
+    }
+    fn coset_parity_squarings(&self) -> u64 {
+        2 * u64::from(self.0.n.saturating_sub(1))
     fn x_sibling_pair(&self, p: FastPoint, j: FastPoint) -> Option<(FastPoint, u64)> {
         if p.infinity || j.infinity || p.x == j.x {
             return None;
-        }
-        let f = &self.0.field;
         let inv = f.inv(p.x ^ j.x);
         let lp = f.mul(p.y ^ j.y, inv);
         let lm = lp ^ f.mul(j.x, inv);
@@ -7970,7 +7998,6 @@ impl CountedGroup for BinaryGroup<'_> {
         let x_plus = f.sqr(lp) ^ lp ^ base;
         let y_plus = f.mul(lp, p.x ^ x_plus) ^ x_plus ^ p.y;
         Some((FastPoint::affine(x_plus, y_plus), f.sqr(lm) ^ lm ^ base))
-    }
 }
 
 /// Trial-division factorisation of a word.
@@ -9783,6 +9810,18 @@ impl PairTable {
     }
 
     pub fn build<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        Self::build_filtered(g, fb, None)
+    }
+
+    /// The full table restricted to the pairs `keep(i, j)` admits, in the
+    /// same order, so every key the filtered table holds carries the same
+    /// first witness as the full table's (`mitm-coset`).  `None` keeps
+    /// every pair and is exactly [`Self::build`].
+    pub fn build_filtered<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        keep: Option<&dyn Fn(usize, usize) -> bool>,
+    ) -> Self {
         let start = Instant::now();
         let n = fb.points.len();
         let mut ops = GroupOps::default();
@@ -9790,6 +9829,11 @@ impl PairTable {
         let mut attempts = 0u64;
         for i in 0..n {
             for j in i..n {
+                if let Some(keep) = keep {
+                    if !keep(i, j) {
+                        continue;
+                    }
+                }
                 let s = g.add(&mut ops, fb.points[i], fb.points[j]);
                 if g.is_identity(&s) {
                     continue;
@@ -9799,7 +9843,11 @@ impl PairTable {
             }
         }
         Self {
-            kind: "full",
+            kind: if keep.is_some() {
+                "full_coset_filtered"
+            } else {
+                "full"
+            },
             entries: map.len() as u64,
             map,
             parts: Vec::new(),
@@ -9823,6 +9871,16 @@ impl PairTable {
     /// plus its own double.  About `|F|²/4` additions instead of
     /// `|F|²/2`; the probe is unchanged.
     pub fn build_negation_folded<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        Self::build_negation_folded_filtered(g, fb, None)
+    }
+
+    /// The negation-folded table restricted to the pairs `keep(i, j)`
+    /// admits (see [`Self::build_filtered`]); the probe is unchanged.
+    pub fn build_negation_folded_filtered<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        keep: Option<&dyn Fn(usize, usize) -> bool>,
+    ) -> Self {
         let start = Instant::now();
         let mut ops = GroupOps::default();
         let groups: Vec<&Vec<usize>> = fb
@@ -9837,6 +9895,11 @@ impl PairTable {
             let i = groups[ai][0];
             for group in groups.iter().skip(ai) {
                 for &j in group.iter() {
+                    if let Some(keep) = keep {
+                        if !keep(i, j) {
+                            continue;
+                        }
+                    }
                     let s = g.add(&mut ops, fb.points[i], fb.points[j]);
                     if g.is_identity(&s) {
                         continue;
@@ -9847,7 +9910,11 @@ impl PairTable {
             }
         }
         Self {
-            kind: "negation_folded",
+            kind: if keep.is_some() {
+                "negation_folded_coset_filtered"
+            } else {
+                "negation_folded"
+            },
             entries: map.len() as u64,
             map,
             parts: Vec::new(),
