@@ -42,7 +42,9 @@ pub mod ic_boundary {
     use num_traits::ToPrimitive;
     use serde::{Deserialize, Serialize};
 
-    use crate::cryptanalysis::prime_fast::{FastCurve as FastPrimeCurve, Pt as FastPrimePoint};
+    use crate::cryptanalysis::prime_fast::{
+        FastCurve as FastPrimeCurve, Fp64, Pt as FastPrimePoint,
+    };
     use crate::cryptanalysis::residual_walk::is_prime_u64;
 
     include!(concat!(env!("OUT_DIR"), "/ic_boundary.rs"));
@@ -53,6 +55,14 @@ pub mod pq_groebner_f2 {
 }
 
 pub mod prime_fast {
+    use std::collections::HashMap;
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+    use std::sync::Mutex;
+    use std::time::Instant;
+
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
     include!(concat!(env!("OUT_DIR"), "/prime_fast.rs"));
 }
 

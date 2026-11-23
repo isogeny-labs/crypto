@@ -2,7 +2,14 @@
 
 **Implementation and development checks; the registered Prime31 campaign has not run.**
 PR: [isogeny-labs/crypto#4923](https://github.com/isogeny-labs/crypto/pull/4923).
-The current state and launch blockers are recorded in [RUN_STATUS.json](RUN_STATUS.json).
+The new [isogeny-choice extension](isogeny-choice/README.md) adds the three A− kernels,
+quartic blocks, target-degree-three native/transported bases, matched plain controls,
+and current-source negation-aware rho references. Its [illustrated report](isogeny-choice/reports/Prime31_Isogeny_Comparison.pdf)
+and [status](isogeny-choice/RUN_STATUS.json) record 54 development contracts and
+230 prepared but unexecuted cells [pcc:unverified].
+
+The paragraphs below describe the original 55-cell panel. Its historical state
+and launch blockers are recorded in [RUN_STATUS.json](RUN_STATUS.json).
 The [protocol](PROTOCOL.md) is a draft, with [machine-readable design](protocol.json)
 and [native panel inputs](panel.json). It has not passed the current canonical
 freeze gate. No speedup, complete Prime31 recovery, or comparison with optimized

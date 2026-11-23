@@ -7,6 +7,10 @@ use std::path::{Path, PathBuf};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
+const UPSTREAM_REVISION: &str = "33b3bc3c7485df0fe80aae41e2093cf940d87ff3";
+const UPSTREAM_MANIFEST: &str =
+    "research/prime31_aux_matched_20261122/isogeny-choice/upstream/manifest.json";
+
 struct Range<'a> {
     start: &'a str,
     end: &'a str,
@@ -123,6 +127,33 @@ fn inventory(root: &Path, relative: &str, role: &str) -> Value {
     })
 }
 
+/// Verify every upstream snapshot and every unchanged dependency against the
+/// separately retained exact-revision manifest before selecting any source.
+fn upstream_sources(root: &Path) -> Value {
+    let bytes = read(root, UPSTREAM_MANIFEST);
+    let manifest: Value = serde_json::from_slice(&bytes).expect("valid upstream source manifest");
+    assert_eq!(manifest["schema"], "prime31-isogeny-upstream-source/v1");
+    assert_eq!(manifest["upstream_revision"], UPSTREAM_REVISION);
+    let snapshots = manifest["snapshots"]
+        .as_array()
+        .expect("upstream snapshots");
+    let unchanged = manifest["unchanged_dependencies"]
+        .as_array()
+        .expect("unchanged upstream dependencies");
+    assert_eq!(snapshots.len(), 4);
+    assert_eq!(snapshots.len() + unchanged.len(), 43);
+    for source in snapshots.iter().chain(unchanged) {
+        let path = source["path"].as_str().expect("upstream source path");
+        let expected = source["sha256"].as_str().expect("upstream source SHA-256");
+        assert_eq!(
+            digest(&read(root, path)),
+            expected,
+            "upstream bytes changed: {path}"
+        );
+    }
+    manifest
+}
+
 /// Keep the real F4 parent/child layout when it is attached through #[path].
 /// The parent is named mod.rs so its unchanged `pub mod reuse/certified`
 /// declarations resolve the original children in the same directory.
@@ -131,7 +162,10 @@ fn f4_layout(root: &Path, out: &Path) -> Value {
     fs::create_dir_all(&directory).expect("create layout-preserving F4 directory");
     let mut copied = Vec::new();
     for (relative, filename) in [
-        ("src/cryptanalysis/f4_fp.rs", "mod.rs"),
+        (
+            "research/prime31_aux_matched_20261122/isogeny-choice/upstream/f4_fp.rs",
+            "mod.rs",
+        ),
         ("src/cryptanalysis/f4_fp/reuse.rs", "reuse.rs"),
         (
             "src/cryptanalysis/f4_fp/pair_certificate.rs",
@@ -199,6 +233,7 @@ fn main() {
         .canonicalize()
         .expect("qualifier must stay inside its repository");
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    let upstream_source_provenance = upstream_sources(&root);
     let f4_layout = f4_layout(&root, &out);
     let extracted = vec![
         extract(
@@ -235,8 +270,8 @@ fn main() {
         extract(
             &root,
             &out,
-            "src/cryptanalysis/groebner_f4.rs",
-            "576eceef9f2abd24ec8fadb2c14f74e7bcca9db57999c7978ed6485503c18c4e",
+            "research/prime31_aux_matched_20261122/isogeny-choice/upstream/groebner_f4.rs",
+            "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
             &[Range {
                 start: "// ── Monomial ordering",
                 end: "/// Leading monomial of `f` under `ord`, as `(exponent, coefficient)`.\n",
@@ -247,8 +282,8 @@ fn main() {
         extract(
             &root,
             &out,
-            "src/cryptanalysis/ic_boundary.rs",
-            "8bf3a729bb553cbc2f09d9eca64f3aa2025de4c06d2f16c8f2a199f932444d4c",
+            "research/prime31_aux_matched_20261122/isogeny-choice/upstream/ic_boundary.rs",
+            "1f94ec22dbf7f865fd309e4fb770478dd555afd3282808143526fa775b81726d",
             &[
                 Range {
                     start: "/// The field operations behind the group operations: modular\n",
@@ -272,8 +307,13 @@ fn main() {
                 },
                 Range {
                     start: "// ── A fast hasher for point keys",
+                    end: "    /// A binary curve's sibling pair from ONE inversion `1/(x_P + x_J)`:\n",
+                    scope: "actual map hasher, word modular arithmetic, IncrementalGauss, SiblingPair, and CountedGroup prefix; unused malformed upstream x_sibling_pair members omitted as recorded in upstream provenance",
+                },
+                Range {
+                    start: "    /// `[k]P` by double-and-add, counted exactly.\n",
                     end: "fn mix(v: u64) -> u64 {",
-                    scope: "actual map hasher, all word modular arithmetic, IncrementalGauss, SiblingPair, and complete CountedGroup trait",
+                    scope: "actual CountedGroup scalar multiplication methods and original trait closing brace, serial_add_each, and PRIME_ADD_EACH_BLOCK; no substitute sibling members or inserted braces",
                 },
                 Range {
                     start: "fn mix(v: u64) -> u64 {",
@@ -281,24 +321,44 @@ fn main() {
                     scope: "unchanged production A1 rho_reference and point hash; not the tuned negation-map reference",
                 },
                 Range {
-                    start: "/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A\n",
-                    end: "#[inline]\nfn negmod(a: u64, m: u64) -> u64 {",
-                    scope: "actual pick_word architecture dispatch",
+                    start: "// ── The matched reference: a tuned, automorphism-aware counted rho",
+                    end: "impl RhoClasses<PrimeCurve> for CubicClasses {",
+                    scope: "complete production RhoWalk, WalkPolicy, jump sizing, joint multiplication, architecture dispatch, RhoClasses, PointClasses, NegationClasses, and CubicClasses inherent implementation; no cubic class or binary/Frobenius implementation",
                 },
                 Range {
-                    start: "pub struct CubicClasses {",
-                    end: "impl RhoClasses<PrimeCurve> for CubicClasses {",
-                    scope: "CubicClasses type and complete inherent implementation required by PrimeCurve's automorphism method; no rho class implementation",
+                    start: "/// The class representative of `p` with its coefficients, and whether\n",
+                    end: "/// One lane of [`rho_walk_lanes`]: the state [`TunedWalker::walk`] keeps in\n",
+                    scope: "complete production canonicalisation, tuned single-target walker, counters, policy entry points, RhoSetup, ladder verification, and rho_search_from; no batched lane or multi-target walk",
+                },
+                Range {
+                    start: "/// How [`rho_walk_v3`] builds its table.\n",
+                    end: "/// One target's share of a [`rho_batch_with`] run.\n",
+                    scope: "complete production RhoV3 including v4/v5/v6 configuration, jump and ladder sizing, rho_walk_v3, and required chained_jumps helper; no multi-target batch",
+                },
+                Range {
+                    start: "/// The matched reference for `A = 2`: [`rho_reference_walk`] with\n",
+                    end: "/// The native work of a signed-Frobenius run that the unit prices at\n",
+                    scope: "complete production rho_reference_negation wrapper for the registered historical counted A=2 reference",
                 },
                 Range {
                     start: "// ── Prime-field curves on one word",
+                    end: "    /// `P + J` in full and the abscissa of `P − J` from ONE inversion: the\n",
+                    scope: "complete PrimePoint, PrimeCurve, CountedFp, Jacobi helper, and CountedGroup implementation prefix; unused malformed upstream x_sibling_pair_counted override omitted as recorded in upstream provenance",
+                },
+                Range {
+                    start: "    fn neg(&self, p: PrimePoint) -> PrimePoint {\n",
                     end: "/// A prime-field instance: curve, prime-order subgroup, generator.\n",
-                    scope: "complete PrimePoint, PrimeCurve, CountedFp, Jacobi helper, and full CountedGroup implementation including native walk overrides",
+                    scope: "actual remaining PrimeCurve CountedGroup methods including native walk overrides and original impl closing brace; no substitute sibling method or inserted brace",
                 },
                 Range {
                     start: "/// A materialised factor base with its column map.  Both `P` and `−P`\n",
                     end: "/// The prime-field base: the `size` smallest abscissae that are on the\n",
                     scope: "complete FactorBase type, count_index_build, and inherent implementation including from_column_map",
+                },
+                Range {
+                    start: "#[inline(always)]\n#[allow(unused_unsafe)]\nfn prefetch_cache_line<T>(lines: &[T], index: usize) {\n",
+                    end: "struct GuardLineSet {\n",
+                    scope: "complete production cache-line prefetch helper used by OpenCoefMap, including unchanged x86_64 intrinsic and non-x86_64 cfg branches",
                 },
                 Range {
                     start: "/// Resolve the signs of a witness of abscissae: which points above them\n",
@@ -323,8 +383,8 @@ fn main() {
         extract(
             &root,
             &out,
-            "src/cryptanalysis/prime_fast.rs",
-            "ace8a36eabd60f189d5b6a77e249e103091cc4353a944f52fe8027dfc175dc2a",
+            "research/prime31_aux_matched_20261122/isogeny-choice/upstream/prime_fast.rs",
+            "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
             &[
                 Range {
                     start: "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n",
@@ -340,6 +400,11 @@ fn main() {
                     start: "    pub fn is_on_curve(&self, p: Pt) -> bool {\n",
                     end: "fn biguint_to_u64(v: &BigUint) -> Option<u64> {",
                     scope: "all remaining FastCurve arithmetic methods including batched additions and existing impl closing brace; unused textbook conversion adapters omitted",
+                },
+                Range {
+                    start: "// ── Parallel distinguished-point rho",
+                    end: "// ── Index calculus: factor base, pair table, relations, linear algebra",
+                    scope: "complete production prime_fast RhoConfig, RhoResult, operation counts, collision verification, rho_parallel, and worker/lane implementation; prescribed one-thread tuned wall reference, no index-calculus substitute",
                 },
             ],
             "prime_fast.rs",
@@ -408,8 +473,16 @@ fn main() {
 
     let mut full: Vec<_> = [
         (
-            "src/cryptanalysis/f4_fp.rs",
-            "complete production general F4",
+            "research/prime31_aux_matched_20261122/isogeny-choice/upstream/f4_fp.rs",
+            "complete current-upstream production general F4 snapshot",
+        ),
+        (
+            UPSTREAM_MANIFEST,
+            "exact-revision upstream snapshots and unchanged dependency provenance",
+        ),
+        (
+            "research/prime31_aux_matched_20261122/isogeny-choice/fixtures/kernel_correctness_fixtures.json",
+            "exact kernel fixture included in the kernel_fiber_contract test executable",
         ),
         (
             "src/cryptanalysis/f4_fp/reuse.rs",
@@ -491,6 +564,7 @@ fn main() {
         "schema": "prime31-aux-matched-source-manifest/v1",
         "scope": "matched auxiliary study with unchanged production F4 and exact declared source closure",
         "evidence_status": "build provenance only; test results require a separate receipt; PCC-unverified",
+        "upstream_source_provenance": upstream_source_provenance,
         "extracted_production_ranges": extracted,
         "layout_preserving_f4_copy": f4_layout,
         "whole_files": full,

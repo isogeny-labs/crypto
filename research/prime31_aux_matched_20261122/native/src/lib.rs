@@ -4,9 +4,11 @@ pub mod audit;
 pub mod bases;
 pub mod collector;
 pub mod cryptanalysis;
+pub mod kernel_fibers;
 pub mod oracle;
 pub mod provenance;
 pub mod replay;
+pub mod target_transport;
 
 pub use cryptanalysis::ic_boundary::{
     pivot_inversion_steps, rho_reference, CountedGroup, FactorBase, GroupOps, IncrementalGauss,

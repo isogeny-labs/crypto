@@ -1,5 +1,5 @@
 //! Exact finite-field S3 relation extraction on every sequential-prefix chart.
-//! The membership set is the complete V in both presentations. Original point
+//! The membership set is the complete V in every presentation. Original point
 //! signs and every finite/infinite prefix are replayed before accepting a row.
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -41,6 +41,19 @@ impl TowerDescription {
 pub enum Presentation {
     Dense,
     Tower,
+    /// Compose consecutive quadratic membership maps into degree-four blocks.
+    /// An unpaired final map stays quadratic; the original full fibre and
+    /// original tower validation are unchanged.
+    Tower4,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DomainRoots {
+    #[default]
+    Scan,
+    Frobenius,
+    Auto,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -55,6 +68,10 @@ pub struct OracleLimits {
     pub stop_after_first: bool,
     pub max_variables: usize,
     pub max_input_terms: usize,
+    /// Exact current-production finite-domain extraction policy. Legacy cells
+    /// retain Scan/off; the new panel records its choice explicitly.
+    pub domain_roots: DomainRoots,
+    pub sibling_batch: bool,
 }
 impl Default for OracleLimits {
     fn default() -> Self {
@@ -67,6 +84,8 @@ impl Default for OracleLimits {
             stop_after_first: true,
             max_variables: 32,
             max_input_terms: 100_000,
+            domain_roots: DomainRoots::Scan,
+            sibling_batch: false,
         }
     }
 }
@@ -302,7 +321,7 @@ fn build_chart(
     limits: &OracleLimits,
     counts: &mut OracleCounters,
 ) -> Result<Option<ChartSystem>, String> {
-    let depth = if presentation == Presentation::Tower {
+    let depth = if presentation != Presentation::Dense {
         tower.ok_or("tower presentation requires a tower")?.depth()
     } else {
         1
@@ -310,7 +329,13 @@ fn build_chart(
     if depth == 0 {
         return Err("tower depth must be positive".into());
     }
-    let mut n = m.checked_mul(depth).ok_or("variable count overflow")?;
+    let block_width = if presentation == Presentation::Tower4 {
+        2
+    } else {
+        1
+    };
+    let levels = depth.div_ceil(block_width);
+    let mut n = m.checked_mul(levels).ok_or("variable count overflow")?;
     let mut prefixes = Vec::with_capacity(m.saturating_sub(2));
     for j in 0..m - 2 {
         if mask & (1 << j) != 0 {
@@ -332,9 +357,11 @@ fn build_chart(
         if presentation == Presentation::Dense {
             equations.push(dense_membership(values, i, n, p, counts));
         } else {
-            for j in 0..depth {
+            for j in 0..levels {
+                let step_index = j * block_width;
+                let paired = block_width == 2 && step_index + 1 < depth;
                 let here = variable(j * m + i, n);
-                let next = if j + 1 < depth {
+                let next = if j + 1 < levels {
                     variable((j + 1) * m + i, n)
                 } else {
                     scalar_poly(
@@ -347,9 +374,40 @@ fn build_chart(
                 };
                 match tower.unwrap() {
                     TowerDescription::Velu { steps, .. } => {
-                        let (xi, tau) = steps[j];
+                        let (xi, tau) = steps[step_index];
                         if tau == 0 {
                             return Err("singular/reducible zero-tau tower step".into());
+                        }
+                        if paired {
+                            let (beta, sigma) = steps[step_index + 1];
+                            if sigma == 0 {
+                                return Err("singular/reducible zero-tau tower step".into());
+                            }
+                            // For r1=N/D and r2(z)=z+sigma/(z-beta), the
+                            // composite is [N(N-beta D)+sigma D^2]/[D(N-beta D)].
+                            // Nonzero tau and sigma keep these coprime: at
+                            // D=0 the numerator is tau^2, and at N-beta D=0
+                            // it is sigma D^2. Clearing denominators therefore
+                            // introduces no affine roots at either pole.
+                            let d = add_poly(&here, &scalar_poly(sub(0, xi, p), n), p);
+                            let n1 =
+                                add_poly(&mul_poly(&here, &d, p, counts), &scalar_poly(tau, n), p);
+                            let inner =
+                                add_poly(&n1, &scale_poly(&d, sub(0, beta, p), p, counts), p);
+                            let denominator = mul_poly(&d, &inner, p, counts);
+                            let d2 = mul_poly(&d, &d, p, counts);
+                            let numerator = add_poly(
+                                &mul_poly(&n1, &inner, p, counts),
+                                &scale_poly(&d2, sigma, p, counts),
+                                p,
+                            );
+                            let rhs = mul_poly(&next, &denominator, p, counts);
+                            equations.push(add_poly(
+                                &numerator,
+                                &scale_poly(&rhs, p - 1, p, counts),
+                                p,
+                            ));
+                            continue;
                         }
                         let h2 = mul_poly(&here, &here, p, counts);
                         let neg_next = scale_poly(&next, p - 1, p, counts);
@@ -360,12 +418,19 @@ fn build_chart(
                         equations.push(add_poly(&add_poly(&h2, &product, p), &remainder, p));
                     }
                     TowerDescription::Dickson { shift, .. } => {
-                        let y = if j == 0 {
+                        let y = if step_index == 0 {
                             add_poly(&here, &scalar_poly(sub(0, *shift, p), n), p)
                         } else {
                             here
                         };
-                        let h2 = mul_poly(&y, &y, p, counts);
+                        let mut h2 = mul_poly(&y, &y, p, counts);
+                        if paired {
+                            // The first Dickson map produces y^2-2; applying
+                            // the second gives (y^2-2)^2-2. The original shift
+                            // belongs only to the first map of the full chain.
+                            h2 = add_poly(&h2, &scalar_poly(p - 2, n), p);
+                            h2 = mul_poly(&h2, &h2, p, counts);
+                        }
                         let rest = add_poly(
                             &scale_poly(&next, p - 1, p, counts),
                             &scalar_poly(p - 2, n),
@@ -695,7 +760,7 @@ pub fn decompose(
     if limits.max_degree == 0 || limits.max_pairs_per_step == 0 || limits.max_variables == 0 {
         return Err("solver degree, pair batch and variable cap must be positive".into());
     }
-    if presentation == Presentation::Tower {
+    if presentation != Presentation::Dense {
         let t = tower.ok_or("tower presentation requires a tower")?;
         if t.depth() == 0
             || t.depth() >= usize::BITS as usize
@@ -789,6 +854,12 @@ pub fn decompose(
             }
         };
         let mut opts = F4Options::new(Ordering::Grevlex, limits.max_degree);
+        opts.domain_roots = match limits.domain_roots {
+            DomainRoots::Scan => f4_fp::DomainRootMode::Scan,
+            DomainRoots::Frobenius => f4_fp::DomainRootMode::Frobenius,
+            DomainRoots::Auto => f4_fp::DomainRootMode::Auto,
+        };
+        opts.sibling_batch = limits.sibling_batch;
         opts.deadline = Some(deadline);
         opts.max_pairs_per_step = Some(limits.max_pairs_per_step);
         let mut cap_hit = false;
