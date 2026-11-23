@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T04:26:11Z",
+ "id": "PCC-20261123-c38e68",
+ "kind": "statement",
+ "producer": {
+  "commit": "ab905abd2a7b234c1c94946e8bae85493d120457",
+  "model": "gpt-6-astra",
+  "session": "fass-target-quotient-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/independent/qualifier-replay1/qualifier.stdout.jsonl",
+    "sha256": "a1c1fffe57f3f3b65408171b9244cceff4ba57a52276d041a6ba8d52f02339d9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/independent/qualifier-replay1/manifest.pre-call.txt",
+    "sha256": "6a695b98a213e7164b1b080681501e05fce1c2672337a4c2836a2e253e333f07"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/independent/qualifier-replay1/manifest.post-call.txt",
+    "sha256": "8fc258d7f375cbd9244848b3a6ffe45987bb3da5d931212d539edf7aec619e36"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/producer/certificate-attempt1/cusp-d6-k2-remainder.identity.json",
+    "sha256": "5b8adc9c6e41d9f07a620d6dc5bca9d96655fdabe22123eee3e6caf3589963dd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/independent/certificate-replay1/check.stdout.jsonl",
+    "sha256": "27cb082037e27a2f3072214f2321f4e985234fcfa7a7c87754fbea1c013ba8fe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/independent/certificate-replay1/manifest.pre-call.txt",
+    "sha256": "45c7b2dcb3ed9152f3acd9df8c95458d929f55e0b5e77c9340f9f97f7a11aa32"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/independent/certificate-replay1/manifest.post-call.txt",
+    "sha256": "aa8d51405af0620b3ed3cac84b9ac2855f70e9a34001892bc87cb2c49f7f1aac"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/root-gate/check-attempt1/stderr.log",
+    "sha256": "c8acb4e78859fb292426941b2276f50b47f47530c06d2ebef9e5747ae3f3ca2a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/root-gate/check-attempt2/stderr.log",
+    "sha256": "a54279ba28e664a153ca474e8efeeccb79cced693a9762240440e1cc87287f19"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact raw replay, fixed-degree evaluated identity and local repository setup outcomes; no universal theorem, performance, random-yield or signed relation conclusion",
+ "statement": "Separate-role same-host replay of the frozen 91-target quotient qualifier returned exit 0 with byte-identical stdout and stable source/binary hashes. The fixed d6,k2 identity certificate IDC1h7e169f28f6a50bb6 was accepted at 32 certificate points and 32 fresh seeded points; proof is null. Root metadata completed but two sparse path-dependency check attempts did not reach compilation. All observations are unsigned and are not scientific execution verification."
+}
