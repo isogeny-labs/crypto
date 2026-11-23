@@ -235,7 +235,9 @@ strong-rho run on a public target into a checked `vs_rho` claim (§9). On Linux 
 (`--cpus auto`); on macOS there is no affinity control, so it records
 every run at L0 and says so. Operation counts are unaffected.
 
-The skills in [`.agents/skills/`](../../.agents/skills) walk an agent
+The skills in the workspace trunk
+([`isogeny-labs/workspace:.agents/skills/`](https://github.com/isogeny-labs/workspace/tree/main/.agents/skills);
+[`.agents/skills/README.md`](../../.agents/skills/README.md)) walk an agent
 through a measurement (`ecbench-measure`), an independent run
 (`ecbench-independent-runner`) and an extension (`ecbench-extend`).
 
@@ -1044,6 +1046,21 @@ bases the Gröbner arms use, so the engines meet on one query stream
   per relation and nothing else. The difference the unit does not see, one
   inversion a target against `2|F_x|`, is in the `inversions` counter, the
   record's field-operation tally and wall time.
+- `rootfind-floor:m=2|3` is the same search and the same charged additions
+  as `rootfind-subtract`, with x-only Montgomery candidates and a
+  word-blocked Bloom filter in front of the exact abscissa map (lever 1 of
+  `research/rootfind_baseline_100x_20261117/PLAN.md`). It is a separate
+  oracle id: never change what `rootfind-subtract` counts. Classification
+  is constant-factor engineering (wall / field work); evidence under
+  `research/rootfind_floor_oracle_20261119/`.
+- `rootfind-kmitm:m=3..12` is meet-in-the-middle root finding. Default
+  **probe-favoring** split: left `L = min(9, m−1)`, right `R = m−L`
+  (so `R = 1` for every `m ≤ 10`); `split=balanced` keeps `⌈m/2⌉/⌊m/2⌋`.
+  On primes, both `R = 1` and `R ≥ 2` use one Montgomery batch inversion
+  a target (over the factor base or the precomputed right sums) and
+  Bloom-filtered folded-key lookups into the left table (lever-1 +
+  lever-3 of the 100× plan). Enables `m = 10..12`. New id; evidence under
+  `research/rootfind_kmitm_20261119/`.
 
 Read a root-finding arm against a Gröbner arm on the resource vector and on
 wall time: the root finder's `S` is a complete count of group additions,
