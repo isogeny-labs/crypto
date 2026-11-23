@@ -15,8 +15,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 /// Indices are positions in the unchanged input CompleteRelation slice.
-/// Contradictions refer to nonzero RHS after exact reduction of all small
-/// coefficients; they must be treated as invalid evidence, not useful rank.
+/// A residual RHS is an inconsistency ONLY if the RHS is a known constant
+/// and every unknown (including any target log) is modeled as a small
+/// column. Otherwise it flags a missing column/unknown, not a false group
+/// relation. In either case it is not independent small-coordinate rank.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProjectedRankAudit {
     pub input_rows: usize,
@@ -55,6 +57,10 @@ fn add_sparse_term(row: &mut BTreeMap<u32, u64>, column: u32, term: u64, p: u64)
 /// existing replay normalization. Invalid rows are refused, not repaired by
 /// silently changing a source witness. Odd composite moduli are not rank
 /// fields; if a needed pivot is not invertible the function fails closed.
+///
+/// Any target scalar coefficient must first be represented as an explicit
+/// unknown column in the input small matrix, NOT hidden inside rhs; a
+/// residual RHS with an omitted target column is not proof of invalidity.
 ///
 /// A sparse echelon basis is kept with leading coefficient 1. Original
 /// independent row indices are retained, so downstream callers can preserve
