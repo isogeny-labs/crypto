@@ -26,3 +26,7 @@ has both local Mathlib-import failures and account-billing CI failure; its
 generic/instance/axiom audit has not succeeded. Root #4990 CI failures and
 over30 check budget remain held, not waived. Only signed PCC standing
 verifies. Use normal CI cadence and merge requirements. [pcc:unverified]
+
+## Coordinate successor completed
+
+Coordinate D source0eac0c32 succeeds once; claim5bd9de and coordinates/CURRENT_RESULT_D.md have the actual matrix/pairing2/controls/coverage. Full2753B stdout is public; whole185920B table and whole ELFs remain private custody-pending at /dev/shm/ct23-jacobian8-first-D. A format1, B compile1 and C Clippy1 are preserved. Do not repeat D or the census. Next: actual rational Richelot codomain/map qualification, then actual Weil8 and full-cost descent/solver work. Parent #5005 metadata merge candidate still waits publication; shared formal/CI/billing/paid/vault blocks unchanged. [pcc:unverified]
