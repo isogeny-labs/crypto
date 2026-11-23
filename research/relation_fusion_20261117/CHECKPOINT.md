@@ -1,3 +1,27 @@
+# Active 15× continuation checkpoint — 2026-11-23
+
+The original 15× goal remains active and unachieved. Current worktree is `/workspace/relation-supervisor-live`, branch `lane/relation-fusion-supervisor-20261123`, draft PR https://github.com/isogeny-labs/crypto/pull/4989. PR #4530 is merged; do not push more work to its closed branch. This worktree is based on actual main `816f9c3a942efed569049618c056d12a0c56d693`. The shared local `origin/main` ref is stale: consult `git ls-remote` and fetch the exact SHA with submodule recursion disabled.
+
+LocalCPU0, one numerical thread, zero cloud spend and the user's checkpoint/S3 waiver persist. No credentials or repeat permission are needed for that waiver. No subagents. Rust science/harness/statistics; Python may edit metadata and render recorded values. Preserve every failure, neutral control, frozen proof obligation and trust key. No fresh/reserved seed selection.
+
+Root recovery is already completed through the recorded scope: actual-root check 141 and adapter matrices 142/144 and 198/199 passed; saved artifact audits passed. The old 109-error recovery is historical. Full root unit 165 was interrupted after 46 observed failures and remains unqualified; do not restart it as if unrun or claim a complete-suite count. No current-main whole-suite result is established by these old records.
+
+Latest completed repeated comparison is 200/211: 1260 calls, all saved whole proofs replayed; primary median strongest-control/candidate ratios 1.0027–1.1244 lie inside A/A spread. No improvement or 15× admission. Frozen evidence in packed-measurements-214.tar.xz remains unchanged. Supplemental clock closure 218 binds the previously unchecked receipt clock; it does not rewrite frozen 211.
+
+Parent trace 216/223 completes 324 calls and full-proof/phase-partition audits. Archive 225 (1984 indexed files) and extraction audit 226 are published in PR #4989. Process interval minus reported worker is a descriptive hypothesis source, not pure wrapper overhead or measured gain. Report 242 includes all three primary-case totals and the exclusive phase means, with wait explicitly including worker computation.
+
+Native supervisor source/tools 239 were published at `2647188b4a7f3d4ac5a3e6f72dcfed8fb60ce265` before final functional data 240. Five OS tests 238 pass, including actual abrupt-supervisor-death cleanup. Final 240 completes 216 proof cases / 108 exact wrapped/native identities and six transport controls. Artifact audit 241 replays every proof and rejects three sabotage classes. All are unsigned producer data [pcc:unverified]; they establish no timing result. Earlier 229/234/237 contexts remain separate because they did not test the parent-death refinement.
+
+Archive 244 contains 2714 indexed files: preliminary/final raw cohorts, final OS evidence, source, frozen tools, retained build logs/failures and report 242. Extraction audit 245 byte-checks both 233 and 244 and replays both 216-proof cohorts; each output equals its original. No independent-host or signed-execution attestation. No live benchmark/build/test jobs at this checkpoint.
+
+Next: publish final 240/241/242/244/245 evidence, then prepare the prospectively fixed repeated native-launcher comparison with both launchers applied to all strongest controls. Proposed roster is 24 controls and 12 candidates, 48 AA cells + 36 AB cells per round/case, five rounds × six original cases = 2520 calls. This is preparatory, not frozen or run. Primary remains packed-dag-487 with native supervision; no post-hoc primary replacement. All original six-case 15×, proof, pin, monitor and A/A criteria remain.
+
+Canonical protocol/export/schema checker access is pending: https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/experiment-protocol/SKILL.md says “Read the canonical SKILL.md and follow it.” The canonical `isogeny-labs/crypto-autoresearcher` clone at `/workspace/crypto-autoresearcher` (d46b06b5) stores those files as authenticated VLT1 ciphertext. Supported `vaultctl unlock --quiet` exits 2: KEY is not configured through any documented route. Environment status has no secret bindings or outbound identities; no environment-change tool is available. An async user settings question is pending; never request secret values in chat. Continue source preparation and other independent work, but do not run the dependent comparative timing experiment by substituting a weaker checker or bypassing encryption.
+
+Publication check 247 passes the current source ledger chain and canonical main-816f prefix, reporting legacy missing-type payloads as ineligible rather than rewriting them. Report prose has zero findings; 17 shared session-log findings are byte-identical to the base findings and outside this lane’s additions. Historical global benchmark gate problems below are retained, not asserted as newly checked against current main. Do not rewrite historical claim types, exit-null receipts, keys or gates to manufacture a green result.
+
+## Historical checkpoints (superseded by the current summary above)
+
 # Active15x continuation checkpoint
 
 Goal remains active,not achieved. Never close it at a component,report orPR. User authorized localCPU0,zero cloud and checkpoint/S3 waiver; do not ask for credentials or retry permission. No subagents. Rust math/harness/stats only; Python metadata/rendering only.
