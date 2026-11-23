@@ -147,6 +147,60 @@ pub struct MethodDecl {
     pub params: &'static [ParamDecl],
 }
 
+const GROWING_ARITY_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (12..=40)",
+    },
+];
+
+const AUX_TOWER_SOLVER_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (14..=36); AUX prime-isogeny + rootfind-mitm",
+    },
+];
+
+const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "p",
+        default: Some("5"),
+        help: "base-field prime for the self-hosted E(F_{p^k}) cell",
+    },
+    ParamDecl {
+        name: "k",
+        default: Some("2"),
+        help: "extension degree, or `schedule` to use k_of_p(p,k_min,k_max)",
+    },
+    ParamDecl {
+        name: "k_min",
+        default: Some("2"),
+        help: "lower clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "k_max",
+        default: Some("8"),
+        help: "upper clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "trial_budget",
+        default: Some("2000000"),
+        help: "charged k-decomp trial budget",
+    },
+    ParamDecl {
+        name: "planted",
+        default: Some("2"),
+        help: "number of planted k-summand targets per cell",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: Some("semaev"),
+        help: "`semaev` = LineOracle/LineS4Oracle; `brute` = exhaustive k-summand control",
+    },
+];
+
 const K4_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "base",
@@ -768,6 +822,30 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::fp4::solve_k4",
             applies: Applies::Any,
             params: K4_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.diem_kgrow",
+            family: "ic",
+            summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
+            entry: "ecbench::diem_kgrow::solve",
+            applies: Applies::Any,
+            params: DIEM_KGROW_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.growing_arity",
+            family: "ic",
+            summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
+            entry: "ecbench::growing_arity::solve",
+            applies: Applies::Any,
+            params: GROWING_ARITY_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.aux_tower_solver",
+            family: "ic",
+            summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
+            entry: "ecbench::aux_tower_solver::solve",
+            applies: Applies::Any,
+            params: AUX_TOWER_SOLVER_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -3682,6 +3760,19 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             curve.slug, curve.family
         ));
     }
+    if id == "ic.diem_kgrow" {
+        // Self-hosted (p,k) cell; any workload is accepted as a carrier.
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
+    if id == "ic.growing_arity" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
+    if id == "ic.aux_tower_solver" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
     if id == NEG_STRONG {
         if !matches!(inst, Instance::F2m4(_)) {
             return Err(neg_strong_refusal(curve));
@@ -4155,6 +4246,19 @@ pub fn solve_measured(
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     three_leads_applicable(m, inst, curve)?;
+    // Self-hosted extension geometry from params; workload curve unused.
+    if m.id == "ic.diem_kgrow" {
+        let _ = (inst, curve, target, oracle);
+        return super::diem_kgrow::solve(m, seed);
+    }
+    if m.id == "ic.growing_arity" {
+        let _ = (inst, curve, target, oracle);
+        return super::growing_arity::solve(m, seed);
+    }
+    if m.id == "ic.aux_tower_solver" {
+        let _ = (inst, curve, target, oracle);
+        return super::aux_tower_solver::solve(m, seed);
+    }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -12527,6 +12631,9 @@ mod accounting_rules_tests {
         // Covered elsewhere (own tests, native backends, other curve shapes).
         covered.extend([
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
+            "ic.diem_kgrow",          // self-hosted E(F_{p^k}) charged cell + ladder example
+            "ic.growing_arity",       // growing-m ksum on prime_instance_for
+            "ic.aux_tower_solver",    // AUX prime-isogeny + rootfind-mitm ladder
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",
