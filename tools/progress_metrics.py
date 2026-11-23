@@ -1232,7 +1232,8 @@ def conductor_memory_frontier(ref, since):
 def ecc2k_halftrace_setup(ref, since):
     """Copy stored fixed-query instruction medians; producer evidence only."""
     path = "research/trace_zero_halftrace_elimination_20261123/summary.json"
-    for date, commit, text in file_history(ref, path, since):
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    for date, commit, text in file_history(ref, path, since_day):
         data = json.loads(text)
         for degree in (83, 131):
             for arm in ("baseline", "elimination", "baseline-aa"):
