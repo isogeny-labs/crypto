@@ -25,3 +25,17 @@ Implement and source-review additional Rust controls and the thin shell CLI gate
 
 ### Errors (what went wrong, how it was handled)
 No local Rust compiler or Cargo; full-root and focused local tests cannot run here. The existing CI job is the available compiler route, with source changes visibly unqualified until executed. Natural source stream still missing; do not replace it with planted fixtures.
+
+## 2026-11-23 20:22 UTC — fixed-control and existing-job implementation
+
+### What was done (commands, files, features)
+Added five Rust tests while preserving the original two and the complete production admission prefix. Authored deterministic planted CLI input/expected-output controls. Extended only the existing graph job and added a thin native-tool shell qualifier. Source review checked target signs and the fixed projected rank; shell syntax and workflow structure were checked locally. Exact native execution is pending. [pcc:unverified]
+
+### Decisions made (and why)
+Build the original committed-lock native example and emitted test harness, copy/hash executables before calls, and feed the admitted fixed control into the original graph evaluator. Retain failures, complete output and distinct pre/post manifests. Generated graph dependency resolution stays explicitly unfrozen. Use jq for JSON literals only; all group and rank work remains Rust. No source change to collector, graph kernel, Arithmetic or other active lanes.
+
+### Open threads
+Inspect one terminal exact-source native job receipt; correct any qualification failure within this scope. Preserve authentic-capture requirement, source custody, fully charged stage/complete-cost evaluation and unsigned PCC standing. Record the reusable collector and target-column conversion with the workload-bound source note.
+
+### Errors (what went wrong, how it was handled)
+No local Rust/Cargo; local compile/full-root gate remains unmet. KB and Conductor unavailable; read-only workers and primary-source fallback used. Genuine fixed-Prime31 capture not found in the bounded search, not asserted globally absent.

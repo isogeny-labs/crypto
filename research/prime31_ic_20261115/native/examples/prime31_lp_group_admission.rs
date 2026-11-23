@@ -192,4 +192,246 @@ mod tests {
         let mut c=fixture(); c.large_points[1].1=c.small_points[0].1; assert!(admit(c).is_err());
         let mut c=fixture(); c.rows.push(fixture().rows.remove(0)); assert!(admit(c).is_err());
     }
+
+    fn residue(value: i128) -> u64 {
+        value.rem_euclid(PRIME31.n as i128) as u64
+    }
+
+    /// Predetermined equations, with RHS values derived from the planted logs.
+    /// The expected export is constructed independently of `admit`.
+    fn mixed_fixture(negative_target: bool) -> (Capture, Vec<Export>) {
+        let mut ar = Arithmetic::default();
+        let (s, sl) = oriented_multiple(3, &mut ar);
+        let (l, ll) = oriented_multiple(5, &mut ar);
+        let (m, ml) = oriented_multiple(11, &mut ar);
+        let mut q = ar.scalar(PRIME31, 7, Some(PRIME31.g)).unwrap();
+        if negative_target {
+            q.1 = PRIME31.p - q.1;
+        }
+        let (sl, ll, ml) = (sl as i128, ll as i128, ml as i128);
+        let a = [
+            residue(2 * sl),
+            residue(-sl + ll - 7),
+            residue(2 * sl - ll + 3 * ml - 28),
+            residue(sl + ml - 14),
+            residue(sl - ll + ml - 21),
+        ];
+        let n = PRIME31.n;
+        // Replacing Q by -Q requires b -> -b. The expected target column
+        // is +b for that negative-target control, and -b otherwise.
+        let input_b = |b: u64| if negative_target { n - b } else { b };
+        let target_coefficient = |b: u64| if negative_target { b } else { n - b };
+        let capture = Capture {
+            schema: "prime31-lp-capture/v1".into(),
+            target: q,
+            small_points: vec![(1, s)],
+            large_points: vec![(9, l), (10, m)],
+            rows: vec![
+                Row { id: 40, small: vec![(1, 2)], large: vec![], a: a[0], b: 0 },
+                Row { id: 41, small: vec![(1, n - 1)], large: vec![(9, 1)],
+                    a: a[1], b: input_b(1) },
+                Row { id: 42, small: vec![(1, 2)], large: vec![(9, n - 1), (10, 3)],
+                    a: a[2], b: input_b(4) },
+                Row { id: 43, small: vec![(1, 1)], large: vec![(10, 1)],
+                    a: a[3], b: input_b(2) },
+                Row { id: 44, small: vec![(1, 1)], large: vec![(9, n - 1), (10, 1)],
+                    a: a[4], b: input_b(3) },
+            ],
+        };
+        let expected = vec![
+            Export { id: 40, small: vec![(1, 2)], large: vec![], rhs: a[0] },
+            Export { id: 41, small: vec![(1, n - 1), (TARGET, target_coefficient(1))],
+                large: vec![(9, 1)], rhs: a[1] },
+            Export { id: 42, small: vec![(1, 2), (TARGET, target_coefficient(4))],
+                large: vec![(9, n - 1), (10, 3)], rhs: a[2] },
+            Export { id: 43, small: vec![(1, 1), (TARGET, target_coefficient(2))],
+                large: vec![(10, 1)], rhs: a[3] },
+            Export { id: 44, small: vec![(1, 1), (TARGET, target_coefficient(3))],
+                large: vec![(9, n - 1), (10, 1)], rhs: a[4] },
+        ];
+        (capture, expected)
+    }
+
+    fn capture_value(c: &Capture) -> serde_json::Value {
+        let rows: Vec<_> = c.rows.iter().map(|r| serde_json::json!({
+            "id": r.id, "small": &r.small, "large": &r.large, "a": r.a, "b": r.b,
+        })).collect();
+        serde_json::json!({
+            "schema": &c.schema, "target": c.target,
+            "small_points": &c.small_points, "large_points": &c.large_points,
+            "rows": rows,
+        })
+    }
+
+    fn expected_jsonl(expected: &[Export]) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        for row in expected {
+            serde_json::to_writer(&mut bytes, row).unwrap();
+            bytes.push(b'\n');
+        }
+        bytes
+    }
+
+    #[test]
+    fn mixed_lp_arities_and_negative_target_have_exact_exports() {
+        for negative_target in [false, true] {
+            let (capture, expected) = mixed_fixture(negative_target);
+            assert_eq!(capture.rows.iter().map(|r| r.large.len()).collect::<Vec<_>>(),
+                vec![0, 1, 2, 1, 2]);
+            assert_eq!(capture.rows[0].b, 0);
+            let actual = admit(capture).unwrap();
+            assert_eq!(actual, expected);
+            assert_eq!(actual[0].small, vec![(1, 2)]);
+
+            // R41 + R42 - 3R43 eliminates both LP columns. Together with
+            // R40 its small/target matrix is [[2, 0], [-2, +/-1]], so
+            // this fixed fixture has useful projected rank exactly two.
+            let combination = [(1usize, 1i128), (2, 1), (3, -3)];
+            for lp in [9u64, 10] {
+                let value: i128 = combination.iter().map(|&(i, weight)| {
+                    weight * actual[i].large.iter()
+                        .find(|(id, _)| *id == lp).map_or(0, |(_, c)| *c) as i128
+                }).sum();
+                assert_eq!(residue(value), 0);
+            }
+            for (column, coefficient) in [(1u32, PRIME31.n - 2),
+                (TARGET, if negative_target { PRIME31.n - 1 } else { 1 })]
+            {
+                let value: i128 = combination.iter().map(|&(i, weight)| {
+                    weight * actual[i].small.iter()
+                        .find(|(id, _)| *id == column).map_or(0, |(_, c)| *c) as i128
+                }).sum();
+                assert_eq!(residue(value), coefficient);
+            }
+            let rhs = residue(combination.iter()
+                .map(|&(i, weight)| weight * actual[i].rhs as i128).sum());
+            let mut ar = Arithmetic::default();
+            let (_, sl) = oriented_multiple(3, &mut ar);
+            assert_eq!(rhs, residue(-2 * sl as i128 + 7));
+        }
+    }
+
+    #[test]
+    fn identity_equations_and_inclusive_row_cap_are_accepted() {
+        let (mut capture, _) = mixed_fixture(false);
+        capture.small_points.clear();
+        capture.large_points.clear();
+        capture.rows = (0..CAP).map(|id| Row {
+            id: id as u64, small: vec![], large: vec![], a: 0, b: 0,
+        }).collect();
+        // The final row is 0 = -7G + Q, not just a syntactic zero row.
+        capture.rows[CAP - 1].a = PRIME31.n - 7;
+        capture.rows[CAP - 1].b = 1;
+        let actual = admit(capture).unwrap();
+        assert_eq!(actual.len(), CAP);
+        assert_eq!(actual[0], Export { id: 0, small: vec![], large: vec![], rhs: 0 });
+        assert_eq!(actual[CAP - 1], Export { id: (CAP - 1) as u64,
+            small: vec![(TARGET, PRIME31.n - 1)], large: vec![], rhs: PRIME31.n - 7 });
+    }
+
+    #[test]
+    fn bounds_schema_and_point_aliases_refuse() {
+        let mut c = fixture(); c.schema.push_str("-unknown"); assert!(admit(c).is_err());
+        let mut c = fixture(); c.rows.clear(); assert!(admit(c).is_err());
+        let mut c = fixture();
+        c.rows = (0..=CAP).map(|id| Row {
+            id: id as u64, small: vec![], large: vec![], a: 0, b: 0,
+        }).collect();
+        assert_eq!(admit(c).unwrap_err(), "schema or row cap");
+        let mut c = fixture(); c.rows[0].a = PRIME31.n; assert!(admit(c).is_err());
+        let mut c = fixture(); c.rows[0].b = PRIME31.n; assert!(admit(c).is_err());
+        let mut c = fixture(); c.rows[0].small[0].1 = 0; assert!(admit(c).is_err());
+        let mut c = fixture(); c.rows[0].large[0].1 = 0; assert!(admit(c).is_err());
+        let mut c = fixture(); c.rows[0].small.push((1, 1)); assert!(admit(c).is_err());
+        let mut c = fixture(); c.rows[0].small = (0..65).map(|id| (id, 1)).collect();
+        assert!(admit(c).unwrap_err().contains("bounds or canonical form"));
+        let mut c = fixture(); c.small_points.clear();
+        assert_eq!(admit(c).unwrap_err(), "missing point mapping");
+        let mut c = fixture(); c.large_points.clear();
+        assert_eq!(admit(c).unwrap_err(), "missing point mapping");
+        let mut c = fixture(); c.small_points[0].1.1 = 0; assert!(admit(c).is_err());
+        let mut c = fixture(); c.small_points[0].1.0 = PRIME31.p; assert!(admit(c).is_err());
+        let mut c = fixture(); c.target.0 = PRIME31.p; assert!(admit(c).is_err());
+        let mut c = fixture(); c.large_points[1].0 = c.large_points[0].0;
+        assert!(admit(c).is_err());
+        let mut c = fixture();
+        c.small_points = vec![c.small_points[0]; CAP + 1];
+        assert_eq!(admit(c).unwrap_err(), "point table cap");
+        let mut c = fixture();
+        c.large_points = vec![c.large_points[0]; CAP + 1];
+        assert_eq!(admit(c).unwrap_err(), "point table cap");
+    }
+
+    #[test]
+    fn unknown_fields_and_wrong_target_sign_refuse() {
+        let mut value = capture_value(&fixture());
+        value["unexpected"] = serde_json::json!(true);
+        assert!(serde_json::from_value::<Capture>(value).is_err());
+        let mut value = capture_value(&fixture());
+        value["rows"][0]["unexpected"] = serde_json::json!(true);
+        assert!(serde_json::from_value::<Capture>(value).is_err());
+        let (mut c, _) = mixed_fixture(false);
+        c.target.1 = PRIME31.p - c.target.1;
+        assert!(admit(c).unwrap_err().contains("row 41: nonzero group residual"));
+    }
+
+    #[test]
+    fn checked_planted_cli_control_bundle() {
+        let (valid, expected) = mixed_fixture(false);
+        let valid_bytes = serde_json::to_vec_pretty(&capture_value(&valid)).unwrap();
+        assert_eq!(admit(serde_json::from_slice(&valid_bytes).unwrap()).unwrap(), expected);
+        let expected_bytes = expected_jsonl(&expected);
+
+        let (mut late_invalid, _) = mixed_fixture(false);
+        let last = late_invalid.rows.last_mut().unwrap();
+        last.a = (last.a + 1) % PRIME31.n;
+        let late_invalid_bytes = serde_json::to_vec_pretty(&capture_value(&late_invalid)).unwrap();
+        let error = admit(serde_json::from_slice(&late_invalid_bytes).unwrap()).unwrap_err();
+        assert!(error.contains("row 44: nonzero group residual"));
+
+        let (negative, negative_expected) = mixed_fixture(true);
+        let negative_bytes = serde_json::to_vec_pretty(&capture_value(&negative)).unwrap();
+        assert_eq!(admit(serde_json::from_slice(&negative_bytes).unwrap()).unwrap(), negative_expected);
+        let negative_expected_bytes = expected_jsonl(&negative_expected);
+
+        let (directory, remove_after) = match std::env::var_os("PRIME31_ADMISSION_CONTROL_DIR") {
+            Some(path) => (std::path::PathBuf::from(path), false),
+            None => {
+                let nonce = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+                (std::env::temp_dir().join(format!("prime31-admission-controls-{}-{nonce}",
+                    std::process::id())), true)
+            }
+        };
+        if remove_after {
+            std::fs::create_dir(&directory).unwrap();
+        } else {
+            std::fs::create_dir_all(&directory).unwrap();
+        }
+        for (name, bytes) in [
+            ("valid.json", valid_bytes),
+            ("expected.jsonl", expected_bytes),
+            ("late-invalid.json", late_invalid_bytes),
+            ("negative-target.json", negative_bytes),
+            ("negative-target-expected.jsonl", negative_expected_bytes),
+        ] {
+            let path = directory.join(name);
+            // Allow deterministic replay, but do not overwrite a different
+            // existing control under an immutable evidence pathname.
+            match std::fs::read(&path) {
+                Ok(prior) => assert_eq!(prior, bytes, "changed control: {name}"),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    std::fs::write(&path, &bytes).unwrap();
+                }
+                Err(error) => panic!("cannot read control {name}: {error}"),
+            }
+            assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        }
+        if remove_after {
+            std::fs::remove_dir_all(&directory).unwrap();
+        } else {
+            eprintln!("planted CLI controls (not natural yield): {}", directory.display());
+        }
+    }
 }
+
