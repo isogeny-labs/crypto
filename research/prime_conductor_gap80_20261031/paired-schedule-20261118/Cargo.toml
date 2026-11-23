@@ -1,0 +1,17 @@
+[package]
+name = "conductor-paired-schedule-qualification"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# A development test target linking the actual ecbench library. No timer,
+# substituted solver, benchmark runner, or legacy cfg(test) library modules.
+[workspace]
+
+[lib]
+path = "../../../tests/paired_schedule.rs"
+
+[dependencies]
+crypto_lib = { package = "crypto", path = "../../.." }
+num-bigint = "=0.4.8"
+serde_json = { version = "=1.0.151", features = ["arbitrary_precision", "raw_value"] }

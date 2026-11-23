@@ -1,0 +1,16 @@
+d=1 Q=2 K=F_2^5; D line, 1 of 1 FB x-values lift
+Stage A: 0.05s cpu; A terms 12, B terms 17
+ansatz monomials: 2079; sample points 2139
+Stage B' (sampling 2139 points: numeric Res_Y of two quartics + monomial rows): 2.06s cpu
+   matrix type Matrix_gf2e_dense
+Stage C' (linear solve 2139x2079 over K): 0.92s cpu; consistent (ansatz holds on 60 extra rows): True; rank n/a
+g: 1267 nonzero terms, total degree 16, deg per s_i [16, 16, 16, 16, 16], max weighted deg sum(i*k_i) 80
+check: g(s(w_planted)) == 0 : True
+check: direct S6(uw,xR) == g(s(w)) at 3/3 random w
+check: g at random FB 5-tuple != 0 : False
+Stage D (descent + reduction): 0.06s cpu; descended eq terms [630, 664, 638, 640, 630]; weighted degrees [16, 16, 16, 16, 16]; planted s in F_Q: True
+parity in descended eqs: odd-exponent terms in s1..s4: 0 (by construction of the ansatz; consistency above is the test)
+check: reduced system vanishes at planted (t,s5): True
+wrote results/exp16d_msolve/m5_q2_s1611_red.ms
+saved
+exit 0

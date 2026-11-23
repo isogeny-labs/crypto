@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-variable-coefficient-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "crt_protocol": "../xedni_full_law_crt_20261120/protocol.json",
+  "crt_candidate_stream_sha256": "8703dc0d0cd3b3613f5f28a196d2218257fbb5d9e469fb602f953f8b4fe7265e",
+  "coefficients": [2, 3, 4, 5, 6, 7, 8],
+  "input_law": "all 1722 ordered distinct nonidentity point pairs on the fixed E(F47); the CRT curve policy is unchanged and does not read reduced relation flags",
+  "screen": "for every pair and each coefficient k, check T+kG=O at 47; for compatible pairs only, check P+kQ=O on every preexisting CRT candidate at 7, then at 11, then over Q",
+  "purpose": "conditional diagnostic for rational relation incidence, with every reduced-group coefficient check charged explicitly; reduced compatibility must not be treated as a free unknown-target selector",
+  "resource": "complete finite enumeration of the seven coefficients and 32256 preexisting CRT curves; abort on arithmetic failure and retain the failed status",
+  "claim_boundary": "fixed bounded coefficients and centered CRT representatives; relation incidence is not a DLP algorithm or a wall-time comparison"
+}

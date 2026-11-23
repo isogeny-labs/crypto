@@ -1,0 +1,23 @@
+// Editable explanatory figure. Bounds describe the cited models, not measurements.
+digraph GraphAlgorithmCosts {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.30", ranksep="0.35", splines=polyline];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#B7C7D2", fontcolor="#16283D", fillcolor="#F0F5F7", margin="0.18,0.12", penwidth=1.2];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#61788A", fontcolor="#526278", arrowsize=0.7];
+
+  relations [label="NORMALIZED LARGE-PRIME BLOCK\nR rows · C columns · I nonzero incidences\nCombine repeated columns; cancel zero coefficients", fillcolor="#16283D", fontcolor="white", color="#16283D"];
+
+  gain [label="AT MOST TWO ENTRIES PER ROW\nDerived gain-DSU application\nO((C + R) α(C)) rank metadata\nTrack balanced / pinned components", fillcolor="#E2F2F0", color="#007C83"];
+  peel [label="GENERAL SPARSE ROWS\nSingleton peeling\nO(R + C + I) bookkeeping\nA surviving core can still have full rank"];
+  {rank=same; gain; peel;}
+
+  cancellation [label="ALGEBRAIC CANCELLATION\nRequire yᵀ A_L = 0\nRetain yᵀ A_F and yᵀ(a,b)\nWitness length and sparse payload are additional work", fillcolor="#FFF4DB", color="#BD8A2C"];
+  filtering [label="FILTERING AND STRUCTURE\nReuse MST / structured elimination\nTrack current fill, row weights, N and Z\nMatching gives structural rank only"];
+  solve [label="EXACT RESIDUAL LINEAR ALGEBRA\nWiedemann: O(NZ + N²) in its successful-solve model\nSupplied width t: O(N min{t³, t² log² N})\nCharge discovery, reconstruction and retries", fillcolor="#E2F2F0", color="#007C83"];
+
+  relations -> gain [label="two-entry case"];
+  relations -> peel [label="any row arity"];
+  gain -> cancellation [label="rank metadata guides witnesses"];
+  peel -> cancellation [label="retained rows"];
+  cancellation -> filtering [label="check independence and useful rank"];
+  filtering -> solve [label="residual matrix and recovery transcript"];
+}

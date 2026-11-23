@@ -44,7 +44,7 @@ Sources: report/REPORT.md, brief/BRIEF.md §3, brief/MAP_ideas_corpus.json (GAP:
 
 ### A3. BRIEF §3 levers with no surviving or executed idea
 - Lever 2 (sub-N² S_4 membership on prime curves; D_m-invariant coordinates on 2-torsion curves): only coding_comb-3, killed. No card attacks root finding directly.
-- Lever 4 (PKM-tower plateau D=6,6,7,7; prediction d_F = 4+⌊(t−2)/4⌋): no dedicated card. ml_empirical-1 used the PKM data and was killed on design.
+- Lever 4 (PKM-tower plateau D=6,6,7,7; prediction d_F = 4+⌊(t−2)/4⌋): the re-measurement now exists — `research/pkm_kummer_remeasure_t1_14_20261101/` (m=2 Kummer, t=1..12 committed, D = 4,4,4,4,4,5,5,5,5,6,6,6 — the prediction holds in every measured cell; t=13,14 running), plus the P-192 wide ladder `research/pkm_isogeny_wide_p192_20261101/` (m=2 D=6 at N=20,22; m=3 D=7 at N=15; m=4 D=7 at N=12). No scoring card has consumed them yet.
 - Lever 5 (Frobenius-equivariant F4 on the barrel): only symmetry-1 arm B, which was cut.
 - Lever 6 (non-subspace Frobenius-stable bases): μ_263, the Hamming ball (KN-OPEN-5e3dd0) and the cyclotomic-sparse A2 base each have no executed card. The cards touching it are wildcards-2, transfer_tori-4 and symmetry-3, all killed or deferred.
 - Lever 10 (Miller cocycles, same-field Prym, Kani/Richelot second N-torsion): transfer_tori-3 was deferred. alg_geom-5 was killed, but its scope is degree-2 extensions only. Same-field Prym over F_p or prime-degree F_{2^n} has no card.
@@ -102,3 +102,19 @@ Counts from literature/*.json. "inwin" means date ≥ 2026-09-12.
 4. adjacent_fields re-run over the GAP list: one lane agent.
 5. MP-lattices-4 corrected smallness model: minutes to an hour.
 6. MP-coding_comb-1 msolve d_F on the key-equation presentation at n ≤ 17: under 1 hour.
+
+
+
+
+
+- Lever 4 (PKM-tower plateau D=6,6,7,7; prediction d_F = 4+⌊(t−2)/4⌋): no dedicated card. ml_empirical-1 used the PKM data and was killed on design.
+
+
+
+
+
+
+
+
+
+

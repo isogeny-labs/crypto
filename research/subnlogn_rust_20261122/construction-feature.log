@@ -1,0 +1,158 @@
+   Compiling isogeny_algos v0.1.0 (/workspace/scratch/ff2114c20d1b/crypto/isogeny_algos)
+    Finished `release` profile [optimized] target(s) in 3m 08s
+     Running unittests src/lib.rs (isogeny_algos/target/release/build/isogeny_algos/73a449618300738b/out/isogeny_algos-73a449618300738b)
+
+running 118 tests
+test cm::tests::class_numbers_from_forms ... ok
+test eigen_seta::tests::diagonal_masks_apply_coordinatewise ... ok
+test eigen_seta::tests::toy_parameter_checks_are_fail_closed ... ok
+test binary_volcano::tests::binary_volcano_roots_with_multiplicity ... ok
+test binary_volcano::tests::binary_volcano_frobenius_disc_decomposition ... ok
+test eigen_seta_toy::tests::invalid_parameters_rejected ... ok
+test cm::tests::small_hilbert_polys_match_known_values ... ok
+test eigen_seta_toy::tests::jacobian_start_dual_quotient_exposes_intermediate_product ... ok
+test binary_volcano::tests::binary_volcano_same_order_a2_and_factor_base ... ok
+test eigen_seta_toy::tests::two_halves_middle_automorphism_oracle ... ignored, bounded exploratory two-halves odd-torsion oracle; not a scalable decoder
+test eigen_seta_toy::tests::two_adic_four_division_matches_basis_coordinates ... ok
+test eigen_seta_toy::tests::cm_key_and_all_sender_indices_round_trip ... ok
+test find::modpoly::e4_tests::normalized_j_series_has_the_known_initial_coefficients ... ok
+test find::modpoly::e4_tests::sieve_matches_independent_divisor_enumeration ... ok
+test eigen_seta_toy::tests::single_chain_decoder_multiple_keys ... ok
+test eigen_seta_toy::tests::special_key_single_chain_splits_and_payload_factors ... ok
+test binary_volcano::tests::binary_volcano_two_sum_yield_matches_brute_force ... ok
+test find::sutherland::cm::tests::rejects_invalid_parameters_and_wrong_norm ... ok
+test find::sea::recombination_tests::progression_bsgs_matches_exhaustive_search_including_low_order_steps ... ok
+test find::sutherland::cm::tests::large_prime_uses_exact_trace_certificate ... ok
+test find::sutherland::crt::tests::reconstructs_signed_bounds_for_arbitrary_targets ... ok
+test find::sutherland::crt::tests::rejects_bad_setup_and_push_is_transactional ... ok
+test gf3n::tests::bitsliced_digits ... ok
+test gf3n::tests::moduli_match_exhaustive_scan ... ok
+test gf3n::tests::mul_inv_match_digit_schoolbook ... ok
+test gls_loop::tests::cheapest_loops_reproduce_known_values ... ok
+test gls_loop::tests::cm_generated_curve_has_requested_order_by_exhaustive_count ... ok
+test gls_loop::tests::invalid_cm_norm_and_unsupported_inputs_are_rejected ... ok
+test gls_loop::tests::loop_closes_and_maps_points_on_a_small_instance ... ok
+test lattice::tests::dependent_rows ... ok
+test find::modpoly::e4_tests::large_index_avoids_u64_cube_and_sum_overflow ... ok
+test lattice::tests::knapsack_planted ... ok
+test lattice::tests::matches_lll_gram_4x4 ... ok
+test mpoly::tests::integer_roots_basic ... ok
+test lattice::tests::reduced_and_transform ... ok
+test mpoly::tests::resultants ... ok
+test mpoly::tests::ring_ops_and_eval ... ok
+test mpoly::tests::integer_roots_large ... ok
+test ntt::tests::primes_have_roots ... ok
+test ntt::tests::multi_limb_extremes ... ok
+test padic::tests::constructor_rejects_invalid_residue_fields ... ok
+test padic::tests::field_axioms_in_an_unramified_extension ... ok
+test padic::tests::integers_and_residues_round_trip ... ok
+test padic::tests::max_precision_rejects_unit_characteristic - should panic ... ok
+test padic::tests::max_precision_rejects_zero_characteristic - should panic ... ok
+test padic::tests::ring_arithmetic_matches_big_integers ... ok
+test ntt::tests::single_limb_against_naive ... ok
+test subnlogn::assembly::tests::finite_admission_rejects_insufficient_precision ... ok
+test subnlogn::certified::tests::certified_phases_obey_disk_and_symmetries ... ok
+test subnlogn::certified::tests::eighth_roots_match_an_independent_integer_square_root ... ok
+test subnlogn::certified::tests::gaussian_and_scaled_positive_are_certified_and_consistent ... ok
+test subnlogn::certified::tests::machin_interval_contains_known_pi_prefix ... ok
+test subnlogn::certified::tests::signed_rounding_is_directed_for_both_signs ... ok
+test subnlogn::crt::tests::inverse_preserves_wide_signed_payloads ... ok
+test subnlogn::crt::tests::malformed_shapes_are_rejected ... ok
+test subnlogn::crt::tests::padded_prefixes_and_invalid_target_intervals_are_fixed ... ok
+test subnlogn::crt::tests::triangular_layout_matches_independent_crt_definition ... ok
+test subnlogn::fastdiv::tests::agrees_with_native_u128_division ... ok
+test subnlogn::fastdiv::tests::canonicalizes_inputs_and_rejects_zero_divisors ... ok
+test subnlogn::fastdiv::tests::known_quotients_cover_balanced_and_unbalanced_operands ... ok
+test subnlogn::fastdiv::tests::large_quotient_executes_multiple_newton_updates ... ok
+test subnlogn::fastdiv::tests::powers_of_two_and_boundary_corrections_are_exact ... ok
+test subnlogn::fastint::tests::negative_coefficients_endpoint_and_long_carries ... ok
+test subnlogn::fastint::tests::non_aligned_bit_chunks_and_euclidean_carry ... ok
+test subnlogn::fastint::tests::recursive_products_against_independent_schoolbook ... ok
+test subnlogn::fastint::tests::shifts_and_retained_transform_layout ... ok
+test subnlogn::fastint::tests::small_native_oracle_and_zero ... ok
+test subnlogn::motif::tests::bad_lengths_are_rejected_before_any_mutation ... ok
+test subnlogn::motif::tests::basis_vectors_check_every_source_target_coefficient ... ok
+test subnlogn::motif::tests::forward_and_inverse_match_direct_xor_and_restore_arbitrary_scratch ... ok
+test subnlogn::motif::tests::preflight_bounds_ground_set_and_materialized_storage ... ok
+test subnlogn::motif::tests::published_counts_include_source_rank_correction ... ok
+test subnlogn::motif::tests::three_local_schedules_exchange_banks_and_restore_all_scratch ... ok
+test subnlogn::parameters::tests::forced_dimension_geometry_is_only_a_structural_fixture ... ok
+test subnlogn::parameters::tests::native_lengths_are_explicit_literal_base_cases ... ok
+test subnlogn::parameters::tests::prime_interval_left_is_strict_and_right_inclusive ... ok
+test subnlogn::parameters::tests::roots_and_logarithms_use_exact_endpoints ... ok
+test find::sutherland::cm::tests::talk_fixture_and_noncyclic_surface_match_hecke ... ok
+test subnlogn::resampling::tests::hypotheses_and_nearest_indices_are_exact ... ok
+test find::sutherland::cm::tests::explicit_cm_crt_matches_integer_q_expansion ... ok
+test subnlogn::ring::tests::complex_products_and_negacyclic_wrap ... ok
+test subnlogn::ring::tests::rejects_outside_disk_and_invalid_dimensions ... ok
+test subnlogn::ring::tests::signed_fields_with_negative_leading_coefficients ... ok
+test find::sutherland::cm::tests::selected_degrees_and_v_one_match_hecke ... ok
+test subnlogn::swap::tests::composed_rank_shear_executes_exactly_one_child_per_pivot ... ok
+test subnlogn::swap::tests::exact_lower_lower_compiler_reconstructs_rank_deficient_matrices ... ok
+test subnlogn::swap::tests::fixed_integer_units_inverse_and_negative_target_are_exact ... ok
+test subnlogn::swap::tests::odd_radix_padding_and_digit_moves_match_numeric_addresses ... ok
+test subnlogn::swap::tests::parking_appends_multiple_roles_without_crossing_an_ancestor ... ok
+test subnlogn::swap::tests::rational_triangular_shear_preserves_earlier_controls ... ok
+test subnlogn::swap::tests::published_bit_neighbors_roles_and_rational_projector_are_constructive ... ok
+test subnlogn::synthetic::tests::characteristic_and_resource_limits_are_explicit ... ok
+test subnlogn::synthetic::tests::ordinary_convolutions_match_independent_schoolbook ... ok
+test subnlogn::synthetic::tests::production_field_without_long_base_field_roots_works ... ok
+test subnlogn::synthetic::tests::signed_monomial_permutation_and_negacyclic_product ... ok
+test subnlogn::synthetic::tests::stored_forward_matches_direct_dft_and_opposite_scales_by_inverse_t ... ok
+test subnlogn::tape::tests::descriptors_and_fixed_width_records_are_exact ... ok
+test subnlogn::tape::tests::sequential_segments_reopen_and_do_not_alias_wide_roles ... ok
+test subnlogn::tape::tests::stack_restore_does_not_scan_parked_ancestors ... ok
+test subnlogn::tensor::tests::actual_published_neighbor_indexing_and_wide_roles ... ok
+test subnlogn::swap::tests::sequential_binary_wrapper_preserves_wide_signed_payloads ... ok
+test subnlogn::tensor::tests::factor_row_program_matches_independent_column_matrix ... ok
+test subnlogn::tensor::tests::encoded_layer_matches_direct_walsh_sum_with_spectators ... ok
+test subnlogn::tensor::tests::packed_rotations_repair_current_bad_addresses_exactly ... ok
+test subnlogn::tensor::tests::published_admission_is_checked_before_any_tape_work ... ok
+test subnlogn::tensor::tests::published_residual_ranks_and_decreasing_kernel_signs ... ok
+test subnlogn::tensor::tests::sparse_complement_is_orthonormal_and_orthogonal_to_lines ... ok
+test subnlogn::transforms::tests::named_layout_example_and_single_bit_inverse ... ok
+test binary_volcano::tests::binary_volcano_bsgs_order_matches_naive_at_n20 ... ok
+test subnlogn::resampling::tests::sparse_maps_preserve_disk_and_zero ... ok
+test subnlogn::transforms::tests::normalized_convolution_matches_sparse_signed_wrap_oracle ... ok
+test binary_volcano::tests::binary_volcano_levels_match_brute_force_at_n12 ... ok
+test subnlogn::tensor::tests::million_dimensional_coordinate_program_has_correct_effect_and_inverse ... ok
+test subnlogn::resampling::tests::gaussian_transform_identity_matches_independent_fourier_sums ... ok
+test subnlogn::transforms::tests::retained_multiaxis_layout_and_opposite_normalization ... ok
+test eigen_seta_toy::tests::two_halves_oracle_decoder_multiple_keys ... ok
+test eigen_seta_toy::tests::ciphertext_kani_first_half_reaches_jacobian ... ok
+test subnlogn::assembly::tests::whole_integer_flow_requires_all_stages_and_both_scales has been running for over 60 seconds
+test subnlogn::assembly::tests::whole_integer_flow_requires_all_stages_and_both_scales ... ok
+
+test result: ok. 117 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 141.09s
+
+     Running tests/subnlogn.rs (isogeny_algos/target/release/build/isogeny_algos/9daa226f6bc4c4e2/out/subnlogn-9daa226f6bc4c4e2)
+
+running 10 tests
+test binary_field_rejection_does_not_disable_existing_polynomial_arithmetic ... ok
+test integer_reference_has_independent_known_answers ... ok
+test exact_integer_zero_padding_and_endianness_are_explicit ... ok
+test strict_integer_modes_and_resource_limits_do_not_silently_fall_back ... ok
+test wrapper_retains_optimized_hooks_and_opaque_prepared_operands ... ok
+test p224_low_characteristic_limb_is_not_mistaken_for_characteristic_one ... ok
+test published_selection_reports_base_case_and_actual_prerequisite_work ... ok
+test square_route_and_shared_counters_are_exercised ... ok
+test existing_polynomial_calls_reach_candidate_and_bounded_fallback ... ok
+test exact_products_match_word_reference_at_carry_and_limb_boundaries ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests examples/subnlogn.rs (isogeny_algos/target/release/build/isogeny_algos/eec9176daad820f5/out/subnlogn-eec9176daad820f5)
+
+running 2 tests
+test tests::published_example_reports_literal_base_case ... ok
+test tests::example_checks_candidate_products_and_auxiliary_restoration ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/subnlogn_full_flow.rs (isogeny_algos/target/release/build/isogeny_algos/86d3046cf237ec81/out/subnlogn_full_flow-86d3046cf237ec81)
+
+running 1 test
+test tests::known_answer_runs_the_whole_numerical_flow ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.55s
+

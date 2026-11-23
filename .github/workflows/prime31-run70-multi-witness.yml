@@ -1,0 +1,33 @@
+name: Prime31 run70 authentic-RHS multi-certificate gate
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run70_multi_witness.rs"
+      - "research/prime31_ic_20261115/native/examples/prime31_run69_genuine_partial_rank.rs"
+      - "research/prime31_f4_admission_20261121/run57_basis.json"
+      - "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv"
+      - ".github/workflows/prime31-run70-multi-witness.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run70_multi_witness.rs"
+      - "research/prime31_ic_20261115/native/examples/prime31_run69_genuine_partial_rank.rs"
+      - ".github/workflows/prime31-run70-multi-witness.yml"
+  workflow_dispatch:
+jobs:
+  multi-witness-real-rhs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Existing Rust library tests
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo test --locked --release --lib
+      - name: Run70 K=1/4/16 source-linked authentic-RHS reference calibration
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run70_multi_witness

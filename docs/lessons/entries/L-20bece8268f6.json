@@ -1,0 +1,14 @@
+{
+  "action": "Check explicit process state and active CPU evidence before calling it a surviving computation; process age alone includes defunct children.",
+  "created": "2026-11-18T19:59:27Z",
+  "evidence": [
+    "pcc/claims/PCC-20261118-2521f3.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "Interpreting a timed-out child in a process list",
+  "why": "A post-timeout process was already Z before cleanup; an earlier probe without state led to an incorrect live-orphan interpretation, retained and corrected additively."
+}

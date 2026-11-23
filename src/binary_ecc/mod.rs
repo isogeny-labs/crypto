@@ -65,10 +65,10 @@ pub mod trace_zero;
 
 pub use cover_transfer::{
     BinaryCoverCertificate, BinaryCoverPoint, ClosedPointPushforwardCertificate,
-    CoverTransferError, ImageEndomorphismCertificate, JacobianPushforwardCertificate,
-    OrdinaryBinaryCover, PullPushCompositionCertificate, PullbackClosedPointCertificate,
-    PullbackFiberKind, SubgroupTransferStatus, TorsionProjectorCertificate,
-    UnsupportedCoverOperation,
+    CoverTransferError, GeneratedSubgroupTransferCertificate, ImageEndomorphismCertificate,
+    JacobianPushforwardCertificate, OrdinaryBinaryCover, PullPushCompositionCertificate,
+    PullbackClosedPointCertificate, PullbackFiberKind, SubgroupTransferStatus,
+    TorsionProjectorCertificate, UnsupportedCoverOperation,
 };
 pub use curve::{BinaryCurve, BinaryPoint};
 pub use f2m::{F2mElement, IrreduciblePoly};

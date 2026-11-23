@@ -1,0 +1,67 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "K0-13 matched counted vs fiber-closed Frobenius pair table",
+  "description": "Frozen in research/fiber_h_gt1_k0_13_20261122/PROTOCOL.md before data. Same compact-orbit-scan columns=1 FB, stride-renew targets, and ic.pipeline_full accounting; only the oracle swaps between mitm-frobenius-counted:m=2 and mitm-frobenius-fiber:fiber=closed,m=2. Prices the planner h>1 fiber default; no security or leaderboard S claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202611221001,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "ic-counted",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-fiber-closed",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-fiber:fiber=closed,m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "rho-frob-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611221101,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

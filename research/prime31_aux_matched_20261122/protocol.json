@@ -1,0 +1,1043 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "prime31-aux-matched-20261122-v1",
+ "version": 1,
+ "created": "2026-11-22",
+ "repository": "crypto",
+ "study_dir": "research/prime31_aux_matched_20261122",
+ "authors": [
+  "Codex matched-auxiliary lane"
+ ],
+ "links": {
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4923",
+  "panel": "research/prime31_aux_matched_20261122/panel.json",
+  "protocol_text": "research/prime31_aux_matched_20261122/PROTOCOL.md",
+  "validation_schema_snapshot": "research/pencil_large_prime_20261029/native_canonical_export/schemas/experiment-protocol.v1.json at d080cca06199ced73d18acfa78c3256d350e6b77",
+  "current_canonical_validation": "Blocked: the current crypto-autoresearcher skill, schema and checker at 808b08bcb0a53cb9ddfa7b6c4b4181d9e11d2445 are VLT1 envelopes in both local checkout and authenticated GitHub reads; archived-schema structural validation is not the current canonical check.",
+  "target_fixture": "research/prime31_aux_matched_20261122/target-fixture.json",
+  "panel_sha256": "9f815e248b9d9058bd3524a853ef1bfe37178c4cb0b9f8ddfb84280194e65409"
+ },
+ "question": "On one ordinary Prime31 public target, what natural-query relations, useful modular dependencies, complete scalar recoveries, and bounded failures occur for whole ordinary-auxiliary, supersingular-j1728 and Dickson fibers, matched plain controls, and dense versus retained tower membership?",
+ "claims": [
+  {
+   "id": "C-recovery",
+   "text": "Each registered execution will report either an independently replayed complete scalar recovery or its observed setup, query, memory, deadline or infrastructure failure; no unattempted or censored cell is a negative efficacy result.",
+   "class": "exact_computation",
+   "decided_by": [
+    "rho-diagnostic"
+   ],
+   "if_supported": "A recovered cell demonstrates only the stated finite public-target solve, with all its setup and failed attempts retained.",
+   "if_not_supported": "Preserve bounded and blocked outcomes with their original caps; do not infer impossibility or zero success probability."
+  },
+  {
+   "id": "C-scope",
+   "text": "The pilot does not claim a speedup, a complete native-operation cost model, superiority to tuned negation rho, statistical significance, a best seed, or asymptotic scaling.",
+   "class": "out_of_scope",
+   "decided_by": []
+  }
+ ],
+ "arms": [
+  {"id": "ordinary-t6-s0-dense","role": "candidate","description": "ordinary whole fiber, depth 6, construction seed 0, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": [["cargo","build","--offline","--locked","--release","--manifest-path","research/prime31_aux_matched_20261122/native/Cargo.toml"]],"binary_sha256": null,"threads": 2,"image_digest": null,"env": {"RAYON_NUM_THREADS": "2"}},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "dense"}},
+  {"id": "ordinary-t6-s0-tower","role": "candidate","description": "ordinary whole fiber, depth 6, construction seed 0, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s0-plain","role": "baseline","description": "Plain base matched to usable column count of ordinary-t6-s0; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 0,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s1-dense","role": "candidate","description": "ordinary whole fiber, depth 6, construction seed 1, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s1-tower","role": "candidate","description": "ordinary whole fiber, depth 6, construction seed 1, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s1-plain","role": "baseline","description": "Plain base matched to usable column count of ordinary-t6-s1; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 1,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s1093-dense","role": "candidate","description": "ordinary whole fiber, depth 6, construction seed 1093, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s1093-tower","role": "candidate","description": "ordinary whole fiber, depth 6, construction seed 1093, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t6-s1093-plain","role": "baseline","description": "Plain base matched to usable column count of ordinary-t6-s1093; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s0-dense","role": "candidate","description": "ordinary whole fiber, depth 8, construction seed 0, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s0-tower","role": "candidate","description": "ordinary whole fiber, depth 8, construction seed 0, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s0-plain","role": "baseline","description": "Plain base matched to usable column count of ordinary-t8-s0; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 0,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s1-dense","role": "candidate","description": "ordinary whole fiber, depth 8, construction seed 1, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s1-tower","role": "candidate","description": "ordinary whole fiber, depth 8, construction seed 1, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s1-plain","role": "baseline","description": "Plain base matched to usable column count of ordinary-t8-s1; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 1,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s1093-dense","role": "candidate","description": "ordinary whole fiber, depth 8, construction seed 1093, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s1093-tower","role": "candidate","description": "ordinary whole fiber, depth 8, construction seed 1093, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ordinary-t8-s1093-plain","role": "baseline","description": "Plain base matched to usable column count of ordinary-t8-s1093; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ordinary","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s0-dense","role": "candidate","description": "ss_j1728 whole fiber, depth 6, construction seed 0, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s0-tower","role": "candidate","description": "ss_j1728 whole fiber, depth 6, construction seed 0, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s0-plain","role": "baseline","description": "Plain base matched to usable column count of ss_j1728-t6-s0; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 0,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s1-dense","role": "candidate","description": "ss_j1728 whole fiber, depth 6, construction seed 1, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s1-tower","role": "candidate","description": "ss_j1728 whole fiber, depth 6, construction seed 1, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s1-plain","role": "baseline","description": "Plain base matched to usable column count of ss_j1728-t6-s1; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 1,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s1093-dense","role": "candidate","description": "ss_j1728 whole fiber, depth 6, construction seed 1093, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s1093-tower","role": "candidate","description": "ss_j1728 whole fiber, depth 6, construction seed 1093, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t6-s1093-plain","role": "baseline","description": "Plain base matched to usable column count of ss_j1728-t6-s1093; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s0-dense","role": "candidate","description": "ss_j1728 whole fiber, depth 8, construction seed 0, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s0-tower","role": "candidate","description": "ss_j1728 whole fiber, depth 8, construction seed 0, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s0-plain","role": "baseline","description": "Plain base matched to usable column count of ss_j1728-t8-s0; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 0,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s1-dense","role": "candidate","description": "ss_j1728 whole fiber, depth 8, construction seed 1, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s1-tower","role": "candidate","description": "ss_j1728 whole fiber, depth 8, construction seed 1, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s1-plain","role": "baseline","description": "Plain base matched to usable column count of ss_j1728-t8-s1; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 1,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s1093-dense","role": "candidate","description": "ss_j1728 whole fiber, depth 8, construction seed 1093, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s1093-tower","role": "candidate","description": "ss_j1728 whole fiber, depth 8, construction seed 1093, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "ss_j1728-t8-s1093-plain","role": "baseline","description": "Plain base matched to usable column count of ss_j1728-t8-s1093; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "ss_j1728","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s0-dense","role": "candidate","description": "dickson whole fiber, depth 6, construction seed 0, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s0-tower","role": "candidate","description": "dickson whole fiber, depth 6, construction seed 0, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s0-plain","role": "baseline","description": "Plain base matched to usable column count of dickson-t6-s0; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 0,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s1-dense","role": "candidate","description": "dickson whole fiber, depth 6, construction seed 1, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s1-tower","role": "candidate","description": "dickson whole fiber, depth 6, construction seed 1, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s1-plain","role": "baseline","description": "Plain base matched to usable column count of dickson-t6-s1; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 1,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s1093-dense","role": "candidate","description": "dickson whole fiber, depth 6, construction seed 1093, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s1093-tower","role": "candidate","description": "dickson whole fiber, depth 6, construction seed 1093, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t6-s1093-plain","role": "baseline","description": "Plain base matched to usable column count of dickson-t6-s1093; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 6,"base_seed": 1093,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s0-dense","role": "candidate","description": "dickson whole fiber, depth 8, construction seed 0, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s0-tower","role": "candidate","description": "dickson whole fiber, depth 8, construction seed 0, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 0,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s0-plain","role": "baseline","description": "Plain base matched to usable column count of dickson-t8-s0; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 0,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s1-dense","role": "candidate","description": "dickson whole fiber, depth 8, construction seed 1, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s1-tower","role": "candidate","description": "dickson whole fiber, depth 8, construction seed 1, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 1,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s1-plain","role": "baseline","description": "Plain base matched to usable column count of dickson-t8-s1; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 1,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s1093-dense","role": "candidate","description": "dickson whole fiber, depth 8, construction seed 1093, dense membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s1093-tower","role": "candidate","description": "dickson whole fiber, depth 8, construction seed 1093, tower membership; arity 4.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": false,"presentation": "tower"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "dickson-t8-s1093-plain","role": "baseline","description": "Plain base matched to usable column count of dickson-t8-s1093; matching construction retained separately.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"reference_family": "dickson","depth": 8,"base_seed": 1093,"arity": 4,"plain_control": true,"presentation": "dense"},"same_instrument_as": "ordinary-t6-s0-dense"},
+  {"id": "rho-a1","role": "reference","description": "One production A=1 r-adding Pollard-rho diagnostic on the same public target; not the tuned negation-aware comparator.","instrument": {"repo": "crypto","commit": null,"build": null,"binary_sha256": null,"threads": 2},"parameters": {"mode": "rho","seed": 4188,"max_steps": 1000000},"same_instrument_as": "ordinary-t6-s0-dense"}
+ ],
+ "controls": {
+  "aa": {
+   "present": false,
+   "comparison": null,
+   "not_applicable_reason": "This pilot records diagnostic execution and exact replay outcomes. No clock or native-counter ratio is admitted as performance evidence. Separate L2 and A/A qualification is required before a performance comparison."
+  },
+  "positive": {
+   "present": false,
+   "arm": null,
+   "expected_detection": null,
+   "not_applicable_reason": "Small-field correctness fixtures and adversarial signed-replay tests are preflight development checks, not additional Prime31 natural-query observations."
+  },
+  "negative": {
+   "present": false,
+   "arm": null,
+   "null_population": null,
+   "not_applicable_reason": "The pilot has no statistical null-population claim. Queries are generated independently of decomposability. Complete oracle negatives remain distinct from timeout, degree, solution and lift-cap unknowns; matched plain baselines are explicit registered arms."
+  }
+ },
+ "variable_ledger": {
+  "independent": [
+   {
+    "name": "auxiliary family",
+    "levels": [
+     "ordinary",
+     "ss_j1728",
+     "dickson"
+    ]
+   },
+   {
+    "name": "fiber depth",
+    "levels": [
+     6,
+     8
+    ]
+   },
+   {
+    "name": "construction seed",
+    "levels": [
+     0,
+     1,
+     1093
+    ]
+   },
+   {
+    "name": "membership/base arm",
+    "levels": [
+     "dense",
+     "tower",
+     "plain"
+    ]
+   }
+  ],
+  "factors": [
+   {
+    "name": "target curve",
+    "treatment": "fixed",
+    "value": {
+     "p": 2147483647,
+     "a": 847514846,
+     "b": 2087444724,
+     "r": 2147446831,
+     "G": [
+      625037715,
+      2100627251
+     ]
+    },
+    "how": "Existing cofactor-one ordinary Prime31 fixture, independently checked by primality, nonsingularity, subgroup and Hasse tests."
+   },
+   {
+    "name": "public target",
+    "treatment": "fixed",
+    "value": {
+     "fixture_seed": 20261122,
+     "path": "research/prime31_aux_matched_20261122/panel.json",
+     "Q": [
+      984837385,
+      1142774582
+     ]
+    },
+    "how": "Prepare Q once from the public fixture seed, record generation work, and publish exact coordinates before any campaign run. The collector and oracle receive G,Q,r and never the fixture scalar."
+   },
+   {
+    "name": "arity",
+    "treatment": "fixed",
+    "value": 4,
+    "how": "Four signed finite factor-base summands. Every possible sequential prefix identity chart remains in scope."
+   },
+   {
+    "name": "coordinate fiber",
+    "treatment": "measured",
+    "how": "Retain every coordinate in the accepted auxiliary fiber. Record complete V, unusable x, usable column count c, full rational tower and independent fiber certificate."
+   },
+   {
+    "name": "matched plain control",
+    "treatment": "measured",
+    "value": {
+     "plain_seed": 0,
+     "max_plain_x_trials": 4096
+    },
+    "how": "Construct exactly c usable target columns using the fixed plain seed. Record reference construction as matching-design overhead, include it in campaign work, and keep it distinct from the plain algorithm's setup. Never truncate an auxiliary fiber."
+   },
+   {
+    "name": "construction attempts",
+    "treatment": "fixed",
+    "value": {
+     "max_seed_builds": 8
+    },
+    "how": "Try initial seed plus attempt index, with every rejected build and available partial work retained. Ordinary trace-zero auxiliaries are rejected and charged. Process deadline bounds internal constructor loops."
+   },
+   {
+    "name": "query stream",
+    "treatment": "fixed",
+    "value": {
+     "seed": 4188,
+     "max_queries": 64
+    },
+    "how": "Same SplitMix64 rejection-sampled alpha,beta stream for every IC arm, form alpha*G+beta*Q before decomposition. Preserve identity query targets as tagged observations. Never select queries by known decomposition."
+   },
+   {
+    "name": "solver and caps",
+    "treatment": "fixed",
+    "value": {
+     "max_degree": 512,
+     "max_pairs_per_step": 32,
+     "timeout_ms": 1000,
+     "max_solutions": 4096,
+     "max_signed_lift_attempts": 1000000,
+     "stop_after_first": true,
+     "max_variables": 64,
+     "max_input_terms": 100000
+    },
+    "how": "Same production F4 and rational extraction engine. Degree512 is at least the degree256 dense membership input at depth8. No grid/meet-in-middle fallback may be relabeled as algebraic solving."
+   },
+   {
+    "name": "replication and correlation",
+    "treatment": "fixed",
+    "value": 1,
+    "how": "One execution per registered arm on one target. Repeated plain configurations across reference seeds/families are correlated repeated configurations, not independent replicates. Three construction seeds do not provide an independent target population."
+   },
+   {
+    "name": "execution environment",
+    "treatment": "fixed",
+    "value": {
+     "cpu_limit": 2,
+     "memory_mib": 4096,
+     "concurrency": 1,
+     "retries": 0,
+     "external_seconds": 120,
+     "collection_seconds": 100,
+     "rayon_threads": 2,
+     "terminate_after_seconds": 115,
+     "kill_grace_seconds": 5
+    },
+    "how": "Published source and bounded IsoLab command execution after admission. Two affinity-bound CPUs and two Rayon threads; diagnostic clocks. External TERM at 115 seconds plus 5 seconds before KILL implements the registered 120-second envelope; 4096 MiB address-space/RAM boundary. No unrecorded retry or cap escalation."
+   }
+  ],
+  "comparisons": [
+   {
+    "id": "presentation-ordinary-t6-s0",
+    "arms": [
+     "ordinary-t6-s0-dense",
+     "ordinary-t6-s0-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ordinary-t6-s0",
+    "arms": [
+     "ordinary-t6-s0-dense",
+     "ordinary-t6-s0-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ordinary-t6-s1",
+    "arms": [
+     "ordinary-t6-s1-dense",
+     "ordinary-t6-s1-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ordinary-t6-s1",
+    "arms": [
+     "ordinary-t6-s1-dense",
+     "ordinary-t6-s1-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ordinary-t6-s1093",
+    "arms": [
+     "ordinary-t6-s1093-dense",
+     "ordinary-t6-s1093-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ordinary-t6-s1093",
+    "arms": [
+     "ordinary-t6-s1093-dense",
+     "ordinary-t6-s1093-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ordinary-t8-s0",
+    "arms": [
+     "ordinary-t8-s0-dense",
+     "ordinary-t8-s0-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ordinary-t8-s0",
+    "arms": [
+     "ordinary-t8-s0-dense",
+     "ordinary-t8-s0-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ordinary-t8-s1",
+    "arms": [
+     "ordinary-t8-s1-dense",
+     "ordinary-t8-s1-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ordinary-t8-s1",
+    "arms": [
+     "ordinary-t8-s1-dense",
+     "ordinary-t8-s1-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ordinary-t8-s1093",
+    "arms": [
+     "ordinary-t8-s1093-dense",
+     "ordinary-t8-s1093-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ordinary-t8-s1093",
+    "arms": [
+     "ordinary-t8-s1093-dense",
+     "ordinary-t8-s1093-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ss_j1728-t6-s0",
+    "arms": [
+     "ss_j1728-t6-s0-dense",
+     "ss_j1728-t6-s0-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ss_j1728-t6-s0",
+    "arms": [
+     "ss_j1728-t6-s0-dense",
+     "ss_j1728-t6-s0-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ss_j1728-t6-s1",
+    "arms": [
+     "ss_j1728-t6-s1-dense",
+     "ss_j1728-t6-s1-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ss_j1728-t6-s1",
+    "arms": [
+     "ss_j1728-t6-s1-dense",
+     "ss_j1728-t6-s1-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ss_j1728-t6-s1093",
+    "arms": [
+     "ss_j1728-t6-s1093-dense",
+     "ss_j1728-t6-s1093-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ss_j1728-t6-s1093",
+    "arms": [
+     "ss_j1728-t6-s1093-dense",
+     "ss_j1728-t6-s1093-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ss_j1728-t8-s0",
+    "arms": [
+     "ss_j1728-t8-s0-dense",
+     "ss_j1728-t8-s0-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ss_j1728-t8-s0",
+    "arms": [
+     "ss_j1728-t8-s0-dense",
+     "ss_j1728-t8-s0-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ss_j1728-t8-s1",
+    "arms": [
+     "ss_j1728-t8-s1-dense",
+     "ss_j1728-t8-s1-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ss_j1728-t8-s1",
+    "arms": [
+     "ss_j1728-t8-s1-dense",
+     "ss_j1728-t8-s1-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-ss_j1728-t8-s1093",
+    "arms": [
+     "ss_j1728-t8-s1093-dense",
+     "ss_j1728-t8-s1093-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-ss_j1728-t8-s1093",
+    "arms": [
+     "ss_j1728-t8-s1093-dense",
+     "ss_j1728-t8-s1093-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-dickson-t6-s0",
+    "arms": [
+     "dickson-t6-s0-dense",
+     "dickson-t6-s0-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-dickson-t6-s0",
+    "arms": [
+     "dickson-t6-s0-dense",
+     "dickson-t6-s0-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-dickson-t6-s1",
+    "arms": [
+     "dickson-t6-s1-dense",
+     "dickson-t6-s1-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-dickson-t6-s1",
+    "arms": [
+     "dickson-t6-s1-dense",
+     "dickson-t6-s1-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-dickson-t6-s1093",
+    "arms": [
+     "dickson-t6-s1093-dense",
+     "dickson-t6-s1093-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-dickson-t6-s1093",
+    "arms": [
+     "dickson-t6-s1093-dense",
+     "dickson-t6-s1093-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-dickson-t8-s0",
+    "arms": [
+     "dickson-t8-s0-dense",
+     "dickson-t8-s0-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-dickson-t8-s0",
+    "arms": [
+     "dickson-t8-s0-dense",
+     "dickson-t8-s0-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-dickson-t8-s1",
+    "arms": [
+     "dickson-t8-s1-dense",
+     "dickson-t8-s1-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-dickson-t8-s1",
+    "arms": [
+     "dickson-t8-s1-dense",
+     "dickson-t8-s1-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "presentation-dickson-t8-s1093",
+    "arms": [
+     "dickson-t8-s1093-dense",
+     "dickson-t8-s1093-tower"
+    ],
+    "differs_in": [
+     "membership presentation"
+    ],
+    "design": "one_factor",
+    "reason": "Same complete coordinate fiber, usable target columns, query stream, production F4 solver and caps. Only the polynomial membership presentation changes."
+   },
+   {
+    "id": "base-dickson-t8-s1093",
+    "arms": [
+     "dickson-t8-s1093-dense",
+     "dickson-t8-s1093-plain"
+    ],
+    "differs_in": [
+     "factor-base coordinate set",
+     "full membership cardinality including nonlifting x",
+     "construction method and cost"
+    ],
+    "design": "confounded",
+    "reason": "Usable column count is matched. Whole-fiber dense membership can include nonlifting coordinates, whereas the plain base contains only lifting coordinates; no claim isolates a single algebraic mechanism."
+   },
+   {
+    "id": "rho-diagnostic",
+    "arms": [
+     "rho-a1"
+    ],
+    "differs_in": [],
+    "design": "absolute",
+    "reason": "Public-target recovery/censoring reference, no superiority claim or inferred comparison to optimized negation rho.",
+    "threshold": "Candidate must satisfy [d]G=Q under independent replay."
+   }
+  ],
+  "crosses_map": false,
+  "aa_not_applicable": "No admitted performance ratio is computed in this diagnostic pilot.",
+  "transfer_obligations": []
+ },
+ "randomization": {
+  "arm_order": "fixed",
+  "arm_order_reason": "Use panel order family ordinary, ss_j1728, dickson; depth6 then8; seed0,1,1093; dense,tower,plain within each group; rho last. Fixed serial order does not support wall-clock causal comparisons.",
+  "seed_derivation": {
+   "method": "harness_drawn",
+   "seeds": [
+    0,
+    1,
+    1093
+   ],
+   "note": "The frozen native panel expands the explicit construction-seed grid [0,1,1093]. Each constructor retry uses seed+i for i<8. Every IC query stream restarts at4188; alpha and beta are successive rejection-sampled words modulo r. Plain seed0; one rho seed4188; target fixture seed20261122. Export actual seed and full cell parameters, not a cyclic canonical explicit_list interpretation."
+  },
+  "instance_sampling": {
+   "rule": "One precommitted ordinary Prime31 curve and one independently generated public Q; no target screening or resampling based on solver output.",
+   "independent_of_arm": true
+  },
+  "blinding": {
+   "analysis_labels_masked": false,
+   "how": "Explicitly exploratory deterministic pilot; no blinded inferential test. Code, inputs, caps and all exclusions must be frozen before affected data.",
+   "unmasked_at": null
+  }
+ },
+ "sample_size": {
+  "instances": 1,
+  "replicates": 1,
+  "warmups": 0,
+  "power": {
+   "method": "other",
+   "alpha": 0.05,
+   "tests_in_family": 1,
+   "correction": "none",
+   "passes": false,
+   "note": "No statistical power claim. The55 singleton arms are54 fixed IC configurations and one rho diagnostic on one shared target, not55 independent ECDLP instances. Report cell-level outcomes and correlations; no inferential confidence interval or asymptotic conclusion."
+  },
+  "preflight_runtime": {
+   "fixed_seconds": null,
+   "per_sample_seconds": null,
+   "threads": 2,
+   "estimated_total_seconds": null,
+   "measured_on": null
+  }
+ },
+ "metrics": {
+  "primary": [
+   {
+    "id": "recovery_status",
+    "name": "Complete scalar recovery or bounded status",
+    "unit": "status",
+    "kind": "exact",
+    "definition": "Recovered means a candidate from natural relation collection satisfies [d]G=Q in both production and independent arithmetic. Preserve censored, setup-failed, killed and unattempted states separately.",
+    "source": "cell_summary.status, collection.recovery_replayed, rho_summary.independent_replay and external exit receipt",
+    "aggregation": "per_row",
+    "uncertainty": "none_exact"
+   },
+   {
+    "id": "accepted_rows",
+    "name": "Independently replayed signed relation rows",
+    "unit": "rows",
+    "kind": "counted",
+    "definition": "Every accepted row including duplicate coefficient rows; zero rows and identity-query origin remain visible. These are feasibility observations, not independently sampled successes.",
+    "source": "collection_summary.accepted_rows and relation events",
+    "aggregation": "per_row",
+    "uncertainty": "none_exact"
+   },
+   {
+    "id": "rank_and_dependency",
+    "name": "Factor-base rank, augmented rank and useful dependencies",
+    "unit": "ranks/dependencies",
+    "kind": "counted",
+    "definition": "Report rank(A), rank([A|-beta]) and useful dependencies modulo r. Rank(A) alone is not recovery; duplicate A rows can determine d.",
+    "source": "collection_summary.rank_a, rank_augmented, useful_dependencies",
+    "aggregation": "per_row",
+    "uncertainty": "none_exact"
+   }
+  ],
+  "secondary": [
+   {
+    "id": "query_outcomes",
+    "name": "Public-query outcome inventory",
+    "unit": "queries",
+    "kind": "counted",
+    "definition": "Started, completed positive, complete negative, unknown and interrupted queries; partial results are retained. An unknown query is not a complete negative.",
+    "source": "query_start, query_result, query_error and collection_summary",
+    "aggregation": "per_row",
+    "uncertainty": "none_exact"
+   },
+   {
+    "id": "native_work",
+    "name": "Available native work counters",
+    "unit": "scoped native operations",
+    "kind": "counted",
+    "definition": "Separate construction, production group and field, F4, root extraction, polynomial construction, signing and modular row-elimination counters. Counts are partial and cannot be summed as a complete time/energy/cost model.",
+    "source": "reference_build_result.base.cost, query_result.oracle.counters, collection_summary.group_and_field and rank work",
+    "aggregation": "per_row",
+    "uncertainty": "none_exact"
+   },
+   {
+    "id": "cold_elapsed_diagnostic",
+    "name": "Observed process and phase elapsed time",
+    "unit": "s",
+    "kind": "timed",
+    "definition": "Diagnostic total includes reference matching, rejected construction attempts, successful setup, all queries, extraction, signed verification and rank. Preserve matching-design overhead separately; no admitted speed ratio.",
+    "source": "cell_summary.total_seconds_diagnostic, setup timings, external resource receipt",
+    "aggregation": "per_row",
+    "uncertainty": "range"
+   },
+   {
+    "id": "resources",
+    "name": "Observed resource and spend receipts",
+    "unit": "CPU/RAM/USD",
+    "kind": "counted",
+    "definition": "Preserve assigned and observed CPU/RAM, peak RSS, exit code, deadline/kill state, job/pod/image/source identities, build/idle/failed-attempt costs and budget timestamp. Missing telemetry remains missing.",
+    "source": "IsoLab launcher/job receipts, process resource receipt and account budget ledger",
+    "aggregation": "per_row",
+    "uncertainty": "none_exact"
+   }
+  ]
+ },
+ "measurement": {
+  "isolation_required": "none",
+  "warmups": 0,
+  "order": "sequential",
+  "clock": "none",
+  "counters": [
+   "construction_attempts",
+   "usable_columns",
+   "queries",
+   "accepted_rows",
+   "duplicate_coefficient_rows",
+   "rank_a",
+   "rank_augmented",
+   "useful_dependencies",
+   "scoped_native_work"
+  ],
+  "record": [
+   "Full source revision and source-manifest hash; binary SHA256, image digest and exact argv",
+   "Frozen protocol, panel and individual cell hashes",
+   "Public G,Q,r and complete base definitions and independent certificates",
+   "Host/CPU/kernel, actual resources, job/pod UIDs, exit code and interruption status",
+   "Every query_start before solver entry, every terminal result or explicit absence after process death",
+   "All setup/retry/matching work and budget receipt timestamp; no missing failure is dropped"
+  ],
+  "timed_primary_justification": null
+ },
+ "execution": {
+  "backend": "isolab-k8s",
+  "queue": "IsoLab existing Spot command-job route; access currently unavailable",
+  "placement": {
+   "cpu_limit": 2,
+   "memory_mib": 4096,
+   "concurrency": 1,
+   "process_seconds": 120,
+   "collection_seconds": 100,
+   "maximum_campaign_usd": 5,
+   "maximum_ic_cells": 54,
+   "maximum_rho_cells": 1,
+   "current_budget_remaining": null,
+   "absolute_campaign_deadline_utc": null,
+   "admission": "No launch until current daily/monthly shared budget and reservations establish headroom, a finite original absolute deadline is recorded, published source and image are bound, source checkpoint is uploaded, and current canonical protocol validation/freeze succeeds.",
+   "terminate_after_seconds": 115,
+   "kill_grace_seconds": 5
+  },
+  "measurement_class": "search",
+  "timeout_seconds": 120,
+  "checkpoint": {
+   "policy": "none",
+   "interval_seconds": null,
+   "grace_seconds": null,
+   "restore_validation": "none",
+   "after_restore": {
+    "wall_time": "invalid",
+    "counted_units": "valid"
+   }
+  },
+  "retries": {
+   "infrastructure_only": true,
+   "max_attempts": 1
+  }
+ },
+ "stopping_rules": [
+  {
+   "kind": "fixed_n",
+   "preregistered": true,
+   "rule": "Exactly54 IC singleton arms and one A=1 rho diagnostic are planned. One execution each, serial; no retries. Additional settings or targets require a prospective amended protocol."
+  },
+  {
+   "kind": "budget",
+   "preregistered": true,
+   "rule": "Each process is externally capped at120seconds total (TERM at115seconds, KILL after5seconds grace),2affinity-bound CPU,4096MiB and2Rayon threads. IC collection stops at64 attempted public queries,100seconds, recovered scalar, or fatal correctness failure. A query shares a1000ms cooperative deadline across charts. Rho stops at1,000,000steps or external deadline."
+  },
+  {
+   "kind": "budget",
+   "preregistered": true,
+   "rule": "Total lane ceiling USD5 includes build, idle, storage, transfer and failed attempts. Do not launch when shared daily/monthly headroom is unknown or exhausted. Before admission freeze one original absolute campaign deadline; retries never reset it."
+  },
+  {
+   "kind": "invalidation",
+   "preregistered": true,
+   "rule": "Any inconsistent fiber certificate, membership/sign-map mismatch, off-curve result, independent replay mismatch, wrong source/input hash, cap mismatch or missing launch custody invalidates the affected observation and stops the campaign for diagnosis."
+  },
+  {
+   "kind": "preregistered_sequential",
+   "preregistered": true,
+   "rule": "No cap or seed adaptation inside this pilot. Preserve incomplete cells as censored. A positive first witness establishes that query's existence only; a complete negative requires all charts and extraction to finish."
+  }
+ ],
+ "decision_rule": {
+  "text": "Publish per-cell feasibility and work inventory. Complete recovery is accepted only after independent public-point replay. No complete solve means censored/not recovered within the registered caps, not failure of the mathematical technique. Compare dense/tower only within the identical whole fiber and stream; compare plain only at matched usable c while exposing nonlifting membership and setup differences. Do not pool duplicate plain configurations as independent replicates. Since clocks lack L2/A/A admission and native counters are partial, do not compute an end-to-end speed ratio or statistical winner. A later performance experiment requires a prospective L2/A/A and tuned-negation-rho protocol.",
+  "comparison_ids": [
+   "presentation-ordinary-t6-s0",
+   "base-ordinary-t6-s0",
+   "presentation-ordinary-t6-s1",
+   "base-ordinary-t6-s1",
+   "presentation-ordinary-t6-s1093",
+   "base-ordinary-t6-s1093",
+   "presentation-ordinary-t8-s0",
+   "base-ordinary-t8-s0",
+   "presentation-ordinary-t8-s1",
+   "base-ordinary-t8-s1",
+   "presentation-ordinary-t8-s1093",
+   "base-ordinary-t8-s1093",
+   "presentation-ss_j1728-t6-s0",
+   "base-ss_j1728-t6-s0",
+   "presentation-ss_j1728-t6-s1",
+   "base-ss_j1728-t6-s1",
+   "presentation-ss_j1728-t6-s1093",
+   "base-ss_j1728-t6-s1093",
+   "presentation-ss_j1728-t8-s0",
+   "base-ss_j1728-t8-s0",
+   "presentation-ss_j1728-t8-s1",
+   "base-ss_j1728-t8-s1",
+   "presentation-ss_j1728-t8-s1093",
+   "base-ss_j1728-t8-s1093",
+   "presentation-dickson-t6-s0",
+   "base-dickson-t6-s0",
+   "presentation-dickson-t6-s1",
+   "base-dickson-t6-s1",
+   "presentation-dickson-t6-s1093",
+   "base-dickson-t6-s1093",
+   "presentation-dickson-t8-s0",
+   "base-dickson-t8-s0",
+   "presentation-dickson-t8-s1",
+   "base-dickson-t8-s1",
+   "presentation-dickson-t8-s1093",
+   "base-dickson-t8-s1093",
+   "rho-diagnostic"
+  ],
+  "threshold": "Exact public-point replay for recovery; all other outcomes retain their observed status.",
+  "statistic": "Per-cell recovery/censoring, rows, modular ranks, useful dependencies, partial work and resource inventory.",
+  "interval": "No inferential interval: one fixed target and no independent performance replicates.",
+  "multiple_comparison_correction": "none",
+  "effect_size_measure": "Descriptive paired changes in feasibility, rows and scoped counters only; no normalized total-cost ratio.",
+  "verdict_vocabulary": [
+   "recovered",
+   "not_recovered_within_caps",
+   "setup_failed",
+   "unknown_or_interrupted",
+   "invalid",
+   "not_attempted_blocked"
+  ]
+ },
+ "analysis_plan": {
+  "script": null,
+  "inputs": [
+   "Frozen panel and generated cell JSON",
+   "Per-cell JSONL with flushed starts/results",
+   "External process, job, source/image, checkpoint and budget receipts"
+  ],
+  "outputs": [
+   "Cell-level status and work table retaining every planned arm",
+   "Flow planned55,attempted/completed/blocked counts",
+   "No speedup or significance claim"
+  ],
+  "blinded": false,
+  "frozen_before_data": false
+ },
+ "reporting": {
+  "export_schema": "experiment.export/v1",
+  "review_schema": "experiment.review/v1",
+  "graphs": [
+   "Implementation and admitted-execution flow diagram; quantitative chart only after comparable admitted data exists"
+  ],
+  "report_dir": "reports"
+ },
+ "inadmissible": [
+  "Calling this draft a frozen or current-canonical-validated protocol",
+  "Starting a campaign before publication, checkpoint, source/image custody, live budget and deadline admission",
+  "Treating local builds/unit tests or target preparation as a Prime31 research campaign",
+  "Selecting successful natural targets or borrowing a generic discrete log to derive their alpha,beta",
+  "Truncating auxiliary fibers or silently matching only nominal depth",
+  "Reporting incomplete extraction or omitted identity charts as complete negatives",
+  "Discarding duplicate A rows or equating rank(A) with complete recovery",
+  "Treating correlated repeated plain configurations or construction seeds as independent target samples",
+  "Dropping setup search, seed retries, failed queries, extraction, signed replay or rank cost",
+  "Admitting diagnostic wall time or partial native counts as an end-to-end speedup",
+  "Claiming comparison to optimized negation rho from the A=1 reference",
+  "Generalizing this one-field pilot to P-192,P-256,Curve25519 or asymptotic ECDLP hardness"
+ ],
+ "amendments": [],
+ "freeze": {
+  "status": "draft",
+  "protocol_sha256": null,
+  "commit": null,
+  "frozen_at": null,
+  "filed_before_affected_data": null
+ }
+}

@@ -297,3 +297,106 @@ pub fn run(case: usize) -> Value {
         "pcc": "unverified"
     })
 }
+
+/// One preregistered public-residual attempt. A scalar recurrence is only a
+/// candidate generator: every row of M and the original curve are checked.
+pub fn positive() -> Value {
+    let started = Instant::now();
+    let mut ar = Arithmetic::default();
+    check_curve(PRIME31, &mut ar).expect("actual cofactor-one prime31 curve");
+    let base = first_eight(&mut ar);
+    let xs = base.map(|q| q.0);
+    assert_eq!(xs, [0, 1, 2, 3, 5, 6, 8, 9]);
+    let h = factor_polynomial(&xs);
+    let residual = Some((1_911_579_686, 548_820_096));
+    let (r, s) = residual.unwrap();
+    assert!(ar.on_curve(PRIME31, residual));
+    assert!(!xs.contains(&r));
+    let seed = 0x0d99_0003;
+    let (cols, rows) = sparse_macaulay(r, s, &h, 9);
+    assert_eq!(cols, 11_440);
+    assert_eq!(rows.len(), 27_456);
+    let nnz: usize = rows.iter().map(Vec::len).sum();
+    let moment_start = Instant::now();
+    let (sequence, _, moment_multiplications) = moments(&rows, cols, seed, 2 * cols);
+    let moment_elapsed_ns = moment_start.elapsed().as_nanos();
+    let (complexity, connection) = berlekamp_massey(&sequence);
+    let last = connection[complexity];
+    let eligible = complexity == cols && last == 0;
+    let mut projection_applications = 0usize;
+    let mut macaulay_null_checked = false;
+    let mut constant_nonzero = false;
+    let mut original_equations_checked = false;
+    let mut full_point_checked = false;
+    let mut coefficients: Option<[u64; NV]> = None;
+    if eligible {
+        // Regenerate D and the Krylov starting vector. moments() consumes
+        // random values for D, then scalar projection u, then start v.
+        let mut random = seed;
+        let diagonal: Vec<u64> = (0..rows.len())
+            .map(|_| random_nonzero(&mut random)).collect();
+        for _ in 0..cols { let _ = random_nonzero(&mut random); }
+        let start_vector: Vec<u64> = (0..cols)
+            .map(|_| random_nonzero(&mut random)).collect();
+        let mut projected = start_vector.clone();
+        let mut next = vec![0u64; cols];
+        // If F(t)=t^N+c1*t^(N-1)+...+c_(N-1)*t, then F(t)/t
+        // applied to v is a candidate in ker(A). Verify ker(M) directly.
+        for &coefficient in connection.iter().take(complexity).skip(1) {
+            gram_apply(&rows, &diagonal, &projected, &mut next);
+            for (value, &initial) in next.iter_mut().zip(&start_vector) {
+                *value = add(*value, mul(coefficient, initial));
+            }
+            mem::swap(&mut projected, &mut next);
+            projection_applications += 1;
+        }
+        macaulay_null_checked = rows.iter().all(|row| {
+            row.iter().fold(0u64, |sum, &(i, c)| add(sum, mul(c, projected[i]))) == 0
+        });
+        constant_nonzero = projected[0] != 0;
+        if macaulay_null_checked && constant_nonzero {
+            let inv = pow(projected[0], P - 2);
+            let basis = monomials(9);
+            let index: HashMap<Exp, usize> = basis.iter().copied().enumerate()
+                .map(|(i, exp)| (exp, i)).collect();
+            let recovered: [u64; NV] = std::array::from_fn(|j| {
+                let mut exp = [0u8; NV];
+                exp[j] = 1;
+                mul(projected[index[&exp]], inv)
+            });
+            let qs = equations(r, s, &h);
+            original_equations_checked = qs.iter().all(|q| eval_poly(q, &recovered) == 0)
+                && independent_direct_m(&recovered, r, s) == h;
+            if original_equations_checked {
+                full_point_checked =
+                    check_public_coefficients(&mut ar, residual, &base, &recovered);
+            }
+            if original_equations_checked && full_point_checked {
+                coefficients = Some(recovered);
+            }
+        }
+    }
+    json!({
+        "schema": "prime31.rr9.d9-positive-krylov.v1",
+        "protocol": "RR9_D9_POSITIVE_KRYLOV_PROTOCOL_20261122.md",
+        "p": P, "n": PRIME31.n, "base_x": xs,
+        "public_residual": [r, s], "seed": seed,
+        "degree": 9, "rows": rows.len(), "columns": cols, "nnz": nnz,
+        "krylov_moments": sequence.len(),
+        "scalar_bm_linear_complexity": complexity,
+        "scalar_bm_last_coefficient": last,
+        "eligible_singular_recurrence": eligible,
+        "projection_gram_applications": projection_applications,
+        "macaulay_null_checked": macaulay_null_checked,
+        "constant_monomial_nonzero": constant_nonzero,
+        "original_equations_checked": original_equations_checked,
+        "original_full_point_checked": full_point_checked,
+        "recovered_coefficients": coefficients,
+        "moment_operator_field_multiplications": moment_multiplications.to_string(),
+        "moment_elapsed_ns": moment_elapsed_ns.to_string(),
+        "all_charged_elapsed_ns": started.elapsed().as_nanos().to_string(),
+        "no_sign_mask_or_secret_scalar_passed": true,
+        "complete_unknown_ecdlp_solves": 0,
+        "pcc": "unverified"
+    })
+}
