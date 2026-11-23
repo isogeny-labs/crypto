@@ -1064,6 +1064,27 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Keep the wide 32-bit arithmetic in its own cold-to-other-fields code
+// region. Inlining it into the generic verifier perturbs even the unchanged
+// 61-bit hot path and gave measurable code-layout regressions.
+#[inline(never)]
+fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    debug_assert!(p > 1 && p <= u32::MAX as u64);
+    let reciprocal = u64::MAX / p;
+    let mut result = vec![0; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 { continue; }
+        for (j, &y) in b.iter().enumerate() {
+            if y == 0 { continue; }
+            let term = result[i + j] + x * y;
+            let quotient = ((term as u128 * reciprocal as u128) >> 64) as u64;
+            let remainder = term - quotient * p;
+            result[i + j] = if remainder >= p { remainder - p } else { remainder };
+        }
+    }
+    trim(result)
+}
+
 // Build the monic product of distinct linear factors in place. Completing
 // root certificates previously allocated an intermediate Vec at every root,
 // even though multiplying by (X-r) needs only a backward coefficient pass.
@@ -1076,7 +1097,6 @@ fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
     for &root in roots {
         if root >= p || previous.is_some_and(|a| a >= root) {
             return Err("noncanonical or repeated root".into());
-        }
         previous = Some(root);
         let c = if root == 0 { 0 } else { p - root };
         let n = product.len();
@@ -1093,14 +1113,11 @@ fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
             let sum = product[i - 1] + vmul(product[i], c, p);
             product[i] = if sum >= p { sum - p } else { sum };
         product[0] = vmul(product[0], c, p);
-    }
     Ok(product)
-}
 
 // Fast path for c + d*x^k (k >= 5), with c,d both nonzero. This is
 // separate from monomial multiplication, which is handled earlier.
 #[cold]
-#[inline(never)]
 fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>> {
     if binomial.len() < 6 || binomial[0] == 0
         || binomial[1] != 0 || binomial[2] != 0
@@ -1113,7 +1130,6 @@ fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>
     let high = binomial[shift];
     let mut out = vec![0; binomial.len() + other.len() - 1];
     for (i, &x) in other.iter().enumerate() {
-        if x == 0 { continue; }
         // All caller coefficients are canonical. Two additions cannot
         // overflow u64 because p <= 2^61 - 1.
         let product = vmul(x, low, p);
@@ -1177,6 +1193,9 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
+    if p <= u32::MAX as u64 && a.len() >= 8 && b.len() >= 8 {
+        return vproduct_barrett32(a, b, p);
+    }
     // A wide dense convolution can accumulate each output coefficient in u64
     // and perform ONE modular reduction per coefficient, not one per pair.
     // The bound is checked in u128, so no intermediate u64 overflow is possible.
@@ -1199,7 +1218,6 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
             *coefficient = sum % p;
         }
         return trim(result);
-    }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
@@ -2802,6 +2820,37 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round88_dense_barrett_product_matches_reference_convolution() {
+        let mut state = 0x8422_26d3_1214_6587u64;
+        // The oracle uses independent u128 remainder arithmetic.
+        for p in [3u64, 65521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            for alen in 2..=12 {
+                for blen in 2..=12 {
+                    for case in 0..24 {
+                        let mut a = vec![0; alen];
+                        let mut b = vec![0; blen];
+                        for x in a.iter_mut().chain(b.iter_mut()) {
+                            state = state.wrapping_mul(6364136223846793005)
+                                .wrapping_add(1442695040888963407);
+                            *x = state % p;
+                        }
+                        if case % 6 == 0 { a[0] = 0; b[blen - 1] = 0; }
+                        if case % 7 == 0 { a[alen - 1] = p - 1; b[0] = p - 1; }
+                        let mut expected = vec![0u64; alen + blen - 1];
+                        for (i, &x) in a.iter().enumerate() {
+                            for (j, &y) in b.iter().enumerate() {
+                                expected[i + j] = ((expected[i + j] as u128
+                                    + x as u128 * y as u128) % p as u128) as u64;
+                            }
+                        assert_eq!(vproduct(&a, &b, p), trim(expected),
+                            "p={p} alen={alen} blen={blen} case={case}");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn round87_remainder_only_replay_matches_independent_division() {
         // Compare fixed-degree remainder-only reduction against the frozen
         // Euclidean quotient-and-remainder verifier, including 61-bit fields.
@@ -2822,13 +2871,7 @@ mod tests {
                             vdiv(&dividend, &modulus, p).unwrap().1,
                             "p={p} degree={degree} seed={seed} extra={extra}"
                         );
-                    }
-                }
-            }
-        }
-    }
 
-    #[test]
     fn round86_monic_shift_and_linear_match_independent_products() {
         // Directly exercise the source-exact traced producer arithmetic.
         // In particular, a shift must not charge scalar arithmetic events.
