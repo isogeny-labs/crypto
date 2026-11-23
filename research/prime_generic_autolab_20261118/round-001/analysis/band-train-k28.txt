@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | inc | 12/12 | 20.541 | 23.629 | 51.426 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | ksum3f-n141 | 12/12 | 117.748 | 131.966 | 259.922 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | ksum4f-n60 | 12/12 | 271.430 | 303.858 | 595.711 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | mitm2-n342 | 12/12 | 19.898 | 23.134 | 52.251 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | mitm2-n482 | 12/12 | 22.815 | 25.923 | 53.892 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 12/12 | 1.016 | 1.115 | 2.008 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | wsum-b5-n3 | 12/12 | 47.425 | 56.865 | 141.826 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | inc vs ksum3f-n141 | inc < ksum3f-n141 |
+| icv1-fp28-tm3161-380f655a | inc vs ksum4f-n60 | inc < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | inc vs mitm2-n342 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | inc vs mitm2-n482 | inc < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm3161-380f655a | inc vs wsum-b5-n3 | inc < wsum-b5-n3 |
+| icv1-fp28-tm3161-380f655a | ksum3f-n141 vs ksum4f-n60 | ksum3f-n141 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum3f-n141 vs mitm2-n342 | mitm2-n342 < ksum3f-n141 |
+| icv1-fp28-tm3161-380f655a | ksum3f-n141 vs mitm2-n482 | mitm2-n482 < ksum3f-n141 |
+| icv1-fp28-tm3161-380f655a | ksum3f-n141 vs rho-neg | rho-neg < ksum3f-n141 |
+| icv1-fp28-tm3161-380f655a | ksum3f-n141 vs wsum-b5-n3 | wsum-b5-n3 < ksum3f-n141 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs mitm2-n342 | mitm2-n342 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs mitm2-n482 | mitm2-n482 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs rho-neg | rho-neg < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | ksum4f-n60 vs wsum-b5-n3 | wsum-b5-n3 < ksum4f-n60 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs mitm2-n482 | mitm2-n342 < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs rho-neg | rho-neg < mitm2-n342 |
+| icv1-fp28-tm3161-380f655a | mitm2-n342 vs wsum-b5-n3 | mitm2-n342 < wsum-b5-n3 |
+| icv1-fp28-tm3161-380f655a | mitm2-n482 vs rho-neg | rho-neg < mitm2-n482 |
+| icv1-fp28-tm3161-380f655a | mitm2-n482 vs wsum-b5-n3 | mitm2-n482 < wsum-b5-n3 |
+| icv1-fp28-tm3161-380f655a | rho-neg vs wsum-b5-n3 | rho-neg < wsum-b5-n3 |
