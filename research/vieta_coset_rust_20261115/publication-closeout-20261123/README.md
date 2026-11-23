@@ -111,3 +111,36 @@ retained as superseded sparse-input diagnostics, not current policy standing.
 The authorized stop condition is met: PR4525 is merged, its actual outcomes
 are recorded, and its follow-up stays off. PR4535 and its separate cohorts
 are outside this closeout.
+
+## First bounded administrative check — November 23
+
+PR4987 head `7d1b8408a0` remains open and mergeable, with MERGE auto-merge
+enabled and no reviews, comments or unresolved threads. Required size passed;
+validation-gate and artifacts failed. Validation stopped on Git-only recovery
+of the unchanged packed-filter archived facts, before reaching its gate tests.
+Artifacts stopped on four inherited tool-test failures, including an undefined
+`paths` in `wire_workflows.py`. A focused same-source metadata test reproduced
+its failure. The local artifact **policy** check still passes; it is narrower
+than that failed CI job [pcc:unverified].
+
+Other observed failures concern unchanged archived planner inputs, frozen
+backend report availability, old curve naming, PCC source/lock mismatch and
+PCC claim/test failures. The exact compared scopes match current main.
+See [CI diagnosis](evidence/ci-diagnosis-20261123T0805Z.json) and
+[failing-input equality](evidence/failing-input-equality-20261123T0805Z.json).
+No unrelated infrastructure, historical claim, record, registry or exclusion
+was changed. No CI rerun, benchmark, replay or local S3 operation occurred
+[pcc:unverified].
+
+One new journal paragraph lacked an explicit unverified citation. That
+qualification is added, and its original full block and digest are retained
+in [the edit receipt](evidence/journal-qualification-20261123T0805Z.json).
+No original statement was removed. All earlier main journal bytes remain an
+exact prefix; all other old journal blocks are untouched. Global prose lint
+now reports the same 17 findings as main, with zero new PR-owned paragraph
+findings. See [the comparison](evidence/prose-qualification-result-20261123T0805Z.json).
+The change does not confer independent scientific standing [pcc:unverified].
+
+The remaining bounded checks follow actual head changes and required results.
+No merge is authorized with failed or pending required checks, and no
+numerical goal or measurement is reactivated by this administrative follow-up.
