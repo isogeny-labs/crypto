@@ -2,9 +2,12 @@
 
 Regenerated automatically by `.github/workflows/gb-baseline-rebench.yml` (`tools/gb_baseline.py`) whenever the F4 / Gröbner engine code, the harnesses or `panel.json` change. Do not edit by hand.
 
+- Commit: `e09024b2e8ec3b30f4f16d5d87b4d94dd4bb9d40`  
+- Run: https://github.com/isogeny-labs/crypto/actions/runs/45080384094  
+- Host: AMD EPYC 9V45 96-Core Processor (4 CPUs), rustc 1.100.0 (0ef1bc386 2026-11-09)  
+- Generated: 2026-11-22T23:57:39Z; per-cell timeout 600 s
 - Commit: `43b3270e6f6be286994872aaa38b0945f9d5ece5`  
 - Run: https://github.com/isogeny-labs/crypto/actions/runs/44836588931  
-- Host: AMD EPYC 9V45 96-Core Processor (4 CPUs), rustc 1.100.0 (0ef1bc386 2026-11-09)  
 - Generated: 2026-11-21T00:24:43Z; per-cell timeout 600 s
 - Commit: `aa7cb9c186269ec3b3e0e2b9170f2ea358c98bb8`  
 - Run: https://github.com/isogeny-labs/crypto/actions/runs/44788401623  
@@ -24,6 +27,9 @@ Regenerated automatically by `.github/workflows/gb-baseline-rebench.yml` (`tools
 
 | curve | m | status | counted cost | unit | answer digest | wall s | vs baseline |
 |:--|--:|:--|--:|:--|:--|--:|:--|
+| M31 | 2 | ok | 5620 | multiply-adds (F_p elimination) | `7695ff52fe1defda` | 0.00139 | unchanged |
+| M31 | 3 | ok | 1.845e+06 | multiply-adds (F_p elimination) | `8d038345ea40a3fa` | 0.0125 | unchanged |
+| M31 | 4 | ok | 2.143e+08 | multiply-adds (F_p elimination) | `f7d48b0b09178c89` | 0.139 | unchanged |
 | M31 | 2 | ok | 5620 | multiply-adds (F_p elimination) | `7695ff52fe1defda` | 0.00138 | unchanged |
 | M31 | 3 | ok | 1.845e+06 | multiply-adds (F_p elimination) | `8d038345ea40a3fa` | 0.0116 | unchanged |
 | M31 | 4 | ok | 2.143e+08 | multiply-adds (F_p elimination) | `f7d48b0b09178c89` | 0.135 | unchanged |
@@ -38,6 +44,14 @@ Regenerated automatically by `.github/workflows/gb-baseline-rebench.yml` (`tools
 | M31 | 7 | timeout | — | — | `—` | — | still timeout |
 | M31 | 8 | timeout | — | — | `—` | — | still timeout |
 | M31 | 9 | timeout | — | — | `—` | — | still timeout |
+| N31 | 2 | ok | 796 | word XORs (GF(2) Macaulay elimination) | `10055e840b7b42c7` | 0.000474 | unchanged |
+| N31 | 3 | ok | 7.039e+07 | word XORs (GF(2) Macaulay elimination) | `10055e840b7b42c7` | 0.123 | unchanged |
+| N31 | 4 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.71e-05 | cost unit changed |
+| N31 | 5 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.51e-05 | cost unit changed |
+| N31 | 6 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.51e-05 | cost unit changed |
+| N31 | 7 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.5e-05 | cost unit changed |
+| N31 | 8 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.5e-05 | cost unit changed |
+| N31 | 9 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.49e-05 | cost unit changed |
 | N31 | 2 | ok | 796 | word XORs (GF(2) Macaulay elimination) | `10055e840b7b42c7` | 0.000445 | unchanged |
 | N31 | 3 | ok | 7.039e+07 | word XORs (GF(2) Macaulay elimination) | `10055e840b7b42c7` | 0.113 | unchanged |
 | N31 | 4 | ok | 0 | word XORs (GF(2) Macaulay elimination) | `20b0fa11cd19564e` | 1.86e-05 | cost unit changed |
