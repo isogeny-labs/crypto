@@ -1,0 +1,52 @@
+name: Prime31 rational chain original-lock correctness
+
+on:
+  push:
+    branches:
+      - lane/prime31-dickson-quotient-gate
+    paths:
+      - examples/prime31_rational_chain_guard.rs
+      - examples/identity_certificate_rational_chain.rs
+      - .github/workflows/prime31-rational-chain-guard.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prime31-rational-chain-correctness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  original-lock-correctness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Record original source and lock identities
+        run: |
+          mkdir -p correctness-receipts/identities
+          git rev-parse HEAD > correctness-receipts/checkout-commit.txt
+          sha256sum Cargo.toml Cargo.lock src/cryptanalysis/ext_curve.rs src/cryptanalysis/semaev_prime_poly.rs src/cryptanalysis/ic_boundary.rs src/cryptanalysis/identity_certificate.rs research/prime31_ic_20261115/native/lib.rs examples/prime31_rational_chain_guard.rs examples/identity_certificate_rational_chain.rs > correctness-receipts/source-sha256.txt
+      - name: Fixed rational-chain and original imported tests
+        run: |
+          set -euo pipefail
+          cargo test --locked --release --example prime31_rational_chain_guard 2>&1 | tee correctness-receipts/component-tests.txt
+      - name: Complete deterministic correctness receipt without timings
+        run: |
+          set -euo pipefail
+          cargo run --locked --release --example prime31_rational_chain_guard > correctness-receipts/correctness-cases.json 2> correctness-receipts/diagnostic-stderr.txt
+      - name: Native identity issuance and separate-seed replay
+        run: |
+          set -euo pipefail
+          cargo run --locked --release --example identity_certificate_rational_chain -- correctness-receipts/identities > correctness-receipts/identity-issuance.json 2> correctness-receipts/identity-stderr.txt
+          cargo run --locked --release --example identity_certificate_rational_chain -- --check correctness-receipts/identities 6677026024 > correctness-receipts/identity-replay.json 2>> correctness-receipts/identity-stderr.txt
+      - name: Retain source-bound correctness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rational-chain-${{ github.sha }}
+          path: correctness-receipts/
+          retention-days: 14
