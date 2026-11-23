@@ -4,6 +4,8 @@
 mod nagao_unit;
 #[path = "jv_nagao_unit_elimination.rs"]
 mod nagao_unit_elimination;
+#[path = "jv_nagao_unit_fast_elimination.rs"]
+mod nagao_unit_fast_elimination;
 use super::deferred_pair_graph as deferred;
 use super::homogeneous_quotient::{ExtraCounts, Quotient};
 use super::quadratic_pair_relation::{self as pair, Certificate, SplitOptions, SplitReport};
@@ -430,12 +432,92 @@ pub fn run_extension_unit_deferred_pair_dlp_on(
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum DescentBackend {
     Original,
+    OriginalTrace,
     #[allow(
         dead_code,
         reason = "Retained backend selected by the sibling adapted comparison entry point"
     )]
     AdaptedSix,
     UnitFive,
+    UnitFiveFast,
+    UnitFiveFastTrace,
+}
+impl DescentBackend {
+    fn original(self) -> bool {
+        matches!(self, Self::Original | Self::OriginalTrace)
+    }
+    fn unit(self) -> bool {
+        matches!(
+            self,
+            Self::UnitFive | Self::UnitFiveFast | Self::UnitFiveFastTrace
+        )
+    }
+    fn label(self) -> &'static str {
+        match self {
+            Self::Original => "original-six",
+            Self::OriginalTrace => "original-six-traced",
+            Self::AdaptedSix => "adapted-six",
+            Self::UnitFive => "exact-unit-five",
+            Self::UnitFiveFast => "exact-unit-five-fast",
+            Self::UnitFiveFastTrace => "exact-unit-five-fast-traced",
+        }
+    }
+}
+
+/// Matched six-coordinate control with cold, process-local F4 learning.
+#[allow(
+    dead_code,
+    reason = "Public opt-in backend used by sibling comparison workers"
+)]
+pub fn run_extension_traced_deferred_pair_dlp_on(
+    spec: &Spec,
+    seed: u64,
+    options: DeferredPairDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if !(1..=1_000_000).contains(&options.collection.max_screen_refusals)
+        || options.collection.collection.max_descent_residuals > 8192
+    {
+        return Err("bounded traced descent/refusal history required".into());
+    }
+    run_quadratic_pair(
+        spec,
+        seed,
+        options.collection.collection,
+        options.collection.max_screen_refusals,
+        options.max_deferred_edges,
+        DescentBackend::OriginalTrace,
+    )
+}
+
+/// Exact normalized unit reduction; optional checked F4 replay preserves all
+/// audit/fallback records. Dedicated workers start cold with a single arity.
+#[allow(
+    dead_code,
+    reason = "Public opt-in backend used by sibling comparison workers"
+)]
+pub fn run_extension_fast_unit_deferred_pair_dlp_on(
+    spec: &Spec,
+    seed: u64,
+    options: DeferredPairDlpOptions,
+    trace_reuse: bool,
+) -> Result<(Value, Option<u64>), String> {
+    if !(1..=1_000_000).contains(&options.collection.max_screen_refusals)
+        || options.collection.collection.max_descent_residuals > 8192
+    {
+        return Err("bounded unit descent/refusal history required".into());
+    }
+    run_quadratic_pair(
+        spec,
+        seed,
+        options.collection.collection,
+        options.collection.max_screen_refusals,
+        options.max_deferred_edges,
+        if trace_reuse {
+            DescentBackend::UnitFiveFastTrace
+        } else {
+            DescentBackend::UnitFiveFast
+        },
+    )
 }
 
 /// Matched root-materialization adapter control, retaining six coordinates.
@@ -495,7 +577,9 @@ fn run_quadratic_pair(
     let other_before = work::snapshot_other();
     let ctx = {
         let _model = work::enter(Phase::Model);
-        Ctx::new(spec)
+        let mut ctx = Ctx::new(spec);
+        ctx.trace = backend == DescentBackend::OriginalTrace;
+        ctx
     };
     let base_phase = work::enter(Phase::FactorBase);
     let mut base_rng = StdRng::seed_from_u64(seed ^ 0xBACE_0001);
@@ -738,6 +822,7 @@ fn run_quadratic_pair(
     let by_x: HashMap<_, _> = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
     let mut descents = Vec::new();
     let mut nagao_attempts = Vec::new();
+    let (mut trace_replayed, mut trace_shape_fallbacks) = (0u64, 0u64);
     let mut affine_rows = Vec::new();
     let mut projected_rows = Vec::new();
     let mut affine = CountedRelationSystem::new(spec.l, 2);
@@ -764,16 +849,40 @@ fn run_quadratic_pair(
         let opts = cover::opts_for_mode(24, 600.0, cover::StopMode::Staircase(64));
         for i in 0..options.max_descent_residuals {
             let mut rng = StdRng::seed_from_u64(seed ^ i.wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let (decompositions, cost) = if backend != DescentBackend::Original {
-                let attempt = nagao_unit::decompose(
-                    &ctx,
-                    &base,
-                    &by_x,
-                    &residual,
-                    &opts,
-                    &mut rng,
-                    backend == DescentBackend::UnitFive,
-                );
+            let (decompositions, cost) = if !backend.original() {
+                let attempt = if matches!(
+                    backend,
+                    DescentBackend::UnitFiveFast | DescentBackend::UnitFiveFastTrace
+                ) {
+                    nagao_unit::decompose_using(
+                        &ctx,
+                        &base,
+                        &by_x,
+                        &residual,
+                        &opts,
+                        &mut rng,
+                        |polys, p, opts, rng| {
+                            let (s, t, a) = if backend == DescentBackend::UnitFiveFastTrace {
+                                nagao_unit_fast_elimination::solve_audited_traced(
+                                    polys, p, opts, rng,
+                                )?
+                            } else {
+                                nagao_unit_fast_elimination::solve_audited(polys, p, opts, rng)?
+                            };
+                            Ok((s, t, Some(a)))
+                        },
+                    )
+                } else {
+                    nagao_unit::decompose(
+                        &ctx,
+                        &base,
+                        &by_x,
+                        &residual,
+                        &opts,
+                        &mut rng,
+                        backend == DescentBackend::UnitFive,
+                    )
+                };
                 let (rows, cost, audit) = match attempt {
                     Ok(value) => value,
                     Err(error) => {
@@ -787,7 +896,7 @@ fn run_quadratic_pair(
                         break;
                     }
                 };
-                if backend == DescentBackend::UnitFive {
+                if backend.unit() {
                     nagao_attempts.push(json!({"residual_index":i,"u":remainder::encode(&residual.u),"v":remainder::encode(&residual.v),"audit":audit}));
                 }
                 (rows, cost)
@@ -797,6 +906,11 @@ fn run_quadratic_pair(
             residuals += 1;
             timeouts += u64::from(cost.timed_out);
             incomplete += u64::from(cost.incomplete);
+            trace_replayed += u64::from(cost.replayed);
+            trace_shape_fallbacks += u64::from(cost.trace_mismatch);
+            if backend == DescentBackend::OriginalTrace {
+                nagao_attempts.push(json!({"residual_index":i,"u":remainder::encode(&residual.u),"v":remainder::encode(&residual.v),"six_coordinate_cost":&cost}));
+            }
             for mut decomposition in decompositions {
                 decomposition.terms.sort_unstable();
                 if config
@@ -866,12 +980,14 @@ fn run_quadratic_pair(
         "solver_product_scope":"two-column affine RREF only; collection/kernel/projection work recorded separately",
         "complete_cost":false,"total_bitops":null,"comparative_eligibility":false,"known_uncounted":["native containers/control/normalization/scans","PRNG internals","fixed-factor and Euclidean internals","hashing/serialization"]});
     if backend != DescentBackend::Original {
-        report["nagao_backend"] = json!(if backend == DescentBackend::UnitFive {
-            "exact-unit-five"
-        } else {
-            "adapted-six"
-        });
+        report["nagao_backend"] = json!(backend.label());
         report["nagao_attempts"] = json!(nagao_attempts);
+        report["coordinate_trace_reuse"] = json!(matches!(
+            backend,
+            DescentBackend::OriginalTrace | DescentBackend::UnitFiveFastTrace
+        ));
+        report["coordinate_trace_replayed"] = json!(trace_replayed);
+        report["coordinate_trace_shape_fallbacks"] = json!(trace_shape_fallbacks);
     }
     Ok((report, scalar))
 }
@@ -879,6 +995,70 @@ fn run_quadratic_pair(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn fast_and_replayed_materializers_preserve_fixed_full_rows() {
+        let spec = cover::generate_spec(101, 409);
+        let ctx = Ctx::new(&spec);
+        let jac = ctx.jac();
+        let base = cover::factor_base(&ctx, &mut StdRng::seed_from_u64(13));
+        let by_x = base.iter().enumerate().map(|(i, b)| (b.x, i)).collect();
+        let mut planted = jac.identity();
+        for b in base.iter().take(6) {
+            planted = jac.add(&planted, &b.d);
+        }
+        let opts = cover::opts_for_mode(24, 30.0, cover::StopMode::Staircase(64));
+        for (is_planted, r) in [(false, spec.gj), (true, planted)] {
+            let (expected, cost) = cover::nagao_decompose(
+                &ctx,
+                &base,
+                &by_x,
+                &r,
+                &opts,
+                &mut StdRng::seed_from_u64(947),
+            );
+            assert!(!cost.incomplete && !cost.timed_out);
+            if is_planted {
+                assert!(!expected.is_empty());
+            }
+            for trace in [false, true] {
+                cover::set_trace_scope(0x5554_3546);
+                let (rows, cost, audit) = nagao_unit::decompose_using(
+                    &ctx,
+                    &base,
+                    &by_x,
+                    &r,
+                    &opts,
+                    &mut StdRng::seed_from_u64(947),
+                    |polys, p, opts, rng| {
+                        let (r, s, a) = if trace {
+                            nagao_unit_fast_elimination::solve_audited_traced(polys, p, opts, rng)?
+                        } else {
+                            nagao_unit_fast_elimination::solve_audited(polys, p, opts, rng)?
+                        };
+                        Ok((r, s, Some(a)))
+                    },
+                )
+                .unwrap();
+                cover::set_trace_scope(0);
+                assert!(!cost.incomplete && !cost.timed_out);
+                assert_eq!(expected, rows);
+                assert!(audit.is_some());
+                assert!(rows.iter().all(|d| cover::verify_dec(&jac, &base, &r, d)));
+            }
+        }
+    }
+    #[test]
+    fn fast_backend_refuses_unbounded_audit_before_collection() {
+        let spec = cover::generate_spec(101, 17);
+        for trace in [false, true] {
+            let mut o = DeferredPairDlpOptions::default();
+            o.collection.collection.max_descent_residuals = 8193;
+            assert!(run_extension_fast_unit_deferred_pair_dlp_on(&spec, 389, o, trace).is_err());
+        }
+        let mut o = DeferredPairDlpOptions::default();
+        o.collection.collection.max_descent_residuals = 8193;
+        assert!(run_extension_traced_deferred_pair_dlp_on(&spec, 389, o).is_err());
+    }
     fn source(terms: Vec<(usize, i8)>, large: i8) -> Source {
         Source {
             candidate_index: 1,

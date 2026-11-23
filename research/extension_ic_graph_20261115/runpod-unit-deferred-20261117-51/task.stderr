@@ -1,0 +1,1 @@
+run-task.sh: line 106:   493 Killed                  timeout --signal=TERM --kill-after=5s "$(jq -er .qualifier_timeout_seconds "$run/runtime-plan.json")s" "$run/analyzer" "$run" "$run/summary.json" > "$run/analysis-original.log" 2>&1

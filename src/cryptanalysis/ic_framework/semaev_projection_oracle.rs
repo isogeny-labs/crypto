@@ -214,9 +214,8 @@ mod tests {
         let p1 = fb.points[2];
         let p2 = fb.points[4.min(fb.points.len().saturating_sub(1))];
         let mut ops = GroupOps::default();
-        let target = inst
-            .curve
-            .add(&mut ops, inst.curve.add(&mut ops, p0, p1), p2);
+        let first_pair = inst.curve.add(&mut ops, p0, p1);
+        let target = inst.curve.add(&mut ops, first_pair, p2);
         assert!(!target.infinity);
 
         let ctx = InstanceCtx {

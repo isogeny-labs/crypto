@@ -1,0 +1,38 @@
+name: Rootfind Round 134 source-exact A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-round134-jacobi-tonelli-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round134/**
+      - .github/workflows/rootfind_round134.yml
+permissions:
+  contents: read
+jobs:
+  native-source-exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round134
+      - name: Build two exact production Rust modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin automation/rootfind-round133-tonelli-shanks-20261123
+          mkdir -p /tmp/rootfind_round134
+          git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round134/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round134/optimized.rs
+          cat research/rootfind_round134/bench_helper.rs >> /tmp/rootfind_round134/baseline.rs
+          cat research/rootfind_round134/bench_helper.rs >> /tmp/rootfind_round134/optimized.rs
+          cp research/rootfind_round134/source_exact_main.rs /tmp/rootfind_round134/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round134/main.rs -o /tmp/rootfind_round134/bench
+      - name: Exhaustive and randomized square-root oracles, 13-trial alternating A/B
+        run: /tmp/rootfind_round134/bench

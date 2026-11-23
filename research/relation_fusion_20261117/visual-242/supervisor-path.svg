@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="235" viewBox="0 0 1000 235">
+<rect width="1000" height="235" fill="white"/><g font-family="DejaVu Sans,sans-serif" font-size="16" fill="#193147">
+<text x="20" y="25" font-weight="bold">Qualified transport paths; no speed comparison yet</text>
+<rect x="20" y="45" width="455" height="65" rx="7" fill="#e7edf3"/><text x="35" y="69">Wrapped: taskset → timeout → prlimit → worker</text><text x="35" y="94" font-size="13">Three utility execs; existing limits and full proof checks</text>
+<rect x="505" y="45" width="475" height="65" rx="7" fill="#e1efe9"/><text x="520" y="69">Native: pre_exec limits → one worker exec</text><text x="520" y="94" font-size="13">Private group · pidfd/poll deadline · parent-death guard</text>
+<path d="M 247 111 V 145 H 500 M 742 111 V 145 H 500 V 160" fill="none" stroke="#47637c" stroke-width="2"/>
+<rect x="180" y="160" width="640" height="55" rx="7" fill="#f5eee3"/><text x="200" y="184">Complete worker proof replay + parent full replay / exact bindings</text><text x="200" y="204" font-size="13">Same source-bound frozen workers and inputs; generic changes also reach controls</text>
+</g></svg>

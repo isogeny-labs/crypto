@@ -1,0 +1,46 @@
+name: Chained two-hop finite descent qualification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/chained_twohop_descent_20261123/src/**'
+      - 'research/chained_twohop_descent_20261123/formal/**'
+      - 'research/chained_twohop_descent_20261123/run_first_B.sh'
+      - 'research/chained_twohop_descent_20261123/custody_metadata_B.py'
+      - 'research/chained_twohop_descent_20261123/SOURCE_LOCK_B.json'
+      - '.github/workflows/chained-twohop-descent.yml'
+permissions:
+  contents: read
+jobs:
+  finite-qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Install pinned official compiler versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal --component clippy,rustfmt
+          curl --fail --location --retry 0 --proto '=https' \
+            --output "$RUNNER_TEMP/lean-4.35.0-linux.tar.zst" \
+            https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst
+          tar --zstd --extract --file "$RUNNER_TEMP/lean-4.35.0-linux.tar.zst" --directory "$RUNNER_TEMP"
+      - name: Exact frozen source and one native qualification
+        shell: bash
+        env:
+          LEAN4_BIN: ${{ runner.temp }}/lean-4.35.0-linux/bin/lean
+        run: |
+          set -euo pipefail
+          bash research/chained_twohop_descent_20261123/run_first_B.sh \
+            "$GITHUB_SHA" "$RUNNER_TEMP/twohop-custody" "$RUNNER_TEMP/twohop-compiler-temp"
+      - name: Preserve complete source, both ELFs and every recorded stream
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: twohop-complete-${{ github.sha }}
+          path: ${{ runner.temp }}/twohop-custody
+          retention-days: 90
+          if-no-files-found: warn

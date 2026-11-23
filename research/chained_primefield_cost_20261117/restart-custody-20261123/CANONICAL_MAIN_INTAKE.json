@@ -1,0 +1,41 @@
+{
+  "recorded": "2026-11-23T06:53:34.447875+00:00",
+  "canonical_base": "816f9c3a942efed569049618c056d12a0c56d693",
+  "tracking_commit": "71f1217dd2b412f4b2e0c6b8e140d704324054d6",
+  "baseline_command": [
+    "python",
+    "tools/pcc/pcc.py",
+    "ledger",
+    "verify",
+    "--base",
+    "816f9c3a942efed569049618c056d12a0c56d693"
+  ],
+  "exit": 0,
+  "full_stdout": "BASELINE_PCC.stdout",
+  "full_stderr": "BASELINE_PCC.stderr",
+  "claim_files": 3772,
+  "ledger_rows": 1564,
+  "input_files": {
+    "pcc/ledger.jsonl": {
+      "bytes": 901394,
+      "sha256": "a1d0e77a89af5bfd733feb995899eda0ed2c168bb33c2ec246e089f9739d6896"
+    },
+    "pcc/keyring.json": {
+      "bytes": 473,
+      "sha256": "21929cc6389f58d0f847912af7f3fbf44e91ca90725965780085353c1322031c"
+    },
+    "tools/pcc/pcc.py": {
+      "bytes": 107227,
+      "sha256": "00036f8b524bf070a5cf36e02b2599148d390bdf30562d81a1a073df7777da2a"
+    },
+    "docs/shared-code.lock.json": {
+      "bytes": 6090,
+      "sha256": "cbd292d35ec62a5bd316e6f53022c2b36f340f3b93b0e8ead1bb3c57305523e0"
+    },
+    "AGENTS.md": {
+      "bytes": 152091,
+      "sha256": "a6d1a1da5d48c4b3fb9b5caa1d074ded49ed77448baa58a616b200422471ad53"
+    }
+  },
+  "no_baseline_edit": true
+}

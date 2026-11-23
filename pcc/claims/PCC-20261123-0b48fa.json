@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T12:03:11Z",
+ "id": "PCC-20261123-0b48fa",
+ "kind": "statement",
+ "producer": {
+  "commit": "c37b4dfb14b184186aca10b987e8926c67adcdad",
+  "model": "",
+  "session": "2026-11-23"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/ACTUAL_FIRST_B_RESULT.json",
+    "sha256": "395c09f67c3fbf131e11c04b91d51f3a6dbd2cb6946d913ab52ade75255db9f9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/first-B-native/census.stdout",
+    "sha256": "0700a8a4c5a6e4d96e7b17b1bb657ba7f50df46589b88d5287a50e12e1e0d9e7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "realcurve-B-finite-data",
+ "statement": "Native real-curve profile B c37b4dfb passes format, release compile, strict Clippy and complete census with all guards0:28 cubic-pair sextics and48 quintics,1296 matching Newton/resultant orders and76 rejected/restored mod2 count mutants. Sixteen3+3 models have elliptic Weil factors and minimal4096 horizon2-part; the other12 are ordinary nonsplit with horizon v2=16, so the preregistered nonsplit minimal fixture is absent. All485+1 models have no elliptic Weil factor and horizon v2=12. Whole28832B stdout retained; no Jacobian8 coordinates or ECDLP advantage."
+}
