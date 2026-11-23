@@ -1,0 +1,93 @@
+{
+  "schema": "prime31-s3-double-resultant-review/v1",
+  "observed_date_utc": "2026-11-23",
+  "status": "published mathematical derivation; symbolic residual checks passed; native Rust validation not run",
+  "pcc": "unverified",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/4979",
+  "branch": "research/prime31-s3-double-resultant-review-20261123",
+  "base_main_sha": "816f9c3a942efed569049618c056d12a0c56d693",
+  "parent_prs": {
+    "pair_spectrum_4951": "merged",
+    "original_root_4962": "merged"
+  },
+  "original_source": {
+    "s3_path": "src/cryptanalysis/semaev_prime_poly.rs",
+    "s3_blob": "123ccac36794ed3ce043e01b3a9c27ed3e2ca096",
+    "iteration9_note_blob": "e2348e91dc08141a663c5adb9798b6ca8f09424e",
+    "iteration9_state_blob": "9c1e877a50b020f4da70a83decca1a7e245f8f7a"
+  },
+  "artifacts": [
+    {
+      "path": "research/prime31_summation_compression_20261122/iteration10/DOUBLE_RESULTANT_AND_SUPPORT.md",
+      "git_blob": "db62fd8a58435c9b103d767dc6a86d9da58e5ef7"
+    },
+    {
+      "path": "research/prime31_summation_compression_20261122/iteration10/REPORT.md",
+      "git_blob": "7ccc41f147440c74ad2008fca1d04a1d592f66e8"
+    },
+    {
+      "path": "research/prime31_summation_compression_20261122/iteration10/RESULTANT_GATES.svg",
+      "git_blob": "e906f9dcddf5b77b0904198e337e829d8bfd16db"
+    },
+    {
+      "path": "research/prime31_summation_compression_20261122/iteration10/VALIDATION.md",
+      "git_blob": "000456f3e6052eb1d3681a468f8e3e379443b89e"
+    }
+  ],
+  "derived": {
+    "assumptions": "p>3, nonsingular E/Fp, signed B abscissa representatives in odd-order G, pair-sum spectrum X of size D",
+    "range_D": "B<=D<=B^2",
+    "double_resultant": "Delta(r)=diag(r)*off(r)^2; deg=2D^2-D",
+    "diagonal": "S3(ui,ui,r)=-4yi^2(r-x(2Si)); deg 1",
+    "target_support": "Q(r)=H(r)*diag(r)*off(r); deg D^2+D; nonidentity four-sum iff Q(x(R))=0",
+    "matrix": "M=W C(r) W^T rank<=3, det(M) identically zero for D>=4, including misses",
+    "prime31_B31": {
+      "n": 2147446831,
+      "number_unordered_four_multisets": 677040,
+      "neg_fixed_zero_sum_multisets": 496,
+      "nonzero_target_x_upper": 338272,
+      "nonzero_target_x_total": 1073723415,
+      "miss_count_lower": 1073385143,
+      "uniform_nonidentity_miss_probability_lower": 0.9996849542486693
+    },
+    "conditional_costs": {
+      "direct_pair_scan_exponent": "2/3",
+      "full_index_exponent": "4/7",
+      "validity": "conventional uniform-target full-independent-row model only; stronger baselines and eligible families not established"
+    }
+  },
+  "validation": {
+    "symbolic_s3_offdiagonal_residual": "zero",
+    "symbolic_s3_diagonal_residual": "zero",
+    "symbolic_rank_three_pencil_residual": "zero",
+    "symbolic_attempt1": "failure in polynomial-domain coercion; no output",
+    "symbolic_attempt2": "passed exact residuals",
+    "native_rust_test_count": 0,
+    "group_arithmetic_executed": false,
+    "independent_signed_verifier": false,
+    "lean": false,
+    "paid_compute": false
+  },
+  "parallelism": {
+    "coordinator": 1,
+    "native_worker_slots_available": 0,
+    "parallelized": "independent GitHub source reads",
+    "algebra_worker": "not launched; coordinator authored/challenged derivation",
+    "rust_worker": "not launched; no new index algorithm selected; original arithmetic work reserved outside this note",
+    "validation_worker": "not launched; coordinator prepared checks and symbolic residual; native tests await source-frozen executable",
+    "elapsed_time_gain_claim": false
+  },
+  "kb": "research-KB MCP and repository wrapper not available; use repository and accessible primary arXiv texts as fallback",
+  "space": "Existing Space Page preserved; no duplicate; no mutation attempted",
+  "next": [
+    "Independent source-frozen original-Rust exhaustive small-order signed output and miss validation",
+    "Check low-rank determinant false-positive fixture on actually missed target and all duplicates",
+    "Devise new exact target index with sigma<=2 and tau<1 including charged no-hit cases",
+    "Record useful authentic-RHS rank and end-to-end cold ECDLP only after admitted Rust execution"
+  ],
+  "holds": [
+    "Do not edit merged PR #4951/#4962",
+    "Do not change iteration9 frozen files or concurrent workflow and root STATE",
+    "No source-bound benchmark or signed PCC without actual runner and independent replay"
+  ]
+}
