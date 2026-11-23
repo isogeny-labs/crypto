@@ -29,12 +29,29 @@ AMD EPYC 9V74, CPU pinned to CPU 0, native GCC and Clang optimized C++ reproduct
 
 The large low-degree ratios are due to bypassing the prior exponentiation/GCD; they are **not** end-to-end isogeny speedups. Cubic and ψ₃ controls did not reliably improve. The optional fixed-array experiment (39396) slowed standalone `mulmod()` on GCC 32-bit primes (approximately 0.86×), and was rejected.
 
+## Native Rust source-exact A/B (two successful executions)
+
+The workflow compiles the **actual Rust baseline and candidate production source files** with Rust 1.100.0 `-C opt-level=3 -C target-cpu=native`, runs the same independent correctness oracles on both, and executes 13 alternating A/B trials per workload. The first run and an independent rerun both passed: [GitHub Actions run 45148126063](https://github.com/isogeny-labs/crypto/actions/runs/45148126063).
+
+| Complete operation | Prime | First run (before → after ns, paired speedup) | Independent rerun speedup |
+|---|---|---|---|
+| Monic linear | 65,521 | 1,085 → 46.9, **23.34×** | **24.63×** |
+| Monic linear | 1,000,000,007 | 1,623 → 46.3, **34.52×** | **37.09×** |
+| Monic linear | 2^61−1 | 4,097 → 46.4, **86.77×** | **118.09×** |
+| Monic quadratic | 1,000,000,007 | 3,536 → 226, **15.81×** | **18.02×** |
+| Monic quadratic | 2^32−5 | 3,902 → 260, **15.00×** | **15.01×** |
+| Monic quadratic | 2^61−1 | 7,859 → 219, **36.20×** | **34.95×** |
+| Quadratic with repeated root | 1,000,000,007 | 2,960 → 172, **16.52×** | **14.83×** |
+| Scaled quadratic | 2^61−1 | 6,813 → 484, **14.09×** | **14.41×** |
+
+The p=65,521 quadratic control (p≡1 mod 4) stayed near parity. Most cubic, quartic, ψ₃ and full isogeny workloads remained approximately at parity, sometimes **up to 2–3% slower**. The native figures demonstrate fast low-degree root extraction, **not** faster complete 3-isogeny discovery or ECC2K index-calculus throughput.
+
 ## Correctness validation
 
 - Independent exhaustive quadratic oracles at p=3,5,7,11,13,19,23,31,101 (12,425 polynomials) passed for both baseline and optimized local reproductions.
 - Differential randomized modular multiplication and exponentiation, known-factor/repeated-root cubic and quartic roots, and random quartic roots passed for p=101,65,521,1e9+7,2^32−5,2^61−1.
 - GCC AddressSanitizer + UndefinedBehaviorSanitizer passed.
-- Rust source includes additional exhaustive tests of nonmonic/padded linear, scaled quadratic, repeated and irreducible roots. The source-exact native Rust A/B CI workflow additionally runs independent oracles and 13 alternating trials. A passing native build and numeric Rust performance are required before merge.
+- Rust source includes additional exhaustive tests of nonmonic/padded linear, scaled quadratic, repeated and irreducible roots. The source-exact native Rust A/B CI workflow additionally runs independent oracles and 13 alternating trials. Source-exact native Rust build, correctness oracles and repeated A/B numerical timings passed. Broad repository CI and true end-to-end workloads remain required before merge.
 
 ## Reproduce
 
