@@ -2435,7 +2435,7 @@ impl FactorBaseBuilder<Fp2Curve> for GlsLineBase<'_> {
 
 /// `counters` with the marker that says the oracle's set-up counts all
 /// its table work (`ecbench::work::known_uncounted`).
-fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
+pub(crate) fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
     counters.insert("counted:table_insert_attempts".to_string(), 1);
     counters
 }
