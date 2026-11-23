@@ -133,6 +133,20 @@ class CompleteSectorTest(unittest.TestCase):
                       'vars', len(sys['variables']),
                       'gens', len(sys['equations']))
 
+    def test_smallest_missing_charts(self):
+        """All three minimal F5 failure witnesses from merged prior work."""
+        s = circuit(5, 0, 1, 3, field_lift=True)
+        fast = compile_checker(s)
+        for xs in ((0, 1, 2, 3),  # O-only Frobenius join loses T=(4,0)
+                   (0, 0, 1, 1),  # affine S3 chain loses T=O at infinity
+                   (0, 1, 0, 1)): # F5-affine intermediate misses F25
+            self.assertEqual(
+                eval_poly(specialized_summation(5, 0, 1, xs[:-1]),
+                          xs[-1], 5), 0)
+            env = sem_witness(s, xs)
+            self.assertIsNotNone(env, xs)
+            self.assertTrue(fast(env), xs)
+
     def test_projected_50_instances(self):
         """Full each-X root-set comparison after 50 random slices per cell."""
         for p, a, b, m in ((5, 0, 1, 3), (7, 1, 1, 3),
