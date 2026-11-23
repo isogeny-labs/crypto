@@ -179,4 +179,4 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
-| [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection and full expected bit cost; actual target ideal^4/residual quotient dimension<=2 and conditional point-group/fixed pair-base coverage bound, known-label finder/cost open [pcc:unverified] | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |
+| [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection and full expected bit cost; actual residual quotient dimension<=2, short rational certificate coverage and residual-class invariance, known-label finder/cost open [pcc:unverified] | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |

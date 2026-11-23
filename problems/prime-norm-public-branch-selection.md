@@ -437,3 +437,19 @@ Next zero/onepoint residualcases and paddedidentity coverage, nonsplitdegree2
 field/scalar bridge, asymmetric/growingknownsupport survivingnormalization,
 then actualpublicfinder/density/retry/full expectedbitcost. Originalcriteria,
 nonscalarorigin/rank-directedWjet obligations and oldfailurehistory retained.
+
+## 2026-11-23: all short rational certificates and invariant residual class
+
+078/build084/local041/PCC-20261123-89ca74 derivesactual0/1/2rational
+residualpointcertificate cases, paddedgroupidentityandcoverage<=(B.card+1)^2
+underactualinjection/copimecardpremises.080/build086/local042/PCC-a97e80
+checks205/5new/0warnings/standardfoundations, constructsactualresidualunit
+representingactualJfromexactspanh=I4J, derivesclassinversefourthtargetclass
+andindependenceofnonzerohwithout rationalsplitting. All localunsigned
+outsidehistoricalshared53/57/fresh. [pcc:unverified]
+
+Nextactualasymmetricbranch rplus/rminus normorder/commonminfactor and
+survivingorientedknownpoint factors, then growingpublickernel/nonzeroimage/
+degree/group/knownscalarfinder/completeexpectedcost. Classinvariance does
+notpreventchangingrepresentatives/factorizations or proveuniversalbarrier.
+Originalcriteria/nonscalarorigin/rank-directedWjet and oldhistory unchanged.
