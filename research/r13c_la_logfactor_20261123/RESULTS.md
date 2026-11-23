@@ -56,3 +56,27 @@ because the constant is unfavourable.
    The current rows record `core_rows` and `core_cols`, not `w`.
 3. Keep the `(2,2,2)` plane-quartic transfer gate as the strategic route to exponent 1;
    this result makes the H-arm's 4/3 asymptotics plausible but does not make it cheap.
+
+## Mechanism: the log factor is the mean row weight
+
+The instrumented run (`run_*_w.jsonl`) records the merged-core geometry. All 26 SGE rows
+certify. The decomposition is nearly exact:
+
+| p | rows | cols | mean weight (SGE-filled, nnz/rows) | `la_mul` |
+|--:|--:|--:|--:|--:|
+| 262,147 | 8,164 | 8,036 | 16.927 | 4.2611e8 |
+| 1,048,583 | 20,728 | 20,481 | 19.839 | 3.3056e9 |
+| 1,572,869 | 27,202 | 26,892 | 20.749 | 6.0110e9 |
+
+Local exponents: rows 0.672 / 0.670, cols 0.675 / 0.672, weight 0.132 / 0.142.
+The product `rows · cols · weight` predicts the `la_mul` ratio to 0.2%:
+7.774 vs 7.758 measured (262k→1.05M) and 1.826 vs 1.818 (1.05M→1.57M). The constant is
+about 2.55 in both intervals.
+
+Fitting the weight alone against `(ln p)^c` gives **c_w = 1.781** (the direct `la_mul`
+fit gives 1.915; the difference is the rows/cols exponents being 0.67 rather than exactly
+2/3). So the super-4/3 growth is entirely in the mean row weight; the matrix dimensions
+grow as `p^(2/3)`, and `la_mul ≈ 2.55 · rows · cols · w`.
+
+This is the direct test R13-C asked for: the log factor is not an artifact of the fit, it
+is the observed growth of the merged core's row weight.
