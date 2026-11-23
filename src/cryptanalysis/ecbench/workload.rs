@@ -56,6 +56,13 @@ use crate::cryptanalysis::prime_orbit_index_calculus::{
 pub enum CurveSpec {
     /// Full Curve25519 model and fixed prime-order generator.
     Curve25519,
+    /// One exact cell from the canonical phased panel.  The cell resolves
+    /// through the embedded reviewed manifest; specs do not copy parameters.
+    Panel { cell: String },
+    /// A pinned direct higher-genus destination in the canonical phased
+    /// panel. Kept distinct from [`Panel`](Self::Panel) so a phase policy
+    /// cannot substitute a source elliptic cell for a Jacobian cell.
+    PanelDestination { cell: String },
     /// `ic_boundary::find_prime_order_curve(bits, seed)`: prime order,
     /// cofactor 1, `8 ≤ bits ≤ 32`.
     PrimeSearch { bits: u32, seed: u64 },
@@ -309,7 +316,10 @@ pub enum CurveSpec {
 impl CurveSpec {
     /// Preserve an external public point when making a measured-child input.
     pub fn for_child(&self, inst: &Instance) -> CurveSpec {
-        if matches!(self, Self::PrimePublicFixture { .. }) {
+        if matches!(
+            self,
+            Self::Panel { .. } | Self::PanelDestination { .. } | Self::PrimePublicFixture { .. }
+        ) {
             self.clone()
         } else {
             Self::explicit(inst).unwrap_or_else(|| self.clone())
@@ -330,6 +340,24 @@ impl CurveSpec {
                     return Err("Curve25519 generator failed its group/order checks".into());
                 }
                 Ok(Instance::Curve25519(Box::new(curve)))
+            }
+            CurveSpec::Panel { ref cell } => {
+                let resolved = super::panel::curve_spec(cell)?;
+                if matches!(resolved, CurveSpec::Panel { .. }) {
+                    return Err(format!(
+                        "panel cell `{cell}` recursively names a panel cell"
+                    ));
+                }
+                resolved.build()
+            }
+            CurveSpec::PanelDestination { ref cell } => {
+                let resolved = super::panel::destination_curve_spec(cell)?;
+                if matches!(resolved, CurveSpec::PanelDestination { .. }) {
+                    return Err(format!(
+                        "destination panel cell `{cell}` recursively names a destination panel cell"
+                    ));
+                }
+                resolved.build()
             }
             CurveSpec::ThreeLeads {
                 p,
@@ -791,6 +819,10 @@ impl CurveSpec {
     pub fn call(&self) -> String {
         match *self {
             CurveSpec::Curve25519 => "Curve25519Wide::new()".into(),
+            CurveSpec::Panel { ref cell } => format!("ecbench::panel::cell({cell})"),
+            CurveSpec::PanelDestination { ref cell } => {
+                format!("ecbench::panel::destination({cell})")
+            }
             CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"),
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")

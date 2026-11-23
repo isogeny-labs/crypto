@@ -1,0 +1,21 @@
+# 2026-11-22 public-source research lead sweep
+
+[pcc:unverified] Non-atomic snapshot, no new signed scientific verification.
+
+## Complete public inventory and substantive delta
+Source: [immutable observed-head JSON](public-pr-inventory.json). Repositories and terminal REST page sizes: crypto 100+70; crypto-autoresearcher 35; cryptanalysis 7; ecbench 2; ecc-challenges 1; experiments 0; prototype 6; lfd-summation-systems 2; autoresearcher 0.
+Open public PRs 223 versus Nov 19 202: added 102, no longer open 81, changed retained head SHA 24. A missing open PR is not presumed merged.
+
+## Research leads, not PR counts
+P1 Prime31 original-field IC: [crypto #4901](https://github.com/isogeny-labs/crypto/pull/4901) reports 8-32% native projective S3 component gain, with source-matched checked arithmetic; [#4812](https://github.com/isogeny-labs/crypto/pull/4812), [#4809](https://github.com/isogeny-labs/crypto/pull/4809), RR9/W8/F4 comprise ONE public-Q extraction/rank/cold-cost family, not separate wins. Next blinded relation rank per fully charged computation and complete one-target/64-target/1024-target cold Rust solves vs best frontier IC and strong rho.
+P1/P2 graph IC: [crypto #4905](https://github.com/isogeny-labs/crypto/pull/4905) is a draft port of coset-filtered MITM and k=3 gain-forest to ecbench; not a measured complete solve. Next exact witness equivalence, charged table/LA/descent and paired whole-S.
+P1/P2 genus 3 IC: [crypto #4895](https://github.com/isogeny-labs/crypto/pull/4895) reports p=65537/131101/262147 S/negation-rho 0.416/0.507/0.293 on small scoped panels; tentative with non-favorable scaling fit and unsigned PCC. Next diverse curves, complete cost and independent admission.
+P1/P2 algebraic F4: [crypto #4891](https://github.com/isogeny-labs/crypto/pull/4891) validates 20 S4 group-law fixtures but finds matched-degree window/pullback null at degree 6-8; degree>=10 times out. [#4698](https://github.com/isogeny-labs/crypto/pull/4698) is unsigned source-only asymptotic claim, not a proven complete algorithm. Next novel rank-producing relation test and adversarial proof review.
+P2 root-finding: [crypto #4909](https://github.com/isogeny-labs/crypto/pull/4909) reports native Rust complete quadratic/cubic root gains of about 0.5-3.5%, and a component inverse gain; rejected dense variants regress. Not an ECC2K or cold ECDLP result. Next same-source whole-pipeline throughput.
+P1 chain transfer: [cryptanalysis #1912](https://github.com/isogeny-labs/cryptanalysis/pull/1912) has source-only full-log auditor scope; selected source vectors are not full original 695/672 custody. Next approved native two-log exact source-target full solve cost and independent PCC.
+P1 fixed-E6 Lean vs P2 generalization: merged [LFD #33](https://github.com/isogeny-labs/lfd-summation-systems/pull/33) has fixed curve y^2=x^3+6x-7, target (1,0), p admissibility and k>=38; producer reports full Linux 236-module/970-declaration audit. [#45](https://github.com/isogeny-labs/lfd-summation-systems/pull/45) remains draft source-plus-partial-Lean higher-summand candidate. Do not extend to all curves, fixed primes or binary inverse-growth.
+P2 negative controls: [crypto #4900](https://github.com/isogeny-labs/crypto/pull/4900) reports m=3 flat-presentation no-lever and Curve25519 miniature nulls. [#4891](https://github.com/isogeny-labs/crypto/pull/4891) reports matched-degree pullback null. Avoid repeating falsified candidates without a changed mechanism.
+
+## Retrieval, admissibility and merge gates
+Current crypto/cryptanalysis AGENTS and Nov 20-21 session logs read; crypto-autoresearcher AGENTS and lab contract are VLT1-encrypted/non-UTF8. Live research-KB query access was unavailable in this runtime; no private KB content or backup metadata is included. An unavailable query does not establish absence of prior work. No independently signed PCC standing established. No cloud-worker liveness inferred from open PRs.
+Current main PCC ledger exactly extends this branch's immutable prefix by one entry. Preserve main prefix on eventual merge; do not touch ledger, historical dated snapshots or external infrastructure. PR #4724 remains draft pending CI/review/conflict gates. No auto-merge/merge, compute launch or infrastructure mutation.

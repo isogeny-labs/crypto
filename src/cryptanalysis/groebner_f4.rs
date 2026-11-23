@@ -204,10 +204,8 @@ fn monic_with_lm(f: &MPoly, ord: Ordering) -> Option<(MPoly, Vec<u32>)> {
 /// because each step strictly decreases the leading monomial of the
 /// remainder.
 pub fn reduce(f: &MPoly, basis: &[MPoly], ord: Ordering) -> MPoly {
-    let cached: Vec<(MPoly, Vec<u32>)> = basis
-        .iter()
-        .filter_map(|g| monic_with_lm(g, ord))
-        .collect();
+    let cached: Vec<(MPoly, Vec<u32>)> =
+        basis.iter().filter_map(|g| monic_with_lm(g, ord)).collect();
     reduce_monic(f, &cached, ord)
 }
 

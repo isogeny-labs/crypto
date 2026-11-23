@@ -1,0 +1,1729 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/curve25519_flat_exponent_20261115",
+ "validator": "validator subagent (Claude Opus 5.5), independent stdlib recomputation; analyse.py not imported or reused",
+ "date_utc": "2026-11-22",
+ "validated_commit": "908df456e7c76b1388b0343570463260779e049a",
+ "data_commit": "355a1ed70ae9e70a45d22db3139d5c4a498eaa4e",
+ "report_layer_commit": "6c433273d414aa5ed0ee3cb9399e74d8ad00ef21",
+ "protocol_commit": "a297c73259acb73dce22685e47eb5113130d29a7",
+ "verdict": "pass_with_errata",
+ "program_disposition": "validated",
+ "disposition_scope": "Measurement layer validated: cells, run.log, binary identity, seeds, commands, fits, the P1-P6 verdicts, the controls and the chain/flat ratios. No erratum changes a fit, a ratio, a prediction verdict or the m = 3 'no lever' / m = 4 'undetermined' outcomes. The README prose and REPORT.typ need errata E1-E15 before their per-operation, mechanism, censoring-location and rho-distance statements are cited. P2 is correctly reported as FAILED.",
+ "bound_artifacts_sha256": {
+  "PROTOCOL.md": "5294201309ba3dda64666d9ed25ddfbe384002c3c37047f275b67095afe12eb3",
+  "README.md": "5a3b2f9e991c68e5da6c46586bce6fc9a1cdd03aa8f123bf4ada6b5c42ed01ec",
+  "REPORT.typ": "452369efb464fb8acf4d5cc88c3de41721d0b9fd3749e3d2b501e8d02da659e3",
+  "REPORT.pdf": "1a939f530a9d0c3b8719bd95f9fbfc6743ba25dba03c31b2052cb4a4bfbccf6d",
+  "analyse.py": "0635f3de4ec0854d7433ee44778fa9fea7442dcc357fb5a2e725d7b5a0c30d24",
+  "analysis.json": "0ba79506f1ead7a0d45cc23dce3730a2996f8799b100b956f0326fa6ad4bd9ba",
+  "analysis.md": "42b5df18fed64bbcbe2ea1b237a53e40553b5ed9eb8d6bfce58b614ed29bb38b",
+  "figure.py": "ca313ec53f28a122f80904583bf894a1fb37a99ee47c37f013f27700d661a2c5",
+  "flat_exponent.png": "e459dee569c28d1cedd3c29b1fa0356eabf9c4f759e409600fbadb387e2c4954",
+  "flat_exponent.svg": "1bd5ab74f033e70e86465227c1c728680642f91a97aefcb8615f7fa906722502",
+  "run.log": "8610b8d3bcb6fce4062a8b1000b8ce5a9e045013cf4874d5e2ef30a59f44d38b",
+  "run_cells.py": "9391410d51ad035e6ef7600cf0869a86824b539d1f0ce0aeb423a71b004cb05c",
+  "cells/20_subflat_m3_sym_d12.json": "9903edbb0ccf72dd7389225b3577a46173f66cb8d948136444656161bbb5454f",
+  "cells/20_subflat_m3_sym_d14.json": "b7512d0f50e0f98bfece715fa75c46de6285ba4204b908bc5d041c2be2c79b21",
+  "cells/20_subflat_m3_sym_d18.json": "6efa6b1ab829a1e1418f27fcaba0eda59bb2b1b2887d6bbf86a6c19da975aa24",
+  "cells/20_subflat_m3_sym_d19.json": "c502f8afab8222937df2a1606d9af3fa43a2e8a57708b26a6fda146012733832",
+  "cells/20_subflat_m3_sym_d21.json": "bb6d3fd4915baf86f48f2fe13e29fddc3afcb565d51ac5776487668ba9b40ed0",
+  "cells/20_subflat_m3_sym_d27.json": "0a2f4bd8809ae247d34601a4ed1c7c902bce13e1fa02b47a3143f189c2373fa3",
+  "cells/20_subflat_m3_sym_d28.json": "dc1d513e5b9b334edc42dcd835965cc1d842361001ee6247e20259502e66c3b4",
+  "cells/20_subflat_m3_sym_d36.json": "d99bae70ea134c05bf0470b1f184c06951a7db65e2fbbb43a7f9ce1399af214d",
+  "cells/20_subflat_m3_sym_d38.json": "c6936ed7cf6491eb3789a9850db0280c5f621a87818ce0c6488141670bb945ae",
+  "cells/20_subflat_m3_sym_d42.json": "86326765ae4c9181b89c87a3f89d4ba8bf238aade8af908f3a806d9dc2212d64",
+  "cells/20_subflat_m3_sym_d54.json": "8d8844f46cf117cc808ca25cc1a8f492d352dae8de637963038511aa1771129c",
+  "cells/20_subflat_m3_sym_d57.json": "a50ce352f72eec803169f411fbcda92219180e772c3a52143ee5c59447fb66ab",
+  "cells/20_subflat_m3_sym_d63.json": "7329a0a0ddc48920280a8d5942d625f499f9acee59c3230b6fdacf3c25d0c058",
+  "cells/20_subflat_m3_sym_d9.json": "4971f71d6b811d4683a27c4862d96b4e49ec2dbcdb8f3717a9ce17af5b79ce10",
+  "cells/20_subflat_m4_sym_d12.json": "2e75a50eadb093c9b0bc13dcba7096cee755629efb45101871429e00af88aee2",
+  "cells/20_subflat_m4_sym_d14.json": "2d3c4a8d6d180c574dea195efdc870911bc0a500efe0fb0f4d076f6ad7132e3d",
+  "cells/20_subflat_m4_sym_d18.json": "1923f711244f208412c41eb6bc0e4674de79893102734e3f145fd2475d1256ed",
+  "cells/20_subflat_m4_sym_d3.json": "a21e5a18d0a6b6022e1f9dc04f491785b150b4c30561f4186b51393dab82af0f",
+  "cells/20_subflat_m4_sym_d7.json": "0b82224b9f8630fc67dd522fe9511e6a3fe8cbc799fdbd97557cbc43cc78fb4a",
+  "cells/20_subflat_m4_sym_d9.json": "5c5e981fe20e01c07bd43adafd47c2c9e89faadfb5e0bf04ba9830f73272cde7",
+  "cells/p16777141_A7842_subflat_m3_sym_d10.json": "4ea07d00433daacb8e91d3404518d4679b8741008bebacfde9851064c508bf9c",
+  "cells/p16777141_A7842_subflat_m3_sym_d12.json": "4d1555178187334e4b31b63f6276eadb676c7639a94f6bec9bfec2676b6ebd03",
+  "cells/p16777141_A7842_subflat_m3_sym_d15.json": "a2a440de79bbe835f07935306632ce14c8c7d4da2a3e8bdbe69d3fb7bd2c48a6",
+  "cells/p16777141_A7842_subflat_m3_sym_d20.json": "a1d504ac9d58fe0b41d41510209108f08030bf08b59565f0cbcb60ab4ea41ed7",
+  "cells/p16777141_A7842_subflat_m3_sym_d30.json": "69007cec8998fbca49fca9d4f43f909f2ff6dd9c2b6ae4d8d64ba230c662d77d"
+ },
+ "binary": {
+  "path": "/home/user/bin-archive/curve25519_family-5abc70ba",
+  "sha256": "5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746"
+ },
+ "checks": [
+  {
+   "name": "frozen_commit",
+   "result": "pass",
+   "detail": "Validated at HEAD 908df456e7c76b1388b0343570463260779e049a (branch claude/curve25519-index-calculus-i674j4); study directory clean against HEAD at the end of validation. Data (cells/*.json, run.log, PROTOCOL.md, run_cells.py) last changed at 355a1ed70ae9; report layer committed at 6c433273d414; README at HEAD differs from the reviewed 6c433273d4 text (sha256 485bc05a...) by one added [pcc:unverified] tag (l.158). At dispatch the report layer was untracked and README/REPORT.* changed during validation; the verdict binds only to the file hashes listed under bound_artifacts."
+  },
+  {
+   "name": "protocol_frozen_before_data",
+   "result": "pass",
+   "detail": "PROTOCOL.md and run_cells.py committed at a297c73259 (2026-11-15T05:18:53Z), an ancestor of HEAD, unchanged to HEAD; first cell (m = 4, D = 3) written 05:19:09Z after a 1.9 s run; first data commit 6879ac50d2 at 05:19:52Z. Every cell file has a single commit (no rewrites)."
+  },
+  {
+   "name": "binary_sha256 (P6)",
+   "result": "pass",
+   "detail": "sha256sum of /home/user/bin-archive/curve25519_family-5abc70ba = 5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746 = PROTOCOL value; both run.log launch lines carry it (with cap 7200, mem_kb 12000000); all 25 cells' ext.bin_sha256 equal it."
+  },
+  {
+   "name": "command_strings",
+   "result": "pass",
+   "detail": "All 25 ext.cmd strings equal exactly 'ulimit -v 12000000; RAYON_NUM_THREADS=1 /home/user/bin-archive/curve25519_family-5abc70ba f4sub <mini> subflat D 0 mont M sym 6 SEED 7200' with mini = '20' (20 cells) or 'p=16777141,A=7842' (5 controls); cap_s 7200, mem_kb 12000000, env_extra [] in all."
+  },
+  {
+   "name": "seed_rule",
+   "result": "pass",
+   "detail": "SEED = 20261108 + 1000*M + D holds for all 25 cells in ext.cmd; the 'seed' field equals it in the 23 complete cells; the 2 censored records (m3 D63, m4 D18) are runner fallback records without a 'seed' field (seed verified from cmd only)."
+  },
+  {
+   "name": "run_log_consistency",
+   "result": "pass",
+   "detail": "25 cell lines; each matches its record (T to 4 s.f., SD list, wall within 1 s); run.log is append-only across its 9 commits; the NOTE line is a manual insertion and is disclosed as such."
+  },
+  {
+   "name": "complete_cell_integrity",
+   "result": "pass",
+   "detail": "23 complete cells: 6/6 targets done, complete = true, inconsistent = true, timed_out = false for all 138 target systems; mean_field_ops equals the mean of per-target field_ops."
+  },
+  {
+   "name": "per_cell_T_W_SD_nsop",
+   "result": "pass",
+   "detail": "Independent recomputation equals analysis.json exactly for every cell (max relative difference 0). README Cells table: see E6 (three rounding errors)."
+  },
+  {
+   "name": "load_flags",
+   "result": "pass",
+   "detail": "Only m = 3 D = 57 exceeds 1.5 (load_before 1.8818, after 1.0); all other loads 0.785 to 1.087. Excluded from the W fit as the protocol requires."
+  },
+  {
+   "name": "containers",
+   "result": "pass",
+   "detail": "First container: m = 3 D <= 54 and all m = 4 cells; second: m = 3 D = 57, 63 and all five k = 24 controls (started_utc), as README states."
+  },
+  {
+   "name": "censored_failure_reasons",
+   "result": "pass_with_errata",
+   "detail": "Both exit -6 (SIGABRT). m4 D18: stderr 'memory allocation of 575648 bytes failed', no frames. m3 D63: stderr tail (400 chars) shows RawVec::grow_one in f4_with_arithmetic; the allocation message is truncated. Allocation failure is the consistent inference (panic = unwind; f4sub breaks and writes a record at the first incomplete target, so a timeout cannot produce an abort). See E8."
+  },
+  {
+   "name": "OLS m3 T",
+   "result": "pass",
+   "detail": "n 13, D 9..57, span 6.33; s = 4.598196 [4.402187, 4.794205], t(11) = 2.20099 (own incomplete-beta inversion). README 4.598 [4.402, 4.794] / 4.60 [4.40, 4.79]."
+  },
+  {
+   "name": "OLS m3 W excluding D57",
+   "result": "pass",
+   "detail": "n 12, D 9..54, span 6.0; s = 4.976882 [4.391079, 5.562684], t(10) = 2.22814. README 4.977 [4.391, 5.563] / 4.98 [4.39, 5.56]."
+  },
+  {
+   "name": "first_container_fits",
+   "result": "pass",
+   "detail": "T: n 12, 4.596536 [4.366052, 4.827020] (README 4.597 [4.366, 4.827]); W identical to the main W fit (D57 excluded either way)."
+  },
+  {
+   "name": "m4_estimator_applicability",
+   "result": "pass",
+   "detail": "Complete m = 4 cells with D >= 9: 9, 12, 14 (n = 3, span 1.556); estimator not applicable; README 'span 1.6x' correct."
+  },
+  {
+   "name": "two_point_local_slopes",
+   "result": "pass_with_errata",
+   "detail": "All 12 m3 T, 12 m3 W, 4 m4 T, 4 m4 W values reproduce to 2 dp. Prose 'rise monotonically above D = 28' is false (E5)."
+  },
+  {
+   "name": "residuals",
+   "result": "pass",
+   "detail": "T/fit ranges 0.7167 (D = 27) to 1.3769 (D = 38): README 0.72 to 1.38."
+  },
+  {
+   "name": "k24_controls (P5)",
+   "result": "pass",
+   "detail": "Ratios to the k = 20 law 1.41503, 1.11946, 1.03653, 0.79259, 1.16474; max deviation 1.41503 <= 1.5; fitted T 1.053e7, 2.435e7, 6.795e7, 2.551e8, 1.646e9; SD = D + 1."
+  },
+  {
+   "name": "four_digit_test_D12",
+   "result": "pass",
+   "detail": "k20 27,263,936.67 vs k24 27,263,980.67; both 2.726e7 at 4 s.f.; relative difference 1.614e-6."
+  },
+  {
+   "name": "chain_vs_flat_ratios",
+   "result": "pass",
+   "detail": "m3: 19.45, 28.42, 16.57, 170.52, 1.0, 10.52, 362.59, 201.00 (D = 9..28); m4: 1.0, 1.0, 1065.82 (D = 3, 7, 9). Ratio 1.0 cells have identical per-target field_ops and seeds. Labels correct: m3 D36 and m4 D12 chain censored (memory, ext study), m3 D57 chain censored (1200 s timeout, parent); D38, 42, 54, 63 and m4 D14, 18 have no chain record. One duplicate key (m4 D19, both censored) is irrelevant."
+  },
+  {
+   "name": "L3_cross_check",
+   "result": "pass",
+   "detail": "The 8 m = 3 flat cells shared with wave-6 L3 (D = 9..36) have identical per-target field_ops; W differs by -12 % to +12 %."
+  },
+  {
+   "name": "replay_m3_D12",
+   "result": "pass",
+   "detail": "Host idle (load 0.36). Replay of the dispatch command reproduced all six per-target field_ops and target_x exactly (mean 27,263,936.67), SD 13 each; W 209.9 ms vs recorded 198.0 ms (+6.0 %)."
+  },
+  {
+   "name": "P1..P6 verdicts",
+   "result": "pass",
+   "detail": "P1 held (4.598 in [4.0, 4.8], lo 4.402 > 3, no lever). P2 FAILED (s_W - s_T = 0.3787 < 0.5; s_W in [4.5, 7]). P3 held (max complete 57, first censored 63 <= 84). P4 held (3, 7, 9, 12, 14 complete; censored 18 <= 28; not applicable; slopes 10.97, 14.06 > 2). P5 held (4-digit equal; 1.415 <= 1.5). P6 held."
+  },
+  {
+   "name": "P2_reported_as_failed_not_relabelled",
+   "result": "pass_with_errata",
+   "detail": "README and analysis.md state P2 FAILED, count five of six held, and do not move the threshold or the exclusion. The post-hoc 'bend, not a power law' reading is presented as a finding (E3) and the dependence of the failure on the protocol-mandated D57 exclusion is undisclosed (E12)."
+  },
+  {
+   "name": "SD_eq_D_plus_1_claim",
+   "result": "pass",
+   "detail": "Every target of every complete cell with D >= 9 (m3 13 cells, m4 3 cells, k24 5 cells) has solving_degree_max = D + 1; m4 D3 and D7 have 8."
+  },
+  {
+   "name": "no_lever_m3_claim",
+   "result": "pass",
+   "detail": "Lever needs s < 0 with upper bound < 0; s_T upper bound 4.794 (and s_W 5.563) far above 0."
+  },
+  {
+   "name": "no_admissible_value_claim",
+   "result": "pass_with_errata",
+   "detail": "a* = 1/(m + 1 - s) < 0 for every value in both 95 % intervals (lower bounds 4.402 and 4.391 > 4); derived 2/(m + 1 - s) = -3.343 (T) and -2.047 (W). Correct arithmetic; 'never pays' is a derived extrapolation (E14)."
+  },
+  {
+   "name": "cost_depends_on_m_D_not_prime_claim",
+   "result": "partially_supported",
+   "detail": "Same T to 1.6e-6 at the one shared D = 12; other control D values only within 0.79 to 1.42x of the k = 20 fit; one other prime, m = 3 only (E13)."
+  },
+  {
+   "name": "readme_numbers",
+   "result": "pass_with_errata",
+   "detail": "All fit, ratio, slope, residual, control, load, container and size numbers reproduce. Wrong: 'flat at 6 to 8 ns through D = 42' (E1), 'within 1.2x per operation through D = 42' (E2), table ns/op 7.0 (D28) and 10.8 (m4 D9) and wall 42 (D28) (E6)."
+  },
+  {
+   "name": "readme_claims",
+   "result": "pass_with_errata",
+   "detail": "Unsupported or contradicted: SD causal sentence (E4), monotone W slopes (E5), k24 'rerun' as determinism evidence (E7), 'inside f4_with_arithmetic' for both cells (E8), 'shown struck' (E9), untraced '18x rho-neg' (E10), over-general prime independence (E13), untested cache hypothesis (E15)."
+  },
+  {
+   "name": "pcc_unverified_tagging",
+   "result": "fail",
+   "detail": "The header (l.9-10) declares every measured number an unverified assertion, but many result sentences lack the per-sentence tag (E11)."
+  },
+  {
+   "name": "certificate_discipline",
+   "result": "not_applicable",
+   "detail": "No discrete-log solve, relation or closure is claimed; all 138 target systems are inconsistent. Determinism of the counted unit was checked by replay instead."
+  },
+  {
+   "name": "controls_and_reference_arm",
+   "result": "pass",
+   "detail": "Controls present and checked: k = 24 cross-prime control, chain-presentation identity at prime D (exact), L3 cross-run identity. No rho arm: the study makes no cross-method comparison of its own (not a leaderboard or benchmarks row). The imported rho statements are not validated here (E10)."
+  },
+  {
+   "name": "reporting_contract_and_disclosures",
+   "result": "pass",
+   "detail": "Engine measurement in two named units, phases not mixed; m = 83 / ECC2K-130 rules not applicable; the run deviates from EKS, ecbench, benchrec and Conductor routing and says so; wall time is not at an ecbench isolation level and has no A/A interval (E15)."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "medium",
+   "text": "Answer (README l.27-28; REPORT.typ l.42): 'per-operation time is flat at 6 to 8 ns through D = 42 and rises to 32 ns at D = 54' contradicts the data and the README's own P2 bullet. Recomputed ns per op: 9.82 at D = 9, 8.07 at D = 27, 11.24 at D = 42; the range for D <= 42 is 6.04 to 11.24.",
+   "suggested_fix": "'per-operation time stays between 6.0 and 9.8 ns for D <= 38 without a trend, is 11.2 ns at D = 42 and 32.1 ns at D = 54 (44.0 ns at the load-flagged, second-container D = 57)'."
+  },
+  {
+   "id": "E2",
+   "severity": "medium",
+   "text": "P2 bullet (l.121-123; REPORT.typ l.379) 'the two units agree to within 1.2x per operation through D = 42', repeated in 'What changed' (l.160). ns per op spans 1.86x over D <= 42 (6.04 to 11.24) and 1.63x over D <= 38 (6.04 to 9.82); relative to the D <= 42 median (7.21 ns) it is 0.84x to 1.56x. No reading gives 1.2x. 'diverge by 4 to 6x at D >= 54' is consistent (4.45x and 6.10x of that median).",
+   "suggested_fix": "Replace with the measured spread, e.g. 'per-operation time varies within 1.6x (6.0 to 9.8 ns) with no trend for D <= 38, then rises: 1.56x the median at D = 42, 4.5x at D = 54, 6.1x at D = 57 (load-flagged)'. Change 'through D = 42' to 'through D = 38' in 'What changed'."
+  },
+  {
+   "id": "E3",
+   "severity": "medium",
+   "text": "Answer (l.27) and P2 (l.119-121) state 'the wall-time excess is not a power law but a bend at the top of the range' as a finding. It is a post-hoc reading with no preregistered test or model comparison. It rests on D = 42, 54 and 57, and D = 57 is load-flagged and ran in the second container; the wall unit has no A/A interval (E15). Descriptively, the W-minus-T local-slope excess is concentrated from 38->42 on (+5.18, +4.17, then +5.83 for the flagged 54->57). P2 itself is correctly kept as FAILED.",
+   "suggested_fix": "Label it explicitly: 'Post-hoc, not preregistered and not tested: the excess appears concentrated at D >= 42 ...'. Drop 'not a power law' or present it as a hypothesis for a future preregistered test."
+  },
+  {
+   "id": "E4",
+   "severity": "medium",
+   "text": "Solving-degree section (l.94-96; REPORT.typ l.316): 'the flat presentation removes that dependence and pays D + 1 ..., which is why the chain / flat ratio is 1.0 at prime D and 170 to 363x at the smooth D = 18, 27, 28'. The recorded chain cells contradict the causal clause. At D = 18, 27, 28 the chain SD is lower (7, 8, 11 against 19, 28, 29) and its largest matrices are smaller (14,548 / 38,639 / 49,575 rows against 35,987 / 220,400 / 259,774), yet chain T is 170.5x, 362.6x and 201.0x the flat T. The solving degree cannot explain the ratio. The other composite D (9, 12, 14, 21) give only 10.5 to 28.4x.",
+   "suggested_fix": "'At prime D the two presentations are the same system (ratio 1.0, identical per-target field_ops). At composite D the chain has lower SD and smaller largest matrices but 10.5 to 363x more counted operations (12 variables at 3 levels against 6 at 1). The mechanism is not determined by these data.'"
+  },
+  {
+   "id": "E5",
+   "severity": "low",
+   "text": "l.86-87 (REPORT.typ l.303): 'the wall slopes rise monotonically above D = 28'. The W local slopes are 5.78, 7.63, 7.20, 8.60 and 10.16, so 36->38 exceeds 38->42 and the sequence is not monotone. The last value (54->57) uses the load-flagged D = 57 wall time without saying so. Close-D two-point W slopes move by about 1.8 to 2.6 for a 10 % W error (E15).",
+   "suggested_fix": "'the wall slopes rise from 5.8 (28->36) to 8.6 (42->54) with one dip (7.63, then 7.20); 54->57 (10.16) uses the load-flagged D = 57 wall time'."
+  },
+  {
+   "id": "E6",
+   "severity": "low",
+   "text": "Rounding errors in the Cells table (and REPORT.typ l.137, l.218). m = 3 D = 28 ns per op is 6.94502, shown as 7.0; correct is 6.9 (double rounding via analysis.md's 6.95). m = 4 D = 9 ns per op is 10.74592, shown as 10.8; correct is 10.7 (via 10.75). m = 3 D = 28 wall s is shown as 42, but ext.wall_s is 42.5 and run.log prints 43 s from the raw value (>= 42.5 s); half-even rounding of the already-rounded 42.5 produced 42.",
+   "suggested_fix": "Change to 6.9, 10.7 and 43. Round from the raw cell values, not from analysis.md's 2-dp strings."
+  },
+  {
+   "id": "E7",
+   "severity": "low",
+   "text": "l.139-140 (REPORT.typ l.404): 'T is deterministic given the seed; the k = 24 D = 12 rerun reproduced the first-container k = 20 D = 12 value to 1.6e-6'. The k = 24 cell is not a rerun: it uses another prime (p = 16,777,141), another curve and other targets, and its value differs (27,263,980.67 against 27,263,936.67, with different per-target lists). It cannot show container independence. The claim itself is supported by other evidence. The validator replay of k = 20 m = 3 D = 12 (seed 20264120) in the second container on 2026-11-22 reproduced all six per-target field_ops and target_x exactly. The 8 m = 3 cells shared with wave-6 L3 have identical per-target field_ops.",
+   "suggested_fix": "Cite the validator replay (validator-report.json, replay_m3_D12) and the L3 identity as the evidence. Describe the k = 24 D = 12 agreement as a cross-prime coincidence to 1.6e-6, not a rerun."
+  },
+  {
+   "id": "E8",
+   "severity": "low",
+   "text": "Censoring (l.146-147; REPORT.typ l.414): 'Both censored cells died on an allocation failure inside f4_with_arithmetic'. For m = 4 D = 18 the stderr records 'memory allocation of 575648 bytes failed' with no frames, so the location is not recorded. For m = 3 D = 63 the backtrace shows RawVec::grow_one inside f4_with_arithmetic with exit -6, but run_cells.py kept only the last 400 characters of stderr and the allocation message is cut off. Allocation failure is the consistent inference: panic = unwind, so a panic would exit 101; and f4sub writes a record at the first incomplete target, so a timeout cannot end in an abort. The README presents it as recorded.",
+   "suggested_fix": "'m = 4, D = 18: allocation failure (message recorded; location not recorded). m = 3, D = 63: SIGABRT in RawVec::grow_one inside f4_with_arithmetic (allocation message truncated by the runner's 400-character stderr tail; allocation failure inferred; a per-target timeout would have produced a record).' Apply the same qualifier to P3's 'on memory, not time'."
+  },
+  {
+   "id": "E9",
+   "severity": "low",
+   "text": "l.137-138 (REPORT.typ l.403): the D = 57 wall time is 'shown struck in the table'. It is not struck in README.md or REPORT.typ; it is annotated '(load-flagged, excluded from the wall fit)'.",
+   "suggested_fix": "'and marked load-flagged in the table', or strike it in both tables."
+  },
+  {
+   "id": "E10",
+   "severity": "low",
+   "text": "Distance remaining (l.33; REPORT.typ l.50): '18x rho-neg at w = 0 at best' could not be traced to the README's sources-checked list or to research/curve25519_wave6_runs_20261115. The nearest figure found is in research/curve25519_leads_wave5_20261112/lanes/pipeline.md (citing research/curve25519_ic_baseline_20261102/README.md): 7.8x / 10.6x / 18.1x / 24.7x rho-neg at k = 20 / 24 / 28 / 32. There 18.1x is the k = 28 value, not the best. 'Rho remains ahead on every track' is also imported. This study has no rho arm.",
+   "suggested_fix": "Cite the exact source file, row, k and arm for the algebraic-track distance, or remove the figure. Mark both rho statements as imported from that source, not measured here."
+  },
+  {
+   "id": "E11",
+   "severity": "low",
+   "text": "[pcc:unverified] coverage is incomplete. The header (l.9-10) covers numbers globally, but these result sentences carry no tag: l.26 'Five of the six predictions held.'; l.67-68 (all targets complete, all inconsistent); l.71-72 (6,920,436 x 6,957,419 matrix); l.83-86 (first two local-slope sentences); l.89 (residuals); l.93 (SD = D + 1); l.108-109 (D = 12 test); l.112 (k = 24 ns per op); l.116 (P1 first sentence); l.118 (P2 first sentence); l.124 (P3); l.125-127 (P4); l.128 (P5); l.129 (P6); l.137-142 (load 1.88; T unaffected; first-container fit 4.597; loads 0.79 to 1.09); l.146-150 (censoring); l.154 and l.156 ('What changed', m = 3 and m = 4); l.160-161.",
+   "suggested_fix": "Append [pcc:unverified] to each listed sentence, or register a pcc claim and cite its id and standing."
+  },
+  {
+   "id": "E12",
+   "severity": "low",
+   "text": "P2's failure depends on the protocol-mandated exclusion of the one load-flagged cell, and the README does not say so. With the D = 57 wall time included (not permitted by the protocol), s_W = 5.248 [4.623, 5.873] and s_W - s_T = 0.650 >= 0.5. On the matched set D = 9..54 the difference is 0.380. The exclusion is correct and P2 stays FAILED.",
+   "suggested_fix": "Add one sentence to P2: 'The failure depends on the protocol's exclusion of the load-flagged D = 57 wall time; including it (not permitted) would give s_W = 5.25 and a difference of 0.65. On the matched D = 9..54 set the difference is 0.38.'"
+  },
+  {
+   "id": "E13",
+   "severity": "low",
+   "text": "l.110-111 (REPORT.typ l.365): 'the cost depends on (m, D) and not on the prime'. This was tested at one other prime, at m = 3 only, on five D values. Agreement is only at the shared D = 12 (1.6e-6); the other D values lie within 0.79 to 1.42x of the k = 20 fit. The control maximum (1.415) exceeds the k = 20 residual maximum (1.377), so 'the same scatter' is approximate.",
+   "suggested_fix": "'At the shared D = 12 the two primes give T equal to 1.6e-6. At D = 10, 15, 20, 30 the k = 24 values lie within 0.79 to 1.42x of the k = 20 law, close to the k = 20 residual range (0.72 to 1.38). This is consistent with T depending on (m, D) and not on p, tested at one other prime and m = 3 only.'"
+  },
+  {
+   "id": "E14",
+   "severity": "low",
+   "text": "l.31-33: 'enlarging the base never pays at m = 3 under the relation-count model'. The arithmetic is right: a* = 1/(m + 1 - s) < 0 for every value in both 95 % intervals, and the relation-phase exponent 1 + (s - m + 1)a rises with a for any s > 2. But s was fitted at p = 1,048,573 over D = 9..57, and the parent protocol calls this extrapolation derived, not measured. 'never' goes past the measured range.",
+   "suggested_fix": "Add 'derived, not measured: s fitted over D = 9..57 at k = 20, extrapolated by the parent's model' to the sentence."
+  },
+  {
+   "id": "E15",
+   "severity": "low",
+   "text": "The wall-time unit has no A/A interval (not an ecbench session; shared host), and the run-to-run variation is not disclosed. For identical systems: validator replay 209.9 against 198.0 ms (+6.0 %); wave-6 L3 against this study, -12 % to +12 % over the 8 shared cells (for example D = 28: 7,704 against 6,966 ms; D = 36: 33,320 against 29,780 ms). l.160-161 'informative only where the matrices fit in cache-friendly sizes' is an untested hypothesis: no cache or memory-bandwidth measurement exists.",
+   "suggested_fix": "Add the observed 6 to 12 % run-to-run W variation to the wall-time disclosure and note its effect on close-D two-point W slopes. Label the cache sentence a hypothesis."
+  },
+  {
+   "id": "E16",
+   "severity": "editorial",
+   "text": "(a) 'chain' means both the run sequence and the chain presentation: P3 'the m = 3 chain reached D = 57' and P4 'the chain censors at D = 18' refer to run sequences. (b) The engine field 'study' in every cell reads 'curve25519_exponent_study_20261108' (hard-coded in f4sub); only ext.study names this study. (c) The two censored records have no 'seed' field (runner fallback record); their seeds were verified from ext.cmd. (d) 's_T >> 0, both units' should read 's_T and s_W >> 0'. (e) REPORT.typ and REPORT.pdf were outside the dispatch and were not validated; REPORT.typ repeats E1, E2, E4, E5, E6, E7, E8, E9, E10 and E13 and needs the same fixes.",
+   "suggested_fix": "Say 'run sequence' where the run order is meant; note (b) and (c) in the Files section; fix (d); apply all errata to REPORT.typ and rebuild REPORT.pdf."
+  }
+ ],
+ "recomputed": {
+  "cells": [
+   {
+    "cell": "20_subflat_m3_sym_d9",
+    "m": 3,
+    "D": 9,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 0.5,
+    "T": 7589010.0,
+    "W_ms": 74.5604,
+    "SD": 10,
+    "ns_per_op": 9.8248,
+    "max_rows": 1640,
+    "max_cols": 2335
+   },
+   {
+    "cell": "20_subflat_m3_sym_d12",
+    "m": 3,
+    "D": 12,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 1.2,
+    "T": 27263900.0,
+    "W_ms": 197.96,
+    "SD": 13,
+    "ns_per_op": 7.2609,
+    "max_rows": 5982,
+    "max_cols": 7325
+   },
+   {
+    "cell": "20_subflat_m3_sym_d14",
+    "m": 3,
+    "D": 14,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 2.1,
+    "T": 46864600.0,
+    "W_ms": 346.982,
+    "SD": 15,
+    "ns_per_op": 7.4039,
+    "max_rows": 11841,
+    "max_cols": 13736
+   },
+   {
+    "cell": "20_subflat_m3_sym_d18",
+    "m": 3,
+    "D": 18,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 5.8,
+    "T": 142361000.0,
+    "W_ms": 949.985,
+    "SD": 19,
+    "ns_per_op": 6.6731,
+    "max_rows": 35987,
+    "max_cols": 39274
+   },
+   {
+    "cell": "20_subflat_m3_sym_d19",
+    "m": 3,
+    "D": 19,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 0.919921875,
+    "wall_s": 8.2,
+    "T": 220437000.0,
+    "W_ms": 1331.24,
+    "SD": 20,
+    "ns_per_op": 6.0391,
+    "max_rows": 45742,
+    "max_cols": 49437
+   },
+   {
+    "cell": "20_subflat_m3_sym_d21",
+    "m": 3,
+    "D": 21,
+    "member": "k20",
+    "container": "first",
+    "load_before": 0.919921875,
+    "load_after": 1.005859375,
+    "wall_s": 11.0,
+    "T": 264922000.0,
+    "W_ms": 1794.81,
+    "SD": 22,
+    "ns_per_op": 6.7749,
+    "max_rows": 71397,
+    "max_cols": 75980
+   },
+   {
+    "cell": "20_subflat_m3_sym_d27",
+    "m": 3,
+    "D": 27,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.005859375,
+    "load_after": 1.07666015625,
+    "wall_s": 35.7,
+    "T": 726601000.0,
+    "W_ms": 5864.19,
+    "SD": 28,
+    "ns_per_op": 8.0707,
+    "max_rows": 220400,
+    "max_cols": 228223
+   },
+   {
+    "cell": "20_subflat_m3_sym_d28",
+    "m": 3,
+    "D": 28,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.07666015625,
+    "load_after": 1.0869140625,
+    "wall_s": 42.5,
+    "T": 1003050000.0,
+    "W_ms": 6966.22,
+    "SD": 29,
+    "ns_per_op": 6.945,
+    "max_rows": 259774,
+    "max_cols": 268221
+   },
+   {
+    "cell": "20_subflat_m3_sym_d36",
+    "m": 3,
+    "D": 36,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0869140625,
+    "load_after": 1.08203125,
+    "wall_s": 180.4,
+    "T": 4133240000.0,
+    "W_ms": 29780.4,
+    "SD": 37,
+    "ns_per_op": 7.2051,
+    "max_rows": 816590,
+    "max_cols": 830893
+   },
+   {
+    "cell": "20_subflat_m3_sym_d38",
+    "m": 3,
+    "D": 38,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.08203125,
+    "load_after": 1.01123046875,
+    "wall_s": 272.0,
+    "T": 6720060000.0,
+    "W_ms": 44987.2,
+    "SD": 39,
+    "ns_per_op": 6.6945,
+    "max_rows": 1047061,
+    "max_cols": 1063068
+   },
+   {
+    "cell": "20_subflat_m3_sym_d42",
+    "m": 3,
+    "D": 42,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.01123046875,
+    "load_after": 1.0,
+    "wall_s": 558.0,
+    "T": 8230640000.0,
+    "W_ms": 92508.3,
+    "SD": 43,
+    "ns_per_op": 11.2395,
+    "max_rows": 1662343,
+    "max_cols": 1682046
+   },
+   {
+    "cell": "20_subflat_m3_sym_d54",
+    "m": 3,
+    "D": 54,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 1.0087890625,
+    "wall_s": 4831.9,
+    "T": 25061900000.0,
+    "W_ms": 804055.0,
+    "SD": 55,
+    "ns_per_op": 32.0827,
+    "max_rows": 5367149,
+    "max_cols": 5400244
+   },
+   {
+    "cell": "20_subflat_m3_sym_d57",
+    "m": 3,
+    "D": 57,
+    "member": "k20",
+    "container": "second",
+    "load_before": 1.8818359375,
+    "load_after": 1.0,
+    "wall_s": 8367.4,
+    "T": 31679600000.0,
+    "W_ms": 1392940.0,
+    "SD": 58,
+    "ns_per_op": 43.9697,
+    "max_rows": 6920436,
+    "max_cols": 6957419
+   },
+   {
+    "cell": "20_subflat_m3_sym_d63",
+    "m": 3,
+    "D": 63,
+    "member": "k20",
+    "container": "second",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 13903.8,
+    "censored": true
+   },
+   {
+    "cell": "20_subflat_m4_sym_d3",
+    "m": 4,
+    "D": 3,
+    "member": "k20",
+    "container": "first",
+    "load_before": 0.78515625,
+    "load_after": 0.78515625,
+    "wall_s": 1.9,
+    "T": 423322.0,
+    "W_ms": 9.15052,
+    "SD": 8,
+    "ns_per_op": 21.616,
+    "max_rows": 564,
+    "max_cols": 536
+   },
+   {
+    "cell": "20_subflat_m4_sym_d7",
+    "m": 4,
+    "D": 7,
+    "member": "k20",
+    "container": "first",
+    "load_before": 0.78515625,
+    "load_after": 0.802734375,
+    "wall_s": 4.1,
+    "T": 24975900.0,
+    "W_ms": 369.346,
+    "SD": 8,
+    "ns_per_op": 14.7881,
+    "max_rows": 1659,
+    "max_cols": 3786
+   },
+   {
+    "cell": "20_subflat_m4_sym_d9",
+    "m": 4,
+    "D": 9,
+    "member": "k20",
+    "container": "first",
+    "load_before": 0.802734375,
+    "load_after": 0.83349609375,
+    "wall_s": 10.7,
+    "T": 133286000.0,
+    "W_ms": 1432.28,
+    "SD": 10,
+    "ns_per_op": 10.7459,
+    "max_rows": 3608,
+    "max_cols": 9621
+   },
+   {
+    "cell": "20_subflat_m4_sym_d12",
+    "m": 4,
+    "D": 12,
+    "member": "k20",
+    "container": "first",
+    "load_before": 0.83349609375,
+    "load_after": 1.05322265625,
+    "wall_s": 109.9,
+    "T": 3133020000.0,
+    "W_ms": 17834.2,
+    "SD": 13,
+    "ns_per_op": 5.6923,
+    "max_rows": 16282,
+    "max_cols": 33819
+   },
+   {
+    "cell": "20_subflat_m4_sym_d14",
+    "m": 4,
+    "D": 14,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.05322265625,
+    "load_after": 1.0,
+    "wall_s": 749.6,
+    "T": 27384300000.0,
+    "W_ms": 124076.0,
+    "SD": 15,
+    "ns_per_op": 4.5309,
+    "max_rows": 57701,
+    "max_cols": 91593
+   },
+   {
+    "cell": "20_subflat_m4_sym_d18",
+    "m": 4,
+    "D": 18,
+    "member": "k20",
+    "container": "first",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 1287.1,
+    "censored": true
+   },
+   {
+    "cell": "p16777141_A7842_subflat_m3_sym_d10",
+    "m": 3,
+    "D": 10,
+    "member": "k24",
+    "container": "second",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 0.7,
+    "T": 14902400.0,
+    "W_ms": 110.992,
+    "SD": 11,
+    "ns_per_op": 7.4479,
+    "max_rows": 2647,
+    "max_cols": 3534
+   },
+   {
+    "cell": "p16777141_A7842_subflat_m3_sym_d12",
+    "m": 3,
+    "D": 12,
+    "member": "k24",
+    "container": "second",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 1.3,
+    "T": 27264000.0,
+    "W_ms": 215.286,
+    "SD": 13,
+    "ns_per_op": 7.8964,
+    "max_rows": 5982,
+    "max_cols": 7325
+   },
+   {
+    "cell": "p16777141_A7842_subflat_m3_sym_d15",
+    "m": 3,
+    "D": 15,
+    "member": "k24",
+    "container": "second",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 2.9,
+    "T": 70433000.0,
+    "W_ms": 476.956,
+    "SD": 16,
+    "ns_per_op": 6.7718,
+    "max_rows": 16063,
+    "max_cols": 18270
+   },
+   {
+    "cell": "p16777141_A7842_subflat_m3_sym_d20",
+    "m": 3,
+    "D": 20,
+    "member": "k24",
+    "container": "second",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 9.6,
+    "T": 202179000.0,
+    "W_ms": 1567.93,
+    "SD": 21,
+    "ns_per_op": 7.7552,
+    "max_rows": 57454,
+    "max_cols": 61581
+   },
+   {
+    "cell": "p16777141_A7842_subflat_m3_sym_d30",
+    "m": 3,
+    "D": 30,
+    "member": "k24",
+    "container": "second",
+    "load_before": 1.0,
+    "load_after": 1.0,
+    "wall_s": 70.1,
+    "T": 1916980000.0,
+    "W_ms": 11512.0,
+    "SD": 31,
+    "ns_per_op": 6.0053,
+    "max_rows": 355161,
+    "max_cols": 364928
+   }
+  ],
+  "fits": {
+   "m3_T": {
+    "n": 13,
+    "D": [
+     9,
+     12,
+     14,
+     18,
+     19,
+     21,
+     27,
+     28,
+     36,
+     38,
+     42,
+     54,
+     57
+    ],
+    "slope": 4.598196,
+    "lo95": 4.402187,
+    "hi95": 4.794205,
+    "t975": 2.20099,
+    "span": 6.3333,
+    "derived_2_over_m_plus_1_minus_s": -3.3434
+   },
+   "m3_W_excl_flag": {
+    "n": 12,
+    "D": [
+     9,
+     12,
+     14,
+     18,
+     19,
+     21,
+     27,
+     28,
+     36,
+     38,
+     42,
+     54
+    ],
+    "slope": 4.976882,
+    "lo95": 4.391079,
+    "hi95": 5.562684,
+    "t975": 2.22814,
+    "span": 6.0,
+    "derived_2_over_m_plus_1_minus_s": -2.0473
+   },
+   "m3_T_first": {
+    "n": 12,
+    "D": [
+     9,
+     12,
+     14,
+     18,
+     19,
+     21,
+     27,
+     28,
+     36,
+     38,
+     42,
+     54
+    ],
+    "slope": 4.596536,
+    "lo95": 4.366052,
+    "hi95": 4.82702,
+    "t975": 2.22814,
+    "span": 6.0,
+    "derived_2_over_m_plus_1_minus_s": -3.3527
+   },
+   "m3_W_first": {
+    "n": 12,
+    "D": [
+     9,
+     12,
+     14,
+     18,
+     19,
+     21,
+     27,
+     28,
+     36,
+     38,
+     42,
+     54
+    ],
+    "slope": 4.976882,
+    "lo95": 4.391079,
+    "hi95": 5.562684,
+    "t975": 2.22814,
+    "span": 6.0,
+    "derived_2_over_m_plus_1_minus_s": -2.0473
+   },
+   "m3_W_incl_D57_sensitivity_not_protocol": {
+    "n": 13,
+    "D": [
+     9,
+     12,
+     14,
+     18,
+     19,
+     21,
+     27,
+     28,
+     36,
+     38,
+     42,
+     54,
+     57
+    ],
+    "slope": 5.247822,
+    "lo95": 4.622736,
+    "hi95": 5.872908,
+    "t975": 2.20099,
+    "span": 6.3333,
+    "derived_2_over_m_plus_1_minus_s": -1.6028
+   },
+   "m4": {
+    "n": 3,
+    "D": [
+     9,
+     12,
+     14
+    ],
+    "span": 1.5555555555555556,
+    "applicable": false
+   }
+  },
+  "sW_minus_sT": 0.378686,
+  "sW_minus_sT_matched_D9_54": 0.380346,
+  "sW_incl_D57_minus_sT_sensitivity_not_protocol": 0.649626,
+  "m3_T_residual_ratio_T_over_fit": {
+   "12": 1.1195,
+   "14": 0.9472,
+   "18": 0.906,
+   "19": 1.094,
+   "21": 0.8299,
+   "27": 0.7167,
+   "28": 0.837,
+   "36": 1.086,
+   "38": 1.377,
+   "42": 1.0644,
+   "54": 1.0205,
+   "57": 1.0061,
+   "9": 1.1698
+  },
+  "local_slopes": {
+   "m3_T": [
+    [
+     9,
+     12,
+     4.4454
+    ],
+    [
+     12,
+     14,
+     3.5141
+    ],
+    [
+     14,
+     18,
+     4.4212
+    ],
+    [
+     18,
+     19,
+     8.0871
+    ],
+    [
+     19,
+     21,
+     1.8367
+    ],
+    [
+     21,
+     27,
+     4.0147
+    ],
+    [
+     27,
+     28,
+     8.8658
+    ],
+    [
+     28,
+     36,
+     5.6344
+    ],
+    [
+     36,
+     38,
+     8.9895
+    ],
+    [
+     38,
+     42,
+     2.026
+    ],
+    [
+     42,
+     54,
+     4.4307
+    ],
+    [
+     54,
+     57,
+     4.3339
+    ]
+   ],
+   "m3_W": [
+    [
+     9,
+     12,
+     3.3942
+    ],
+    [
+     12,
+     14,
+     3.6406
+    ],
+    [
+     14,
+     18,
+     4.0076
+    ],
+    [
+     18,
+     19,
+     6.2407
+    ],
+    [
+     19,
+     21,
+     2.9854
+    ],
+    [
+     21,
+     27,
+     4.7111
+    ],
+    [
+     27,
+     28,
+     4.7352
+    ],
+    [
+     28,
+     36,
+     5.7807
+    ],
+    [
+     36,
+     38,
+     7.6299
+    ],
+    [
+     38,
+     42,
+     7.2032
+    ],
+    [
+     42,
+     54,
+     8.6042
+    ],
+    [
+     54,
+     57,
+     10.1634
+    ]
+   ],
+   "m4_T": [
+    [
+     3,
+     7,
+     4.8124
+    ],
+    [
+     7,
+     9,
+     6.6633
+    ],
+    [
+     9,
+     12,
+     10.9748
+    ],
+    [
+     12,
+     14,
+     14.064
+    ]
+   ],
+   "m4_W": [
+    [
+     3,
+     7,
+     4.3644
+    ],
+    [
+     7,
+     9,
+     5.3928
+    ],
+    [
+     9,
+     12,
+     8.7661
+    ],
+    [
+     12,
+     14,
+     12.5836
+    ]
+   ]
+  },
+  "ns_per_op_m3_spread": {
+   "D_le_38": [
+    6.039,
+    9.825,
+    1.627
+   ],
+   "D_le_42": [
+    6.039,
+    11.24,
+    1.861
+   ],
+   "median_D_le_42": 7.205,
+   "D54_over_median": 4.453,
+   "D57_over_median": 6.103
+  },
+  "k24_controls": [
+   {
+    "D": 10,
+    "T": 14902400.0,
+    "SD": 11,
+    "W_ms": 110.99,
+    "ns_per_op": 7.448,
+    "k20_fit_T": 10531500.0,
+    "ratio_to_fit": 1.41503
+   },
+   {
+    "D": 12,
+    "T": 27264000.0,
+    "SD": 13,
+    "W_ms": 215.29,
+    "ns_per_op": 7.896,
+    "k20_fit_T": 24354700.0,
+    "ratio_to_fit": 1.11946
+   },
+   {
+    "D": 15,
+    "T": 70433000.0,
+    "SD": 16,
+    "W_ms": 476.96,
+    "ns_per_op": 6.772,
+    "k20_fit_T": 67950700.0,
+    "ratio_to_fit": 1.03653
+   },
+   {
+    "D": 20,
+    "T": 202179000.0,
+    "SD": 21,
+    "W_ms": 1567.93,
+    "ns_per_op": 7.755,
+    "k20_fit_T": 255086000.0,
+    "ratio_to_fit": 0.79259
+   },
+   {
+    "D": 30,
+    "T": 1916980000.0,
+    "SD": 31,
+    "W_ms": 11511.99,
+    "ns_per_op": 6.005,
+    "k20_fit_T": 1645840000.0,
+    "ratio_to_fit": 1.16474
+   }
+  ],
+  "k24_max_deviation_from_k20_law": 1.41503,
+  "D12_four_digit_test": {
+   "k20_T": 27263936.666666668,
+   "k24_T": 27263980.666666668,
+   "rel_diff": 1.6138535141843663e-06,
+   "four_sig_fig_equal": true,
+   "k20_per_target": [
+    27263959,
+    27263748,
+    27263981,
+    27263975,
+    27263979,
+    27263978
+   ],
+   "k24_per_target": [
+    27263981,
+    27263979,
+    27263981,
+    27263981,
+    27263981,
+    27263981
+   ],
+   "same_seed": [
+    20264120,
+    20264120
+   ]
+  },
+  "chain_vs_flat": [
+   {
+    "m": 3,
+    "D": 9,
+    "chain": 147635020.5,
+    "chain_SD": 7,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m3_sym_d9_g0.json",
+    "ratio": 19.45378923551435,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 12,
+    "chain": 774804479.8333334,
+    "chain_SD": 7,
+    "src": "curve25519_exponent_study_ext_20261110/cells/k20_m3_sym_d12_g0.json",
+    "ratio": 28.418657558745796,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 14,
+    "chain": 776610720.8333334,
+    "chain_SD": 10,
+    "src": "curve25519_exponent_study_ext_20261110/cells/k20_m3_sym_d14_g0.json",
+    "ratio": 16.57136688563465,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 18,
+    "chain": 24275087917.833332,
+    "chain_SD": 7,
+    "src": "curve25519_exponent_study_ext_20261110/cells/k20_m3_sym_d18_g0.json",
+    "ratio": 170.5177886919746,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 19,
+    "chain": 220436708.16666666,
+    "chain_SD": 20,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m3_sym_d19_g0.json",
+    "ratio": 1.0,
+    "exact_per_target_equal": true,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 21,
+    "chain": 2787948088.1666665,
+    "chain_SD": 11,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m3_sym_d21_g0.json",
+    "ratio": 10.523642065073508,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 27,
+    "chain": 263459825507.33334,
+    "chain_SD": 8,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m3_sym_d27_g0.json",
+    "ratio": 362.5922920795802,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 28,
+    "chain": 201612982318.0,
+    "chain_SD": 11,
+    "src": "curve25519_exponent_study_ext_20261110/cells/k20_m3_sym_d28_g0.json",
+    "ratio": 200.9992924173872,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 3,
+    "D": 36,
+    "chain": "censored (exit -6)"
+   },
+   {
+    "m": 3,
+    "D": 38,
+    "chain": "not run"
+   },
+   {
+    "m": 3,
+    "D": 42,
+    "chain": "not run"
+   },
+   {
+    "m": 3,
+    "D": 54,
+    "chain": "not run"
+   },
+   {
+    "m": 3,
+    "D": 57,
+    "chain": "censored (timed_out)"
+   },
+   {
+    "m": 3,
+    "D": 63,
+    "chain": "not run"
+   },
+   {
+    "m": 4,
+    "D": 3,
+    "chain": 423322.0,
+    "chain_SD": 8,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m4_sym_d3_g0.json",
+    "ratio": 1.0,
+    "exact_per_target_equal": true,
+    "seed_match": true
+   },
+   {
+    "m": 4,
+    "D": 7,
+    "chain": 24975907.333333332,
+    "chain_SD": 8,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m4_sym_d7_g0.json",
+    "ratio": 1.0,
+    "exact_per_target_equal": true,
+    "seed_match": true
+   },
+   {
+    "m": 4,
+    "D": 9,
+    "chain": 142058000763.16666,
+    "chain_SD": 9,
+    "src": "curve25519_exponent_study_20261108/cells/k20_m4_sym_d9_g0.json",
+    "ratio": 1065.8172930704284,
+    "exact_per_target_equal": false,
+    "seed_match": true
+   },
+   {
+    "m": 4,
+    "D": 12,
+    "chain": "censored (exit -6)"
+   },
+   {
+    "m": 4,
+    "D": 14,
+    "chain": "not run"
+   },
+   {
+    "m": 4,
+    "D": 18,
+    "chain": "not run"
+   }
+  ],
+  "chain_shape_at_smooth_D": {
+   "D18": {
+    "chain": {
+     "n_vars": 12,
+     "levels": 3,
+     "SD": 7,
+     "max_rows": 14548
+    },
+    "flat": {
+     "n_vars": 6,
+     "levels": 1,
+     "SD": 19,
+     "max_rows": 35987
+    }
+   },
+   "D27": {
+    "chain": {
+     "n_vars": 12,
+     "levels": 3,
+     "SD": 8,
+     "max_rows": 38639
+    },
+    "flat": {
+     "n_vars": 6,
+     "levels": 1,
+     "SD": 28,
+     "max_rows": 220400
+    }
+   },
+   "D28": {
+    "chain": {
+     "n_vars": 12,
+     "levels": 3,
+     "SD": 11,
+     "max_rows": 49575
+    },
+    "flat": {
+     "n_vars": 6,
+     "levels": 1,
+     "SD": 29,
+     "max_rows": 259774
+    }
+   }
+  },
+  "binary_sha256_file": "5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746",
+  "load_flags": [
+   "20_subflat_m3_sym_d57"
+  ],
+  "load_flagged_values": {
+   "20_subflat_m3_sym_d57": [
+    1.8818359375,
+    1.0
+   ]
+  },
+  "unflagged_load_range": [
+   0.78515625,
+   1.0869140625
+  ],
+  "censored": {
+   "20_subflat_m3_sym_d63": {
+    "failure": "exit -6",
+    "exit": -6,
+    "wall_s": 13903.8,
+    "mentions_alloc_failed": false,
+    "mentions_f4_with_arithmetic": true,
+    "mentions_grow_one": true,
+    "stderr_len": 400
+   },
+   "20_subflat_m4_sym_d18": {
+    "failure": "exit -6",
+    "exit": -6,
+    "wall_s": 1287.1,
+    "mentions_alloc_failed": true,
+    "mentions_f4_with_arithmetic": false,
+    "mentions_grow_one": false,
+    "stderr_len": 146
+   }
+  },
+  "seeds": {
+   "20_subflat_m3_sym_d12": [
+    20264120,
+    20264120,
+    true
+   ],
+   "20_subflat_m3_sym_d14": [
+    20264122,
+    20264122,
+    true
+   ],
+   "20_subflat_m3_sym_d18": [
+    20264126,
+    20264126,
+    true
+   ],
+   "20_subflat_m3_sym_d19": [
+    20264127,
+    20264127,
+    true
+   ],
+   "20_subflat_m3_sym_d21": [
+    20264129,
+    20264129,
+    true
+   ],
+   "20_subflat_m3_sym_d27": [
+    20264135,
+    20264135,
+    true
+   ],
+   "20_subflat_m3_sym_d28": [
+    20264136,
+    20264136,
+    true
+   ],
+   "20_subflat_m3_sym_d36": [
+    20264144,
+    20264144,
+    true
+   ],
+   "20_subflat_m3_sym_d38": [
+    20264146,
+    20264146,
+    true
+   ],
+   "20_subflat_m3_sym_d42": [
+    20264150,
+    20264150,
+    true
+   ],
+   "20_subflat_m3_sym_d54": [
+    20264162,
+    20264162,
+    true
+   ],
+   "20_subflat_m3_sym_d57": [
+    20264165,
+    20264165,
+    true
+   ],
+   "20_subflat_m3_sym_d63": [
+    null,
+    20264171,
+    null
+   ],
+   "20_subflat_m3_sym_d9": [
+    20264117,
+    20264117,
+    true
+   ],
+   "20_subflat_m4_sym_d12": [
+    20265120,
+    20265120,
+    true
+   ],
+   "20_subflat_m4_sym_d14": [
+    20265122,
+    20265122,
+    true
+   ],
+   "20_subflat_m4_sym_d18": [
+    null,
+    20265126,
+    null
+   ],
+   "20_subflat_m4_sym_d3": [
+    20265111,
+    20265111,
+    true
+   ],
+   "20_subflat_m4_sym_d7": [
+    20265115,
+    20265115,
+    true
+   ],
+   "20_subflat_m4_sym_d9": [
+    20265117,
+    20265117,
+    true
+   ],
+   "p16777141_A7842_subflat_m3_sym_d10": [
+    20264118,
+    20264118,
+    true
+   ],
+   "p16777141_A7842_subflat_m3_sym_d12": [
+    20264120,
+    20264120,
+    true
+   ],
+   "p16777141_A7842_subflat_m3_sym_d15": [
+    20264123,
+    20264123,
+    true
+   ],
+   "p16777141_A7842_subflat_m3_sym_d20": [
+    20264128,
+    20264128,
+    true
+   ],
+   "p16777141_A7842_subflat_m3_sym_d30": [
+    20264138,
+    20264138,
+    true
+   ]
+  },
+  "containers": {
+   "first": [
+    [
+     3,
+     9,
+     "20"
+    ],
+    [
+     3,
+     12,
+     "20"
+    ],
+    [
+     3,
+     14,
+     "20"
+    ],
+    [
+     3,
+     18,
+     "20"
+    ],
+    [
+     3,
+     19,
+     "20"
+    ],
+    [
+     3,
+     21,
+     "20"
+    ],
+    [
+     3,
+     27,
+     "20"
+    ],
+    [
+     3,
+     28,
+     "20"
+    ],
+    [
+     3,
+     36,
+     "20"
+    ],
+    [
+     3,
+     38,
+     "20"
+    ],
+    [
+     3,
+     42,
+     "20"
+    ],
+    [
+     3,
+     54,
+     "20"
+    ],
+    [
+     4,
+     3,
+     "20"
+    ],
+    [
+     4,
+     7,
+     "20"
+    ],
+    [
+     4,
+     9,
+     "20"
+    ],
+    [
+     4,
+     12,
+     "20"
+    ],
+    [
+     4,
+     14,
+     "20"
+    ],
+    [
+     4,
+     18,
+     "20"
+    ]
+   ],
+   "second": [
+    [
+     3,
+     10,
+     "p=16777141,A=7842"
+    ],
+    [
+     3,
+     12,
+     "p=16777141,A=7842"
+    ],
+    [
+     3,
+     15,
+     "p=16777141,A=7842"
+    ],
+    [
+     3,
+     20,
+     "p=16777141,A=7842"
+    ],
+    [
+     3,
+     30,
+     "p=16777141,A=7842"
+    ],
+    [
+     3,
+     57,
+     "20"
+    ],
+    [
+     3,
+     63,
+     "20"
+    ]
+   ]
+  },
+  "run_log": {
+   "launch_lines": 2,
+   "launch_sha_ok": true,
+   "cell_lines": 25,
+   "cell_line_mismatches_vs_records": [],
+   "append_only_across_9_commits": true
+  },
+  "replay_m3_D12": {
+   "replay_mean_field_ops": 27263936.666666668,
+   "record_mean_field_ops": 27263936.666666668,
+   "per_target_identical": true,
+   "replay_per_target": [
+    27263959,
+    27263748,
+    27263981,
+    27263975,
+    27263979,
+    27263978
+   ],
+   "replay_targets_x": [
+    264746,
+    1013584,
+    812155,
+    250284,
+    49210,
+    570403
+   ],
+   "replay_seed": 20264120,
+   "replay_SD": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13
+   ],
+   "replay_W_ms": 209.9219845,
+   "record_W_ms": 197.96027233333334,
+   "record_targets_x": [
+    264746,
+    1013584,
+    812155,
+    250284,
+    49210,
+    570403
+   ],
+   "targets_identical": true
+  },
+  "L3_cross_check": {
+   "cells": "m = 3 flat D = 9, 12, 14, 18, 21, 27, 28, 36 (research/curve25519_wave6_runs_20261115/L3_flat/cells)",
+   "per_target_field_ops_identical": true,
+   "W_ms_L3_vs_this": {
+    "9": [
+     65.4,
+     74.6
+    ],
+    "12": [
+     213.5,
+     198.0
+    ],
+    "14": [
+     363.0,
+     347.0
+    ],
+    "18": [
+     999.7,
+     950.0
+    ],
+    "21": [
+     1897.6,
+     1794.8
+    ],
+    "27": [
+     6160.6,
+     5864.2
+    ],
+    "28": [
+     7704.3,
+     6966.2
+    ],
+    "36": [
+     33319.5,
+     29780.4
+    ]
+   }
+  }
+ },
+ "commands": [
+  "cd /home/user/crypto && git status --short; git rev-parse HEAD; git log --format='%H %aI %cI %s' -- research/curve25519_flat_exponent_20261115/PROTOCOL.md research/curve25519_flat_exponent_20261115/run_cells.py; git merge-base --is-ancestor a297c73259 HEAD; git diff a297c73259 HEAD -- research/curve25519_flat_exponent_20261115/PROTOCOL.md research/curve25519_flat_exponent_20261115/run_cells.py",
+  "per-file git log of cells/*.json and run.log; append-only check of run.log across its 9 commits (prefix test of consecutive git show versions)",
+  "sha256sum research/curve25519_flat_exponent_20261115/*.* research/curve25519_flat_exponent_20261115/cells/* (start and end of validation); git show HEAD:<file> | sha256sum for every study file",
+  "sha256sum /home/user/bin-archive/curve25519_family-5abc70ba",
+  "uptime  # 01:47:27Z load 0.36, no runner running",
+  "(ulimit -v 12000000; RAYON_NUM_THREADS=1 /home/user/bin-archive/curve25519_family-5abc70ba f4sub 20 subflat 12 0 mont 3 sym 6 20264120 7200) > replay_m3_d12.out  # exit 0, about 1.3 s",
+  "python3 -I validate.py /home/user/crypto/research/curve25519_flat_exponent_20261115 /home/user/crypto/research replay_m3_d12.out recomputed.json  # independent stdlib script, embedded below; does not import analyse.py",
+  "python3 -I comparison of research/curve25519_wave6_runs_20261115/L3_flat/cells/20_subflat_m3_sym_d*.json against this study's cells (per-target field_ops, seeds, mean ms)",
+  "python3 -I comparison of chain vs flat n_vars, levels, SD, max_rows at m = 3 D = 12, 18, 27, 28",
+  "sed -n 1755,1800p src/bin/curve25519_family.rs (f4sub breaks at first incomplete target and writes a record); grep panic Cargo.toml (panic = unwind)",
+  "python3 -I comparison of analysis.json against recomputed.json (fits within 4e-5 in the interval ends from the 3-dp t table; cells, controls and chain ratios identical)",
+  "grep of research/curve25519_wave6_runs_20261115, research/curve25519_leads_wave5_20261112 and research/ for the '18x rho-neg' figure"
+ ],
+ "validator_script_sha256": "c11de669c12eee6cd9469889a8927be5db04e2a7ea9ffd3c35382b2d89276c3c",
+ "validator_script_source": "#!/usr/bin/env python3\n\"\"\"Independent re-derivation for curve25519_flat_exponent_20261115 (validator; stdlib only; does not import\nor reuse analyse.py). Usage: validate.py <study_dir> <research_dir> <replay_json_or_-> <out_json>\"\"\"\nimport glob, hashlib, json, math, os, re, sys\n\nSTUDY, RES, REPLAY, OUT = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]\nSHA_EXPECT = \"5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746\"\nBIN = \"/home/user/bin-archive/curve25519_family-5abc70ba\"\nR = {}\n\n\n# ---------- Student t quantile, own implementation (regularised incomplete beta, Lentz CF) ----------\ndef _betacf(a, b, x):\n    tiny = 1e-300\n    qab, qap, qam = a + b, a + 1.0, a - 1.0\n    c, d = 1.0, 1.0 - qab * x / qap\n    d = 1.0 / (d if abs(d) > tiny else tiny)\n    h = d\n    for m in range(1, 1000):\n        m2 = 2 * m\n        aa = m * (b - m) * x / ((qam + m2) * (a + m2))\n        d = 1.0 + aa * d; d = 1.0 / (d if abs(d) > tiny else tiny)\n        c = 1.0 + aa / c; c = c if abs(c) > tiny else tiny\n        h *= d * c\n        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))\n        d = 1.0 + aa * d; d = 1.0 / (d if abs(d) > tiny else tiny)\n        c = 1.0 + aa / c; c = c if abs(c) > tiny else tiny\n        de = d * c; h *= de\n        if abs(de - 1.0) < 1e-15:\n            break\n    return h\n\n\ndef _ibeta(a, b, x):\n    if x <= 0: return 0.0\n    if x >= 1: return 1.0\n    lbt = math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log(1 - x)\n    if x < (a + 1) / (a + b + 2):\n        return math.exp(lbt) * _betacf(a, b, x) / a\n    return 1.0 - math.exp(lbt) * _betacf(b, a, 1 - x) / b\n\n\ndef t_cdf(t, df):\n    x = df / (df + t * t)\n    p = 0.5 * _ibeta(df / 2.0, 0.5, x)\n    return 1 - p if t > 0 else p\n\n\ndef t_q975(df):\n    lo, hi = 0.0, 100.0\n    for _ in range(200):\n        mid = (lo + hi) / 2\n        if t_cdf(mid, df) < 0.975: lo = mid\n        else: hi = mid\n    return (lo + hi) / 2\n\n\ndef ols(points):\n    \"\"\"points: list of (D, value). OLS of ln value on ln D; returns dict.\"\"\"\n    xs = [math.log(d) for d, _ in points]; ys = [math.log(v) for _, v in points]\n    n = len(xs); xb = sum(xs) / n; yb = sum(ys) / n\n    sxx = sum((x - xb) ** 2 for x in xs); sxy = sum((x - xb) * (y - yb) for x, y in zip(xs, ys))\n    b = sxy / sxx; a = yb - b * xb\n    res = [y - (a + b * x) for x, y in zip(xs, ys)]\n    s2 = sum(r * r for r in res) / (n - 2)\n    se = math.sqrt(s2 / sxx); tq = t_q975(n - 2)\n    return {\"n\": n, \"D\": [d for d, _ in points], \"slope\": b, \"intercept\": a, \"se\": se, \"t975\": tq,\n            \"lo\": b - tq * se, \"hi\": b + tq * se, \"span\": max(d for d, _ in points) / min(d for d, _ in points)}\n\n\n# ---------- load cells ----------\ncells = {}\nfor f in sorted(glob.glob(os.path.join(STUDY, \"cells\", \"*.json\"))):\n    j = json.load(open(f)); e = j[\"ext\"]; name = os.path.basename(f)[:-5]\n    cmd = e[\"cmd\"]\n    mini = cmd.split(\" f4sub \")[1].split()[0]\n    m, D = j[\"m\"], j[\"d_or_t\"]\n    c = {\"name\": name, \"mini\": mini, \"m\": m, \"D\": D, \"capped\": bool(j.get(\"capped\")), \"exit\": e[\"exit\"],\n         \"wall_s\": e[\"wall_s\"], \"started\": e[\"started_utc\"], \"lb\": e[\"load_before\"], \"la\": e[\"load_after\"],\n         \"sha\": e[\"bin_sha256\"], \"cmd\": cmd, \"cap_s\": e[\"cap_s\"], \"mem_kb\": e[\"mem_kb\"], \"env_extra\": e[\"env_extra\"],\n         \"seed_field\": j.get(\"seed\")}\n    seed_rule = 20261108 + 1000 * m + D\n    c[\"seed_rule\"] = seed_rule\n    c[\"expected_cmd\"] = (f\"ulimit -v 12000000; RAYON_NUM_THREADS=1 {BIN} f4sub {mini} subflat {D} 0 mont {m} sym 6 \"\n                         f\"{seed_rule} 7200\")\n    c[\"cmd_ok\"] = cmd == c[\"expected_cmd\"] and mini in (\"20\", \"p=16777141,A=7842\")\n    c[\"seed_ok_field\"] = (j.get(\"seed\") == seed_rule) if \"seed\" in j else None\n    c[\"seed_in_cmd\"] = int(cmd.split()[-2])\n    c[\"load_flag\"] = max(e[\"load_before\"], e[\"load_after\"]) > 1.5\n    if c[\"capped\"]:\n        c[\"failure\"] = j.get(\"failure\"); c[\"stderr_tail\"] = j.get(\"stderr\", \"\")\n    else:\n        pt = j[\"per_target\"]\n        fo = [t[\"field_ops\"] for t in pt]; ms = [t[\"ms\"] for t in pt]\n        c.update({\"targets\": len(pt), \"targets_done\": j.get(\"targets_done\"), \"targets_requested\": j.get(\"targets_requested\"),\n                  \"T\": sum(fo) / len(fo), \"T_recorded_mean\": j[\"mean_field_ops\"], \"W\": sum(ms) / len(ms),\n                  \"SD\": max(t[\"solving_degree_max\"] for t in pt), \"SD_list\": [t[\"solving_degree_max\"] for t in pt],\n                  \"all_complete\": all(t[\"complete\"] for t in pt), \"all_inconsistent\": all(t[\"inconsistent\"] for t in pt),\n                  \"any_timed_out\": any(t[\"timed_out\"] for t in pt), \"max_rows\": max(t[\"max_rows\"] for t in pt),\n                  \"max_cols\": max(t[\"max_cols\"] for t in pt), \"p\": j[\"p\"], \"per_target_field_ops\": fo})\n        c[\"ns_per_op\"] = c[\"W\"] * 1e6 / c[\"T\"]\n        c[\"T_mean_matches_record\"] = abs(c[\"T\"] - c[\"T_recorded_mean\"]) <= 1e-6 * c[\"T\"]\n        c[\"SD_eq_D_plus_1\"] = c[\"SD\"] == D + 1 and all(s == D + 1 for s in c[\"SD_list\"])\n    cells[name] = c\nR[\"n_cells\"] = len(cells)\nk20 = {k: c for k, c in cells.items() if c[\"mini\"] == \"20\"}\nk24 = {k: c for k, c in cells.items() if c[\"mini\"] != \"20\"}\nR[\"n_k20\"], R[\"n_k24\"] = len(k20), len(k24)\n\n# container regime: first container ended at or after 2026-11-15T07:34Z, second began 2026-11-21T19:2xZ\nfor c in cells.values():\n    c[\"container\"] = \"first\" if c[\"started\"] < \"2026-11-16\" else \"second\"\n\n# ---------- integrity checks ----------\nR[\"binary_sha256_file\"] = hashlib.sha256(open(BIN, \"rb\").read()).hexdigest()\nR[\"binary_sha_matches_protocol\"] = R[\"binary_sha256_file\"] == SHA_EXPECT\nR[\"cells_sha_ok\"] = all(c[\"sha\"] == SHA_EXPECT for c in cells.values())\nR[\"cells_cmd_ok\"] = {k: c[\"cmd_ok\"] for k, c in cells.items()}\nR[\"cells_seed_field\"] = {k: [c[\"seed_field\"], c[\"seed_rule\"], c[\"seed_ok_field\"]] for k, c in cells.items()}\nR[\"cells_seed_in_cmd_ok\"] = all(c[\"seed_in_cmd\"] == c[\"seed_rule\"] for c in cells.values())\nR[\"cells_limits_ok\"] = all(c[\"cap_s\"] == 7200 and c[\"mem_kb\"] == 12000000 and c[\"env_extra\"] == [] for c in cells.values())\nR[\"load_flags\"] = sorted(k for k, c in cells.items() if c[\"load_flag\"])\nR[\"load_range_unflagged\"] = [min(min(c[\"lb\"], c[\"la\"]) for c in cells.values() if not c[\"load_flag\"]),\n                             max(max(c[\"lb\"], c[\"la\"]) for c in cells.values() if not c[\"load_flag\"])]\nR[\"load_flagged_values\"] = {k: [cells[k][\"lb\"], cells[k][\"la\"]] for k in R[\"load_flags\"]}\nR[\"censored\"] = {k: {\"failure\": c[\"failure\"], \"exit\": c[\"exit\"], \"wall_s\": c[\"wall_s\"],\n                     \"mentions_alloc_failed\": \"memory allocation\" in c[\"stderr_tail\"],\n                     \"mentions_f4_with_arithmetic\": \"f4_with_arithmetic\" in c[\"stderr_tail\"],\n                     \"mentions_grow_one\": \"grow_one\" in c[\"stderr_tail\"],\n                     \"stderr_len\": len(c[\"stderr_tail\"])} for k, c in cells.items() if c[\"capped\"]}\ncomp = [c for c in cells.values() if not c[\"capped\"]]\nR[\"complete_cells_all_targets_done\"] = all(c[\"targets\"] == 6 and c[\"targets_done\"] == 6 and c[\"targets_requested\"] == 6 for c in comp)\nR[\"complete_cells_all_complete_flags\"] = all(c[\"all_complete\"] for c in comp)\nR[\"complete_cells_all_inconsistent\"] = all(c[\"all_inconsistent\"] for c in comp)\nR[\"complete_cells_none_timed_out\"] = not any(c[\"any_timed_out\"] for c in comp)\nR[\"complete_cells_T_mean_matches\"] = all(c[\"T_mean_matches_record\"] for c in comp)\nR[\"SD_eq_D_plus_1_cells_D_ge_9\"] = {k: c[\"SD_eq_D_plus_1\"] for k, c in cells.items() if not c[\"capped\"] and c[\"D\"] >= 9}\nR[\"SD_small_D\"] = {k: c[\"SD_list\"] for k, c in cells.items() if not c[\"capped\"] and c[\"D\"] < 9}\nR[\"containers\"] = {\"first\": sorted((c[\"m\"], c[\"D\"], c[\"mini\"]) for c in cells.values() if c[\"container\"] == \"first\"),\n                   \"second\": sorted((c[\"m\"], c[\"D\"], c[\"mini\"]) for c in cells.values() if c[\"container\"] == \"second\")}\n\n# ---------- per-cell table ----------\nR[\"cells\"] = {k: {kk: c[kk] for kk in (\"m\", \"D\", \"mini\", \"capped\", \"T\", \"W\", \"SD\", \"ns_per_op\", \"wall_s\", \"lb\", \"la\",\n                                          \"container\", \"max_rows\", \"max_cols\", \"started\") if kk in c}\n              for k, c in sorted(cells.items(), key=lambda kv: (kv[1][\"mini\"], kv[1][\"m\"], kv[1][\"D\"]))}\n\n# ---------- fits ----------\ndef pts(pool, m, unit, excl_flag=False, first_only=False):\n    out = []\n    for c in pool.values():\n        if c[\"m\"] != m or c[\"capped\"] or c[\"D\"] < 9: continue\n        if excl_flag and c[\"load_flag\"]: continue\n        if first_only and c[\"container\"] != \"first\": continue\n        out.append((c[\"D\"], c[unit]))\n    return sorted(out)\n\nF = {}\nF[\"m3_T\"] = ols(pts(k20, 3, \"T\"))\nF[\"m3_W_excl_flag\"] = ols(pts(k20, 3, \"W\", excl_flag=True))\nF[\"m3_T_first\"] = ols(pts(k20, 3, \"T\", first_only=True))\nF[\"m3_W_first\"] = ols(pts(k20, 3, \"W\", first_only=True, excl_flag=True))\nF[\"m3_W_incl_D57_sensitivity_not_protocol\"] = ols(pts(k20, 3, \"W\"))\np4 = pts(k20, 4, \"T\")\nF[\"m4_applicability\"] = {\"n\": len(p4), \"D\": [d for d, _ in p4], \"span\": p4[-1][0] / p4[0][0],\n                         \"applicable\": len(p4) >= 4 and p4[-1][0] / p4[0][0] >= 4}\nfor k in (\"m3_T\", \"m3_W_excl_flag\", \"m3_T_first\", \"m3_W_first\", \"m3_W_incl_D57_sensitivity_not_protocol\"):\n    s = F[k][\"slope\"]; F[k][\"balanced_2_over_m1s\"] = 2 / (3 + 1 - s); F[k][\"a_star\"] = 1 / (3 + 1 - s)\nR[\"fits\"] = F\nR[\"sW_minus_sT\"] = F[\"m3_W_excl_flag\"][\"slope\"] - F[\"m3_T\"][\"slope\"]\nR[\"sW_minus_sT_matched_D9_54\"] = F[\"m3_W_excl_flag\"][\"slope\"] - F[\"m3_T_first\"][\"slope\"]\nR[\"sW_incl57_minus_sT\"] = F[\"m3_W_incl_D57_sensitivity_not_protocol\"][\"slope\"] - F[\"m3_T\"][\"slope\"]\n\n# residuals\nfT = F[\"m3_T\"]\nR[\"m3_T_residual_ratio\"] = {c[\"D\"]: c[\"T\"] / math.exp(fT[\"intercept\"] + fT[\"slope\"] * math.log(c[\"D\"]))\n                            for c in k20.values() if c[\"m\"] == 3 and not c[\"capped\"]}\n\n# local slopes (all complete cells, in D order)\ndef local(pool, m, unit):\n    s = sorted((c[\"D\"], c[unit]) for c in pool.values() if c[\"m\"] == m and not c[\"capped\"])\n    return [[a[0], b[0], math.log(b[1] / a[1]) / math.log(b[0] / a[0])] for a, b in zip(s, s[1:])]\nR[\"local\"] = {\"m3_T\": local(k20, 3, \"T\"), \"m3_W\": local(k20, 3, \"W\"), \"m4_T\": local(k20, 4, \"T\"), \"m4_W\": local(k20, 4, \"W\")}\n\n# ---------- k = 24 controls ----------\nctrl = []\nfor c in sorted(k24.values(), key=lambda c: c[\"D\"]):\n    fit = math.exp(fT[\"intercept\"] + fT[\"slope\"] * math.log(c[\"D\"]))\n    ctrl.append({\"D\": c[\"D\"], \"T\": c[\"T\"], \"SD\": c[\"SD\"], \"W\": c[\"W\"], \"ns_per_op\": c[\"ns_per_op\"], \"fit\": fit,\n                 \"ratio\": c[\"T\"] / fit, \"p\": c[\"p\"]})\nR[\"controls\"] = ctrl\nR[\"controls_max_dev\"] = max(max(r[\"ratio\"], 1 / r[\"ratio\"]) for r in ctrl)\na = next(c for c in k20.values() if c[\"m\"] == 3 and c[\"D\"] == 12); b = next(c for c in k24.values() if c[\"D\"] == 12)\nR[\"D12\"] = {\"k20_T\": a[\"T\"], \"k24_T\": b[\"T\"], \"rel_diff\": abs(a[\"T\"] - b[\"T\"]) / a[\"T\"],\n            \"k20_4sig\": float(\"%.4g\" % a[\"T\"]), \"k24_4sig\": float(\"%.4g\" % b[\"T\"]),\n            \"four_digit_equal\": (\"%.4g\" % a[\"T\"]) == (\"%.4g\" % b[\"T\"]),\n            \"k20_per_target\": a[\"per_target_field_ops\"], \"k24_per_target\": b[\"per_target_field_ops\"],\n            \"seeds\": [a[\"seed_field\"], b[\"seed_field\"]]}\n\n# ---------- chain cells ----------\nchain = {}\ndups = []\nfor d in (\"curve25519_exponent_study_20261108\", \"curve25519_exponent_study_ext_20261110\"):\n    for f in sorted(glob.glob(os.path.join(RES, d, \"cells\", \"k20_m[34]_sym_d*_g0.json\"))):\n        j = json.load(open(f)); key = (j[\"m\"], j[\"d_or_t\"])\n        rec = {\"src\": os.path.relpath(f, RES), \"capped\": bool(j.get(\"capped\"))}\n        if not rec[\"capped\"]:\n            pt = j[\"per_target\"]\n            rec.update({\"T\": sum(t[\"field_ops\"] for t in pt) / len(pt), \"SD\": max(t[\"solving_degree_max\"] for t in pt),\n                        \"per_target\": [t[\"field_ops\"] for t in pt], \"seed\": j.get(\"seed\"), \"W\": sum(t[\"ms\"] for t in pt) / len(pt)})\n        else:\n            rec[\"why\"] = j.get(\"failure\") or (\"timed_out\" if any(t.get(\"timed_out\") for t in j.get(\"per_target\") or []) else \"capped\")\n            rec[\"seed\"] = j.get(\"seed\")\n        if key not in chain:\n            chain[key] = rec\n        else:\n            old = chain[key]\n            dups.append((key, old[\"src\"], old[\"capped\"], old.get(\"T\"), rec[\"src\"], rec[\"capped\"], rec.get(\"T\")))\n            if old[\"capped\"] and not rec[\"capped\"]:\n                chain[key] = rec\nR[\"chain_duplicates\"] = dups\ncvf = []\nfor c in sorted(k20.values(), key=lambda c: (c[\"m\"], c[\"D\"])):\n    r = chain.get((c[\"m\"], c[\"D\"]))\n    row = {\"m\": c[\"m\"], \"D\": c[\"D\"], \"flat_T\": c.get(\"T\"), \"chain\": None}\n    if r is None:\n        row[\"chain\"] = \"not run\"\n    elif r[\"capped\"]:\n        row[\"chain\"] = \"censored (%s)\" % r[\"why\"]\n    else:\n        row[\"chain\"] = r[\"T\"]; row[\"chain_SD\"] = r[\"SD\"]; row[\"chain_seed\"] = r[\"seed\"]; row[\"src\"] = r[\"src\"]\n        if c.get(\"T\"):\n            row[\"ratio\"] = r[\"T\"] / c[\"T\"]\n            row[\"exact_per_target_equal\"] = r[\"per_target\"] == c[\"per_target_field_ops\"]\n            row[\"seed_match\"] = r[\"seed\"] == c[\"seed_field\"]\n    cvf.append(row)\nR[\"chain_vs_flat\"] = cvf\n\n# ---------- run.log ----------\nlog = open(os.path.join(STUDY, \"run.log\")).read().splitlines()\nlaunch = [l for l in log if l.startswith(\"binary \")]\nR[\"runlog_launch_lines\"] = len(launch)\nR[\"runlog_launch_sha_ok\"] = all(SHA_EXPECT in l and \"cap 7200\" in l and \"mem_kb 12000000\" in l for l in launch)\nmism = []\nfor l in log:\n    mo = re.match(r\"(\\d\\d:\\d\\d:\\d\\dZ) (\\S+) (.*) (\\d+)s$\", l)\n    if not mo: continue\n    name = mo.group(2); c = cells.get(name)\n    if c is None: mism.append((\"no cell\", l)); continue\n    body = mo.group(3)\n    if c[\"capped\"]:\n        if body != \"capped\": mism.append((name, \"capped mismatch\"))\n    else:\n        mt = re.match(r\"T (\\S+) SD \\[(.*)\\]\", body)\n        if float(mt.group(1)) != float(\"%.4g\" % c[\"T_recorded_mean\"]): mism.append((name, \"T\", mt.group(1)))\n        if [int(x) for x in mt.group(2).split(\",\")] != c[\"SD_list\"]: mism.append((name, \"SD\"))\n    if abs(int(mo.group(4)) - c[\"wall_s\"]) > 1: mism.append((name, \"wall\", mo.group(4), c[\"wall_s\"]))\nR[\"runlog_cell_line_mismatches\"] = mism\nR[\"runlog_cell_lines\"] = sum(1 for l in log if re.match(r\"\\d\\d:\\d\\d:\\d\\dZ \\S+ \", l))\n\n# ---------- replay ----------\nif REPLAY != \"-\":\n    rp = json.loads(open(REPLAY).read().strip().splitlines()[-1])\n    rec = cells[\"20_subflat_m3_sym_d12\"]\n    rfo = [t[\"field_ops\"] for t in rp[\"per_target\"]]\n    R[\"replay\"] = {\"replay_mean_field_ops\": rp[\"mean_field_ops\"], \"record_mean_field_ops\": rec[\"T_recorded_mean\"],\n                   \"per_target_identical\": rfo == rec[\"per_target_field_ops\"], \"replay_per_target\": rfo,\n                   \"replay_targets_x\": [t[\"target_x\"] for t in rp[\"per_target\"]],\n                   \"replay_seed\": rp.get(\"seed\"), \"replay_SD\": [t[\"solving_degree_max\"] for t in rp[\"per_target\"]],\n                   \"replay_W_ms\": sum(t[\"ms\"] for t in rp[\"per_target\"]) / len(rp[\"per_target\"]),\n                   \"record_W_ms\": rec[\"W\"]}\n    rj = json.load(open(os.path.join(STUDY, \"cells\", \"20_subflat_m3_sym_d12.json\")))\n    R[\"replay\"][\"record_targets_x\"] = [t[\"target_x\"] for t in rj[\"per_target\"]]\n    R[\"replay\"][\"targets_identical\"] = R[\"replay\"][\"replay_targets_x\"] == R[\"replay\"][\"record_targets_x\"]\n\njson.dump(R, open(OUT, \"w\"), indent=1, default=str)\n\n# ---------- print summary ----------\nprint(\"cells\", R[\"n_cells\"], \"k20\", R[\"n_k20\"], \"k24\", R[\"n_k24\"])\nprint(\"bin sha file\", R[\"binary_sha256_file\"], R[\"binary_sha_matches_protocol\"], \"cells sha ok\", R[\"cells_sha_ok\"])\nprint(\"cmd ok all\", all(R[\"cells_cmd_ok\"].values()), [k for k, v in R[\"cells_cmd_ok\"].items() if not v])\nprint(\"seed field\", {k: v for k, v in R[\"cells_seed_field\"].items() if v[2] is not True})\nprint(\"seed in cmd ok\", R[\"cells_seed_in_cmd_ok\"], \"limits ok\", R[\"cells_limits_ok\"])\nprint(\"load flags\", R[\"load_flags\"], R[\"load_flagged_values\"], \"unflagged range\", R[\"load_range_unflagged\"])\nprint(\"censored\", json.dumps(R[\"censored\"], indent=0))\nfor k in (\"complete_cells_all_targets_done\", \"complete_cells_all_complete_flags\", \"complete_cells_all_inconsistent\",\n          \"complete_cells_none_timed_out\", \"complete_cells_T_mean_matches\"):\n    print(k, R[k])\nprint(\"SD=D+1 (D>=9)\", all(R[\"SD_eq_D_plus_1_cells_D_ge_9\"].values()), \"small D\", R[\"SD_small_D\"])\nprint(\"containers\", R[\"containers\"])\nprint(\"\\nm D mini T W SD ns/op wall rows cols container\")\nfor k, c in R[\"cells\"].items():\n    if c[\"capped\"]:\n        print(c[\"m\"], c[\"D\"], c[\"mini\"], \"CENSORED\", c[\"wall_s\"], c[\"container\"], c[\"lb\"], c[\"la\"])\n    else:\n        print(c[\"m\"], c[\"D\"], c[\"mini\"], \"%.6e\" % c[\"T\"], \"%.6g\" % c[\"W\"], c[\"SD\"], \"%.4f\" % c[\"ns_per_op\"], c[\"wall_s\"],\n              c[\"max_rows\"], c[\"max_cols\"], c[\"container\"], c[\"lb\"], c[\"la\"])\nprint()\nfor k, f in F.items():\n    if \"slope\" in f:\n        print(k, \"n\", f[\"n\"], \"D\", f[\"D\"][0], \"..\", f[\"D\"][-1], \"slope %.6f [%.6f, %.6f] t %.5f span %.3f 2/(m+1-s) %.4f\" %\n              (f[\"slope\"], f[\"lo\"], f[\"hi\"], f[\"t975\"], f[\"span\"], f[\"balanced_2_over_m1s\"]))\n    else:\n        print(k, f)\nprint(\"sW - sT %.6f ; matched D9..54 %.6f ; sW(incl57) - sT %.6f\" % (R[\"sW_minus_sT\"], R[\"sW_minus_sT_matched_D9_54\"], R[\"sW_incl57_minus_sT\"]))\nprint(\"residuals\", {d: round(v, 4) for d, v in sorted(R[\"m3_T_residual_ratio\"].items())})\nfor k, v in R[\"local\"].items():\n    print(\"local\", k, \", \".join(\"%d->%d %.4f\" % tuple(x) for x in v))\nprint(\"\\ncontrols\")\nfor r in ctrl:\n    print(r[\"D\"], \"T %.6e SD %d W %.4f ns/op %.3f fit %.5e ratio %.5f p %d\" % (r[\"T\"], r[\"SD\"], r[\"W\"], r[\"ns_per_op\"], r[\"fit\"], r[\"ratio\"], r[\"p\"]))\nprint(\"max dev\", R[\"controls_max_dev\"])\nprint(\"D12\", R[\"D12\"])\nprint(\"\\nchain dups\", R[\"chain_duplicates\"])\nfor r in cvf:\n    print(r)\nprint(\"\\nrunlog launch\", R[\"runlog_launch_lines\"], R[\"runlog_launch_sha_ok\"], \"cell lines\", R[\"runlog_cell_lines\"], \"mismatches\", R[\"runlog_cell_line_mismatches\"])\nif \"replay\" in R: print(\"\\nreplay\", R[\"replay\"])\n",
+ "replay_output_sha256": "cfd52714b93dff8c0ac5318c8c0d88f58a4b9bf4cfaee87abda0086ecce26e3d",
+ "not_validated": [
+  "REPORT.typ",
+  "REPORT.pdf",
+  "flat_exponent.svg/png rendering (figure.py read: it plots analysis.json values, which match the recomputation)",
+  "imported rho-distance statements (E10)",
+  "the wave-6 validation of 5abc70ba against dc2c30a4 (cited, not re-run; the exact chain/flat identity at m3 D19 and m4 D3, D7 is consistent with it)"
+ ]
+}
