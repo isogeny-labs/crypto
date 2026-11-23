@@ -1192,6 +1192,8 @@ impl FixedBase {
             affine_subspace: self.fb.affine_subspace.clone(),
             known_logs: self.fb.known_logs.clone(),
             frobenius_orbit_layout: self.fb.frobenius_orbit_layout,
+            generator_ladder: self.fb.generator_ladder.clone(),
+            negations_deferred: self.fb.negations_deferred,
         }
     }
 }

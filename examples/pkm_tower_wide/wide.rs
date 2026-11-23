@@ -515,6 +515,7 @@ fn dickson_torus<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::
             v,
             scale: f.one(),
             c,
+            velu: None,
             info: json!({"case": "torus", "d": s(f, d), "u": [s(f, u.0), s(f, u.1)],
                          "zeta": [s(f, zeta.0), s(f, zeta.1)], "c": s(f, c)}),
         };
