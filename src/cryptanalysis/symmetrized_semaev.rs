@@ -433,6 +433,623 @@ fn leading_sorted_monomial(f: &MPoly) -> (Vec<u32>, FieldElement) {
     best.unwrap_or_else(|| (vec![0; f.n_vars], FieldElement::zero(f.p.clone())))
 }
 
+// ── Curve-once X_R-power-split parametric elementary-symmetric S_{m+1} ──
+
+#[inline]
+fn add_u64(a: u64, b: u64, p: u64) -> u64 {
+    let s = a as u128 + b as u128;
+    if s >= p as u128 {
+        (s - p as u128) as u64
+    } else {
+        s as u64
+    }
+}
+
+#[inline]
+fn sub_u64(a: u64, b: u64, p: u64) -> u64 {
+    if a >= b {
+        a - b
+    } else {
+        p - (b - a)
+    }
+}
+
+#[inline]
+fn mul_u64(a: u64, b: u64, p: u64, mults: &mut u64) -> u64 {
+    *mults += 1;
+    ((a as u128 * b as u128) % p as u128) as u64
+}
+
+fn pow_u64(mut base: u64, mut exp: u64, p: u64, mults: &mut u64) -> u64 {
+    let mut acc = 1u64 % p;
+    base %= p;
+    while exp > 0 {
+        if exp & 1 == 1 {
+            acc = mul_u64(acc, base, p, mults);
+        }
+        exp >>= 1;
+        if exp > 0 {
+            base = mul_u64(base, base, p, mults);
+        }
+    }
+    acc
+}
+
+#[inline]
+fn inv_u64(a: u64, p: u64, mults: &mut u64) -> Option<u64> {
+    let a = a % p;
+    if a == 0 {
+        None
+    } else {
+        Some(pow_u64(a, p - 2, p, mults))
+    }
+}
+
+/// Coefficients `[c0, c1, c2]` of `S_3(x1, x2, U) = c2·U² + c1·U + c0` over `F_p`.
+#[inline]
+pub fn s3_quad_coeffs_u64(x1: u64, x2: u64, a: u64, b: u64, p: u64, mults: &mut u64) -> [u64; 3] {
+    let x1 = x1 % p;
+    let x2 = x2 % p;
+    let a = a % p;
+    let b = b % p;
+    let diff = sub_u64(x1, x2, p);
+    let c2 = mul_u64(diff, diff, p, mults);
+    let sum = add_u64(x1, x2, p);
+    let prod = mul_u64(x1, x2, p, mults);
+    let two_b = add_u64(b, b, p);
+    let inner = add_u64(mul_u64(sum, add_u64(prod, a, p), p, mults), two_b, p);
+    let c1 = sub_u64(0, add_u64(inner, inner, p), p);
+    let pm_a = sub_u64(prod, a, p);
+    let pm_a_sq = mul_u64(pm_a, pm_a, p, mults);
+    let four_b = add_u64(two_b, two_b, p);
+    let c0 = sub_u64(pm_a_sq, mul_u64(four_b, sum, p, mults), p);
+    [c0, c1, c2]
+}
+
+/// Exact evaluation of `S_3(x1, x2, x3) mod p`.
+pub fn eval_s3_u64(x1: u64, x2: u64, x3: u64, a: u64, b: u64, p: u64) -> u64 {
+    let mut mults = 0u64;
+    let [c0, c1, c2] = s3_quad_coeffs_u64(x1, x2, a, b, p, &mut mults);
+    let x3 = x3 % p;
+    let t = add_u64(mul_u64(c2, x3, p, &mut mults), c1, p);
+    add_u64(mul_u64(t, x3, p, &mut mults), c0, p)
+}
+
+/// Exact evaluation of `S_4(x1, x2, x3, x4) mod p` via the universal 4×4 Sylvester identity.
+pub fn eval_s4_u64(x1: u64, x2: u64, x3: u64, x4: u64, a: u64, b: u64, p: u64) -> u64 {
+    let mut mults = 0u64;
+    eval_s4_counted(x1, x2, x3, x4, a, b, p, &mut mults)
+}
+
+pub(crate) fn eval_s4_counted(
+    x1: u64,
+    x2: u64,
+    x3: u64,
+    x4: u64,
+    a: u64,
+    b: u64,
+    p: u64,
+    mults: &mut u64,
+) -> u64 {
+    let [p0, p1, p2] = s3_quad_coeffs_u64(x1, x2, a, b, p, mults);
+    let [q0, q1, q2] = s3_quad_coeffs_u64(x3, x4, a, b, p, mults);
+    let d02 = sub_u64(mul_u64(p2, q0, p, mults), mul_u64(p0, q2, p, mults), p);
+    let d12 = sub_u64(mul_u64(p2, q1, p, mults), mul_u64(p1, q2, p, mults), p);
+    let d01 = sub_u64(mul_u64(p1, q0, p, mults), mul_u64(p0, q1, p, mults), p);
+    sub_u64(mul_u64(d02, d02, p, mults), mul_u64(d12, d01, p, mults), p)
+}
+
+/// Degree-≤4 univariate polynomial `Q(U) = S_4(x3, x4, xr, U) = sum_{k=0..=4} q[k]·U^k`.
+fn s4_univariate_in_u(
+    x3: u64,
+    x4: u64,
+    xr: u64,
+    a: u64,
+    b: u64,
+    p: u64,
+    mults: &mut u64,
+) -> [u64; 5] {
+    let xr = xr % p;
+    let a = a % p;
+    let b = b % p;
+    let [a0, a1, a2] = s3_quad_coeffs_u64(x3, x4, a, b, p, mults);
+    // S_3(W, xr, U) as a quadratic in W with coefficients b2(U), b1(U), b0(U) of degree ≤ 2 in U:
+    // S_3(W, xr, U) = (U² - 2 xr U + xr² - 4b - 2a U) W² ... let's collect powers of W directly:
+    // S_3(W, xr, U) = (W - xr)² U² - 2[(W + xr)(W·xr + a) + 2b] U + (W·xr - a)² - 4b(W + xr)
+    //   = W²·[U² - 2 xr U + xr²]
+    //   + W ·[-2 xr U² - 2(xr² + a) U - 2 a xr - 4b]
+    //   + 1 ·[xr² U² - (2 a xr + 4b) U + a² - 4b xr].
+    let xr2 = mul_u64(xr, xr, p, mults);
+    let two_xr = add_u64(xr, xr, p);
+    let two_a = add_u64(a, a, p);
+    let two_b = add_u64(b, b, p);
+    let four_b = add_u64(two_b, two_b, p);
+    let two_a_xr = mul_u64(two_a, xr, p, mults);
+    let lin_const = add_u64(two_a_xr, four_b, p);
+
+    // b2(U) = 1·U² + (-2 xr)·U + xr²
+    let b2 = [xr2, sub_u64(0, two_xr, p), 1 % p];
+    // b1(U) = (-2 xr)·U² + (-2(xr² + a))·U + (-2a·xr - 4b)
+    let xr2_plus_a = add_u64(xr2, a, p);
+    let b1 = [
+        sub_u64(0, lin_const, p),
+        sub_u64(0, add_u64(xr2_plus_a, xr2_plus_a, p), p),
+        sub_u64(0, two_xr, p),
+    ];
+    // b0(U) = xr²·U² + (-2a·xr - 4b)·U + (a² - 4b·xr)
+    let a2_sq = mul_u64(a, a, p, mults);
+    let four_b_xr = mul_u64(four_b, xr, p, mults);
+    let b0 = [sub_u64(a2_sq, four_b_xr, p), sub_u64(0, lin_const, p), xr2];
+
+    let lin_comb = |c_left: u64, left: &[u64; 3], c_right: u64, right: &[u64; 3], m: &mut u64| {
+        let mut out = [0u64; 3];
+        for i in 0..3 {
+            out[i] = sub_u64(
+                mul_u64(c_left, left[i], p, m),
+                mul_u64(c_right, right[i], p, m),
+                p,
+            );
+        }
+        out
+    };
+    let mul_quad = |u: &[u64; 3], v: &[u64; 3], m: &mut u64| {
+        let mut out = [0u64; 5];
+        for i in 0..3 {
+            for j in 0..3 {
+                let prod = mul_u64(u[i], v[j], p, m);
+                out[i + j] = add_u64(out[i + j], prod, p);
+            }
+        }
+        out
+    };
+
+    let d02 = lin_comb(a2, &b0, a0, &b2, mults);
+    let d12 = lin_comb(a2, &b1, a1, &b2, mults);
+    let d01 = lin_comb(a1, &b0, a0, &b1, mults);
+    let sq = mul_quad(&d02, &d02, mults);
+    let pr = mul_quad(&d12, &d01, mults);
+    let mut out = [0u64; 5];
+    for i in 0..5 {
+        out[i] = sub_u64(sq[i], pr[i], p);
+    }
+    out
+}
+
+/// Exact evaluation of `S_5(x1, x2, x3, x4, x5) mod p` via `Res_{2,4,U}(S_3(x1,x2,U), S_4(x3,x4,x5,U))`.
+pub fn eval_s5_u64(x1: u64, x2: u64, x3: u64, x4: u64, x5: u64, a: u64, b: u64, p: u64) -> u64 {
+    let mut mults = 0u64;
+    eval_s5_counted(x1, x2, x3, x4, x5, a, b, p, &mut mults)
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn eval_s5_counted(
+    x1: u64,
+    x2: u64,
+    x3: u64,
+    x4: u64,
+    x5: u64,
+    a: u64,
+    b: u64,
+    p: u64,
+    mults: &mut u64,
+) -> u64 {
+    let [p0, p1, p2] = s3_quad_coeffs_u64(x1, x2, a, b, p, mults);
+    let q = s4_univariate_in_u(x3, x4, x5, a, b, p, mults);
+    if p2 != 0 {
+        // Division-free pseudo-remainder of degree-4 `q` by `p2·U² + p1·U + p0`:
+        // R(α_1)·R(α_2) = p2^3 · Res_{2,4}(P, Q) = p0·r1² - p1·r1·r0 + p2·r0².
+        let h3 = sub_u64(mul_u64(p2, q[3], p, mults), mul_u64(q[4], p1, p, mults), p);
+        let h2 = sub_u64(mul_u64(p2, q[2], p, mults), mul_u64(q[4], p0, p, mults), p);
+        let h1 = mul_u64(p2, q[1], p, mults);
+        let h0 = mul_u64(p2, q[0], p, mults);
+
+        let g2 = sub_u64(mul_u64(p2, h2, p, mults), mul_u64(h3, p1, p, mults), p);
+        let g1 = sub_u64(mul_u64(p2, h1, p, mults), mul_u64(h3, p0, p, mults), p);
+        let g0 = mul_u64(p2, h0, p, mults);
+
+        let r1 = sub_u64(mul_u64(p2, g1, p, mults), mul_u64(g2, p1, p, mults), p);
+        let r0 = sub_u64(mul_u64(p2, g0, p, mults), mul_u64(g2, p0, p, mults), p);
+
+        let t0 = mul_u64(p0, mul_u64(r1, r1, p, mults), p, mults);
+        let t1 = mul_u64(p1, mul_u64(r1, r0, p, mults), p, mults);
+        let t2 = mul_u64(p2, mul_u64(r0, r0, p, mults), p, mults);
+        let num = add_u64(sub_u64(t0, t1, p), t2, p);
+        let p2_cubed = mul_u64(p2, mul_u64(p2, p2, p, mults), p, mults);
+        let inv = inv_u64(p2_cubed, p, mults).expect("p2 != 0");
+        return mul_u64(num, inv, p, mults);
+    }
+    // Degenerate x1 == x2 (p2 == 0): exact 6×6 Sylvester determinant.
+    let mut mat = [[0u64; 6]; 6];
+    for r in 0..4 {
+        mat[r][r] = p2;
+        mat[r][r + 1] = p1;
+        mat[r][r + 2] = p0;
+    }
+    for r in 0..2 {
+        mat[4 + r][r] = q[4];
+        mat[4 + r][r + 1] = q[3];
+        mat[4 + r][r + 2] = q[2];
+        mat[4 + r][r + 3] = q[1];
+        mat[4 + r][r + 4] = q[0];
+    }
+    det6_mod(&mut mat, p, mults)
+}
+
+fn det6_mod(mat: &mut [[u64; 6]; 6], p: u64, mults: &mut u64) -> u64 {
+    let mut det = 1u64 % p;
+    for col in 0..6 {
+        let Some(piv) = (col..6).find(|&r| mat[r][col] != 0) else {
+            return 0;
+        };
+        if piv != col {
+            mat.swap(piv, col);
+            det = sub_u64(0, det, p);
+        }
+        let pv = mat[col][col];
+        det = mul_u64(det, pv, p, mults);
+        let inv = inv_u64(pv, p, mults).unwrap();
+        for r in (col + 1)..6 {
+            if mat[r][col] == 0 {
+                continue;
+            }
+            let factor = mul_u64(mat[r][col], inv, p, mults);
+            mat[r][col] = 0;
+            for c in (col + 1)..6 {
+                let sub = mul_u64(factor, mat[col][c], p, mults);
+                mat[r][c] = sub_u64(mat[r][c], sub, p);
+            }
+        }
+    }
+    det
+}
+
+/// Curve-once `X_R`-power-split parametric elementary-symmetric summation
+/// polynomial `\tilde S_{m+1}(e_1, …, e_m; X_R)` for `m ∈ {2, 3, 4}` (`ParamS3`,
+/// `ParamS4`, `ParamS5`) over `F_p` (`p < 2^62`).
+///
+/// Built once per curve (`y² = x³ + a·x + b`) in `prepare()` by simultaneous
+/// Schur–Vandermonde RREF over strictly increasing `m`-tuples and Lagrange/Vandermonde
+/// `X_R`-interpolation at `2^{m-1} + 1` nodes `X_R ∈ {0, …, 2^{m-1}}`.
+/// Specializing to any target `x_R ∈ F_p` then requires only `O(#active_monomials · 2^{m-1})`
+/// Horner multiplications (~1,700 mulmods for `m = 4` vs ~2.95M mulmods for per-target grid).
+#[derive(Clone, Debug)]
+pub struct ParamSymmetricSemaev {
+    pub m: usize,
+    pub p: u64,
+    pub xr_deg: usize,
+    /// Non-zero elementary-symmetric exponent vectors `[c1, c2, c3, c4]` (`c_j = 0` for `j >= m`),
+    /// satisfying `c1 + c2 + … + c_m ≤ 2^{m-1}`.
+    pub active_monos: Vec<[u8; 4]>,
+    /// For each entry in `active_monos`, its `X_R`-polynomial `[a_0, a_1, …, a_{xr_deg}]`
+    /// representing `sum_{k=0..=xr_deg} a_k · X_R^k`.
+    pub xr_polys: Vec<Vec<u64>>,
+    /// Exact `F_p` multiplications spent building this parametric representation.
+    pub setup_fp_mults: u64,
+}
+
+/// Alias matching the `ParamS5` naming in `research/pkm_priced_20261115`.
+pub type ParamS5 = ParamSymmetricSemaev;
+
+impl ParamSymmetricSemaev {
+    /// Precompute `\tilde S_{m+1}(e_1, …, e_m; X_R)` once for `(m, a, b, p)`.
+    pub fn build(m: usize, a: u64, b: u64, p: u64) -> Result<Self, String> {
+        if !(2..=4).contains(&m) {
+            return Err(format!(
+                "ParamSymmetricSemaev: m must be 2, 3 or 4, got {m}"
+            ));
+        }
+        let xr_deg = 1usize << (m - 1); // 2, 4, 8
+        let min_p = (xr_deg + m + 1) as u64;
+        if p < min_p {
+            return Err(format!(
+                "ParamSymmetricSemaev: prime p = {p} must be at least {min_p} for m = {m}"
+            ));
+        }
+        let mut mults = 0u64;
+        let a = a % p;
+        let b = b % p;
+
+        // Enumerate all e-exponent tuples `c[0..m]` with `sum(c) <= xr_deg`.
+        let monos = enumerate_e_monos(m, xr_deg as u8);
+        let n_monos = monos.len();
+
+        // Enumerate all strictly increasing m-tuples `0 <= v_0 < v_1 < ... < v_{m-1} < xr_deg + m`.
+        // By the multivariate symmetric Vandermonde theorem, there are `C(xr_deg + m, m) == n_monos`
+        // such tuples and the evaluation matrix `M[row, col] = prod_j e_j(v)^{c_j}` is non-singular
+        // over every field of characteristic `> xr_deg + m - 1`.
+        let pts = enumerate_increasing_tuples(m, xr_deg + m);
+        debug_assert_eq!(pts.len(), n_monos);
+
+        let n_nodes = xr_deg + 1;
+        let cols_total = n_monos + n_nodes;
+        let mut aug = vec![0u64; n_monos * cols_total];
+
+        for (row, v) in pts.iter().enumerate() {
+            let es = eval_elem_sym_tuple(v, p, &mut mults);
+            // Powers of each `e_j`: up to `xr_deg`.
+            let mut epow = [[1u64; 9]; 4];
+            for j in 0..m {
+                for k in 1..=xr_deg {
+                    epow[j][k] = mul_u64(epow[j][k - 1], es[j], p, &mut mults);
+                }
+            }
+            let base = row * cols_total;
+            for (col, c) in monos.iter().enumerate() {
+                let mut prod = 1u64;
+                for j in 0..m {
+                    let exp = c[j] as usize;
+                    if exp > 0 {
+                        prod = mul_u64(prod, epow[j][exp], p, &mut mults);
+                    }
+                }
+                aug[base + col] = prod;
+            }
+            for xr in 0..n_nodes {
+                let val = match m {
+                    2 => {
+                        let [c0, c1, c2] = s3_quad_coeffs_u64(v[0], v[1], a, b, p, &mut mults);
+                        let x = xr as u64;
+                        let t = add_u64(mul_u64(c2, x, p, &mut mults), c1, p);
+                        add_u64(mul_u64(t, x, p, &mut mults), c0, p)
+                    }
+                    3 => eval_s4_counted(v[0], v[1], v[2], xr as u64, a, b, p, &mut mults),
+                    4 => eval_s5_counted(v[0], v[1], v[2], v[3], xr as u64, a, b, p, &mut mults),
+                    _ => unreachable!(),
+                };
+                aug[base + n_monos + xr] = val;
+            }
+        }
+
+        // Simultaneous Gauss-Jordan RREF on `[M | Y_0 .. Y_{xr_deg}]` (`n_monos × (n_monos + n_nodes)`).
+        rref_multi_rhs(&mut aug, n_monos, cols_total, n_monos, p, &mut mults)?;
+
+        // Invert `(xr_deg + 1) × (xr_deg + 1)` Vandermonde at nodes `0, 1, …, xr_deg`
+        // to convert node values `[val(0), …, val(xr_deg)]` into `X_R`-power coefficients.
+        let v_inv = vandermonde_inv(n_nodes, p, &mut mults)?;
+
+        let mut active_monos = Vec::new();
+        let mut xr_polys = Vec::new();
+        for (idx, &mono) in monos.iter().enumerate() {
+            let row_vals = &aug[idx * cols_total + n_monos..idx * cols_total + cols_total];
+            if row_vals.iter().all(|&y| y == 0) {
+                continue;
+            }
+            let mut coeffs = vec![0u64; n_nodes];
+            for deg_k in 0..n_nodes {
+                let mut acc = 0u64;
+                for node_j in 0..n_nodes {
+                    if row_vals[node_j] != 0 {
+                        let t = mul_u64(
+                            v_inv[deg_k * n_nodes + node_j],
+                            row_vals[node_j],
+                            p,
+                            &mut mults,
+                        );
+                        acc = add_u64(acc, t, p);
+                    }
+                }
+                coeffs[deg_k] = acc;
+            }
+            if coeffs.iter().any(|&c| c != 0) {
+                active_monos.push(mono);
+                xr_polys.push(coeffs);
+            }
+        }
+
+        Ok(Self {
+            m,
+            p,
+            xr_deg,
+            active_monos,
+            xr_polys,
+            setup_fp_mults: mults,
+        })
+    }
+
+    /// Specialize `\tilde S_{m+1}(e_1, …, e_m; x_r)` at a concrete target `x_r ∈ F_p`
+    /// in `O(#active_monos · 2^{m-1})` scalar operations.
+    /// Returns `(non_zero_terms, fp_mults)`.
+    pub fn specialize(&self, x_r: u64) -> (Vec<([u8; 4], u64)>, u64) {
+        let p = self.p;
+        let x = x_r % p;
+        let mut mults = 0u64;
+        // Precompute `[1, x_r, x_r², …, x_r^{xr_deg}]` once (only `xr_deg - 1` mults!).
+        let mut xpow = [1u64; 9];
+        for k in 1..=self.xr_deg {
+            xpow[k] = mul_u64(xpow[k - 1], x, p, &mut mults);
+        }
+        let mut out = Vec::with_capacity(self.active_monos.len());
+        for (mono, poly) in self.active_monos.iter().zip(&self.xr_polys) {
+            let mut acc = poly[0] as u128;
+            for k in 1..=self.xr_deg {
+                let ck = poly[k];
+                if ck != 0 {
+                    mults += 1;
+                    acc += (ck as u128) * (xpow[k] as u128);
+                }
+            }
+            let val = (acc % p as u128) as u64;
+            if val != 0 {
+                out.push((*mono, val));
+            }
+        }
+        (out, mults)
+    }
+
+    /// Evaluate `\tilde S_{m+1}(e_1, …, e_m; x_r)` at scalar elementary-symmetric values `e[0..m]`.
+    pub fn eval_at_elem_sym(&self, e: &[u64], x_r: u64) -> u64 {
+        assert_eq!(e.len(), self.m);
+        let p = self.p;
+        let (terms, _) = self.specialize(x_r);
+        let mut mults = 0u64;
+        let mut epow = [[1u64; 9]; 4];
+        for j in 0..self.m {
+            let ej = e[j] % p;
+            for k in 1..=self.xr_deg {
+                epow[j][k] = mul_u64(epow[j][k - 1], ej, p, &mut mults);
+            }
+        }
+        let mut acc = 0u64;
+        for (mono, coef) in terms {
+            let mut t = coef;
+            for j in 0..self.m {
+                let exp = mono[j] as usize;
+                if exp > 0 {
+                    t = mul_u64(t, epow[j][exp], p, &mut mults);
+                }
+            }
+            acc = add_u64(acc, t, p);
+        }
+        acc
+    }
+}
+
+fn enumerate_e_monos(m: usize, max_sum: u8) -> Vec<[u8; 4]> {
+    let mut out = Vec::new();
+    let mut cur = [0u8; 4];
+    fn rec(pos: usize, m: usize, rem: u8, cur: &mut [u8; 4], out: &mut Vec<[u8; 4]>) {
+        if pos == m {
+            out.push(*cur);
+            return;
+        }
+        for c in 0..=rem {
+            cur[pos] = c;
+            rec(pos + 1, m, rem - c, cur, out);
+        }
+        cur[pos] = 0;
+    }
+    rec(0, m, max_sum, &mut cur, &mut out);
+    out
+}
+
+fn enumerate_increasing_tuples(m: usize, n_pool: usize) -> Vec<Vec<u64>> {
+    let mut out = Vec::new();
+    let mut cur = Vec::with_capacity(m);
+    fn rec(start: usize, m: usize, n_pool: usize, cur: &mut Vec<u64>, out: &mut Vec<Vec<u64>>) {
+        if cur.len() == m {
+            out.push(cur.clone());
+            return;
+        }
+        let need = m - cur.len();
+        for v in start..=(n_pool - need) {
+            cur.push(v as u64);
+            rec(v + 1, m, n_pool, cur, out);
+            cur.pop();
+        }
+    }
+    rec(0, m, n_pool, &mut cur, &mut out);
+    out
+}
+
+/// Elementary symmetric values `[e_1(v), …, e_m(v)] mod p` of `v` via `(T + v_0)…(T + v_{m-1})`.
+pub fn eval_elem_sym_tuple(v: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    let m = v.len();
+    let mut poly = vec![0u64; m + 1];
+    poly[0] = 1 % p;
+    for (step, &vj) in v.iter().enumerate() {
+        let vj = vj % p;
+        for k in (1..=step + 1).rev() {
+            let prod = mul_u64(poly[k - 1], vj, p, mults);
+            poly[k] = add_u64(poly[k], prod, p);
+        }
+    }
+    poly[1..=m].to_vec()
+}
+
+fn rref_multi_rhs(
+    aug: &mut [u64],
+    n_rows: usize,
+    n_cols: usize,
+    n_piv: usize,
+    p: u64,
+    mults: &mut u64,
+) -> Result<(), String> {
+    let can_lazy = (p as u128) < (1u128 << 46);
+    for col in 0..n_piv {
+        let piv = (col..n_rows)
+            .find(|&r| aug[r * n_cols + col] != 0)
+            .ok_or_else(|| {
+                format!("ParamSymmetricSemaev: singular interpolation matrix at col {col}")
+            })?;
+        if piv != col {
+            for c in col..n_cols {
+                aug.swap(piv * n_cols + c, col * n_cols + c);
+            }
+        }
+        let pv = aug[col * n_cols + col];
+        let inv = inv_u64(pv, p, mults).unwrap();
+        aug[col * n_cols + col] = 1;
+        for c in (col + 1)..n_cols {
+            if aug[col * n_cols + c] != 0 {
+                aug[col * n_cols + c] = mul_u64(aug[col * n_cols + c], inv, p, mults);
+            }
+        }
+        // Eliminate all other rows `r != col`.
+        if can_lazy {
+            let p128 = p as u128;
+            let p2 = p128 * p128;
+            for r in 0..n_rows {
+                if r == col {
+                    continue;
+                }
+                let factor = aug[r * n_cols + col];
+                if factor == 0 {
+                    continue;
+                }
+                aug[r * n_cols + col] = 0;
+                let f128 = factor as u128;
+                for c in (col + 1)..n_cols {
+                    let pc = aug[col * n_cols + c];
+                    if pc != 0 {
+                        *mults += 1;
+                        let cur = aug[r * n_cols + c] as u128 + p2 - f128 * (pc as u128);
+                        aug[r * n_cols + c] = (cur % p128) as u64;
+                    }
+                }
+            }
+        } else {
+            for r in 0..n_rows {
+                if r == col {
+                    continue;
+                }
+                let factor = aug[r * n_cols + col];
+                if factor == 0 {
+                    continue;
+                }
+                aug[r * n_cols + col] = 0;
+                for c in (col + 1)..n_cols {
+                    let pc = aug[col * n_cols + c];
+                    if pc != 0 {
+                        let sub = mul_u64(factor, pc, p, mults);
+                        aug[r * n_cols + c] = sub_u64(aug[r * n_cols + c], sub, p);
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+fn vandermonde_inv(n: usize, p: u64, mults: &mut u64) -> Result<Vec<u64>, String> {
+    let cols = 2 * n;
+    let mut aug = vec![0u64; n * cols];
+    for i in 0..n {
+        let mut pw = 1u64 % p;
+        let x = i as u64 % p;
+        for j in 0..n {
+            aug[i * cols + j] = pw;
+            pw = mul_u64(pw, x, p, mults);
+        }
+        aug[i * cols + n + i] = 1 % p;
+    }
+    rref_multi_rhs(&mut aug, n, cols, n, p, mults)?;
+    let mut inv = vec![0u64; n * n];
+    for i in 0..n {
+        inv[i * n..(i + 1) * n].copy_from_slice(&aug[i * cols + n..i * cols + cols]);
+    }
+    Ok(inv)
+}
+
 // ── Tests ───────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -559,5 +1176,99 @@ mod tests {
             n_sym,
             n_xs
         );
+    }
+
+    #[test]
+    fn param_symmetric_semaev_m2_m3_m4_exact_identities() {
+        // Test over a 31-bit prime M31 = 2^31 - 1 and a small prime p = 1009.
+        for &(p, a, b) in &[(1009u64, 7u64, 13u64), (2_147_483_647u64, 2_147_483_644, 5)] {
+            let ps3 = ParamSymmetricSemaev::build(2, a, b, p).expect("ParamS3");
+            let ps4 = ParamSymmetricSemaev::build(3, a, b, p).expect("ParamS4");
+            let ps5 = ParamS5::build(4, a, b, p).expect("ParamS5");
+            assert!(ps5.active_monos.len() <= 495);
+
+            // Check per-target specialization cost of ParamS5: O(1) (~few thousand mulmods),
+            // instead of ~2.48M–2.95M mulmods for grid interpolation.
+            let (_, spec_mults) = ps5.specialize(123_456_789 % p);
+            assert!(
+                spec_mults < 4_500,
+                "ParamS5 per-target specialization took {spec_mults} mulmods"
+            );
+
+            // Verify exact polynomial identity on 64 pseudo-random tuples (including repeated coordinates!).
+            let mut state = 0x9e37_79b9_7f4a_7c15u64 ^ p;
+            let mut next = || {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                (state >> 16) % p
+            };
+            for t in 0..64 {
+                let x1 = next();
+                let x2 = if t % 8 == 0 { x1 } else { next() };
+                let x3 = if t % 11 == 0 { x2 } else { next() };
+                let x4 = next();
+                let xr = next();
+                let mut m_tmp = 0u64;
+
+                let e2 = eval_elem_sym_tuple(&[x1, x2], p, &mut m_tmp);
+                assert_eq!(
+                    ps3.eval_at_elem_sym(&e2, xr),
+                    eval_s3_u64(x1, x2, xr, a, b, p),
+                    "ParamS3 mismatch at p={p}, t={t}"
+                );
+
+                let e3 = eval_elem_sym_tuple(&[x1, x2, x3], p, &mut m_tmp);
+                assert_eq!(
+                    ps4.eval_at_elem_sym(&e3, xr),
+                    eval_s4_u64(x1, x2, x3, xr, a, b, p),
+                    "ParamS4 mismatch at p={p}, t={t}"
+                );
+
+                let e4 = eval_elem_sym_tuple(&[x1, x2, x3, x4], p, &mut m_tmp);
+                assert_eq!(
+                    ps5.eval_at_elem_sym(&e4, xr),
+                    eval_s5_u64(x1, x2, x3, x4, xr, a, b, p),
+                    "ParamS5 mismatch at p={p}, t={t}"
+                );
+            }
+        }
+
+        // Verify ParamS5 vanishes on true 5-point curve relations P1 + P2 + P3 + P4 = R on E(F_1009).
+        use crate::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
+        let curve = PrimeCurve {
+            p: 1009,
+            a: 7,
+            b: 13,
+        };
+        let ps5 = ParamS5::build(4, curve.a, curve.b, curve.p).unwrap();
+        let mut pts = Vec::new();
+        for x in 1..80u64 {
+            if let Some(y) = curve.sqrt(curve.rhs(x)) {
+                if y != 0 {
+                    pts.push(PrimePoint::affine(x, y));
+                }
+            }
+        }
+        let mut ops = GroupOps::default();
+        for k in 0..10 {
+            let p1 = pts[k];
+            let p2 = pts[k + 3];
+            let p3 = pts[k + 7];
+            let p4 = pts[k + 11];
+            let s12 = curve.add(&mut ops, p1, p2);
+            let s123 = curve.add(&mut ops, s12, p3);
+            let r = curve.add(&mut ops, s123, p4);
+            if s12.infinity || s123.infinity || r.infinity {
+                continue;
+            }
+            let mut m_tmp = 0u64;
+            let e4 = eval_elem_sym_tuple(&[p1.x, p2.x, p3.x, p4.x], curve.p, &mut m_tmp);
+            assert_eq!(
+                ps5.eval_at_elem_sym(&e4, r.x),
+                0,
+                "ParamS5 must vanish on P1+P2+P3+P4 = R"
+            );
+        }
     }
 }

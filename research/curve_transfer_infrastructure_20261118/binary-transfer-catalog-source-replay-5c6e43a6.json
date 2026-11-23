@@ -1,0 +1,133 @@
+{
+  "schema_version": "binary-subgroup-transfer-source-verification/v1",
+  "status": "producer_source_digest_bound_to_recorded_git_tree",
+  "corpus": {
+    "schema_version": "binary-subgroup-transfer-certificates/v1",
+    "bytes": 500924,
+    "sha256": "a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392"
+  },
+  "producer_commit": "5c6e43a6f0cffe0afc4c962ff54056716cf6437e",
+  "source_sha256": "e7a12f60c219624b2442bb54a79bb114ad8c89cfd1d33f6f0ca4643af7bae7dd",
+  "source_digest_encoding": "u64be(path_utf8_bytes)||path_utf8||u64be(content_utf8_bytes)||content_utf8, repeated in source-path order",
+  "source_files_checked": 21,
+  "source_files": [
+    {
+      "path": "src/bin/curve_cover_check/checker.rs",
+      "bytes": 25144,
+      "sha256": "b4e8391ec7dfc2cf853a67882d38028f13398429a79d3cc16ad9272f8c1d6101"
+    },
+    {
+      "path": "src/bin/curve_cover_check/links.rs",
+      "bytes": 10238,
+      "sha256": "d08702aadd17a28be50e3a5d2c004497f086502ce8a5ebb37064d2124b0ba374"
+    },
+    {
+      "path": "src/bin/curve_cover_check/models.rs",
+      "bytes": 4253,
+      "sha256": "2a8569ac5b33d55d1fa312f1da0be3b49578ff916dc8cccd41561ad3c25d8f5d"
+    },
+    {
+      "path": "src/bin/hyperelliptic_cover.rs",
+      "bytes": 180182,
+      "sha256": "7721374da2b7cc12a7b8d4bf996437c4fdae744af6ca8c47ecd4d2b6aeebdb39"
+    },
+    {
+      "path": "src/binary_ecc/cover_transfer.rs",
+      "bytes": 113022,
+      "sha256": "e1336ef5e5fb6ab32d58be956e72a8732adc43aca30d46a4f8ce45b03cdcdad5"
+    },
+    {
+      "path": "src/binary_ecc/curve.rs",
+      "bytes": 65468,
+      "sha256": "936e2061e4c51ee91b7afef8e3ef4fdb2b82fa5b48b988d9001cc958f05310e9"
+    },
+    {
+      "path": "src/binary_ecc/f2m.rs",
+      "bytes": 64976,
+      "sha256": "dcf5cbe5632ec4de0dd171fdf1aee24d721e849fcc46e35b3533ac79f5397ee5"
+    },
+    {
+      "path": "src/binary_ecc/hyperelliptic.rs",
+      "bytes": 69991,
+      "sha256": "816d2316e80b74220b912ff0c3cfc8d1173d67aacc945fff4a2e63c5afa59c15"
+    },
+    {
+      "path": "src/binary_ecc/mod.rs",
+      "bytes": 3850,
+      "sha256": "22668e7636d35b175c80505307d40cae32f1a1b1e8bec9b1c0239bebb11b3d51"
+    },
+    {
+      "path": "src/binary_ecc/operation_tally.rs",
+      "bytes": 3717,
+      "sha256": "1686c137a5f460ed4a5e8bd473c5ca61e73c6073e8777bf8ce3c0e39f523c5e1"
+    },
+    {
+      "path": "src/binary_ecc/poly_f2m.rs",
+      "bytes": 18982,
+      "sha256": "4d76cd2e1fefe1a0decc2b118b12b896577e1fed30c9ee37fece6104487ce55c"
+    },
+    {
+      "path": "src/cryptanalysis/ecc2k130_guard.rs",
+      "bytes": 79863,
+      "sha256": "135469db8e5f11ffd950c24a1a840883b5a96b84659ed1b3f3c3a80b8e2c6b4f"
+    },
+    {
+      "path": "src/cryptanalysis/group_op_count.rs",
+      "bytes": 12038,
+      "sha256": "db89aa329c17ad37faf723efc92c80030df0367f51c82c01a64906c9ba36e0e3"
+    },
+    {
+      "path": "src/prime_hyperelliptic/fp2.rs",
+      "bytes": 12739,
+      "sha256": "b833bdff5247f2eea0cde7feb89d0378cfe8305671f9065d2dae7ab538c03e55"
+    },
+    {
+      "path": "src/prime_hyperelliptic/mod.rs",
+      "bytes": 4645,
+      "sha256": "e199bbc9bd33e6df119f4f71a153737f7bdf6e1da3303fc702f6347a4a8e6766"
+    },
+    {
+      "path": "src/prime_hyperelliptic/primality.rs",
+      "bytes": 8218,
+      "sha256": "3b055ac166717960963e4e80b7d75eaba6c1681a7bc2e7ddfbb0d4af4d5aaf1c"
+    },
+    {
+      "path": "src/hash/sha256.rs",
+      "bytes": 18239,
+      "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+    },
+    {
+      "path": "src/utils/mod.rs",
+      "bytes": 17812,
+      "sha256": "f2e3414962f6a06fbacacae5b01ba020fa95d6cf05074a256ed70d8522619400"
+    },
+    {
+      "path": "docs/curves/binary-subgroup-transfer-certificates.schema.json",
+      "bytes": 17678,
+      "sha256": "00ffc04318b3b826769e9a1fc697eb5d62662e2bb7c6707808f9084487787053"
+    },
+    {
+      "path": "Cargo.toml",
+      "bytes": 20554,
+      "sha256": "c10489f74b7db80cf9bc9889bfed6d58637a9db6ae4ae90f40b8faae1cd6a9b3"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 65445,
+      "sha256": "430a56316353412d28492dc9e3f9d77bd6e1243442c663a5dcbea6b5028e46ba"
+    }
+  ],
+  "verifier": {
+    "path": "scripts/verify_binary_transfer_source.mjs",
+    "sha256": "64e09943c4a2be2508485325fcafa3dfa3d2dc27614db149270c2b5b1894e245"
+  },
+  "checks": {
+    "corpus_schema_and_producer_metadata_valid": true,
+    "commit_object_resolved": true,
+    "producer_source_path_list_matches_verifier": true,
+    "all_source_blobs_utf8": true,
+    "individual_source_hashes_computed": true,
+    "framed_source_digest_equal": true
+  },
+  "claim_boundary": "this repository-mode check binds the binary corpus's saved producer source digest and reviewed 21-path closure to blobs in the recorded Git commit; it does not attest that an executable was built from that commit, independently verify cover, Jacobian, transfer, or subgroup arithmetic, provide signed PCC standing, or establish a solver or computational advantage"
+}

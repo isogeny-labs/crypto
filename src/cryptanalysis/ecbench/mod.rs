@@ -11,6 +11,7 @@
 //! | [`canonical`] | canonical JSON, SHA-256 identities, derived seeds |
 //! | [`workload`] | curve constructions → ICV1-named single-target workloads |
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
+//! | [`panel`] | the canonical 20/30/60/80-bit cross-family curve ladder |
 //! | [`oracle`] | the static Diffie-Hellman oracle: Cheon's auxiliary inputs as a counted, separately priced resource |
 //! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
@@ -103,6 +104,7 @@ pub mod negation_strong;
 pub mod optimization;
 pub mod oracle;
 pub mod orbit_ic;
+pub mod panel;
 pub mod plane_quartic;
 pub mod prime_orbit;
 pub mod record;

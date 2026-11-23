@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T18:52:53Z",
+ "id": "PCC-20261119-487eb4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "3ec231abdd97f277aa103b9acec8fc4304596e60",
+  "model": "Codex",
+  "session": "division-polynomial-parity-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "18ff0ba0df95634a17ff4a32dc64ae641401242775bd51b7220577dd6838c8ba",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.divisionPolynomialSq_ne_zero_at_const_mul_transcendental"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This is the parity-correct algebraicity and transcendence endpoint. The auxiliary pre\u03a8 polynomial is insufficient at even indices, as the separately checked index-two obstruction shows. This claim does not prove the still-missing group-law implication that scalar torsion forces \u03a8Sq to vanish, nor any subexponential ECDLP runtime theorem.",
+ "statement": "For a Weierstrass curve over a constant field, a nonzero-index full squared division polynomial \u03a8Sq cannot vanish at a nonzero constant multiple of a transcendental element in a field extension."
+}
