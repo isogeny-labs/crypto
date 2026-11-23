@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-20T18:41:48Z",
+ "id": "PCC-20261120-3ec0e9",
+ "kind": "measurement",
+ "producer": {
+  "commit": "5f6b97f2041111efe4380ba0fcea3773dd8de27f",
+  "model": "Composer",
+  "session": "pr-4841"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/floor_crater_ecdlp_gap_20261120/results/ell8209_rho_retest_crater_vs_floor.md",
+    "sha256": "065b6d17fd6875624173fd334385df2a418a5cb779f333231e28b521154f33be"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/floor_crater_ecdlp_gap_20261120/results/ell8209_rho_retest_audit.json",
+    "sha256": "a9a09fa7a4acde775595890c54352814594ac7ed98e2ef5b236c57508796f9e7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/floor_crater_ecdlp_gap_20261120/sessions/ell8209_q29_rho_retest_20261120/audit.json",
+    "sha256": "4f9c134dad110df6d16947200285754b6e8132e581c4d205864fd86d0d90124c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/floor_crater_ecdlp_gap_20261120/sessions/ell8209_q29_rho_retest_20261120/table.txt",
+    "sha256": "0b3abab62a1964fda198e3950f81959fe10916bb70e1e0de87ec2d35a062f13d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/floor_crater_ecdlp_gap_20261120/results/bridge_cost.json",
+    "sha256": "9c82e166876e4d58774302666a67851a61681f58695f6feb75fe873092c84bd7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/floor_crater_ecdlp_gap_20261120/results/bridge_cost.md",
+    "sha256": "aff839a5eb24cc33b35c08ccbbe25255a4edf1f23650a66a6dfd23664735af05"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Certified -19 CM pairs; ecbench L0 rho retest \u2113=8209 seed 20261120; known-kernel V\u00e9lu OpCounts. Unsigned producer artifacts; standing unverified.",
+ "statement": "Matched floor vs crater ECDLP: on \u2113=8209 with fresh measurement seed 20261120, rho-neg and rho-neg-aa floor/crater ratios are both 1.055 with 95% bootstrap [0.943, 1.198] (16 crater + 48 floor workloads, 768/768 verified, audit OK), so the CI includes 1 and does not see a conductor gap. Known-kernel V\u00e9lu bridge costs on the certified pairs are 2134, 65710, 1048858 multiplications for \u2113 in {263,8209,131101}, i.e. C_bridge/\u221aN \u2248 3.65\u20133.67. Solver S\u22481 while bridge \u226b \u221aN at these sizes."
+}

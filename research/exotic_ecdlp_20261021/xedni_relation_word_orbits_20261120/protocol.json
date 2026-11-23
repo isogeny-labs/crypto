@@ -1,0 +1,14 @@
+{
+  "schema": "xedni-relation-word-orbits-protocol-v1",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "arithmetic_source_sha256": "1605edd1e877873111b992a297760f9a7dd451ee391394262925646bf107fe4a",
+  "curve": {"field_prime": 47, "a1": 0, "a2": 0, "a3": 0, "a4": 46, "a6": 45, "group_order": 43},
+  "input_law": "optimistic upper envelope: for every nonidentity Q in E(F47), include the row P+2Q=0 with P=-2Q exactly once, whether or not a rational lift was constructed",
+  "factor_base": "all 42 nonidentity E(F47) points, folded into 21 sign orbits",
+  "row_modulus": 43,
+  "orbit_rule": "iterate doubling on sign-orbit representatives; report all cycles and the rank of each cycle block",
+  "checks": "enumerate the full finite curve, map all 42 rows to the frozen source-pair law, verify group relations, exact sign-folded matrix, cycle partition, modular rank, and independent accepted-Sage replay",
+  "expected_rows": 42,
+  "resource": "complete finite algebraic upper-envelope diagnostic; no timing or speedup comparison",
+  "claim_boundary": "rank ceiling for the fixed curve, full-base sign quotient, and P+2Q relation word; additional relation words or target-dependent group operations lie outside this row space"
+}

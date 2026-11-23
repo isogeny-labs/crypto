@@ -1,8 +1,4 @@
-# ./validate_command_request.sh runpod_capped/requests_m112/*.json requests_r2i/pfd-x-t14-k0-c6.json requests_r2i/pfd-x-t14-k1-c6.json requests_r2i/pfd-x-t13-k0-c6.json (run from the study directory, 2026-11-15T00:29:21Z). A first run reported the three -m112 requests INVALID: the appended provenance note made it 2,088 characters, over the validator's 2,048 limit; the sentence was shortened in common.sh m112_request and the requests regenerated.
+# ./validate_command_request.sh runpod_capped/requests_m112/pfd-x-t14-k0-c7-m112.json requests_r2i/pfd-x-t14-k0-c6.json (run from the study directory, 2026-11-21T20:10:15Z; Amendment 33). The cap-6 -m112 requests of draft Amendment 18 were removed with their study names.
 validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines
-VALID    runpod_capped/requests_m112/pfd-x-t13-k0-c6-m112.json
-VALID    runpod_capped/requests_m112/pfd-x-t14-k0-c6-m112.json
-VALID    runpod_capped/requests_m112/pfd-x-t14-k1-c6-m112.json
+VALID    runpod_capped/requests_m112/pfd-x-t14-k0-c7-m112.json
 VALID    requests_r2i/pfd-x-t14-k0-c6.json
-VALID    requests_r2i/pfd-x-t14-k1-c6.json
-VALID    requests_r2i/pfd-x-t13-k0-c6.json

@@ -32,7 +32,7 @@ Every figure is `[pcc:unverified]`. Paths are relative to `research/pkm_falldegr
 - Pod times are measured from `progress.txt` / the RESULTS files / `SPOT_LOSSES.md` / `STAGE_B_LOST.md`. For lost jobs the pod-killed time is from the EKS audit log as cited there.
 - Amendment 12's cost guard readings exist only for `pfd-b-20261109-r1` (`receipts/BR/price-guard/start.json`, `check-20261109T2340Z.json`). No other EKS job has a `price-guard/` directory (the guard was frozen 2026-11-09 and the other jobs ran before it or were not read; Y-jobs: `SPOT_LOSSES.md:31` 'no price was read').
 - `state`: all EKS rows closed (jobs ended, succeeded, failed or lost); `pfd-b-rp` open. The Spot losses (rows `pfd-b-20261108`, `pfd-b-20261109-r1`, `pfd-x-t13-k0-c6-20261108`, `-r1`, `-r2`) are included.
-- RunPod dev smokes: rows copied from the current `runpod_capped/ledger.tsv:8-9` with their `cost.json` evidence verified (1.04 x 47 s = 0.0136; 1.04 x 188 s = 0.0543).
+- RunPod dev smokes: rows copied from the current `runpod_capped/ledger.tsv:8-9` with their `cost.json` evidence checked (1.04 x 47 s = 0.0136; 1.04 x 188 s = 0.0543).
 - No `.run/` supervisor directory exists in this checkout (`find /home/user/crypto -maxdepth 4 -name .run` is empty); supervisor records are `cards/*.run` and `receipts/*/pool-check/*.supervisor.log`, which carry no cost.
 
 ## 3. Items considered and not in the sum
@@ -51,3 +51,42 @@ Every figure is `[pcc:unverified]`. Paths are relative to `research/pkm_falldegr
 - The 24 h freshness line is left `never`; set `complete_as_of` only after reviewing rows, the open `pfd-b-rp` row, and whether further RunPod pods of the study (R3 decisive cells) exist.
 - A `closed` EKS row carries a bound, not an invoice; the launcher's own convention ('actual or best derived when closed') is met by 'derived', but the rows are conservative by design. Replace with measured spend if an AWS Cost Explorer reading by job tag is available.
 - Whole draft vs launcher: the file passes `ledger_sum`'s awk check (6 tab fields, state open/closed, numeric usd).
+
+## 5. Update of 2026-11-21 (Amendment 33 port)
+
+Owner decision 21 sets the guard US$510 and the ceiling US$540. The update replaces rows 1, 2 and 18 above and adds rows;
+the EKS rows (3-17) are unchanged. Every figure is `[pcc:unverified]`.
+
+- **Measured RunPod rows.** `billing_v2_20261121.tsv` holds RunPod's own billing per pod, read-only
+  `GET https://api.runpod.io/v2/billing/pods` for 2026-11-14 to 2026-11-22 in daily buckets, summed per pod
+  (`totalAmount`). The account is shared with other studies (180 pods billed in that window), so only pods whose id
+  appears in a study file are listed; the file names that file for each pod. Rows 1 and 2 (the two development smokes)
+  now carry the billed figures (0.0141, 0.0541) instead of the derived ones, and row 18 (`pfd-b-rp`, open at the
+  US$40 cap) is closed at its billed 13.0428.
+- **The Amendment 31 batch (PREREGISTRATION.md Amendment 32: US$370.84).** Eight rows: route F `pfd-x-t14-k0-c7-m112-rp`
+  (`z8etqr6jgg6jlh`) 63.4011 and `pfd-x-t14-k1-c7-m112-rp` (`vj7gjatk8lm6le`) 63.4016; route C `pfd-m2c-t14-k0-rp`
+  (`6m8yac6n96khdv`) 63.4019 and `pfd-m2c-t14-k1-rp` (`yzyabb71rh7n5e`) 53.6615; validation `pfd-m2c-t12-k0-rp`,
+  `-t12-k1-`, `-t13-k0-`, `-t13-k1-` 31.7438, 31.7440, 31.7442, 31.7443. Sum 370.8424, equal to Amendment 32's figure.
+  The pod ids come from `results/SNAPSHOT_20261117/<job>/snapshot.json`.
+- **Spend before Amendment 31 ("about US$95", Amendment 32).** Itemised here: the EKS rows (19.3324) and 31 billed
+  RunPod pods named in study files (43.9962 with the smokes and `pfd-b-rp`). Names marked "inferred" in the billing
+  file: `ta5f081df7skpe` and `1tvdt8uv14lpm9` are the cap 7 attempt 2 pods per the 2026-11-15 session log ("t = 14 cap
+  7 (draws 0, 1) running on pods ta5f081df7skpe and 1tvdt8uv14lpm9"); `t0bqkj2h4g2dgo` and `y8dxu6qiiykumx` are the
+  two pods `results/RUNPOD_LOSSES_20261115.md` saw billed but not created by that session, probably the other
+  session's study pods of that morning. The row `a32-remainder/unitemised` (31.6714) brings the pre-Amendment-31 total
+  to Amendment 32's US$95: it stands in for the pods of this study whose ids are in no study file (UNKNOWN-4 in the
+  ledger). With it the ledger sum is 465.8424, Amendment 32's "about US$466".
+- **UNKNOWN-5 (two snapshot pods), as it stood at this update.** `bdr-growthlaw` (billed 35.7037) and
+  `pkm-dense-rerun-20261115` (37.2565) were listed by the 2026-11-17 snapshot among the pods "of this study" and were
+  not rows. Settled by owner decision 27 below.
+- **Check at this update.** `ledger_sum` 465.8424; this route's worst case 31.2000 (1.04 x 30 h); 497.0424 <= 510.
+- **Owner decision 24 (2026-11-21, later the same day).** The guard is US$535 and the ceiling US$540; the per-job cap
+  is US$65. With the ledger unchanged at 465.8424 and the new job's worst case 2.08 × 30 = 62.40, the check is
+  528.2424 <= 535. With the UNKNOWN-5 pods counted it would be 601.20, above both.
+- **Smoke3 (2026-11-21).** The third development smoke closed its own row at 0.0896 (`receipts_dev/pkm-x-dev-smoke3/
+  cost.json`); the sum became 465.9320.
+- **Owner decision 27 (2026-11-21, about 23:00Z).** `pkm-dense-rerun-20261115` (`bjs0g3ugkgvx3c`, billed 37.2565) is a
+  closed row, counted as this study. `bdr-growthlaw` stays outside: another study (`docs/session-logs/2026-11-15.md:4536`
+  launched it under the benchmark record `20261115T1952Z-growth-law-cells-rerun`; review 4 M3). Study ceiling US$600,
+  guard US$595, per-job cap US$65. Ledger sum 503.1885; the job's worst case is 2.08 × 30.8 h = 64.0640 (review 4 M5f);
+  503.1885 + 64.0640 = 567.2525 <= 595.
