@@ -38,3 +38,10 @@ A next authorized measurement should replay exactly the same natural two-LP rela
 - Prior [cryptanalysis k=3 graph results](https://github.com/isogeny-labs/cryptanalysis/blob/f9c7b49e770212c24e29ca5c87e202e2aa6e8493/docs/ic/gaudry-gain-forest-harvester-20261122/RESULTS.md) describe a different field/graph family; no performance transfer is assumed.
 - Sources checked (KB): dedicated research-KB and conductor functions were not present in this runtime. The wrapper was unavailable without a checkout. Used the merged catalog, exact live GitHub Rust source and tests, the sibling research receipt and referenced primary algorithm analysis instead. No novelty or completeness claim.
 - Runtime: no local `rustc`, `cargo`, `gh` or `conductor`; GitHub's source-exact Actions workflow is the bounded native gate. A passing wrapper does not establish a root-crate build or independent PCC.
+
+
+## Executed source-exact native gate — 2026-11-23 08:47 UTC
+
+[GitHub Actions run **45141218801**](https://github.com/isogeny-labs/crypto/actions/runs/45141218801), job 137579407581, **SUCCESS**, original-source Rust integration harness **23/23 passed**, zero failures, release profile, Rust 1.100.0. The job used pull-request merge checkout `f3a5540cbb` of source head `4a11cd93926b65418d68575f74809a849347c9ce` into base `816f9c3a942efed569049618c056d12a0c56d693`. Source SHA256: `src/cryptanalysis/large_prime_graph/witness.rs=a4e88bbc9adcbaab694fd0ffb5e1b2e19dc8bbf84e96d76071c7da02bdbf3f35`; `tests/large_prime_graph.rs=a498e261785aaaf710a6a36e5f311a0ee2f8a42ac2619ac3418898692d4af9d7`. The new `forest_witness_parent_paths_survive_small_component_reroots` and all existing rank/replay and pivot-projection tests passed. The later doc/session-log commits changed neither production module nor test blob.
+
+This receipt verifies compiled source-exact *module-level* correctness on synthetic inputs and independent Rust helper replay; it does not verify the unshimmed root crate, a full authentic Prime31 collector stream, same-stream comparative running times, a PCC-signed proof or complete solver performance. [pcc:unverified]
