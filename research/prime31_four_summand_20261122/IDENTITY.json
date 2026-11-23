@@ -1,0 +1,536 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h16239a628042ecea",
+  "statement": {
+    "name": "RR5 norm factorization with target on curve",
+    "source": "research/prime31_four_summand_20261122/MATHEMATICS.md; native/extractor.rs::system",
+    "variables": [
+      "X",
+      "r",
+      "s",
+      "A",
+      "b",
+      "c",
+      "d"
+    ],
+    "degree_bound": 6,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "X"
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "A"
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "s"
+                        },
+                        {
+                          "op": "var",
+                          "args": "s"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "r"
+                          },
+                          {
+                            "op": "var",
+                            "args": "r"
+                          },
+                          {
+                            "op": "var",
+                            "args": "r"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "A"
+                          },
+                          {
+                            "op": "var",
+                            "args": "r"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "X"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "X"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "s"
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "X"
+                          },
+                          {
+                            "op": "var",
+                            "args": "b"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "X"
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "r"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "c"
+                              },
+                              {
+                                "op": "var",
+                                "args": "X"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "var",
+                            "args": "d"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "s"
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "X"
+                          },
+                          {
+                            "op": "var",
+                            "args": "b"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "X"
+                          },
+                          {
+                            "op": "neg",
+                            "args": {
+                              "op": "var",
+                              "args": "r"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "c"
+                              },
+                              {
+                                "op": "var",
+                                "args": "X"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "var",
+                            "args": "d"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "r"
+              }
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "X"
+                        },
+                        {
+                          "op": "var",
+                          "args": "X"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "r"
+                        },
+                        {
+                          "op": "var",
+                          "args": "X"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "r"
+                        },
+                        {
+                          "op": "var",
+                          "args": "r"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "var",
+                      "args": "A"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "X"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "X"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "X"
+                      },
+                      {
+                        "op": "neg",
+                        "args": {
+                          "op": "var",
+                          "args": "r"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "c"
+                              },
+                              {
+                                "op": "var",
+                                "args": "X"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "var",
+                            "args": "d"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "c"
+                              },
+                              {
+                                "op": "var",
+                                "args": "X"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "var",
+                            "args": "d"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "const",
+                    "args": 2
+                  },
+                  {
+                    "op": "var",
+                    "args": "s"
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "c"
+                          },
+                          {
+                            "op": "var",
+                            "args": "X"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "d"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "X"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 5931862342567740209,
+  "value_digest": "2d0ee373171eb15eeaf2a902df958be61d1607cdb5b0c234b1ef954a9ea2d48f",
+  "independence": "Same-team producer execution with an additional deterministic checker seed; unsigned evaluated evidence, no formal proof or independent verifier.",
+  "proof": null
+}

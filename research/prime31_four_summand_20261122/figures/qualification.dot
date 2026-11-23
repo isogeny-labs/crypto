@@ -1,0 +1,35 @@
+digraph Qualification {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", fontsize=13,
+         label="RR5 correctness qualification · 22 November 2026", labelloc=t,
+         pad=0.18, nodesep=0.28, ranksep=0.35, compound=true];
+  node [shape=box, style="rounded,filled", color="#A8BBC7", fillcolor="#F4F7F9",
+        fontname="DejaVu Sans", fontsize=10, margin="0.14,0.10"];
+  edge [color="#6B8090", arrowsize=0.65, fontname="DejaVu Sans", fontsize=9];
+
+  subgraph cluster_extraction {
+    label="Prime31 B8 · one positive and one empty control";
+    color="#B8CBD6"; style=rounded;
+    public [label="Same public curve, eight base points and targets\nSame degree, time, output and memory limits", fillcolor="#E8F1F5"];
+    expanded [label="Expanded remainder\n4 equations · 3 variables\n319 terms · degree 10", fillcolor="#FFF2D9", color="#CEAC63"];
+    compact [label="Monic quotient product U·W = h\n8 equations · 7 variables\n99 terms · degree 3", fillcolor="#E7F2EE", color="#74A995"];
+    refused [label="Both controls incomplete\nNo univariate; field scan refused", fillcolor="#FFF2D9", color="#CEAC63"];
+    passed [label="Both controls complete\nPositive: exact signed row\nEmpty: no chart row", fillcolor="#E7F2EE", color="#74A995"];
+    public -> expanded; public -> compact;
+    expanded -> refused; compact -> passed;
+    {rank=same; expanded; compact;}
+    {rank=same; refused; passed;}
+  }
+
+  subgraph cluster_integration {
+    label="Separate B4 extraction-to-adapter controls";
+    color="#B8CBD6"; style=rounded;
+    rows [label="Actual extracted signed rows\nPoint sum and public RHS replayed", fillcolor="#E8F1F5"];
+    rank [label="Exact modular rank\nReject false RHS/signs; deduplicate opposite rows"];
+    f11 [label="F11 control\nScalar 3 recovered at rank 2\nFinal rank 3; independent replay", fillcolor="#E7F2EE", color="#74A995"];
+    prime [label="Prime31 control\nRank 1\nTarget scalar remains undetermined", fillcolor="#F4F7F9"];
+    rows -> rank; rank -> f11; rank -> prime;
+    {rank=same; f11; prime;}
+  }
+  passed -> rows [style=invis];
+  refused -> rows [style=invis];
+}
