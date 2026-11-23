@@ -1,0 +1,75 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Phase 1 qualification: cold single-target K1-23 IC versus counted matched rho",
+  "description": "Qualification cell for research/ecbench_phase1_e2e_20261118. Public targets, complete cold costs, counted matched rho plus two strong-rho controls, and the best previously measured generator-orbit IC layout. Draft until PROTOCOL.md and REGISTRATION.sha256 freeze it; no speedup or security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 202611190501,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-v6",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_v6"
+      }
+    },
+    {
+      "name": "rho-v6-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_v6"
+      }
+    },
+    {
+      "name": "rho-v5-trajectory",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_v5"
+      }
+    },
+    {
+      "name": "rho-strong-v2",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "gen-c4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-generator"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611190502,
+    "isolation_required": "L2",
+    "timeout_seconds": 3600
+  }
+}

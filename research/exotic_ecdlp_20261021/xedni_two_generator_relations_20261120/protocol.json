@@ -1,0 +1,14 @@
+{
+  "schema": "xedni-two-generator-relations-protocol-v1",
+  "box_rows_raw_sha256": "7edbcede5787ad2c07a61fe56b841c04250d01e3ff8ca8ec0959d8502a397706",
+  "curve_coefficients": [94, 0, 188, 1738, 3805],
+  "Q": [-4, 19],
+  "R": ["52242961/137641", "-1907191742616/51064811"],
+  "reduction_prime": 47,
+  "matrix_modulus": 43,
+  "columns": "all 80 nonidentity rational box points, lexicographic (a,b) order; rational identity has no column",
+  "addition_rows": "for nonzero box labels u<=v in lexicographic order with u+v in the box, record e_u+e_v-e_(u+v), omitting the identity column; verify each exact rational point sum",
+  "collision_rows": "within each reduced finite point bucket, sorted by (a,b), record e_anchor-e_other for every nonanchor point; verify reductions equal and rational points differ",
+  "rank_stages": "rank over F43 of addition rows; addition plus collision rows; then add e_(1,0) normalization",
+  "claim_boundary": "finite box linear-system structure and construction counts; not a calibrated large-field index-calculus result"
+}

@@ -43,6 +43,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::ic_boundary::{
     CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
+    TauOrbitCheck,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 
@@ -332,6 +333,43 @@ pub trait DecompositionOracle<G: CountedGroup> {
     /// double-and-add, charged to the same verification ops.  `None` (the
     /// default) keeps every recorded run's check.
     fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        None
+    }
+
+    /// `m > 0` when the oracle asks for the `StrideGeneratorSib { m }`
+    /// giant-step walk in place of `targets=stride-generator` (sibling
+    /// pairs `C ± [i]G` from one inversion, the minus side an abscissa
+    /// only, see `TargetSource::StrideGeneratorSib`); it must then answer
+    /// [`probe_x`](Self::probe_x).  `0` (the default) keeps every
+    /// recorded run's walk.
+    fn walk_siblings(&self) -> u32 {
+        0
+    }
+
+    /// Whether a target known only by its abscissa `x` (a binary curve's
+    /// field element as a word) can decompose: `Some(false)` is a counted
+    /// miss, `Some(true)` a counted hit that the pipeline confirms by
+    /// forming the point and calling [`decompose`](Self::decompose);
+    /// `None` (the default) when the oracle has no such probe.
+    fn probe_x(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        _counters: &mut OracleCounters,
+        _x: u64,
+    ) -> Option<bool> {
+        None
+    }
+
+    /// The stored signed Frobenius orbit of `G` (already paid for by the
+    /// base) that the recovery check `[d]G` may read through the τ-adic
+    /// expansion of `d` ([`tau_orbit_mul`]) instead of a double-and-add,
+    /// charged to the same verification ops.  `None` (the default) keeps
+    /// every recorded run's check; consulted only when
+    /// [`recovery_ladder`](Self::recovery_ladder) is `None`.
+    ///
+    /// [`tau_orbit_mul`]: crate::cryptanalysis::ic_boundary::tau_orbit_mul
+    fn recovery_tau_orbit(&self) -> Option<TauOrbitCheck<G::Elt>> {
         None
     }
 
@@ -931,6 +969,9 @@ pub enum Targets {
     /// `StrideRenew` probing the repeat guard only on targets that
     /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
     StrideRenewDeferredGuard,
+    /// `StrideRenew` with each set-up `[a]G + [b]Q` one joint
+    /// double-and-add.  See `TargetSource::StrideRenewJoint`.
+    StrideRenewJoint,
 }
 
 impl Targets {
@@ -956,6 +997,7 @@ impl Targets {
             Targets::StrideRenew => "stride-renew",
             Targets::StrideGenerator => "stride-generator",
             Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
+            Targets::StrideRenewJoint => "stride-renew-joint",
         }
     }
 
@@ -981,8 +1023,9 @@ impl Targets {
             "stride-renew" => Ok(Targets::StrideRenew),
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
+            "stride-renew-joint" => Ok(Targets::StrideRenewJoint),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew, stride-renew-deferred-guard or stride-renew-joint"
             )),
         }
     }

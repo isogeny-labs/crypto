@@ -1,0 +1,84 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "flock",
+        "/tmp/crypto-bench.lock",
+        "bash",
+        "research/prime_conductor_gap80_20261031/local-20261119/run-target80.sh"
+      ],
+      "cwd": ".",
+      "exit": 124,
+      "started_utc": "2026-11-19T17:52:48+00:00",
+      "wall_s": 60.01
+    }
+  ],
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T17:52:33+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/local-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T1752Z-conductor-target80-local-20261119",
+  "metrics": [],
+  "problem": "kernel:conductor80-explicit-map",
+  "publication_pending": "research/prime_conductor_gap80_20261031/local-20261119/publication-pending.json",
+  "raw": [
+    {
+      "bytes": 4,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/target80-bounded/exit",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ca/ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "uploaded": false
+    },
+    {
+      "bytes": 73,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/target80-bounded/stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/84/84f598d1d3f049edbe3527fce64f65b123b3076bc746cb86b6b21394eadd5543",
+      "sha256": "84f598d1d3f049edbe3527fce64f65b123b3076bc746cb86b6b21394eadd5543",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/target80-bounded/stdout",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 136624,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/local-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9cc1e5008cb9c1def70c1022a29143ec48c8028044181e0d73d6cd48855d2795",
+      "sha256": "9cc1e5008cb9c1def70c1022a29143ec48c8028044181e0d73d6cd48855d2795",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/local-20261119/reports/report.pdf",
+    "png": [
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/ecdLP.png",
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/scalar.png"
+    ],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/ecdLP.svg",
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/scalar.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor-target80-local-20261119",
+  "status": "open",
+  "summary": "Censored at60second watchdog (exit124); original80bit native constructor produces no quotient/images or durable partial coverage. Record remains open pending authenticated raw-data publication.",
+  "validation": "research/prime_conductor_gap80_20261031/local-20261119/summary.json"
+}

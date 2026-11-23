@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T18:41:49Z",
+ "id": "PCC-20261118-6b2875",
+ "kind": "statement",
+ "producer": {
+  "commit": "c17030e0f29b15ccde2154c63272d86f83fc740f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/tests.stdout",
+    "sha256": "60b56f383c71807d90bb8410dd56f1bea653bfead53c7eef2c93c3fc889ac2dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/proof/exit.json",
+    "sha256": "77d9820cb8fb0793121ed206bc7d11c78131a792a59085856e686ea3bac8e614"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/build-b-inputs.sha256",
+    "sha256": "9a6f335173b27ef55a2ece1d0c96dadcf11fe119a68cbac80bec8efde8828d1e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/paired-schedule-20261118/test-pre-call.sha256",
+    "sha256": "e6a9500e92a6c62ba8a0c8908c48d7ec68fb85f1a745ab421e320ab988b75b51"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/paired-schedule-20261118",
+ "statement": "The focused public target linking the actual root ecbench library passes all eleven tests: six versioned scheduling/seed/admission/tiny-solver controls and five unchanged wide-field arithmetic/workload controls. The full two-field plan retains all 192 workload identities while checking paired seed/index/order properties. The independent native seed vector fixture is a reference; no full legacy unit-suite pass, CLI compatibility result, measured session or large conductor crossing is established by this test receipt."
+}

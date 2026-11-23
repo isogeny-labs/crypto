@@ -1,0 +1,80 @@
+K1 max |numeric - closed form| = 1.71e-04 ; m>=6 with floored beat-set == {s<m-3}: []
+K2 max gain of mixed depths over uniform floored optimum = 2.22e-16
+K3:
+  m6_sigma0.1667: s=3.900 2/(m+1-s)=0.645 (published 0.645) floored quad=0.780 lin=0.780 attempt-exp at no-floor opt=-0.613
+  m8_sigma0.1250: s=4.349 2/(m+1-s)=0.430 (published 0.43) floored quad=0.621 lin=0.621 attempt-exp at no-floor opt=-0.505
+  m7_sigma0.1429: s=4.142 2/(m+1-s)=0.518 (published 0.518) floored quad=0.690 lin=0.690 attempt-exp at no-floor opt=-0.555
+  m4_sigma0.2500: s=3.245 2/(m+1-s)=1.140 (published 1.14) floored quad=1.082 lin=1.082 attempt-exp at no-floor opt=-0.710
+
+thresholds s* (grid, first s with E>=1/2):
+ m | closure m-3 | floor quadLA | floor linLA | one-output quadLA | nofloor quadLA
+ 4 |     1 | 1.0 | 1.5 | 1.0 | 1.0
+ 5 |     2 | 2.0 | 2.0 | 1.5 | 2.0
+ 6 |     3 | 2.5 | 2.5 | 2.0 | 3.0
+ 7 |     4 | 3.0 | 3.0 | 2.5 | 4.0
+ 8 |     5 | 3.5 | 3.5 | 3.0 | 5.0
+ 9 |     6 | 4.0 | 4.0 | 3.5 | 6.0
+10 |     7 | 4.5 | 4.5 | 4.0 | 7.0
+11 |     8 | 5.0 | 5.0 | 4.5 | 8.0
+12 |     9 | 5.5 | 5.5 | 5.0 | 9.0
+13 |    10 | 6.0 | 6.0 | 5.5 | 10.0
+14 |    11 | 6.5 | 6.5 | 6.0 | 11.0
+15 |    12 | 7.0 | 7.0 | 6.5 | 12.0
+16 |    13 | 7.5 | 7.5 | 7.0 | 13.0
+
+slope bars alpha* (multilinear ML / full columns FC), w=1 [w=2]:
+ m | closure ML | correct ML | correct FC | one-output ML | closure ML w2 | correct ML w2
+ 4 | 0.0417 | 0.0417 | 0.0412 | 0.0417 | 0.0171 | 0.0171
+ 5 | 0.0794 | 0.0794 | 0.0770 | 0.0532 | 0.0311 | 0.0311
+ 6 | 0.1100 | 0.0842 | 0.0814 | 0.0615 | 0.0417 | 0.0328
+ 7 | 0.1352 | 0.0876 | 0.0846 | 0.0677 | 0.0498 | 0.0340
+ 8 | 0.1561 | 0.0903 | 0.0871 | 0.0724 | 0.0563 | 0.0350
+ 9 | 0.1740 | 0.0924 | 0.0890 | 0.0763 | 0.0615 | 0.0357
+10 | 0.1893 | 0.0941 | 0.0905 | 0.0794 | 0.0658 | 0.0363
+11 | 0.2027 | 0.0955 | 0.0918 | 0.0820 | 0.0694 | 0.0368
+12 | 0.2145 | 0.0967 | 0.0928 | 0.0842 | 0.0724 | 0.0372
+13 | 0.2250 | 0.0977 | 0.0937 | 0.0860 | 0.0751 | 0.0375
+14 | 0.2345 | 0.0985 | 0.0945 | 0.0876 | 0.0774 | 0.0378
+15 | 0.2430 | 0.0993 | 0.0952 | 0.0891 | 0.0794 | 0.0381
+16 | 0.2508 | 0.0999 | 0.0958 | 0.0903 | 0.0812 | 0.0383
+
+measured slopes (w=1, multilinear):
+ m=4 certified step                   N 4->8 sigma=0.2500 (value) closure:KILL      correct:KILL      s=3.25 E_cl=1.140 E_corr(q)=1.082 E_corr(l)=1.082
+ m=4 certified step                   N 8->12 sigma=0.2500 (value) closure:KILL      correct:KILL      s=3.25 E_cl=1.140 E_corr(q)=1.082 E_corr(l)=1.082
+ m=4 certified endpoints              N 4->12 sigma=0.2500 (value) closure:KILL      correct:KILL      s=3.25 E_cl=1.140 E_corr(q)=1.082 E_corr(l)=1.082
+ m=4 censored lb vs last certified    N 12->16 sigma=0.0000 (lower bound) closure:below-bar correct:below-bar s=0.00 E_cl=0.400 E_corr(q)=0.400 E_corr(l)=0.250
+ m=4 censored lb vs last certified    N 12->20 sigma=0.1250 (lower bound) closure:KILL      correct:KILL      s=2.17 E_cl=0.708 E_corr(q)=0.725 E_corr(l)=0.725
+ m=5 certified step                   N 5->10 sigma=0.2000 (value) closure:KILL      correct:KILL      s=3.61 E_cl=0.837 E_corr(q)=0.902 E_corr(l)=0.902
+ m=5 certified endpoints              N 5->10 sigma=0.2000 (value) closure:KILL      correct:KILL      s=3.61 E_cl=0.837 E_corr(q)=0.902 E_corr(l)=0.902
+ m=5 censored lb vs last certified    N 10->15 sigma=0.4000 (lower bound) closure:KILL      correct:KILL      s=4.85 E_cl=1.746 E_corr(q)=1.214 E_corr(l)=1.214
+ m=6 certified step                   N 6->12 sigma=0.1667 (value) closure:KILL      correct:KILL      s=3.90 E_cl=0.645 E_corr(q)=0.780 E_corr(l)=0.780
+ m=6 certified endpoints              N 6->12 sigma=0.1667 (value) closure:KILL      correct:KILL      s=3.90 E_cl=0.645 E_corr(q)=0.780 E_corr(l)=0.780
+ m=6 censored lb vs last certified    N 12->18 sigma=0.1667 (lower bound) closure:KILL      correct:KILL      s=3.90 E_cl=0.645 E_corr(q)=0.780 E_corr(l)=0.780
+ m=6 P1 mixed ladder OLS (msolve)     N 6->14 sigma=0.1667 (value (finite-N fit)) closure:KILL      correct:KILL      s=3.90 E_cl=0.645 E_corr(q)=0.780 E_corr(l)=0.780
+ m=6 P1 mixed ladder endpoints        N 6->14 sigma=0.1250 (value) closure:KILL      correct:KILL      s=3.26 E_cl=0.535 E_corr(q)=0.652 E_corr(l)=0.652
+ m=7 censored lb vs last certified    N 7->14 sigma=0.2857 (lower bound) closure:KILL      correct:KILL      s=6.04 E_cl=1.021 E_corr(q)=1.007 E_corr(l)=1.007
+ m=7 P1 mixed ladder OLS (msolve)     N 7->11 sigma=0.2000 (value (finite-N fit)) closure:KILL      correct:KILL      s=5.05 E_cl=0.679 E_corr(q)=0.842 E_corr(l)=0.842
+ m=7 P1 mixed ladder endpoints        N 7->11 sigma=0.2500 (value) closure:KILL      correct:KILL      s=5.68 E_cl=0.862 E_corr(q)=0.946 E_corr(l)=0.946
+ m=8 certified step                   N 8->16 sigma=0.1250 (value) closure:below-bar correct:KILL      s=4.35 E_cl=0.430 E_corr(q)=0.621 E_corr(l)=0.621
+ m=8 certified endpoints              N 8->16 sigma=0.1250 (value) closure:below-bar correct:KILL      s=4.35 E_cl=0.430 E_corr(q)=0.621 E_corr(l)=0.621
+ m=8 censored lb vs last certified    N 16->24 sigma=0.1250 (lower bound) closure:below-bar correct:KILL      s=4.35 E_cl=0.430 E_corr(q)=0.621 E_corr(l)=0.621
+ m=8 P1 mixed ladder OLS (msolve)     N 8->11 sigma=0.0000 (value (finite-N fit)) closure:below-bar correct:below-bar s=0.00 E_cl=0.222 E_corr(q)=0.222 E_corr(l)=0.125
+ m=8 P1 mixed ladder endpoints        N 8->11 sigma=0.0000 (value) closure:below-bar correct:below-bar s=0.00 E_cl=0.222 E_corr(q)=0.222 E_corr(l)=0.125
+
+s_W from msolve widths (P1 mixed ladders):
+ m=6: dlog2W/dN=0.728 s_W=4.37 vs s*_correct=2.5 s*_closure=3
+ m=7: dlog2W/dN=0.818 s_W=5.72 vs s*_correct=3.0 s*_closure=4
+ m=8: dlog2W/dN=0.237 s_W=1.90 vs s*_correct=3.5 s*_closure=5
+
+m=8 needed D at N_opt (asymptotic floored rule, budget N*(m-1)/(2m)):
+ log2r=31: N_opt=(8/7)log2r=35.429, Dmax_ML_w1=3, Dmax_FC_w1=3, Dmax_FC+u6_w1=3, Dmax_ML_w2=1, Dmax_FC_w2=1, Dmax_FC+u6_w2=1, Dmax_closure_rule_ML_w1 (same N)=6, sigma_needed_from_anchor(16,8)_ML_w1=-0.263, D_at_Nopt_if_sigma=1/8_from_anchor=10.375
+ log2r=64: N_opt=(8/7)log2r=73.143, Dmax_ML_w1=7, Dmax_FC_w1=7, Dmax_FC+u6_w1=6, Dmax_ML_w2=2, Dmax_FC_w2=2, Dmax_FC+u6_w2=2, Dmax_closure_rule_ML_w1 (same N)=12, sigma_needed_from_anchor(16,8)_ML_w1=-0.018, D_at_Nopt_if_sigma=1/8_from_anchor=15.125
+ log2r=128: N_opt=(8/7)log2r=146.286, Dmax_ML_w1=14, Dmax_FC_w1=13, Dmax_FC+u6_w1=13, Dmax_ML_w2=5, Dmax_FC_w2=5, Dmax_FC+u6_w2=5, Dmax_closure_rule_ML_w1 (same N)=24, sigma_needed_from_anchor(16,8)_ML_w1=0.046, D_at_Nopt_if_sigma=1/8_from_anchor=24.250
+ log2r=160: N_opt=(8/7)log2r=182.857, Dmax_ML_w1=17, Dmax_FC_w1=16, Dmax_FC+u6_w1=16, Dmax_ML_w2=6, Dmax_FC_w2=6, Dmax_FC+u6_w2=6, Dmax_closure_rule_ML_w1 (same N)=29, sigma_needed_from_anchor(16,8)_ML_w1=0.054, D_at_Nopt_if_sigma=1/8_from_anchor=28.750
+ log2r=256: N_opt=(8/7)log2r=292.571, Dmax_ML_w1=27, Dmax_FC_w1=26, Dmax_FC+u6_w1=26, Dmax_ML_w2=10, Dmax_FC_w2=10, Dmax_FC+u6_w2=10, Dmax_closure_rule_ML_w1 (same N)=47, sigma_needed_from_anchor(16,8)_ML_w1=0.069, D_at_Nopt_if_sigma=1/8_from_anchor=42.500
+
+m=8 finite exact optimisation (T = max(1, m! r B/2^N) * M(N,D) + m B^2 < sqrt(pi r/4)):
+ log2r=31: {'N_best': 48, 'Dmax': 1, 'attempts': 19.6875}
+ log2r=64: {'N_best': 104, 'Dmax': 6, 'attempts': 1.0}
+ log2r=128: {'N_best': 175, 'Dmax': 13, 'attempts': 1.0}
+ log2r=256: {'N_best': 330, 'Dmax': 26, 'attempts': 1.0}
