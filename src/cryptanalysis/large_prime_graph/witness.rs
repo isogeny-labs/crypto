@@ -41,7 +41,7 @@ pub struct WitnessStats {
     pub reroot_steps: u64,
     /// Tree edge steps used while reducing original or anchor rows.
     pub path_steps: u64,
-    /// Actual modular inversions: input admission and anchor normalization.
+    /// Actual successful-stream modular inversions: one per nonempty input row\n    /// (paired endpoint inverses share one inversion), plus anchor normalization.
     /// Tree-path hops reuse the cached inverses of admitted equation edges.
     pub inverse_calls: u64,
 }
@@ -92,9 +92,10 @@ fn coeff_at(row: &[(usize, u64)], vertex: usize) -> u64 {
 /// reroot work is O(V log V). For R rows, maximum forest depth D and L
 /// emitted source terms, the conservative ordered-map work is
 /// O((R D + V log V) log(R+2) + L), excluding modular inverse bit costs.
-/// Inverses for each independent tree edge's two endpoints are computed at
-/// admission, not on each path hop: O(I + R) inversions for I input LP
-/// incidences and at most two anchor normalizations per original row.
+/// Inverses for each independent tree edge's two endpoints are computed via
+/// one product inversion at admission, not per path hop: at most R + A
+/// inversions on accepted rows, for R nonempty inputs and A anchor
+/// normalizations. Refused rows may perform additional uncounted diagnostics.
 /// D may be V, and witness materialization may dominate; no complete-cost
 /// or asymptotic ECDLP advantage is assumed.
 #[derive(Clone, Debug)]
@@ -230,7 +231,7 @@ impl ForestWitnessExtractor {
                 entries: terms.len(),
             });
         }
-        let mut input_inverses = [0u64; 2];
+        // Validate the complete row before any semantic state mutation.
         for (i, &(v, a)) in terms.iter().enumerate() {
             if v >= self.parent.len() {
                 return Err(LpGraphError::ColumnOutOfRange { column: v });
@@ -238,9 +239,39 @@ impl ForestWitnessExtractor {
             if a == 0 || a >= p || (i == 1 && v == terms[0].0) {
                 return Err(LpGraphError::NonCanonicalRow { row: row_idx });
             }
-            input_inverses[i] = inv_mod(a, p)
-                .ok_or(LpGraphError::NonInvertible { value: a })?;
         }
+        let mut input_inverses = [0u64; 2];
+        // Montgomery's batch-inversion identity for two units:
+        // (ab)^(-1) gives a^(-1)=b(ab)^(-1), b^(-1)=a(ab)^(-1).
+        // Retain direct single-entry checks and the original failing-coefficient
+        // error contract for unsupported composite moduli, without committing
+        // any row/forest state on an inverse failure.
+        let inversions = match terms {
+            [] => 0u64,
+            [(_, a)] => {
+                input_inverses[0] =
+                    inv_mod(*a, p).ok_or(LpGraphError::NonInvertible { value: *a })?;
+                1
+            }
+            [(_, a), (_, b)] => {
+                let ab = mul_mod(*a, *b, p);
+                let inv_ab = match inv_mod(ab, p) {
+                    Some(value) => value,
+                    None => {
+                        // If a is a unit but ab is not, b must be a nonunit.
+                        // The extra inverse here is solely on the refusal path.
+                        if inv_mod(*a, p).is_none() {
+                            return Err(LpGraphError::NonInvertible { value: *a });
+                        }
+                        return Err(LpGraphError::NonInvertible { value: *b });
+                    }
+                };
+                input_inverses[0] = mul_mod(*b, inv_ab, p);
+                input_inverses[1] = mul_mod(*a, inv_ab, p);
+                1
+            }
+            _ => unreachable!("arity checked before inverse preparation"),
+        };
         let original_roots = if terms.len() == 2 {
             Some((self.root(terms[0].0), self.root(terms[1].0)))
         } else {
@@ -252,7 +283,7 @@ impl ForestWitnessExtractor {
         let mut outstanding = Vec::new();
         let mut scans = projection.scans;
         let mut steps = projection.steps;
-        let mut inversions = terms.len() as u64;
+        let mut inversions = inversions;
         for (&root, &gamma) in &projection.roots {
             if let Some(anchor_idx) = self.anchor[root] {
                 let anchor_projection = self.project(&self.rows[anchor_idx])?;
