@@ -2405,7 +2405,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(accumulator, p)?;
                 canonical(base, p)?;
-                let state = powers.get_mut(id).ok_or("missing power begin")?;
+                let Some(Some(TraceComputation::Power(state))) = computations.get_mut(*id as usize) else { return Err("missing power begin".into()); };
                 if state.exponent == 0 {
                     return Err("power continued after completion".into());
                 }
@@ -2440,7 +2440,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::PowerEnd { id, value } => {
                 canonical(value, p)?;
-                let state = powers.remove(id).ok_or("missing power begin")?;
+                let state = computations.get_mut(*id as usize).and_then(Option::take).ok_or("missing power begin")?;
+                let TraceComputation::Power(state) = state else { return Err("missing power begin".into()); };
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
@@ -2517,7 +2518,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
-                let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+                let state = computations.get_mut(*id as usize).and_then(Option::take).ok_or("missing gcd begin")?;
+                let TraceComputation::Gcd((a, b)) = state else { return Err("missing gcd begin".into()); };
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
                 }
@@ -2605,7 +2607,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [xp_mod_f, linear_part] {
                     canonical(v, p)?;
                 }
-                if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+                if computations.iter().any(Option::is_some) || inverse.is_some() || split.is_some() {
                     return Err("unfinished native computation".into());
                 }
                 let acknowledged = index < report.events.len();
@@ -2693,11 +2695,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         if g != *linear_part || product != g {
                             return Err("distinct-root completeness failed".into());
                         }
-                        previous = Some(r);
-                        product = vproduct(&product, &[(p - r) % p, 1], p);
-                    }
-                    if g != *linear_part || product != g {
-                        return Err("distinct-root completeness failed".into());
                     }
                 }
                 finished = true;
@@ -2749,43 +2746,6 @@ fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     trim(result)
 }
 
-#[inline]
-fn field_value_cached(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal32: u64) -> u64 {
-    // Dispatch once by operation; the 61-bit Mersenne fast path must not
-    // take an extra wrapper call or reciprocal guard on every field event.
-    match op {
-        FieldOp::Add => {
-            if a < p && b < p {
-                let sum = a + b;
-                if sum >= p { sum - p } else { sum }
-            } else {
-                ((a as u128 + b as u128) % p as u128) as u64
-            }
-        }
-        FieldOp::Sub => {
-            if a < p && b < p {
-                if a >= b { a - b } else { a + p - b }
-            } else {
-                ((a as u128 + p as u128 - b as u128) % p as u128) as u64
-            }
-        }
-        FieldOp::Mul | FieldOp::Square => {
-            if p == MAX_PRIME && a < p && b < p {
-                let product = a as u128 * b as u128;
-                let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-                if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
-            } else if reciprocal32 != 0 && a < p && b < p {
-                let product = a * b; // canonical p <= 2^32-1
-                let quotient = ((product as u128 * reciprocal32 as u128) >> 64) as u64;
-                let remainder = product - quotient * p;
-                // The quotient underestimates floor(product/p) by at most 1.
-                if remainder >= p { remainder - p } else { remainder }
-            } else {
-                ((a as u128 * b as u128) % p as u128) as u64
-            }
-        }
-    }
-}
 
 #[inline]
 fn monic_power_degree(poly: &[u64]) -> Option<usize> {
@@ -3478,7 +3438,7 @@ mod tests {
                 }
                 let reference = vdiv(&a, &b, p).unwrap();
                 let mut sink = |_event: &RootEvent| Ok(());
-                let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
+                let mut engine = Engine {
                     report: RootReport {
                         schema: "prime-root-trace/v1".into(),
                         p,
