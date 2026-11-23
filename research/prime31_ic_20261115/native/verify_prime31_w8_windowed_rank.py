@@ -13,10 +13,35 @@ A=847514846
 B=2087444724
 N=2147446831
 G=(625037715,2100627251)
-W=[1,3,5,7,11,13,17,19]
+SEED=0x7738423442383231
+TARGET_XOR=0x5441524745545338
+OFFSET_XOR=0x4f46465345545332
+MASK=(1<<64)-1
+W_ODD=[1,3,5,7,11,13,17,19]
+W_POW2=[1,2,4,8,16,32,64,128]
 WINDOWS=[
   list(range(0,8)), list(range(8,16)),list(range(16,24)),list(range(23,31))
 ]
+
+def splitmix64(state):
+    state=(state+0x9e3779b97f4a7c15)&MASK
+    z=state
+    z=((z^(z>>30))*0xbf58476d1ce4e5b9)&MASK
+    z=((z^(z>>27))*0x94d049bb133111eb)&MASK
+    return state,z^(z>>31)
+
+def nonzero_scalar(state):
+    threshold=(((1<<64)-N) % N)
+    while True:
+        state,x=splitmix64(state)
+        if x>=threshold and x%N:
+            return state,x%N
+
+def indexed_offset(t,attempt):
+    state=(SEED ^ TARGET_XOR ^ OFFSET_XOR ^
+           ((t*0xd6e8feb86659fd93)&MASK) ^
+           ((attempt*0xa0761d6478bd642f)&MASK))
+    return nonzero_scalar(state)[1]
 
 def neg(q):
     if q is None:
@@ -60,9 +85,9 @@ def canonical():
     assert [q[0] for q in result[:8]]==[0,1,2,3,5,6,8,9]
     return result
 
-def slots(base,wi):
+def slots(base,wi,weights):
     result=[]
-    for j,w in enumerate(W):
+    for j,w in enumerate(weights):
         plus=[scalar(w,base[i]) for i in WINDOWS[wi]]
         assert all(q is not None for q in plus)
         result.append(plus+[neg(q) for q in plus])
@@ -78,12 +103,12 @@ def replay(ss,word):
         result=add(result,ss[j][i])
     return result
 
-def row(wi,word):
+def row(wi,word,weights):
     out=[0]*31
     for j,i in enumerate(word):
         idx=WINDOWS[wi][i%8]
         sign=1 if i<8 else -1
-        out[idx]=(out[idx]+sign*W[j])%N
+        out[idx]=(out[idx]+sign*weights[j])%N
     return out
 
 def independent_elimination(eqs):
@@ -121,12 +146,14 @@ def verify(data):
     c=data["curve"]
     assert (c["p"],c["a"],c["b"],c["n"],c["cofactor"])==(P,A,B,N,1)
     assert point(c["g"])==G
-    assert data["weights"]==W
+    assert data["weights"] in (W_ODD,W_POW2)
+    assert data["target_generation"] == "indexed-offset-v2"
+    weights=data["weights"]
     assert data["windows"]==WINDOWS
     assert data["ordered_words_per_window"]==16**8
     base=canonical()
     assert [point(q) for q in data["base_points"]]==base
-    ss=[slots(base,wi) for wi in range(4)]
+    ss=[slots(base,wi,weights) for wi in range(4)]
 
     eqs=[]
     ranks=[]
@@ -136,7 +163,7 @@ def verify(data):
         public_r=point(rec["public_r"])
         assert public_r==scalar(scalar_k,G)
         assert replay(ss[wi],rec["word"])==public_r
-        eqs.append((row(wi,rec["word"]),scalar_k))
+        eqs.append((row(wi,rec["word"],weights),scalar_k))
         ranks.append(rec["rank"])
     assert ranks==list(range(1,32))
     logs=independent_elimination(eqs)
@@ -154,7 +181,9 @@ def verify(data):
     targets=data["recovered_targets"]
     assert data["target_count"]==len(targets)==data["verified_target_count"]==1024
     assert data["online_queries"]==len(targets)+data["failed_online_queries"]
+    target_state=SEED ^ TARGET_XOR
     for t,rec in enumerate(targets):
+        target_state,expected_secret=nonzero_scalar(target_state)
         assert rec["target_index"]==t
         wi=rec["window"]
         secret=rec["test_secret"]
@@ -162,9 +191,11 @@ def verify(data):
         q=point(rec["public_q"])
         shift=rec["offset"]
         assert q==scalar(secret,G)==scalar(recovered,G)
-        assert secret==recovered
+        assert secret==recovered==expected_secret
+        assert shift==indexed_offset(t,rec["failed_prior_queries"])
+        assert wi==(t+rec["failed_prior_queries"])%4
         assert replay(ss[wi],rec["word"])==add(q,scalar(shift,G))
-        coeff=row(wi,rec["word"])
+        coeff=row(wi,rec["word"],weights)
         candidate=(sum(x*y for x,y in zip(coeff,logs))-shift)%N
         assert candidate==secret,("recovered wrong",t)
         assert rec["failed_prior_queries"]<32
