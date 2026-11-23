@@ -308,3 +308,74 @@ natural extraction, accepted row, rejected row, rank increment and target
 recovery; (iv) only then collect matched complete cold T=1 comparisons.
 No signed PCC standing, native Rust execution, blind Prime31 target solve
 or measured advantage is established by this change. `[pcc:unverified]`
+
+## 2026-11-23 — extraction-to-acceptance *provenance* gate
+
+A further adversarial gap was found in the previous Python `SolveRecord`
+reader: verifying a receipt's **true group equation** and checking that the
+*total* number of accepted rows does not exceed extracted candidates does
+**not** establish that any accepted row actually came from the corresponding
+attempt's extractor output. A true signed row from a different run could
+otherwise be spliced into a reported attempt, improperly advancing useful
+rank while falsely charging the reported F4 work. This is an input-integrity
+issue, not a faster ECDLP solver. `[pcc:unverified]`
+
+At the frozen producer source
+[solver.rs at 95e5062](https://github.com/isogeny-labs/crypto/blob/95e5062573e24d124235756c062e2ab8178aac4c/research/prime31_rr5_public_relations_20261123/native/solver.rs),
+the producer iterates `extraction.relations` in order and sends each
+candidate to the
+[relation adapter](https://github.com/isogeny-labs/crypto/blob/95e5062573e24d124235756c062e2ab8178aac4c/research/prime31_four_summand_20261122/native/relation_adapter.rs).
+The latter combines repeated signed indices, removes zero sums, sorts indices,
+and—if the first surviving term is negative—negates *all* coefficients
+and *both* public RHS scalars modulo `n`. It stops acceptance on deadline,
+an error, or a recovered answer. Consequently, for each reported attempt,
+its accepted receipts must be the **exact canonicalized prefix** of its
+reported extracted candidates, with the attempt's unchanged public
+`a,b` (modulo that permitted global sign flip). Checking only row truth or
+aggregate extraction counts is insufficient.
+
+The read-only [Python source](independent_rr5_replay.py) now reconstructs
+that canonicalization and checks the ordered candidate/receipt pairing
+before authenticating any row or admitting rank. Extracted-but-unaccepted
+candidates still count toward the recorded denominator, but not rank.
+The implementation is isolated to this PR's existing validation directory,
+not the Rust extractor, graph/S3 solvers, or frozen RR5 output.
+
+New source commits:
+[admission logic `8323a15`](https://github.com/isogeny-labs/crypto/commit/8323a15ba68bd0284e2824ed2784020edb571c3b)
+and [two authored regression cases `0339450`](https://github.com/isogeny-labs/crypto/commit/0339450f8bd74459b9021de3984d103d5b8c937c).
+The authored Python test-suite count is **13**, with a true two-attempt
+public solve control, accepted-row substitution, skipped-candidate and
+changed-public-query poison cases, plus exact signed-leaf normalisation.
+The **new repository tests have not been executed**; no native Rust test
+or natural B677 replay was run. The coordinator separately ran seven
+small *local prototype-only* canonical-prefix checks with Python 3.13.5
+(`python /mnt/data/prime31_admission/check_provenance.py`, 7/7 pass,
+SHA-256 `74911178daeddb57b2ec7b1159434987951760a883b75bce23ecb8a1d632d351`).
+That prototype is not the repository implementation, a source-exact
+test receipt, a signed independent validator, or a new claim of execution
+standing. `[pcc:unverified]`
+
+**Remaining evidence boundary:** a matching candidate/receipt prefix
+proves *record-internal consistency only*. It does not prove that the reported
+F4 algorithm ran, that its transcript was not forged, or that all wall time,
+failures and base construction were charged. Require source-frozen extractor
+execution custody, an independently authenticated candidate stream and
+both original-Rust/Python replay, then complete-cold matched baselines.
+
+**Worker/ownership record:** no native worker agent launcher was exposed.
+The coordinator performed three disjoint logical work packages: (1) checked
+prior APS/BSGS/Run72/75 negative controls and live #4970/#4974/#4972 ownership
+without choosing cross-cohort baselines; (2) inspected the original Rust
+`SolveRecord` and `RelationAdapter` source contracts and changed only this
+Python consumer; (3) designed the candidate-link poison controls and the
+separate, non-source-exact seven-case prototype. There were no spawned
+parallel workers, root builds, timed experiments, external spend, PR merges,
+or elapsed-time speed claims. `[pcc:unverified]`
+
+**Next:** execute the 13 exact-source Python cases and original Rust 15+12
+tests on an unreserved authorized runner; preserve the first genuine
+unknown-index Prime31 RR5 record with its full extraction/attempt stream;
+then check actual rank, independent target replay and all-cost comparisons.
+The [B677 owner #4974](https://github.com/isogeny-labs/crypto/pull/4974)
+still has not supplied admitted accepted natural B677 relations.
