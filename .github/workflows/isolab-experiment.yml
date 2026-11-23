@@ -63,6 +63,7 @@ jobs:
             taskq/deploy/eks-karpenter
             tools/artifacts
             .artifacts
+            research/rootfind_k13_l2_admission_probe_20261116
       - name: Verify request, build identity and MCP contracts
         run: |
           set -euo pipefail
@@ -122,25 +123,15 @@ jobs:
       - name: Materialize native build inputs
         working-directory: source
         run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path research/prime_leads_chase_20261113/norm-branch-census --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
-      - name: Pull store data needed by the tested source
+      # build-bundle compiles ecbench + isolab-fresh-owner from Git-tracked Rust
+      # only. five_leads / pencil study logs are store-backed, unrecovered while
+      # S3 is AllAccessDisabled, and are not compile inputs — do not pull them.
+      - name: Skip unrecovered research store hydration for the native build
         working-directory: source
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
         run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 ../control/tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029
+          set -euo pipefail
+          test -f .artifacts/recovery/index.json
+          echo "Skipping research/five_leads_e2e_20261019 and research/pencil_large_prime_20261029 store pull (S3 disabled; not required for build-bundle)."
       - name: Install the pinned native toolchain
         run: |
           sudo apt-get update -qq
@@ -197,7 +188,7 @@ jobs:
     needs: build
     if: >-
       !github.event.pull_request.draft &&
-      (github.ref == 'refs/heads/main')
+      (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 150
     permissions:
@@ -218,6 +209,7 @@ jobs:
             taskq/deploy/eks-karpenter
             tools/artifacts
             .artifacts
+            research/rootfind_k13_l2_admission_probe_20261116
       - name: Check out the tested norm-branch checkpoint inputs
         if: inputs.norm_branch_census
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -247,7 +239,25 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029 taskq/deploy/eks-karpenter
+          # Harness scripts are Git-tracked. ic-size-sweep-20261026 validation
+          # blobs are store-backed and unrecovered while S3 is AllAccessDisabled
+          # (see build job note). Moving .artifacts.json is insufficient: pull
+          # still reads tracked manifests via git index. Omit that tree from the
+          # path list so ordinary m45-t4-finish / non-size_sweep launch can proceed.
+          set -euo pipefail
+          skip=taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026
+          pull_paths=()
+          while IFS= read -r -d '' p; do
+            pull_paths+=("$p")
+          done < <(find taskq/deploy/eks-karpenter -mindepth 1 -maxdepth 1 ! -name validation -print0)
+          if [[ -d taskq/deploy/eks-karpenter/validation ]]; then
+            while IFS= read -r -d '' p; do
+              pull_paths+=("$p")
+            done < <(find taskq/deploy/eks-karpenter/validation -mindepth 1 -maxdepth 1 ! -name 'ic-size-sweep-20261026' -print0)
+          fi
+          echo "Skipping unrecovered $skip store pull (S3 disabled; not required for ordinary experiment launch)."
+          printf 'pull_paths=%s\n' "${#pull_paths[@]}"
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${pull_paths[@]}"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}

@@ -1,0 +1,83 @@
+{
+  "schema": "supervised-synthetic-analysis-qualification/v1",
+  "source_context": "SUPERVISED_SYNTHETIC_SOURCE_253.json",
+  "source_tool_pins_unchanged": true,
+  "cohorts": [
+    {
+      "name": "neutral",
+      "source": "Rust generated synthetic clocks with saved real complete proof bytes",
+      "analyzer_exit_code": 0,
+      "whole_proof_replays": 2520,
+      "six_recorded_primary_medians": [
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8
+      ],
+      "threshold_arithmetic_passes": false,
+      "performance_admitted": false,
+      "analysis_sha256": "fbadd14224623941dc30fd1cff8a6483b68b92e8786866e6325738eeffd68f27"
+    },
+    {
+      "name": "hypothetical20",
+      "source": "Rust generated synthetic clocks with saved real complete proof bytes",
+      "analyzer_exit_code": 0,
+      "whole_proof_replays": 2520,
+      "six_recorded_primary_medians": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+      ],
+      "threshold_arithmetic_passes": true,
+      "performance_admitted": false,
+      "analysis_sha256": "ca69cb68451de6510bbc20118ba57237fb55af08122cf11459447b996bec776c"
+    }
+  ],
+  "canaries": [
+    {
+      "kind": "clock",
+      "analyzer_exit_code": 1,
+      "expected_rejection": "complete phase/boundary binding",
+      "file_roster_equal": true,
+      "base_files": 15125,
+      "changed_files": [
+        {
+          "path": "AA-r0-p2147483647-n3-frozen85-sparse-103-wrapped/process.json",
+          "base_sha256": "3da2a1848557c54e79dd0111c44822fbb409985a3042bfe569695baf66ebf8d2",
+          "canary_sha256": "e37a68a6dee5413ddd9876ac745b26c4c420aaf31b3aa742f48fc659bbfd9462"
+        }
+      ]
+    },
+    {
+      "kind": "duplicate",
+      "analyzer_exit_code": 1,
+      "expected_rejection": "missing/duplicate cell",
+      "file_roster_equal": true,
+      "base_files": 15125,
+      "changed_files": [
+        {
+          "path": "summary.json",
+          "base_sha256": "eb01c0aa7a4c0b082799200104fd46b0ef0d5ba8628c65b6e4033570a4caa566",
+          "canary_sha256": "86de52e2de0a73a20f5343781f2c38b0e9d8ad3bc99f53759ff187c8f4bd7fab"
+        }
+      ]
+    }
+  ],
+  "unit_tests_261": {
+    "exit_code": 0,
+    "analyzer": 8,
+    "collector": 3,
+    "fixture": 3,
+    "distinct_definitions": 8,
+    "shared_roster_tests_repeated": 3
+  },
+  "performance_observations_collected": 0,
+  "canonical_protocol_validation": "pending",
+  "primary_15x_admitted": false,
+  "signed_execution_verdict": false
+}

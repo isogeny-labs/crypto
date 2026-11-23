@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T10:14:56Z",
+ "id": "PCC-20261123-dd244a",
+ "kind": "execution",
+ "producer": {
+  "commit": "a2e5f5bce3edc9d999e5afc05592426ed4d07725",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/CHECKS.json",
+    "sha256": "db8304b11c61148333d880b33f3320c4b4a4981ea662435286fecea2d319799f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/LOCAL_CUSTODY.json",
+    "sha256": "8d9378d9deadd8a99b7fcabb4fa2a0dddc9e0efec6b937d121b7d73037f84c4a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/reports/RESULTS.pdf",
+    "sha256": "4d49b09ce998258271ff1bf2f109405b0935c7ae9d2ca4da5237550c11292779"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/README.md",
+    "sha256": "1ddb7ee7c27e996424d6d3e127d0182e92a2afeb5e1a34fa2497c0b6e81b9863"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Final local archive441bdf8b6cd8c25da3f07ea0c95ab3620c33e75d7561f528ab4a7d91aa9ccf3a extracts with1918 file hashes checked. Extracted native hot analysis repeats24192 scalar replays and byte-identical statistics. All eight frozen source manifests pass; committed-state metrics export completes under60seconds with361 scoped neutral observations;29 report/plot copies match byte-for-byte and sampled PDF pages are visually inspected. Whole-root gate remains failed, signed/S3 admission absent, rebuild caches external. Unsigned producer execution metadata."
+}

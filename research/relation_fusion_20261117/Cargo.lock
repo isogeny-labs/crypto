@@ -105,9 +105,17 @@ name = "relation-fusion"
 version = "0.1.0"
 dependencies = [
  "certified-relations",
+ "relation-native-supervisor",
  "relation-replay-checker",
  "serde_json",
  "sha2",
+]
+
+[[package]]
+name = "relation-native-supervisor"
+version = "0.1.0"
+dependencies = [
+ "libc",
 ]
 
 [[package]]

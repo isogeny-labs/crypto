@@ -1,0 +1,22 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T11:02:08Z",
+ "id": "PCC-20261123-dc026e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "ca7023cd857557d181008b141b9c793f3b39cae6",
+  "model": "Codex",
+  "session": "native-precision-history-20261123"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "94e6d3b3d053f6c67f8014c4fb8a1ebd158dd58dfc7dcbba9aa13dfbce9afc8d",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_precision_history_20261123/formal/PrecisionHistory.lean",
+   "theorem": "NativePrecisionHistory.next_precision_mul_le"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR4996 finite numeric source-precision history; Lean4.35.0, exact Mathlib56a00585 and Std-only shared core3e47fb77; unsigned local qualification; replaces malformed proof-reference claim PCC-20261123-f665ec, retained unchanged",
+ "statement": "For a finite Nat history with the exact shared childPrecision recurrence, positive scale at most edges,8-fold edge shrink, bounded prior exponents a(k)<=A, M(0)<=s and p(0)<=s, the inherited precision satisfies p(d)<=81*s*2^A. Its formal composition with current active valuation, root/current comparison and the two dimension absorption hypotheses yields p(d+1)*u(d)<=34*M(d)*2^(A+2*u(d)-i(d)). These are numeric-history theorems, not extraction of actual Rust executions, source admission, total counter cost or an ECDLP improvement."
+}

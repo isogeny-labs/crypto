@@ -5,6 +5,7 @@ edition = "2021"
 rust-version = "1.87"
 publish = false
 [workspace]
+exclude = ["native-supervisor"]
 [features]
 scale-screen = ["certified-relations/scale-screen"]
 [dependencies]
@@ -12,3 +13,4 @@ certified-relations = { path = "../../crates/certified-relations" }
 relation-replay-checker = { path = "../../crates/relation-replay-checker" }
 serde_json = "1"
 sha2 = "0.10"
+relation-native-supervisor = { path = "native-supervisor" }

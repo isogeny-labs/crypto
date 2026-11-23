@@ -1,0 +1,30 @@
+import CryptoLeanCore.TaperedPrecision
+
+open CryptoLeanCore.TaperedPrecision
+
+-- Existing structures/laws, not a new arithmetic model.
+#check Nat.le_induction
+#check Nat.div_mul_le_self
+#check Nat.pow_add
+#check Nat.pow_mul
+#check Nat.pow_succ
+#check Nat.pow_le_pow_right
+#check Nat.mul_le_mul_left
+#check Nat.le_of_mul_le_mul_left
+#check Nat.log2_two_pow
+#check Nat.lt_two_pow_self
+
+-- Assembly only: lower component contracts are hypotheses, not results.
+example (p M u i : Nat)
+    (hp : 4 * (p * u) ≤ M * 2 ^ (2 * u - i))
+    (hn : 4 * (8 * ((3 * M + u - 1) / u) * 2 ^ (2 * u - i) * u) ≤
+      97 * M * 2 ^ (2 * u - i))
+    (he : 4 * (8 * M * (2 * u + 1) * u) ≤
+      42 * M * 2 ^ (2 * u - i)) :
+    childPrecision p M u (2 * u) i * u ≤ 35 * M * 2 ^ (2 * u - i) := by
+  rw [childPrecision_formula]
+  simp only [Nat.add_mul, Nat.mul_assoc] at *
+  omega
+
+-- Non-vacuous arithmetic instance; not a source-admitted graph.
+example : childPrecision 33 64 2 4 1 * 2 ≤ 35 * 64 * 2 ^ (4 - 1) := by decide

@@ -1,0 +1,24 @@
+/tmp/ecdlp-precision-audit-20261123/checks/13-finite-native-history/PrecisionHistory.lean:52:55: error: Invalid argument name `R` for function `Nat.cast_nonneg`
+
+Hint: Perhaps you meant one of the following parameter names:
+  • `α`: R̵α̲
+  • `n`: R̵n̲
+/tmp/ecdlp-precision-audit-20261123/checks/13-finite-native-history/PrecisionHistory.lean:69:31: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  h ≥ 0
+  g ≥ 0
+  g - h ≥ 1
+  f ≥ 0
+  e ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c ≥ 0
+  b - e ≥ 0
+  2*b - f ≥ 0
+where
+ b := ↑s
+ c := ↑(M 0)
+ e := ↑(p 0)
+ f := ↑(∑ j ∈ range d, M j)
+ g := ↑(80 * s) * ↑(2 ^ A)
+ h := ↑(40 * 2 ^ A) * ↑(2 * s)

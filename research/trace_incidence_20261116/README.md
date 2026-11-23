@@ -200,3 +200,9 @@ Those graphs are unchanged because this imports unsigned historical evidence,
 with raw-object custody and native matched runs still pending. No claim to
 be the fastest external implementation is made; mature external comparisons,
 the original paper's implementation and an admitted native replay remain open.
+
+## Native complete-cost continuation, 23 November 2026
+
+[Eight-stage study](setup_20261123/README.md) · [Combined report](setup_20261123/reports/RESULTS.pdf) · [Resume requirements](setup_20261123/NEXT.md).
+
+The new sibling study preserves all prior sources and evidence. It measures charged mixed-label progressions, exact arithmetic/lookup/allocation/compiler variants, growing fields through three ordinary curves at p=2^31−1, and generic/native rho controls. The final predeclared primary improves its matched baseline but fails rho parity; all losses, memory, misses and replay checks remain visible. These are unsigned local measurements with the existing temporary raw-custody exception; canonical indices are unchanged. [pcc:unverified]
