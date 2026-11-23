@@ -1,0 +1,7 @@
+# Raw run data stays out of Git (CI's S3 store upload is unavailable; the audit kept
+# its sessions out of Git too). RAW_SHA256SUMS in each run directory names every file.
+**/sessions/*/records.jsonl
+**/sessions/*/plan.json
+**/audits/audit-*.json
+**/logs/run-*.log
+**/logs/verify-*.log
