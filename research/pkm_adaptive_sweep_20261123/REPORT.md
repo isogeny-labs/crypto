@@ -74,7 +74,18 @@ An initial 128-target replication accidentally ran a literal t=3 candidate again
 | Relation target trials | **8,455 / 9,112** |
 | Raw relations found | **703 / 726** |
 
-The predeclared **small-instance relation-extraction component gate passed**. The useful result is lower total cost per completed relation pipeline, driven mainly by much cheaper F4 systems; raw relation probability changed modestly. The random-panel store SHA-256 is `de0291fd492c7b534515ed29e3012ce5cc7c6d0ad1eb8bb73467a72b230adcdf`. The binary's embedded `git_commit` is null, so its SHA-256 pins execution but source provenance requires an independent clean rebuild. This benchmark is on a ~10-bit subgroup. The candidate's median reported `s_over_rho` is about **53,088**, so even this improved map is far from the same-target rho reference in the repository's counted-cost model. It does not establish a faster complete same-target ECDLP than optimized rho, an asymptotic advantage, or performance on s59, P-192 or NIST curves. Those remain distinct gates.
+The predeclared **small-instance relation-extraction component gate passed**. Useful relations per charged GAE improved **1.54×** (derived from the two aggregate relation and cost totals), driven mainly by much cheaper F4 systems; raw relation probability per trial improved only about **1.04×**. The random-panel store SHA-256 is `de0291fd492c7b534515ed29e3012ce5cc7c6d0ad1eb8bb73467a72b230adcdf`. The binary's embedded `git_commit` is null, so its SHA-256 pins execution but source provenance requires an independent clean rebuild. This benchmark is on a ~10-bit subgroup. The candidate's median reported `s_over_rho` is about **53,088**, so even this improved map is far from the same-target rho reference in the repository's counted-cost model. It does not establish a faster complete same-target ECDLP than optimized rho, an asymptotic advantage, or performance on s59, P-192 or NIST curves. Those remain distinct gates.
+
+To resume the original map search under a dated protocol amendment, increase the auxiliary ceiling while retaining its append-only store:
+
+```bash
+python3 research/pkm_adaptive_sweep_20261123/f4_height4.py \
+  --bin /Volumes/SSD990-2/crypto/target/release/ic \
+  --store research/pkm_adaptive_sweep_20261123/matched_f4_height4.jsonl \
+  --through-aux-seed 64 --max-wall-seconds 120
+```
+
+The runner stops on its original sign-test confirmation gate; the degree-16 seed-1 result crossed a separately frozen random-scalar cost gate after that original gate rejected it. `f4_height4_random.py` reproduces that validation in a distinct store. The raw stores must not be rewritten or merged across these gates.
 
 ## Source replay and first larger-rung diagnostic
 
