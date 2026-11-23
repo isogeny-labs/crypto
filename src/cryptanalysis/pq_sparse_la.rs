@@ -565,6 +565,84 @@ mod tests {
         );
     }
 
+    /// Independent exhaustive F7 target oracle. Unlike the historical
+    /// sparse reference, this enumerates *all* solutions and admits a
+    /// target only when every solution assigns it the same value.
+    #[test]
+    fn target_uniqueness_matches_exhaustive_f7_oracle() {
+        use rand::rngs::StdRng;
+        use rand::{Rng, SeedableRng};
+        let mut rng = StdRng::seed_from_u64(0x71a9_3f0e);
+        let n = BigUint::from(7u32);
+        for case in 0..96usize {
+            let cols = 1 + case % 4;
+            let planted: Vec<u32> = (0..cols).map(|_| rng.gen_range(0..7)).collect();
+            let n_rows = rng.gen_range(0..=cols + 2);
+            let raw: Vec<(Vec<(usize, u32)>, u32)> = (0..n_rows)
+                .map(|_| {
+                    let entries = (0..rng.gen_range(0..=cols + 1))
+                        .map(|_| (rng.gen_range(0..cols), rng.gen_range(0..7u32)))
+                        .collect::<Vec<_>>();
+                    let rhs = if case % 2 == 0 {
+                        entries.iter().map(|&(j, a)| a * planted[j]).sum::<u32>() % 7
+                    } else {
+                        rng.gen_range(0..7u32)
+                    };
+                    (entries, rhs)
+                })
+                .collect();
+            let matrix: Vec<SparseRow> = raw
+                .iter()
+                .map(|(row, rhs)| {
+                    SparseRow::from_entries(
+                        row.iter().map(|&(j, a)| (j, BigUint::from(a))).collect(),
+                        BigUint::from(*rhs),
+                    )
+                })
+                .collect();
+            let mut unique = vec![None; cols];
+            let mut ambiguous = vec![false; cols];
+            let mut any = false;
+            let limit = 7usize.pow(cols as u32);
+            for mut packed in 0..limit {
+                let mut x = vec![0u32; cols];
+                for slot in &mut x {
+                    *slot = (packed % 7) as u32;
+                    packed /= 7;
+                }
+                if raw.iter().any(|(row, rhs)| {
+                    row.iter().map(|&(j, a)| a * x[j]).sum::<u32>() % 7 != *rhs
+                }) {
+                    continue;
+                }
+                if !any {
+                    any = true;
+                    for j in 0..cols {
+                        unique[j] = Some(x[j]);
+                    }
+                } else {
+                    for j in 0..cols {
+                        if unique[j] != Some(x[j]) {
+                            ambiguous[j] = true;
+                        }
+                    }
+                }
+            }
+            for col in 0..cols {
+                let expected = if any && !ambiguous[col] {
+                    unique[col].map(BigUint::from)
+                } else {
+                    None
+                };
+                let got = sparse_solve_mod_n(matrix.clone(), cols, col, &n);
+                assert_eq!(
+                    got, expected,
+                    "exhaustive F7 oracle case {case}, target {col}, rows {raw:?}"
+                );
+            }
+        }
+    }
+
     /// **Composite modulus** with non-invertible pivot: ensure no panic.
     #[test]
     fn handles_composite_modulus_gracefully() {
