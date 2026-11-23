@@ -2099,6 +2099,12 @@ fn augmented_basis_min_payload_fixed_optimum_and_explicit_target_column() {
     assert_eq!(rank.augmented_basis_row_indices, vec![1, 2]);
     assert_eq!(selected, vec![target[1].clone(), target[2].clone()]);
 
+    let (empty, empty_audit, empty_comparisons) =
+        select_min_payload_augmented_basis(&[], 101).unwrap();
+    assert!(empty.is_empty());
+    assert_eq!(empty_audit.augmented_rank, 0);
+    assert_eq!(empty_comparisons, 0);
+
     assert!(select_min_payload_augmented_basis(
         &[mk(vec![(0, 1), (0, 2)], 0, 20, 1)], 101
     ).is_err());
