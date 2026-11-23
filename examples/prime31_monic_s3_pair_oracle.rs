@@ -476,6 +476,23 @@ fn main(){
 mod tests {
     use super::*;
     #[test]
+    fn cached_factorbase_membership_preserves_newton_chart() {
+        let f=Fp::new(P);
+        for size in [2usize,4,8,16,64] {
+            let w=factorbase(f,size);
+            let h=membership(f,&w);
+            for z in [GX,X2G,X3G,X10G] {
+                assert_eq!(construct_from_membership(f,&w,z,&h),
+                           construct(f,&w,z),"cached construction differs B={size} z={z}");
+                if size<=8 {
+                    assert_eq!(extract_with_cached_h(f,&w,z,false,Some(&h)),
+                               extract_with_method(f,&w,z,false),
+                               "cached extraction differs B={size} z={z}");
+                }
+            }
+        }
+    }
+    #[test]
     fn monic_s3_pair_oracle_exact_public_positive_and_negative_controls() {
         let f=Fp::new(P);
         for size in [2usize,3,4,6,8] {
