@@ -1641,20 +1641,22 @@ impl RadicalRootCtx {
             1 => ok(vec![]),
             2 => {
                 // x + c0 and a*x have roots without an inversion.
-                // Division by 2 is a canonical-field halving, not a
-                // generic modular inverse followed by multiplication.
-                // The context already computed inv(3) and inv(4) while
-                // initializing Cardano/Ferrari; reuse them for linear roots.
-                // Preserve the general Euclidean inverse for other leads.
+                // The context already holds inverses of 3 and 4 for
+                // Cardano/Ferrari. Cache hits beat Euclid at large primes;
+                // native Rust tests rejected the halving shortcut at a=2,
+                // and showed regressions on smaller prime fields.
                 let root = if c[0] == 0 { 0 }
                     else if c[1] == 1 { fp.neg(c[0]) }
-                    else if c[1] == 2 { fp.half(fp.neg(c[0])) }
                     else {
                         let neg_c0 = fp.neg(c[0]);
-                        let inverse = match c[1] {
-                            3 => self.inv3,
-                            4 => self.inv4,
-                            _ => fp.inv(c[1]),
+                        let inverse = if fp.p >= (1u64 << 20) {
+                            match c[1] {
+                                3 => self.inv3,
+                                4 => self.inv4,
+                                _ => fp.inv(c[1]),
+                            }
+                        } else {
+                            fp.inv(c[1])
                         };
                         fp.mul(neg_c0, inverse)
                     };
