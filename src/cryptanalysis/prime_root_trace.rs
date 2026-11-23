@@ -214,7 +214,7 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
 #[inline]
-fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
+fn field_value(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal_64: u64) -> u64 {
     match op {
         FieldOp::Add => {
             if a < p && b < p {
@@ -238,7 +238,19 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
                 let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
                 let folded = (folded & MAX_PRIME) + (folded >> 61);
                 if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+            } else if reciprocal_64 != 0 && a < p && b < p {
+                // Canonical <=32-bit products: reciprocal is computed just
+                // once when Engine is created. No variable integer division
+                // in the event-heavy root-finding field-operation path.
+                // For x=a*b < 2^64 and mu=floor(2^64/p), q=floor(x*mu/2^64)
+                // underestimates floor(x/p) by at most one.
+                let product = a * b;
+                let quotient = ((product as u128 * reciprocal_64 as u128) >> 64) as u64;
+                let remainder = product - quotient * p;
+                if remainder >= p { remainder - p } else { remainder }
             } else if p <= u32::MAX as u64 && a < p && b < p {
+                // Keep the original arithmetic for independent unit tests,
+                // where no cached reciprocal is supplied.
                 (a * b) % p
             } else {
                 ((a as u128 * b as u128) % p as u128) as u64
@@ -259,6 +271,7 @@ fn validate_input(f: &[u64], p: u64, limits: &RootLimits) -> Result<(), String> 
 }
 struct Engine<'a> {
     report: RootReport,
+    reciprocal_64: u64,
     sink: &'a mut dyn FnMut(&RootEvent) -> Result<(), String>,
     next_id: u64,
 }
@@ -287,7 +300,7 @@ impl Engine<'_> {
         if self.report.counters.field_work() >= self.report.limits.field_work {
             return Err(RootStop::WorkLimit);
         }
-        let value = field_value(&op, a, b, self.report.p);
+        let value = field_value(&op, a, b, self.report.p, self.reciprocal_64);
         self.event(RootEvent::Field { op, a, b, value })?;
         Ok(value)
     }
@@ -523,6 +536,13 @@ pub fn solve(
 ) -> Result<RootReport, String> {
     validate_input(f, p, &limits)?;
     let mut engine = Engine {
+        // p is public and validated. Cache reciprocal only for <=32-bit
+        // fields, matching the 64-bit Barrett product bound.
+        reciprocal_64: if p <= u32::MAX as u64 {
+            ((1u128 << 64) / p as u128) as u64
+        } else {
+            0
+        },
         report: RootReport {
             schema: "prime-root-trace/v1".into(),
             p,
@@ -1352,6 +1372,37 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round124_cached_barrett_trace_field_matches_wide_reference() {
+        let mut state = 0x524f_4f54_2026_1122u64;
+        for p in [3u64, 487, 65_521, 998_244_353,
+                  1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            let reciprocal_64 = if p <= u32::MAX as u64 {
+                ((1u128 << 64) / p as u128) as u64
+            } else {
+                0
+            };
+            for _ in 0..8192 {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a = state % p;
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let b = state % p;
+                for op in [FieldOp::Add, FieldOp::Sub, FieldOp::Mul, FieldOp::Square] {
+                    let reference = field_value(&op, a, b, p, 0);
+                    let optimized = field_value(&op, a, b, p, reciprocal_64);
+                    assert_eq!(optimized, reference, "p={p} a={a} b={b} op={op:?}");
+                    if a < p - 1 && b < p - 1 {
+                        assert_eq!(
+                            field_value(&op, a + p, b, p, reciprocal_64),
+                            field_value(&op, a + p, b, p, 0),
+                            "noncanonical p={p} op={op:?}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn round22_fast_trace_field_exact_under_frozen_arithmetic() {
         let mut seed = 0x524f_4f54_2026_1118u64;
         for p in [3, 487, 998244353, 1000000007, MAX_PRIME - 30, MAX_PRIME] {
@@ -1367,11 +1418,11 @@ mod tests {
                         FieldOp::Mul | FieldOp::Square =>
                             ((a as u128 * b as u128) % p as u128) as u64,
                     };
-                    assert_eq!(field_value(&op, a, b, p), reference,
+                    assert_eq!(field_value(&op, a, b, p, 0), reference,
                                "p={p} a={a} b={b} op={op:?}");
                     if a < p - 2 && b < p - 2 {
                         assert_eq!(
-                            field_value(&op, a + p, b, p),
+                            field_value(&op, a + p, b, p, 0),
                             match op {
                                 FieldOp::Add => ((a as u128 + p as u128 + b as u128) % p as u128) as u64,
                                 FieldOp::Sub => ((a as u128 + p as u128 + p as u128 - b as u128) % p as u128) as u64,
@@ -1405,7 +1456,7 @@ mod tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(&op, a, b, p, 0)
                     } else {
                         old(op, a, b, p)
                     };
