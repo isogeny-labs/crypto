@@ -1,9 +1,7 @@
 name: CT327 bounded public F103 rho control against cold IC and BSGS
 
 on:
-  push:
-    branches:
-      - research/ct327-f103-negation-rho-control-20261123
+  pull_request:
     paths:
       - "tests/ct238_native_cubic_norm_compression.rs"
       - ".github/workflows/ct327-f103-rho-control.yml"
