@@ -1,0 +1,286 @@
+{
+  "schema": "native-qualification-peer-review/v1",
+  "created_utc": "2026-11-23T09:20:05.010Z",
+  "role": "same-team independent artifact reviewer; inherited session model",
+  "scope": "Read-only review of pre-existing artifacts. No native tests, experiments, crypto arithmetic/certificate replays, cloud/S3 operations or secret reads performed. Administrative shell/Node hashing and status parsing only.",
+  "source_main": "816f9c3a942efed569049618c056d12a0c56d693",
+  "tested_source_head": "1f71987723a5c2d069e22abd4f99fc3303f51fee",
+  "source_difference": "Only docs/ACTIVE.md and docs/session-logs/2026-11-23.md differ between those commits; crate bytes unchanged.",
+  "pr": 4996,
+  "pcc_claim": "PCC-20261123-d1840d",
+  "pcc_standing": "unverified; no signed verdict or execution proof established by this review",
+  "artifact_consistency_disposition": "supported_within_scope",
+  "formal_validator_disposition": "insufficient_evidence_until_frozen_receipts_are_committed_and_bound",
+  "requirements": [
+    {
+      "requirement": "Native build receipt",
+      "status": "consistent",
+      "evidence": "unmodified-build/{cargo.jsonl,cargo.stderr,exit-code.txt}",
+      "detail": "Exit 0; terminal build-finished success:true. 42 native executable artifacts, 28 with test profile. Build 09:07:32–09:09:35 UTC. No test execution attributed to --no-run."
+    },
+    {
+      "requirement": "Every scheduled raw test result",
+      "status": "consistent",
+      "evidence": "qualification/{schedule.tsv,rows.tsv,*.stdout,*.stderr,post-call.json}",
+      "detail": "Schedule, producer rows, pre-call schedule, emitted test artifacts and post-call per-row names/indices agree. Each of 28 raw outputs has exactly one ok summary. 245 passed, 0 failed/ignored/measured/filtered; all stderr files empty. 159 library cases plus 86 other cases; 11 harnesses contain zero tests. Raw joint_targets output includes child stdout between its test header and terminal ok; it is not a failed case."
+    },
+    {
+      "requirement": "Native/source identity",
+      "status": "consistent",
+      "evidence": "unmodified-build/source-sha256.txt; qualification/{pre-call.json,executables.sha256,before-call-hashes.txt,after-call-hashes.txt,post-call-source-check.txt}",
+      "detail": "All 87 tracked crate files match the pre-build manifest, tested HEAD and main pin. All 42 original/copy pairs (84 paths) match frozen hashes and have no write bits at review. Pre/post receipts each contain 84 OK checks; source post-check has 87 OK checks. Integration tests spawn CARGO_BIN_EXE originals, which are included in both guards. No source repair was needed to obtain this build."
+    },
+    {
+      "requirement": "Toolchain metadata",
+      "status": "consistent_with_receipt_limit",
+      "evidence": "rust-1.99.1-channel.toml; rust-toolchain-install-{plan,receipt}.json; installer scripts/log",
+      "detail": "Saved channel digest matches .sha256 and plan; each of five planned package URLs/digests agrees with its channel section and receipt. All installation command steps report exit 0, no signal or stop. Build version receipts identify Rust/Cargo 1.99.1. Downloaded archives were intentionally removed by the installer, so reviewer rehashed metadata and installed executables, not the original archive payloads. This does not attest official origin independently of the producer."
+    },
+    {
+      "requirement": "Declared orchestration limits",
+      "status": "consistent_with_scope_limit",
+      "evidence": "build-unmodified.sh; run-qualification.sh; qualification/pre-call.json",
+      "detail": "Build: timeout 900s plus 10s kill grace, two Cargo jobs. Qualification: nominal global 600s, per harness at most 300s plus 5s kill grace, one test thread, no retries. Both use 250ms sampled whole-cgroup stop at 15032385536 bytes. Recorded build peak 14825893888 and qualification peak 14352605184 bytes; memory-stop flag0 and final binary-hash exit0. These are shared-cgroup guard readings, not process peak RSS, hard CPU reservations, L2 isolation or a performance measurement."
+    },
+    {
+      "requirement": "Historical input panel",
+      "status": "consistent",
+      "evidence": "research/hashed_ecdl_speed_20261029/inputs/{SHA256SUMS,manifest.json}",
+      "detail": "85 locally materialized files match frozen SHA256SUMS. Manifest has 84 unique cases:60 development and24 holdout. Preparation is not panel execution."
+    },
+    {
+      "requirement": "Formal validator admission/PCC",
+      "status": "insufficient_evidence",
+      "evidence": ".claude/agents/validator.md at source HEAD; pcc/keyring.json; PCC-20261123-d1840d",
+      "detail": "Source is committed, but this review currently binds local producer build/run receipts, not a committed publication snapshot. The validator role requires a frozen committed artifact set. There is no signed independent recompute/replay or trusted execution verifier. This is an unverified same-team artifact-consistency review; it is not independent PCC execution verification."
+    }
+  ],
+  "findings": [
+    {
+      "id": "V1",
+      "severity": "admission",
+      "finding": "Bind this review to exact committed raw receipts/archive before calling it a formal validator report. Preserve local hashes and unsigned standing."
+    },
+    {
+      "id": "V2",
+      "severity": "reporting",
+      "finding": "Report 28 harness executions and245 passing cases;11 harnesses have zero tests. The binary census is42 original/copy pairs,84 paths. Doctests, minimum-toolchain compatibility, lint and whole-root qualification were not run in this receipt."
+    },
+    {
+      "id": "V3",
+      "severity": "baseline_identity",
+      "finding": "Keep historical original tensor arms, current tensor implementation, and later CPU studies as separate baseline identities. Current flags alone cannot recreate old binary/source snapshots."
+    }
+  ],
+  "historical_baseline_map": [
+    {
+      "family": "Oct29 historical tensor optimization",
+      "identities": "Baseline crypto d188c5a6775dff07129084ab2f3f7ae39547c9fc; historical comparison.json development binary pair e522c1c17cddb3eb17d744525b49eb5b44757dfa04a7b99fcff09bfd501a84b7 /84276e2c508d5889abd101798dd4fd966140332148204ab4d98c556e0b86ac48. Later sizing IDENTITY records a separate release pair7c431843da1c1cf4079c2b34a967f0a3f881c95a05eb26979b93cb456976a8a8 /48a4f0239d3ca4a238143db909166b5560a08df0eabf9c4e2d5d8a04cda13528 and candidate source c866ee97; do not collapse these receipt stages.",
+      "outcome": "Original84-case frozen scientific panel not completed. Local sizing covers2 cases/10 executions,1 AA and1 AB round,protocol_complete:false,unisolated L0. Original1800s science deadline remains; proposed25h/round amendment explicitly not adopted. Retain historical build borrow error,33pass/1fail assertion suite, later34pass suite, and both p17 resource exits1 and earlier timeouts124."
+    },
+    {
+      "family": "Current tensor crate",
+      "identities": "This review source main816f9c3a/tested1f719877,87-file manifest; direct/functional public fallback, selectable prefix control/pruning plus later encoding/dedupe/auto/compressed-point changes and prepared/five-lead optional collectors.",
+      "outcome": "Development qualification only. Forced small recursion tests exercise implementation semantics; public usize guard fallback and passing controls are not general complexity, aggregate allocation or sharp D.11 inherited-precision proof. Dimensions/entry/packet proposals retain their open tuple/bit-space/source-binding obligations."
+    },
+    {
+      "family": "Later CPU studies",
+      "identities": "panel2 source abfd53ec854c5a1c2c1aae91b7bcc2b81475e230 complete binary ab285bfc2c56bf460751a7122c15fd144a8f64a2de7524f28701f57ffe8a8a27; round18 baseline2bd4588fba603ba1787e1d8ad82f084ef461d7cf candidate0d6e3840edb6330c62098d4ce2e821ed07f93ce9 and their own build records; round23 inspected README is historical producer prose.",
+      "outcome": "Separate fixed-fixture L0 complete CPU recovery/caching/MITM/batching comparisons,not the84-case tensor panel or a fresh replay here. CPU README larger-field ladder expired with zero recovery rows. Runtime-image source label is distinct from staged native binary source. No cross-panel pooling or current-source parity inferred."
+    }
+  ],
+  "limitations": [
+    "No general counter correctness/complexity theorem,algorithm improvement,novelty,L2 admission,full84-case completion,external fastest comparison,challenge scalar or scaling claim is established.",
+    "No independent cryptographic replay was performed; this review checks regression-output consistency and identities at their recorded scope.",
+    "Installed compiler hashes were observed after the producer run; archive payloads are no longer locally retained. No signed compiler-provenance attestation is inferred."
+  ],
+  "kb_receipt": {
+    "status": "unavailable_as_reported_by_parent",
+    "detail": "KB MCP tools absent; bash scripts/research-kb status exited127: no executable found. Parent queries:hashed ECDLP native tensor current baseline84-case panel; hashed ECDL missing module standalone build; packet recurrence sharp D.11 inherited precision. Repository primary notes/protocol/receipts used as fallback; no fresh primary manuscript reread or novelty claim."
+  },
+  "test_summaries": [
+    {
+      "index": 0,
+      "name": "hashed_ecdl_tensor",
+      "passed": 159,
+      "failed": 0
+    },
+    {
+      "index": 1,
+      "name": "certified_hash_prime",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "index": 2,
+      "name": "factoring_cli",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "index": 3,
+      "name": "finite_extensions",
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "index": 4,
+      "name": "five_leads",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "index": 5,
+      "name": "hashed-ecdl",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "index": 6,
+      "name": "hashed-ecdl-panel",
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "index": 7,
+      "name": "joint_addition_diagnostics",
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "index": 8,
+      "name": "joint_targets",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "index": 9,
+      "name": "optimized_cli",
+      "passed": 7,
+      "failed": 0
+    },
+    {
+      "index": 10,
+      "name": "panel_driver",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "index": 11,
+      "name": "prepared_pairs",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "index": 12,
+      "name": "prepared_root_diagnostics",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "index": 13,
+      "name": "strict_json",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "index": 14,
+      "name": "structured",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "index": 15,
+      "name": "structured_cli",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "index": 16,
+      "name": "tensor-admission-audit",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 17,
+      "name": "tensor-census",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 18,
+      "name": "tensor-e1-quotient-panel",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 19,
+      "name": "tensor-e1-rewire-dose",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 20,
+      "name": "tensor-e1-shape",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 21,
+      "name": "tensor-e1-sparse-null",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 22,
+      "name": "tensor-e1-typed-rewire",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 23,
+      "name": "tensor-factor",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 24,
+      "name": "tensor-guards",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 25,
+      "name": "tensor-structured",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 26,
+      "name": "tensor-treewidth",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "index": 27,
+      "name": "width_extensions",
+      "passed": 4,
+      "failed": 0
+    }
+  ],
+  "important_hashes": {
+    "unmodified-build/cargo.jsonl": "fbae4715bfd75f041fa53363b3e7f972b23bcb1f1e873b657f7736370dd2ea9e",
+    "unmodified-build/cargo.stderr": "0d36a4b66b69ec0ebffd0def619f54600c2fbcaaeaedfa5cf9d2951f6774f48f",
+    "unmodified-build/source-sha256.txt": "8090c1767895e7b2139e7fb611214e337cba21b235ad19fe8cfd27a82ba221b3",
+    "qualification/pre-call.json": "73455383fdbeb57962fde912e3b3f995756d54d8847ebee677cf83711a7d5abd",
+    "qualification/post-call.json": "c05ad73f6a2ecc852ee0cb33ca9c404a3ba90ec12a09c4e37d371876eb2bcccb",
+    "qualification/schedule.tsv": "71a48d58137293a9ecc5e9bdac96bd9d09b0eb5d13637183728f94ac7e280338",
+    "qualification/executables.sha256": "78a171cc3afb023bae8fe4ae2b1963f45bf5bba418a7cf55cccf401481d89adb",
+    "qualification/rows.tsv": "622ec84af820810680407af049531a41af305c16e871301498641c16bf4b9871",
+    "rust-toolchain-install-plan.json": "6ac41c5554fbdb41d4818e55a7ca8fee0c01a51f63854ee9d8bed486ee37c7c1",
+    "rust-toolchain-install-receipt.json": "4303ae494a79dc9be783298f639e013b222d0ff1c8fc6afa66254c6d6afcc640",
+    "rust-1.99.1-channel.toml": "fb152be80975c194aa5fc684b2aec3a6e14e2b855efe2faa4e5f8ae6e590f463"
+  },
+  "evidence_hash_manifest": "evidence-01.sha256",
+  "evidence_hash_manifest_sha256": "29ead3214cfc8d5a3a084228e14ab3cfa915b4f477e551927654fcad30c6413c"
+}

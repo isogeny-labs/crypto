@@ -1,0 +1,33 @@
+{
+  "frozen_at_utc": "2026-11-23T16:24:21.557682+00:00",
+  "attempt": "03",
+  "purpose": "Local correctness qualification of unchanged root library at the pinned baseline",
+  "rationale": "Attempts01/02 are preserved. Attempt02 reached root compilation but failed because sparse hydration omitted relative transitive modules. The pinned checkout now contains the complete relevant directories, repeated literal/manifest-relative include scan has zero missing references outside separate integration-test targets, and all materialized tracked files match baseline Git blobs. This attempt uses existing dependency and target caches with unchanged source and command.",
+  "root_sha": "7d61e3b45de6e93d235345a0061dae08db1f8b44",
+  "command": [
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-rust-toolchain/installed/bin/cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked"
+  ],
+  "cwd": "/workspace/scratch/857f9e575d1c/work/vitse-current-root",
+  "build_jobs": 1,
+  "default_features": "unchanged",
+  "timeout_seconds": 1200,
+  "stop_conditions": [
+    "First Cargo termination, including compiler/test failure",
+    "1200-second cap, terminating Cargo process group",
+    "No implementation or feature changes; no ignored/pruned tests; no follow-on attempt without a new task"
+  ],
+  "cargo_home": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/cargo-home",
+  "target_dir": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target",
+  "preflight_sha256": "72f5925763ff9031d4ddc45d5fe17787448a83757459ef8459ffe1a02eb2a8bd",
+  "source_integrity_sha256": "a31f54d3b4fd019b6ef42b90c2286d46369534430c20495c83a637c8a4976e08",
+  "prior_attempt_receipt_hashes": {
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/cargo-test-release-lib.log": "55d66f4a65f27971388d9e7876975fbb220213ca2c10b96a5f8fd2e9d5743dd3",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/gate-result.json": "75e473157e7760848176f971391a86591c9ce6d0c9768acbdaf70df355bebd5a",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate-02/cargo-test-release-lib.log": "79d6c2c9aa00107c5ba7b754f112e4af5876a2e4d1db54deed31ca8397329899",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate-02/gate-result.json": "b8caf969b3c90d94396df9979ef8f8aca3bf111ccc17dcc2484f175fa5d5b59c"
+  }
+}
