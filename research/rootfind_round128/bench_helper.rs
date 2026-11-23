@@ -9,9 +9,13 @@ pub fn round128_benchmark(operation: &str, p: u64, repetitions: usize) -> u64 {
         let a = (3 + i * 7) % p;
         let b = (13 + i * 7) % p;
         let c = (29 + i * 7) % p;
-        let pair = f.add(f.add(f.mul(a, b), f.mul(a, c)), f.mul(b, c));
+        let ab = f.mul(a, b);
+        let ac = f.mul(a, c);
+        let bc = f.mul(b, c);
+        let pair = f.add(f.add(ab, ac), bc);
         let sum = f.add(f.add(a, b), c);
-        let poly = vec![f.sub(0, f.mul(f.mul(a, b), c)), pair, f.sub(0, sum), 1];
+        let abc = f.mul(ab, c);
+        let poly = vec![f.sub(0, abc), pair, f.sub(0, sum), 1];
         cases.push((a, b, poly));
     }
     let mut checksum = 0u64;
