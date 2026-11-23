@@ -706,3 +706,50 @@ fn forest_witness_rejects_bad_rows_without_spurious_rank() {
     assert!(f.add_row(&[(0, 1), (1, 2)]).unwrap().is_some());
     assert_eq!(f.stats().dependent_rows, 1);
 }
+
+
+#[test]
+fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto::cryptanalysis::large_prime_filter::replay_complete_relation;
+    let p = 7;
+    let partials = vec![
+        PartialRelation { id: 10, small: vec![(0, 1)], large: vec![(101, 1)], rhs: 1 },
+        PartialRelation { id: 11, small: vec![(0, 2)], large: vec![(102, 2)], rhs: 2 },
+        PartialRelation { id: 12, small: vec![(0, 1)], large: vec![(101, 3), (102, 4)], rhs: 3 },
+    ];
+    let index = LpIndex::build(&partials, p).unwrap();
+    let batch = collect_witnesses(&index).unwrap();
+    assert_eq!(batch.rank, 2);
+    assert_eq!(batch.witnesses.len(), 1);
+    let out = materialize_complete_relations(&index, &batch, &partials, 4, 4).unwrap();
+    assert_eq!(out.len(), 1);
+    assert_eq!(out[0].sources, vec![(10, 4), (11, 5), (12, 1)]);
+    assert_eq!(out[0].small, vec![(0, 1)]); // 4*1 + 5*2 + 1*1 = 15 ≡ 1 (mod 7)
+    assert_eq!(out[0].rhs, 3);             // 4*1 + 5*2 + 1*3 = 17 ≡ 3 (mod 7)
+    assert_eq!(replay_complete_relation(&out[0], &partials, p).unwrap(), out[0]);
+    assert!(materialize_complete_relations(&index, &batch, &partials, 4, 2).is_none());
+    assert!(materialize_complete_relations(&index, &batch, &partials, 0, 4).is_none());
+    let mut duplicate = partials.clone();
+    duplicate[2].id = 11;
+    assert!(materialize_complete_relations(&index, &batch, &duplicate, 4, 4).is_none());
+}
+
+#[test]
+fn forest_witness_materialization_randomized_original_replay() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto::cryptanalysis::large_prime_filter::replay_complete_relation;
+    let mut rng = Rng(0xba44_739c_a1d8_5501);
+    for trial in 0..160 {
+        let p = [3u64, 7, 1_000_003][trial % 3];
+        let rows = 1 + rng.below(30) as usize;
+        let stream = random_lp_stream(&mut rng, rows, 10, 2, p);
+        let index = LpIndex::build(&stream, p).unwrap();
+        let batch = collect_witnesses(&index).unwrap();
+        let out = materialize_complete_relations(&index, &batch, &stream, 300, 300).unwrap();
+        assert_eq!(out.len(), batch.witnesses.len());
+        for row in &out {
+            assert_eq!(replay_complete_relation(row, &stream, p).unwrap(), *row);
+        }
+    }
+}
