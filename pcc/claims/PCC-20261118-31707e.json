@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:25:34Z",
+ "id": "PCC-20261118-31707e",
+ "kind": "statement",
+ "producer": {
+  "commit": "043f1bf305f7afc562253d4000d5b28420be9163",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/arithmetic-checkpoint.json",
+    "sha256": "1ea1e73e7fdbc2bcf11823841135d9caf4cdedc97f48ac9359e0c07a4e986ac1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-a/arithmetic.json",
+    "sha256": "837bf4e375d1a154922c75943ac48fdc488b081ffff931e4f1a21a3a4cc46bba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/attempt-a/ring.jsonl",
+    "sha256": "816b0a3edc34aaa914bab30b06d90c7921fc111161f5a4a88ce1a1dea436e7a8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261118-9456e2.json",
+    "sha256": "c82be27b31f2335cfabce155c3fcb80934f161eb41b60db1721a1b5ece92f80c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/pre-check.sha256",
+    "sha256": "3c408ad09b64f6c096330a98e45608d9dd34c30e42f86558b66a045a3dd79eab"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/post-check-a.stdout",
+    "sha256": "9ed36a5697bec4e2a786e2a4d614d7d44d228ce21df9788f44c3b8b53586c205"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118",
+ "statement": "Additive correction to PCC-20261118-9456e2: its prose decimal-digit count 1437 is incorrect; the bound native output and arithmetic-checkpoint.json show 1438 decimal digits. The exact 4774-bit conductor/trace and native arithmetic agreement are unchanged. For fixed published n=9551, the original full certificate attempt exits 124 and does not establish primality; the separately frozen staged attempt is pending. No lower endpoint, evaluated isogeny or endpoint timing is established. Use this corrected statement for the arithmetic checkpoint, not the earlier prose count."
+}

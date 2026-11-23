@@ -1,0 +1,60 @@
+--------------------------------------------------------------------------------
+Profile data file 'jv53.cg' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 706387674
+Trigger: Program termination
+Profiled target:  ../base/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0 (PID 4359, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+3,989,756,263 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+555,622,571 (13.93%)  ???:<&crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#42} as core::ops::function::FnMut<(&alloc::vec::Vec<(u32, u64)>,)>>::call_mut 
+446,723,856 (11.20%)  ???:<crypto_lib::cryptanalysis::jv_cover::Fq as crypto_lib::cryptanalysis::jv_cover::Fld>::mul 
+329,265,412 ( 8.25%)  ???:__umodti3 
+242,039,677 ( 6.07%)  ./malloc/./malloc/malloc.c:_int_malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+221,489,110 ( 5.55%)  ???:<<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::Interned>::id 
+187,641,424 ( 4.70%)  ???:crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic 
+169,029,451 ( 4.24%)  ./malloc/./malloc/malloc.c:_int_free [/usr/lib/x86_64-linux-gnu/libc.so.6]
+121,844,367 ( 3.05%)  ./malloc/./malloc/malloc.c:malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 89,460,501 ( 2.24%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#42}> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#42}>, core::option::Option<core::convert::Infallible>> as core::iter::traits::iterator::Iterator>::try_fold<(), core::iter::traits::iterator::Iterator::try_for_each::call<alloc::vec::Vec<u32>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>::Break>::{closure#0}, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>::{closure#0}, core::ops::control_flow::ControlFlow<core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>> 
+ 88,394,061 ( 2.22%)  ???:crypto_lib::cryptanalysis::jv_cover::pmul::<crypto_lib::cryptanalysis::jv_cover::Fq> 
+ 85,064,582 ( 2.13%)  ???:crypto_lib::cryptanalysis::f4_fp::rref32_deferred 
+ 78,443,968 ( 1.97%)  ???:crypto_lib::cryptanalysis::jv_cover::pdivrem::<crypto_lib::cryptanalysis::jv_cover::Fq> 
+ 67,760,744 ( 1.70%)  ./malloc/./malloc/malloc.c:free [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 64,499,006 ( 1.62%)  ???:crypto_lib::cryptanalysis::f4_fp::add_lazy_avx2 
+ 59,483,347 ( 1.49%)  ???:crypto_lib::cryptanalysis::zero_dim_la::fast_inner 
+ 54,546,109 ( 1.37%)  ???:crypto_lib::cryptanalysis::zero_dim_la::dot_avx2 
+ 53,665,632 ( 1.35%)  ./malloc/./malloc/malloc.c:malloc_consolidate [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 48,324,372 ( 1.21%)  ???:<alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<u64>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}::{closure#0}>>>::from_iter 
+ 46,536,554 ( 1.17%)  ???:<alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<core::slice::iter::Iter<usize>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#42}::{closure#1}>>>::from_iter 
+ 45,529,532 ( 1.14%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear::{closure#8}::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<(u32, u64), <alloc::vec::Vec<(u32, u64)>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear::{closure#8}::{closure#0}>>::{closure#0}>::{closure#0}> 
+ 40,917,360 ( 1.03%)  ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 35,711,041 ( 0.90%)  ./malloc/./malloc/malloc.c:unlink_chunk.isra.0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 34,989,150 ( 0.88%)  ???:crypto_lib::cryptanalysis::gaudry_cubic::rref_mod_p 
+ 32,355,232 ( 0.81%)  ???:<alloc::vec::Vec<(u128, u32)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u128, u32), core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u128>>, <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::{closure#7}>>>::from_iter 
+ 31,621,705 ( 0.79%)  ???:<crypto_lib::cryptanalysis::jv_cover::Fq as crypto_lib::cryptanalysis::jv_cover::Fld>::inv 
+ 30,611,246 ( 0.77%)  ???:crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::add 
+ 30,052,975 ( 0.75%)  ???:<hashbrown::map::HashMap<alloc::vec::Vec<u32>, (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::FxHasher>>>::insert 
+ 29,266,848 ( 0.73%)  ???:<crypto_lib::cryptanalysis::jv_cover::Fq3 as crypto_lib::cryptanalysis::jv_cover::Fld>::mul 
+ 29,106,961 ( 0.73%)  ???:<alloc::vec::Vec<(u32, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u32, u64), core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<alloc::vec::into_iter::IntoIter<u32>, core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#30}::{closure#0}>>>::from_iter 
+ 29,043,577 ( 0.73%)  ???:crypto_lib::cryptanalysis::jv_cover::charpoly_mod_p 
+ 27,363,652 ( 0.69%)  ./malloc/./malloc/malloc.c:_int_free_merge_chunk [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 23,367,957 ( 0.59%)  ???:crypto_lib::cryptanalysis::zero_dim_la::roots_in_fp 
+ 21,218,295 ( 0.53%)  ???:__rustc::__rdl_alloc 
+ 20,459,865 ( 0.51%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>, crypto_lib::cryptanalysis::zero_dim_la::fast_inner::{closure#4}::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<(u64, u64), <alloc::vec::Vec<(u64, u64)>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>, crypto_lib::cryptanalysis::zero_dim_la::fast_inner::{closure#4}::{closure#0}>>::{closure#0}>::{closure#0}> 
+ 19,675,864 ( 0.49%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<u128>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#31}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<alloc::vec::Vec<u32>, <alloc::vec::Vec<alloc::vec::Vec<u32>>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<u128>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#31}>>::{closure#0}>::{closure#0}> 

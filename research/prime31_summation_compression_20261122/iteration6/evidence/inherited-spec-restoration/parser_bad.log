@@ -1,0 +1,50 @@
+error: mismatched closing delimiter: `}`
+   --> /workspace/scratch/2f841b0b9a19/ci_syntax_audit/spec.bad.rs:964:45
+    |
+964 |         let phase_transfer = Spec::from_json(
+    |                                             ^ unclosed delimiter
+965 |                 "label": "phase-matched cover-transfer fixture",
+966 |                                  "lane": "cover_transfer", "route": "P1-K0-23-G3-COVER"},
+    |                                                                                        ^ mismatched closing delimiter
+
+error: mismatched closing delimiter: `}`
+    --> /workspace/scratch/2f841b0b9a19/ci_syntax_audit/spec.bad.rs:1038:46
+     |
+ 559 | mod tests {
+     |           - closing delimiter possibly meant for this
+...
+1038 |         plan_for_new_run(binary_groebner_spec(
+     |                                              ^ unclosed delimiter
+...
+1042 | }
+     | ^ mismatched closing delimiter
+
+error: this file contains an unclosed delimiter
+    --> /workspace/scratch/2f841b0b9a19/ci_syntax_audit/spec.bad.rs:1042:3
+     |
+ 559 | mod tests {
+     |           - unclosed delimiter
+...
+ 894 |     fn phase_policy_uses_panel_cells_and_enforces_public_target_count() {
+     |                                                                         - unclosed delimiter
+...
+ 920 |         assert!(plan(phase(
+     |                - unclosed delimiter
+...
+ 944 |         let phase_hec = Spec::from_json(
+     |                                        - unclosed delimiter
+...
+ 957 |         let wrong_hec_source = Spec::from_json(
+     |                                               - unclosed delimiter
+...
+ 979 |         let missing_route = Spec::from_json(
+     |                                            - another 8 unclosed delimiters begin from here
+...
+1023 |     fn new_binary_groebner_runs_require_the_canonical_field_profile() {
+     |                                                                       - this delimiter might not be properly closed...
+...
+1042 | }
+     | -^
+     | |
+     | ...as it matches this but it has different indentation
+

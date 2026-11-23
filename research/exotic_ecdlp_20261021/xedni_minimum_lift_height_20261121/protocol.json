@@ -1,0 +1,19 @@
+{
+  "schema": "xedni-minimum-lift-height-protocol-v1",
+  "curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "generator_Q": ["17", "10"],
+  "reduction_prime": 47,
+  "target_reduction": [10, 1],
+  "target_scalar_class_mod_43": 22,
+  "candidate_law": "x=a/b^2, gcd(a,b)=1, b>0, H=max(abs(a),b)",
+  "source_generator_sha256": "53fd653948c4376920c4d0ee2d53f2db275ebd7be5004d50f73d5d68986ade4e",
+  "source_lift_class_sha256": "d7e599026feb648a2a95b24829c1c6ea484cb87f47dc43e8bcf401552961ef2e",
+  "source_height_input_sha256": "ae3173327e63bbf730c0a7f1b6920dff18fe43a6e8a6140a65a0521ad532264f",
+  "source_height_audit_sha256": "7ea931aa5fc48449fec874e865cbba1304620ed7f4d2846a0453317ff37bcdb3",
+  "finite_representatives": [-21, 22],
+  "tail_condition": "all other integers n congruent to 22 modulo 43 have abs(n)>=64",
+  "tail_goal": "for every such tail representative, H>2^1300",
+  "minimum_goal": "-21Q has strictly smaller H than every other rational point reducing to target",
+  "height_comparison": "reuse exact x(65Q) numerator bits 2894 and Silverman bound B<14; use 2/3<log(2)<7/10",
+  "verification": "independent Python Fraction group law for finite representatives and Lean conditional tail inequality; curve-specific MW and height theorem bridge remains explicit"
+}

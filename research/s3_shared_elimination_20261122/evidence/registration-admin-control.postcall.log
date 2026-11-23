@@ -1,0 +1,96 @@
+SCOPE disposable local Git metadata control; no scientific tests, verifier, signing, network, or production ledger mutation
+FIXTURE_COMMIT 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a
+4fa99e147646bf34970445fb2be59c7bdbd6b84e11ec0aa90d85ba7ade0c532e  /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh
+1b5722fd9fc11c78157281a8e8d6c63d2c9cc25559df33f1dfcff93da1a5445b  /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.before-fix.sh
+5c798abb69e415371dbe71da694703041ad208042100d6c95bded7dbf4c500fc  /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/tools/pcc/pcc.py
+CASE before-fix-preview expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.before-fix.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --preview 
+EXIT 3
+jq: error: syntax error, unexpected '+', expecting end of file (Unix shell quoting issues?) at <top-level>, line 1:
++
+jq: 1 compile error
+CASE preview expected=zero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --preview 
+EXIT 0
+CASE stale-head expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --preview --expected-commit 0000000000000000000000000000000000000000 
+EXIT 1
+register_statement: HEAD differs from expected commit
+CASE stale-tail expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --preview --expected-last-ledger-hash 0000000000000000000000000000000000000000000000000000000000000000 
+EXIT 1
+register_statement: ledger tail differs from expected last hash
+CASE wrong-reviewed-hash expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --append --expected-claim-sha256 0000000000000000000000000000000000000000000000000000000000000000 
+EXIT 1
+register_statement: proposed claim differs from reviewed claim hash
+CASE dirty-receipt expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --preview 
+EXIT 1
+cmp: EOF on /tmp/s3-pcc-register.XGIvtfM9/receipt after byte 105
+register_statement: receipt bytes differ from the expected commit
+CASE corrupt-ledger expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --preview 
+EXIT 1
+register_statement: ledger hash mismatch or canonical-serializer incompatibility
+CASE append expected=zero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --append --expected-claim-sha256 8822934b20e837d79508308d22c5c0b6ebebe304bb373edc9786b8b242a0da78 
+EXIT 0
+CASE duplicate-claim expected=nonzero
+COMMAND /workspace/scratch/012d3e641737/s3-pcc-admin.88L70k8I/fixture/study/register_statement.sh --expected-commit 54b89649e2d8d9a57f6b38b74dc45d4eb45a368a --expected-last-ledger-hash 69e9faa1f5ffbf3bf5e097c87245921340341f72fa955e479ab1844772f7da29 --receipt receipt.json --id PCC-20261122-a1b2c3 --at 2026-11-22T23:00:00Z --statement Synthetic\ administrative\ metadata\ control\ only\;\ no\ scientific\ verification\ or\ result.\ \[pcc:unverified\] --append --expected-claim-sha256 8822934b20e837d79508308d22c5c0b6ebebe304bb373edc9786b8b242a0da78 
+EXIT 1
+register_statement: claim path already exists
+REVIEWED_PREVIEW_RECORD
+{
+  "schema": "s3-shared-elimination.pcc-registration/v1",
+  "mode": "preview",
+  "claim_path": "pcc/claims/PCC-20261122-a1b2c3.json",
+  "claim_sha256": "8822934b20e837d79508308d22c5c0b6ebebe304bb373edc9786b8b242a0da78",
+  "entry_sha256": "69e9faa1f5ffbf3bf5e097c87245921340341f72fa955e479ab1844772f7da29",
+  "receipt_sha256": "25aeae9a4f5cb43c47ce717bc16236e57cfa359437bf321590d4488c6698d203",
+  "contract_source_sha256": "5c798abb69e415371dbe71da694703041ad208042100d6c95bded7dbf4c500fc",
+  "base_entries_hash_checked": 1,
+  "appended_entries": 0,
+  "standing": "unverified",
+  "standing_source": "unsigned metadata only; no standing verifier executed",
+  "verifier_run": false,
+  "signature_created": false,
+  "python_executed": false,
+  "claim": {
+    "schema": "pcc.claim/v1",
+    "id": "PCC-20261122-a1b2c3",
+    "kind": "statement",
+    "claim_type": "data",
+    "statement": "Synthetic administrative metadata control only; no scientific verification or result. [pcc:unverified]",
+    "scope": "Unsigned producer development records for exact modular matrices and shared S3 elimination. Source review is within the same assistant team. No signed scientific verification, performance result, or complete-cost comparison is asserted. [pcc:unverified]",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "subject": {
+          "path": "receipt.json",
+          "sha256": "25aeae9a4f5cb43c47ce717bc16236e57cfa359437bf321590d4488c6698d203"
+        }
+      }
+    ],
+    "producer": {
+      "commit": "54b89649e2d8d9a57f6b38b74dc45d4eb45a368a",
+      "session": "",
+      "model": ""
+    },
+    "created_at": "2026-11-22T23:00:00Z"
+  },
+  "ledger_entry": {
+    "at": "2026-11-22T23:00:00Z",
+    "body": {
+      "claim_id": "PCC-20261122-a1b2c3",
+      "claim_sha256": "8822934b20e837d79508308d22c5c0b6ebebe304bb373edc9786b8b242a0da78",
+      "path": "pcc/claims/PCC-20261122-a1b2c3.json"
+    },
+    "hash": "69e9faa1f5ffbf3bf5e097c87245921340341f72fa955e479ab1844772f7da29",
+    "prev": "0e130b945905af4794072b3ff7d695a8505e823b4f0f5cbb2b1e931c63863eeb",
+    "schema": "pcc.ledger-entry/v1",
+    "seq": 1,
+    "type": "claim"
+  }
+}
+ADMIN_CONTROL_RESULT cases=9 expectations_met=true production_ledger_modified=false scientific_verification=false

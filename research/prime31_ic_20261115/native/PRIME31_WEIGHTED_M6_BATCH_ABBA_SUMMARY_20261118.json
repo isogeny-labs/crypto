@@ -1,0 +1,120 @@
+{
+  "schema": "prime31.weighted_m6_complete_batch_abba.v1",
+  "date_utc": "2026-11-18",
+  "source_sha": "1cab702112f7d3af371d6b5af349d5a443615a11",
+  "original_arithmetic_sha": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "actions_run": "https://github.com/isogeny-labs/crypto/actions/runs/44295520583",
+  "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44295520583/artifacts/14422898426",
+  "artifact_zip_sha256_locally_rehashed": "64f26701b748076a335626e7cdc517a0746e51a4a524fd25c62d5792375353cf",
+  "source_p": 2147483647,
+  "source_n": 2147446831,
+  "curve_a": 847514846,
+  "curve_b": 2087444724,
+  "generator": [
+    625037715,
+    2100627251
+  ],
+  "weights": [
+    1,
+    3,
+    5,
+    7,
+    11,
+    13
+  ],
+  "basis_kind": "first_31_rational_x_canonical_y",
+  "order": "A B B A (A scalar; B batched)",
+  "test_passes": {
+    "original_rust_library": "40/40",
+    "scalar_focused": "2/2",
+    "batched_focused": "2/2",
+    "independent_arithmetic": "4/4 full original-curve transcripts",
+    "exact_relation_witness_and_scalar_agreement": true
+  },
+  "results": {
+    "rank": 31,
+    "training_positive": 31,
+    "training_calls": 106,
+    "logs_recovered": 1024,
+    "distinct_public_targets": 1024,
+    "target_queries_with_shifts": 3717,
+    "generic_fallbacks": 0,
+    "whole_program_wall_ms": {
+      "scalar": [
+        43428.237076,
+        43510.029825
+      ],
+      "batched": [
+        5812.828441,
+        5988.72397
+      ]
+    },
+    "phase_wall_ms": {
+      "scalar": {
+        "setup": [
+          30.001727,
+          30.077805
+        ],
+        "train": [
+          1209.137923,
+          1206.963634
+        ],
+        "query": [
+          42187.646448,
+          42271.524851
+        ]
+      },
+      "batched": {
+        "setup": [
+          29.755431,
+          29.631738
+        ],
+        "train": [
+          161.822303,
+          160.477252
+        ],
+        "query": [
+          5618.952719,
+          5796.322461
+        ]
+      }
+    },
+    "paired_complete_speedup": [
+      7.471102496279573,
+      7.265325642484069
+    ],
+    "median_paired_complete_speedup": 7.368214069381821,
+    "query_operations": {
+      "scalar": {
+        "fp_inversions": 110831708,
+        "fp_multiplications": 7093290578,
+        "group_additions": 110834780
+      },
+      "batched": {
+        "fp_inversions": 102278,
+        "fp_multiplications": 670994789,
+        "group_additions": 110834780
+      }
+    },
+    "training_operations": {
+      "scalar": {
+        "fp_inversions": 3162648,
+        "fp_multiplications": 202412621,
+        "group_additions": 3162785
+      },
+      "batched": {
+        "fp_inversions": 4908,
+        "fp_multiplications": 19264019,
+        "group_additions": 3162785
+      }
+    }
+  },
+  "classification": {
+    "complete_index_calculus_style_solver": true,
+    "nonenumerative_algebraic_extractor": false,
+    "generic_three_plus_three_enumeration": true,
+    "strongest_external_ic_bsgs_rho_matched": false
+  },
+  "pcc_standing": "unverified",
+  "limitations": "One GitHub-hosted machine, two paired AB/BA executions, same frozen corpus. Native CI and separately coded Python replay passed, but signed independent PCC and stronger matched frontier still outstanding."
+}

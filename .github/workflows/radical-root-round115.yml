@@ -1,0 +1,32 @@
+name: Rootfinding Round115 source-exact Rust Barrett A/B
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round115_barrett_ab.py'
+      - '.github/workflows/radical-root-round115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  barrett-source-exact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round115_barrett_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check 180K+ exact arithmetic comparisons, roots, and 13 alternating A/B trials
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round115_barrett_ab.py | tee round115_native_rust.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round115-rust-ab
+          path: round115_native_rust.txt
+          if-no-files-found: warn

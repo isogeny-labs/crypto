@@ -1,0 +1,29 @@
+name: Rootfind round76 identity pruning (source-exact Rust)
+
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round76_trace_isolated.py'
+      - '.github/workflows/rootfind-trace-round76.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-source-exact-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round76_trace_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare exact Rust polynomial outputs and benchmark AB/BA
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round76_trace_isolated.py
