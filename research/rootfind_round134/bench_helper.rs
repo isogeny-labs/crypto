@@ -350,7 +350,8 @@ pub fn round134_polynomial_cases(p: u64, kind: &str) -> Vec<Vec<u64>> {
         for &r in roots {
             let mut next = vec![0u64;poly.len()+1];
             for (j,&coefficient) in poly.iter().enumerate() {
-                next[j] = f.sub(next[j], f.mul(coefficient, r));
+                let product = f.mul(coefficient, r);
+                next[j] = f.sub(next[j], product);
                 next[j+1] = f.add(next[j+1], coefficient);
             }
             poly=next;
