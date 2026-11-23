@@ -164,6 +164,27 @@ pub fn solve_audited(
     opts: &F4Options,
     rng: &mut StdRng,
 ) -> Result<(Vec<Vec<u64>>, ZeroDimStats, Audit), &'static str> {
+    solve_audited_with_trace(input, p, opts, rng, false)
+}
+
+/// Opt-in F4 learning/replay. A shape mismatch runs the library's checked
+/// fallback and remains visible in Audit.stats. Callers retain their F4 scope;
+/// dedicated workers use one arity in a fresh process and charge learning.
+pub fn solve_audited_traced(
+    input: &[Poly],
+    p: u64,
+    opts: &F4Options,
+    rng: &mut StdRng,
+) -> Result<(Vec<Vec<u64>>, ZeroDimStats, Audit), &'static str> {
+    solve_audited_with_trace(input, p, opts, rng, true)
+}
+fn solve_audited_with_trace(
+    input: &[Poly],
+    p: u64,
+    opts: &F4Options,
+    rng: &mut StdRng,
+    trace: bool,
+) -> Result<(Vec<Vec<u64>>, ZeroDimStats, Audit), &'static str> {
     let reduction = UnitReduction::new(input, p)?;
     let reduced_sha256 = format!(
         "{:x}",
@@ -171,7 +192,8 @@ pub fn solve_audited(
             serde_json::to_vec(reduction.polynomials()).map_err(|_| "reduced serialization")?
         )
     );
-    let (roots, stats) = cover::solve_zero_dim(reduction.polynomials(), N - 1, p, opts, rng);
+    let (roots, stats) =
+        cover::solve_zero_dim_traced(reduction.polynomials(), N - 1, p, opts, rng, trace);
     let roots = roots
         .iter()
         .map(|x| reduction.lift(x))
