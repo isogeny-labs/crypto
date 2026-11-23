@@ -32,6 +32,10 @@ root extraction or fully charged comparison is completed. [pcc:unverified]
 - [Current native observation](reports/integration-export/observation.json):
   160 raw-file pins, 41 parsed records and 2 sampled identity certificates,
   including every historical failed/capped attempt and the fresh qualification.
+- [Unsigned observation registration](../../pcc/claims/PCC-20261123-688e4c.json)
+  and [registration receipt](reports/pcc-registration.json): producer commit
+  `9db32aeb03d7f1c1964016efcb23ed9c8241ed9f`, standing `unverified`, no
+  signature or verifier verdict. The existing ledger prefix was preserved.
 - [Historical native observation export](reports/development-export/observation.json):
   116 raw-file pins, 23 parsed stdout records and 2 sampled identity certificates;
   unsigned, with failed and capped attempts retained. Its paths refer to the

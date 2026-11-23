@@ -17,7 +17,7 @@ prevents those distinct observations from being combined or overwritten.
 The copied `evidence/development-01` through `development-08`, original-library
 gates and checkpoint preflight retain their exact original bytes. Their source
 paths and executable paths are historical metadata from the original checkout;
-resolve repository paths against the published269cd7b source when reconstructing
+resolve repository paths against the published 269cd7b source when reconstructing
 those runs. Do not interpret a copied old source manifest as a check of this new
 checkout. The copied observation export under `reports/development-export` is
 also historical: its path pins still refer to the original namespace and must
@@ -25,7 +25,7 @@ not be registered as if they referred to this new checkout.
 
 The original identity records retain their original mathematical statements,
 source references and fixed checker streams. Their source references are to the
-derivation in the published269cd7b tree. They remain sampled unsigned identity
+derivation in the published 269cd7b tree. They remain sampled unsigned identity
 records, not formal or independently executed proofs.
 
 ## Current integration
@@ -49,3 +49,18 @@ Fresh observations use new evidence directories and a new native export output
 path. Every historical failure remains in the new export, with its original
 source identities and scope. PCC registration must bind that new export and an
 actual published producer commit while preserving the current canonical ledger.
+
+## Published integration and registration
+
+The integration producer is `9db32aeb03d7f1c1964016efcb23ed9c8241ed9f`, with
+tree `724221b848ebe7d5e6bdf5be4aad03a34d84ff55`, on publication base
+`816f9c3a942efed569049618c056d12a0c56d693`. All 41 production/source-selector
+inputs in the development09 inventory are byte-identical between its e510
+execution snapshot and that publication base. The two publication source
+inventories are retained under reports/. No rerun at 816f is implied.
+
+PCC-20261123-688e4c registers only the new integration observation and this
+actual published producer commit. The native metadata tool preserved the
+existing canonical ledger prefix and appended sequence 1564. Its receipt
+explicitly reports unverified standing and no signature, verifier execution
+or verifier verdict.
