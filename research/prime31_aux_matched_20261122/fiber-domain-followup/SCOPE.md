@@ -1,5 +1,7 @@
 # Exact fiber-domain continuation
 
+Implementation PR: https://github.com/isogeny-labs/crypto/pull/4975. Published implementation commit: `d88d650950802bc4335f828151006fcae47909ec`; see PUBLICATION.json for the exact tree binding to local qualification history.
+
 Initial tracking PR: https://github.com/isogeny-labs/crypto/pull/4956 (merged tracking only; the implementation is published separately).
 
 Objective: complete cold single-target ECDLP advantage on the unchanged ordinary Prime31 fixture, with strongest maintained applicable IC and matched optimized negation-map rho. Preserve the preceding protocol and results. No campaign is admitted by this development work.

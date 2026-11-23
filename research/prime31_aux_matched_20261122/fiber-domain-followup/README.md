@@ -82,7 +82,7 @@ retries and inherited USD5 aggregate ceiling. The shared access obstruction is
 The primary paper is Petit, Kosters and Messeng,
 [PKC2016 §§3.4-3.5](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf).
 Large-prime-degree evaluation caveats are from Bernstein, De Feo, Leroux and
-Smith, [Faster computation of isogenies of large prime degree](https://arxiv.org/pdf/2003.10118),
+Smith, [large-prime-degree isogeny evaluation](https://arxiv.org/pdf/2003.10118),
 §§4.8-4.15. The repository's existing finite-domain root work (PR #4826) and
 pinned native controls informed this continuation. Shared research-KB tools and
 wrapper were unavailable; no novelty or exhaustive literature claim follows.

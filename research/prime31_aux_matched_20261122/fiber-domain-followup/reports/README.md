@@ -25,7 +25,7 @@ Inspect all six rendered pages with Poppler or a PDF renderer before delivery.
 The data gate intentionally rejects an assertion of established end-to-end
 advantage: this prose would need a separately reviewed revision supported by
 complete-cold execution evidence. Mathematical component counts are explicitly
-source-derived and must not be relabeled as measured speedups.
+source-derived and must not be relabeled as measured runtime comparisons.
 
 The path-reuse refactor removes the former second map traversal. Page 3 now
 shows one validation cost C plus separately charged index construction and
