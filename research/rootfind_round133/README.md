@@ -34,11 +34,29 @@ p≡3 mod4 distinct quadratics and random quartic, random cubic and ψ₃ contro
 - C++ exhaustive root oracles: all monic quadratics over p=3,5,7,11,13,19,23,31,101 (12,425 polynomial inputs); both reference and candidate agree with brute-force roots.
 - Additional C++ differential randomized field arithmetic, polynomial multiplication/powers, constructed, repeated-root and random cubic/quartic tests across p=101, 65,521, 1,000,000,009, 1,000,000,007, 4,294,967,291, 2⁶¹−1: PASS.
 - GCC AddressSanitizer and UndefinedBehaviorSanitizer: PASS.
-- Rust source-exact A/B workflow (`.github/workflows/rootfind_round133.yml`) compiles the actual Round 132 Rust baseline versus the Round 133 production Rust candidate, independently checks roots, and executes 13 alternating trials per operation including p=1,000,000,009. **The local runtime lacks rustc/cargo; GitHub Actions is required for native Rust validation.** Do not assume it passed until a completed run is inspected.
+- Rust source-exact A/B workflow (`.github/workflows/rootfind_round133.yml`) compiles the actual Round 132 Rust baseline versus the Round 133 production Rust candidate, independently checks roots, and executes 13 alternating trials per operation including p=1,000,000,009. **The local runtime lacks rustc/cargo. Two GitHub Actions source-exact native Rust A/B executions passed, including independent correctness oracles.**
 
 ## Reproduce local C++ measurements
 
 The companion Round133 local artifact contains `round133_bench.cpp`, `round133_seed2.cpp`, `summary133.csv`, 4 raw trial CSVs, and sanitizer logs. Compile with `g++ -O3 -march=native -std=c++20` or equivalent Clang settings, run `--verify`, then collect timed CSV. Candidate bitmask 88548 is Tonelli-Shanks alone, 154084 is repeated-root handling alone, 219620 is combined. Use 23012 as the Round132 baseline. The output mode is `taskclock` when `perf_event_open` is available; this is **software task-clock, not CPU cycles**.
+
+## Production Rust A/B (two successful independent executions)
+
+[Run 1](https://github.com/isogeny-labs/crypto/actions/runs/45156668313) and [run 2](https://github.com/isogeny-labs/crypto/actions/runs/45156813457). Each compiles the actual Round132 and Round133 production Rust source files with `rustc -C opt-level=3 -C target-cpu=native`; independent oracles pass on both, and 13 alternating paired trials produce the following **complete roots() query** results. Times are median nanoseconds per query. Paired speedup uses medians of within-trial ratios.
+
+| Complete operation | Prime | Native run 1 before → after | Run 1 speedup | Independent run 2 speedup |
+| --- | --- | ---: | ---: | ---: |
+| Distinct quadratic roots | 65,521 | 3,418 → 1,008 ns | **3.384×** | **4.203×** |
+| Distinct quadratic roots | 1,000,000,009 | 6,259 → 1,860 ns | **3.349×** | **3.912×** |
+| Repeated quadratic root | 65,521 | 1,106 → 29.8 ns | **37.552×** | **32.749×** |
+| Repeated quadratic root | 1,000,000,009 | 1,737 → 31.5 ns | **54.912×** | **72.636×** |
+| Cubic known roots | 65,521 | 7,356 → 5,138 ns | **1.473×** | **1.314×** |
+| Cubic known roots | 1,000,000,009 | 14,078 → 10,811 ns | **1.321×** | **1.303×** |
+| Quartic known roots | 1,000,000,009 | 23,132 → 18,883 ns | **1.227×** | **1.237×** |
+| Repeated quadratic root | 1,000,000,007 | 145 → 30.1 ns | **4.803×** | **4.584×** |
+| Repeated quadratic root | 2⁶¹−1 | 174 → 29.8 ns | **5.857×** | **5.527×** |
+
+At p=1,000,000,009, complete `find_isogeny(3)` showed **1.012×** in the first run but **0.991×** in the second; at p=65,521 it showed **1.099–1.126×**. Thus the overall isogeny speedup is workload- and field-dependent. Some previously fast nonrepeated p≡3 mod4 quadratics regressed approximately 1–6%, and random/quartic workloads did not universally improve. No overall ECC index-calculus gain is claimed.
 
 ## Acceptance
 
