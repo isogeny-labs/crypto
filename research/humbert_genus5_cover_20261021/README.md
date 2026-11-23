@@ -99,3 +99,33 @@ before data: all solved, and the counted fields are identical to the flag-free i
 32003. The relation phase ran at 0.042× and the LA phase at 0.29× [pcc:unverified] (L0). With
 relations cheap, lp ties dlpf, and excess with safe clique removal gives no measurable gain.
 Report: `levers_20261116/REPORT.pdf`.
+
+## Next leads and a matched rho (2026-11-20, `next_leads_20261120/`)
+
+Faster setup (`HUMBERT_SETUP_FAST`), a factor-base re-balance and a matched multi-thread rho
+(`HUMBERT_RHO_*`: distinguished points, 64 batched affine walks per thread, Barrett K4, negation map)
+were built and independently verified in workflow `wf_51f8d293-995`. The campaign was 150 runs under
+a protocol frozen before data. Setup is 0.06× and counted identical; dlpf at alpha 0.3 is 0.83× of
+alpha 0.5 at q = 32003. The matched rho runs at about 14× the scalar rho's steps per second.
+Against it, the best IC arm takes 1.68, 1.19 and 0.77 of rho's expected time at q = 16001, 24001
+and 32003 [pcc:unverified] (L0). The earlier "below rho" ratios of 0.04–0.36 were measured against
+a weak scalar rho and are superseded. Report: `next_leads_20261120/REPORT.pdf`.
+
+## Slope test against a SIMD matched rho (2026-11-20, `slope_20261120/`)
+
+The crate now accepts q < 2^16. Two further flags were verified in workflow `wf_6b058b58-659`:
+the SIMD matched rho (`HUMBERT_RHO_SIMD`) and Montgomery mod-r linear algebra
+(`HUMBERT_LA_FASTMOD`). The campaign was 160 runs over q = 16001–65521; all solved, with counted
+fields identical. Against the SIMD rho, which runs at 4.5× the v7 rho's steps per second, the
+best IC arm takes 3.89, 1.97, 2.00 and 1.37 of rho's expected time. The slopes are 1.21 for IC
+and 2.00 for rho, which puts the extrapolated crossover near q ≈ 92 000 [pcc:unverified] (L0).
+Report: `slope_20261120/REPORT.pdf`.
+
+## Crossover test at q < 2^17 (2026-11-21, `crossover_20261121/`)
+
+The crate now accepts q < 2^17. The campaign was 150 runs over q = 65521–131071, all solved. The
+crossover extrapolated from `slope_20261120` (q ≈ 92 000) is falsified: the best IC arm's
+per-instance ratio to the SIMD rho's expected time rises from 1.21 to 2.00 [pcc:unverified]. Two
+causes are measured: LA is quadratic in q at fixed alpha, and the r < 2^62 rule makes r ≪ q^4,
+which flattens rho. Report: `crossover_20261121/REPORT.pdf`. A lab-wide audit of rho references
+followed: `research/rho_reference_audit_20261121`.

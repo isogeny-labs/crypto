@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-crt-rank-simon-protocol-v1",
+  "amends": "rank-protocol.json",
+  "reason": "the proof-enabled PARI call reported lower 0 and upper 3 without a certified rank",
+  "curve_coefficients": ["1081", "1034", "0", "-6816", "-3997"],
+  "known_point": ["17", "10"],
+  "method": "checked Sage simon_two_descent(known_points=[Q], limbigprime=0)",
+  "timeout_seconds": 60,
+  "status_rules": "retain complete, error, or timeout with stderr and elapsed time; report lower and upper bounds separately",
+  "interpretation": "one selected rational curve; no uniform rank inference"
+}

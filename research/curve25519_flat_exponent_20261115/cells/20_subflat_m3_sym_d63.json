@@ -1,0 +1,23 @@
+{
+ "miniature": "20",
+ "kind": "subflat",
+ "form": "sym",
+ "m": 3,
+ "d_or_t": 63,
+ "capped": true,
+ "failure": "exit -6",
+ "stderr": " <alloc::raw_vec::RawVec<(alloc::vec::Vec<(u32, u64)>, u64)>>::grow_one\n   5: crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic\n   6: crypto_lib::cryptanalysis::f4_fp::f4\n   7: crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::solve_system\n   8: curve25519_family::f4sub\n   9: curve25519_family::main\nnote: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.\n",
+ "ext": {
+  "study": "curve25519_flat_exponent_20261115",
+  "cap_s": 7200,
+  "mem_kb": 12000000,
+  "load_before": 1.0,
+  "load_after": 1.0,
+  "wall_s": 13903.8,
+  "started_utc": "2026-11-21T21:45:31Z",
+  "bin_sha256": "5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746",
+  "exit": -6,
+  "cmd": "ulimit -v 12000000; RAYON_NUM_THREADS=1 /home/user/bin-archive/curve25519_family-5abc70ba f4sub 20 subflat 63 0 mont 3 sym 6 20264171 7200",
+  "env_extra": []
+ }
+}

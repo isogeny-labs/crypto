@@ -1,0 +1,110 @@
+{
+  "schema": "ghs.frontier.admission/v1",
+  "observed_at": "2026-11-19T16:51:17Z",
+  "status": "blocked_before_launch",
+  "launch_performed": false,
+  "paid_resource_created": false,
+  "tracking_revision_at_observation": "2b88bdd84b2c102da686d4c589b2d6a68cea07d3",
+  "tracking_revision_published": true,
+  "experiment_revision_frozen": false,
+  "workflow": {
+    "repository": "isogeny-labs/crypto",
+    "id": 390723163,
+    "path": ".github/workflows/isolab-experiment.yml",
+    "main_revision": "ad2a014c0022cf000845014499a9649b6c2cef2d",
+    "main_workflow_git_blob": "c66a56fe4ab501293ed766ede670d9121b30fac2",
+    "main_workflow_sha256": "82f6065c5fa2839eede0947b5e505564447d59ebf19fcf4357dc5a286ec70369",
+    "active": true,
+    "latest_manual_run": 44374607134,
+    "latest_manual_outcome": "contracts_artifact_hydration_failure_before_build",
+    "build_payload": "ecbench_only_for_generic_mode",
+    "standalone_ghs_l2_supported": false
+  },
+  "routes": [
+    {
+      "id": "installed_mcp",
+      "status": "blocked",
+      "reason": "no_registered_isolab_eks_server"
+    },
+    {
+      "id": "direct_aws_bridge",
+      "status": "blocked",
+      "reason": "no_aws_credentials"
+    },
+    {
+      "id": "direct_kubernetes",
+      "status": "blocked",
+      "reason": "kubectl_absent_and_no_cluster_identity"
+    },
+    {
+      "id": "github_ecbench",
+      "status": "blocked",
+      "reason": "main_contract_job_fails_before_build"
+    },
+    {
+      "id": "standalone_ghs_command",
+      "status": "implemented_unexecuted",
+      "reason": "operator_preflight_image_and_submission_unavailable",
+      "wall_admission": "diagnostic_only"
+    },
+    {
+      "id": "standalone_ghs_l2",
+      "status": "design_only_non_admitting",
+      "reason": "offline_contract_exists_but_custom_driver_has_no_trusted_independent_l2_grader"
+    }
+  ],
+  "gates": {
+    "aws_identity": false,
+    "live_budget": false,
+    "all_tenant_pool": false,
+    "namespace_quota": false,
+    "checkpoint": false,
+    "git_custody_final_revision": false,
+    "digest_pinned_final_image": false,
+    "l2_custom_driver": false,
+    "independent_result_readback": false
+  },
+  "budget": {
+    "shared_daily_policy_usd": 200,
+    "shared_monthly_policy_usd": 1000,
+    "live_remaining_usd": null,
+    "matched_m3_all_attempt_ceiling_usd": 5,
+    "worker_scaling_all_attempt_ceiling_usd": null,
+    "worker_scaling_ceiling_status": "required_before_launch"
+  },
+  "open_dependencies": [
+    {
+      "kind": "pull_request",
+      "id": 4695,
+      "purpose": "read_only_budget_telemetry",
+      "state": "open_not_on_main",
+      "limits": "always_launch_admitted_false_and_no_pool_or_checkpoint_admission"
+    },
+    {
+      "kind": "pull_request",
+      "id": 4705,
+      "purpose": "per_job_artifact_hydration",
+      "state": "draft_not_on_main",
+      "limits": "does_not_add_standalone_ghs_l2_contract"
+    }
+  ],
+  "script_sha256": {
+    "scripts/checkpoint.sh": "4f50bbeae65b6f87cdf686644b42eb4d7ce9e40a9c52d84beb8e19a21eb631b2",
+    "scripts/isolab_pool_check.sh": "887146b97a21c909808364cdbc23ef31fa0b40f4d05b8221e9d35ee7728c1d7f",
+    "research/quartic_ghs_strong_rho_20261114/make_requests.py": "096a0123293a51bb2344ed7bbec8d6b25a38ddfd4bccf0b94882f945d8136378",
+    "research/quartic_ghs_strong_rho_20261114/Dockerfile": "2f1f1348215cc9a05a8063229e1432860a5d20b4de3c14db0354dabed546460e",
+    "research/quartic_ghs_strong_rho_20261114/pod_run.sh": "a7a7795c0013485855805c87c14bb67fee2864273a934e72b85ebb3bef7e0a6e"
+  },
+  "local_control": {
+    "request_generator_tests": 7,
+    "request_generator_failures": 0
+  },
+  "subsequent_offline_contract": {
+    "status": "validated_non_admitting",
+    "normal_verifier_exit": 3,
+    "launch_surface_added": false,
+    "trusted_isolation_grader_added": false,
+    "result": "no_measurement_admission"
+  }
+}
+

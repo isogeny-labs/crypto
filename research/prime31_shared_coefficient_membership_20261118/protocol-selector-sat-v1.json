@@ -1,0 +1,66 @@
+{
+  "schema": "prime31.selector-sat.protocol/v1",
+  "status": "prospective",
+  "frozen_at_utc": "2026-11-20T00:54:23Z",
+  "base_commit": "cd50f50fa1cc7caf40a0f13a4fa99f586d0f7016",
+  "pull_request": 4692,
+  "preexecution_amendment": {
+    "amended_at_utc": "2026-11-20T01:56:56Z",
+    "registered_rows_completed_before_amendment": 0,
+    "changes": [
+      "add source-linked native CNF-XOR arm",
+      "freeze semantic-priority native branching and retain plain branching only as an explicit diagnostic control",
+      "enforce wall, memory, conflict, hash, frozen-panel, and independent-replay checks in committed runners"
+    ]
+  },
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "generator": [625037715, 2100627251]
+  },
+  "slot_weights": [1, 3, 5, 7, 11, 13, 17, 19],
+  "panel_seed": "0x7738423442383231_xor_B",
+  "rungs": {
+    "development": [4, 6, 8],
+    "holdout": [12, 16],
+    "whole_solve": [31]
+  },
+  "frozen_labels": {
+    "B4_natural": {"positive": 0, "negative": 64},
+    "B8_natural": {"positive": 46, "negative": 18, "multiplicity_sum": 115},
+    "planted_per_rung": 8
+  },
+  "backends": [
+    "cryptominisat_cnf_xor",
+    "cryptominisat_cnf",
+    "cadical_cnf",
+    "repository_native_cdcl_cnf_semantic_priority",
+    "repository_native_cdcl_xor_semantic_priority"
+  ],
+  "diagnostic_controls_not_used_for_advancement": [
+    "repository_native_cdcl_cnf_plain_branching",
+    "repository_native_cdcl_xor_plain_branching"
+  ],
+  "separate_non_equivalent_control": "shared_rr9_f4_common_support_only",
+  "generic_half_words": {"B4": 4096, "B6": 20736, "B8": 65536},
+  "per_case_caps": {"wall_seconds": 900, "memory_gib": 16, "threads": 1},
+  "forbidden_counters": [
+    "secret_scalars_consumed",
+    "witness_indices_or_signs_consumed",
+    "pair_table_entries_consumed",
+    "half_table_entries_consumed",
+    "complete_selector_assignments_enumerated",
+    "grader_records_consumed_after_target_extraction"
+  ],
+  "advance_requires": [
+    "all_B8_labels_agree",
+    "all_accepted_witnesses_replay",
+    "all_forbidden_counters_zero",
+    "all_planned_B8_rows_complete",
+    "observed_solver_work_growth_below_generic_B_to_the_four_frontier"
+  ],
+  "pcc": "unverified"
+}

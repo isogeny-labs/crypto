@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 643,
-    "frontier": 420,
+    "nodes": 654,
+    "frontier": 431,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -18,61 +18,21 @@
       "algorithm": 12,
       "conditional": 91,
       "measured": 31,
-      "proved_internal_unreviewed": 72,
-      "open": 91,
+      "proved_internal_unreviewed": 78,
+      "open": 92,
       "heuristic": 71,
-      "refuted": 33,
+      "refuted": 37,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 588,
-      "kernel_checked": 45,
+      "none": 589,
+      "kernel_checked": 55,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 6
     }
   },
   "frontier": [
-    {
-      "id": "GAP-IC-STOPPING-CENSORSHIP",
-      "label": "Adaptive stopping and failure-censorship bridge",
-      "status": "open",
-      "formal": "none",
-      "action": "prove or refute",
-      "impact": 23,
-      "downstream": [
-        "ALG-SP-GAUDRY-ABELIAN-IC",
-        "ALG-SP-JV-COVER-DECOMPOSITION",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "ATTACK-GHS-WEIL-DESCENT",
-        "COND-HASHED-ECDL-TENSOR-BOUND",
-        "COND-PF-APS-COST",
-        "COND-PF-EP-BETA-THRESHOLD",
-        "COND-PF-HKPYY-COMPLEXITY",
-        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-        "COND-SP-FGHR-PDP-EDWARDS",
-        "COND-SP-FPPR-BINARY",
-        "COND-SP-SEMAEV15-COMPLEXITY",
-        "COND-WD-JV-COVER-DECOMP",
-        "COND-WD-KMPS-INEFFECTIVE",
-        "DEF-INDEX-CALCULUS-PIPELINE",
-        "FACT-PF-EP-LINEARIZED-NO-GAIN",
-        "FACT-PF-MM-TRINOMIAL-NO-GAIN",
-        "HEUR-DECOMPOSITION-PROBABILITY",
-        "HEUR-RELATION-RANK",
-        "THM-WD-DIEM-SMALL-GENUS",
-        "THM-WD-GTTD-THM1"
-      ],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-IC-PUBLIC-POPULATION-CONTRACT",
-        "RT-IC-YIELD-SCALING-CERTIFICATE",
-        "RT-IC-RANK-SUPPORT-CERTIFICATE"
-      ],
-      "pressure": []
-    },
     {
       "id": "GAP-IC-SOLVER-VISIBLE-YIELD",
       "label": "Mathematical-to-solver-visible yield bridge",
@@ -106,7 +66,16 @@
         "RT-IC-YIELD-SCALING-CERTIFICATE",
         "RT-IC-YIELD-RANK-COMPOSITION"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-IC-SOLVER-VISIBLE-BOUND",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-IC-SOLVER-INCOMPLETENESS",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-IC-YIELD-SCALING-LAW",
@@ -148,70 +117,50 @@
         {
           "from": "THM-RP-YIELD-SUM-COUNT",
           "relation": "qualifies"
+        },
+        {
+          "from": "CEX-IC-MEAN-SHAPE-SEPARATION",
+          "relation": "qualifies"
         }
       ]
     },
     {
-      "id": "GAP-IC-ROW-ENSEMBLE-LAW",
-      "label": "Relation-row ensemble law",
+      "id": "GAP-IC-STOPPING-CENSORSHIP",
+      "label": "Adaptive stopping and failure-censorship bridge",
       "status": "open",
       "formal": "none",
       "action": "prove or refute",
-      "impact": 15,
+      "impact": 16,
       "downstream": [
+        "ALG-SP-GAUDRY-ABELIAN-IC",
         "ALG-SP-JV-COVER-DECOMPOSITION",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "ATTACK-GHS-WEIL-DESCENT",
         "COND-HASHED-ECDL-TENSOR-BOUND",
+        "COND-PF-APS-COST",
+        "COND-PF-EP-BETA-THRESHOLD",
+        "COND-PF-HKPYY-COMPLEXITY",
         "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-        "COND-WAGNER-ECDLP-FILTER-GAIN",
+        "COND-SP-FGHR-PDP-EDWARDS",
+        "COND-SP-FPPR-BINARY",
+        "COND-SP-SEMAEV15-COMPLEXITY",
         "COND-WD-JV-COVER-DECOMP",
-        "COND-WD-KMPS-INEFFECTIVE",
-        "GAP-END-TO-END-IC-EXPONENT",
-        "GAP-IC-YIELD-RANK-COMPOSITION",
-        "HEUR-RELATION-RANK",
-        "THM-WD-DIEM-SMALL-GENUS",
-        "THM-WD-GTTD-THM1"
+        "DEF-INDEX-CALCULUS-PIPELINE",
+        "FACT-PF-EP-LINEARIZED-NO-GAIN",
+        "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+        "HEUR-DECOMPOSITION-PROBABILITY",
+        "HEUR-RELATION-RANK"
       ],
       "depends_citations": [],
       "research_targets": [
-        "RT-IC-RANK-SUPPORT-CERTIFICATE",
-        "RT-IC-YIELD-RANK-COMPOSITION"
+        "RT-IC-PUBLIC-POPULATION-CONTRACT",
+        "RT-IC-YIELD-SCALING-CERTIFICATE",
+        "RT-IC-RANK-SUPPORT-CERTIFICATE"
       ],
-      "pressure": []
-    },
-    {
-      "id": "GAP-IC-SUPPORT-CONNECTIVITY-LAW",
-      "label": "Relation-support connectivity law",
-      "status": "open",
-      "formal": "none",
-      "action": "prove or refute",
-      "impact": 15,
-      "downstream": [
-        "ALG-SP-JV-COVER-DECOMPOSITION",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "ATTACK-GHS-WEIL-DESCENT",
-        "COND-HASHED-ECDL-TENSOR-BOUND",
-        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-        "COND-WAGNER-ECDLP-FILTER-GAIN",
-        "COND-WD-JV-COVER-DECOMP",
-        "COND-WD-KMPS-INEFFECTIVE",
-        "GAP-END-TO-END-IC-EXPONENT",
-        "GAP-IC-YIELD-RANK-COMPOSITION",
-        "HEUR-RELATION-RANK",
-        "THM-WD-DIEM-SMALL-GENUS",
-        "THM-WD-GTTD-THM1"
-      ],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-IC-RANK-SUPPORT-CERTIFICATE",
-        "RT-IC-YIELD-RANK-COMPOSITION"
-      ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-IC-STOPPING-CENSORSHIP",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-IC-TARGET-STRATIFICATION",
@@ -245,41 +194,9 @@
         {
           "from": "MEAS-PF-YIELD-CENSUS",
           "relation": "qualifies"
-        }
-      ]
-    },
-    {
-      "id": "GAP-IC-TERMINAL-RANK-LAW",
-      "label": "Terminal reusable-rank probability law",
-      "status": "open",
-      "formal": "none",
-      "action": "prove or refute",
-      "impact": 15,
-      "downstream": [
-        "ALG-SP-JV-COVER-DECOMPOSITION",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "ATTACK-GHS-WEIL-DESCENT",
-        "COND-HASHED-ECDL-TENSOR-BOUND",
-        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-        "COND-WAGNER-ECDLP-FILTER-GAIN",
-        "COND-WD-JV-COVER-DECOMP",
-        "COND-WD-KMPS-INEFFECTIVE",
-        "GAP-END-TO-END-IC-EXPONENT",
-        "GAP-IC-YIELD-RANK-COMPOSITION",
-        "HEUR-RELATION-RANK",
-        "THM-WD-DIEM-SMALL-GENUS",
-        "THM-WD-GTTD-THM1"
-      ],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-IC-RANK-SUPPORT-CERTIFICATE",
-        "RT-IC-YIELD-RANK-COMPOSITION"
-      ],
-      "pressure": [
+        },
         {
-          "from": "MEAS-RANK-DEFICIT-CENSUS",
+          "from": "CEX-IC-MEAN-SHAPE-SEPARATION",
           "relation": "qualifies"
         }
       ]
@@ -349,49 +266,6 @@
       ]
     },
     {
-      "id": "HEUR-RELATION-RANK",
-      "label": "Relation independence/rank heuristic",
-      "status": "heuristic",
-      "formal": "none",
-      "action": "prove, or measure on a scaling family without censoring",
-      "impact": 11,
-      "downstream": [
-        "ALG-SP-JV-COVER-DECOMPOSITION",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "ATTACK-GHS-WEIL-DESCENT",
-        "COND-HASHED-ECDL-TENSOR-BOUND",
-        "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-        "COND-WD-JV-COVER-DECOMP",
-        "COND-WD-KMPS-INEFFECTIVE",
-        "THM-WD-DIEM-SMALL-GENUS",
-        "THM-WD-GTTD-THM1"
-      ],
-      "depends_citations": [],
-      "research_targets": [
-        "RT-PRIME-YIELD-RANK-WRITEONCE"
-      ],
-      "pressure": [
-        {
-          "from": "HEUR-RP-WALK-TARGET-GUARD",
-          "relation": "qualifies"
-        },
-        {
-          "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
-          "relation": "qualifies"
-        },
-        {
-          "from": "THM-LEFT-KERNEL-RELATIONS",
-          "relation": "qualifies"
-        },
-        {
-          "from": "GAP-IC-KERNEL-MODE-SCOPE",
-          "relation": "qualifies"
-        }
-      ]
-    },
-    {
       "id": "ALG-WD-GAUDRY-2000",
       "label": "Gaudry 2000: fixed-genus index calculus, Õ(q^2)",
       "status": "conditional",
@@ -412,6 +286,30 @@
         "src/cryptanalysis/jacobian_transfer/cost.rs"
       ],
       "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-LEFT-KERNEL-RELATIONS",
+      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 9,
+      "downstream": [
+        "ALG-SP-JV-COVER-DECOMPOSITION",
+        "ALG-SPARSE-LINEAR-ALGEBRA",
+        "ALG-WD-GAUDRY-2000",
+        "ALG-WD-THERIAULT-2003",
+        "ATTACK-GHS-WEIL-DESCENT",
+        "COND-WD-JV-COVER-DECOMP",
+        "COND-WD-KMPS-INEFFECTIVE",
+        "THM-WD-DIEM-SMALL-GENUS",
+        "THM-WD-GTTD-THM1"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-IC-KERNEL-MODE-CENSUS"
+      ],
       "pressure": []
     },
     {
@@ -601,6 +499,83 @@
       "pressure": []
     },
     {
+      "id": "GAP-IC-ROW-ENSEMBLE-LAW",
+      "label": "Relation-row ensemble law",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 5,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND",
+        "COND-WAGNER-ECDLP-FILTER-GAIN",
+        "GAP-END-TO-END-IC-EXPONENT",
+        "GAP-IC-YIELD-RANK-COMPOSITION",
+        "HEUR-RELATION-RANK"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-IC-RANK-SUPPORT-CERTIFICATE",
+        "RT-IC-YIELD-RANK-COMPOSITION"
+      ],
+      "pressure": []
+    },
+    {
+      "id": "GAP-IC-SUPPORT-CONNECTIVITY-LAW",
+      "label": "Relation-support connectivity law",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 5,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND",
+        "COND-WAGNER-ECDLP-FILTER-GAIN",
+        "GAP-END-TO-END-IC-EXPONENT",
+        "GAP-IC-YIELD-RANK-COMPOSITION",
+        "HEUR-RELATION-RANK"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-IC-RANK-SUPPORT-CERTIFICATE",
+        "RT-IC-YIELD-RANK-COMPOSITION"
+      ],
+      "pressure": [
+        {
+          "from": "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-IC-TERMINAL-RANK-LAW",
+      "label": "Terminal reusable-rank probability law",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 5,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND",
+        "COND-WAGNER-ECDLP-FILTER-GAIN",
+        "GAP-END-TO-END-IC-EXPONENT",
+        "GAP-IC-YIELD-RANK-COMPOSITION",
+        "HEUR-RELATION-RANK"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-IC-RANK-SUPPORT-CERTIFICATE",
+        "RT-IC-YIELD-RANK-COMPOSITION"
+      ],
+      "pressure": [
+        {
+          "from": "MEAS-RANK-DEFICIT-CENSUS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "ASM-GG-RANDOM-PARTITION",
       "label": "Rigorous rho analyses assume a uniformly random partition",
       "status": "assumed",
@@ -747,6 +722,10 @@
       "pressure": [
         {
           "from": "THM-LEFT-KERNEL-RELATIONS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-IC-SURPLUS-RIGHT-RANK",
           "relation": "qualifies"
         }
       ]
@@ -1738,6 +1717,20 @@
       "pressure": []
     },
     {
+      "id": "GAP-RP-CYCLE-CLOSURE-LAW",
+      "label": "Two-summand relation-graph first-cycle law",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 1,
+      "downstream": [
+        "COND-RP-TWO-SUMMAND-FAMILY-LAW"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "GAP-SP-BOUNDED-ROOT-SUMPOLY",
       "label": "Small-coordinate roots of summation polynomials over F_p",
       "status": "open",
@@ -2162,6 +2155,43 @@
         "RT-PF-YYTK-READ"
       ],
       "pressure": []
+    },
+    {
+      "id": "HEUR-RELATION-RANK",
+      "label": "Relation independence/rank heuristic",
+      "status": "heuristic",
+      "formal": "none",
+      "action": "prove, or measure on a scaling family without censoring",
+      "impact": 1,
+      "downstream": [
+        "COND-HASHED-ECDL-TENSOR-BOUND"
+      ],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PRIME-YIELD-RANK-WRITEONCE"
+      ],
+      "pressure": [
+        {
+          "from": "HEUR-RP-WALK-TARGET-GUARD",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-LEFT-KERNEL-RELATIONS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-IC-KERNEL-MODE-SCOPE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-IC-SURPLUS-RIGHT-RANK",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "HEUR-RP-DESCENT-TERMINATION",
@@ -3279,6 +3309,74 @@
       "pressure": [
         {
           "from": "FACT-GG-WALK-CLASS-WELLDEFINED",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-IC-MATH-YIELD-EQUALS-SOLVER-YIELD",
+      "label": "'Mathematical decomposition yield automatically equals solver-visible yield'",
+      "status": "refuted",
+      "formal": "kernel_checked",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-IC-SOLVER-INCOMPLETENESS",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-IC-MEAN-IMPLIES-SHAPE",
+      "label": "'Equal conserved mean determines target-wise yield shape'",
+      "status": "refuted",
+      "formal": "kernel_checked",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-IC-MEAN-SHAPE-SEPARATION",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-IC-ROW-SURPLUS-FULL-RIGHT-RANK",
+      "label": "'More rows than columns implies reusable full-column rank'",
+      "status": "refuted",
+      "formal": "kernel_checked",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-IC-SURPLUS-RIGHT-RANK",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-IC-SUCCESS-ONLY-UNBIASED",
+      "label": "'Success-only retention preserves the failure distribution'",
+      "status": "refuted",
+      "formal": "kernel_checked",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-IC-STOPPING-CENSORSHIP",
           "relation": "refutes"
         }
       ]
@@ -6274,6 +6372,54 @@
       "pressure": []
     },
     {
+      "id": "CEX-IC-MEAN-SHAPE-SEPARATION",
+      "label": "Equal total yield, different coverage and fibres (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-IC-SOLVER-INCOMPLETENESS",
+      "label": "Reject-all solver hides a real decomposition (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-IC-STOPPING-CENSORSHIP",
+      "label": "Success-only selection erases a real failure (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-IC-SURPLUS-RIGHT-RANK",
+      "label": "Row surplus with nonzero left and right kernels (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-INSIDE-GAP-N1-FAMILY",
       "label": "n = 1: {X^k, X^k+1} has inside gap k - 1",
       "status": "proved_internal_unreviewed",
@@ -6906,17 +7052,27 @@
       "pressure": []
     },
     {
-      "id": "THM-LEFT-KERNEL-RELATIONS",
-      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "id": "THM-IC-SOLVER-VISIBLE-BOUND",
+      "label": "Solver-visible yield is at most mathematical yield; completeness gives equality (Lean)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
-      "research_targets": [
-        "RT-IC-KERNEL-MODE-CENSUS"
-      ],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+      "label": "An unused relation column gives a nonzero right-kernel vector (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     },
     {

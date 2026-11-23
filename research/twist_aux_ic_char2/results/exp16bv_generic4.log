@@ -1,0 +1,11 @@
+# exp16bv_check: d=4 (Q=16), K=GF(2^16), seed 99
+(1) S3 vanishes at (x(P1),x(P2),x(P1+P2)) for 20 random pairs on y^2+xy=x^3+a x^2+b (a!=0): True
+    S5 built: 729 terms, degrees [8, 8, 8, 8, 8] (cpu 0.3s)
+    S5 vanishes on 10 random (P1..P4, P1+..+P4): True
+    Lemma 1, m=4 (b in GF(2^16)): x_jF_j - x0F0 == 0 exactly for j=1..4: [True, True, True, True]
+(2) G(E1..E4) at x0=x_R by normal form: 68 terms; odd-exponent counts E1..E4: [0, 0, 0, 35] (cpu 0.2s)
+(3) e_k(c0+u w) formula check on 5 random cases: False
+generic: span dim 4, dim U 0
+generic ideal degree 4096 (GB cpu 75.9s)
+DONE
+EXIT 0
