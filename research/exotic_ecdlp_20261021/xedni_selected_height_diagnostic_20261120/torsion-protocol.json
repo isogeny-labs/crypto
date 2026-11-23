@@ -1,0 +1,9 @@
+{
+  "schema": "xedni-selected-torsion-count-protocol-v1",
+  "reason": "Crosscheck Sage's trivial rational torsion orders using exact point counts over small good residue fields.",
+  "fixtures_sha256": "7df5e375792c2c9cd0368ffd878e47ef268078bc14b42b6d1384fddf9cf3f0b7",
+  "source_sha256": "9d62e5b8d10ac47436198896eba7f0e85d8968cf83b9d74f99fc0f49a7a551fa",
+  "field_primes": [3, 5, 7, 11, 13, 17, 19, 23, 29, 31],
+  "method": "For each curve and good odd field prime, count the point at infinity and all affine solutions using exact integer quadratic residues. Report the first pair of good primes in scan order whose curve orders are coprime.",
+  "claim_boundary": "These are independent finite-field order checks; the rank and height conclusions come from separately recorded Sage runs."
+}

@@ -7,9 +7,8 @@
 //! ```text
 //! genus_ladder run --primes 131,257 --genera 2,3,4,5 --curves 4 --seeds 3
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
-//!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
-//!     [--quartic] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
-//!     [--quartic-arms full,2lp,2lp-alg,2lp-kick,2lp-new,2lp-sfb] [--quartic-seeds p=s1/s2,...]
+//!     [--seed-search 600] [--order-method enumerate|bsgs1|bsgs2] [--max-trials 5e7] [--smith] [--smith-census N]
+//!     [--quartic] [--quartic-alg] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
@@ -22,6 +21,17 @@
 //! Arm `s` is arm `w` with the merge: `--sge W,F` (default 4,1.5) reduces the
 //! peeled core, then the coordinate Wiedemann solves the reduced matrix; the
 //! arm is named `...+sgecoord+sge(W,F)` and only runs merged.
+//! `--excess E,K` (repeatable, with `--sge`) adds a run per setting that
+//! collects `(1 + E)` times the relations of the stopping rule, keeps the
+//! lightest fraction `K` of the peeled core's rows, then merges and solves;
+//! named `<arm>+sge(W,F)+ex(E,K)` (`research/genus_ladder_light_rows_20261121`).
+//! `--bounded W[,STEP[,EMAX[,COVER]]]` (repeatable, with `--sge`; defaults
+//! 0.1, 3.0, 2) adds a run per setting that collects relations in steps of
+//! STEP times those at the rule's first stop, up to EMAX, until the selected
+//! core (the heaviest rows dropped, each column keeping COVER live rows, down
+//! to cols + margin) has mean row weight at most W; then merges and solves.
+//! Named `<arm>+sge(W,F)+bd(W,STEP,EMAX,COVER)`
+//! (`research/genus_ladder_bounded_core_20261122`).
 //! One JSON object per line.  Protocol:
 //! `research/genus_ladder_20261114/PROTOCOL.md`.  All figures are
 //! `[pcc:unverified]`.
@@ -87,7 +97,13 @@ struct Cfg {
     /// `--quartic-inhom N`: inhomogeneous rows wanted by the `2lp-new` arm
     /// before its first attempt (default 8, the frozen constant).
     quartic_inhom: u64,
+    quartic_alg: bool,
     sge: Vec<gl::SgeParams>,
+    /// `--excess E,K` (repeatable): relation excess with lightest-row selection.
+    excess: Vec<gl::ExcessParams>,
+    /// `--bounded W,STEP,EMAX,COVER` (repeatable): weight-bounded core.
+    bounded: Vec<gl::BoundedParams>,
+    order_method: gl::OrderMethod,
     out: String,
 }
 
@@ -123,7 +139,11 @@ fn parse() -> Result<Cfg, String> {
         quartic_seeds: Default::default(),
         quartic_diag: false,
         quartic_inhom: 8,
+        quartic_alg: false,
         sge: Vec::new(),
+        excess: Vec::new(),
+        bounded: Vec::new(),
+        order_method: gl::OrderMethod::Enumerate,
         out: String::new(),
     };
     let mut i = 1;
@@ -136,6 +156,11 @@ fn parse() -> Result<Cfg, String> {
         }
         if flag == "--restart-sqrt" {
             c.restart_sqrt = true;
+            i += 1;
+            continue;
+        }
+        if flag == "--quartic-alg" {
+            c.quartic_alg = true;
             i += 1;
             continue;
         }
@@ -231,6 +256,39 @@ fn parse() -> Result<Cfg, String> {
                 }
                 c.sge.push(gl::SgeParams { w_max, fill_max });
             }
+            "--excess" => {
+                let (e, k) = v
+                    .split_once(',')
+                    .ok_or(format!("--excess wants E,K, not {v}"))?;
+                let extra = num(e)?;
+                let keep = num(k)?;
+                if !(extra >= 0.0 && extra.is_finite() && keep > 0.0 && keep <= 1.0) {
+                    return Err(format!("--excess wants E >= 0 and 0 < K <= 1, not {v}"));
+                }
+                c.excess.push(gl::ExcessParams { extra, keep });
+            }
+            "--bounded" => {
+                let f: Vec<&str> = v.split(',').collect();
+                if f.is_empty() || f.len() > 4 {
+                    return Err(format!("--bounded wants W[,STEP[,EMAX[,COVER]]], not {v}"));
+                }
+                let target = num(f[0])?;
+                let step = f.get(1).map(|x| num(x)).transpose()?.unwrap_or(0.1);
+                let extra_max = f.get(2).map(|x| num(x)).transpose()?.unwrap_or(3.0);
+                let cover = f.get(3).map(|x| num(x)).transpose()?.unwrap_or(2.0) as u32;
+                if !(target > 0.0 && step > 0.0 && extra_max >= step && cover >= 1) {
+                    return Err(format!(
+                        "--bounded wants W > 0, 0 < STEP <= EMAX, COVER >= 1, not {v}"
+                    ));
+                }
+                c.bounded.push(gl::BoundedParams {
+                    target,
+                    step,
+                    extra_max,
+                    cover,
+                });
+            }
+            "--order-method" => c.order_method = gl::OrderMethod::parse(&v)?,
             "--out" => c.out = v,
             _ => return Err(format!("unknown flag {flag}")),
         }
@@ -299,6 +357,10 @@ fn main() -> ExitCode {
         "smith": cfg.smith, "smith_census": cfg.smith_census, "quartic": cfg.quartic,
         "threads": cfg.threads,
         "restart": if cfg.restart_sqrt { json!("min(4096, max(16, sqrt(r)/2))") } else { json!(gl::RESTART) }});
+    if cfg.quartic_alg {
+        // Only with the flag, so a run without it writes the frozen layout.
+        config["quartic_alg"] = json!(true);
+    }
     if !cfg.sge.is_empty() {
         // Only with the flag, so a run without it writes the frozen layout.
         config["sge"] = json!(cfg
@@ -312,6 +374,19 @@ fn main() -> ExitCode {
         config["quartic_arms"] = json!(cfg.quartic_arms);
         config["quartic_seeds"] = json!(cfg.quartic_seeds);
     }
+    if !cfg.excess.is_empty() {
+        // Only with the flag, so a run without it writes the frozen layout.
+        config["excess"] = json!(cfg
+            .excess
+            .iter()
+            .map(|e| json!({"extra": e.extra, "keep": e.keep}))
+            .collect::<Vec<_>>());
+    if !cfg.bounded.is_empty() {
+        config["bounded"] = json!(cfg
+            .bounded
+            .map(|b| json!({"target": b.target, "step": b.step, "extra_max": b.extra_max, "cover": b.cover}))
+    if cfg.order_method != gl::OrderMethod::Enumerate {
+        config["order_method"] = json!(cfg.order_method.name());
     emit(config);
 
     // ── instance search, one cell per (p, g) and one per quartic prime ──
@@ -368,12 +443,16 @@ fn main() -> ExitCode {
                 *reasons.entry("f_reducible_even_order".into()).or_default() += 1;
                 continue;
             }
-            match gl::make_instance(p, g, cs, cs, cfg.max_h) {
+            let t_inst = Instant::now();
+            match gl::make_instance_with(p, g, cs, cs, cfg.max_h, cfg.order_method) {
                 Ok(inst) => {
                     admitted += 1;
                     let mut rec = json!({"kind": "instance", "family": "hyperelliptic", "p": p, "g": g,
                         "curve_seed": cs, "f": inst.curve.f_coeffs(), "order": inst.order,
                         "h": inst.h, "r": inst.r});
+                    if cfg.order_method != gl::OrderMethod::Enumerate {
+                        rec["order_search_wall_s"] = json!(t_inst.elapsed().as_secs_f64());
+                    }
                     if cfg.smith && g == 3 {
                         rec["smith"] = smith_record(&inst.curve.f_coeffs(), p, cs);
                     }
@@ -627,8 +706,28 @@ fn main() -> ExitCode {
                         .chain(cfg.sge.iter().copied().map(Some))
                         .collect()
                 };
+                // Each merge setting runs plain and, with --excess, once per excess
+                // setting; an excess setting without a merge setting runs only
+                // when no --sge is given.
+                type Combo = (
+                    Option<gl::SgeParams>,
+                    Option<gl::ExcessParams>,
+                    Option<gl::BoundedParams>,
+                );
+                let mut combos: Vec<Combo> = Vec::new();
                 for sge in settings {
-                    let o = gl::run_ic_ext(
+                    combos.push((sge, None, None));
+                    if sge.is_some() || cfg.sge.is_empty() {
+                        for ex in &cfg.excess {
+                            combos.push((sge, Some(*ex), None));
+                        }
+                        for bd in &cfg.bounded {
+                            combos.push((sge, None, Some(*bd)));
+                        }
+                    }
+                }
+                for (sge, excess, bounded) in combos {
+                    let o = gl::run_ic_ext_bounded(
                         &inst,
                         IcParams {
                             arm,
@@ -645,10 +744,20 @@ fn main() -> ExitCode {
                             sge,
                         },
                         ext,
+                        excess,
+                        bounded,
                     );
                     let suffix = match sge {
                         None => String::new(),
                         Some(s) => format!("+sge({},{})", s.w_max, s.fill_max),
+                    } + &match excess {
+                        None => String::new(),
+                        Some(e) => format!("+ex({},{})", e.extra, e.keep),
+                    } + &match bounded {
+                        None => String::new(),
+                        Some(b) => {
+                            format!("+bd({},{},{},{})", b.target, b.step, b.extra_max, b.cover)
+                        }
                     };
                     let mut rec = head.clone();
                     rec["kind"] = json!("run");
@@ -692,6 +801,34 @@ fn main() -> ExitCode {
                     rec["core_rows"] = json!(o.core_rows);
                     rec["core_cols"] = json!(o.core_cols);
                     rec["attempts"] = json!(o.attempts);
+                    if let Some(b) = bounded {
+                        rec["bd_target"] = json!(b.target);
+                        rec["bd_step"] = json!(b.step);
+                        rec["bd_extra_max"] = json!(b.extra_max);
+                        rec["bd_cover"] = json!(b.cover);
+                        rec["bd_n0"] = json!(o.bd_n0);
+                        rec["bd_probes"] = json!(o.bd_probes);
+                        rec["bd_extra"] = json!(o.bd_extra);
+                        rec["bd_capped"] = json!(o.bd_capped);
+                    }
+                    if let Some(ex) = excess {
+                        rec["excess_extra"] = json!(ex.extra);
+                        rec["excess_keep"] = json!(ex.keep);
+                    }
+                    if excess.is_some() || bounded.is_some() {
+                        // Only on excess/bounded runs, so other runs keep the frozen layout.
+                        rec["excess_rows_collected"] = json!(o.excess_rows_collected);
+                        rec["rows_kept"] = json!(o.rows_kept);
+                        rec["mean_weight_before"] = json!(o.mean_weight_before);
+                        rec["mean_weight_after"] = json!(o.mean_weight_after);
+                        rec["core_nnz_before_sge"] = json!(o.core_nnz_before_sge);
+                        rec["core_nnz_after_sge"] = json!(o.core_nnz_after_sge);
+                        rec["core_rows_pre"] = json!(o.core_rows_pre);
+                        rec["core_cols_pre"] = json!(o.core_cols_pre);
+                        rec["la_sel_mul"] = json!(o.la_sel.mul);
+                        rec["la_sel_add"] = json!(o.la_sel.add);
+                        rec["ex_fallback"] = json!(o.ex_fallback);
+                    }
                     if let Some(sp) = sge {
                         // Merge-stage fields, only on merged runs.
                         let st = o.sge;
@@ -827,7 +964,79 @@ fn main() -> ExitCode {
                 rec["core_cols"] = json!(o.core_cols);
                 rec["attempts"] = json!(o.attempts);
                 rec["wall_ns"] = json!(o.wall_ns);
+                if cfg.quartic_alg {
+                    rec["rel_enum_mul"] = json!(o.rel_enum.mul);
+                    rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
+                }
                 emit(rec);
+            }
+            if cfg.quartic_alg {
+                // Algebraic decomposition, without and with the merge, on the
+                // same instance and seed as the scan arm `Q_diem_2lp`.
+                let nb = (cfg.qc * f64::from(*q).sqrt()).ceil() as usize;
+                let settings = [
+                    ("+alg", None),
+                    (
+                        "+alg+sge(8,3)",
+                        Some(gl::SgeParams {
+                            w_max: 8,
+                            fill_max: 3.0,
+                        }),
+                    ),
+                ];
+                for (suffix, sge) in settings {
+                    let o = ql::run_diem_opts(
+                        &inst,
+                        ql::QIcParams {
+                            arm: ql::QArm::DoubleLp,
+                            nb,
+                            seed: *seed,
+                            max_lines: cfg.max_trials,
+                            verify_relations: false,
+                        },
+                        ql::QIcOpts {
+                            decomp: ql::Decomp::Algebraic,
+                            sge,
+                        },
+                    );
+                    let mut rec = head.clone();
+                    rec["kind"] = json!("run");
+                    rec["arm"] = json!(format!("Q_{}{}", o.arm, suffix));
+                    rec["certified"] = json!(o.certified);
+                    rec["exhausted"] = json!(o.exhausted);
+                    rec["ok"] = json!(o.recovered == Some(inst.t_secret));
+                    rec["group_ops"] = json!(o.group_ops);
+                    rec["cantor_mul"] = json!(o.pic_mul);
+                    rec["cantor_inv"] = json!(o.pic_inv);
+                    rec["rel_mul"] = json!(o.rel.mul);
+                    rec["rel_add"] = json!(o.rel.add);
+                    rec["rel_enum_mul"] = json!(o.rel_enum.mul);
+                    rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
+                    rec["la_mul"] = json!(o.la.mul);
+                    rec["la_add"] = json!(o.la.add);
+                    rec["la_sge_mul"] = json!(o.la_sge.mul);
+                    rec["la_sge_add"] = json!(o.la_sge.add);
+                    rec["fb_cols"] = json!(o.fb_cols);
+                    rec["trials"] = json!(o.lines_tried);
+                    rec["relations"] = json!(o.relations);
+                    rec["rels_by_lp"] = json!(o.rels_by_lp);
+                    rec["decomp_trials"] = json!(o.decomp_trials);
+                    rec["decomp_relations"] = json!(o.decomp_relations);
+                    rec["decomp_fallbacks"] = json!(o.decomp_fallbacks);
+                    rec["core_rows"] = json!(o.core_rows);
+                    rec["core_cols"] = json!(o.core_cols);
+                    rec["attempts"] = json!(o.attempts);
+                    if sge.is_some() {
+                        rec["sge_rows_in"] = json!(o.sge.rows_in);
+                        rec["sge_cols_in"] = json!(o.sge.cols_in);
+                        rec["sge_rows_out"] = json!(o.sge.rows_out);
+                        rec["sge_cols_out"] = json!(o.sge.cols_out);
+                        rec["sge_nnz_in"] = json!(o.sge.nnz_in);
+                        rec["sge_nnz_out"] = json!(o.sge.nnz_out);
+                    }
+                    rec["wall_ns"] = json!(o.wall_ns);
+                    emit(rec);
+                }
             }
             let expect = (std::f64::consts::PI * inst.r as f64 / 4.0).sqrt();
             let mut rec = head.clone();

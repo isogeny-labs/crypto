@@ -86,7 +86,7 @@ use super::f2m::{F2mElement, IrreduciblePoly};
 use super::poly_f2m::F2mPoly;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
-use std::fmt;
+use std::{fmt, time::Instant};
 
 /// Largest binary extension degree accepted by the checked constructor.
 ///
@@ -1053,6 +1053,9 @@ pub struct HcdlpSolveOutcome {
     pub walk_steps: u64,
     pub restarts: u64,
     pub collisions: u64,
+    pub setup_wall_ns: u64,
+    pub search_wall_ns: u64,
+    pub verification_wall_ns: u64,
 }
 
 fn counted_scalar_mul(
@@ -1099,6 +1102,7 @@ pub fn hcdlp_bsgs_counted(
         return Ok(out);
     }
 
+    let setup_started = Instant::now();
     let mut m = bound.sqrt();
     if &m * &m < *bound {
         m += BigUint::one();
@@ -1118,18 +1122,28 @@ pub fn hcdlp_bsgs_counted(
 
     let gamma = counted_scalar_mul(p, &m, curve, &mut out.setup)?;
     let neg_gamma = gamma.try_neg(curve)?;
+    out.setup_wall_ns = setup_started.elapsed().as_nanos() as u64;
     let mut giant = q.clone();
     let mut j = BigUint::zero();
+    let mut search_started = Instant::now();
     while j < m {
         out.table_lookups = out.table_lookups.saturating_add(1);
         if let Some(i_value) = table.get(&divisor_key(&giant)) {
             let scalar = &j * &m + i_value;
             if &scalar < bound {
+                out.search_wall_ns = out
+                    .search_wall_ns
+                    .saturating_add(search_started.elapsed().as_nanos() as u64);
+                let verification_started = Instant::now();
                 let replay = counted_scalar_mul(p, &scalar, curve, &mut out.verification)?;
+                out.verification_wall_ns = out
+                    .verification_wall_ns
+                    .saturating_add(verification_started.elapsed().as_nanos() as u64);
                 if replay == *q {
                     out.recovered = Some(scalar);
                     return Ok(out);
                 }
+                search_started = Instant::now();
             }
         }
         j += BigUint::one();
@@ -1138,6 +1152,9 @@ pub fn hcdlp_bsgs_counted(
             out.search.additions = out.search.additions.saturating_add(1);
         }
     }
+    out.search_wall_ns = out
+        .search_wall_ns
+        .saturating_add(search_started.elapsed().as_nanos() as u64);
     out.exhausted = true;
     Ok(out)
 }
@@ -1227,6 +1244,7 @@ pub fn hcdlp_pollard_rho_counted(
     let mut rng = seed;
     for restart in 0..max_restarts {
         out.restarts = restart;
+        let setup_started = Instant::now();
         let a0 = BigUint::from(hcdlp_splitmix64(&mut rng)) % order;
         let b0 = BigUint::from(hcdlp_splitmix64(&mut rng)) % order;
         let ap = counted_scalar_mul(p, &a0, curve, &mut out.setup)?;
@@ -1234,6 +1252,9 @@ pub fn hcdlp_pollard_rho_counted(
         let start = ap.try_add_on_valid_curve(&bq, curve)?;
         out.setup.additions = out.setup.additions.saturating_add(1);
         let salt = hcdlp_splitmix64(&mut rng);
+        out.setup_wall_ns = out
+            .setup_wall_ns
+            .saturating_add(setup_started.elapsed().as_nanos() as u64);
 
         let mut slow = start.clone();
         let mut slow_a = a0.clone();
@@ -1241,6 +1262,8 @@ pub fn hcdlp_pollard_rho_counted(
         let mut fast = start;
         let mut fast_a = a0;
         let mut fast_b = b0;
+        let search_started = Instant::now();
+        let mut search_accounted = false;
         for _ in 0..max_steps {
             (slow, slow_a, slow_b) = step(&slow, &slow_a, &slow_b, salt, &mut out.search)?;
             (fast, fast_a, fast_b) = step(&fast, &fast_a, &fast_b, salt, &mut out.search)?;
@@ -1249,6 +1272,10 @@ pub fn hcdlp_pollard_rho_counted(
             if slow != fast {
                 continue;
             }
+            out.search_wall_ns = out
+                .search_wall_ns
+                .saturating_add(search_started.elapsed().as_nanos() as u64);
+            search_accounted = true;
             out.collisions = out.collisions.saturating_add(1);
             let numerator = if slow_a >= fast_a {
                 &slow_a - &fast_a
@@ -1267,13 +1294,22 @@ pub fn hcdlp_pollard_rho_counted(
                 break;
             };
             let candidate = (numerator * inverse) % order;
+            let verification_started = Instant::now();
             let replay = counted_scalar_mul(p, &candidate, curve, &mut out.verification)?;
+            out.verification_wall_ns = out
+                .verification_wall_ns
+                .saturating_add(verification_started.elapsed().as_nanos() as u64);
             if replay == *q {
                 out.recovered = Some(candidate);
                 out.restarts = restart;
                 return Ok(out);
             }
             break;
+        }
+        if !search_accounted {
+            out.search_wall_ns = out
+                .search_wall_ns
+                .saturating_add(search_started.elapsed().as_nanos() as u64);
         }
     }
     out.restarts = max_restarts;
