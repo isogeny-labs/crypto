@@ -1,0 +1,232 @@
+{
+  "schema": "ic_autolab.families/v1",
+  "note": "Candidate families per track for generic prime-order E(F_p) curves (prime_search seed 59297: icv1-fp20-t727-cd198a38, icv1-fp24-t1059-6df599df, icv1-fp28-tm3161-380f655a, icv1-fp32-t74357-b7396dac). Three separate ratchet tracks prevent confounding: (1) multibase restricts to N >= 3 independent factor-base columns (excluding C <= 2 BSGS-boundary arms), (2) generic includes all owner-admitted generic IC families including fresh-per-run C = 2 walk/target-walk arms (owner rulings 2026-11-04 and 2026-11-10), and (3) algebraic restricts to Semaev + tower-membership F4/grid decomposition (pkm-semaev).",
+  "tracks": {
+    "multibase": {
+      "factor_base": "prime-abscissa:size={n}",
+      "scan_factor": 1,
+      "n_grid": [
+        0.5,
+        0.7,
+        0.85,
+        1.2,
+        1.4,
+        2.0
+      ],
+      "n_min": 3,
+      "n_max": 2047,
+      "families": [
+        {
+          "id": "mitm2",
+          "oracle": "mitm:negation_folded=1",
+          "default_f": 1.0,
+          "n_min": 4,
+          "note": "Round-0 baseline: m = 2 negation-folded pair table on the smallest abscissae"
+        },
+        {
+          "id": "ksum3f",
+          "oracle": "ksum:m=3,free=1",
+          "default_f": 0.35,
+          "n_min": 5,
+          "note": "m = 3 k-sum table with verified build-time collision free rows"
+        },
+        {
+          "id": "ksum4f",
+          "oracle": "ksum:m=4,free=1",
+          "default_f": 0.15,
+          "n_min": 6,
+          "note": "m = 4 k-sum table with verified build-time collision free rows"
+        },
+        {
+          "id": "wsum-b5",
+          "oracle": "wsum:coef=5,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 factor-base points with |e_c| <= 5 and collision free rows"
+        },
+        {
+          "id": "wsum-b8",
+          "oracle": "wsum:coef=8,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 factor-base points with |e_c| <= 8 and collision free rows"
+        },
+        {
+          "id": "wsum-b12",
+          "oracle": "wsum:coef=12,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 factor-base points with |e_c| <= 12 and collision free rows"
+        },
+        {
+          "id": "wsum-b20",
+          "oracle": "wsum:coef=20,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 factor-base points with |e_c| <= 20 and collision free rows"
+        },
+        {
+          "id": "wsum-b28",
+          "oracle": "wsum:coef=28,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 factor-base points with |e_c| <= 28 (model optimum B* = 2^(-1/2) r^(1/6) ~ 27.7 at k = 32)"
+        },
+        {
+          "id": "wsum-b34",
+          "oracle": "wsum:coef=34,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 factor-base points with |e_c| <= 34"
+        },
+        {
+          "id": "mitmblocked",
+          "oracle": "mitm-prime-blocked:m=2",
+          "default_f": 1.0,
+          "n_min": 4,
+          "note": "Cache-blocked prime pair table (ic-planner/1 default)"
+        },
+        {
+          "id": "mitmbatch",
+          "oracle": "mitm-prime-batch:m=2",
+          "default_f": 1.0,
+          "n_min": 4,
+          "note": "Batched-inversion prime pair table"
+        },
+        {
+          "id": "ksum5f",
+          "oracle": "ksum:m=5,free=1",
+          "default_f": 0.08,
+          "n_min": 8,
+          "note": "m = 5 k-sum table with verified build-time collision free rows"
+        }
+      ]
+    },
+    "generic": {
+      "factor_base": "prime-abscissa:size={n}",
+      "scan_factor": 1,
+      "n_grid": [
+        0.5,
+        0.7,
+        0.85,
+        1.2,
+        1.4,
+        2.0
+      ],
+      "n_min": 2,
+      "n_max": 2047,
+      "families": [
+        {
+          "id": "mitm2",
+          "oracle": "mitm:negation_folded=1",
+          "default_f": 1.0,
+          "n_min": 4,
+          "note": "Round-0 baseline: m = 2 negation-folded pair table on the smallest abscissae"
+        },
+        {
+          "id": "tw2l-x20-j16",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "Two-seed target walk (tw=2) with chained jumps (cj=1), lazy certification (lazy=1), and fresh table per run (seed=run); owner ruling 2026-11-10"
+        },
+        {
+          "id": "wwalkGg-x09-sr",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "Fresh-per-run walk-built C = 2 table with known-log G jumps grown to rank-2 seed rows (seed=run); BSGS boundary, owner ruling 2026-11-04"
+        },
+        {
+          "id": "ksum4f",
+          "oracle": "ksum:m=4,free=1",
+          "default_f": 0.15,
+          "n_min": 6,
+          "note": "m = 4 k-sum table with verified build-time collision free rows"
+        },
+        {
+          "id": "wsum-b8",
+          "oracle": "wsum:coef=8,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 seeds with |e_c| <= 8"
+        },
+        {
+          "id": "wsum-b12",
+          "oracle": "wsum:coef=12,free=1",
+          "default_f": 0.0001,
+          "n_min": 3,
+          "n_max": 4,
+          "note": "Multi-seed signed coefficient box over C >= 3 seeds with |e_c| <= 12"
+        },
+        {
+          "id": "tw2l-x15-j16",
+          "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "Two-seed target walk with x = 1.5, 16 jumps, lazy certification, seed=run"
+        },
+        {
+          "id": "tw2l-x20-j8",
+          "oracle": "wwalk:x=2.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "default_f": 0.0001,
+          "n_min": 2,
+          "n_max": 2,
+          "params": {
+            "targets": "stride-generator"
+          },
+          "note": "Two-seed target walk with x = 2.0, 8 jumps, lazy certification, seed=run"
+        }
+      ]
+    },
+    "algebraic": {
+      "factor_base": "prime-isogeny:t={n},seed=1093",
+      "scan_factor": 1,
+      "n_grid": [
+        0.83,
+        1.17
+      ],
+      "n_min": 4,
+      "n_max": 8,
+      "families": [
+        {
+          "id": "pkm-iso-g4",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=4",
+          "default_f": 0.12,
+          "note": "PKM auxiliary-curve 2-isogeny tower (seed 1093) + Semaev S3 solved with guess split 4"
+        },
+        {
+          "id": "pkm-iso-g2",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=2",
+          "default_f": 0.12,
+          "note": "PKM auxiliary-curve 2-isogeny tower (seed 1093) + Semaev S3 solved with guess split 2"
+        },
+        {
+          "id": "pkm-iso-g0",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=0",
+          "default_f": 0.12,
+          "note": "PKM auxiliary-curve 2-isogeny tower (seed 1093) + Semaev S3 solved with no guess split"
+        }
+      ]
+    }
+  }
+}

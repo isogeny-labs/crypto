@@ -13,7 +13,7 @@ patch is `instrument.patch`, a diff against `fffa1b1243` under `src/`:
 |---|---|
 | `MAX_GENUS` 5 -> 16, `CAP` 24 -> 4g+8, `REL_FB` 5 -> 16 | none (array capacity only) |
 | `count_points_ext(k)` for any k: enumerates F_{p^k} with a squares bitmap and forward differences | unused (g <= 5 keeps K = 2) |
-| `jacobian_order` at g >= 6: K enumerated point counts from a cost model; an ambiguous window retries with K+1, up to K = g (exact L(1)) | unused |
+| `jacobian_order` at g >= 6: K enumerated point counts from a cost model. A failed window is retried once with K+1. An ambiguous window whose candidates all share one large prime r is resolved by taking the candidate with the smallest cofactor, so `order` is then a multiple of the group exponent, not #J (14 of 32 instances; erratum E4). Only r is used downstream. | unused |
 | Arm `D` (`D_deg2_full`): every degree-1 and degree-2 place in the base | new arm |
 | Arm `E` (`E_deg2_lp`): degree-1 2LP base (same `nb` as arm `c`); degree-1 places outside it and every degree-2 place are large primes, at most two per relation | new arm |
 | CLI: letters `D`, `E`; `GL_VERIFY_RELATIONS` env re-checks each relation by group arithmetic; `GL_KNOWN` forces K | none unless set |
