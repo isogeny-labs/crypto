@@ -157,3 +157,73 @@ This change is strictly disjoint from #4970/#4974/#4976's extraction and #4972's
 
 
 **Frozen synthetic development replay artifact (09:35 UTC):** [development_fixture_replay_20261123.json](development_fixture_replay_20261123.json) is exact stdout from the committed Python checker operating on the **byte-identical** committed public fixture. Verified by \`git hash-object\`: fixture \`44a7437ea5cc74cd66638a0a7bdb47525833b593\`, checker \`346036d8e1df814f572e8dce1c079178dc77d9b1\`, test suite \`a3593ab19e790be02c36044d156012376988b8a4\`, stdout \`ac2cba738cd85d7b48459fd5fb137c876ce7d18a\`. The direct fixture's SHA-256 is \`d954db5502909259edbe075d7a5cb73ea5b811d2cafeb86b2d55ae857ba05862\`. The source-exact local command \`python3 independent_rr5_replay.py --receipt public_rr5_sample.json\` returned 2 authenticated rows, first target prefix 2 and target 5; \`python3 -m unittest -q test_independent_rr5_replay.py\` still passed 8/8. This **development record** is neither a natural blind RR5 extraction receipt nor signed PCC evidence. No current-performance, extraction-yield or security claim follows. [pcc:unverified]
+
+## Genuine Grevlex B8 extracted-row boundary — 2026-11-23 UTC
+
+A **real RR5 algebraically extracted signed row**, rather than another planted
+rank-system example, is now stored as
+[`rr5_grevlex_b8_producer_row.json`](rr5_grevlex_b8_producer_row.json).
+It is a read-only conversion of the frozen
+[RR5 development09 Grevlex B8 positive stdout](https://github.com/isogeny-labs/crypto/blob/95e5062573e24d124235756c062e2ab8178aac4c/research/prime31_rr5_public_relations_20261123/evidence/development-09/b8-positive.stdout)
+(Git blob `c16fac3b6bd28a2c125f53e466eea2c97b84f95f`), published on
+[RR5 PR #4970](https://github.com/isogeny-labs/crypto/pull/4970).
+The fixed-positive target was **constructed from the factor base by the
+producer's correctness test**, not drawn as a blind unknown-index ECDLP
+challenge. This is not a native `SolveRecord`; the `a=0, b=1` labels are
+the exact, explicit `R=Q` group identity of that correctness fixture,
+not additional evidence that the producer generated an `aG+bQ` query.
+
+Source's eight natural-abscissa points have indices 0–7. The one
+nonenumeratively extracted four-leaf row is
+`P[0] - P[1] + P[2] + P[3] = Q`, where
+`Q=(92816593,1965281801)`. Two nonshared arithmetic checks of the
+public identity (Python group law and JavaScript BigInt group law)
+reconstructed that exact Q; a pinned-source transcript comparison also
+matched the eight points, target and signed row. This is **mathematical
+development replay**, not a compiled Rust run, signed independent PCC, or
+blind scalar recovery. [pcc:unverified]
+
+The row has augmented rank **1** and factor-base-only coefficient rank
+**1** over n=2147446831; hence target-coordinate rank gap **0**,
+no determined scalar and no earliest target prefix. There is nothing
+legitimate for the gate to report as a solved ECDLP. The producer's frozen
+B8 traversal reports seven F4 runs and 54,099,486 F4 field operations to
+obtain this one row; these are *partial stage counters*, not an
+end-to-end timing, a representative per-relation rate or an IC/rho ratio.
+The producer reports `Complete` for its **fixed B8 extraction only**;
+B677 natural extraction remains open.
+
+Both standalone checkers now include source-coupled regression tests:
+`test_independent_rr5_replay.py::test_extracted_grevlex_b8_row_stays_underdetermined`
+(also poisons the second signed leaf), and
+`rr5_receipt_check.rs::tests::real_extracted_grevlex_b8_public_row_has_rank_but_no_target_scalar`
+(also checks the poisoned row fails). The Python suite has **9 authored
+tests** and the mixed-RHS Rust binary **12 authored tests**, plus
+15 from the original separate Rust gate. These **new tests have not been
+executed in this session**, and the Rust compilation gap is unchanged.
+
+For future source-frozen replay, the intended commands are:
+
+```sh
+python3 -m unittest discover -s research/cheap_ecdlp_cold_gate_20261123 -p 'test_independent_rr5_replay.py' -v
+python3 research/cheap_ecdlp_cold_gate_20261123/independent_rr5_replay.py --receipt research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json
+cargo test --release --manifest-path research/cheap_ecdlp_cold_gate_20261123/Cargo.toml --bin rr5_receipt_check
+cargo run --release --manifest-path research/cheap_ecdlp_cold_gate_20261123/Cargo.toml --bin rr5_receipt_check -- research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json
+```
+
+**Admission next:** source-freeze and independently replay a natural
+unknown-index `SolveRecord` with an exact point-only B677 manifest;
+for the candidate to recover d, its independently authenticated rows
+must first give `rank([C|-b])-rank(C)=1`. No shortcut from one
+fixed-positive B8 row can satisfy this. Preserve all refused chart,
+failed-root and bounded-inconclusive cases; charge all extraction, setup,
+modular algebra, verification and timeout costs before any matched
+cold-one-target benchmark.
+
+**Roles and constraints:** no native agent launcher was exposed. The
+coordinator performed the GitHub source audit, read-only producer-row
+conversion and all writes. The baseline/relation-source and test-design
+reads were independent parallel tool calls but **not separately spawned
+workers**. Python and JS group calculations are separate mathematical
+replays, **not independently signed validation**. No competing build,
+paid compute, reserved runner, merge, or speed claim was made.
