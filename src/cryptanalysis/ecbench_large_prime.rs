@@ -504,6 +504,11 @@ pub struct SolveOptions {
     /// find, without a trial cap, how many trials a given verified rank takes.
     /// Filter arms only.
     pub trajectory: Option<TrajectoryRequest>,
+    /// Keep a copy of the exact `lpf::PartialRelation` batch handed to the
+    /// large-prime filter in [`FilterPipelineReport::relations`] (filter arms
+    /// only; never serialized), so graph tools can be evaluated on the real
+    /// stream (`large_prime_graph::eval`).
+    pub capture_relations: bool,
     /// Test hook: damage one entry of the finished orbit table *after* its
     /// self-checks, to show that the replays (not the table build) are what
     /// catch a wrong coefficient.  Never set outside tests.
@@ -691,6 +696,9 @@ pub struct FilterPipelineReport {
     /// Only with [`SolveOptions::trajectory`].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trajectory: Option<RankTrajectory>,
+    /// Only with [`SolveOptions::capture_relations`]; never serialized.
+    #[serde(skip)]
+    pub relations: Option<Vec<lpf::PartialRelation>>,
 }
 
 /// The accepted-decomposition stream of one run.
@@ -1362,6 +1370,7 @@ fn run_filter_pipeline(
         });
     }
     drop(stored);
+    let captured = extras.capture_relations.then(|| inputs.clone());
 
     // Group element of every column id in the shifted indexing.
     let mut points = Vec::with_capacity(base.column_points.len() + 1);
@@ -1442,6 +1451,7 @@ fn run_filter_pipeline(
         stream: extras.stream,
         post_collect: extras.post_collect,
         trajectory,
+        relations: captured,
     })
 }
 
@@ -1450,6 +1460,7 @@ struct PipelineExtras<'a> {
     stream: Option<StreamReport>,
     post_collect: Option<PostCollectReport>,
     trajectory: Option<&'a TrajectoryRequest>,
+    capture_relations: bool,
 }
 
 #[derive(Default)]
@@ -1948,6 +1959,7 @@ fn solve_with_verification(
                 }),
                 post_collect: post_collect_report.take(),
                 trajectory: options.trajectory.as_ref(),
+                capture_relations: options.capture_relations,
             },
         )?;
         recovered = matrix.pinned(d_col);

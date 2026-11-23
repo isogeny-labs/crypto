@@ -1,0 +1,206 @@
+{
+  "schema": "lp-graph-eval/v1",
+  "modulus": 2096401,
+  "label": "ecbench_large_prime binary n=24 seed=20261123 r=2096401 graph=Filter config=SolveConfig { small_dimension: 6, envelope_dimension: 11, summands: 4, max_large_primes: 2, max_trials: 120000, max_states: 4000000, seed: 20261123, large_prime_graph: Filter } recovered=Some(7)",
+  "rows": 120000,
+  "lp_columns": 965,
+  "incidences": 231882,
+  "arity_histogram": {
+    "0": 138,
+    "1": 7842,
+    "2": 112020
+  },
+  "rank": {
+    "two_entry_rows": 120000,
+    "exact_for_stream": true,
+    "gain_dsu": {
+      "vertices": 965,
+      "rows": 120000,
+      "rank": 965,
+      "left_nullity": 119035,
+      "components": 1,
+      "unflagged_components": 0,
+      "unions": 964,
+      "balanced_cycles": 55828,
+      "unbalanced_cycles": 55228,
+      "singletons": 7842,
+      "zero_rows": 138
+    },
+    "gain_dsu_ns": 6349225,
+    "dense_rank": null,
+    "dense_matches": null,
+    "structural_lower_bound": null,
+    "matching_rank": 965
+  },
+  "cores": {
+    "lp_graph_max_core": 193,
+    "lp_graph_two_core_vertices": 965,
+    "incidence_two_core_rows": 112020,
+    "incidence_two_core_columns": 965,
+    "ns": 15277466
+  },
+  "matching": {
+    "structural_rank": 965,
+    "phases": 1,
+    "hopcroft_karp_ns": 4109361,
+    "dm": {
+      "structural_rank": 965,
+      "over_rows": 120000,
+      "over_columns": 965,
+      "under_rows": 0,
+      "under_columns": 0,
+      "well_size": 0,
+      "fine_blocks": [],
+      "structural_left_nullity_lower_bound": 119035
+    },
+    "dm_ns": 2529362,
+    "fine_block_count": 0,
+    "largest_fine_block": 0
+  },
+  "trees": {
+    "vertices": 965,
+    "edges": 112020,
+    "bfs": {
+      "cycles": 111056,
+      "total_length": 494523,
+      "max_length": 5
+    },
+    "bfs_ns": 3485609,
+    "low_stretch": {
+      "cycles": 111056,
+      "total_length": 494523,
+      "max_length": 5
+    },
+    "low_stretch_ns": 3586314
+  },
+  "pivot_filter": {
+    "report": {
+      "input_relations": 120000,
+      "input_large_vertices": 965,
+      "duplicate_relations": 0,
+      "peeled_relations": 0,
+      "core_relations": 119862,
+      "core_large_vertices": 965,
+      "pivots": 965,
+      "merges": 230917,
+      "rejected_fill": 0,
+      "complete_relations": 119035,
+      "cycles_closed": 118897
+    },
+    "mst_stats": null,
+    "refused": false,
+    "ns": 219725978,
+    "residual_columns": 33,
+    "residual_nonzeros": 441267,
+    "source_terms": 349952,
+    "max_row_weight": 6,
+    "replayed": 119035,
+    "replay_failures": 0
+  },
+  "mst_filter": {
+    "report": {
+      "input_relations": 120000,
+      "input_large_vertices": 0,
+      "duplicate_relations": 0,
+      "peeled_relations": 0,
+      "core_relations": 0,
+      "core_large_vertices": 0,
+      "pivots": 0,
+      "merges": 0,
+      "rejected_fill": 0,
+      "complete_relations": 0,
+      "cycles_closed": 0
+    },
+    "mst_stats": {
+      "trees": 0,
+      "edge_evaluations": 0,
+      "infeasible_edge_candidates": 0,
+      "normalized_rows": 0,
+      "selected_edges": 0,
+      "largest_column_degree": 0,
+      "largest_active_coefficients": 0,
+      "input_nonzeros": 0,
+      "output_nonzeros": 0,
+      "budget_refusals": 1
+    },
+    "refused": true,
+    "ns": 22908642,
+    "residual_columns": 0,
+    "residual_nonzeros": 0,
+    "source_terms": 0,
+    "max_row_weight": 0,
+    "replayed": 0,
+    "replay_failures": 0
+  },
+  "residual_elimination": {
+    "vertices": 33,
+    "edges": 528,
+    "fill_edges": 0,
+    "width": 32,
+    "clique_work": 11440,
+    "truncated": false
+  },
+  "residual_elimination_ns": 21978216,
+  "residual_rows_skipped_for_width": 0,
+  "partitions": [
+    {
+      "parts": 2,
+      "block_connectivity_minus_one": 33,
+      "fm_connectivity_minus_one": 33,
+      "fm": {
+        "parts": 2,
+        "part_sizes": [
+          59517,
+          59518
+        ],
+        "connectivity_minus_one": 33,
+        "cut_nets": 33,
+        "fm_passes": 1,
+        "fm_moves": 0
+      },
+      "fm_ns": 45696337
+    },
+    {
+      "parts": 4,
+      "block_connectivity_minus_one": 99,
+      "fm_connectivity_minus_one": 99,
+      "fm": {
+        "parts": 4,
+        "part_sizes": [
+          29758,
+          29759,
+          29759,
+          29759
+        ],
+        "connectivity_minus_one": 99,
+        "cut_nets": 33,
+        "fm_passes": 3,
+        "fm_moves": 0
+      },
+      "fm_ns": 79310552
+    },
+    {
+      "parts": 8,
+      "block_connectivity_minus_one": 231,
+      "fm_connectivity_minus_one": 231,
+      "fm": {
+        "parts": 8,
+        "part_sizes": [
+          14879,
+          14879,
+          14879,
+          14880,
+          14879,
+          14880,
+          14879,
+          14880
+        ],
+        "connectivity_minus_one": 231,
+        "cut_nets": 33,
+        "fm_passes": 7,
+        "fm_moves": 0
+      },
+      "fm_ns": 124299155
+    }
+  ]
+}
