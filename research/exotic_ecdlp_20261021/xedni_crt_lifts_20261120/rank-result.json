@@ -1,0 +1,11 @@
+{
+  "elapsed_s": 3.826,
+  "exit_code": 1,
+  "protocol_sha256": "94bd70082be8f936a026be11fc1e1753863959dac7623ad184fdbe5e76ef5a32",
+  "result": null,
+  "runtime_sha256": "073ca37250b100a7f961de3475da8a4d489f3f2140c15f4c72457816893f3f01",
+  "schema": "xedni-crt-rank-result-v1",
+  "source_sha256": "fe3fada5e91bb8446061eb1cfeaeb692b74d0f933bb804a74f8058720566ea31",
+  "status": "error",
+  "stderr_tail": "Traceback (most recent call last):\n  File \"/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_crt_lifts_20261120/rank_sage.py\", line 20, in <module>\n    main()\n    ~~~~^^\n  File \"/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_crt_lifts_20261120/rank_sage.py\", line 14, in main\n    rank = E.rank(use_database=False, proof=True, algorithm=\"pari\", only_use_mwrank=True)\n  File \"/Volumes/SSD990/cryptanalysis/third_party/sage-binary/local/var/lib/sage/venv-python3.14/lib/python3.14/site-packages/sage/schemes/elliptic_curves/ell_rational_field.py\", line 2071, in rank\n    raise RuntimeError(f\"rank not provably correct (lower bound: {len(ge)}, upper bound:{upper}). Hint: increase pari_effort.\")\nRuntimeError: rank not provably correct (lower bound: 0, upper bound:3). Hint: increase pari_effort.\n"
+}

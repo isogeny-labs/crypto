@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t74357-b7396dac | 31.69 | inc | 12/12 | 30.228 | 34.729 | 75.241 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | ksum3f-n334 | 12/12 | 431.909 | 482.064 | 933.461 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | ksum4f-n143 | 12/12 | 2812.070 | 3238.120 | 7072.571 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | mitm2-n1144 | 12/12 | 34.033 | 38.617 | 79.872 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | mitm2-n810 | 12/12 | 29.485 | 34.265 | 77.286 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-neg | 12/12 | 1.005 | 1.105 | 2.003 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | wsum-b5-n3 | 12/12 | 153.579 | 184.263 | 460.414 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t74357-b7396dac | inc vs ksum3f-n334 | inc < ksum3f-n334 |
+| icv1-fp32-t74357-b7396dac | inc vs ksum4f-n143 | inc < ksum4f-n143 |
+| icv1-fp32-t74357-b7396dac | inc vs mitm2-n1144 | inc < mitm2-n1144 |
+| icv1-fp32-t74357-b7396dac | inc vs mitm2-n810 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-t74357-b7396dac | inc vs wsum-b5-n3 | inc < wsum-b5-n3 |
+| icv1-fp32-t74357-b7396dac | ksum3f-n334 vs ksum4f-n143 | ksum3f-n334 < ksum4f-n143 |
+| icv1-fp32-t74357-b7396dac | ksum3f-n334 vs mitm2-n1144 | mitm2-n1144 < ksum3f-n334 |
+| icv1-fp32-t74357-b7396dac | ksum3f-n334 vs mitm2-n810 | mitm2-n810 < ksum3f-n334 |
+| icv1-fp32-t74357-b7396dac | ksum3f-n334 vs rho-neg | rho-neg < ksum3f-n334 |
+| icv1-fp32-t74357-b7396dac | ksum3f-n334 vs wsum-b5-n3 | wsum-b5-n3 < ksum3f-n334 |
+| icv1-fp32-t74357-b7396dac | ksum4f-n143 vs mitm2-n1144 | mitm2-n1144 < ksum4f-n143 |
+| icv1-fp32-t74357-b7396dac | ksum4f-n143 vs mitm2-n810 | mitm2-n810 < ksum4f-n143 |
+| icv1-fp32-t74357-b7396dac | ksum4f-n143 vs rho-neg | rho-neg < ksum4f-n143 |
+| icv1-fp32-t74357-b7396dac | ksum4f-n143 vs wsum-b5-n3 | wsum-b5-n3 < ksum4f-n143 |
+| icv1-fp32-t74357-b7396dac | mitm2-n1144 vs mitm2-n810 | mitm2-n810 < mitm2-n1144 |
+| icv1-fp32-t74357-b7396dac | mitm2-n1144 vs rho-neg | rho-neg < mitm2-n1144 |
+| icv1-fp32-t74357-b7396dac | mitm2-n1144 vs wsum-b5-n3 | mitm2-n1144 < wsum-b5-n3 |
+| icv1-fp32-t74357-b7396dac | mitm2-n810 vs rho-neg | rho-neg < mitm2-n810 |
+| icv1-fp32-t74357-b7396dac | mitm2-n810 vs wsum-b5-n3 | mitm2-n810 < wsum-b5-n3 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs wsum-b5-n3 | rho-neg < wsum-b5-n3 |

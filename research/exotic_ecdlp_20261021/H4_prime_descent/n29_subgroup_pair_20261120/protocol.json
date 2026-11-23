@@ -1,0 +1,17 @@
+{
+  "schema": "h4-n29-subgroup-pair-protocol-v1",
+  "question": "For frozen H4 n29 instance zero, what prime-subgroup base does cofactor clearing produce, and what are pair-index construction cost and fresh-target three-sum yield?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "instance": {"field_degree": 29, "instance_index": 0, "subspace_dimension": 10, "python_seed_formula": "20261022*1000+29*10+0", "sage_seed_formula": "20261022+29*10+0"},
+  "subgroup_rule": "factor exact curve order; choose largest prime factor r; h=order/r; require r at least 2^20 and r*G=0 for first nonzero cleared point",
+  "base_rule": "enumerate all lifts from the frozen x-subspace, multiply by h, retain distinct nonidentity r-subgroup points sorted by encoded coordinates; record direct eligibility and duplicate/identity counts",
+  "index_rule": "store the first ordered pair for each distinct subgroup sum; retain all B^2 attempted pairs and distinct-key count; no scalar-coordinate oracle in candidate lookup",
+  "targets": "32 SHA256-derived nonzero scalars h4-n29-target-i modulo r, multiplied by G solely to construct frozen reproducible public points; independent of index content",
+  "lookup_rule": "for each public target Q, scan the sorted cleared base C and test Q-C against the first-pair index; stop on first group-verified triple or exhaustion; retain every status and elapsed time",
+  "caps": {"process_seconds": 300, "observed_peak_rss_bytes": 8589934592},
+  "host": "ordinary local macOS checked Sage; algorithmic diagnostic, not an isolated CPU timing tier",
+  "statistics": ["order_factorization", "base_counts", "B_squared_attempts", "distinct_pair_sums", "index_wall_ns", "all_32_lookup_statuses", "witnesses", "lookup_wall_ns", "peak_rss_bytes"],
+  "claim_boundary": "n29 subgroup-construction and natural-target pair-index diagnostic only; no full factor-log solve or single-target IC/rho comparison",
+  "status": "frozen before execution"
+}
