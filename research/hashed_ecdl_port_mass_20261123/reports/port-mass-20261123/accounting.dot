@@ -1,0 +1,14 @@
+digraph accounting {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.3", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, margin="0.18,0.12", color="#52677b", fillcolor="#edf3f8"];
+  edge [color="#52677b", arrowsize=0.7, fontname="DejaVu Sans", fontsize=10];
+  parent [label="Parent: M edges, V old vertices\nValid packing: P packets; r group labels", URL="https://github.com/isogeny-labs/crypto/blob/5ec6aed05e17f24457f15266a6d9b592bb4d3279/crates/hashed-ecdl-tensor/src/contraction/packing.rs"];
+  child [label="Actual child constructor, all r groups\nEach endpoint retained once; every packet replicated", URL="https://github.com/isogeny-labs/crypto/blob/5ec6aed05e17f24457f15266a6d9b592bb4d3279/crates/hashed-ecdl-tensor/src/contraction/deformation.rs"];
+  ports [label="Total child edges = 2M\nCommon weight p: 2Mp", fillcolor="#e3f2ec", URL="https://github.com/aburan28/crypto-lean/blob/50b95696db2e7a34b7c5f1ba47eb5408f49ca12d/CryptoLean/Combinatorics/PortMass.lean"];
+  vertices [label="Total child vertices = V + rP\nOld isolates and empty packets included", fillcolor="#fff0d9", URL="https://github.com/aburan28/crypto-lean/blob/50b95696db2e7a34b7c5f1ba47eb5408f49ca12d/CryptoLean/Combinatorics/PortMass.lean"];
+  sample [label="Balanced source-object fixture\nM=8192, V=16386, r=64, P=4096\n16384 edges; 278530 vertices\n254016 isolated new packet vertices", fillcolor="#f3eff9", URL="https://github.com/isogeny-labs/crypto/pull/5046"];
+  scope [label="Full-family structural accounting\nVisited prefix, coefficient work and complete cost are separate", shape=note, fillcolor="#fafafa", fontsize=10];
+  parent -> child; child -> ports; child -> vertices;
+  {rank=same; ports; vertices;}
+  ports -> sample; vertices -> sample; sample -> scope;
+}
