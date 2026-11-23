@@ -16,6 +16,15 @@ Develop and independently validate a Rust index-calculus method exploiting chain
 Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items
+
+- [x] Qualify the primary-derived genuine CM19 F7 genus3 source:counts17/65/236, Weil(T2+3T+7)^3, Jac1331; actual17-point twist/Frobenius/inverse controls and checked2-page report (Codex, 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012, source0b9b506b/result89d7b471, unsigned180c4c; actual polarization/J4/kernel/target/cost follow-ups remain open). [pcc:unverified]
+
+- [x] Qualify the fixed250 F5 plane quartics:190 smooth,70 Phi3-cube mod2,0 full PE-cube sources; complete raw and checked2-page report (Codex, started 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012; stacked on completed finite lane PR #5007). [pcc:unverified]
+
+- [x] Classify all PGL2(F3) changes and evaluate scalar-free cross-model Richelot chains with an actual F9 twist/Frobenius control:12 isomorphisms,4 three-hop chains, original order7 actions+/-2, full report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, source96aa5f9c, unsigned331403/efc6e3; full costs/Weil8/formal/CI/custody separate follow-ups). [pcc:unverified]
+- [x] Qualify full rational Jacobian Richelot maps and exact raw dual -[2] on three21-class groups:4 bijections/1764 map additions/84 composites, finite dual-only kernel result and complete report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, resultdde79a33, unsigned6b4fb5/4b7b49). [pcc:unverified]
+
+- [x] Qualify real genus-two F3 Frobenius sectors, elliptic-factor eligibility and exact extension-order constraints before selecting a genuine mod8 Jacobian fixture (Codex, started 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007; stacked on native validation #5005).
 - [ ] Sweep all accessible Isogeny Labs PRs with private PDF, source-linked public inventory, grouped research assessment, Lean/PCC audit and exact-head CI receipts (ChatGPT, started 2026-11-23, branch codex/daily-research-leads-20261123)
 - [ ] Pursue ten ECDLP research tracks in parallel through a shared cost/accounting gate; preserve source scope, controls and execution blockers (Codex, started 2026-11-23, branch research/parallel-ecdlp-goals-20261123).
 - [ ] Complete review/landing for the Vitse Prime31 compatibility audit: PR #5016, lane/vitse-prime31-compatibility; reusable checker, production-selector bridge, 17 contract tests and 22 standalone identity/SHA tests complete; exact main 71408278 full-root gate fails on duplicate round73_mersenne_single_fold test modules (ChatGPT, started 2026-11-23). See research/vitse_prime31_compatibility_20261123/ROOT_GATE.md. [pcc:unverified]
@@ -375,6 +384,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 - [ ] Publish two-hop finite-kernel native/Lean evidence and reports; complete inherited generic formal-instance review before acceptance; preserve written geometry and rational-endpoint/morphism distinctions (Codex, started 2026-11-23, branch lane/chained-twohop-descent-20261123, PR #4992).
+
+- [ ] Investigate longer 2-power Jacobian descent with absent rational two-torsion; audit characteristic kernel layers and rational Richelot factorization before selecting a new native/formal unit (Codex, started 2026-11-23, branch lane/chained-2power-descent-20261123, PR #4997).
 
 ## Blocked / questions for the owner
 - Extension-field graph IC (PR #4986): new Rust traced unit/six backends and one-worker qualifier are scoped-qualified; new Runpod comparison is blocked by balance-0.42USD and unavailable checkpoint upload. Full-library syntax and inherited benchmark-record gates remain separate. See [measurement admission](../problems/extension-ic-trace-measurement-admission.md). No successor pod or parity claim. [pcc:unverified]
