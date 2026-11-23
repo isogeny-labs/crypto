@@ -1,12 +1,12 @@
 # Prime31 four-distinct-leaf representation density and real solver-cost experiment
 
-**Date:** 2026-11-23 UTC. **Standing:** exact integer combinatorial derivation and a new original-Rust diagnostic source; the diagnostic has NOT been run in this connector environment (no cargo/rustc). No non-generic extraction, cold solve or timing advantage is claimed. [pcc:unverified]
+**Date:** 2026-11-23 UTC. **Standing:** exact integer combinatorial derivation and a new original-Rust diagnostic source; the diagnostic PASSED 2/2 source-bound original Rust 1.100.0 tests in GitHub Actions run #45111925963; the frozen B677 fixture identity and final table were executed. No non-generic extraction, cold solve or timing advantage is claimed. [pcc:unverified]
 
 ## Unchanged curve and genuine source provenance
 
 - E / F_2147483647: y²=x³+847514846x+2087444724, generator G=(625037715,2100627251), subgroup n=2147446831, reported cofactor one.
 - Existing Rust `prime31_algebraic_ic::{Arithmetic,Base,PRIME31}` and the **same** B509 Dickson + 168 public Y7 leaves (`RUN66_Y7_EXTRA168.csv`) reconstruct B677. No curve engine, base, signed relation or parser is replaced.
-- The new source `research/prime31_ic_20261115/native/examples/prime31_m4_representation_density.rs` verifies the actual field, base membership, on-curve and x-distinctness checks, then evaluates exact coefficient-vector counts using u128. This is a **combinatorial prescreen**, NOT an index-calculus oracle; its output requires source-pinned Rust execution before calling it a native pass.
+- The new source `research/prime31_ic_20261115/native/examples/prime31_m4_representation_density.rs` verifies the actual field, base membership, on-curve and x-distinctness checks, then evaluates exact coefficient-vector counts using u128. This is a **combinatorial prescreen**, NOT an index-calculus oracle; its output passed an exact-source native Rust 1.100.0 GitHub Actions development correctness gate (2/2 tests, frozen 168-leaf fixture hash check).
 
 ## Exact identity (not a probabilistic model)
 
@@ -47,7 +47,7 @@ For B=8 the expected number of distinct-index four-signed representations is onl
 
 ## Frozen next original-Rust experiment: base-size versus **independent rank per fully charged query**
 
-**P0 admission before paid runs:** obtain exact-source native two-test pass for the diagnostic, confirm its original B677 fixture hash and record its stdout/source sha/runner. Confirm current #4953 complete B8 positive and empty statuses from source-bound CI before transplanting any comparison.
+**P0 admission before paid runs:** Native original-Rust diagnostic gate now PASSED 2/2 at [Actions #45111925963](https://github.com/isogeny-labs/crypto/actions/runs/45111925963), on source commit `10414848c449dba47f8367fc8e38ec5418aec106` (the later PDF adds no Rust changes); original fixture SHA-256 checked, B677 row `677,138805851600,140045175925,64.6376197055,65.2147349603`. This is a correctness pass only. Confirm current #4953 B8 complete positive/empty statuses from source-bound CI before transplanting any comparison.
 
 **Arms:** public-only compact RR5 monic quotient extractor and incumbent best RR9/F3 nonenumerative extractor, each at B=224,256,320,677 using the existing registered original-Rust B677 points and subgroup. Define B224/256/320 as deterministic prefixes of the original B509 Dickson list; B677 is the original 509+168 hybrid, **not** the same random ensemble. Recompute preexisting *valid* free homogeneous relation rank at each B; do not transplant all 88 rows unchanged. The ordinary cofactor-one curve and generator remain identical throughout.
 
@@ -59,4 +59,4 @@ For B=8 the expected number of distinct-index four-signed representations is onl
 
 **End-to-end acceptance:** recover all requested actual public target logs through authentic-RHS independent rank using original Rust, including cold setup and all failed probes. Compare identical source-pinned target cohorts on the same isolated host against the strongest reproducible existing index-calculus solver, tuned `prime_fast` negation-map Pollard rho, and shared BSGS diagnostic. Primary metric cold **one-target** full cost; T=32/128/1024 only separately labelled amortization. Require A/A, at least five measured rounds for an admitted hardware speed comparison, independent replay and signed PCC; repeat on two additional ordinary prime-order curves before claiming broader prime-field performance.
 
-**Current result:** The exact combinatorial prescreen and Rust source are submitted for review; **no new solver throughput, rank or scalar-recovery measurement** was made in this run. B677 root extraction and its cost remain the decisive missing gates. [pcc:unverified]
+**Current result:** Exact combinatorial prescreen, B677 original Rust factor-base reconstruction and 2/2 native correctness tests passed; **no new solver throughput, rank or scalar-recovery measurement** was made in this run. B677 root extraction and its cost remain the decisive missing gates. GitHub PDF structural xref/object/page audit passed, but it has not been visually rasterized in this connector environment; the editable SVG/CSV and Markdown are the reviewable source. [pcc:unverified]
