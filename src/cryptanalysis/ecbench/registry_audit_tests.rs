@@ -346,6 +346,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("bsgs.interleaved", Fx::Prime18, &[]),
     ("bsgs.negation", Fx::Prime18, &[]),
     ("bsgs.negation_table", Fx::Prime18, &[]),
+    ("bsgs.negation_table_v2", Fx::Prime18, &[]),
     ("bsgs.textbook_v2", Fx::Prime18, &[]),
     ("bsgs.interleaved_v2", Fx::Prime18, &[]),
     ("bsgs.negation_v2", Fx::Prime18, &[]),
@@ -471,6 +472,20 @@ const CASES: &[(&str, Fx, P)] = &[
     ("jacobian_image.bsgs", Fx::K0n7, &[]),
     ("jacobian_image.rho3_field_tally", Fx::K0n7, &[]),
     ("jacobian_image.bsgs_field_tally", Fx::K0n7, &[]),
+    ("jacobian_image.rho3_v2", Fx::K0n7, &[]),
+    ("jacobian_image.bsgs_v2", Fx::K0n7, &[]),
+    (
+        "jacobian_image.genus3_projected_ic_v1",
+        Fx::K0n7,
+        &[
+            ("fb_size", "32"),
+            ("extra_relations", "8"),
+            ("branches", "32"),
+            ("d_step_in", "4"),
+            ("max_trials", "200000"),
+            ("threads", "1"),
+        ],
+    ),
     ("jacobian_image.rho3", Fx::Binary11, &[]),
     ("jacobian_image.bsgs", Fx::Binary11, &[]),
     ("jacobian_image.rho3_field_tally", Fx::Binary11, &[]),
@@ -580,8 +595,8 @@ const UNPRICED_EXEMPT: &[(&str, &str)] = &[
 
 /// Rule 2: the phase that holds the final `[d]G = Q` check, which must
 /// charge something inside the total (a recovered run performed the check).
-/// `jacobian_image.*` is absent: it converts no operation to GAE at all
-/// (its check is counted in `jacobian_group_operations_uncharged`).
+/// Historical `jacobian_image.*` is absent: it converts no operation to GAE at
+/// all. The v2 adapters charge their source replay in `verification`.
 const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.known_log_ksum_v1", "target_recovery_check"),
     ("ic.known_log_mitm2_v1", "target_recovery_check"),
@@ -594,6 +609,9 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("rho.negation_strong", "check"),
     ("ic.koblitz_batched", "verify"),
     ("ic.koblitz_batched_v2", "verify"),
+    ("jacobian_image.rho3_v2", "verification"),
+    ("jacobian_image.bsgs_v2", "verification"),
+    ("jacobian_image.genus3_projected_ic_v1", "verification"),
 ];
 
 fn phase_gap(rep: &SolveReport) -> f64 {
@@ -791,6 +809,8 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
         ("jacobian_image.bsgs", &[], &koblitz),
         ("jacobian_image.rho3_field_tally", &[], &koblitz),
         ("jacobian_image.bsgs_field_tally", &[], &koblitz),
+        ("jacobian_image.rho3_v2", &[], &koblitz),
+        ("jacobian_image.bsgs_v2", &[], &koblitz),
         ("ic.koblitz_batched", batched, &koblitz),
         (
             "rho.negation_strong",

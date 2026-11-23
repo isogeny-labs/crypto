@@ -242,7 +242,7 @@ fn fine_block_of_target(
     let ct = comp[t];
     let cols_in = (0..ncols).filter(|&c| comp[c] == ct).count();
     let rows_in = (0..n)
-        .filter(|&r| m.mate_row[r].map_or(false, |mc| comp[mc] == ct))
+        .filter(|&r| m.mate_row[r].is_some_and(|mc| comp[mc] == ct))
         .count();
     (cols_in, rows_in, matched_rows, m.probes + edges)
 }
