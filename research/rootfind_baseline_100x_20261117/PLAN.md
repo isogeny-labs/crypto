@@ -102,3 +102,15 @@ shared host, 10 runs, library arms re-measured on the same host):
 - Next: a smaller or partitioned filter at large A (the 1 MiB gather is
   L2-latency bound), the explicit-intrinsics arithmetic, then step 1 of the
   order of work (oracle id, witness recovery, parity test).
+
+## Status, 2026-11-18 (next 100x: the k-sum relation phase)
+
+`research/ksum_fast_ic_20261118` re-implements the generic-track incumbent,
+`ksum:m=5`, end to end on batched Montgomery/AVX-512 arithmetic. All
+numbers are `[pcc:unverified]`: 48 targets, 2 rounds, the same curve and
+host. Against the library pipeline (97.2 ms a solve):
+- with the table charged to every solve, as the pipeline does: 21x on one
+  thread, 38x on 4 threads at A = 19, and 51x at the re-tuned A = 17;
+- with one table per curve (multi-target accounting): 140–168x.
+
+The counted cost S is unchanged (7.7x rho remains).
