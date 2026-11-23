@@ -110,26 +110,56 @@ impl Fp<'_> {
         f.pow(a, self.p - 2)
     }
 
-    // Tonelli-Shanks square root for odd prime fields p = 1 (mod 4).
-    // The p = 3 (mod 4) callers already use a cheaper single exponent.
-    // A nonresidue returns None; a repeated root (zero) requires no powers.
+    // For an odd prime p, Jacobi(a,p) is the Legendre symbol. Selecting
+    // a Tonelli-Shanks nonresidue with binary reciprocity avoids running
+    // an entire p-sized modular exponentiation for every trial candidate.
+    fn jacobi_symbol(mut a: u64, mut n: u64) -> i8 {
+        debug_assert!(n > 0 && n & 1 == 1);
+        a %= n;
+        let mut sign = 1i8;
+        while a != 0 {
+            let twos = a.trailing_zeros();
+            if (twos & 1) != 0 && (n & 7 == 3 || n & 7 == 5) {
+                sign = -sign;
+            }
+            a >>= twos;
+            if a & 3 == 3 && n & 3 == 3 {
+                sign = -sign;
+            }
+            let next = n % a;
+            n = a;
+            a = next;
+        }
+        if n == 1 { sign } else { 0 }
+    }
+
+    // Tonelli-Shanks for odd primes p = 1 (mod 4).
+    //
+    // Let p-1 = q*2^s, q odd. Compute h=a^((q-1)/2) only once, then
+    // r=h*a=a^((q+1)/2), t=h^2*a=a^q. Use Jacobi(value,p) before the
+    // nonresidue search: otherwise nonsquare inputs perform expensive
+    // Tonelli setup and regress substantially relative to Euler rejection.
     fn sqrt_tonelli_shanks(&mut self, value: u64) -> Option<u64> {
         if value == 0 {
             return Some(0);
         }
         let p = self.p;
-        if self.pow(value, (p - 1) / 2) != 1 {
+        // For an odd PRIME modulus, Jacobi(value,p) = Legendre(value,p).
+        // Reject nonsquares before searching for an auxiliary nonresidue.
+        if Self::jacobi_symbol(value, p) != 1 {
             return None;
         }
         let s = (p - 1).trailing_zeros();
         let q = (p - 1) >> s;
         let mut z = 2u64;
-        while self.pow(z, (p - 1) / 2) != p - 1 {
+        while Self::jacobi_symbol(z, p) != -1 {
             z += 1;
         }
         let mut c = self.pow(z, q);
-        let mut t = self.pow(value, q);
-        let mut r = self.pow(value, (q + 1) / 2);
+        let h = self.pow(value, (q - 1) / 2);
+        let h_squared = self.mul(h, h);
+        let mut t = self.mul(h_squared, value);
+        let mut r = self.mul(h, value);
         let mut m = s;
         while t != 1 {
             let mut i = 0u32;
@@ -732,6 +762,33 @@ mod tests {
                 let twice_root = field.add(root, root);
                 let repeated = [repeated_product, field.sub(0, twice_root), 1];
                 assert_eq!(field.roots(&repeated), vec![root]);
+            }
+        }
+    }
+
+    #[test]
+    fn round134_jacobi_and_shared_powers_match_legendre_oracle() {
+        // The Jacobi identity relies on odd PRIME moduli. Test a range of
+        // 2-adic valuations, including 2^23 and 2^27 dividing p-1.
+        for p in [5u64, 17, 97, 257, 65_521, 998_244_353,
+                  1_000_000_009, 2_013_265_921] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            let max_value = if p < 300 { p } else { 160 };
+            for i in 0..max_value {
+                let a = if p < 300 { i } else { (i * 79_919 + 13) % p };
+                let expected_residue = a == 0 || field.pow(a, (p - 1) / 2) == 1;
+                let got = field.sqrt_tonelli_shanks(a);
+                assert_eq!(got.is_some(), expected_residue, "p={p} a={a}");
+                if let Some(root) = got {
+                    assert_eq!(field.mul(root, root), a, "p={p} a={a}");
+                }
+                if a != 0 {
+                    let legendre = field.pow(a, (p - 1) / 2);
+                    let expected_sign = if legendre == 1 { 1 } else { -1 };
+                    assert_eq!(Fp::jacobi_symbol(a, p), expected_sign,
+                               "Jacobi p={p} a={a}");
+                }
             }
         }
     }
