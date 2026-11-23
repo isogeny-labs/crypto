@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+
+- [ ] Reproduce the genus 2–4 HEC index calculus comparison and examine the mathematical contribution (Codex, started 2026-11-18, branch research/hec-tenfold-replay, PR #4789)
 - [x] Publish the fresh P-192 plane-quartic transfer acceptance replay, machine receipt and exact remaining obligations (Codex, completed 2026-11-19, branch codex/p192-quartic-transfer-assessment-20261119, PR #4788)
 
 - [ ] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, and linear-stage accounting for extension-field graph IC (Cursor, started 2026-11-18, branch cursor/graph-index-calculus-ecdlp-7226)
