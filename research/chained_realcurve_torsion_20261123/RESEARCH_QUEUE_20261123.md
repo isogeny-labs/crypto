@@ -8,7 +8,7 @@ standing. Every scientific result below is unsigned. [pcc:unverified]
 ## Next unblocked work
 
 1. Finish source-first explicit E7 pullback and both homogeneous Richelot
-   chains over candidateF3^6. Code is in elliptic_chain; no phase has run.
+   chains over candidateF3^6. Code is in elliptic_chain; first A stops at format1 before arithmetic; versioned B is frozen and unexecuted.
    All7 points/49 addition pairs per map, scalar-free transfer functions,
    actual F3 descent,2 source infinities,4 real degree drops, nonvacuous
    positive/negative and scale/basepoint controls are frozen before calls.
@@ -70,3 +70,7 @@ immutable. Do not execute foreign CT332/CT333 Python or repeat their abstract
   stores remain untouched. Use owned RAM worktree and connected Git-data API
   with exact trees/commits/expected-head guards because native auth expired.
   [pcc:unverified]
+
+## Written further successors
+
+RATIONAL_JACOBIAN_CHAIN_LEAD.md supplies the canonical degree2 support and raw-dual -2 control for actual successive maps. GENUS3_PLANE_QUARTIC_SUCCESSOR.md freezes the prospective family shape and necessary source gates for a genuine nonhyperelliptic genus3 Jacobian. These are unexecuted written leads; do the current map/report/cost work first, then freeze any new code/population before calls. [pcc:unverified]
