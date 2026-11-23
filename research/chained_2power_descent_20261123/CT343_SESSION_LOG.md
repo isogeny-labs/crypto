@@ -19,3 +19,21 @@ Source-pinned independent Rust/Cantor parity for the two explicit even-order gen
 ### Errors (what went wrong, how it was handled)
 
 The initial CT343 program completed arithmetic but failed JSON result formatting with `TypeError: 'K' object is not subscriptable` because its target encoder was passed a single point rather than a point-pair. Corrected only serialization, then checked full canonical result. A combined multi-mutant shell batch exceeded its timeout after successfully checking two mutations; ran remaining mutation separately in both Python modes. Shared 2MB log was not overwritten after connector line-range failures. Local Python executor had no native worker slots or Rust compiler; source code was manually transferred through the GitHub connector, then Git blob hashes confirmed exact identity. Independent signed proof and execution validation remain outstanding. [pcc:unverified]
+
+## 2026-11-23 UTC — CT343 character-certificate follow-up
+
+### What was done (commands, files, features)
+
+Read AGENTS, ACTIVE, CT343 frozen report and task-local log, CT342 group structure, latest draft #5066 and its two cost-audit comments, merged #3877/#5007/#4215, cryptanalysis #1523 and #4178. Checked primary Dallaporta 2024 §3.3 and Stoll 2001 bibliographic record; KB/Conductor not exposed. Preregistered bounded certificate test in #5066 comment 7115047665 at frozen base f0752c827. Local CT339 SHA256 matched prior pin. New [report](CT343_CHARACTER_CERTIFICATE.md), [exact source](ct343_character.py) and [canonical raw](CT343_CHARACTER_RESULT.json) committed at 7885aa86,25db97c8,d724c817; source Git blob 3744ef4b5de38bf8c02dbb5d3b0d13804a5c5375 and raw 117f3a318c15ef1320b41f398d2d6f8907b11790 verified by remote reads. Python normal/-O identical; three mutant flags rejected in both. 1196 correct lifts, 1196 wrong alternatives rejected, 2392 off-subgroup same-image controls rejected. [pcc:unverified]
+
+### Decisions made (and why)
+
+Two 2-descent bits replace online source scalar multiplication under explicit map/kernel premises; no need to implement the previous shared-power or streaming candidate to establish this certificate. Full kernel signatures at z=1 and 52 are 00/10/01/11. The complete destination lookup table used for the test is only a correctness oracle, not a competitive solver. Source-to-image cost and physical field pricing not measured. One coordinator, no native workers or Rust; no paid resources, benchmark reservation, CI rerun, merge or original 695/701 work. No claimed parallel elapsed-time gain.
+
+### Open threads (unfinished, pick up next time)
+
+Independent native character/formal map qualification and signed PCC; charge setup, validation and Legendre computations against direct-source PH and strongest references. Kernel intersection with 2J is the obstruction to extending this particular certificate. Existing norm-reuse owner retains authenticated fixtures and C169/C13a/C13b/N2_actual/D cost gate.
+
+### Errors (what went wrong, how it was handled)
+
+Shared daily log read returned empty; left unchanged, appended only this task-local log. Mutants bad-branch, bad-pair, ignore-second failed with no separating pair, pair does not separate kernel, off-subgroup accepted respectively. No native independent validation; do not promote. [pcc:unverified]
