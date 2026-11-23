@@ -1,0 +1,5056 @@
+{
+  "arms": [
+    {
+      "admission_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "all_cells_complete": true,
+      "arm": "quartic_s3",
+      "base_columns": 2,
+      "base_index_work": {
+        "counted:base_index_builds": 1,
+        "index_inserts": 12,
+        "index_point_negations": 4,
+        "index_sort_word_ops": 6
+      },
+      "base_logs_supplied": false,
+      "base_selector_roots": [
+        3,
+        4
+      ],
+      "base_signed_points": [
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "base_sqrt_muls": 8,
+      "base_subgroup_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "cells": [
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 1953,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 18538,
+            "equation_validation_ns": 12339,
+            "membership_and_replay_ns": 4917,
+            "rank_ns": 1993,
+            "sign_reconciliation_ns": 9584
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 2,
+            "decoded_signed_candidates": 2,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 1,
+            "duplicate_signed_multisets": 1,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 2,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 1,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 2,
+          "distinct_leaf_x_tuples": 2,
+          "distinct_ordered_signed": 2,
+          "distinct_signed_multisets": 1,
+          "domain_scan_field_multiplications": 0,
+          "equations": 3,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "index": 0,
+          "native_max_solving_degree": 4,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 2,
+          "rank_before": 1,
+          "replay_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 2,
+            "field_muls": 4,
+            "field_sqrs": 2,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 2,
+            "local_line_sign_flips": 0,
+            "nodes": 2,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 14,
+          "variables": 2,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 3,
+            "factored_univariates": 8,
+            "field_ops": 182,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 9,
+            "max_rows": 7,
+            "root_field_multiplications": 310,
+            "solutions_visited": 2,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 49324,
+              "native_f4_ns": 660185,
+              "root_recovery_ns": 67410,
+              "total_ns": 850151,
+              "traversal_other_ns": 73232
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 77767,
+            "other": 66940,
+            "target_construction": 161,
+            "total": 997473,
+            "visitor_call": 852605,
+            "visitor_call_outside_timing": 2454
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              0,
+              3,
+              12,
+              0
+            ],
+            [
+              2,
+              12,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 3348,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 25288,
+            "equation_validation_ns": 28424,
+            "membership_and_replay_ns": 8973,
+            "rank_ns": 3084,
+            "sign_reconciliation_ns": 25908
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 4,
+            "decoded_signed_candidates": 4,
+            "dependent_new_rows": 1,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 2,
+            "duplicate_signed_multisets": 2,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 4,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 2,
+          "distinct_full_x_chains": 4,
+          "distinct_leaf_x_tuples": 4,
+          "distinct_ordered_signed": 4,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 5,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              4,
+              2
+            ],
+            [
+              3,
+              4,
+              3,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              4
+            ],
+            [
+              4,
+              4,
+              4,
+              3
+            ]
+          ],
+          "index": 1,
+          "native_max_solving_degree": 5,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 2,
+          "replay_group_ops": {
+            "adds": 12,
+            "doubles": 0,
+            "field_invs": 8,
+            "field_muls": 22,
+            "field_sqrs": 10,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 8,
+            "local_line_sign_flips": 0,
+            "nodes": 8,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 41,
+          "variables": 4,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 10,
+            "factored_univariates": 32,
+            "field_ops": 6657,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 30,
+            "max_rows": 34,
+            "root_field_multiplications": 1304,
+            "solutions_visited": 4,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 95025,
+              "native_f4_ns": 2053055,
+              "root_recovery_ns": 148432,
+              "total_ns": 2544505,
+              "traversal_other_ns": 247993
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 88142,
+            "other": 51629,
+            "target_construction": 300,
+            "total": 2685838,
+            "visitor_call": 2545767,
+            "visitor_call_outside_timing": 1262
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 12002,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 120973,
+            "equation_validation_ns": 146321,
+            "membership_and_replay_ns": 38867,
+            "rank_ns": 0,
+            "sign_reconciliation_ns": 138235
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 16,
+            "decoded_signed_candidates": 16,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 1,
+            "duplicate_rows_in_cell": 15,
+            "duplicate_signed_multisets": 14,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 0,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 16,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 16,
+          "distinct_leaf_x_tuples": 8,
+          "distinct_ordered_signed": 16,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 7,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              3,
+              4,
+              2,
+              3
+            ],
+            [
+              3,
+              3,
+              4,
+              3,
+              2,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              4,
+              3,
+              4,
+              3,
+              2
+            ],
+            [
+              4,
+              4,
+              4,
+              3,
+              3,
+              4
+            ]
+          ],
+          "index": 2,
+          "native_max_solving_degree": 5,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 3,
+          "replay_group_ops": {
+            "adds": 64,
+            "doubles": 0,
+            "field_invs": 48,
+            "field_muls": 117,
+            "field_sqrs": 55,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 48,
+            "local_line_sign_flips": 0,
+            "nodes": 48,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ]
+          ],
+          "trace_events": 170,
+          "variables": 6,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 41,
+            "factored_univariates": 144,
+            "field_ops": 121314,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 115,
+            "max_rows": 99,
+            "root_field_multiplications": 5702,
+            "solutions_visited": 16,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 456398,
+              "native_f4_ns": 13069686,
+              "root_recovery_ns": 732750,
+              "total_ns": 16279685,
+              "traversal_other_ns": 2020851
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 139370,
+            "other": 65739,
+            "target_construction": 311,
+            "total": 16486506,
+            "visitor_call": 16281086,
+            "visitor_call_outside_timing": 1401
+          }
+        }
+      ],
+      "cold_wall_ns": {
+        "admission": 64587,
+        "base": 65038,
+        "cells": 20169817,
+        "other": 257698,
+        "rank_setup": 8894,
+        "scalar_recovery_and_replay": 1222,
+        "total": 20567256
+      },
+      "correctness_failure": false,
+      "cumulative_distinct_relation_rows": 3,
+      "final_rank": 3,
+      "independent_oracle_outside_candidate_cost": [
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 2,
+          "full_sum_group_ops": {
+            "adds": 32,
+            "doubles": 0,
+            "field_invs": 12,
+            "field_muls": 36,
+            "field_sqrs": 16,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 2,
+          "infinity_prefix_matches": 0,
+          "m": 2,
+          "oracle_wall_ns": 16565,
+          "prefix_chart_group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "field_invs": 0,
+            "field_muls": 0,
+            "field_sqrs": 0,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 1,
+          "total_group_matches": 2,
+          "visited_tuples": 16
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 4,
+          "full_sum_group_ops": {
+            "adds": 192,
+            "doubles": 0,
+            "field_invs": 90,
+            "field_muls": 246,
+            "field_sqrs": 112,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 4,
+          "infinity_prefix_matches": 0,
+          "m": 3,
+          "oracle_wall_ns": 19209,
+          "prefix_chart_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 4,
+            "field_muls": 14,
+            "field_sqrs": 6,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 4,
+          "visited_tuples": 64
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 16,
+          "full_sum_group_ops": {
+            "adds": 1024,
+            "doubles": 0,
+            "field_invs": 556,
+            "field_muls": 1484,
+            "field_sqrs": 680,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 16,
+          "infinity_prefix_matches": 8,
+          "m": 4,
+          "oracle_wall_ns": 88974,
+          "prefix_chart_group_ops": {
+            "adds": 40,
+            "doubles": 0,
+            "field_invs": 32,
+            "field_muls": 85,
+            "field_sqrs": 39,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 24,
+          "visited_tuples": 256
+        }
+      ],
+      "public_g_anchor": {
+        "coefficient": 1,
+        "column": 1,
+        "rhs": 1
+      },
+      "rank_columns": 3,
+      "rank_dependent_rows": 1,
+      "rank_gain_from_relations": 2,
+      "rank_inconsistent_rows": 0,
+      "rank_row_ops": 20,
+      "rank_work": {
+        "counted:gauss_column_scans_and_pivot_inversions": 1,
+        "gauss_entries_scanned": 54,
+        "pivot_inversion_steps": 24
+      },
+      "recovered_scalar": 3,
+      "recovered_verified": true,
+      "recovery_group_ops": {
+        "adds": 1,
+        "doubles": 1,
+        "field_invs": 2,
+        "field_muls": 7,
+        "field_sqrs": 3,
+        "montgomery_reductions": 0,
+        "scalar_mults": 1,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "request": {
+        "curve_a": 0,
+        "curve_b": 3,
+        "depth": 1,
+        "generator": [
+          4,
+          2
+        ],
+        "limits": {
+          "max_assignments": 20000,
+          "max_degree": 8,
+          "max_trace_events": 100000,
+          "seconds_per_target": 10
+        },
+        "p": 7,
+        "public_q": [
+          1,
+          2
+        ],
+        "scalar_modulus": 13,
+        "targets": [
+          {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          }
+        ]
+      },
+      "seed_rank": 1,
+      "target_group_ops": {
+        "adds": 3,
+        "doubles": 0,
+        "field_invs": 0,
+        "field_muls": 0,
+        "field_sqrs": 0,
+        "montgomery_reductions": 0,
+        "scalar_mults": 6,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      }
+    },
+    {
+      "admission_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "all_cells_complete": true,
+      "arm": "invariant_q",
+      "base_columns": 2,
+      "base_index_work": {
+        "counted:base_index_builds": 1,
+        "index_inserts": 12,
+        "index_point_negations": 4,
+        "index_sort_word_ops": 6
+      },
+      "base_logs_supplied": false,
+      "base_selector_roots": [
+        3,
+        4
+      ],
+      "base_signed_points": [
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "base_sqrt_muls": 8,
+      "base_subgroup_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "cells": [
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 1912,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 10937,
+            "equation_validation_ns": 13149,
+            "membership_and_replay_ns": 3936,
+            "rank_ns": 1783,
+            "sign_reconciliation_ns": 7672
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 2,
+            "decoded_signed_candidates": 2,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 1,
+            "duplicate_signed_multisets": 1,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 2,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 1,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 2,
+          "distinct_leaf_x_tuples": 2,
+          "distinct_ordered_signed": 2,
+          "distinct_signed_multisets": 1,
+          "domain_scan_field_multiplications": 0,
+          "equations": 6,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "index": 0,
+          "native_max_solving_degree": 3,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 2,
+          "rank_before": 1,
+          "replay_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 2,
+            "field_muls": 4,
+            "field_sqrs": 2,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 2,
+            "local_line_sign_flips": 0,
+            "nodes": 2,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 23,
+          "variables": 5,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 6,
+            "factored_univariates": 18,
+            "field_ops": 1905,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 29,
+            "max_rows": 26,
+            "root_field_multiplications": 390,
+            "solutions_visited": 2,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 39389,
+              "native_f4_ns": 881569,
+              "root_recovery_ns": 65038,
+              "total_ns": 1127359,
+              "traversal_other_ns": 141363
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 74522,
+            "other": 46390,
+            "target_construction": 140,
+            "total": 1249743,
+            "visitor_call": 1128691,
+            "visitor_call_outside_timing": 1332
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              0,
+              3,
+              12,
+              0
+            ],
+            [
+              2,
+              12,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 3006,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 25818,
+            "equation_validation_ns": 46119,
+            "membership_and_replay_ns": 9645,
+            "rank_ns": 3074,
+            "sign_reconciliation_ns": 26871
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 4,
+            "decoded_signed_candidates": 4,
+            "dependent_new_rows": 1,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 2,
+            "duplicate_signed_multisets": 2,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 4,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 2,
+          "distinct_full_x_chains": 4,
+          "distinct_leaf_x_tuples": 4,
+          "distinct_ordered_signed": 4,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 11,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              4,
+              2
+            ],
+            [
+              3,
+              4,
+              3,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              4
+            ],
+            [
+              4,
+              4,
+              4,
+              3
+            ]
+          ],
+          "index": 1,
+          "native_max_solving_degree": 3,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 2,
+          "replay_group_ops": {
+            "adds": 12,
+            "doubles": 0,
+            "field_invs": 8,
+            "field_muls": 22,
+            "field_sqrs": 10,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 8,
+            "local_line_sign_flips": 0,
+            "nodes": 8,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 83,
+          "variables": 10,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 24,
+            "factored_univariates": 144,
+            "field_ops": 142832,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 158,
+            "max_rows": 199,
+            "root_field_multiplications": 2898,
+            "solutions_visited": 4,
+            "solving_degree": 2,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 114533,
+              "native_f4_ns": 10239401,
+              "root_recovery_ns": 496026,
+              "total_ns": 11744629,
+              "traversal_other_ns": 894669
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 90827,
+            "other": 55894,
+            "target_construction": 290,
+            "total": 11893193,
+            "visitor_call": 11746182,
+            "visitor_call_outside_timing": 1553
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 14251,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 134843,
+            "equation_validation_ns": 361315,
+            "membership_and_replay_ns": 45177,
+            "rank_ns": 0,
+            "sign_reconciliation_ns": 150899
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 16,
+            "decoded_signed_candidates": 16,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 1,
+            "duplicate_rows_in_cell": 15,
+            "duplicate_signed_multisets": 14,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 0,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 16,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 16,
+          "distinct_leaf_x_tuples": 8,
+          "distinct_ordered_signed": 16,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 16,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              3,
+              4,
+              2,
+              3
+            ],
+            [
+              3,
+              3,
+              4,
+              3,
+              2,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              4,
+              3,
+              4,
+              3,
+              2
+            ],
+            [
+              4,
+              4,
+              4,
+              3,
+              3,
+              4
+            ]
+          ],
+          "index": 2,
+          "native_max_solving_degree": 3,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 3,
+          "replay_group_ops": {
+            "adds": 64,
+            "doubles": 0,
+            "field_invs": 48,
+            "field_muls": 117,
+            "field_sqrs": 55,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 48,
+            "local_line_sign_flips": 0,
+            "nodes": 48,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ]
+          ],
+          "trace_events": 344,
+          "variables": 15,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 99,
+            "factored_univariates": 695,
+            "field_ops": 3295185,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 427,
+            "max_rows": 493,
+            "root_field_multiplications": 20369,
+            "solutions_visited": 16,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 706485,
+              "native_f4_ns": 106211575,
+              "root_recovery_ns": 2474677,
+              "total_ns": 118622831,
+              "traversal_other_ns": 9230094
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 138829,
+            "other": 99371,
+            "target_construction": 330,
+            "total": 118864306,
+            "visitor_call": 118625776,
+            "visitor_call_outside_timing": 2945
+          }
+        }
+      ],
+      "cold_wall_ns": {
+        "admission": 6850,
+        "base": 14482,
+        "cells": 132007242,
+        "other": 318990,
+        "rank_setup": 2784,
+        "scalar_recovery_and_replay": 2314,
+        "total": 132352662
+      },
+      "correctness_failure": false,
+      "cumulative_distinct_relation_rows": 3,
+      "final_rank": 3,
+      "independent_oracle_outside_candidate_cost": [
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 2,
+          "full_sum_group_ops": {
+            "adds": 32,
+            "doubles": 0,
+            "field_invs": 12,
+            "field_muls": 36,
+            "field_sqrs": 16,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 2,
+          "infinity_prefix_matches": 0,
+          "m": 2,
+          "oracle_wall_ns": 19950,
+          "prefix_chart_group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "field_invs": 0,
+            "field_muls": 0,
+            "field_sqrs": 0,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 1,
+          "total_group_matches": 2,
+          "visited_tuples": 16
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 4,
+          "full_sum_group_ops": {
+            "adds": 192,
+            "doubles": 0,
+            "field_invs": 90,
+            "field_muls": 246,
+            "field_sqrs": 112,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 4,
+          "infinity_prefix_matches": 0,
+          "m": 3,
+          "oracle_wall_ns": 19720,
+          "prefix_chart_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 4,
+            "field_muls": 14,
+            "field_sqrs": 6,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 4,
+          "visited_tuples": 64
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 16,
+          "full_sum_group_ops": {
+            "adds": 1024,
+            "doubles": 0,
+            "field_invs": 556,
+            "field_muls": 1484,
+            "field_sqrs": 680,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 16,
+          "infinity_prefix_matches": 8,
+          "m": 4,
+          "oracle_wall_ns": 87872,
+          "prefix_chart_group_ops": {
+            "adds": 40,
+            "doubles": 0,
+            "field_invs": 32,
+            "field_muls": 85,
+            "field_sqrs": 39,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 24,
+          "visited_tuples": 256
+        }
+      ],
+      "public_g_anchor": {
+        "coefficient": 1,
+        "column": 1,
+        "rhs": 1
+      },
+      "rank_columns": 3,
+      "rank_dependent_rows": 1,
+      "rank_gain_from_relations": 2,
+      "rank_inconsistent_rows": 0,
+      "rank_row_ops": 20,
+      "rank_work": {
+        "counted:gauss_column_scans_and_pivot_inversions": 1,
+        "gauss_entries_scanned": 54,
+        "pivot_inversion_steps": 24
+      },
+      "recovered_scalar": 3,
+      "recovered_verified": true,
+      "recovery_group_ops": {
+        "adds": 1,
+        "doubles": 1,
+        "field_invs": 2,
+        "field_muls": 7,
+        "field_sqrs": 3,
+        "montgomery_reductions": 0,
+        "scalar_mults": 1,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "request": {
+        "curve_a": 0,
+        "curve_b": 3,
+        "depth": 1,
+        "generator": [
+          4,
+          2
+        ],
+        "limits": {
+          "max_assignments": 20000,
+          "max_degree": 8,
+          "max_trace_events": 100000,
+          "seconds_per_target": 10
+        },
+        "p": 7,
+        "public_q": [
+          1,
+          2
+        ],
+        "scalar_modulus": 13,
+        "targets": [
+          {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          }
+        ]
+      },
+      "seed_rank": 1,
+      "target_group_ops": {
+        "adds": 3,
+        "doubles": 0,
+        "field_invs": 0,
+        "field_muls": 0,
+        "field_sqrs": 0,
+        "montgomery_reductions": 0,
+        "scalar_mults": 6,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      }
+    },
+    {
+      "admission_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "all_cells_complete": true,
+      "arm": "line_l",
+      "base_columns": 2,
+      "base_index_work": {
+        "counted:base_index_builds": 1,
+        "index_inserts": 12,
+        "index_point_negations": 4,
+        "index_sort_word_ops": 6
+      },
+      "base_logs_supplied": false,
+      "base_selector_roots": [
+        3,
+        4
+      ],
+      "base_signed_points": [
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "base_sqrt_muls": 8,
+      "base_subgroup_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "cells": [
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 3527,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 21412,
+            "equation_validation_ns": 24386,
+            "membership_and_replay_ns": 7601,
+            "rank_ns": 1782,
+            "sign_reconciliation_ns": 14362
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 4,
+            "decoded_signed_candidates": 4,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 2,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 3,
+            "duplicate_signed_multisets": 3,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 4,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 1,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 2,
+          "distinct_leaf_x_tuples": 2,
+          "distinct_ordered_signed": 2,
+          "distinct_signed_multisets": 1,
+          "domain_scan_field_multiplications": 0,
+          "equations": 6,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "index": 0,
+          "native_max_solving_degree": 3,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 2,
+          "rank_before": 1,
+          "replay_group_ops": {
+            "adds": 8,
+            "doubles": 0,
+            "field_invs": 4,
+            "field_muls": 8,
+            "field_sqrs": 4,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 0,
+            "local_line_sign_flips": 2,
+            "nodes": 4,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 41,
+          "variables": 5,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 10,
+            "factored_univariates": 25,
+            "field_ops": 4505,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 44,
+            "max_rows": 45,
+            "root_field_multiplications": 702,
+            "solutions_visited": 4,
+            "solving_degree": 2,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 73070,
+              "native_f4_ns": 1525680,
+              "root_recovery_ns": 113027,
+              "total_ns": 1925532,
+              "traversal_other_ns": 213755
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 54562,
+            "other": 50527,
+            "target_construction": 150,
+            "total": 2032062,
+            "visitor_call": 1926823,
+            "visitor_call_outside_timing": 1291
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              0,
+              3,
+              12,
+              0
+            ],
+            [
+              2,
+              12,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 11236,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 91168,
+            "equation_validation_ns": 163126,
+            "membership_and_replay_ns": 33360,
+            "rank_ns": 3095,
+            "sign_reconciliation_ns": 95184
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 16,
+            "decoded_signed_candidates": 16,
+            "dependent_new_rows": 1,
+            "duplicate_ordered_signed": 12,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 14,
+            "duplicate_signed_multisets": 14,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 16,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 2,
+          "distinct_full_x_chains": 4,
+          "distinct_leaf_x_tuples": 4,
+          "distinct_ordered_signed": 4,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 11,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              4,
+              2
+            ],
+            [
+              3,
+              4,
+              3,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              4
+            ],
+            [
+              4,
+              4,
+              4,
+              3
+            ]
+          ],
+          "index": 1,
+          "native_max_solving_degree": 4,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 2,
+          "replay_group_ops": {
+            "adds": 48,
+            "doubles": 0,
+            "field_invs": 32,
+            "field_muls": 88,
+            "field_sqrs": 40,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 0,
+            "local_line_sign_flips": 16,
+            "nodes": 32,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 227,
+          "variables": 10,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 60,
+            "factored_univariates": 287,
+            "field_ops": 365679,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 349,
+            "max_rows": 363,
+            "root_field_multiplications": 7487,
+            "solutions_visited": 16,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 397169,
+              "native_f4_ns": 25606117,
+              "root_recovery_ns": 1061004,
+              "total_ns": 29244964,
+              "traversal_other_ns": 2180674
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 71908,
+            "other": 95424,
+            "target_construction": 291,
+            "total": 29414500,
+            "visitor_call": 29246877,
+            "visitor_call_outside_timing": 1913
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 99070,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 981786,
+            "equation_validation_ns": 2281140,
+            "membership_and_replay_ns": 344717,
+            "rank_ns": 0,
+            "sign_reconciliation_ns": 1224134
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 128,
+            "decoded_signed_candidates": 128,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 112,
+            "duplicate_rows_from_previous_cells": 1,
+            "duplicate_rows_in_cell": 127,
+            "duplicate_signed_multisets": 126,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 0,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 128,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 16,
+          "distinct_leaf_x_tuples": 8,
+          "distinct_ordered_signed": 16,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 16,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              3,
+              4,
+              2,
+              3
+            ],
+            [
+              3,
+              3,
+              4,
+              3,
+              2,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              4,
+              3,
+              4,
+              3,
+              2
+            ],
+            [
+              4,
+              4,
+              4,
+              3,
+              3,
+              4
+            ]
+          ],
+          "index": 2,
+          "native_max_solving_degree": 4,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 3,
+          "replay_group_ops": {
+            "adds": 512,
+            "doubles": 0,
+            "field_invs": 384,
+            "field_muls": 936,
+            "field_sqrs": 440,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 0,
+            "local_line_sign_flips": 192,
+            "nodes": 384,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ]
+          ],
+          "trace_events": 1604,
+          "variables": 15,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 407,
+            "factored_univariates": 1874,
+            "field_ops": 13153064,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 1521,
+            "max_rows": 1793,
+            "root_field_multiplications": 60780,
+            "solutions_visited": 128,
+            "solving_degree": 4,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 4930847,
+              "native_f4_ns": 584427667,
+              "root_recovery_ns": 8711576,
+              "total_ns": 658744239,
+              "traversal_other_ns": 60674149
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 111899,
+            "other": 132269,
+            "target_construction": 401,
+            "total": 658991542,
+            "visitor_call": 658746973,
+            "visitor_call_outside_timing": 2734
+          }
+        }
+      ],
+      "cold_wall_ns": {
+        "admission": 8072,
+        "base": 18939,
+        "cells": 690438104,
+        "other": 278489,
+        "rank_setup": 3064,
+        "scalar_recovery_and_replay": 2103,
+        "total": 690748771
+      },
+      "correctness_failure": false,
+      "cumulative_distinct_relation_rows": 3,
+      "final_rank": 3,
+      "independent_oracle_outside_candidate_cost": [
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 2,
+          "full_sum_group_ops": {
+            "adds": 32,
+            "doubles": 0,
+            "field_invs": 12,
+            "field_muls": 36,
+            "field_sqrs": 16,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 2,
+          "infinity_prefix_matches": 0,
+          "m": 2,
+          "oracle_wall_ns": 19971,
+          "prefix_chart_group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "field_invs": 0,
+            "field_muls": 0,
+            "field_sqrs": 0,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 1,
+          "total_group_matches": 2,
+          "visited_tuples": 16
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 4,
+          "full_sum_group_ops": {
+            "adds": 192,
+            "doubles": 0,
+            "field_invs": 90,
+            "field_muls": 246,
+            "field_sqrs": 112,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 4,
+          "infinity_prefix_matches": 0,
+          "m": 3,
+          "oracle_wall_ns": 19690,
+          "prefix_chart_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 4,
+            "field_muls": 14,
+            "field_sqrs": 6,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 4,
+          "visited_tuples": 64
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 16,
+          "full_sum_group_ops": {
+            "adds": 1024,
+            "doubles": 0,
+            "field_invs": 556,
+            "field_muls": 1484,
+            "field_sqrs": 680,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 16,
+          "infinity_prefix_matches": 8,
+          "m": 4,
+          "oracle_wall_ns": 89415,
+          "prefix_chart_group_ops": {
+            "adds": 40,
+            "doubles": 0,
+            "field_invs": 32,
+            "field_muls": 85,
+            "field_sqrs": 39,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 24,
+          "visited_tuples": 256
+        }
+      ],
+      "public_g_anchor": {
+        "coefficient": 1,
+        "column": 1,
+        "rhs": 1
+      },
+      "rank_columns": 3,
+      "rank_dependent_rows": 1,
+      "rank_gain_from_relations": 2,
+      "rank_inconsistent_rows": 0,
+      "rank_row_ops": 20,
+      "rank_work": {
+        "counted:gauss_column_scans_and_pivot_inversions": 1,
+        "gauss_entries_scanned": 54,
+        "pivot_inversion_steps": 24
+      },
+      "recovered_scalar": 3,
+      "recovered_verified": true,
+      "recovery_group_ops": {
+        "adds": 1,
+        "doubles": 1,
+        "field_invs": 2,
+        "field_muls": 7,
+        "field_sqrs": 3,
+        "montgomery_reductions": 0,
+        "scalar_mults": 1,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "request": {
+        "curve_a": 0,
+        "curve_b": 3,
+        "depth": 1,
+        "generator": [
+          4,
+          2
+        ],
+        "limits": {
+          "max_assignments": 20000,
+          "max_degree": 8,
+          "max_trace_events": 100000,
+          "seconds_per_target": 10
+        },
+        "p": 7,
+        "public_q": [
+          1,
+          2
+        ],
+        "scalar_modulus": 13,
+        "targets": [
+          {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          }
+        ]
+      },
+      "seed_rank": 1,
+      "target_group_ops": {
+        "adds": 3,
+        "doubles": 0,
+        "field_invs": 0,
+        "field_muls": 0,
+        "field_sqrs": 0,
+        "montgomery_reductions": 0,
+        "scalar_mults": 6,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      }
+    },
+    {
+      "admission_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "all_cells_complete": true,
+      "arm": "oriented_o",
+      "base_columns": 2,
+      "base_index_work": {
+        "counted:base_index_builds": 1,
+        "index_inserts": 12,
+        "index_point_negations": 4,
+        "index_sort_word_ops": 6
+      },
+      "base_logs_supplied": false,
+      "base_selector_roots": [
+        3,
+        4
+      ],
+      "base_signed_points": [
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 3
+        },
+        {
+          "infinity": false,
+          "x": 3,
+          "y": 4
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "infinity": false,
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "base_sqrt_muls": 8,
+      "base_subgroup_group_ops": {
+        "adds": 4,
+        "doubles": 6,
+        "field_invs": 8,
+        "field_muls": 34,
+        "field_sqrs": 14,
+        "montgomery_reductions": 0,
+        "scalar_mults": 2,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "cells": [
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 1811,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 10857,
+            "equation_validation_ns": 10686,
+            "membership_and_replay_ns": 3856,
+            "rank_ns": 1973,
+            "sign_reconciliation_ns": 7561
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 2,
+            "decoded_signed_candidates": 2,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 1,
+            "duplicate_signed_multisets": 1,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 2,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 1,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 2,
+          "distinct_leaf_x_tuples": 2,
+          "distinct_ordered_signed": 2,
+          "distinct_signed_multisets": 1,
+          "domain_scan_field_multiplications": 0,
+          "equations": 4,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "index": 0,
+          "native_max_solving_degree": 3,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 2,
+          "rank_before": 1,
+          "replay_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 2,
+            "field_muls": 4,
+            "field_sqrs": 2,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 0,
+            "local_line_sign_flips": 0,
+            "nodes": 2,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 17,
+          "variables": 3,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 4,
+            "factored_univariates": 9,
+            "field_ops": 777,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 15,
+            "max_rows": 17,
+            "root_field_multiplications": 234,
+            "solutions_visited": 2,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 36744,
+              "native_f4_ns": 543859,
+              "root_recovery_ns": 43969,
+              "total_ns": 723500,
+              "traversal_other_ns": 98928
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 83846,
+            "other": 47912,
+            "target_construction": 190,
+            "total": 856881,
+            "visitor_call": 724933,
+            "visitor_call_outside_timing": 1433
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              0,
+              3,
+              12,
+              0
+            ],
+            [
+              2,
+              12,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 3133,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 27180,
+            "equation_validation_ns": 35874,
+            "membership_and_replay_ns": 9815,
+            "rank_ns": 3396,
+            "sign_reconciliation_ns": 50497
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 4,
+            "decoded_signed_candidates": 4,
+            "dependent_new_rows": 1,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 0,
+            "duplicate_rows_in_cell": 2,
+            "duplicate_signed_multisets": 2,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 1,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 4,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 2,
+          "distinct_full_x_chains": 4,
+          "distinct_leaf_x_tuples": 4,
+          "distinct_ordered_signed": 4,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 8,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              4,
+              2
+            ],
+            [
+              3,
+              4,
+              3,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              4
+            ],
+            [
+              4,
+              4,
+              4,
+              3
+            ]
+          ],
+          "index": 1,
+          "native_max_solving_degree": 4,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 2,
+          "replay_group_ops": {
+            "adds": 12,
+            "doubles": 0,
+            "field_invs": 8,
+            "field_muls": 22,
+            "field_sqrs": 10,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 0,
+            "local_line_sign_flips": 0,
+            "nodes": 8,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "trace_events": 68,
+          "variables": 7,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 19,
+            "factored_univariates": 93,
+            "field_ops": 60570,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 120,
+            "max_rows": 115,
+            "root_field_multiplications": 1994,
+            "solutions_visited": 4,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 129895,
+              "native_f4_ns": 5465336,
+              "root_recovery_ns": 280137,
+              "total_ns": 6490993,
+              "traversal_other_ns": 615625
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 81373,
+            "other": 53691,
+            "target_construction": 290,
+            "total": 6627528,
+            "visitor_call": 6492174,
+            "visitor_call_outside_timing": 1181
+          }
+        },
+        {
+          "augmented_rows_with_rhs": [
+            [
+              1,
+              1,
+              12,
+              0
+            ]
+          ],
+          "callback_other_ns": 14386,
+          "callback_phases_ns": {
+            "dedup_and_row_ns": 202784,
+            "equation_validation_ns": 234765,
+            "membership_and_replay_ns": 46189,
+            "rank_ns": 0,
+            "sign_reconciliation_ns": 154753
+          },
+          "complete": true,
+          "counts": {
+            "accepted_signed_occurrences": 16,
+            "decoded_signed_candidates": 16,
+            "dependent_new_rows": 0,
+            "duplicate_ordered_signed": 0,
+            "duplicate_rows_from_previous_cells": 1,
+            "duplicate_rows_in_cell": 15,
+            "duplicate_signed_multisets": 14,
+            "group_or_chart_rejections": 0,
+            "inconsistent_new_rows": 0,
+            "independent_new_rows": 0,
+            "invalid_equation_assignments": 0,
+            "membership_rejections": 0,
+            "raw_assignments": 16,
+            "undecodable_assignments": 0
+          },
+          "cumulative_distinct_relation_rows": 3,
+          "distinct_augmented_rows_in_cell": 1,
+          "distinct_full_x_chains": 16,
+          "distinct_leaf_x_tuples": 8,
+          "distinct_ordered_signed": 16,
+          "distinct_signed_multisets": 2,
+          "domain_scan_field_multiplications": 0,
+          "equations": 12,
+          "full_field_refusals": 0,
+          "full_x_chains": [
+            [
+              3,
+              3,
+              3,
+              4,
+              2,
+              3
+            ],
+            [
+              3,
+              3,
+              4,
+              3,
+              2,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              3,
+              4,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              3,
+              4,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              4
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              1,
+              5
+            ],
+            [
+              4,
+              3,
+              3,
+              3,
+              4,
+              4
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              2
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              1,
+              3
+            ],
+            [
+              4,
+              3,
+              4,
+              4,
+              4,
+              3
+            ],
+            [
+              4,
+              4,
+              3,
+              4,
+              3,
+              2
+            ],
+            [
+              4,
+              4,
+              4,
+              3,
+              3,
+              4
+            ]
+          ],
+          "index": 2,
+          "native_max_solving_degree": 4,
+          "native_pairs_above_bound_sum": 0,
+          "ordered_signed_witnesses": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                5
+              ]
+            ],
+            [
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ]
+            ],
+            [
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ]
+            ]
+          ],
+          "outcome": "complete_rows",
+          "public_target": {
+            "infinity": false,
+            "x": 1,
+            "y": 2
+          },
+          "rank_after": 3,
+          "rank_before": 3,
+          "replay_group_ops": {
+            "adds": 64,
+            "doubles": 0,
+            "field_invs": 48,
+            "field_muls": 117,
+            "field_sqrs": 55,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "schedule": {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          },
+          "sign_work": {
+            "divisions_by_nonzero_parent_y": 0,
+            "local_line_sign_flips": 0,
+            "nodes": 48,
+            "square_root_calls": 0,
+            "square_root_muls": 0,
+            "zero_parent_branches": 0
+          },
+          "signed_multisets": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                2
+              ]
+            ],
+            [
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                4,
+                5
+              ]
+            ]
+          ],
+          "trace_events": 371,
+          "variables": 11,
+          "visitor": {
+            "candidates_rejected": 0,
+            "complete": true,
+            "domain_evaluations": 0,
+            "f4_runs": 108,
+            "factored_univariates": 579,
+            "field_ops": 2426973,
+            "first_hilbert_deviation_degree": null,
+            "full_field_branches": 0,
+            "last_hilbert_deviation_degree": null,
+            "max_cols": 573,
+            "max_rows": 558,
+            "root_field_multiplications": 15335,
+            "solutions_visited": 16,
+            "solving_degree": 3,
+            "staircase_extinction_degree": null,
+            "stopped_early": false,
+            "timed_out": false,
+            "timings": {
+              "callback_ns": 652877,
+              "native_f4_ns": 98047021,
+              "root_recovery_ns": 2120450,
+              "total_ns": 115035815,
+              "traversal_other_ns": 14215467
+            },
+            "trace_error": null,
+            "trace_stopped": false
+          },
+          "wall_ns": {
+            "equation_construction": 123106,
+            "other": 91988,
+            "target_construction": 331,
+            "total": 115253273,
+            "visitor_call": 115037848,
+            "visitor_call_outside_timing": 2033
+          }
+        }
+      ],
+      "cold_wall_ns": {
+        "admission": 6950,
+        "base": 18118,
+        "cells": 122737682,
+        "other": 286793,
+        "rank_setup": 3285,
+        "scalar_recovery_and_replay": 1952,
+        "total": 123054780
+      },
+      "correctness_failure": false,
+      "cumulative_distinct_relation_rows": 3,
+      "final_rank": 3,
+      "independent_oracle_outside_candidate_cost": [
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 2,
+          "full_sum_group_ops": {
+            "adds": 32,
+            "doubles": 0,
+            "field_invs": 12,
+            "field_muls": 36,
+            "field_sqrs": 16,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 2,
+          "infinity_prefix_matches": 0,
+          "m": 2,
+          "oracle_wall_ns": 18358,
+          "prefix_chart_group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "field_invs": 0,
+            "field_muls": 0,
+            "field_sqrs": 0,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 1,
+          "total_group_matches": 2,
+          "visited_tuples": 16
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 4,
+          "full_sum_group_ops": {
+            "adds": 192,
+            "doubles": 0,
+            "field_invs": 90,
+            "field_muls": 246,
+            "field_sqrs": 112,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 4,
+          "infinity_prefix_matches": 0,
+          "m": 3,
+          "oracle_wall_ns": 23826,
+          "prefix_chart_group_ops": {
+            "adds": 4,
+            "doubles": 0,
+            "field_invs": 4,
+            "field_muls": 14,
+            "field_sqrs": 6,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 4,
+          "visited_tuples": 64
+        },
+        {
+          "candidate_sets_equal": true,
+          "finite_ordered_signed": 16,
+          "full_sum_group_ops": {
+            "adds": 1024,
+            "doubles": 0,
+            "field_invs": 556,
+            "field_muls": 1484,
+            "field_sqrs": 680,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "full_x_chains": 16,
+          "infinity_prefix_matches": 8,
+          "m": 4,
+          "oracle_wall_ns": 114924,
+          "prefix_chart_group_ops": {
+            "adds": 40,
+            "doubles": 0,
+            "field_invs": 32,
+            "field_muls": 85,
+            "field_sqrs": 39,
+            "montgomery_reductions": 0,
+            "scalar_mults": 0,
+            "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+          },
+          "signed_multisets": 2,
+          "total_group_matches": 24,
+          "visited_tuples": 256
+        }
+      ],
+      "public_g_anchor": {
+        "coefficient": 1,
+        "column": 1,
+        "rhs": 1
+      },
+      "rank_columns": 3,
+      "rank_dependent_rows": 1,
+      "rank_gain_from_relations": 2,
+      "rank_inconsistent_rows": 0,
+      "rank_row_ops": 20,
+      "rank_work": {
+        "counted:gauss_column_scans_and_pivot_inversions": 1,
+        "gauss_entries_scanned": 54,
+        "pivot_inversion_steps": 24
+      },
+      "recovered_scalar": 3,
+      "recovered_verified": true,
+      "recovery_group_ops": {
+        "adds": 1,
+        "doubles": 1,
+        "field_invs": 2,
+        "field_muls": 7,
+        "field_sqrs": 3,
+        "montgomery_reductions": 0,
+        "scalar_mults": 1,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      },
+      "request": {
+        "curve_a": 0,
+        "curve_b": 3,
+        "depth": 1,
+        "generator": [
+          4,
+          2
+        ],
+        "limits": {
+          "max_assignments": 20000,
+          "max_degree": 8,
+          "max_trace_events": 100000,
+          "seconds_per_target": 10
+        },
+        "p": 7,
+        "public_q": [
+          1,
+          2
+        ],
+        "scalar_modulus": 13,
+        "targets": [
+          {
+            "a": 0,
+            "b": 1,
+            "m": 2
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 3
+          },
+          {
+            "a": 0,
+            "b": 1,
+            "m": 4
+          }
+        ]
+      },
+      "seed_rank": 1,
+      "target_group_ops": {
+        "adds": 3,
+        "doubles": 0,
+        "field_invs": 0,
+        "field_muls": 0,
+        "field_sqrs": 0,
+        "montgomery_reductions": 0,
+        "scalar_mults": 6,
+        "scope": "native group calls; scalar_mults contain the already counted adds/doubles"
+      }
+    }
+  ],
+  "duplicate_counter_semantics": "parallel projections of all accepted occurrences; ordered, multiset and row duplicates overlap and must not be summed",
+  "evidence_status": "unsigned bounded native development; pcc:unverified",
+  "frozen_predictions_passed": true,
+  "performance_claim": null,
+  "primitive_accounting": "partial native ledgers, not total field/bit cost",
+  "primitive_gaps": [
+    "selector builder arithmetic",
+    "primality/nonsingularity checks",
+    "polynomial construction and validation",
+    "sign formula arithmetic except counted square roots",
+    "sorting/key comparisons and allocation",
+    "runtime bookkeeping"
+  ],
+  "request": {
+    "curve_a": 0,
+    "curve_b": 3,
+    "depth": 1,
+    "generator": [
+      4,
+      2
+    ],
+    "limits": {
+      "max_assignments": 20000,
+      "max_degree": 8,
+      "max_trace_events": 100000,
+      "seconds_per_target": 10
+    },
+    "p": 7,
+    "public_q": [
+      1,
+      2
+    ],
+    "scalar_modulus": 13,
+    "targets": [
+      {
+        "a": 0,
+        "b": 1,
+        "m": 2
+      },
+      {
+        "a": 0,
+        "b": 1,
+        "m": 3
+      },
+      {
+        "a": 0,
+        "b": 1,
+        "m": 4
+      }
+    ]
+  },
+  "schema": "dickson-s3-matched-accounting/v1",
+  "solver_policy": "solve_visit_traced; no supplied domains; no full-field recursion; incoming generators retained",
+  "wall_boundary": "cold arm admission through in-memory output assembly; excludes final JSON encoding and process startup",
+  "zero_y_decoder_control": {
+    "arms": [
+      {
+        "arm": "quartic_s3",
+        "distinct_assignments": 1,
+        "ordered_signed_for_fixed_leaf_order": [
+          [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          [
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ]
+        ],
+        "sign_work": {
+          "divisions_by_nonzero_parent_y": 0,
+          "local_line_sign_flips": 0,
+          "nodes": 1,
+          "square_root_calls": 1,
+          "square_root_muls": 4,
+          "zero_parent_branches": 1
+        }
+      },
+      {
+        "arm": "invariant_q",
+        "distinct_assignments": 1,
+        "ordered_signed_for_fixed_leaf_order": [
+          [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          [
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ]
+        ],
+        "sign_work": {
+          "divisions_by_nonzero_parent_y": 0,
+          "local_line_sign_flips": 0,
+          "nodes": 1,
+          "square_root_calls": 1,
+          "square_root_muls": 4,
+          "zero_parent_branches": 1
+        }
+      },
+      {
+        "arm": "line_l",
+        "distinct_assignments": 2,
+        "ordered_signed_for_fixed_leaf_order": [
+          [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          [
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ]
+        ],
+        "sign_work": {
+          "divisions_by_nonzero_parent_y": 0,
+          "local_line_sign_flips": 0,
+          "nodes": 2,
+          "square_root_calls": 0,
+          "square_root_muls": 0,
+          "zero_parent_branches": 0
+        }
+      },
+      {
+        "arm": "oriented_o",
+        "distinct_assignments": 2,
+        "ordered_signed_for_fixed_leaf_order": [
+          [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          [
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ]
+        ],
+        "sign_work": {
+          "divisions_by_nonzero_parent_y": 0,
+          "local_line_sign_flips": 0,
+          "nodes": 2,
+          "square_root_calls": 0,
+          "square_root_muls": 0,
+          "zero_parent_branches": 0
+        }
+      }
+    ],
+    "kind": "constructor_and_decoder_only",
+    "rank": null
+  }
+}

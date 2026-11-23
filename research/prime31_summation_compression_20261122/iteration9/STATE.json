@@ -1,0 +1,108 @@
+{
+  "schema": "prime31-pair-spectrum-elimination/v1",
+  "observed_date_local": "2026-11-22",
+  "observed_date_utc": "2026-11-23",
+  "objective": "Prove and measure complete asymptotically faster relation solving on ordinary prime-field ECDLP; objective remains open",
+  "current_status": "written exact algebraic contraction, unsigned and native-unexecuted",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/4951",
+  "branch": "research/prime31-pair-spectrum-elimination-20261123",
+  "parents": [
+    {
+      "pr": 4928,
+      "head": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+      "merged": true
+    },
+    {
+      "pr": 4924,
+      "head": "84659f850676ea01aebfe9a90747b5000c6215b0",
+      "merged": true
+    },
+    {
+      "pr": 4941,
+      "head": "a6d7b529ed5cd0586fbf04e916978f302cb65ecc",
+      "merged": true
+    }
+  ],
+  "original_curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "provenance": "inherited, not independently recounted in iteration9"
+  },
+  "derived": {
+    "assumptions": "odd-order rational source subgroup, B distinct liftable x representatives, R nonidentity",
+    "signed_base_size": "L=2B",
+    "pair_expressions": "exactly B^2",
+    "pair_spectrum": "D<=B^2",
+    "zero_pairs": "B unordered or 2B ordered",
+    "source_polynomial": "H2(V) monic split squarefree, deg D",
+    "query_remainder": "K_r(V)=Res_U(H2(U),S3(U,V,x(R))) mod H2(V)",
+    "miss_condition": "H2(x(R)) != 0 && gcd(H2,K_r)=1",
+    "certificate": "Bezout A*H2 + B*K_r = 1, plus nonzero H2(x(R))",
+    "setup": "O(B^2*C_add + M(D)*log D) plus base construction",
+    "empty_query": "O(M(D)*log D) field work (quasilinear multiplication model), not sublinear in B when D~B^2",
+    "output": "O(Z_R) signed tuple replay in addition to isolation",
+    "standings": "all unverified"
+  },
+  "example": {
+    "B": 31,
+    "L": 62,
+    "number_unoriented_pair_expressions": 961,
+    "number_ordered_pair_labels": 3844,
+    "actual_D": "not measured",
+    "actual_runtime": "not measured"
+  },
+  "source_files": {
+    "proof": {
+      "path": "research/prime31_summation_compression_20261122/iteration9/PAIR_SPECTRUM_RESULTANT.md",
+      "git_blob": "e2348e91dc08141a663c5adb9798b6ca8f09424e"
+    },
+    "diagram": {
+      "path": "research/prime31_summation_compression_20261122/iteration9/PAIR_SPECTRUM.svg",
+      "git_blob": "d7a1276619b1d925903591eaaa88b2fc0f10d695"
+    },
+    "report": {
+      "path": "research/prime31_summation_compression_20261122/iteration9/REPORT.md",
+      "git_blob": "1f53a97ccf24df6f75b44de1dfc356a74d961226"
+    }
+  },
+  "ci_audit": [
+    {
+      "run": 45096187034,
+      "job": 137436389923,
+      "source": "original-lock",
+      "outcome": "failure inherited ecbench/spec.rs; no candidate tests"
+    },
+    {
+      "run": 45097885135,
+      "job": 137441679059,
+      "source": "restored spec",
+      "outcome": "failure inherited ic_framework/mod.rs:4528; no candidate tests"
+    },
+    {
+      "run": 45100829948,
+      "job": 137451053331,
+      "source": "later root-lock",
+      "outcome": "failure duplicate root Cargo.toml key; no candidate tests"
+    }
+  ],
+  "environment": [
+    "noninteractive Space read denied user input",
+    "research KB connector not available",
+    "cargo and rustc not installed in this runtime",
+    "no EKS/paid experiments submitted"
+  ],
+  "concurrency": "Root STATE.json and iteration6/7 reports intentionally not edited while other owner/source lanes active; independent iteration9 snapshot only",
+  "next": [
+    "Original-Rust exact signed pair-spectrum polynomial oracle and F101 all-target equality test against iteration8 group-semiring contraction",
+    "Retain wrong-sign/ghost/zero-pair/P,P,P,-P controls and every miss via Bezout certificate",
+    "Source-bound native CI under repaired manifest/parser, independent replay, held-out uniform Prime31 targets",
+    "Seek genuinely smaller empty-inclusive query exponent tau<1, charged cold rank/target recovery on an eligible growing family"
+  ],
+  "pcc": "unverified"
+}
