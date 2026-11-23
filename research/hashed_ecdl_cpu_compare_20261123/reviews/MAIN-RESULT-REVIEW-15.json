@@ -1,0 +1,160 @@
+{
+  "schema": "native-cpu-main-result-and-canonical-mismatch-review/v1",
+  "review_id": "MAIN-RESULT-REVIEW-15",
+  "created_utc": "2026-11-23T15:18:12.534Z",
+  "repository": "isogeny-labs/crypto",
+  "pr": 4996,
+  "source_packet_commit": "51ac3d745a0a7512ef3622f87fa536ae165c8cec",
+  "scope": "Same-root-team read-only actual artifact/result and canonical identity-contract review. No report prose,MAIN-OUTCOME/EXPORT-ERRATA text,report tables as conclusions,PDF layout or future protocol draft is accepted or frozen by this review. No scientific executable/validator rerun or authenticated independent-session execution review.",
+  "disposition": {
+    "native_census_and_record_consistency": "SUPPORTED_WITHIN_SCOPE as an unsigned local native exact-recovery/control census on12fixed public targets;360unique calls complete and retained artifacts match.",
+    "export_fidelity": "SUPPORTED_WITHIN_SCOPE: original export preserves native identities and measured numeric tokens,with all4728referenced file identities matching at review.",
+    "original_canonical_protocol_export_gate": "FAILED:324execution cells outside protocol-derived seed table against immutable5bcd frozen protocol. No canonical experiment acceptance is granted.",
+    "overall_frozen_protocol_acceptance": "NOT_ESTABLISHED because the frozen structured seed convention conflicts with native identity/seed rules. Native completion and schema/file integrity cannot clear this gate.",
+    "execution_standing": "UNESTABLISHED; no signed PCCexecution verdict or authenticated independent execution provenance.",
+    "retrospective_correction": "Permissible only as explicitly retrospective clarification/limited validation,with originalfailed gate/protocol/export/raw preserved and no backdated acceptance."
+  },
+  "evidence_manifest": {
+    "path": "main-result-evidence-15.json",
+    "bytes": 13948,
+    "sha256": "8642baeed7994a5e25eb68e8a0dc06178a1aaebe770068ea39267fd8f44cd0df",
+    "entries": 40
+  },
+  "original_artifact_identities": {
+    "frozen_protocol_canonical_sha256": "5bcd31006a76336912ac3687a371d4bc3f291feeb1cb4058d07e0f2f0645d625",
+    "frozen_protocol_file_sha256": "bc2f72e7ffe7bf1fb271fe15c38cae15e3f34d28c0c0f8e79dc5335835465e0e",
+    "export": {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/export-v1/export.json",
+      "bytes": 2936344,
+      "sha256": "46e507036dfcf874b65b2fd9c769c91050843a7b509e8f441fd35e8e532c0097"
+    },
+    "analysis": {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/main/analysis.json",
+      "sha256": "e21f7a848fae2f9a634cfe4024170bb0f92708955bebbf1a43384a429700d9ed"
+    },
+    "summary_csv_sha256": "273fa64c6a957be2f39fb7f003f822dc83f2e8acd54df962a35c72cd182e8f9f",
+    "failed_canonical_log_sha256": "e3932e45d1fa6aa38378c6a85ba375949e07e1cbe72bb6dd959d6dbabae40708",
+    "checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "export_schema_sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+    "adapter_source_sha256": "cc7447d8c9b1b663f5d097b275b82fd1330dc74fcc7b9ae702a41f9419147e2c"
+  },
+  "native_terminal_records": {
+    "started_utc": "2026-11-23T14:44:47Z",
+    "finished_utc": "2026-11-23T15:03:34Z",
+    "coarse_wall_seconds": 1127,
+    "supervisor_observed_exit": 0,
+    "controller_receipt": "main-supervisor-terminal.json is an unsigned observation of originalsession68847terminalreturn0.",
+    "driver": {
+      "exit": 0,
+      "start": "14:44:47Z",
+      "finish": "15:03:27Z",
+      "physical_stop": 0,
+      "sampled_peak_cgroup_bytes": 14327767040
+    },
+    "finalization": {
+      "exit": 0,
+      "start": "15:03:27Z",
+      "finish": "15:03:27Z",
+      "physical_stop": 0
+    },
+    "point_audit": {
+      "exit": 0,
+      "start": "15:03:27Z",
+      "finish": "15:03:34Z",
+      "physical_stop": 0
+    },
+    "census": {
+      "planned": 360,
+      "attempted": 360,
+      "completed": 360,
+      "not_attempted": 0,
+      "failed_or_incomplete": 0,
+      "distinct_targets": 12,
+      "warmups": 36,
+      "measured": 324,
+      "measured_per_arm_target": 9
+    },
+    "controls": {
+      "recorded_external_Native_replays": 360,
+      "OpenSSL_positives": 360,
+      "wrong_scalar_rejections": 360,
+      "consistent_substituted_target_rejections": 360,
+      "all360certificate_bytes_and_structural_counter_groups_equal": true
+    },
+    "scope": "Native generic CachedMitm implementation on fixed6curves20..40fieldbits,orderbits20/25/28/32/36/41,m8/batch64,12publictargets. This does not validate arbitrary ECDLP inputs,a tensor counter theorem,global rank or a new asymptotic algorithm."
+  },
+  "readback_checks": [
+    {
+      "id": "R15-1",
+      "method": "Node/JavaScript administrative CSV/JSON/file reads only",
+      "result": "All360unique logicalarm/case/seed/round keys agree between raw rows,native analysis and export;36warmups/324measured. Each per-cell status has worker/replayexit0andmatches nativeanalysis. Certificate scalar,attempts,relation count andSHA agree;12target groups have exact full certificate bytes acrossarms/rounds. Structuralsignature(includingtau,scalar,relations,attempts,preparations,built/probed,inversions/tablecapacity)is equal pertarget."
+    },
+    {
+      "id": "R15-2",
+      "method": "Existing stdout/stderr/progress readback,no cryptographic executable invoked",
+      "result": "All360Native outputs read VERIFIEDscalar=actualcertificate scalar with empty stderr.1080OpenSSL stdout/stderr pairs match exact positive/scalar-reject/public-binding-reject strings.2160progress lines contain1080unique ENDrecords with expected0positive/1negativeexit,truevalidflags. This supports consistency of recorded checks,not independently rerun arithmetic."
+    },
+    {
+      "id": "R15-3",
+      "method": "General-language metadata recomputation in Node/JavaScript,NOT Rust/frozen native analyzer execution",
+      "result": "Grouped existing nativeanalysis rows by(case,seed,arm),excludedround0,parsed recorded f64clockvalues,sorted each9-value group andselectedindices0,4,8. All36summary min/median/max triples forcomplete,driverandoracle fields match existingCSV numerically. No solver,Native analyzer,arithmetic test,performance interpretation or new observation was produced."
+    },
+    {
+      "id": "R15-4",
+      "method": "Node24JSON.parse source-token context plus rawCSV/status text",
+      "result": "For all360runs,all17native numeric counter tokens match original columns6..22 exactly; wall_seconds matches rawcomplete token anddriver_seconds matches originalstatusJSON number lexeme. counted.completed_calls=1andallwall_valid=false. No binary-floating round trip was used for this lexical check."
+    },
+    {
+      "id": "R15-5",
+      "method": "Administrative SHA256/byte-size readback,deduplicatedby path",
+      "result": "All4728unique references in export top-level files,runartifacts,analysisoutputs/script andhost match current fileSHA/size; no conflicting reference hash. All295main frozeninputs remain unchanged. This is a local integrity check,not full remote publication or signed execution."
+    }
+  ],
+  "canonical_failure": {
+    "captured_check": "export-v1/canonical-check.stdout contains324FINDING lines andFAILfooter;stderr isempty. All findings are executioncell outsideprotocol-derivedseedtable,oneforevery measuredrow. No canonicalchecker was rerun by reviewer.",
+    "contract_source": "tools/experiment_protocol.py seeds_table lines350..373 andlint_export seedtable branch; schema/lint are metadata code read-only.",
+    "structured_frozen_contract": {
+      "method": "explicit_list",
+      "seeds": [
+        101,
+        202
+      ],
+      "instances": "Strings0through11",
+      "measured_replicates": "0through8",
+      "seed_assignment": "Alternates101/202through flattenedarm/instance/replicate table using explicit[kmod2]."
+    },
+    "frozen_prose_and_actual_native_contract": {
+      "instance_id": "case-seed suchas0-101",
+      "rounds": "Warmup0,measured1through9",
+      "seed_assignment": "One fixed target/oracle seed101or202for eachcase/target,shared acrossarmsandallrounds.",
+      "native_fields": "Allrawworkerlabelsureplicate0warmupfalseare preserved; collector supplies logicalarm/case-seed/round."
+    },
+    "root_cause": "Structured method explicit_list was registered using semantics incompatible with the declared native identity design. Captured canonical checker follows its implementation contract; this is not a corrupted solver output or a reason to alter actual seeds.",
+    "why_id_renaming_is_insufficient": "Even mapping12case-seed IDs tonumericinstance labels andoffsetting measuredrounds by1wouldleave alternatingcanonical seeds within each9replicate group. A fixed-seed target canmatchatmost5of9,so at least144seed mismatches remain across36groups. No metadata relabeling can honestly makeoriginal5bcd fullyconform without changingitsdeclaredseedrule orfabricating seeds.",
+    "review_coverage_gap": "Earlier readiness reviewschecked source/controlcensus,schema logs,hashes andadministrative gates but didnot cross-checkseeds_table-derived identities againstactualcollector design. This was a reviewcoverage gap. Reviews10..14remain immutable andare not retroactively upgraded tocanonicalexport acceptance."
+  },
+  "adapter_qualification": {
+    "source": "Separate arbitrary_precisionRustmetadata-only package; originalsrouce/raw remain preserved.",
+    "prebuild_source_manifest": "export-source-before-build-v1b.sha2565entries,allcurrent hashesmatch.",
+    "copied_qualifier_manifest": "7source/compiler/binaryentries,allhashesmatch; twooriginal/copybinary pairs equal,readonly0555.",
+    "recorded_tests": "6passed/0failed/0ignored; strictClippy passes. Reviewer read retainedlogs anddidnot runtests/builds.",
+    "retained_development_failure": "11-export-source-check-v1 exit101is retained;11bexit0thenbuild12exit0,units13exit0,export14exit0. Allpackaging checks begin after actualmainterminal15:03:34UTC.",
+    "fixes": "Sourceincorporatescompleted_callsprimarymetric,originalsupervisorterminalexit gate andcanonical-parent outside-rawcheck. Case/seed/round binding andcomplete-onlyrefusal preservepartialrawflow."
+  },
+  "scoped_judgment": {
+    "native_question": "Recorded boundednative exactrecovery andrequiredchecks are supportedwithin artifact-consistency scope.",
+    "schema_file_integrity": "These narrower checks can be reported separately. Originalcanonical check reacheslint onlyafterexport/protocolschema checks pass; reviewer independentlychecked4728fileidentities andnative lexical fidelity. Neitherfactis a zero-findings result fororiginalprotocolbinding.",
+    "original_canonical_gate": "RetainFAILED324findingstatus prominently in any outcome/receipt. Do not callthe completefrozenexperimentprotocolcanonicallyaccepted orfullypreregistered-compliant.",
+    "retrospective_identity_clarification": "May document actualcase-seed/native-round mapping andcause afterdata,linkedtooriginalprotocol/export/logdigests. Explicitlylabel anynew schema/file-onlycheckas limited andretrospective. Preserveoriginalfailedrecord anddo not backdate areplacementprotocol orchange actualseeds.",
+    "future_protocol": "A prospectivefutureprotocol must encodeactualcanonicalinstance/replicate/seedsemantics beforeaffecteddata. Anyfuture-onlydraftorretrospectiveclarification leavesexistingdataacceptance unchanged. No future draftwas reviewed here."
+  },
+  "limitations": [
+    "All execution/Native/OpenSSL artifacts are unsigned producer records on samehost; no authenticated independentexecution orsignedPCCstanding.",
+    "SeparateOpenSSL pointarithmeticchecks fixed publictarget,rP=O,kP=Q andtwo negativecauses; itdoesnot independentlyverifyprimality,Hasse/cardinality,fullrelations orworkcounts. Native archive replay shares solverarithmetic.",
+    "CPUtime,per-processpeakRSS andtotaloperationSare unmeasured. Sampledcgrouppeak includesretainedotherdata. Clocks are descriptiveunrankedL0andwall_validfalse.",
+    "No broad correctness/asymptotic/novelty/rho/external/L2/full84case orproof-history obligation is discharged.",
+    "Fullrawcertificates/exportpayload arelocal-only unlessseparatelypublished. Hashreceiptsandthisreadbackdonot substitute forremoterawpayload orofficialindependentsession review.",
+    "Reportprose,MAIN-OUTCOME/EXPORT-ERRATA,new narrowvalidationlogs,future draftandPDF are outside thisreview; no claim theywere inspected oraccepted."
+  ],
+  "preservation": "Only exclusive newreview15files/source snapshots written. Original5bcdprotocol,export-v1,rawmain,295pinsandearlierreviews remain unchanged."
+}

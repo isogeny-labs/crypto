@@ -14,6 +14,7 @@
 //! [`SolveReport::unpriced`]; a report with any unpriced work is a lower
 //! bound and says so.
 
+use crate::cryptanalysis::ic_framework::plugins::{ResidualSweepOracle, CosetMitmOracle};
 use super::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -88,8 +89,8 @@ use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
     CyclotomicBase, DescentAlgebraicOracle, FrobeniusKSumOracle, FrobeniusMitmOracle, GlvOrbitBase,
     KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase,
-    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
-    WSumOracle, WWalkOracle,
+    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle,
+    SubtractOracle, WSumOracle, WWalkOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -862,17 +863,35 @@ pub fn registry() -> &'static [MethodDecl] {
         },
         MethodDecl {
             id: "ic.diem_kgrow",
+            family: "ic",
             summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
             entry: "ecbench::diem_kgrow::solve",
+            applies: Applies::Any,
             params: DIEM_KGROW_PARAMS,
+            family: "ic",
+            applies: Applies::Any,
+        },
+        MethodDecl {
             id: "ic.growing_arity",
+            family: "ic",
             summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
             entry: "ecbench::growing_arity::solve",
+            applies: Applies::Any,
             params: GROWING_ARITY_PARAMS,
+            family: "ic",
+            applies: Applies::Any,
+        },
+        MethodDecl {
             id: "ic.aux_tower_solver",
+            family: "ic",
             summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
             entry: "ecbench::aux_tower_solver::solve",
+            applies: Applies::Any,
             params: AUX_TOWER_SOLVER_PARAMS,
+            family: "ic",
+            applies: Applies::Any,
+        },
+        MethodDecl {
             id: "rho.cubic",
             family: "rho",
             summary: "tuned walk on {±ζ₃^i(P)} (A = 6), the rational order-3 automorphism of a j = 0 curve with p ≡ 1 (mod 3) and 3 | r − 1; Wiener–Zuccherato look-ahead and cycle escape; refuses any curve without the structure",
@@ -9110,7 +9129,7 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
-        "mitm-coset" => Box::new(CosetMitmOracle::new(ms)),
+        "mitm-coset" => Box::new(FiberMitmOracle::new(ms)),
         // Generic over the group: one probe a target into the negation-folded
         // table of every signed m-sum of the base (as on prime curves).
         // Restored from d87eb39548 (lost in the 2026-11-16 merges).

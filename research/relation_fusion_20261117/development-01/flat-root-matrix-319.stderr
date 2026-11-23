@@ -1,0 +1,355 @@
+   Compiling crypto v0.1.0 (/workspace/relation-supervisor-live)
+error[E0061]: this function takes 5 arguments but 4 arguments were supplied
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/aux_tower_solver.rs:127:17
+    |
+127 |     let tower = isogeny_tower(inst.curve.p, t, seed, &mut tower_ops)?;
+    |                 ^^^^^^^^^^^^^                        -------------- argument #4 of type `AuxFamily` is missing
+    |
+note: function defined here
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/prime_tower.rs:445:8
+    |
+445 | pub fn isogeny_tower(
+    |        ^^^^^^^^^^^^^
+...
+449 |     family: AuxFamily,
+    |     -----------------
+help: provide the argument
+    |
+127 |     let tower = isogeny_tower(inst.curve.p, t, seed, /* AuxFamily */, &mut tower_ops)?;
+    |                                                      ++++++++++++++++
+
+error[E0062]: field `id` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:869:13
+    |
+865 |             id: "ic.diem_kgrow",
+    |             ------------------- first use of `id`
+...
+869 |             id: "ic.growing_arity",
+    |             ^^ used more than once
+
+error[E0062]: field `summary` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:870:13
+    |
+866 | ...   summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
+    |       ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- first use of `summary`
+...
+870 | ...   summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
+    |       ^^^^^^^ used more than once
+
+error[E0062]: field `entry` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:871:13
+    |
+867 |             entry: "ecbench::diem_kgrow::solve",
+    |             ----------------------------------- first use of `entry`
+...
+871 |             entry: "ecbench::growing_arity::solve",
+    |             ^^^^^ used more than once
+
+error[E0062]: field `params` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:872:13
+    |
+868 |             params: DIEM_KGROW_PARAMS,
+    |             ------------------------- first use of `params`
+...
+872 |             params: GROWING_ARITY_PARAMS,
+    |             ^^^^^^ used more than once
+
+error[E0062]: field `id` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:873:13
+    |
+865 |             id: "ic.diem_kgrow",
+    |             ------------------- first use of `id`
+...
+873 |             id: "ic.aux_tower_solver",
+    |             ^^ used more than once
+
+error[E0062]: field `summary` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:874:13
+    |
+866 | ...   summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
+    |       ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- first use of `summary`
+...
+874 | ...   summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
+    |       ^^^^^^^ used more than once
+
+error[E0062]: field `entry` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:875:13
+    |
+867 |             entry: "ecbench::diem_kgrow::solve",
+    |             ----------------------------------- first use of `entry`
+...
+875 |             entry: "ecbench::aux_tower_solver::solve",
+    |             ^^^^^ used more than once
+
+error[E0062]: field `params` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:876:13
+    |
+868 |             params: DIEM_KGROW_PARAMS,
+    |             ------------------------- first use of `params`
+...
+876 |             params: AUX_TOWER_SOLVER_PARAMS,
+    |             ^^^^^^ used more than once
+
+error[E0062]: field `id` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:877:13
+    |
+865 |             id: "ic.diem_kgrow",
+    |             ------------------- first use of `id`
+...
+877 |             id: "rho.cubic",
+    |             ^^ used more than once
+
+error[E0062]: field `summary` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:879:13
+    |
+866 | ...   summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
+    |       ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- first use of `summary`
+...
+879 | ...   summary: "tuned walk on {±ζ₃^i(P)} (A = 6), the rational order-3 automorphism of a j = 0 curve with p ≡ 1 (mod 3) and 3 | r − 1; Wiener–Zuccherato look-ahead and cycle escape; refuses any curve without the structure",
+    |       ^^^^^^^ used more than once
+
+error[E0062]: field `entry` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:880:13
+    |
+867 |             entry: "ecbench::diem_kgrow::solve",
+    |             ----------------------------------- first use of `entry`
+...
+880 |             entry: "ic_boundary::CubicClasses with RhoWalk::negation()",
+    |             ^^^^^ used more than once
+
+error[E0062]: field `params` specified more than once
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:882:13
+    |
+868 |             params: DIEM_KGROW_PARAMS,
+    |             ------------------------- first use of `params`
+...
+882 |             params: RHO_PARAMS,
+    |             ^^^^^^ used more than once
+
+error[E0063]: missing fields `y_minus` and `y_plus` in initializer of `SiblingPair`
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_boundary.rs:7928:23
+     |
+7928 |         let mut out = SiblingPair {
+     |                       ^^^^^^^^^^^ missing `y_minus` and `y_plus`
+
+error[E0061]: this function takes 5 arguments but 4 arguments were supplied
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/pkm_semaev.rs:1069:21
+     |
+1069 |                     isogeny_tower(p, t, seed, &mut scratch)?
+     |                     ^^^^^^^^^^^^^             ------------ argument #4 of type `AuxFamily` is missing
+     |
+note: function defined here
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/prime_tower.rs:445:8
+     |
+ 445 | pub fn isogeny_tower(
+     |        ^^^^^^^^^^^^^
+...
+ 449 |     family: AuxFamily,
+     |     -----------------
+help: provide the argument
+     |
+1069 |                     isogeny_tower(p, t, seed, /* AuxFamily */, &mut scratch)?
+     |                                               ++++++++++++++++
+
+error[E0061]: this function takes 9 arguments but 7 arguments were supplied
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2421:5
+     |
+2421 |       groebner_basis_f4_inner(
+     |  _____^^^^^^^^^^^^^^^^^^^^^^^-
+2422 | |         initial,
+2423 | |         n_vars,
+2424 | |         budget,
+...    |
+2428 | |         fl_enabled(),
+2429 | |     )
+     | |_____- two arguments of type `std::option::Option<&mut F4Skeleton>` and `pq_f4_f2::TraceMode<'_>` are missing
+     |
+note: function defined here
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2680:4
+     |
+2680 | fn groebner_basis_f4_inner(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^
+...
+2687 |     mut skel: Option<&mut F4Skeleton>,
+     |     ---------------------------------
+2688 |     mut trace: TraceMode<'_>,
+     |     ------------------------
+help: provide the arguments
+     |
+2421 |     groebner_basis_f4_inner(
+ ...
+2427 |         EARLY_GUARD,
+2428 ~         /* Option<&mut F4Skeleton> */,
+2429 +         /* TraceMode<'_> */,
+2430 ~         fl_enabled(),
+     |
+
+error[E0061]: this function takes 9 arguments but 7 arguments were supplied
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2442:5
+     |
+2442 |       groebner_basis_f4_inner(
+     |  _____^^^^^^^^^^^^^^^^^^^^^^^-
+2443 | |         initial,
+2444 | |         n_vars,
+2445 | |         budget,
+...    |
+2449 | |         false,
+2450 | |     )
+     | |_____- two arguments of type `std::option::Option<&mut F4Skeleton>` and `pq_f4_f2::TraceMode<'_>` are missing
+     |
+note: function defined here
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2680:4
+     |
+2680 | fn groebner_basis_f4_inner(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^
+...
+2687 |     mut skel: Option<&mut F4Skeleton>,
+     |     ---------------------------------
+2688 |     mut trace: TraceMode<'_>,
+     |     ------------------------
+help: provide the arguments
+     |
+2442 |     groebner_basis_f4_inner(
+ ...
+2448 |         EARLY_GUARD,
+2449 ~         /* Option<&mut F4Skeleton> */,
+2450 +         /* TraceMode<'_> */,
+2451 ~         false,
+     |
+
+error[E0061]: this function takes 9 arguments but 8 arguments were supplied
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2463:27
+     |
+2463 |       let (basis, mut st) = groebner_basis_f4_inner(
+     |  ___________________________^^^^^^^^^^^^^^^^^^^^^^^-
+2464 | |         initial,
+2465 | |         n_vars,
+2466 | |         budget,
+...    |
+2471 | |         TraceMode::Off,
+2472 | |     );
+     | |_____- argument #9 of type `bool` is missing
+     |
+note: function defined here
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2680:4
+     |
+2680 | fn groebner_basis_f4_inner(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^
+...
+2689 |     allow_fl: bool,
+     |     --------------
+help: provide the argument
+     |
+2463 |     let (basis, mut st) = groebner_basis_f4_inner(
+ ...
+2471 |         TraceMode::Off,
+2472 ~         /* bool */,
+2473 ~     );
+     |
+
+error[E0061]: this function takes 9 arguments but 8 arguments were supplied
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2513:9
+     |
+2513 |           groebner_basis_f4_inner(
+     |  _________^^^^^^^^^^^^^^^^^^^^^^^-
+2514 | |             eqs,
+2515 | |             n_vars,
+2516 | |             budget,
+...    |
+2521 | |             mode,
+2522 | |         )
+     | |_________- argument #9 of type `bool` is missing
+     |
+note: function defined here
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/pq_f4_f2.rs:2680:4
+     |
+2680 | fn groebner_basis_f4_inner(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^
+...
+2689 |     allow_fl: bool,
+     |     --------------
+help: provide the argument
+     |
+2513 |         groebner_basis_f4_inner(
+ ...
+2521 |             mode,
+2522 ~             /* bool */,
+2523 ~         )
+     |
+
+error[E0063]: missing fields `base_y` and `singular` in initializer of `PairProjection`
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/semaev_projection.rs:1639:12
+     |
+1639 |         Ok(Self {
+     |            ^^^^ missing `base_y` and `singular`
+
+error[E0063]: missing fields `base_y` and `singular` in initializer of `PairProjection`
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/semaev_projection.rs:1733:12
+     |
+1733 |         Ok(Self {
+     |            ^^^^ missing `base_y` and `singular`
+
+warning: unused import: `num_integer::Integer`
+  --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/prime_tower_wide.rs:30:5
+   |
+30 | use num_integer::Integer;
+   |     ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `m`
+   --> /workspace/relation-supervisor-live/src/binary_ecc/f2m.rs:605:13
+    |
+605 |         let m = self.m;
+    |             ^
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+help: you might have meant to pattern match on the similarly named constant `M`
+    |
+605 -         let m = self.m;
+605 +         let cryptanalysis::aux_tower_solver::M = self.m;
+    |
+help: if this is intentional, prefix it with an underscore
+    |
+605 |         let _m = self.m;
+    |             +
+
+warning: unreachable pattern
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9135:9
+     |
+9118 |         "ksum" => Box::new(KSumOracle::new(ms)),
+     |         ------ matches all the relevant values
+...
+9135 |         "ksum" => Box::new(KSumOracle::new(ms)),
+     |         ^^^^^^ no value can reach this
+     |
+     = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: unreachable pattern
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9136:9
+     |
+9124 |         "ksum-frobenius" => Box::new(
+     |         ---------------- matches all the relevant values
+...
+9136 |         "ksum-frobenius" => Box::new(FrobeniusKSumOracle::new(ms, inst)),
+     |         ^^^^^^^^^^^^^^^^ no value can reach this
+
+warning: unreachable pattern
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9137:9
+     |
+9121 |         "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
+     |         ------- matches all the relevant values
+...
+9137 |         "wwalk" => Box::new(WWalkOracle::new()),
+     |         ^^^^^^^ no value can reach this
+
+warning: unused variable: `two_t`
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/prime_tower_wide.rs:414:9
+    |
+414 |     let two_t = BigUint::one() << t;
+    |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_two_t`
+
+Some errors have detailed explanations: E0061, E0062, E0063.
+For more information about an error, try `rustc --explain E0061`.
+warning: `crypto` (lib) generated 6 warnings
+error: could not compile `crypto` (lib) due to 21 previous errors; 6 warnings emitted

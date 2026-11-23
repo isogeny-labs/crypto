@@ -1,0 +1,455 @@
+{
+  "schema": "prime31-fiber-development-receipt/v1",
+  "scope": "research/prime31_aux_matched_20261122/fiber-domain-followup",
+  "source_commit": "6dd952d6b5a848f69a65afa5e00ef59e708628a5",
+  "build": {
+    "command": "cargo test --release --offline --locked --no-run --message-format=json --manifest-path research/prime31_aux_matched_20261122/native/Cargo.toml",
+    "exit_code": 0,
+    "attempt": 1
+  },
+  "test_executables": 24,
+  "tests_passed": 103,
+  "tests_failed": 0,
+  "tests_ignored": 0,
+  "tests_filtered": 0,
+  "tests": [
+    {
+      "name": "identity_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "b4f22b8e3afe53b5df901404916563a36ef9614f9e3ee28cbf77737a702dbf84"
+    },
+    {
+      "name": "prepared_oracle_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "34d0220fdbe56165cfe3aa70a734747160f191aadaaca3bd9d87b29e4a1a0b7d"
+    },
+    {
+      "name": "adversarial_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "75b4d1f2ff8dddd01ad3e4aaa2a4d963118412c7cbf101686f6d81ead842fbee"
+    },
+    {
+      "name": "target_transport_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "a49035162cd2313b23919772fa6521bc4c044690581361fee500d9443bdd24fb"
+    },
+    {
+      "name": "plain_reference_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "af2bef0ae03c2fa2268f27e8a6bbcdd126bf7fca37b3d32f36a8b90acde28465"
+    },
+    {
+      "name": "fiber_extract_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "ad17f328cf6093d756dd425ff110d310ca647861c3028bdd1a3f9e34203bc02d"
+    },
+    {
+      "name": "staged_panel_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "955c873d8b24e9e59f4f362f06e4480e871e2b7bc0beccd466105ce8179ec734"
+    },
+    {
+      "name": "domain_modes_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "b2cd211c14b7d8c08cf470a2f1386e93c015a29cde32cd154b82a3fe1bbce420"
+    },
+    {
+      "name": "specialized_control_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "46a7936b6718ffc95b9c9dcbee707ea676c19549766e1afe48c4109cd2efb7d1"
+    },
+    {
+      "name": "pair_control_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "cfcee611d543ae6d81bb43aa926cec2cb62c928956d50a5962da5017ec074db2"
+    },
+    {
+      "name": "recovery_modes_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "ff56574623a3ff5850f1401a3f7095a511260185dfec6e04535f35f17c36d476"
+    },
+    {
+      "name": "collector_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "0ddfae9bdb0697867cef0a8b6e22d663e2b3b7b54ffacade23b407a04c4e172f"
+    },
+    {
+      "name": "oracle_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "cc03409fe41b6673d943a256f49c6725c1e3f7b96424d258bfb850e9d36742d0"
+    },
+    {
+      "name": "sparse_h2_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "acfd460ab0b599c0898a07c8439c71f0c069b21e8d5caa15b188ef6f35085dc4"
+    },
+    {
+      "name": "kernel_fiber_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "c1a8372c0fe4113936c072cbe673b84f1f88b8cc8bda371b81745e396d7ca397"
+    },
+    {
+      "name": "choice_audit_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "600a531da53c08a5bab614673b44db22a3e8e90cf00a641fb5920ba5e7bac324"
+    },
+    {
+      "name": "rho_v6_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "0b3f661a5baefc9f329b20cdc26f509204d848b39f345c7a94d0faf109ff7a6f"
+    },
+    {
+      "name": "provenance_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "8dd4cf1d9155fd0730a7b9eeae3f18ee060ad534588960c20bb5f3c72f049e8d"
+    },
+    {
+      "name": "incumbent_driver_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "fa490b8868a68846fd3e24d31c2ac413c75328f4acf7727e4fc632eb9fedc667"
+    },
+    {
+      "name": "base_certificates",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "f4a17aff6f0720c105c9ac849c89d2a4ac7db67f695365937422692ca1bc1875"
+    },
+    {
+      "name": "incumbent_control_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "b22902038de41c429b5e08428961aa83e3235dedd818bb00aae7695489402b82"
+    },
+    {
+      "name": "audit_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "9a67df4150d62896f6eaa575403091e521aeb2060c5766361902e19cdac0cc76"
+    },
+    {
+      "name": "prepared_panel_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "8c0d0390e00a4bb5b029fb902f1ee8f69d8f4b20a1fc51b134ee135e406114b7"
+    },
+    {
+      "name": "tower4_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "db72a4cb89cbd43210f1096f93feae853f7acc773d0f1afe4ae734162acd4f58"
+    }
+  ],
+  "immutable_binaries": [
+    {
+      "name": "adversarial_contracts",
+      "sha256": "3444b80036e4eaeb0fa1a5e729c590040cf29f17725e8747a4c906c78d878f58"
+    },
+    {
+      "name": "audit_contracts",
+      "sha256": "7872ae4b6d45be8b6da0e537c853e4cc635ce8eedf2f0dd90e9463af3d6a8de6"
+    },
+    {
+      "name": "base_certificates",
+      "sha256": "dc3a0edcbf72982c136a8b87c6f6fe9e9284e108eb780d70b6d27d2fe03bb24f"
+    },
+    {
+      "name": "choice_audit_contract",
+      "sha256": "0ef1f22dabdd664e5b71fa619ebfd696dd4bc2198f5e81e308c8e6920c3c4ad0"
+    },
+    {
+      "name": "collector_contracts",
+      "sha256": "e70b1fa29aec477cfa477add563e695c492b7b2bf496779b4ec52bd0ce9d3abb"
+    },
+    {
+      "name": "domain_modes_contract",
+      "sha256": "80530678387129dae5ada02b840a762fccefe3c55690334b6cebf0051b150792"
+    },
+    {
+      "name": "fiber_extract_contract",
+      "sha256": "9469206321462c03cccd16ca2012f02723d16153c54b9130f0111c69f533b283"
+    },
+    {
+      "name": "identity_contract",
+      "sha256": "cb68a679f61eaa9769e1303fcc3038b222be60af5cc17440f3078bb06c8b1b59"
+    },
+    {
+      "name": "incumbent_control_contract",
+      "sha256": "4ffe798c6b6e0792954c4fd1950a1f0175deae4c5c452678296bf2207ff78cde"
+    },
+    {
+      "name": "incumbent_driver_contract",
+      "sha256": "aad7bed7e1724c8a68f789e513dbf68a0a666960a284e0191daeb56866e9d5fd"
+    },
+    {
+      "name": "kernel_fiber_contract",
+      "sha256": "361ef88527e1dfa207425ef975a492925ad9de18e45f124f51dd3cb3b280c82e"
+    },
+    {
+      "name": "oracle_contracts",
+      "sha256": "c8c2783c2171fb7f54d5c07e56215e7437dd51445ecac29371a0405fcd454313"
+    },
+    {
+      "name": "pair_control_contract",
+      "sha256": "431a0be1daaff5ed0fcaddd3c18c4dd0d572370cfdb2573c7a40299f40ac19a7"
+    },
+    {
+      "name": "plain_reference_contract",
+      "sha256": "d258a3f77f4e541d2cfed83e924f0acdb3af8f4e5dd79622de13541bfca61b29"
+    },
+    {
+      "name": "prepared_oracle_contract",
+      "sha256": "d014cea704a89987cfd6749734bf575d477dcaee4f8259c03e799a3dec967e05"
+    },
+    {
+      "name": "prepared_panel_contract",
+      "sha256": "962549cdef889140e834ed07da1c8dc019b967f1015f7fa3a7ba31322573f8d8"
+    },
+    {
+      "name": "prime31-aux-matched",
+      "sha256": "97b393f711cfc091da6903d75093bce8d90b2eefa0a604fc559de84714bc84c9"
+    },
+    {
+      "name": "prime31-ic-incumbent",
+      "sha256": "396015cc21c7d2e0c3f4b9c169e2fa5aa2e4c264759a69c162862ac62e5c0956"
+    },
+    {
+      "name": "prime31-isogeny-choices",
+      "sha256": "abafcde6b1b5422e795b9a3053e8ed9564f4d1cbc89ba7ea51600c5d9c37d6f0"
+    },
+    {
+      "name": "prime31-sparse-identity",
+      "sha256": "9ab1e7d4ff145e89325d07a5aaf4c48f5120dd1e3947f31d06c7e800827fe4f8"
+    },
+    {
+      "name": "provenance_contracts",
+      "sha256": "df9f2e4e8c1f1730858f5de9fac38de2928cc3481274189837447886d0eb0c86"
+    },
+    {
+      "name": "recovery_modes_contract",
+      "sha256": "51ea133db57912498fb1561b0ac720aebc8ba641449f671304bea571c05f3244"
+    },
+    {
+      "name": "rho_v6_contract",
+      "sha256": "ea7bc77b180e4e843539beb941e8ebd26a6aae9a12c6f0febd4a095cfe67b45c"
+    },
+    {
+      "name": "sparse_h2_contract",
+      "sha256": "be112f3a063830b92916f96a90d8a66d6ce865eef603e5cd3f4129b551ca3236"
+    },
+    {
+      "name": "specialized_control_contract",
+      "sha256": "896d9eea1719a20f96a979bcef62bd9bc0cfcbfb67cd1ebeaf3d92aa95b0c7d2"
+    },
+    {
+      "name": "staged_panel_contract",
+      "sha256": "8c901cdef0fd36d30636ef5b0105429a73aa533cf17bfc2b2a8bc45d1356003e"
+    },
+    {
+      "name": "target_transport_contract",
+      "sha256": "06930ab7ede60ce1119936cb70924158cea9a4422b403e97122f8ea942185357"
+    },
+    {
+      "name": "tower4_contract",
+      "sha256": "f263b468c659add269597b2866516ab4d75c3f6d0d6c8d3ac8b3501f4a711b86"
+    }
+  ],
+  "pre_post_binary_hashes_identical": true,
+  "pre_call_manifest_sha256": "48e07daf192eadf68aab3a77d9b8a13c8f1892e1578661262974f28bbf0bb8e9",
+  "source_inventory_files": 104,
+  "source_manifest_sha256": "004174bd4047c40bf64239232d30998a233a0155c3840eb8150296a30b220ed9",
+  "source_inventory_matches_checkout": true,
+  "source_check_scope": "Embedded source bytes match checkout and every inventoried file is in HEAD. Launcher must also enforce clean checkout and input custody. Compiler, registry package bodies and external admission are not verified here.",
+  "panels": [
+    {
+      "group": "panels",
+      "stage": "screening",
+      "inputs": 20,
+      "index_sha256": "148d7c412c77e47606b51f9264cc91c45da842f2b1f96046ddbabb3f4aa38f8a",
+      "attempted": 0,
+      "selected": 0
+    },
+    {
+      "group": "panels",
+      "stage": "recovery-candidates",
+      "inputs": 100,
+      "index_sha256": "4332bdca5166f457c7cb375119c7daf8b704917c8ae54b77199201dffe7174e5",
+      "attempted": 0,
+      "selected": 0
+    },
+    {
+      "group": "incumbent-panels",
+      "stage": "screening",
+      "inputs": 3,
+      "index_sha256": "80f6e9d3f82ab1cba1d3ac72151036efe93b4ff3a14dce6762a1b3a974119ac5",
+      "attempted": 0,
+      "selected": 0
+    },
+    {
+      "group": "incumbent-panels",
+      "stage": "recovery-candidates",
+      "inputs": 15,
+      "index_sha256": "b7fd8e64afcbe8e7b072f064253cdd54223390f6534bbb2894afdcad6cb8035f",
+      "attempted": 0,
+      "selected": 0
+    }
+  ],
+  "campaigns_attempted": 0,
+  "selected_for_execution": 0,
+  "natural_prime31_campaign_queries_executed": 0,
+  "native_correctness_fixture_execution_only": true,
+  "archive": {
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/evidence/native-qualification-attempt1.tar.gz",
+    "sha256": "63b4bbf821e4dca1a21f4ea34cadc6d6f3646c764d4fd75d1ce5a6fe0cda1974",
+    "includes": "build records, embedded inventory, source checks, all fixed test stdout/stderr, exit records, pre/post binary hashes and input-parser checks",
+    "excludes": "Executable bodies remain in the transient immutable qualifier directory; no remote binary archive was uploaded."
+  },
+  "root_library_gate": "separately recorded; not established by standalone package checks",
+  "performance_measurement": false,
+  "end_to_end_advantage_established": false,
+  "pcc_standing": "unverified",
+  "limits": [
+    "Fixed fixture correctness and metadata checks only.",
+    "Test times are diagnostics, not admitted comparative timing.",
+    "Foreign specialized operation ledgers remain partial.",
+    "Complete campaign still requires the existing execution and measurement evidence."
+  ]
+}

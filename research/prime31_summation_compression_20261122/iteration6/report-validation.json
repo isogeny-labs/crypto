@@ -1,16 +1,16 @@
 {
   "schema": "prime31-iteration6-report-validation/v1",
-  "status": "pending_repaired_ci",
-  "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+  "status": "blocked_third_inherited_syntax",
+  "source_commit": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
   "gate_source_sha256": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0",
   "identity_issuer_sha256": "b803aa70037cd95467cc0865f99fd8af5848912eb490542d8ad327b3dfa490fc",
-  "ci_summary": "The initial original-lock build failed before new tests on inherited spec.rs syntax. A faithful parent-source restoration is committed; its source-bound rerun is in progress, with no test success yet asserted.",
-  "identity_summary": "Native cubic-residual issuer prepared but not executed. Issuance and replay remain pending; intended certificate standing proof:null.",
-  "ci_url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135",
-  "ci_job_id": null,
-  "failure_scope": "Inherited malformed test-fixture calls and unclosed delimiters around ecbench/spec.rs lines 894-1042; no mathematical counterexample inferred.",
-  "next_action": "Collect the repaired original-lock correctness and native identity receipts, preserving the initial failure. Then specify an exact guarded-quadratic solver with setup, misses, rational extraction, memory and signed output fully charged.",
-  "receipt_path": null,
+  "ci_summary": "All three dedicated original-lock builds stopped before tests. The latest run passed the earlier parser locations but failed compiling inherited binary_hyperelliptic_index_calculus.rs. All five independent command groups failed before native execution; zero tests ran.",
+  "identity_summary": "The third build attempted to compile the native issuer but failed before it executed. Its separate replay command was not reached. Earlier issuer/replay steps were skipped. No new identity certificate is claimed.",
+  "ci_url": "https://github.com/isogeny-labs/crypto/actions/runs/45113871392",
+  "ci_job_id": "137492117014",
+  "failure_scope": "Third source-bound compile failure at unchanged src/cryptanalysis/binary_hyperelliptic_index_calculus.rs:640 and 1233; compiler reported 198 further unclosed delimiters. No native test or new identity program executed.",
+  "next_action": "Retain the complete third-failure evidence and restore the separate whole-crate build prerequisite without weakening checks. Pursue the exact structured S3 zero-component query with near-linear setup in D and query exponent below 1/2 in D, including misses and any certificate output.",
+  "receipt_path": "evidence/ci-framework-restored-failure/receipt.json",
   "standing": "pcc:unverified",
   "performance": "No new timing panel or asymptotic solving bound.",
   "initial_failure": {
@@ -24,5 +24,118 @@
     "audit_path": "evidence/inherited-spec-restoration/AUDIT.md",
     "freeze_path": "evidence/inherited-spec-restoration/SOURCE_FREEZE.json"
   },
-  "family_appendix": "Written reviewed input-availability results; no root solver or prime-subgroup family certified."
+  "family_appendix": "Written reviewed input-availability results; no root solver or prime-subgroup family certified.",
+  "failure_history": [
+    {
+      "source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+      "run_id": 45096187034,
+      "job_id": 137436389923,
+      "error_path": "src/cryptanalysis/ecbench/spec.rs",
+      "tests_executed": 0,
+      "receipt_path": "evidence/ci-inherited-build-failure/receipt.json"
+    },
+    {
+      "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+      "run_id": 45097885135,
+      "job_id": 137441679059,
+      "error_path": "src/cryptanalysis/ic_framework/mod.rs",
+      "error_line": 4528,
+      "tests_executed": 0,
+      "artifact_id": 14784865238,
+      "artifact_zip_sha256": "915598d695abeb8f35368527093cd1be101db1c0f457a9aeda2c44707aaf1693",
+      "receipt_path": "evidence/ci-restored-spec-failure/receipt.json"
+    },
+    {
+      "source_commit": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+      "run_id": 45113871392,
+      "job_id": 137492117014,
+      "completed_at": "2026-11-23T04:56:20Z",
+      "error_path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+      "error_lines": [
+        640,
+        1233
+      ],
+      "tests_executed": 0,
+      "command_groups_attempted": 5,
+      "identity_issuer_executed": false,
+      "identity_replay_command_reached": false,
+      "artifact_id": 14790654045,
+      "artifact_zip_sha256": "b1b6d310eab134128f525529eded863ac4f6147b08c1f66037d18ab3c4f7c104",
+      "receipt_path": "evidence/ci-framework-restored-failure/receipt.json",
+      "error_git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+      "receipt_sha256": "9f390381811b2809e2273d4fc6c5689740c74f79c9118cb46cb4b4e76b5c9876"
+    }
+  ],
+  "claims_added": [
+    "PCC-20261123-2d6d3e",
+    "PCC-20261123-0d1e17",
+    "PCC-20261123-774115",
+    "PCC-20261123-a41174",
+    "PCC-20261123-5ce73e",
+    "PCC-20261123-f0209c",
+    "PCC-20261123-391a91"
+  ],
+  "space_status": "Existing Space and Page were previously confirmed. The latest edit remains of unknown commit status after Page RPC timeouts; the Browser fallback was aborted without a completed access check. No new successful save is asserted.",
+  "research_pr": {
+    "number": 4928,
+    "url": "https://github.com/isogeny-labs/crypto/pull/4928",
+    "state": "merged",
+    "former_branch_deleted": true
+  },
+  "followup_freeze_path": "evidence/followup-main-freeze/SOURCE_FREEZE.json",
+  "separate_general_pr_failure": {
+    "run_id": 45100829948,
+    "job_id": 137451053331,
+    "run_head": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+    "actual_checkout": "4a40be161b9b3e6bc4db8a8dc16864e82d754d7b",
+    "cause": "Inherited missing Cargo array-table headers; duplicate key before tests",
+    "already_fixed_by": "69fad1271054225a95d5682f5fdcd11fd2a692d7",
+    "scope": "Separate general-PR run; not another dedicated rational-chain verification result"
+  },
+  "last_correctness_pr": {
+    "number": 4962,
+    "url": "https://github.com/isogeny-labs/crypto/pull/4962",
+    "branch": "lane/prime31-rational-chain-correctness",
+    "base_commit": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+    "tracking_commit": "1650b344b9bd72237d9bafd26b3401da1385eafa",
+    "state": "merged",
+    "merged_at": "2026-11-23T04:57:27Z",
+    "merge_commit": "b0a8d8b0a7ec3bf3469589dda7010d5612c9f70a",
+    "last_head": "a675e7c495145c30399dfa33a63f01f9f1ab54c3"
+  },
+  "mathematical_refinements": {
+    "pencil": {
+      "path": "../iteration10/S3_PENCIL_CONTRACTION.md",
+      "claim": "PCC-20261123-f0209c",
+      "scope": "Exact rank-three factorization, norm representation, formal degree 2D-1 and unit leading coefficient. Dense-format and arbitrary-subset fixed-linear-basis observations are scoped; no fast query or algorithmic lower bound follows.",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_CONTRACTION.md",
+      "independent_review_url": "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_INDEPENDENT_REVIEW.md"
+    },
+    "family": {
+      "path": "../iteration10/FAMILY_SIZE_CORRECTION.md",
+      "claim": "PCC-20261123-391a91",
+      "scope": "Application of Chang Corollary 11 to powers-of-two moduli supports each fixed 0<beta<5/12. This contains the conditional four-summand optimum for 0<=tau<1; it does not supply the missing query algorithm or source curve family.",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/FAMILY_SIZE_CORRECTION.md",
+      "independent_review_url": "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/FAMILY_SIZE_INDEPENDENT_REVIEW.md"
+    }
+  },
+  "active_pr": {
+    "number": 4977,
+    "url": "https://github.com/isogeny-labs/crypto/pull/4977",
+    "branch": "lane/prime31-s3-pencil-family",
+    "base_commit": "816f9c3a942efed569049618c056d12a0c56d693",
+    "tracking_commit": "c2c25f9799c3f5492ade4d638c7aa6a3900acbde",
+    "state": "draft"
+  },
+  "core_publication": {
+    "commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+    "tree": "aed09081faf0f0ac0eb7ba044995b1ede9ce86c9",
+    "pr": 4977,
+    "scope": "Immutable publication of core evidence and iteration10 notes; native verification source remains 14a9f021b630fec0a7dd38cb724d71d68c99626b."
+  },
+  "report_scope": {
+    "claim_count_at_core": 16,
+    "core_commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+    "scope": "The sixteen claims covered by this immutable core report. Later lane claims and follow-up mathematics are outside this report."
+  }
 }

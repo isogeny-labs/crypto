@@ -1,0 +1,118 @@
+2026-11-23T05:37:57.9692576Z 5e536ed93302def2122968aa880b22c4b675d516
+2026-11-23T05:37:57.9710569Z 3533cd5ac59cfb78bf7250e78b8f7fc761b8c951cfe2eec9ad4accdc62e9993a  examples/prime31_rr5_quartic.rs
+2026-11-23T05:37:57.9711521Z 983129351b28b8e2933bac1261ab6f93f0fa9c932a81b3e65950e1b1184142a6  research/prime31_four_summand_20261122/native/b677_controls.rs
+2026-11-23T05:37:57.9712641Z 3f491defbc7aa1643192db4d0c7144afcec1f84a41f03489355a866459329624  research/prime31_four_summand_20261122/native/b677_fixture.rs
+2026-11-23T05:37:57.9713373Z 55688d3d2ef369893fa8f4fc912cba838af2ffa9e4322218fc826a6bec3b5d96  research/prime31_four_summand_20261122/native/b677_gate.rs
+2026-11-23T05:37:57.9714086Z 7e94c1c71a58a61bc28150accbd0cb94515a72219da1c8d684b6f410bfa10ed9  research/prime31_four_summand_20261122/native/build.rs
+2026-11-23T05:37:57.9715263Z fd573488ea7065a382d71c98819342287cc235de881595922bd94ecb6ffed951  research/prime31_four_summand_20261122/native/extractor.rs
+2026-11-23T05:37:57.9716272Z e6a8a9f5054d625783fdbc85d4ac7ddc845629681a3755bc388ca887aa3fd8dd  research/prime31_four_summand_20261122/native/identity_certificate.rs
+2026-11-23T05:37:57.9717002Z 831b07ffcc9085c142f921772448965a47cc489ef1ade78aa0e80db1cd52da7d  research/prime31_four_summand_20261122/native/independent_tests.rs
+2026-11-23T05:37:57.9717675Z 58f52f34a28dbae2bf8d89d063249fa65f2aa00ea3e34ac4135c338ea5f6b8e5  research/prime31_four_summand_20261122/native/lib.rs
+2026-11-23T05:37:57.9718596Z 5842aa1c5e1e09038f5d6b337c8fc08257aabdf8f1a8cd8846713f3041e61f8d  research/prime31_four_summand_20261122/native/main.rs
+2026-11-23T05:37:57.9719525Z 1915ef03235d68900b696c12a9abca5de51abd68f55d40ee568c4476124a7350  research/prime31_four_summand_20261122/native/relation_adapter.rs
+2026-11-23T05:37:57.9720225Z ca3414d970325490aa4a4e6fd9e2752f6f87e16244037cdfbf09d15e950b783d  research/prime31_four_summand_20261122/native/selector_circuit.rs
+2026-11-23T05:37:57.9721334Z 9896516dc81af72ac556547d27771e24ca99e5df4962843355dbbb12286d7c93  research/prime31_four_summand_20261122/native/Cargo.lock
+2026-11-23T05:37:57.9816514Z rustc 1.100.0 (0ef1bc386 2026-11-09)
+2026-11-23T05:37:57.9816905Z binary: rustc
+2026-11-23T05:37:57.9817237Z commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+2026-11-23T05:37:57.9817619Z commit-date: 2026-11-09
+2026-11-23T05:37:57.9817898Z host: x86_64-unknown-linux-gnu
+2026-11-23T05:37:57.9818180Z release: 1.100.0
+2026-11-23T05:37:57.9818454Z LLVM version: 23.1.5
+2026-11-23T05:37:57.9858119Z ##[group]Run set -o pipefail
+2026-11-23T05:37:57.9858401Z [36;1mset -o pipefail[0m
+2026-11-23T05:37:57.9858856Z [36;1mecho "Compilation uses two workers within the 15-minute job timeout; per-run 2 GiB and 180-second limits begin only after this stage."[0m
+2026-11-23T05:37:57.9859657Z [36;1mcargo test --locked --release --all-targets --no-run --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml 2>&1 | tee rr5-receipts/build-tests.txt[0m
+2026-11-23T05:37:57.9860611Z [36;1mcargo build --locked --release --bin rr5-identity-certificate --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml 2>&1 | tee rr5-receipts/build-identity.txt[0m
+2026-11-23T05:37:57.9893334Z shell: /usr/bin/bash -e {0}
+2026-11-23T05:37:57.9893636Z env:
+2026-11-23T05:37:57.9893880Z   CARGO_BUILD_JOBS: 2
+2026-11-23T05:37:57.9894153Z   RAYON_NUM_THREADS: 1
+2026-11-23T05:37:57.9894448Z   CARGO_HOME: /home/runner/.cargo
+2026-11-23T05:37:57.9894726Z   CARGO_INCREMENTAL: 0
+2026-11-23T05:37:57.9895256Z   CARGO_TERM_COLOR: always
+2026-11-23T05:37:57.9895455Z   CACHE_ON_FAILURE: false
+2026-11-23T05:37:57.9895645Z ##[endgroup]
+2026-11-23T05:37:57.9941853Z Compilation uses two workers within the 15-minute job timeout; per-run 2 GiB and 180-second limits begin only after this stage.
+2026-11-23T05:37:58.0201454Z [1m[92m    Updating[0m crates.io index
+2026-11-23T05:37:59.0354207Z [1m[92m   Compiling[0m rr5-original-f4-closure v0.1.0 (/home/runner/work/crypto/crypto/research/prime31_four_summand_20261122/native/f4-source)
+2026-11-23T05:38:21.3889070Z [1m[92m    Finished[0m `release` profile [optimized] target(s) in 0.25s
+2026-11-23T05:38:21.3969077Z ##[group]Run set -o pipefail
+2026-11-23T05:38:21.3969354Z [36;1mset -o pipefail[0m
+2026-11-23T05:38:21.3969557Z [36;1mulimit -v 2097152[0m
+2026-11-23T05:38:21.3970151Z [36;1mtimeout 180 cargo test --locked --release --lib --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml -- --test-threads=1 --nocapture 2>&1 | tee rr5-receipts/native.txt[0m
+2026-11-23T05:38:21.3999306Z shell: /usr/bin/bash -e {0}
+2026-11-23T05:38:21.3999688Z env:
+2026-11-23T05:38:21.3999860Z   CARGO_BUILD_JOBS: 2
+2026-11-23T05:38:21.4000049Z   RAYON_NUM_THREADS: 1
+2026-11-23T05:38:21.4000244Z   CARGO_HOME: /home/runner/.cargo
+2026-11-23T05:38:21.4000464Z   CARGO_INCREMENTAL: 0
+2026-11-23T05:38:21.4000665Z   CARGO_TERM_COLOR: always
+2026-11-23T05:38:21.4000861Z   CACHE_ON_FAILURE: false
+2026-11-23T05:38:21.4001050Z ##[endgroup]
+2026-11-23T05:38:21.4432522Z [1m[92m     Running[0m unittests lib.rs (research/prime31_four_summand_20261122/native/target/release/build/prime31-four-summand/92bd8bf1cbd78eaf/out/prime31_four_summand-92bd8bf1cbd78eaf)
+2026-11-23T05:38:21.4433056Z 
+2026-11-23T05:38:21.4433133Z running 32 tests
+2026-11-23T05:38:21.4462840Z test f4_resource_controls::resource_limit_tests::bounded_calls_refuse_unguarded_optional_modes ... ok
+2026-11-23T05:38:21.4463909Z test f4_resource_controls::resource_limit_tests::bounded_deadline_is_incomplete_and_distinct_from_resource_admission ... ok
+2026-11-23T05:38:21.4464957Z test f4_resource_controls::resource_limit_tests::bounded_native_and_traced_positive_control ... ok
+2026-11-23T05:38:21.4465816Z test f4_resource_controls::resource_limit_tests::final_interreduce_cannot_expand_past_the_term_budget ... ok
+2026-11-23T05:38:21.4466761Z test f4_resource_controls::resource_limit_tests::pair_limit_includes_above_degree_pairs_and_stops_traversal ... ok
+2026-11-23T05:38:21.4467721Z test f4_resource_controls::resource_limit_tests::recording_reserves_dense_copies_and_contributor_storage ... ok
+2026-11-23T05:38:21.4468598Z test f4_resource_controls::resource_limit_tests::replay_obeys_the_current_call_limits ... ok
+2026-11-23T05:38:21.4469527Z test f4_resource_controls::resource_limit_tests::symbolic_closure_refuses_new_support_before_matrix_allocation ... ok
+2026-11-23T05:38:21.4470554Z test independent_tests::b677_controls::b677_fixture_has_exact_public_selector_and_independent_curve_replay ... ok
+2026-11-23T05:38:21.4476802Z test independent_tests::b677_controls::b677_forced_construction_caps_do_not_claim_empty_or_complete ... ok
+2026-11-23T05:38:21.4489062Z test independent_tests::b677_controls::b677_frozen_mixed_positive_and_public_walk_targets_are_valid ... ok
+2026-11-23T05:38:22.0060466Z test independent_tests::b677_controls::b677_zero_native_resource_caps_fail_closed_before_algebraic_search ... ok
+2026-11-23T05:38:23.1805843Z test selector_circuit::tests::b677_circuit_matches_dense_selector_and_rejects_every_auxiliary_mutation ... B677_CIRCUIT {"dense_selector_degree":1192,"equations":123,"max_total_degree":2,"modular_multiplication_gates":17,"parameter_controls":4,"rejected_auxiliary_mutations":476,"symbolic_additions":1899,"symbolic_multiplications":1139,"terms":686,"variables":122}
+2026-11-23T05:38:23.1807919Z ok
+2026-11-23T05:38:23.1808046Z 
+2026-11-23T05:38:23.1808340Z test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.74s
+2026-11-23T05:38:23.1808758Z 
+2026-11-23T05:38:23.1879146Z ##[group]Run set -o pipefail
+2026-11-23T05:38:23.1879411Z [36;1mset -o pipefail[0m
+2026-11-23T05:38:23.1879619Z [36;1mulimit -v 2097152[0m
+2026-11-23T05:38:23.1880302Z [36;1mtimeout 180 cargo test --locked --release --example prime31_rr5_quartic --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml -- --test-threads=1 --nocapture 2>&1 | tee rr5-receipts/example.txt[0m
+2026-11-23T05:38:23.1909886Z shell: /usr/bin/bash -e {0}
+2026-11-23T05:38:23.2356078Z [1m[92m    Finished[0m `release` profile [optimized] target(s) in 0.02s
+2026-11-23T05:38:23.2356981Z [1m[92m     Running[0m unittests ../../../examples/prime31_rr5_quartic.rs (research/prime31_four_summand_20261122/native/target/release/build/prime31-four-summand/67e8a95f83535bb7/out/prime31_rr5_quartic-67e8a95f83535bb7)
+2026-11-23T05:38:23.2357567Z 
+2026-11-23T05:38:23.2357643Z running 8 tests
+2026-11-23T05:38:23.2357948Z test tests::genuine_rhs_rank_rejects_sign_and_rhs_poisoning_before_mutation ... ok
+2026-11-23T05:38:23.2358349Z test tests::incomplete_branches_and_limits_never_become_empty_results ... ok
+2026-11-23T05:38:23.2358746Z test tests::noncanonical_invalid_and_duplicate_base_inputs_are_rejected ... ok
+2026-11-23T05:38:23.2359098Z test tests::poisoning_changes_public_equations ... ok
+2026-11-23T05:38:23.2359422Z test tests::public_b4_solver_matches_test_only_signed_scalar_oracle ... ok
+2026-11-23T05:38:23.2359803Z test tests::specialized_zero_terms_and_cancellation_expose_univariates ... ok
+2026-11-23T05:38:23.2360170Z test tests::symbolic_quartic_has_target_and_witness_roots ... ok
+2026-11-23T05:38:23.2360551Z test tests::target_in_base_is_unsupported_even_when_a_signed_relation_exists ... ok
+2026-11-23T05:38:23.2360790Z 
+2026-11-23T05:38:23.2360991Z test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-23T05:38:23.2361249Z 
+2026-11-23T05:38:23.2390683Z ##[group]Run set -o pipefail
+2026-11-23T05:38:23.2390952Z [36;1mset -o pipefail[0m
+2026-11-23T05:38:23.2391162Z [36;1mulimit -v 2097152[0m
+2026-11-23T05:38:23.2391835Z [36;1mtimeout 180 cargo run --locked --release --bin rr5-identity-certificate --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml > rr5-receipts/identity.json 2> rr5-receipts/identity.stderr[0m
+2026-11-23T05:38:23.2420505Z shell: /usr/bin/bash -e {0}
+2026-11-23T05:38:23.2420726Z env:
+2026-11-23T05:38:23.2420897Z   CARGO_BUILD_JOBS: 2
+2026-11-23T05:38:23.2421084Z   RAYON_NUM_THREADS: 1
+2026-11-23T05:38:23.2421274Z   CARGO_HOME: /home/runner/.cargo
+2026-11-23T05:38:23.2421491Z   CARGO_INCREMENTAL: 0
+2026-11-23T05:38:23.2421681Z   CARGO_TERM_COLOR: always
+2026-11-23T05:38:23.2421875Z   CACHE_ON_FAILURE: false
+2026-11-23T05:38:23.2422067Z ##[endgroup]
+2026-11-23T05:38:23.2876751Z ##[group]Run actions/upload-artifact@v4
+2026-11-23T05:38:23.4361173Z With the provided path, there will be 7 files uploaded
+2026-11-23T05:38:23.4362226Z Artifact name is valid!
+2026-11-23T05:38:23.4362811Z Root directory input is valid!
+2026-11-23T05:38:23.7229902Z Beginning upload of artifact content to blob storage
+2026-11-23T05:38:23.7471307Z (node:3630) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-23T05:38:23.9527559Z Uploaded bytes 15826
+2026-11-23T05:38:24.0007632Z Finished uploading artifact content to blob storage!
+2026-11-23T05:38:24.0008423Z SHA256 digest of uploaded artifact zip is 2e10c0a9b7eb3f9c23c5b426504107e022bf5013ff6d94c1403e1bacb04d39ee
+2026-11-23T05:38:24.0009412Z Finalizing artifact upload
+2026-11-23T05:38:24.3533188Z Artifact rr5-component-5e536ed93302def2122968aa880b22c4b675d516.zip successfully finalized. Artifact ID 14793046863
+2026-11-23T05:38:24.3534627Z Artifact rr5-component-5e536ed93302def2122968aa880b22c4b675d516 has been successfully uploaded! Final size is 15826 bytes. Artifact ID is 14793046863
+2026-11-23T05:38:24.3539911Z Artifact download URL: https://github.com/isogeny-labs/crypto/actions/runs/45118811731/artifacts/14793046863
