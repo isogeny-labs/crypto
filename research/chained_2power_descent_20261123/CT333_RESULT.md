@@ -1,5 +1,13 @@
 # CT333 — all Frobenius types: rational Richelot-kernel sieve
 
+## Amendment A1 — nonvacuous plane rejection (2026-11-23 UTC)
+
+Source audit found that original `bad_plane_image()` raised on both outcomes, so its third reported negative control was **vacuous**; the 720-permutation census and its independent mathematical representation do not use that test. The original source and JSON remain frozen for history. [CT333_AMENDMENT_A1.md](CT333_AMENDMENT_A1.md) was committed before any code correction.
+
+The amended `require_valid_plane` checks three distinct nonzero entries and actual membership in the fifteen isotropic planes; a genuine plane is accepted as a positive control. Corrected [CT333_RESULT_A1.json](CT333_RESULT_A1.json), under script Git blob `33420a3ad6cba0fad0de25cf7c413fa3abf65596` (SHA-256 `09b2c5f9add394f267bbf12f3f6924ff98f9bddae1ebd36059293427803dc393`), was generated with both Python modes, `cmp` passed, and all eleven census rows remained byte-for-byte equivalent to the original (the only changed JSON field is the source hash). The three malformed controls now all have actual rejection predicates; the additional true-plane positive control passes. Amended JSON blob `ee24527cfa4ca20e412243ac606cf8cd51f70a02`, SHA-256 `75e7e60590b896e3313285fbe12a6efbbd12a7176715162468f3c0528c9e174f`. This is **producer self-checking**, not signed PCC. [pcc:unverified]
+
+The previously committed [original PDF](CT333_FROBENIUS_KERNEL_GATE.pdf) predates A1 and incorrectly describes all three original mutations as substantive; treat that PDF as **historical/superseded**. The corrected A1 PDF was regenerated and visually inspected separately, but has not yet been published as a verified Git blob; the Markdown report and corrected JSON are canonical until then.
+
 **Date:** 2026-11-23 UTC. **Standing:** bounded producer-authored source-only finite enumeration, **[pcc:unverified]**. This is an additive continuation of [CT331](CT331_IRREDUCIBLE_TORSION_GATE.md) and [CT332](CT332_RESULT.md), not a native/genus-three solver experiment.
 
 ## Executed result
