@@ -5093,6 +5093,7 @@ mod round37_frobenius_tests {
     }
 }
 
+
 #[cfg(test)]
 mod round73_mersenne_single_fold {
     use super::*;

@@ -1,0 +1,55 @@
+{
+  "source_commit": "2647188b4a7f3d4ac5a3e6f72dcfed8fb60ce265",
+  "exit_code": 0,
+  "flow": {
+    "planned": 216,
+    "attempted": 216,
+    "completed": 216,
+    "excluded": 0
+  },
+  "launcher_pairs_equal": 108,
+  "native_proof_cases": 108,
+  "wrapped_proof_cases": 108,
+  "OS_tests_passed": 5,
+  "transport_controls": [
+    {
+      "expected_success": false,
+      "id": "transport-wrapped-invalid-mode",
+      "later_arms_still_planned": true,
+      "observed_success": false
+    },
+    {
+      "expected_success": true,
+      "id": "transport-wrapped-limits",
+      "later_arms_still_planned": true,
+      "observed_success": true
+    },
+    {
+      "expected_collision_rejected": true,
+      "native": false,
+      "sentinel_preserved": true
+    },
+    {
+      "expected_success": false,
+      "id": "transport-native-invalid-mode",
+      "later_arms_still_planned": true,
+      "observed_success": false
+    },
+    {
+      "expected_success": true,
+      "id": "transport-native-limits",
+      "later_arms_still_planned": true,
+      "observed_success": true
+    },
+    {
+      "expected_collision_rejected": true,
+      "native": true,
+      "sentinel_preserved": true
+    }
+  ],
+  "raw_summary_sha256": "eb27c160278ae7e961c11c2022581a92818dc175d188a07051c48e4358461b36",
+  "saved_artifact_audit": "SUPERVISOR_FINAL_AUDIT_241.json",
+  "all_final_source_tool_pins_unchanged": true,
+  "parent_performance_statistics_computed": false,
+  "15x_admitted": false
+}
