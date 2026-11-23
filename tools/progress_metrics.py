@@ -1091,16 +1091,19 @@ def trace_complete_cost(ref, since):
                             ("target", "summary-target-a1.json"),
                             ("progression", "summary-ap-a1.json"),
                             ("holdout", "summary-holdout-a1.json"),
-                            ("flat", "summary-flat-a1.json")):
+                            ("flat", "summary-flat-a1.json"),
+                            ("field", "summary-field-a1.json"),
+                            ("scaling", "summary-scaling-a1.json")):
         path = f"{root}/{filename}"
         for date, commit, text in file_history(ref, path, since_day):
             data = json.loads(text)
             source = f"{path}@{commit}"
+            size = "640" if stage == "scaling" else "128"
             for group, row in data.get("groups", {}).items():
-                if not group.endswith("/128"):
+                if not group.endswith("/" + size):
                     continue
                 arm = group.rsplit("/", 1)[0].replace("/", "_").replace("-", "_")
-                prefix = f"trace.complete.{stage}.b128.{arm}"
+                prefix = f"trace.complete.{stage}.b{size}.{arm}"
                 emit(prefix + ".wall_s", row["complete_wall_s"]["median"],
                      date=date, problem="prime-labelled-pool-recovery",
                      unit="wall_s", better="neutral",
@@ -1111,10 +1114,10 @@ def trace_complete_cost(ref, since):
                      better="neutral", label="Retained bounded censors; PCC unverified",
                      source=source)
             for group, row in data.get("target_cluster_mean_ratios", {}).items():
-                if not group.endswith("_over_current-tuned8/128"):
+                if not group.endswith("_over_current-tuned8/" + size):
                     continue
                 arm = group.split("_over_", 1)[0].replace("-", "_")
-                prefix = f"trace.complete.flat.b128.{arm}.over_rho8"
+                prefix = f"trace.complete.{stage}.b{size}.{arm}.over_rho8"
                 for suffix, field in (("mean_ratio", "ratio"),
                                       ("upper95", "bootstrap_q95")):
                     emit(prefix + "." + suffix, row[field], date=date,
