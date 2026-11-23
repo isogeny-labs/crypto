@@ -1,0 +1,7 @@
+Scheduled relation-yield benchmark trigger, 2026-11-23 07:19 UTC.
+Repository: isogeny-labs/crypto (formerly aburan28/crypto)
+Branch: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Workload: frozen synthetic Koblitz GF(2^23), a=0, m=2, 256 natural, 64 planted, 64 UNSAT.
+Baseline: results/relation_baseline.json; anomaly threshold: >20%.
+Log: results/hourly_log.csv.
