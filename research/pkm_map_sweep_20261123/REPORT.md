@@ -28,4 +28,23 @@ The smallest paired confirmation `p` was 0.02048 for `cm:coset=5`: 72/96 success
 
 The next discriminating rung is now narrower: change the **isogeny chain or auxiliary curve**, not just `R'`. Search and construction, F4 solving, relation collection, rank and scalar recovery all remain to be charged before any full algorithm comparison.
 
+## Third rung: eight distinct chains
+
+Following [PROTOCOL_CHAINS.md](PROTOCOL_CHAINS.md), [chain_sweep.py](chain_sweep.py) invoked the repository `pkm-smooth-tower isogeny` generator for seeds 1–8 at `p=1000003`, smoothness bound 13 and minimum fiber 500. Its binary SHA-256 was `82ae63d60b04e3fbf3c8ad2ada00ab2cd09a03a1609e8ad511a83eab1495aed0`; the generator's two relevant source files were clean against local commit `5097d0d45c46`. The overall local checkout contained unrelated changes, so these are development measurements, not a clean-source release run. Generator CPU was 0.768–1.119 s per successful seed. All eight generated auxiliary curves were distinct, and their low-degree chains and high-degree maps are preserved in [seed artifacts](.) and [chain_results.jsonl](chain_results.jsonl) [pcc:unverified].
+
+| Seed | Low degrees | High degree | Lifting abscissae | Screen hits, map/control | Confirm hits, map/control | Paired p |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 2,2,2,2,3,5,5 | 1200 | 590 | 26/24 | 52/43 | 0.1312 |
+| 2 | 2,2,2,2,3,3,5 | 720 | 338 | 10/16 | 19/20 | 0.6321 |
+| 3 | 2,2,3,3,3,3,5 | 1620 | 782 | 34/31 | 59/67 | 0.9179 |
+| 4 | 2,2,2,3,3,3,11 | 2376 | 1189 | 46/45 | 88/92 | 0.9270 |
+| 5 | 2,2,2,2,2,2,2,5 | 640 | 306 | 11/13 | 17/15 | 0.4253 |
+| 6 | 2,2,3,3,3,11 | 1188 | 601 | 26/26 | 49/45 | 0.3220 |
+| 7 | 2,2,2,3,3,3,3 | 648 | 315 | 12/16 | 14/16 | 0.7214 |
+| 8 | 3,3,3,5,11 | 1485 | 729 | 28/30 | 71/63 | 0.1279 |
+
+All eight full fibers were independently evaluated through their recorded rational chains, with degree equal to fiber cardinality; every hit was checked by point addition. Independent exhaustive ordered-pair enumeration for seed 1, target index 0, found two relations, matching the sweep. No row passed the `0.01/8=0.00125` paired confirmation gate, even before charging generation. The raw result SHA-256 is `fb4185f7a039c162cd11781ce5edd9194bee1f9e38a53e540b09a4ee54d7ed3c`.
+
+Across the three frozen rungs, 56 candidate maps or fibers have been screened: 16 affine placements, 32 genuine cosets and eight distinct chains. None has a confirmed relation-yield and cost improvement over its size-matched interval. This does not settle the larger PKM question: the tests use one field, one target curve, `m=2`, enumerated relations and no F4 or cold single-target DLP pipeline. The next test should use the existing `prime-algebraic` F4 space on a fixed candidate/control pair and charge the complete relation pipeline; P-192 and 59-bit fields need separate runs.
+
 Sources checked: Petit–Kosters–Messeng, [Algebraic approaches for the ECDLP over prime fields](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf), §§3.1–3.4; the repository `docs/ic/SWEEPER.md` and `research/isogeny_vs_mu_factor_base_20261102/`; KB `source:81a446d8a0f88023cfe934a2fcb608bb` (existing prime-algebraic sweep and its provisional baseline).
