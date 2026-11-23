@@ -23,6 +23,18 @@ in the current commit's full Git history, blob
 
 These are retained historical inputs, not newly generated measurements.
 
+## Weak-curve Lean CI input (2026-11-21)
+
+`research/weak_curve_properties_lean_20261011/root_lib.stdout` is the
+346,379-byte original Git blob `d01cc9689c2222005990eae14232afa2a13305c9`
+from the parent of migration commit `d2f715a221cc06f373cdc24346560943001782b6`.
+Its SHA-256 is the unchanged manifest digest
+`762ca86fbcec6dbb4dcf0bebf42875421b6936bda04b2ea4b4510d69be87cc07`.
+That migration commit is outside the maintained PR head's ancestry, so a
+HEAD-scoped history search cannot discover the blob on CI. The catalog maps the
+digest to a deterministic gzip copy of those exact original bytes. The normal
+manifest size and SHA-256 checks still run before the file is installed.
+
 ## Shallow CI checkouts (2026-11-18)
 
 CI checkouts are shallow (`fetch-depth: 1` or `2`), so the full-history

@@ -28,11 +28,18 @@ path = "src/choice_main.rs"
 test = false
 bench = false
 
+[[bin]]
+name = "prime31-sparse-identity"
+path = "src/identity_main.rs"
+test = false
+bench = false
+
 [features]
 default = []
 wide-vars = []
 
 [dependencies]
+hex = "0.4"
 certified-relations = { path = "../../../crates/certified-relations" }
 relation-replay-checker = { path = "../../../crates/relation-replay-checker" }
 num-bigint = { version = "0.4", features = ["rand"] }

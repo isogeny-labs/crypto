@@ -1,0 +1,123 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261122-prime31-sparse-h2-staged",
+  "title": "Admit and run the staged Prime31 sparse-H2 comparison with matched controls",
+  "created": "2026-11-22",
+  "authors": [
+    "Prime31 auxiliary-isogeny research lane"
+  ],
+  "status": "blocked",
+  "status_note": "There are 77 prepared screening inputs and 385 unselected recovery candidates, with zero campaign runs. Checkpoint upload, authenticated runner access, remaining shared budget, canonical protocol, pinned source/image, and exact stage selections are not admitted.",
+  "blocked_on": [
+    "pr:4937 publish and review the sparse-H2 implementation, protocol amendment, accounting, and exact source inventory",
+    "branch:lane/prime31-sparse-h2 the eventual executable card must pin an admitted merged source commit and image digest",
+    "note:checkpoint gate failed because neither an upload token nor an AWS profile is available; retain the actual gate evidence",
+    "note:no authenticated IsoLab EKS or Actions submission route and no current runner capacity receipt are available",
+    "note:the inherited USD 5 aggregate lane ceiling includes earlier expenditure and remaining headroom is unknown, so no spending is admitted",
+    "note:canonical experiment protocol, original absolute deadline, source/image binding, and explicit screening cell/hash selection have not been admitted",
+    "note:recovery candidates remain unselected until actual screening receipts support a separately frozen recovery selection",
+    "note:the card's resumable checkpoint and pinned independent verification command remain unbound; no resume flag or verifier execution is invented",
+    "note:the full root-library gate remains open after the unchanged duplicate Cargo.toml name key stopped it before tests"
+  ],
+  "links": {
+    "lead": "research/prime31_aux_matched_20261122/sparse-h2-followup/PROTOCOL.md",
+    "notes": [
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/ACCOUNTING.md",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/BASELINE_REVIEW.md",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/MATHEMATICS.md",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/DEVELOPMENT_RECEIPT_v2.json",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/ERRATA.md",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/RESUME.md",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/selection.template.json",
+      "research/prime31_aux_matched_20261122/sparse-h2-followup/run-staged.sh"
+    ],
+    "prs": [
+      4937
+    ]
+  },
+  "question": "On the fixed public Prime31 target, does the same-fiber sparse H2 factorization improve observed setup, natural-query collection, or verified complete-recovery cost relative to the standard presentations and matched pair-table, plain, and rho controls?",
+  "decision_value": "Screening receipts will determine which exact representation and control pairs warrant the separately admitted recovery subset. Replayed recovery with complete matched accounting could justify retaining a practical route; negative, failed, capped, or unresolved outcomes will limit that route at the tested envelope and guide the next implementation decision without a global speed claim.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "isogeny-labs/crypto",
+    "commit": null,
+    "branch": "lane/prime31-sparse-h2",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--offline",
+        "--locked",
+        "--jobs",
+        "1",
+        "--manifest-path",
+        "research/prime31_aux_matched_20261122/native/Cargo.toml",
+        "--bin",
+        "prime31-isogeny-choices"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 0,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Per-cell bounds are one affinity-bound CPU and one computational thread, 4096 MiB RAM, and 120 s outer process time; TERM at 115 s allows 5 s grace. Collection is at most 110 s and each query at most 2000 ms. Disk 0 records no admitted disk reservation, not zero disk usage. Aggregate cost and disk needs remain unresolved because no subset or remaining USD 5 budget is admitted. Zero scientific retries."
+  },
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 120
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "prime31-aux-matched.offline-audit/v1",
+    "verify": [],
+    "land": "research/prime31_aux_matched_20261122/sparse-h2-followup/results"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261122-prime31-sparse-h2-staged"
+    ],
+    "ttl_s": 300,
+    "env": {
+      "name": "prime31-sparse-h2-staged-unadmitted",
+      "recipe": "Blocked environment binding: after admission, build from the exact reviewed merged source revision, record the immutable execution-image digest and independent native replay binary, and retain source/build inventories. No image or runnable launch is currently pinned by this card."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 120,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261122-prime31-sparse-h2-staged"
+    },
+    "notes": "This is a blocked tracking placeholder, not one executable scientific shard or an authorization to run the entire 77/385-input inventories. No task is leased or launched by this card. Keep argv=false and zero funding until a reviewed amendment binds the admitted selection, legitimate checkpoint/resume behavior, exact protocol/source/image, original deadline, budget and independent verifier. Use the existing gated staged wrapper; do not bypass its admission checks.",
+    "funding": {
+      "units": 0,
+      "rationale": "Zero priority funding while launch admission and remaining shared budget are unknown; this card must not preempt funded executable work. Funding units are scheduling priority, not a new dollar budget or permission to spend."
+    }
+  },
+  "owner_hint": "Prime31 auxiliary-isogeny lane with an authorized IsoLab EKS execution session"
+}
