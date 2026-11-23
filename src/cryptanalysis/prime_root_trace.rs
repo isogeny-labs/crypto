@@ -620,14 +620,19 @@ impl Engine<'_> {
             // base equal to the last useful base. The verifier supports both
             // this shorter trace and legacy traces with the terminal square.
             exponent >>= 1;
+            // The base is dead after the final exponent bit. Avoid the last
+            // polynomial square, reduction, and their field/certificate events.
+            // PowerStep records the unchanged base when exponent reaches zero.
             if exponent != 0 {
+                let product = self.square(&b)?;
+                b = self.div(&product, modulus)?.1;
+            }
                 let product = self.mul(&b, &b)?;
                 b = if product.len() < modulus.len() {
                     product
                 } else {
                     self.div(&product, modulus)?.1
                 };
-            }
             self.event(RootEvent::PowerStep {
                 id,
                 exponent,
@@ -3549,6 +3554,64 @@ mod round77_producer_regression {
     }
 }
 
+
+#[cfg(test)]
+mod round79_terminal_power_regression {
+    use super::*;
+
+    #[test]
+    fn terminal_base_elision_preserves_results_and_legacy_certificates() {
+        for p in [101, 65_521, 1_000_000_007, MAX_PRIME] {
+            let limits = RootLimits {
+                field_work: MAX_WORK,
+                split_attempts: 512,
+                events: MAX_EVENTS,
+                degree: MAX_DEGREE,
+            };
+            let polynomials = [
+                vec![p - 2, 1],
+                vproduct(&[p - 2, 1], &[p - 3, 1], p),
+                vec![p - 1, 0, 0, 1],
+            ];
+            for f in polynomials {
+                let report = solve(&f, p, 79, limits.clone(), &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "incomplete p={p} f={f:?}");
+                verify(&report).unwrap();
+
+                let mut moduli = HashMap::new();
+                let mut legacy = report.clone();
+                let mut terminal_steps = 0;
+                for event in &mut legacy.events {
+                    match event {
+                        RootEvent::PowerBegin { id, modulus, .. } => {
+                            moduli.insert(*id, modulus.clone());
+                        }
+                        RootEvent::PowerStep { id, exponent: 0, base, .. } => {
+                            terminal_steps += 1;
+                            let modulus = moduli.get(id).unwrap();
+                            // Reconstruct the historical v1 terminal step.
+                            *base = vdiv(&vproduct(base, base, p), modulus, p).unwrap().1;
+                        _ => {}
+                    }
+                }
+                assert!(terminal_steps > 0);
+                // Old stored certificates still pass, despite the optimized
+                // producer no longer spending work on dead terminal squares.
+                verify(&legacy).unwrap();
+
+                // An unrelated terminal base is not a valid certificate.
+                let mut malformed = report.clone();
+                let target = malformed.events.iter_mut().find(|event| matches!(
+                    event, RootEvent::PowerStep { exponent: 0, .. }
+                )).unwrap();
+                if let RootEvent::PowerStep { base, .. } = target {
+                    base.push(1);
+                assert!(verify(&malformed).is_err());
+            }
+        }
+    }
+}
+
 mod round89_column_accumulators {
 
     // Independent wide-arithmetic oracle. Never uses vproduct or vsquare.
@@ -3576,7 +3639,6 @@ mod round89_column_accumulators {
                     } else if case % 3 == 1 {
                         a[0] = p - 1;
                         b[width - 1] = p - 1;
-                    }
                     assert_eq!(vproduct(&a, &b, p), reference_product(&a, &b, p),
                         "product: p={p}, width={width}, case={case}");
                     assert_eq!(vsquare(&a, p), reference_product(&a, &a, p),
@@ -3784,7 +3846,6 @@ mod round100_traced_multiplication {
                         for (j, &y) in b.iter().enumerate() {
                             expected[i + j] = ((expected[i + j] as u128
                                 + x as u128 * y as u128) % p as u128) as u64;
-                        }
                     let expected = trim(expected);
                     let mut observer = |_: &RootEvent| -> Result<(), String> { Ok(()) };
                     let mut engine = Engine {
@@ -3853,7 +3914,6 @@ mod round107_inverse_chain {
                 unacknowledged: None,
                 sink_error: None,
                 roots: vec![],
-            };
             let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
             let actual = engine.inv(value).unwrap();
             assert_eq!(actual, vpow(value, p - 2, p), "value={value}");
