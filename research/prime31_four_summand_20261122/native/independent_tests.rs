@@ -11,6 +11,9 @@ use prime31_algebraic_ic::{Curve, PRIME31};
 use std::collections::BTreeSet;
 use std::io::Write;
 
+#[path = "b677_controls.rs"]
+mod b677_controls;
+
 type Affine = Option<(u64, u64)>;
 type SignedRows = BTreeSet<Vec<(usize, i64)>>;
 

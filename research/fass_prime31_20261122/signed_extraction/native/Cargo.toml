@@ -1,0 +1,21 @@
+[package]
+name = "fass-signed-extraction-qualifier"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "fass-signed-extraction-qualifier"
+path = "main.rs"
+
+[[bin]]
+name = "fass-signed-diagonal-identity"
+path = "diagonal_identity.rs"
+
+[dependencies]
+rand = { version = "=0.8.8", features = ["small_rng"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+hex = "=0.4.3"
