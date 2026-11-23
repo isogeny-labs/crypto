@@ -37,3 +37,5 @@ ready it, enable auto-merge or issue its merge. Publish this evidence/report as
 a separately tracked continuation and keep its actual artifact requirements
 explicit. No signed standing,
 successful applicable gate or merge authorization is inferred from this note.
+
+Evidence/report continuation: draft PR5052, first publication0b196b166252ca1d41a6e939388db40404144003. This Git publication includes metadata and the inspected PDF, not the117571164-byte full native archive. Future canonical artifact name: research/curve25519_torus_native_20261115/section-compiler-v1/native-run-v1.tar.xz. [pcc:unverified]
