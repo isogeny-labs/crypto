@@ -1,0 +1,227 @@
+{
+  "schema": "native-cpu-preflight-source-and-record-review/v1",
+  "review_id": "PREFLIGHT-DESIGN-REVIEW-11",
+  "created_utc": "2026-11-23T13:46:11.201Z",
+  "repository": "isogeny-labs/crypto",
+  "pr": 4996,
+  "committed_preparation": {
+    "commit": "0430733269dc2128185adc5b3c068470b1449ea1",
+    "tree": "15f051b09220af55604a0e20ef196b294254b799",
+    "base_commit": "310d7fb0d908e9ca32c7d9282e31810b700d52cd",
+    "publication_paths_checked": 128,
+    "preparation_manifest_entries_checked": 122,
+    "study_tree_files": 123,
+    "nested_Cargo_lock": "Present and exactly bound by committed manifest"
+  },
+  "scope": "Same-root-team read-only source/design, committed artifact binding and terminal record consistency review. No build/test/solver/Native replay/OpenSSL invocation, source edit, old-record edit, cloud/S3 access or secrets. No official independent-session experiment.review disposition or authenticated execution standing.",
+  "disposition": {
+    "committed_preparation_binding": "Supported within checked scope; all122manifest payload paths and128published identities match exact Git blobs.",
+    "source_variants": "All108inputs per variant match their frozen manifests; sole difference CPUlib is exact493 parent versus current/c478 candidate. Shared current worker/paper/verifier inputs remain equal.",
+    "qualification_records": "Locally consistent:47/0/0 per variant, two empty worker bin harnesses,7/0/0 driver tests and one empty audit harness. Earlier strict-Clippy101failure retained.",
+    "terminal_preflight": "Local terminal records are consistent with36/36 completed warmup cells,12 distinct targets, exact certificates/counters,36 positive point checks and72 intended negative rejections. This is readback, not independent execution.",
+    "main_panel": "Not yet frozen/qualified by this review. Pre-main source/control gaps below require explicit successor handling; no main performance acceptance is given.",
+    "pcc": "PCC-20261123-9c9ba9 and4e6b53 are unsigned statement records with empty proofs. No signed verdict, execution attestation or new theorem standing is supplied."
+  },
+  "evidence_manifest": {
+    "path": "preflight-design-evidence-11.json",
+    "bytes": 55415,
+    "sha256": "b87ee2c2c7f8bb084ba60190416c7da385fe86977c19603b0349aa588c9a9b57",
+    "entries": 154,
+    "publication_note": "Manifest is compact metadata; local-only raw compiler/binaries/terminal payload remain explicitly local."
+  },
+  "preserved_review10": {
+    "path": "/tmp/ecdlp-cpu-comparison-20261123/review/SOURCE-RECONCILIATION-10.json",
+    "sha256": "aa79df295fb683828b16b4fb6f7fc07d2d7db0aa44748a1d20dfb175d34d8d90",
+    "manifest_sha256": "dffe60256a01a95d86d7b0dc500e86d0c0d3dd1c92830324cb8fe4282ed82a00",
+    "old_records_edited": false
+  },
+  "checks": [
+    {
+      "id": "C11-1",
+      "status": "supported_within_scope",
+      "check": "Read all128published paths from043 Git objects;126listed blob identities/byte counts match producer publication metadata, and journal/ledger exactly equal base prefix plus supplied append. All123study files match local bytes;122entry SHA256SUMS-preflight-preparation fully matches committed bytes. Cargo.lock included."
+    },
+    {
+      "id": "C11-2",
+      "status": "supported_within_scope",
+      "check": "Expanded both108-input source manifests and compared each current byte to exact source-base Git object, except parent CPUlib to493. Only CPUlib differs; shared current scale.rs/paper module and all other inputs are identical."
+    },
+    {
+      "id": "C11-3",
+      "status": "supported_within_scope",
+      "check": "Expanded239entry frozen execution manifest with no mismatch.17qualified executables are mode0500.12variant and4driver original/copy bytes and hashes agree. Frozen checker hash2cabda898c4ac6d37660a96e9357c881d46d43828b44ed316d7311da0edbf853 equals the old review05 recorded checker identity."
+    },
+    {
+      "id": "C11-4",
+      "status": "supported_within_scope",
+      "check": "Read retained stage01/02/03/03b/03c/04 exits and raw harness summaries. Source-separated libraries each47pass; worker bin harnesses0; driver7pass; point-audit harness0. Initial03exit101 retained with both strict-Clippy diagnostics. Later03b/03c/04exit0; no qualification retries or solver reruns were performed by reviewer."
+    },
+    {
+      "id": "C11-5",
+      "status": "supported_source_design",
+      "check": "run maps only b to candidate, a/c same parent. All native argv useu; exclusive cell directories include logical arm/case/seed/round. row binds native arm/case/seed/replicate0/warmupfalse/verified/fieldbits/L0, integer fields and finite nonnegative worker clocks. analyze binds scalar/attempts/relation count to certificate; compares complete certificate bytes and structural signature across all arms/rounds per canonical case+seed."
+    },
+    {
+      "id": "C11-6",
+      "status": "supported_source_design_with_limits",
+      "check": "arbitrary_precision enabled; raw CSV columns remain strings; original certificate bytes hashed and retained. Derived median/range/ratio uses f64 explicitly as derived diagnostics. The structural signature is scalar/relations/attempts/preparations/built/probed/inversions/table capacity, not total operation cost."
+    },
+    {
+      "id": "C11-7",
+      "status": "supported_source_design",
+      "check": "point-audit validates full bounded unique schedule census, reads canonical unsigned curve/point/scalar values, and invokes existing separate OpenSSL implementation. Wrong scalar changeskto(k+1)modr; substitution changes(Qy,k)to(p-Qy,r-k). k>0,k<r,y>0,y<p make controls distinct/nonvacuous. Expected failure causes are exact scalar and fixed-public-target-binding messages; no order-reduced scalar multiplication is substituted."
+    }
+  ],
+  "findings": [
+    {
+      "id": "P11-1",
+      "priority": "P1",
+      "location": "invoke-worker.sh; native/src/main.rs external replay; native/src/bin/point-audit.rs; Root/run-stage.sh",
+      "finding": "Nested timeout calls lack --foreground. Their process groups can differ from the outer group targeted by whole-cgroup memory-stop TERM; killing that outer group need not terminate all workers/replayers/checkers. Successful phase05 never triggered this stop and does not validate forced descendant termination.",
+      "before_main": "Pin a successor using group-preserving nested timeout behavior on worker,Native replay and point-audit paths, with an explicit supervisor/finalizer boundary. Check descendant termination with a bounded benign control before relying on guard enforcement. Preserve043and phase05 bytes."
+    },
+    {
+      "id": "P11-2",
+      "priority": "P2",
+      "location": "Root/run-preflight.sh and native/src/main.rs analyze()",
+      "finding": "set-e skips analyzer after run failure. Analyzer also parses driver_seconds and computes group stats outside the per-cell catch; malformed/missing/nonfinite/negative driver clock can return before analysis.json. Analyzer trusts success booleans without checking exit-code consistency.",
+      "before_main": "After driver terminal, always invoke one separate finalizer while retaining original driver exit. Validate driver clock and exit/bool consistency inside per-cell catch before group insertion; require a failed attempted-cell regression to retain analysis flow. Parent plans a separate panel-v2 successor; not reviewed or qualified here."
+    },
+    {
+      "id": "P11-3",
+      "priority": "P2",
+      "location": "239-entry preflight-execution-before.sha256 versus local launch scripts",
+      "finding": "run-preflight.sh and run-stage.sh are absent from pre-call manifest and committed preparation. Their current review-time hashes bind only now-read bytes, not pre-call guard/pipeline execution. The binaries,config,source wrappers are otherwise pinned.",
+      "before_main": "Publish and pre-call-pin exact main launcher,outer guard and finalizer sources alongside source/binaries/config. Do not reconstruct or relabel a later launcher hash as pre-call evidence."
+    },
+    {
+      "id": "P11-4",
+      "priority": "P2",
+      "location": "schedule(10), measured rounds1..9",
+      "finding": "All arm/target cells are unique and each has9measured observations. Candidate b has3visits to each within-block position, but parent a/c have complementary2/4/3position counts. Per-target A/A ordering is not fully balanced; aggregate target balance does not establish per-target balance.",
+      "position_counts_by_case_plus_seed_ordinal_mod3": [
+        {
+          "mod": 0,
+          "a": [
+            2,
+            4,
+            3
+          ],
+          "b": [
+            3,
+            3,
+            3
+          ],
+          "c": [
+            4,
+            2,
+            3
+          ]
+        },
+        {
+          "mod": 1,
+          "a": [
+            4,
+            3,
+            2
+          ],
+          "b": [
+            3,
+            3,
+            3
+          ],
+          "c": [
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "mod": 2,
+          "a": [
+            3,
+            2,
+            4
+          ],
+          "b": [
+            3,
+            3,
+            3
+          ],
+          "c": [
+            3,
+            4,
+            2
+          ]
+        }
+      ],
+      "before_main": "Disclose original imbalance or prospectively version a balanced schedule without modifying phase05. Parent proposes3Latin rotation blocks with fixed block orientation and reversed middle block, plus explicit balance regression; no successor source/record is accepted by this review."
+    }
+  ],
+  "terminal_phase05": {
+    "source_and_inputs": "Original043preparation and239-entry manifest, unchanged; parent confirmed terminal before reviewer read outputs.",
+    "started_utc": "2026-11-23T13:37:24Z",
+    "finished_utc": "2026-11-23T13:39:07Z",
+    "recorded_elapsed_seconds_from_whole_second_timestamps": 103,
+    "exit_code": 0,
+    "physical_stop": 0,
+    "sampled_peak_cgroup_bytes": 13817049088,
+    "guard_bytes": 15032385536,
+    "counts": {
+      "planned": 36,
+      "attempted": 36,
+      "completed": 36,
+      "not_attempted": 0,
+      "failed_or_incomplete": 0,
+      "distinct_targets": 12,
+      "warmups": 36,
+      "measured": 0
+    },
+    "readback": "Checked every36raw row/status/certificate metadata/hash against analysis. All status exits0andfinite nonnegative driver clocks;12target certificate groups exactly equal acrossa/b/c. Read108point-audit stdout/stderr pairs and216progress lines:36positives and36ofeach intended negative reject, all matching exactexpectedmessages/codes. Post-call239line log is allOK; reviewer also expanded current239pins with no mismatch. No cryptographic verification tool was invoked.",
+    "local_payload_trees": [
+      {
+        "kind": "local_directory_digest",
+        "path": "/tmp/ecdlp-cpu-comparison-20261123/05-warmup-only-preflight",
+        "files": 8,
+        "bytes": 1605,
+        "sha256": "f5542e6f75dec6ae5be6558d358cb262f02a0dee854bc50ed8ab5771f138cdf3",
+        "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+        "published_in_git": false
+      },
+      {
+        "kind": "local_directory_digest",
+        "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight",
+        "files": 476,
+        "bytes": 3031359,
+        "sha256": "3d0bd575d5c597399e5272f1e4e0a2fc1e49fe9d236e1dc0812d095ba842f95f",
+        "digest_recipe": "Walk regular files recursively, reject symlinks; sort relative POSIX paths lexicographically; SHA256 UTF8 compact JSON array of [relative_path,byte_count,sha256_file] tuples; no trailing newline.",
+        "published_in_git": false
+      }
+    ],
+    "publication": "Phase05terminal raw payload is local-only at review time; preparation commit043does not remotely contain these later observations. Directory digests pin local contents and do not replace raw publication or authenticate producer execution.",
+    "runtime_feasibility": {
+      "formula": "10 times whole-preflight elapsed times1.25; conservative whole-second upper bound uses104s.",
+      "nominal_seconds": 1287.5,
+      "conservative_seconds": 1300,
+      "proposed_main_ceiling_seconds": 1800,
+      "result": "Fits as a descriptive planning estimate under this formula. Future protocol must freeze exact estimator,unchanged360cell census and hard stop. Neither25percent margin nor successful preflight guarantees future runtime; no silent census reduction or pooled preflight/main data."
+    }
+  },
+  "main_census": {
+    "calls": 360,
+    "warmups": 36,
+    "measured": 324,
+    "distinct_public_targets": 12,
+    "measured_per_arm_target": 9,
+    "source_factor": "staged numerator scratch parent versus reverse-pass no-numerator current implementation",
+    "parameters": "Same current public-target scale.rs,m8,batch64 and limits; seed101/202 are distinct points, schedule rounds are repeat executions.",
+    "scope": "Correctness/certificate/counter equality plus descriptive shared-hostL0durations; no S/rho comparison,ranked speed,exponent,novel mechanism or original84-case result."
+  },
+  "limitations": [
+    "Original native archive replay shares solver arithmetic; OpenSSL has separate point arithmetic but does not independently verify full relations,primality,Hasse/cardinality,work counters or execution history.",
+    "Copied binaries and raw compiler metadata are local-only and unsigned. Exact source/artifact byte identity is distinct from authenticated execution provenance.",
+    "Main360-call protocol,successorV2driver/order/guard controls,qualification and source freeze are not yet reviewed.",
+    "Full-root/doctest/lint/MSRV/CI and broad mathematical/external-performance gates are not inferred from these standalone records.",
+    "KB tools remain unavailable; inherited wrapper127fallback and direct source history provide no novelty clearance."
+  ]
+}

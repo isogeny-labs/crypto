@@ -1,0 +1,181 @@
+{
+  "schema": "native-cpu-main-readiness-source-review/v1",
+  "review_id": "MAIN-READINESS-REVIEW-12",
+  "created_utc": "2026-11-23T14:10:26.565Z",
+  "repository": "isogeny-labs/crypto",
+  "pr": 4996,
+  "scope": "Same-root-team read-only source/control-record and pre-freeze design review. V2 is local/unpublished and main protocol is draft. No official independent-session experiment.review acceptance,authenticated execution review or signed PCC standing.",
+  "disposition": {
+    "v2_source_changes": "Supported within reviewed bytes: clock/exit validation is caught per cell,measured order is balanced,three nested timeout paths use--foreground,and separate supervisor attempts finalization after driver terminal.",
+    "retained_control_records": "Locally consistent within their scoped mock failure and process-group signaling contracts. No cryptographic call is counted as performed by V2 canaries or dry analysis.",
+    "main_readiness": "Conditionally ready for prospective source/manifest/protocol sealing; not approved as a frozen executable panel. Remaining gates below are open and main data is absent.",
+    "source_custody": "Original V2 pre-unit receipt pins binaries only. Reviewed source hashes are later snapshots; no contemporaneous pre-build/pre-unit V2 source pin is established by this review.",
+    "fresh_reproduction": "Parent plans fresh source-prehashed clean-target reproduction and copied-unit qualification. No future reproduction result is reviewed or counted here."
+  },
+  "evidence_manifest": {
+    "path": "main-readiness-evidence-12.json",
+    "bytes": 15327,
+    "sha256": "886db67e9c862f5fc6f0c4e125a641e0a62962ad2bf1e12992dea8d6820e005d",
+    "entries": 39
+  },
+  "source_snapshot": {
+    "directory": "/tmp/ecdlp-cpu-comparison-20261123/review/main-readiness-inputs-12",
+    "entries": 11,
+    "main_driver_sha256": "fb8269af1d4b7e7059f07ab2cb09f0db514f84b06e8ddbba731992b66e3055df",
+    "auditor_sha256": "1f2f36d4b5506604515e699146615d089b9ca2ebfdfe1bf0c25339902c6fdf65",
+    "draft_protocol_sha256": "76dc6bb9ca86d39dcd12a2d87a0176d403ad104dc2b1cd4ef807956682cdffe5",
+    "note": "Exact reviewed bytes are copied exclusively under review; later draft/publication changes do not revise this snapshot. These are review-time source identities,not retroactively pre-call source receipts."
+  },
+  "review11_resolution": [
+    {
+      "issue": "P11-1 nested timeout groups",
+      "status": "Source-level remedy supported; bounded signal canary supported within records.",
+      "details": "Worker wrapper,external Native replay andpoint-audit-v2 use--foreground. Retained control shows9owned PIDs in PGID43659 before groupTERM; after status143 all recorded processes are gone or zombies. No live recorded process remains in receipt. RAM threshold,4GiB virtual enforcement and arbitrary unrecorded process behavior were not tested."
+    },
+    {
+      "issue": "P11-2 failure finalization/clock flags",
+      "status": "Source-level remedy and scoped controls supported.",
+      "details": "Success booleans now require integer exit0; finite nonnegative driver_seconds checked inside caught read closure before grouping. Two added regressions reject invalid measured clock9e999and inconsistent exit1 while retaining full flow. Supervisor records driver code,then invokes a separate guarded finalizer regardless of driver success. Finalizer reconstructs only missing config from frozen input and labels it; no attempt/cell is invented. It may still be refused by RAM admission or interrupted by its120s limit."
+    },
+    {
+      "issue": "P11-3 launch source pins",
+      "status": "Open for actual main; limited canary source pins exist.",
+      "details": "Mock-failure canary has7entry pre-call manifest covering driver,worker wrapper,guard,supervisor,finalizer,failure fixture andconfig. Actual main full pre-call manifest/config/host receipt and committed publication are not yet present. V2 pre-unit manifests have4binary entries only."
+    },
+    {
+      "issue": "P11-4 per-target order imbalance",
+      "status": "Resolved in reviewed V2 source and retained unit result.",
+      "details": "Measured rounds1..9 form3Latin rotation blocks, middle block reversed. Static administrative count gives360unique cells,36warmups and36arm/target measured groups, each position[3,3,3]. Round0exactly retains preflight mapping."
+    }
+  ],
+  "qualification": {
+    "recorded_build_phase": "06-v2-native-build exit0,13:49:44..13:50:01UTC; strict all-target Clippy logged,original Rust/offline locked release.",
+    "recorded_units": "06b exit0,13:53:52..13:53:53UTC: panel-v2 has10passed/0failed/0ignored; point-audit-v2 harness has0cases. Do not count empty harness as a positive point-audit test.",
+    "binaries": "Four copied mode0500 executables match pre-call SHA256 and original build paths. Raw compiler metadata records the same4executable paths and test/non-test roles. Post-control binary checks match. Binary test results do not resolve missing earlier source-hash custody.",
+    "controls_meaning": "New tests meaningfully check per-target position balance and attempted-invalid-clock/exit mismatch flow retention,alongside original schedule/identity/median/lossless/missing-panel controls.",
+    "checks_not_run": "Reviewer did not invoke any binary,tests,Clippy,build or schema checker."
+  },
+  "failure_canary": {
+    "type": "Mock infrastructure failure,not a solver measurement",
+    "worker": "control-fail-worker.sh exits23; no solver/replay invoked for failed worker.",
+    "driver_exit": 1,
+    "analysis_exit": 1,
+    "point_audit_status": 125,
+    "point_audit_status_meaning": "Skipped sentinel; auditor was not executed",
+    "planned": 360,
+    "attempted": 1,
+    "completed": 0,
+    "failed_or_incomplete": 1,
+    "not_attempted": 359,
+    "analysis_rows": 360,
+    "exact_certificate_and_counter_equality": false,
+    "post_hash_check": "7entries allOK",
+    "scope": "Demonstrates finalizer invocation and flow retention after an ordinary failed worker. It does not test all early-admission,timeout,filesystem or memory failures."
+  },
+  "signal_canary": {
+    "owned_processes": 9,
+    "original_group": 43659,
+    "three_paths": "worker wrapper +external replay-shaped timeout +point-audit-shaped timeout,all benignsleep fixtures",
+    "recorded_exit": 143,
+    "after_states": [
+      "gone",
+      "gone",
+      "gone",
+      "Z",
+      "Z",
+      "Z",
+      "gone",
+      "gone",
+      "gone"
+    ],
+    "no_live_recorded_processes": true,
+    "scope": "Administrative interpretation of retained process/start-tick/PGID receipts. No process was inspected live,killed or rerun by reviewer. It is not a RAM stress or4GiB enforcement test."
+  },
+  "dry_analysis": {
+    "recorded_phase": "06c exit0,13:56:22UTC",
+    "copied_records": 36,
+    "warmup_only": true,
+    "outputs_byte_equal_to_original": [
+      "analysis.json",
+      "summary.csv",
+      "latency.svg"
+    ],
+    "scope": "No Native solver or point replay was rerun. Warmup-only copy gives empty measured summaries; it does not directly exercise main9-observation timing groups. Source diff leaves summary/ratio logic unchanged,and unit controls cover median behavior."
+  },
+  "preservation": {
+    "original239pins": "Expanded by reviewer with zero mismatches; parent after-V2-controls log has239OK lines.",
+    "original_terminal_trees": "Recomputed phase05andpreflight directory digests equal frozen review11manifest,including476preflight files.",
+    "review10": "Unchanged SHA256aa79df295fb683828b16b4fb6f7fc07d2d7db0aa44748a1d20dfb175d34d8d90",
+    "review11": "Unchanged SHA256623085c77a300861a83bb29a90014170abddb1a0a8edd850d0358c225584bfe0",
+    "old_records_written_by_reviewer": []
+  },
+  "draft_protocol": {
+    "id": "HASHED-ECDL-CPU-SCRATCH-PUBLIC-TARGETS-20261123",
+    "freeze": {
+      "status": "draft",
+      "protocol_sha256": null,
+      "commit": null,
+      "frozen_at": null,
+      "filed_before_affected_data": false
+    },
+    "source_script_sha256": "fb8269af1d4b7e7059f07ab2cb09f0db514f84b06e8ddbba731992b66e3055df",
+    "script_hash_matches_reviewed_source": true,
+    "census": {
+      "calls": 360,
+      "warmups": 36,
+      "measured": 324,
+      "distinct_targets": 12,
+      "measured_per_arm_target": 9
+    },
+    "worker_mapping": "Same source108input variants and m8/batch64 public targets; a/cidenticalparent executable,bcurrent candidate; rawnativeuispreserved. Seeds101/202are distinct targets; rounds are repeat executions.",
+    "schema_logs": "Original draft13findings and successor1finding are retained; v3log records0findings. Canonical Python checker was metadata-only and not rerun by reviewer. Schema0does not authenticate execution or freeze the draft.",
+    "timing_scope": "Per-target descriptive L0median/full range/parent ratios beside A/A. No p-value,equivalence,ranked speed,S,rho,exponent or population-general claim."
+  },
+  "budget_semantics": {
+    "driver_seconds": 1500,
+    "finalization_seconds": 120,
+    "point_audit_seconds": 120,
+    "outer_kill_grace_seconds_per_phase": 10,
+    "sum_guarded_limits_plus_three_graces_seconds": 1770,
+    "nominal_planning_envelope_seconds": 1800,
+    "hard_total_supervisor_watchdog": false,
+    "remaining_overhead": "Supervisor/setup,post-callhash and metadataI/O have no total1800watchdog. Draft usesnominal; it must not be cited as a proven hard end-to-end cap.",
+    "preflight_estimate": "Whole-second upper104s x10x1.25=1300planning seconds. Fits1500driver and1800nominal envelope as a feasibility estimate; no runtime guarantee and no sample reduction.",
+    "finalization": "Always attempt after terminal driver; actual RAM admission refusal,120s timeout or missing output remains an incomplete result. Source never guarantees successful analysis under every fault.",
+    "memory_scope": "4GiB ulimit applies to worker process path only. Whole-cgroup15,032,385,536is a sampled stop threshold including retained host data,not a tested hard physical cap. Original threshold and virtual limit were not exercised by canary."
+  },
+  "remaining_gates": [
+    {
+      "id": "G12-1",
+      "status": "open",
+      "requirement": "Retain original missing V2 pre-build/pre-unit source custody. Fresh reproduction may capture exact sources/locks/launchers first,then build and copy/hash qualifiers before units. Bind any identical binary hashes as new evidence,not a backdated receipt. That new result requires separate inspection."
+    },
+    {
+      "id": "G12-2",
+      "status": "open",
+      "requirement": "Capture and pin actual main config,source/binary/guard/supervisor/finalizer/point-audit/host receipt in an exclusive pre-call manifest. Verify unchanged108-input worker variants and A/A binary identity again before first main call."
+    },
+    {
+      "id": "G12-3",
+      "status": "open",
+      "requirement": "Provide promised CPU/kernel/cgroup/affinity/runtime-library host receipt before calls. It is planned as administrative metadata,not captured by the reviewed run-main/stage source. Explicitly limit4GiB field to worker andfinalization promise toalwaysattempt."
+    },
+    {
+      "id": "G12-4",
+      "status": "open",
+      "requirement": "Freeze protocol with exact source/analysis hashes,unmodified360census and explicit phase/nominal-budget semantics; commit/push/fetch and verify actual published payload before data. Current reviewed protocol is draft with null freeze hash/commit/time andfiled_before_affected_data=false."
+    },
+    {
+      "id": "G12-5",
+      "status": "required_acceptance_condition",
+      "requirement": "Final acceptance must require original supervisor exit,driver/analysis/point-audit dispositions and post-callsource/hash log together. main-disposition.json lacks hash_exit; threezero fields alone do not establish full acceptance. Retain failure/unattempted cells and point-audit skipped sentinel125."
+    }
+  ],
+  "out_of_scope": [
+    "No main360-cell result exists or is accepted here.",
+    "No authenticated independent execution/session/PCC verdict is inferred from source,canary or producer booleans.",
+    "No new cryptographic mechanism,novelty,asymptotic improvement,full84-case comparison,primary rho ranking or general math proof.",
+    "Full-root/doctest/MSRV/CI and external comparisons remain separate; only recorded V2package strictClippy is read as passed."
+  ],
+  "reviewer_admin_errors": "One static schedule-count helper initially had an elsewarm typo and exited1 after successful preservation hashes; corrected admin helper then reported360unique cells,all positions[3,3,3]andround0parity. No source/result file was affected."
+}
