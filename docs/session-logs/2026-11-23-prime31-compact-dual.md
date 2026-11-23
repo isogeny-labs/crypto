@@ -23,3 +23,19 @@
 - A concurrent check showed #5020 merged after the previous handoff. An attempted source edit was safely aborted before writing, and work moved to distinct #5033 with a tracking first commit.
 - This runtime has no cargo/rustc or native subagent launcher. BigInt was required for exact Prime31 modular arithmetic: ordinary JS Number multiplication can exceed 2^53, so a non-exact scratch check was rejected and rerun in exact BigInt; no invalid arithmetic result was used as evidence.
 - Canonical shared daily log is oversized and contains pre-existing merge-conflict markers. A separate dated session supplement and PR handoff were used; the corrupted shared blob was not modified.
+
+## 2026-11-23 UTC — Post-integration live owner/CI check
+
+### What was done (commands, files, features)
+- Read back draft #5033, all four changed paths and exact original-Rust blob `98b760116e03c91461bf33741cb7b76c7d86a5ac`; confirmed 19 authored `#[test]` functions and a four-file PR diff: ACTIVE, this supplemental log, the research report and the isolated verifier.
+- Rechecked live #4970, #4974, #4993 and #4988: all are now **merged**; #4974's body still says the actual blind B677 extraction has not run, and #4993 explicitly did not seal negation_v5 as the best rho baseline. Corrected the task report and PR body to distinguish completed source controls from outstanding extraction and baseline qualification.
+- Inspected current #5033 head CI once: `migrate` in progress at https://github.com/isogeny-labs/crypto/actions/runs/45228950390/job/137882958752 and `review` skipped at https://github.com/isogeny-labs/crypto/actions/runs/45228950690/job/137882958178. Neither constitutes a passing native original-Rust test.
+
+### Decisions made (and why)
+- Keep #5033 draft and isolated, no Actions rerun, competing build, benchmark, publication or merge. The experimental reduction is a verifier-complexity control, not validated cold solver cost.
+
+### Open threads (unfinished, pick up next time)
+- Source-frozen cargo compilation, replay of both new adversarial cases, independent exact row recombination and same-stream dense/compact timing/RSS when a runner and reservation are available; genuine unknown-index B677 rows remain an external dependency.
+
+### Errors (what went wrong, how it was handled)
+- Repository ACTIVE and PR prose were behind merge events in other lanes; reconciled our own report/PR without modifying those merged branches or reclassifying their scientific outcomes. Canonical daily log's oversized/conflicted blob remains untouched.
