@@ -790,6 +790,7 @@ pub fn collect_relations(
                 }
             }
         };
+        let pos = pos;
         report.walk_wall_ns += started.elapsed().as_nanos() as u64;
 
         let (a, b, r) = (pos.a.clone(), pos.b.clone(), pos.r.clone());
@@ -811,13 +812,16 @@ pub fn collect_relations(
         let oracle_started = Instant::now();
         let classified = decompose_with(curve, &r, fb, params.smoothness);
         report.smoothness_wall_ns += oracle_started.elapsed().as_nanos() as u64;
-        if let Some(entries) = classified {
-            report.smooth_trials += 1;
-            relations.push(HecRelation {
-                coef_a: a,
-                coef_b: b,
-                entries: subtract_steps(entries, &taken),
-            });
+        match classified {
+            Some(entries) => {
+                report.smooth_trials += 1;
+                relations.push(HecRelation {
+                    coef_a: a,
+                    coef_b: b,
+                    entries: subtract_steps(entries, &taken),
+                });
+            }
+            None => {}
         }
     }
     report.relations = relations.len();
@@ -1197,7 +1201,7 @@ pub fn binary_hec_index_calculus_dlp(
 pub fn hasse_interval(curve: &HyperellipticCurve) -> (BigUint, BigUint) {
     let q = BigUint::one() << curve.m as usize;
     let root = q.sqrt();
-    let g = curve.genus;
+    let g = curve.genus as u32;
     let lo = if root.is_zero() {
         BigUint::one()
     } else {
