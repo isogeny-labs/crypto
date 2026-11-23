@@ -1,0 +1,43 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | gen-c3 | 144/144 | 0.861 | 1.089 | 3.141 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | gen-c4 | 144/144 | 0.774 | 1.000 | 3.038 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | gen-c4-aa | 144/144 | 0.774 | 1.000 | 3.038 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | gen-c4-m1 | 144/144 | 0.774 | 1.000 | 3.038 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kl-c3 | 144/144 | 0.858 | 1.074 | 3.018 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | kl-c4 | 144/144 | 0.710 | 0.912 | 2.731 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong | 144/144 | 0.882 | 0.946 | 1.522 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-v5 | 144/144 | 0.220 | 0.243 | 0.458 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs gen-c4 | gen-c4 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs gen-c4-aa | gen-c4-aa < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs gen-c4-m1 | gen-c4-m1 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs kl-c3 | kl-c3 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs kl-c4 | kl-c4 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs rho-v5 | rho-v5 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs gen-c4-aa | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs gen-c4-m1 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs kl-c3 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs kl-c4 | kl-c4 < gen-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs rho-v5 | rho-v5 < gen-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-aa vs gen-c4-m1 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-aa vs kl-c3 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-aa vs kl-c4 | kl-c4 < gen-c4-aa |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-aa vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-aa vs rho-v5 | rho-v5 < gen-c4-aa |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-m1 vs kl-c3 | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-m1 vs kl-c4 | kl-c4 < gen-c4-m1 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-m1 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4-m1 vs rho-v5 | rho-v5 < gen-c4-m1 |
+| icv1-f2m23-tm5197-1f85e9e1 | kl-c3 vs kl-c4 | kl-c4 < kl-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | kl-c3 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kl-c3 vs rho-v5 | rho-v5 < kl-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | kl-c4 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | kl-c4 vs rho-v5 | rho-v5 < kl-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
