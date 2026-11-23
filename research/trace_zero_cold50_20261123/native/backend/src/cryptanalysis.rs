@@ -14,7 +14,11 @@ pub mod trace_zero_point_chain;
 pub mod trace_zero_relations;
 #[path = "../../../../../src/cryptanalysis/trace_zero_linearized.rs"]
 pub mod trace_zero_linearized;
+#[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/cryptanalysis/trace_zero_word_field.rs"]
+pub mod trace_zero_word_field;
+#[cfg(any(feature = "legacy-halftrace", feature = "incumbent"))]
+#[path = "../../../baseline_word_field_snapshot.rs"]
 pub mod trace_zero_word_field;
 #[path = "../../../../../src/cryptanalysis/trace_zero_subspace_relations.rs"]
 pub mod trace_zero_subspace_relations;

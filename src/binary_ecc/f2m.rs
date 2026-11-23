@@ -1021,6 +1021,21 @@ impl TraceTables {
 
 /// The cached [`TraceTables`] for `irreducible` (built on first use).
 fn trace_tables(irreducible: &IrreduciblePoly) -> Arc<TraceTables> {
+    // These complete polynomials have one immutable map each, independent
+    // of tail-term ordering. Avoid allocating a key and locking a HashMap
+    // on every scalar trace/half-trace call for these qualified fields.
+    if packed_half_trace_modulus(irreducible) {
+        static FIELD83: OnceLock<Arc<TraceTables>> = OnceLock::new();
+        static FIELD131: OnceLock<Arc<TraceTables>> = OnceLock::new();
+        let cache = if irreducible.degree == 83 {
+            &FIELD83
+        } else {
+            &FIELD131
+        };
+        return cache
+            .get_or_init(|| Arc::new(TraceTables::new(irreducible)))
+            .clone();
+    }
     type Cache = Mutex<HashMap<(u32, Vec<u32>), Arc<TraceTables>>>;
     static CACHE: OnceLock<Cache> = OnceLock::new();
     let key = (irreducible.degree, irreducible.low_terms.clone());
@@ -1622,6 +1637,7 @@ pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
 
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
+#[inline]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
     use std::arch::x86_64::*;
     // The length checks also preserve memory safety for a short output:
@@ -1684,6 +1700,42 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
             out[i + j + 1] ^= hi;
         }
     }
+}
+
+/// Fused product/reduction for canonical 131-bit operands and
+/// X^131+X^13+X²+X+1. The caller must select by the complete modulus.
+/// Unsupported instruction sets retain the existing word-field fallback.
+#[inline]
+pub(crate) fn mul_mod131(a: &[u64; 3], b: &[u64; 3]) -> Option<[u64; 3]> {
+    debug_assert_eq!((a[2] | b[2]) & !7, 0);
+    #[cfg(target_arch = "x86_64")]
+    if has_hw_clmul() {
+        // SAFETY: runtime feature detection; fixed, canonical operand widths.
+        return Some(unsafe { mul_mod131_hw(a, b) });
+    }
+    None
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "pclmulqdq")]
+unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
+    // Compatible target features allow the fixed-size multiply to inline;
+    // its intermediate words need not cross the general reduction ABI.
+    let mut p = [0u64; 6];
+    mul_words_hw(a, b, &mut p);
+    let s0 = (p[2] >> 3) | (p[3] << 61);
+    let s1 = (p[3] >> 3) | (p[4] << 61);
+    let s2 = (p[4] >> 3) | (p[5] << 61);
+    let lo = s0 ^ (s0 << 1) ^ (s0 << 2) ^ (s0 << 13);
+    let mid = s1 ^ (s1 << 1) ^ (s1 << 2) ^ (s1 << 13) ^ (s0 >> 63) ^ (s0 >> 62) ^ (s0 >> 51);
+    let high = s2 ^ (s2 << 1) ^ (s2 << 2) ^ (s2 << 13) ^ (s1 >> 63) ^ (s1 >> 62) ^ (s1 >> 51);
+    let last = (p[2] & 7) ^ high;
+    let top = last >> 3;
+    [
+        p[0] ^ lo ^ top ^ (top << 1) ^ (top << 2) ^ (top << 13),
+        p[1] ^ mid,
+        last & 7,
+    ]
 }
 
 /// Reduce `value` modulo `m(z)` in place, a whole word at a time.
@@ -1907,6 +1959,55 @@ fn reduce_chunked(value: &mut [u64], irreducible: &IrreduciblePoly) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn fused_131_matches_bitwise_reduction_on_every_basis_product() {
+        if !has_hw_clmul() {
+            assert_eq!(mul_mod131(&[1, 0, 0], &[1, 0, 0]), None);
+            return;
+        }
+        let irr = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![0, 1, 2, 13],
+        };
+        for i in 0..131usize {
+            for j in 0..131usize {
+                let mut a = [0; 3];
+                let mut b = [0; 3];
+                a[i / 64] = 1u64 << (i % 64);
+                b[j / 64] = 1u64 << (j % 64);
+                let mut reference = [0; 6];
+                reference[(i + j) / 64] = 1u64 << ((i + j) % 64);
+                reduce_bitwise(&mut reference, &irr);
+                assert_eq!(mul_mod131(&a, &b).unwrap(), reference[..3], "i={i}, j={j}");
+            }
+        }
+    }
+
+    #[test]
+    fn qualified_trace_cache_shares_only_the_complete_same_polynomial() {
+        let first = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![0, 1, 2, 13],
+        };
+        let permuted = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![13, 2, 1, 0],
+        };
+        let different = IrreduciblePoly::deg_131();
+        assert!(Arc::ptr_eq(&trace_tables(&first), &trace_tables(&permuted)));
+        assert!(!Arc::ptr_eq(
+            &trace_tables(&first),
+            &trace_tables(&different)
+        ));
+        for irr in [&first, &permuted, &different] {
+            let direct = TraceTables::new(irr);
+            let cached = trace_tables(irr);
+            assert_eq!(direct.trace_mask, cached.trace_mask);
+            assert_eq!(direct.half_trace, cached.half_trace);
+        }
+    }
 
     #[test]
     fn direct_hex_matches_legacy_at_word_boundaries_and_preserves_syntax() {

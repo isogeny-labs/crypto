@@ -3,7 +3,7 @@
 //! reductions reuse the production word kernels; exact maps are prepared once.
 use crate::binary_ecc::{
     curve::{point_add, point_neg},
-    f2m::{mul_words_into, reduce_words, spread32},
+    f2m::{mul_mod131, mul_words_into, reduce_words, spread32},
     operation_tally, BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly,
 };
 pub type Element = [u64; 3];
@@ -107,6 +107,11 @@ impl WordField {
     #[inline]
     pub fn mul(&self, a: Element, b: Element) -> Element {
         operation_tally::tick(self.m, "mul");
+        if self.reduction == 131 {
+            if let Some(value) = mul_mod131(&a, &b) {
+                return value;
+            }
+        }
         let mut out = [0u64; 7];
         mul_words_into(&a[..self.nw], &b[..self.nw], &mut out);
         self.reduce(out)
@@ -121,7 +126,7 @@ impl WordField {
         }
         self.reduce(out)
     }
-    #[inline]
+    #[inline(always)]
     fn reduce(&self, mut p: [u64; 7]) -> Element {
         match self.reduction {
             83 => {
