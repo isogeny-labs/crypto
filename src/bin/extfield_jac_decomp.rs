@@ -901,6 +901,10 @@ fn run_lp(inst: &Instance, tag: u64, w_cal: f64) -> Value {
 }
 
 #[cfg(test)]
+#[expect(
+    clippy::items_after_test_module,
+    reason = "the command entry point follows this established test module"
+)]
 mod tests {
     use super::*;
 

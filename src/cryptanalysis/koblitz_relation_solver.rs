@@ -160,9 +160,37 @@ fn invmod(a: u64, m: u64) -> Option<u64> {
 /// Export for the factor-base-logs precompute, which tracks coefficient
 /// rank in `u64` while its relation rows stay big-integer for the final
 /// dense solve.
+///
+/// Orbit coefficients and walk multipliers are almost always a single
+/// limb already below `m`.  Paying a heap `BigUint` division for every
+/// zero or reduced entry was the dominant cost of feeding a sparse
+/// relation into the word solver.
 pub(crate) fn to_u64_mod(v: &BigUint, m: u64) -> u64 {
-    let reduced = v % BigUint::from(m);
-    reduced.to_u64_digits().first().copied().unwrap_or(0)
+    debug_assert!(m >= 2);
+    if v.is_zero() {
+        return 0;
+    }
+    let digits = v.to_u64_digits();
+    match digits.len() {
+        0 => 0,
+        1 => {
+            let x = digits[0];
+            if x < m {
+                x
+            } else {
+                x % m
+            }
+        }
+        2 => {
+            let lo = digits[0];
+            let hi = digits[1];
+            ((lo as u128 | ((hi as u128) << 64)) % m as u128) as u64
+        }
+        _ => {
+            let reduced = v % BigUint::from(m);
+            reduced.to_u64_digits().first().copied().unwrap_or(0)
+        }
+    }
 }
 
 impl IncrementalRelationSolver {
@@ -224,8 +252,12 @@ impl IncrementalRelationSolver {
         let hb = mulmod(h, to_u64_mod(&relation.coef_b, m), m);
         let ha = mulmod(h, to_u64_mod(&relation.coef_a, m), m);
         let mut row = vec![0u64; self.unknowns + 2];
+        // An m-summand relation touches only a handful of orbits; skip
+        // the dense BigUint zeros without a conversion call.
         for (o, c) in relation.row.iter().enumerate().take(self.unknowns) {
-            row[o] = to_u64_mod(c, m);
+            if !c.is_zero() {
+                row[o] = to_u64_mod(c, m);
+            }
         }
         row[self.unknowns] = submod(0, hb, m);
         row[self.unknowns + 1] = ha;
@@ -875,6 +907,30 @@ mod tests {
         let too_big = BigUint::from(1u8) << 70;
         assert!(IncrementalRelationSolver::new(4, &too_big).is_none());
         assert!(IncrementalRelationSolver::new(4, &BigUint::zero()).is_none());
+    }
+
+    #[test]
+    fn to_u64_mod_matches_biguint_remainder_on_small_and_wide_inputs() {
+        let m = 262_543u64;
+        assert_eq!(to_u64_mod(&BigUint::zero(), m), 0);
+        assert_eq!(to_u64_mod(&BigUint::from(1u32), m), 1);
+        assert_eq!(to_u64_mod(&BigUint::from(m - 1), m), m - 1);
+        assert_eq!(to_u64_mod(&BigUint::from(m), m), 0);
+        assert_eq!(to_u64_mod(&BigUint::from(m + 17), m), 17);
+        let two_limb = (BigUint::from(u64::MAX) << 3usize) + BigUint::from(91u32);
+        let want = (&two_limb % BigUint::from(m))
+            .to_u64_digits()
+            .first()
+            .copied()
+            .unwrap_or(0);
+        assert_eq!(to_u64_mod(&two_limb, m), want);
+        let wide = (BigUint::one() << 130usize) + BigUint::from(12345u32);
+        let want = (&wide % BigUint::from(m))
+            .to_u64_digits()
+            .first()
+            .copied()
+            .unwrap_or(0);
+        assert_eq!(to_u64_mod(&wide, m), want);
     }
 
     #[test]

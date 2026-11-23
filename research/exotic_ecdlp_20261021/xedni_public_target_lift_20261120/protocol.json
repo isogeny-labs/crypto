@@ -1,0 +1,23 @@
+{
+  "schema": "xedni-public-target-lift-protocol-v1",
+  "source_panel_protocol": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/protocol.json",
+  "source_search": "research/exotic_ecdlp_20261021/xedni_target_conditioned_lift_20261120/run.py",
+  "source_search_raw_sha256": "ce1ab19d3df0ccde7af47a81aaa3247037aa61e2e4915ba36d10d6b26cd3a231",
+  "source_rho_solver": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/run_sage.py",
+  "source_rho_solver_raw_sha256": "b35b225581e7994121e60277c1956c37eaa0b132ab8a84c3fbf50da3344b2907",
+  "cells": [{"p":1531,"q":1553},{"p":2287,"q":2251}],
+  "height_cap": 8192,
+  "control_scalars": [1,2],
+  "random_target_seed": "xedni-public-lift-v1-20261120",
+  "random_targets_per_cell": 3,
+  "random_target_rule": "for j=0,1,2 choose k=1+int(SHA256(UTF8(seed+':'+p+':'+j)).hexdigest(),16) mod (q-1), require distinct k and exclude control scalars; construct T=k*Qbar outside timing; pass only public coordinates to lift search",
+  "canonical_lift_law": "in increasing H=max(abs(a),b) from 1 to 8192, then b and a, test b>=1, gcd(abs(a),b)=1, b not divisible by p, x=a/b^2 reducing to supplied public x; test exact integral quadratic discriminant and both y roots; accept first exact rational point reducing to supplied (x,y)",
+  "lift_search_status": "found records exact (a,b,c) giving x=a/b^2,y=c/b^3; height_cap_exhausted and wall_cap_exhausted retain counters and cap; a found lift alone is a stage result and no scalar is returned by this arm",
+  "rho_arm": "same public point T, pinned deterministic Floyd rho with target-specific hashed seed, independently verified scalar",
+  "target_order": "Qbar, 2Qbar positive controls, then three SHA-256-seeded public points per reduction",
+  "arm_order": "lift then rho for even zero-based target index; rho then lift for odd index",
+  "lift_wall_cap_seconds": 180,
+  "rho_wall_cap_seconds": 120,
+  "online_interval": "lift timer includes target-conditioned b/a generation, all discriminant tests, found-point verification or cap; rho timer includes target-dependent walk through scalar verification; exclude process startup and curve/fixture construction",
+  "claim_boundary": "fixed curve and two prime reductions; exact capped lift-stage coverage and same-public-point rho full-solve reference, with distinct result types and ordinary-host timing"
+}
