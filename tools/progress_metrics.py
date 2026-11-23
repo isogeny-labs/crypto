@@ -1093,12 +1093,13 @@ def trace_complete_cost(ref, since):
                             ("holdout", "summary-holdout-a1.json"),
                             ("flat", "summary-flat-a1.json"),
                             ("field", "summary-field-a1.json"),
-                            ("scaling", "summary-scaling-a1.json")):
+                            ("scaling", "summary-scaling-a1.json"),
+                            ("hot", "summary-hot-a1.json")):
         path = f"{root}/{filename}"
         for date, commit, text in file_history(ref, path, since_day):
             data = json.loads(text)
             source = f"{path}@{commit}"
-            size = "640" if stage == "scaling" else "128"
+            size = "640" if stage in ("scaling", "hot") else "128"
             for group, row in data.get("groups", {}).items():
                 if not group.endswith("/" + size):
                     continue
@@ -1109,15 +1110,22 @@ def trace_complete_cost(ref, since):
                      unit="wall_s", better="neutral",
                      label="Stored complete-adapter median; includes bounded censors; local PCC unverified",
                      source=source)
+                emit(prefix + ".mean_wall_s", row["complete_wall_s"]["mean"],
+                     date=date, problem="prime-labelled-pool-recovery",
+                     unit="wall_s", better="neutral",
+                     label="Stored native complete-cost mean; bounded censors retained, PCC unverified",
+                     source=source)
                 emit(prefix + ".censored", row.get("censored"), date=date,
                      problem="prime-labelled-pool-recovery", unit="target-round units",
                      better="neutral", label="Retained bounded censors; PCC unverified",
                      source=source)
             for group, row in data.get("target_cluster_mean_ratios", {}).items():
-                if not group.endswith("_over_current-tuned8/" + size):
+                reference = "native-tuned64" if stage == "hot" else "current-tuned8"
+                if not group.endswith("_over_" + reference + "/" + size):
                     continue
                 arm = group.split("_over_", 1)[0].replace("-", "_")
-                prefix = f"trace.complete.{stage}.b{size}.{arm}.over_rho8"
+                reference_id = "native_rho64" if stage == "hot" else "rho8"
+                prefix = f"trace.complete.{stage}.b{size}.{arm}.over_{reference_id}"
                 for suffix, field in (("mean_ratio", "ratio"),
                                       ("upper95", "bootstrap_q95")):
                     emit(prefix + "." + suffix, row[field], date=date,
