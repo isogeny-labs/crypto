@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261121T1920Z-c25519-sibling-panel",
+  "latest_record": "20261123T1558Z-ecc2k-adjoint-primary",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 19,
     "invalid": 8,
-    "measured": 310,
+    "measured": 312,
     "open": 63
   },
   "repo": "crypto",
@@ -31202,6 +31202,81 @@
       ],
       "problem": "kernel:ecbench_wallfix_prs",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 44024513.0,
+      "latest": 44024513.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_complete_cold_ir",
+      "points": [
+        {
+          "commit": "3dff594d6343",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1558Z-ecc2k-adjoint-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            44024513.0,
+            44024513.0
+          ],
+          "summary": "Fixed d12 n131 uniform:13.82% fewer complete-oracle Ir,6.18% fewer cold-query Ir;90 exact matching rows. Unsigned producer evidence; root release compilation timed out before tests.",
+          "value": 44024513.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-index-calculus-projector",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 18070727.0,
+      "latest": 18070727.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_complete_oracle_ir",
+      "points": [
+        {
+          "commit": "3dff594d6343",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1558Z-ecc2k-adjoint-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            18070727.0,
+            18070727.0
+          ],
+          "summary": "Fixed d12 n131 uniform:13.82% fewer complete-oracle Ir,6.18% fewer cold-query Ir;90 exact matching rows. Unsigned producer evidence; root release compilation timed out before tests.",
+          "value": 18070727.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-index-calculus-projector",
+      "unit": "ir"
+    },
+    {
+      "better": "neutral",
+      "first": 12.0,
+      "latest": 12.0,
+      "latest_derived": {},
+      "metric": "preflight_calls",
+      "points": [
+        {
+          "commit": "adb69a3b7bd7",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T1557Z-ecc2k-adjoint-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Calibrated fixed12-call engineering feasibility panel, not a native-runtime or primary improvement claim.",
+          "value": 12.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-index-calculus-projector",
+      "unit": "count"
     },
     {
       "better": "lower",
