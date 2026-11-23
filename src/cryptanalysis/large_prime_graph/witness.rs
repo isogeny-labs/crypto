@@ -41,6 +41,10 @@ pub struct WitnessStats {
     pub reroot_steps: u64,
     /// Tree edge steps used while reducing original or anchor rows.
     pub path_steps: u64,
+    /// Parent-pointer reads required to discover paths, even where their
+    /// common suffix requires no field arithmetic after cancellation.
+    #[serde(default)]
+    pub parent_path_reads: u64,
     /// Successful-stream modular inversions: one per nonempty input row,
     /// plus one per anchor cache miss. Parent hops reuse edge inverses.
     pub inverse_calls: u64,
@@ -69,6 +73,7 @@ struct Reduced {
     basis: BTreeMap<usize, u64>,
     scans: u64,
     steps: u64,
+    reads: u64,
 }
 
 /// A root-normalized anchor plus its original-tree-edge source combination.
@@ -205,6 +210,27 @@ impl ForestWitnessExtractor {
         flips
     }
 
+    /// Eliminate one oriented tree edge, updating the exact original-row map.
+    fn reduce_edge(
+        &self,
+        child: usize,
+        par: usize,
+        edge_idx: usize,
+        coefficient: &mut u64,
+        out: &mut Reduced,
+    ) {
+        let edge = &self.rows[edge_idx];
+        let parent_b = coeff_at(edge, par);
+        let pair = self.edge_inverses[edge_idx]
+            .expect("independent tree edge must retain both inverses");
+        let inverse = if edge[0].0 == child { pair[0] } else { pair[1] };
+        debug_assert_eq!(mul_mod(coeff_at(edge, child), inverse, self.p), 1);
+        let factor = mul_mod(*coefficient, inverse, self.p);
+        add_term(&mut out.basis, edge_idx, neg_mod(factor, self.p), self.p);
+        *coefficient = neg_mod(mul_mod(factor, parent_b, self.p), self.p);
+        out.steps += 1;
+    }
+
     fn project(&self, row: &[(usize, u64)]) -> Result<Reduced, LpGraphError> {
         let p = self.p;
         let mut out = Reduced {
@@ -212,25 +238,55 @@ impl ForestWitnessExtractor {
             basis: BTreeMap::new(),
             scans: 0,
             steps: 0,
+            reads: 0,
         };
-        for &(vertex, a) in row {
-            let root = self.root(vertex);
-            let (path, scans) = self.path_to_root(vertex, root);
-            out.scans += scans;
-            let mut coefficient = a;
-            for (child, par, edge_idx) in path {
-                let edge = &self.rows[edge_idx];
-                let parent_b = coeff_at(edge, par);
-                let pair = self.edge_inverses[edge_idx]
-                    .expect("independent tree edge must retain both inverses");
-                let inverse = if edge[0].0 == child { pair[0] } else { pair[1] };
-                debug_assert_eq!(mul_mod(coeff_at(edge, child), inverse, p), 1);
-                let factor = mul_mod(coefficient, inverse, p);
-                add_term(&mut out.basis, edge_idx, neg_mod(factor, p), p);
-                coefficient = neg_mod(mul_mod(factor, parent_b, p), p);
-                out.steps += 1;
+        // A pair in one component shares its parent path above the LCA.
+        // Reduce the edge-disjoint paths separately, then reduce the common
+        // suffix once only if the combined coefficient survives. This avoids
+        // redundant field/map operations but still charges BOTH path lookups.
+        if row.len() == 2 && self.root(row[0].0) == self.root(row[1].0) {
+            let root = self.root(row[0].0);
+            let (left, left_scans) = self.path_to_root(row[0].0, root);
+            let (right, right_scans) = self.path_to_root(row[1].0, root);
+            out.scans += left_scans + right_scans;
+            out.reads += (left.len() + right.len()) as u64;
+            let mut shared = 0;
+            while shared < left.len()
+                && shared < right.len()
+                && left[left.len() - shared - 1] == right[right.len() - shared - 1]
+            {
+                shared += 1;
             }
-            add_term(&mut out.roots, root, coefficient, p);
+            let mut alpha = row[0].1;
+            for &(child, par, edge_idx) in &left[..left.len() - shared] {
+                self.reduce_edge(child, par, edge_idx, &mut alpha, &mut out);
+            }
+            let mut beta = row[1].1;
+            for &(child, par, edge_idx) in &right[..right.len() - shared] {
+                self.reduce_edge(child, par, edge_idx, &mut beta, &mut out);
+            }
+            let mut gamma = add_mod(alpha, beta, p);
+            if gamma != 0 {
+                // Shared edges are ordered LCA -> root in the left path.
+                for &(child, par, edge_idx) in &left[left.len() - shared..] {
+                    self.reduce_edge(child, par, edge_idx, &mut gamma, &mut out);
+                }
+                add_term(&mut out.roots, root, gamma, p);
+            }
+        } else {
+            // Distinct-root pairs, singleton anchors and empty rows retain
+            // the original independent path-to-root projection.
+            for &(vertex, a) in row {
+                let root = self.root(vertex);
+                let (path, scans) = self.path_to_root(vertex, root);
+                out.scans += scans;
+                out.reads += path.len() as u64;
+                let mut coefficient = a;
+                for (child, par, edge_idx) in path {
+                    self.reduce_edge(child, par, edge_idx, &mut coefficient, &mut out);
+                }
+                add_term(&mut out.roots, root, coefficient, p);
+            }
         }
         Ok(out)
     }
@@ -302,6 +358,7 @@ impl ForestWitnessExtractor {
         let mut outstanding = Vec::new();
         let mut scans = projection.scans;
         let mut steps = projection.steps;
+        let mut reads = projection.reads;
         let mut inversions = inversions;
         let mut new_anchor_caches = Vec::new();
         let mut cache_hits = 0u64;
@@ -319,6 +376,7 @@ impl ForestWitnessExtractor {
                     let anchor_projection = self.project(&self.rows[anchor_idx])?;
                     scans += anchor_projection.scans;
                     steps += anchor_projection.steps;
+                    reads += anchor_projection.reads;
                     let alpha = anchor_projection.roots.get(&root).copied().unwrap_or(0);
                     let inverse = inv_mod(alpha, p).ok_or(LpGraphError::NonInvertible {
                         value: alpha,
@@ -345,6 +403,7 @@ impl ForestWitnessExtractor {
         // All arithmetic has succeeded: metadata and forest changes follow.
         self.stats.adjacency_scans += scans;
         self.stats.path_steps += steps;
+        self.stats.parent_path_reads += reads;
         self.stats.inverse_calls += inversions;
         self.stats.anchor_cache_hits += cache_hits;
         self.stats.anchor_cache_misses += new_anchor_caches.len() as u64;
