@@ -1,6 +1,6 @@
 {
   "schema": "prime31-sparse-h2.run-status/v1",
-  "pr": "https://github.com/isogeny-labs/crypto/pull/4937",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4945",
   "status": "implementation_qualified_campaign_blocked_before_launch",
   "current_development_receipt": "DEVELOPMENT_RECEIPT_v2.json",
   "current_development_claim": "PCC-20261123-f873fd",
@@ -14,14 +14,30 @@
     "root_library_tests_executed": 0,
     "root_library_gate": "blocked_by_unchanged_root_Cargo_toml_duplicate_name_key_line132"
   },
-  "screening": {"prepared": 77, "selected": 0, "attempted": 0, "completed": 0},
-  "recovery_candidates": {"prepared": 385, "selected": 0, "attempted": 0, "completed": 0},
+  "screening": {
+    "prepared": 77,
+    "selected": 0,
+    "attempted": 0,
+    "completed": 0
+  },
+  "recovery_candidates": {
+    "prepared": 385,
+    "selected": 0,
+    "attempted": 0,
+    "completed": 0
+  },
   "natural_query_campaigns_executed": 0,
   "rho_campaigns_executed": 0,
   "performance_claim": null,
   "prior_protocols": [
-    {"requested_cells": 55, "status": "unchanged_open_requirement"},
-    {"requested_cells": 230, "status": "unchanged_open_requirement"}
+    {
+      "requested_cells": 55,
+      "status": "unchanged_open_requirement"
+    },
+    {
+      "requested_cells": 230,
+      "status": "unchanged_open_requirement"
+    }
   ],
   "admission": {
     "checkpoint": "failed_missing_upload_token_or_AWS_profile",
@@ -36,5 +52,19 @@
     "retries": 0
   },
   "backlog": "backlog/XP-20261122-prime31-sparse-h2-staged",
-  "next_action": "Satisfy actual execution admission, publish exact pilot selection, then execute and independently replay pilot before selecting recovery candidates."
+  "next_action": "Satisfy actual execution admission, publish exact pilot selection, then execute and independently replay pilot before selecting recovery candidates.",
+  "tracking_pr": {
+    "number": 4937,
+    "merged_at_utc": "2026-11-23T03:19:01Z",
+    "head": "119a80e149336827faf9408656d136cbc4ea0a1d",
+    "merge_commit": "eb17aa8c9cf8ee9f1abe3f3fbffb29bb3cb035bc",
+    "contents": "One initial task-tracking line; implementation was not in that PR"
+  },
+  "source_publication": {
+    "commit": "44e05d7b3cb7ece0d1e761222f8df4e64b2197a5",
+    "source_check_exit_code": 0,
+    "matched_source_files": 84,
+    "receipt": "POST_PUBLICATION.json",
+    "claim": "PCC-20261123-a63eb4"
+  }
 }

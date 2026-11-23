@@ -3,7 +3,7 @@
 ## Goal
 
 Implement the user-approved follow-up to merged PR #4923 and record the changes,
-checks and experiment status in PR #4937. Preserve the ordinary Prime31 target,
+checks and experiment status in PR #4945. Preserve the ordinary Prime31 target,
 whole fibers, original evidence and existing resource/budget ceilings.
 
 ## Lead / hypothesis
@@ -23,10 +23,12 @@ source/image, live budget/capacity and original absolute deadline before dispatc
 
 ## State
 
-Implementation is qualified on lane/prime31-sparse-h2, PR #4937: 76 optimized
+Implementation is qualified on lane/prime31-sparse-h2, PR #4945: 76 optimized
 native tests passed across 17 immutable executables, with no failures or ignored
-tests. Standing remains unverified under PCC-20261123-f873fd. PDF/source
-publication and the published-source check are the current steps. No new
+tests. Standing remains unverified under PCC-20261123-f873fd. The PDF and exact
+source are published in the continuation after tracking-only PR #4937 merged.
+The immutable source check matches all 84 inventoried files at commit
+44e05d7b3cb7ece0d1e761222f8df4e64b2197a5. No new
 Prime31 natural-query campaign, census or rho solve has launched. The historical
 55- and 230-cell protocols and receipts remain unchanged. [pcc:unverified]
 
@@ -34,8 +36,8 @@ Prime31 natural-query campaign, census or rho solve has launched. The historical
 
 The coordinated build, immutable qualification, prospective inputs and fixed
 identity certificate are retained. Use DEVELOPMENT_RECEIPT_v2.json and ERRATA.md;
-the original receipt is frozen. Publish the exact source and record its
-source-check receipt. Reconcile experiment admission and execute run-staged.sh
+the original receipt is frozen. The source-check receipt is in
+POST_PUBLICATION.json. Reconcile experiment admission and execute run-staged.sh
 only after all actual gates succeed. The root-library gate stopped before tests
 on an unchanged duplicate key in root Cargo.toml; it remains open.
 
