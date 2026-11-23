@@ -373,6 +373,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [x] Track every task first in docs/ACTIVE.md and a draft PR; roll /goal out to isogeny-labs repos (claude, started 2026-11-17, branch track-first-active, PR #4499)
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
+- [ ] Publish two-hop finite-kernel native/Lean evidence and reports; complete inherited generic formal-instance review before acceptance; preserve written geometry and rational-endpoint/morphism distinctions (Codex, started 2026-11-23, branch lane/chained-twohop-descent-20261123, PR #4992).
+
 ## Blocked / questions for the owner
 - Extension-field graph IC (PR #4986): new Rust traced unit/six backends and one-worker qualifier are scoped-qualified; new Runpod comparison is blocked by balance-0.42USD and unavailable checkpoint upload. Full-library syntax and inherited benchmark-record gates remain separate. See [measurement admission](../problems/extension-ic-trace-measurement-admission.md). No successor pod or parity claim. [pcc:unverified]
 
