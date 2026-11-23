@@ -303,9 +303,14 @@ mod tests {
             for &x in &w {
                 for &y in &w {
                     let s=f.add(x,y);let t=f.mul(x,y);
-                    assert_eq!(poly_eval_pair(f,&h0,s,t),0);
-                    assert_eq!(poly_eval_pair(f,&h1,s,t),0);
-                    assert_eq!(valid_t(f,&h0,&h1,&q,&r,s,t),Curve::new(P,A,B).s3(x,y,z)==0);
+                    // The H_j remainders agree with membership only ON F_z=0;
+                    // off that hypersurface, H_j differs by a multiple of F_z.
+                    let satisfies_s3=Curve::new(P,A,B).s3(x,y,z)==0;
+                    if satisfies_s3 {
+                        assert_eq!(poly_eval_pair(f,&h0,s,t),0);
+                        assert_eq!(poly_eval_pair(f,&h1,s,t),0);
+                    }
+                    assert_eq!(valid_t(f,&h0,&h1,&q,&r,s,t),satisfies_s3);
                 }
             }
         }
