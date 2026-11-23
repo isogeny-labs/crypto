@@ -1,6 +1,6 @@
 # Graph-IC: cache equation-edge inverses for coefficient-aware LP witnesses
 
-Date: 2026-11-23. Owning draft: [PR #4988](https://github.com/isogeny-labs/crypto/pull/4988). Status: **source authored; hosted native gate pending at this checkpoint**. [pcc:unverified]
+Date: 2026-11-23. Owning draft: [PR #4988](https://github.com/isogeny-labs/crypto/pull/4988). Status: **24/24 original-source release Rust tests passed** at commit `0dc8dc8` in [run 45149347868](https://github.com/isogeny-labs/crypto/actions/runs/45149347868), job 137606480996, 2026-11-23T09:43 UTC. The later [paired-inverse follow-up](PAIRED_INVERSE_20261123.md) has its own pending validation.  [pcc:unverified]
 
 ## Concrete bottleneck and mathematical mechanism
 
@@ -27,3 +27,9 @@ Prior evidence: [rooted-parent study](ROOTED_WITNESS_PATHS_20261123.md), [forest
 Acquire an **authentic public Prime31 coefficient-bearing two-LP collector stream** with independently checked original elliptic-curve source equations and recorded subgroup order ell. Replay same stream through the frozen rooted-parent control and cached arm, along with pivot and MST filters. Require identical source coefficients, RHS and projected factor-base rank in uncapped controls, no invalid elliptic-curve relation, and zero replay failures. Charge inversions, modular multiplies, input normalization, path and reroot hops, witness map operations, coefficient caps/refusals, peak memory, and isolated same-host wall time. Test capped cases separately: completeness claims do not survive arbitrary witness refusal. Only after this phase and a complete-cold target solve is a performance claim admissible.
 
 No paid compute, merge, auto-merge or leaderboard promotion authorized.
+
+## Observed test receipt and follow-up
+
+[GitHub Actions #45149347868](https://github.com/isogeny-labs/crypto/actions/runs/45149347868) completed **SUCCESS**, 24/24 native source-exact release Rust tests, 0 failures, using Rust 1.100.0 at `0dc8dc835b811285075ea2c062746839b0d46a48`. Original-source SHA256 in job: `large_prime_graph.rs` `fee0933ec8ad49e455538f060c282e70c0420d46a61bbdaabad5b7786e15c42c`, `witness.rs` `0d5bb8bd83a9b248b23dccdcc6d7a164a960254395ecb9c143d6e42ff7000c62`, `tests/large_prime_graph.rs` `a61e6c77247884cae99bbf5561ee4accda1952447ef386f1352c4b164ab2afbc`. This is not full-root Rust validation, group-witness verification or Prime31 measurement. The separate [PCC gate #45149434858](https://github.com/isogeny-labs/crypto/actions/runs/45149434858) failed, including an untagged PR-prose `speedup` mention; it must not be conflated with the passing native gate. [pcc:unverified]
+
+The subsequent [paired endpoint inversion study](PAIRED_INVERSE_20261123.md) reduces successful-stream admission inversions from I+A to U+A by using a product inverse for two coefficients. This requires a **fresh source-exact validation**: the 24/24 receipt applies only to the pre-paired revision. [pcc:unverified]
