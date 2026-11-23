@@ -8,7 +8,8 @@
 //! cargo test --release --example chained_s3_prime31_pilot
 //! cargo run --release --example chained_s3_prime31_pilot
 
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
+use std::time::Instant;
 
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use crypto_lib::cryptanalysis::semaev_prime_poly::Curve as SemaevCurve;
@@ -27,13 +28,21 @@ enum XKey {
 }
 
 fn key(p: PrimePoint) -> XKey {
-    if p.infinity { XKey::Infinity } else { XKey::Finite(p.x) }
+    if p.infinity {
+        XKey::Infinity
+    } else {
+        XKey::Finite(p.x)
+    }
 }
 fn full_key(p: PrimePoint) -> (bool, u64, u64) {
     (p.infinity, p.x, p.y)
 }
 fn signed(c: &PrimeCurve, p: PrimePoint, negative: bool) -> PrimePoint {
-    if negative { c.neg(p) } else { p }
+    if negative {
+        c.neg(p)
+    } else {
+        p
+    }
 }
 
 #[derive(Default, Debug)]
@@ -319,7 +328,223 @@ fn scalar(c: &PrimeCurve, mut point: PrimePoint, mut k: u64) -> PrimePoint {
     r
 }
 
+// A row records the signed multiplicity of every factor-base coordinate.
+// Keep the zero row: shorter decompositions and cancellation are real cases.
+type RelationRow = Vec<i8>;
+type PairWitness = (usize, usize, bool, bool);
+
+fn row(base: &[PrimePoint], witness: &[(usize, bool)]) -> RelationRow {
+    let mut result = vec![0; base.len()];
+    for &(index, negative) in witness {
+        result[index] += if negative { -1 } else { 1 };
+    }
+    result
+}
+
+fn signed_pairs(
+    c: &PrimeCurve,
+    base: &[PrimePoint],
+    st: &mut Stats,
+) -> HashMap<(bool, u64, u64), Vec<PairWitness>> {
+    let mut table = HashMap::<_, Vec<_>>::new();
+    for i in 0..base.len() {
+        for j in i..base.len() {
+            for si in [false, true] {
+                for sj in [false, true] {
+                    let sum = c.add(&mut st.ops, signed(c, base[i], si), signed(c, base[j], sj));
+                    table.entry(full_key(sum)).or_default().push((i, j, si, sj));
+                }
+            }
+        }
+    }
+    table
+}
+
+fn pair_point(
+    c: &PrimeCurve,
+    base: &[PrimePoint],
+    pair: PairWitness,
+    st: &mut Stats,
+) -> PrimePoint {
+    c.add(
+        &mut st.ops,
+        signed(c, base[pair.0], pair.2),
+        signed(c, base[pair.1], pair.3),
+    )
+}
+
+fn verify_row(
+    c: &PrimeCurve,
+    base: &[PrimePoint],
+    target: PrimePoint,
+    coefficients: &[i8],
+    st: &mut Stats,
+) {
+    let mut sum = PrimePoint::INFINITY;
+    for (index, &coefficient) in coefficients.iter().enumerate() {
+        for _ in 0..coefficient.unsigned_abs() {
+            let term = signed(c, base[index], coefficient < 0);
+            sum = c.add(&mut st.ops, sum, term);
+        }
+    }
+    assert_eq!(sum, target, "accepted row fails group verification");
+}
+
+fn right_summands(
+    c: &PrimeCurve,
+    base: &[PrimePoint],
+    m: usize,
+    st: &mut Stats,
+) -> Vec<(Vec<(usize, bool)>, PrimePoint)> {
+    let mut right = Vec::new();
+    if m == 3 {
+        for k in 0..base.len() {
+            for sk in [false, true] {
+                right.push((vec![(k, sk)], signed(c, base[k], sk)));
+            }
+        }
+    } else {
+        assert_eq!(m, 4);
+        for k in 0..base.len() {
+            for l in k..base.len() {
+                for sk in [false, true] {
+                    for sl in [false, true] {
+                        let pair = (k, l, sk, sl);
+                        right.push((vec![(k, sk), (l, sl)], pair_point(c, base, pair, st)));
+                    }
+                }
+            }
+        }
+    }
+    right
+}
+
+fn all_group_rows(
+    c: &PrimeCurve,
+    base: &[PrimePoint],
+    target: PrimePoint,
+    right: &[(Vec<(usize, bool)>, PrimePoint)],
+    table: &HashMap<(bool, u64, u64), Vec<PairWitness>>,
+    st: &mut Stats,
+) -> BTreeSet<RelationRow> {
+    let mut rows = BTreeSet::new();
+    for (suffix, sum) in right {
+        let residue = c.add(&mut st.ops, target, c.neg(*sum));
+        st.probes += 1;
+        if let Some(matches) = table.get(&full_key(residue)) {
+            for &(i, j, si, sj) in matches {
+                let mut terms = vec![(i, si), (j, sj)];
+                terms.extend(suffix);
+                let coefficients = row(base, &terms);
+                verify_row(c, base, target, &coefficients, st);
+                rows.insert(coefficients);
+            }
+        }
+    }
+    rows
+}
+
+fn all_s3_rows(
+    c: &PrimeCurve,
+    base: &[PrimePoint],
+    target: PrimePoint,
+    right: &[(Vec<(usize, bool)>, PrimePoint)],
+    table: &HashMap<XKey, Vec<(usize, usize)>>,
+    st: &mut Stats,
+) -> BTreeSet<RelationRow> {
+    let mut rows = BTreeSet::new();
+    for (suffix, sum) in right {
+        let residue = c.add(&mut st.ops, target, c.neg(*sum));
+        st.probes += 1;
+        if let Some(matches) = table.get(&key(residue)) {
+            for &(i, j) in matches {
+                st.lift_candidates += 1;
+                for si in [false, true] {
+                    for sj in [false, true] {
+                        let pair = (i, j, si, sj);
+                        if pair_point(c, base, pair, st) != residue {
+                            continue;
+                        }
+                        let mut terms = vec![(i, si), (j, sj)];
+                        terms.extend(suffix);
+                        let coefficients = row(base, &terms);
+                        verify_row(c, base, target, &coefficients, st);
+                        rows.insert(coefficients);
+                    }
+                }
+            }
+        }
+    }
+    rows
+}
+
+fn small_field_panel(arm: &str, m: usize, size: usize) {
+    assert!([3, 4].contains(&m));
+    let c = PrimeCurve { p: 101, a: 7, b: 4 };
+    let sem = SemaevCurve::new(c.p, c.a, c.b);
+    let base = factor_base(&c, size);
+    let mut targets = vec![PrimePoint::INFINITY];
+    for x in 0..c.p {
+        if let Some(y) = c.sqrt(c.rhs(x)) {
+            targets.push(PrimePoint::affine(x, y));
+            if y != 0 {
+                targets.push(PrimePoint::affine(x, c.p - y));
+            }
+        }
+    }
+    let start = Instant::now();
+    let mut stats = Stats::default();
+    let mut produced = 0usize;
+    let mut successful_targets = 0usize;
+    let (keys, entries, max_bucket, right_states) = match arm {
+        "group" => {
+            let table = signed_pairs(&c, &base, &mut stats);
+            let right = right_summands(&c, &base, m, &mut stats);
+            for target in targets.iter().copied() {
+                let rows = all_group_rows(&c, &base, target, &right, &table, &mut stats);
+                produced += rows.len();
+                successful_targets += usize::from(!rows.is_empty());
+            }
+            (
+                table.len(),
+                table.values().map(Vec::len).sum::<usize>(),
+                table.values().map(Vec::len).max().unwrap_or(0),
+                right.len(),
+            )
+        }
+        "s3" => {
+            let table = build_s3_pairs(&c, &sem, &base, &mut stats);
+            let right = right_summands(&c, &base, m, &mut stats);
+            for target in targets.iter().copied() {
+                let rows = all_s3_rows(&c, &base, target, &right, &table, &mut stats);
+                produced += rows.len();
+                successful_targets += usize::from(!rows.is_empty());
+            }
+            (
+                table.len(),
+                table.values().map(Vec::len).sum::<usize>(),
+                table.values().map(Vec::len).max().unwrap_or(0),
+                right.len(),
+            )
+        }
+        _ => panic!("arm must be group or s3"),
+    };
+    println!(
+        "arm={arm} p={} a={} b={} m={m} B={size} targets={} successful_targets={} verified_rows={} table_keys={keys} table_entries={entries} max_bucket={max_bucket} right_states={right_states} probes={} lift_candidates={} roots={} s3_inversions={} adds={} doubles={} group_field_ops={:?} elapsed_ns={}",
+        c.p, c.a, c.b, targets.len(), successful_targets, produced,
+        stats.probes, stats.lift_candidates, stats.s3_root_calls,
+        stats.s3_denominator_inversions, stats.ops.adds, stats.ops.doubles,
+        stats.ops.field_ops, start.elapsed().as_nanos()
+    );
+}
+
 fn main() {
+    let args: Vec<_> = std::env::args().collect();
+    if args.get(1).is_some_and(|value| value == "--small-field") {
+        assert_eq!(args.len(), 5, "usage: --small-field group|s3 3|4 base_size");
+        small_field_panel(&args[2], args[3].parse().unwrap(), args[4].parse().unwrap());
+        return;
+    }
     let c = PrimeCurve { p: P, a: A, b: B };
     let sem = SemaevCurve::new(P, A, B);
     let g = PrimePoint::affine(GX, GY);
@@ -335,8 +560,12 @@ fn main() {
     let mut targets = Vec::new();
     for k in 0..32usize {
         let mut ops = GroupOps::default();
-        let t = c.add(&mut ops, base[k % base.len()], base[(3*k+5) % base.len()]);
-        targets.push(c.add(&mut ops, t, base[(7*k+11) % base.len()]));
+        let t = c.add(
+            &mut ops,
+            base[k % base.len()],
+            base[(3 * k + 5) % base.len()],
+        );
+        targets.push(c.add(&mut ops, t, base[(7 * k + 11) % base.len()]));
         targets.push(scalar(&c, g, (k as u64 + 13) * 97_531));
     }
     let mut hits = 0usize;
@@ -349,8 +578,24 @@ fn main() {
             hits += 1;
         }
     }
-    println!("field={} curve_a={} curve_b={} order={} B={} targets={} matches={}", P, A, B, N, base.len(), targets.len(), hits);
-    println!("group: entries={} probes={} adds={} doubles={} field_ops={:?}", group_table.len(), group_stats.probes, group_stats.ops.adds, group_stats.ops.doubles, group_stats.ops.field_ops);
+    println!(
+        "field={} curve_a={} curve_b={} order={} B={} targets={} matches={}",
+        P,
+        A,
+        B,
+        N,
+        base.len(),
+        targets.len(),
+        hits
+    );
+    println!(
+        "group: entries={} probes={} adds={} doubles={} field_ops={:?}",
+        group_table.len(),
+        group_stats.probes,
+        group_stats.ops.adds,
+        group_stats.ops.doubles,
+        group_stats.ops.field_ops
+    );
     println!("S3: xkeys={} probes={} roots={} inversions={} diagonal={} lift_candidates={} adds={} doubles={} field_ops={:?}", s3_table.len(), s3_stats.probes, s3_stats.s3_root_calls, s3_stats.s3_denominator_inversions, s3_stats.exceptional_x_equal, s3_stats.lift_candidates, s3_stats.ops.adds, s3_stats.ops.doubles, s3_stats.ops.field_ops);
     println!("NOTE: S3 inversions are separate from group field_ops; counts are not comparable work units until calibrated. No ECDLP solved.");
 }
@@ -358,6 +603,89 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn exhaustive_rows(
+        c: &PrimeCurve,
+        base: &[PrimePoint],
+        target: PrimePoint,
+        m: usize,
+    ) -> BTreeSet<RelationRow> {
+        fn visit(
+            c: &PrimeCurve,
+            base: &[PrimePoint],
+            target: PrimePoint,
+            m: usize,
+            terms: &mut Vec<(usize, bool)>,
+            sum: PrimePoint,
+            rows: &mut BTreeSet<RelationRow>,
+            ops: &mut GroupOps,
+        ) {
+            if terms.len() == m {
+                if sum == target {
+                    rows.insert(row(base, terms));
+                }
+                return;
+            }
+            for index in 0..base.len() {
+                for negative in [false, true] {
+                    terms.push((index, negative));
+                    let next = c.add(ops, sum, signed(c, base[index], negative));
+                    visit(c, base, target, m, terms, next, rows, ops);
+                    terms.pop();
+                }
+            }
+        }
+        let mut rows = BTreeSet::new();
+        visit(
+            c,
+            base,
+            target,
+            m,
+            &mut Vec::new(),
+            PrimePoint::INFINITY,
+            &mut rows,
+            &mut GroupOps::default(),
+        );
+        rows
+    }
+
+    #[test]
+    fn complete_rows_match_exhaustive_oracle_for_three_and_four_terms() {
+        let c = PrimeCurve { p: 101, a: 7, b: 4 };
+        let sem = SemaevCurve::new(c.p, c.a, c.b);
+        let base = factor_base(&c, 4);
+        let mut targets = vec![PrimePoint::INFINITY];
+        for x in 0..c.p {
+            if let Some(y) = c.sqrt(c.rhs(x)) {
+                targets.push(PrimePoint::affine(x, y));
+                if y != 0 {
+                    targets.push(PrimePoint::affine(x, c.p - y));
+                }
+            }
+        }
+        let group_table = signed_pairs(&c, &base, &mut Stats::default());
+        let s3_table = build_s3_pairs(&c, &sem, &base, &mut Stats::default());
+        for m in [3, 4] {
+            let right = right_summands(&c, &base, m, &mut Stats::default());
+            for target in targets.iter().copied() {
+                let expected = exhaustive_rows(&c, &base, target, m);
+                let group = all_group_rows(
+                    &c,
+                    &base,
+                    target,
+                    &right,
+                    &group_table,
+                    &mut Stats::default(),
+                );
+                let s3 = all_s3_rows(&c, &base, target, &right, &s3_table, &mut Stats::default());
+                assert_eq!(
+                    group, expected,
+                    "point-pair method, m={m}, target={target:?}"
+                );
+                assert_eq!(s3, expected, "S3 method, m={m}, target={target:?}");
+            }
+        }
+    }
 
     fn brute(c: &PrimeCurve, base: &[PrimePoint], target: PrimePoint) -> bool {
         let mut ops = GroupOps::default();
@@ -393,13 +721,16 @@ mod tests {
             if let Some(y) = c.sqrt(c.rhs(x)) {
                 targets.push(PrimePoint::affine(x, y));
                 if y != 0 {
-                    targets.push(PrimePoint::affine(x, c.p-y));
+                    targets.push(PrimePoint::affine(x, c.p - y));
                 }
             }
         }
         for t in targets {
             let b = brute(&c, &base, t);
-            assert_eq!(query_group(&c, &sem, &base, &group, t, &mut st_group).is_some(), b);
+            assert_eq!(
+                query_group(&c, &sem, &base, &group, t, &mut st_group).is_some(),
+                b
+            );
             assert_eq!(query_s3(&c, &sem, &base, &s3, t, &mut st_s3).is_some(), b);
         }
     }
@@ -411,9 +742,10 @@ mod tests {
             let sem = SemaevCurve::new(p, a, b);
             let base = factor_base(&c, 12);
             let mut st = Stats::default();
-            let pair_panel: Vec<_> = base.iter().flat_map(|&v| {
-                base.iter().map(move |&w| (v, w))
-            }).collect();
+            let pair_panel: Vec<_> = base
+                .iter()
+                .flat_map(|&v| base.iter().map(move |&w| (v, w)))
+                .collect();
             let mut batched = Stats::default();
             let batch = s3_roots_many(&c, &sem, &pair_panel, &mut batched);
             assert_eq!(batched.s3_denominator_inversions, 1, "one batched inverse");
