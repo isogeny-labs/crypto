@@ -1,0 +1,12 @@
+# F4 Ir split of the elimination on jv_cover --exp ccov p=53 (104 tests, RAYON_NUM_THREADS=1, callgrind --toggle-collect=*f4_with_arithmetic*, AVX2 path since valgrind hides AVX-512). Source: l3.cg via tools/cgaddr.py + tools/blocks.py; F4 total 1,136,909,960 Ir
+kernel	elements_or_events	Ir	Ir_per_element	element_width	notes
+cascade sparse scatter acc[cc]+=neg*v (closure#41, 2 copies)	10,784,279 updates	108,064,553	9-11	u64 acc, (u32,u64) reducer entries	scalar scatter; 396,020 eliminations, 27.2 entries/reducer, 10,273 pair rows
+cascade column scan + per-elim setup (u64 Barrett test of acc[c])	1.685M cols scanned, 0.90M reducer-col tests	~44,000,000	3-21	u64	
+cascade gather free cols + u64 Barrett narrowing	1,646,637 elts	30,413,778	18	u64->u32	scalar u128 Barrett
+rref32_deferred widen u32->u64 (closure#1 + closure#7 outer)	~4.6M elts	~10,400,000	2.25	u32->u64	SSE2
+reduce_lazy_by pivot checks (u64 Barrett on acc[c])	~1.04M checks	~21,000,000	17-19	u64	
+add_lazy_avx2 dense lazy axpy	314,976 calls, 5,303,907 4-lane iters (21.2M lane-elts)	62,003,385 (+3,035,227 add_lazy wrapper)	2.25/elt body, ~45/call fixed	u32 pivot x u64 acc, 4 lanes	avg 67 elts/call
+store narrowing u64->u32 (rref32_deferred self)	2,975,402 elts	34,217,123	11.5	u64->u32	scalar u128 Barrett, unrolled x2
+first-nonzero scan + Barrett32 pivot scaling	~3.1M + 1.40M elts	~23,900,000	~2.5 / 9.25	u32	SSE2 Barrett32
+back-substitution narrowing u64->u32 (closure#7 inner)	2,234,396 elts	45,805,118	20.5	u64->u32	SSE2-emulated 64-bit Barrett
+TOTAL elimination (inclusive cascade 188.6M + rref32_deferred 227.0M)		~415,600,000 (36.5% of F4)		

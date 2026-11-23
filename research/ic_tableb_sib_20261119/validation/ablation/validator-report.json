@@ -1,0 +1,1134 @@
+{
+ "checks": {
+  "readme_checks": 39,
+  "readme_mismatches_at_printed_precision": 2,
+  "runs_per_arm": {
+   "P20": {
+    "rho-neg": 96,
+    "sib8-p256": 96,
+    "tw2l": 96,
+    "tw2l-sg": 96,
+    "tw2l-sib": 96
+   },
+   "P22": {
+    "rho-neg": 96,
+    "sib8-p256": 96,
+    "tw2l": 96,
+    "tw2l-sg": 96,
+    "tw2l-sib": 96
+   },
+   "P24": {
+    "rho-neg": 96,
+    "sib8-p256": 96,
+    "tw2l": 96,
+    "tw2l-sg": 96,
+    "tw2l-sib": 96
+   }
+  },
+  "scalars": {
+   "P20": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   },
+   "P22": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   },
+   "P24": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   }
+  }
+ },
+ "gaps": [
+  {
+   "gap": "No second host, no EKS/S3 in this container: the replays ran on the same container and CPU class as the producer (L0, 4 shared cores). Counted cost does not depend on the host, so the replays are valid; the wall-time columns (ns/GAE, end-to-end wall) are not independently reproduced.",
+   "id": "G1-no-second-host"
+  },
+  {
+   "gap": "Every replay used target/release/ecbench (sha256 b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0), the binary that produced the sessions. No cargo build was allowed, so there is no from-source rebuild as in research/ic_tableb_binary_ksum_20261115/validator. The independent checks are (a) a re-execution of all 480 deterministic runs per session by a different session than the producer's, (b) the validator's own Python prime-field arithmetic ([recovered]G == target for every record), and (c) an own recompute of every headline from records.jsonl.",
+   "id": "G2-same-binary"
+  },
+  {
+   "gap": "No pcc claim filed and no keyring signature on the certificate or the report: every statement here is [pcc:unverified]. AGENTS.md 'Sabotage is assumed' asks for signed artifacts; none could be produced in this container.",
+   "id": "G3-no-pcc-or-keyring"
+  },
+  {
+   "gap": "bitop/v1 ratios are recomputed from each record's own work.bitops_per_sqrt_r field; the per-primitive bitop widths behind that field were not re-derived (the unit's definition is the producer's).",
+   "id": "G4-bitop-not-rederived"
+  },
+  {
+   "gap": "L0 runs, no isolation tier and no native L2/replay/A/A admission: valid for counted cost only; no wall-time or L2 claim is validated.",
+   "id": "G5-no-isolation"
+  }
+ ],
+ "headline": [
+  {
+   "claimed": 1.3038270834147392,
+   "name": "P20/S/rho-neg/w0",
+   "recomputed": 1.3038270834147392
+  },
+  {
+   "claimed": 1.4177687943740944,
+   "name": "P20/S/rho-neg/w0.1",
+   "recomputed": 1.4177687943740949
+  },
+  {
+   "claimed": 2.443244193008294,
+   "name": "P20/S/rho-neg/w1",
+   "recomputed": 2.443244193008295
+  },
+  {
+   "claimed": 1.3973015341655814,
+   "name": "P20/S/sib8-p256/w0",
+   "recomputed": 1.3973015341655817
+  },
+  {
+   "claimed": 1.6640162504585039,
+   "name": "P20/S/sib8-p256/w0.1",
+   "recomputed": 1.6640162504585045
+  },
+  {
+   "claimed": 4.064448697094811,
+   "name": "P20/S/sib8-p256/w1",
+   "recomputed": 4.064448697094812
+  },
+  {
+   "claimed": 2.8809921109222807,
+   "name": "P20/S/tw2l/w0",
+   "recomputed": 2.8809921109222816
+  },
+  {
+   "claimed": 3.048923410436639,
+   "name": "P20/S/tw2l/w0.1",
+   "recomputed": 3.048923410436638
+  },
+  {
+   "claimed": 4.5603051060658455,
+   "name": "P20/S/tw2l/w1",
+   "recomputed": 4.5603051060658455
+  },
+  {
+   "claimed": 1.968226620966794,
+   "name": "P20/S/tw2l-sg/w0",
+   "recomputed": 1.968226620966795
+  },
+  {
+   "claimed": 2.136060190713431,
+   "name": "P20/S/tw2l-sg/w0.1",
+   "recomputed": 2.136060190713431
+  },
+  {
+   "claimed": 3.646562318433158,
+   "name": "P20/S/tw2l-sg/w1",
+   "recomputed": 3.6465623184331553
+  },
+  {
+   "claimed": 2.310067024121068,
+   "name": "P20/S/tw2l-sib/w0",
+   "recomputed": 2.310067024121068
+  },
+  {
+   "claimed": 2.5768794701817117,
+   "name": "P20/S/tw2l-sib/w0.1",
+   "recomputed": 2.5768794701817117
+  },
+  {
+   "claimed": 4.978191484727501,
+   "name": "P20/S/tw2l-sib/w1",
+   "recomputed": 4.9781914847275015
+  },
+  {
+   "claimed": 1.0752883242475115,
+   "name": "P20/sib8-p256_over_rho-neg/raw_gae",
+   "recomputed": 1.0752883242475113
+  },
+  {
+   "claimed": 0.9895549699314027,
+   "name": "P20/sib8-p256_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.9895549699314043
+  },
+  {
+   "claimed": 1.1684494701119768,
+   "name": "P20/sib8-p256_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.1684494701119752
+  },
+  {
+   "claimed": 1.07169236775327,
+   "name": "P20/sib8-p256_over_rho-neg/band_w0",
+   "recomputed": 1.0716923677532697
+  },
+  {
+   "claimed": 1.1736866103003207,
+   "name": "P20/sib8-p256_over_rho-neg/band_w0.1",
+   "recomputed": 1.1736866103003212
+  },
+  {
+   "claimed": 1.6635458333333335,
+   "name": "P20/sib8-p256_over_rho-neg/band_w1",
+   "recomputed": 1.6635458333333333
+  },
+  {
+   "claimed": 1.196648941173138,
+   "name": "P20/sib8-p256_over_rho-neg/bitop",
+   "recomputed": 1.1966489411731385
+  },
+  {
+   "claimed": 1.101314859596233,
+   "name": "P20/sib8-p256_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.1013148595962345
+  },
+  {
+   "claimed": 1.3002355102479826,
+   "name": "P20/sib8-p256_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.300235510247981
+  },
+  {
+   "claimed": 1.7753644066679686,
+   "name": "P20/tw2l-sib_over_rho-neg/raw_gae",
+   "recomputed": 1.775364406667968
+  },
+  {
+   "claimed": 1.63639808267146,
+   "name": "P20/tw2l-sib_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.6363980826714617
+  },
+  {
+   "claimed": 1.9261320395327786,
+   "name": "P20/tw2l-sib_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.9261320395327757
+  },
+  {
+   "claimed": 1.7717587351161428,
+   "name": "P20/tw2l-sib_over_rho-neg/band_w0",
+   "recomputed": 1.7717587351161428
+  },
+  {
+   "claimed": 1.8175597321701042,
+   "name": "P20/tw2l-sib_over_rho-neg/band_w0.1",
+   "recomputed": 1.8175597321701045
+  },
+  {
+   "claimed": 2.0375333333333336,
+   "name": "P20/tw2l-sib_over_rho-neg/band_w1",
+   "recomputed": 2.037533333333333
+  },
+  {
+   "claimed": 1.9517547895392517,
+   "name": "P20/tw2l-sib_over_rho-neg/bitop",
+   "recomputed": 1.9517547895392524
+  },
+  {
+   "claimed": 1.7995665604096358,
+   "name": "P20/tw2l-sib_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.7995665604096391
+  },
+  {
+   "claimed": 2.1168134829212906,
+   "name": "P20/tw2l-sib_over_rho-neg/bitop_ci_hi",
+   "recomputed": 2.1168134829212883
+  },
+  {
+   "claimed": 0.6056718948565772,
+   "name": "P20/sib8-p256_over_tw2l-sib/raw_gae",
+   "recomputed": 0.6056718948565774
+  },
+  {
+   "claimed": 0.5979147782583121,
+   "name": "P20/sib8-p256_over_tw2l-sib/raw_gae_ci_lo",
+   "recomputed": 0.5979147782583124
+  },
+  {
+   "claimed": 0.6135296493050962,
+   "name": "P20/sib8-p256_over_tw2l-sib/raw_gae_ci_hi",
+   "recomputed": 0.6135296493050963
+  },
+  {
+   "claimed": 0.6048748887263243,
+   "name": "P20/sib8-p256_over_tw2l-sib/band_w0",
+   "recomputed": 0.6048748887263241
+  },
+  {
+   "claimed": 0.6457485768013682,
+   "name": "P20/sib8-p256_over_tw2l-sib/band_w0.1",
+   "recomputed": 0.6457485768013684
+  },
+  {
+   "claimed": 0.8164508556097241,
+   "name": "P20/sib8-p256_over_tw2l-sib/band_w1",
+   "recomputed": 0.8164508556097242
+  },
+  {
+   "claimed": 0.6131143869028902,
+   "name": "P20/sib8-p256_over_tw2l-sib/bitop",
+   "recomputed": 0.6131143869028903
+  },
+  {
+   "claimed": 0.6050417804186871,
+   "name": "P20/sib8-p256_over_tw2l-sib/bitop_ci_lo",
+   "recomputed": 0.6050417804186868
+  },
+  {
+   "claimed": 0.6212946999580418,
+   "name": "P20/sib8-p256_over_tw2l-sib/bitop_ci_hi",
+   "recomputed": 0.6212946999580412
+  },
+  {
+   "claimed": 0.6836896701984142,
+   "name": "P20/tw2l-sg_over_tw2l/raw_gae",
+   "recomputed": 0.6836896701984141
+  },
+  {
+   "claimed": 0.6697091427825835,
+   "name": "P20/tw2l-sg_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.669709142782584
+  },
+  {
+   "claimed": 0.6979620484108642,
+   "name": "P20/tw2l-sg_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.6979620484108642
+  },
+  {
+   "claimed": 0.6831766784452298,
+   "name": "P20/tw2l-sg_over_tw2l/band_w0",
+   "recomputed": 0.6831766784452297
+  },
+  {
+   "claimed": 0.7005948996296771,
+   "name": "P20/tw2l-sg_over_tw2l/band_w0.1",
+   "recomputed": 0.7005948996296777
+  },
+  {
+   "claimed": 0.7996312162497015,
+   "name": "P20/tw2l-sg_over_tw2l/band_w1",
+   "recomputed": 0.7996312162497013
+  },
+  {
+   "claimed": 0.6608649724609185,
+   "name": "P20/tw2l-sg_over_tw2l/bitop",
+   "recomputed": 0.6608649724609184
+  },
+  {
+   "claimed": 0.6467346268076606,
+   "name": "P20/tw2l-sg_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.6467346268076608
+  },
+  {
+   "claimed": 0.6753040485578607,
+   "name": "P20/tw2l-sg_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.6753040485578605
+  },
+  {
+   "claimed": 0.8021501020997213,
+   "name": "P20/tw2l-sib_over_tw2l/raw_gae",
+   "recomputed": 0.8021501020997206
+  },
+  {
+   "claimed": 0.7636149878631797,
+   "name": "P20/tw2l-sib_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.7636149878631802
+  },
+  {
+   "claimed": 0.8426298547375835,
+   "name": "P20/tw2l-sib_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.8426298547375825
+  },
+  {
+   "claimed": 0.8018303886925794,
+   "name": "P20/tw2l-sib_over_tw2l/band_w0",
+   "recomputed": 0.8018303886925794
+  },
+  {
+   "claimed": 0.8451768454927094,
+   "name": "P20/tw2l-sib_over_tw2l/band_w0.1",
+   "recomputed": 0.8451768454927097
+  },
+  {
+   "claimed": 1.0916356184382947,
+   "name": "P20/tw2l-sib_over_tw2l/band_w1",
+   "recomputed": 1.0916356184382945
+  },
+  {
+   "claimed": 0.8765769934535084,
+   "name": "P20/tw2l-sib_over_tw2l/bitop",
+   "recomputed": 0.8765769934535083
+  },
+  {
+   "claimed": 0.8359346269286625,
+   "name": "P20/tw2l-sib_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.8359346269286635
+  },
+  {
+   "claimed": 0.9191953541572389,
+   "name": "P20/tw2l-sib_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.9191953541572385
+  },
+  {
+   "claimed": 1.1789451121946226,
+   "name": "P22/S/rho-neg/w0",
+   "recomputed": 1.1789451121946224
+  },
+  {
+   "claimed": 1.2874007134869003,
+   "name": "P22/S/rho-neg/w0.1",
+   "recomputed": 1.2874007134869008
+  },
+  {
+   "claimed": 2.2635011251174055,
+   "name": "P22/S/rho-neg/w1",
+   "recomputed": 2.263501125117405
+  },
+  {
+   "claimed": 1.1426650198406842,
+   "name": "P22/S/sib8-p256/w0",
+   "recomputed": 1.1426650198406836
+  },
+  {
+   "claimed": 1.4016494170398408,
+   "name": "P22/S/sib8-p256/w0.1",
+   "recomputed": 1.4016494170398415
+  },
+  {
+   "claimed": 3.7325089918322596,
+   "name": "P22/S/sib8-p256/w1",
+   "recomputed": 3.73250899183226
+  },
+  {
+   "claimed": 2.488484777432875,
+   "name": "P22/S/tw2l/w0",
+   "recomputed": 2.4884847774328747
+  },
+  {
+   "claimed": 2.6646059948728587,
+   "name": "P22/S/tw2l/w0.1",
+   "recomputed": 2.6646059948728578
+  },
+  {
+   "claimed": 4.249696951832704,
+   "name": "P22/S/tw2l/w1",
+   "recomputed": 4.249696951832706
+  },
+  {
+   "claimed": 1.929418831417295,
+   "name": "P22/S/tw2l-sg/w0",
+   "recomputed": 1.9294188314172949
+  },
+  {
+   "claimed": 2.105484931135074,
+   "name": "P22/S/tw2l-sg/w0.1",
+   "recomputed": 2.1054849311350754
+  },
+  {
+   "claimed": 3.6900798285951004,
+   "name": "P22/S/tw2l-sg/w1",
+   "recomputed": 3.690079828595101
+  },
+  {
+   "claimed": 1.701730965856264,
+   "name": "P22/S/tw2l-sib/w0",
+   "recomputed": 1.7017309658562636
+  },
+  {
+   "claimed": 1.9607704807776234,
+   "name": "P22/S/tw2l-sib/w0.1",
+   "recomputed": 1.9607704807776238
+  },
+  {
+   "claimed": 4.292126115069866,
+   "name": "P22/S/tw2l-sib/w1",
+   "recomputed": 4.292126115069865
+  },
+  {
+   "claimed": 0.9720077509983448,
+   "name": "P22/sib8-p256_over_rho-neg/raw_gae",
+   "recomputed": 0.9720077509983442
+  },
+  {
+   "claimed": 0.8847510159192316,
+   "name": "P22/sib8-p256_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.8847510159192329
+  },
+  {
+   "claimed": 1.0678700007134092,
+   "name": "P22/sib8-p256_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.0678700007134077
+  },
+  {
+   "claimed": 0.9692266484854393,
+   "name": "P22/sib8-p256_over_rho-neg/band_w0",
+   "recomputed": 0.9692266484854389
+  },
+  {
+   "claimed": 1.0887437006644967,
+   "name": "P22/sib8-p256_over_rho-neg/band_w0.1",
+   "recomputed": 1.0887437006644964
+  },
+  {
+   "claimed": 1.6489980722402593,
+   "name": "P22/sib8-p256_over_rho-neg/band_w1",
+   "recomputed": 1.6489980722402597
+  },
+  {
+   "claimed": 1.105980763801466,
+   "name": "P22/sib8-p256_over_rho-neg/bitop",
+   "recomputed": 1.1059807638014654
+  },
+  {
+   "claimed": 1.006335241433089,
+   "name": "P22/sib8-p256_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.0063352414330906
+  },
+  {
+   "claimed": 1.2154930082314945,
+   "name": "P22/sib8-p256_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.2154930082314925
+  },
+  {
+   "claimed": 1.4462230263465472,
+   "name": "P22/tw2l-sib_over_rho-neg/raw_gae",
+   "recomputed": 1.4462230263465474
+  },
+  {
+   "claimed": 1.323018666134113,
+   "name": "P22/tw2l-sib_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.323018666134115
+  },
+  {
+   "claimed": 1.580900629351322,
+   "name": "P22/tw2l-sib_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.58090062935132
+  },
+  {
+   "claimed": 1.4434352780753874,
+   "name": "P22/tw2l-sib_over_rho-neg/band_w0",
+   "recomputed": 1.4434352780753874
+  },
+  {
+   "claimed": 1.5230459795745437,
+   "name": "P22/tw2l-sib_over_rho-neg/band_w0.1",
+   "recomputed": 1.5230459795745441
+  },
+  {
+   "claimed": 1.8962332589285713,
+   "name": "P22/tw2l-sib_over_rho-neg/band_w1",
+   "recomputed": 1.8962332589285715
+  },
+  {
+   "claimed": 1.6210442798234317,
+   "name": "P22/tw2l-sib_over_rho-neg/bitop",
+   "recomputed": 1.6210442798234317
+  },
+  {
+   "claimed": 1.4826699530438545,
+   "name": "P22/tw2l-sib_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.4826699530438574
+  },
+  {
+   "claimed": 1.7723327782784986,
+   "name": "P22/tw2l-sib_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.772332778278497
+  },
+  {
+   "claimed": 0.6721008677712964,
+   "name": "P22/sib8-p256_over_tw2l-sib/raw_gae",
+   "recomputed": 0.6721008677712959
+  },
+  {
+   "claimed": 0.663813852602,
+   "name": "P22/sib8-p256_over_tw2l-sib/raw_gae_ci_lo",
+   "recomputed": 0.6638138526020001
+  },
+  {
+   "claimed": 0.6804913375764765,
+   "name": "P22/sib8-p256_over_tw2l-sib/raw_gae_ci_hi",
+   "recomputed": 0.6804913375764763
+  },
+  {
+   "claimed": 0.6714721908264312,
+   "name": "P22/sib8-p256_over_tw2l-sib/band_w0",
+   "recomputed": 0.6714721908264308
+  },
+  {
+   "claimed": 0.7148462457900532,
+   "name": "P22/sib8-p256_over_tw2l-sib/band_w0.1",
+   "recomputed": 0.7148462457900528
+  },
+  {
+   "claimed": 0.869617735305409,
+   "name": "P22/sib8-p256_over_tw2l-sib/band_w1",
+   "recomputed": 0.8696177353054091
+  },
+  {
+   "claimed": 0.6822643758515543,
+   "name": "P22/sib8-p256_over_tw2l-sib/bitop",
+   "recomputed": 0.682264375851554
+  },
+  {
+   "claimed": 0.6738470478720803,
+   "name": "P22/sib8-p256_over_tw2l-sib/bitop_ci_lo",
+   "recomputed": 0.67384704787208
+  },
+  {
+   "claimed": 0.6907868484785233,
+   "name": "P22/sib8-p256_over_tw2l-sib/bitop_ci_hi",
+   "recomputed": 0.6907868484785228
+  },
+  {
+   "claimed": 0.7756323563461303,
+   "name": "P22/tw2l-sg_over_tw2l/raw_gae",
+   "recomputed": 0.7756323563461307
+  },
+  {
+   "claimed": 0.7662005462853799,
+   "name": "P22/tw2l-sg_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.7662005462853795
+  },
+  {
+   "claimed": 0.7851802705279948,
+   "name": "P22/tw2l-sg_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.785180270527994
+  },
+  {
+   "claimed": 0.7753388121617064,
+   "name": "P22/tw2l-sg_over_tw2l/band_w0",
+   "recomputed": 0.775338812161707
+  },
+  {
+   "claimed": 0.7901674525938832,
+   "name": "P22/tw2l-sg_over_tw2l/band_w0.1",
+   "recomputed": 0.790167452593883
+  },
+  {
+   "claimed": 0.8683159929800959,
+   "name": "P22/tw2l-sg_over_tw2l/band_w1",
+   "recomputed": 0.8683159929800954
+  },
+  {
+   "claimed": 0.7554792357769745,
+   "name": "P22/tw2l-sg_over_tw2l/bitop",
+   "recomputed": 0.7554792357769744
+  },
+  {
+   "claimed": 0.745618356470459,
+   "name": "P22/tw2l-sg_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.7456183564704592
+  },
+  {
+   "claimed": 0.765470526224597,
+   "name": "P22/tw2l-sg_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.7654705262245968
+  },
+  {
+   "claimed": 0.6842581196505778,
+   "name": "P22/tw2l-sib_over_tw2l/raw_gae",
+   "recomputed": 0.6842581196505779
+  },
+  {
+   "claimed": 0.6506291663429803,
+   "name": "P22/tw2l-sib_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.6506291663429803
+  },
+  {
+   "claimed": 0.7196252466507598,
+   "name": "P22/tw2l-sib_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.7196252466507586
+  },
+  {
+   "claimed": 0.6838422245089123,
+   "name": "P22/tw2l-sib_over_tw2l/band_w0",
+   "recomputed": 0.6838422245089127
+  },
+  {
+   "claimed": 0.7358575656402749,
+   "name": "P22/tw2l-sib_over_tw2l/band_w0.1",
+   "recomputed": 0.7358575656402748
+  },
+  {
+   "claimed": 1.0099840444431842,
+   "name": "P22/tw2l-sib_over_tw2l/band_w1",
+   "recomputed": 1.0099840444431836
+  },
+  {
+   "claimed": 0.7695730212133393,
+   "name": "P22/tw2l-sib_over_tw2l/bitop",
+   "recomputed": 0.7695730212133394
+  },
+  {
+   "claimed": 0.7323559167756558,
+   "name": "P22/tw2l-sib_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.7323559167756566
+  },
+  {
+   "claimed": 0.8086814367348787,
+   "name": "P22/tw2l-sib_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.8086814367348781
+  },
+  {
+   "claimed": 1.1573112909716492,
+   "name": "P24/S/rho-neg/w0",
+   "recomputed": 1.1573112909716492
+  },
+  {
+   "claimed": 1.2618266077879479,
+   "name": "P24/S/rho-neg/w0.1",
+   "recomputed": 1.2618266077879479
+  },
+  {
+   "claimed": 2.202464459134638,
+   "name": "P24/S/rho-neg/w1",
+   "recomputed": 2.2024644591346365
+  },
+  {
+   "claimed": 1.0281985571202037,
+   "name": "P24/S/sib8-p256/w0",
+   "recomputed": 1.0281985571202041
+  },
+  {
+   "claimed": 1.2921206103208023,
+   "name": "P24/S/sib8-p256/w0.1",
+   "recomputed": 1.2921206103208023
+  },
+  {
+   "claimed": 3.667419089126183,
+   "name": "P24/S/sib8-p256/w1",
+   "recomputed": 3.667419089126185
+  },
+  {
+   "claimed": 2.213254043456736,
+   "name": "P24/S/tw2l/w0",
+   "recomputed": 2.213254043456735
+  },
+  {
+   "claimed": 2.390707265314777,
+   "name": "P24/S/tw2l/w0.1",
+   "recomputed": 2.390707265314778
+  },
+  {
+   "claimed": 3.9877862620371674,
+   "name": "P24/S/tw2l/w1",
+   "recomputed": 3.9877862620371656
+  },
+  {
+   "claimed": 1.8789029392155958,
+   "name": "P24/S/tw2l-sg/w0",
+   "recomputed": 1.8789029392155954
+  },
+  {
+   "claimed": 2.0563259187351,
+   "name": "P24/S/tw2l-sg/w0.1",
+   "recomputed": 2.0563259187351006
+  },
+  {
+   "claimed": 3.6531327344106472,
+   "name": "P24/S/tw2l-sg/w1",
+   "recomputed": 3.6531327344106472
+  },
+  {
+   "claimed": 1.3625496613613437,
+   "name": "P24/S/tw2l-sib/w0",
+   "recomputed": 1.3625496613613437
+  },
+  {
+   "claimed": 1.6265019569004797,
+   "name": "P24/S/tw2l-sib/w0.1",
+   "recomputed": 1.6265019569004797
+  },
+  {
+   "claimed": 4.002072616752702,
+   "name": "P24/S/tw2l-sib/w1",
+   "recomputed": 4.002072616752703
+  },
+  {
+   "claimed": 0.8912865548544798,
+   "name": "P24/sib8-p256_over_rho-neg/raw_gae",
+   "recomputed": 0.8912865548544799
+  },
+  {
+   "claimed": 0.8022333723511437,
+   "name": "P24/sib8-p256_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.802233372351145
+  },
+  {
+   "claimed": 0.9902252265275454,
+   "name": "P24/sib8-p256_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 0.9902252265275437
+  },
+  {
+   "claimed": 0.888437333275263,
+   "name": "P24/sib8-p256_over_rho-neg/band_w0",
+   "recomputed": 0.8884373332752632
+  },
+  {
+   "claimed": 1.0240080549465995,
+   "name": "P24/sib8-p256_over_rho-neg/band_w0.1",
+   "recomputed": 1.0240080549465995
+  },
+  {
+   "claimed": 1.6651433687911312,
+   "name": "P24/sib8-p256_over_rho-neg/band_w1",
+   "recomputed": 1.665143368791131
+  },
+  {
+   "claimed": 1.0235134572721232,
+   "name": "P24/sib8-p256_over_rho-neg/bitop",
+   "recomputed": 1.0235134572721232
+  },
+  {
+   "claimed": 0.921089986930207,
+   "name": "P24/sib8-p256_over_rho-neg/bitop_ci_lo",
+   "recomputed": 0.921089986930209
+  },
+  {
+   "claimed": 1.1373262244533666,
+   "name": "P24/sib8-p256_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.1373262244533653
+  },
+  {
+   "claimed": 1.1801935171270532,
+   "name": "P24/tw2l-sib_over_rho-neg/raw_gae",
+   "recomputed": 1.1801935171270537
+  },
+  {
+   "claimed": 1.0691167310526277,
+   "name": "P24/tw2l-sib_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.06911673105263
+  },
+  {
+   "claimed": 1.3028107197399754,
+   "name": "P24/tw2l-sib_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.3028107197399739
+  },
+  {
+   "claimed": 1.1773406792025518,
+   "name": "P24/tw2l-sib_over_rho-neg/band_w0",
+   "recomputed": 1.177340679202552
+  },
+  {
+   "claimed": 1.2890059116377555,
+   "name": "P24/tw2l-sib_over_rho-neg/band_w0.1",
+   "recomputed": 1.289005911637755
+  },
+  {
+   "claimed": 1.8170883984775603,
+   "name": "P24/tw2l-sib_over_rho-neg/band_w1",
+   "recomputed": 1.8170883984775605
+  },
+  {
+   "claimed": 1.3369236151728896,
+   "name": "P24/tw2l-sib_over_rho-neg/bitop",
+   "recomputed": 1.33692361517289
+  },
+  {
+   "claimed": 1.2108926251671557,
+   "name": "P24/tw2l-sib_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.2108926251671581
+  },
+  {
+   "claimed": 1.4760720444227784,
+   "name": "P24/tw2l-sib_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.4760720444227764
+  },
+  {
+   "claimed": 0.7552037372855088,
+   "name": "P24/sib8-p256_over_tw2l-sib/raw_gae",
+   "recomputed": 0.7552037372855086
+  },
+  {
+   "claimed": 0.7455467694282196,
+   "name": "P24/sib8-p256_over_tw2l-sib/raw_gae_ci_lo",
+   "recomputed": 0.7455467694282191
+  },
+  {
+   "claimed": 0.7649857905593291,
+   "name": "P24/sib8-p256_over_tw2l-sib/raw_gae_ci_hi",
+   "recomputed": 0.7649857905593285
+  },
+  {
+   "claimed": 0.7546136381501982,
+   "name": "P24/sib8-p256_over_tw2l-sib/band_w0",
+   "recomputed": 0.7546136381501982
+  },
+  {
+   "claimed": 0.7944168802496328,
+   "name": "P24/sib8-p256_over_tw2l-sib/band_w0.1",
+   "recomputed": 0.7944168802496331
+  },
+  {
+   "claimed": 0.9163799461744758,
+   "name": "P24/sib8-p256_over_tw2l-sib/band_w1",
+   "recomputed": 0.9163799461744756
+  },
+  {
+   "claimed": 0.7655736241443856,
+   "name": "P24/sib8-p256_over_tw2l-sib/bitop",
+   "recomputed": 0.7655736241443855
+  },
+  {
+   "claimed": 0.7559831209457462,
+   "name": "P24/sib8-p256_over_tw2l-sib/bitop_ci_lo",
+   "recomputed": 0.7559831209457465
+  },
+  {
+   "claimed": 0.7752857937520417,
+   "name": "P24/sib8-p256_over_tw2l-sib/bitop_ci_hi",
+   "recomputed": 0.7752857937520417
+  },
+  {
+   "claimed": 0.8491557214723247,
+   "name": "P24/tw2l-sg_over_tw2l/raw_gae",
+   "recomputed": 0.8491557214723243
+  },
+  {
+   "claimed": 0.8420939654948998,
+   "name": "P24/tw2l-sg_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.8420939654949001
+  },
+  {
+   "claimed": 0.8562766969662491,
+   "name": "P24/tw2l-sg_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.8562766969662492
+  },
+  {
+   "claimed": 0.8489323422995136,
+   "name": "P24/tw2l-sg_over_tw2l/band_w0",
+   "recomputed": 0.8489323422995135
+  },
+  {
+   "claimed": 0.8601328772321901,
+   "name": "P24/tw2l-sg_over_tw2l/band_w0.1",
+   "recomputed": 0.86013287723219
+  },
+  {
+   "claimed": 0.9160803750159969,
+   "name": "P24/tw2l-sg_over_tw2l/band_w1",
+   "recomputed": 0.9160803750159969
+  },
+  {
+   "claimed": 0.8333832206980838,
+   "name": "P24/tw2l-sg_over_tw2l/bitop",
+   "recomputed": 0.8333832206980845
+  },
+  {
+   "claimed": 0.82579600924169,
+   "name": "P24/tw2l-sg_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.8257960092416903
+  },
+  {
+   "claimed": 0.8410401415948731,
+   "name": "P24/tw2l-sg_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.841040141594873
+  },
+  {
+   "claimed": 0.6162033556190641,
+   "name": "P24/tw2l-sib_over_tw2l/raw_gae",
+   "recomputed": 0.6162033556190641
+  },
+  {
+   "claimed": 0.581470127682847,
+   "name": "P24/tw2l-sib_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.5814701276828477
+  },
+  {
+   "claimed": 0.6530113197548459,
+   "name": "P24/tw2l-sib_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.6530113197548454
+  },
+  {
+   "claimed": 0.6156318409942979,
+   "name": "P24/tw2l-sib_over_tw2l/band_w0",
+   "recomputed": 0.6156318409942979
+  },
+  {
+   "claimed": 0.6803434199152456,
+   "name": "P24/tw2l-sib_over_tw2l/band_w0.1",
+   "recomputed": 0.6803434199152453
+  },
+  {
+   "claimed": 1.0035825276925041,
+   "name": "P24/tw2l-sib_over_tw2l/band_w1",
+   "recomputed": 1.0035825276925046
+  },
+  {
+   "claimed": 0.7107424610127335,
+   "name": "P24/tw2l-sib_over_tw2l/bitop",
+   "recomputed": 0.7107424610127338
+  },
+  {
+   "claimed": 0.6707107758443287,
+   "name": "P24/tw2l-sib_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.6707107758443297
+  },
+  {
+   "claimed": 0.7531634559628468,
+   "name": "P24/tw2l-sib_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.7531634559628464
+  }
+ ],
+ "headline_max_rel_diff": 2.1696050035084146e-15,
+ "headline_mismatches": [],
+ "independent": true,
+ "method": "Independent recomputation in Python (stdlib) from the committed records.jsonl of the three sessions by recompute.py: every non-warm-up verified run is priced as priced_gae(w) = G - C + w (U + n_C), S = priced_gae / sqrt(r) (AGENTS.md section 5a), with C and n_C the pinned-calibration native work of the curve's row in docs/ic/calibration.json, U the uncharged counters plus the counted table work; ratios are ratios of per-workload means over 48 workloads with a linearised-t interval on the log scale (df 47). 'claimed' is the full-precision output of ecbench band --json and ecbench compare --json run on the same sessions (ecbench-claimed.json); 'recomputed' is the validator's own number. Band orders were also recomputed from the validator's S. README tables were compared at their printed precision (readme-comparison.json).",
+ "own_band_orders": [
+  {
+   "a": "sib8-p256",
+   "b": "tw2l",
+   "own_band_order": "sib8-p256 < tw2l at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "tw2l-sib",
+   "b": "tw2l",
+   "own_band_order": "unresolved inside the band",
+   "session": "P20"
+  },
+  {
+   "a": "tw2l-sg",
+   "b": "tw2l",
+   "own_band_order": "tw2l-sg < tw2l at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l-sib",
+   "own_band_order": "sib8-p256 < tw2l-sib at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "rho-neg",
+   "own_band_order": "rho-neg < sib8-p256 at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l",
+   "own_band_order": "sib8-p256 < tw2l at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "tw2l-sib",
+   "b": "tw2l",
+   "own_band_order": "unresolved inside the band",
+   "session": "P22"
+  },
+  {
+   "a": "tw2l-sg",
+   "b": "tw2l",
+   "own_band_order": "tw2l-sg < tw2l at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l-sib",
+   "own_band_order": "sib8-p256 < tw2l-sib at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "rho-neg",
+   "own_band_order": "unresolved inside the band",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l",
+   "own_band_order": "sib8-p256 < tw2l at every weight",
+   "session": "P24"
+  },
+  {
+   "a": "tw2l-sib",
+   "b": "tw2l",
+   "own_band_order": "unresolved inside the band",
+   "session": "P24"
+  },
+  {
+   "a": "tw2l-sg",
+   "b": "tw2l",
+   "own_band_order": "tw2l-sg < tw2l at every weight",
+   "session": "P24"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l-sib",
+   "own_band_order": "sib8-p256 < tw2l-sib at every weight",
+   "session": "P24"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "rho-neg",
+   "own_band_order": "unresolved inside the band",
+   "session": "P24"
+  }
+ ],
+ "raw_data": [
+  {
+   "path": "../../ablation/sessions/P20/records.jsonl",
+   "sha256": "d2b89537c19685a7d6421910178163ec6fe23c9d2df7f96c3583fd83a00af548"
+  },
+  {
+   "path": "../../ablation/sessions/P20/spec.json",
+   "sha256": "5c676fcc1e8c3dcd664cc9e083550d9058133a3bf4f4b934951daf036a015257"
+  },
+  {
+   "path": "../../ablation/sessions/P20/session.json",
+   "sha256": "264d9072190b00393f33b876220e3a90dc8372a731b3981c33792039a2396764"
+  },
+  {
+   "path": "../../ablation/sessions/P22/records.jsonl",
+   "sha256": "9ccd9c5d92bc2b5f95ca6cceafbc06733ac6cc33c2ada90a5866c66228af04c6"
+  },
+  {
+   "path": "../../ablation/sessions/P22/spec.json",
+   "sha256": "03a45b7c40d7bfca2b1ee49d9e00ae971c3cb260b81cb9b99e407958d0e25c25"
+  },
+  {
+   "path": "../../ablation/sessions/P22/session.json",
+   "sha256": "8a6abf10b0b502567bd526c0803a2450589b88909a218aee18fc78b7f624e7be"
+  },
+  {
+   "path": "../../ablation/sessions/P24/records.jsonl",
+   "sha256": "b6b0d62274fee4c0a39c08d0ee02eb12bf43adaa4396424b8892540d9b19778d"
+  },
+  {
+   "path": "../../ablation/sessions/P24/spec.json",
+   "sha256": "5cfb545d62d6a6fd005fb6acce7ee385d1f7aec89112109f9d86701b50165608"
+  },
+  {
+   "path": "../../ablation/sessions/P24/session.json",
+   "sha256": "e8ffd1e788eb0ef5fbb8a530e7cdb2f46882af8e9fb99fd6067b88fb6bf62175"
+  },
+  {
+   "path": "../../../../docs/ic/calibration.json",
+   "sha256": "f0c0a873dc7b27c8baa86c5ac1debe9643d799e93ce0110175d0622cc8f7fff2"
+  }
+ ],
+ "readme_discrepancies": [
+  {
+   "decimals": 3,
+   "match": false,
+   "readme": 0.817,
+   "recomputed": 0.8164508556097242,
+   "study": "ablation",
+   "what": "P20 sib8-p256/tw2l-sib band w1"
+  },
+  {
+   "decimals": 3,
+   "match": false,
+   "readme": 0.672,
+   "recomputed": 0.6714721908264308,
+   "study": "ablation",
+   "what": "P22 sib8-p256/tw2l-sib band w0"
+  }
+ ],
+ "schema": "validation-gate.validator-report/v1",
+ "status": "pass",
+ "study": "research/ic_tableb_sib_20261119/ablation",
+ "validated_commit": "afc9a49d36dee4e9ef5074d9a2aa03bc72513ba7",
+ "validator_code_sha256": {
+  "own-numbers.json": "f27561f410399280edc1e3b4676a3f3f09393b95f73034ab91da06173ac15bb1",
+  "recompute.py": "4727d5c328114d94a5d8fe8779c010ab14b811621b92a6f2ea98b1ecaeb8375c"
+ }
+}

@@ -5,6 +5,10 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
+
+const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
+const expectedAssessmentDate = "2026-11-18";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(process.argv[2] ?? path.resolve(here, "../.."));
@@ -14,7 +18,9 @@ const reportPath = path.join(curvesDir, "covers.json");
 const graphPath = path.join(curvesDir, "cover-links.yaml");
 const assessmentPath = path.join(curvesDir, "cover-transfer-assessments.json");
 
-const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
+const readJson = (file) => JSON.parse(catalogSnapshotBytes(
+  root, path.relative(root, file).split(path.sep).join("/"), expectedCatalogCommit,
+).toString("utf8"));
 const registry = readJson(registryPath);
 const report = readJson(reportPath);
 const graph = readJson(graphPath);
@@ -29,14 +35,101 @@ function canonicalJson(value) {
       .sort()
       .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
       .join(",")}}`;
+  }
   return JSON.stringify(value);
 }
 
 function sha256(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
+}
 
 function mod(value, modulus) {
   return ((value % modulus) + modulus) % modulus;
+}
+
+const verifierU64Limit = 18446744073709551616n;
+const verifierPsi13Limit = 3317044064679887385961981n;
+const verifierWordWitnesses = [
+  2n,
+  325n,
+  9375n,
+  28178n,
+  450775n,
+  9780504n,
+  1795265022n,
+];
+const verifierPrimeWitnesses = [
+  2n,
+  3n,
+  5n,
+  7n,
+  11n,
+  13n,
+  17n,
+  19n,
+  23n,
+  29n,
+  31n,
+  37n,
+  41n,
+  43n,
+  47n,
+  53n,
+];
+
+function verifierPowMod(base, exponent, modulus) {
+  let accumulator = 1n;
+  let current = base % modulus;
+  for (let bits = exponent; bits !== 0n; bits >>= 1n) {
+    if ((bits & 1n) !== 0n) accumulator = (accumulator * current) % modulus;
+    current = (current * current) % modulus;
+  }
+  return accumulator;
+}
+
+function verifierStrongProbablePrime(n, witness) {
+  const base = witness % n;
+  if (base === 0n) return true;
+  let exponent = n - 1n;
+  let squarings = 0;
+  while ((exponent & 1n) === 0n) {
+    exponent >>= 1n;
+    squarings += 1;
+  }
+  let residue = verifierPowMod(base, exponent, n);
+  if (residue === 1n || residue === n - 1n) return true;
+  while (--squarings > 0) {
+    residue = (residue * residue) % n;
+    if (residue === n - 1n) return true;
+  }
+  return false;
+}
+
+// This verifier intentionally owns its proof-range classifier rather than
+// importing the generator or Rust implementation. The theorem boundary is
+// exclusive, and an all-passing value outside it remains unsupported.
+function verifierPrimeProofStatus(decimal) {
+  const n = BigInt(decimal);
+  if (n < 2n) return "composite";
+  if (n === 2n || n === 3n) return "proved_u64";
+  if ((n & 1n) === 0n) return "composite";
+  if (n < verifierU64Limit) {
+    return verifierWordWitnesses.every((witness) =>
+      verifierStrongProbablePrime(n, witness)
+    )
+      ? "proved_u64"
+      : "composite";
+  }
+  if (verifierPrimeWitnesses.some((prime) => n !== prime && n % prime === 0n)) {
+    return "composite";
+  }
+  if (!verifierPrimeWitnesses.every((witness) => verifierStrongProbablePrime(n, witness))) {
+    return "composite";
+  }
+  return n < verifierPsi13Limit
+    ? "proved_psi13"
+    : "unsupported_without_primality_certificate";
+}
 
 function oddFieldContext(p, degree, modulusCoefficients) {
   const zero = () => Array(degree).fill(0n);
@@ -54,18 +147,24 @@ function oddFieldContext(p, degree, modulusCoefficients) {
     for (let index = 0; index < degree; index += 1) {
       coefficients[index] = encoded % p;
       encoded /= p;
+    }
     if (encoded !== 0n) {
       throw new Error("field element encoding exceeds the declared extension degree");
+    }
     return coefficients;
+  }
 
   function add(left, right) {
     return left.map((coefficient, index) => mod(coefficient + right[index], p));
+  }
 
   function multiply(left, right) {
     const product = Array(2 * degree - 1).fill(0n);
     for (let i = 0; i < degree; i += 1) {
       for (let j = 0; j < degree; j += 1) {
         product[i + j] = mod(product[i + j] + left[i] * right[j], p);
+      }
+    }
     for (let exponent = 2 * degree - 2; exponent >= degree; exponent -= 1) {
       const leading = product[exponent];
       if (leading !== 0n) {
@@ -75,13 +174,18 @@ function oddFieldContext(p, degree, modulusCoefficients) {
             p,
           );
         }
+      }
+    }
     return product.slice(0, degree);
+  }
 
   function scale(value, scalar) {
     return value.map((coefficient) => mod(coefficient * scalar, p));
+  }
 
   function equal(left, right) {
     return left.every((coefficient, index) => coefficient === right[index]);
+  }
 
   return {
     zero,
@@ -92,6 +196,7 @@ function oddFieldContext(p, degree, modulusCoefficients) {
     equal,
     one: decode(1n),
   };
+}
 
 function binaryMultiply(left, right, degree, modulusPolynomial) {
   let product = 0n;
@@ -100,14 +205,19 @@ function binaryMultiply(left, right, degree, modulusPolynomial) {
   while (multiplier !== 0n) {
     if ((multiplier & 1n) !== 0n) {
       product ^= multiplicand;
+    }
     multiplier >>= 1n;
     multiplicand <<= 1n;
     if ((multiplicand & (1n << BigInt(degree))) !== 0n) {
       multiplicand ^= modulusPolynomial;
+    }
+  }
   return product;
+}
 
 function isPlainObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
 
 function resolveRepoPath(relativePath) {
   if (
@@ -119,12 +229,17 @@ function resolveRepoPath(relativePath) {
     relativePath.split("/").includes("..")
   ) {
     return null;
+  }
   const absolute = path.resolve(root, relativePath);
   const fromRoot = path.relative(root, absolute);
+  if (
     fromRoot.length === 0 ||
     fromRoot === ".." ||
     fromRoot.startsWith(".." + path.sep) ||
     path.isAbsolute(fromRoot)
+  ) {
+    return null;
+  }
   if (fs.existsSync(absolute)) {
     const realRoot = fs.realpathSync(root);
     const realFile = fs.realpathSync(absolute);
@@ -136,7 +251,10 @@ function resolveRepoPath(relativePath) {
       path.isAbsolute(realRelative)
     ) {
       return null;
+    }
+  }
   return absolute;
+}
 
 function markdownAnchor(line) {
   return line
@@ -147,37 +265,54 @@ function markdownAnchor(line) {
     .replace(/[^a-z0-9 _-]/gu, "")
     .replace(/\s+/gu, "-")
     .replace(/-+/gu, "-");
+}
 
 function evidenceReferenceResolves(reference) {
   if (typeof reference !== "string" || reference.length === 0 || /^https?:\/\//u.test(reference)) {
     return false;
+  }
   const separator = reference.indexOf("#");
   const relativePath = separator === -1 ? reference : reference.slice(0, separator);
   let fragment = null;
   try {
     fragment = separator === -1 ? null : decodeURIComponent(reference.slice(separator + 1));
   } catch {
+    return false;
+  }
   const absolute = resolveRepoPath(relativePath);
   if (absolute === null || !fs.existsSync(absolute)) {
+    return false;
+  }
   if (!fragment) {
     return true;
+  }
   const contents = fs.readFileSync(absolute, "utf8");
   if (contents.includes(fragment)) {
+    return true;
+  }
   if (relativePath.endsWith(".md")) {
     return contents
       .split(/\r?\n/u)
       .filter((line) => /^#+\s+/u.test(line))
       .some((line) => markdownAnchor(line) === fragment);
+  }
   return false;
+}
 
 function evidenceReferencePath(reference) {
   if (typeof reference !== "string") {
+    return null;
+  }
+  const separator = reference.indexOf("#");
   return separator === -1 ? reference : reference.slice(0, separator);
+}
 
 function pdfLiteralMetadata(bytes, key) {
   const source = bytes.toString("latin1");
   const match = new RegExp(`/${key}\\s*\\(`, "u").exec(source);
   if (match === null) {
+    return null;
+  }
   const decoded = [];
   let depth = 1;
   for (let index = match.index + match[0].length; index < source.length; index += 1) {
@@ -186,13 +321,16 @@ function pdfLiteralMetadata(bytes, key) {
       const escaped = source[index + 1];
       if (escaped === undefined) {
         return null;
+      }
       if (/[0-7]/u.test(escaped)) {
         let octal = escaped;
         while (octal.length < 3 && /[0-7]/u.test(source[index + 1 + octal.length] ?? "")) {
           octal += source[index + 1 + octal.length];
+        }
         decoded.push(Number.parseInt(octal, 8));
         index += octal.length;
         continue;
+      }
       const simpleEscapes = {
         n: 0x0a,
         r: 0x0d,
@@ -206,6 +344,7 @@ function pdfLiteralMetadata(bytes, key) {
       decoded.push(simpleEscapes[escaped] ?? escaped.charCodeAt(0));
       index += 1;
       continue;
+    }
     if (character === "(") {
       depth += 1;
     } else if (character === ")") {
@@ -221,57 +360,83 @@ function pdfLiteralMetadata(bytes, key) {
           for (let offset = 0; offset < body.length; offset += 2) {
             littleEndian[offset] = body[offset + 1];
             littleEndian[offset + 1] = body[offset];
+          }
           return littleEndian.toString("utf16le");
+        }
         return value.toString("latin1");
+      }
+    }
     decoded.push(character.charCodeAt(0));
+  }
   return null;
+}
 
 function sortedObjectKeys(value) {
   return Object.keys(value).sort();
+}
 
 function strictStringOrder(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
+}
 
 function sortedRecord(entries) {
   return Object.fromEntries([...entries].sort(([left], [right]) => strictStringOrder(left, right)));
+}
 
 function targetDeclaredFieldRecord(model) {
   if (model.field.startsWith("f2m-")) {
     return { label: model.field, modulus: model.modulus };
+  }
   if (model.field.startsWith("fpk-")) {
     return {
       label: model.field,
       p: String(model.p),
       modulus: model.modulus.map(String),
     };
+  }
   return { label: model.field, p: String(model.p) };
+}
 
 function expectedDeclaredFieldBinding(record) {
   const fieldUid = `urn:declared-field:1:sha256:${sha256(canonicalJson(record))}`;
   const binary = record.label.match(/^f2m-([1-9][0-9]*)-/u);
   if (binary !== null) {
+    return {
       field_uid: fieldUid,
       record,
       characteristic: "2",
       extension_degree: Number(binary[1]),
       representation: "binary_polynomial_extension",
+    };
+  }
   const extension = record.label.match(/^fpk-([1-9][0-9]*)-([1-9][0-9]*)-/u);
   if (extension !== null) {
+    return {
+      field_uid: fieldUid,
+      record,
       characteristic: String(record.p),
       extension_degree: Number(extension[2]),
       representation: "odd_polynomial_extension",
+    };
+  }
+  return {
     field_uid: fieldUid,
     record,
     characteristic: String(record.p),
     extension_degree: 1,
     representation: "prime",
+  };
+}
 
 function compareTriples(left, right) {
   for (let index = 0; index < 3; index += 1) {
     const comparison = strictStringOrder(left[index], right[index]);
     if (comparison !== 0) {
       return comparison;
+    }
+  }
   return 0;
+}
 
 function memberDigest(domain, members) {
   return sha256(Buffer.concat([
@@ -279,19 +444,38 @@ function memberDigest(domain, members) {
     Buffer.from([0]),
     Buffer.from(JSON.stringify(members), "utf8"),
   ]));
+}
 
 const problems = [];
 function check(condition, message) {
   if (!condition) {
     problems.push(message);
+  }
+}
 
-check(registry.curves.length === 15813, "unexpected registry row count");
-check(report.curves.length === 15813, "unexpected cover-report row count");
-check(graph.curves.length === 15813, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === 15813, "unexpected CV1 map count");
-check(Object.keys(graph.covers).length === 15811, "unexpected HC1 cover count");
+check(verifierPrimeProofStatus("59") === "proved_u64", "verifier u64-prime control failed");
+check(verifierPrimeProofStatus("15") === "composite", "verifier u64-composite control failed");
+check(
+  verifierPrimeProofStatus("5902977611310272157103") === "proved_psi13",
+  "verifier psi13 pilot-prime control failed",
+);
+check(
+  verifierPrimeProofStatus("318665857834031151167461") === "composite",
+  "verifier psi12 pseudoprime control failed",
+);
+check(
+  verifierPrimeProofStatus("3317044064679887385962123") ===
+    "unsupported_without_primality_certificate",
+  "verifier above-psi13 fail-closed control failed",
+);
 
-const registryBytes = fs.readFileSync(registryPath);
+check(registry.curves.length === 15791, "unexpected registry row count");
+check(report.curves.length === 15791, "unexpected cover-report row count");
+check(graph.curves.length === 15791, "unexpected graph curve-node count");
+check(Object.keys(graph.maps).length === 15791, "unexpected CV1 map count");
+check(Object.keys(graph.covers).length === 15789, "unexpected HC1 cover count");
+
+const registryBytes = catalogSnapshotBytes(root, "docs/curves/registry.json", expectedCatalogCommit);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
 check(graph.registry_sha256 === report.registry_sha256, "cover-links registry digest mismatch");
 
@@ -306,6 +490,7 @@ for (const curve of registry.curves) {
   registryByModelHash.set(modelHash, curve);
   registrySlugs.add(curve.slug);
   icv1Identities.add(curve.icv1);
+}
 
 const reportByModelHash = new Map();
 for (const curve of report.curves) {
@@ -313,8 +498,10 @@ for (const curve of report.curves) {
   check(registryCurve !== undefined, `cover report references unknown model ${curve.model_sha256}`);
   if (registryCurve !== undefined) {
     check(registryCurve.slug === curve.slug, `cover report slug mismatch for ${curve.slug}`);
+  }
   check(!reportByModelHash.has(curve.model_sha256), `duplicate cover report row ${curve.model_sha256}`);
   reportByModelHash.set(curve.model_sha256, curve);
+}
 
 const coverReferenceCounts = new Map();
 const mapReferenceCounts = new Map();
@@ -334,13 +521,18 @@ for (const graphCurve of graph.curves) {
   check(registryCurve !== undefined, `graph references unknown model ${graphCurve.model_sha256}`);
   if (registryCurve === undefined) {
     continue;
+  }
 
   check(graphCurve.model_json === registryCurve.model_json, `model JSON mismatch for ${registryCurve.slug}`);
+  check(
     graphCurve.icv1_identity.slug === registryCurve.slug &&
       graphCurve.icv1_identity.full === registryCurve.icv1,
     `ICV1 binding mismatch for ${registryCurve.slug}`,
+  );
+  check(
     graphCurve.representations.length === registryCurve.representations.length,
     `representation count mismatch for ${registryCurve.slug}`,
+  );
 
   for (let index = 0; index < graphCurve.representations.length; index += 1) {
     const graphRepresentation = graphCurve.representations[index];
@@ -352,14 +544,19 @@ for (const graphCurve of graph.curves) {
         canonicalJson(graphRepresentation.curve) === canonicalJson(registryRepresentation.curve),
       `representation payload mismatch for ${registryCurve.slug}`,
     );
+    check(
       graphRepresentation.subgroup_transport.status === "not_tested" &&
         graphRepresentation.subgroup_transport.evidence_ref === null,
       `unexpected subgroup-transfer status for ${graphRepresentation.ec1}`,
+    );
+    check(
       !ec1Aliases.has(graphRepresentation.ec1) && !curveUids.has(graphRepresentation.curve_uid),
       `duplicate EC1 representation ${graphRepresentation.ec1}`,
+    );
     ec1Aliases.add(graphRepresentation.ec1);
     curveUids.add(graphRepresentation.curve_uid);
     representationCount += 1;
+  }
 
   check(graphCurve.cover_links.length === 1, `expected one cover link for ${registryCurve.slug}`);
   for (const link of graphCurve.cover_links) {
@@ -374,36 +571,48 @@ for (const graphCurve of graph.curves) {
           map.record.target_model_json === graphCurve.model_json,
         `CV1 binding mismatch for ${registryCurve.slug}`,
       );
+    }
     coverReferenceCounts.set(link.cover_uid, (coverReferenceCounts.get(link.cover_uid) ?? 0) + 1);
     mapReferenceCounts.set(link.map_uid, (mapReferenceCounts.get(link.map_uid) ?? 0) + 1);
+  }
+}
 
 check(
   canonicalJson([...reportByModelHash.keys()].sort(strictStringOrder)) ===
     canonicalJson([...registryByModelHash.keys()].sort(strictStringOrder)),
   "cover-report model hashes are not exactly the registry model hashes",
 );
+check(
   canonicalJson([...graphModelHashes].sort(strictStringOrder)) ===
+    canonicalJson([...registryByModelHash.keys()].sort(strictStringOrder)),
   "graph model hashes are not a unique exact copy of the registry model hashes",
+);
 
-check(representationCount === 1001, "unexpected EC1 representation count");
-check(ec1Aliases.size === 1001, "unexpected unique EC1 count");
-check(curveUids.size === 1001, "unexpected unique curve-UID count");
-  mapReferenceCounts.size === 15813 && [...mapReferenceCounts.values()].every((count) => count === 1),
+check(representationCount === 979, "unexpected EC1 representation count");
+check(ec1Aliases.size === 979, "unexpected unique EC1 count");
+check(curveUids.size === 979, "unexpected unique curve-UID count");
+check(
+  mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
-  coverReferenceCounts.size === 15811 &&
+);
+check(
+  coverReferenceCounts.size === 15789 &&
     [...coverReferenceCounts.values()].every((count) => count === 1 || count === 2) &&
     [...coverReferenceCounts.values()].filter((count) => count === 2).length === 2,
   "unexpected HC1 sharing pattern",
+);
 
 for (const [uid, cover] of Object.entries(graph.covers)) {
   check(uid === cover.cover_uid, `HC1 key/payload mismatch ${uid}`);
   check(uid.endsWith(sha256(canonicalJson(cover.record))), `HC1 content hash mismatch ${uid}`);
   check(coverReferenceCounts.has(uid), `unreferenced HC1 ${uid}`);
+}
 
 for (const [uid, map] of Object.entries(graph.maps)) {
   check(uid === map.map_uid, `CV1 key/payload mismatch ${uid}`);
   check(uid.endsWith(sha256(canonicalJson(map.record))), `CV1 content hash mismatch ${uid}`);
   check(mapReferenceCounts.get(uid) === 1, `unexpected CV1 reference count ${uid}`);
+}
 
 const graphCurveByModelHash = new Map(graph.curves.map((curve) => [curve.model_sha256, curve]));
 const arithmeticChecks = { binary: 0, prime: 0, extension: 0, normalized_target: 0 };
@@ -411,34 +620,50 @@ const constructionCounts = { binary_cubic_pullback_v1: 0, prime_quadratic_pullba
 
 for (const coverResult of report.curves) {
   const registryCurve = registryByModelHash.get(coverResult.model_sha256);
+  if (registryCurve === undefined) {
+    continue;
+  }
   const targetModel = JSON.parse(registryCurve.model_json);
   const certificate = coverResult.certificate;
   constructionCounts[certificate.construction] =
     (constructionCounts[certificate.construction] ?? 0) + 1;
 
+  check(
     coverResult.status === "verified_over_declared_field" && coverResult.exists === true,
     `unexpected cover status for ${coverResult.slug}`,
+  );
+  check(
     coverResult.field_relation === "same_field" && coverResult.map_direction === "H -> E",
     `unexpected field relation or direction for ${coverResult.slug}`,
+  );
+  check(
     coverResult.subfield_descent === "not_tested" &&
       coverResult.subgroup_transfer === "not_tested" &&
       coverResult.dlp_advantage === null &&
       coverResult.minimal_degree === null &&
       coverResult.minimal_genus === null,
     `claim-boundary mismatch for ${coverResult.slug}`,
+  );
 
   const graphCurve = graphCurveByModelHash.get(coverResult.model_sha256);
   if (graphCurve === undefined || graphCurve.cover_links.length !== 1) {
+    continue;
+  }
   const link = graphCurve.cover_links[0];
   const graphMap = graph.maps[link.map_uid];
   const graphCover = graph.covers[link.cover_uid];
   if (graphMap === undefined || graphCover === undefined) {
+    continue;
+  }
 
   check(graphCover.record.field.label === targetModel.field, `HC1 field mismatch for ${coverResult.slug}`);
+  check(
     graphCover.record.genus === certificate.genus &&
       canonicalJson(graphCover.record.f) === canonicalJson(certificate.f) &&
       canonicalJson(graphCover.record.h) === canonicalJson(certificate.h),
     `HC1/report certificate mismatch for ${coverResult.slug}`,
+  );
+  check(
     graphMap.record.degree === certificate.degree &&
       canonicalJson(graphMap.record.x) === canonicalJson(certificate.x) &&
       canonicalJson(graphMap.record.y_v) === canonicalJson(certificate.y_v) &&
@@ -446,6 +671,7 @@ for (const coverResult of report.curves) {
       canonicalJson(graphMap.record.target_model_map) ===
         canonicalJson(certificate.target_model_map ?? null),
     `CV1/report certificate mismatch for ${coverResult.slug}`,
+  );
 
   if (certificate.construction === "binary_cubic_pullback_v1") {
     const degree = Number(targetModel.field.match(/^f2m-(\d+)-/u)?.[1]);
@@ -454,10 +680,13 @@ for (const coverResult of report.curves) {
     const b = BigInt(targetModel.b);
     const d = BigInt(certificate.y_0[0]);
 
+    check(
       targetModel.form === "y^2+xy=x^3+a*x^2+b" &&
         targetModel.field.startsWith("f2m-") &&
         b !== 0n,
       `invalid binary constructor input for ${coverResult.slug}`,
+    );
+    check(
       certificate.degree === 3 &&
         certificate.genus === 3 &&
         canonicalJson(certificate.h) === canonicalJson(["0x0", "0x0", "0x1"]) &&
@@ -465,6 +694,8 @@ for (const coverResult of report.curves) {
         canonicalJson(certificate.y_v) === canonicalJson(["0x0", "0x1"]) &&
         certificate.target_model_map === undefined,
       `invalid binary map shape for ${coverResult.slug}`,
+    );
+    check(
       certificate.f.length === 8 &&
         certificate.f[0] === "0x0" &&
         BigInt(certificate.f[1]) === d &&
@@ -475,12 +706,19 @@ for (const coverResult of report.curves) {
         certificate.f[6] === "0x0" &&
         certificate.f[7] === "0x1",
       `invalid binary source polynomial for ${coverResult.slug}`,
+    );
+    check(
       binaryMultiply(d, d, degree, modulusPolynomial) === b,
       `binary square-root identity failed for ${coverResult.slug}`,
+    );
     arithmeticChecks.binary += 1;
+    continue;
+  }
 
   if (certificate.construction !== "prime_quadratic_pullback_v1") {
     check(false, `unknown construction ${certificate.construction} for ${coverResult.slug}`);
+    continue;
+  }
 
   const shortModel = certificate.target_model_map?.source_model ?? targetModel;
   const p = BigInt(shortModel.p);
@@ -496,16 +734,20 @@ for (const coverResult of report.curves) {
   const discriminantTerm = field.add(
     field.scale(field.multiply(field.multiply(a, a), a), 4n),
     field.scale(field.multiply(b, b), 27n),
+  );
   const expectedF = [
     fAtC,
     field.zero(),
     field.add(field.scale(cSquared, 3n), a),
+    field.zero(),
     field.scale(c, 3n),
+    field.zero(),
     field.one,
   ];
   const actualF = certificate.f.map((coefficient) => field.decode(coefficient));
 
   check(p > 3n && (p & 1n) === 1n, `invalid odd characteristic for ${coverResult.slug}`);
+  check(
     certificate.degree === 2 &&
       certificate.genus === 2 &&
       certificate.h.length === 0 &&
@@ -516,11 +758,14 @@ for (const coverResult of report.curves) {
       certificate.x[1] === "0x0" &&
       certificate.x[2] === "0x1",
     `invalid odd-characteristic map shape for ${coverResult.slug}`,
+  );
   check(!field.equal(fAtC, field.zero()), `selected shift is a root for ${coverResult.slug}`);
   check(!field.equal(discriminantTerm, field.zero()), `singular short target for ${coverResult.slug}`);
+  check(
     actualF.length === expectedF.length &&
       actualF.every((coefficient, index) => field.equal(coefficient, expectedF[index])),
     `F(u^2+c) coefficient replay failed for ${coverResult.slug}`,
+  );
 
   const selectedShift = Number(BigInt(certificate.x[0]));
   for (let priorShift = 0; priorShift < selectedShift; priorShift += 1) {
@@ -529,18 +774,23 @@ for (const coverResult of report.curves) {
     const candidateCubed = field.multiply(candidateSquared, candidate);
     const value = field.add(field.add(candidateCubed, field.multiply(a, candidate)), b);
     check(field.equal(value, field.zero()), `shift is not the first nonroot for ${coverResult.slug}`);
+  }
 
   if (extensionDegree > 1) {
+    check(
       targetModel.form === "y^2=x^3+a*x+b" &&
         targetModel.field.startsWith("fpk-") &&
         targetModel.modulus.length === extensionDegree &&
+        certificate.target_model_map === undefined,
       `invalid extension-field target for ${coverResult.slug}`,
+    );
     arithmeticChecks.extension += 1;
   } else {
     if (targetModel.form === "y^2=x^3+a*x+b") {
       check(certificate.target_model_map === undefined, `unexpected target model map for ${coverResult.slug}`);
     } else {
       const targetMap = certificate.target_model_map;
+      check(
         targetMap !== undefined &&
           targetMap.degree === 1 &&
           targetMap.status === "verified_algebraic_identity" &&
@@ -548,6 +798,7 @@ for (const coverResult of report.curves) {
           targetMap.source_model.form === "y^2=x^3+a*x+b" &&
           targetMap.source_model.field === targetModel.field,
         `invalid birational target-model map for ${coverResult.slug}`,
+      );
       if (targetMap !== undefined) {
         const fieldPrime = BigInt(targetModel.p);
         const montgomeryA = BigInt(targetMap.montgomery_A);
@@ -569,6 +820,7 @@ for (const coverResult of report.curves) {
               "unique extension of the birational map to smooth projective models",
           `target normalization metadata mismatch for ${coverResult.slug}`,
         );
+        check(
           montgomeryA >= 0n &&
             montgomeryA < fieldPrime &&
             montgomeryB > 0n &&
@@ -579,11 +831,14 @@ for (const coverResult of report.curves) {
             scale < fieldPrime &&
             mod(3n * shift, fieldPrime) === montgomeryA,
           `target normalization parameter range/shift mismatch for ${coverResult.slug}`,
+        );
+        check(
           mod(square(montgomeryB) * shortA, fieldPrime) ===
               mod(1n - montgomeryA * shift, fieldPrime) &&
             mod(cube(montgomeryB) * shortB, fieldPrime) ===
               mod(2n * cube(shift) - shift, fieldPrime),
           `short/Montgomery coefficient identity failed for ${coverResult.slug}`,
+        );
 
         if (targetModel.form === "B*y^2=x^3+A*x^2+x") {
           check(
@@ -597,6 +852,7 @@ for (const coverResult of report.curves) {
               targetMap.inverse.Y === "y/B" &&
               mod(square(montgomeryA) - 4n, fieldPrime) !== 0n,
             `Montgomery normalization replay failed for ${coverResult.slug}`,
+          );
         } else {
           const twisted = targetModel.form === "a*x^2+y^2=1+d*x^2*y^2";
           const scaled =
@@ -608,6 +864,7 @@ for (const coverResult of report.curves) {
             ? mod(rawD * square(square(targetScale)), fieldPrime)
             : rawD;
           const denominator = mod(edwardsA - edwardsD, fieldPrime);
+          check(
             (twisted || scaled) &&
               targetMap.kind === "edwards_from_short" &&
               scale === targetScale &&
@@ -624,19 +881,26 @@ for (const coverResult of report.curves) {
               targetMap.inverse.X === "((c+y)/(c-y)+A/3)/B" &&
               targetMap.inverse.Y === "c*(c+y)/(B*x*(c-y))",
             `Edwards normalization replay failed for ${coverResult.slug}`,
+          );
+        }
         arithmeticChecks.normalized_target += 1;
+      }
+    }
     arithmeticChecks.prime += 1;
+  }
+}
 
 check(constructionCounts.binary_cubic_pullback_v1 === 165, "unexpected binary-construction count");
-check(constructionCounts.prime_quadratic_pullback_v1 === 15648, "unexpected odd-construction count");
+check(constructionCounts.prime_quadratic_pullback_v1 === 15626, "unexpected odd-construction count");
 check(arithmeticChecks.binary === 165, "unexpected binary arithmetic-replay count");
-check(arithmeticChecks.prime === 14305, "unexpected prime-field arithmetic-replay count");
-check(arithmeticChecks.extension === 1343, "unexpected extension-field arithmetic-replay count");
+check(arithmeticChecks.prime === 14302, "unexpected prime-field arithmetic-replay count");
+check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
+check(
   arithmeticChecks.normalized_target === 30,
   "unexpected normalized-target algebraic-replay count",
+);
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "17922e31b1ef00ca0f1c3cc04647b10d7f278198";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -670,9 +934,11 @@ const expectedMapClaimIds = [
   "jacobian_arithmetic_for_cover",
   "pullback_point_classes",
   "pushforward_point_divisors",
+].sort();
 const expectedSubgroupClaimIds = [
   "catalog_order_annihilates_generator",
   "composition_on_generator",
+  "computational_advantage",
   "degree_inverse_recovery",
   "gcd_degree_catalog_order",
   "generator_on_curve",
@@ -684,9 +950,10 @@ const expectedSubgroupClaimIds = [
   "pullback_valid",
   "recovery_from_arbitrary_jacobian_result",
   "subgroup_identity",
+].sort();
 const expectedTemplateStatuses = {
   "map.advantage.unknown": "unknown",
-  "map.binary-arbitrary-pushforward.refuted": "refuted",
+  "map.binary-arbitrary-pushforward.supported": "supported",
   "map.binary-composition.supported": "supported",
   "map.binary-construction.supported": "supported",
   "map.binary-jacobian.supported": "supported",
@@ -700,11 +967,18 @@ const expectedTemplateStatuses = {
   "map.fp827-geometry.supported": "supported",
   "map.geometry.catalog-supported": "supported",
   "map.independent-oracle.unknown": "unknown",
+  "map.prime-balanced.supported": "supported",
+  "map.prime-composition.supported": "supported",
   "map.prime-construction.supported": "supported",
-  "map.prime-jacobian.refuted": "refuted",
+  "map.prime-extension-balanced.refuted": "refuted",
+  "map.prime-extension-transfer.refuted": "refuted",
   "map.prime-normalization.supported": "supported",
+  "map.prime-normalized-transfer.refuted": "refuted",
   "map.prime-pipeline.refuted": "refuted",
-  "map.prime-transfer.unknown": "unknown",
+  "map.prime-proof-backend.refuted": "refuted",
+  "map.prime-proof-transfer.refuted": "refuted",
+  "map.prime-pullback.supported": "supported",
+  "map.prime-pushforward.supported": "supported",
   "map.same-field.not-applicable": "not_applicable",
   "subgroup.arbitrary-recovery.unknown": "unknown",
   "subgroup.binary-annihilation.supported": "supported",
@@ -715,8 +989,6 @@ const expectedTemplateStatuses = {
   "subgroup.binary-injective-generated.unknown": "unknown",
   "subgroup.binary-inverse-recovery.supported": "supported",
   "subgroup.binary-pullback.supported": "supported",
-  "subgroup.binary-untested-generator.unknown": "unknown",
-  "subgroup.binary-untested-transfer.unknown": "unknown",
   "subgroup.degree-coprime.supported": "supported",
   "subgroup.exact-image-order29.supported": "supported",
   "subgroup.exact-order29.supported": "supported",
@@ -738,7 +1010,7 @@ const expectedProfiles = {
       pullback_point_classes: "map.binary-pullback.supported",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
       pushforward_point_divisors: "map.binary-typed-pushforward.supported",
-      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.refuted",
+      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.supported",
       composition_on_typed_domain: "map.binary-composition.supported",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.same-field.not-applicable",
@@ -746,25 +1018,105 @@ const expectedProfiles = {
     },
     full_transfer_pipeline: "map.binary-pipeline.refuted",
   },
-  "map.odd-prime-quadratic.direct": {
-    predicate_id: "odd_prime_quadratic_direct_same_field",
+  "map.odd-prime-quadratic.direct.proved-u64": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_proved_u64",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.prime-construction.supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-balanced.supported",
+      pullback_point_classes: "map.prime-pullback.supported",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-pushforward.supported",
+      arbitrary_jacobian_pushforward: "map.prime-pushforward.supported",
+      composition_on_typed_domain: "map.prime-composition.supported",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
     full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
+  "map.odd-prime-quadratic.direct.proved-psi13": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_proved_psi13",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-balanced.supported",
+      pullback_point_classes: "map.prime-pullback.supported",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-pushforward.supported",
+      arbitrary_jacobian_pushforward: "map.prime-pushforward.supported",
+      composition_on_typed_domain: "map.prime-composition.supported",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
+  "map.odd-prime-quadratic.direct.unsupported-proof": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_unsupported_without_primality_certificate",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-proof-backend.refuted",
+      pullback_point_classes: "map.prime-proof-transfer.refuted",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-proof-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-proof-transfer.refuted",
+      composition_on_typed_domain: "map.prime-proof-transfer.refuted",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
   "map.odd-prime-quadratic.normalized": {
+    kind: "map_base",
     predicate_id: "odd_prime_quadratic_normalized_same_field",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-proof-backend.refuted",
+      pullback_point_classes: "map.prime-normalized-transfer.refuted",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-normalized-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-normalized-transfer.refuted",
+      composition_on_typed_domain: "map.prime-normalized-transfer.refuted",
       alternate_target_model_map: "map.prime-normalization.supported",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
   "map.odd-extension-quadratic.direct": {
+    kind: "map_base",
     predicate_id: "odd_extension_quadratic_direct_same_field",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.extension-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-extension-balanced.refuted",
+      pullback_point_classes: "map.prime-extension-transfer.refuted",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-extension-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-extension-transfer.refuted",
+      composition_on_typed_domain: "map.prime-extension-transfer.refuted",
+      alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.extension-descent.unknown",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
   "subgroup.binary-degree3": {
     kind: "subgroup_base",
     predicate_id: "linked_subgroup_degree3",
+    claims: {
       subgroup_identity: "subgroup.identity.supported",
       gcd_degree_catalog_order: "subgroup.degree-coprime.supported",
       generator_on_curve: "subgroup.binary-generator.supported",
@@ -778,10 +1130,18 @@ const expectedProfiles = {
       image_order_equals_catalog_order: "subgroup.image-numeric-order.unknown",
       degree_inverse_recovery: "subgroup.binary-inverse-recovery.supported",
       recovery_from_arbitrary_jacobian_result: "subgroup.arbitrary-recovery.unknown",
+      computational_advantage: "map.advantage.unknown",
+    },
+  },
   "subgroup.odd-degree2": {
+    kind: "subgroup_base",
     predicate_id: "linked_subgroup_degree2",
+    claims: {
+      subgroup_identity: "subgroup.identity.supported",
+      gcd_degree_catalog_order: "subgroup.degree-coprime.supported",
       generator_on_curve: "subgroup.prime-generator.unknown",
       catalog_order_annihilates_generator: "subgroup.prime-generator.unknown",
+      numeric_exact_source_order: "subgroup.numeric-order.unknown",
       pullback_valid: "subgroup.prime-transfer.unknown",
       image_annihilated_by_catalog_order: "subgroup.prime-transfer.unknown",
       composition_on_generator: "subgroup.prime-transfer.unknown",
@@ -789,13 +1149,22 @@ const expectedProfiles = {
       image_order_equals_actual_source_order: "subgroup.prime-transfer.unknown",
       image_order_equals_catalog_order: "subgroup.prime-transfer.unknown",
       degree_inverse_recovery: "subgroup.prime-transfer.unknown",
+      recovery_from_arbitrary_jacobian_result: "subgroup.arbitrary-recovery.unknown",
+      computational_advantage: "map.advantage.unknown",
+    },
+  },
+};
 const expectedControlStatuses = {
   identity: ["supported", null],
   geometry: ["supported", null],
   arithmetic_internal: ["supported", null],
   arithmetic_independent_oracle: ["unknown", "independent_map_oracle"],
+  binary_f2_source_law_pilot: ["supported", null],
   binary_catalog_subgroups: ["supported", null],
-  odd_degree2_transfer: ["refuted", null],
+  odd_degree2_direct_transfer_runtime: ["supported", null],
+  odd_degree2_primality_fail_closed: ["supported", null],
+  odd_degree2_normalized_fail_closed: ["supported", null],
+  odd_degree2_extension_fail_closed: ["supported", null],
   published_artifact: ["refuted", "catalog_wide_packaged_binary"],
   cross_repository_core_parity: ["supported", null],
   current_fixed_f8_cross_repository_parity: [
@@ -804,14 +1173,16 @@ const expectedControlStatuses = {
   ],
   coordinate_controls: ["unknown", "coordinate_controls"],
   paired_performance: ["not_applicable", null],
+};
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "91a1695012de08dedf823da26d6b97704ef4768963bf92c7741b1ed7b0c4fd1d",
-  profiles: "3bdd304400d1eebc6d86a4fcebdac6d9f8377232e0692cbf50319cf314c071dd",
-  controls: "4a202047ce88566f46de87d80ce2befe49f02ec9b1414053bd44b9adbf27e89c",
-  open_obligations: "238520a990f10a3f542ea12f9fa75367716a0e046450f2e3df37687e144676fa",
+  result_templates: "b1e576c5e57af064233316481d58bf629ce69ac6a274c6205ed09616b1f50d75",
+  profiles: "853cf08ea5a8d4bcbfdd8048bcfe47d9826b059dda35e926934d63f0278ecbbd",
+  controls: "1363a5847f14b2558d457398b042f0d1f6798b0129d876e4ff4e49bb7c7e0191",
+  open_obligations: "f92c7adfa7366d0ca33f3578bf24da9fa023c20850939dc1d3fffa9fc0efe3ad",
   global_cost_accounting:
-    "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
+    "79e885e252d5ba207bc7b00e5e67a3f44e58271abc624b5f9931c4fec1656d12",
+};
 const expectedCostStatuses = {
   cover_construction: "unknown",
   failed_construction_searches: "unknown",
@@ -826,6 +1197,7 @@ const expectedCostStatuses = {
   matched_generic_baseline: "unknown",
   end_to_end_speedup: "unknown",
   jacobian_relations_linear_algebra_target_decomposition: "not_applicable",
+};
 const requiredSourceArtifactPaths = [
   "Cargo.toml",
   "Cargo.lock",
@@ -837,10 +1209,13 @@ const requiredSourceArtifactPaths = [
   "docs/curves/cover-transfer-assessment.schema.json",
   "docs/curves/fixed-f8-genus3-order-certificate.json",
   "scripts/build_cover_transfer_assessments.mjs",
+  "scripts/catalog_snapshot.mjs",
+  "scripts/test_cover_transfer_assessment.mjs",
   "src/bin/curve_cover_check/checker.rs",
   "src/bin/curve_cover_check/models.rs",
   "src/bin/curve_cover_check/links.rs",
   "src/bin/curve_cover_check.rs",
+  "src/bin/curve_transfer_sweep.rs",
   "src/bin/hyperelliptic_cover.rs",
   "src/bin/ecdlp_audit/fixed_f8_order.rs",
   "src/lib.rs",
@@ -850,6 +1225,7 @@ const requiredSourceArtifactPaths = [
   "src/binary_ecc/curve.rs",
   "src/binary_ecc/cover_transfer.rs",
   "src/binary_ecc/hyperelliptic.rs",
+  "tests/binary_cover_transfer_f2_source_oracle.rs",
   "src/cryptanalysis/mod.rs",
   "src/cryptanalysis/ecc2k130_guard.rs",
   "src/hash/mod.rs",
@@ -858,6 +1234,9 @@ const requiredSourceArtifactPaths = [
   "src/prime_hyperelliptic/fp2.rs",
   "src/prime_hyperelliptic/fp_poly.rs",
   "src/prime_hyperelliptic/curve.rs",
+  "src/prime_hyperelliptic/primality.rs",
+  "src/prime_hyperelliptic/balanced.rs",
+  "src/prime_hyperelliptic/cover_transfer.rs",
   "src/utils/mod.rs",
   "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
   "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
@@ -867,37 +1246,68 @@ const requiredSourceArtifactPaths = [
 ];
 const closedMapPredicates = [
   "binary_cubic_same_field",
-  "odd_prime_quadratic_direct_same_field",
+  "odd_prime_quadratic_direct_proved_u64",
+  "odd_prime_quadratic_direct_proved_psi13",
+  "odd_prime_quadratic_direct_unsupported_without_primality_certificate",
   "odd_prime_quadratic_normalized_same_field",
   "odd_extension_quadratic_direct_same_field",
+].sort();
 const closedSubgroupPredicates = [
   "linked_subgroup_degree3",
   "linked_subgroup_degree2",
+].sort();
 const mapMembershipDomain = "cover-transfer-assessments/v2/map_base";
 const subgroupMembershipDomain = "cover-transfer-assessments/v2/subgroup_base";
 
+check(
   assessment.schema_version === "cover-transfer-assessments/v2",
   "assessment schema version is not cover-transfer-assessments/v2",
+);
+check(
   canonicalJson(sortedObjectKeys(assessment)) === canonicalJson(expectedRootKeys),
   "assessment root key set changed",
+);
+check(
   assessment.catalog_commit === expectedCatalogCommit,
   "assessment catalog commit changed",
+);
+check(
+  assessment.assessment_date === expectedAssessmentDate,
+  "assessment date does not identify the 2026-11-18 semantic refresh",
+);
 for (const relativePath of [
+  "docs/curves/registry.json",
+  "docs/curves/covers.json",
+  "docs/curves/cover-links.yaml",
 ]) {
+  try {
     const committedBytes = execFileSync(
       "git",
       ["show", `${assessment.catalog_commit}:${relativePath}`],
-      { cwd: root, encoding: "buffer", maxBuffer: 64 * 1024 * 1024 },
-      sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
+      { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
+    );
+    check(
+      sha256(committedBytes) === sha256(catalogSnapshotBytes(root, relativePath, expectedCatalogCommit)),
       `catalog file ${relativePath} does not match catalog_commit ${assessment.catalog_commit}`,
+    );
   } catch (error) {
+    check(
       false,
       `cannot resolve catalog_commit ${assessment.catalog_commit} for ${relativePath}: ${error.message}`,
+    );
+  }
+}
+check(
   canonicalJson(assessment.status_vocabulary) === canonicalJson(expectedStatusVocabulary),
   "assessment status vocabulary changed",
+);
 for (const [section, expectedDigest] of Object.entries(expectedSemanticDigests)) {
-    sha256(canonicalJson(assessment[section])) === expectedDigest,
-    `authoritative semantic digest mismatch for ${section}`,
+  const actualDigest = sha256(canonicalJson(assessment[section]));
+  check(
+    actualDigest === expectedDigest,
+    `authoritative semantic digest mismatch for ${section}: expected ${expectedDigest}, got ${actualDigest}`,
+  );
+}
 
 const allowedStatuses = new Set(expectedStatusVocabulary);
 const sourceArtifacts = Array.isArray(assessment.source_artifacts)
@@ -908,18 +1318,33 @@ const sourceArtifactPaths = new Set();
 for (const artifact of sourceArtifacts) {
   if (!isPlainObject(artifact)) {
     check(false, "source_artifacts contains a non-object");
+    continue;
+  }
+  check(
     typeof artifact.path === "string" && !sourceArtifactPaths.has(artifact.path),
     "duplicate or invalid source-artifact path",
+  );
   sourceArtifactPaths.add(artifact.path);
   const absolute = resolveRepoPath(artifact.path);
   check(absolute !== null, "unsafe source-artifact path " + String(artifact.path));
   check(absolute !== null && fs.existsSync(absolute), "missing source artifact " + String(artifact.path));
   if (absolute !== null && fs.existsSync(absolute)) {
-      /^[0-9a-f]{64}$/u.test(artifact.sha256) &&
-        sha256(fs.readFileSync(absolute)) === artifact.sha256,
-      "source-artifact digest mismatch for " + artifact.path,
+    try {
+      const bytes = Object.hasOwn(artifact, "source_commit")
+        ? legacyFormulaSnapshotBytes(root, artifact.path, artifact.source_commit)
+        : catalogSnapshotBytes(root, artifact.path, expectedCatalogCommit);
+      check(
+        /^[0-9a-f]{64}$/u.test(artifact.sha256) && sha256(bytes) === artifact.sha256,
+        "source-artifact digest mismatch for " + artifact.path,
+      );
+    } catch (error) {
+      check(false, `unreadable pinned source artifact ${artifact.path}: ${error.message}`);
+    }
+  }
+}
 for (const requiredPath of requiredSourceArtifactPaths) {
   check(sourceArtifactPaths.has(requiredPath), "missing required source pin " + requiredPath);
+}
 
 const checkerSourceDigest = sha256(
   Buffer.concat(
@@ -930,18 +1355,31 @@ const checkerSourceDigest = sha256(
       "src/bin/curve_cover_check.rs",
     ].map((relativePath) => fs.readFileSync(path.join(root, relativePath))),
   ),
+);
+check(
   /^[0-9a-f]{64}$/u.test(report.checker_source_sha256) &&
     report.checker_source_sha256 === checkerSourceDigest,
   "cover report checker_source_sha256 does not match the complete native checker source",
+);
 
 const catalogProducerSourceDigest = sha256(
+  Buffer.concat(
+    [
+      "src/bin/curve_cover_check/checker.rs",
+      "src/bin/curve_cover_check/models.rs",
       "src/bin/hyperelliptic_cover.rs",
+    ].map((relativePath) => fs.readFileSync(path.join(root, relativePath))),
+  ),
+);
 const infrastructureDocumentation = fs.readFileSync(
   path.join(curvesDir, "HYPERELLIPTIC_INFRASTRUCTURE.md"),
   "utf8",
+);
+check(
   /checker source,\s+model\s+normalization source/u.test(infrastructureDocumentation) &&
     infrastructureDocumentation.includes(`\`${catalogProducerSourceDigest}\``),
   "catalog-export producer-source definition or digest is stale",
+);
 
 const resultTemplates = isPlainObject(assessment.result_templates)
   ? assessment.result_templates
@@ -949,9 +1387,11 @@ const resultTemplates = isPlainObject(assessment.result_templates)
 const profiles = isPlainObject(assessment.profiles) ? assessment.profiles : {};
 const claimContract = isPlainObject(assessment.claim_contract)
   ? assessment.claim_contract
+  : {};
 const mapClaimContract = isPlainObject(claimContract.map) ? claimContract.map : {};
 const subgroupClaimContract = isPlainObject(claimContract.subgroup)
   ? claimContract.subgroup
+  : {};
 const mapClaimIds = sortedObjectKeys(mapClaimContract);
 const subgroupClaimIds = sortedObjectKeys(subgroupClaimContract);
 check(isPlainObject(assessment.result_templates), "result_templates is not an object");
@@ -959,112 +1399,179 @@ check(isPlainObject(assessment.profiles), "profiles is not an object");
 check(isPlainObject(assessment.claim_contract), "claim_contract is not an object");
 check(mapClaimIds.length > 0, "map claim contract is empty");
 check(subgroupClaimIds.length > 0, "subgroup claim contract is empty");
+check(
   canonicalJson(mapClaimIds) === canonicalJson(expectedMapClaimIds),
   "map claim contract is not the closed authoritative claim set",
+);
+check(
   canonicalJson(subgroupClaimIds) === canonicalJson(expectedSubgroupClaimIds),
   "subgroup claim contract is not the closed authoritative claim set",
+);
 for (const [kind, contract] of [
   ["map", mapClaimContract],
   ["subgroup", subgroupClaimContract],
+]) {
   for (const [claimId, description] of Object.entries(contract)) {
+    check(
       typeof claimId === "string" &&
         claimId.length > 0 &&
         typeof description === "string" &&
         description.trim().length > 0,
       kind + " claim contract has an invalid entry",
+    );
+  }
+}
 
 const obligations = Array.isArray(assessment.open_obligations)
   ? assessment.open_obligations
+  : [];
 check(Array.isArray(assessment.open_obligations), "open_obligations is not an array");
 const obligationIds = new Set();
 for (const obligation of obligations) {
   check(isPlainObject(obligation), "open_obligations contains a non-object");
   if (!isPlainObject(obligation)) {
+    continue;
+  }
+  check(
     typeof obligation.id === "string" &&
       obligation.id.length > 0 &&
       !obligationIds.has(obligation.id),
     "duplicate or invalid open-obligation ID",
+  );
   obligationIds.add(obligation.id);
   check(obligation.status === "unknown", "open obligation is not unknown: " + String(obligation.id));
+}
 
 const usedTemplateIds = new Set();
 const referencedObligationIds = new Set();
+check(
   canonicalJson(sortedObjectKeys(resultTemplates)) ===
     canonicalJson(sortedObjectKeys(expectedTemplateStatuses)),
   "result-template set changed from the authoritative verifier matrix",
+);
 for (const [templateId, expectedStatus] of Object.entries(expectedTemplateStatuses)) {
+  check(
     resultTemplates[templateId]?.status === expectedStatus,
     `authoritative status mismatch for result template ${templateId}`,
+  );
+}
 for (const [templateId, template] of Object.entries(resultTemplates)) {
   check(templateId.length > 0, "empty result-template ID");
   check(isPlainObject(template), "result template is not an object: " + templateId);
   if (!isPlainObject(template)) {
+    continue;
+  }
   check(allowedStatuses.has(template.status), "invalid template status: " + templateId);
+  check(
     typeof template.scope === "string" && template.scope.trim().length > 0,
     "template scope is empty: " + templateId,
+  );
+  check(
     typeof template.rationale === "string" && template.rationale.trim().length > 0,
     "template rationale is empty: " + templateId,
+  );
   const evidenceRefs = Array.isArray(template.evidence_refs) ? template.evidence_refs : [];
   check(Array.isArray(template.evidence_refs), "template evidence_refs is not an array: " + templateId);
+  check(
     new Set(evidenceRefs).size === evidenceRefs.length &&
       evidenceRefs.every((reference) => typeof reference === "string" && reference.length > 0),
     "template evidence_refs is not a unique nonempty string set: " + templateId,
+  );
   for (const reference of evidenceRefs) {
     check(evidenceReferenceResolves(reference), "unresolved template evidence reference: " + reference);
+  }
   if (template.status === "supported" || template.status === "refuted") {
     check(evidenceRefs.length > 0, "supported/refuted template lacks evidence: " + templateId);
     for (const reference of evidenceRefs) {
+      check(
         sourceArtifactPaths.has(evidenceReferencePath(reference)),
         `supported/refuted template evidence is not SHA-pinned: ${templateId}: ${reference}`,
+      );
+    }
+  }
   if (template.status === "supported") {
+    check(
       template.obligation_id === undefined,
       "supported template unexpectedly carries an obligation: " + templateId,
+    );
   } else if (template.status === "unknown") {
+    check(
       typeof template.obligation_id === "string" &&
         obligationIds.has(template.obligation_id),
       "unknown template lacks a known obligation: " + templateId,
+    );
     if (typeof template.obligation_id === "string") {
       referencedObligationIds.add(template.obligation_id);
+    }
   } else if (template.status === "refuted") {
+    check(
       template.obligation_id === undefined ||
         (typeof template.obligation_id === "string" &&
           obligationIds.has(template.obligation_id)),
       "refuted template has an unknown obligation: " + templateId,
+    );
+    if (typeof template.obligation_id === "string") {
+      referencedObligationIds.add(template.obligation_id);
+    }
+  } else {
+    check(
+      template.obligation_id === undefined,
       "not-applicable template unexpectedly carries an obligation: " + templateId,
+    );
+  }
+}
 
 function requireTemplate(templateId, context) {
+  check(
     typeof templateId === "string" && Object.hasOwn(resultTemplates, templateId),
     context + " references an unknown result template " + String(templateId),
+  );
   if (typeof templateId === "string") {
     usedTemplateIds.add(templateId);
+  }
+}
 
 const mapProfilesByPredicate = new Map();
 const subgroupProfilesByPredicate = new Map();
+check(
   canonicalJson(sortedObjectKeys(profiles)) ===
     canonicalJson(sortedObjectKeys(expectedProfiles)),
   "profile set changed from the authoritative verifier matrix",
+);
 for (const [profileId, expectedProfile] of Object.entries(expectedProfiles)) {
   const actualProfile = profiles[profileId];
   check(isPlainObject(actualProfile), `missing authoritative profile ${profileId}`);
   if (!isPlainObject(actualProfile)) {
+    continue;
+  }
+  check(
     actualProfile.kind === expectedProfile.kind &&
       actualProfile.predicate_id === expectedProfile.predicate_id &&
       canonicalJson(actualProfile.claims) === canonicalJson(expectedProfile.claims) &&
       actualProfile.full_transfer_pipeline === expectedProfile.full_transfer_pipeline,
     `claim/template assignment changed for authoritative profile ${profileId}`,
+  );
+}
 for (const [profileId, profile] of Object.entries(profiles)) {
   check(isPlainObject(profile), "profile is not an object: " + profileId);
   if (!isPlainObject(profile)) {
+    continue;
+  }
   const expectedClaimIds =
     profile.kind === "map_base"
       ? mapClaimIds
       : profile.kind === "subgroup_base"
         ? subgroupClaimIds
         : [];
+  check(
     profile.kind === "map_base" || profile.kind === "subgroup_base",
     "invalid profile kind: " + profileId,
+  );
+  check(
     typeof profile.predicate_id === "string" && profile.predicate_id.length > 0,
     "invalid profile predicate: " + profileId,
+  );
+  check(
     Array.isArray(profile.hypotheses) &&
       profile.hypotheses.length > 0 &&
       new Set(profile.hypotheses).size === profile.hypotheses.length &&
@@ -1072,62 +1579,130 @@ for (const [profileId, profile] of Object.entries(profiles)) {
         (hypothesis) => typeof hypothesis === "string" && hypothesis.trim().length > 0,
       ),
     "profile hypotheses are not a unique nonempty string set: " + profileId,
+  );
+  check(
     typeof profile.boundary === "string" && profile.boundary.trim().length > 0,
     "profile boundary is empty: " + profileId,
+  );
   check(isPlainObject(profile.claims), "profile claims is not an object: " + profileId);
   const actualClaimIds = isPlainObject(profile.claims) ? sortedObjectKeys(profile.claims) : [];
+  check(
     canonicalJson(actualClaimIds) === canonicalJson(expectedClaimIds),
     "profile claim set is incomplete or has extras: " + profileId,
+  );
   for (const [claimId, templateId] of Object.entries(profile.claims ?? {})) {
     check(expectedClaimIds.includes(claimId), "profile uses an unknown claim: " + profileId);
     requireTemplate(templateId, "profile " + profileId + " claim " + claimId);
+  }
   if (profile.kind === "map_base") {
+    check(
       !mapProfilesByPredicate.has(profile.predicate_id),
       "duplicate map predicate profile " + profile.predicate_id,
+    );
     mapProfilesByPredicate.set(profile.predicate_id, profileId);
     requireTemplate(profile.full_transfer_pipeline, "map profile " + profileId + " full pipeline");
   } else if (profile.kind === "subgroup_base") {
+    check(
       !subgroupProfilesByPredicate.has(profile.predicate_id),
       "duplicate subgroup predicate profile " + profile.predicate_id,
+    );
     subgroupProfilesByPredicate.set(profile.predicate_id, profileId);
+    check(
       profile.full_transfer_pipeline === undefined,
       "subgroup profile unexpectedly defines full_transfer_pipeline: " + profileId,
+    );
+  }
+}
 const fullPipelinePrerequisites = [
+  "cover_existence",
+  "curve_map_correctness",
+  "jacobian_arithmetic_for_cover",
+  "pullback_point_classes",
+  "pushforward_point_divisors",
+  "arbitrary_jacobian_pushforward",
+  "composition_on_typed_domain",
+];
+for (const [profileId, profile] of Object.entries(profiles)) {
   if (profile.kind !== "map_base") {
+    continue;
+  }
   const pipelineStatus = resultTemplates[profile.full_transfer_pipeline]?.status;
   if (pipelineStatus === "supported") {
     for (const claimId of fullPipelinePrerequisites) {
       const prerequisiteStatus = resultTemplates[profile.claims?.[claimId]]?.status;
+      check(
         prerequisiteStatus === "supported",
         `full transfer pipeline ${profileId} is supported while prerequisite ${claimId} is ${String(prerequisiteStatus)}`,
+      );
+    }
+  }
+}
+check(
   canonicalJson([...mapProfilesByPredicate.keys()].sort()) === canonicalJson(closedMapPredicates),
   "map profiles do not implement the closed predicate set",
+);
+check(
   canonicalJson([...subgroupProfilesByPredicate.keys()].sort()) ===
     canonicalJson(closedSubgroupPredicates),
   "subgroup profiles do not implement the closed predicate set",
+);
 
 const mapContexts = new Map();
 const subgroupContexts = new Map();
+for (const graphCurve of graph.curves) {
   if (graphCurve.cover_links.length !== 1) {
+    continue;
+  }
+  const link = graphCurve.cover_links[0];
+  const graphMap = graph.maps[link.map_uid];
   const coverResult = reportByModelHash.get(graphCurve.model_sha256);
   if (graphMap === undefined || coverResult === undefined) {
+    continue;
+  }
   const targetModel = JSON.parse(graphCurve.model_json);
   let predicateId = null;
+  if (
     coverResult.certificate.construction === "binary_cubic_pullback_v1" &&
     targetModel.field.startsWith("f2m-") &&
     targetModel.form === "y^2+xy=x^3+a*x^2+b" &&
     graphMap.record.target_model_map === null
+  ) {
     predicateId = "binary_cubic_same_field";
   } else if (
     coverResult.certificate.construction === "prime_quadratic_pullback_v1" &&
     targetModel.field.startsWith("fp-") &&
     targetModel.form === "y^2=x^3+a*x+b" &&
-    predicateId = "odd_prime_quadratic_direct_same_field";
+    graphMap.record.target_model_map === null
+  ) {
+    const proofStatus = verifierPrimeProofStatus(targetModel.p);
+    check(proofStatus !== "composite", "direct-prime profile contains a composite modulus");
+    predicateId = proofStatus === "proved_u64"
+      ? "odd_prime_quadratic_direct_proved_u64"
+      : proofStatus === "proved_psi13"
+        ? "odd_prime_quadratic_direct_proved_psi13"
+        : proofStatus === "unsupported_without_primality_certificate"
+          ? "odd_prime_quadratic_direct_unsupported_without_primality_certificate"
+          : null;
+  } else if (
+    coverResult.certificate.construction === "prime_quadratic_pullback_v1" &&
+    targetModel.field.startsWith("fp-") &&
     targetModel.form !== "y^2=x^3+a*x+b" &&
     graphMap.record.target_model_map !== null
+  ) {
+    check(
+      verifierPrimeProofStatus(targetModel.p) ===
+        "unsupported_without_primality_certificate",
+      "normalized profile proof boundary changed",
+    );
     predicateId = "odd_prime_quadratic_normalized_same_field";
+  } else if (
+    coverResult.certificate.construction === "prime_quadratic_pullback_v1" &&
     targetModel.field.startsWith("fpk-") &&
+    targetModel.form === "y^2=x^3+a*x+b" &&
+    graphMap.record.target_model_map === null
+  ) {
     predicateId = "odd_extension_quadratic_direct_same_field";
+  }
   check(predicateId !== null, "map matches no closed predicate: " + link.map_uid);
   mapContexts.set(link.map_uid, {
     predicateId,
@@ -1151,19 +1726,27 @@ const subgroupContexts = new Map();
       graphCurve,
       graphMap,
     });
+    check(
       graphMap.record.degree === 2 || graphMap.record.degree === 3,
       "subgroup map has an unsupported degree: " + tripleKey,
+    );
+  }
+}
 check(mapContexts.size === Object.keys(graph.maps).length, "not every CV1 map has a predicate context");
 check(subgroupContexts.size === representationCount, "not every EC1 representation has a subgroup context");
 
 const typedBindings = isPlainObject(assessment.typed_bindings)
   ? assessment.typed_bindings
+  : {};
 const actualFieldBindings = isPlainObject(typedBindings.fields)
   ? typedBindings.fields
+  : {};
 const actualJacobianBindings = isPlainObject(typedBindings.jacobians)
   ? typedBindings.jacobians
+  : {};
 const actualTypedMapBindings = isPlainObject(typedBindings.maps)
   ? typedBindings.maps
+  : {};
 check(isPlainObject(assessment.typed_bindings), "typed_bindings is not an object");
 check(isPlainObject(typedBindings.fields), "typed_bindings.fields is not an object");
 check(isPlainObject(typedBindings.jacobians), "typed_bindings.jacobians is not an object");
@@ -1177,42 +1760,60 @@ for (const [mapUid, context] of mapContexts) {
   const link = context.graphCurve.cover_links[0];
   const sourceCover = graph.covers[link.cover_uid];
   if (sourceCover === undefined) {
+    continue;
+  }
   const targetModel = JSON.parse(context.graphCurve.model_json);
   const targetFieldRecord = targetDeclaredFieldRecord(targetModel);
+  check(
     canonicalJson(sourceCover.record.field) === canonicalJson(targetFieldRecord),
     "typed binding source/target field mismatch for " + mapUid,
+  );
   const field = expectedDeclaredFieldBinding(sourceCover.record.field);
   const priorField = expectedFieldBindings.get(field.field_uid);
+  check(
     priorField === undefined || canonicalJson(priorField) === canonicalJson(field),
     "declared-field UID collision for " + mapUid,
+  );
   expectedFieldBindings.set(field.field_uid, field);
   const priorLabelUid = fieldUidByLabel.get(field.record.label);
+  check(
     priorLabelUid === undefined || priorLabelUid === field.field_uid,
     "declared-field label names multiple records: " + field.record.label,
+  );
   fieldUidByLabel.set(field.record.label, field.field_uid);
 
   if (field.representation === "prime") {
+    check(
       field.record.label === `fp-${field.characteristic}` && field.extension_degree === 1,
       "invalid prime-field context for " + field.record.label,
+    );
   } else if (field.representation === "odd_polynomial_extension") {
+    check(
       Array.isArray(field.record.modulus) &&
         field.record.modulus.length === field.extension_degree &&
         field.record.label.startsWith(`fpk-${field.characteristic}-${field.extension_degree}-`),
       "invalid odd-extension context for " + field.record.label,
+    );
+  } else {
+    check(
       field.representation === "binary_polynomial_extension" &&
         field.characteristic === "2" &&
         typeof field.record.modulus === "string" &&
         field.record.label.startsWith(`f2m-${field.extension_degree}-`),
       "invalid binary-extension context for " + field.record.label,
+    );
+  }
 
   const binary = context.predicateId === "binary_cubic_same_field";
   const infinityConfiguration = binary
     ? "one_rational_point"
     : "two_rational_points";
+  check(
     binary
       ? sourceCover.record.genus === 3 && sourceCover.record.f.length === 8
       : sourceCover.record.genus === 2 && sourceCover.record.f.length === 7,
     "Jacobian context has the wrong source geometry for " + mapUid,
+  );
   const jacobianRecord = {
     schema_version: "jacobian-context/v1",
     source_cover_uid: link.cover_uid,
@@ -1220,12 +1821,15 @@ for (const [mapUid, context] of mapContexts) {
     dimension: sourceCover.record.genus,
     object: "Picard_degree_zero",
     infinity_configuration: infinityConfiguration,
+  };
   const jacobianUid =
     `urn:jacobian-context:1:sha256:${sha256(canonicalJson(jacobianRecord))}`;
   const jacobian = { jacobian_uid: jacobianUid, record: jacobianRecord };
   const priorJacobian = expectedJacobianBindings.get(jacobianUid);
+  check(
     priorJacobian === undefined || canonicalJson(priorJacobian) === canonicalJson(jacobian),
     "Jacobian-context UID collision for " + mapUid,
+  );
   expectedJacobianBindings.set(jacobianUid, jacobian);
 
   check(!expectedTypedMapBindings.has(mapUid), "duplicate expected typed map " + mapUid);
@@ -1233,28 +1837,39 @@ for (const [mapUid, context] of mapContexts) {
     map_uid: mapUid,
     target_icv1_slug: context.graphCurve.icv1_identity.slug,
     target_model_sha256: context.graphCurve.model_sha256,
+    source_cover_uid: link.cover_uid,
     source_jacobian_uid: jacobianUid,
     field_relationship: {
       kind: "same_declared_field_identity",
       source_field_uid: field.field_uid,
       target_field_uid: field.field_uid,
       degree: 1,
+    },
+  });
+}
 
-check(expectedFieldBindings.size === 579, "unexpected declared-field context count");
-check(fieldUidByLabel.size === 579, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === 15811, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === 15813, "unexpected typed-map binding count");
+check(expectedFieldBindings.size === 557, "unexpected declared-field context count");
+check(fieldUidByLabel.size === 557, "declared-field labels are not bijective with field contexts");
+check(expectedJacobianBindings.size === 15789, "unexpected Jacobian-context count");
+check(expectedTypedMapBindings.size === 15791, "unexpected typed-map binding count");
+check(
   canonicalJson(actualFieldBindings) === canonicalJson(sortedRecord(expectedFieldBindings)),
   "typed declared-field bindings are not the exact independently derived set",
+);
+check(
   canonicalJson(actualJacobianBindings) === canonicalJson(sortedRecord(expectedJacobianBindings)),
   "typed Jacobian bindings are not the exact independently derived set",
+);
+check(
   canonicalJson(actualTypedMapBindings) === canonicalJson(sortedRecord(expectedTypedMapBindings)),
   "typed map bindings are not the exact independently derived set",
+);
 
 const memberships = isPlainObject(assessment.memberships) ? assessment.memberships : {};
 const mapMemberships = Array.isArray(memberships.map_base) ? memberships.map_base : [];
 const subgroupMemberships = Array.isArray(memberships.subgroup_base)
   ? memberships.subgroup_base
+  : [];
 check(isPlainObject(assessment.memberships), "memberships is not an object");
 check(Array.isArray(memberships.map_base), "memberships.map_base is not an array");
 check(Array.isArray(memberships.subgroup_base), "memberships.subgroup_base is not an array");
@@ -1264,32 +1879,50 @@ const mapMembershipProfileIds = new Set();
 for (const group of mapMemberships) {
   check(isPlainObject(group), "map membership group is not an object");
   if (!isPlainObject(group)) {
+    continue;
+  }
   const profile = profiles[group.profile_id];
+  check(
     profile !== undefined &&
       profile.kind === "map_base" &&
       !mapMembershipProfileIds.has(group.profile_id),
     "map membership has an unknown, wrong-kind, or duplicate profile",
+  );
   mapMembershipProfileIds.add(group.profile_id);
   const members = Array.isArray(group.members) ? group.members : [];
   check(Array.isArray(group.members), "map membership members is not an array");
   check(group.count === members.length, "map membership count mismatch for " + String(group.profile_id));
+  check(
     members.every((member) => typeof member === "string" && member.length > 0),
     "map membership contains a non-string member for " + String(group.profile_id),
+  );
+  check(
     canonicalJson(members) === canonicalJson([...members].sort(strictStringOrder)),
     "map membership is not sorted for " + String(group.profile_id),
+  );
+  check(
     new Set(members).size === members.length,
     "map membership contains duplicates for " + String(group.profile_id),
+  );
+  check(
     group.members_sha256 ===
       memberDigest(`${mapMembershipDomain}/${group.profile_id}`, members),
     "map membership digest mismatch for " + String(group.profile_id),
+  );
   for (const mapUid of members) {
     const context = mapContexts.get(mapUid);
     check(context !== undefined, "map membership references an unknown target " + String(mapUid));
     check(!mapProfileByMember.has(mapUid), "map appears in multiple base profiles " + String(mapUid));
     mapProfileByMember.set(mapUid, group.profile_id);
     if (context !== undefined && profile !== undefined) {
+      check(
         context.predicateId === profile.predicate_id,
         "map does not satisfy its profile predicate " + String(mapUid),
+      );
+    }
+  }
+}
+check(
   canonicalJson([...mapMembershipProfileIds].sort()) ===
     canonicalJson(
       Object.entries(profiles)
@@ -1298,62 +1931,113 @@ for (const group of mapMemberships) {
         .sort(),
     ),
   "map membership groups do not cover every map profile exactly once",
+);
+check(
   canonicalJson([...mapProfileByMember.keys()].sort(strictStringOrder)) ===
     canonicalJson([...mapContexts.keys()].sort(strictStringOrder)),
   "map memberships are not an exact partition of all CV1 UIDs",
+);
 
 const subgroupProfileByMember = new Map();
 const subgroupMembershipProfileIds = new Set();
 for (const group of subgroupMemberships) {
   check(isPlainObject(group), "subgroup membership group is not an object");
+  if (!isPlainObject(group)) {
+    continue;
+  }
+  const profile = profiles[group.profile_id];
+  check(
+    profile !== undefined &&
       profile.kind === "subgroup_base" &&
       !subgroupMembershipProfileIds.has(group.profile_id),
     "subgroup membership has an unknown, wrong-kind, or duplicate profile",
+  );
   subgroupMembershipProfileIds.add(group.profile_id);
+  const members = Array.isArray(group.members) ? group.members : [];
   check(Array.isArray(group.members), "subgroup membership members is not an array");
+  check(
     group.count === members.length,
     "subgroup membership count mismatch for " + String(group.profile_id),
+  );
+  check(
     members.every(
       (member) =>
         Array.isArray(member) &&
         member.length === 3 &&
         member.every((part) => typeof part === "string" && part.length > 0),
+    ),
     "subgroup membership contains a malformed triple for " + String(group.profile_id),
+  );
+  check(
     canonicalJson(members) === canonicalJson([...members].sort(compareTriples)),
     "subgroup membership is not sorted for " + String(group.profile_id),
+  );
   const memberKeys = members.map((member) => JSON.stringify(member));
+  check(
     new Set(memberKeys).size === memberKeys.length,
     "subgroup membership contains duplicate triples for " + String(group.profile_id),
+  );
+  check(
+    group.members_sha256 ===
       memberDigest(`${subgroupMembershipDomain}/${group.profile_id}`, members),
     "subgroup membership digest mismatch for " + String(group.profile_id),
+  );
   for (const triple of members) {
+    const tripleKey = JSON.stringify(triple);
     const context = subgroupContexts.get(tripleKey);
     check(context !== undefined, "subgroup membership references an unknown triple " + tripleKey);
+    check(
       !subgroupProfileByMember.has(tripleKey),
       "subgroup triple appears in multiple base profiles " + tripleKey,
+    );
     subgroupProfileByMember.set(tripleKey, group.profile_id);
+    if (context !== undefined && profile !== undefined) {
+      check(
+        context.predicateId === profile.predicate_id,
         "subgroup does not satisfy its profile predicate " + tripleKey,
+      );
+    }
+  }
+}
+check(
   canonicalJson([...subgroupMembershipProfileIds].sort()) ===
+    canonicalJson(
+      Object.entries(profiles)
         .filter(([, profile]) => profile.kind === "subgroup_base")
+        .map(([profileId]) => profileId)
+        .sort(),
+    ),
   "subgroup membership groups do not cover every subgroup profile exactly once",
+);
+check(
   canonicalJson([...subgroupProfileByMember.keys()].sort(strictStringOrder)) ===
     canonicalJson([...subgroupContexts.keys()].sort(strictStringOrder)),
   "subgroup memberships are not an exact partition of all EC1/map triples",
+);
 
 const expectedPredicateCounts = {
   binary_cubic_same_field: 165,
-  odd_prime_quadratic_direct_same_field: 14275,
+  odd_prime_quadratic_direct_proved_u64: 14012,
+  odd_prime_quadratic_direct_proved_psi13: 2,
+  odd_prime_quadratic_direct_unsupported_without_primality_certificate: 258,
   odd_prime_quadratic_normalized_same_field: 30,
-  odd_extension_quadratic_direct_same_field: 1343,
+  odd_extension_quadratic_direct_same_field: 1324,
   linked_subgroup_degree3: 142,
-  linked_subgroup_degree2: 859,
+  linked_subgroup_degree2: 837,
+};
 const actualPredicateCounts = {};
 for (const context of mapContexts.values()) {
   actualPredicateCounts[context.predicateId] =
     (actualPredicateCounts[context.predicateId] ?? 0) + 1;
+}
 for (const context of subgroupContexts.values()) {
+  actualPredicateCounts[context.predicateId] =
+    (actualPredicateCounts[context.predicateId] ?? 0) + 1;
+}
+check(
   canonicalJson(actualPredicateCounts) === canonicalJson(expectedPredicateCounts),
   "closed profile predicate counts changed",
+);
 
 const expectedExactOverlays = {
   "map.binary-f2m7-degree3": {
@@ -1362,66 +2046,85 @@ const expectedExactOverlays = {
       "urn:curve-cover-map:1:sha256:0dc60016b03df7d55ee829880508251fe8261c92a241b76a78987eeaa9787a03",
     claim_overrides: {
       curve_map_correctness: "map.f2m7-geometry.supported",
+    },
     evidence_additions: [
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#icv1-f2m7-t13-616700dd",
       "research/hyperelliptic_cover_infrastructure_20261006/README.md",
     ],
+  },
   "subgroup.binary-f2m7-order29": {
     kind: "subgroup",
     target: [
       "EC1N7Ce0hb6d297a2ca08",
       "urn:ec-record:1:sha256:b6d297a2ca085e9d7b8a6858df7421083e12e740c89b1647660b413e00ed02ff",
+      "urn:curve-cover-map:1:sha256:0dc60016b03df7d55ee829880508251fe8261c92a241b76a78987eeaa9787a03",
+    ],
+    claim_overrides: {
       numeric_exact_source_order: "subgroup.exact-order29.supported",
       image_order_equals_catalog_order: "subgroup.exact-image-order29.supported",
+    },
+    evidence_additions: [
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
+    ],
+  },
   "map.prime-fp827-degree2": {
+    kind: "map",
+    target:
       "urn:curve-cover-map:1:sha256:5768ce11909c0f56d84f05e70d71dfb6a46fb175b6f9cc0ed727eec14aef9c8e",
+    claim_overrides: {
       curve_map_correctness: "map.fp827-geometry.supported",
+    },
+    evidence_additions: [
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#icv1-fp10-t5-192cb216",
+      "research/hyperelliptic_cover_infrastructure_20261006/README.md",
+    ],
+  },
   "subgroup.prime-fp827-order823": {
+    kind: "subgroup",
+    target: [
       "EC1P10Cfphcf15d87ab724",
       "urn:ec-record:1:sha256:cf15d87ab724c8d1fc74d88af320937e4c1cc7e706d4e0e8a0d11734831342a3",
+      "urn:curve-cover-map:1:sha256:5768ce11909c0f56d84f05e70d71dfb6a46fb175b6f9cc0ed727eec14aef9c8e",
+    ],
     claim_overrides: {},
+    evidence_additions: [
       "docs/curves/cover-links.yaml#EC1P10Cfphcf15d87ab724",
-  "subgroup.binary-new-registry-unvalidated": {
-      "EC1N73Ce0h9999c3e90683",
-      "urn:ec-record:1:sha256:9999c3e9068310bbfdef49da0bb3e43251d8a89431b9e79715225d5671ab2abd",
-      "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
-      generator_on_curve: "subgroup.binary-untested-generator.unknown",
-      catalog_order_annihilates_generator: "subgroup.binary-untested-generator.unknown",
-      pullback_valid: "subgroup.binary-untested-transfer.unknown",
-      image_annihilated_by_catalog_order: "subgroup.binary-untested-transfer.unknown",
-      composition_on_generator: "subgroup.binary-untested-transfer.unknown",
-      degree_inverse_recovery: "subgroup.binary-untested-transfer.unknown",
-    evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h9999c3e90683"],
-  "subgroup.binary-pr2452-registry-unvalidated": {
-      "EC1N73Ce0h243f847bccdd",
-      "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3",
-    evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h243f847bccdd"],
+      "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#icv1-fp10-t5-192cb216",
+    ],
+  },
+};
 const exactOverlays = Array.isArray(assessment.exact_overlays)
   ? assessment.exact_overlays
+  : [];
 check(Array.isArray(assessment.exact_overlays), "exact_overlays is not an array");
+check(
   canonicalJson(
     exactOverlays
       .map((overlay) => overlay?.overlay_id)
       .sort(strictStringOrder),
   ) === canonicalJson(sortedObjectKeys(expectedExactOverlays)),
   "exact-overlay ID set changed from the authoritative verifier matrix",
+);
 const overlayIds = new Set();
 const overlayByMap = new Map();
 const overlayBySubgroup = new Map();
 for (const overlay of exactOverlays) {
   check(isPlainObject(overlay), "exact_overlays contains a non-object");
   if (!isPlainObject(overlay)) {
+    continue;
+  }
+  check(
     typeof overlay.overlay_id === "string" &&
       overlay.overlay_id.length > 0 &&
       !overlayIds.has(overlay.overlay_id),
     "duplicate or invalid exact-overlay ID",
+  );
   overlayIds.add(overlay.overlay_id);
   const expectedOverlay = expectedExactOverlays[overlay.overlay_id];
   check(expectedOverlay !== undefined, `unexpected exact overlay ${String(overlay.overlay_id)}`);
   if (expectedOverlay !== undefined) {
+    check(
       overlay.kind === expectedOverlay.kind &&
         canonicalJson(overlay.target) === canonicalJson(expectedOverlay.target) &&
         canonicalJson(overlay.claim_overrides) ===
@@ -1429,107 +2132,169 @@ for (const overlay of exactOverlays) {
         canonicalJson(overlay.evidence_additions) ===
           canonicalJson(expectedOverlay.evidence_additions),
       `typed target/claim/evidence binding changed for exact overlay ${overlay.overlay_id}`,
+    );
+  }
+  check(
     typeof overlay.boundary === "string" && overlay.boundary.trim().length > 0,
     "exact overlay boundary is empty: " + String(overlay.overlay_id),
+  );
+  check(
     isPlainObject(overlay.claim_overrides),
     "exact overlay claim_overrides is not an object: " + String(overlay.overlay_id),
+  );
   const evidenceAdditions = Array.isArray(overlay.evidence_additions)
     ? overlay.evidence_additions
     : [];
+  check(
     Array.isArray(overlay.evidence_additions) &&
       new Set(evidenceAdditions).size === evidenceAdditions.length &&
       evidenceAdditions.every(
         (reference) => typeof reference === "string" && reference.length > 0,
+      ),
     "exact overlay evidence_additions is not a unique string set: " + String(overlay.overlay_id),
+  );
   for (const reference of evidenceAdditions) {
     check(evidenceReferenceResolves(reference), "unresolved overlay evidence reference: " + reference);
+    check(
       sourceArtifactPaths.has(evidenceReferencePath(reference)),
       `overlay evidence is not SHA-pinned: ${String(overlay.overlay_id)}: ${reference}`,
+    );
+  }
 
   let allowedClaims = [];
   let targetKey = null;
   if (overlay.kind === "map") {
+    check(
       typeof overlay.target === "string" && mapContexts.has(overlay.target),
       "map overlay targets an unknown CV1 UID: " + String(overlay.overlay_id),
+    );
     targetKey = overlay.target;
     allowedClaims = [...mapClaimIds, "full_transfer_pipeline"];
+    check(
       typeof targetKey === "string" && !overlayByMap.has(targetKey),
       "multiple exact overlays target one map: " + String(targetKey),
+    );
     if (typeof targetKey === "string") {
       overlayByMap.set(targetKey, overlay);
+    }
   } else if (overlay.kind === "subgroup") {
     const validTriple =
       Array.isArray(overlay.target) &&
       overlay.target.length === 3 &&
       overlay.target.every((part) => typeof part === "string" && part.length > 0);
     targetKey = validTriple ? JSON.stringify(overlay.target) : null;
+    check(
       validTriple && subgroupContexts.has(targetKey),
       "subgroup overlay targets an unknown exact triple: " + String(overlay.overlay_id),
+    );
     allowedClaims = subgroupClaimIds;
+    check(
       targetKey !== null && !overlayBySubgroup.has(targetKey),
       "multiple exact overlays target one subgroup triple: " + String(targetKey),
+    );
     if (targetKey !== null) {
       overlayBySubgroup.set(targetKey, overlay);
+    }
+  } else {
     check(false, "invalid exact-overlay kind: " + String(overlay.overlay_id));
+  }
 
   for (const [claimId, templateId] of Object.entries(overlay.claim_overrides ?? {})) {
+    check(
       allowedClaims.includes(claimId),
       "exact overlay overrides an unknown claim: " + String(overlay.overlay_id),
+    );
     requireTemplate(
       templateId,
       "exact overlay " + String(overlay.overlay_id) + " claim " + claimId,
+    );
+  }
+}
 
 function zeroStatusCounts() {
+  return {
     unknown: 0,
     supported: 0,
     refuted: 0,
     not_applicable: 0,
+  };
+}
 
 function addTemplateStatus(counts, templateId, context) {
   const template = resultTemplates[templateId];
   check(template !== undefined, context + " has no effective result template");
   if (template !== undefined && allowedStatuses.has(template.status)) {
     counts[template.status] += 1;
+  }
+}
 
 const effectiveStatusCounts = {
   map_claims: zeroStatusCounts(),
   map_full_transfer_pipeline: zeroStatusCounts(),
   subgroup_claims: zeroStatusCounts(),
   all: zeroStatusCounts(),
+};
 for (const mapUid of [...mapContexts.keys()].sort(strictStringOrder)) {
   const profileId = mapProfileByMember.get(mapUid);
   const profile = profiles[profileId];
   const overlay = overlayByMap.get(mapUid);
   if (profile === undefined) {
     check(false, "map has no effective base profile: " + mapUid);
+    continue;
+  }
   for (const claimId of mapClaimIds) {
     const templateId = overlay?.claim_overrides?.[claimId] ?? profile.claims[claimId];
     addTemplateStatus(effectiveStatusCounts.map_claims, templateId, "map " + mapUid + " claim " + claimId);
     addTemplateStatus(effectiveStatusCounts.all, templateId, "map " + mapUid + " claim " + claimId);
+  }
   const pipelineTemplate =
     overlay?.claim_overrides?.full_transfer_pipeline ?? profile.full_transfer_pipeline;
   addTemplateStatus(
     effectiveStatusCounts.map_full_transfer_pipeline,
     pipelineTemplate,
     "map " + mapUid + " full_transfer_pipeline",
+  );
+  addTemplateStatus(
     effectiveStatusCounts.all,
+    pipelineTemplate,
+    "map " + mapUid + " full_transfer_pipeline",
+  );
+}
 for (const subgroupKey of [...subgroupContexts.keys()].sort(strictStringOrder)) {
   const profileId = subgroupProfileByMember.get(subgroupKey);
+  const profile = profiles[profileId];
   const overlay = overlayBySubgroup.get(subgroupKey);
+  if (profile === undefined) {
     check(false, "subgroup has no effective base profile: " + subgroupKey);
+    continue;
+  }
   for (const claimId of subgroupClaimIds) {
+    const templateId = overlay?.claim_overrides?.[claimId] ?? profile.claims[claimId];
     addTemplateStatus(
       effectiveStatusCounts.subgroup_claims,
+      templateId,
       "subgroup " + subgroupKey + " claim " + claimId,
+    );
+    addTemplateStatus(
       effectiveStatusCounts.all,
+      templateId,
+      "subgroup " + subgroupKey + " claim " + claimId,
+    );
+  }
+}
 
 const declaredEffectiveStatusCounts =
   assessment.effective_status_counts ?? assessment.coverage?.effective_status_counts;
 if (declaredEffectiveStatusCounts !== undefined) {
+  check(
     canonicalJson(declaredEffectiveStatusCounts) === canonicalJson(effectiveStatusCounts),
     "declared effective-status counts do not match all effective claim assignments",
+  );
+}
+check(
   canonicalJson([...usedTemplateIds].sort()) === canonicalJson(sortedObjectKeys(resultTemplates)),
   "one or more result templates are unused",
+);
 
 function gcd(left, right) {
   let a = left;
@@ -1538,12 +2303,15 @@ function gcd(left, right) {
     const remainder = a % b;
     a = b;
     b = remainder;
+  }
   return a;
+}
 for (const [subgroupKey, context] of subgroupContexts) {
   const subgroupOrder = BigInt(context.representation.curve.subgroup_order);
   const degree = BigInt(context.graphMap.record.degree);
   check(subgroupOrder > 1n, "subgroup order is not positive for " + subgroupKey);
   check(gcd(subgroupOrder, degree) === 1n, "subgroup order is not coprime to map degree for " + subgroupKey);
+}
 
 const coverage = isPlainObject(assessment.coverage) ? assessment.coverage : {};
 check(isPlainObject(assessment.coverage), "coverage is not an object");
@@ -1561,8 +2329,11 @@ const expectedCoverageKeys = [
   "map_profiles",
   "subgroup_profiles",
   "scope_note",
+].sort();
+check(
   canonicalJson(sortedObjectKeys(coverage)) === canonicalJson(expectedCoverageKeys),
   "coverage key set changed",
+);
 const geometryVerifiedMaps = report.curves.filter(
   (curve) => curve.status === "verified_over_declared_field",
 ).length;
@@ -1578,96 +2349,166 @@ const expectedCoverage = {
   map_membership_entries: mapMemberships.reduce(
     (sum, group) => sum + (Array.isArray(group.members) ? group.members.length : 0),
     0,
+  ),
   subgroup_membership_entries: subgroupMemberships.reduce(
+    (sum, group) => sum + (Array.isArray(group.members) ? group.members.length : 0),
+    0,
+  ),
   map_profiles: [...mapProfilesByPredicate.keys()].length,
   subgroup_profiles: [...subgroupProfilesByPredicate.keys()].length,
+};
 for (const [key, expectedValue] of Object.entries(expectedCoverage)) {
   check(coverage[key] === expectedValue, "coverage count mismatch for " + key);
+}
+check(
   typeof coverage.scope_note === "string" && coverage.scope_note.trim().length > 0,
   "coverage scope_note is empty",
-check(coverage.assessed_maps === 15813 && coverage.unassessed_maps === 0, "map coverage is incomplete");
-  coverage.assessed_subgroups === 1001 && coverage.unassessed_subgroups === 0,
+);
+check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
+check(
+  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
+);
 
 const inlineAssessments = [];
+for (const artifact of sourceArtifacts) {
   if (isPlainObject(artifact.freshness)) {
     inlineAssessments.push(["source artifact " + artifact.path, artifact.freshness]);
+  }
+}
 const controls = Array.isArray(assessment.controls) ? assessment.controls : [];
 check(Array.isArray(assessment.controls), "controls is not an array");
+check(
+  canonicalJson(
     controls.map((control) => control?.control).sort(strictStringOrder),
   ) === canonicalJson(sortedObjectKeys(expectedControlStatuses)),
   "control ID set changed from the authoritative verifier matrix",
+);
 for (const control of controls) {
   const expected = expectedControlStatuses[control?.control];
   check(expected !== undefined, `unexpected control ${String(control?.control)}`);
   if (expected !== undefined) {
+    check(
       control.assessment?.status === expected[0] &&
         (control.assessment?.obligation_id ?? null) === expected[1],
       `authoritative status/obligation mismatch for control ${control.control}`,
+    );
+  }
   if (isPlainObject(control.assessment)) {
     inlineAssessments.push(["control " + String(control.control), control.assessment]);
+  }
+}
 for (const [label, inlineAssessment] of inlineAssessments) {
   check(allowedStatuses.has(inlineAssessment.status), label + " has an invalid status");
   const refs = Array.isArray(inlineAssessment.evidence_refs)
     ? inlineAssessment.evidence_refs
+    : [];
   check(Array.isArray(inlineAssessment.evidence_refs), label + " evidence_refs is not an array");
+  check(
     typeof inlineAssessment.scope === "string" && inlineAssessment.scope.trim().length > 0,
     label + " scope is empty",
+  );
+  check(
     typeof inlineAssessment.rationale === "string" &&
       inlineAssessment.rationale.trim().length > 0,
     label + " rationale is empty",
+  );
+  check(
     new Set(refs).size === refs.length,
     label + " evidence_refs contains duplicates",
+  );
   for (const reference of refs) {
     check(evidenceReferenceResolves(reference), "unresolved inline evidence reference: " + reference);
+  }
   if (inlineAssessment.status === "supported" || inlineAssessment.status === "refuted") {
     check(refs.length > 0, label + " supported/refuted result lacks evidence");
     for (const reference of refs) {
+      check(
+        sourceArtifactPaths.has(evidenceReferencePath(reference)),
         `${label} supported/refuted evidence is not SHA-pinned: ${reference}`,
+      );
+    }
+  }
   if (inlineAssessment.status === "supported") {
+    check(
       inlineAssessment.obligation_id === undefined,
       label + " supported result unexpectedly carries an obligation",
+    );
   } else if (inlineAssessment.status === "unknown") {
+    check(
       typeof inlineAssessment.obligation_id === "string" &&
         obligationIds.has(inlineAssessment.obligation_id),
       label + " unknown result lacks a known obligation",
+    );
     if (typeof inlineAssessment.obligation_id === "string") {
       referencedObligationIds.add(inlineAssessment.obligation_id);
+    }
   } else if (inlineAssessment.status === "refuted") {
+    check(
       inlineAssessment.obligation_id === undefined ||
         (typeof inlineAssessment.obligation_id === "string" &&
           obligationIds.has(inlineAssessment.obligation_id)),
       label + " refuted result has an unknown obligation",
+    );
+    if (typeof inlineAssessment.obligation_id === "string") {
+      referencedObligationIds.add(inlineAssessment.obligation_id);
+    }
+  } else {
+    check(
+      inlineAssessment.obligation_id === undefined,
       label + " not-applicable result unexpectedly carries an obligation",
+    );
+  }
+}
+check(
   canonicalJson([...referencedObligationIds].sort(strictStringOrder)) ===
     canonicalJson([...obligationIds].sort(strictStringOrder)),
   "open obligations are orphaned or referenced without declarations",
+);
 const allowedCostStatuses = new Set(["measured", "modeled", "unknown", "not_applicable"]);
 const costItems = Array.isArray(assessment.global_cost_accounting)
   ? assessment.global_cost_accounting
+  : [];
+check(
   canonicalJson(costItems.map((item) => item?.phase).sort(strictStringOrder)) ===
     canonicalJson(sortedObjectKeys(expectedCostStatuses)),
   "global cost phase set changed from the authoritative verifier matrix",
+);
 for (const item of costItems) {
   check(allowedCostStatuses.has(item.status), "global cost phase has an invalid status");
+  check(
     expectedCostStatuses[item.phase] === item.status,
     `authoritative cost status mismatch for ${String(item.phase)}`,
+  );
   if (item.status === "unknown" || item.status === "not_applicable") {
     check(item.value === null, "unknown/not-applicable cost phase has a numeric value");
+  } else {
+    check(
       typeof item.value === "number" && Number.isFinite(item.value),
       "measured/modeled cost phase lacks a finite numeric value",
+    );
+  }
   const sourceRefs = Array.isArray(item.source_refs) ? item.source_refs : [];
   check(Array.isArray(item.source_refs), "global cost source_refs is not an array");
   check(new Set(sourceRefs).size === sourceRefs.length, "global cost source_refs contains duplicates");
   for (const reference of sourceRefs) {
     check(evidenceReferenceResolves(reference), "unresolved global-cost evidence reference: " + reference);
     if (item.status === "measured" || item.status === "modeled") {
+      check(
+        sourceArtifactPaths.has(evidenceReferencePath(reference)),
         `measured/modeled cost evidence is not SHA-pinned: ${reference}`,
+      );
+    }
+  }
   if (item.status === "measured" || item.status === "modeled") {
     check(sourceRefs.length > 0, "measured/modeled cost phase lacks evidence");
+  }
+}
 const reportArtifacts = isPlainObject(assessment.report) ? assessment.report : {};
 check(isPlainObject(assessment.report), "report is not an object");
+check(
   canonicalJson(sortedObjectKeys(reportArtifacts)) ===
+    canonicalJson(
       [
         "markdown",
         "pdf",
@@ -1679,7 +2520,9 @@ check(isPlainObject(assessment.report), "report is not an object");
         "context_graph_png",
         "release_receipt",
       ].sort(),
+    ),
   "report artifact key set changed",
+);
 const hashBoundReportKinds = new Set([
   "markdown",
   "pdf",
@@ -1691,19 +2534,27 @@ const hashBoundReportKinds = new Set([
   "context_graph_png",
   "release_receipt",
 ]);
-// These rendered research reports are immutable records of the preceding
-// 15,791-model catalog. The live ledger above is checked against the expanded
-// registry independently; it must not relabel the older PDF as current.
 const reportCoverageMarker =
-  "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; " +
-  "geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; " +
-  "unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0";
+  "cover-transfer-assessments/v2; " +
+  [
+    "catalog_maps",
+    "unique_cover_models",
+    "geometry_verified_maps",
+    "ec1_representations",
+    "assessed_maps",
+    "unassessed_maps",
+    "assessed_subgroups",
+    "unassessed_subgroups",
+  ]
+    .map((key) => `${key}=${coverage[key]}`)
+    .join("; ");
 const staleReportPatterns = [
   /the other 2,089 map rows and 662 EC1 representations remain unassessed/iu,
   /2,089 map rows unassessed here/iu,
   /662 other EC1 representations/iu,
   /assess the other 2,089 current map rows/iu,
   /assess the remaining 2,089 maps and 662 EC1 representations/iu,
+];
 const staleCurrentPopulationPatterns = [
   /current 2,091-row/iu,
   /2,091 current (?:map rows|models|inputs)/iu,
@@ -1713,48 +2564,132 @@ const staleCurrentPopulationPatterns = [
   /737\/1,354 result/iu,
   /all 2,091 current inputs/iu,
   /all 2,091 model forms/iu,
+];
+const refreshedPrimePartitionMarkers = [
+  "14,012 proved_u64",
+  "2 proved_psi13",
+  "258 unsupported_without_primality_certificate",
+  "30 normalized fail-closed",
+  "1,324 extension backend unavailable",
+];
+const staleTransferCapabilityPatterns = [
+  /arbitrary-class Jacobian pushforward remains unsupported for all 165/iu,
+  /odd two-infinity induced maps:\s*UNKNOWN/iu,
+  /all odd induced maps remain open/iu,
+  /balanced two-infinity backend[^.]*does not implement the degree-two induced maps/iu,
+  /all 15,626 odd two-infinity catalog sources remain outside the current backend/iu,
+];
 for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
+  const absolute = resolveRepoPath(relativePath);
   check(absolute !== null, "unsafe report artifact path for " + kind);
   check(absolute !== null && fs.existsSync(absolute), "missing report artifact " + String(relativePath));
   if (hashBoundReportKinds.has(kind)) {
+    check(
       sourceArtifactPaths.has(relativePath),
       `report artifact ${kind} is not bound by a source_artifacts SHA-256 pin`,
+    );
+  }
+  if (absolute === null || !fs.existsSync(absolute)) {
+    continue;
+  }
   const bytes = fs.readFileSync(absolute);
   if (kind === "markdown" || kind === "graph_source") {
     const contents = bytes.toString("utf8");
+    check(
       contents.includes(reportCoverageMarker),
       `${kind} report lacks the exact v2 coverage marker: ${reportCoverageMarker}`,
+    );
     for (const stalePattern of staleReportPatterns) {
       check(!stalePattern.test(contents), `${kind} report retains stale partial-assessment language`);
+    }
     for (const stalePattern of staleCurrentPopulationPatterns) {
       check(!stalePattern.test(contents), `${kind} report retains a stale current-population count`);
+    }
+    for (const marker of refreshedPrimePartitionMarkers) {
+      check(contents.includes(marker), `${kind} report lacks refreshed partition marker: ${marker}`);
+    }
+    for (const stalePattern of staleTransferCapabilityPatterns) {
+      check(!stalePattern.test(contents), `${kind} report retains a superseded transfer claim`);
+    }
+    check(
+      kind === "markdown"
+        ? contents.includes("all 142 pinned binary EC1 bindings")
+        : contents.includes("142 binary<BR/>(all tested)"),
+      `${kind} report lacks the all-142 binary certificate boundary`,
+    );
+  }
   if (kind === "context_graph_source") {
+    const contents = bytes.toString("utf8");
     for (const marker of [
       "557 fields / 15,789 Jacobian contexts / 15,791 maps",
-      "current-source test: 15,791 / 15,791",
+      "pinned-cohort source replay: 15,791 / 15,791 at catalog commit 7283047",
       "746 inside / 1,354 outside old allowlist",
+      "all 142 binary generators receive the stated typed checks",
+      "14,012 deterministic-u64 + 2 strict-psi13 rows",
+      "258 direct rows: no primality certificate",
+      "30 normalized + 1,324 extension rows: backend unavailable",
+      "F2 pilot is partial (20 classes), not full GF(8)",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);
+    }
+    for (const stalePattern of staleCurrentPopulationPatterns) {
       check(!stalePattern.test(contents), "context graph retains a stale current-population count");
+    }
+  }
   if (kind === "release_receipt") {
+    const contents = bytes.toString("utf8");
+    for (const marker of [
       "current 2,100-row",
       "586 direct short-Weierstrass prime-field models",
       "2,100 total",
       "746/1,354 result",
       "13 passed; 0 failed",
+    ]) {
       check(contents.includes(marker), `release receipt lacks current marker: ${marker}`);
+    }
+    for (const stalePattern of staleCurrentPopulationPatterns) {
       check(!stalePattern.test(contents), "release receipt retains a stale current-population count");
+    }
+  }
   if (kind === "pdf") {
     check(bytes.subarray(0, 5).toString("ascii") === "%PDF-", "report PDF signature is invalid");
+    check(
       pdfLiteralMetadata(bytes, "Subject") === reportCoverageMarker,
       "report PDF lacks the embedded exact v2 coverage marker",
+    );
+    try {
+      const extracted = execFileSync("pdftotext", [absolute, "-"], {
+        encoding: "utf8",
+        maxBuffer: 16 * 1024 * 1024,
+      });
+      for (const marker of refreshedPrimePartitionMarkers) {
+        check(extracted.includes(marker), `report PDF lacks refreshed partition marker: ${marker}`);
+      }
+      check(
+        extracted.includes("all 142 pinned binary EC1 bindings"),
+        "report PDF lacks the all-142 binary certificate boundary",
+      );
+      check(
+        extracted.includes(expectedCatalogCommit),
+        "report PDF does not identify the pinned catalog commit",
+      );
+      for (const stalePattern of staleTransferCapabilityPatterns) {
+        check(!stalePattern.test(extracted), "report PDF retains a superseded transfer claim");
+      }
+    } catch (error) {
+      check(false, `cannot extract report PDF text: ${error.message}`);
+    }
   } else if (kind === "graph_png" || kind === "context_graph_png") {
+    check(
       bytes.subarray(0, 8).toString("hex") === "89504e470d0a1a0a",
       "report PNG signature is invalid",
+    );
   } else if (kind === "graph_svg" || kind === "context_graph_svg") {
     check(/<svg\b/u.test(bytes.toString("utf8")), "report SVG is invalid");
   } else if (kind === "graph_source" || kind === "context_graph_source") {
     check(/\bdigraph\b/u.test(bytes.toString("utf8")), "report graph source is invalid");
+  }
+}
 
 const summary = {
   root,
@@ -1769,175 +2704,40 @@ const summary = {
     representations: representationCount,
     unique_ec1: ec1Aliases.size,
     shared_covers: [...coverReferenceCounts.values()].filter((count) => count === 2).length,
+  },
   construction_counts: constructionCounts,
   arithmetic_checks: arithmeticChecks,
+  prime_transfer_partition: {
+    proved_u64_direct:
+      actualPredicateCounts.odd_prime_quadratic_direct_proved_u64 ?? 0,
+    proved_psi13_direct:
+      actualPredicateCounts.odd_prime_quadratic_direct_proved_psi13 ?? 0,
+    unsupported_without_primality_certificate:
+      actualPredicateCounts
+        .odd_prime_quadratic_direct_unsupported_without_primality_certificate ?? 0,
+    normalized_fail_closed:
+      actualPredicateCounts.odd_prime_quadratic_normalized_same_field ?? 0,
+    extension_backend_unavailable:
+      actualPredicateCounts.odd_extension_quadratic_direct_same_field ?? 0,
+  },
   profile_counts: {
     map: mapProfilesByPredicate.size,
     subgroup: subgroupProfilesByPredicate.size,
     exact_overlays: exactOverlays.length,
+  },
   typed_binding_counts: {
     fields: expectedFieldBindings.size,
     jacobians: expectedJacobianBindings.size,
     maps: expectedTypedMapBindings.size,
+  },
   effective_status_counts: effectiveStatusCounts,
   scope_note:
     "Checks the complete v2 membership ledger, explicit field/Jacobian/map bindings, graph/content joins, and cover formulas " +
-    "over every declared field. It does not independently prove odd p primality, " +
-    "extension-modulus irreducibility, EC1 subgroup orders, or transfer advantage.",
+    "over every declared field. It independently replays the deterministic-u64 and strict-psi13 proof partition, but does not " +
+    "supply primality certificates beyond that theorem range, independently prove extension-modulus irreducibility or EC1 subgroup orders, or establish transfer advantage.",
+};
 
 console.log(JSON.stringify(summary, null, 2));
 if (problems.length !== 0) {
   process.exitCode = 1;
-
-import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
-
-const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
-
-
-const readJson = (file) => JSON.parse(catalogSnapshotBytes(
-  root, path.relative(root, file).split(path.sep).join("/"), expectedCatalogCommit,
-).toString("utf8"));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-check(registry.curves.length === 15791, "unexpected registry row count");
-check(report.curves.length === 15791, "unexpected cover-report row count");
-check(graph.curves.length === 15791, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === 15791, "unexpected CV1 map count");
-check(Object.keys(graph.covers).length === 15789, "unexpected HC1 cover count");
-
-const registryBytes = catalogSnapshotBytes(root, "docs/curves/registry.json", expectedCatalogCommit);
-
-
-
-
-
-
-
-
-
-check(representationCount === 979, "unexpected EC1 representation count");
-check(ec1Aliases.size === 979, "unexpected unique EC1 count");
-check(curveUids.size === 979, "unexpected unique curve-UID count");
-  mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
-  coverReferenceCounts.size === 15789 &&
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-check(constructionCounts.prime_quadratic_pullback_v1 === 15626, "unexpected odd-construction count");
-check(arithmeticChecks.prime === 14302, "unexpected prime-field arithmetic-replay count");
-check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
-
-  "map.binary-arbitrary-pushforward.supported": "supported",
-      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.supported",
-  result_templates: "a762cc8659726c43b7ce84bd1750b4cd6c108c216031ec318452140dbb7aebc9",
-  profiles: "8fbcabe05bc436d528bdafabc5514d45d80355337ec6f74edd6db0b3ebc8fde1",
-  controls: "2ecc0db58b61a77891ddb1ed14924d70f9a101bb3791114859e83aa92279e06f",
-  open_obligations: "98cf42d30763b94c73d6b62c8c3b3901bc0556eb3c9be5067ea97798a447a53a",
-  "scripts/catalog_snapshot.mjs",
-
-      { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
-      sha256(committedBytes) === sha256(catalogSnapshotBytes(root, relativePath, expectedCatalogCommit)),
-  const actualDigest = sha256(canonicalJson(assessment[section]));
-    actualDigest === expectedDigest,
-    `authoritative semantic digest mismatch for ${section}: expected ${expectedDigest}, got ${actualDigest}`,
-
-    try {
-      const bytes = Object.hasOwn(artifact, "source_commit")
-        ? legacyFormulaSnapshotBytes(root, artifact.path, artifact.source_commit)
-        : catalogSnapshotBytes(root, artifact.path, expectedCatalogCommit);
-        /^[0-9a-f]{64}$/u.test(artifact.sha256) && sha256(bytes) === artifact.sha256,
-        "source-artifact digest mismatch for " + artifact.path,
-    } catch (error) {
-      check(false, `unreadable pinned source artifact ${artifact.path}: ${error.message}`);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-check(expectedFieldBindings.size === 557, "unexpected declared-field context count");
-check(fieldUidByLabel.size === 557, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === 15789, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === 15791, "unexpected typed-map binding count");
-
-
-
-
-  odd_prime_quadratic_direct_same_field: 14272,
-  odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree2: 837,
-
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
-
-
-
-
-
-
-
-
-check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
-  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
-
-  "cover-transfer-assessments/v2; " +
-  [
-    "catalog_maps",
-    "unique_cover_models",
-    "geometry_verified_maps",
-    "ec1_representations",
-    "assessed_maps",
-    "unassessed_maps",
-    "assessed_subgroups",
-    "unassessed_subgroups",
-  ]
-    .map((key) => `${key}=${coverage[key]}`)
-    .join("; ");
-
-
+}

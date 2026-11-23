@@ -1,0 +1,37 @@
+[package]
+name = "shared-s3-component-qualifier"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+
+# Deliberately independent of the root crate's large test/dependency closure.
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "shared-s3-source-manifest"
+path = "src/source_manifest.rs"
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+
+[build-dependencies]
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+sha2 = "0.10"
+
+# Development qualification only. Existing registry dependencies retain the
+# ordinary release optimization level; the actual source components in this
+# crate are compiled without optimization to reduce peak compiler memory.
+# Neither this profile nor its test duration supplies performance evidence.
+[profile.release]
+debug = 0
+lto = false
+
+[profile.release.package.shared-s3-component-qualifier]
+opt-level = 0
+codegen-units = 256

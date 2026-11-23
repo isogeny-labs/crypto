@@ -1,0 +1,53 @@
+{
+  "schema": "prime31-component-study/v1",
+  "date": "2026-11-21",
+  "status": "independent_python_component_only",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724
+  },
+  "exact": {
+    "primitive_seventh_root": 1752599774,
+    "cubics": 56,
+    "cubic_roots_each": 3,
+    "cosets": 8,
+    "total_distinct_x": 168,
+    "polynomial_identity_passed": 8,
+    "archived_root_sets_matched": 8,
+    "horizontal_triples_independently_group_verified": 56
+  },
+  "timing": {
+    "language": "Python",
+    "host": "current local container",
+    "rootfinder": "same independent Cantor-Zassenhaus code both arms",
+    "repetitions": 5,
+    "scope": "whole factor-base acquisition only",
+    "generic_degree21_ms": [
+      193.4938,
+      190.325774,
+      196.364708,
+      197.763496,
+      191.443948
+    ],
+    "seven_cubics_ms": [
+      39.344694,
+      41.740101,
+      39.159722,
+      43.345772,
+      36.654935
+    ],
+    "median_generic_ms": 193.4938,
+    "median_cubics_ms": 39.344694,
+    "median_ratio": 4.917913454861283
+  },
+  "rust": {
+    "source": "examples/prime31_coset_cubic_factor.rs",
+    "native_build": "pending",
+    "native_benchmark": "pending",
+    "full_ecdlp": "not demonstrated",
+    "source_group_relation_check": "pkm_smooth_tower::Curve::add; build pending"
+  },
+  "source_fixture": "User-provided run52 archive/eight_leaves.tsv",
+  "note": "No public-target multivariate root recovery, no full ECDLP speedup."
+}
