@@ -1,0 +1,16 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",ranksep=.3];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa"];
+ third [label="ACTUAL THIRD-MULTIPLICITY CANDIDATES\n3 paired nodes + distinct singleton target\nStrict degree budget; all ordinates nonzero"];
+ reduce [label="CHECKED ZERO-PORT ELIMINATION\nY4/X3 coefficient zero -> Ydegree <=2\nTarget + paired jets force all coefficients zero"];
+ eligible [label="ACTUAL ELIGIBLE SUBMODULE V\nDegreeLT bounds intersect actual jet kernel\nActual scalar port injective: dim(V) <=1"];
+ original [label="ACTUAL ORIGINAL 72 -> 70 MAP\nRank-nullity proves dim(kernel F) >=2"];
+ curve [label="ORIGINAL CURVE-MULTIPLE SUBKERNEL\nker(F) intersect ker(actual30remainder)"];
+ bridge [label="OPEN ACTUAL QUOTIENT MAP INTO V\nDivision degree + full4 -> full3\nInjectivity must be proved",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ next [label="OPEN: nonzero remainder image\nThen norm / scalar / growing finder / full cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ third -> reduce -> eligible;
+ original -> curve;
+ curve -> bridge [style=dashed];
+ bridge -> eligible [style=dashed,label="membership + injection unproved"];
+ original -> next [style=dashed]; eligible -> next [style=dashed,label="only after bridge"];
+}

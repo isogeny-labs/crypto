@@ -1,0 +1,1725 @@
+module
+public import OrientationStudyBase121
+public import NormSignedHankel
+public import Mathlib.RingTheory.Polynomial.Basic
+public import Mathlib.Algebra.Polynomial.RingDivision
+public import Mathlib.Algebra.Polynomial.Taylor
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+import all OrientationStudyBase121
+import all NormSignedHankel
+public section
+noncomputable section
+namespace OrientationPublicHankel
+open OrientationConvolutionTrace OrientationStoredBox
+open scoped BigOperators
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def node (S : Finset K) (i : Fin (Fintype.card S)) : K :=
+  ((Fintype.equivFin S).symm i).val
+
+def publicCoefficient (S : Finset K) (x : K) (j : ℕ) : K :=
+  x^j / ∏ t∈S.erase x, (x-t)
+
+def momentPairs (S : Finset K) (z : K → K) (j : ℕ) : List (K × K) :=
+  List.ofFn (fun i : Fin (Fintype.card S) => (z (node S i), publicCoefficient S (node S i) j))
+
+def momentLogged (S : Finset K) (z : K → K) (j : ℕ) : Logged K :=
+  dotLogged (momentPairs S z j)
+
+theorem momentLogged_value (S : Finset K) (z : K → K) (j : ℕ) :
+    (momentLogged S z j).value=NormSignedHankel.moment S z j := by
+  rw [momentLogged,dotLogged_value]
+  simp only [momentPairs,List.map_ofFn,Function.comp_def,Fin.sum_ofFn]
+  calc
+    _ = ∑ x : S, z x*publicCoefficient S x j := by
+      exact Equiv.sum_comp (Fintype.equivFin S).symm
+        (fun x : S => z x*publicCoefficient S x j)
+    _ = NormSignedHankel.moment S z j := by
+      calc
+        _ = ∑ x : S, z x*(x:K)^j / ∏ t∈S.erase (x:K), ((x:K)-t) := by
+          apply Finset.sum_congr rfl
+          intro x hx
+          dsimp only [publicCoefficient]
+          ring
+        _ = _ := Finset.sum_coe_sort S
+          (fun x : K => z x*x^j / ∏ t∈S.erase x, (x-t))
+
+theorem momentLogged_multiply (S : Finset K) (z : K → K) (j : ℕ) :
+    (momentLogged S z j).events.count .multiply=S.card := by
+  simp only [momentLogged,dotLogged_multiply,momentPairs,List.length_ofFn,Fintype.card_coe]
+
+theorem momentLogged_add (S : Finset K) (z : K → K) (j : ℕ) :
+    (momentLogged S z j).events.count .add=S.card := by
+  simp only [momentLogged,dotLogged_add,momentPairs,List.length_ofFn,Fintype.card_coe]
+
+def momentsLogged (S : Finset K) (z : K → K) (m : ℕ) : Logged (Stored K (2*m-1) 1) :=
+  materializeLogged (fun j _ => momentLogged S z j.val)
+
+theorem momentsLogged_value (S : Finset K) (z : K → K) (m : ℕ) (j : Fin (2*m-1)) :
+    view (momentsLogged S z m).value j 0=NormSignedHankel.moment S z j.val := by
+  simp only [momentsLogged,materializeLogged_value,momentLogged_value]
+
+theorem momentsLogged_multiply (S : Finset K) (z : K → K) (m : ℕ) :
+    (momentsLogged S z m).events.count .multiply=(2*m-1)*S.card := by
+  simp only [momentsLogged,materializeLogged_count,momentLogged_multiply]
+  simp
+
+theorem momentsLogged_add (S : Finset K) (z : K → K) (m : ℕ) :
+    (momentsLogged S z m).events.count .add=(2*m-1)*S.card := by
+  simp only [momentsLogged,materializeLogged_count,momentLogged_add]
+  simp
+
+def rowPairs {m : ℕ} (moments : Stored K (2*m-1) 1) (b : Fin m → K) (j : Fin m) :
+    List (K × K) :=
+  List.ofFn (fun k : Fin m =>
+    (view moments ⟨j.val+k.val,by omega⟩ 0,b k))
+
+def kernelLogged (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    Logged (Stored K m 1) :=
+  let moments := momentsLogged S z m
+  let rows := materializeLogged (fun j _ => dotLogged (rowPairs moments.value b j))
+  ⟨rows.value,moments.events++rows.events⟩
+
+theorem kernelLogged_value (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) (j : Fin m) :
+    view (kernelLogged S z m b).value j 0=(NormSignedHankel.hankel S z m).mulVec b j := by
+  simp only [kernelLogged,materializeLogged_value,dotLogged_value,rowPairs,List.map_ofFn,
+    Function.comp_def,Fin.sum_ofFn,momentsLogged_value]
+  rfl
+
+theorem kernelLogged_multiply (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    (kernelLogged S z m b).events.count .multiply=(2*m-1)*S.card+m*m := by
+  simp only [kernelLogged,List.count_append,momentsLogged_multiply,materializeLogged_count,
+    dotLogged_multiply,rowPairs,List.length_ofFn]
+  simp
+
+theorem kernelLogged_add (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    (kernelLogged S z m b).events.count .add=(2*m-1)*S.card+m*m := by
+  simp only [kernelLogged,List.count_append,momentsLogged_add,materializeLogged_count,
+    dotLogged_add,rowPairs,List.length_ofFn]
+  simp
+
+theorem kernelLogged_zero_iff (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    (∀ j : Fin m, view (kernelLogged S z m b).value j 0=0) ↔
+      (NormSignedHankel.hankel S z m).mulVec b=0 := by
+  simp only [kernelLogged_value,funext_iff,Pi.zero_apply]
+
+theorem exists_kernelLogged_iff (S : Finset K) (z : K → K) (m : ℕ) :
+    (∃ b : Fin m → K, b≠0 ∧ ∀ j : Fin m, view (kernelLogged S z m b).value j 0=0) ↔
+      (NormSignedHankel.hankel S z m).det=0 := by
+  simp only [kernelLogged_zero_iff]
+  exact Matrix.exists_mulVec_eq_zero_iff
+
+def branch (y : K → K) (bits : K → Bool) (x : K) : K :=
+  if bits x then -y x else y x
+
+omit [DecidableEq K] in
+theorem branch_square (y : K → K) (bits : K → Bool) (x : K) :
+    (branch y bits x)^2=(y x)^2 := by
+  simp only [branch]
+  split <;> ring
+
+end OrientationPublicHankel
+#print axioms OrientationPublicHankel.momentLogged_value
+#print axioms OrientationPublicHankel.momentLogged_multiply
+#print axioms OrientationPublicHankel.momentLogged_add
+#print axioms OrientationPublicHankel.momentsLogged_value
+#print axioms OrientationPublicHankel.momentsLogged_multiply
+#print axioms OrientationPublicHankel.momentsLogged_add
+#print axioms OrientationPublicHankel.kernelLogged_value
+#print axioms OrientationPublicHankel.kernelLogged_multiply
+#print axioms OrientationPublicHankel.kernelLogged_add
+#print axioms OrientationPublicHankel.kernelLogged_zero_iff
+#print axioms OrientationPublicHankel.exists_kernelLogged_iff
+#print axioms OrientationPublicHankel.branch_square
+
+namespace OrientationPublicHankel
+open OrientationConvolutionTrace
+variable {K : Type*} [Field K] [DecidableEq K]
+
+abbrev BinaryCalls (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :=
+  Fin ((kernelLogged S z m b).events.count .multiply) ⊕
+    Fin ((kernelLogged S z m b).events.count .add)
+
+abbrev WordPorts (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :=
+  BinaryCalls S z m b × Fin (3*q)
+
+theorem wordPorts_card (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K) :
+    Fintype.card (WordPorts q S z m b)=6*q*((2*m-1)*S.card+m*m) := by
+  simp only [WordPorts,BinaryCalls,Fintype.card_prod,Fintype.card_sum,Fintype.card_fin,
+    kernelLogged_multiply,kernelLogged_add]
+  ring
+
+theorem wordPorts_cubic (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K)
+    (hq : m≤q) : 6*m^3≤Fintype.card (WordPorts q S z m b) := by
+  rw [wordPorts_card]
+  have ht : m*m≤(2*m-1)*S.card+m*m := by omega
+  have H := Nat.mul_le_mul hq ht
+  nlinarith
+
+theorem literal_incidence_edges {E : Type*} [Fintype E]
+    (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K)
+    (incidence : WordPorts q S z m b ↪ E × Bool) :
+    3*q*((2*m-1)*S.card+m*m)≤Fintype.card E := by
+  have H := Fintype.card_le_of_injective incidence incidence.injective
+  rw [wordPorts_card] at H
+  simp only [Fintype.card_prod,Fintype.card_bool] at H
+  nlinarith
+
+theorem literal_incidence_cubic {E : Type*} [Fintype E]
+    (q : ℕ) (S : Finset K) (z : K → K) (m : ℕ) (b : Fin m → K)
+    (incidence : WordPorts q S z m b ↪ E × Bool) (hq : m≤q) :
+    3*m^3≤Fintype.card E := by
+  have H := literal_incidence_edges q S z m b incidence
+  have ht : m*m≤(2*m-1)*S.card+m*m := by omega
+  have Hm := Nat.mul_le_mul hq ht
+  nlinarith
+
+end OrientationPublicHankel
+#print axioms OrientationPublicHankel.wordPorts_card
+#print axioms OrientationPublicHankel.wordPorts_cubic
+#print axioms OrientationPublicHankel.literal_incidence_edges
+#print axioms OrientationPublicHankel.literal_incidence_cubic
+
+namespace OrientationCurveAuxiliary
+open Polynomial
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def curveAux (f A B : K[X]) : K[X] := A^2-f*B^2
+
+omit [DecidableEq K] in
+theorem curveAux_eval (f A B : K[X]) (x : K) :
+    (curveAux f A B).eval x=(A.eval x)^2-f.eval x*(B.eval x)^2 := by
+  simp [curveAux]
+
+omit [DecidableEq K] in
+theorem curveAux_branch (S : Finset K) (z : K → K) (f : K[X])
+    (hp : ∀ x∈S, (z x)^2=f.eval x) (x : K) (hx : x∈S) :
+    (curveAux f (C (z x)) 1).eval x=0 := by
+  rw [curveAux_eval]
+  simp [hp x hx]
+
+omit [DecidableEq K] in
+theorem curveAux_nonzero (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) : curveAux f A B≠0 := by
+  rw [hn]
+  exact mul_ne_zero (C_ne_zero.mpr hc) (Lagrange.nodal_monic.ne_zero)
+
+omit [DecidableEq K] in
+theorem curveAux_natDegree (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) :
+    (curveAux f A B).natDegree=S.card := by
+  rw [hn,natDegree_mul (C_ne_zero.mpr hc) (Lagrange.nodal_monic.ne_zero)]
+  simp only [natDegree_C,Lagrange.natDegree_nodal,zero_add]
+
+omit [DecidableEq K] in
+theorem curveAux_power_nonzero (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) (r : ℕ) :
+    (curveAux f A B)^r≠0 :=
+  pow_ne_zero r (curveAux_nonzero S f A B c hc hn)
+
+omit [DecidableEq K] in
+theorem curveAux_power_degree (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) (r a : ℕ) (hcard : S.card=2*a) :
+    ((curveAux f A B)^r).natDegree=r*(2*a) := by
+  rw [natDegree_pow,curveAux_natDegree S f A B c hc hn,hcard]
+
+omit [DecidableEq K] in
+theorem curveAux_power_not_strict (S : Finset K) (f A B : K[X]) (c : K) (hc : c≠0)
+    (hn : curveAux f A B=C c*Lagrange.nodal S id) (r a : ℕ) (hcard : S.card=2*a) :
+    ¬((curveAux f A B)^r).natDegree<r*(2*a) := by
+  rw [curveAux_power_degree S f A B c hc hn r a hcard]
+  exact Nat.lt_irrefl _
+
+theorem public_curveAux_boundary (S : Finset K) (z : K → K) (f : K[X]) (a : ℕ)
+    (ha : 2≤a) (hcard : S.card=2*a) (hf : f.natDegree=3)
+    (hp : ∀ x∈S, (z x)^2=f.eval x)
+    (hd : (NormSignedHankel.hankel S z (a-1)).det=0) :
+    ∃ B : K[X], B≠0 ∧ B.natDegree<a-1 ∧ ∀ r : ℕ,
+      (curveAux f (((Lagrange.interpolate S id z)*B)%ₘ Lagrange.nodal S id) B)^r≠0 ∧
+      ((curveAux f (((Lagrange.interpolate S id z)*B)%ₘ Lagrange.nodal S id) B)^r).natDegree=
+        r*(2*a) := by
+  obtain ⟨B,hb,hB,c,hc,hn⟩ := NormSignedHankel.publicInputCertificate S z f a ha hcard hf hp hd
+  refine ⟨B,hb,hB,?_⟩
+  intro r
+  exact ⟨curveAux_power_nonzero S f _ B c hc hn r,
+    curveAux_power_degree S f _ B c hc hn r a hcard⟩
+
+end OrientationCurveAuxiliary
+#print axioms OrientationCurveAuxiliary.curveAux_eval
+#print axioms OrientationCurveAuxiliary.curveAux_branch
+#print axioms OrientationCurveAuxiliary.curveAux_nonzero
+#print axioms OrientationCurveAuxiliary.curveAux_natDegree
+#print axioms OrientationCurveAuxiliary.curveAux_power_nonzero
+#print axioms OrientationCurveAuxiliary.curveAux_power_degree
+#print axioms OrientationCurveAuxiliary.curveAux_power_not_strict
+#print axioms OrientationCurveAuxiliary.public_curveAux_boundary
+
+namespace OrientationQuadraticRecovery
+open Polynomial
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def StrictBudget (a : ℕ) (q0 q1 q2 : K[X]) : Prop :=
+  q0.degree+((2*(a-2):ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ) ∧
+  q1.degree+((a+(a-2):ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ) ∧
+  q2.degree+((2*a:ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ)
+
+omit [DecidableEq K] in
+theorem strictBudget_coefficients (a : ℕ) (q0 q1 q2 : K[X]) (ha : 2≤a)
+    (h : StrictBudget a q0 q1 q2) :
+    q2=0 ∧ q1.natDegree<2 ∧ q0.natDegree<4 := by
+  obtain ⟨h0,h1,h2⟩ := h
+  have hq2 : q2=0 := by
+    by_contra hn
+    rw [degree_eq_natDegree hn] at h2
+    have H : q2.natDegree+2*a<2*a := by exact_mod_cast h2
+    omega
+  refine ⟨hq2,?_,?_⟩
+  · by_cases hn : q1=0
+    · simp [hn]
+    · rw [degree_eq_natDegree hn] at h1
+      have H : q1.natDegree+(a+(a-2))<2*a := by exact_mod_cast h1
+      omega
+  · by_cases hn : q0=0
+    · simp [hn]
+    · rw [degree_eq_natDegree hn] at h0
+      have H : q0.natDegree+2*(a-2)<2*a := by exact_mod_cast h0
+      omega
+
+theorem strict_quadratic_interpolator_zero (S : Finset K) (z : K → K) (a : ℕ)
+    (q0 q1 q2 : K[X]) (ha : 2≤a) (hcard : S.card=2*a) (hchar : (2:K)≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget a q0 q1 q2)
+    (hplus : ∀ x∈S, q0.eval x+q1.eval x*z x+q2.eval x*(z x)^2=0)
+    (hminus : ∀ x∈S, q0.eval x+q1.eval x*(-z x)+q2.eval x*(-z x)^2=0) :
+    q0=0 ∧ q1=0 ∧ q2=0 := by
+  obtain ⟨hq2,hd1,hd0⟩ := strictBudget_coefficients a q0 q1 q2 ha hb
+  have hroots : ∀ x∈S, q0.eval x=0 ∧ q1.eval x=0 := by
+    intro x hx
+    have hp : q0.eval x+q1.eval x*z x=0 := by simpa only [hq2,eval_zero,zero_mul,add_zero] using hplus x hx
+    have hm : q0.eval x-q1.eval x*z x=0 := by
+      simpa only [hq2,eval_zero,zero_mul,add_zero,mul_neg,sub_eq_add_neg] using hminus x hx
+    have hprod : (2:K)*(q1.eval x*z x)=0 := by linear_combination hp-hm
+    have h1 : q1.eval x=0 := ((mul_eq_zero.mp hprod).resolve_left hchar |> mul_eq_zero.mp).resolve_right (hz x hx)
+    have h0 : q0.eval x=0 := by simpa only [h1,zero_mul,add_zero] using hp
+    exact ⟨h0,h1⟩
+  have hq0 : q0=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd (NormSignedHankel.nodalDivides S q0 (fun x hx => (hroots x hx).1)) hn
+    rw [Lagrange.natDegree_nodal,hcard] at H
+    omega
+  have hq1 : q1=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd (NormSignedHankel.nodalDivides S q1 (fun x hx => (hroots x hx).2)) hn
+    rw [Lagrange.natDegree_nodal,hcard] at H
+    omega
+  exact ⟨hq0,hq1,hq2⟩
+
+end OrientationQuadraticRecovery
+#print axioms OrientationQuadraticRecovery.strictBudget_coefficients
+#print axioms OrientationQuadraticRecovery.strict_quadratic_interpolator_zero
+
+namespace OrientationSymmetricRecovery
+open Polynomial
+open scoped BigOperators
+variable {K : Type*} [Field K] [DecidableEq K]
+
+def StrictBudget (a ell : ℕ) (q : Fin (ell+1) → K[X]) : Prop :=
+  ∀ j, (q j).degree+((j.val*a+(ell-j.val)*(a-2):ℕ):WithBot ℕ)<((2*a:ℕ):WithBot ℕ)
+
+omit [DecidableEq K] in
+theorem strict_coeff_degree (a ell : ℕ) (q : Fin (ell+1) → K[X]) (ha : 2≤a)
+    (h : StrictBudget a ell q) (j : Fin (ell+1)) : (q j).natDegree<2*a := by
+  by_cases hn : q j=0
+  · simp only [hn,natDegree_zero]
+    omega
+  · have H := h j
+    rw [degree_eq_natDegree hn] at H
+    have Hn : (q j).natDegree+(j.val*a+(ell-j.val)*(a-2))<2*a := by exact_mod_cast H
+    omega
+
+omit [DecidableEq K] in
+theorem strict_high_coeff_zero (a ell : ℕ) (q : Fin (ell+1) → K[X])
+    (h : StrictBudget a ell q) (j : Fin (ell+1)) (hj : 2≤j.val) : q j=0 := by
+  by_contra hn
+  have H := h j
+  rw [degree_eq_natDegree hn] at H
+  have Hn : (q j).natDegree+(j.val*a+(ell-j.val)*(a-2))<2*a := by exact_mod_cast H
+  have Hw := Nat.mul_le_mul_right a hj
+  omega
+
+theorem strict_symmetric_interpolator_zero (S : Finset K) (z : K → K) (a ell : ℕ)
+    (q : Fin (ell+1) → K[X]) (ha : 2≤a) (hcard : S.card=2*a) (hchar : (2:K)≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget a ell q)
+    (hplus : ∀ x∈S, (∑ j, (q j).eval x*(z x)^j.val)=0)
+    (hminus : ∀ x∈S, (∑ j, (q j).eval x*(-z x)^j.val)=0) :
+    ∀ j, q j=0 := by
+  have rootKill (j : Fin (ell+1)) (he : ∀ x∈S, (q j).eval x=0) : q j=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd (NormSignedHankel.nodalDivides S (q j) he) hn
+    rw [Lagrange.natDegree_nodal,hcard] at H
+    have Hd := strict_coeff_degree a ell q ha hb j
+    omega
+  cases ell with
+  | zero =>
+    have Hq : q 0=0 := rootKill 0 (by intro x hx; simpa using hplus x hx)
+    intro j
+    have Hj : j=0 := Fin.ext (by omega)
+    simpa only [Hj] using Hq
+  | succ ell =>
+    let j1 : Fin (ell+2) := (0 : Fin (ell+1)).succ
+    have heval (x v : K) : (∑ j : Fin (ell+2), (q j).eval x*v^j.val)=
+        (q 0).eval x+(q j1).eval x*v := by
+      rw [Fin.sum_univ_succ,Fin.sum_univ_succ]
+      have ht : (∑ j : Fin ell, (q j.succ.succ).eval x*v^j.succ.succ.val)=0 := by
+        apply Finset.sum_eq_zero
+        intro j _
+        rw [strict_high_coeff_zero a (ell+1) q hb j.succ.succ (by simp),eval_zero,zero_mul]
+      simp only [Fin.val_zero,Fin.val_succ,pow_zero,pow_one,mul_one,zero_add]
+      simp only [Fin.val_succ] at ht
+      rw [ht,add_zero]
+    have hroots : ∀ x∈S, (q 0).eval x=0 ∧ (q j1).eval x=0 := by
+      intro x hx
+      have hp := hplus x hx
+      have hm := hminus x hx
+      rw [heval] at hp hm
+      have hprod : (2:K)*((q j1).eval x*z x)=0 := by linear_combination hp-hm
+      have h1 : (q j1).eval x=0 :=
+        ((mul_eq_zero.mp hprod).resolve_left hchar |> mul_eq_zero.mp).resolve_right (hz x hx)
+      have h0 : (q 0).eval x=0 := by simpa only [h1,zero_mul,add_zero] using hp
+      exact ⟨h0,h1⟩
+    have H0 : q 0=0 := rootKill 0 (fun x hx => (hroots x hx).1)
+    have H1 : q j1=0 := rootKill j1 (fun x hx => (hroots x hx).2)
+    intro j
+    by_cases hj0 : j.val=0
+    · have He : j=0 := Fin.ext hj0
+      simpa only [He] using H0
+    · by_cases hj1 : j.val=1
+      · have He : j=j1 := Fin.ext (by simpa [j1] using hj1)
+        simpa only [He] using H1
+      · exact strict_high_coeff_zero a (ell+1) q hb j (by omega)
+
+end OrientationSymmetricRecovery
+#print axioms OrientationSymmetricRecovery.strict_coeff_degree
+#print axioms OrientationSymmetricRecovery.strict_high_coeff_zero
+#print axioms OrientationSymmetricRecovery.strict_symmetric_interpolator_zero
+
+namespace OrientationUniformMultiplicity
+open Polynomial
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+def xJet (p : K[X][X]) (x : K) (t : ℕ) : K[X] := by
+  classical
+  exact ofFn (p.natDegree+1) (fun j => ((p.coeff j.val).comp (X+C x)).coeff t)
+
+def FullMultiplicity (r : ℕ) (p : K[X][X]) (x y : K) : Prop :=
+  ∀ t k : ℕ, t+k<r → ((xJet p x t).comp (X+C y)).coeff k=0
+
+def StrictBudget (a ell r : ℕ) (p : K[X][X]) : Prop :=
+  p.natDegree≤ell ∧ ∀ j≤p.natDegree,
+    (p.coeff j).degree+((j*a+(ell-j)*(a-2):ℕ):WithBot ℕ)<((2*a*r:ℕ):WithBot ℕ)
+
+theorem xJet_coeff (p : K[X][X]) (x : K) (t j : ℕ) (hj : j≤p.natDegree) :
+    (xJet p x t).coeff j=((p.coeff j).comp (X+C x)).coeff t := by
+  classical
+  unfold xJet
+  exact ofFn_coeff_eq_val_of_lt
+    (fun i : Fin (p.natDegree+1) => ((p.coeff i.val).comp (X+C x)).coeff t)
+    (show j<p.natDegree+1 by omega)
+
+theorem xJet_degree (p : K[X][X]) (x : K) (t : ℕ) :
+    (xJet p x t).natDegree≤p.natDegree := by
+  classical
+  unfold xJet
+  have H := ofFn_natDegree_lt (by omega : 1≤p.natDegree+1)
+    (fun j : Fin (p.natDegree+1) => ((p.coeff j.val).comp (X+C x)).coeff t)
+  exact Nat.le_of_lt_succ H
+
+theorem xJet_zero (p : K[X][X]) (x : K) : xJet p x 0=p.map (evalRingHom x) := by
+  classical
+  apply Polynomial.ext
+  intro j
+  by_cases hj : j≤p.natDegree
+  · rw [xJet_coeff p x 0 j hj,coeff_map]
+    simp [coeff_zero_eq_eval_zero]
+  · rw [coeff_eq_zero_of_natDegree_lt ((xJet_degree p x 0).trans_lt (by omega)),
+      coeff_map,coeff_eq_zero_of_natDegree_lt (by omega)]
+    exact (map_zero _).symm
+
+theorem fullMultiplicity_one_iff (p : K[X][X]) (x y : K) :
+    FullMultiplicity 1 p x y ↔ (p.map (evalRingHom x)).eval y=0 := by
+  constructor
+  · intro h
+    have H := h 0 0 (by decide)
+    simpa [xJet_zero,coeff_zero_eq_eval_zero] using H
+  · intro h t k htk
+    have ht : t=0 := by omega
+    have hk : k=0 := by omega
+    subst t
+    subst k
+    simpa [xJet_zero,coeff_zero_eq_eval_zero] using h
+
+theorem fullMultiplicity_factors_iff (r : ℕ) (p : K[X][X]) (x y : K) :
+    FullMultiplicity r p x y ↔ ∀ t<r, (X-C y)^(r-t)∣xJet p x t := by
+  constructor
+  · intro h t ht
+    rw [X_sub_C_pow_dvd_iff,X_pow_dvd_iff]
+    intro k hk
+    exact h t k (by omega)
+  · intro h t k htk
+    have H := h t (by omega)
+    rw [X_sub_C_pow_dvd_iff,X_pow_dvd_iff] at H
+    exact H k (by omega)
+
+theorem paired_low_jet_zero (r : ℕ) (p : K[X][X]) (x y : K) (t : ℕ)
+    (ht : t<r) (hy : y≠-y) (hd : p.natDegree<2*(r-t))
+    (hp : FullMultiplicity r p x y) (hm : FullMultiplicity r p x (-y)) :
+    xJet p x t=0 := by
+  by_contra hn
+  have H1 := (fullMultiplicity_factors_iff r p x y).mp hp t ht
+  have H2 := (fullMultiplicity_factors_iff r p x (-y)).mp hm t ht
+  have Hc : IsCoprime ((X-C y)^(r-t)) ((X-C (-y))^(r-t)) :=
+    (pairwise_coprime_X_sub_C Function.injective_id hy).pow
+  have Hdiv := Hc.mul_dvd H1 H2
+  have Hdeg := natDegree_le_of_dvd Hdiv hn
+  rw [natDegree_mul (pow_ne_zero _ (X_sub_C_ne_zero y))
+    (pow_ne_zero _ (X_sub_C_ne_zero (-y)))] at Hdeg
+  simp only [natDegree_pow,natDegree_X_sub_C,mul_one] at Hdeg
+  have Hj := xJet_degree p x t
+  omega
+
+theorem strict_uniform_interpolator_zero (S : Finset K) (z : K → K)
+    (a ell r : ℕ) (p : K[X][X]) (ha : 2≤a) (hcard : S.card=2*a)
+    (hchar : (2:K)≠0) (hz : ∀ x∈S, z x≠0) (hb : StrictBudget a ell r p)
+    (hplus : ∀ x∈S, FullMultiplicity r p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity r p x (-z x)) : p=0 := by
+  classical
+  by_contra hp
+  let d := p.natDegree
+  let s := r-d/2
+  have htop : p.coeff d≠0 := by
+    simpa only [d,coeff_natDegree] using (leadingCoeff_ne_zero.mpr hp)
+  have Hbudget := hb.2 d (le_refl _)
+  rw [degree_eq_natDegree htop] at Hbudget
+  have Hn : (p.coeff d).natDegree+(d*a+(ell-d)*(a-2))<2*a*r := by
+    exact_mod_cast Hbudget
+  have ha0 : 0<a := lt_of_lt_of_le (by decide : 0<2) ha
+  have hd : d<2*r := by
+    have Hda : d*a<(2*r)*a := by nlinarith [Nat.zero_le ((ell-d)*(a-2))]
+    exact (Nat.mul_lt_mul_right ha0).mp Hda
+  have hs : 0<s := by dsimp [s];omega
+  have Hvan : ∀ x∈S, ∀ t<s, ((p.coeff d).comp (X+C x)).coeff t=0 := by
+    intro x hx t ht
+    have ht' : t<r := by dsimp [s] at ht;omega
+    have Hd : p.natDegree<2*(r-t) := by change d<2*(r-t);dsimp [s] at ht;omega
+    have hne : z x≠-z x := by
+      intro He
+      have Hzero : (2:K)*z x=0 := by linear_combination He
+      exact mul_ne_zero hchar (hz x hx) Hzero
+    have Hj := paired_low_jet_zero r p x (z x) t ht' hne Hd (hplus x hx) (hminus x hx)
+    have Hcoeff := congrArg (fun q : K[X] => q.coeff d) Hj
+    simpa only [xJet_coeff p x t d (le_refl _),coeff_zero] using Hcoeff
+  have Hprod : (∏ x∈S, (X-C x)^s)∣p.coeff d := by
+    apply Finset.prod_dvd_of_coprime
+    · intro x hx y hy hxy
+      exact (pairwise_coprime_X_sub_C Function.injective_id hxy).pow
+    · intro x hx
+      apply X_sub_C_pow_dvd_iff.mpr
+      apply X_pow_dvd_iff.mpr
+      exact Hvan x hx
+  have Hnodal : (Lagrange.nodal S id)^s∣p.coeff d := by
+    simpa only [Lagrange.nodal,id_eq,Finset.prod_pow] using Hprod
+  have Hdegree := natDegree_le_of_dvd Hnodal htop
+  rw [natDegree_pow,Lagrange.natDegree_nodal,hcard] at Hdegree
+  have Hscale : 2*r≤2*s+d := by dsimp [s];omega
+  have Hmul := Nat.mul_le_mul_right a Hscale
+  nlinarith [Nat.zero_le ((ell-d)*(a-2))]
+
+end OrientationUniformMultiplicity
+#print axioms OrientationUniformMultiplicity.xJet_coeff
+#print axioms OrientationUniformMultiplicity.xJet_degree
+#print axioms OrientationUniformMultiplicity.xJet_zero
+#print axioms OrientationUniformMultiplicity.fullMultiplicity_one_iff
+#print axioms OrientationUniformMultiplicity.fullMultiplicity_factors_iff
+#print axioms OrientationUniformMultiplicity.paired_low_jet_zero
+#print axioms OrientationUniformMultiplicity.strict_uniform_interpolator_zero
+
+namespace OrientationSingletonTarget
+open Polynomial OrientationUniformMultiplicity
+variable {K : Type*} [Field K]
+
+theorem strict_one_degrees (a ell : ℕ) (p : K[X][X]) (ha : 2≤a)
+    (hb : StrictBudget a ell 1 p) :
+    p.natDegree<2 ∧ (p.coeff 0).natDegree<2*a ∧ (p.coeff 1).natDegree<a := by
+  have ha0 : 0<a := lt_of_lt_of_le (by decide : 0<2) ha
+  have hd : p.natDegree<2 := by
+    by_cases hp : p=0
+    · simp only [hp,natDegree_zero];omega
+    · have ht : p.coeff p.natDegree≠0 := by
+        simpa only [coeff_natDegree] using (leadingCoeff_ne_zero.mpr hp)
+      have H := hb.2 p.natDegree (le_refl _)
+      rw [degree_eq_natDegree ht] at H
+      have Hn : (p.coeff p.natDegree).natDegree+
+          (p.natDegree*a+(ell-p.natDegree)*(a-2))<2*a*1 := by exact_mod_cast H
+      have Hda : p.natDegree*a<2*a := by
+        nlinarith [Nat.zero_le ((ell-p.natDegree)*(a-2))]
+      exact (Nat.mul_lt_mul_right ha0).mp Hda
+  have h0 : (p.coeff 0).natDegree<2*a := by
+    by_cases hz : p.coeff 0=0
+    · simp only [hz,natDegree_zero];omega
+    · have H := hb.2 0 (Nat.zero_le _)
+      rw [degree_eq_natDegree hz] at H
+      have Hn : (p.coeff 0).natDegree+(0*a+(ell-0)*(a-2))<2*a*1 := by exact_mod_cast H
+      omega
+  have h1 : (p.coeff 1).natDegree<a := by
+    by_cases hj : 1≤p.natDegree
+    · by_cases hz : p.coeff 1=0
+      · simp only [hz,natDegree_zero];exact ha0
+      · have H := hb.2 1 hj
+        rw [degree_eq_natDegree hz] at H
+        have Hn : (p.coeff 1).natDegree+(1*a+(ell-1)*(a-2))<2*a*1 := by exact_mod_cast H
+        omega
+    · rw [coeff_eq_zero_of_natDegree_lt (by omega)]
+      simpa only [natDegree_zero] using ha0
+  exact ⟨hd,h0,h1⟩
+
+theorem singleton_target_one_zero [DecidableEq K] (S : Finset K) (z : K → K) (target : K)
+    (a ell : ℕ) (p : K[X][X]) (ha : 2≤a) (hcard : S.card=2*a) (ht : target∈S)
+    (hchar : (2:K)≠0) (hz : ∀ x∈S.erase target, z x≠0)
+    (hb : StrictBudget a ell 1 p)
+    (hplus : ∀ x∈S, FullMultiplicity 1 p x (z x))
+    (hminus : ∀ x∈S.erase target, FullMultiplicity 1 p x (-z x)) : p=0 := by
+  classical
+  obtain ⟨hd,hd0,hd1⟩ := strict_one_degrees a ell p ha hb
+  have Hexp : p=C (p.coeff 0)+C (p.coeff 1)*X := by
+    calc
+      p = ∑ j∈Finset.range 2, C (p.coeff j)*X^j := as_sum_range_C_mul_X_pow' p hd
+      _ = _ := by simp [Finset.sum_range_succ]
+  have heval (x y : K) : (p.map (evalRingHom x)).eval y=
+      (p.coeff 0).eval x+(p.coeff 1).eval x*y := by
+    simpa using congrArg (fun P : K[X][X] => (P.map (evalRingHom x)).eval y) Hexp
+  have hroot1 : ∀ x∈S.erase target, (p.coeff 1).eval x=0 := by
+    intro x hx
+    have Hp := (fullMultiplicity_one_iff p x (z x)).mp (hplus x (Finset.mem_of_mem_erase hx))
+    have Hm := (fullMultiplicity_one_iff p x (-z x)).mp (hminus x hx)
+    rw [heval] at Hp Hm
+    have Hprod : (2:K)*((p.coeff 1).eval x*z x)=0 := by linear_combination Hp-Hm
+    exact ((mul_eq_zero.mp Hprod).resolve_left hchar |> mul_eq_zero.mp).resolve_right (hz x hx)
+  have hq1 : p.coeff 1=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd (NormSignedHankel.nodalDivides (S.erase target) (p.coeff 1) hroot1) hn
+    rw [Lagrange.natDegree_nodal,Finset.card_erase_of_mem ht,hcard] at H
+    omega
+  have hroot0 : ∀ x∈S, (p.coeff 0).eval x=0 := by
+    intro x hx
+    have H := (fullMultiplicity_one_iff p x (z x)).mp (hplus x hx)
+    rw [heval] at H
+    simpa only [hq1,eval_zero,zero_mul,add_zero] using H
+  have hq0 : p.coeff 0=0 := by
+    by_contra hn
+    have H := natDegree_le_of_dvd (NormSignedHankel.nodalDivides S (p.coeff 0) hroot0) hn
+    rw [Lagrange.natDegree_nodal,hcard] at H
+    omega
+  simpa only [hq0,hq1,map_zero,zero_mul,add_zero] using Hexp
+
+end OrientationSingletonTarget
+#print axioms OrientationSingletonTarget.strict_one_degrees
+#print axioms OrientationSingletonTarget.singleton_target_one_zero
+
+namespace OrientationRationalAdmission
+
+def coefficientCountTwice (a r ell : ℤ) : ℤ :=
+  2*(ell+1)*(2*a*r-(a-1)*ell)
+
+def constraintCountTwice (a unknown r : ℤ) : ℤ :=
+  (2*a+unknown)*r*(r+1)
+
+theorem sufficient_count_gap (a unknown r ell : ℤ) (ha : 3≤a) (hr : 1≤r)
+    (hu : 3≤unknown) : coefficientCountTwice a r ell<constraintCountTwice a unknown r := by
+  have Hcon : 0≤(ell-r)*(ell-r+1) := by
+    by_cases h : 0≤ell-r
+    · exact mul_nonneg h (by omega)
+    · exact mul_nonneg_of_nonpos_of_nonpos (by omega) (by omega)
+  have Ha : 0≤2*(a-3) := by omega
+  have Hfactor := mul_nonneg Ha Hcon
+  have Hunknown : 0≤(unknown-3)*r*(r+1) :=
+    mul_nonneg (mul_nonneg (by omega) (by omega)) (by omega)
+  have Hr : 0<3*r-1 := by omega
+  have Hidentity : constraintCountTwice a unknown r-coefficientCountTwice a r ell=
+      (2*ell-3*r+1)^2+(3*r-1)+2*(a-3)*((ell-r)*(ell-r+1))+
+        (unknown-3)*r*(r+1) := by
+    unfold coefficientCountTwice constraintCountTwice
+    ring
+  have Hpos : 0<constraintCountTwice a unknown r-coefficientCountTwice a r ell := by
+    rw [Hidentity]
+    linarith [sq_nonneg (2*ell-3*r+1)]
+  exact sub_pos.mp Hpos
+
+theorem singleton_count_gap (a r ell : ℤ) (ha : 3≤a) (hr : 1≤r) :
+    coefficientCountTwice a r ell<constraintCountTwice a (2*a-1) r :=
+  sufficient_count_gap a (2*a-1) r ell ha hr (by omega)
+
+theorem fixed_small_admission :
+    coefficientCountTwice 2 4 7/2=72 ∧ constraintCountTwice 2 3 4/2=70 ∧
+      constraintCountTwice 2 3 4<coefficientCountTwice 2 4 7 := by
+  norm_num [coefficientCountTwice,constraintCountTwice]
+
+end OrientationRationalAdmission
+#print axioms OrientationRationalAdmission.sufficient_count_gap
+#print axioms OrientationRationalAdmission.singleton_count_gap
+#print axioms OrientationRationalAdmission.fixed_small_admission
+
+namespace OrientationAnchoredOperator
+open Polynomial OrientationUniformMultiplicity
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+def coefficientJet (x : K) (t : ℕ) : K[X] →ₗ[K] K :=
+  (lcoeff K t).comp (taylor x)
+
+def xJetLinear (x : K) (t : ℕ) : K[X][X] →ₗ[K] K[X] :=
+  Polynomial.lsum (fun j => (monomial j : K →ₗ[K] K[X]).comp (coefficientJet x t))
+
+def mixedJetLinear (x y : K) (t k : ℕ) : K[X][X] →ₗ[K] K :=
+  (lcoeff K k).comp ((taylor y).comp (xJetLinear x t))
+
+theorem coefficientJet_apply (x : K) (t : ℕ) (q : K[X]) :
+    coefficientJet x t q=(q.comp (X+C x)).coeff t := by
+  simp only [coefficientJet,LinearMap.comp_apply,lcoeff_apply,taylor_apply]
+
+theorem xJetLinear_apply (x : K) (t : ℕ) (p : K[X][X]) :
+    xJetLinear x t p=xJet p x t := by
+  classical
+  simp only [xJetLinear,lsum_apply,LinearMap.comp_apply]
+  rw [p.sum_over_range (fun n => by simp)]
+  rw [Finset.sum_range]
+  unfold xJet
+  rw [ofFn_eq_sum_monomial]
+  apply Finset.sum_congr rfl
+  intro j _
+  rw [coefficientJet_apply]
+
+theorem mixedJetLinear_apply (x y : K) (t k : ℕ) (p : K[X][X]) :
+    mixedJetLinear x y t k p=((xJet p x t).comp (X+C y)).coeff k := by
+  simp only [mixedJetLinear,LinearMap.comp_apply,lcoeff_apply,taylor_apply,xJetLinear_apply]
+
+abbrev Positions := Unit ⊕ (Fin 3 × Bool)
+abbrev Triangle := {tk : Fin 4 × Fin 4 // tk.1.val+tk.2.val<4}
+abbrev Rows := Positions × Triangle
+abbrev Columns := {ji : Fin 8 × Fin 16 // ji.2.val+2*ji.1.val<16}
+
+def positionX (target : K) (x : Fin 3 → K) : Positions → K :=
+  Sum.elim (fun _ => target) (fun ib => x ib.1)
+
+def positionY (target : K) (y : Fin 3 → K) : Positions → K :=
+  Sum.elim (fun _ => target) (fun ib => if ib.2 then -y ib.1 else y ib.1)
+
+def jetOperator (xt yt : K) (x y : Fin 3 → K) : K[X][X] →ₗ[K] (Rows → K) :=
+  LinearMap.pi (fun row => mixedJetLinear (positionX xt x row.1) (positionY yt y row.1)
+    row.2.val.1.val row.2.val.2.val)
+
+theorem jetOperator_apply (xt yt : K) (x y : Fin 3 → K) (p : K[X][X]) (row : Rows) :
+    jetOperator xt yt x y p row=
+      ((xJet p (positionX xt x row.1) row.2.val.1.val).comp
+        (X+C (positionY yt y row.1))).coeff row.2.val.2.val := by
+  change mixedJetLinear _ _ _ _ p=_
+  exact mixedJetLinear_apply _ _ _ _ p
+
+theorem jetOperator_zero_iff (xt yt : K) (x y : Fin 3 → K) (p : K[X][X]) :
+    jetOperator xt yt x y p=0 ↔
+      ∀ i : Positions, FullMultiplicity 4 p (positionX xt x i) (positionY yt y i) := by
+  constructor
+  · intro h i t k htk
+    have ht : t<4 := by omega
+    have hk : k<4 := by omega
+    have H := congrFun h (i,⟨(⟨t,ht⟩,⟨k,hk⟩),htk⟩)
+    simpa only [jetOperator_apply,Pi.zero_apply] using H
+  · intro h
+    apply _root_.funext
+    intro row
+    rw [jetOperator_apply]
+    exact h row.1 row.2.val.1.val row.2.val.2.val row.2.property
+
+theorem anchored_zero_iff (xt yt : K) (x y : Fin 3 → K) (p : K[X][X]) :
+    jetOperator xt yt x y p=0 ↔ FullMultiplicity 4 p xt yt ∧
+      ∀ i : Fin 3, FullMultiplicity 4 p (x i) (y i) ∧ FullMultiplicity 4 p (x i) (-y i) := by
+  rw [jetOperator_zero_iff]
+  constructor
+  · intro h
+    refine ⟨?_,?_⟩
+    · simpa only [positionX,positionY,Sum.elim_inl] using h (Sum.inl ())
+    · intro i
+      constructor
+      · simpa [positionX,positionY] using h (Sum.inr (i,false))
+      · simpa [positionX,positionY] using h (Sum.inr (i,true))
+  · rintro ⟨ht,h⟩ i
+    cases i with
+    | inl utok =>
+        cases utok
+        simpa only [positionX,positionY,Sum.elim_inl] using ht
+    | inr ib =>
+        rcases ib with ⟨i,b⟩
+        cases b
+        · simpa [positionX,positionY] using (h i).1
+        · simpa [positionX,positionY] using (h i).2
+
+theorem positions_card : Fintype.card Positions=7 := by decide
+
+theorem triangle_card : Fintype.card Triangle=10 := by decide
+
+theorem rows_card : Fintype.card Rows=70 := by
+  simp only [Rows,Fintype.card_prod,positions_card,triangle_card]
+
+theorem columns_card : Fintype.card Columns=72 := by decide
+
+end OrientationAnchoredOperator
+#print axioms OrientationAnchoredOperator.coefficientJet_apply
+#print axioms OrientationAnchoredOperator.xJetLinear_apply
+#print axioms OrientationAnchoredOperator.mixedJetLinear_apply
+#print axioms OrientationAnchoredOperator.jetOperator_apply
+#print axioms OrientationAnchoredOperator.jetOperator_zero_iff
+#print axioms OrientationAnchoredOperator.anchored_zero_iff
+#print axioms OrientationAnchoredOperator.positions_card
+#print axioms OrientationAnchoredOperator.triangle_card
+#print axioms OrientationAnchoredOperator.rows_card
+#print axioms OrientationAnchoredOperator.columns_card
+
+namespace OrientationAnchoredEmbedding
+open Polynomial OrientationUniformMultiplicity OrientationAnchoredOperator
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+def coordinateMap (j : Fin 8) (i : Fin 16) : (Columns → K) →ₗ[K] K :=
+  if h : i.val+2*j.val<16 then LinearMap.proj ⟨(j,i),h⟩ else 0
+
+def rowPolynomial (j : Fin 8) : (Columns → K) →ₗ[K] K[X] := by
+  classical
+  exact (ofFn (R:=K) 16).comp (LinearMap.pi (fun i => coordinateMap j i))
+
+def coefficientEmbedding : (Columns → K) →ₗ[K] K[X][X] := by
+  classical
+  exact ((ofFn (R:=K[X]) 8).restrictScalars K).comp
+    (LinearMap.pi (fun j => rowPolynomial j))
+
+def finiteOperator (xt yt : K) (x y : Fin 3 → K) : (Columns → K) →ₗ[K] (Rows → K) :=
+  (jetOperator xt yt x y).comp coefficientEmbedding
+
+theorem rowPolynomial_coeff (v : Columns → K) (j : Fin 8) (i : Fin 16) :
+    (rowPolynomial j v).coeff i.val=coordinateMap j i v := by
+  classical
+  change (ofFn 16 (fun k => coordinateMap j k v)).coeff i.val=_
+  exact ofFn_coeff_eq_val_of_lt _ i.isLt
+
+theorem coefficientEmbedding_coeff (v : Columns → K) (j : Fin 8) :
+    (coefficientEmbedding v).coeff j.val=rowPolynomial j v := by
+  classical
+  change (ofFn 8 (fun k => rowPolynomial k v)).coeff j.val=_
+  exact ofFn_coeff_eq_val_of_lt _ j.isLt
+
+theorem coefficientEmbedding_coordinate (v : Columns → K) (c : Columns) :
+    ((coefficientEmbedding v).coeff c.val.1.val).coeff c.val.2.val=v c := by
+  rw [coefficientEmbedding_coeff,rowPolynomial_coeff]
+  simp only [coordinateMap,dite_eq_left c.property,LinearMap.proj_apply]
+
+theorem coefficientEmbedding_injective : Function.Injective (coefficientEmbedding (K:=K)) := by
+  intro v w h
+  apply _root_.funext
+  intro c
+  have H := congrArg (fun p : K[X][X] => (p.coeff c.val.1.val).coeff c.val.2.val) h
+  simpa only [coefficientEmbedding_coordinate] using H
+
+theorem rowPolynomial_degree (v : Columns → K) (j : Fin 8) :
+    (rowPolynomial j v).natDegree<16 := by
+  classical
+  change (ofFn 16 (fun k => coordinateMap j k v)).natDegree<16
+  exact ofFn_natDegree_lt (by decide) _
+
+theorem coefficientEmbedding_degree (v : Columns → K) :
+    (coefficientEmbedding v).natDegree<8 := by
+  classical
+  change (ofFn 8 (fun k => rowPolynomial k v)).natDegree<8
+  exact ofFn_natDegree_lt (by decide) _
+
+theorem coefficientEmbedding_budget (v : Columns → K) :
+    StrictBudget 2 7 4 (coefficientEmbedding v) := by
+  classical
+  have Hd := coefficientEmbedding_degree v
+  refine ⟨by omega,?_⟩
+  intro j hj
+  let J : Fin 8 := ⟨j,by omega⟩
+  let q : K[X] := (coefficientEmbedding v).coeff j
+  change q.degree+((j*2+(7-j)*0:ℕ):WithBot ℕ)<(16:WithBot ℕ)
+  simp only [Nat.mul_zero,Nat.add_zero]
+  by_cases hq : q=0
+  · simp [hq]
+    exact WithBot.bot_lt_coe (16 : ℕ)
+  · have Hq : q=rowPolynomial J v := coefficientEmbedding_coeff v J
+    have Hdeg : q.natDegree<16 := by rw [Hq];exact rowPolynomial_degree v J
+    let I : Fin 16 := ⟨q.natDegree,Hdeg⟩
+    have Htop : q.coeff q.natDegree≠0 := by
+      simpa only [coeff_natDegree] using (leadingCoeff_ne_zero.mpr hq)
+    have Hcoeff : q.coeff q.natDegree=coordinateMap J I v := by
+      change ((coefficientEmbedding v).coeff J.val).coeff I.val=_
+      rw [coefficientEmbedding_coeff,rowPolynomial_coeff]
+    have Hmask : q.natDegree+2*j<16 := by
+      by_contra hn
+      have Hz : coordinateMap J I v=0 := by simp [coordinateMap,J,I,hn]
+      exact Htop (Hcoeff.trans Hz)
+    rw [degree_eq_natDegree hq]
+    have Hn : q.natDegree+j*2<16 := by omega
+    exact_mod_cast Hn
+
+theorem finiteOperator_zero_iff (xt yt : K) (x y : Fin 3 → K) (v : Columns → K) :
+    finiteOperator xt yt x y v=0 ↔ FullMultiplicity 4 (coefficientEmbedding v) xt yt ∧
+      ∀ i : Fin 3, FullMultiplicity 4 (coefficientEmbedding v) (x i) (y i) ∧
+        FullMultiplicity 4 (coefficientEmbedding v) (x i) (-y i) := by
+  change jetOperator xt yt x y (coefficientEmbedding v)=0 ↔ _
+  exact anchored_zero_iff xt yt x y (coefficientEmbedding v)
+
+theorem finiteOperator_nonzero_kernel (xt yt : K) (x y : Fin 3 → K) :
+    ∃ v : Columns → K, v≠0 ∧ finiteOperator xt yt x y v=0 := by
+  classical
+  have Hni : ¬Function.Injective (finiteOperator xt yt x y) := by
+    intro h
+    have H := LinearMap.finrank_le_finrank_of_injective h
+    simp only [Module.finrank_fintype_fun_eq_card,columns_card,rows_card] at H
+    norm_num at H
+  have Hker : ¬∀ v : Columns → K, finiteOperator xt yt x y v=0 → v=0 := by
+    intro h
+    exact Hni (LinearMap.ker_eq_bot.mp (LinearMap.ker_eq_bot'.mpr h))
+  push Not at Hker
+  obtain ⟨v,hzero,hv⟩ := Hker
+  exact ⟨v,hv,hzero⟩
+
+theorem public_positive_auxiliary (xt yt : K) (x y : Fin 3 → K) :
+    ∃ p : K[X][X], p≠0 ∧ StrictBudget 2 7 4 p ∧ FullMultiplicity 4 p xt yt ∧
+      ∀ i : Fin 3, FullMultiplicity 4 p (x i) (y i) ∧ FullMultiplicity 4 p (x i) (-y i) := by
+  classical
+  obtain ⟨v,hv,hzero⟩ := finiteOperator_nonzero_kernel xt yt x y
+  have Hp : coefficientEmbedding v≠0 := by
+    intro h
+    apply hv
+    apply coefficientEmbedding_injective
+    simpa only [map_zero] using h
+  exact ⟨coefficientEmbedding v,Hp,coefficientEmbedding_budget v,
+    (finiteOperator_zero_iff xt yt x y v).mp hzero⟩
+
+end OrientationAnchoredEmbedding
+#print axioms OrientationAnchoredEmbedding.rowPolynomial_coeff
+#print axioms OrientationAnchoredEmbedding.coefficientEmbedding_coeff
+#print axioms OrientationAnchoredEmbedding.coefficientEmbedding_coordinate
+#print axioms OrientationAnchoredEmbedding.coefficientEmbedding_injective
+#print axioms OrientationAnchoredEmbedding.rowPolynomial_degree
+#print axioms OrientationAnchoredEmbedding.coefficientEmbedding_degree
+#print axioms OrientationAnchoredEmbedding.coefficientEmbedding_budget
+#print axioms OrientationAnchoredEmbedding.finiteOperator_zero_iff
+#print axioms OrientationAnchoredEmbedding.finiteOperator_nonzero_kernel
+#print axioms OrientationAnchoredEmbedding.public_positive_auxiliary
+
+namespace OrientationCurveFilter
+open Polynomial
+variable {K : Type*} [Field K]
+
+def curveEquation (f : K[X]) : K[X][X] := X^2-C f
+
+def curveRemainder (f : K[X]) (p : K[X][X]) : K[X][X] :=
+  p %ₘ curveEquation f
+
+def publicEval (p : K[X][X]) (x y : K) : K :=
+  p.eval₂ (evalRingHom x) y
+
+theorem curveEquation_monic (f : K[X]) : (curveEquation f).Monic := by
+  exact monic_X_pow_sub_C f (by decide : 2≠0)
+
+theorem curveEquation_ne_zero (f : K[X]) : curveEquation f≠0 :=
+  (curveEquation_monic f).ne_zero
+
+theorem curveRemainder_zero_iff (f : K[X]) (p : K[X][X]) :
+    curveRemainder f p=0 ↔ curveEquation f ∣ p := by
+  exact modByMonic_eq_zero_iff_dvd (curveEquation_monic f)
+
+theorem curveRemainder_ne_zero_iff (f : K[X]) (p : K[X][X]) :
+    curveRemainder f p≠0 ↔ ¬curveEquation f ∣ p := by
+  exact not_congr (curveRemainder_zero_iff f p)
+
+theorem curveEquation_eval_zero_iff (f : K[X]) (x y : K) :
+    publicEval (curveEquation f) x y=0 ↔ y^2=f.eval x := by
+  simp only [publicEval,curveEquation,eval₂_sub,eval₂_pow,eval₂_X,eval₂_C,
+    coe_evalRingHom,sub_eq_zero]
+
+theorem curveRemainder_publicEval (f : K[X]) (p : K[X][X]) (x y : K)
+    (h : y^2=f.eval x) : publicEval (curveRemainder f p) x y=publicEval p x y := by
+  exact eval₂_modByMonic_eq_self_of_root ((curveEquation_eval_zero_iff f x y).mpr h)
+end OrientationCurveFilter
+#print axioms OrientationCurveFilter.curveEquation_monic
+#print axioms OrientationCurveFilter.curveEquation_ne_zero
+#print axioms OrientationCurveFilter.curveRemainder_zero_iff
+#print axioms OrientationCurveFilter.curveRemainder_ne_zero_iff
+#print axioms OrientationCurveFilter.curveEquation_eval_zero_iff
+#print axioms OrientationCurveFilter.curveRemainder_publicEval
+
+namespace OrientationKernelCurveRemainder
+open Polynomial OrientationCurveFilter OrientationAnchoredEmbedding OrientationAnchoredOperator
+open OrientationUniformMultiplicity
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+def remainderLinear (f : K[X]) : K[X][X] →ₗ[K] K[X][X] :=
+  (modByMonicHom (curveEquation f)).restrictScalars K
+
+def kernelRemainder (f : K[X]) (xt yt : K) (x y : Fin 3 → K) :
+    LinearMap.ker (finiteOperator xt yt x y) →ₗ[K] K[X][X] :=
+  ((remainderLinear f).comp coefficientEmbedding).comp
+    (LinearMap.ker (finiteOperator xt yt x y)).subtype
+
+theorem curveEquation_natDegree (f : K[X]) : (curveEquation f).natDegree=2 := by
+  exact natDegree_X_pow_sub_C
+
+theorem curveRemainder_degree (f : K[X]) (p : K[X][X]) :
+    (curveRemainder f p).natDegree<2 := by
+  have Hne : curveEquation f≠1 := by
+    intro h
+    have H := congrArg natDegree h
+    rw [curveEquation_natDegree,natDegree_one] at H
+    norm_num at H
+  have H := natDegree_modByMonic_lt p (curveEquation_monic f) Hne
+  simpa only [curveRemainder,curveEquation_natDegree] using H
+
+theorem curveRemainder_split (f : K[X]) (p : K[X][X]) :
+    curveRemainder f p=C ((curveRemainder f p).coeff 0)+
+      C ((curveRemainder f p).coeff 1)*X := by
+  have Hdeg : (curveEquation f).degree≤(2:ℕ) := by
+    rw [degree_eq_natDegree (curveEquation_ne_zero f),curveEquation_natDegree]
+  have H := sum_modByMonic_coeff (p:=p) (curveEquation_monic f) Hdeg
+  simpa only [Fin.sum_univ_succ,Fin.sum_univ_zero,Fin.val_zero,Fin.val_succ,
+    zero_add,Nat.zero_add,monomial_zero_left,← C_mul_X_eq_monomial,add_zero,
+    curveRemainder] using H.symm
+
+theorem curveRemainder_zero_coeffs_iff (f : K[X]) (p : K[X][X]) :
+    curveRemainder f p=0 ↔ (curveRemainder f p).coeff 0=0 ∧
+      (curveRemainder f p).coeff 1=0 := by
+  constructor
+  · intro h
+    simp only [h,coeff_zero, and_self]
+  · rintro ⟨h0,h1⟩
+    rw [curveRemainder_split,h0,h1]
+    simp
+
+theorem remainderLinear_apply (f : K[X]) (p : K[X][X]) :
+    remainderLinear f p=curveRemainder f p := by rfl
+
+theorem kernelRemainder_apply (f : K[X]) (xt yt : K) (x y : Fin 3 → K)
+    (v : LinearMap.ker (finiteOperator xt yt x y)) :
+    kernelRemainder f xt yt x y v=curveRemainder f (coefficientEmbedding v.val) := by rfl
+
+theorem kernelRemainder_zero_iff (f : K[X]) (xt yt : K) (x y : Fin 3 → K)
+    (v : LinearMap.ker (finiteOperator xt yt x y)) :
+    kernelRemainder f xt yt x y v=0 ↔ curveEquation f ∣ coefficientEmbedding v.val := by
+  rw [kernelRemainder_apply,curveRemainder_zero_iff]
+
+theorem exists_kernel_remainder_ne_zero_iff (f : K[X]) (xt yt : K) (x y : Fin 3 → K) :
+    (∃ v : LinearMap.ker (finiteOperator xt yt x y), kernelRemainder f xt yt x y v≠0) ↔
+    ∃ v : Columns → K, finiteOperator xt yt x y v=0 ∧ ¬curveEquation f ∣ coefficientEmbedding v := by
+  constructor
+  · rintro ⟨v,hv⟩
+    exact ⟨v.val,v.property,fun h => hv ((kernelRemainder_zero_iff f xt yt x y v).mpr h)⟩
+  · rintro ⟨v,hv,hn⟩
+    refine ⟨⟨v,hv⟩,?_⟩
+    exact fun h => hn ((kernelRemainder_zero_iff f xt yt x y ⟨v,hv⟩).mp h)
+
+theorem kernelRemainder_target_eval (f : K[X]) (xt yt : K) (x y : Fin 3 → K)
+    (v : LinearMap.ker (finiteOperator xt yt x y)) (ht : yt^2=f.eval xt) :
+    publicEval (kernelRemainder f xt yt x y v) xt yt=0 := by
+  rw [kernelRemainder_apply,curveRemainder_publicEval f _ xt yt ht]
+  have H := ((finiteOperator_zero_iff xt yt x y v.val).mp v.property).1 0 0 (by decide)
+  simpa [publicEval,xJet_zero,coeff_zero_eq_eval_zero,eval₂_eq_eval_map] using H
+
+theorem kernelRemainder_pair_evals (f : K[X]) (xt yt : K) (x y : Fin 3 → K)
+    (v : LinearMap.ker (finiteOperator xt yt x y)) (hp : ∀ i, (y i)^2=f.eval (x i)) :
+    ∀ i : Fin 3, publicEval (kernelRemainder f xt yt x y v) (x i) (y i)=0 ∧
+      publicEval (kernelRemainder f xt yt x y v) (x i) (-y i)=0 := by
+  intro i
+  have H := ((finiteOperator_zero_iff xt yt x y v.val).mp v.property).2 i
+  constructor
+  · rw [kernelRemainder_apply,curveRemainder_publicEval f _ (x i) (y i) (hp i)]
+    have H0 := H.1 0 0 (by decide)
+    simpa [publicEval,xJet_zero,coeff_zero_eq_eval_zero,eval₂_eq_eval_map] using H0
+  · have Hneg : (-y i)^2=f.eval (x i) := by simpa only [neg_sq] using hp i
+    rw [kernelRemainder_apply,curveRemainder_publicEval f _ (x i) (-y i) Hneg]
+    have H0 := H.2 0 0 (by decide)
+    simpa [publicEval,xJet_zero,coeff_zero_eq_eval_zero,eval₂_eq_eval_map] using H0
+end OrientationKernelCurveRemainder
+#print axioms OrientationKernelCurveRemainder.curveEquation_natDegree
+#print axioms OrientationKernelCurveRemainder.curveRemainder_degree
+#print axioms OrientationKernelCurveRemainder.curveRemainder_split
+#print axioms OrientationKernelCurveRemainder.curveRemainder_zero_coeffs_iff
+#print axioms OrientationKernelCurveRemainder.remainderLinear_apply
+#print axioms OrientationKernelCurveRemainder.kernelRemainder_apply
+#print axioms OrientationKernelCurveRemainder.kernelRemainder_zero_iff
+#print axioms OrientationKernelCurveRemainder.exists_kernel_remainder_ne_zero_iff
+#print axioms OrientationKernelCurveRemainder.kernelRemainder_target_eval
+#print axioms OrientationKernelCurveRemainder.kernelRemainder_pair_evals
+
+namespace OrientationCubicRemainderBudget
+open Polynomial OrientationCurveFilter OrientationAnchoredEmbedding OrientationAnchoredOperator
+open OrientationKernelCurveRemainder
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+def evenPart (f : K[X]) (v : Columns → K) : K[X] :=
+  ∑ s : Fin 4, rowPolynomial ⟨2*s.val,by omega⟩ v * f^s.val
+
+def oddPart (f : K[X]) (v : Columns → K) : K[X] :=
+  ∑ s : Fin 4, rowPolynomial ⟨2*s.val+1,by omega⟩ v * f^s.val
+
+def curveQuotient (f : K[X]) (v : Columns → K) : K[X][X] :=
+  C (rowPolynomial 2 v)+C (rowPolynomial 3 v)*X+
+  C (rowPolynomial 4 v)*(X^2+C f)+C (rowPolynomial 5 v)*X*(X^2+C f)+
+  C (rowPolynomial 6 v)*(X^4+C f*X^2+C (f^2))+
+  C (rowPolynomial 7 v)*X*(X^4+C f*X^2+C (f^2))
+
+theorem rowPolynomial_weighted_degree (v : Columns → K) (j : Fin 8) :
+    (rowPolynomial j v).natDegree≤15-2*j.val := by
+  classical
+  by_cases hq : rowPolynomial j v=0
+  · simp only [hq,natDegree_zero,Nat.zero_le]
+  · have Hdeg := rowPolynomial_degree v j
+    let I : Fin 16 := ⟨(rowPolynomial j v).natDegree,Hdeg⟩
+    have Htop : (rowPolynomial j v).coeff I.val≠0 := by
+      simpa only [I,coeff_natDegree] using (leadingCoeff_ne_zero.mpr hq)
+    have Hmask : I.val+2*j.val<16 := by
+      by_contra hn
+      apply Htop
+      rw [rowPolynomial_coeff]
+      simp [coordinateMap,hn]
+    change (rowPolynomial j v).natDegree≤15-2*j.val
+    change (rowPolynomial j v).natDegree+2*j.val<16 at Hmask
+    omega
+
+theorem evenPart_degree (f : K[X]) (v : Columns → K) (hf : f.natDegree≤3) :
+    (evenPart f v).natDegree≤15 := by
+  apply natDegree_sum_le_of_forall_le
+  intro s hs
+  have Hrow := rowPolynomial_weighted_degree v (⟨2*s.val,by omega⟩ : Fin 8)
+  have Hpow := natDegree_pow_le_of_le s.val hf
+  have H := natDegree_mul_le_of_le Hrow Hpow
+  dsimp only [Fin.val_mk] at H
+  have Hs := s.isLt
+  omega
+
+theorem oddPart_degree (f : K[X]) (v : Columns → K) (hf : f.natDegree≤3) :
+    (oddPart f v).natDegree≤13 := by
+  apply natDegree_sum_le_of_forall_le
+  intro s hs
+  have Hrow := rowPolynomial_weighted_degree v (⟨2*s.val+1,by omega⟩ : Fin 8)
+  have Hpow := natDegree_pow_le_of_le s.val hf
+  have H := natDegree_mul_le_of_le Hrow Hpow
+  dsimp only [Fin.val_mk] at H
+  have Hs := s.isLt
+  omega
+
+theorem coefficientEmbedding_eight (v : Columns → K) :
+    coefficientEmbedding v=C (rowPolynomial 0 v)+C (rowPolynomial 1 v)*X+
+    C (rowPolynomial 2 v)*X^2+C (rowPolynomial 3 v)*X^3+
+    C (rowPolynomial 4 v)*X^4+C (rowPolynomial 5 v)*X^5+
+    C (rowPolynomial 6 v)*X^6+C (rowPolynomial 7 v)*X^7 := by
+  classical
+  change ofFn 8 (fun j => rowPolynomial j v)=_
+  simp [ofFn_eq_sum_monomial,Fin.sum_univ_succ,← C_mul_X_pow_eq_monomial,add_assoc]
+
+theorem curve_reconstruction (f : K[X]) (v : Columns → K) :
+    C (evenPart f v)+C (oddPart f v)*X+curveEquation f*curveQuotient f v=
+      coefficientEmbedding v := by
+  rw [coefficientEmbedding_eight]
+  simp [evenPart,oddPart,curveQuotient,curveEquation,Fin.sum_univ_succ]
+  ring
+
+theorem actual_remainder (f : K[X]) (v : Columns → K) :
+    curveRemainder f (coefficientEmbedding v)=C (evenPart f v)+C (oddPart f v)*X := by
+  have Hd : (C (evenPart f v)+C (oddPart f v)*X).degree≤(1:WithBot ℕ) :=
+    (degree_add_le _ _).trans (max_le (degree_C_le.trans (by decide)) (degree_C_mul_X_le _))
+  have HF : (curveEquation f).degree=(2:WithBot ℕ) := by
+    rw [degree_eq_natDegree (curveEquation_ne_zero f),curveEquation_natDegree]
+    norm_num
+  have Hlt : (C (evenPart f v)+C (oddPart f v)*X).degree<(curveEquation f).degree := by
+    rw [HF]
+    exact lt_of_le_of_lt Hd (by decide)
+  exact (div_modByMonic_unique (curveQuotient f v)
+    (C (evenPart f v)+C (oddPart f v)*X) (curveEquation_monic f)
+    ⟨curve_reconstruction f v,Hlt⟩).2
+end OrientationCubicRemainderBudget
+#print axioms OrientationCubicRemainderBudget.rowPolynomial_weighted_degree
+#print axioms OrientationCubicRemainderBudget.evenPart_degree
+#print axioms OrientationCubicRemainderBudget.oddPart_degree
+#print axioms OrientationCubicRemainderBudget.coefficientEmbedding_eight
+#print axioms OrientationCubicRemainderBudget.curve_reconstruction
+#print axioms OrientationCubicRemainderBudget.actual_remainder
+
+namespace OrientationFiniteCurveCoordinates
+open Polynomial OrientationCurveFilter OrientationAnchoredEmbedding OrientationAnchoredOperator
+open OrientationKernelCurveRemainder OrientationCubicRemainderBudget
+variable {K : Type*} [Field K]
+abbrev Ports := Fin 16 ⊕ Fin 14
+
+def coefficientPort (j n : ℕ) : K[X][X] →ₗ[K] K :=
+  (lcoeff K n).comp ((lcoeff (K[X]) j).restrictScalars K)
+
+def finiteRemainder (f : K[X]) : (Columns → K) →ₗ[K] (Ports → K) :=
+  LinearMap.pi (fun port => match port with
+    | Sum.inl i => (coefficientPort 0 i.val).comp ((remainderLinear f).comp coefficientEmbedding)
+    | Sum.inr i => (coefficientPort 1 i.val).comp ((remainderLinear f).comp coefficientEmbedding))
+
+def kernelCoordinates (f : K[X]) (xt yt : K) (x y : Fin 3 → K) :
+    LinearMap.ker (finiteOperator xt yt x y) →ₗ[K] (Ports → K) :=
+  (finiteRemainder f).comp (LinearMap.ker (finiteOperator xt yt x y)).subtype
+
+theorem actual_even_coefficient (f : K[X]) (v : Columns → K) :
+    (curveRemainder f (coefficientEmbedding v)).coeff 0=evenPart f v := by
+  rw [actual_remainder]
+  simp
+
+theorem actual_odd_coefficient (f : K[X]) (v : Columns → K) :
+    (curveRemainder f (coefficientEmbedding v)).coeff 1=oddPart f v := by
+  rw [actual_remainder]
+  simp
+
+theorem finiteRemainder_inl (f : K[X]) (v : Columns → K) (i : Fin 16) :
+    finiteRemainder f v (Sum.inl i)=(evenPart f v).coeff i.val := by
+  change ((curveRemainder f (coefficientEmbedding v)).coeff 0).coeff i.val=_
+  rw [actual_even_coefficient]
+
+theorem finiteRemainder_inr (f : K[X]) (v : Columns → K) (i : Fin 14) :
+    finiteRemainder f v (Sum.inr i)=(oddPart f v).coeff i.val := by
+  change ((curveRemainder f (coefficientEmbedding v)).coeff 1).coeff i.val=_
+  rw [actual_odd_coefficient]
+
+theorem finiteRemainder_zero_iff (f : K[X]) (v : Columns → K) (hf : f.natDegree≤3) :
+    finiteRemainder f v=0 ↔ curveRemainder f (coefficientEmbedding v)=0 := by
+  constructor
+  · intro h
+    have HA : evenPart f v=0 := by
+      apply Polynomial.ext
+      intro n
+      rw [coeff_zero]
+      by_cases hn : n<16
+      · have H := congrFun h (Sum.inl (⟨n,hn⟩ : Fin 16))
+        simpa only [finiteRemainder_inl,Pi.zero_apply,Fin.val_mk] using H
+      · exact coeff_eq_zero_of_natDegree_lt (lt_of_le_of_lt (evenPart_degree f v hf) (by omega))
+    have HB : oddPart f v=0 := by
+      apply Polynomial.ext
+      intro n
+      rw [coeff_zero]
+      by_cases hn : n<14
+      · have H := congrFun h (Sum.inr (⟨n,hn⟩ : Fin 14))
+        simpa only [finiteRemainder_inr,Pi.zero_apply,Fin.val_mk] using H
+      · exact coeff_eq_zero_of_natDegree_lt (lt_of_le_of_lt (oddPart_degree f v hf) (by omega))
+    rw [actual_remainder,HA,HB]
+    simp
+  · intro h
+    apply _root_.funext
+    intro port
+    cases port with
+    | inl i =>
+      change ((curveRemainder f (coefficientEmbedding v)).coeff 0).coeff i.val=0
+      rw [h]
+      simp
+    | inr i =>
+      change ((curveRemainder f (coefficientEmbedding v)).coeff 1).coeff i.val=0
+      rw [h]
+      simp
+
+theorem kernelCoordinates_zero_iff (f : K[X]) (xt yt : K) (x y : Fin 3 → K)
+    (v : LinearMap.ker (finiteOperator xt yt x y)) (hf : f.natDegree≤3) :
+    kernelCoordinates f xt yt x y v=0 ↔ curveEquation f ∣ coefficientEmbedding v.val := by
+  change finiteRemainder f v.val=0 ↔ _
+  rw [finiteRemainder_zero_iff f v.val hf,curveRemainder_zero_iff]
+
+theorem exists_kernelCoordinates_ne_zero_iff (f : K[X]) (xt yt : K) (x y : Fin 3 → K)
+    (hf : f.natDegree≤3) :
+    (∃ v : LinearMap.ker (finiteOperator xt yt x y), kernelCoordinates f xt yt x y v≠0) ↔
+    ∃ v : Columns → K, finiteOperator xt yt x y v=0 ∧ ¬curveEquation f ∣ coefficientEmbedding v := by
+  constructor
+  · rintro ⟨v,hv⟩
+    exact ⟨v.val,v.property,fun h => hv ((kernelCoordinates_zero_iff f xt yt x y v hf).mpr h)⟩
+  · rintro ⟨v,hv,hn⟩
+    refine ⟨⟨v,hv⟩,?_⟩
+    exact fun h => hn ((kernelCoordinates_zero_iff f xt yt x y ⟨v,hv⟩ hf).mp h)
+
+theorem ports_card : Fintype.card Ports=30 := by decide
+end OrientationFiniteCurveCoordinates
+#print axioms OrientationFiniteCurveCoordinates.actual_even_coefficient
+#print axioms OrientationFiniteCurveCoordinates.actual_odd_coefficient
+#print axioms OrientationFiniteCurveCoordinates.finiteRemainder_inl
+#print axioms OrientationFiniteCurveCoordinates.finiteRemainder_inr
+#print axioms OrientationFiniteCurveCoordinates.finiteRemainder_zero_iff
+#print axioms OrientationFiniteCurveCoordinates.kernelCoordinates_zero_iff
+#print axioms OrientationFiniteCurveCoordinates.exists_kernelCoordinates_ne_zero_iff
+#print axioms OrientationFiniteCurveCoordinates.ports_card
+
+namespace OrientationThirdMultiplicityPort
+open Polynomial OrientationUniformMultiplicity
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+theorem third_forbidden_degree (S : Finset K) (z : K → K) (p : K[X][X])
+    (hcard : S.card=3) (hchar : (2:K)≠0) (hz : ∀ x∈S, z x≠0)
+    (hb : StrictBudget 2 5 3 p)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x)) :
+    ¬(p.natDegree=3 ∨ p.natDegree=5) := by
+  classical
+  intro hd
+  have hp : p≠0 := by intro H;subst p;simp only [natDegree_zero] at hd;omega
+  let d := p.natDegree
+  let s := 3-d/2
+  have htop : p.coeff d≠0 := by
+    simpa only [d,coeff_natDegree] using leadingCoeff_ne_zero.mpr hp
+  have Hbudget := hb.2 d (le_refl _)
+  rw [degree_eq_natDegree htop] at Hbudget
+  have Hn : (p.coeff d).natDegree+(d*2+(5-d)*(2-2))<2*2*3 := by
+    exact_mod_cast Hbudget
+  have Hvan : ∀ x∈S, ∀ t<s, ((p.coeff d).comp (X+C x)).coeff t=0 := by
+    intro x hx t ht
+    have ht' : t<3 := by dsimp [s] at ht;omega
+    have Hd : p.natDegree<2*(3-t) := by change d<2*(3-t);dsimp [s] at ht;change d=3 ∨ d=5 at hd;omega
+    have Hne : z x≠-z x := by
+      intro H
+      have Hz : (2:K)*z x=0 := by linear_combination H
+      exact mul_ne_zero hchar (hz x hx) Hz
+    have Hj := paired_low_jet_zero 3 p x (z x) t ht' Hne Hd (hplus x hx) (hminus x hx)
+    have Hc := congrArg (fun q : K[X] => q.coeff d) Hj
+    simpa only [xJet_coeff p x t d (le_refl _),coeff_zero] using Hc
+  have Hprod : (∏ x∈S,(X-C x)^s)∣p.coeff d := by
+    apply Finset.prod_dvd_of_coprime
+    · intro x hx y hy hxy
+      exact (pairwise_coprime_X_sub_C Function.injective_id hxy).pow
+    · intro x hx
+      exact X_sub_C_pow_dvd_iff.mpr (X_pow_dvd_iff.mpr (Hvan x hx))
+  have Hnodal : (Lagrange.nodal S id)^s∣p.coeff d := by
+    simpa only [Lagrange.nodal,id_eq,Finset.prod_pow] using Hprod
+  have Hdeg := natDegree_le_of_dvd Hnodal htop
+  rw [natDegree_pow,Lagrange.natDegree_nodal,hcard] at Hdeg
+  change d=3 ∨ d=5 at hd
+  dsimp [s] at Hdeg
+  omega
+
+theorem third_degree_le_four (S : Finset K) (z : K → K) (p : K[X][X])
+    (hcard : S.card=3) (hchar : (2:K)≠0) (hz : ∀ x∈S, z x≠0)
+    (hb : StrictBudget 2 5 3 p)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x)) : p.natDegree≤4 := by
+  have H := third_forbidden_degree S z p hcard hchar hz hb hplus hminus
+  have Hd := hb.1
+  omega
+
+theorem third_fourth_coefficient_zero (S : Finset K) (z : K → K) (p : K[X][X])
+    (hcard : S.card=3) (hchar : (2:K)≠0) (hz : ∀ x∈S, z x≠0)
+    (hb : StrictBudget 2 5 3 p)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x))
+    (hport : (p.coeff 4).coeff 3=0) : p.coeff 4=0 := by
+  classical
+  by_contra hq
+  have H4 : 4≤p.natDegree := le_natDegree_of_ne_zero hq
+  have Hd := third_degree_le_four S z p hcard hchar hz hb hplus hminus
+  have Hbudget := hb.2 4 H4
+  rw [degree_eq_natDegree hq] at Hbudget
+  have Hn : (p.coeff 4).natDegree+(4*2+(5-4)*(2-2))<2*2*3 := by
+    exact_mod_cast Hbudget
+  have Htop : (p.coeff 4).coeff (p.coeff 4).natDegree≠0 := by
+    simpa only [coeff_natDegree] using leadingCoeff_ne_zero.mpr hq
+  have Hne3 : (p.coeff 4).natDegree≠3 := by
+    intro H
+    rw [H,hport] at Htop
+    exact Htop rfl
+  have Hvan : ∀ x∈S, ((p.coeff 4).comp (X+C x)).coeff 0=0 := by
+    intro x hx
+    have Hne : z x≠-z x := by
+      intro H
+      have Hz : (2:K)*z x=0 := by linear_combination H
+      exact mul_ne_zero hchar (hz x hx) Hz
+    have Hj := paired_low_jet_zero 3 p x (z x) 0 (by decide) Hne (by omega) (hplus x hx) (hminus x hx)
+    have Hc := congrArg (fun q : K[X] => q.coeff 4) Hj
+    simpa only [xJet_coeff p x 0 4 H4,coeff_zero] using Hc
+  have Hprod : (∏ x∈S,(X-C x)^1)∣p.coeff 4 := by
+    apply Finset.prod_dvd_of_coprime
+    · intro x hx y hy hxy
+      exact (pairwise_coprime_X_sub_C Function.injective_id hxy).pow
+    · intro x hx
+      apply X_sub_C_pow_dvd_iff.mpr
+      apply X_pow_dvd_iff.mpr
+      intro t ht
+      have Ht : t=0 := by omega
+      subst t
+      exact Hvan x hx
+  have Hnodal : (Lagrange.nodal S id)^1∣p.coeff 4 := by
+    simpa only [Lagrange.nodal,id_eq,Finset.prod_pow] using Hprod
+  have Hdegree := natDegree_le_of_dvd Hnodal hq
+  rw [natDegree_pow,Lagrange.natDegree_nodal,hcard] at Hdegree
+  omega
+
+theorem third_low_degree_of_port_zero (S : Finset K) (z : K → K) (p : K[X][X])
+    (hcard : S.card=3) (hchar : (2:K)≠0) (hz : ∀ x∈S, z x≠0)
+    (hb : StrictBudget 2 5 3 p)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x))
+    (hport : (p.coeff 4).coeff 3=0) : p.natDegree≤2 := by
+  by_cases hp : p=0
+  · simp only [hp,natDegree_zero,Nat.zero_le]
+  · have Hd := third_degree_le_four S z p hcard hchar hz hb hplus hminus
+    have Hbad := third_forbidden_degree S z p hcard hchar hz hb hplus hminus
+    have Hq := third_fourth_coefficient_zero S z p hcard hchar hz hb hplus hminus hport
+    have Htop : p.coeff p.natDegree≠0 := by
+      simpa only [coeff_natDegree] using leadingCoeff_ne_zero.mpr hp
+    have Hne4 : p.natDegree≠4 := by
+      intro H
+      rw [H,Hq] at Htop
+      exact Htop rfl
+    omega
+end OrientationThirdMultiplicityPort
+#print axioms OrientationThirdMultiplicityPort.third_forbidden_degree
+#print axioms OrientationThirdMultiplicityPort.third_degree_le_four
+#print axioms OrientationThirdMultiplicityPort.third_fourth_coefficient_zero
+#print axioms OrientationThirdMultiplicityPort.third_low_degree_of_port_zero
+
+namespace OrientationThirdQuadraticJets
+open Polynomial OrientationUniformMultiplicity
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+theorem paired_linear_coefficient_jets (p : K[X][X]) (x y : K)
+    (hd : p.natDegree≤2) (hchar : (2:K)≠0) (hy : y≠0)
+    (hp : FullMultiplicity 3 p x y) (hm : FullMultiplicity 3 p x (-y)) :
+    ∀ t<3, ((p.coeff 1).comp (X+C x)).coeff t=0 := by
+  classical
+  by_cases H1 : 1≤p.natDegree
+  · intro t ht
+    by_cases ht2 : t<2
+    · have Hne : y≠-y := by
+        intro H
+        have Hzero : (2:K)*y=0 := by linear_combination H
+        exact mul_ne_zero hchar hy Hzero
+      have Hj := paired_low_jet_zero 3 p x y t ht Hne (by omega) hp hm
+      have Hc := congrArg (fun q : K[X] => q.coeff 1) Hj
+      simpa only [xJet_coeff p x t 1 H1,coeff_zero] using Hc
+    · have Ht : t=2 := by omega
+      subst t
+      let q := xJet p x 2
+      have Hq : q.natDegree<3 := by
+        have H := xJet_degree p x 2
+        change (xJet p x 2).natDegree<3
+        omega
+      have He : q=C (q.coeff 0)+C (q.coeff 1)*X+C (q.coeff 2)*X^2 := by
+        have H := q.as_sum_range_C_mul_X_pow' Hq
+        simpa [Finset.sum_range_succ] using H
+      have Hplus : q.eval y=0 := by
+        have H := hp 2 0 (by decide)
+        simpa [q,coeff_zero_eq_eval_zero] using H
+      have Hminus : q.eval (-y)=0 := by
+        have H := hm 2 0 (by decide)
+        simpa [q,coeff_zero_eq_eval_zero] using H
+      rw [He] at Hplus Hminus
+      simp only [eval_add,eval_mul,eval_C,eval_X,eval_pow] at Hplus Hminus
+      have Hmul : ((2:K)*y)*q.coeff 1=0 := by linear_combination Hplus-Hminus
+      have Hcoef : q.coeff 1=0 := (mul_eq_zero.mp Hmul).resolve_left (mul_ne_zero hchar hy)
+      rw [← xJet_coeff p x 2 1 H1]
+      exact Hcoef
+  · have Hcoeff : p.coeff 1=0 := coeff_eq_zero_of_natDegree_lt (by omega)
+    intro t ht
+    simp only [Hcoeff,zero_comp,coeff_zero]
+
+theorem singleton_zero_jet (p : K[X][X]) (x y : K) (hd : p.natDegree≤2)
+    (h : FullMultiplicity 3 p x y) : xJet p x 0=0 := by
+  by_contra hn
+  have Hdiv := (fullMultiplicity_factors_iff 3 p x y).mp h 0 (by decide)
+  have Hdeg := natDegree_le_of_dvd Hdiv hn
+  simp only [Nat.sub_zero,natDegree_pow,natDegree_X_sub_C,mul_one] at Hdeg
+  have Hjet := xJet_degree p x 0
+  omega
+end OrientationThirdQuadraticJets
+#print axioms OrientationThirdQuadraticJets.paired_linear_coefficient_jets
+#print axioms OrientationThirdQuadraticJets.singleton_zero_jet
+
+namespace OrientationThirdSingletonElimination
+open Polynomial OrientationUniformMultiplicity OrientationThirdMultiplicityPort OrientationThirdQuadraticJets
+open scoped BigOperators
+variable {K : Type*} [Field K]
+
+theorem quadratic_linear_coefficient_zero (S : Finset K) (z : K → K) (p : K[X][X])
+    (xt yt : K) (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget 2 5 3 p) (hd : p.natDegree≤2)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x))
+    (htarget : FullMultiplicity 3 p xt yt) : p.coeff 1=0 := by
+  classical
+  by_contra hq
+  have H1 : 1≤p.natDegree := le_natDegree_of_ne_zero hq
+  have Hbudget := hb.2 1 H1
+  rw [degree_eq_natDegree hq] at Hbudget
+  have Hn : (p.coeff 1).natDegree+(1*2+(5-1)*(2-2))<2*2*3 := by exact_mod_cast Hbudget
+  have Hprod : (∏ x∈S,(X-C x)^3)∣p.coeff 1 := by
+    apply Finset.prod_dvd_of_coprime
+    · intro x hx y hy hxy
+      exact (pairwise_coprime_X_sub_C Function.injective_id hxy).pow
+    · intro x hx
+      exact X_sub_C_pow_dvd_iff.mpr (X_pow_dvd_iff.mpr
+        (paired_linear_coefficient_jets p x (z x) hd hchar (hz x hx) (hplus x hx) (hminus x hx)))
+  have Hnodal : (Lagrange.nodal S id)^3∣p.coeff 1 := by
+    simpa only [Lagrange.nodal,id_eq,Finset.prod_pow] using Hprod
+  have Hdeg : (p.coeff 1).natDegree≤((Lagrange.nodal S id)^3).natDegree := by
+    rw [natDegree_pow,Lagrange.natDegree_nodal,hcard]
+    omega
+  have Heq := eq_mul_leadingCoeff_of_monic_of_dvd_of_natDegree_le
+    ((show (Lagrange.nodal S id).Monic from Lagrange.nodal_monic).pow 3) Hnodal Hdeg
+  have Hj := singleton_zero_jet p xt yt hd htarget
+  have Hc := congrArg (fun q : K[X] => q.coeff 1) Hj
+  have Hvan : ((p.coeff 1).comp (X+C xt)).coeff 0=0 := by
+    simpa only [xJet_coeff p xt 0 1 H1,coeff_zero] using Hc
+  have Heval : (p.coeff 1).eval xt=0 := by simpa [coeff_zero_eq_eval_zero] using Hvan
+  have Hnone : ∀ x∈S, xt≠id x := by
+    intro x hx H
+    exact hnot (H.symm ▸ hx)
+  have Hnz := pow_ne_zero 3 (Lagrange.eval_nodal_not_at_node Hnone)
+  rw [Heq,eval_mul,eval_pow,eval_C] at Heval
+  have Hlead : (p.coeff 1).leadingCoeff=0 := (mul_eq_zero.mp Heval).resolve_left Hnz
+  exact (leadingCoeff_ne_zero.mpr hq) Hlead
+
+theorem quadratic_quadratic_coefficient_zero (S : Finset K) (z : K → K) (p : K[X][X])
+    (xt yt : K) (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0) (hyt : yt≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget 2 5 3 p) (hd : p.natDegree≤2)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x))
+    (htarget : FullMultiplicity 3 p xt yt) : p.coeff 2=0 := by
+  classical
+  by_contra hq
+  have H2 : 2≤p.natDegree := le_natDegree_of_ne_zero hq
+  have H1 : 1≤p.natDegree := by omega
+  have Hlinear := quadratic_linear_coefficient_zero S z p xt yt hcard hnot hchar hz hb hd hplus hminus htarget
+  have Hbudget := hb.2 2 H2
+  rw [degree_eq_natDegree hq] at Hbudget
+  have Hn : (p.coeff 2).natDegree+(2*2+(5-2)*(2-2))<2*2*3 := by exact_mod_cast Hbudget
+  have Htarget0 : ((p.coeff 2).comp (X+C xt)).coeff 0=0 := by
+    have Hj := singleton_zero_jet p xt yt hd htarget
+    have Hc := congrArg (fun q : K[X] => q.coeff 2) Hj
+    simpa only [xJet_coeff p xt 0 2 H2,coeff_zero] using Hc
+  have Htarget1 : ((p.coeff 2).comp (X+C xt)).coeff 1=0 := by
+    let q := xJet p xt 1
+    have Hq : q.natDegree<3 := by have H := xJet_degree p xt 1;change (xJet p xt 1).natDegree<3;omega
+    have He : q=C (q.coeff 0)+C (q.coeff 1)*X+C (q.coeff 2)*X^2 := by
+      have H := q.as_sum_range_C_mul_X_pow' Hq
+      simpa [Finset.sum_range_succ] using H
+    have Ht : (taylor yt q).coeff 1=0 := by
+      simpa only [taylor_apply] using htarget 1 1 (by decide)
+    rw [taylor_coeff_one,He] at Ht
+    simp only [derivative_add,derivative_C,derivative_C_mul_X,derivative_C_mul_X_sq,
+      eval_add,eval_zero,eval_C,eval_mul,eval_X] at Ht
+    have Hq1 : q.coeff 1=0 := by
+      change (xJet p xt 1).coeff 1=0
+      rw [xJet_coeff p xt 1 1 H1,Hlinear]
+      simp
+    rw [Hq1] at Ht
+    have Hmul : ((2:K)*yt)*q.coeff 2=0 := by linear_combination Ht
+    have Hq2 := (mul_eq_zero.mp Hmul).resolve_left (mul_ne_zero hchar hyt)
+    rw [← xJet_coeff p xt 1 2 H2]
+    exact Hq2
+  have Hvan : ∀ x∈insert xt S, ∀ t<2, ((p.coeff 2).comp (X+C x)).coeff t=0 := by
+    intro x hx t ht
+    by_cases Hx : x=xt
+    · subst x
+      have Ht : t=0 ∨ t=1 := by omega
+      rcases Ht with Ht|Ht
+      · subst t;exact Htarget0
+      · subst t;exact Htarget1
+    · have HxS : x∈S := (Finset.mem_insert.mp hx).resolve_left Hx
+      have Hne : z x≠-z x := by
+        intro H
+        have Hz : (2:K)*z x=0 := by linear_combination H
+        exact mul_ne_zero hchar (hz x HxS) Hz
+      have Hj := paired_low_jet_zero 3 p x (z x) t (by omega) Hne (by omega) (hplus x HxS) (hminus x HxS)
+      have Hc := congrArg (fun q : K[X] => q.coeff 2) Hj
+      simpa only [xJet_coeff p x t 2 H2,coeff_zero] using Hc
+  have Hprod : (∏ x∈insert xt S,(X-C x)^2)∣p.coeff 2 := by
+    apply Finset.prod_dvd_of_coprime
+    · intro x hx y hy hxy
+      exact (pairwise_coprime_X_sub_C Function.injective_id hxy).pow
+    · intro x hx
+      exact X_sub_C_pow_dvd_iff.mpr (X_pow_dvd_iff.mpr (Hvan x hx))
+  have Hnodal : (Lagrange.nodal (insert xt S) id)^2∣p.coeff 2 := by
+    simpa only [Lagrange.nodal,id_eq,Finset.prod_pow] using Hprod
+  have Hdegree := natDegree_le_of_dvd Hnodal hq
+  rw [natDegree_pow,Lagrange.natDegree_nodal,Finset.card_insert_of_notMem hnot,hcard] at Hdegree
+  omega
+
+theorem third_quadratic_zero (S : Finset K) (z : K → K) (p : K[X][X])
+    (xt yt : K) (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0) (hyt : yt≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget 2 5 3 p) (hd : p.natDegree≤2)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x))
+    (htarget : FullMultiplicity 3 p xt yt) : p=0 := by
+  classical
+  by_contra hp
+  have Hlinear := quadratic_linear_coefficient_zero S z p xt yt hcard hnot hchar hz hb hd hplus hminus htarget
+  have Hquad := quadratic_quadratic_coefficient_zero S z p xt yt hcard hnot hchar hyt hz hb hd hplus hminus htarget
+  have Htop : p.coeff p.natDegree≠0 := by simpa only [coeff_natDegree] using leadingCoeff_ne_zero.mpr hp
+  have Hd0 : p.natDegree=0 := by
+    by_contra H
+    have Hd : p.natDegree=1 ∨ p.natDegree=2 := by omega
+    rcases Hd with Hd|Hd
+    · rw [Hd,Hlinear] at Htop;exact Htop rfl
+    · rw [Hd,Hquad] at Htop;exact Htop rfl
+  have Hq0 : p.coeff 0≠0 := by simpa only [Hd0] using Htop
+  have Hbudget := hb.2 0 (Nat.zero_le _)
+  rw [degree_eq_natDegree Hq0] at Hbudget
+  have Hn : (p.coeff 0).natDegree+(0*2+(5-0)*(2-2))<2*2*3 := by exact_mod_cast Hbudget
+  have Hvan : ∀ x∈insert xt S, ∀ t<3, ((p.coeff 0).comp (X+C x)).coeff t=0 := by
+    intro x hx t ht
+    let yy := if x=xt then yt else z x
+    have Hfull : FullMultiplicity 3 p x yy := by
+      dsimp [yy]
+      split_ifs with H
+      · subst x;exact htarget
+      · exact hplus x ((Finset.mem_insert.mp hx).resolve_left H)
+    have Hj : xJet p x t=0 := by
+      by_contra hn
+      have Hdiv := (fullMultiplicity_factors_iff 3 p x yy).mp Hfull t ht
+      have Hdeg := natDegree_le_of_dvd Hdiv hn
+      simp only [natDegree_pow,natDegree_X_sub_C,mul_one] at Hdeg
+      have Hjet := xJet_degree p x t
+      omega
+    have Hc := congrArg (fun q : K[X] => q.coeff 0) Hj
+    simpa only [xJet_coeff p x t 0 (Nat.zero_le _),coeff_zero] using Hc
+  have Hprod : (∏ x∈insert xt S,(X-C x)^3)∣p.coeff 0 := by
+    apply Finset.prod_dvd_of_coprime
+    · intro x hx y hy hxy
+      exact (pairwise_coprime_X_sub_C Function.injective_id hxy).pow
+    · intro x hx
+      exact X_sub_C_pow_dvd_iff.mpr (X_pow_dvd_iff.mpr (Hvan x hx))
+  have Hnodal : (Lagrange.nodal (insert xt S) id)^3∣p.coeff 0 := by
+    simpa only [Lagrange.nodal,id_eq,Finset.prod_pow] using Hprod
+  have Hdegree := natDegree_le_of_dvd Hnodal Hq0
+  rw [natDegree_pow,Lagrange.natDegree_nodal,Finset.card_insert_of_notMem hnot,hcard] at Hdegree
+  omega
+
+theorem third_port_zero (S : Finset K) (z : K → K) (p : K[X][X])
+    (xt yt : K) (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0) (hyt : yt≠0)
+    (hz : ∀ x∈S, z x≠0) (hb : StrictBudget 2 5 3 p)
+    (hplus : ∀ x∈S, FullMultiplicity 3 p x (z x))
+    (hminus : ∀ x∈S, FullMultiplicity 3 p x (-z x))
+    (htarget : FullMultiplicity 3 p xt yt) (hport : (p.coeff 4).coeff 3=0) : p=0 := by
+  have Hd := third_low_degree_of_port_zero S z p hcard hchar hz hb hplus hminus hport
+  exact third_quadratic_zero S z p xt yt hcard hnot hchar hyt hz hb Hd hplus hminus htarget
+end OrientationThirdSingletonElimination
+#print axioms OrientationThirdSingletonElimination.quadratic_linear_coefficient_zero
+#print axioms OrientationThirdSingletonElimination.quadratic_quadratic_coefficient_zero
+#print axioms OrientationThirdSingletonElimination.third_quadratic_zero
+#print axioms OrientationThirdSingletonElimination.third_port_zero
+
+namespace OrientationThirdEligibleSpace
+open Polynomial OrientationUniformMultiplicity OrientationAnchoredOperator
+open OrientationThirdSingletonElimination OrientationFiniteCurveCoordinates
+variable {K : Type*} [Field K]
+
+def budgetSpace : Submodule K K[X][X] :=
+  ((degreeLT (K[X]) 6).restrictScalars K) ⊓
+    ⨅ j : Fin 6, (degreeLT K (12-2*j.val)).comap ((lcoeff (K[X]) j.val).restrictScalars K)
+
+abbrev ThirdPositions (S : Finset K) := Unit ⊕ (S × Bool)
+abbrev ThirdTriangle := {tk : Fin 3 × Fin 3 // tk.1.val+tk.2.val<3}
+abbrev ThirdRows (S : Finset K) := ThirdPositions S × ThirdTriangle
+
+def thirdX (S : Finset K) (xt : K) : ThirdPositions S → K :=
+  Sum.elim (fun _ => xt) (fun ib => ib.1.val)
+
+def thirdY (S : Finset K) (z : K → K) (yt : K) : ThirdPositions S → K :=
+  Sum.elim (fun _ => yt) (fun ib => if ib.2 then -z ib.1.val else z ib.1.val)
+
+def thirdJetOperator (S : Finset K) (z : K → K) (xt yt : K) : K[X][X] →ₗ[K] (ThirdRows S → K) :=
+  LinearMap.pi (fun row => mixedJetLinear (thirdX S xt row.1) (thirdY S z yt row.1)
+    row.2.val.1.val row.2.val.2.val)
+
+def eligible (S : Finset K) (z : K → K) (xt yt : K) : Submodule K K[X][X] :=
+  budgetSpace ⊓ LinearMap.ker (thirdJetOperator S z xt yt)
+
+def scalarPort (S : Finset K) (z : K → K) (xt yt : K) : eligible S z xt yt →ₗ[K] K :=
+  (coefficientPort 4 3).comp (eligible S z xt yt).subtype
+
+theorem budgetSpace_strict (p : K[X][X]) (hp : p∈budgetSpace) : StrictBudget 2 5 3 p := by
+  have Ho : p∈degreeLT (K[X]) 6 := hp.1
+  have Hdegree := mem_degreeLT.mp Ho
+  have Hd : p.natDegree<6 := by
+    by_cases hz : p=0
+    · simp only [hz,natDegree_zero];omega
+    · rw [degree_eq_natDegree hz] at Hdegree
+      exact_mod_cast Hdegree
+  refine ⟨by omega,?_⟩
+  intro j hj
+  let J : Fin 6 := ⟨j,by omega⟩
+  have Hinner := (Submodule.mem_iInf _).mp hp.2 J
+  change p.coeff j∈degreeLT K (12-2*j) at Hinner
+  have HinnerDegree := mem_degreeLT.mp Hinner
+  change (p.coeff j).degree+((j*2:ℕ):WithBot ℕ)<((12:ℕ):WithBot ℕ)
+  by_cases hq : p.coeff j=0
+  · simp [hq]
+    exact WithBot.bot_lt_coe (12:ℕ)
+  · rw [degree_eq_natDegree hq] at HinnerDegree ⊢
+    have Hn : (p.coeff j).natDegree<12-2*j := by exact_mod_cast HinnerDegree
+    have Hbound : (p.coeff j).natDegree+j*2<12 := by omega
+    exact_mod_cast Hbound
+
+theorem thirdJetOperator_zero_iff (S : Finset K) (z : K → K) (xt yt : K) (p : K[X][X]) :
+    thirdJetOperator S z xt yt p=0 ↔
+      ∀ i : ThirdPositions S, FullMultiplicity 3 p (thirdX S xt i) (thirdY S z yt i) := by
+  constructor
+  · intro h i t k htk
+    have ht : t<3 := by omega
+    have hk : k<3 := by omega
+    have H := congrFun h (i,⟨(⟨t,ht⟩,⟨k,hk⟩),htk⟩)
+    change mixedJetLinear _ _ t k p=0 at H
+    simpa only [mixedJetLinear_apply] using H
+  · intro h
+    apply _root_.funext
+    intro row
+    change mixedJetLinear _ _ _ _ p=0
+    rw [mixedJetLinear_apply]
+    exact h row.1 row.2.val.1.val row.2.val.2.val row.2.property
+
+theorem scalarPort_apply (S : Finset K) (z : K → K) (xt yt : K) (p : eligible S z xt yt) :
+    scalarPort S z xt yt p=(p.val.coeff 4).coeff 3 := by rfl
+
+theorem scalarPort_zero (S : Finset K) (z : K → K) (xt yt : K)
+    (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0) (hyt : yt≠0)
+    (hz : ∀ x∈S, z x≠0) (p : eligible S z xt yt) (h : scalarPort S z xt yt p=0) : p=0 := by
+  have Hb := budgetSpace_strict p.val p.property.1
+  have Hk : thirdJetOperator S z xt yt p.val=0 := p.property.2
+  have Hfull := (thirdJetOperator_zero_iff S z xt yt p.val).mp Hk
+  have Htarget : FullMultiplicity 3 p.val xt yt := by
+    simpa only [thirdX,thirdY] using Hfull (Sum.inl ())
+  have Hplus : ∀ x∈S, FullMultiplicity 3 p.val x (z x) := by
+    intro x hx
+    simpa only [thirdX,thirdY,Bool.false_eq_true,ite_false] using Hfull (Sum.inr (⟨x,hx⟩,false))
+  have Hminus : ∀ x∈S, FullMultiplicity 3 p.val x (-z x) := by
+    intro x hx
+    simpa only [thirdX,thirdY,ite_true] using Hfull (Sum.inr (⟨x,hx⟩,true))
+  have Hp := third_port_zero S z p.val xt yt hcard hnot hchar hyt hz Hb Hplus Hminus Htarget h
+  exact Subtype.ext Hp
+
+theorem scalarPort_injective (S : Finset K) (z : K → K) (xt yt : K)
+    (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0) (hyt : yt≠0)
+    (hz : ∀ x∈S, z x≠0) : Function.Injective (scalarPort S z xt yt) := by
+  apply LinearMap.ker_eq_bot.mp
+  apply LinearMap.ker_eq_bot'.mpr
+  intro p hp
+  exact scalarPort_zero S z xt yt hcard hnot hchar hyt hz p hp
+
+theorem eligible_finrank_le_one (S : Finset K) (z : K → K) (xt yt : K)
+    (hcard : S.card=3) (hnot : xt∉S) (hchar : (2:K)≠0) (hyt : yt≠0)
+    (hz : ∀ x∈S, z x≠0) : Module.finrank K (eligible S z xt yt)≤1 := by
+  have H := LinearMap.finrank_le_finrank_of_injective
+    (scalarPort_injective S z xt yt hcard hnot hchar hyt hz)
+  simpa only [Module.finrank_self] using H
+end OrientationThirdEligibleSpace
+#print axioms OrientationThirdEligibleSpace.budgetSpace_strict
+#print axioms OrientationThirdEligibleSpace.thirdJetOperator_zero_iff
+#print axioms OrientationThirdEligibleSpace.scalarPort_apply
+#print axioms OrientationThirdEligibleSpace.scalarPort_zero
+#print axioms OrientationThirdEligibleSpace.scalarPort_injective
+#print axioms OrientationThirdEligibleSpace.eligible_finrank_le_one

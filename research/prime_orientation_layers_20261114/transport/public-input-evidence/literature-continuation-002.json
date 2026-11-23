@@ -1,0 +1,26 @@
+{
+  "created_at": "2026-11-23T15:50:54.623544+00:00",
+  "classification": "literature/source continuation pointer only, not proof or novelty claim",
+  "kb": "MCP/fallback unavailable; prior primary2013read scope plus exact local source fallback",
+  "web_queries": [
+    "mathlib Polynomial taylorAlgHom hasseDeriv_mul"
+  ],
+  "web_sources": [
+    {
+      "url": "https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/HasseDeriv.html",
+      "scope": "search reference to standard Hasse product rule"
+    },
+    {
+      "url": "https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/Bivariate.html",
+      "scope": "declaration index for swap; not pinned revision"
+    }
+  ],
+  "local_sources": [
+    "Mathlib/Algebra/Polynomial/Taylor.lean:taylorAlgHom/taylor_mul",
+    "Mathlib/Algebra/Polynomial/HasseDeriv.lean:hasseDeriv_mul",
+    "Mathlib/Algebra/Polynomial/Bivariate.lean:248,277,281",
+    "Mathlib/LinearAlgebra/FiniteDimensional/Lemmas.lean:173",
+    "Mathlib/LinearAlgebra/Dimension/Constructions.lean:Submodule.finrank_le"
+  ],
+  "effect": "Use existing local generic algebra/dimension as stated; actual quotient local multiplicity transport remains unproved. Correct earlier missed Bivariate.swap name pattern without inheriting current web API as proof."
+}
