@@ -1,6 +1,6 @@
 # Rectangular Wiedemann over finite fields: row-weighted Gram qualification
 
-**Status (2026-11-22 Pacific / 2026-11-23 UTC):** a new **opt-in Rust implementation and regression tests** on draft PR #4960; **original-Rust tests and benchmarks not executed in this tool runtime**. Do not promote to an ecbench result or an ECDLP advantage. Existing `wiedemann_solve` remains the control, with its historical fixed-seed behavior.
+**Status (2026-11-22 Pacific / 2026-11-23 UTC):** a new **opt-in Rust implementation and regression tests** on draft PR #4960. A bounded **original-source Rust module gate passed 25/25** with an isolated test harness on a GitHub Actions runner; **root-crate compilation, real collector measurements, complete ECDLP solving and independent PCC verification remain outstanding**. Do not promote to an ecbench result or an ECDLP advantage. Existing `wiedemann_solve` remains the control, with its historical fixed-seed behavior.
 
 ## Scoped mathematical claim and counterexample
 
@@ -23,7 +23,7 @@ In `src/cryptanalysis/pq_wiedemann.rs`, `wiedemann_solve_row_preconditioned` con
 
 Relative to unweighted matrix-free `M^T M`, the weighted operator charges `r` additional scalar multiplications per Krylov product and `r` for the weighted RHS, plus `r` nonzero weight draws per attempt. If `Z` is the matrix nonzero count, its product work is `O(Z+r)`, not `O(Z)` with weights free. The `2c+2` sequence and solution reconstruction retain a scalar quadratic-depth bottleneck. Any complete-cost experiment must price setup, retries, original-system verification and failed solves. No asymptotic speedup is asserted.
 
-## Proposed correctness gate (not yet run)
+## Correctness gates: completed isolated source test, outstanding root integration
 
 Run against the original Rust source, not a translated arithmetic implementation:
 
@@ -37,7 +37,7 @@ cargo test --lib wiedemann_solve_agrees_with_reference_on_larger_rectangular_sys
 
 Expected gates: the former unweighted implementation returns `None` on every `F_5` isotropic-column seed; the weighted path succeeds for at least one of 64 seeded attempts, returns only the original solution, and is deterministic. Over `F_7` the full-column-rank overdetermined 4×2 system must recover the planted solution for at least one seed of 128; a deliberately contradictory RHS must never be accepted. Square inputs and every pre-existing reference regression must remain behaviorally unchanged.
 
-**Execution blocker:** this runtime has GitHub source-edit tools but no native `cargo` or `rustc` in its container; earlier repository CI reported malformed root modules (`ecbench/spec.rs`, `ic_framework/mod.rs`), and no newer successful exact-head Rust run was obtained here. That is a separate source/build gate to refresh before claiming execution. A targeted CI job may be used if available under the existing authorizations; no paid EKS benchmark has been launched.
+**Execution qualification:** the targeted original-source Rust test suite ran successfully (25/25 tests) via the linked harness in GitHub Actions as detailed below. This runtime's local container has no native `cargo` or `rustc`. Earlier repository CI reported malformed root modules (`ecbench/spec.rs`, `ic_framework/mod.rs`); their current root-build status was not independently resolved by the isolated test. No paid EKS benchmark has been launched.
 
 ## Next integration and experiment gate
 
@@ -54,8 +54,8 @@ Expected gates: the former unweighted implementation returns `None` on every `F_
 - **Sources checked (KB):** unavailable in this runtime: no research-KB MCP actions were exposed. The repository wrapper was not executable in the separate prior #4917/#4929 sessions; not retried in this connector-only run. Repository/literature fallback above is explicitly bounded; no repository-wide absence assertion.
 - Other active owners: the gain-forest harvester/coset MITM integrated through #4905; graph evaluation through #4929. This branch changes only the PQ sparse-LA opt-in path and its tests, not the harvester, graph evaluator or current experiment queue.
 
-## Added bounded native execution gate (run scheduled; result pending)
+## Executed bounded native original-source gate (25/25 pass)
 
 The draft PR now includes a GitHub Actions workflow [`graph-ic-gram-native.yml`](https://github.com/isogeny-labs/crypto/blob/automation/graph-ic-gram-precond-20261122/.github/workflows/graph-ic-gram-native.yml) that invokes `research/lp_graph_algorithms_20261123/native_pq_gram/run.sh` with an eight-minute timeout on a standard hosted runner. The standalone Cargo harness **symlinks the original, unchanged PQ source modules** `pq_wiedemann.rs` and `pq_sparse_la.rs` and supplies only small documented shims for crate-wide `mod_inverse` and the dense reference test oracle. This tests actual Rust source behavior but does not establish full-crate integration or equivalence of those shims to the production crate. The runner prints source commit and SHA-256 of each original module; root-crate build remains a separate gate. 
 
-At the last recorded check, workflow run [45113688390](https://github.com/isogeny-labs/crypto/actions/runs/45113688390) was **in progress**, with the native test step not yet executed. Do not report any Rust tests as passing before a completed job log is inspected. No EKS budget or paid compute was allocated by this session.
+The completed [workflow run 45113688390](https://github.com/isogeny-labs/crypto/actions/runs/45113688390), job `137491561293`, reported **success: 25 passed, 0 failed, 0 ignored, 0 filtered** in 17.10 seconds of test execution using Rust **1.100.0**. It included all three new tests and historical scalar/structured-sparse regression suites. Exact checked-out workflow commit: `bdcee01d189a0287a93a51e48901e9ee72bd2aaf`. SHA-256 of original modules printed by the runner: `pq_sparse_la.rs` `4bf06ccfc9728fe0c88bf8478242f0fb4fc4264447abb8d8a747dc0d7c0983d3`, and `pq_wiedemann.rs` `541c5279fe2f12cf89db2ddc6cfbfdc02cb2f4a20714a801b3ac5ebd812cc680`. The successful source-bound run does **not** prove unshimmed full-crate build or algorithmic advantage. No EKS budget or paid compute was allocated by this session.
