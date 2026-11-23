@@ -1,6 +1,6 @@
 # Root-normalized anchor reuse for coefficient-aware LP witness extraction
 
-Date: 2026-11-23 UTC. Owner: [graph-IC draft PR #4988](https://github.com/isogeny-labs/crypto/pull/4988). Status: **Rust source and a new regression submitted; new native qualification pending**. [pcc:unverified]
+Date: 2026-11-23 UTC. Owner: [graph-IC draft PR #4988](https://github.com/isogeny-labs/crypto/pull/4988). Status: **26/26 source-exact Rust release tests passed; full-crate and authentic collector-stream qualification pending**. [pcc:unverified]
 
 ## Mechanism and exact invariant
 
@@ -39,12 +39,13 @@ Falsify this change on any mismatch of exact coefficients, rank, source IDs, RHS
 - [Merged graph algorithm catalog #4917](https://github.com/isogeny-labs/crypto/pull/4917), especially the coefficient-aware rank/output accounting, and `docs/ic/graph-algorithms/{README,SOURCES}.md`.
 - [Merged gain-forest integration #4905](https://github.com/isogeny-labs/crypto/pull/4905), separate pipeline owner.
 - [Source-bound forest/anchor design](./FOREST_WITNESS_DESIGN_20261123.md), [rooted path proof](./ROOTED_WITNESS_PATHS_20261123.md), [edge cache](./EDGE_INVERSE_CACHE_20261123.md), [paired inverse](./PAIRED_INVERSE_20261123.md).
+- **New native source-exact receipt (2026-11-23 11:52 UTC):** [GitHub Actions run 45168809535](https://github.com/isogeny-labs/crypto/actions/runs/45168809535), job 137672643013, **SUCCESS: 26/26 Rust 1.100.0 release integration tests**, including the new `forest_witness_reuses_root_anchor_and_invalidates_after_join` regression. The PR checkout was merge SHA `69ea3684e1cc4f565d2f9d10fce5c67de1e95c1a`, not the branch HEAD; independently fetched branch and merge GitHub blobs for the production witness module (`8b6f0fa49177b1a835eb76ec467a00082b747455`), integration tests (`e04d25d57eca32e80e7ab6ea5d303cf66d89bc43`) and graph module (`a79a800ac002e5a831529a5a2e0b5d5dc0bdcce9`) and verified byte-identical blob identities. CI SHA-256 hashes for witness/tests: `f6bef72a1d6c06867515bb73c8714936e23109b21a5c25a6d016bf2436ea9e2a` / `bea184b30297d4012112ded1bd74415ac853e2cfb9cb466ac79921bf57154e64`.
 - The preceding [source-exact 25-test workflow 45158286356](https://github.com/isogeny-labs/crypto/actions/runs/45158286356) **passed all 25 tests** at source `1e332f06` (old paired-inversion implementation), in Rust 1.100.0. This receipt does **not** qualify the new anchor-cache change.
 - **Sources checked (KB):** dedicated research-KB MCP and repository wrapper unavailable in the connector-only environment. Scoped primary fallback: current GitHub modules and notes above, plus code-search attempts in `crypto`, `cryptanalysis`, `crypto-autoresearcher` for a natural Prime31 two-LP source stream; no eligible stream established. This is a limited retrieval result, not an absence proof.
 
 ## Required next execution
 
-1. Inspect the new native source-exact workflow at the final code/test head; read job logs, correct any failures and retain previous failed receipts.
+1. Preserve the native 26/26 receipt at its exact source identity; the unshimmed production-crate gate and independent PCC review remain separate.
 2. Only after passing, freeze a source/group-verified, naturally collected `p=2^31-1` two-LP stream with the actual subgroup order `ell`, generator, curve, target, per-row source witnesses and independent field checks. Do not substitute the synthetic 4-prime test.
 3. On identical normalized input, compare old rooted-parent `21418acd`, prior cached-edge `0dc8dc8`, paired-inverse `1e332f06`, new anchor cache, pivot and MST; separately charge setup, rejected rows, anchor-map work, inverse/multiply counts, source expansion/fill, output rank, memory and phase wall time under matched resources.
 4. Verify all exact sources and final target logarithms `[x]G=Q`, then compare full cold solver costs against the strongest eligible index-calculus control and optimized negation-map rho. Require independent PCC admission before promoting any performance result.
