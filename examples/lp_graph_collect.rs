@@ -65,6 +65,15 @@ fn main() {
         },
     )
     .expect("solve");
+    // A successful recovered logarithm must pass both existing independent
+    // general-arithmetic and fast-curve checks. A rank-only run may exhaust
+    // its bounded trials; do not mislabel that as a completed ECDLP solve.
+    if report.recovered.is_some() {
+        assert!(
+            report.verified_fast && report.verified_independent,
+            "recovered logarithm failed independent group verification"
+        );
+    }
     let pipeline = report.filter_pipeline.as_ref().expect("filter arm");
     let relations = pipeline.relations.clone().expect("captured relations");
     eprintln!(
@@ -106,6 +115,18 @@ fn main() {
         );
     }
     let eval = evaluate_stream(&label, &relations, instance.r, &params).expect("evaluate");
+    if params.compare_exact_forest {
+        // These are source-coefficient replay checks, not group replay.
+        assert_eq!(eval.pivot_filter.replay_failures, 0, "pivot source replay");
+        if !eval.mst_filter.refused {
+            assert_eq!(eval.mst_filter.replay_failures, 0, "MST source replay");
+        }
+        if let Some(ref forest) = eval.forest_filter {
+            if !forest.refused {
+                assert_eq!(forest.replay_failures, 0, "forest source replay");
+            }
+        }
+    }
     let json = serde_json::to_string_pretty(&eval).unwrap() + "\n";
     match args
         .iter()
