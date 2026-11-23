@@ -1,0 +1,195 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ksum_retune_20261118 pilot P24",
+ "description": "Sizing pilot (not data) for the k-sum (k, N) rule: prune=1, split=1, stride-renew. Generic decomposition track (bounded by sqrt(r); cannot beat rho). Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 10935329,
+    "a": 5320418,
+    "b": 8535318,
+    "group_order": 10933753,
+    "r": 10933753,
+    "gx": 258338,
+    "gy": 9805035
+   }
+  ],
+  "targets_per_curve": 64,
+  "target_seed": 20261118202,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "k4n13",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=13",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k4n14",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=14",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k4n15",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=15",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k5n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=10",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k5n11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k5n12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=12",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k6n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=6,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k6n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=10",
+     "oracle": "ksum:m=6,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k6n11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=6,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k7n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=7,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k7n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=10",
+     "oracle": "ksum:m=7,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k7n11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=7,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261118302,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

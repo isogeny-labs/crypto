@@ -1,0 +1,11 @@
+Commands: optimized deny-warnings Rust build, then producer --selftest
+Build exit: 0
+Selftest exit: 1
+Date: 2026-11-18 UTC
+Data status: no panel execution occurred and no result file was written.
+
+The shared deterministic irreducible selector has no degree-one candidate
+under its trial-division implementation, so the new `F_3` unit selftest could
+not construct its field through that selector.  The correction supplies the
+canonical degree-one modulus `[0,1]` directly in both unit tests.  Frozen panel
+degrees are 2 through 4 and their field construction is unchanged.
