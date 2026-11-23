@@ -7930,6 +7930,8 @@ impl CountedGroup for BinaryGroup<'_> {
             lambda_plus: lp,
             key_minus: 0,
             lambda_minus: 0,
+            y_plus: None,
+            y_minus: None,
         };
         if want_minus {
             let lm = lp ^ f.mul(j.x, inv);
