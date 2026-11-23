@@ -8,6 +8,16 @@
 
 ## Problem
 
+Round04(2026-11-23): [explicit-basis and subfield checks](../research/ecc2k130_jacobian_theory_20261123/round04/REPORT.md)
+give the written maximal-basis discriminant7^65*131^129, replayed by
+independent exact Gram and volume calculations. The specified norm263
+ideal now initializes. The degree130 class step and degree65 test time
+out without a result. In degrees2,5,10,13,26 explicit totally positive
+norm263 integral witnesses replay without class-group data, so these
+necessary norm tests do not exclude the candidate. They do not provide
+a degree130 lift. PCC-411bb5/0801cc are unverified. Curve realization,
+gluing and executable subgroup maps remain open. [pcc:unverified]
+
 Round03(2026-11-23): [elliptic-complement analysis](../research/ecc2k130_jacobian_theory_20261123/round03/REPORT.md)
 gives a written reduction of the genus131 natural-A, optimal elliptic
 degree<1213355897362451 case to E0 and degree34453, requiring a totally

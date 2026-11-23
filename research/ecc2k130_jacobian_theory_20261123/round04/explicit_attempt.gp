@@ -1,0 +1,22 @@
+default(parisize,268435456);
+default(parisizemax,536870912);
+read("../round03/field.gp");
+read("basis_data.gp");
+attempt() = {
+  my(N,B,P,V);
+  print("BEGIN explicit maximal basis; no nonprincipality conclusion without certification");
+  N=nfinit([H,Basis,[7,131]]);
+  if(N.disc!=7^65*131^129,error("wrong maximal discriminant"));
+  if(N.sign!=[130,0],error("wrong field signature"));
+  print("NFINIT returned; maximal discriminant and signature agree");
+  P=idealadd(N,263,Mod(x+1,H));
+  if(idealnorm(N,P)!=263,error("wrong ideal norm"));
+  print("specified_ideal_norm=263");
+  B=bnfinit(N,1);
+  print("BNFINIT returned; class-group certification still outstanding");
+  V=bnfisprincipal(B,P,4);
+  print("ordinary_class_vector=",V[1]);
+  print("compact_generator=",V[2]);
+};
+iferr(attempt(),E,print("PARI_ERROR=",E);quit(2));
+quit;
