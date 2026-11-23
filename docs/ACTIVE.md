@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Construct actual C7 mixed S/adjoint Jacobian chain through certified beta, fixed F7^6 E[4]/Weil4, full4096 J4/kernel/pairing/Frobenius and1331 rationalpoint/scalar certificates (Codex, started 2026-11-23, branch lane/chained-cm19-actual-j4-20261123, PR #5080; follows #5077; all negative outcomes retained). [pcc:unverified]
+- [x] Construct actual C7 mixed S/adjoint Jacobian chain through certified beta, fixed F7^6 E[4]/Weil4, full4096 J4/kernel/pairing/Frobenius and1331 rationalpoint/scalar certificates (Codex, started 2026-11-23, branch lane/chained-cm19-actual-j4-20261123, PR #5080; follows #5077; source257bf0f/result62db83d, data8b15b2, inspected2-page report081d42; all negative outcomes retained; independent verifier/explicit degree4 functions remain next). [pcc:unverified]
 
 - [x] Independently verify frozen actual C7 three-torsion conic/divisor rank certificates with separate native arithmetic and no candidate-search replay, then audit actual divided H/Tminus identities (Codex, started 2026-11-23, branch lane/chained-cm19-certificate-audit-20261123, PR #5077; completed source76c0def/result6ac7338/reportcd165a; follows #5072, feature-base auto-merge waits for parent). [pcc:unverified]
 
