@@ -1,0 +1,22 @@
+{
+  "schema": "xedni-fresh-target-pair-protocol-v1",
+  "source_panel_protocol": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/protocol.json",
+  "source_threshold_result": "research/exotic_ecdlp_20261021/xedni_radius_threshold_20261120/result.json",
+  "source_threshold_result_raw_sha256": "63c6021c256d0382e003f0a4e38560441d28274af8519f3620a94696fa2b0322",
+  "cells": [
+    {"p": 1531, "q": 1553, "R_over_Q": 11, "radius": 65},
+    {"p": 2287, "q": 2251, "R_over_Q": 1238, "radius": 54}
+  ],
+  "target_seed": "xedni-fresh-target-v1-20261120",
+  "targets_per_cell": 3,
+  "target_rule": "for j=0,1,2 compute k=1+int(SHA256(UTF8(seed+':'+p+':'+j)).hexdigest(),16) mod (q-1), then T=k*Qbar; require distinct k per cell; fixture construction is outside all arm intervals and hidden from solvers",
+  "target_input": "public reduced point T only; scalar k is used solely for fixture and post-solve audit",
+  "rational_arm": "fresh per-target scan of every nonzero (a,b) in [-B,B]^2 in frozen height-score order; construct exact rational aQ+bR, reduce and compare to T; after match return (a+lambda*b) mod q and independently verify",
+  "finite_control_arm": "same coefficient order and target; compute ((a+lambda*b) mod q)*Qbar and compare to T without rational-point construction; return and verify matched scalar",
+  "rho_arm": "same public point T; deterministic 3-partition Floyd rho with 64 restart seeds, up to 100000 iterations per restart, recording every walk update and degenerate collision; verify recovered scalar",
+  "arm_order_by_target_index": [["rational","finite","rho"],["rho","rational","finite"],["finite","rho","rational"]],
+  "time_cap_per_arm_seconds": 120,
+  "online_interval": "start immediately before first target-dependent candidate or walk computation and stop after scalar recovery and independent public-point verification; include failed attempts and restarts; exclude process launch, curve/pairing/label setup, lambda discovery, and fixture generation",
+  "status_policy": "retain verified, candidate_cap_exhausted, rho_cap_exhausted, wall_cap_exhausted and error rows; no missing online cost is zero",
+  "host_tier": "ordinary-host exploratory; preserve arm order and raw wall intervals; no Tier 0/1 speedup claim"
+}

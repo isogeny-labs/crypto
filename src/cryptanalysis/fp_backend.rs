@@ -1843,7 +1843,7 @@ pub fn jacobi_limbs<const N: usize>(a: &[u64; N], n: &[u64; N]) -> i32 {
 }
 
 /// The largest supported limb count of [`FpWide`].
-pub const MAX_LIMBS: usize = 8;
+pub const MAX_LIMBS: usize = 9;
 
 // ── FpWide<N>: Montgomery over N limbs ────────────────────────────────
 

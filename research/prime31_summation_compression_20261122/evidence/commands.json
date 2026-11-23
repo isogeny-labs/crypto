@@ -1,0 +1,52 @@
+[
+  {
+    "name": "new-example-tests",
+    "command": [
+      "cargo",
+      "test",
+      "--offline",
+      "--locked",
+      "--release",
+      "--manifest-path",
+      "gate-test-adapter/Cargo.toml",
+      "--example",
+      "prime31_dickson_quotient"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "bea087f2cdeb00304d4f912d8a66faebf75b1dbb9739fd7c96a77a48797f5bdc",
+    "stderr_sha256": "d222456d22920ae9897440fbdb852df07c8689ed65114baa2d554fa62fdbee94"
+  },
+  {
+    "name": "source-library-tests",
+    "command": [
+      "cargo",
+      "test",
+      "--offline",
+      "--locked",
+      "--release",
+      "--manifest-path",
+      "gate-test-adapter/Cargo.toml",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "0d15f6bdec3264093fd7cfa2ce751d3f07e430a8abcc75e5e0aec8a379ddfdc4",
+    "stderr_sha256": "775d84601d575866ea5fa0608c13665fa2f043832f659ae624221576b1906fbe"
+  },
+  {
+    "name": "correctness-cases",
+    "command": [
+      "cargo",
+      "run",
+      "--offline",
+      "--locked",
+      "--release",
+      "--manifest-path",
+      "gate-test-adapter/Cargo.toml",
+      "--example",
+      "prime31_dickson_quotient"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e9c2f4788c7370e317057df70dbf6cd3b4bdf5a1401056f3e30b7c26bc07326d",
+    "stderr_sha256": "f4e213569667bdaa88c29de8b07dc835c5379300a9d4490c2c63aee0624e9ca0"
+  }
+]

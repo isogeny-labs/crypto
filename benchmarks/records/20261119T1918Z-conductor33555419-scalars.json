@@ -1,0 +1,144 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-scalar.sh"
+      ],
+      "cwd": ".",
+      "exit": 127,
+      "started_utc": "2026-11-19T19:18:58+00:00",
+      "wall_s": 0.003
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-scalar-b.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:19:20+00:00",
+      "wall_s": 7.018
+    }
+  ],
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T19:18:53+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/twist-transport-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T1918Z-conductor33555419-scalars",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 192,
+      "name": "icv1-fp53-t33555417-7e2a3b7a.mean_scalar_per_mul",
+      "note": "Native ns converted to seconds; L0 batch64 throughput; setup/verification/output excluded; warmups excluded from statistic.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.00013235683178710938
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 192,
+      "name": "icv1-fp53-t33555417-7e2a3b7a.median_scalar_per_mul",
+      "note": "Native ns converted to seconds; L0 batch64 throughput; setup/verification/output excluded; warmups excluded from statistic.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0001279442734375
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 192,
+      "name": "icv1-fp53-t33555417-813cf2d9.mean_scalar_per_mul",
+      "note": "Native ns converted to seconds; L0 batch64 throughput; setup/verification/output excluded; warmups excluded from statistic.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.00013162352270507812
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 192,
+      "name": "icv1-fp53-t33555417-813cf2d9.median_scalar_per_mul",
+      "note": "Native ns converted to seconds; L0 batch64 throughput; setup/verification/output excluded; warmups excluded from statistic.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0001270407109375
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 192,
+      "name": "icv1-fp53-t33555417-ade0b980.mean_scalar_per_mul",
+      "note": "Native ns converted to seconds; L0 batch64 throughput; setup/verification/output excluded; warmups excluded from statistic.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.00013344204361979164
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 192,
+      "name": "icv1-fp53-t33555417-ade0b980.median_scalar_per_mul",
+      "note": "Native ns converted to seconds; L0 batch64 throughput; setup/verification/output excluded; warmups excluded from statistic.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0001274866953125
+    }
+  ],
+  "problem": "kernel:prime53-transported-scalar",
+  "raw": [
+    {
+      "bytes": 61700,
+      "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/raw-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259",
+      "sha256": "e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/report.pdf",
+    "png": [
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/rho.png",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/scalar.png"
+    ],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/rho.svg",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/scalar.svg",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/map.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor33555419-scalars",
+  "status": "open",
+  "summary": "32 bases/model, source/image/u2,6 measured rounds plus warmup;672 independently checked scalar batches. Failed launcher preserved. All times descriptive L0; record remains open pending authenticated S3 publication.",
+  "validation": "research/prime_conductor_gap80_20261031/twist-transport-20261119/summary.json"
+}

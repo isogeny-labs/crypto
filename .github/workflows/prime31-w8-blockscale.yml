@@ -1,0 +1,81 @@
+name: Prime31 W8 block-scale sweep (source-specific)
+on:
+  push:
+    branches:
+      - automation/prime31-blockscale-sweep-20261119
+    paths:
+      - ".github/workflows/prime31-w8-blockscale.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_w8_blockscale.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_w8_blockscale.py"
+      - "research/prime31_ic_20261115/rr9/W8_BLOCK_SCALE_PROTOCOL_20261119.md"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-w8-blockscale.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_w8_blockscale.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_w8_blockscale.py"
+      - "research/prime31_ic_20261115/rr9/W8_BLOCK_SCALE_PROTOCOL_20261119.md"
+permissions:
+  contents: read
+jobs:
+  source-specific-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact experiment commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout pinned original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only study into original Rust crate
+        run: |
+          mkdir -p pinned/research/prime31_ic_20261115/native/examples
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_blockscale.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_w8_blockscale.rs
+          echo "SOURCE $(git rev-parse HEAD)"
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_w8_blockscale.rs \
+             research/prime31_ic_20261115/rr9/W8_BLOCK_SCALE_PROTOCOL_20261119.md
+      - name: Original arithmetic Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Focused block-scale tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_w8_blockscale
+      - name: Full 5-arm 512-public-target original-curve census
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_blockscale > prime31-blockscale-full.json
+          jq -e '.schema=="prime31.w8.blockscale.v1" and
+                 .curve.p==2147483647 and .curve.n==2147446831 and
+                 .samples_per_window==128 and
+                 (.per_window|length)==4 and (.pooled|length)==5 and
+                 (.certificates|length)==20 and
+                 .all_65536_words_in_each_half==true and
+                 .generic_four_plus_four_grading_only==true and
+                 .nonenumerative_index_extraction==false and
+                 .complete_ecdlp_solved==false and .pcc_verified==false' \
+                 prime31-blockscale-full.json
+      - name: Independent affine replay and summary checks
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_blockscale.py \
+            prime31-blockscale-full.json | tee prime31-blockscale-checked.json
+          sha256sum prime31-blockscale-full.json prime31-blockscale-checked.json \
+            research/prime31_ic_20261115/native/examples/prime31_w8_blockscale.rs \
+            research/prime31_ic_20261115/native/verify_prime31_w8_blockscale.py \
+            | tee sha256.txt
+      - name: Persist complete reproducibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-blockscale-original-rust-20261119
+          path: |
+            prime31-blockscale-full.json
+            prime31-blockscale-checked.json
+            sha256.txt
+          if-no-files-found: warn
