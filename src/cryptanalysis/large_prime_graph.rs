@@ -24,6 +24,7 @@
 //! | fundamental-cycle total length `L` | [`fundamental_cycle_length`] | `O(v + e + L)` |
 //! | minimum-degree elimination ordering, fill and width | [`minimum_degree`] | `O(Σ d_i² log v)` |
 //! | FM hypergraph partitioning, column-net `Σ (λ_j − 1)` | [`fm_partition`], [`connectivity_minus_one`] | `O(I log R)` per pass |
+//! | block Wiedemann kernel vectors and solves over `F_ℓ` (catalog §3, item 6) | [`block_wiedemann`] | `O(N(1 + n/m)·Z)` products, `O(N²(m + n))` projections, `O((m + n)·m·L²)` σ-basis |
 //!
 //! All field arithmetic is over `F_ℓ` for an odd prime modulus `ℓ < 2^63`.
 //! Primality is a caller obligation, exactly as in `large_prime_filter`.
@@ -35,6 +36,7 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 
+pub mod block_wiedemann;
 pub mod eval;
 pub mod witness;
 pub mod projected_rank;

@@ -10,6 +10,9 @@ serde_json = "1"
 sha2 = "0.10"
 
 [lib]
+# Same library name as the root crate, so tests/large_prime_graph.rs
+# (`use crypto_lib::…`) compiles unchanged in both.
+name = "crypto_lib"
 path = "src/lib.rs"
 
 [[test]]

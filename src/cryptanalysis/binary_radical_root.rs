@@ -88,6 +88,149 @@ impl LinMap {
     }
 }
 
+/// Solves `z² + z = c` in `F_{2ⁿ}` for any `n ≤ 63`.
+///
+/// `φ(z) = z² + z` is `F₂`-linear with kernel `{0, 1}` and image the
+/// trace-0 hyperplane `H`.  For odd `n` the solver is the half-trace
+/// `Σ_{i ≤ (n−1)/2} c^{4^i}`.  Even `n` has no half-trace, so the solver
+/// is a precomputed linear `M` with `φ(M(c)) = c` on `H`: `M(φ(zⁱ)) = zⁱ`
+/// for `1 ≤ i < n` (the `φ(zⁱ)` are a basis of `H`, since `ker φ ∩
+/// span(z, …, z^{n−1}) = 0`) and `M(v) = 0` for one basis element `v` of
+/// trace 1.  Either way the call costs the same byte-table lookups.
+pub struct ArtinSchreier {
+    pub n: u32,
+    trace_mask: u64,
+    sqrt: LinMap,
+    solve: LinMap,
+}
+
+impl ArtinSchreier {
+    pub fn new(gf: &Gf2) -> Option<Self> {
+        let n = gf.n;
+        if n == 0 || n > 63 {
+            return None;
+        }
+        let basis: Vec<u64> = (0..n).map(|i| 1u64 << i).collect();
+        let sqrt: Vec<u64> = basis.iter().map(|&b| gf.sqr_k(b, n - 1)).collect();
+        let tr = |x: u64| {
+            let (mut acc, mut p) = (0u64, x);
+            for _ in 0..n {
+                acc ^= p;
+                p = gf.sqr(p);
+            }
+            acc
+        };
+        let mut trace_mask = 0u64;
+        for (i, &b) in basis.iter().enumerate() {
+            trace_mask |= (tr(b) & 1) << i;
+        }
+        let images: Vec<u64> = if n % 2 == 1 {
+            basis
+                .iter()
+                .map(|&b| {
+                    let (mut acc, mut p) = (0u64, b);
+                    for _ in 0..=(n - 1) / 2 {
+                        acc ^= p;
+                        p = gf.sqr_k(p, 2);
+                    }
+                    acc
+                })
+                .collect()
+        } else {
+            // Rows (vector, image under M), reduced to an echelon form with
+            // distinct pivots; M(x) is then read off by reducing x.
+            let v = basis[trace_mask.trailing_zeros() as usize];
+            let mut rows: Vec<(u64, u64)> = Vec::with_capacity(n as usize);
+            let mut push = |mut vec: u64, mut img: u64, rows: &mut Vec<(u64, u64)>| {
+                for &(rv, ri) in rows.iter() {
+                    let p = 63 - rv.leading_zeros();
+                    if vec >> p & 1 == 1 {
+                        vec ^= rv;
+                        img ^= ri;
+                    }
+                }
+                assert!(vec != 0, "φ(zⁱ) and v must be independent");
+                let p = 63 - vec.leading_zeros();
+                for r in rows.iter_mut() {
+                    if r.0 >> p & 1 == 1 {
+                        r.0 ^= vec;
+                        r.1 ^= img;
+                    }
+                }
+                rows.push((vec, img));
+            };
+            for &b in &basis[1..] {
+                push(gf.sqr(b) ^ b, b, &mut rows);
+            }
+            push(v, 0, &mut rows);
+            basis
+                .iter()
+                .map(|&e| {
+                    let (mut x, mut img) = (e, 0u64);
+                    for &(rv, ri) in &rows {
+                        if x >> (63 - rv.leading_zeros()) & 1 == 1 {
+                            x ^= rv;
+                            img ^= ri;
+                        }
+                    }
+                    debug_assert_eq!(x, 0);
+                    img
+                })
+                .collect()
+        };
+        Some(Self {
+            n,
+            trace_mask,
+            sqrt: LinMap::from_images(&sqrt),
+            solve: LinMap::from_images(&images),
+        })
+    }
+
+    #[inline(always)]
+    pub fn trace(&self, x: u64) -> u64 {
+        ((x & self.trace_mask).count_ones() & 1) as u64
+    }
+
+    #[inline(always)]
+    pub fn sqrt(&self, x: u64) -> u64 {
+        self.sqrt.apply(x)
+    }
+
+    /// A root of `z² + z = c`; meaningful only when `trace(c) = 0`.
+    #[inline(always)]
+    pub fn solve(&self, c: u64) -> u64 {
+        self.solve.apply(c)
+    }
+}
+
+/// The trace test and Artin–Schreier step `as_roots` needs.
+trait AsSolver {
+    fn tr(&self, x: u64) -> u64;
+    fn as_solve(&self, c: u64) -> u64;
+}
+
+impl AsSolver for ArtinSchreier {
+    #[inline(always)]
+    fn tr(&self, x: u64) -> u64 {
+        self.trace(x)
+    }
+    #[inline(always)]
+    fn as_solve(&self, c: u64) -> u64 {
+        self.solve(c)
+    }
+}
+
+impl AsSolver for RadicalQuartic {
+    #[inline(always)]
+    fn tr(&self, x: u64) -> u64 {
+        self.trace(x)
+    }
+    #[inline(always)]
+    fn as_solve(&self, c: u64) -> u64 {
+        self.half_trace(c)
+    }
+}
+
 /// `x⁻¹ mod m` for `gcd(x, m) = 1`.
 fn inv_mod(x: u128, m: u128) -> Option<u128> {
     let (mut r0, mut r1) = (m as i128, (x % m) as i128);
@@ -562,16 +705,23 @@ impl RowRoots {
 // ── The factorisation S₄ = S₃(u, x_R, X)·S₃(u', x_R, X) ─────────────────
 
 /// Roots of `A·X² + B·X + C` (`A·B ≠ 0`, `ab_inv = 1/(A·B)`), by one
-/// half-trace: `X = (B/A)·t` with `t² + t = A·C/B²`.
+/// Artin–Schreier step: `X = (B/A)·t` with `t² + t = A·C/B²`.
 #[inline(always)]
-fn as_roots(a: u64, b: u64, c: u64, ab_inv: u64, r: &RadicalQuartic, gf: &Gf2) -> Option<[u64; 2]> {
+fn as_roots<S: AsSolver>(
+    a: u64,
+    b: u64,
+    c: u64,
+    ab_inv: u64,
+    r: &S,
+    gf: &Gf2,
+) -> Option<[u64; 2]> {
     let (inv_a, inv_b) = (gf.mul(b, ab_inv), gf.mul(a, ab_inv));
     let w = gf.mul(gf.mul(a, c), gf.sqr(inv_b));
-    if r.trace(w) != 0 {
+    if r.tr(w) != 0 {
         return None;
     }
     let k = gf.mul(b, inv_a);
-    let x0 = gf.mul(k, r.half_trace(w));
+    let x0 = gf.mul(k, r.as_solve(w));
     Some([x0, x0 ^ k])
 }
 
@@ -862,14 +1012,14 @@ pub struct FactoredSubspaceOracle {
     pub span: Vec<u64>,
     /// Echelon basis `(pivot bit, vector)`, pivots descending.
     echelon: Vec<(u32, u64)>,
-    r: RadicalQuartic,
+    r: ArtinSchreier,
 }
 
 impl FactoredSubspaceOracle {
-    /// `None` for even `n` (no half-trace) or a dependent basis.
+    /// `None` for `n > 63` or a dependent basis.  Any parity of `n`.
     pub fn new(basis: &[u64], b: u64, gf: &Gf2) -> Option<Self> {
         let l = basis.len() as u32;
-        let r = RadicalQuartic::new(0, gf)?;
+        let r = ArtinSchreier::new(gf)?;
         let mut span = Vec::with_capacity(1usize << l);
         for idx in 0..(1u64 << l) {
             let mut v = 0u64;
@@ -1303,9 +1453,52 @@ mod tests {
     }
 
     #[test]
+    fn artin_schreier_solves_exactly_the_trace_zero_hyperplane() {
+        for n in 2u32..=63 {
+            let Some(gf) = find_irreducible(n).map(|p| Gf2::new(&p)) else {
+                continue;
+            };
+            let asr = ArtinSchreier::new(&gf).unwrap();
+            let mask = (1u64 << n) - 1;
+            let mut rng = StdRng::seed_from_u64(0xa5 ^ n as u64);
+            let (mut t0, mut t1) = (0u32, 0u32);
+            for _ in 0..400 {
+                let z = rng.gen::<u64>() & mask;
+                let c = gf.sqr(z) ^ z;
+                // Every image of φ has trace 0 and is solved.
+                assert_eq!(asr.trace(c), 0, "n={n}");
+                let r = asr.solve(c);
+                assert_eq!(gf.sqr(r) ^ r, c, "n={n} c={c:#x}");
+                assert!(r == z || r == z ^ 1, "n={n}");
+                // A random element: trace 1 exactly when unsolvable.
+                let x = rng.gen::<u64>() & mask;
+                let y = asr.solve(x);
+                if asr.trace(x) == 0 {
+                    assert_eq!(gf.sqr(y) ^ y, x, "n={n}");
+                    t0 += 1;
+                } else {
+                    assert_ne!(gf.sqr(y) ^ y, x, "n={n}");
+                    t1 += 1;
+                }
+                assert_eq!(gf.mul(asr.sqrt(x), asr.sqrt(x)), x, "n={n}");
+            }
+            assert!(t0 > 100 && t1 > 100, "n={n}: trace split {t0}/{t1}");
+        }
+    }
+
+    #[test]
     fn factored_subspace_oracle_decides_as_subspace_oracle() {
         use crate::cryptanalysis::semaev_decomp::{eval_s4_general, SubspaceOracle};
-        for (n, l) in [(13u32, 4u32), (17, 5), (19, 6), (23, 6)] {
+        for (n, l) in [
+            (13u32, 4u32),
+            (17, 5),
+            (19, 6),
+            (23, 6),
+            (12, 4),
+            (16, 5),
+            (18, 6),
+            (22, 6),
+        ] {
             let gf = field(n);
             let mut rng = StdRng::seed_from_u64(900 + n as u64);
             for trial in 0..3 {
