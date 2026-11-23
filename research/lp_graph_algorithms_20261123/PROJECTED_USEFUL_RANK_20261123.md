@@ -22,3 +22,12 @@ Charge sparse input traversal, exact BTreeMap row elimination and normalization,
 - isogeny-labs/crypto-autoresearcher: bounded code-search for LP/rank; no direct owning implementation identified by those hits, not an absence proof.
 - Cavallar, *Strategies in filtering in the number field sieve* (2000), https://ir.cwi.nl/pub/4456; Diem, *Index calculus with double large prime variation* (2006), https://arxiv.org/abs/math/0606607. These motivate filtering and rank checking but do not prove prime-field ECDLP gains.
 - Sources checked (KB): KB unavailable — research-KB MCP server and repository wrapper/checkout are not exposed in this runtime. No source_id receipt claimed. Conductor command and independent worker spawning similarly unavailable. Current ownership is the already open draft graph-IC lane; no new worktree or competing build was launched.
+
+
+## Source implementation submitted for native qualification
+
+Committed in draft PR #4988: `src/cryptanalysis/large_prime_graph/projected_rank.rs` adds a sparse echelon diagnostic, exposed via `large_prime_graph::projected_rank::audit_projected_rank`. It retains every original `CompleteRelation`, returns selected original indices and explicitly segregates redundant rows from inconsistent RHS rows. It tracks pivot nonzeros, peak retained-plus-transient nonzeros, field elimination and normalization operations and inversions. The field-order modulus is a caller obligation; each required nonunit pivot is refused. The code path does not change the production collector, LP witness construction, filter or target solver.
+
+Four test additions in `tests/large_prime_graph.rs`: exact F7 LP-nullity-vs-useful-rank and original-source replay; planted RHS inconsistency; 128 fixed-seed randomized sparse systems over F3/F7/F1000003/F(2^61-1) compared to independent dense small/augmented rank and rank of selected original rows; malformed input and composite nonunit refusal. Synthetic fixtures are not authentic collected Prime31 relations or cold timing. The PR's source-bound CI automatically runs on changed graph/test files. Do not report native qualification until it completes.
+
+This is a direct response to the missing *useful independent factor-base rank* observable in previous synthetic LP witness tests. Follow-up, after source-exact native pass: matched pivot/MST/forest on an eligible, frozen, group-replayed Prime31 source stream, including exact rank(T), RHS consistency and all materialization costs. A rank audit alone is not a solver acceleration. [pcc:unverified]
