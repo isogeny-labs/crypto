@@ -2425,6 +2425,8 @@ pub fn groebner_basis_f4(
         None,
         max_matrix_words(),
         EARLY_GUARD,
+        None,
+        TraceMode::Off,
         fl_enabled(),
     )
 }
@@ -2446,6 +2448,8 @@ pub fn groebner_basis_f4_full_width(
         None,
         max_matrix_words(),
         EARLY_GUARD,
+        None,
+        TraceMode::Off,
         false,
     )
 }
@@ -2469,6 +2473,7 @@ pub fn groebner_basis_f4_skeleton(
         EARLY_GUARD,
         Some(&mut *skeleton),
         TraceMode::Off,
+        fl_enabled(),
     );
     st.skeleton_bytes = skeleton.bytes;
     (basis, st)
@@ -2519,6 +2524,7 @@ pub fn groebner_basis_f4_traced(
             EARLY_GUARD,
             None,
             mode,
+            fl_enabled(),
         )
     };
     let inputs: Vec<F2BoolPoly> = initial.into_iter().filter(|p| !p.is_zero()).collect();
