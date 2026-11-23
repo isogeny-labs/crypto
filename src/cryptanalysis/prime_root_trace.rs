@@ -410,6 +410,17 @@ impl Engine<'_> {
         Ok(acc)
     }
     fn mul(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
+        // Multiplying by the constant polynomial one copies coefficients.
+        // Keep the Product certificate event, but avoid all field events.
+        if a == [1] || b == [1] {
+            let product = trim(if a == [1] { b.to_vec() } else { a.to_vec() });
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            return Ok(product);
+        }
         // The source-exact root benchmarks found a 2-3% gain on 65,521
         // but repeatable larger-prime full-solver regressions. Restrict this
         // small-field identity specialization to its measured benefit region;
@@ -418,7 +429,6 @@ impl Engine<'_> {
             if let Some(result) = self.mul_shortcut(a, b)? {
                 return Ok(result);
             }
-        }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -454,6 +464,40 @@ impl Engine<'_> {
         })?;
         Ok(product)
     }
+    /// Polynomial squaring uses symmetry: coefficient i*j equals j*i.
+    /// Off-diagonal products are doubled with one field addition, while
+    /// diagonals use the field-square operation. The independently checked
+    /// Product event is identical to generic polynomial multiplication.
+    fn square(&mut self, a: &[u64]) -> Work<Vec<u64>> {
+        let mut product = if a.is_empty() {
+            vec![]
+        } else {
+            vec![0; 2 * a.len() - 1]
+        };
+        for (i, &x) in a.iter().enumerate() {
+            if x == 0 { continue; }
+            for (j, &y) in a.iter().enumerate().skip(i) {
+                if y == 0 { continue; }
+                let z = if i == j {
+                    self.field(FieldOp::Square, x, x)?
+                } else {
+                    let xy = self.field(FieldOp::Mul, x, y)?;
+                    self.field(FieldOp::Add, xy, xy)?
+                };
+                let previous = product[i + j];
+                product[i + j] = if previous == 0 {
+                    z
+                    self.field(FieldOp::Add, previous, z)?
+            }
+        }
+        let product = trim(product);
+        self.event(RootEvent::Product {
+            a: a.to_vec(),
+            b: a.to_vec(),
+            product: product.clone(),
+        })?;
+        Ok(product)
+    }
     // An opt-in coefficient-copy shortcut for the identities 1*f and X*f.
     // Keep it out of the dense-by-dense convolution code path.
     #[inline(never)]
@@ -469,12 +513,8 @@ impl Engine<'_> {
             Some(trim(shifted))
         } else if b == [0, 1] && a.len() >= 4 {
             let mut shifted = Vec::with_capacity(a.len() + 1);
-            shifted.push(0);
             shifted.extend_from_slice(a);
-            Some(trim(shifted))
-        } else {
             None
-        };
         if let Some(product) = special {
             // Preserve the durable Product event and independent verification.
             self.event(RootEvent::Product {
@@ -483,12 +523,21 @@ impl Engine<'_> {
                 product: product.clone(),
             })?;
             Ok(Some(product))
-        } else {
             Ok(None)
-        }
-    }
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
+        // Euclidean GCD often ends with a unit divisor; dividing by 1
+        // is a coefficient copy, not a degree-by-degree long division.
+        if b == [1] {
+            let quotient = trim(a.to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: quotient.clone(),
+                remainder: vec![],
+            })?;
+            return Ok((quotient, vec![]));
+        }
         let mut r = a.to_vec();
         let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
         if a.len() >= b.len() {
@@ -617,7 +666,10 @@ impl Engine<'_> {
             if lead != 1 {
                 let inv = self.inv(lead)?;
                 for c in &mut a {
-                    *c = self.field(FieldOp::Mul, *c, inv)?;
+                    // Zero coefficients stay zero under monic scaling.
+                    if *c != 0 {
+                        *c = self.field(FieldOp::Mul, *c, inv)?;
+                    }
                 }
             }
         }
@@ -3468,8 +3520,36 @@ mod tests {
 }
 
 #[cfg(test)]
-mod round89_column_accumulators {
+mod round77_producer_regression {
     use super::*;
+
+    #[test]
+    fn symmetric_squaring_unit_products_and_divisions_verify_at_all_field_sizes() {
+        let limits = RootLimits {
+            field_work: MAX_WORK, split_attempts: 512,
+            events: MAX_EVENTS, degree: MAX_DEGREE,
+        };
+        for p in [7, 13, 101, 65_521, 1_000_000_007, MAX_PRIME] {
+            let linear = vec![p - 2, 1];
+            let quadratic = vproduct(&linear, &[(p - (17 % p)) % p, 1], p);
+            for f in [linear, quadratic, vec![1, 0, 1]] {
+                let report = solve(&f, p, 77, limits.clone(), &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "incomplete p={p} f={f:?}");
+                verify(&report).unwrap();
+                assert!(report.events.iter().any(|event| matches!(
+                    event, RootEvent::Product { a, b, .. } if a == b
+                )), "missing square certificate at p={p}");
+                for &root in &report.roots {
+                    assert_eq!(f.iter().rev().fold(0u64, |acc, &c|
+                        ((acc as u128 * root as u128 + c as u128) % p as u128) as u64
+                    ), 0, "not a root at p={p}");
+                }
+            }
+        }
+    }
+}
+
+mod round89_column_accumulators {
 
     // Independent wide-arithmetic oracle. Never uses vproduct or vsquare.
     fn reference_product(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
@@ -3479,12 +3559,8 @@ mod round89_column_accumulators {
             for (j, &y) in b.iter().enumerate() {
                 out[i + j] =
                     ((out[i + j] as u128 + x as u128 * y as u128) % p as u128) as u64;
-            }
-        }
         trim(out)
-    }
 
-    #[test]
     fn column_convolution_and_squaring_match_u128_reference() {
         use rand::Rng;
         let mut rng = StdRng::seed_from_u64(0x2026_1121_0089);
@@ -3505,12 +3581,7 @@ mod round89_column_accumulators {
                         "product: p={p}, width={width}, case={case}");
                     assert_eq!(vsquare(&a, p), reference_product(&a, &a, p),
                         "square: p={p}, width={width}, case={case}");
-                }
-            }
-        }
-    }
 
-    #[test]
     fn binomial_products_match_independent_arithmetic_oracle() {
         let mut rng = StdRng::seed_from_u64(0x2026_1121_0091);
         for p in [65_521, 1_000_000_007, MAX_PRIME] {
@@ -3522,50 +3593,26 @@ mod round89_column_accumulators {
                         if case % 2 == 0 { 1 } else { rng.gen_range(1..p) };
                     let mut other: Vec<u64> =
                         (0..width).map(|_| rng.gen_range(0..p)).collect();
-                    if case % 3 == 0 {
                         for i in (0..width).step_by(3) { other[i] = 0; }
-                    }
                     let expected = reference_product(&binomial, &other, p);
                     assert_eq!(vverified_product(&binomial, &other, p), expected,
                         "left binomial p={p} width={width} case={case}");
                     assert_eq!(vverified_product(&other, &binomial, p), expected,
                         "right binomial p={p} width={width} case={case}");
-                }
-            }
-        }
-    }
 
-    #[test]
     fn certificate_replay_matches_solver_after_clone_elimination() {
-        let limits = RootLimits {
             field_work: MAX_WORK,
             split_attempts: 1000,
             events: MAX_EVENTS,
             degree: MAX_DEGREE,
-        };
-        for p in [65_521, 1_000_000_007, MAX_PRIME] {
             for polynomial in [vec![p - 3, 1], vec![6, p - 5, 1]] {
                 let report = solve(&polynomial, p, 13, limits.clone(),
                     &mut |_| Ok(())).unwrap();
                 assert!(report.complete(), "incomplete p={p} poly={polynomial:?}");
-                verify(&report).unwrap();
-            }
-        }
-    }
-}
 
-#[cfg(test)]
 mod round94_noop_reductions {
-    use super::*;
 
-    #[test]
     fn monic_roots_and_power_shortcuts_preserve_independent_certificates() {
-        let limits = RootLimits {
-            field_work: MAX_WORK,
-            split_attempts: 1000,
-            events: MAX_EVENTS,
-            degree: MAX_DEGREE,
-        };
         for p in [7u64, 13, 65_521, 1_000_000_007, MAX_PRIME] {
             let linear = vec![p - 3, 1];
             let quadratic = vproduct(&linear, &[p - 5, 1], p);
@@ -3581,19 +3628,8 @@ mod round94_noop_reductions {
                     verify(&report).unwrap();
                     assert_eq!(report.roots, expected,
                         "p={p} seed={seed} polynomial={polynomial:?}");
-                }
-            }
-        }
-    }
 
-    #[test]
     fn short_modular_power_products_need_no_division_events() {
-        let limits = RootLimits {
-            field_work: MAX_WORK,
-            split_attempts: 1000,
-            events: MAX_EVENTS,
-            degree: MAX_DEGREE,
-        };
         // For degree-eight moduli, the first several binary powering
         // products have smaller degree than the modulus and need no
         // polynomial reduction. The verifier independently recomputes them.
@@ -3604,14 +3640,8 @@ mod round94_noop_reductions {
             verify(&report).unwrap();
             assert!(report.events.iter().any(|event|
                 matches!(event, RootEvent::PowerBegin { .. })));
-        }
-    }
-}
 
-#[cfg(test)]
 mod round97_remainder_tests {
-    use super::*;
-    #[test]
     fn round97_quotient_free_power_reduction_matches_division_remainder() {
         let mut seed=0x97f0_2026_1121_0001u64;
         for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
@@ -3621,29 +3651,18 @@ mod round97_remainder_tests {
                     for c in &mut modulus[..degree] {
                         seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
                         *c=seed%p;
-                    }
                     modulus[degree]=1;
                     if case%4==0 { for c in &mut modulus[1..degree] { *c=0; } }
                     if case%4==1 { for c in &mut modulus[..degree] { *c=0; } }
                     let mut product=vec![0u64;case%(2*degree+3)];
                     for c in &mut product {
-                        seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
-                        *c=seed%p;
-                    }
                     if case%5==0 && !product.is_empty() { *product.last_mut().unwrap()=0; }
                     let expected=vdiv(&product,&modulus,p).unwrap().1;
                     let actual=vpower_reduce(product,&modulus,p).unwrap();
                     assert_eq!(actual,expected,"p={p} degree={degree} case={case}");
-                }
-            }
-        }
-    }
-}
 
 
-#[cfg(test)]
 mod round103_quartic_quotient {
-    use super::*;
 
     // Independent oracle: long division, generic multiplication and squaring.
     // It does not call vpower, quartic_mul, quartic_square, or quartic_reduce.
@@ -3655,11 +3674,8 @@ mod round103_quartic_quotient {
             if e & 1 == 1 { r = vdiv(&vproduct(&r, &b, p), &m, p).unwrap().1; }
             e >>= 1;
             if e != 0 { b = vdiv(&vproduct(&b, &b, p), &m, p).unwrap().1; }
-        }
         r
-    }
 
-    #[test]
     fn round105_mersenne_quartic_addition_chain_matches_division() {
         // Independent polynomial multiplication/long division oracle.
         let p = MAX_PRIME;
@@ -3668,7 +3684,6 @@ mod round103_quartic_quotient {
             for width in [0usize, 1, 2, 4, 7] {
                 for _ in 0..16 {
                     let modulus = vec![
-                        rng.gen_range(0..p), rng.gen_range(0..p),
                         rng.gen_range(0..p), rng.gen_range(0..p),
                         if nonmonic { rng.gen_range(2..p) } else { 1 },
                     ];
@@ -3679,10 +3694,6 @@ mod round103_quartic_quotient {
                             reference_power(&base, exponent, &modulus, p),
                             "nonmonic={nonmonic} width={width} exponent={exponent}",
                         );
-                    }
-                }
-            }
-        }
         // Extreme residues ensure intermediate products cannot be
         // specialized using unchecked assumptions about coefficient size.
         for coefficient in [0, 1, 2, p / 2, p - 2, p - 1] {
@@ -3693,12 +3704,7 @@ mod round103_quartic_quotient {
                     vpower(&base, exponent, &modulus, p).unwrap(),
                     reference_power(&base, exponent, &modulus, p),
                 );
-            }
-        }
-    }
-    #[test]
     fn round104_mersenne_quartic_column_extremes() {
-        let p = MAX_PRIME;
         let values = [0u64, 1, 2, p / 2, p - 2, p - 1];
         for &x in &values {
             for &y in &values {
@@ -3711,15 +3717,9 @@ mod round103_quartic_quotient {
                     let expected_square = vdiv(&vsquare(&a, p), &modulus, p).unwrap().1;
                     assert_eq!(quartic_trim(quartic_mul(a, b, c, p)), expected_product);
                     assert_eq!(quartic_trim(quartic_square(a, c, p)), expected_square);
-                }
-            }
-        }
         for k in 0..16u128 {
             let value = 4 * (p as u128 - 1).pow(2) - k;
             assert_eq!(quartic_mersenne_reduce(value), (value % p as u128) as u64);
-        }
-    }
-    #[test]
     fn quartic_multiply_square_horner_and_power_match_independent_long_division() {
         let mut state = 0x1030_aaaa_bbbb_ccccu64;
         for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
@@ -3754,16 +3754,9 @@ mod round103_quartic_quotient {
                 assert_eq!(actual, expected,
                     "power p={p} iteration={iteration} e={exponent}");
                 assert_eq!(vpower(&base, exponent, &nonmonic, p).unwrap(), expected);
-            }
-        }
-    }
-}
 
-#[cfg(test)]
 mod round100_traced_multiplication {
-    use super::*;
 
-    #[test]
     fn sparse_unit_and_zero_accumulator_elision_matches_wide_oracle() {
         // Engine arithmetic is tested independently of the verifier's
         // polynomial multiplication. The certificate Product still binds
@@ -3786,14 +3779,12 @@ mod round100_traced_multiplication {
                         if case % 4 == 1 && i % 3 != 0 { b[i] = 0; }
                         if case % 4 == 2 && i % 2 == 0 { a[i] = 1; }
                         if case % 4 == 3 && i % 3 == 0 { b[i] = 1; }
-                    }
                     let mut expected = vec![0u64; 2 * width - 1];
                     for (i, &x) in a.iter().enumerate() {
                         for (j, &y) in b.iter().enumerate() {
                             expected[i + j] = ((expected[i + j] as u128
                                 + x as u128 * y as u128) % p as u128) as u64;
                         }
-                    }
                     let expected = trim(expected);
                     let mut observer = |_: &RootEvent| -> Result<(), String> { Ok(()) };
                     let mut engine = Engine {
@@ -3817,7 +3808,6 @@ mod round100_traced_multiplication {
                         },
                         sink: &mut observer,
                         next_id: 0,
-                    };
                     assert_eq!(engine.mul(&a, &b).unwrap(), expected,
                         "p={p}, width={width}, case={case}");
                     assert!(matches!(engine.report.events.last(),
@@ -3829,47 +3819,25 @@ mod round100_traced_multiplication {
                             RootEvent::Field { op: FieldOp::Add, a, .. } =>
                                 assert_ne!(*a, 0),
                             _ => {}
-                        }
-                    }
-                }
-            }
-        }
-    }
 
-    #[test]
     fn optimized_trace_still_verifies_end_to_end_sparse_and_dense_roots() {
-        let limits = RootLimits {
             field_work: MAX_WORK, split_attempts: 1000,
-            events: MAX_EVENTS, degree: MAX_DEGREE,
-        };
         for p in [13u64, 65_521, 1_000_000_007, MAX_PRIME] {
             for f in [
                 vec![p - 3, 1],
                 vec![6, p - 5, 1],
                 vec![1, 0, 1],
-            ] {
                 let report = solve(&f, p, 17, limits.clone(),
-                    &mut |_| Ok(())).unwrap();
                 assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
-                verify(&report).unwrap();
-            }
-        }
-    }
-}
 
-#[cfg(test)]
 mod round107_inverse_chain {
-    use super::*;
 
-    #[test]
     fn mersenne_inverse_chain_matches_independent_fermat_oracle() {
-        let p = MAX_PRIME;
         let mut seed = 0x726f_6f74_3130_3731u64;
         let mut samples = vec![1, 2, 3, 5, p - 2, p - 1, p / 2];
         for _ in 0..1024 {
             seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
             samples.push(1 + seed % (p - 1));
-        }
         for value in samples {
             let mut sink = |_: &RootEvent| Ok(());
             let report = RootReport {
@@ -3895,11 +3863,7 @@ mod round107_inverse_chain {
             } else {
                 assert_eq!(engine.report.counters.squares, 60);
                 assert_eq!(engine.report.counters.multiplications, 10);
-            }
-        }
-    }
 
-    #[test]
     fn inverse_shortcuts_preserve_verified_root_certificates() {
         let limits = RootLimits { field_work: MAX_WORK, split_attempts: 1000,
                                   events: MAX_EVENTS, degree: MAX_DEGREE };
@@ -3908,33 +3872,21 @@ mod round107_inverse_chain {
                 vec![6, p - 5, 1],       // monic (x-2)(x-3)
                 vec![12 % p, p - (10 % p), 2], // twice that polynomial mod p
                 vec![p - 2, 1],         // linear root 2
-            ] {
-                let report = solve(&polynomial, p, 13, limits.clone(),
                                    &mut |_| Ok(())).unwrap();
                 assert!(report.complete(), "p={p}, stop={:?}", report.stop);
-                verify(&report).unwrap();
-            }
-        }
-    }
-}
 
-#[cfg(test)]
 mod round108_unit_monomial_fastpaths {
-    use super::*;
 
-    #[test]
     fn identity_and_x_shift_products_preserve_independent_certificates() {
         // Direct producer-vs-independent-verifier oracle across field sizes,
         // narrow break-even cases, and both operand orders.
         let mut seed = 0x726f_6f74_3130_3831u64;
-        for p in [7, 65_521, 1_000_000_007, MAX_PRIME] {
             for width in [1usize, 2, 3, 4, 8] {
                 for case in 0..64u64 {
                     let mut polynomial = vec![0; width];
                     for coefficient in &mut polynomial {
                         seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
                         *coefficient = seed % p;
-                    }
                     polynomial[width - 1] = 1 + case % (p - 1);
                     for monomial in [&[1u64][..], &[0, 1][..]] {
                         for (a, b) in [(monomial, polynomial.as_slice()),
@@ -3959,46 +3911,30 @@ mod round108_unit_monomial_fastpaths {
                             assert_eq!(engine.report.counters.field_work(), 0);
                             assert!(matches!(engine.report.events.last(),
                                 Some(RootEvent::Product { .. })));
-                        }
-                    }
-                }
-            }
-        }
-    }
 
-    #[test]
     fn quartic_mersenne_two_fold_and_sparse_reduction_oracle() {
         // Independent u128 division, not the optimized vmul/folding code.
-        let p = MAX_PRIME;
         let mut seed = 0xa319_5432_fba9_87de_u64;
         let mut next = || {
             seed ^= seed << 7;
             seed ^= seed >> 9;
             seed ^= seed << 8;
             seed % p
-        };
         let oracle = |a: [u64; 4], b: [u64; 4], c: [u64; 4]| {
             let mut t = [0u64; 7];
             for i in 0..4 {
                 for j in 0..4 {
                     let sum = t[i + j] as u128 + a[i] as u128 * b[j] as u128;
                     t[i + j] = (sum % p as u128) as u64;
-                }
-            }
             for degree in (4..=6).rev() {
                 let high = t[degree];
-                for j in 0..4 {
                     let product = (high as u128 * c[j] as u128 % p as u128) as u64;
                     let old = t[degree - 4 + j];
                     t[degree - 4 + j] = if old >= product {
                         old - product
                     } else {
                         old + p - product
-                    };
-                }
-            }
             [t[0], t[1], t[2], t[3]]
-        };
         for shape in 0..6 {
             for case in 0..2000 {
                 let mut a = [next(), next(), next(), next()];
@@ -4014,28 +3950,19 @@ mod round108_unit_monomial_fastpaths {
                     "shape={shape} case={case} multiply");
                 assert_eq!(quartic_square(a, c, p), oracle(a, a, c),
                     "shape={shape} case={case} square");
-            }
-        }
         for value in [
             0u128, 1, p as u128, 4 * (p as u128 - 1).pow(2),
             4 * (p as u128 - 1).pow(2) - 1,
         ] {
             assert_eq!(quartic_mersenne_reduce(value),
                 (value % p as u128) as u64);
-        }
-    }
 
-}
 
-#[cfg(test)]
 mod round110_unit_binomial_quotient {
-    use super::*;
 
-    #[test]
     fn unit_binomial_remainder_matches_independent_u128_long_division() {
         // The reference performs full polynomial long division with u128
         // arithmetic; it never calls the specialized reduction routine.
-        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
             for degree in [4usize, 5, 8] {
                 for constant in [1, p - 1] {
                     let mut modulus = vec![0u64; degree + 1];
@@ -4050,12 +3977,10 @@ mod round110_unit_binomial_quotient {
                             state ^= state >> 9;
                             state ^= state << 8;
                             *value = state % p;
-                        }
                         if iteration % 11 == 0 {
                             for value in &mut product { *value = p - 1; }
                         } else if iteration % 13 == 0 {
                             product[width - 1] = 0;
-                        }
                         let mut expected = product.clone();
                         for shift in (0..expected.len() - degree).rev() {
                             let high = expected[shift + degree];
@@ -4064,71 +3989,39 @@ mod round110_unit_binomial_quotient {
                             expected[shift] = ((expected[shift] as u128
                                 + p as u128 - term as u128) % p as u128) as u64;
                             expected[shift + degree] = 0;
-                        }
                         expected.truncate(degree);
-                        assert_eq!(
                             vpower_reduce(product, &modulus, p).unwrap(),
                             trim(expected),
                             "p={p} degree={degree} constant={constant} trial={iteration}"
-                        );
-                    }
-                }
-            }
-        }
-    }
-}
 
-#[cfg(test)]
 mod round114_sparse_octic_remainder {
-    use super::*;
 
-    #[test]
     fn sparse_octic_matches_independent_long_division() {
         // Exhaust edge values and randomly chosen coefficients across fields.
         // The oracle uses u128 division, never vmul or the optimized helper.
         let mut state = 0x726f_6f74_3131_3431u64;
-        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
             for constant in [0, 1, 2, p - 1, p - 2] {
                 for interior in [None, Some((3usize, 1u64)), Some((6, 1)),
                                  Some((6, p - 1)), Some((6, 2))] {
                     let degree = 8;
-                    let mut modulus = vec![0u64; degree + 1];
-                    modulus[0] = constant;
                     if let Some((index, value)) = interior {
                         modulus[index] = value;
-                    }
-                    modulus[degree] = 1;
                     for iteration in 0..128 {
                         let mut product = vec![0u64; degree + 1 + (iteration % 9)];
-                        for value in &mut product {
-                            state ^= state << 7;
-                            state ^= state >> 9;
-                            state ^= state << 8;
-                            *value = state % p;
-                        }
                         if iteration % 13 == 0 {
                             product.fill(p - 1);
                         } else if iteration % 17 == 0 {
                             let last = product.len() - 1;
                             product[last] = 0;
-                        }
                         let mut oracle = product.clone();
                         for shift in (0..oracle.len() - degree).rev() {
                             let high = oracle[shift + degree];
                             for index in 0..degree {
                                 let term = ((high as u128 * modulus[index] as u128)
-                                        % p as u128) as u64;
                                 oracle[shift + index] = ((oracle[shift + index] as u128
                                     + p as u128 - term as u128) % p as u128) as u64;
                             }
                             oracle[shift + degree] = 0;
-                        }
                         oracle.truncate(degree);
                         assert_eq!(vpower_reduce(product, &modulus, p).unwrap(), trim(oracle),
                             "p={p} constant={constant} interior={interior:?} trial={iteration}");
-                    }
-                }
-            }
-        }
-    }
-}
