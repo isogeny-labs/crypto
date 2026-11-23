@@ -1,0 +1,39 @@
+name: Rootfind Round 128 source-exact benchmark
+on:
+  push:
+    branches:
+      - automation/rootfind-round128-isogeny-poly-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round128/**
+      - .github/workflows/rootfind_round128.yml
+permissions:
+  contents: read
+jobs:
+  source-exact-ab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round128
+      - name: Compile baseline and candidate from production Rust source
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=816f9c3a942efed569049618c056d12a0c56d693
+          git fetch --no-tags --depth=1 origin "$BASE"
+          mkdir -p /tmp/rootfind_round128
+          git show "$BASE:src/cryptanalysis/ecbench/isogeny.rs" > /tmp/rootfind_round128/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round128/optimized.rs
+          cat research/rootfind_round128/bench_helper.rs >> /tmp/rootfind_round128/baseline.rs
+          cat research/rootfind_round128/bench_helper.rs >> /tmp/rootfind_round128/optimized.rs
+          cp research/rootfind_round128/source_exact_main.rs /tmp/rootfind_round128/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round128/main.rs -o /tmp/rootfind_round128/bench
+      - name: Source-exact alternating native Rust comparison
+        run: /tmp/rootfind_round128/bench

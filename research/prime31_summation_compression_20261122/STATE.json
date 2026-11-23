@@ -5,10 +5,10 @@
   "objective": "Develop a genuinely faster prime-field Semaev-style relation-solving strategy, then establish a correctly accounted asymptotic gain on an explicit growing family.",
   "objective_status": "open; no asymptotic speedup achieved",
   "repository": "isogeny-labs/crypto",
-  "pull_request": "https://github.com/isogeny-labs/crypto/pull/4928",
-  "branch": "lane/prime31-dickson-quotient-gate",
-  "tracking_commit": "087744300ac8d91335f2099b72fd311743fe7d32",
-  "review_base": "c6a9c98b665ce70f5c017257488b19bd324c4080",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/4977",
+  "branch": "lane/prime31-s3-pencil-family",
+  "tracking_commit": "c2c25f9799c3f5492ade4d638c7aa6a3900acbde",
+  "review_base": "816f9c3a942efed569049618c056d12a0c56d693",
   "curve": {
     "p": 2147483647,
     "a": 847514846,
@@ -107,7 +107,7 @@
       "proof": "iteration6/MATHEMATICAL_NOTE.md",
       "independent_review": "iteration6/INDEPENDENT_REVIEW.md",
       "literature": "iteration6/LITERATURE_AUDIT.md",
-      "status": "Written representation independently reviewed; supplied-witness verifier source frozen; initial root CI failure preserved; repaired root-lock rerun in progress at last observation",
+      "status": "Written representation independently reviewed; fixed verifier source unchanged; three original-root builds failed before native execution, with all failures retained",
       "completed": [
         "Root-oriented rational-tree purity and full-fibre membership equivalence",
         "Quadratic-system bijection and exact mk+3m-5 / mk+3m-4 counts for m>=2,k>=1",
@@ -127,7 +127,7 @@
       "ci_failure_receipt": "iteration6/evidence/ci-inherited-build-failure/receipt.json",
       "new_tests_executed": false,
       "build_prerequisite": {
-        "status": "committed; rerun in progress at last observation",
+        "status": "Spec restoration merged through4928; exact four-line framework restoration later merged through4962; original-root build still blocked in a separate unchanged source",
         "source_blob": "ed85acbb242a11a1412da7c842cef70872235dcc",
         "proof": "iteration6/evidence/inherited-spec-restoration/AUDIT.md",
         "freeze": "iteration6/evidence/inherited-spec-restoration/SOURCE_FREEZE.json",
@@ -139,12 +139,37 @@
         "job_id": 137441679059,
         "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
         "url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135",
-        "status": "in_progress at2026-11-23T02:10:20Z",
-        "last_observed_step": "Restored inherited spec regression tests",
+        "status": "completed",
+        "last_observed_step": "Compilation failed in inherited ic_framework/mod.rs",
         "candidate_tests_completed_observed": false,
         "identity_issuance_observed": false,
-        "next_action": "Collect completed source-bound logs/artifact and retain all failure or success receipts; do not infer completion from mathematical review"
-      }
+        "next_action": "Superseded by the source-bound third failure; retain unchanged",
+        "conclusion": "failure",
+        "completed_at": "2026-11-23T02:10:54Z",
+        "receipt": "iteration6/evidence/ci-restored-spec-failure/receipt.json",
+        "claim": "PCC-20261123-774115"
+      },
+      "latest_ci": {
+        "run_id": 45113871392,
+        "job_id": 137492117014,
+        "source_commit": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/45113871392",
+        "status": "completed",
+        "conclusion": "failure",
+        "completed_at": "2026-11-23T04:56:20Z",
+        "commands_attempted": 5,
+        "native_tests_executed": 0,
+        "candidate_program_executed": false,
+        "identity_issuer_executed": false,
+        "separate_seed_replay_executed": false,
+        "blocker": "Unchanged src/cryptanalysis/binary_hyperelliptic_index_calculus.rs, blobf001a1b641abd48bb0130c1a9a246e37c28bcc3a; inherited merge damage at77d388...",
+        "artifact_id": 14790654045,
+        "artifact_zip_sha256": "b1b6d310eab134128f525529eded863ac4f6147b08c1f66037d18ab3c4f7c104",
+        "receipt": "iteration6/evidence/ci-framework-restored-failure/receipt.json",
+        "claim": "PCC-20261123-5ce73e",
+        "standing": "unverified"
+      },
+      "followup_source": "14a9f021b630fec0a7dd38cb724d71d68c99626b"
     },
     {
       "id": 7,
@@ -172,6 +197,65 @@
           "review": "iteration7/INTEGRATION_REVIEW.md",
           "claim": "PCC-20261123-0d1e17",
           "scope": "Fixed symmetricF withN>=16 overp=3 mod4; selectable ordinary non-anomalous odd-order curve withN/4<=B<=3N/4; composite-source completeness needs charged small-order restrictions"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "candidate": "Exact signed group-semiring m4 contraction and uniform-target yield/rank accounting",
+      "proof": "iteration8/EXACT_CONTRACTION_AND_YIELD.md",
+      "source_commit": "a6d7b529ed5cd0586fbf04e916978f302cb65ecc",
+      "merged_pr": 4941,
+      "status": "Previously merged independent written baseline; no native execution asserted",
+      "outcome": "Exact control with empty-inclusive scan cost; general-Linnik-only parameter restriction is refined by iteration10"
+    },
+    {
+      "id": 9,
+      "candidate": "Squarefree signed pair-spectrum S3 resultant with zero-pair branches and miss certificate",
+      "proof": "iteration9/PAIR_SPECTRUM_RESULTANT.md",
+      "source_commit": "f043ca05a338637f830e09fa19ad14d9b18a34ce",
+      "merged_pr": 4951,
+      "status": "Previously merged independent written baseline; isolated state retained",
+      "outcome": "B^2 nonzero unoriented pair expressions and D<=B^2; explicit empty query costs quasi-linear inD, plus output; no sublinear query"
+    },
+    {
+      "id": 10,
+      "candidate": "Reusable rank-three S3 pencil, exact target-degree analysis and smooth-modulus parameter correction",
+      "proofs": [
+        "iteration10/S3_PENCIL_CONTRACTION.md",
+        "iteration10/FAMILY_SIZE_CORRECTION.md"
+      ],
+      "independent_reviews": [
+        "iteration10/S3_PENCIL_INDEPENDENT_REVIEW.md",
+        "iteration10/FAMILY_SIZE_INDEPENDENT_REVIEW.md",
+        "iteration10/ROOT_REVIEW.md"
+      ],
+      "claims": [
+        "PCC-20261123-f0209c",
+        "PCC-20261123-391a91"
+      ],
+      "completed": [
+        "Explicit matrixS3(u,v,r)=w(u)^t C_r w(v), rank<=3; product is a distinct nonlinear operation",
+        "Formal target degree2D-1 and unit leading coefficient-4f(V)Hprime(V)^2 moduloH",
+        "Exact universal linear-span and dense2D^2-format scope; no general lower bound",
+        "Rational pair-spectrum discriminants never reject a nondegenerate component",
+        "Chang smooth-modulus theorem supplies any fixed0<beta<5/12 on chosen fields, combined with the fixed-source fibre lemma"
+      ],
+      "outcome": "Identified precise missing structured zero-component index. Field-size support no longer imposes the older extra tau<1/2 restriction; actual relation-query speedup remains open.",
+      "scope": "Written proof, primary-source application and independent mathematical review; no cryptographic computation or performance result",
+      "status": "unverified",
+      "state": "iteration10/PENCIL_FAMILY_STATE.json",
+      "source_commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+      "followups": [
+        {
+          "proof": "iteration10/parallel_review/REVIEW.md",
+          "claim": "PCC-20261123-19eed1",
+          "scope": "Exact support cap (B^4+5B^2)/3, B31 cap309442; written bound only"
+        },
+        {
+          "proof": "iteration10/quotient_followup/DICKSON_PAIR_NORM_REVIEW.md",
+          "claim": "PCC-20261123-ad740c",
+          "scope": "Exact norm identity and limited D2 folding counterexample; no executed fixture"
         }
       ]
     }
@@ -231,6 +315,41 @@
       "id": "PCC-20261123-0d1e17",
       "scope": "Selectable ordinary non-anomalous curve density and extra small-order membership guards",
       "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-774115",
+      "scope": "Second original-root compile failure",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-a41174",
+      "scope": "Current-main source/parser reconciliation and prospective original-lock freeze",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-5ce73e",
+      "scope": "Third original-root compile failure with independent command-step coverage",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-f0209c",
+      "scope": "Rank-three pencil, exact formal degree and representation-specific costs",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-391a91",
+      "scope": "Smooth-modulus prime-family parameter correction",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-19eed1",
+      "scope": "Cancellation-reduced four-sum support and PR4979 integration",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-ad740c",
+      "scope": "Leaf-to-pair norm and limited F7 composition counterexample",
+      "standing": "unverified"
     }
   ],
   "identity_certificates": {
@@ -243,9 +362,9 @@
     "scope": "Native evaluated tier over 2^61-1 plus separate checked-i128 coefficient expansion; all proof fields null; no formal kernel proof",
     "root_replay": "identity-certificates/root-replay.json"
   },
-  "next_mathematical_gate": "For the explicit rational quadratic representation, derive a charged exact elimination/contraction recurrence, including empty targets and Fp isolation. In the declared conventional full-rank m=4 model with setup exponent<=2 and matrix exponent2, a candidate query exponent tau<1 is needed; prove the actual solver bound and required yield/rank assumptions rather than inferring it from input degree.",
-  "next_empirical_gate": "Finish source-matched original-root-lock correctness CI for the supplied-chain verifier; then freeze a specified root solver and native natural-target generator before any admitted matched performance study. Existing verification receipts are not discovery timings.",
-  "growing_family_obligation": "Linnik construction with cappedq retains q=Omega(p^(1/L)); fixed-source density now proved for selectablec on supplied odd-order E. A required prime-order source family and supported optimization exponent remain unestablished.",
+  "next_mathematical_gate": "Exploit the actual leaf norm R_M J_M=kappa C_M^2 without a quadratic-in-D target table. Seek an exact empty-inclusive query with comparable charged setup/output. Fixed theta<1 is a sufficient component exponent target versus the quasi-linear-in-D baseline; theta<1/2 is the stronger conditional pipeline target when D=Theta(B^2), setup is quasi-linear-in-D and the declared uniform/full-row model applies. Logarithmic gains also count at their actual component scope. No such algorithm is established.",
+  "next_empirical_gate": "Resolve the original-root binary-hyperelliptic source reconstruction separately, preserving both parent algorithms/tests, then rerun the frozen original-lock gate; never substitute a smaller crate while calling it whole-root validation. Pair-spectrum implementation remains a separate bounded semantic task.",
+  "growing_family_obligation": "ChangCor11 plus fixed-source density supports B=Theta(p^beta) for everyfixed0<beta<5/12 on selectedfields and a suppliedeligibleoddE. Prime/source construction costs and a required prime-order family remain separate; no arbitrary-input-prime or proper-subgroup guarantee.",
   "overlap_exclusions": [
     "#4692",
     "#4812",
@@ -256,27 +375,29 @@
   "continuation": {
     "existing_automation_id": "6b0356b62c58819095775adf491e4492",
     "cadence": "existing hourly schedule",
-    "prompt_update_status": "Existing enabled hourly task updated with iteration6 source checkpoint and confirmed Page IDs; schedule preserved",
+    "prompt_update_status": "Existing enabled task updated; exact prompt echo checked; hourly cadence and user parallel-worker prefix preserved",
     "prompt_source": "CONTINUATION.md",
-    "next_scheduled_run_at_update": "2026-11-22T16:55:14-08:00",
-    "receipt": "evidence/automation-update-receipt.json",
-    "prompt_sha256": "dfbdeb186d7e8e8dd8637e2a62212144fe39f0f454d4d41d0273ba739e5c1dfe",
-    "space_attachment": "independent task attached to page_729b0b80bdb4819193f457c80ecabe84"
+    "next_scheduled_run_at_update": "2026-11-22T22:55:14-08:00",
+    "receipt": "iteration10/evidence/automation-update.json",
+    "prompt_sha256": "330482f7d8e3109518c883f85fc3533d7ece80387b4dc193135ee31c6cd425bf",
+    "space_attachment": "independent task attached to page_729b0b80bdb4819193f457c80ecabe84",
+    "updated_at": "2026-11-23T06:26:28.270234+00:00"
   },
   "space": {
     "name": "Prime Field Summation Polynomial Research",
     "creation_attempts": 2,
-    "status": "confirmed created and read back; research Page saved; existing task attached",
+    "status": "Initial creation/readback confirmed; latest content update commit status unknown",
     "space_id": "page_space_038e4361a33c8191af04e7a127104c0f",
     "page_id": "page_729b0b80bdb4819193f457c80ecabe84",
-    "instruction": "Read and update the known research Page with guarded edits. Do not recreate Space/Page. Verify committed saves and update latest state.",
+    "instruction": "Do not recreate or replay the uncertain mutation. Reconcile the same content stream with a bounded read and fresh guards after service recovery. Latest browser check was aborted without reading state.",
     "recovery": "Successful complete Space listing and paginated Page search found no target; subsequent create returned exact IDs and readback confirmed content",
     "prepared_content": "SPACE_PAGE.md",
     "page_creation_key": "prime31-dickson-quotient-gate-20261122",
     "root_page_id": "page_6b0398c4e92481918fd28c1f69875748",
     "url": "https://chatgpt.com/space/page_729b0b80bdb4819193f457c80ecabe84",
     "receipt": "iteration6/space-receipt.json",
-    "preview_status": "Native content readback verified; rendered preview not inspected"
+    "preview_status": "Native content readback verified; rendered preview not inspected",
+    "latest_sync_receipt": "iteration10/SPACE_SYNC_STATUS.json"
   },
   "environment_limits": [
     "Local original lock could not resolve either1.19.0 offline; original manifest/lock subsequently passed hosted CI. Both historical adapter and hosted receipts are retained.",
@@ -289,8 +410,8 @@
     "Interactive iteration6 runtime has Rust installed; partial materialization lacks a root crate checkout. New fixed correctness execution uses original-root-lock hosted CI. Prior unattended no-Rust statement describes that older runtime only."
   ],
   "report": "iteration6/REPORT.md",
-  "pdf_status": "Seven-page report visually checked, including reviewed growing-field and density appendix; latest recorded repaired CI is pending",
-  "delivery_status": "Derivations, source, failure receipts, report and state are versioned in the existing lane PR; Space page confirmed. Latest native correctness remains pending at the recorded observation.",
+  "pdf_status": "Nine-page core report rendered and visually reviewed; 63446 bytes; sixteen claims at immutable core d6e1d03; later follow-ups are separate annexes",
+  "delivery_status": "Reviewed core, source-bound native failure evidence, report and follow-up annexes in this checkpoint; relation-solving objective remains open; latest native Space synchronization is unconfirmed",
   "companion_lane": {
     "pull_request": "https://github.com/isogeny-labs/crypto/pull/4924",
     "branch": "research/symmetric-pair-quotient-prime31-20261122",
@@ -306,7 +427,8 @@
       "scope": "Historical source-bound result at 96c910... and byte-identical monic source at 70e048... only; later observed c4bfab5... changes source and requires a new matching receipt. Producer CI unverified, timings not admitted.",
       "current_head_change": "Only B677_MONIC_SCALING_PROTOCOL_20261123.md differs between 96c... and 70e..."
     },
-    "current_change_gate": "Since source-bound 96c9101315d9f0c7ca5fee2af18cdb10d16c645d, 14 commits alter monic-oracle Rust source and workflow. Prior source-bound CI does not qualify those changed bytes; no new matching head CI found."
+    "current_change_gate": "Since source-bound 96c9101315d9f0c7ca5fee2af18cdb10d16c645d, 14 commits alter monic-oracle Rust source and workflow. Prior source-bound CI does not qualify those changed bytes; no new matching head CI found.",
+    "status": "Merged; source-bound historical evidence only. Read current continuation lanes rather than writing to the deleted branch."
   },
   "original_lock_ci": {
     "workflow": ".github/workflows/prime31-dickson-quotient-gate.yml",
@@ -324,19 +446,59 @@
     "standing": "unverified",
     "historical_scope": "Iteration1 only; does not qualify iteration6 source"
   },
-  "pdf_sha256": "d97913ceeeef9d035bfc528cf05c9995771c1cd5fcd4174998273cc1f0ba195e",
+  "pdf_sha256": "520d4a80717575a0fcb7d4ebff44661372bec8a5b416464a0be73df374069cad",
   "prior_report": "REPORT.md",
   "checkpoint_parent": "5fb95f63bd8a38de306abf14b93ed54f032fbe8a",
   "latest_correctness_ci": {
-    "run_id": 45097885135,
-    "job_id": 137441679059,
-    "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
-    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135",
-    "status": "in_progress at2026-11-23T02:10:20Z",
-    "last_observed_step": "Restored inherited spec regression tests",
-    "candidate_tests_completed_observed": false,
-    "identity_issuance_observed": false,
-    "next_action": "Collect completed source-bound logs/artifact and retain all failure or success receipts; do not infer completion from mathematical review"
+    "run_id": 45113871392,
+    "job_id": 137492117014,
+    "source_commit": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45113871392",
+    "status": "completed",
+    "conclusion": "failure",
+    "completed_at": "2026-11-23T04:56:20Z",
+    "commands_attempted": 5,
+    "native_tests_executed": 0,
+    "candidate_program_executed": false,
+    "identity_issuer_executed": false,
+    "separate_seed_replay_executed": false,
+    "blocker": "Unchanged src/cryptanalysis/binary_hyperelliptic_index_calculus.rs, blobf001a1b641abd48bb0130c1a9a246e37c28bcc3a; inherited merge damage at77d388...",
+    "artifact_id": 14790654045,
+    "artifact_zip_sha256": "b1b6d310eab134128f525529eded863ac4f6147b08c1f66037d18ab3c4f7c104",
+    "receipt": "iteration6/evidence/ci-framework-restored-failure/receipt.json",
+    "claim": "PCC-20261123-5ce73e",
+    "standing": "unverified"
   },
-  "last_updated_utc": "2026-11-23T02:15:40.218159+00:00"
+  "last_updated_utc": "2026-11-23T06:25:53.299082+00:00",
+  "merged_pr_history": [
+    {
+      "number": 4928,
+      "merge": "2051d2f5b2c0a717deb5d47b8bdd7599264689e0",
+      "merged_at": "2026-11-23T02:32:58Z",
+      "source": "observed GitHub metadata; external merge"
+    },
+    {
+      "number": 4962,
+      "merge": "b0a8d8b0a7ec3bf3469589dda7010d5612c9f70a",
+      "head": "a675e7c495145c30399dfa33a63f01f9f1ab54c3",
+      "merged_at": "2026-11-23T04:57:27Z",
+      "source": "observed GitHub metadata; external merge"
+    }
+  ],
+  "core_publication": {
+    "commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+    "tree": "aed09081faf0f0ac0eb7ba044995b1ede9ce86c9",
+    "file_count": 48,
+    "pull_request": 4977
+  },
+  "parallel_result": {
+    "pull_request": 4979,
+    "head": "1a9f3e3c6966258f1a94068d95ec3f3e337b7196",
+    "observed_state": "open draft, unmerged",
+    "source_state": "https://github.com/isogeny-labs/crypto/blob/1a9f3e3c6966258f1a94068d95ec3f3e337b7196/research/prime31_summation_compression_20261122/iteration10/STATE.json",
+    "review": "iteration10/parallel_review/REVIEW.md",
+    "metadata_collision_resolution": "Only our unfrozen iteration10/STATE.json renamed to PENCIL_FAMILY_STATE.json; both source sets preserved",
+    "native_validation": "not established; producer symbolic checks are provenance only"
+  },
+  "problem_record": "../../problems/prime31-exact-pair-spectrum-query.md"
 }

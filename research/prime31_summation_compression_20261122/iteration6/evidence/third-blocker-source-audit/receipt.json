@@ -1,0 +1,144 @@
+{
+  "schema": "prime31-terminal-build-source-audit/v1",
+  "repository": "isogeny-labs/crypto",
+  "path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+  "refs": {
+    "failed": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+    "base": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+    "current": "816f9c3a942efed569049618c056d12a0c56d693",
+    "merge": "77d388738a48eb5a6e2abd80636c2e31cceab254",
+    "parent1": "a9d68fbd9c2dc5b6db267746c483febd22cb5501",
+    "parent2": "0d4721abfeb0c402cb7de6227e0f2108101162dc"
+  },
+  "source_checks": [
+    {
+      "label": "failed",
+      "bytes": 46830,
+      "lines": 1233,
+      "git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+      "sha256": "94f99234a3952dafac3f2726f3cfe045d1313718ff9b3b74f48dfe3c7ca861f3",
+      "parser_exit": 1,
+      "parser_stderr_sha256": "16fe142d19db53f2fd1fe3f3a3dec0770675860d07bfc52814052b929eebdff3"
+    },
+    {
+      "label": "base",
+      "bytes": 46830,
+      "lines": 1233,
+      "git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+      "sha256": "94f99234a3952dafac3f2726f3cfe045d1313718ff9b3b74f48dfe3c7ca861f3",
+      "parser_exit": 1,
+      "parser_stderr_sha256": "499af2d486c1f25e8760888e62cbfd72eee313547dfc5c95fe1e8239cfd5c63c"
+    },
+    {
+      "label": "current",
+      "bytes": 46830,
+      "lines": 1233,
+      "git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+      "sha256": "94f99234a3952dafac3f2726f3cfe045d1313718ff9b3b74f48dfe3c7ca861f3",
+      "parser_exit": 1,
+      "parser_stderr_sha256": "f93fdb04f6d495715f49edf141959fa2f7a4809066affae903dac21f4a34410e"
+    },
+    {
+      "label": "merge",
+      "bytes": 46830,
+      "lines": 1233,
+      "git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+      "sha256": "94f99234a3952dafac3f2726f3cfe045d1313718ff9b3b74f48dfe3c7ca861f3",
+      "parser_exit": 1,
+      "parser_stderr_sha256": "3a2d6773f018fa0aaa32764282e40a6760ae15a81f5162e997cd514dd63f7ef0"
+    },
+    {
+      "label": "parent1",
+      "bytes": 49786,
+      "lines": 1474,
+      "git_blob": "12758d4edc3f1d5f6c6c66ebb32397d04c991af7",
+      "sha256": "09220e0bc13554cda29220d1576c34095e131b516debf0a4cb928439106abaaa",
+      "parser_exit": 0,
+      "parser_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "parent2",
+      "bytes": 52581,
+      "lines": 1539,
+      "git_blob": "89a190d53bcd20a8141c219db2f0f8fd963b9ce2",
+      "sha256": "20467a3cf0529770676132871c6ff4823c5e37a64d8af333038674ddfb2576cd",
+      "parser_exit": 0,
+      "parser_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "failed_base_current_merge_byte_equal": true,
+  "latest_file_change_in_bounded_history": "77d388738a48eb5a6e2abd80636c2e31cceab254",
+  "merge_introduces_parse_failure": true,
+  "both_merge_parent_files_parse": true,
+  "current_main_repaired": false,
+  "merge_base_source": {
+    "status": "diverged",
+    "merge_base": "86f17c632710b1cd6c6ed06a0a9dc6952293cca1",
+    "mergebase_source_fetch": "404 NOT_FOUND; no source union or restoration is asserted"
+  },
+  "job": {
+    "run_id": 45113871392,
+    "job_id": 137492117014,
+    "head_sha": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+    "conclusion": "failure",
+    "completed_at": "2026-11-23T04:56:20Z",
+    "five_independent_command_steps_all_failed": true
+  },
+  "diagnostic_scope": "Rust parser reported a delimiter mismatch at line 640 and unclosed input at line 1233, including the diagnostic phrase another 198 unclosed delimiters. This is not an independently enumerated defect count.",
+  "candidate_test_result": "No test execution or native identity issuance follows from these compilation failures; source repair outside this audit remains necessary.",
+  "rustfmt_version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
+  "command": [
+    "rustfmt",
+    "--edition",
+    "2021",
+    "--emit",
+    "stdout",
+    "--config",
+    "skip_children=true",
+    "<exact source snapshot>"
+  ],
+  "diff_statistics": {
+    "parent1_git_diff_numstat": {
+      "exit": 1,
+      "stdout": "154\t395\tterminal-build-audit/{parent1.rs => merge.rs}\n",
+      "stderr": ""
+    },
+    "parent2_git_diff_numstat": {
+      "exit": 1,
+      "stdout": "173\t479\tterminal-build-audit/{parent2.rs => merge.rs}\n",
+      "stderr": ""
+    }
+  },
+  "scope": "Source text, history and parser only; no production source mutation, new CI, crypto execution, compilation/typecheck, patch proposal or full parent-union reconstruction.",
+  "standing": "unverified",
+  "evidence": {
+    "metadata.json": {
+      "bytes": 35609,
+      "sha256": "9f937bb3c666c576e738e239c5e494a2dd71b2fed33b08ef4caac600bcbaf9c5"
+    },
+    "source-checks.json": {
+      "bytes": 1983,
+      "sha256": "a382462964eae144b43c352526b76a61cb812985c6a0c5c64a9fb1bf3bf6849a"
+    },
+    "current.parser.log": {
+      "bytes": 1903,
+      "sha256": "f93fdb04f6d495715f49edf141959fa2f7a4809066affae903dac21f4a34410e"
+    },
+    "parent1.parser.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "parent2.parser.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "merge-stats.json": {
+      "bytes": 141,
+      "sha256": "dfdeb106623f7f45e3b2e6343896b3378cb0bf79054b6b0cece841e49c32f257"
+    },
+    "subsequence-check.json": {
+      "bytes": 440,
+      "sha256": "fc5ae7f0edde6c532d05a087b706d56a0057201d97cee44693ce7dbe1d7c520f"
+    }
+  }
+}

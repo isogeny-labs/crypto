@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:01:52Z",
+ "id": "PCC-20261123-500c19",
+ "kind": "measurement",
+ "producer": {
+  "commit": "0589624ea3d93b0f5876e8462dd40d94a272a900",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/summary-target-a1.json",
+    "sha256": "5dc85136bbba480f98bad137c36da4f89793772920515f181e65832130501a51"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/target.cpp",
+    "sha256": "cde11799e91de02066064f72d3358a49510d34de1c45f8d83b37c3793ac2cbc3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Complete-target run finishes2520 rows,2424 independent public scalar replays and3540 generation-accounting checks;300 balanced cold/reuse units have identical trial lists. AtB128 cold median1.721ms, asymmetric-third4 median1.427ms, asymmetric8 median1.469ms, older sealed rho0.778ms. Grow retains15/60 censored units atB128; losses and coverage remain explicit. No rho parity or substantial context-only gain is established. Shared-local unsigned producer measurements."
+}

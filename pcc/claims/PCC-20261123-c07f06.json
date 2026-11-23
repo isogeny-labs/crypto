@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:44:26Z",
+ "id": "PCC-20261123-c07f06",
+ "kind": "execution",
+ "producer": {
+  "commit": "2b4d943030b1fec3ea2de3c35fa9251b5e15c85f",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/test-field-generation.json",
+    "sha256": "c27fbe491230a1a03180319ebfbb2c5f01706f147eb138234d35d8c071eeef34"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/test-progression-barrett.json",
+    "sha256": "024169130816ab9df4422c84be585021e19efcc4a87e3b3cf3ce703f0eff34d3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/test-canonical-field-direct.json",
+    "sha256": "116b9e3c3ce604a309ebae66d96c66e2a9fd00939421b1acb5b2e994d58f3307"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/field-direct-qualification.json",
+    "sha256": "79cede0868826ea3fac4cda3d4fbc36a411d1e7a38d5ac6f7bdac0fc5a2bddc0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/field-bloom-qualification.json",
+    "sha256": "79cede0868826ea3fac4cda3d4fbc36a411d1e7a38d5ac6f7bdac0fc5a2bddc0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/root-cargo-gate.json",
+    "sha256": "44d22a514f7cf1f83b4b9fc1cb7e34f73d0d20c832c8efacb18a71f4c95aad24"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Field successor passes5760 generator equality cases with1904640 independent affine mixed labels and2614 retained rejections,47736 exceptional/scaled point arithmetic controls,160000 field products and10 malformed inputs for each Bloom/direct variant, plus1920 fresh witness-oracle qualification calls. Producer results unsigned. Root Cargo gate remains unqualified after cache miss and60second dependency-build timeout."
+}

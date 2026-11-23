@@ -1,0 +1,75 @@
+{
+  "schema": "prime31-original-lock-correctness-failure/v1",
+  "source_commit": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+  "run_id": 45113871392,
+  "job_id": 137492117014,
+  "artifact_id": 14790654045,
+  "artifact_zip_sha256": "b1b6d310eab134128f525529eded863ac4f6147b08c1f66037d18ab3c4f7c104",
+  "zip_sha256_verified": true,
+  "zip_bytes": 9170,
+  "conclusion": "failure",
+  "completed_at": "2026-11-23T04:56:20Z",
+  "scope": "All five independent command steps attempted compilation. Every attempt stopped in unchanged binary_hyperelliptic_index_calculus.rs; zero native tests and no candidate/issuer program executed. Separate-seed replay command was not reached after issuer compilation failed.",
+  "error_path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+  "error_lines": [
+    640,
+    1233
+  ],
+  "error_git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+  "baseline_commit": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+  "current_main_checked": "816f9c3a942efed569049618c056d12a0c56d693",
+  "source_unchanged_in_base_failed_current": true,
+  "native_tests_executed": 0,
+  "candidate_program_executed": false,
+  "identity_issuer_executed": false,
+  "independent_seed_replay_executed": false,
+  "files": {
+    "checkout-commit.txt": {
+      "bytes": 41,
+      "sha256": "3a54e27b18ad1782e199a19b99cdb24cbd72301a1f7e714ea59d31de8316728b"
+    },
+    "component-tests.txt": {
+      "bytes": 3019,
+      "sha256": "79a213213e61df37217b0bdbfcc4dc9c8e5879a2e67097c53ab2d776545ecede"
+    },
+    "correctness-cases.json": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diagnostic-stderr.txt": {
+      "bytes": 3019,
+      "sha256": "79a213213e61df37217b0bdbfcc4dc9c8e5879a2e67097c53ab2d776545ecede"
+    },
+    "identity-issuance.json": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "identity-stderr.txt": {
+      "bytes": 3019,
+      "sha256": "79a213213e61df37217b0bdbfcc4dc9c8e5879a2e67097c53ab2d776545ecede"
+    },
+    "job.log.gz": {
+      "bytes": 19976,
+      "sha256": "3912a290b327772830b181096af95530e34f867031b95ddec3a41ee8caad424f"
+    },
+    "jobs.json": {
+      "bytes": 4955,
+      "sha256": "3cc32fda39659bd310170a5934295e14ba81365893f41832336b512e4b159ea3"
+    },
+    "plugin-boundary-test.txt": {
+      "bytes": 3019,
+      "sha256": "79a213213e61df37217b0bdbfcc4dc9c8e5879a2e67097c53ab2d776545ecede"
+    },
+    "source-sha256.txt": {
+      "bytes": 1413,
+      "sha256": "7ccd3108920e426890efbb60bad5056c6d8184471217951cd81c333b8d8e60c5"
+    },
+    "spec-tests.txt": {
+      "bytes": 24313,
+      "sha256": "87e72410adf9e56ca6b892d5395dcdf3b4186dda519798131dc1646db82545ee"
+    }
+  },
+  "decoded_job_log_sha256": "9ae4f470ce9f0720b5cee01945140c2b6d6d390b23838f5e34baffa8d808afe9",
+  "observed_at": "2026-11-23T06:01:17.879172+00:00",
+  "standing": "unverified"
+}
