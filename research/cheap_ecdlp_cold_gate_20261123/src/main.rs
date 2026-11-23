@@ -23,7 +23,16 @@ struct Certificate {
     base: Vec<[u64; 2]>, relations: Vec<Relation>, targets: Vec<Target>,
 }
 #[derive(Debug, Serialize)]
-struct TargetResult { index: usize, determined: bool, recovered: Option<u64>, group_replay_passed: bool }
+struct TargetResult {
+    index: usize,
+    determined: bool,
+    recovered: Option<u64>,
+    // Earliest input relation prefix spanning this target's coefficients.
+    // It is a row-stream property, not a claim about extractor cost or timing.
+    first_determined_relation_prefix: Option<usize>,
+    group_replay_passed: bool,
+    scalar_replay_passed: bool,
+}
 #[derive(Debug, Serialize)]
 struct Report {
     p: u64, n: u64, base_size: usize, relation_count: usize,
@@ -64,35 +73,47 @@ fn group_sum(ar:&mut Arithmetic,pts:&[Point],terms:&[[i64;2]])->Result<Point,Str
     }
     Ok(sum)
 }
-struct Echelon {rows:Vec<Option<Vec<u64>>>,rank:usize}
+// Each independent pivot records the 1-based position of the relation that
+// introduced it. Pivots are never replaced, so this is a chronological basis.
+struct Echelon {rows:Vec<Option<(Vec<u64>,usize)>>,rank:usize}
 impl Echelon {
     fn new(cols:usize)->Self {Self{rows:vec![None;cols],rank:0}}
     fn reduce(&self,row:&mut [u64]){
         let cols=self.rows.len();
         for i in 0..cols {
             if row[i]==0 {continue}
-            if let Some(base)=&self.rows[i] {
+            if let Some((base,_))=&self.rows[i] {
                 let k=row[i];
                 for j in i..=cols {row[j]=sub(row[j],mul(k,base[j]));}
             }
         }
     }
-    fn insert(&mut self,mut row:Vec<u64>)->Result<bool,String>{
+    fn insert(&mut self,mut row:Vec<u64>,relation_prefix:usize)->Result<bool,String>{
         self.reduce(&mut row);
         let cols=self.rows.len();
         if let Some(i)=(0..cols).find(|&i|row[i]!=0){
             let inverse=pow(row[i],N-2);
             for x in &mut row[i..] {*x=mul(*x,inverse);}
-            self.rows[i]=Some(row);self.rank+=1;Ok(true)
+            self.rows[i]=Some((row,relation_prefix));self.rank+=1;Ok(true)
         } else if row[cols]!=0 {
             Err("inconsistent authenticated RHS rows".into())
         } else {Ok(false)}
     }
-    // Reducing augmented (c,0) yields residual RHS -c dot L.
-    fn projected(&self,mut c:Vec<u64>)->Option<u64>{
-        self.reduce(&mut c);
+    // Reducing (c,0) yields residual RHS -c dot L. A unique expansion in
+    // the chronological independent pivot basis uses a well-defined subset
+    // of pivots. Their latest birth index is the *earliest* prefix at which
+    // the target was determined, without rescanning each relation prefix.
+    fn projected(&self,mut c:Vec<u64>)->Option<(u64,usize)>{
         let cols=self.rows.len();
-        if c[..cols].iter().any(|&v|v!=0) {None} else {Some(neg(c[cols]))}
+        let mut earliest_prefix=0;
+        for i in 0..cols {
+            if c[i]==0 {continue}
+            let Some((base,birth))=&self.rows[i] else {return None};
+            let k=c[i];
+            for j in i..=cols {c[j]=sub(c[j],mul(k,base[j]));}
+            earliest_prefix=earliest_prefix.max(*birth);
+        }
+        Some((neg(c[cols]),earliest_prefix))
     }
 }
 fn verify(data:&Certificate)->Result<Report,String>{
@@ -118,7 +139,7 @@ fn verify(data:&Certificate)->Result<Report,String>{
         if lhs!=rhs {return Err(format!("relation[{i}] EC replay failed"))}
         let mut row=coefficient_row(&r.terms,base.len())?;
         row[base.len()]=r.rhs;
-        if !matrix.insert(row)?{dependent+=1}
+        if !matrix.insert(row,i+1)?{dependent+=1}
     }
     let mut targets=Vec::new();
     let mut determined=0;
@@ -137,8 +158,9 @@ fn verify(data:&Certificate)->Result<Report,String>{
                 return Err(format!("target[{i}] claimed_log independent replay failed"))
             }
         }
-        let recovered=matrix.projected(coefficient_row(&t.terms,base.len())?)
-            .map(|v|sub(v,t.offset));
+        let projection=matrix.projected(coefficient_row(&t.terms,base.len())?);
+        let first_determined_relation_prefix=projection.map(|(_,prefix)|prefix);
+        let recovered=projection.map(|(v,_)|sub(v,t.offset));
         if let Some(d)=recovered {
             if ar.scalar(PRIME31,d,Some(PRIME31.g))!=q {
                 return Err(format!("target[{i}] recovered scalar EC replay failed"))
@@ -149,7 +171,10 @@ fn verify(data:&Certificate)->Result<Report,String>{
             determined+=1;
         }
         targets.push(TargetResult{index:i,determined:recovered.is_some(),
-            recovered,group_replay_passed:recovered.is_some()});
+            recovered,first_determined_relation_prefix,
+            // The public group witness passed for every accepted target,
+            // including those whose logarithm is still underdetermined.
+            group_replay_passed:true,scalar_replay_passed:recovered.is_some()});
     }
     Ok(Report{p:PRIME31.p,n:N,base_size:base.len(),
         relation_count:data.relations.len(),relation_rank:matrix.rank,
@@ -193,6 +218,10 @@ mod tests {
         assert_eq!((r.relation_rank,r.base_size,r.determined_targets),(2,4,1));
         assert_eq!(r.targets[0].recovered,Some(3));
         assert_eq!(r.targets[1].recovered,None);
+        assert_eq!(r.targets[0].first_determined_relation_prefix,Some(2));
+        assert_eq!(r.targets[1].first_determined_relation_prefix,None);
+        assert!(r.targets[1].group_replay_passed);
+        assert!(!r.targets[1].scalar_replay_passed);
     }
     #[test]
     fn homogeneous_row_recovers_previous_underdetermined_target(){
@@ -201,6 +230,7 @@ mod tests {
         let r=verify(&c).expect("P3-P2-P1=O");
         assert_eq!((r.relation_rank,r.determined_targets),(3,2));
         assert_eq!(r.targets[1].recovered,Some(3));
+        assert_eq!(r.targets[1].first_determined_relation_prefix,Some(3));
     }
     #[test]
     fn recover_unknown_target_without_harness_scalar(){
@@ -236,6 +266,34 @@ mod tests {
         assert_eq!(out.determined_targets,2);
         assert_eq!(out.targets[0].recovered,Some(N-1));
         assert_eq!(out.targets[1].recovered,Some(0));
+    }
+    #[test]
+    fn relation_order_changes_first_visibility_but_not_answer(){
+        let mut c=sample();
+        c.targets=vec![Target{
+            q:Some([PRIME31.g.0,PRIME31.g.1]),
+            offset:0,terms:vec![[0,1]],claimed_log:None,
+        }];
+        let first=verify(&c).expect("public G, first pivot");
+        assert_eq!(first.targets[0].first_determined_relation_prefix,Some(1));
+        c.relations.swap(0,1);
+        let second=verify(&c).expect("same independent rows, reordered");
+        assert_eq!(second.targets[0].first_determined_relation_prefix,Some(2));
+        assert_eq!(first.targets[0].recovered,second.targets[0].recovered);
+    }
+    #[test]
+    fn identity_is_determined_with_zero_relation_prefix(){
+        let mut c=sample();
+        c.relations.clear();
+        c.targets=vec![Target{
+            q:None,offset:0,terms:vec![[0,1],[0,-1]],claimed_log:None,
+        }];
+        let r=verify(&c).expect("zero-coefficient target");
+        assert_eq!(r.relation_rank,0);
+        assert_eq!(r.targets[0].first_determined_relation_prefix,Some(0));
+        assert_eq!(r.targets[0].recovered,Some(0));
+        assert!(r.targets[0].group_replay_passed);
+        assert!(r.targets[0].scalar_replay_passed);
     }
     #[test]
     fn reject_false_rhs(){let mut c=sample();c.relations[0].rhs=2;assert!(verify(&c).is_err());}
