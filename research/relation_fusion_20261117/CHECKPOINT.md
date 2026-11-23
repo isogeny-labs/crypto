@@ -1,5 +1,29 @@
 # Active 15× continuation checkpoint — 2026-11-23
 
+## Latest completed flat-draft364–375; publication pending
+
+NO active job. Published actual-root348/code338+16tests/native36/example2/report358/packet360/extraction361 remainat4e6364822b5cc30412f2b58a4d788bdba063d9ed onPR4989, remoteverified363. Full8216runtime suite unqualified; original15×unachieved. Rootsource348pinsunchanged.
+
+NEWuncommitted separateflatdraft: src/flat_supervised_roster.rs andsrc/bin/flat-supervised-{compare,analyze,fixture}.rs. Frozenold253sources/tools/roster/evidenceunchanged. Allold18generic/packedimplementations noweligible36controls,72AA+48ABarms×5rounds×6cases=3600plannedcalls; fixedprimaryflat-dag-487-native.15unitcheckspass365(9analyzer+3collector+3fixture), includingoldpackedprimaryeligibility andstrongestcontrol/clock/noise/globalgates. Initial364copiedtestexpected24butvisited36,7pass1fail; before365all4sources,/workspace/flat-supervised-before-365 andfailure364retained.365onlyraisesnewcount/assert/addsoldprimarytest; syntheticfixtureusescheckedimmutableproofhardlinks/atomiccanarymetadatareplacementsforspace. Oldtests/sourceunmodified.
+
+Frozen366tools/workersourcepinsat/workspace/relation-native-qualifiers/flat-supervised-366. NEWsyntheticinputpinsfrom200keepoldsixinput/old85/96hashesbutcurrentworkeractualflat274;200untouched. Syntheticneutral367andhypothetical20368each3600fullanalyticproofreplays, plusseparatefixtureprechecks. Neutralfalse/positivearithmetictrue,BOTHprimary_15x_admittedfalse. Clock369/duplicate370rejectexit1withexactreasons,noreports,all21605originalneutralfilehashesunchanged.0actualworker/launcher/hostclock/performanceobservations; monitorflagsalsoinvented.
+
+Packet373FULL43305indexedfiles/1324800bytes/SHAca025d792443e29fa1aed8b0013b8d42b998af1ede1941ddc4842a9bf933c1c9, source/tools/bothcompletecohorts/canarybytedeltas/initialfailure.375safeextractbytechecksall/source253+366pins,replays7200proofs toexact367/368reports,bothreconstructedcanariesexpectedexit1andnoreport,neutralbyte-mapunchanged,deterministicrepackpass. Report372onepagePDFinspected. Typedunsigned2cbc23+newpacketclaim. Allnewrecords/scripts/copiedtools/packetareUNCOMMITTED. Next376ledger/prose/sourcechecks,explicitstagepluscurrent363handoff/ACTIVE/log/CHECKPOINT,commitpushsamePR4989,verifyremote/updatebody. Nevermarkgoalcompletefromthisdraft. Actualcomparativeflat/native remainsunrun.
+
+Disk~202MiBfree; no newlargebuild. /workspace/flat-matched-package-373 ishardlinkmetadatafolder, extracted375/fullcohorts/canaryviewsalsoholdhardlinks. Preservefrozenproofs/tools; canreclaimonlyreviewedscratch/oldcompilerintermediatesafterrecordingexacthashes, notbroaddelete. CurrentrootunitELF557MiB(e7435ac0b284a6c7)stillneededforfullsuiteandmustnotremove. Earlier355onlyNov17rlib/rmetaremovedwithhashreceipt.
+
+Afterpublication actualnextscientificstep requires supportedResearchVaultKEYbindingandread/reconcilecanonicalprotocol/export/schema, thenpublishFINALprospectivesource/tool/inputpinsforaSEPARATErealcollector/analyzer andoriginalfullboundarystrongest-controlrepeats/AAgates. Existingpendingasyncsettingsquestionremainsnoanswer;349currentenvnoKEY/fallback/bindings. S3checkpointwaiverisNOTcanonicalgatewaiver, noS3credentialquestion. No fresh/reservedseeds, hidden setup, weakenedbaseline/gates, frozenkeys/evidenceedit. Goalactive; thisturnsubstantiveindependentprogressmeansnot3globallyblockedturns. No stop_goalcomplete.
+
+
+## Publication363 complete; original speed goal remains active
+
+All source348/code344/338+16unit/native36/example2/report358/PDF/packet360/extraction361/publication362 are committed and remotely verified at4e6364822b5cc30412f2b58a4d788bdba063d9ed on same draftPR4989. Body/title updated toactualfinalscope. No activejobs. Rootcoherentbaseline prerequisites and currentnative36recheck are complete atdeclared scopes. Full8216runtime suite remainsunqualified. No15×orrealcomparativetiming admission. Old337/334andallfrozenkeys/gates/evidenceunchanged.
+
+Nextindependentwork: adapt existingmatched draft253 forflatcandidate inNEWfiles only; do notedit frozen supervised_roster/compare/analyze/fixture or packed_roster. Actualfiles src/supervised_roster.rs andsrc/bin/supervised-{compare,analyze,fixture}.rs. Olddraft2520calls primarypacked-dag-487-native. Strongflatdraft shouldretain allold18arms ascontrols (12genericlegacy/current+6packedtree), eachwithbothlaunchers=36controls; A/Aduplicates72, A/B36controls+12flatvariants=48,5rounds×6cases=>3600plannedcalls. Flatprimary mustbeprospectivelyfixed, alloldpackedcontrols/equivalenttransportretained, no newinstances/seeds. Newdraft/qualifications areprep/syntheticonly; canonicalprotocol/export validationstillpendingnoKEYas349, no actualtiming. Preserveallcompleteproof/canary/strongestmin/AAgates.
+
+363remotehandoffonlycurrentlyuncommitted; nextcommitwithrelatedpreparation. Whitespace diagnostics in frozen root-unit-recovery-348.patch are legitimate unifieddiff blank contextlines, notsourcewhitespace; rawlogsalsokeepblankEOF.362codecheckwasunstagedactualsource clean, not a claim entirecachedartifactdiffhaszero whitespacewarnings. No artifactbyte edited.
+
+
 ## Latest completed source348 qualification and packet360, publication pending
 
 NO active build/test/numerical job. Source348 unchanged1452pins; seven-file344/348delta now fully qualified at declared scopes. Default-feature full rootunitcompiler348 exit0;350 recovered338PASS/0FAIL/41existingignored/7837filtered;356API/plugin16PASS/0FAIL. Originalexample357mainpasses documented16/120 and36/512, all7260/131328completepairs/indices/countsequalBigUint andwordpathtrue. Actualnative35236PASS,252mutationassertions/2refusals,all181artifactfilesbyte-equal322. Claimsb39691,83ce61,d508b2; unsigned/nohostorcounterattestation. Full8216runtime suite NOT qualified. No15×orcomparativetiming admission, originalFpdegreeNULL.
