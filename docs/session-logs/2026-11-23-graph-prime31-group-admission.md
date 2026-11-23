@@ -11,3 +11,17 @@ Run native example tests once permitted runtime is available, collect immutable 
 
 ## Errors (what went wrong, how it was handled)
 Canonical large daily log returned empty content despite SHA; preserve it. KB, Conductor, local cargo/worktree and worker tools unavailable; bounded GitHub code and literature fallback recorded in protocol. One coordinator; no native job launched. #5059 already terminal merged by separate activity; no reopen.
+
+## 2026-11-23 20:14 UTC — source-exact native qualification resumed
+
+### What was done (commands, files, features)
+Recovered active #5076 exact head 17db8809, inspected current AGENTS/ACTIVE, original source and existing graph workflow; retrieved the latest canonical journal through its Git blob after the contents endpoint returned empty text. Read-only workers reviewed mathematical/API semantics, developer-CI permissions and upstream capture availability. Updated ACTIVE alone at c1ed7fe7.
+
+### Decisions made (and why)
+Reserve additive fixed-control qualification in the existing graph job, with the original admission implementation and production graph/arithmetic unchanged. The qualified item is supplied-equation admission and CLI interoperability, not collection yield. Use the existing committed Cargo.lock. No merge, no paid compute, no experimental timings. KB/Conductor unavailable; documented bounded source fallback, no shared lease claimed.
+
+### Open threads
+Implement and source-review additional Rust controls and the thin shell CLI gate; then inspect exact-source native CI once, preserving output/lock/compiler/binary identities. Obtain genuine collector-custodied Prime31 rows before the registered same-stream performance panel.
+
+### Errors (what went wrong, how it was handled)
+No local Rust compiler or Cargo; full-root and focused local tests cannot run here. The existing CI job is the available compiler route, with source changes visibly unqualified until executed. Natural source stream still missing; do not replace it with planted fixtures.
