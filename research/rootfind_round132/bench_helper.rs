@@ -233,16 +233,20 @@ pub fn round132_low_degree_oracle() {
             let root = (11 + 199 * i) % p;
             let leading = [1u64, 3, 7, p - 1][(i as usize) % 4];
             let prod = f.mul(leading, root);
-            assert_eq!(f.roots(&[f.sub(0, prod), leading]), vec![root]);
+            let linear = [f.sub(0, prod), leading];
+            assert_eq!(f.roots(&linear), vec![root]);
             let second = (root + 271) % p;
             let product = f.mul(root, second);
             let sum = f.add(root, second);
             let mut expected = vec![root, second];
             expected.sort_unstable();
             expected.dedup();
-            assert_eq!(f.roots(&[product, f.sub(0, sum), 1]), expected);
-            assert_eq!(f.roots(&[f.mul(root, root), f.sub(0, f.add(root, root)), 1]),
-                vec![root]);
+            let quadratic = [product, f.sub(0, sum), 1];
+            assert_eq!(f.roots(&quadratic), expected);
+            let square = f.mul(root, root);
+            let twice = f.add(root, root);
+            let repeated = [square, f.sub(0, twice), 1];
+            assert_eq!(f.roots(&repeated), vec![root]);
         }
     }
 }
