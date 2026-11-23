@@ -81,16 +81,15 @@ impl Big {
         if self.is_zero() || o.is_zero() {
             return Big::zero();
         }
-        let mut r = vec![0u64; self.0.len() + o.0.len()];
-        for (i, &a) in self.0.iter().enumerate() {
-            let mut c = 0u128;
-            for (j, &b) in o.0.iter().enumerate() {
-                let s = r[i + j] as u128 + a as u128 * b as u128 + c;
-                r[i + j] = s as u64;
-                c = s >> 64;
-            }
-            r[i + o.0.len()] = c as u64;
+        Big::norm(mul_limbs(&self.0, &o.0))
+    }
+    /// Quadratic product, kept as an independent oracle for the Karatsuba path.
+    pub fn mul_schoolbook(&self, o: &Big) -> Big {
+        if self.is_zero() || o.is_zero() {
+            return Big::zero();
         }
+        let mut r = vec![0u64; self.0.len() + o.0.len()];
+        schoolbook_into(&mut r, &self.0, &o.0);
         Big::norm(r)
     }
     pub fn mul_small(&self, m: u64) -> Big {
@@ -253,6 +252,137 @@ impl Big {
         }
         s
     }
+}
+
+/// Operand length (in limbs) below which `mul_limbs` uses the quadratic loop.
+pub const KARATSUBA_LIMBS: usize = 32;
+
+/// `r = a*b` for zeroed `r` of length `a.len()+b.len()`.
+fn schoolbook_into(r: &mut [u64], a: &[u64], b: &[u64]) {
+    debug_assert_eq!(r.len(), a.len() + b.len());
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 {
+            continue;
+        }
+        let row = &mut r[i..i + b.len() + 1];
+        let mut c = 0u64;
+        for (rj, &y) in row.iter_mut().zip(b) {
+            let s = *rj as u128 + x as u128 * y as u128 + c as u128;
+            *rj = s as u64;
+            c = (s >> 64) as u64;
+        }
+        row[b.len()] = c;
+    }
+}
+
+/// `acc += x`, returning the carry out of `acc`.
+fn add_into(acc: &mut [u64], x: &[u64]) -> u64 {
+    let mut c = 0u64;
+    for (i, a) in acc.iter_mut().enumerate() {
+        let y = x.get(i).copied().unwrap_or(0);
+        if i >= x.len() && c == 0 {
+            break;
+        }
+        let (s1, o1) = a.overflowing_add(y);
+        let (s2, o2) = s1.overflowing_add(c);
+        *a = s2;
+        c = (o1 | o2) as u64;
+    }
+    c
+}
+
+/// `acc -= x` where the result is known to be nonnegative.
+fn sub_into(acc: &mut [u64], x: &[u64]) {
+    let mut bw = 0u64;
+    for (i, a) in acc.iter_mut().enumerate() {
+        let y = x.get(i).copied().unwrap_or(0);
+        if i >= x.len() && bw == 0 {
+            break;
+        }
+        let (d1, o1) = a.overflowing_sub(y);
+        let (d2, o2) = d1.overflowing_sub(bw);
+        *a = d2;
+        bw = (o1 | o2) as u64;
+    }
+    debug_assert_eq!(bw, 0, "sub_into underflow");
+}
+
+/// Balanced Karatsuba, `r = a*b`, `a.len() == b.len()`, `r` zeroed.
+fn karatsuba_into(r: &mut [u64], a: &[u64], b: &[u64]) {
+    let n = a.len();
+    debug_assert_eq!(n, b.len());
+    if n < KARATSUBA_LIMBS {
+        schoolbook_into(r, a, b);
+        return;
+    }
+    let h = n / 2;
+    let (a0, a1) = a.split_at(h);
+    let (b0, b1) = b.split_at(h);
+    let (low, high) = r.split_at_mut(2 * h);
+    karatsuba_into(low, a0, b0);
+    karatsuba_into(high, a1, b1);
+    // Sums have at most n-h+1 limbs; their product at most 2(n-h+1).
+    let mut sa = a1.to_vec();
+    let ca = add_into(&mut sa, a0);
+    sa.push(ca);
+    let mut sb = b1.to_vec();
+    let cb = add_into(&mut sb, b0);
+    sb.push(cb);
+    let mut mid = vec![0u64; sa.len() + sb.len()];
+    let (sa, sb) = (trim(&sa), trim(&sb));
+    if sa.len() == sb.len() {
+        karatsuba_into(&mut mid[..sa.len() + sb.len()], sa, sb);
+    } else if !sa.is_empty() && !sb.is_empty() {
+        mul_into(&mut mid[..sa.len() + sb.len()], sa, sb);
+    }
+    sub_into(&mut mid, &r[..2 * h]);
+    sub_into(&mut mid, &r[2 * h..]);
+    let carry = add_into(&mut r[h..], trim(&mid));
+    debug_assert_eq!(carry, 0);
+}
+
+fn trim(x: &[u64]) -> &[u64] {
+    let mut n = x.len();
+    while n > 0 && x[n - 1] == 0 {
+        n -= 1;
+    }
+    &x[..n]
+}
+
+/// `r = a*b` for zeroed `r` of length `a.len()+b.len()`, any shapes.
+fn mul_into(r: &mut [u64], a: &[u64], b: &[u64]) {
+    let (a, b) = if a.len() >= b.len() { (a, b) } else { (b, a) };
+    if b.len() < KARATSUBA_LIMBS {
+        schoolbook_into(r, a, b);
+        return;
+    }
+    if a.len() == b.len() {
+        karatsuba_into(r, a, b);
+        return;
+    }
+    // Unbalanced: balanced blocks of the shorter length, accumulated.
+    let k = b.len();
+    let mut block = vec![0u64; 2 * k];
+    let mut start = 0;
+    while start < a.len() {
+        let piece = &a[start..(start + k).min(a.len())];
+        let width = piece.len() + k;
+        block[..width].fill(0);
+        mul_into(&mut block[..width], piece, b);
+        let carry = add_into(&mut r[start..], &block[..width]);
+        debug_assert_eq!(carry, 0);
+        start += k;
+    }
+}
+
+/// Exact product of little-endian limb slices (length `a.len()+b.len()`,
+/// not normalized). Karatsuba above `KARATSUBA_LIMBS`.
+pub fn mul_limbs(a: &[u64], b: &[u64]) -> Vec<u64> {
+    let mut r = vec![0u64; a.len() + b.len()];
+    if !a.is_empty() && !b.is_empty() {
+        mul_into(&mut r, a, b);
+    }
+    r
 }
 
 impl PartialOrd for Big {
@@ -454,4 +584,43 @@ pub fn big_mod(a: &Big, n: &Big) -> Big {
         }
     }
     Big::from_limbs(&r)
+}
+
+#[cfg(test)]
+mod mul_tests {
+    use super::*;
+
+    fn fixture(limbs: usize, mut s: u64, dense: bool) -> Big {
+        let v: Vec<u64> = (0..limbs)
+            .map(|_| {
+                s ^= s << 13;
+                s ^= s >> 7;
+                s ^= s << 17;
+                if dense { u64::MAX - (s & 3) } else { s }
+            })
+            .collect();
+        Big::from_limbs(&v)
+    }
+
+    #[test]
+    fn karatsuba_matches_schoolbook_on_all_shapes() {
+        let sizes = [0, 1, 2, 31, 32, 33, 63, 64, 65, 97, 128, 200, 257, 513];
+        for &x in &sizes {
+            for &y in &sizes {
+                for dense in [false, true] {
+                    let a = fixture(x, 0x9e37_79b9_7f4a_7c15 ^ x as u64, dense);
+                    let b = fixture(y, 0x2545_f491_4f6c_dd1d ^ y as u64, dense);
+                    assert_eq!(a.mul(&b), a.mul_schoolbook(&b), "{x}x{y} dense={dense}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn karatsuba_all_ones_square() {
+        for n in [32, 33, 64, 100, 1000] {
+            let a = Big::from_limbs(&vec![u64::MAX; n]);
+            assert_eq!(a.mul(&a), a.mul_schoolbook(&a), "{n}");
+        }
+    }
 }

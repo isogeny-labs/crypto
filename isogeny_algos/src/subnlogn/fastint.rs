@@ -2,26 +2,38 @@
 //!
 //! This is the classical prerequisite, **not** the new sub-nlogn algorithm.
 //! It follows the negacyclic construction of Brent and Zimmermann, *Modern
-//! Computer Arithmetic*, §2.3.3, Algorithm 2.4. No external arithmetic callback,
-//! floating-point FFT, or unbounded schoolbook leaf is used.
+//! Computer Arithmetic*, §2.3.3, Algorithm 2.4. No external arithmetic callback
+//! or floating-point FFT is used; leaves use the crate's exact Karatsuba product
+//! below a fixed cutoff.
 //!
-//! At an N-bit node choose a power of two L dividing N, with
-//! L <= sqrt(N)/ceil(log2(N)). Split into L radix-2^w chunks, w=N/L, and
-//! convolve in Z/(2^K+1), K=L*ceil((2w+log2(L)+2)/L). The extra two bits allow
-//! symmetric recovery of every signed negacyclic coefficient. Multiplication
-//! by roots of unity is a signed binary shift. Forward DIF and inverse DIT
-//! retain the same bit-reversed ordering; there is no global bit-reversal pass.
+//! At a K-bit node (K a multiple of 64) choose a power of two L dividing K
+//! (by a small cost model, typically near sqrt(K)/4). Split into L radix-2^w chunks, w=K/L, and convolve in
+//! Z/(2^K'+1), with K' the smallest multiple of a power of two Q >= max(L, 64)
+//! (Q close to sqrt(K')) that is at least 2w+log2(L)+2. The extra two bits allow
+//! symmetric recovery of every signed negacyclic coefficient. Multiplication by
+//! roots of unity is a signed binary shift. Forward DIF and inverse DIT retain
+//! the same bit-reversed ordering; there is no global bit-reversal pass.
 //!
-//! The recurrence has L*K = 2N+O(N/log^2 N) and
-//! log K = (log N)/2+O(log log N). Its bit cost is
-//! O(N log N log log N); the final carry pass writes disjoint bit ranges in
-//! O(N) work. These are mathematical operation bounds, not a runtime benchmark
-//! or a proof that Rust's allocator is a multitape machine.
+//! Ring elements are fixed-width little-endian limb buffers of K/64+1 limbs,
+//! canonical in [0, 2^K]; butterflies, shifts and the final carry pass work in
+//! place on those buffers, so a node allocates O(1) buffers rather than O(1)
+//! integers per butterfly. Squaring reuses one forward transform.
+//!
+//! The recurrence has L*K' = 2K+O(K/sqrt K) and log K' = (log K)/2+O(1). Its
+//! bit cost is O(K log K log log K). These are mathematical operation bounds,
+//! not a runtime benchmark or a proof that Rust's allocator is a multitape
+//! machine.
 
-use crate::bigint::Big;
+use crate::bigint::{mul_limbs, Big};
 
-/// A fixed cutoff; its value never grows with input length.
-const BASE_BITS: usize = 4096;
+/// Products of at most this many bits use `Big::mul` (Karatsuba). Fixed; it
+/// never grows with input length.
+pub const BASE_BITS: usize = 1 << 17;
+
+/// Fermat rings Z/(2^K+1) with K at most this use one Karatsuba product and a
+/// fold. Fixed.
+pub const LEAF_BITS: usize = 1 << 14;
+
 
 /// Counts actual recursive operations, useful for distinguishing the FFT path
 /// from a small-input base case. Saturating diagnostic counters do not dispatch.
@@ -52,16 +64,42 @@ pub fn multiply_with_work(a: &Big, b: &Big) -> (Big, Work) {
         work.schoolbook_leaves = 1;
         return (a.mul(b), work);
     }
-    let n = bits
-        .checked_next_power_of_two()
-        .expect("product length overflow");
-    // a*b < 2^n, so the modular result is the ordinary integer product.
-    let value = multiply_mod(a, b, n, &mut work, 0);
+    let n = top_ring_bits(bits);
+    // a*b < 2^bits <= 2^n, so the modular result is the ordinary product.
+    let value = multiply_mod_with(a, b, n, LEAF_BITS, &mut work);
     (value, work)
 }
 
-fn pow2(n: usize) -> Big {
-    Big::from_u64(1).shl(n)
+/// Smallest multiple of a power-of-two granule near sqrt(bits) that is >= bits.
+fn top_ring_bits(bits: usize) -> usize {
+    let granule = pow2_floor(bits.isqrt()).max(64);
+    bits.checked_next_multiple_of(granule)
+        .expect("product length overflow")
+}
+
+fn pow2_floor(x: usize) -> usize {
+    if x == 0 {
+        0
+    } else {
+        1 << (usize::BITS - 1 - x.leading_zeros())
+    }
+}
+
+/// `a*b mod 2^n+1` for `a, b <= 2^n`, `n` a multiple of 64.
+fn multiply_mod_with(a: &Big, b: &Big, n: usize, leaf: usize, work: &mut Work) -> Big {
+    assert!(n.is_multiple_of(64) && n > 0);
+    let m = n / 64;
+    let load = |x: &Big| {
+        assert!(x.bits() <= n + 1 && (x.bits() <= n || x.0.len() == m + 1));
+        let mut v = vec![0u64; m + 1];
+        v[..x.0.len()].copy_from_slice(&x.0);
+        v
+    };
+    let (x, y) = (load(a), load(b));
+    let mut out = vec![0u64; m + 1];
+    let square = a == b;
+    mul_mod(&x, &y, &mut out, square, leaf, work, 0);
+    Big::from_limbs(&out)
 }
 
 /// Copy only the requested bit interval: shifting the entire source for every
@@ -71,280 +109,454 @@ pub(crate) fn bit_slice(x: &Big, start: usize, len: usize) -> Big {
         return Big::zero();
     }
     let actual = len.min(x.bits() - start);
-    let count = actual.div_ceil(64);
-    let first = start / 64;
-    let shift = start % 64;
-    let mut out = Vec::with_capacity(count);
-    for j in 0..count {
-        let mut limb = x.0.get(first + j).copied().unwrap_or(0) >> shift;
-        if shift != 0 {
-            limb |= x.0.get(first + j + 1).copied().unwrap_or(0) << (64 - shift);
-        }
-        out.push(limb);
-    }
-    if !actual.is_multiple_of(64) {
-        *out.last_mut().expect("nonempty slice") &= (1u64 << (actual % 64)) - 1;
-    }
+    let mut out = vec![0u64; actual.div_ceil(64)];
+    extract_bits(&x.0, start, actual, &mut out);
     Big::from_limbs(&out)
 }
 
-fn write_bits(out: &mut [u64], offset: usize, value: &Big) {
-    let limb = offset / 64;
-    let shift = offset % 64;
-    for (j, &x) in value.0.iter().enumerate() {
-        out[limb + j] |= x << shift;
-        if shift != 0 && limb + j + 1 < out.len() {
-            out[limb + j + 1] |= x >> (64 - shift);
+/// Write bits `[start, start+len)` of `src` into the low limbs of `dst`
+/// (which must hold `len.div_ceil(64)` limbs and is otherwise untouched).
+fn extract_bits(src: &[u64], start: usize, len: usize, dst: &mut [u64]) {
+    let count = len.div_ceil(64);
+    let first = start / 64;
+    let shift = start % 64;
+    for (j, d) in dst[..count].iter_mut().enumerate() {
+        let mut limb = src.get(first + j).copied().unwrap_or(0) >> shift;
+        if shift != 0 {
+            limb |= src.get(first + j + 1).copied().unwrap_or(0) << (64 - shift);
+        }
+        *d = limb;
+    }
+    if !len.is_multiple_of(64) {
+        dst[count - 1] &= (1u64 << (len % 64)) - 1;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Limb primitives.
+
+/// `x += v` (v a single limb) with carry propagation; returns the carry out.
+fn add_small(x: &mut [u64], mut v: u64) -> bool {
+    for limb in x {
+        if v == 0 {
+            return false;
+        }
+        let (s, o) = limb.overflowing_add(v);
+        *limb = s;
+        v = o as u64;
+    }
+    v != 0
+}
+
+/// `x -= v` with borrow propagation; returns the borrow out.
+fn sub_small(x: &mut [u64], mut v: u64) -> bool {
+    for limb in x {
+        if v == 0 {
+            return false;
+        }
+        let (d, o) = limb.overflowing_sub(v);
+        *limb = d;
+        v = o as u64;
+    }
+    v != 0
+}
+
+/// `a += b` in place over equal lengths; returns the carry out.
+#[inline]
+fn add_assign_n(a: &mut [u64], b: &[u64]) -> u64 {
+    let mut c = 0u64;
+    for (x, &y) in a.iter_mut().zip(b) {
+        let (s1, o1) = x.overflowing_add(y);
+        let (s2, o2) = s1.overflowing_add(c);
+        *x = s2;
+        c = (o1 | o2) as u64;
+    }
+    c
+}
+
+/// `out = a - b` over equal lengths; returns the borrow out.
+#[inline]
+fn sub_n(out: &mut [u64], a: &[u64], b: &[u64]) -> u64 {
+    let mut c = 0u64;
+    for ((o, &x), &y) in out.iter_mut().zip(a).zip(b) {
+        let (d1, o1) = x.overflowing_sub(y);
+        let (d2, o2) = d1.overflowing_sub(c);
+        *o = d2;
+        c = (o1 | o2) as u64;
+    }
+    c
+}
+
+// ---------------------------------------------------------------------------
+// Z/(2^K+1) on buffers of m+1 limbs, K = 64m, canonical in [0, 2^K].
+
+/// `x[..m]` holds `lo`; replace `x` by the canonical form of `lo - t`.
+/// Requires |t| < 2^K.
+fn fold(x: &mut [u64], t: i64) {
+    let m = x.len() - 1;
+    x[m] = 0;
+    let lo = &mut x[..m];
+    if t > 0 {
+        // Wrapped W = lo - t + 2^K, and -2^K = 1, so the value is W + 1 <= 2^K.
+        if sub_small(lo, t as u64) && add_small(lo, 1) {
+            x[m] = 1;
+        }
+    } else if t < 0 && add_small(lo, t.unsigned_abs()) {
+        // Wrapped W = lo + |t| - 2^K, and 2^K = -1, so the value is W - 1.
+        if lo.iter().all(|&v| v == 0) {
+            x[m] = 1;
+        } else {
+            sub_small(lo, 1);
         }
     }
 }
 
-struct Fermat {
-    n: usize,
-    modulus: Big,
-    half: Big,
+fn is_zero(x: &[u64]) -> bool {
+    x.iter().all(|&v| v == 0)
 }
 
-impl Fermat {
-    fn new(n: usize) -> Self {
-        Self {
-            n,
-            modulus: pow2(n).add_small(1),
-            half: pow2(n - 1),
+/// `x = -x`.
+fn neg_in_place(x: &mut [u64]) {
+    let m = x.len() - 1;
+    if x[m] == 1 {
+        x[..m].fill(0);
+        x[0] = 1;
+        x[m] = 0;
+    } else if !is_zero(&x[..m]) {
+        // 2^K + 1 - x = (2^K - 1 - x) + 2.
+        for v in &mut x[..m] {
+            *v = !*v;
         }
-    }
-
-    fn neg(&self, a: &Big) -> Big {
-        if a.is_zero() {
-            Big::zero()
-        } else {
-            self.modulus.sub(a)
-        }
-    }
-
-    fn add(&self, a: &Big, b: &Big) -> Big {
-        let sum = a.add(b);
-        if sum >= self.modulus {
-            sum.sub(&self.modulus)
-        } else {
-            sum
-        }
-    }
-
-    fn sub(&self, a: &Big, b: &Big) -> Big {
-        if a >= b {
-            a.sub(b)
-        } else {
-            self.modulus.sub(&b.sub(a))
-        }
-    }
-
-    /// Reduction for a nonnegative integer with at most 2N+1 bits.
-    fn reduce(&self, value: &Big) -> Big {
-        debug_assert!(value.bits() <= 2 * self.n + 1);
-        let low = bit_slice(value, 0, self.n);
-        let high = value.shr(self.n);
-        self.sub(&low, &high)
-    }
-
-    fn shift(&self, value: &Big, exponent: usize) -> Big {
-        let exponent = exponent % (2 * self.n);
-        let result = self.reduce(&value.shl(exponent % self.n));
-        if exponent >= self.n {
-            self.neg(&result)
-        } else {
-            result
-        }
-    }
-
-    fn inverse_shift(&self, value: &Big, exponent: usize) -> Big {
-        let exponent = exponent % (2 * self.n);
-        self.shift(
-            value,
-            if exponent == 0 {
-                0
-            } else {
-                2 * self.n - exponent
-            },
-        )
+        x[m] = add_small(&mut x[..m], 2) as u64;
     }
 }
 
-fn transform(values: &mut [Big], ring: &Fermat, inverse: bool, work: &mut Work) {
-    let len = values.len();
-    assert!(len.is_power_of_two());
-    assert_eq!((2 * ring.n) % len, 0);
-    if inverse {
-        let mut block = 2;
-        while block <= len {
-            let half = block / 2;
-            let step = 2 * ring.n / block;
-            for chunk in values.chunks_exact_mut(block) {
-                let (low, high) = chunk.split_at_mut(half);
-                for (j, (a, b)) in low.iter_mut().zip(high.iter_mut()).enumerate() {
-                    let t = ring.inverse_shift(b, j * step);
-                    let sum = ring.add(a, &t);
-                    let difference = ring.sub(a, &t);
-                    *a = sum;
-                    *b = difference;
-                    work.butterflies = work.butterflies.saturating_add(1);
-                }
-            }
-            if block == len {
-                break;
-            }
-            block *= 2;
+/// `a = a + b`.
+#[inline]
+fn add_mod(a: &mut [u64], b: &[u64]) {
+    let m = a.len() - 1;
+    let c = add_assign_n(&mut a[..m], &b[..m]);
+    let t = a[m] + b[m] + c;
+    fold(a, t as i64);
+}
+
+/// `out = a - b`.
+#[inline]
+fn sub_mod(out: &mut [u64], a: &[u64], b: &[u64]) {
+    let m = out.len() - 1;
+    let bw = sub_n(&mut out[..m], &a[..m], &b[..m]);
+    let t = a[m] as i64 - b[m] as i64 - bw as i64;
+    fold(out, t);
+}
+
+/// `out = src * 2^e`; `wide` is scratch of 2m limbs. `out` and `src` differ.
+fn shift_mod(src: &[u64], e: usize, out: &mut [u64], wide: &mut [u64]) {
+    let m = src.len() - 1;
+    let k = 64 * m;
+    let e = e % (2 * k);
+    let (negative, e) = if e >= k { (true, e - k) } else { (false, e) };
+    if e == 0 {
+        out.copy_from_slice(src);
+        if negative {
+            neg_in_place(out);
         }
-        let log_len = len.trailing_zeros() as usize;
-        for value in values {
-            *value = ring.inverse_shift(value, log_len);
-        }
+        return;
+    }
+    // src <= 2^K and e < K, so src*2^e < 2^(2K) fits in 2m limbs.
+    let (q, r) = (e / 64, e % 64);
+    let wide = &mut wide[..2 * m];
+    wide[..q].fill(0);
+    if r == 0 {
+        wide[q..q + m + 1].copy_from_slice(src);
+        wide[q + m + 1..].fill(0);
     } else {
-        let mut block = len;
-        while block >= 2 {
-            let half = block / 2;
-            let step = 2 * ring.n / block;
-            for chunk in values.chunks_exact_mut(block) {
-                let (low, high) = chunk.split_at_mut(half);
-                for (j, (a, b)) in low.iter_mut().zip(high.iter_mut()).enumerate() {
-                    let sum = ring.add(a, b);
-                    let difference = ring.sub(a, b);
-                    *a = sum;
-                    *b = ring.shift(&difference, j * step);
-                    work.butterflies = work.butterflies.saturating_add(1);
-                }
-            }
-            block /= 2;
+        let mut prev = 0u64;
+        for i in 0..=m {
+            let v = src[i];
+            wide[q + i] = (v << r) | (prev >> (64 - r));
+            prev = v;
+        }
+        let tail = q + m + 1;
+        if tail < 2 * m {
+            wide[tail] = prev >> (64 - r);
+            wide[tail + 1..].fill(0);
+        } else {
+            debug_assert_eq!(prev >> (64 - r), 0);
         }
     }
+    let (low, high) = wide.split_at(m);
+    // src*2^e = low + high*2^K = low - high.
+    let bw = if negative {
+        sub_n(&mut out[..m], high, low)
+    } else {
+        sub_n(&mut out[..m], low, high)
+    };
+    fold(out, -(bw as i64));
 }
 
-/// Sign-magnitude carry, kept local so the low-level prerequisite does not
-/// depend on the certified arithmetic that itself depends on multiplication.
-struct Carry {
-    negative: bool,
-    magnitude: Big,
+fn greater_than_half(x: &[u64]) -> bool {
+    let m = x.len() - 1;
+    if x[m] != 0 {
+        return true;
+    }
+    let top = x[m - 1];
+    top >> 63 == 1 && (top << 1 != 0 || !is_zero(&x[..m - 1]))
 }
 
-impl Carry {
-    fn zero() -> Self {
+/// Per-node scratch buffers.
+struct Scratch {
+    t: Vec<u64>,
+    wide: Vec<u64>,
+}
+
+impl Scratch {
+    fn new(m: usize) -> Self {
         Self {
-            negative: false,
-            magnitude: Big::zero(),
+            t: vec![0; m + 1],
+            wide: vec![0; 2 * m],
         }
     }
+}
 
-    fn add(&mut self, negative: bool, magnitude: Big) {
-        if self.negative == negative {
-            self.magnitude = self.magnitude.add(&magnitude);
-        } else if self.magnitude >= magnitude {
-            self.magnitude = self.magnitude.sub(&magnitude);
-        } else {
-            self.magnitude = magnitude.sub(&self.magnitude);
-            self.negative = negative;
+/// Forward DIF transform of `len` elements of stride `s` in Z/(2^K+1),
+/// with root 2^(2K/len); output in bit-reversed order.
+fn forward(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut Work) {
+    let k = 64 * (s - 1);
+    let mut block = len;
+    while block >= 2 {
+        let half = block / 2;
+        let step = 2 * k / block;
+        for chunk in data.chunks_exact_mut(block * s) {
+            let (low, high) = chunk.split_at_mut(half * s);
+            for (j, (a, b)) in low
+                .chunks_exact_mut(s)
+                .zip(high.chunks_exact_mut(s))
+                .enumerate()
+            {
+                sub_mod(&mut sc.t, a, b);
+                add_mod(a, b);
+                shift_mod(&sc.t, j * step, b, &mut sc.wide);
+            }
         }
-        if self.magnitude.is_zero() {
-            self.negative = false;
-        }
+        work.butterflies = work.butterflies.saturating_add((len / 2) as u64);
+        block /= 2;
     }
+}
 
-    /// Euclidean radix division, including a negative carry. The returned
-    /// digit is always nonnegative, while self becomes floor(self/2^w).
-    fn take_digit(&mut self, w: usize, radix: &Big) -> Big {
-        let low = bit_slice(&self.magnitude, 0, w);
-        self.magnitude = self.magnitude.shr(w);
-        let digit = if self.negative && !low.is_zero() {
-            self.magnitude = self.magnitude.add_small(1);
-            radix.sub(&low)
+/// Inverse DIT transform (without the 1/len scaling), bit-reversed input.
+fn inverse(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut Work) {
+    let k = 64 * (s - 1);
+    let mut block = 2;
+    while block <= len {
+        let half = block / 2;
+        let step = 2 * k / block;
+        for chunk in data.chunks_exact_mut(block * s) {
+            let (low, high) = chunk.split_at_mut(half * s);
+            for (j, (a, b)) in low
+                .chunks_exact_mut(s)
+                .zip(high.chunks_exact_mut(s))
+                .enumerate()
+            {
+                shift_mod(b, 2 * k - j * step, &mut sc.t, &mut sc.wide);
+                sub_mod(b, a, &sc.t);
+                add_mod(a, &sc.t);
+            }
+        }
+        work.butterflies = work.butterflies.saturating_add((len / 2) as u64);
+        block *= 2;
+    }
+}
+
+/// Valid recursive dimensions for a K-bit node: (len, chunk width, child K').
+fn candidates(k: usize) -> impl Iterator<Item = (usize, usize, usize)> {
+    (2..=k.trailing_zeros().min(40)).filter_map(move |i| {
+        let len = 1usize << i;
+        let width = k / len;
+        let needed = 2 * width + i as usize + 2;
+        let granule = pow2_floor(needed.isqrt()).max(64).max(len);
+        let child = needed.next_multiple_of(granule);
+        (child < k).then_some((len, width, child))
+    })
+}
+
+/// Relative cost model (seconds-like units) used only to choose dimensions:
+/// a Karatsuba leaf costs about KARATSUBA_COST*m^log2(3) for m limbs, and a
+/// butterfly about BUTTERFLY_COST per limb. Correctness never depends on it.
+const KARATSUBA_COST: f64 = 4.2e-9;
+const BUTTERFLY_COST: f64 = 3.0e-9;
+
+fn model_cost(k: usize, leaf_bits: usize, depth: usize) -> f64 {
+    if k <= leaf_bits || depth > 8 {
+        return KARATSUBA_COST * ((k / 64) as f64).powf(1.585);
+    }
+    candidates(k)
+        .map(|(len, _, child)| node_cost(len, child, leaf_bits, depth))
+        .fold(f64::INFINITY, f64::min)
+}
+
+fn node_cost(len: usize, child: usize, leaf_bits: usize, depth: usize) -> f64 {
+    let limbs = (child / 64 + 1) as f64;
+    let log_len = len.trailing_zeros() as f64;
+    // Three transforms (two forward, one inverse) plus spread/untwist passes.
+    let transforms = (3.0 * log_len + 4.0) * (len / 2) as f64 * limbs * BUTTERFLY_COST;
+    transforms + len as f64 * model_cost(child, leaf_bits, depth + 1)
+}
+
+/// Recursive dimensions for a K-bit node, chosen by `node_cost`.
+fn plan(k: usize, leaf_bits: usize) -> (usize, usize, usize) {
+    debug_assert!(k.is_multiple_of(64));
+    thread_local! {
+        static CACHE: std::cell::RefCell<std::collections::HashMap<(usize, usize), (usize, usize, usize)>> =
+            Default::default();
+    }
+    if let Some(hit) = CACHE.with(|c| c.borrow().get(&(k, leaf_bits)).copied()) {
+        return hit;
+    }
+    let best = candidates(k)
+        .map(|d| (node_cost(d.0, d.2, leaf_bits, 0), d))
+        .min_by(|x, y| x.0.total_cmp(&y.0))
+        .map(|(_, d)| d)
+        .expect("invalid recursive Fermat dimensions");
+    CACHE.with(|c| c.borrow_mut().insert((k, leaf_bits), best));
+    best
+}
+
+/// Split the K-bit value `src` (< 2^K) into `len` chunks of `width` bits and
+/// write chunk j times 2^(j*twist) into element j of `dst` (stride s').
+fn spread(src: &[u64], width: usize, len: usize, twist: usize, dst: &mut [u64], sc: &mut Scratch) {
+    let s = sc.t.len();
+    for (j, d) in dst.chunks_exact_mut(s).take(len).enumerate() {
+        sc.t.fill(0);
+        extract_bits(src, j * width, width, &mut sc.t);
+        shift_mod(&sc.t, j * twist, d, &mut sc.wide);
+    }
+}
+
+/// `acc += value * 2^offset` with carry propagation.
+fn add_shifted(acc: &mut [u64], value: &[u64], offset: usize) {
+    let (q, r) = (offset / 64, offset % 64);
+    let mut carry = 0u64;
+    let mut prev = 0u64;
+    let mut i = 0;
+    while i <= value.len() {
+        let v = value.get(i).copied().unwrap_or(0);
+        let limb = if r == 0 {
+            v
         } else {
-            low
+            (v << r) | (prev >> (64 - r))
         };
-        if self.magnitude.is_zero() {
-            self.negative = false;
-        }
-        digit
+        prev = v;
+        let (s1, o1) = acc[q + i].overflowing_add(limb);
+        let (s2, o2) = s1.overflowing_add(carry);
+        acc[q + i] = s2;
+        carry = (o1 | o2) as u64;
+        i += 1;
     }
+    let overflow = add_small(&mut acc[q + i..], carry);
+    debug_assert!(!overflow);
 }
 
-fn dimensions(n: usize) -> (usize, usize, usize) {
-    let log_n = usize::BITS as usize - (n - 1).leading_zeros() as usize;
-    let mut len = 1usize;
-    while let Some(next) = len.checked_mul(2) {
-        if !n.is_multiple_of(next) {
-            break;
-        }
-        // Division avoids overflowing when checking next^2 * log_n^2 <= n.
-        let budget = n / log_n / log_n;
-        if next > budget / next {
-            break;
-        }
-        len = next;
-    }
-    // Every generated N above the cutoff is divisible by at least four.
-    assert!(len >= 4, "invalid recursive Fermat dimensions");
-    let width = n / len;
-    let guard = len.trailing_zeros() as usize + 2;
-    let child = (2 * width + guard).div_ceil(len) * len;
-    assert!(child < n, "Fermat recursion must decrease");
-    (len, width, child)
+/// Reduce a nonnegative integer of fewer than 2K+64 bits modulo 2^K+1.
+fn reduce_wide(x: &[u64], out: &mut [u64]) {
+    let m = out.len() - 1;
+    debug_assert!(is_zero(&x[2 * m..]));
+    let bw = sub_n(&mut out[..m], &x[..m], &x[m..2 * m]);
+    fold(out, -(bw as i64));
 }
 
-fn multiply_mod(a: &Big, b: &Big, n: usize, work: &mut Work, depth: usize) -> Big {
+/// Leaf: one exact product, then fold the high half.
+fn leaf(a: &[u64], b: &[u64], out: &mut [u64], square: bool) {
+    let m = out.len() - 1;
+    let product = if square {
+        mul_limbs(&a[..m], &a[..m])
+    } else {
+        mul_limbs(&a[..m], &b[..m])
+    };
+    let bw = sub_n(&mut out[..m], &product[..m], &product[m..]);
+    fold(out, -(bw as i64));
+}
+
+/// `out = a*b mod 2^K+1` with K = 64*(len-1); `square` means a == b.
+fn mul_mod(
+    a: &[u64],
+    b: &[u64],
+    out: &mut [u64],
+    square: bool,
+    leaf_bits: usize,
+    work: &mut Work,
+    depth: usize,
+) {
     work.depth = work.depth.max(depth);
-    let ring = Fermat::new(n);
-    debug_assert!(a < &ring.modulus && b < &ring.modulus);
-    if a.is_zero() || b.is_zero() {
-        return Big::zero();
+    let m = out.len() - 1;
+    let k = 64 * m;
+    // Canonical endpoint 2^K represents -1 and is not an ordinary K-bit value.
+    if a[m] != 0 {
+        out.copy_from_slice(b);
+        neg_in_place(out);
+        return;
     }
-    // Canonical endpoint 2^N represents -1 and is not an ordinary N-bit chunk.
-    if a.bit(n) {
-        return ring.neg(b);
+    if b[m] != 0 {
+        out.copy_from_slice(a);
+        neg_in_place(out);
+        return;
     }
-    if b.bit(n) {
-        return ring.neg(a);
+    if is_zero(a) || is_zero(b) {
+        out.fill(0);
+        return;
     }
-    if n <= BASE_BITS {
+    if k <= leaf_bits {
         work.schoolbook_leaves = work.schoolbook_leaves.saturating_add(1);
-        return ring.reduce(&a.mul(b));
+        leaf(a, b, out, square);
+        return;
     }
     work.transform_nodes = work.transform_nodes.saturating_add(1);
-    let (len, width, child) = dimensions(n);
-    let coefficient_ring = Fermat::new(child);
-    let twist_step = child / len;
-    let mut left = Vec::with_capacity(len);
-    let mut right = Vec::with_capacity(len);
-    for j in 0..len {
-        left.push(coefficient_ring.shift(&bit_slice(a, j * width, width), j * twist_step));
-        right.push(coefficient_ring.shift(&bit_slice(b, j * width, width), j * twist_step));
-    }
-    transform(&mut left, &coefficient_ring, false, work);
-    transform(&mut right, &coefficient_ring, false, work);
-    for (a_j, b_j) in left.iter_mut().zip(right.iter()) {
-        *a_j = multiply_mod(a_j, b_j, child, work, depth + 1);
-    }
-    drop(right);
-    transform(&mut left, &coefficient_ring, true, work);
-    let mut carry = Carry::zero();
-    let mut out = vec![0; n.div_ceil(64)];
-    let radix = pow2(width);
-    for (j, coefficient) in left.into_iter().enumerate() {
-        let coefficient = coefficient_ring.inverse_shift(&coefficient, j * twist_step);
-        if coefficient > coefficient_ring.half {
-            carry.add(true, coefficient_ring.modulus.sub(&coefficient));
-        } else {
-            carry.add(false, coefficient);
-        }
-        let digit = carry.take_digit(width, &radix);
-        write_bits(&mut out, j * width, &digit);
-    }
-    // Sum c_j * 2^(jw) = out + carry*2^N = out - carry (mod 2^N+1).
-    let out = Big::from_limbs(&out);
-    debug_assert!(carry.magnitude < ring.modulus);
-    if carry.negative {
-        ring.add(&out, &carry.magnitude)
+    let (len, width, child) = plan(k, leaf_bits);
+    let mc = child / 64;
+    let s = mc + 1;
+    let twist = child / len;
+    let log_len = len.trailing_zeros() as usize;
+    let mut sc = Scratch::new(mc);
+
+    let mut fa = vec![0u64; len * s];
+    spread(&a[..m], width, len, twist, &mut fa, &mut sc);
+    forward(&mut fa, len, s, &mut sc, work);
+    let fb = if square {
+        None
     } else {
-        ring.sub(&out, &carry.magnitude)
+        let mut fb = vec![0u64; len * s];
+        spread(&b[..m], width, len, twist, &mut fb, &mut sc);
+        forward(&mut fb, len, s, &mut sc, work);
+        Some(fb)
+    };
+    let mut product = vec![0u64; s];
+    for j in 0..len {
+        let x = &fa[j * s..(j + 1) * s];
+        let y = fb.as_ref().map_or(x, |f| &f[j * s..(j + 1) * s]);
+        mul_mod(x, y, &mut product, square, leaf_bits, work, depth + 1);
+        fa[j * s..(j + 1) * s].copy_from_slice(&product);
     }
+    drop(fb);
+    inverse(&mut fa, len, s, &mut sc, work);
+
+    // Untwist, divide by len, read each coefficient as a signed integer in
+    // (-2^(K'-1), 2^(K'-1)], and accumulate sum c_j 2^(j*width).
+    let mut positive = vec![0u64; 2 * m + 2];
+    let mut negative = vec![0u64; 2 * m + 2];
+    for (j, c) in fa.chunks_exact(s).enumerate() {
+        let e = (j * twist + log_len) % (2 * child);
+        shift_mod(c, (2 * child - e) % (2 * child), &mut sc.t, &mut sc.wide);
+        if greater_than_half(&sc.t) {
+            neg_in_place(&mut sc.t);
+            add_shifted(&mut negative, &sc.t, j * width);
+        } else {
+            add_shifted(&mut positive, &sc.t, j * width);
+        }
+    }
+    let mut p = vec![0u64; m + 1];
+    let mut q = vec![0u64; m + 1];
+    reduce_wide(&positive, &mut p);
+    reduce_wide(&negative, &mut q);
+    sub_mod(out, &p, &q);
 }
 
 #[cfg(test)]
@@ -364,6 +576,21 @@ mod tests {
         Big::from_limbs(&values)
     }
 
+    fn pow2(n: usize) -> Big {
+        Big::from_u64(1).shl(n)
+    }
+
+    fn modulus(n: usize) -> Big {
+        pow2(n).add_small(1)
+    }
+
+    /// Ring element buffer of m+1 limbs from a canonical Big.
+    fn element(x: &Big, m: usize) -> Vec<u64> {
+        let mut v = vec![0u64; m + 1];
+        v[..x.0.len()].copy_from_slice(&x.0);
+        v
+    }
+
     #[test]
     fn small_native_oracle_and_zero() {
         for a in [0, 1, 7, u32::MAX as u64, u64::MAX] {
@@ -378,65 +605,176 @@ mod tests {
 
     #[test]
     fn recursive_products_against_independent_schoolbook() {
-        for (a_len, b_len) in [(33, 33), (65, 1), (67, 70), (180, 193), (511, 257)] {
+        for (a_len, b_len) in [
+            (33, 33),
+            (65, 1),
+            (67, 70),
+            (180, 193),
+            (511, 257),
+            (600, 600),
+            (1100, 300),
+            (2048, 2048),
+        ] {
             let a = fixture(a_len, 0x9e3779b97f4a7c15);
             let b = fixture(b_len, 0x2545f4914f6cdd1d);
             let (got, work) = multiply_with_work(&a, &b);
-            assert_eq!(got, a.mul(&b), "lengths {a_len},{b_len}");
-            assert!(work.transform_nodes > 0);
-            assert!(work.butterflies > 0);
+            assert_eq!(got, a.mul_schoolbook(&b), "lengths {a_len},{b_len}");
             assert!(work.schoolbook_leaves > 0);
+            if a.bits() + b.bits() > BASE_BITS {
+                assert!(work.transform_nodes > 0, "lengths {a_len},{b_len}");
+                assert!(work.butterflies > 0);
+            } else {
+                assert_eq!(work.transform_nodes, 0);
+            }
+            // Squaring shares one forward transform.
+            assert_eq!(multiply(&a, &a), a.mul_schoolbook(&a), "square {a_len}");
+        }
+    }
+
+    #[test]
+    fn deep_recursion_with_small_leaf() {
+        for (limbs, leaf) in [(64, 256), (150, 512), (300, 256), (513, 1024)] {
+            let a = fixture(limbs, 11 + limbs as u64);
+            let b = fixture(limbs - 3, 29 + limbs as u64);
+            let n = top_ring_bits(a.bits() + b.bits());
+            let mut work = Work::default();
+            assert_eq!(
+                multiply_mod_with(&a, &b, n, leaf, &mut work),
+                a.mul_schoolbook(&b),
+                "limbs {limbs} leaf {leaf}"
+            );
+            assert!(work.depth >= 2, "limbs {limbs} leaf {leaf}: {work:?}");
+            let n = top_ring_bits(2 * a.bits());
+            let mut work = Work::default();
+            assert_eq!(multiply_mod_with(&a, &a, n, leaf, &mut work), a.mul_schoolbook(&a));
         }
     }
 
     #[test]
     fn negative_coefficients_endpoint_and_long_carries() {
         for n in [8192, 16384, 32768] {
-            let ring = Fermat::new(n);
-            let near = pow2(n).sub_small(1);
-            let mut work = Work::default();
-            assert_eq!(
-                multiply_mod(&near, &near, n, &mut work, 0),
-                Big::from_u64(4)
-            );
-            assert_eq!(
-                multiply_mod(&pow2(n), &near, n, &mut work, 0),
-                Big::from_u64(2)
-            );
-            assert_eq!(
-                multiply_mod(&pow2(n), &pow2(n), n, &mut work, 0),
-                Big::from_u64(1)
-            );
-            let a = fixture(n / 64, 123);
-            let b = fixture(n / 64, 456);
-            let expected = a.mul(&b).divrem(&ring.modulus).1;
-            assert_eq!(multiply_mod(&a, &b, n, &mut work, 0), expected);
-        }
-    }
-
-    #[test]
-    fn shifts_and_retained_transform_layout() {
-        let ring = Fermat::new(96);
-        for input in [Big::zero(), Big::from_u64(1), pow2(96), fixture(1, 99)] {
-            for exponent in [0, 1, 63, 95, 96, 97, 191, 192, 377] {
-                assert_eq!(
-                    ring.shift(&input, exponent),
-                    input.shl(exponent).divrem(&ring.modulus).1
-                );
+            for leaf in [256, 1024, LEAF_BITS] {
+                let near = pow2(n).sub_small(1);
+                let mut work = Work::default();
+                let mut run = |a: &Big, b: &Big| multiply_mod_with(a, b, n, leaf, &mut work);
+                assert_eq!(run(&near, &near), Big::from_u64(4));
+                assert_eq!(run(&pow2(n), &near), Big::from_u64(2));
+                assert_eq!(run(&pow2(n), &pow2(n)), Big::from_u64(1));
+                assert_eq!(run(&Big::zero(), &near), Big::zero());
+                let a = fixture(n / 64, 123);
+                let b = fixture(n / 64, 456);
+                let expected = a.mul_schoolbook(&b).divrem(&modulus(n)).1;
+                assert_eq!(run(&a, &b), expected, "n {n} leaf {leaf}");
+                let expected = a.mul_schoolbook(&a).divrem(&modulus(n)).1;
+                assert_eq!(run(&a, &a), expected, "square n {n} leaf {leaf}");
             }
         }
-        let mut values = (0..16)
-            .map(|j| Big::from_u64(j * j + 3))
-            .collect::<Vec<_>>();
-        let original = values.clone();
-        let mut work = Work::default();
-        transform(&mut values, &ring, false, &mut work);
-        transform(&mut values, &ring, true, &mut work);
-        assert_eq!(values, original);
     }
 
     #[test]
-    fn non_aligned_bit_chunks_and_euclidean_carry() {
+    fn ring_primitives_against_big_oracle() {
+        for m in [1usize, 2, 3, 5] {
+            let n = 64 * m;
+            let p = modulus(n);
+            let inputs = [
+                Big::zero(),
+                Big::from_u64(1),
+                Big::from_u64(2),
+                pow2(n - 1),
+                pow2(n - 1).add_small(1),
+                pow2(n).sub_small(1),
+                pow2(n),
+                fixture(m, 99).divrem(&p).1,
+                fixture(m, 7).divrem(&p).1,
+            ];
+            let mut wide = vec![0u64; 2 * m];
+            for x in &inputs {
+                let ex = element(x, m);
+                for exponent in [0, 1, 63, 64, 65, n - 1, n, n + 1, 2 * n - 1, 2 * n, 3 * n + 5] {
+                    let mut out = vec![0u64; m + 1];
+                    shift_mod(&ex, exponent, &mut out, &mut wide);
+                    assert_eq!(
+                        Big::from_limbs(&out),
+                        x.shl(exponent).divrem(&p).1,
+                        "m {m} shift {exponent}"
+                    );
+                }
+                let mut negated = ex.clone();
+                neg_in_place(&mut negated);
+                assert_eq!(Big::from_limbs(&negated), p.sub(x).divrem(&p).1);
+                assert_eq!(greater_than_half(&ex), x > &pow2(n - 1));
+                for y in &inputs {
+                    let ey = element(y, m);
+                    let mut sum = ex.clone();
+                    add_mod(&mut sum, &ey);
+                    assert_eq!(Big::from_limbs(&sum), x.add(y).divrem(&p).1);
+                    let mut difference = vec![0u64; m + 1];
+                    sub_mod(&mut difference, &ex, &ey);
+                    assert_eq!(Big::from_limbs(&difference), x.add(&p).sub(y).divrem(&p).1);
+                }
+            }
+            for t in [-3i64, -1, 0, 1, 3] {
+                for lo in [Big::zero(), Big::from_u64(1), pow2(n).sub_small(1)] {
+                    let mut x = element(&lo, m);
+                    fold(&mut x, t);
+                    let expected = if t >= 0 {
+                        lo.add(&p).add(&p).sub_small(t as u64).divrem(&p).1
+                    } else {
+                        lo.add_small(t.unsigned_abs()).divrem(&p).1
+                    };
+                    assert_eq!(Big::from_limbs(&x), expected, "fold m {m} t {t}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn retained_transform_layout_round_trip() {
+        for (m, len) in [(1usize, 16usize), (2, 8), (3, 64)] {
+            let s = m + 1;
+            let p = modulus(64 * m);
+            let mut sc = Scratch::new(m);
+            let mut work = Work::default();
+            let mut data = vec![0u64; len * s];
+            for (j, c) in data.chunks_exact_mut(s).enumerate() {
+                let value = fixture(m, j as u64 + 1).divrem(&p).1;
+                c.copy_from_slice(&element(&value, m));
+            }
+            if len > 4 {
+                data[s..2 * s].fill(0);
+                data[2 * s + m] = 1; // the endpoint 2^K
+                data[2 * s..2 * s + m].fill(0);
+            }
+            let original = data.clone();
+            forward(&mut data, len, s, &mut sc, &mut work);
+            inverse(&mut data, len, s, &mut sc, &mut work);
+            // The inverse omits 1/len: compare against len * original.
+            for (got, want) in data.chunks_exact(s).zip(original.chunks_exact(s)) {
+                let want = Big::from_limbs(want).mul_small(len as u64).divrem(&p).1;
+                assert_eq!(Big::from_limbs(got), want);
+            }
+        }
+    }
+
+    #[test]
+    fn plan_dimensions_are_valid() {
+        let mut k = 256 * 64;
+        while k <= 1 << 26 {
+            for extra in [0, 64, 4096] {
+                let kk = top_ring_bits(k + extra);
+                let (len, width, child) = plan(kk, LEAF_BITS);
+                assert!(len.is_power_of_two() && len >= 4);
+                assert_eq!(len * width, kk);
+                assert!(child.is_multiple_of(64) && child.is_multiple_of(len));
+                assert!(child >= 2 * width + len.trailing_zeros() as usize + 2);
+                assert!(child < kk);
+            }
+            k *= 2;
+        }
+    }
+
+    #[test]
+    fn non_aligned_bit_chunks() {
         let x = fixture(8, 777);
         for offset in [0, 1, 63, 64, 65, 127, 333, 512] {
             for width in [0, 1, 33, 64, 65, 135] {
@@ -448,12 +786,5 @@ mod tests {
                 assert_eq!(bit_slice(&x, offset, width), expected);
             }
         }
-        let mut c = Carry {
-            negative: true,
-            magnitude: Big::from_u64(257),
-        };
-        assert_eq!(c.take_digit(8, &pow2(8)), Big::from_u64(255));
-        assert!(c.negative);
-        assert_eq!(c.magnitude, Big::from_u64(2));
     }
 }

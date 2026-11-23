@@ -18,6 +18,12 @@ use std::sync::Arc;
 
 /// Word-based reference, independent of the candidate's byte transforms.
 /// Each inner sum is at most (2^64-1)^2 + 2(2^64-1) = 2^128-1.
+fn word_bits(x: &[u64]) -> usize {
+    x.iter()
+        .rposition(|&v| v != 0)
+        .map_or(0, |i| 64 * i + 64 - x[i].leading_zeros() as usize)
+}
+
 fn word_product(a: &[u64], b: &[u64]) -> Vec<u64> {
     let mut out = vec![0; a.len() + b.len()];
     for (i, &x) in a.iter().enumerate() {
@@ -154,8 +160,32 @@ fn published_selection_reports_base_case_and_actual_prerequisite_work() {
                     dimension: 1
                 }
             ));
-            assert!(prerequisite.transform_nodes > 0);
+            // The receipt names the branch that ran: the Fermat recursion
+            // only above the fixed product-length cutoff.
+            let bits = word_bits(&a) + word_bits(&b);
+            assert_eq!(
+                prerequisite.transform_nodes > 0,
+                bits > isogeny_algos::subnlogn::fastint::BASE_BITS
+            );
             assert!(prerequisite.schoolbook_leaves > 0);
+        }
+        PublishedExecution::Transform { .. } => {
+            panic!("native input did not enter the literal family")
+        }
+    }
+    // Above the cutoff the published base case runs the Fermat recursion.
+    let large_a: Vec<_> = (0..2100u64)
+        .map(|i| i.wrapping_mul(0x9e37_79b9_7f4a_7c15) ^ u64::MAX)
+        .collect();
+    let large_b: Vec<_> = (0..2060u64)
+        .map(|i| i.wrapping_mul(0xd1b5_4a32_d192_ed03))
+        .collect();
+    let large = multiply_published(&large_a, &large_b).unwrap();
+    assert_eq!(large.limbs, word_product(&large_a, &large_b));
+    match large.execution {
+        PublishedExecution::BaseCase { prerequisite, .. } => {
+            assert!(prerequisite.transform_nodes > 0);
+            assert!(prerequisite.butterflies > 0);
         }
         PublishedExecution::Transform { .. } => {
             panic!("native input did not enter the literal family")
