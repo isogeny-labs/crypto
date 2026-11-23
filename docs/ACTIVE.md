@@ -352,7 +352,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 - [ ] Audit and independently validate two-hop Richelot prime-field descent with fixed-point-free order-three action on two-torsion; preserve prior forced-return results and distinguish a descended morphism from a rational endpoint (Codex, started 2026-11-23, branch lane/chained-twohop-descent-20261123, PR #4992).
 
-- [ ] Investigate longer 2-power Jacobian descent with absent rational two-torsion; audit characteristic kernel layers and rational Richelot factorization before selecting a new native/formal unit (Codex, started 2026-11-23, branch lane/chained-2power-descent-20261123).
+- [ ] Investigate longer 2-power Jacobian descent with absent rational two-torsion; audit characteristic kernel layers and rational Richelot factorization before selecting a new native/formal unit (Codex, started 2026-11-23, branch lane/chained-2power-descent-20261123, PR #4997).
 
 ## Blocked / questions for the owner
 
