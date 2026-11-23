@@ -2,14 +2,14 @@
 
 User goal starts at crypto3877 and spans crypto/cryptanalysis plus locked
 crypto-autoresearcher. This mutable queue succeeds the inherited Jacobian
-queue. Current draft5072 owns actual3-torsion conic certificates; all
+queue. Completed scoped5072 actual3-torsion conic certificate unit; draft5077 owns separate native audit; all
 scientific standing unsigned. KB/Conductor unavailable, no novelty
 clearance; never enter VLT1 or run research-kb. [pcc:unverified]
 
 | Priority | State | Next discriminating action / evidence |
 |---|---|---|
-| 0 | Native actual3-torsion result complete | Source5759530, data d9f917, written proof05a984: all16 cells, sign−8/8 certificates, sign+0/8 common-degree3; all7 strict phases0, guards[]. Package source-linked visual/PDF/all-page inspection, publish/read back complete result/report, mark scoped task ready. |
-| 1 | Next unblocked | Separate tracked independent Rust verifier: parse frozen full raw, rebuild fibre constraints with independent arithmetic/polynomial routines, verify conic divisors and printed rank minors/nullspaces without rerunning candidate search. Real altered-conic/minor/sign/control then restore; preserve all16 cells. Check written group-scheme descent/H/Tminus algebra independently. |
+| 0 | Native actual3-torsion result/report complete | Source5759530, data d9f917, written proof05a984: all16 cells, sign−8/8 certificates, sign+0/8 common-degree3; all7 strict phases0, guards[]. Complete result1b04550 and inspected2page report93bce13, all46/29 files full readback; reportd89889. Ready scoped unit after final metadata push; main ledger fork blocks merge. |
+| 1 | In progress5077 | Separate tracked independent Rust verifier: parse frozen full raw, rebuild fibre constraints with independent arithmetic/polynomial routines, verify conic divisors and printed rank minors/nullspaces without rerunning candidate search. Real altered-conic/minor/sign/control then restore; preserve all16 cells. Check written group-scheme descent/H/Tminus algebra independently. |
 | 2 | Actual map continuation | Actual beta=(phi1,−g,g−phi3), g=(phi0−phi1−phi3*pi)/3, B=beta*Tminus. Transport frozen non2divisible H maps via actual beta, construct exact J4/kernel/pairing and chained adjoint [4] maps, implement real divisor/target evaluation with full costs. No previous H census replay. |
 | 3 | Computational admission | Seek quantitative prime-field mechanism and strongest original elliptic baselines with setup/conversion/maps/solve/replay/memory. Same-prime transfers do not descend to a proper subfield. Separate future admission before advantage benchmarks. |
 | 4 | Prior negatives complete | F5 full-family PE-cube negative, sign-independent0-of144 mixed filter, G2 chains and strong automorphism baseline all retained. Earlier raw dual−2 correction and format/source defects immutable; no repeated old cohorts. |
