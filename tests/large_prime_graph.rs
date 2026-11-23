@@ -1650,6 +1650,8 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
     let capped = evaluate_stream("cap", &source, ell, &p).unwrap();
     assert!(capped.forest_filter.is_none());
     assert_eq!(capped.forest_skip_reason.as_deref(), Some("row_cap"));
+    assert!(capped.pivot_filter.exact_projected_rank.is_none());
+    assert!(capped.mst_filter.exact_projected_rank.is_none());
 
     p.forest_max_rows = 32;
     let mut wider = source.clone();
@@ -1660,6 +1662,8 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
     let skipped = evaluate_stream("arity3", &wider, ell, &p).unwrap();
     assert!(skipped.forest_filter.is_none());
     assert_eq!(skipped.forest_skip_reason.as_deref(), Some("arity_above_two"));
+    assert!(skipped.pivot_filter.exact_projected_rank.is_none());
+    assert!(skipped.mst_filter.exact_projected_rank.is_none());
 }
 
 #[test]
