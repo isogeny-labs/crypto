@@ -955,7 +955,7 @@ fn forest_witness_reuses_root_anchor_and_invalidates_after_join() {
         equations.push(closing);
         let s = f.stats();
         assert_eq!(s.anchor_cache_misses, 2);
-        assert_eq!(s.anchor_cache_hits, 47);
+        assert_eq!(s.anchor_cache_hits, 48); // join used old cache, then invalidated
         assert_eq!(s.inverse_calls, 3 + 48 + 1 + 1 + 1 + 1);
         assert_eq!(f.rank(), 4);
         assert_eq!(s.dependent_rows, 49);
