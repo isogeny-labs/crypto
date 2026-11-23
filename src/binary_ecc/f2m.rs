@@ -264,9 +264,44 @@ impl F2mElement {
     /// first, big-endian byte order).  Useful for ingesting NIST
     /// curve constants.
     pub fn from_hex(hex: &str, m: u32) -> Self {
+        if let Some(value) = Self::from_ascii_hex(hex, m) {
+            return value;
+        }
         let cleaned: String = hex.chars().filter(|c| !c.is_whitespace()).collect();
         let big = BigUint::parse_bytes(cleaned.as_bytes(), 16).expect("invalid hex");
         Self::from_biguint(&big, m)
+    }
+
+    /// Ordinary hexadecimal coordinates need neither a cleaned String nor
+    /// a temporary BigUint. Unusual accepted syntax keeps the original parser.
+    fn from_ascii_hex(hex: &str, m: u32) -> Option<Self> {
+        if hex.is_empty() {
+            return None;
+        }
+        let mut out = Self::zero(m);
+        let mut chunks = hex.as_bytes().rchunks_exact(8);
+        for (i, chunk) in chunks.by_ref().enumerate() {
+            let value = parse_ascii_hex8(chunk)? as u64;
+            if i / 2 < out.bits.len() {
+                out.bits[i / 2] |= value << ((i % 2) * 32);
+            }
+        }
+        let mut prefix = 0u32;
+        for &byte in chunks.remainder() {
+            let digit = match byte {
+                b'0'..=b'9' => byte - b'0',
+                b'a'..=b'f' => byte - b'a' + 10,
+                b'A'..=b'F' => byte - b'A' + 10,
+                _ => return None,
+            };
+            prefix = (prefix << 4) | digit as u32;
+        }
+        let i = hex.len() / 8;
+        if i / 2 < out.bits.len() {
+            out.bits[i / 2] |= (prefix as u64) << ((i % 2) * 32);
+        }
+        out.mask_in_place();
+        Some(out)
     }
 
     pub fn from_biguint(v: &BigUint, m: u32) -> Self {
@@ -711,6 +746,59 @@ impl F2mElement {
         e.mask_in_place();
         e
     }
+}
+
+/// Validate and pack eight ASCII hex digits. SSE2 is part of x86-64's
+/// baseline; this needs no stronger feature or unchecked input load.
+#[cfg(target_arch = "x86_64")]
+#[inline]
+fn parse_ascii_hex8(bytes: &[u8]) -> Option<u32> {
+    use std::arch::x86_64::*;
+    let word = u64::from_le_bytes(bytes.try_into().ok()?);
+    // SAFETY: x86-64 guarantees SSE2; all operations are register-only.
+    unsafe {
+        let v = _mm_cvtsi64_si128(word as i64);
+        let lower = _mm_or_si128(v, _mm_set1_epi8(0x20));
+        let digits = _mm_and_si128(
+            _mm_cmpgt_epi8(v, _mm_set1_epi8(b'0' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b':' as i8), v),
+        );
+        let letters = _mm_and_si128(
+            _mm_cmpgt_epi8(lower, _mm_set1_epi8(b'a' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b'g' as i8), lower),
+        );
+        if _mm_movemask_epi8(_mm_or_si128(digits, letters)) & 255 != 255 {
+            return None;
+        }
+        let high = _mm_and_si128(_mm_srli_epi16::<6>(v), _mm_set1_epi8(1));
+        let nibble = _mm_add_epi8(
+            _mm_and_si128(v, _mm_set1_epi8(15)),
+            _mm_mullo_epi16(high, _mm_set1_epi16(9)),
+        );
+        let pairs = _mm_and_si128(
+            _mm_or_si128(_mm_slli_epi16::<4>(nibble), _mm_srli_epi16::<8>(nibble)),
+            _mm_set1_epi16(255),
+        );
+        let packed = _mm_packus_epi16(pairs, _mm_setzero_si128());
+        Some((_mm_cvtsi128_si32(packed) as u32).swap_bytes())
+    }
+}
+
+#[cfg(not(target_arch = "x86_64"))]
+#[inline]
+fn parse_ascii_hex8(bytes: &[u8]) -> Option<u32> {
+    if bytes.len() != 8 {
+        return None;
+    }
+    bytes.iter().try_fold(0u32, |value, &byte| {
+        let digit = match byte {
+            b'0'..=b'9' => byte - b'0',
+            b'a'..=b'f' => byte - b'a' + 10,
+            b'A'..=b'F' => byte - b'A' + 10,
+            _ => return None,
+        };
+        Some((value << 4) | digit as u32)
+    })
 }
 
 // ── Absolute trace and half-trace ─────────────────────────────────
@@ -1535,6 +1623,48 @@ pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
+    use std::arch::x86_64::*;
+    // The length checks also preserve memory safety for a short output:
+    // that case falls through to the original bounds-checked loop.
+    if a.len() == b.len() && (a.len() == 2 || a.len() == 3) && out.len() >= 2 * a.len() {
+        let av = _mm_loadu_si128(a.as_ptr().cast());
+        let bv = _mm_loadu_si128(b.as_ptr().cast());
+        let p0 = _mm_clmulepi64_si128::<0x00>(av, bv);
+        let p1 = _mm_clmulepi64_si128::<0x11>(av, bv);
+        let a01 = _mm_xor_si128(av, _mm_srli_si128::<8>(av));
+        let b01 = _mm_xor_si128(bv, _mm_srli_si128::<8>(bv));
+        let m01 = _mm_xor_si128(
+            _mm_clmulepi64_si128::<0x00>(a01, b01),
+            _mm_xor_si128(p0, p1),
+        );
+        let low = _mm_xor_si128(p0, _mm_slli_si128::<8>(m01));
+        let mut middle = _mm_xor_si128(p1, _mm_srli_si128::<8>(m01));
+        if a.len() == 3 {
+            let a2 = _mm_cvtsi64_si128(a[2] as i64);
+            let b2 = _mm_cvtsi64_si128(b[2] as i64);
+            let p2 = _mm_clmulepi64_si128::<0x00>(a2, b2);
+            let m02 = _mm_xor_si128(
+                _mm_clmulepi64_si128::<0x00>(_mm_xor_si128(av, a2), _mm_xor_si128(bv, b2)),
+                _mm_xor_si128(p0, p2),
+            );
+            let m12 = _mm_xor_si128(
+                _mm_clmulepi64_si128::<0x00>(
+                    _mm_xor_si128(_mm_srli_si128::<8>(av), a2),
+                    _mm_xor_si128(_mm_srli_si128::<8>(bv), b2),
+                ),
+                _mm_xor_si128(p1, p2),
+            );
+            middle = _mm_xor_si128(middle, _mm_xor_si128(m02, _mm_slli_si128::<8>(m12)));
+            let high = _mm_xor_si128(p2, _mm_srli_si128::<8>(m12));
+            let old = _mm_loadu_si128(out.as_ptr().add(4).cast());
+            _mm_storeu_si128(out.as_mut_ptr().add(4).cast(), _mm_xor_si128(old, high));
+        }
+        let old = _mm_loadu_si128(out.as_ptr().cast());
+        _mm_storeu_si128(out.as_mut_ptr().cast(), _mm_xor_si128(old, low));
+        let old = _mm_loadu_si128(out.as_ptr().add(2).cast());
+        _mm_storeu_si128(out.as_mut_ptr().add(2).cast(), _mm_xor_si128(old, middle));
+        return;
+    }
     for (i, &ai) in a.iter().enumerate() {
         for (j, &bj) in b.iter().enumerate() {
             let (lo, hi) = clmul64_hw(ai, bj);
@@ -1777,6 +1907,97 @@ fn reduce_chunked(value: &mut [u64], irreducible: &IrreduciblePoly) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn direct_hex_matches_legacy_at_word_boundaries_and_preserves_syntax() {
+        let mut seed = 0x50cc_2a13_2026_1123u64;
+        for m in [0, 1, 5, 63, 64, 65, 83, 127, 128, 131, 192, 576, 577, 600] {
+            for len in 1..=170 {
+                let text: String = (0..len)
+                    .map(|_| {
+                        seed ^= seed << 13;
+                        seed ^= seed >> 7;
+                        seed ^= seed << 17;
+                        b"0123456789aBcDeF"[(seed & 15) as usize] as char
+                    })
+                    .collect();
+                let expected = F2mElement::from_biguint(
+                    &BigUint::parse_bytes(text.as_bytes(), 16).unwrap(),
+                    m,
+                );
+                assert_eq!(F2mElement::from_hex(&text, m), expected, "m={m}, len={len}");
+            }
+            for text in ["+a", "1_2_", "  +A_B\t", "\u{2003}FF\u{a0}00", "0__"] {
+                let cleaned: String = text.chars().filter(|c| !c.is_whitespace()).collect();
+                let expected = F2mElement::from_biguint(
+                    &BigUint::parse_bytes(cleaned.as_bytes(), 16).unwrap(),
+                    m,
+                );
+                assert_eq!(F2mElement::from_hex(text, m), expected);
+            }
+        }
+        for text in [
+            "",
+            "  ",
+            "+",
+            "_1",
+            "0x12",
+            "abcdefg",
+            "g000000000000000000000000",
+        ] {
+            assert!(std::panic::catch_unwind(|| F2mElement::from_hex(text, 5)).is_err());
+        }
+    }
+
+    #[test]
+    fn hex_eight_digit_pack_validates_every_byte_at_every_position() {
+        for position in 0..8 {
+            for byte in 0..=255u8 {
+                let mut text = *b"a1B2c3D4";
+                text[position] = byte;
+                let expected = if text.iter().all(u8::is_ascii_hexdigit) {
+                    Some(u32::from_str_radix(std::str::from_utf8(&text).unwrap(), 16).unwrap())
+                } else {
+                    None
+                };
+                assert_eq!(
+                    parse_ascii_hex8(&text),
+                    expected,
+                    "position={position}, byte={byte}"
+                );
+            }
+        }
+        assert_eq!(parse_ascii_hex8(b"1234567"), None);
+        assert_eq!(parse_ascii_hex8(b"123456789"), None);
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn unrolled_clmul_matches_every_basis_pair_and_preserves_accumulation() {
+        if !has_hw_clmul() {
+            return;
+        }
+        for limbs in [2usize, 3] {
+            for i in 0..64 * limbs {
+                for j in 0..64 * limbs {
+                    let mut a = [0; 3];
+                    let mut b = [0; 3];
+                    a[i / 64] = 1u64 << (i % 64);
+                    b[j / 64] = 1u64 << (j % 64);
+                    let mut actual = [0x50c0_ffee_1310_0083u64; 8];
+                    let mut expected = actual;
+                    expected[(i + j) / 64] ^= 1u64 << ((i + j) % 64);
+                    mul_words_into(&a[..limbs], &b[..limbs], &mut actual);
+                    assert_eq!(actual, expected, "limbs={limbs}, i={i}, j={j}");
+                }
+            }
+            let mut short = vec![0u64; 2 * limbs - 1];
+            assert!(std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                mul_words_into(&[u64::MAX; 3][..limbs], &[u64::MAX; 3][..limbs], &mut short)
+            }))
+            .is_err());
+        }
+    }
 
     /// Addition in `F_2^m` is XOR; verify on a small concrete case.
     #[test]

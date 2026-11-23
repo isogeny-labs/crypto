@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261123T1918Z-ecc2k-halftrace-primary",
+  "latest_record": "20261123T2303Z-ecc2k-cold50-incumbent-profile",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 8,
-    "measured": 315,
+    "measured": 316,
     "open": 62
   },
   "repo": "crypto",
@@ -31202,6 +31202,32 @@
       ],
       "problem": "kernel:ecbench_wallfix_prs",
       "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 34987635.0,
+      "latest": 34987635.0,
+      "latest_derived": {},
+      "metric": "whole_cold_ir",
+      "points": [
+        {
+          "commit": "ad5f91c4b439",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 2,
+          "record": "20261123T2303Z-ecc2k-cold50-incumbent-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            34987635.0,
+            34987635.0
+          ],
+          "summary": "Two identical source-bound incumbent profiles identify exact input conversion and arithmetic hotspots; no gain or50% conclusion.",
+          "value": 34987635.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-cold50",
+      "unit": "ir"
     },
     {
       "better": "lower",
