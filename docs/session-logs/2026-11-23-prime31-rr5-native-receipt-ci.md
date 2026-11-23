@@ -30,3 +30,27 @@
 - No native `rustc`/`cargo`, Conductor, research-KB, subagent launcher, EKS credentials or local GitHub clone in this execution container; GitHub Actions source-bound validation was substituted. Tool calls read repository and run records concurrently; **one actual coordinator, zero native workers**, no independent signed validator. No scientific benchmark or EKS paid compute was initiated.
 - The current canonical shared `docs/session-logs/2026-11-23.md` is >1 MB, `fetch_file` returned empty content and earlier handoff identified unresolved conflict markers. Did not overwrite it; wrote this append-only supplemental dated log.
 - No pass is asserted from the first two CI runs. The second failure is an actionable inherited source compiler defect, not evidence against ECDLP algorithm correctness or performance. [pcc:unverified]
+
+
+## 2026-11-23 UTC — source-bound execution qualified after repair (two green CI runs)
+
+### What was done (commands, files, features)
+
+- Read exact workflow-run job steps and downloaded complete preserved result artifacts for [#45239291528](https://github.com/isogeny-labs/crypto/actions/runs/45239291528) and [#45239466847](https://github.com/isogeny-labs/crypto/actions/runs/45239466847). Both run the original existing Rust checker with Rust 1.100.0 and complete successfully; **19/19 Rust tests passed, 0 failed, 0 ignored** in the actual `test.stdout`. The second run used git SHA `0297bc50c3b986bec1fe3fb451fd6092d7fc5e71`. Parent `test.exit=0`, and the source SHA256 replay returned OK for all eight source/fixture/dependency files. New compiled checker blob `d3ebbe79b09266acd541c3804c215c8d8d830a2e` retains the E0382 move fix.
+- Frozen second green artifact [#14850584102](https://github.com/isogeny-labs/crypto/actions/runs/45239466847/artifacts/14850584102) includes executable hash `784492368dbd25cd4fd10b0e53776b24686bee90a80bc60eb5bdae25ea503ec0`, resolved helper lock hash `a6123e8bb420a0ae63745b7a9b285fea0e70930058dd6dd02fe1ccff5c4570f1`, `rustc 1.100.0 (0ef1bc386 2026-11-09)`, compile JSON and stderr, test stdout/stderr, and source hashes. Evidence summary checked into [qualification report](../research/cheap_ecdlp_cold_gate_20261123/RUST_NATIVE_QUALIFICATION_20261123.md).
+- Preserved both earlier failures: #45238680831 sparse checkout missing F4 file; #45238957031 inherited Rust E0382 move error (before `std::mem::take` fix). #45239200514 was canceled by serial workflow concurrency; no false pass assigned to it.
+
+### Decisions made (and why)
+
+- Report **original-Rust native test pass at two source-bound revisions** only, not blind relation recovery, full cold speedup or signed PCC. The native test suite checks fixtures and failure admissions but does not validate extracted unknown-index B677 production streams. No competing benchmark, extra automation, producer change, EKS compute, merge or leaderboard promotion.
+- Preserve the draft PR until its independent-validation/merge requirements are resolved. Do not touch ownership of RR5 B677, graph, S3, transfer or maintained rho.
+
+### Open threads (unfinished, pick up next time)
+
+- Independently attest the compiled original-Rust run and its known-answer/mutation scope via PCC as permitted; record signed verdict rather than self-declaring it.
+- Freeze helper-specific Cargo.lock across runs if mandated by qualification (current exact locks and hashes are archived **per run**, but no lock is committed).
+- Obtain actual **blind unknown-index** accepted B677 relation stream from owning producer lane, verify its target separation weights and complete recovery, then charge full cold cost under reserved matched best-IC / optimized-rho / BSGS protocol. Negative/censored rows must remain.
+
+### Errors (what went wrong, how it was handled)
+
+- Earlier sparse-source and moved-value compiler failures are preserved with exact run IDs and artifacts, not overwritten by green runs. One coordinator, **zero spawned native subagents**; independent read operations overlapped but no independently signed validation or elapsed-time speed gain is inferred. [pcc:unverified]
