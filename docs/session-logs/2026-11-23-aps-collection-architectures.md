@@ -2,8 +2,9 @@
 
 ## What was done
 
-Tracked the four requested leads in draft PR #5091 with the required isolated
-ACTIVE-only first commit. Source e791ac91f7535cdc7bcd2c0ee09aa3c1af523621
+Opened draft PR #5091 before implementation. The intended ACTIVE-only tracking
+edit initially matched an obsolete heading and produced no file delta; final
+queue registration corrects that administrative error without rewriting history. Source e791ac91f7535cdc7bcd2c0ee09aa3c1af523621
 implements bounded native large-point partials, recursive pair supports, coupled
 target rows and pilot-frozen partitions. Dedicated four-arm qualification
 completed; repeat bytes agree. Exact source/build/pre/post and normalized
@@ -46,3 +47,7 @@ Clippy index-only loop fixed without suppression. One relative-path PCC lookup
 returned3; exact-ID lookup returned not_covered/2. Prose lint required an
 unverified tag in the frozen plan; only that post-call editorial annotation was
 added, with the original source pin retained. Raw logs stay private.
+
+Final publication review caught the unchanged ACTIVE marker: the current header
+is `Active items`, not the older `Active items (top = next)`. Corrected the
+queue and preserved all other sessions' entries; code/lock/frozen reports unchanged.
