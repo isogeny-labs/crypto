@@ -149,6 +149,31 @@ impl Fp<'_> {
         if Self::jacobi_symbol(value, p) != 1 {
             return None;
         }
+        // Atkin's single-exponent square-root formula for p ≡ 5 (mod 8).
+        // For a quadratic residue a, with v=(2a)^((p-5)/8),
+        // i=2a*v² is a square root of -1, and r=a*v*(i-1)
+        // satisfies r²=a. Keep Jacobi rejection before this branch:
+        // computing a candidate for nonsquares is a severe regression.
+        if p & 7 == 5 {
+            let twice = self.mul(2 % p, value);
+            let v = self.pow(twice, (p - 5) / 8);
+            let v_squared = self.mul(v, v);
+            let i = self.mul(twice, v_squared);
+            let av = self.mul(value, v);
+            let factor = self.sub(i, 1);
+            let candidate = self.mul(av, factor);
+            return if self.mul(candidate, candidate) == value {
+                Some(candidate)
+            } else {
+                None
+            };
+        }
+        // High 2-adicity makes Tonelli-Shanks repeatedly scan and square
+        // roots of unity. For s >= 20, Cipolla's Fp2 exponentiation is
+        // faster on the tested NTT-friendly prime fields.
+        if (p - 1).trailing_zeros() >= 20 {
+            return self.sqrt_cipolla(value);
+        }
         let s = (p - 1).trailing_zeros();
         let q = (p - 1) >> s;
         let mut z = 2u64;
@@ -181,6 +206,79 @@ impl Fp<'_> {
             m = i;
         }
         Some(r)
+    }
+
+    // Multiplication in F_p[theta]/(theta^2-w), using three base-field
+    // products plus w * (a1*b1). All inputs are canonical residues.
+    #[inline]
+    fn mul_quadratic_extension(
+        &mut self,
+        a: (u64, u64),
+        b: (u64, u64),
+        w: u64,
+    ) -> (u64, u64) {
+        let u = self.mul(a.0, b.0);
+        let v = self.mul(a.1, b.1);
+        let lhs = self.add(a.0, a.1);
+        let rhs = self.add(b.0, b.1);
+        let cross = self.mul(lhs, rhs);
+        let wv = self.mul(w, v);
+        let real = self.add(u, wv);
+        let imag = self.sub(self.sub(cross, u), v);
+        (real, imag)
+    }
+
+    #[inline]
+    fn square_quadratic_extension(&mut self, a: (u64, u64), w: u64) -> (u64, u64) {
+        let xx = self.mul(a.0, a.0);
+        let yy = self.mul(a.1, a.1);
+        let xy = self.mul(a.0, a.1);
+        let wyy = self.mul(w, yy);
+        (self.add(xx, wyy), self.add(xy, xy))
+    }
+
+    // Cipolla: for nonzero square a over an odd prime field, find t such
+    // that w=t^2-a is a nonsquare; (t+theta)^((p+1)/2) lies in F_p and
+    // squares to a, where theta^2=w. Verify before returning.
+    //
+    // The caller has already rejected nonresidues with the Jacobi symbol.
+    // Only use this for fields with v2(p-1)>=20; ordinary Tonelli-Shanks
+    // is faster at low 2-adicity.
+    fn sqrt_cipolla(&mut self, a: u64) -> Option<u64> {
+        let p = self.p;
+        let mut t = 1u64;
+        let w = loop {
+            let tt = self.mul(t, t);
+            let w = self.sub(tt, a);
+            if Self::jacobi_symbol(w, p) == -1 {
+                break w;
+            }
+            t += 1;
+            if t >= p {
+                // Defensive fallback for an invalid modulus.
+                return None;
+            }
+        };
+        let mut exponent = (p + 1) / 2;
+        let mut base = (t, 1);
+        let mut root = (1, 0);
+        while exponent != 0 {
+            if exponent & 1 != 0 {
+                root = self.mul_quadratic_extension(root, base, w);
+            }
+            exponent >>= 1;
+            if exponent != 0 {
+                base = self.square_quadratic_extension(base, w);
+            }
+        }
+        if root.1 != 0 {
+            return None;
+        }
+        if self.mul(root.0, root.0) == a {
+            Some(root.0)
+        } else {
+            None
+        }
     }
 
     // Polynomials, lowest degree first.
@@ -268,13 +366,47 @@ impl Fp<'_> {
         }
         r
     }
+    // Within Euclid's algorithm, remainders are needed only up to a
+    // nonzero field scalar. Pseudo-division eliminates the leading term
+    // without computing an inverse of every intermediate divisor:
+    //   R <- lc(m) * R - lc(R) * x^shift * m.
+    // This is NOT an exact modular remainder and must not be used by
+    // powmod(), where the polynomial residue itself matters.
+    fn pseudo_rem_owned(&mut self, mut r: Vec<u64>, m: &[u64]) -> Vec<u64> {
+        Self::trim(&mut r);
+        let degree = m.len() - 1;
+        if degree == 0 {
+            // A nonzero constant divides every polynomial.
+            return Vec::new();
+        }
+        let leading = m[degree];
+        while r.len() > degree {
+            let len = r.len();
+            let top = r[len - 1];
+            let shift = len - degree - 1;
+            if leading != 1 {
+                for coefficient in &mut r[..len - 1] {
+                    *coefficient = self.mul(*coefficient, leading);
+                }
+            }
+            for (i, &mi) in m[..degree].iter().enumerate() {
+                if mi != 0 {
+                    let term = self.mul(top, mi);
+                    r[shift + i] = self.sub(r[shift + i], term);
+                }
+            }
+            r[len - 1] = 0;
+            Self::trim(&mut r);
+        }
+        r
+    }
     fn gcd(&mut self, a: &[u64], b: &[u64]) -> Vec<u64> {
         let mut a = a.to_vec();
         let mut b = b.to_vec();
         Self::trim(&mut a);
         Self::trim(&mut b);
         while !b.is_empty() {
-            let r = self.rem(&a, &b);
+            let r = self.pseudo_rem_owned(a, &b);
             a = b;
             b = r;
         }
@@ -312,6 +444,14 @@ impl Fp<'_> {
                 return vec![half(neg_b)];
             }
             let square_root = if (p & 3) == 3 {
+                // Negative discriminants occur in roughly half of random
+                // quadratic queries. For <=32-bit primes a Jacobi test
+                // is cheaper than the modular exponentiation it avoids.
+                // This prefilter is intentionally absent from split():
+                // there, a squarefree quadratic factor is known to split.
+                if p <= u32::MAX as u64 && Self::jacobi_symbol(discriminant, p) != 1 {
+                    return Vec::new();
+                }
                 Some(self.pow(discriminant, (p + 1) / 4))
             } else {
                 self.sqrt_tonelli_shanks(discriminant)
@@ -886,6 +1026,42 @@ mod tests {
                     }) == 0
                 }).collect();
                 assert_eq!(roots, brute_force, "ψ3 a={a} b={b}");
+            }
+        }
+    }
+
+
+    #[test]
+    fn round137_pseudoremainder_gcd_matches_exact_field_euclid() {
+        for p in [3u64, 5, 7, 11, 101, 65_521, 1_000_000_007,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x137_2026_11_23u64;
+            for _ in 0..128 {
+                let mut next = || {
+                    state ^= state << 13;
+                    state ^= state >> 7;
+                    state ^= state << 17;
+                    state % p
+                };
+                let mut a = vec![next(), next(), next(), next(), next()];
+                let mut b = vec![next(), next(), next(), next()];
+                if a[4] == 0 { a[4] = 1; }
+                if b[3] == 0 { b[3] = 1; }
+                let mut x = a.clone();
+                let mut y = b.clone();
+                while !y.is_empty() {
+                    let r = field.rem(&x, &y);
+                    x = y;
+                    y = r;
+                }
+                let mut got = field.gcd(&a, &b);
+                if x.len() > 1 { field.make_monic(&mut x); }
+                else if !x.is_empty() { x[0] = 1; }
+                if got.len() > 1 { field.make_monic(&mut got); }
+                else if !got.is_empty() { got[0] = 1; }
+                assert_eq!(got, x, "p={p}, a={a:?}, b={b:?}");
             }
         }
     }
