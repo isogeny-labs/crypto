@@ -29,7 +29,7 @@ Input: `lp_graph_eval` seeded 36-row source, seed 23, 12 LP columns, 8 factor-ba
 
 Required: compare source-invariant fields `modulus, rows, lp_columns, incidences, arity_histogram`; old JSON has neither `forest_filter` nor exact-rank fields; candidate has non-refused forest, exact forest/pivot projected rank and zero source replay failures for completed arms; if MST refuses, its rank must stay absent; cap records `row_cap` without emitting a fake forest rank or paying the extra projected-rank audit.
 
-Commands embedded in `.github/workflows/graph-ic-captured-exact-cli.yml`:
+Commands embedded in `.github/workflows/graph-ic-gain-dsu-native.yml`:
 ```sh
 cargo check --locked --release --example lp_graph_eval --example lp_graph_collect
 cargo run --locked --release --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --out /tmp/graph-default.json
@@ -37,7 +37,7 @@ cargo run --locked --release --example lp_graph_eval -- --seed 23 --rows 36 --lp
 cargo run --locked --release --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 8 --out /tmp/graph-capped.json
 ```
 
-No isolation-grade timing/peak-RSS measurement, cold solve, or optimized-rho comparison is claimed by this CLI check. Only one standard hosted correctness job, 15-minute timeout, no paid compute. The source-bound `tests/large_prime_graph.rs` regression already checks 128 original-block rank identities over five `F_ell` fields and 24 seeded same-stream cases, but this new job specifically tests the actual example admission bridge. **Record the native run's terminal outcome before calling it passing.**
+No isolation-grade timing/peak-RSS measurement, cold solve, or optimized-rho comparison is claimed by this CLI check. Only one standard hosted correctness job, 15-minute timeout, no paid compute. The existing source-bound `tests/large_prime_graph.rs` regression already checks 128 original-block rank identities over five `F_ell` fields and 24 seeded same-stream cases, but this new job specifically tests the actual example admission bridge. **Record the native run's terminal outcome before calling it passing.**
 
 A subsequent bounded *real binary* collector invocation (not executed here) is:
 ```sh
