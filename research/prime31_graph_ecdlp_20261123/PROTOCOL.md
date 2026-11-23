@@ -208,6 +208,55 @@ boundary for this native control. This shows a resource bottleneck at nine
 combined points under these limits. It gives no cost or completeness result
 for a different structured selector or a higher admitted resource cap.
 
+### Separate same-field curve: structured B677 graph partition
+
+The inherited RR5 study also fixes a **different ordinary elliptic curve**
+over the same `p=2^31-1`:
+`y²=x³+847514846x+2087444724`, prime order `2147446831`, generator
+`(625037715,2100627251)`. Its public hybrid selector has 677 distinct
+abscissae. `b677_partition_gate.py` independently recomputes the source
+partition: 509 Dickson points as factor-base vertices and 168 Y7 points as
+external large-prime vertices. It replays the test-side two-base/two-LP
+positive equation with its own integer group law. This second curve cannot
+be mixed into the registered `-3x+21` workload or its same-target comparison.
+
+For a uniform query on this second curve, the exact expected signed **witness
+tuple** counts per draw are:
+
+| Factor-base leaves | LP leaves | Expected witnesses per query |
+| ---: | ---: | ---: |
+| 4 | 0 | 20.593316 |
+| 3 | 1 | 27.349227 |
+| 2 | 2 | 13.512784 |
+| 1 | 3 | 2.943730 |
+| 0 | 4 | 0.238564 |
+
+Each entry is `16*C(509,k)*C(168,4-k)/2147446831`; the exact integer
+numerators and common denominator are in
+`evidence/rr5-b677-prerequisite-01/partition-gate.json`. Four-base rows are
+direct. One-LP rows attach an external vertex to the graph root; two-LP rows
+are signed edges between external vertices. The existing gain-aware DSU and
+rank machinery can eliminate LP columns after exact group replay. The three-
+and four-LP families need a hypergraph or other reduction and are excluded
+from this graph cost case.
+
+The source-bound `rr5-b677-gate --case positive --presentation structured`
+was executed with its frozen 30-second and two-million matrix-entry limits.
+It returned `ResourceLimit`: the next matrix admission needed 2,000,016
+entries. A follow-up with the same curve, fixture, target, and symbolic caps
+raised only matrix admission to eight million; it again returned
+`ResourceLimit`, now requiring 8,000,881 entries. Both runs extracted zero
+rows. The original gate had zero adapter rank because no row reached it,
+although the independent grader supplies a valid two-LP witness.
+`structured-positive.stdout`, `structured-cap8m.json`, their stderr, and
+source hashes preserve these incomplete attempts. The high tuple counts
+therefore establish a **potential relation
+population**, not an achieved relation stream or a cost advantage. The next
+falsifier is a completed source-exact B677 extraction on public `aG+bQ`
+queries with signed-row replay, occupied-LP rank, factor-base projection,
+target scalar recovery, and a cold same-target rho comparison. Graph
+algorithm choices become measurable only after that stream exists.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on

@@ -1,5 +1,7 @@
 use crypto_lib::cryptanalysis::f4_fp::F4ResourceLimits;
-use prime31_algebraic_ic::{check_curve, Arithmetic, Curve, Point};
+use prime31_algebraic_ic::{check_curve, Arithmetic, Curve, Point, PRIME31};
+use prime31_four_summand::b677_fixture::Hybrid677;
+use prime31_four_summand::extractor::extract_hybrid677;
 use prime31_four_summand::extractor::{extract, extract_cofactor, Limits, Status};
 use serde_json::json;
 use std::time::Instant;
@@ -40,6 +42,59 @@ fn signed_sum(points: &[(u64, u64)], terms: &[(usize, i64)]) -> Point {
         sum = ar.add(CURVE, sum, point);
     }
     sum
+}
+
+fn bounded_b677() {
+    let fixture = Hybrid677::build().expect("source-bound B677 fixture");
+    let points = fixture.points();
+    let planted = [(0, 1), (1, 1), (2, -1), (5, 1)];
+    let mut ar = Arithmetic::default();
+    let mut query = None;
+    for (index, sign) in planted {
+        let point = Some(points[index]);
+        let signed = if sign == 1 {
+            point
+        } else {
+            ar.neg(PRIME31, point)
+        };
+        query = ar.add(PRIME31, query, signed);
+    }
+    let started = Instant::now();
+    let result = extract_hybrid677(
+        &fixture,
+        query,
+        Limits {
+            max_degree: 10,
+            seconds: 30,
+            max_polynomial_terms: 20_000,
+            max_assignments: 4096,
+        },
+        F4ResourceLimits {
+            max_pairs: 20_000,
+            max_symbolic_monomials: 8_192,
+            max_matrix_entries: 8_000_000,
+        },
+    );
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "curve": PRIME31,
+            "fixture_certificate": fixture.certificate(),
+            "query": query,
+            "control_planted_terms": planted,
+            "status": format!("{:?}", result.status),
+            "reason": result.reason,
+            "relations": result.relations,
+            "diagnostics": result.diagnostics,
+            "elapsed_ms": started.elapsed().as_millis(),
+            "limits": {"max_pairs": 20_000, "max_symbolic_monomials": 8_192,
+                       "max_matrix_entries": 8_000_000},
+        }))
+        .unwrap()
+    );
+    if !matches!(result.status, Status::Complete | Status::Empty) {
+        std::process::exit(2);
+    }
 }
 
 fn next_word(state: &mut u64) -> u64 {
@@ -118,6 +173,10 @@ fn public_panel() {
 
 fn main() {
     let mode = std::env::args().nth(1).unwrap_or_default();
+    if mode == "b677" {
+        bounded_b677();
+        return;
+    }
     if mode == "panel" {
         public_panel();
         return;
