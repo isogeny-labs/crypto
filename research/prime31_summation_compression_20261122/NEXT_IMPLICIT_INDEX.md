@@ -97,6 +97,16 @@ The optimistic full-rank collection model gives the *necessary* scale T=Omega(n/
 
 For k increasing, one can define primes p_k congruent to -1 mod 2^k (Dirichlet guarantees an individual prime for each k), but **no bound here** proves 2^k >= p_k^delta for any fixed delta>0, or supplies ordinary prime-order curves with sufficiently many liftable fibre points. Those are explicit *additional* asymptotic family obligations, not facts inferred from the fixed Mersenne prime 2^31-1. No assumption of infinitely many Mersenne primes is used.
 
+## E. 2026 static-indexing prior-art gate (discovered after the explicit-table derivation)
+
+The signed m=2 group-sum query is an instance of the *abstract* 3SUM-Indexing task (given an additive list A, preprocess it to answer whether a pair sums to a target), so claiming novelty for the table or for generic preprocessed 2SUM would be incorrect.
+
+- Dinur and Golovnev, **Improved Time-Space Tradeoffs for 3SUM-Indexing**, ICALP 2026 (primary full HTML: https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html) report `T*S=~O(B^(5/2))` in a range of static **space S** and **query time T**, and state that their **preprocessing computation is ~O(B^2)**. Their inversion algorithm returns one index pair or absence with high-probability preprocessing correctness, not the complete list of signed tuples needed for independent rank. The stated T/S tradeoff does **not** imply subquadratic preprocessing cost or exact no-false-negative enumeration.
+- Chung and Larsen, **Stronger 3SUM-Indexing Lower Bounds**, SODA 2023: https://doi.org/10.1137/1.9781611977554.ch19. Its lower bounds are for specified static-data-structure models; they are not unconditional algebraic lower bounds on ECDLP.
+- The ICALP 2026 construction uses modular integer hashing and function substructures. An elliptic-curve group point has a readily computable group law and encoding but, on a prime-order group, **does not have a known efficiently computed additive scalar coordinate without a DLP**. Consequently it is not justified to transfer the integer modular-bucketing construction to E(F_p) by simply identifying it abstractly with Z/nZ. A rigorous adaptation must construct the required compatible bucket/sub-function maps *directly from encodings and group operations* without secretly solving DLP. Even if such an adaptation existed, the cited quadratic preprocessing and one-witness output leave the cold/full-rank gate open.
+
+Therefore the genuinely open adaptation is narrower: an algebraically exploitable **original-curve** implicit signed relation index with (i) efficiently computable compatible bucketing, (ii) exact empty certificates or a proved, correctly priced Las Vegas verification step, (iii) all useful independent rows rather than only one witness, and (iv) preprocessing that survives cold complete-solver accounting. This is a prior-art-informed research direction, not a newly implemented method.
+
 ## Provenance, controls and standing
 
 - Semaev, *Summation polynomials and the discrete logarithm problem on elliptic curves* (2004): https://eprint.iacr.org/2004/031
