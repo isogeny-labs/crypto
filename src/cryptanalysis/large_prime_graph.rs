@@ -24,6 +24,7 @@
 //! | fundamental-cycle total length `L` | [`fundamental_cycle_length`] | `O(v + e + L)` |
 //! | minimum-degree elimination ordering, fill and width | [`minimum_degree`] | `O(Σ d_i² log v)` |
 //! | FM hypergraph partitioning, column-net `Σ (λ_j − 1)` | [`fm_partition`], [`connectivity_minus_one`] | `O(I log R)` per pass |
+//! | block Wiedemann kernel vectors and solves over `F_ℓ` (catalog §3, item 6) | [`block_wiedemann`] | `O(N(1 + n/m)·Z)` products, `O(N²(m + n))` projections, `O((m + n)·m·L²)` σ-basis |
 //!
 //! All field arithmetic is over `F_ℓ` for an odd prime modulus `ℓ < 2^63`.
 //! Primality is a caller obligation, exactly as in `large_prime_filter`.
@@ -35,7 +36,10 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 
+pub mod block_wiedemann;
 pub mod eval;
+pub mod witness;
+pub mod projected_rank;
 
 // ---------------------------------------------------------------------------
 // Field helpers (uncounted; the evaluator times phases instead)
@@ -91,6 +95,9 @@ pub enum LpGraphError {
     ColumnOutOfRange {
         column: usize,
     },
+    /// A direct caller supplied a zero/out-of-range coefficient or a repeated
+    /// LP column. Use LpIndex::build to normalize collector input first.
+    NonCanonicalRow { row: usize },
 }
 
 // ---------------------------------------------------------------------------
@@ -294,17 +301,26 @@ impl GainDsu {
         (root, if u == root { 1 } else { self.pot[u] })
     }
 
-    /// Process one canonical row: distinct columns, nonzero coefficients
-    /// reduced mod `ℓ`, at most two entries.
+    /// Process one row with distinct columns and coefficients in 1..ℓ.
+    /// Column order is immaterial (including closing edges in reverse order).
+    /// Validate the entire input before changing *any* rank/count metadata.
+    /// Normalize raw collector rows with LpIndex::build first.
     pub fn add_row(&mut self, terms: &[(usize, u64)]) -> Result<GainRowEffect, LpGraphError> {
         let p = self.modulus;
-        for &(c, a) in terms {
+        if terms.len() > 2 {
+            return Err(LpGraphError::RowTooWide {
+                row: self.rows,
+                entries: terms.len(),
+            });
+        }
+        for (i, &(c, a)) in terms.iter().enumerate() {
             if c >= self.parent.len() {
                 return Err(LpGraphError::ColumnOutOfRange { column: c });
             }
-            debug_assert!(a % p != 0);
+            if a == 0 || a >= p || (i == 1 && c == terms[0].0) {
+                return Err(LpGraphError::NonCanonicalRow { row: self.rows });
+            }
         }
-        self.rows += 1;
         let effect = match *terms {
             [] => {
                 self.zero_rows += 1;
@@ -328,7 +344,6 @@ impl GainDsu {
                 let au = mul_mod(a, pu, p);
                 let bv = mul_mod(b, pv, p);
                 if ru != rv {
-                    self.unions += 1;
                     let before = usize::from(!self.pinned[ru]) + usize::from(!self.pinned[rv]);
                     let pinned = self.pinned[ru] || self.pinned[rv];
                     // a p_u t_ru + b p_v t_rv = 0.
@@ -338,6 +353,7 @@ impl GainDsu {
                         (rv, ru, au, bv) // t_rv = -(a p_u / b p_v) t_ru
                     };
                     let inv = inv_mod(den, p).ok_or(LpGraphError::NonInvertible { value: den })?;
+                    self.unions += 1;
                     self.parent[child] = root;
                     self.pot[child] = neg_mod(mul_mod(num, inv, p), p);
                     if self.union_rank[ru] == self.union_rank[rv] {
@@ -368,13 +384,9 @@ impl GainDsu {
                     }
                 }
             }
-            _ => {
-                return Err(LpGraphError::RowTooWide {
-                    row: self.rows - 1,
-                    entries: terms.len(),
-                })
-            }
+            _ => unreachable!("arity checked before mutation"),
         };
+        self.rows += 1;
         self.rank += effect.rank_increment();
         Ok(effect)
     }

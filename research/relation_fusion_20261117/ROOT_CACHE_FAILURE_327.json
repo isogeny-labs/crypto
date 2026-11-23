@@ -1,0 +1,10 @@
+{
+  "schema": "actual-root-cache-harness-compile-failure/v1",
+  "exit_code": 101,
+  "tests_executed": 0,
+  "reason": "original in-crate correctness fixture read private Gf2.mask; external public-API test cannot access it",
+  "source": "ROOT_CACHE_SOURCE_327.json",
+  "stderr_sha256": "a5f39f5b5cddf139adf01e4449e0ea2412ebd4c8e41164ea11abd3a936d4cd2f",
+  "correction": "Use the exact declared F_2^13 field mask 2^13-1; original seed, fixtures, checks and algorithms unchanged.",
+  "runtime_source322_changed": false
+}

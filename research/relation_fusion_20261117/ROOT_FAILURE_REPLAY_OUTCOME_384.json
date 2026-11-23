@@ -1,0 +1,30 @@
+{
+  "schema": "root-failed-unit-diagnostic-replay-outcome/v1",
+  "plan": "ROOT_FAILURE_REPLAY_PLAN_384.json",
+  "tests": [
+    {
+      "test": "cryptanalysis::binary_radical_root::tests::factored_subspace_oracle_decides_as_subspace_oracle",
+      "exit_code": 101,
+      "wall_timeout": false,
+      "summary": [
+        "FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8215 filtered out; finished in 8.21s"
+      ],
+      "stdout_sha256": "9b7cd4ce4ded25a21dd1730a9bb61b59c7fed8b6b3627168e58deaf581968285",
+      "stderr_sha256": "d20f30e37ad5acee17dde1325f53ee9b16603a2342b789d883e0b8c443277354"
+    },
+    {
+      "test": "cryptanalysis::curve_id::tests::the_binary_search_agrees_with_the_map",
+      "exit_code": 101,
+      "wall_timeout": false,
+      "summary": [
+        "FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8215 filtered out; finished in 0.20s"
+      ],
+      "stdout_sha256": "3340eccc4e3d32c22d66541c09fc4de784d5d06689a36105be6868f87a94e539",
+      "stderr_sha256": "bf7cb7358c473c32850e136bd49c320ec1b9d64785d63b13568178c6a4bba17f"
+    }
+  ],
+  "initial380failure_preserved": true,
+  "full_suite_qualified": false,
+  "performance_observations_collected": 0,
+  "15x_admitted": false
+}

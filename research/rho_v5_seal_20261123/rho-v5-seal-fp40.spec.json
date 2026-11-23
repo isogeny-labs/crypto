@@ -1,0 +1,211 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho-v5-seal: rho.negation_v5 vs rho.negation fp40",
+  "description": "Seal audit: v5 (pow2, weight-2 cap 64) vs rho.negation on PARI-generated prime-order curves (cofactor 1); curve/target/measurement seeds disjoint from earlier panels. ABBA; [d]G=Q.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 1057004962411,
+        "a": 1049774517847,
+        "b": 173779594780,
+        "group_order": 1057006331137,
+        "r": 1057006331137,
+        "gx": 512574552958,
+        "gy": 225586154700
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 1082556520711,
+        "a": 923868759083,
+        "b": 345238179616,
+        "group_order": 1082557127791,
+        "r": 1082557127791,
+        "gx": 376774143399,
+        "gy": 447315367392
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 713973548671,
+        "a": 288712997266,
+        "b": 588666128785,
+        "group_order": 713974674467,
+        "r": 713974674467,
+        "gx": 237237970374,
+        "gy": 542146368637
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 823114672337,
+        "a": 742730951918,
+        "b": 774071221261,
+        "group_order": 823114817999,
+        "r": 823114817999,
+        "gx": 750666591116,
+        "gy": 378188310480
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 631706105879,
+        "a": 445854114107,
+        "b": 437514881591,
+        "group_order": 631705803943,
+        "r": 631705803943,
+        "gx": 339677349503,
+        "gy": 298387893662
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 848033377157,
+        "a": 688422374486,
+        "b": 318608093212,
+        "group_order": 848033791613,
+        "r": 848033791613,
+        "gx": 18415141152,
+        "gy": 573899982152
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 625919332583,
+        "a": 288700090756,
+        "b": 549681024928,
+        "group_order": 625920460463,
+        "r": 625920460463,
+        "gx": 207599817274,
+        "gy": 611852373721
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 917593072691,
+        "a": 60280451329,
+        "b": 900031117000,
+        "group_order": 917593593149,
+        "r": 917593593149,
+        "gx": 176256696823,
+        "gy": 651764426431
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 836516564993,
+        "a": 391478701162,
+        "b": 151741471832,
+        "group_order": 836517641123,
+        "r": 836517641123,
+        "gx": 331532009757,
+        "gy": 501074694954
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 591705344227,
+        "a": 134905816961,
+        "b": 263834016660,
+        "group_order": 591704167027,
+        "r": 591704167027,
+        "gx": 128099629638,
+        "gy": 370732469693
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 642810562327,
+        "a": 358889733783,
+        "b": 390816531413,
+        "group_order": 642810895501,
+        "r": 642810895501,
+        "gx": 20019732566,
+        "gy": 208548464783
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 825466219121,
+        "a": 181587709399,
+        "b": 743336384766,
+        "group_order": 825466248487,
+        "r": 825466248487,
+        "gx": 490375221201,
+        "gy": 126360630441
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 951693106849,
+        "a": 583985044848,
+        "b": 916478628632,
+        "group_order": 951694112437,
+        "r": 951694112437,
+        "gx": 488070172079,
+        "gy": 719584634236
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 704413607369,
+        "a": 113916291138,
+        "b": 586829044986,
+        "group_order": 704413702621,
+        "r": 704413702621,
+        "gx": 217726481695,
+        "gy": 614569791744
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 570500629141,
+        "a": 386878187933,
+        "b": 74104813676,
+        "group_order": 570500753447,
+        "r": 570500753447,
+        "gx": 389943305701,
+        "gy": 483583486624
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 768512382347,
+        "a": 750768576395,
+        "b": 317416101985,
+        "group_order": 768513044213,
+        "r": 768513044213,
+        "gx": 350182667060,
+        "gy": 231330376975
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261163
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "cand",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v5",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 12,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261123,
+    "isolation_required": "L0",
+    "timeout_seconds": 7200
+  }
+}

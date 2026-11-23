@@ -2380,7 +2380,7 @@ fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(
 /// sign is not stored: the probe tests both `R − F_k` and `R + F_k` and
 /// [`try_finalise_s4`] resolves the eight sign patterns in the group, so
 /// an `x` collision (two pair sums `±S`) only costs one failed verify.
-pub struct PairSumTable {
+pub struct WordPairSumTable {
     by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>>,
     /// Word-sized mirror of `by_x` for `p < 2^63`; empty otherwise.
     by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>>,
@@ -2396,7 +2396,7 @@ pub struct PairSumTable {
     pub build_additions: usize,
 }
 
-impl PairSumTable {
+impl WordPairSumTable {
     /// `true` when the table was built in word arithmetic.
     pub fn uses_word_path(&self) -> bool {
         !self.by_x_u64.is_empty() && self.by_x.is_empty()
@@ -2424,7 +2424,7 @@ impl PairSumTable {
 }
 
 /// Build the pair-sum table for `factor_base` (`B(B+1)/2` additions).
-pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_word_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> WordPairSumTable {
     let a_fe = curve.a_fe();
     let n = factor_base.len();
     let p_u64 = if curve.p.bits() <= 63 {
@@ -2493,7 +2493,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
             }
         }
     }
-    PairSumTable {
+    WordPairSumTable {
         by_x,
         by_x_u64,
         fb_u64,
@@ -2506,7 +2506,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
 
 /// **Meet-in-the-middle 3-decomposition**: the third factor-base point is
 /// enumerated (both signs), and the remaining two-point sum is answered by
-/// one hash probe into [`PairSumTable`] instead of the `B²` pair sweep of
+/// one hash probe into [`WordPairSumTable`] instead of the `B²` pair sweep of
 /// [`find_one_relation_s4_via_s3_counted`].
 ///
 /// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
@@ -2521,7 +2521,7 @@ pub fn find_one_relation_s4_via_mitm_counted(
     g: &Point,
     q: &Point,
     factor_base: &[FactorBaseEntry],
-    table: &PairSumTable,
+    table: &WordPairSumTable,
     max_trials: usize,
 ) -> Option<(Relation, usize)> {
     use crate::utils::random::random_scalar;
@@ -3909,7 +3909,7 @@ fn x_fingerprint(x: &BigUint) -> u64 {
 /// checked against the factor-base points (one addition, only on a hit), so a fingerprint
 /// collision is a miss, never a wrong relation; the hit set equals the exact table's, and among
 /// sums with the same x the earliest inserted answers, as in the exact table.
-pub struct PairSumTable {
+pub struct CompactPairSumTable {
     fps: Vec<u64>,
     vals: Vec<u32>,
     points: Vec<Point>,
@@ -3917,7 +3917,7 @@ pub struct PairSumTable {
     entries: usize,
 }
 
-impl PairSumTable {
+impl CompactPairSumTable {
     fn slot(&self, fp: u64) -> usize {
         ((u128::from(fp) * self.fps.len() as u128) >> 64) as usize
     }
@@ -4005,7 +4005,7 @@ impl PairSumTable {
     }
 }
 
-pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_compact_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> CompactPairSumTable {
     assert!(
         factor_base.len() <= PAIR_SUM_TABLE_MAX_FB,
         "compact pair-sum table indexes at most {PAIR_SUM_TABLE_MAX_FB} factor-base points"
@@ -4013,7 +4013,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
     let a_fe = curve.a_fe();
     let f = factor_base.len();
     let slots = (f * f * 5 / 3).max(16);
-    let mut table = PairSumTable {
+    let mut table = CompactPairSumTable {
         fps: vec![0; slots],
         vals: vec![0; slots],
         points: factor_base.iter().map(|e| e.point.clone()).collect(),
@@ -4089,7 +4089,7 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
-    table: &PairSumTable,
+    table: &CompactPairSumTable,
     max_trials: usize,
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
@@ -4221,7 +4221,7 @@ fn find_one_relation_table_walk<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
-    table: &PairSumTable,
+    table: &CompactPairSumTable,
     walk: &mut SampleWalk,
     max_trials: usize,
     rng: &mut R,
@@ -4310,7 +4310,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         count("sweep_collector_work_not_counted", 1);
     }
     let sum_table = if use_table {
-        Some(build_pair_sum_table(curve, &fb))
+        Some(build_compact_pair_sum_table(curve, &fb))
     } else {
         None
     };
@@ -4319,7 +4319,13 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     // the old per-attempt rebuild for A/A comparison (ignored with
     // `IC_FAST_SWEEP=1`, whose word loop always takes the hoisted index);
     // `IC_HOIST_SWEEP=1` is accepted and is the default.
-    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
+    // Default: word sweep when p fits u64 (`IC_FAST_SWEEP=0` forces BigUint sweep).
+    let word_sweep = if !use_table && std::env::var("IC_FAST_SWEEP").as_deref() != Ok("0") {
+        WordSweep::new(curve, &fb)
+    } else {
+        None
+    };
+    let fast_sweep = word_sweep.is_some();
     let hoist_sweep = fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() != Ok("0");
     let hoisted_index = if !use_table && hoist_sweep {
         Some(factor_base_x_index(&fb))
@@ -4666,7 +4672,7 @@ pub fn ec_index_calculus_dlp_s4_mitm_staged(
         max_trials_per_relation,
         max_relation_attempts,
         |fb| {
-            let table = build_pair_sum_table(curve, fb);
+            let table = build_word_pair_sum_table(curve, fb);
             move |curve: &CurveParams,
                   g: &Point,
                   q: &Point,
@@ -4704,7 +4710,7 @@ pub fn ec_index_calculus_dlp_s4_mitm_staged_with_la(
         max_trials_per_relation,
         max_relation_attempts,
         |fb| {
-            let table = build_pair_sum_table(curve, fb);
+            let table = build_word_pair_sum_table(curve, fb);
             move |curve: &CurveParams,
                   g: &Point,
                   q: &Point,
@@ -4943,7 +4949,7 @@ mod tests {
             .expect("16-bit a=-3 fixture");
         let fb = build_factor_base(&curve, 20);
         let a_fe = curve.a_fe();
-        let table = build_pair_sum_table(&curve, &fb);
+        let table = build_word_pair_sum_table(&curve, &fb);
         assert!(!table.by_x_u64.is_empty(), "word path took the table");
         assert!(
             table.by_x.is_empty(),
@@ -5704,7 +5710,7 @@ mod tests {
         };
         let fb = build_factor_base(&curve, 12);
         let exact = build_pair_sum_table_exact(&curve, &fb);
-        let compact = build_pair_sum_table(&curve, &fb);
+        let compact = build_compact_pair_sum_table(&curve, &fb);
         assert!(compact.slot_bytes() < exact.len() * 170);
         let mut hits = 0usize;
         let mut k = BigUint::from(1u32);
@@ -5739,11 +5745,11 @@ mod tests {
             k += 1u32;
         }
         assert!(hits > 0, "no pair sum was hit");
-        let packed = PairSumTable::pack(11, -1, 7, 1);
-        assert_eq!(PairSumTable::unpack(packed), (11, -1, 7, 1));
-        let top = PairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
+        let packed = CompactPairSumTable::pack(11, -1, 7, 1);
+        assert_eq!(CompactPairSumTable::unpack(packed), (11, -1, 7, 1));
+        let top = CompactPairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
         assert_eq!(
-            PairSumTable::unpack(top),
+            CompactPairSumTable::unpack(top),
             (PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1)
         );
     }
@@ -5762,7 +5768,7 @@ mod tests {
         };
         let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
         let fb = build_factor_base(&curve, 12);
-        let table = build_pair_sum_table(&curve, &fb);
+        let table = build_compact_pair_sum_table(&curve, &fb);
         let check = |rel: &Relation| {
             let lhs = g
                 .scalar_mul(&rel.coef_a, &a_fe)
@@ -5914,7 +5920,7 @@ mod tests {
         let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
         for fb_size in [6usize, 12] {
             let fb = build_factor_base(&curve, fb_size);
-            let table = build_pair_sum_table(&curve, &fb);
+            let table = build_compact_pair_sum_table(&curve, &fb);
             let mut rng = rand::rngs::StdRng::seed_from_u64(31 + fb_size as u64);
             let m = fb.len();
             let mut rows = Vec::new();

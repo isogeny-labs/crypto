@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:44:17Z",
+ "id": "PCC-20261123-08e731",
+ "kind": "statement",
+ "producer": {
+  "commit": "06e4e7d94f6cc5e15acce5d3e5fcd3e3bacde8e6",
+  "model": "gpt-6-astra-pro",
+  "session": "keyai-rank-derivative-integration-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/source-manifest.json",
+    "sha256": "1efc3edbd4e209c3566e59de9b6ec7253c9f984b71bac9d9aa886a6a0173c154"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/pre-call.json",
+    "sha256": "ae9cda5408d10064943826d1c1a9e977a76da1c12520f3b17526c603ee230ef2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/post-call.json",
+    "sha256": "fc0f9c941e322fb45da75f204c43df1e59a25dcc7af555ebd15cb4361e2b4124"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/controls.stdout.json",
+    "sha256": "71d7a78bdfff410809f0133d757bdc574cae571b5ab302f32df64ce0c96e1cb7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/example-tests.stdout",
+    "sha256": "165ae1171ac70a07ee696979d8cb355480680566495e5bb6e764a4342a598a23"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/adversarial-tests.stdout",
+    "sha256": "0d632bca01ec85aea44813e3ca34ca146167d601435f0dec53e6d2890d4ecec4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/qualifier/attempt2/support-module-tests.stdout",
+    "sha256": "446093dcf301c186eb5f95c2a0fac39eec19b42dbac035ff81204e97f6c27521"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "KeyAI integration PR #4980; exact source hashes and commands in the attached pre-call and source manifests; public synthetic Prime31 and F13 fixtures; no speed measurement",
+ "statement": "Frozen native correctness qualification of the KeyAI rank/derivative integration observed 4 example tests, 5 independent adversarial tests including 2830 powered-divisibility cases, and 6 unchanged production support tests passing. The Prime31 fixture recorded 32 ordered coordinate tuples, 64 signed witnesses, 8 distinct degree-16 candidate polynomials, one normalized row and rank one before an anchor; one explicit generator anchor raised rank to two and recovered subgroup scalar 2147446829. Eight coefficient Jacobians had rank 16. All five qualification calls exited zero and source/binary hashes were unchanged. This is unsigned scoped development evidence; the full root-library gate, formal proof and performance are separate."
+}

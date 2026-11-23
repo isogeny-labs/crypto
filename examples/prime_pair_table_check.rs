@@ -13,7 +13,7 @@
 //! cargo run --release --example prime_pair_table_check -- 36 512
 //! ```
 
-use crypto_lib::cryptanalysis::ec_index_calculus::{build_factor_base, build_pair_sum_table};
+use crypto_lib::cryptanalysis::ec_index_calculus::{build_factor_base, build_word_pair_sum_table as build_pair_sum_table};
 use crypto_lib::cryptanalysis::research_bench::bench_curves_a_minus_3;
 use crypto_lib::ecc::point::Point;
 

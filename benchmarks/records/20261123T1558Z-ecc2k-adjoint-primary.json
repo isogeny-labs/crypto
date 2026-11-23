@@ -1,0 +1,131 @@
+{
+  "branch": "lane/ecc2k-ic-projector-setup",
+  "closed_utc": "2026-11-23T16:07:46+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_projection_setup_20261123/checks/run-primary.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T15:58:55+00:00",
+      "wall_s": 69.973
+    }
+  ],
+  "commit": "3dff594d6343838b8091642d7701a0bea35af18c",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T15:58:35+00:00",
+  "curve_uid": "icv1-f2m131-tm22283658519494248867-115e0dc5",
+  "entries": [
+    "benchmarks/20261123-ecc2k-adjoint-setup"
+  ],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T1558Z-ecc2k-adjoint-primary",
+  "metrics": [
+    {
+      "baseline": 46922548.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_complete_cold_ir",
+      "note": "Fixed matched query, all setup and replay charged; unsigned producer evidence PCC-20261123-435311.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        44024513.0,
+        44024513.0
+      ],
+      "unit": "ir",
+      "value": 44024513.0
+    },
+    {
+      "baseline": 20968749.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_complete_oracle_ir",
+      "note": "Complete relation-oracle interval includes projector construction; unsigned producer evidence.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        18070727.0,
+        18070727.0
+      ],
+      "unit": "ir",
+      "value": 18070727.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-index-calculus-projector",
+  "raw": [
+    {
+      "bytes": 106720,
+      "path": "research/trace_zero_projection_setup_20261123/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a4/a43711eacaa1e69017a799ecca86b51c16e8f64be4a43d6ea3d60b322b636874",
+      "sha256": "a43711eacaa1e69017a799ecca86b51c16e8f64be4a43d6ea3d60b322b636874",
+      "uploaded": false
+    },
+    {
+      "bytes": 20882,
+      "path": "research/trace_zero_projection_setup_20261123/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2a/2aecf0688722feede2f810f28eaabc64f25834334e9a4bf336921913381f5c83",
+      "sha256": "2aecf0688722feede2f810f28eaabc64f25834334e9a4bf336921913381f5c83",
+      "uploaded": false
+    },
+    {
+      "bytes": 2727,
+      "path": "research/trace_zero_projection_setup_20261123/grid-audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b25a6daf8370ca86a8bca163df9a0fcd0857e4ee36099bb858d32081bdd4a5b",
+      "sha256": "1b25a6daf8370ca86a8bca163df9a0fcd0857e4ee36099bb858d32081bdd4a5b",
+      "uploaded": false
+    },
+    {
+      "bytes": 3521,
+      "path": "research/trace_zero_projection_setup_20261123/polynomial-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bd3455b310afe5e91b7b58f6b1bfa65a8849add806cf34bf558eaed393b6d909",
+      "sha256": "bd3455b310afe5e91b7b58f6b1bfa65a8849add806cf34bf558eaed393b6d909",
+      "uploaded": false
+    },
+    {
+      "bytes": 109306,
+      "path": "research/trace_zero_projection_setup_20261123/export-final.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bc/bc258b9e7d1045b08a09aa09d0ec6e7938443d511a7507952836df45eb648ab3",
+      "sha256": "bc258b9e7d1045b08a09aa09d0ec6e7938443d511a7507952836df45eb648ab3",
+      "uploaded": false
+    },
+    {
+      "bytes": 408512,
+      "path": "research/trace_zero_projection_setup_20261123/RAW-CALLGRIND.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/64ef9bfd5a47d52b4645f0207b905782b14f52eee4ca3780ee4d784d65d9227e",
+      "sha256": "64ef9bfd5a47d52b4645f0207b905782b14f52eee4ca3780ee4d784d65d9227e",
+      "uploaded": false
+    },
+    {
+      "bytes": 2134044,
+      "path": "research/trace_zero_projection_setup_20261123/FROZEN-BINARY.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b8/b89233ffc337e84f2ffc01cc080e7e353db7c599115146fa64c04c1e0a81ed36",
+      "sha256": "b89233ffc337e84f2ffc01cc080e7e353db7c599115146fa64c04c1e0a81ed36",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_projection_setup_20261123/report.pdf",
+    "png": [
+      "research/trace_zero_projection_setup_20261123/instructions.png"
+    ],
+    "svg": [
+      "research/trace_zero_projection_setup_20261123/instructions.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-adjoint-primary",
+  "status": "measured",
+  "summary": "Fixed d12 n131 uniform:13.82% fewer complete-oracle Ir,6.18% fewer cold-query Ir;90 exact matching rows. Unsigned producer evidence; root release compilation timed out before tests.",
+  "validation": null
+}

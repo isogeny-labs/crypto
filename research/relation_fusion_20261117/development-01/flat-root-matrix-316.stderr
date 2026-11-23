@@ -1,0 +1,297 @@
+   Compiling crypto v0.1.0 (/workspace/relation-supervisor-live)
+error[E0428]: the name `PairSumTable` is defined multiple times
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus.rs:3912:1
+     |
+2383 | pub struct PairSumTable {
+     | ----------------------- previous definition of the type `PairSumTable` here
+...
+3912 | pub struct PairSumTable {
+     | ^^^^^^^^^^^^^^^^^^^^^^^ `PairSumTable` redefined here
+     |
+     = note: `PairSumTable` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `build_pair_sum_table` is defined multiple times
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus.rs:4008:1
+     |
+2427 | pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+     | ------------------------------------------------------------------------------------------------- previous definition of the value `build_pair_sum_table` here
+...
+4008 | pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `build_pair_sum_table` redefined here
+     |
+     = note: `build_pair_sum_table` must be defined only once in the value namespace of this module
+
+error[E0428]: the name `hec_dlp` is defined multiple times
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/mod.rs:253:1
+    |
+245 | pub mod hec_dlp;
+    | ---------------- previous definition of the module `hec_dlp` here
+...
+253 | pub mod hec_dlp;
+    | ^^^^^^^^^^^^^^^^ `hec_dlp` redefined here
+    |
+    = note: `hec_dlp` must be defined only once in the type namespace of this module
+
+error[E0425]: cannot find value `word_sweep` in this scope
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus.rs:4375:33
+     |
+4375 | ...                   word_sweep.as_ref(),
+     |                       ^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `refresh_ic_ct_flag` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:324:5
+    |
+324 |     refresh_ic_ct_flag();
+    |     ^^^^^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::refresh_ic_ct_flag;
+    |
+
+error[E0425]: cannot find function `ic_padd` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:330:17
+    |
+330 |         let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
+    |                 ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_padd;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:330:26
+    |
+330 |         let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
+    |                          ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:330:54
+    |
+330 |         let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
+    |                                                      ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0425]: cannot find function `ic_padd` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:426:23
+    |
+426 |             let lhs = ic_padd(&p_i, &p_j, a_fe);
+    |                       ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_padd;
+    |
+
+error[E0425]: cannot find function `refresh_ic_ct_flag` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:456:5
+    |
+456 |     refresh_ic_ct_flag();
+    |     ^^^^^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::refresh_ic_ct_flag;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:500:21
+    |
+500 |     let candidate = ic_smul(g, &x, &a_fe);
+    |                     ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0425]: cannot find function `ic_padd` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:559:17
+    |
+559 |         let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
+    |                 ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_padd;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:559:26
+    |
+559 |         let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
+    |                          ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:559:54
+    |
+559 |         let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
+    |                                                      ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0425]: cannot find function `refresh_ic_ct_flag` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:655:5
+    |
+655 |     refresh_ic_ct_flag();
+    |     ^^^^^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::refresh_ic_ct_flag;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:743:21
+    |
+743 |     let candidate = ic_smul(g, &x, &a_fe);
+    |                     ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0425]: cannot find function `ic_smul` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ec_index_calculus_j0.rs:928:21
+    |
+928 |     let candidate = ic_smul(g, &x, &a_fe);
+    |                     ^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+ 92 + use crate::cryptanalysis::ec_index_calculus::ic_smul;
+    |
+
+error[E0433]: cannot find type `ResidualSweepOracle` in this scope
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:8305:30
+     |
+8305 |     let mut residual_sweep = ResidualSweepOracle::new();
+     |                              ^^^^^^^^^^^^^^^^^^^ use of undeclared type `ResidualSweepOracle`
+     |
+help: consider importing this struct
+     |
+  17 + use crate::cryptanalysis::ic_framework::plugins::ResidualSweepOracle;
+     |
+
+error[E0433]: cannot find type `CosetMitmOracle` in this scope
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9113:34
+     |
+9113 |         "mitm-coset" => Box::new(CosetMitmOracle::new(ms)),
+     |                                  ^^^^^^^^^^^^^^^ use of undeclared type `CosetMitmOracle`
+     |
+help: a struct with a similar name exists
+     |
+9113 -         "mitm-coset" => Box::new(CosetMitmOracle::new(ms)),
+9113 +         "mitm-coset" => Box::new(FiberMitmOracle::new(ms)),
+     |
+help: consider importing this struct
+     |
+  17 + use crate::cryptanalysis::ic_framework::plugins::CosetMitmOracle;
+     |
+
+error[E0425]: cannot find type `F4Skeleton` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:216:39
+    |
+216 |     skeleton: std::sync::Mutex<Option<F4Skeleton>>,
+    |                                       ^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+ 91 + use crate::cryptanalysis::pq_f4_f2::F4Skeleton;
+    |
+
+error[E0425]: cannot find type `F4PairTrace` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:217:36
+    |
+217 |     trace: std::sync::Mutex<Option<F4PairTrace>>,
+    |                                    ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+ 91 + use crate::cryptanalysis::pq_f4_f2::F4PairTrace;
+    |
+
+error[E0423]: cannot find value `F4F2` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:442:9
+    |
+442 |         F4F2.accepts(shape)
+    |         ^^^^
+    |
+    = note: a struct named `F4F2` exists in another namespace
+help: use the path separator to refer to an item
+    |
+442 -         F4F2.accepts(shape)
+442 +         F4F2::accepts(shape)
+    |
+
+error[E0423]: cannot find value `F4F2` in this scope
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:455:35
+    |
+455 |         let (verdict, mut cost) = F4F2.solve(system, &control, budget);
+    |                                   ^^^^
+    |
+    = note: a struct named `F4F2` exists in another namespace
+help: use the path separator to refer to an item
+    |
+455 -         let (verdict, mut cost) = F4F2.solve(system, &control, budget);
+455 +         let (verdict, mut cost) = F4F2::solve(system, &control, budget);
+    |
+
+error[E0425]: cannot find value `SKELETON_DEFAULT_CAP_BYTES` in this scope
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:1798:42
+     |
+1798 |             params.u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)?;
+     |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+     |
+help: consider importing this constant
+     |
+  91 + use crate::cryptanalysis::pq_f4_f2::SKELETON_DEFAULT_CAP_BYTES;
+     |
+
+error[E0425]: cannot find value `TRACE_DEFAULT_CAP_BYTES` in this scope
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:1806:39
+     |
+1806 |             params.u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)?;
+     |                                       ^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+     |
+help: consider importing this constant
+     |
+  91 + use crate::cryptanalysis::pq_f4_f2::TRACE_DEFAULT_CAP_BYTES;
+     |
+
+error[E0423]: cannot find value `F4F2` in this scope
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/solvers.rs:2248:18
+     |
+ 215 | / pub struct F4F2 {
+ 216 | |     skeleton: std::sync::Mutex<Option<F4Skeleton>>,
+ 217 | |     trace: std::sync::Mutex<Option<F4PairTrace>>,
+ 218 | | }
+     | |_- `F4F2` defined here
+...
+2248 |           Box::new(F4F2),
+     |                    ^^^^ help: use struct literal syntax instead: `F4F2 { skeleton: val, trace: val }`
+     |
+     = note: a struct named `F4F2` exists in another namespace
+
+Some errors have detailed explanations: E0423, E0425, E0428, E0433.
+For more information about an error, try `rustc --explain E0423`.
+error: could not compile `crypto` (lib) due to 26 previous errors

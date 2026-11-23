@@ -1,0 +1,18 @@
+# CT339 protocol — Prime31 infinity bridge and independent F103 complete public toy DLP
+
+2026-11-23 UTC. Preregistered before standalone implementation/execution, on existing #4997. [pcc:unverified]
+
+## Inputs and ownership
+Freeze predecessor #4997 head `f4b4e7d53d277a1091417426793554063e7b06e3`, CT337/338 exact records and their failure/amendment history. Preserve the separate norm-point-reuse, original 695/701 record, C169/C13a/C13b/N2_actual/D, EKS pricing, #5007 native F3/E7, and all CI/PCC/merge gates. No paid/competing timing, source mutation of held lanes or new workflow runs. Research-KB and conductor not exposed; review repository CT336–338 plus Magma handbook Richelot and Kani elliptic-subcover results; do not claim novelty.
+
+## Fixed mathematical construction
+Take `C_p:y²=∏_(j=1)^6(x-j)`, `h=7/2`, `t=x-h`, `u=t²`. The two elliptic quotients are `E+:v²=(u-1/4)(u-9/4)(u-25/4)` and `E-:Y²=(1-X/4)(1-9X/4)(1-25X/4)`, `X=1/u,Y=y/t³`. Under `z=1/(x-1),eta=yz³`, original infinity points `Q∞±` are `(z,eta)=(0,±1)`; `π+(Q∞±)=O`, `π-(Q∞±)=(0,±1)`. The basepoint `W1=(x,y)=(1,0)` maps to nonzero two-torsion `T+=(25/4,0)`, `T-=(4/25,0)`. Thus `Φ([P-W1])=(π+(P)-T+,π-(P)-T-)` and a Mumford degree-two output has unshifted image sum. Check projective and special cases by explicit elliptic additions; do not extend generic CT337 chart across its denominator zeros without a separate branch.
+
+## Bounded independent experiment
+Run one **standalone Python** evaluator at p=103 and 2147483647. For p=103 implement separately from CT338's C++: finite-field elliptic group law for nonmonic cubic, odd-degree genus-two polynomial extended gcd/Cantor, and degree-0/1/2 divisor images. For irreducible degree-two supports, use a quadratic-extension root and its conjugate, and verify mapped coordinates descend to Fp. Handle z=0 explicitly; handle t=0 on E- as the identity; treat invalid/division/non-invertible/unsupported as hard failure rather than silent exclusion.
+
+Select the first eight valid nonbranch rational C_103 points with x≥2 in ascending x and canonical y=min(y,-y). Check each `[k]D` for all k=0..20, comparing direct Mumford-image evaluation against `[k]Φ(D)`; record degree-zero/one/two, split/nonsplit, infinity z=0 and exceptions hit. Separately choose the first eligible D in that panel whose `[100]D` maps to a nonidentity point of exact order 23, verify `[23]([100]D)=0` by Cantor and image, and solve all 23 public discrete logs k=0..22 by a separately coded baby-step/giant-step search in the *image* product group, then replay source `[k]G=Q`. Record source steps and transfer/group primitive counters where available, but no wall-clock or cold advantage; this is a deliberately bielliptic, small-field positive control, not ordinary-prime-field attack evidence.
+
+For each p, check `π∞+,π∞-`, `Φ([Q∞+ - W1])+Φ([Q∞- - W1])=0`, all six branch image pairs, and the three kernel-pair images. Require ≥160/168 mapped scalar equalities, **23/23** successful toy logs if order-23 exists, zero unexplained exclusions, at least one nonsplit support and at least one z=0 support. Poisoned elliptic-ordinate and wrong-basepoint controls must produce a rejected equality. Run Python normal and `-O` with fail-closed checks, compare identical record JSON excluding runtime metadata. If gates fail, retain failure and preregister amendments prior to a change; never silently adjust samples.
+
+The deliverable is a reproducible source, JSON report, exact commands/checksums and a handoff/queue entry on #4997. Signed PCC, independent organization validation, Rust source-exact compilation, exception completeness and fully charged Prime31 ECDLP performance remain separate gates.

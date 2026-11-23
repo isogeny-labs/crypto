@@ -1,0 +1,189 @@
+{
+  "schema": "native.precision.history.qualification/v1",
+  "scope": "Finite numeric call-history arithmetic and composition; actual Rust path extraction/source guards/full cost remain open",
+  "source": {
+    "history_sha256": "0a23557953ddc0f74205b6812689bd400d6044c0ae0c607c1805aa09a70cd4b4",
+    "controls_sha256": "a2dc575b5d2d9f2d27c440e0b7fe7a5848ef377a4fe7032d8f7493d315bff001",
+    "shared_core_commit": "3e47fb776a4eb5231de4c8aad2bb6e756c2f89a1",
+    "shared_core_sha256": "92e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a",
+    "mathlib_pin": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)"
+  },
+  "shared_library_mathlib_pin_changed": false,
+  "named_history_theorems": 3,
+  "named_controls": 8,
+  "control_gate_declarations": 9,
+  "extra_audited_equation": "CryptoLeanCore.TaperedPrecision.childPrecision.eq_1",
+  "all_eleven_axiom_queries": true,
+  "protocol": {
+    "worker_lock_enforced_from_phase21": true,
+    "phase19_physical_stop": true,
+    "phase20_checks_pass_but_startup_noncompliant": true,
+    "phase20_not_accepted_as_isolated": true,
+    "phase19_20_overlap_seconds": 1,
+    "attempted_operator_stop": "No live process existed when checked; no live process killed",
+    "phase22_isolated_qualification_accepted": true,
+    "phase22_extra_logical_instances": 0,
+    "source_assumptions_or_native_gate_changed": false,
+    "deadline_seconds": 600,
+    "whole_cgroup_guard_bytes": 15032385536
+  },
+  "local_verdict": {
+    "claim_id": "PCC-20261123-dc026e",
+    "claim_sha256": "89f25a0ea25d5f465832f97477378f4a1c8ed94cb112d66bf176bc8405f380d9",
+    "commit": "ca7023cd857557d181008b141b9c793f3b39cae6",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/hashed_ecdl_precision_history_20261123/formal/PrecisionHistory.lean (PrecisionHistory.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-23T11:08:13Z",
+    "verifier_host": "fa9ba08aa8bc"
+  },
+  "control_gate": "PASS                      9 thm   0 trusted  research/hashed_ecdl_precision_history_20261123/formal/PrecisionHistoryControls.lean",
+  "audit_sha256": "365f65c4e1659eb124ad893624c96b6c01cfc3fd8d87e08796f8e8dca9be3adc",
+  "phases": [
+    {
+      "phase": "12-history-dependency-enumeration",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13107732480,
+      "started_at": "2026-11-23T10:53:31Z",
+      "finished_at": "2026-11-23T10:53:31Z",
+      "stdout_sha256": "7c598c87a454b1bf0732ee6e7d49bc95cf5b2523a2d5addc9c7c738e2359946d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "13-finite-native-history",
+      "exit_code": 1,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13442043904,
+      "started_at": "2026-11-23T10:55:38Z",
+      "finished_at": "2026-11-23T10:55:43Z",
+      "stdout_sha256": "c73ed7a6306d1dcf858a20d4fb6691b87931442003934cf72aaaa4a459a8e026",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "13b-finite-native-history",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13443567616,
+      "started_at": "2026-11-23T10:55:53Z",
+      "finished_at": "2026-11-23T10:55:57Z",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "13c-history-composed-endpoint",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13459365888,
+      "started_at": "2026-11-23T10:59:57Z",
+      "finished_at": "2026-11-23T11:00:01Z",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "14-history-axioms",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13406101504,
+      "started_at": "2026-11-23T10:57:59Z",
+      "finished_at": "2026-11-23T10:58:01Z",
+      "stdout_sha256": "5ded1e500acbef784bad50c99b91d3dcc728097337e0eabb34242a23aa9602f3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "15-history-controls",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13439533056,
+      "started_at": "2026-11-23T10:58:20Z",
+      "finished_at": "2026-11-23T10:58:24Z",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "16-composed-history-controls",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13453029376,
+      "started_at": "2026-11-23T11:00:18Z",
+      "finished_at": "2026-11-23T11:00:24Z",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "17-all-history-axioms",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13442899968,
+      "started_at": "2026-11-23T11:01:41Z",
+      "finished_at": "2026-11-23T11:01:45Z",
+      "stdout_sha256": "9c0d765f634d52fa1983b6146cecbf70a07147cd202d0b258896c6c7be5c02ff",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "18-history-pcc-verifier",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 15005417472,
+      "started_at": "2026-11-23T11:02:13Z",
+      "finished_at": "2026-11-23T11:02:31Z",
+      "stdout_sha256": "9bbb1b62a6b74331200a5f34b2a392837950962ad5402a02558bfca55b4984c2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "19-history-controls-gate",
+      "exit_code": 143,
+      "physical_stop": 1,
+      "peak_whole_cgroup_bytes": 15044239360,
+      "started_at": "2026-11-23T11:03:38Z",
+      "finished_at": "2026-11-23T11:03:55Z",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "20-fresh-history-reproduction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 15021883392,
+      "started_at": "2026-11-23T11:03:54Z",
+      "finished_at": "2026-11-23T11:04:41Z",
+      "stdout_sha256": "692cfac4c3e850f34764054fac15181d035279d2689ba46c8c7134d80422c0ce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "21-unused-external-cache-compaction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13476474880,
+      "started_at": "2026-11-23T11:06:24Z",
+      "finished_at": "2026-11-23T11:06:35Z",
+      "stdout_sha256": "983280aaf6708b138b8dfe1a2dc15705c491c28f1c0bd6f90f6583b74c5ab7c6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "22-isolated-fresh-history-reproduction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14740750336,
+      "started_at": "2026-11-23T11:07:46Z",
+      "finished_at": "2026-11-23T11:08:25Z",
+      "stdout_sha256": "692cfac4c3e850f34764054fac15181d035279d2689ba46c8c7134d80422c0ce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "provenance": "Unsigned producer records and separate read-only review; no signed execution attestation",
+  "S3_used": false,
+  "solver_executions": 0,
+  "additional_external_spend_usd": 0
+}
