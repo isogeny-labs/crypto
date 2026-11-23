@@ -44,6 +44,95 @@ promote either exact-order field. A non-`unknown` exact-order entry requires
 local deterministic evidence produced or replayed by this corpus generator;
 the semantic checker must reject a traits-only promotion. [pcc:unverified]
 
+For candidate annihilators below the strict Sorenson--Webster `psi_13` bound,
+the current producer locally replays strong Miller--Rabin tests to the first
+sixteen prime bases through 53. Below the bound
+`3317044064679887385961981`, passing the first thirteen prime bases is a
+primality proof; the extra bases are retained as a control. Together with the
+record's checked nonidentity and `[r]G=O` obligations, this proves
+`ord(G)=r` for those records. Values at or above the bound remain `unknown`
+without a separately replayed primality certificate; the producer does not
+apply its local probable-prime test above that cutoff. This conclusion is
+only about the named generated subgroup, not the ambient curve order.
+[pcc:unverified]
+
+## Tracked 2026-11-19 successor snapshot
+
+The repository-tracked corpus is
+`docs/curves/binary-subgroup-transfer-certificates.json`: 500,924 bytes,
+SHA-256
+`a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392`.
+It records producer revision
+`5c6e43a6f0cffe0afc4c962ff54056716cf6437e`, length-framed source digest
+`e7a12f60c219624b2442bb54a79bb114ad8c89cfd1d33f6f0ca4643af7bae7dd`,
+174 maps, 150 supported named-subgroup records, 102 locally proved exact
+generated orders, 48 unknown exact orders, and zero failed records. The
+producer revision and compiler string inside the JSON are caller-supplied;
+the source digest binds the binary module routing and deterministic primality
+implementation used by exact-order evidence. Exact regeneration is the
+executable binding. The 500,924-byte `67142558…` / `e0ae0fe5…` snapshot and
+the earlier 500,925-byte `f402ccd4…` / `8c61e842…` snapshot remain historical;
+neither is the current exact-replay target.
+[pcc:unverified]
+
+The Rust 1.98 canonical replay is retained at
+[`binary-transfer-catalog-canonical-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json).
+It is 1,681 bytes with SHA-256
+`31df0daef4b583eeb87f9589460b83bd73345bd8a81a68c74c11ee8d0a2101d6`.
+Release run `44605953074`, Rust GNU job `135849755976`, observed successful
+executable builds at checked-out head `3f4706b2…`, passed 8/8 source controls,
+the 21-file Git-tree
+binding, source-tree and installed-layout catalog replays and receipt
+comparisons, and uploaded artifact `14572815365` (104,468,194 outer ZIP bytes;
+GitHub digest
+`5bc9e50d956b80942001107d331e018ee78ea152beadca3e159023f62c5fc290`).
+Its post-run durable job-side record is
+[`standalone-package-run-44605953074.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json),
+6,612 bytes with SHA-256
+`53495a6193d2e7efc5c61d9644497919309a1dab610987b6909ee62023803d34`.
+That receipt was created after the run and was not included in the observed
+archive; the archive staged the two prior package-run receipts, including
+[`standalone-package-run-44596599220.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json).
+The preceding successful Rust-lane record remains at
+[`standalone-package-run-44585934651.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json).
+The aggregate release remained cancelled by
+unrelated package hydration and runner failures. Executor proxy policy blocked
+independent artifact download, so inner-archive and executable hashes and a
+second direct package replay remain open. Later curve-CI and evidence commits
+do not change the packaged Rust executable source, but this remains
+implementation-equivalent same-implementation evidence rather than an exact
+current-head package, independent arithmetic oracle, or signed standing.
+[pcc:unverified]
+
+The deterministic repository-mode source receipt is
+[`binary-transfer-catalog-source-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json),
+4,958 bytes with SHA-256
+`38405fb08dc6ec3e30c0b59035a63f156476c6a0838048afd6b89f2088e01433`.
+It binds all 21 reviewed paths and their normalized `include_str!` targets to
+the exact recorded Git tree and recomputes `e7a12f60…` with Git replacement
+objects disabled. The verifier is 12,930 bytes with SHA-256
+`64e09943c4a2be2508485325fcafa3dfa3d2dc27614db149270c2b5b1894e245`; its
+8/8 local mutation and substitution controls pass. Exact-head release run
+`44605953074` repeated all eight controls, bound the 21 Git blobs, compared this
+receipt before staging, and compared it again from the installed package tree.
+Scoped successor curve run `44635831391` at exact head `d8df2130…` has green
+assessment (`135953993465`), Lean (`135953993801`), and certificate
+(`135953993705`) jobs. The certificate job passed the combined cover/Jacobian/
+transfer/CLI/source/corpus controls, optimized independent oracles and
+odd-transfer controls, native-plan and fixed-F8 replays, Rust standards check,
+the 22,417-model registry-only Python join/idempotence check, final curve-cover
+check, and sparse-safe browser unit controls. Cover-report artifact
+`14584593258` is 10,085,870 outer ZIP bytes with GitHub digest
+`8245be500a890b32ffa6818cc65adc3859c6d09dc6f26aa01448c7a4af8bda82`.
+The Python gate intentionally uses `--check --registry-only`: it does not
+resolve or silently bypass the pre-existing global IC display-input mismatch.
+The browser controls do not establish freshness of the unhydrated checked-in
+browser data; a fully hydrated browser freshness replay remains open. The
+passed provenance replay does not attest that an executable was built from the
+recorded producer commit or widen any arithmetic, subgroup, solver, or
+advantage claim.
+[pcc:unverified]
+
 ## Required bindings and checks
 
 Every map record binds the complete ICV1 identity, canonical model JSON and

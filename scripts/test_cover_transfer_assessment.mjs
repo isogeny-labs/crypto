@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -23,7 +24,42 @@ const originals = Object.fromEntries(Object.entries(inputs).map(([key, path]) =>
   })),
 ]));
 
-// Invalid fixtures must fail at the catalog join, before reading unrelated source artifacts.
+function retargetModel(data, predicate, mutate) {
+  const registryRow = data.registry.curves.find((row) => predicate(JSON.parse(row.model_json)));
+  assert.notEqual(registryRow, undefined, "negative fixture model not found");
+  const oldModelHash = createHash("sha256").update(registryRow.model_json).digest("hex");
+  const model = JSON.parse(registryRow.model_json);
+  mutate(model);
+  const modelJson = JSON.stringify(model);
+  const newModelHash = createHash("sha256").update(modelJson).digest("hex");
+  registryRow.model_json = modelJson;
+
+  const coverRow = data.covers.curves.find((row) => row.model_sha256 === oldModelHash);
+  const graphRow = data.graph.curves.find((row) => row.model_sha256 === oldModelHash);
+  assert.notEqual(coverRow, undefined, "negative fixture cover row not found");
+  assert.notEqual(graphRow, undefined, "negative fixture graph row not found");
+  coverRow.model_sha256 = newModelHash;
+  graphRow.model_sha256 = newModelHash;
+  graphRow.model_json = modelJson;
+  const mapUid = graphRow.cover_links[0].map_uid;
+  data.graph.maps[mapUid].record.target_model_sha256 = newModelHash;
+  const coverUid = graphRow.cover_links[0].cover_uid;
+  data.graph.covers[coverUid].record.field = {
+    label: model.field,
+    p: String(model.p),
+  };
+}
+
+const directShort = (model) =>
+  model.form === "y^2=x^3+a*x+b" && model.field.startsWith("fp-");
+const widePilot = (model) =>
+  directShort(model) && model.p === "5902977611310272157103";
+const normalizedPrime = (model) =>
+  model.field.startsWith("fp-") && model.form !== "y^2=x^3+a*x+b";
+
+// Join mutations must fail at the catalog join; proof-boundary mutations must
+// fail at their dedicated classifier/count controls. Every case must stop
+// before reading unrelated source artifacts.
 const cases = [
   ["missing graph model", data => data.graph.curves.pop(), /graph rows: not the exact catalog membership/u],
   ["duplicate graph model", data => data.graph.curves.push(data.graph.curves[0]), /duplicate graph model/u],
@@ -33,6 +69,32 @@ const cases = [
     data.graph.curves.find(row => row.representations.length).representations[0].curve_uid = "wrong-curve";
   }, /registry representation binding mismatch/u],
   ["unreferenced map", data => { data.graph.maps["unreferenced-map"] = {}; }, /typed map bindings: not the exact catalog membership/u],
+  ["composite direct-prime modulus", data => {
+    retargetModel(data, directShort, model => {
+      model.p = "15";
+      model.field = "fp-15";
+    });
+  }, /composite prime-field modulus/u],
+  ["psi12 pseudoprime rejected by base 41", data => {
+    retargetModel(data, widePilot, model => {
+      model.p = "318665857834031151167461";
+      model.field = `fp-${model.p}`;
+    });
+  }, /composite prime-field modulus/u],
+  ["all-passing value above psi13 leaves proved profile", data => {
+    for (let index = 0; index < 2; index += 1) {
+      retargetModel(data, widePilot, model => {
+        model.p = "3317044064679887385962123";
+        model.field = `fp-${model.p}`;
+      });
+    }
+  }, /map\.odd-prime-quadratic\.direct\.proved-psi13: expected 2, got 0/u],
+  ["normalized row cannot enter proved direct backend", data => {
+    retargetModel(data, normalizedPrime, model => {
+      model.p = "11";
+      model.field = "fp-11";
+    });
+  }, /normalized profile proof boundary changed/u],
 ];
 for (const [name, mutate, expected] of cases) {
   test(name, () => {

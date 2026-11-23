@@ -45,6 +45,9 @@ pub mod series;
 pub mod sha256;
 /// Strassen's modular factorial and deterministic factoring (BDFLS 2020, section 2).
 pub mod strassen;
+/// Bounded executable components of the September 2026 multiplication proposal.
+#[cfg(feature = "experimental-subnlogn")]
+pub mod subnlogn;
 pub mod testdata;
 pub mod theta;
 pub mod theta_g;

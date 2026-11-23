@@ -6,11 +6,16 @@
 //! transfer exists.
 
 #[path = "curve_cover_check/checker.rs"]
+#[allow(dead_code)]
 mod checker;
 #[path = "curve_cover_check/models.rs"]
 mod models;
 
 use clap::{Parser, Subcommand};
+use crypto_lib::prime_hyperelliptic::{
+    prime_proof_evidence, prime_proof_status, PrimeMontgomeryQuadraticCoverP, PrimeProofStatus,
+    PrimeQuadraticCoverP,
+};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
@@ -25,6 +30,7 @@ use std::{
 const REQUEST_SCHEMA: &str = "curve-transfer-sweep-request/v1";
 const RESULT_SCHEMA: &str = "curve-transfer-sweep/v1";
 const VERIFY_SCHEMA: &str = "curve-transfer-sweep-verification/v1";
+const CAPABILITIES_SCHEMA: &str = "curve-transfer-sweep-capabilities/v1";
 const MAX_INPUT_BYTES: u64 = 64 * 1024 * 1024;
 const HARD_MAX_ATTEMPTS: u32 = 100_000;
 
@@ -41,6 +47,12 @@ struct Args {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Report constructive families and separately routed candidate searches.
+    Capabilities {
+        /// Result path; omit for stdout.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Resolve one target and enumerate the requested finite search space.
     Sweep {
         /// Strict JSON request, or `-` for stdin.
@@ -65,6 +77,105 @@ enum Command {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+}
+
+fn capabilities() -> Value {
+    json!({
+        "schema_version": CAPABILITIES_SCHEMA,
+        "integrated_request_families": [
+            "binary_cubic_pullback_v1",
+            "prime_quadratic_pullback_v1",
+        ],
+        "families": [
+            {
+                "id": "binary_cubic_pullback_v1",
+                "routing": "integrated_constructive_sweep",
+                "shape": "genus_3_hyperelliptic_one_infinity",
+                "field_scope": "same_binary_field",
+                "map_degree": 3,
+                "construction": "explicit_equations_and_map",
+                "jacobian_arithmetic": "implemented_checked_reduced_divisors",
+                "induced_maps": "implemented_pullback_and_arbitrary_class_pushforward",
+                "subgroup_evidence": "separate_map_bound_certificate_corpus",
+                "implementation": "src/binary_ecc/cover_transfer.rs",
+                "limits": "the sweep constructs the family but does not itself certify a named subgroup or solver advantage",
+            },
+            {
+                "id": "prime_quadratic_pullback_v1",
+                "routing": "integrated_constructive_sweep",
+                "shape": "genus_2_hyperelliptic_split_two_infinity",
+                "field_scope": "odd_prime_or_declared_extension_geometry",
+                "map_degree": 2,
+                "construction": "explicit_equations_and_map",
+                "jacobian_arithmetic": "implemented_for_checked_direct_prime_and_montgomery_normalized_models",
+                "induced_maps": "implemented_for_checked_direct_short_weierstrass_and_projective_montgomery_targets",
+                "subgroup_evidence": "not_verified_by_sweep",
+                "implementation": "src/prime_hyperelliptic/cover_transfer.rs",
+                "implementation_paths": [
+                    "src/prime_hyperelliptic/cover_transfer.rs",
+                    "src/prime_hyperelliptic/normalized_cover_transfer.rs"
+                ],
+                "limits": "Edwards exceptional-point adapters, extension arithmetic, and primes outside the accepted proof range remain structured unsupported cases",
+            },
+            {
+                "id": "prime_bielliptic_genus2_atlas_v1",
+                "routing": "separate_bounded_constructor",
+                "shape": "genus_2_hyperelliptic_with_two_elliptic_quotients",
+                "field_scope": "bounded_odd_prime_fields",
+                "map_degree": 2,
+                "construction": "explicit_bielliptic_curve_and_quotient_maps",
+                "jacobian_arithmetic": "separate_chained_transfer_backend",
+                "induced_maps": "separate_checked_pullback_pushforward_hops",
+                "subgroup_evidence": "per_instance_only",
+                "implementation": "src/bin/transfer_atlas.rs",
+                "supporting_module": "src/cryptanalysis/chained_transfer/bielliptic.rs",
+                "limits": "not integrated into the EC1/ICV1 sweep result schema; its own finite parameters and receipts govern completeness",
+            },
+            {
+                "id": "nist_genus3_hyperelliptic_cover_v1",
+                "routing": "separate_bounded_constructor",
+                "shape": "genus_3_hyperelliptic",
+                "field_scope": "selected_odd_prime_short_weierstrass_models",
+                "map_degree": 2,
+                "construction": "explicit_cover_and_pullback",
+                "jacobian_arithmetic": "separate_genus3_backend",
+                "induced_maps": "bounded_instance_checks",
+                "subgroup_evidence": "per_instance_only",
+                "implementation": "src/bin/nist_cover_quartic_map.rs",
+                "supporting_module": "src/cryptanalysis/nist_cover_quartic.rs",
+                "limits": "not a general catalog constructor and not evidence for every odd-prime curve",
+            },
+            {
+                "id": "bielliptic_plane_quartic_diagnostic_v1",
+                "routing": "separate_diagnostic_only",
+                "shape": "genus_3_non_hyperelliptic_plane_quartic",
+                "field_scope": "prime_fields_5_through_257",
+                "map_degree": 2,
+                "construction": "explicit_quartic_cover",
+                "jacobian_arithmetic": "not_implemented_as_a_full_quartic_jacobian_group",
+                "induced_maps": "elliptic_norm_projection_only",
+                "subgroup_evidence": "not_a_full_jacobian_transfer_certificate",
+                "implementation": "src/bin/quartic_ic.rs",
+                "supporting_module": "src/cryptanalysis/bielliptic_quartic.rs",
+                "limits": "the diagnostic's passing relation tests do not establish general quartic Jacobian arithmetic or a Jacobian index_calculus solver",
+            },
+            {
+                "id": "gf2_small_genus_factor_search_v1",
+                "routing": "candidate_filter_not_transfer",
+                "shape": "hyperelliptic_genus_2_through_5_and_non_hyperelliptic_genus_3_through_4",
+                "field_scope": "curves_over_F2_with_bounded_complete_model_enumeration",
+                "map_degree": null,
+                "construction": "curve_model_enumeration_and_frobenius_polynomial_divisibility",
+                "jacobian_arithmetic": "not_supplied_by_the_factor_search",
+                "induced_maps": "not_constructed",
+                "subgroup_evidence": "not_constructed",
+                "implementation": "src/cryptanalysis/curve_construction/enumerate.rs",
+                "limits": "a matching characteristic-polynomial factor is a decomposition candidate, not an explicit cover, correspondence, or logarithm transfer",
+            },
+        ],
+        "failure_semantics": "an unsupported family or empty bounded search is not a proof that no transfer exists",
+        "claim_boundary": "this inventory distinguishes routing and implemented evidence; it does not promote a candidate filter, norm projection, or curve construction into a full Jacobian transfer or solver",
+    })
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -448,18 +559,134 @@ fn candidate(
     family: SweepFamily,
     parameters: Value,
     catalog_default: bool,
-) -> Value {
+) -> Result<Value, String> {
     let (source_identity, map_identity) = source_and_map_identities(target, certificate);
     let binary = family == SweepFamily::BinaryCubicPullbackV1;
+    let normalized_target = model.normalization.is_some();
+    let normalization_kind = model
+        .normalization
+        .as_ref()
+        .and_then(|map| map["kind"].as_str());
+    let montgomery_target = normalization_kind == Some("montgomery_from_short");
+    let unsupported_normalized_target = normalized_target && !montgomery_target;
+    let (prime_proof, transfer_runtime_constructor) = match &model.field {
+        checker::Field::Prime(p) => {
+            let evidence = serde_json::to_value(prime_proof_evidence(p))
+                .map_err(|error| format!("serialize prime proof: {error}"))?;
+            let status = if unsupported_normalized_target {
+                "unsupported_normalized_target_transfer_backend"
+            } else if matches!(
+                prime_proof_status(p),
+                PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+            ) {
+                let coordinate_map = checker::decoded(&certificate.x, &model.field)
+                    .map_err(|reason| format!("decode verified coordinate map: {reason}"))?;
+                if coordinate_map.len() != 3
+                    || !coordinate_map[1].is_zero()
+                    || coordinate_map[2] != BigUint::one()
+                {
+                    return Err("verified prime candidate has an unexpected coordinate map".into());
+                }
+                let runtime_source = if let Some(normalization) = &model.normalization {
+                    let read = |name: &str| -> Result<BigUint, String> {
+                        normalization[name]
+                            .as_str()
+                            .ok_or_else(|| format!("normalized map is missing `{name}`"))
+                            .and_then(checker::number)
+                    };
+                    let runtime = PrimeMontgomeryQuadraticCoverP::try_new(
+                        p.clone(),
+                        read("montgomery_A")?,
+                        read("montgomery_B")?,
+                        coordinate_map[0].clone(),
+                    )
+                    .map_err(|error| {
+                        format!("runtime normalized Montgomery construction: {error}")
+                    })?;
+                    if runtime.adapter().short_a() != &model.a
+                        || runtime.adapter().short_b() != &model.b
+                        || normalization["shift_A_over_3"]
+                            .as_str()
+                            .and_then(|value| checker::number(value).ok())
+                            .as_ref()
+                            != Some(runtime.adapter().shift_a_over_3())
+                    {
+                        return Err(
+                            "normalized Montgomery metadata differs from the typed adapter".into(),
+                        );
+                    }
+                    runtime.source_curve().f.coeffs.clone()
+                } else {
+                    PrimeQuadraticCoverP::try_new(
+                        p.clone(),
+                        model.a.clone(),
+                        model.b.clone(),
+                        coordinate_map[0].clone(),
+                    )
+                    .map_err(|error| format!("runtime prime transfer construction: {error}"))?
+                    .source_curve()
+                    .f
+                    .coeffs
+                    .clone()
+                };
+                if encoded(runtime_source) != certificate.f {
+                    return Err(
+                        "runtime prime transfer source differs from the verified family certificate"
+                            .into(),
+                    );
+                }
+                "runtime_transfer_constructor_replayed"
+            } else {
+                "unsupported_without_primality_certificate"
+            };
+            (evidence, status)
+        }
+        checker::Field::Binary(_) => (
+            Value::Null,
+            "implemented_in_library_not_replayed_by_this_sweep",
+        ),
+        checker::Field::Extension { .. } => (
+            Value::Null,
+            "unsupported_odd_extension_field_transfer_backend",
+        ),
+    };
+    let proved_runtime_prime = matches!(
+        &model.field,
+        checker::Field::Prime(p)
+            if !unsupported_normalized_target
+                && matches!(
+                    prime_proof_status(p),
+                    PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+                )
+    );
     let jacobian_arithmetic = match &model.field {
         checker::Field::Binary(_) => "implemented_checked_one_infinity_model",
-        checker::Field::Prime(p) if p.bits() <= 64 => {
-            "bounded_split_sextic_backend_available_not_replayed_by_sweep"
+        checker::Field::Prime(p)
+            if matches!(
+                prime_proof_status(p),
+                PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+            ) =>
+        {
+            "strict_proof_split_sextic_backend_available_not_replayed_by_sweep"
         }
-        checker::Field::Prime(_) => "unsupported_prime_exceeds_64_bit_balanced_backend",
+        checker::Field::Prime(_) => "unsupported_without_primality_certificate",
         checker::Field::Extension { .. } => "unsupported_odd_extension_field_backend",
     };
-    json!({
+    let arbitrary_class_pushforward = match &model.field {
+        checker::Field::Binary(_) => "implemented_in_library_not_replayed_by_this_sweep",
+        checker::Field::Prime(_) if unsupported_normalized_target => {
+            "unsupported_normalized_target_transfer_backend"
+        }
+        checker::Field::Prime(_) if proved_runtime_prime => {
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        }
+        checker::Field::Prime(p) if p <= &BigUint::from(3u32) => {
+            "unsupported_odd_transfer_requires_characteristic_greater_than_three"
+        }
+        checker::Field::Prime(_) => "unsupported_without_primality_certificate",
+        checker::Field::Extension { .. } => "unsupported_odd_extension_field_transfer_backend",
+    };
+    Ok(json!({
         "candidate_id": map_identity["map_id"],
         "family": family,
         "parameters": parameters,
@@ -480,24 +707,39 @@ fn candidate(
         "field_of_definition": {
             "relation": "same_as_target",
             "field": target.model["field"],
+            "prime_proof": prime_proof,
         },
         "statuses": {
             "explicit_construction": "verified",
             "smoothness_and_genus": "verified_by_family_checker",
             "defining_equation_identity": "verified_exact_polynomial_identity",
             "map_degree": "verified_by_family_checker",
-            "jacobian_arithmetic": jacobian_arithmetic,
-            "arbitrary_class_pushforward": if binary {
+            "transfer_runtime_constructor": if binary {
                 "implemented_in_library_not_replayed_by_this_sweep"
             } else {
-                "unsupported_odd_induced_map_not_implemented"
+                transfer_runtime_constructor
+            },
+            "jacobian_arithmetic": jacobian_arithmetic,
+            "arbitrary_class_pushforward": arbitrary_class_pushforward,
+            "composition_identities": if binary {
+                "implemented_in_library_not_replayed_by_this_sweep"
+            } else if unsupported_normalized_target {
+                "unsupported_normalized_target_transfer_backend"
+            } else if proved_runtime_prime {
+                "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+            } else if matches!(&model.field, checker::Field::Prime(_)) {
+                "unsupported_without_primality_certificate"
+            } else if matches!(&model.field, checker::Field::Extension { .. }) {
+                "unsupported_odd_extension_field_transfer_backend"
+            } else {
+                "unsupported_for_this_arithmetic_backend"
             },
             "subgroup_transfer": "not_verified_by_sweep",
             "solver_evidence": "not_evaluated",
             "dlp_advantage": "not_evaluated",
         },
         "subgroup_obligations": subgroup_obligations(target, certificate.degree),
-    })
+    }))
 }
 
 fn validate_request(request: &SweepRequest) -> Result<(), String> {
@@ -578,7 +820,7 @@ fn sweep(request: SweepRequest, registry_bytes: &[u8]) -> Result<Value, String> 
                     family,
                     json!({}),
                     true,
-                );
+                )?;
                 attempts.push(json!({
                     "family": family,
                     "parameters": {},
@@ -618,7 +860,7 @@ fn sweep(request: SweepRequest, registry_bytes: &[u8]) -> Result<Value, String> 
                                 family,
                                 json!({"prime_subfield_shift": shift}),
                                 catalog_default,
-                            );
+                            )?;
                             attempts.push(json!({
                                 "family": family,
                                 "parameters": {"prime_subfield_shift": shift},
@@ -703,6 +945,7 @@ fn verify(saved: Value, registry_bytes: &[u8]) -> Result<Value, String> {
 
 fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
     match command {
+        Command::Capabilities { output } => (capabilities(), 0, output),
         Command::Sweep {
             request,
             registry,
@@ -795,6 +1038,36 @@ mod tests {
     }
 
     #[test]
+    fn capability_inventory_separates_constructors_filters_and_diagnostics() {
+        let inventory = capabilities();
+        assert_eq!(inventory["schema_version"], CAPABILITIES_SCHEMA);
+        assert_eq!(
+            inventory["integrated_request_families"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        let families = inventory["families"].as_array().unwrap();
+        assert_eq!(families.len(), 6);
+        let quartic = families
+            .iter()
+            .find(|family| family["id"] == "bielliptic_plane_quartic_diagnostic_v1")
+            .unwrap();
+        assert_eq!(quartic["induced_maps"], "elliptic_norm_projection_only");
+        assert_eq!(
+            quartic["jacobian_arithmetic"],
+            "not_implemented_as_a_full_quartic_jacobian_group"
+        );
+        let factor_search = families
+            .iter()
+            .find(|family| family["id"] == "gf2_small_genus_factor_search_v1")
+            .unwrap();
+        assert_eq!(factor_search["routing"], "candidate_filter_not_transfer");
+        assert_eq!(factor_search["induced_maps"], "not_constructed");
+    }
+
+    #[test]
     fn binary_sweep_reports_geometry_separately_from_transfer_evidence() {
         let result = sweep(
             request(binary_model(), SweepFamily::BinaryCubicPullbackV1, 0, 0),
@@ -828,8 +1101,130 @@ mod tests {
         assert_eq!(result["summary"]["verified_candidates"], 4);
         assert_eq!(
             result["candidates"][0]["statuses"]["jacobian_arithmetic"],
-            "bounded_split_sextic_backend_available_not_replayed_by_sweep"
+            "strict_proof_split_sextic_backend_available_not_replayed_by_sweep"
         );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["arbitrary_class_pushforward"],
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
+            "runtime_transfer_constructor_replayed"
+        );
+        assert_eq!(verify(result, &registry).unwrap()["status"], "verified");
+    }
+
+    #[test]
+    fn montgomery_normalized_target_replays_the_composed_constructor() {
+        let model = json!({
+            "v":"1", "form":"B*y^2=x^3+A*x^2+x", "p":"11",
+            "field":"fp-11", "A":"3", "B":"1"
+        });
+        let result = sweep(
+            request(model, SweepFamily::PrimeQuadraticPullbackV1, 0, 0),
+            &empty_registry(),
+        )
+        .unwrap();
+        assert_eq!(result["summary"]["verified_candidates"], 1);
+        assert_eq!(
+            result["candidates"][0]["statuses"]["explicit_construction"],
+            "verified"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["jacobian_arithmetic"],
+            "strict_proof_split_sextic_backend_available_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["arbitrary_class_pushforward"],
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
+            "runtime_transfer_constructor_replayed"
+        );
+    }
+
+    #[test]
+    fn edwards_normalized_target_keeps_the_projective_backend_gap_explicit() {
+        let model = json!({
+            "v":"1", "form":"a*x^2+y^2=1+d*x^2*y^2", "p":"11",
+            "field":"fp-11", "a":"1", "d":"2"
+        });
+        let result = sweep(
+            request(model, SweepFamily::PrimeQuadraticPullbackV1, 0, 0),
+            &empty_registry(),
+        )
+        .unwrap();
+        assert_eq!(result["summary"]["verified_candidates"], 1);
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
+            "unsupported_normalized_target_transfer_backend"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "unsupported_normalized_target_transfer_backend"
+        );
+    }
+
+    #[test]
+    fn wide_montgomery_target_reports_the_proof_gate_not_a_missing_backend() {
+        let model = json!({
+            "v":"1", "form":"B*y^2=x^3+A*x^2+x",
+            "p":"3317044064679887385962123",
+            "field":"fp-3317044064679887385962123", "A":"3", "B":"1"
+        });
+        let mut request = request(model, SweepFamily::PrimeQuadraticPullbackV1, 0, 0);
+        request.bounds.max_field_bits = 82;
+        let result = sweep(request, &empty_registry()).unwrap();
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
+            "unsupported_without_primality_certificate"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "unsupported_without_primality_certificate"
+        );
+    }
+
+    #[test]
+    fn strict_psi13_wide_prime_sweep_replays_every_declared_runtime_constructor() {
+        let model = json!({
+            "v":"1", "form":"y^2=x^3+a*x+b",
+            "p":"5902977611310272157103",
+            "field":"fp-5902977611310272157103",
+            "a":"4168100599208664723916",
+            "b":"240650161999037164785"
+        });
+        let mut request = request(model, SweepFamily::PrimeQuadraticPullbackV1, 0, 3);
+        request.bounds.max_field_bits = 73;
+        request.bounds.max_attempts = 4;
+        let registry = empty_registry();
+        let result = sweep(request, &registry).unwrap();
+        assert_eq!(result["summary"]["parameter_points_attempted"], 4);
+        assert_eq!(result["summary"]["verified_candidates"], 4);
+        for candidate in result["candidates"].as_array().unwrap() {
+            assert_eq!(
+                candidate["field_of_definition"]["prime_proof"]["status"],
+                "proved_psi13"
+            );
+            assert_eq!(
+                candidate["statuses"]["transfer_runtime_constructor"],
+                "runtime_transfer_constructor_replayed"
+            );
+            assert_eq!(
+                candidate["statuses"]["subgroup_transfer"],
+                "not_verified_by_sweep"
+            );
+            assert_eq!(candidate["statuses"]["dlp_advantage"], "not_evaluated");
+        }
         assert_eq!(verify(result, &registry).unwrap()["status"], "verified");
     }
 

@@ -161,16 +161,30 @@ catalog additions inherit no transfer status from it. Current binary code has
 general arbitrary-class pushforward and a structured CLI. Its separate
 `transfer-catalog-export` path replays all live binary map rows and named EC1
 generators into a hash-bound corpus while keeping annihilator checks distinct
-from exact-order evidence. A separate GF(8)
-oracle now reimplements support factorization, residue fields, Frobenius trace,
-and the target group law for all 486 control classes; it still uses production
-source-Jacobian addition for its homomorphism loop, so an independent source
-group law and catalog-wide independent oracle remain open.
+from exact-order evidence. A separate GF(8) oracle now constructs its own
+source group from 33,856 principal divisors, all 486 reduced classes, and 233
+admissible graph places. It checks all 114,791,256 associativity triples, all
+236,196 pushforward-additivity pairs, pullback and both composition identities,
+and only then compares every class operation with production. A clean Rust
+1.98 replay binds those checks to producer commit
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, its exact raw output, and a
+wrapper-level resource receipt. This closes the independent source-law gate
+for that one fixed fixture; signed standing, packaged replay, mutation
+controls, and a catalog-wide independent oracle remain open. A separate `F_2`
+control constructs all 20
+source classes independently
+from principal divisors, checks all 400 ordered sums and 8,000 associativity
+triples, and verifies the independently implemented maps and both composition
+identities before comparing with production. That exact tiny-field fixture is
+additional independent evidence rather than the basis for the 486-class
+result.
 The bounded balanced backend handles direct short-Weierstrass quadratic-cover
-maps over deterministically checked prime fields of at most 64 bits. It
-implements arbitrary balanced-class pushforward, pullback, the deck action,
-and both degree-two composition identities. Normalized targets, extension
-fields, larger prime fields, solver evidence, and every
+maps, and their checked projective Montgomery compositions, over
+deterministically proved prime fields in the complete `u64` domain and below
+the strict Sorenson--Webster `psi_13` bound. It implements arbitrary
+balanced-class pushforward, pullback, the deck action, and both degree-two
+composition identities. Edwards exceptional-point charts, extension fields,
+moduli without a deterministic proof, solver evidence, and every
 computational-advantage claim remain unsupported or unassessed as applicable.
 
 The Rust tests enumerate all affine cover points on every nonsingular
@@ -221,6 +235,20 @@ that map. Genus two and degree two are preserved. Small-field tests exhaust
 all nonsingular parameter choices in characteristics 5, 7 and 11 and verify
 the forward equations and inverse identities wherever affine formulas apply.
 
+The transfer library now has a typed, everywhere-defined projective
+Montgomery/short-Weierstrass isomorphism and composes it with the genus-two
+pullback/pushforward API. Adapter tests exhaust point and projective-map
+bijections for every smooth parameter choice over `p=5,7,11`, and an
+independently coded group law checks one complete `p=11`, `A=3`, `B=2` model.
+A complete composed `p=7` fixture checks all 12 Montgomery points, all 72
+balanced classes, both compositions, and both homomorphism laws. The
+standalone transfer command consumes and returns original
+Montgomery coordinates, while the sweeper replays the composed constructor.
+The six live Montgomery-normalized maps (seven named bindings) are all
+outside the accepted deterministic prime-proof range, so this adds no live
+supported binding. The Edwards charts likewise remain geometry evidence
+rather than an end-to-end induced-map implementation.
+
 The [standards importer](standards/README.md) expands the inventory, while
 [`cover-links.yaml`](cover-links.yaml) supplies exact ICV1/EC1/HC1/CV1 links.
 Pass `--links PATH` alongside custom registry/report paths. `--check` replays
@@ -240,6 +268,43 @@ identity links, not subgroup-transfer certificates.
 | Normalized odd prime field | 30 | 22 |
 | Odd extension field | 1,405 | 9 |
 | **Total** | **22,417** | **1,090** |
+
+A bounded pilot locally replays the five smallest degree-two extension rows
+(two over `GF(5^2)`, three over `GF(7^2)`) with implementation-separated
+finite-field arithmetic in their exact catalog polynomial bases. It verifies
+source smoothness, separability, rational points, fibers, and infinity
+geometry, but its graph regeneration uses the repository checker and its
+basis comparison is differential against `Fp2Ctx`; it is not an independent
+Jacobian implementation. Those five rows have no named EC1 binding; the
+remaining 1,400 extension maps retain structured unsupported records. This
+pilot therefore changes neither the nine linked subgroup statuses nor the
+graph's historical fields.
+
+The separate tracked `odd-transfer-catalog` corpus contains all 22,243 odd
+maps and 940 named bindings. Its 17,879,292 canonical bytes have SHA-256
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`.
+It was generated by the clean producer commit
+`8c94831426fa35040fa7b38b1379299bf6e6d957` and records the framed source
+digest `a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`
+over 29 source files. Its binding partition is 675 supported direct-prime
+certificates, 240 unsupported without an accepted primality certificate, 0
+kernel-intersection rows, 15 unsupported Edwards normalized-target rows, 9
+unsupported extension rows, 1 failed invalid target generator, 0 other invalid
+rows, and 0 transfer-arithmetic failures. The seven Montgomery bindings moved
+from the historical normalized
+bucket to the proof-gated bucket because their composed backend is implemented
+but their fields or declared orders lack an accepted certificate; none is
+claimed live-supported. Exact same-implementation replay returns the expected
+incomplete status and exit `1`; repository source replay binds all 29 source
+blobs and the Lean artifact to that commit and exits `0`. The compiler label remains
+caller-supplied and unverified, and the local unsigned Lean theorem proves only
+its conditional abstract implication. Independent replay and installed-package
+replay remain separate release obligations; these receipts do not rewrite the
+graph or historical assessment and establish no solver, scaling, or
+computational-advantage claim. [pcc:unverified]
+
+The earlier 17,879,352-byte `7c60fc…` corpus from producer `e0ae0fe5…` and
+partition 675/233/22/9/1 remains immutable historical evidence.
 
 All graph `subgroup_transport` fields remain `not_tested` with null evidence.
 The historical [2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)

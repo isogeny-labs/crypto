@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
 
 const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
+const expectedAssessmentDate = "2026-11-18";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(process.argv[2] ?? path.resolve(here, "../.."));
@@ -44,6 +45,90 @@ function sha256(value) {
 
 function mod(value, modulus) {
   return ((value % modulus) + modulus) % modulus;
+}
+
+const verifierU64Limit = 18446744073709551616n;
+const verifierPsi13Limit = 3317044064679887385961981n;
+const verifierWordWitnesses = [
+  2n,
+  325n,
+  9375n,
+  28178n,
+  450775n,
+  9780504n,
+  1795265022n,
+];
+const verifierPrimeWitnesses = [
+  2n,
+  3n,
+  5n,
+  7n,
+  11n,
+  13n,
+  17n,
+  19n,
+  23n,
+  29n,
+  31n,
+  37n,
+  41n,
+  43n,
+  47n,
+  53n,
+];
+
+function verifierPowMod(base, exponent, modulus) {
+  let accumulator = 1n;
+  let current = base % modulus;
+  for (let bits = exponent; bits !== 0n; bits >>= 1n) {
+    if ((bits & 1n) !== 0n) accumulator = (accumulator * current) % modulus;
+    current = (current * current) % modulus;
+  }
+  return accumulator;
+}
+
+function verifierStrongProbablePrime(n, witness) {
+  const base = witness % n;
+  if (base === 0n) return true;
+  let exponent = n - 1n;
+  let squarings = 0;
+  while ((exponent & 1n) === 0n) {
+    exponent >>= 1n;
+    squarings += 1;
+  }
+  let residue = verifierPowMod(base, exponent, n);
+  if (residue === 1n || residue === n - 1n) return true;
+  while (--squarings > 0) {
+    residue = (residue * residue) % n;
+    if (residue === n - 1n) return true;
+  }
+  return false;
+}
+
+// This verifier intentionally owns its proof-range classifier rather than
+// importing the generator or Rust implementation. The theorem boundary is
+// exclusive, and an all-passing value outside it remains unsupported.
+function verifierPrimeProofStatus(decimal) {
+  const n = BigInt(decimal);
+  if (n < 2n) return "composite";
+  if (n === 2n || n === 3n) return "proved_u64";
+  if ((n & 1n) === 0n) return "composite";
+  if (n < verifierU64Limit) {
+    return verifierWordWitnesses.every((witness) =>
+      verifierStrongProbablePrime(n, witness)
+    )
+      ? "proved_u64"
+      : "composite";
+  }
+  if (verifierPrimeWitnesses.some((prime) => n !== prime && n % prime === 0n)) {
+    return "composite";
+  }
+  if (!verifierPrimeWitnesses.every((witness) => verifierStrongProbablePrime(n, witness))) {
+    return "composite";
+  }
+  return n < verifierPsi13Limit
+    ? "proved_psi13"
+    : "unsupported_without_primality_certificate";
 }
 
 function oddFieldContext(p, degree, modulusCoefficients) {
@@ -367,6 +452,22 @@ function check(condition, message) {
     problems.push(message);
   }
 }
+
+check(verifierPrimeProofStatus("59") === "proved_u64", "verifier u64-prime control failed");
+check(verifierPrimeProofStatus("15") === "composite", "verifier u64-composite control failed");
+check(
+  verifierPrimeProofStatus("5902977611310272157103") === "proved_psi13",
+  "verifier psi13 pilot-prime control failed",
+);
+check(
+  verifierPrimeProofStatus("318665857834031151167461") === "composite",
+  "verifier psi12 pseudoprime control failed",
+);
+check(
+  verifierPrimeProofStatus("3317044064679887385962123") ===
+    "unsupported_without_primality_certificate",
+  "verifier above-psi13 fail-closed control failed",
+);
 
 check(registry.curves.length === 15791, "unexpected registry row count");
 check(report.curves.length === 15791, "unexpected cover-report row count");
@@ -866,11 +967,18 @@ const expectedTemplateStatuses = {
   "map.fp827-geometry.supported": "supported",
   "map.geometry.catalog-supported": "supported",
   "map.independent-oracle.unknown": "unknown",
+  "map.prime-balanced.supported": "supported",
+  "map.prime-composition.supported": "supported",
   "map.prime-construction.supported": "supported",
-  "map.prime-jacobian.refuted": "refuted",
+  "map.prime-extension-balanced.refuted": "refuted",
+  "map.prime-extension-transfer.refuted": "refuted",
   "map.prime-normalization.supported": "supported",
+  "map.prime-normalized-transfer.refuted": "refuted",
   "map.prime-pipeline.refuted": "refuted",
-  "map.prime-transfer.unknown": "unknown",
+  "map.prime-proof-backend.refuted": "refuted",
+  "map.prime-proof-transfer.refuted": "refuted",
+  "map.prime-pullback.supported": "supported",
+  "map.prime-pushforward.supported": "supported",
   "map.same-field.not-applicable": "not_applicable",
   "subgroup.arbitrary-recovery.unknown": "unknown",
   "subgroup.binary-annihilation.supported": "supported",
@@ -910,19 +1018,57 @@ const expectedProfiles = {
     },
     full_transfer_pipeline: "map.binary-pipeline.refuted",
   },
-  "map.odd-prime-quadratic.direct": {
+  "map.odd-prime-quadratic.direct.proved-u64": {
     kind: "map_base",
-    predicate_id: "odd_prime_quadratic_direct_same_field",
+    predicate_id: "odd_prime_quadratic_direct_proved_u64",
     claims: {
       cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.prime-construction.supported",
       curve_map_correctness: "map.geometry.catalog-supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
+      jacobian_arithmetic_for_cover: "map.prime-balanced.supported",
+      pullback_point_classes: "map.prime-pullback.supported",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      pushforward_point_divisors: "map.prime-pushforward.supported",
+      arbitrary_jacobian_pushforward: "map.prime-pushforward.supported",
+      composition_on_typed_domain: "map.prime-composition.supported",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
+  "map.odd-prime-quadratic.direct.proved-psi13": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_proved_psi13",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-balanced.supported",
+      pullback_point_classes: "map.prime-pullback.supported",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-pushforward.supported",
+      arbitrary_jacobian_pushforward: "map.prime-pushforward.supported",
+      composition_on_typed_domain: "map.prime-composition.supported",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+  },
+  "map.odd-prime-quadratic.direct.unsupported-proof": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_unsupported_without_primality_certificate",
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-proof-backend.refuted",
+      pullback_point_classes: "map.prime-proof-transfer.refuted",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-proof-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-proof-transfer.refuted",
+      composition_on_typed_domain: "map.prime-proof-transfer.refuted",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.same-field.not-applicable",
       computational_advantage: "map.advantage.unknown",
@@ -936,12 +1082,12 @@ const expectedProfiles = {
       cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.prime-construction.supported",
       curve_map_correctness: "map.geometry.catalog-supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
+      jacobian_arithmetic_for_cover: "map.prime-proof-backend.refuted",
+      pullback_point_classes: "map.prime-normalized-transfer.refuted",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      pushforward_point_divisors: "map.prime-normalized-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-normalized-transfer.refuted",
+      composition_on_typed_domain: "map.prime-normalized-transfer.refuted",
       alternate_target_model_map: "map.prime-normalization.supported",
       field_extension_or_descent: "map.same-field.not-applicable",
       computational_advantage: "map.advantage.unknown",
@@ -955,12 +1101,12 @@ const expectedProfiles = {
       cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.extension-construction.supported",
       curve_map_correctness: "map.geometry.catalog-supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
+      jacobian_arithmetic_for_cover: "map.prime-extension-balanced.refuted",
+      pullback_point_classes: "map.prime-extension-transfer.refuted",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      pushforward_point_divisors: "map.prime-extension-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-extension-transfer.refuted",
+      composition_on_typed_domain: "map.prime-extension-transfer.refuted",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.extension-descent.unknown",
       computational_advantage: "map.advantage.unknown",
@@ -1013,8 +1159,12 @@ const expectedControlStatuses = {
   geometry: ["supported", null],
   arithmetic_internal: ["supported", null],
   arithmetic_independent_oracle: ["unknown", "independent_map_oracle"],
+  binary_f2_source_law_pilot: ["supported", null],
   binary_catalog_subgroups: ["supported", null],
-  odd_degree2_transfer: ["refuted", null],
+  odd_degree2_direct_transfer_runtime: ["supported", null],
+  odd_degree2_primality_fail_closed: ["supported", null],
+  odd_degree2_normalized_fail_closed: ["supported", null],
+  odd_degree2_extension_fail_closed: ["supported", null],
   published_artifact: ["refuted", "catalog_wide_packaged_binary"],
   cross_repository_core_parity: ["supported", null],
   current_fixed_f8_cross_repository_parity: [
@@ -1026,12 +1176,12 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "a762cc8659726c43b7ce84bd1750b4cd6c108c216031ec318452140dbb7aebc9",
-  profiles: "8fbcabe05bc436d528bdafabc5514d45d80355337ec6f74edd6db0b3ebc8fde1",
-  controls: "2ecc0db58b61a77891ddb1ed14924d70f9a101bb3791114859e83aa92279e06f",
-  open_obligations: "98cf42d30763b94c73d6b62c8c3b3901bc0556eb3c9be5067ea97798a447a53a",
+  result_templates: "b1e576c5e57af064233316481d58bf629ce69ac6a274c6205ed09616b1f50d75",
+  profiles: "853cf08ea5a8d4bcbfdd8048bcfe47d9826b059dda35e926934d63f0278ecbbd",
+  controls: "1363a5847f14b2558d457398b042f0d1f6798b0129d876e4ff4e49bb7c7e0191",
+  open_obligations: "f92c7adfa7366d0ca33f3578bf24da9fa023c20850939dc1d3fffa9fc0efe3ad",
   global_cost_accounting:
-    "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
+    "79e885e252d5ba207bc7b00e5e67a3f44e58271abc624b5f9931c4fec1656d12",
 };
 const expectedCostStatuses = {
   cover_construction: "unknown",
@@ -1060,10 +1210,12 @@ const requiredSourceArtifactPaths = [
   "docs/curves/fixed-f8-genus3-order-certificate.json",
   "scripts/build_cover_transfer_assessments.mjs",
   "scripts/catalog_snapshot.mjs",
+  "scripts/test_cover_transfer_assessment.mjs",
   "src/bin/curve_cover_check/checker.rs",
   "src/bin/curve_cover_check/models.rs",
   "src/bin/curve_cover_check/links.rs",
   "src/bin/curve_cover_check.rs",
+  "src/bin/curve_transfer_sweep.rs",
   "src/bin/hyperelliptic_cover.rs",
   "src/bin/ecdlp_audit/fixed_f8_order.rs",
   "src/lib.rs",
@@ -1073,6 +1225,7 @@ const requiredSourceArtifactPaths = [
   "src/binary_ecc/curve.rs",
   "src/binary_ecc/cover_transfer.rs",
   "src/binary_ecc/hyperelliptic.rs",
+  "tests/binary_cover_transfer_f2_source_oracle.rs",
   "src/cryptanalysis/mod.rs",
   "src/cryptanalysis/ecc2k130_guard.rs",
   "src/hash/mod.rs",
@@ -1081,6 +1234,9 @@ const requiredSourceArtifactPaths = [
   "src/prime_hyperelliptic/fp2.rs",
   "src/prime_hyperelliptic/fp_poly.rs",
   "src/prime_hyperelliptic/curve.rs",
+  "src/prime_hyperelliptic/primality.rs",
+  "src/prime_hyperelliptic/balanced.rs",
+  "src/prime_hyperelliptic/cover_transfer.rs",
   "src/utils/mod.rs",
   "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
   "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
@@ -1090,7 +1246,9 @@ const requiredSourceArtifactPaths = [
 ];
 const closedMapPredicates = [
   "binary_cubic_same_field",
-  "odd_prime_quadratic_direct_same_field",
+  "odd_prime_quadratic_direct_proved_u64",
+  "odd_prime_quadratic_direct_proved_psi13",
+  "odd_prime_quadratic_direct_unsupported_without_primality_certificate",
   "odd_prime_quadratic_normalized_same_field",
   "odd_extension_quadratic_direct_same_field",
 ].sort();
@@ -1112,6 +1270,10 @@ check(
 check(
   assessment.catalog_commit === expectedCatalogCommit,
   "assessment catalog commit changed",
+);
+check(
+  assessment.assessment_date === expectedAssessmentDate,
+  "assessment date does not identify the 2026-11-18 semantic refresh",
 );
 for (const relativePath of [
   "docs/curves/registry.json",
@@ -1512,13 +1674,26 @@ for (const graphCurve of graph.curves) {
     targetModel.form === "y^2=x^3+a*x+b" &&
     graphMap.record.target_model_map === null
   ) {
-    predicateId = "odd_prime_quadratic_direct_same_field";
+    const proofStatus = verifierPrimeProofStatus(targetModel.p);
+    check(proofStatus !== "composite", "direct-prime profile contains a composite modulus");
+    predicateId = proofStatus === "proved_u64"
+      ? "odd_prime_quadratic_direct_proved_u64"
+      : proofStatus === "proved_psi13"
+        ? "odd_prime_quadratic_direct_proved_psi13"
+        : proofStatus === "unsupported_without_primality_certificate"
+          ? "odd_prime_quadratic_direct_unsupported_without_primality_certificate"
+          : null;
   } else if (
     coverResult.certificate.construction === "prime_quadratic_pullback_v1" &&
     targetModel.field.startsWith("fp-") &&
     targetModel.form !== "y^2=x^3+a*x+b" &&
     graphMap.record.target_model_map !== null
   ) {
+    check(
+      verifierPrimeProofStatus(targetModel.p) ===
+        "unsupported_without_primality_certificate",
+      "normalized profile proof boundary changed",
+    );
     predicateId = "odd_prime_quadratic_normalized_same_field";
   } else if (
     coverResult.certificate.construction === "prime_quadratic_pullback_v1" &&
@@ -1842,7 +2017,9 @@ check(
 
 const expectedPredicateCounts = {
   binary_cubic_same_field: 165,
-  odd_prime_quadratic_direct_same_field: 14272,
+  odd_prime_quadratic_direct_proved_u64: 14012,
+  odd_prime_quadratic_direct_proved_psi13: 2,
+  odd_prime_quadratic_direct_unsupported_without_primality_certificate: 258,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
   linked_subgroup_degree3: 142,
@@ -2388,6 +2565,20 @@ const staleCurrentPopulationPatterns = [
   /all 2,091 current inputs/iu,
   /all 2,091 model forms/iu,
 ];
+const refreshedPrimePartitionMarkers = [
+  "14,012 proved_u64",
+  "2 proved_psi13",
+  "258 unsupported_without_primality_certificate",
+  "30 normalized fail-closed",
+  "1,324 extension backend unavailable",
+];
+const staleTransferCapabilityPatterns = [
+  /arbitrary-class Jacobian pushforward remains unsupported for all 165/iu,
+  /odd two-infinity induced maps:\s*UNKNOWN/iu,
+  /all odd induced maps remain open/iu,
+  /balanced two-infinity backend[^.]*does not implement the degree-two induced maps/iu,
+  /all 15,626 odd two-infinity catalog sources remain outside the current backend/iu,
+];
 for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   const absolute = resolveRepoPath(relativePath);
   check(absolute !== null, "unsafe report artifact path for " + kind);
@@ -2414,13 +2605,30 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
     for (const stalePattern of staleCurrentPopulationPatterns) {
       check(!stalePattern.test(contents), `${kind} report retains a stale current-population count`);
     }
+    for (const marker of refreshedPrimePartitionMarkers) {
+      check(contents.includes(marker), `${kind} report lacks refreshed partition marker: ${marker}`);
+    }
+    for (const stalePattern of staleTransferCapabilityPatterns) {
+      check(!stalePattern.test(contents), `${kind} report retains a superseded transfer claim`);
+    }
+    check(
+      kind === "markdown"
+        ? contents.includes("all 142 pinned binary EC1 bindings")
+        : contents.includes("142 binary<BR/>(all tested)"),
+      `${kind} report lacks the all-142 binary certificate boundary`,
+    );
   }
   if (kind === "context_graph_source") {
     const contents = bytes.toString("utf8");
     for (const marker of [
       "557 fields / 15,789 Jacobian contexts / 15,791 maps",
-      "current-source test: 15,791 / 15,791",
+      "pinned-cohort source replay: 15,791 / 15,791 at catalog commit 7283047",
       "746 inside / 1,354 outside old allowlist",
+      "all 142 binary generators receive the stated typed checks",
+      "14,012 deterministic-u64 + 2 strict-psi13 rows",
+      "258 direct rows: no primality certificate",
+      "30 normalized + 1,324 extension rows: backend unavailable",
+      "F2 pilot is partial (20 classes), not full GF(8)",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);
     }
@@ -2449,6 +2657,28 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
       pdfLiteralMetadata(bytes, "Subject") === reportCoverageMarker,
       "report PDF lacks the embedded exact v2 coverage marker",
     );
+    try {
+      const extracted = execFileSync("pdftotext", [absolute, "-"], {
+        encoding: "utf8",
+        maxBuffer: 16 * 1024 * 1024,
+      });
+      for (const marker of refreshedPrimePartitionMarkers) {
+        check(extracted.includes(marker), `report PDF lacks refreshed partition marker: ${marker}`);
+      }
+      check(
+        extracted.includes("all 142 pinned binary EC1 bindings"),
+        "report PDF lacks the all-142 binary certificate boundary",
+      );
+      check(
+        extracted.includes(expectedCatalogCommit),
+        "report PDF does not identify the pinned catalog commit",
+      );
+      for (const stalePattern of staleTransferCapabilityPatterns) {
+        check(!stalePattern.test(extracted), "report PDF retains a superseded transfer claim");
+      }
+    } catch (error) {
+      check(false, `cannot extract report PDF text: ${error.message}`);
+    }
   } else if (kind === "graph_png" || kind === "context_graph_png") {
     check(
       bytes.subarray(0, 8).toString("hex") === "89504e470d0a1a0a",
@@ -2477,6 +2707,19 @@ const summary = {
   },
   construction_counts: constructionCounts,
   arithmetic_checks: arithmeticChecks,
+  prime_transfer_partition: {
+    proved_u64_direct:
+      actualPredicateCounts.odd_prime_quadratic_direct_proved_u64 ?? 0,
+    proved_psi13_direct:
+      actualPredicateCounts.odd_prime_quadratic_direct_proved_psi13 ?? 0,
+    unsupported_without_primality_certificate:
+      actualPredicateCounts
+        .odd_prime_quadratic_direct_unsupported_without_primality_certificate ?? 0,
+    normalized_fail_closed:
+      actualPredicateCounts.odd_prime_quadratic_normalized_same_field ?? 0,
+    extension_backend_unavailable:
+      actualPredicateCounts.odd_extension_quadratic_direct_same_field ?? 0,
+  },
   profile_counts: {
     map: mapProfilesByPredicate.size,
     subgroup: subgroupProfilesByPredicate.size,
@@ -2490,8 +2733,8 @@ const summary = {
   effective_status_counts: effectiveStatusCounts,
   scope_note:
     "Checks the complete v2 membership ledger, explicit field/Jacobian/map bindings, graph/content joins, and cover formulas " +
-    "over every declared field. It does not independently prove odd p primality, " +
-    "extension-modulus irreducibility, EC1 subgroup orders, or transfer advantage.",
+    "over every declared field. It independently replays the deterministic-u64 and strict-psi13 proof partition, but does not " +
+    "supply primality certificates beyond that theorem range, independently prove extension-modulus irreducibility or EC1 subgroup orders, or establish transfer advantage.",
 };
 
 console.log(JSON.stringify(summary, null, 2));

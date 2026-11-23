@@ -144,8 +144,13 @@ operations.
   in counted `S`.
 
 A weighted plan is cheaper only at its weight; it is never a ranking across
-the band. The rule set is versioned (`ic-planner/4` since the weight rules were withdrawn);
-change a rule and the version changes with it.
+the band. The rule set is versioned (`ic-planner/5`: fiber-closed Frobenius
+oracle when cofactor `h > 1`; `ic-planner/4` withdrew the weight rules);
+change a rule and the version changes with it. The `h > 1` fiber default is
+`Support::Measured` on the matched K0-13 capsule (not an S win over counted);
+see [`FIBER_H_GT1_VALIDATION.md`](FIBER_H_GT1_VALIDATION.md).
+
+Pair-table DRAM/layout knobs for the m=3 host path are listed in [`PAIR_TABLE_LAYOUT.md`](PAIR_TABLE_LAYOUT.md).
 
 ---
 

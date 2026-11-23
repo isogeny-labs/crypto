@@ -20,11 +20,14 @@ use crypto_lib::binary_ecc::{
     MumfordDivisor, OrdinaryBinaryCover, PullbackFiberKind, SubgroupTransferStatus,
 };
 use crypto_lib::prime_hyperelliptic::{
-    BalancedDivisorP, FpPoly, HyperellipticCurveP, MumfordDivisorP, PrimeEllipticPointP,
-    PrimeQuadraticCoverP, PrimeSubgroupTransferStatus, SplitHyperellipticCurveP,
+    prime_proof_evidence, prime_proof_status, BalancedDivisorP, BalancedHyperellipticError, FpPoly,
+    HyperellipticCurveP, MumfordDivisorP, PrimeEllipticPointP, PrimeMontgomeryAdapterError,
+    PrimeMontgomeryPointP, PrimeMontgomeryQuadraticCoverError, PrimeMontgomeryQuadraticCoverP,
+    PrimeProofStatus, PrimeQuadraticCoverError, PrimeQuadraticCoverP, PrimeSubgroupTransferStatus,
+    SplitHyperellipticCurveP,
 };
 use num_bigint::BigUint;
-use num_traits::{ToPrimitive, Zero};
+use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
@@ -37,6 +40,7 @@ const RESPONSE_SCHEMA: &str = "hyperelliptic-infrastructure-command/v1";
 const ARITHMETIC_SCHEMA: &str = "hyperelliptic-jacobian-operation/v1";
 const TRANSFER_SCHEMA: &str = "hyperelliptic-transfer-operation/v1";
 const TRANSFER_CATALOG_SCHEMA: &str = "binary-subgroup-transfer-certificates/v1";
+const TRANSFER_CATALOG_VERIFY_SCHEMA: &str = "binary-subgroup-transfer-catalog-verification/v1";
 const MAX_INPUT_BYTES: u64 = 32 * 1024 * 1024;
 const MAX_CATALOG_INPUT_BYTES: u64 = 96 * 1024 * 1024;
 
@@ -80,7 +84,8 @@ enum Command {
         #[arg(long)]
         output: Option<PathBuf>,
     },
-    /// Evaluate and certify induced maps for checked binary and direct odd-prime cover families.
+    /// Evaluate and certify induced maps for checked binary, direct odd-prime,
+    /// and admitted Montgomery-normalized odd-prime cover families.
     Transfer {
         /// Transfer request JSON, or `-` for stdin.
         #[arg(long)]
@@ -116,6 +121,30 @@ enum Command {
         #[arg(long)]
         rustc_version: String,
         /// Certificate-corpus path; omit to write the complete corpus to stdout.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Regenerate and byte-for-byte replay a named binary subgroup corpus.
+    TransferCatalogVerify {
+        /// Exact certificate corpus emitted by `transfer-catalog-export`.
+        #[arg(long)]
+        input: PathBuf,
+        /// Exact EC1/ICV1 registry JSON used by the corpus.
+        #[arg(long)]
+        registry: PathBuf,
+        /// Exact curve-cover graph JSON used by the corpus.
+        #[arg(long)]
+        cover_graph: PathBuf,
+        /// Exact curve-traits JSON used by the corpus.
+        #[arg(long)]
+        traits: PathBuf,
+        /// Optional SHA-256 of the exact raw corpus bytes.
+        #[arg(long)]
+        expected_sha256: Option<String>,
+        /// Optional raw byte length. Must accompany `--expected-sha256`.
+        #[arg(long)]
+        expected_bytes: Option<u64>,
+        /// Verification response path; omit to write it to stdout.
         #[arg(long)]
         output: Option<PathBuf>,
     },
@@ -276,23 +305,94 @@ fn catalog_producer_source_digest() -> String {
     checker::digest(producer_sources.as_bytes())
 }
 
+fn framed_source_digest(sources: &[(&str, &str)]) -> String {
+    let mut framed = Vec::new();
+    for (path, contents) in sources {
+        framed.extend_from_slice(&(path.len() as u64).to_be_bytes());
+        framed.extend_from_slice(path.as_bytes());
+        framed.extend_from_slice(&(contents.len() as u64).to_be_bytes());
+        framed.extend_from_slice(contents.as_bytes());
+    }
+    checker::digest(&framed)
+}
+
 fn transfer_catalog_producer_source_digest() -> String {
-    let producer_sources = [
-        include_str!("curve_cover_check/checker.rs"),
-        include_str!("curve_cover_check/links.rs"),
-        include_str!("curve_cover_check/models.rs"),
-        include_str!("hyperelliptic_cover.rs"),
-        include_str!("../binary_ecc/cover_transfer.rs"),
-        include_str!("../binary_ecc/curve.rs"),
-        include_str!("../binary_ecc/f2m.rs"),
-        include_str!("../binary_ecc/hyperelliptic.rs"),
-        include_str!("../binary_ecc/poly_f2m.rs"),
-        include_str!("../../docs/curves/binary-subgroup-transfer-certificates.schema.json"),
-        include_str!("../../Cargo.toml"),
-        include_str!("../../Cargo.lock"),
-    ]
-    .concat();
-    checker::digest(producer_sources.as_bytes())
+    // Bind every local semantic input used by the catalog, including the
+    // primality gate behind exact-order evidence and its word-sized backend.
+    framed_source_digest(&[
+        (
+            "src/bin/curve_cover_check/checker.rs",
+            include_str!("curve_cover_check/checker.rs"),
+        ),
+        (
+            "src/bin/curve_cover_check/links.rs",
+            include_str!("curve_cover_check/links.rs"),
+        ),
+        (
+            "src/bin/curve_cover_check/models.rs",
+            include_str!("curve_cover_check/models.rs"),
+        ),
+        (
+            "src/bin/hyperelliptic_cover.rs",
+            include_str!("hyperelliptic_cover.rs"),
+        ),
+        (
+            "src/binary_ecc/cover_transfer.rs",
+            include_str!("../binary_ecc/cover_transfer.rs"),
+        ),
+        (
+            "src/binary_ecc/curve.rs",
+            include_str!("../binary_ecc/curve.rs"),
+        ),
+        (
+            "src/binary_ecc/f2m.rs",
+            include_str!("../binary_ecc/f2m.rs"),
+        ),
+        (
+            "src/binary_ecc/hyperelliptic.rs",
+            include_str!("../binary_ecc/hyperelliptic.rs"),
+        ),
+        (
+            "src/binary_ecc/mod.rs",
+            include_str!("../binary_ecc/mod.rs"),
+        ),
+        (
+            "src/binary_ecc/operation_tally.rs",
+            include_str!("../binary_ecc/operation_tally.rs"),
+        ),
+        (
+            "src/binary_ecc/poly_f2m.rs",
+            include_str!("../binary_ecc/poly_f2m.rs"),
+        ),
+        (
+            "src/cryptanalysis/ecc2k130_guard.rs",
+            include_str!("../cryptanalysis/ecc2k130_guard.rs"),
+        ),
+        (
+            "src/cryptanalysis/group_op_count.rs",
+            include_str!("../cryptanalysis/group_op_count.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/fp2.rs",
+            include_str!("../prime_hyperelliptic/fp2.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/mod.rs",
+            include_str!("../prime_hyperelliptic/mod.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/primality.rs",
+            include_str!("../prime_hyperelliptic/primality.rs"),
+        ),
+        ("src/hash/sha256.rs", include_str!("../hash/sha256.rs")),
+        ("src/utils/mod.rs", include_str!("../utils/mod.rs")),
+        (
+            "docs/curves/binary-subgroup-transfer-certificates.schema.json",
+            include_str!("../../docs/curves/binary-subgroup-transfer-certificates.schema.json"),
+        ),
+        ("Cargo.toml", include_str!("../../Cargo.toml")),
+        ("Cargo.lock", include_str!("../../Cargo.lock")),
+    ])
 }
 
 fn model_error(command: &str, error: checker::ModelError) -> (Value, i32) {
@@ -340,30 +440,52 @@ fn strict_model(value: &Value) -> Result<checker::Model, checker::ModelError> {
 fn proof_receipt(model: &checker::Model) -> Result<Value, String> {
     match &model.field {
         checker::Field::Prime(p) => {
-            let (jacobian_arithmetic, pullback, pushforward, composition, subgroup_transfer) = if p
-                .bits()
-                <= 64
-            {
-                (
+            let prime_status = prime_proof_status(p);
+            if prime_status == PrimeProofStatus::Composite {
+                return Err("prime modulus failed deterministic primality validation".into());
+            }
+            let proved_prime = matches!(
+                prime_status,
+                PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+            );
+            let normalization_kind = model
+                .normalization
+                .as_ref()
+                .and_then(|map| map["kind"].as_str());
+            let (jacobian_arithmetic, pullback, pushforward, composition, subgroup_transfer) =
+                if proved_prime
+                    && normalization_kind.is_some()
+                    && normalization_kind != Some("montgomery_from_short")
+                {
+                    (
+                        "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation",
+                        "unsupported_normalized_target_transfer_backend",
+                        "unsupported_normalized_target_transfer_backend",
+                        "unsupported_normalized_target_transfer_backend",
+                        "unknown_until_normalized_target_transfer_is_implemented",
+                    )
+                } else if proved_prime {
+                    (
                         "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation",
                         "implemented_for_rational_target_point_classes",
                         "implemented_for_every_canonical_balanced_genus_two_class",
                         "verified_pi_push_pi_pull_equals_multiplication_by_2_and_pi_pull_pi_push_equals_1_plus_deck",
                         "conditional_on_a_checked_annihilator_coprime_to_2_for_a_named_generated_subgroup; exact order and primality remain separate evidence",
                     )
-            } else {
-                (
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unsupported_prime_exceeds_64_bit_balanced_backend",
-                    "unknown",
-                )
-            };
+                } else {
+                    (
+                        "unsupported_without_primality_certificate",
+                        "unsupported_without_primality_certificate",
+                        "unsupported_without_primality_certificate",
+                        "unsupported_without_primality_certificate",
+                        "unknown",
+                    )
+                };
             Ok(json!({
                 "construction": "explicit",
                 "field_of_definition": "same_as_target",
-                "field_validation": "fixed-base_probable_prime_screen",
+                "field_validation": if proved_prime {"deterministic_prime_proof"} else {"fixed_base_probable_prime_screen_only"},
+                "prime_proof": prime_proof_evidence(p),
                 "target_smoothness": "verified_by_discriminant",
                 "source_smoothness": "verified_by_squarefree_sextic",
                 "genus": "verified_genus_2",
@@ -373,6 +495,12 @@ fn proof_receipt(model: &checker::Model) -> Result<Value, String> {
                 "infinity": "two_base_field_rational_points",
                 "jacobian_arithmetic": jacobian_arithmetic,
                 "jacobian_representation": "canonical_balanced_(u,v,n_plus)",
+                "target_model_transfer": match normalization_kind {
+                    None => "direct_short_weierstrass",
+                    Some("montgomery_from_short") if proved_prime => "implemented_checked_projective_montgomery_isomorphism",
+                    Some("montgomery_from_short") => "implemented_backend_blocked_by_missing_primality_certificate",
+                    Some(_) => "unsupported_projective_exceptional_point_backend",
+                },
                 "pullback": pullback,
                 "pushforward": pushforward,
                 "composition": composition,
@@ -613,6 +741,27 @@ fn prime_point_to_json(point: &PrimeEllipticPointP) -> Value {
     }
 }
 
+fn prime_montgomery_point_from_wire(
+    wire: &BinaryPointWire,
+    p: &BigUint,
+) -> Result<PrimeMontgomeryPointP, String> {
+    match prime_point_from_wire(wire, p)? {
+        PrimeEllipticPointP::Infinity => Ok(PrimeMontgomeryPointP::Infinity),
+        PrimeEllipticPointP::Affine { x, y } => Ok(PrimeMontgomeryPointP::Affine { x, y }),
+    }
+}
+
+fn prime_montgomery_point_to_json(point: &PrimeMontgomeryPointP) -> Value {
+    match point {
+        PrimeMontgomeryPointP::Infinity => json!({"kind": "infinity"}),
+        PrimeMontgomeryPointP::Affine { x, y } => json!({
+            "kind": "affine",
+            "x": format!("0x{x:x}"),
+            "y": format!("0x{y:x}"),
+        }),
+    }
+}
+
 fn fiber_kind_to_json(kind: &PullbackFiberKind) -> Value {
     match kind {
         PullbackFiberKind::InfinityRamified { ramification_index } => json!({
@@ -738,20 +887,6 @@ fn model_split_sextic_arithmetic(
     certificate: &checker::Certificate,
     p: &BigUint,
 ) -> (Value, i32) {
-    if p.bits() > 64 {
-        return (
-            response(
-                "arithmetic",
-                "unsupported",
-                json!({
-                    "reason": "the explicit split-sextic cover is constructed and replayed, but balanced arithmetic has a deterministic prime-validation boundary of at most 64 bits",
-                    "construction_status": "explicit_verified",
-                    "arithmetic_status": "unsupported_prime_size",
-                }),
-            ),
-            2,
-        );
-    }
     let f = match prime_poly(&certificate.f, p, "constructed f") {
         Ok(f) => f,
         Err(reason) => {
@@ -767,6 +902,21 @@ fn model_split_sextic_arithmetic(
     };
     let curve = match SplitHyperellipticCurveP::try_new(p.clone(), f) {
         Ok(curve) => curve,
+        Err(BalancedHyperellipticError::UnsupportedPrimalityProofRange { .. }) => {
+            return (
+                response(
+                    "arithmetic",
+                    "unsupported",
+                    json!({
+                        "reason": "the explicit split-sextic cover is constructed and replayed, but balanced arithmetic requires a deterministic modulus proof",
+                        "construction_status": "explicit_verified",
+                        "arithmetic_status": "unsupported_without_primality_certificate",
+                        "prime_proof": prime_proof_evidence(p),
+                    }),
+                ),
+                2,
+            )
+        }
         Err(error) => {
             return (
                 response(
@@ -790,7 +940,8 @@ fn model_split_sextic_arithmetic(
             "infinity_labels": {"plus": "y/x^3=+1", "minus": "y/x^3=-1"},
             "infinity_polynomial_plus": encoded_prime_poly(curve.infinity_polynomial()),
             "representation": "canonical_balanced_(u,v,n_plus)",
-            "scope": "checked balanced Jacobian arithmetic; the transfer command separately exposes the direct-prime quadratic cover maps within the same at-most-64-bit boundary",
+            "prime_proof": prime_proof_evidence(p),
+            "scope": "checked balanced Jacobian arithmetic inside the strict deterministic primality-proof boundary; the transfer command separately exposes quadratic cover maps for direct short-Weierstrass and admitted projective Montgomery targets, while Edwards normalized targets remain unsupported",
         }),
     )
 }
@@ -1177,19 +1328,6 @@ fn split_sextic_odd_arithmetic(
             )
         }
     };
-    if p.bits() > 64 {
-        return (
-            response(
-                "arithmetic",
-                "unsupported",
-                json!({
-                    "reason": "split-sextic balanced arithmetic has a deterministic odd-prime validation boundary of at most 64 bits",
-                    "arithmetic_status": "unsupported_prime_size",
-                }),
-            ),
-            2,
-        );
-    }
     let f = match prime_poly(&supplied.f, &p, "f") {
         Ok(f) => f,
         Err(reason) => {
@@ -1199,8 +1337,22 @@ fn split_sextic_odd_arithmetic(
             )
         }
     };
-    let curve = match SplitHyperellipticCurveP::try_new(p, f) {
+    let curve = match SplitHyperellipticCurveP::try_new(p.clone(), f) {
         Ok(curve) => curve,
+        Err(BalancedHyperellipticError::UnsupportedPrimalityProofRange { .. }) => {
+            return (
+                response(
+                    "arithmetic",
+                    "unsupported",
+                    json!({
+                        "reason": "split-sextic balanced arithmetic requires a deterministic modulus proof",
+                        "arithmetic_status": "unsupported_without_primality_certificate",
+                        "prime_proof": prime_proof_evidence(&p),
+                    }),
+                ),
+                2,
+            )
+        }
         Err(error) => {
             return (
                 response(
@@ -1218,6 +1370,7 @@ fn split_sextic_odd_arithmetic(
         json!({
             "family": supplied.family,
             "field": {"characteristic": supplied.p, "representation": "prime_residue"},
+            "prime_proof": prime_proof_evidence(&p),
             "curve": supplied,
             "infinity_configuration": "two_rational_points",
             "infinity_labels": {"plus": "y/x^3=+1", "minus": "y/x^3=-1"},
@@ -1354,19 +1507,6 @@ fn prime_transfer(
     curve_construction: checker::Certificate,
     p: BigUint,
 ) -> (Value, i32) {
-    if p.bits() > 64 {
-        return (
-            response(
-                "transfer",
-                "unsupported",
-                json!({
-                    "reason": "odd-prime induced maps require the deterministic at-most-64-bit balanced backend",
-                    "transfer_status": "unsupported_prime_size",
-                }),
-            ),
-            2,
-        );
-    }
     if matches!(
         request.operation,
         TransferOperation::ImageEndomorphismCertificate
@@ -1404,23 +1544,130 @@ fn prime_transfer(
         );
     }
     let shift = coordinate_map[0].clone();
-    let cover = match PrimeQuadraticCoverP::try_new(
-        p.clone(),
-        model.a.clone(),
-        model.b.clone(),
-        shift.clone(),
-    ) {
-        Ok(cover) => cover,
-        Err(error) => {
+    let normalization = model.normalization.clone();
+    if let Some(target_model_map) = &normalization {
+        if target_model_map["kind"] != "montgomery_from_short" {
+            return (
+                response(
+                    "transfer",
+                    "unsupported",
+                    json!({
+                        "reason": "Edwards target normalization still requires a typed projective adapter with explicit exceptional-point handling",
+                        "construction_status": "explicit_verified",
+                        "transfer_status": "unsupported_normalized_target_transfer_backend",
+                        "target_model_map_kind": target_model_map["kind"],
+                    }),
+                ),
+                2,
+            );
+        }
+    }
+
+    let unsupported_prime = || {
+        (
+            response(
+                "transfer",
+                "unsupported",
+                json!({
+                    "reason": "odd-prime induced maps require a deterministic modulus proof",
+                    "construction_status": "explicit_verified",
+                    "transfer_status": "unsupported_without_primality_certificate",
+                    "prime_proof": prime_proof_evidence(&p),
+                    "normalized_target_backend": normalization.as_ref().map(|map| map["kind"].clone()),
+                }),
+            ),
+            2,
+        )
+    };
+
+    let (cover, montgomery_adapter) = if let Some(target_model_map) = &normalization {
+        let read_map_number = |name: &str| -> Result<BigUint, String> {
+            target_model_map[name]
+                .as_str()
+                .ok_or_else(|| format!("normalized target map is missing `{name}`"))
+                .and_then(parse_number)
+        };
+        let montgomery_a = match read_map_number("montgomery_A") {
+            Ok(value) => value,
+            Err(reason) => return (response("transfer", "error", json!({"reason": reason})), 1),
+        };
+        let montgomery_b = match read_map_number("montgomery_B") {
+            Ok(value) => value,
+            Err(reason) => return (response("transfer", "error", json!({"reason": reason})), 1),
+        };
+        let recorded_shift = match read_map_number("shift_A_over_3") {
+            Ok(value) => value,
+            Err(reason) => return (response("transfer", "error", json!({"reason": reason})), 1),
+        };
+        let composed = match PrimeMontgomeryQuadraticCoverP::try_new(
+            p.clone(),
+            montgomery_a,
+            montgomery_b,
+            shift.clone(),
+        ) {
+            Ok(cover) => cover,
+            Err(PrimeMontgomeryQuadraticCoverError::Adapter(
+                PrimeMontgomeryAdapterError::UnsupportedPrimalityProofRange { .. },
+            ))
+            | Err(PrimeMontgomeryQuadraticCoverError::Cover(
+                PrimeQuadraticCoverError::UnsupportedPrimalityProofRange { .. },
+            )) => return unsupported_prime(),
+            Err(error) => {
+                return (
+                    response(
+                        "transfer",
+                        "error",
+                        json!({"reason": format!("normalized Montgomery cover runtime validation failed: {error}")}),
+                    ),
+                    1,
+                )
+            }
+        };
+        let short_a_decimal = model.a.to_str_radix(10);
+        let short_b_decimal = model.b.to_str_radix(10);
+        if composed.adapter().shift_a_over_3() != &recorded_shift
+            || composed.adapter().short_a() != &model.a
+            || composed.adapter().short_b() != &model.b
+            || target_model_map["source_model"]["a"].as_str() != Some(short_a_decimal.as_str())
+            || target_model_map["source_model"]["b"].as_str() != Some(short_b_decimal.as_str())
+            || target_model_map.get("target_model") != Some(&request.model)
+        {
             return (
                 response(
                     "transfer",
                     "error",
-                    json!({"reason": format!("prime cover runtime validation failed: {error}")}),
+                    json!({"reason": "normalized target map metadata does not match the typed Montgomery composition"}),
                 ),
                 1,
-            )
+            );
         }
+        (
+            composed.short_cover().clone(),
+            Some(composed.adapter().clone()),
+        )
+    } else {
+        let cover = match PrimeQuadraticCoverP::try_new(
+            p.clone(),
+            model.a.clone(),
+            model.b.clone(),
+            shift.clone(),
+        ) {
+            Ok(cover) => cover,
+            Err(PrimeQuadraticCoverError::UnsupportedPrimalityProofRange { .. }) => {
+                return unsupported_prime()
+            }
+            Err(error) => {
+                return (
+                    response(
+                        "transfer",
+                        "error",
+                        json!({"reason": format!("prime cover runtime validation failed: {error}")}),
+                    ),
+                    1,
+                )
+            }
+        };
+        (cover, None)
     };
     let certificate_source = match prime_poly(&curve_construction.f, &p, "certificate source f") {
         Ok(polynomial) => polynomial,
@@ -1449,7 +1696,24 @@ fn prime_transfer(
             .point
             .as_ref()
             .ok_or_else(|| "operation requires `point`".to_string())?;
-        prime_point_from_wire(wire, &p)
+        if let Some(adapter) = &montgomery_adapter {
+            let point = prime_montgomery_point_from_wire(wire, &p)?;
+            adapter
+                .montgomery_to_short(&point)
+                .map_err(|error| error.to_string())
+        } else {
+            prime_point_from_wire(wire, &p)
+        }
+    };
+    let point_json = |point: &PrimeEllipticPointP| -> Result<Value, String> {
+        if let Some(adapter) = &montgomery_adapter {
+            let point = adapter
+                .short_to_montgomery(point)
+                .map_err(|error| error.to_string())?;
+            Ok(prime_montgomery_point_to_json(&point))
+        } else {
+            Ok(prime_point_to_json(point))
+        }
     };
     let order = || -> Result<BigUint, String> {
         request
@@ -1467,7 +1731,7 @@ fn prime_transfer(
                 .map_err(|error| error.to_string())?;
             Ok(json!({
                 "input": balanced_divisor_to_wire(&divisor),
-                "image": prime_point_to_json(&image),
+                "image": point_json(&image)?,
                 "method": "checked_symmetric_base_field_norm_for_every_canonical_balanced_class",
             }))
         })(),
@@ -1488,7 +1752,7 @@ fn prime_transfer(
                 .pullback_point_class(&point)
                 .map_err(|error| error.to_string())?;
             Ok(json!({
-                "input": prime_point_to_json(&point),
+                "input": point_json(&point)?,
                 "pullback": balanced_divisor_to_wire(&pullback),
             }))
         })(),
@@ -1498,10 +1762,10 @@ fn prime_transfer(
                 .pull_push_composition_certificate(&point)
                 .map_err(|error| error.to_string())?;
             Ok(json!({
-                "input": prime_point_to_json(&certificate.input),
+                "input": point_json(&certificate.input)?,
                 "pullback": balanced_divisor_to_wire(&certificate.pullback),
-                "pushforward": prime_point_to_json(&certificate.pushforward),
-                "twice_input": prime_point_to_json(&certificate.twice_input),
+                "pushforward": point_json(&certificate.pushforward)?,
+                "twice_input": point_json(&certificate.twice_input)?,
                 "identity": "pi_* pi^* = [2]",
                 "identity_holds": certificate.identity_holds,
             }))
@@ -1513,7 +1777,7 @@ fn prime_transfer(
                 .map_err(|error| error.to_string())?;
             Ok(json!({
                 "input": balanced_divisor_to_wire(&certificate.input),
-                "pushforward": prime_point_to_json(&certificate.pushforward),
+                "pushforward": point_json(&certificate.pushforward)?,
                 "pullback": balanced_divisor_to_wire(&certificate.pullback),
                 "deck_transform": balanced_divisor_to_wire(&certificate.deck_transform),
                 "input_plus_deck": balanced_divisor_to_wire(&certificate.input_plus_deck),
@@ -1574,7 +1838,7 @@ fn prime_transfer(
             }
             Ok(json!({
                 "claim_scope": "pullback_is_injective_on_the_named_generated_subgroup; annihilator_exactness_and_primality_not_claimed",
-                "generator": prime_point_to_json(&generator),
+                "generator": point_json(&generator)?,
                 "annihilator": annihilator.to_str_radix(10),
                 "map_degree": 2,
                 "degree_inverse_mod_annihilator": degree_inverse.to_str_radix(10),
@@ -1588,9 +1852,9 @@ fn prime_transfer(
                     "recovery_matches_generator": true,
                 },
                 "pullback": balanced_divisor_to_wire(&certificate.pullback),
-                "pushforward": prime_point_to_json(&certificate.pushforward),
-                "twice_generator": prime_point_to_json(&certificate.twice_input),
-                "recovered_generator": prime_point_to_json(&recovered),
+                "pushforward": point_json(&certificate.pushforward)?,
+                "twice_generator": point_json(&certificate.twice_input)?,
+                "recovered_generator": point_json(&recovered)?,
                 "exact_order_or_primality_claimed": false,
                 "proof_reference": "research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean#injective_with_recovery",
             }))
@@ -1629,6 +1893,31 @@ fn prime_transfer(
     };
 
     let operation = transfer_operation_name(request.operation);
+    let (family, map, coordinate_scope, scope) = if let Some(adapter) = &montgomery_adapter {
+        (
+            "normalized_prime_quadratic_pullback_v1_split_sextic_balanced_montgomery",
+            json!({
+                "short_intermediate": {"X": format!("u^2+0x{shift:x}"), "Y": "v"},
+                "short_to_montgomery": {
+                    "x": format!("0x{:x}*X-0x{:x}", adapter.montgomery_b(), adapter.shift_a_over_3()),
+                    "y": format!("0x{:x}*Y", adapter.montgomery_b()),
+                },
+                "composed": {
+                    "x": format!("0x{:x}*(u^2+0x{shift:x})-0x{:x}", adapter.montgomery_b(), adapter.shift_a_over_3()),
+                    "y": format!("0x{:x}*v", adapter.montgomery_b()),
+                },
+            }),
+            "all target point inputs and outputs use the original Montgomery coordinates; balanced divisors use the normalized split-sextic source",
+            "checked induced map over an admitted odd prime and an everywhere-defined projective Montgomery isomorphism; exact subgroup-order, extension-field, Edwards exceptional-point, solver, scaling, and comparative-cost claims are outside this command",
+        )
+    } else {
+        (
+            "prime_quadratic_pullback_v1_split_sextic_balanced",
+            json!({"x": format!("u^2+0x{shift:x}"), "y": "v"}),
+            "target point inputs and outputs use direct short-Weierstrass coordinates; balanced divisors use the split-sextic source",
+            "checked induced map over a direct odd prime inside the strict deterministic primality-proof boundary; exact subgroup-order, extension-field, solver, scaling, and comparative-cost claims are outside this command",
+        )
+    };
     match computed {
         Ok(result) => (
             response(
@@ -1637,16 +1926,18 @@ fn prime_transfer(
                 json!({
                     "operation": operation,
                     "context": {
-                        "family": "prime_quadratic_pullback_v1_split_sextic_balanced",
+                        "family": family,
                         "target_model": request.model,
                         "curve_construction": curve_construction,
                         "source_genus": 2,
                         "map_degree": 2,
-                        "map": {"x": format!("u^2+0x{shift:x}"), "y": "v"},
+                        "map": map,
+                        "coordinate_scope": coordinate_scope,
                         "infinity": "two_base_field_rational_points_both_mapping_to_target_identity",
+                        "prime_proof": prime_proof_evidence(&p),
                     },
                     "result": result,
-                    "scope": "checked induced map over a direct odd prime of at most 64 bits; exact subgroup-order, extension-field, normalized-target, solver, and comparative-cost claims are outside this command",
+                    "scope": scope,
                 }),
             ),
             0,
@@ -1996,23 +2287,6 @@ fn affine_certificate_point(point: &BinaryPoint) -> Result<Value, String> {
     }
 }
 
-fn small_prime_by_trial_division(n: u64) -> bool {
-    if n < 2 {
-        return false;
-    }
-    if n.is_multiple_of(2) {
-        return n == 2;
-    }
-    let mut divisor = 3u64;
-    while divisor <= n / divisor {
-        if n.is_multiple_of(divisor) {
-            return false;
-        }
-        divisor += 2;
-    }
-    true
-}
-
 fn unknown_exact_order_evidence() -> Value {
     json!({
         "annihilator_primality": {"status": "unknown", "evidence_ref": null},
@@ -2021,18 +2295,18 @@ fn unknown_exact_order_evidence() -> Value {
 }
 
 fn exact_order_evidence(annihilator: &BigUint) -> Value {
-    // The seven current binary bindings absent from the older traits snapshot
-    // have annihilators below 2^27.  Bounded trial division is deterministic
-    // there; nonidentity plus [r]G=O then proves exact order r when r is prime.
-    if let Some(value) = annihilator.to_u64().filter(|value| *value <= 100_000_000) {
-        if small_prime_by_trial_division(value) {
-            let reference =
-                "src/bin/hyperelliptic_cover.rs#small_prime_by_trial_division_and_named_generator_checks";
-            return json!({
-                "annihilator_primality": {"status": "proved", "evidence_ref": reference},
-                "generated_subgroup_cardinality": {"status": "proved", "evidence_ref": reference},
-            });
-        }
+    // A proved-prime annihilator, a checked nonidentity generator, and
+    // [r]G=O establish ord(G)=r. This narrow statement does not assert the
+    // ambient curve order.
+    if matches!(
+        prime_proof_status(annihilator),
+        PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
+    ) {
+        let reference = "Sorenson-Webster-Theorem-1.1-psi13;strong-Miller-Rabin-first-16-prime-bases-through-53;exclusive-bound-3317044064679887385961981;src/prime_hyperelliptic/primality.rs#prime_proof_status;named-generator-nonidentity-and-annihilation-checks";
+        return json!({
+            "annihilator_primality": {"status": "proved", "evidence_ref": reference},
+            "generated_subgroup_cardinality": {"status": "proved", "evidence_ref": reference},
+        });
     }
 
     unknown_exact_order_evidence()
@@ -2395,6 +2669,113 @@ fn binary_transfer_catalog(
     ))
 }
 
+fn pretty_json_bytes(value: &Value) -> Result<Vec<u8>, String> {
+    let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
+    bytes.push(b'\n');
+    Ok(bytes)
+}
+
+fn require_exact_catalog_bytes(input: &[u8], expected: &Value) -> Result<(), String> {
+    if input != pretty_json_bytes(expected)? {
+        return Err(
+            "certificate corpus is not the exact canonical byte serialization regenerated from the supplied inputs"
+                .into(),
+        );
+    }
+    Ok(())
+}
+
+fn verify_binary_transfer_catalog(
+    corpus_bytes: &[u8],
+    registry_bytes: &[u8],
+    graph_bytes: &[u8],
+    traits_bytes: &[u8],
+    expected_sha256: Option<&str>,
+    expected_bytes: Option<u64>,
+) -> Result<(Value, bool), String> {
+    if expected_sha256.is_some() != expected_bytes.is_some() {
+        return Err("expected_sha256 and expected_bytes must be supplied together".into());
+    }
+    let corpus_sha256 = checker::digest(corpus_bytes);
+    if let Some(expected) = expected_sha256 {
+        if expected.len() != 64
+            || !expected
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err("expected_sha256 must be exactly 64 lowercase hexadecimal digits".into());
+        }
+        if expected != corpus_sha256 {
+            return Err(format!(
+                "raw certificate corpus SHA-256 mismatch: expected {expected}, got {corpus_sha256}"
+            ));
+        }
+        let actual_bytes = corpus_bytes.len() as u64;
+        if expected_bytes != Some(actual_bytes) {
+            return Err(format!(
+                "raw certificate corpus byte-length mismatch: expected {}, got {actual_bytes}",
+                expected_bytes.expect("paired option checked")
+            ));
+        }
+    }
+
+    let saved: Value = serde_json::from_slice(corpus_bytes)
+        .map_err(|error| format!("parse certificate corpus: {error}"))?;
+    if saved["schema_version"] != TRANSFER_CATALOG_SCHEMA {
+        return Err("unsupported certificate corpus schema".into());
+    }
+    let producer_commit = saved["producer"]["git_commit"]
+        .as_str()
+        .ok_or_else(|| "certificate corpus producer lacks git_commit".to_string())?;
+    let rustc_version = saved["producer"]["rustc_version"]
+        .as_str()
+        .ok_or_else(|| "certificate corpus producer lacks rustc_version".to_string())?;
+    let (regenerated, complete) = binary_transfer_catalog(
+        registry_bytes,
+        graph_bytes,
+        traits_bytes,
+        producer_commit,
+        rustc_version,
+    )?;
+    require_exact_catalog_bytes(corpus_bytes, &regenerated)?;
+
+    Ok((
+        json!({
+            "schema_version": TRANSFER_CATALOG_VERIFY_SCHEMA,
+            "status": if complete { "verified_complete" } else { "verified_incomplete" },
+            "corpus": {
+                "sha256": corpus_sha256,
+                "bytes": corpus_bytes.len(),
+                "schema_version": TRANSFER_CATALOG_SCHEMA,
+                "canonical_pretty_json_with_trailing_newline": true,
+            },
+            "producer": {
+                "git_commit": producer_commit,
+                "rustc_version": rustc_version,
+                "source_sha256": transfer_catalog_producer_source_digest(),
+                "attestation": "caller_supplied_unverified",
+            },
+            "inputs": {
+                "registry_sha256": checker::digest(registry_bytes),
+                "cover_graph_sha256": checker::digest(graph_bytes),
+                "traits_sha256": checker::digest(traits_bytes),
+            },
+            "checks": {
+                "optional_raw_hash_and_size": expected_sha256.is_some(),
+                "schema_and_metadata_reparsed": true,
+                "cover_graph_rebuilt_exactly": true,
+                "all_maps_and_named_generators_replayed": true,
+                "complete_value_regenerated": true,
+                "canonical_bytes_equal": true,
+                "all_records_supported": complete,
+            },
+            "summary": regenerated["summary"],
+            "claim_boundary": "exact corpus replay establishes the recorded construction, map, and named-generated-subgroup checks; it does not establish exact orders marked unknown, a Jacobian solver, or a DLP advantage",
+        }),
+        complete,
+    ))
+}
+
 fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
     match command {
         Command::Construct { input, output } => match parse_json(&input) {
@@ -2517,6 +2898,55 @@ fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
                 ),
             }
         }
+        Command::TransferCatalogVerify {
+            input,
+            registry,
+            cover_graph,
+            traits,
+            expected_sha256,
+            expected_bytes,
+            output,
+        } => {
+            let verified = read_bytes_with_limit(&input, MAX_CATALOG_INPUT_BYTES)
+                .and_then(|corpus_bytes| {
+                    read_bytes(&registry).map(|registry_bytes| (corpus_bytes, registry_bytes))
+                })
+                .and_then(|(corpus_bytes, registry_bytes)| {
+                    read_bytes_with_limit(&cover_graph, MAX_CATALOG_INPUT_BYTES)
+                        .map(|graph_bytes| (corpus_bytes, registry_bytes, graph_bytes))
+                })
+                .and_then(|(corpus_bytes, registry_bytes, graph_bytes)| {
+                    read_bytes(&traits).map(|traits_bytes| {
+                        (corpus_bytes, registry_bytes, graph_bytes, traits_bytes)
+                    })
+                })
+                .and_then(
+                    |(corpus_bytes, registry_bytes, graph_bytes, traits_bytes)| {
+                        verify_binary_transfer_catalog(
+                            &corpus_bytes,
+                            &registry_bytes,
+                            &graph_bytes,
+                            &traits_bytes,
+                            expected_sha256.as_deref(),
+                            expected_bytes,
+                        )
+                    },
+                );
+            match verified {
+                Ok((verification, complete)) => {
+                    (verification, if complete { 0 } else { 1 }, output)
+                }
+                Err(reason) => (
+                    response(
+                        "transfer_catalog_verify",
+                        "invalid_input",
+                        json!({"reason": reason}),
+                    ),
+                    3,
+                    output,
+                ),
+            }
+        }
     }
 }
 
@@ -2600,6 +3030,17 @@ mod tests {
         })
     }
 
+    fn prime_p73_model() -> Value {
+        json!({
+            "v": "1",
+            "form": "y^2=x^3+a*x+b",
+            "p": "5902977611310272157103",
+            "field": "fp-5902977611310272157103",
+            "a": "4168100599208664723916",
+            "b": "240650161999037164785",
+        })
+    }
+
     #[test]
     fn construction_has_separate_verified_claims() {
         let (answer, code) = construct(binary_model());
@@ -2661,24 +3102,80 @@ mod tests {
 
     #[test]
     fn transfer_catalog_digest_covers_semantics_schema_and_build_pins() {
-        let expected = checker::digest(
-            [
+        let expected = framed_source_digest(&[
+            (
+                "src/bin/curve_cover_check/checker.rs",
                 include_str!("curve_cover_check/checker.rs"),
+            ),
+            (
+                "src/bin/curve_cover_check/links.rs",
                 include_str!("curve_cover_check/links.rs"),
+            ),
+            (
+                "src/bin/curve_cover_check/models.rs",
                 include_str!("curve_cover_check/models.rs"),
+            ),
+            (
+                "src/bin/hyperelliptic_cover.rs",
                 include_str!("hyperelliptic_cover.rs"),
+            ),
+            (
+                "src/binary_ecc/cover_transfer.rs",
                 include_str!("../binary_ecc/cover_transfer.rs"),
+            ),
+            (
+                "src/binary_ecc/curve.rs",
                 include_str!("../binary_ecc/curve.rs"),
+            ),
+            (
+                "src/binary_ecc/f2m.rs",
                 include_str!("../binary_ecc/f2m.rs"),
+            ),
+            (
+                "src/binary_ecc/hyperelliptic.rs",
                 include_str!("../binary_ecc/hyperelliptic.rs"),
+            ),
+            (
+                "src/binary_ecc/mod.rs",
+                include_str!("../binary_ecc/mod.rs"),
+            ),
+            (
+                "src/binary_ecc/operation_tally.rs",
+                include_str!("../binary_ecc/operation_tally.rs"),
+            ),
+            (
+                "src/binary_ecc/poly_f2m.rs",
                 include_str!("../binary_ecc/poly_f2m.rs"),
+            ),
+            (
+                "src/cryptanalysis/ecc2k130_guard.rs",
+                include_str!("../cryptanalysis/ecc2k130_guard.rs"),
+            ),
+            (
+                "src/cryptanalysis/group_op_count.rs",
+                include_str!("../cryptanalysis/group_op_count.rs"),
+            ),
+            (
+                "src/prime_hyperelliptic/fp2.rs",
+                include_str!("../prime_hyperelliptic/fp2.rs"),
+            ),
+            (
+                "src/prime_hyperelliptic/mod.rs",
+                include_str!("../prime_hyperelliptic/mod.rs"),
+            ),
+            (
+                "src/prime_hyperelliptic/primality.rs",
+                include_str!("../prime_hyperelliptic/primality.rs"),
+            ),
+            ("src/hash/sha256.rs", include_str!("../hash/sha256.rs")),
+            ("src/utils/mod.rs", include_str!("../utils/mod.rs")),
+            (
+                "docs/curves/binary-subgroup-transfer-certificates.schema.json",
                 include_str!("../../docs/curves/binary-subgroup-transfer-certificates.schema.json"),
-                include_str!("../../Cargo.toml"),
-                include_str!("../../Cargo.lock"),
-            ]
-            .concat()
-            .as_bytes(),
-        );
+            ),
+            ("Cargo.toml", include_str!("../../Cargo.toml")),
+            ("Cargo.lock", include_str!("../../Cargo.lock")),
+        ]);
         assert_eq!(transfer_catalog_producer_source_digest(), expected);
     }
 
@@ -2688,12 +3185,73 @@ mod tests {
         assert_eq!(proved["annihilator_primality"]["status"], "proved");
         assert_eq!(proved["generated_subgroup_cardinality"]["status"], "proved");
 
+        let proved_wide =
+            exact_order_evidence(&BigUint::parse_bytes(b"5902977611275912361963", 10).unwrap());
+        assert_eq!(proved_wide["annihilator_primality"]["status"], "proved");
+
+        let psi_12 =
+            exact_order_evidence(&BigUint::parse_bytes(b"318665857834031151167461", 10).unwrap());
+        assert_eq!(psi_12["annihilator_primality"]["status"], "unknown");
+
         let unknown = exact_order_evidence(&BigUint::from(100_000_001u64));
         assert_eq!(unknown["annihilator_primality"]["status"], "unknown");
         assert_eq!(
             unknown["generated_subgroup_cardinality"]["status"],
             "unknown"
         );
+
+        let at_bound =
+            exact_order_evidence(&BigUint::parse_bytes(b"3317044064679887385961981", 10).unwrap());
+        assert_eq!(at_bound["annihilator_primality"]["status"], "unknown");
+    }
+
+    #[test]
+    fn transfer_catalog_verify_rejects_invalid_raw_pins_and_schema_before_replay() {
+        let corpus = b"{}";
+        let empty = b"";
+        let digest = checker::digest(corpus);
+
+        let unpaired =
+            verify_binary_transfer_catalog(corpus, empty, empty, empty, Some(&digest), None)
+                .unwrap_err();
+        assert!(unpaired.contains("must be supplied together"));
+
+        let malformed = verify_binary_transfer_catalog(
+            corpus,
+            empty,
+            empty,
+            empty,
+            Some(&digest.to_ascii_uppercase()),
+            Some(corpus.len() as u64),
+        )
+        .unwrap_err();
+        assert!(malformed.contains("lowercase hexadecimal"));
+
+        let wrong_hash = verify_binary_transfer_catalog(
+            corpus,
+            empty,
+            empty,
+            empty,
+            Some(&"0".repeat(64)),
+            Some(corpus.len() as u64),
+        )
+        .unwrap_err();
+        assert!(wrong_hash.contains("SHA-256 mismatch"));
+
+        let wrong_size = verify_binary_transfer_catalog(
+            corpus,
+            empty,
+            empty,
+            empty,
+            Some(&digest),
+            Some(corpus.len() as u64 + 1),
+        )
+        .unwrap_err();
+        assert!(wrong_size.contains("byte-length mismatch"));
+
+        let unsupported =
+            verify_binary_transfer_catalog(corpus, empty, empty, empty, None, None).unwrap_err();
+        assert!(unsupported.contains("unsupported certificate corpus schema"));
     }
 
     #[test]
@@ -2992,6 +3550,42 @@ mod tests {
                 .count(),
             27
         );
+        let subgroup_rows = records
+            .iter()
+            .flat_map(|record| {
+                record["named_subgroups"]
+                    .as_array()
+                    .expect("named subgroup array")
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            subgroup_rows
+                .iter()
+                .filter(
+                    |row| row["exact_order_evidence"]["annihilator_primality"]["status"]
+                        == "proved"
+                )
+                .count(),
+            102
+        );
+        assert_eq!(
+            subgroup_rows
+                .iter()
+                .filter(
+                    |row| row["exact_order_evidence"]["annihilator_primality"]["status"]
+                        == "unknown"
+                )
+                .count(),
+            48
+        );
+
+        let encoded = pretty_json_bytes(&catalog).expect("canonical corpus bytes");
+        require_exact_catalog_bytes(&encoded, &catalog).expect("exact replay bytes");
+        let mut noncanonical = encoded.clone();
+        noncanonical.push(b' ');
+        assert!(require_exact_catalog_bytes(&noncanonical, &catalog)
+            .unwrap_err()
+            .contains("exact canonical byte serialization"));
     }
 
     #[test]
@@ -3359,6 +3953,81 @@ mod tests {
     }
 
     #[test]
+    fn strict_psi13_wide_prime_reaches_arithmetic_and_transfer_but_fails_closed_above_bound() {
+        let model = prime_p73_model();
+        let (constructed, construct_code) = construct(model.clone());
+        assert_eq!(construct_code, 0, "{constructed}");
+        assert_eq!(
+            constructed["result"]["verification"]["prime_proof"]["status"],
+            "proved_psi13"
+        );
+        assert_eq!(
+            constructed["result"]["verification"]["jacobian_arithmetic"],
+            "implemented_checked_balanced_split_sextic_with_deterministic_prime_revalidation"
+        );
+
+        let arithmetic_request = ArithmeticRequest {
+            schema: ARITHMETIC_SCHEMA.into(),
+            model: Some(model.clone()),
+            odd_curve: None,
+            operation: ArithmeticOperation::Identity,
+            left: None,
+            right: None,
+            scalar: None,
+        };
+        let (arithmetic_answer, arithmetic_code) = arithmetic(arithmetic_request);
+        assert_eq!(arithmetic_code, 0, "{arithmetic_answer}");
+        assert_eq!(
+            arithmetic_answer["result"]["context"]["prime_proof"]["status"],
+            "proved_psi13"
+        );
+
+        let transfer_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model,
+            operation: TransferOperation::GeneratedSubgroupCertificate,
+            divisor: None,
+            point: Some(BinaryPointWire::Affine {
+                x: "1".into(),
+                y: "1565394211633018828840".into(),
+            }),
+            order: Some("5902977611275912361963".into()),
+        };
+        let (transfer_answer, transfer_code) = transfer(transfer_request);
+        assert_eq!(transfer_code, 0, "{transfer_answer}");
+        assert_eq!(
+            transfer_answer["result"]["context"]["prime_proof"]["status"],
+            "proved_psi13"
+        );
+        assert_eq!(
+            transfer_answer["result"]["result"]["checks"]["recovery_matches_generator"],
+            true
+        );
+
+        let unsupported_model = json!({
+            "v": "1", "form": "y^2=x^3+a*x+b",
+            "p": "3317044064679887385962123",
+            "field": "fp-3317044064679887385962123",
+            "a": "1", "b": "1",
+        });
+        let unsupported_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: unsupported_model,
+            operation: TransferOperation::SubgroupStatus,
+            divisor: None,
+            point: None,
+            order: Some("3".into()),
+        };
+        let (unsupported, unsupported_code) = transfer(unsupported_request);
+        assert_eq!(unsupported_code, 2, "{unsupported}");
+        assert_eq!(unsupported["status"], "unsupported");
+        assert_eq!(
+            unsupported["result"]["transfer_status"],
+            "unsupported_without_primality_certificate"
+        );
+    }
+
+    #[test]
     fn prime_cover_arithmetic_uses_balanced_split_sextic_backend() {
         let request = ArithmeticRequest {
             schema: ARITHMETIC_SCHEMA.into(),
@@ -3416,18 +4085,174 @@ mod tests {
     }
 
     #[test]
-    fn normalized_montgomery_cover_reaches_verified_construction() {
+    fn normalized_montgomery_cover_reaches_checked_composed_transfer() {
         let model = json!({
             "v":"1", "form":"B*y^2=x^3+A*x^2+x", "p":"11",
             "field":"fp-11", "A":"3", "B":"1"
         });
-        let (answer, code) = construct(model);
+        let (answer, code) = construct(model.clone());
         assert_eq!(code, 0, "{answer}");
         assert_eq!(answer["status"], "ok");
         assert_eq!(
             answer["result"]["certificate"]["target_model_map"]["status"],
             "verified_algebraic_identity"
         );
+        assert_eq!(
+            answer["result"]["verification"]["pullback"],
+            "implemented_for_rational_target_point_classes"
+        );
+        assert_eq!(
+            answer["result"]["verification"]["pushforward"],
+            "implemented_for_every_canonical_balanced_genus_two_class"
+        );
+        assert_eq!(
+            answer["result"]["verification"]["composition"],
+            "verified_pi_push_pi_pull_equals_multiplication_by_2_and_pi_pull_pi_push_equals_1_plus_deck"
+        );
+        assert_eq!(
+            answer["result"]["verification"]["target_model_transfer"],
+            "implemented_checked_projective_montgomery_isomorphism"
+        );
+
+        // Montgomery (10,1) maps to short (0,1); with the deterministic
+        // shift c=0 it exercises the ramified repeated-support fiber U=T^2.
+        let supported_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: model.clone(),
+            operation: TransferOperation::PullPushCompositionCertificate,
+            divisor: None,
+            point: Some(BinaryPointWire::Affine {
+                x: "10".into(),
+                y: "1".into(),
+            }),
+            order: None,
+        };
+        let (supported, supported_code) = transfer(supported_request);
+        assert_eq!(supported_code, 0, "{supported}");
+        assert_eq!(supported["result"]["result"]["identity_holds"], true);
+        assert_eq!(
+            supported["result"]["result"]["input"],
+            json!({"kind":"affine", "x":"0xa", "y":"0x1"})
+        );
+        assert_eq!(
+            supported["result"]["result"]["pullback"]["u"],
+            json!(["0x0", "0x0", "0x1"])
+        );
+        assert_eq!(
+            supported["result"]["context"]["family"],
+            "normalized_prime_quadratic_pullback_v1_split_sextic_balanced_montgomery"
+        );
+
+        let divisor = DivisorWire {
+            u: vec!["0".into(), "0".into(), "1".into()],
+            v: vec!["1".into()],
+            n_plus: Some(0),
+        };
+        let pushforward_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: model.clone(),
+            operation: TransferOperation::Pushforward,
+            divisor: Some(divisor.clone()),
+            point: None,
+            order: None,
+        };
+        let (pushforward, pushforward_code) = transfer(pushforward_request);
+        assert_eq!(pushforward_code, 0, "{pushforward}");
+        assert_eq!(
+            pushforward["result"]["result"]["image"],
+            json!({"kind":"affine", "x":"0x0", "y":"0x0"})
+        );
+
+        let push_pull_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: model.clone(),
+            operation: TransferOperation::PushPullCompositionCertificate,
+            divisor: Some(divisor),
+            point: None,
+            order: None,
+        };
+        let (push_pull, push_pull_code) = transfer(push_pull_request);
+        assert_eq!(push_pull_code, 0, "{push_pull}");
+        assert_eq!(push_pull["result"]["result"]["identity_holds"], true);
+        assert_eq!(
+            push_pull["result"]["result"]["pushforward"],
+            json!({"kind":"affine", "x":"0x0", "y":"0x0"})
+        );
+        assert_eq!(
+            push_pull["result"]["result"]["pullback"],
+            json!({"u":["0xa", "0x0", "0x1"], "v":[], "n_plus":0})
+        );
+        assert_eq!(
+            push_pull["result"]["result"]["deck_transform"],
+            json!({"u":["0x0", "0x0", "0x1"], "v":["0x1"], "n_plus":0})
+        );
+
+        let subgroup_request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model: json!({
+                "v":"1", "form":"B*y^2=x^3+A*x^2+x", "p":"7",
+                "field":"fp-7", "A":"3", "B":"1"
+            }),
+            operation: TransferOperation::GeneratedSubgroupCertificate,
+            divisor: None,
+            point: Some(BinaryPointWire::Affine {
+                x: "4".into(),
+                y: "2".into(),
+            }),
+            order: Some("3".into()),
+        };
+        let (subgroup, subgroup_code) = transfer(subgroup_request);
+        assert_eq!(subgroup_code, 0, "{subgroup}");
+        assert_eq!(
+            subgroup["result"]["result"]["generator"],
+            json!({"kind":"affine", "x":"0x4", "y":"0x2"})
+        );
+        assert_eq!(
+            subgroup["result"]["result"]["degree_inverse_mod_annihilator"],
+            "2"
+        );
+        assert_eq!(
+            subgroup["result"]["result"]["pullback"],
+            json!({"u":["0x2", "0x0", "0x1"], "v":["0x2"], "n_plus":0})
+        );
+        assert_eq!(
+            subgroup["result"]["result"]["pushforward"],
+            json!({"kind":"affine", "x":"0x4", "y":"0x5"})
+        );
+        assert_eq!(
+            subgroup["result"]["result"]["recovered_generator"],
+            json!({"kind":"affine", "x":"0x4", "y":"0x2"})
+        );
+        assert_eq!(
+            subgroup["result"]["result"]["checks"]["recovery_matches_generator"],
+            true
+        );
+        assert_eq!(
+            subgroup["result"]["result"]["exact_order_or_primality_claimed"],
+            false
+        );
+
+        // (0,1) lies on the normalized short-Weierstrass curve but not on
+        // the original Montgomery target. It must never be accepted under
+        // an ambiguous coordinate interpretation.
+        let request = TransferRequest {
+            schema: TRANSFER_SCHEMA.into(),
+            model,
+            operation: TransferOperation::Pullback,
+            divisor: None,
+            point: Some(BinaryPointWire::Affine {
+                x: "0".into(),
+                y: "1".into(),
+            }),
+            order: None,
+        };
+        let (rejected, rejected_code) = transfer(request);
+        assert_eq!(rejected_code, 3, "{rejected}");
+        assert_eq!(rejected["status"], "invalid_input");
+        assert!(rejected["result"]["reason"]
+            .as_str()
+            .unwrap()
+            .contains("not on the Montgomery model"));
     }
 
     #[test]

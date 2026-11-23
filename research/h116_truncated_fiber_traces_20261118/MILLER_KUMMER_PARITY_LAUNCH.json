@@ -1,0 +1,16 @@
+{
+  "schema": "h116-miller-kummer-parity-launch/v1",
+  "protocol_id": "H116-MILLER-KUMMER-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in MILLER_KUMMER_PARITY_SOURCE_GATE.md",
+  "anchors": 8,
+  "maximum_subset_size": 3,
+  "rules": 184,
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_miller_kummer_parity.rs", "-o", "/tmp/h116_miller_kummer_parity"],
+    "selftest": ["/tmp/h116_miller_kummer_parity", "--selftest"],
+    "run": ["/tmp/h116_miller_kummer_parity", "--run", "MILLER_KUMMER_PARITY_RESULT.json"]
+  },
+  "outputs": ["MILLER_KUMMER_PARITY_RESULT.json", "MILLER_KUMMER_PARITY_RUN.txt", "MILLER_KUMMER_PARITY_SHA256SUMS"],
+  "measurement_scope": "bounded products of quadratic characters of doubling Miller functions as abstaining parity decoders, with family-wise curve-preserving shuffle calibration; no generic decoder or ECDLP speedup claim"
+}

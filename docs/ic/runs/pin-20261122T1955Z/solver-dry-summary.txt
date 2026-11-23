@@ -1,0 +1,9 @@
+Local Koblitz n15 solver pin dry-run (2026-11-22T19:55Z)
+Reports: seeds 1..5 @ char2/random-binary-n15-b524b (harness config)
+
+ns_per_f4_muladd: no ratios extracted (inherited-f4 block reports op_unit "word XORs (elimination...)", not F4 mul-adds — wrong frozen config vs calibration-solver-units.md)
+ns_per_conflict: spread 1.553 > 1.25 (ratios 51.30, 70.87, 61.06, 62.37, 79.66) — refuse pin
+ns_per_monomial_op (buchberger-f2): spread 1.508 > 1.25 (ratios 0.122, 0.110, 0.089, 0.081, 0.089) — refuse pin
+m4gb-f2: configurations_run 0 (nonzero exit; reports on disk but not used)
+
+Hashed tensor: 0/10 protocol reports complete; `run_hashed_tensor_pin_local.sh` started 20261122T2030Z (50k trials, seeds 1..5, bits 20+24)

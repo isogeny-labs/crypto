@@ -6,16 +6,23 @@
 //! - [`fp_poly::FpPoly`] — polynomial ring `F_p[x]` with the
 //!   Euclidean machinery (add / mul / divrem / gcd / ext_gcd /
 //!   evaluation / monic).
-//! - [`curve::HyperellipticCurveP`] — `C : y² = f(x)` over a
-//!   deterministically validated odd prime of at most 64 bits, with `f` monic
-//!   and squarefree of exact degree `2g+1`.
+//! - [`curve::HyperellipticCurveP`] — `C : y² = f(x)` over a checked odd
+//!   modulus, with `f` monic and squarefree of exact degree `2g+1`. The
+//!   one-infinity backend is deterministic through 64 bits and retains a
+//!   cached probable-prime screen for wider moduli.
 //! - [`curve::MumfordDivisorP`] — reduced Mumford rep `(u, v)` with
 //!   `u | v² − f`.
 //! - [`balanced::SplitHyperellipticCurveP`] and
 //!   [`balanced::BalancedDivisorP`] — a separate genus-two implementation
 //!   for monic squarefree sextics with two rational infinity points.  Its
 //!   canonical `(u, v, n_plus)` representation retains both infinity
-//!   branches and must not be interchanged with the one-infinity pair.
+//!   branches and must not be interchanged with the one-infinity pair. This
+//!   backend accepts only primes proved by the complete word-sized test or
+//!   the strict Sorenson--Webster `psi_13` bound.
+//! - [`normalized_cover_transfer::PrimeMontgomeryQuadraticCoverP`] — the
+//!   checked composition of the split-sextic cover with an everywhere-defined
+//!   projective short-Weierstrass/Montgomery isomorphism. Edwards birational
+//!   charts remain separate and unsupported.
 //! - **Cantor's algorithm**, char-`p` form: composition `gcd(u_1,
 //!   u_2) → d_1`, `gcd(d_1, v_1 + v_2) → d`, combine; reduce by
 //!   `u_new = (f − v²)/u` until `deg u ≤ g`.  The "no `h(x)`"
@@ -44,15 +51,19 @@
 //!   unsupported.
 //! - The checked Mumford arithmetic is genus-generic; exhaustive order
 //!   enumeration and the `L`-polynomial counters remain genus-2 utilities.
-//! - **Toy sizes only.**  All counting and enumeration routines are
-//!   `O(p^c)` for small `c`; appropriate for `p ≤ ~10^3`.
+//! - Counting and enumeration routines are toy-only (`O(p^c)` for small
+//!   `c`, appropriate for `p ≤ ~10^3`). Ordinary checked group operations do
+//!   not enumerate the field.
 
 pub mod balanced;
 pub mod cover_transfer;
 pub mod curve;
 pub mod fp2;
 pub mod fp_poly;
+pub mod model_transfer;
+pub mod normalized_cover_transfer;
 pub mod ops;
+pub mod primality;
 
 pub use balanced::{
     BalancedDivisorP, BalancedHyperellipticError, SplitHyperellipticCurveP,
@@ -70,3 +81,16 @@ pub use curve::{
 };
 pub use fp2::{enumerate_fp2, Fp2, Fp2ContextError, Fp2Ctx, MAX_FP2_MODULUS};
 pub use fp_poly::FpPoly;
+pub use model_transfer::{
+    PrimeMontgomeryAdapterError, PrimeMontgomeryAdapterP, PrimeMontgomeryPointP,
+    PrimeProjectivePointP,
+};
+pub use normalized_cover_transfer::{
+    PrimeMontgomeryPullPushCertificate, PrimeMontgomeryPushPullCertificate,
+    PrimeMontgomeryQuadraticCoverError, PrimeMontgomeryQuadraticCoverP,
+};
+pub use primality::{
+    prime_proof_evidence, prime_proof_status, PrimeProofEvidence, PrimeProofStatus,
+    DETERMINISTIC_U64_BASES, PRIME_BASES_THROUGH_53, PSI13_EXCLUSIVE_BOUND_DECIMAL,
+    PSI13_THEOREM_REFERENCE, U64_EXCLUSIVE_BOUND_DECIMAL,
+};

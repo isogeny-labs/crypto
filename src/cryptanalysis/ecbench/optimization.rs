@@ -281,6 +281,12 @@ const POLICIES: &[PolicyDecl] = &[
         SpecializedDomain,
         StandardBand
     ),
+    policy!(
+        "ic.k3_gaudry",
+        NativeAdaptive,
+        SpecializedDomain,
+        StandardBand
+    ),
     policy!("rho.cubic", ReplayControl, FrozenHistorical, StandardBand),
     policy!("rho.quartic", ReplayControl, FrozenHistorical, StandardBand),
     policy!(
@@ -339,6 +345,24 @@ const POLICIES: &[PolicyDecl] = &[
         JacobianImageNative
     ),
     policy!(
+        "jacobian_image.rho3_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.bsgs_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.genus3_projected_ic_v1",
+        NativeGrid,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
         "bsgs.textbook",
         ReplayControl,
         FrozenHistorical,
@@ -360,6 +384,12 @@ const POLICIES: &[PolicyDecl] = &[
         "bsgs.negation_table",
         NativeGrid,
         DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "bsgs.negation_table_v2",
+        NativeGrid,
+        FrontierEligible,
         StandardBand
     ),
     policy!(
@@ -621,6 +651,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "rho.signed_frobenius_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v6",
         ImplementationAb,
         FrontierEligible,
         StandardBand
@@ -961,6 +997,9 @@ const PDP3_ENGINES: &[&str] = &[
     "rootfind",
     "rootfind-window",
     "rootfind-negfold",
+    "rootfind-negfold-batch",
+    "rootfind-negfold-batch-harvest",
+    "rootfind-negfold-batch-harvest-torsion",
     "rootfind-window-negfold",
 ];
 
@@ -1388,6 +1427,13 @@ mod tests {
             assert!(keys.contains(format!("system_solver/{name}").as_str()));
         }
         for name in PDP3_ENGINES {
+            assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
+        }
+        for name in [
+            "rootfind-negfold-batch",
+            "rootfind-negfold-batch-harvest",
+            "rootfind-negfold-batch-harvest-torsion",
+        ] {
             assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
         }
         for name in PKM_TOWER_ENGINES {

@@ -1,0 +1,69 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Retained prime33555419 conductor crossing: original53bit subgroup capacity pilot",
+  "description": "Two measured rounds, one transported target per endpoint; L0 diagnostic distinct from full32-target protocol.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 5629830687772387,
+        "a": 5620419248410339,
+        "b": 675862186879016,
+        "group_order": 5629830654216971,
+        "r": 5629830654216971,
+        "gx": 2,
+        "gy": 1401162638053187
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 5629830687772387,
+        "a": 2539833775737119,
+        "b": 1737207970637906,
+        "group_order": 5629830654216971,
+        "r": 5629830654216971,
+        "gx": 2975092980436849,
+        "gy": 5333622322807887
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261119,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-counted",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "ic-bounded",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=8",
+          "oracle": "rootfind-subtract:m=2",
+          "solver": "",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "10000",
+          "solver_budget_seconds": "5"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "paired_curves_v1",
+    "seed": 20261119,
+    "isolation_required": "L2",
+    "timeout_seconds": 120,
+    "algorithm_seed_round": "measured_index"
+  }
+}

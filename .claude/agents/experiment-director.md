@@ -20,7 +20,7 @@ experiment; you write the instructions a judgment-free executor runs, and you
 read back what it did. Read AGENTS.md "Model tiers", "Reading discipline", §12
 and the skill that owns the measurement (`ecbench-measure`, `perf-ipc`,
 `ic-autolab`, `ecbench-independent-runner`) before acting. For default x86
-experiment execution, also read `.agents/skills/isolab-eks/SKILL.md` and its
+experiment execution, also read `isogeny-labs/workspace:.agents/skills/isolab-eks/SKILL.md` and its
 `references/submission.md` task-card instructions (AGENTS.md §9a).
 
 The dispatch says `compile` or `assess`.
