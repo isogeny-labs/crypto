@@ -141,7 +141,7 @@ impl ArtinSchreier {
             // distinct pivots; M(x) is then read off by reducing x.
             let v = basis[trace_mask.trailing_zeros() as usize];
             let mut rows: Vec<(u64, u64)> = Vec::with_capacity(n as usize);
-            let mut push = |mut vec: u64, mut img: u64, rows: &mut Vec<(u64, u64)>| {
+            let push = |mut vec: u64, mut img: u64, rows: &mut Vec<(u64, u64)>| {
                 for &(rv, ri) in rows.iter() {
                     let p = 63 - rv.leading_zeros();
                     if vec >> p & 1 == 1 {
