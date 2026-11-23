@@ -38,6 +38,8 @@ jobs:
           sparse-checkout: |
             /research/cheap_ecdlp_cold_gate_20261123/
             /research/prime31_ic_20261115/native/
+            /src/cryptanalysis/f4_fp_tower.rs
+            /src/cryptanalysis/sig_fp_tower.rs
       - name: Record exact source, source tree and toolchain
         shell: bash
         run: |
@@ -57,6 +59,8 @@ jobs:
             research/prime31_ic_20261115/native/Cargo.toml \
             research/prime31_ic_20261115/native/lib.rs \
             research/prime31_ic_20261115/native/Cargo.lock \
+            src/cryptanalysis/f4_fp_tower.rs \
+            src/cryptanalysis/sig_fp_tower.rs \
             > "$RECEIPT_DIR/source.sha256"
       - name: Resolve and freeze exact dependency lock for this execution
         shell: bash
@@ -101,15 +105,16 @@ jobs:
           set -euo pipefail
           if test -s "$RECEIPT_DIR/source.sha256"; then
             sha256sum -c "$RECEIPT_DIR/source.sha256" \
-              > "$RECEIPT_DIR/source-replay.txt" 2>&1 || true
+              > "$RECEIPT_DIR/source-replay.txt" 2>&1
           fi
           if test -f "$RECEIPT_DIR/Cargo.lock"; then
             sha256sum research/cheap_ecdlp_cold_gate_20261123/Cargo.lock \
-              > "$RECEIPT_DIR/post-lock.sha256" || true
+              > "$RECEIPT_DIR/post-lock.sha256"
+            cmp -s research/cheap_ecdlp_cold_gate_20261123/Cargo.lock "$RECEIPT_DIR/Cargo.lock"
           fi
           git status --porcelain --untracked-files=no > "$RECEIPT_DIR/final-git-status.txt"
-          (cd "$RECEIPT_DIR" && sha256sum *.txt *.stdout *.stderr *.sha256 2>/dev/null) \
-            > "$RECEIPT_DIR/file-digests.txt" || true
+          find "$RECEIPT_DIR" -type f ! -name file-digests.txt -print0 \
+            | sort -z | xargs -0 -r sha256sum > "$RECEIPT_DIR/file-digests.txt"
       - name: Retain full result including failures and caps
         if: always()
         uses: actions/upload-artifact@v4
