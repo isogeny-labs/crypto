@@ -762,7 +762,9 @@ mod tests {
                     ];
                     assert_eq!(f.roots(&scaled), expected, "scaled p={p}, i={i}");
                 }
-                let double = [f.mul(r1, r1), f.sub(0, f.add(r1, r1)), 1];
+                let repeated_coeff = f.add(r1, r1);
+                let repeated_constant = f.mul(r1, r1);
+                let double = [repeated_constant, f.sub(0, repeated_coeff), 1];
                 assert_eq!(f.roots(&double), vec![r1], "repeated p={p}, i={i}");
             }
             // x^2 - n must have no roots for independently selected
