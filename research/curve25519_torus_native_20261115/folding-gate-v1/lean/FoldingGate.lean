@@ -1,0 +1,86 @@
+import Lean
+
+/- Integer implications only. Geometry, decoding and the support-budget bridge
+   are hypotheses; these declarations do not assert algorithmic failure. -/
+namespace FoldingGate
+
+theorem support_budget_bound
+    (m N a s T r B : Nat)
+    (hs : s ≤ m) (htail : r < m) (hpartition : B = m * N + r)
+    (hbudget : a * m ≤ T) (hfloor : N < a * (s + 1)) :
+    B < T * (T + 1) := by
+  have ha : 0 < a := by
+    cases a with
+    | zero => simp at hfloor
+    | succ a => exact Nat.zero_lt_succ a
+  have hmT : m ≤ T := by
+    calc
+      m = 1 * m := by simp
+      _ ≤ a * m := Nat.mul_le_mul_right m ha
+      _ ≤ T := hbudget
+  have hsT : s + 1 ≤ T + 1 := Nat.add_le_add_right (Nat.le_trans hs hmT) 1
+  calc
+    B = m * N + r := hpartition
+    _ < m * N + m := Nat.add_lt_add_left htail (m * N)
+    _ = m * (N + 1) := by simp [Nat.mul_add]
+    _ ≤ m * (a * (s + 1)) := Nat.mul_le_mul_left m hfloor
+    _ = (a * m) * (s + 1) := by ac_rfl
+    _ ≤ T * (T + 1) := Nat.mul_le_mul hbudget hsT
+
+theorem six_support_no_floor_guarantee
+    (m N a s r B : Nat)
+    (hs : s ≤ m) (htail : r < m) (hpartition : B = m * N + r)
+    (hbudget : a * m ≤ 6) (hlarge : 42 ≤ B) :
+    ¬ N < a * (s + 1) := by
+  intro hfloor
+  have h := support_budget_bound m N a s 6 r B hs htail hpartition hbudget hfloor
+  exact Nat.not_lt_of_ge hlarge h
+
+theorem linear_interpolation_guards_imply_floor
+    (N a s D L h : Nat) (hs : 1 ≤ s) (hh : 2 ≤ h) (_hL : 0 < L)
+    (hdimension : N * L < (D + 1) * (s + 1) + h)
+    (hroot : D + h < a * L) :
+    N < a * (s + 1) := by
+  have hs2 : 2 ≤ s + 1 := Nat.add_le_add_right hs 1
+  have hsum : (s + 1) + h ≤ h * (s + 1) := by
+    calc
+      (s + 1) + h = h + (s + 1) := Nat.add_comm _ _
+      _ ≤ h * (s + 1) := Nat.add_le_mul hh hs2
+  have hshift : (D + 1) * (s + 1) + h ≤ (D + h) * (s + 1) := by
+    calc
+      (D + 1) * (s + 1) + h = D * (s + 1) + ((s + 1) + h) := by
+        simp [Nat.add_mul, Nat.add_assoc]
+      _ ≤ D * (s + 1) + h * (s + 1) := Nat.add_le_add_left hsum (D * (s + 1))
+      _ = (D + h) * (s + 1) := by rw [Nat.add_mul]
+  have hscaled : N * L < (a * (s + 1)) * L := by
+    calc
+      N * L < (D + 1) * (s + 1) + h := hdimension
+      _ ≤ (D + h) * (s + 1) := hshift
+      _ < (a * L) * (s + 1) := Nat.mul_lt_mul_of_pos_right hroot (Nat.zero_lt_succ s)
+      _ = (a * (s + 1)) * L := by ac_rfl
+  apply Nat.lt_of_not_ge
+  intro hnot
+  exact Nat.not_lt_of_ge (Nat.mul_le_mul_right L hnot) hscaled
+
+theorem six_support_guards_incompatible
+    (m N a s r B D L h : Nat)
+    (hs : 1 ≤ s) (hsm : s ≤ m) (hh : 2 ≤ h) (hL : 0 < L)
+    (htail : r < m) (hpartition : B = m * N + r)
+    (hbudget : a * m ≤ 6) (hlarge : 42 ≤ B)
+    (hdimension : N * L < (D + 1) * (s + 1) + h) :
+    ¬ D + h < a * L := by
+  intro hroot
+  exact six_support_no_floor_guarantee m N a s r B hsm htail hpartition hbudget hlarge
+    (linear_interpolation_guards_imply_floor N a s D L h hs hh hL hdimension hroot)
+
+def declaredLength : Nat := 213156431 * 20633
+
+theorem declared_length_ge_threshold : 42 ≤ declaredLength := by decide
+
+#print axioms support_budget_bound
+#print axioms six_support_no_floor_guarantee
+#print axioms linear_interpolation_guards_imply_floor
+#print axioms six_support_guards_incompatible
+#print axioms declared_length_ge_threshold
+
+end FoldingGate
