@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T04:44:04Z",
+ "id": "PCC-20261123-a41174",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "GPT-6 Astra Pro",
+  "session": "prime31-rational-chain-followup"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/main-f0-framework-review/receipt.json",
+    "sha256": "d4aba083ece580161b875b5dffa2961f9e0712bd51cc555451b0fb38e721efee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/main-f0-boundary-spec-review/receipt.json",
+    "sha256": "bbae0f76911ef7718400304b8045b2d1bba4853e4f35634930406c8515b99e8b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/main-f0-manifest-review/receipt.json",
+    "sha256": "a34d0f662b2f6d943c34ba9a387e689377c80ceb2a83bd10f65c948b8cf0d5d1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/followup-main-freeze/SOURCE_FREEZE.json",
+    "sha256": "241bb774f50ff537ea67015bde3a9a62b413ec579c031953257f3034e4d078c4"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned source, parser and preregistration observations for PR4962, based on f0ca664eca0081a30adfcc79dcf62a32de40d2af; not workspace type checking, solving correctness or performance.",
+ "statement": "Current-main source/parser reconciliation preserves upstream manifest, boundary and spec repairs; the sole remaining framework candidate restores exactly four historical guard lines, retains the complete35-test suffix, and parses. No cryptographic test execution or native identity issuance is asserted by this record."
+}
