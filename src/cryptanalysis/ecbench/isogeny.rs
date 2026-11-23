@@ -168,6 +168,12 @@ impl Fp<'_> {
                 None
             };
         }
+        // High 2-adicity makes Tonelli-Shanks repeatedly scan and square
+        // roots of unity. For s >= 20, Cipolla's Fp2 exponentiation is
+        // faster on the tested NTT-friendly prime fields.
+        if (p - 1).trailing_zeros() >= 20 {
+            return self.sqrt_cipolla(value);
+        }
         let s = (p - 1).trailing_zeros();
         let q = (p - 1) >> s;
         let mut z = 2u64;
@@ -200,6 +206,79 @@ impl Fp<'_> {
             m = i;
         }
         Some(r)
+    }
+
+    // Multiplication in F_p[theta]/(theta^2-w), using three base-field
+    // products plus w * (a1*b1). All inputs are canonical residues.
+    #[inline]
+    fn mul_quadratic_extension(
+        &mut self,
+        a: (u64, u64),
+        b: (u64, u64),
+        w: u64,
+    ) -> (u64, u64) {
+        let u = self.mul(a.0, b.0);
+        let v = self.mul(a.1, b.1);
+        let lhs = self.add(a.0, a.1);
+        let rhs = self.add(b.0, b.1);
+        let cross = self.mul(lhs, rhs);
+        let wv = self.mul(w, v);
+        let real = self.add(u, wv);
+        let imag = self.sub(self.sub(cross, u), v);
+        (real, imag)
+    }
+
+    #[inline]
+    fn square_quadratic_extension(&mut self, a: (u64, u64), w: u64) -> (u64, u64) {
+        let xx = self.mul(a.0, a.0);
+        let yy = self.mul(a.1, a.1);
+        let xy = self.mul(a.0, a.1);
+        let wyy = self.mul(w, yy);
+        (self.add(xx, wyy), self.add(xy, xy))
+    }
+
+    // Cipolla: for nonzero square a over an odd prime field, find t such
+    // that w=t^2-a is a nonsquare; (t+theta)^((p+1)/2) lies in F_p and
+    // squares to a, where theta^2=w. Verify before returning.
+    //
+    // The caller has already rejected nonresidues with the Jacobi symbol.
+    // Only use this for fields with v2(p-1)>=20; ordinary Tonelli-Shanks
+    // is faster at low 2-adicity.
+    fn sqrt_cipolla(&mut self, a: u64) -> Option<u64> {
+        let p = self.p;
+        let mut t = 1u64;
+        let w = loop {
+            let tt = self.mul(t, t);
+            let w = self.sub(tt, a);
+            if Self::jacobi_symbol(w, p) == -1 {
+                break w;
+            }
+            t += 1;
+            if t >= p {
+                // Defensive fallback for an invalid modulus.
+                return None;
+            }
+        };
+        let mut exponent = (p + 1) / 2;
+        let mut base = (t, 1);
+        let mut root = (1, 0);
+        while exponent != 0 {
+            if exponent & 1 != 0 {
+                root = self.mul_quadratic_extension(root, base, w);
+            }
+            exponent >>= 1;
+            if exponent != 0 {
+                base = self.square_quadratic_extension(base, w);
+            }
+        }
+        if root.1 != 0 {
+            return None;
+        }
+        if self.mul(root.0, root.0) == a {
+            Some(root.0)
+        } else {
+            None
+        }
     }
 
     // Polynomials, lowest degree first.
@@ -331,6 +410,14 @@ impl Fp<'_> {
                 return vec![half(neg_b)];
             }
             let square_root = if (p & 3) == 3 {
+                // Negative discriminants occur in roughly half of random
+                // quadratic queries. For <=32-bit primes a Jacobi test
+                // is cheaper than the modular exponentiation it avoids.
+                // This prefilter is intentionally absent from split():
+                // there, a squarefree quadratic factor is known to split.
+                if p <= u32::MAX as u64 && Self::jacobi_symbol(discriminant, p) != 1 {
+                    return Vec::new();
+                }
                 Some(self.pow(discriminant, (p + 1) / 4))
             } else {
                 self.sqrt_tonelli_shanks(discriminant)
