@@ -1,0 +1,5 @@
+# Frozen H4 n17 complete Gröbner scale check
+
+Use the original FPPR H4 builder at the same pinned source hash with `n=17`, instance index 0, subspace dimension 6, three summands, and seed formula `20261022*1000+17*10+0`. Keep its planted and ordinary-query laws and the exact systems used in the earlier n17 SAT follow-up. Require six exact `V³` solutions in each arm, with the planted assignment among its six, before starting the solver. Serialize seventeen source equations and eighteen Boolean field equations per arm; retain exact input hashes and field/curve/subspace/residual records.
+
+Run planted then ordinary-query with pinned msolve 0.11.0 and FLINT, flags `-g 2 -t 1 -v 2 -m 256`, one thread, 300-second wall cap per arm, 2-GiB observed process-tree RSS gate, and 20-MiB combined-output cap. Preserve completions and every failure or censoring status. On completed arms, exhaustively compare the returned basis roots with the original system over all `2^18` assignments. Record selected-pair degrees, matrix sizes, rows, pairs, wall time and observed memory. Treat this as a local solver-stage scale diagnostic on two frozen systems.

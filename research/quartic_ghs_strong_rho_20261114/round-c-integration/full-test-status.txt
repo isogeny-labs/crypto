@@ -1,0 +1,56 @@
+Command:
+  CARGO_TARGET_DIR=/dev/shm/ghs-integration-target CARGO_BUILD_JOBS=2 cargo test --release --lib
+
+Exit status: 101
+
+The repository-wide library test reached the crypto test crate and failed
+before running tests with ten pre-existing workspace/sparse-checkout compile
+errors outside this study:
+
+1. Missing research/chained_transfer_next_20261115/select_only.tsv
+   included from src/cryptanalysis/chained_transfer/quartic_ic.rs:2539.
+2. Missing
+   research/curve25519_index_calculus_20261102/montgomery-translation.identity.json
+   included from src/cryptanalysis/curve25519_ic.rs:459.
+3. Missing research/curve25519_index_calculus_20261102/model.json included
+   from src/cryptanalysis/curve25519_ic.rs:472.
+4. Missing docs/curves/factor-hints.txt included from
+   src/cryptanalysis/curve_traits/query.rs:168.
+5. Missing docs/curves/trait-sources.json included from
+   src/cryptanalysis/curve_traits/query.rs:169.
+6. Missing
+   research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json
+   included from src/cryptanalysis/curve_traits/query.rs:172.
+7. Missing
+   research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json
+   included from src/cryptanalysis/curve_traits/query.rs:176.
+8. Missing docs/curves/level-certificates.json included from
+   src/cryptanalysis/curve_traits/query.rs:179.
+9. Duplicate test function
+   the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e at
+   src/cryptanalysis/ic_framework/plugins.rs:5285 and :5322 (E0428).
+10. Missing
+    research/ml_dataset_cli_generator_preservation_20261101/fixtures/root-systems.json
+    included from src/ml_dataset/prime_chain_prefix.rs:1121.
+
+First-attempt Cargo line:
+  error: could not compile `crypto` (lib test) due to 10 previous errors
+
+All nine missing artifacts are tracked by the pinned base and were
+materialized from the sparse index. The exact command was then rerun with the
+same target directory. The second attempt reached the crypto test crate and
+failed only on the duplicate test function:
+
+  error[E0428]: the name
+  `the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e`
+  is defined multiple times
+  --> src/cryptanalysis/ic_framework/plugins.rs:5285 and :5322
+
+Second-attempt Cargo line:
+  error: could not compile `crypto` (lib test) due to 1 previous error
+
+The duplicate is byte-present at both locations in `origin/main`. None of
+the reported files is under
+`research/quartic_ghs_strong_rho_20261114/`. The scoped release build,
+selftest, q=223 validator, analyzer tests, and LLVM-IR gate are recorded
+separately.
