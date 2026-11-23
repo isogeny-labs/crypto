@@ -1,0 +1,39 @@
+{
+  "schema": "prime31.rr9-analytic-span-local-summary/v1",
+  "pcc_claim": "PCC-20261119-a9e2e9",
+  "pcc_standing": "unverified",
+  "candidate_commit": "ebe873f889d71a13d359b4b89acd140ad5533add",
+  "original_arithmetic_commit": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "successful_attempt": 4,
+  "selected_base_x": [0, 1, 2, 3],
+  "weights": [1, 3, 5, 7, 11, 13, 17, 19],
+  "cases": {
+    "N": {
+      "determinants": [1468457909, 1667486837, 936410919, 886543102, 2137754017, 1290111997, 1235269058, 1541396348],
+      "B4_rank_by_theorem": 70,
+      "B8_rank_by_theorem": 70
+    },
+    "P": {
+      "determinants": [1418252579, 1982109171, 1921836591, 1045673972, 1683787312, 2146239327, 1923764810, 754634012],
+      "B4_rank_by_theorem": 70,
+      "B8_rank_by_theorem": 70
+    }
+  },
+  "forbidden_target_x_count": 32,
+  "max_unproved_target_points_for_this_certificate": 64,
+  "validation": {
+    "rustfmt_exit": 0,
+    "focused_test_exit": 0,
+    "build_exit": 0,
+    "run_a_exit": 0,
+    "run_b_exit": 0,
+    "aa_byte_identical": true,
+    "sha256_manifest_verified": true
+  },
+  "failed_attempts": [
+    {"attempt": 1, "stage": "rustfmt", "reason": "incoming source was not Rust 1.100.0 formatted"},
+    {"attempt": 2, "stage": "focused test", "reason": "P slot 1 constant transcribed as 1982101171 instead of 1982109171"},
+    {"attempt": 3, "stage": "focused test", "reason": "P slot 2 constant transcribed as 1921086591 instead of 1921836591"}
+  ],
+  "scope": "sufficient one-slot determinant witness and exterior multilinearity implication; exceptional points and nonlinear extraction remain open"
+}

@@ -24,7 +24,10 @@ use serde_json::{json, Value};
 
 use crate::binary_ecc::{
     hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, operation_tally::OperationTally, F2mElement,
-    HcdlpGroupOps, OrdinaryBinaryCover,
+    HcdlpGroupOps, OrdinaryBinaryCover, SubgroupTransferStatus,
+};
+use crate::cryptanalysis::binary_hyperelliptic_index_calculus::{
+    binary_hec_projected_index_calculus_dlp, BhecIndexCalculusParams, BhecIndexCalculusStage,
 };
 use crate::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, shape_divisor, Outcome as CheonOutcome, Side,
@@ -38,8 +41,8 @@ use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, kangaroo_with,
-    verify_candidate, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook,
+    build_negation_table, kangaroo, kangaroo_with, verify_candidate, GenericOutcome,
 };
 use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
@@ -70,9 +73,10 @@ use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
     rho_walk_lanes, rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
-    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
-    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
+    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3,
+    signed_frobenius_rho_v3_partition_counted, BinaryGroup, BinaryInstance, Calibration,
+    CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost, PointClasses,
+    PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
     RhoBatchResult, RhoResult, RhoV3, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
@@ -81,9 +85,10 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
-    CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
-    KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle, WSumOracle, WWalkOracle,
+    CyclotomicBase, DescentAlgebraicOracle, FrobeniusKSumOracle, FrobeniusMitmOracle, GlvOrbitBase,
+    KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase,
+    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
+    WSumOracle, WWalkOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -101,7 +106,7 @@ use crate::cryptanalysis::koblitz_strong_rho::{
     RawPoint as StrongPoint, RawPointG, RhoField, RhoScalar, StrongRho, StrongRhoCharges,
     StrongRhoExtras, StrongRhoG, StrongRhoParams,
 };
-use num_traits::ToPrimitive;
+use num_traits::{ToPrimitive, Zero};
 use rand::{rngs::StdRng, SeedableRng};
 
 /// A parameter a method reads.  `default: None` means required: a value
@@ -227,7 +232,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "solver",
             default: Some(""),
-            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, f4-f2-full-width, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
         },
         ParamDecl {
             name: "linalg",
@@ -526,6 +531,39 @@ const HYPER_IC_PARAMS: &[ParamDecl] = &[
         name: "max_trials",
         default: Some("200000"),
         help: "relation trials before the run counts as exhausted",
+    },
+];
+
+const GENUS3_PROJECTED_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "fb_size",
+        default: Some("0"),
+        help: "degree-one factor-base cap; 0 selects q^(2/(g+1)) for the genus-3 cover",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: Some("8"),
+        help: "rows beyond the factor-base columns plus the target column before the first solve",
+    },
+    ParamDecl {
+        name: "branches",
+        default: Some("64"),
+        help: "seeded factor-base walk branches, capped at the built base size",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: Some("4"),
+        help: "one step in this many adds the image generator, one adds the image target, and the rest add factor-base classes",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("200000"),
+        help: "hard relation-trial cap; exhaustion is retained",
+    },
+    ParamDecl {
+        name: "threads",
+        default: Some("1"),
+        help: "deterministic independent relation walks; canonical comparisons pin this value",
     },
 ];
 
@@ -879,6 +917,41 @@ pub fn registry() -> &'static [MethodDecl] {
             params: &[],
         },
         MethodDecl {
+            id: "jacobian_image.rho3_v2",
+            family: "rho",
+            summary: "jacobian_image.rho3 with the exact cover certificate and prime-subgroup injectivity condition checked at run time, source scalar replay charged, and complete cold wall split across the transfer methodology's nine exclusive phases; destination Jacobian operations remain unpriced in source GAE",
+            entry: "binary_ecc::hcdlp_pollard_rho_counted + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: &[
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "walk-step budget per restart as a multiple of sqrt(r)",
+                },
+                ParamDecl {
+                    name: "max_restarts",
+                    default: Some("64"),
+                    help: "deterministic restart cap for degenerate rho collisions",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "jacobian_image.bsgs_v2",
+            family: "bsgs",
+            summary: "jacobian_image.bsgs with the exact cover certificate and prime-subgroup injectivity condition checked at run time, source scalar replay charged, and complete cold wall split across the transfer methodology's nine exclusive phases; destination Jacobian operations remain unpriced in source GAE",
+            entry: "binary_ecc::hcdlp_bsgs_counted + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: &[],
+        },
+        MethodDecl {
+            id: "jacobian_image.genus3_projected_ic_v1",
+            family: "ic",
+            summary: "transfer-aware characteristic-two genus-3 hyperelliptic index calculus on the exact degree-three cover image: actual degree-one relations and sparse elimination, with factor-base columns made valid modulo r by arbitrary-class pushforward and source-cofactor clearing; complete nine-phase cold wall and charged source replay, while destination native work remains unpriced in source GAE",
+            entry: "binary_hyperelliptic_index_calculus::binary_hec_projected_index_calculus_dlp + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: GENUS3_PROJECTED_IC_PARAMS,
+        },
+        MethodDecl {
             id: "bsgs.textbook",
             family: "bsgs",
             summary: "baby table of m = ⌈√r⌉ steps first, then giant steps; worst 2√r, mean 1.5√r",
@@ -907,6 +980,18 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "bsgs",
             summary: "bsgs.negation with the baby table's half-width m given (m + 1 classes, giant stride 2m + 1): the equal-memory comparator for a known-log base",
             entry: "ecbench::generic::bsgs_negation_table",
+            applies: Applies::Any,
+            params: &[ParamDecl {
+                name: "baby",
+                default: Some("0"),
+                help: "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+            }],
+        },
+        MethodDecl {
+            id: "bsgs.negation_table_v2",
+            family: "bsgs",
+            summary: "versioned cached-table BSGS: target-independent negation baby table, inserts and stride negation charged once in the cold total; online lookups, hit recovery arithmetic and final [d]G = Q verification charged in their phases",
+            entry: "ecbench::generic::build_negation_table + NegationBabyTable::solve + verify_candidate",
             applies: Applies::Any,
             params: &[ParamDecl {
                 name: "baby",
@@ -1497,6 +1582,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.signed_frobenius_v6",
+            family: "rho",
+            summary: "rho.signed_frobenius_v5 with every partition-mix call tallied as uncharged native work; the trajectory and charged group operations are identical; Koblitz curves only",
+            entry: "ic_boundary::signed_frobenius_rho_v3_partition_counted(RhoV3::v6(true))",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.negation_v5",
             family: "rho",
             summary: "rho.negation_v4 with two-rung jumps (one addition a jump, k ≈ √(√(πr/4)) jumps) (RhoV3::v5)",
@@ -1772,6 +1865,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         | "rho.signed_frobenius_v3"
         | "rho.signed_frobenius_v4"
         | "rho.signed_frobenius_v5"
+        | "rho.signed_frobenius_v6"
         | "rho.signed_frobenius_full"
         | "rho.signed_frobenius_v2_full"
         | "rho.signed_frobenius_strong"
@@ -1888,6 +1982,17 @@ fn normalise_param(name: &str, default: Option<&str>, value: &str) -> String {
     }
 }
 
+/// Parameters a method accepts without declaring them: absent from the
+/// registry (so no default is written and the identity of a spec without
+/// them is unchanged), hashed into the identity only when given.  Today
+/// only the factor-base log store of the Koblitz descent pipelines
+/// ([`koblitz_descent::LOG_STORE_PARAM`]), whose runs with a store hit
+/// are amortized rows, never cold ones.
+pub fn optional_param(method: &str, name: &str) -> bool {
+    name == koblitz_descent::LOG_STORE_PARAM
+        && matches!(method, "ic.koblitz_descent" | "ic.koblitz_descent_v2")
+}
+
 /// Fill defaults, normalise integer-valued parameters to canonical
 /// decimal, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
@@ -1910,11 +2015,18 @@ pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
     for k in spec.params.keys() {
-        if !d.params.iter().any(|p| p.name == k) {
+        if !d.params.iter().any(|p| p.name == k) && !optional_param(d.id, k) {
             return Err(format!("method `{}` has no parameter `{k}`", d.id));
         }
     }
     let mut params = BTreeMap::new();
+    // An optional parameter is hashed only when given, so a spec without
+    // it keeps the method identity it always had.
+    for (k, v) in &spec.params {
+        if optional_param(d.id, k) && !d.params.iter().any(|p| p.name == k) {
+            params.insert(k.clone(), v.clone());
+        }
+    }
     for p in d.params {
         match (spec.params.get(p.name), p.default) {
             (Some(v), def) => {
@@ -2278,6 +2390,19 @@ pub(super) fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
         native: BTreeMap::new(),
         work_native: BTreeMap::new(),
     }
+}
+
+/// The counter `rho.signed_frobenius_v5` tallies its per-step jump-index
+/// selection under since 2026-11-19: the name the strong reference uses
+/// for its per-step partition hash, so `ecbench::work` and the §5a band
+/// price the two alike.  Records written before then lack it; their
+/// replay is matched with it removed ([`v5_pre_tally_record`]).
+pub const V5_JUMP_INDEX_COUNTER: &str = "partition_hashes_uncharged";
+
+/// A `rho.signed_frobenius_v5` record written before the per-step
+/// jump-index tally existed: it carries no [`V5_JUMP_INDEX_COUNTER`].
+pub(super) fn v5_pre_tally_record(method: &str, counters: &BTreeMap<String, u64>) -> bool {
+    method == "rho.signed_frobenius_v5" && !counters.contains_key(V5_JUMP_INDEX_COUNTER)
 }
 
 pub(super) fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
@@ -3065,9 +3190,14 @@ fn solve_generic<G: CountedGroup>(
 ) -> Result<SolveReport, String> {
     let cap = || -> Result<u64, String> { Ok(rho_cap(r, param_u64(m, "cap_multiple")? as f64)) };
     let t = Instant::now();
-    // Everything these methods do depends on the target (rho's jump table
-    // is [a]G + [b]Q), so the whole solve is the online window.
-    measurement::begin_online(Phase::RhoSolve);
+    // The versioned cached BSGS builds its reusable `G`-only table before
+    // opening the online window.  Frozen generic ids retain their original
+    // whole-call boundary; in particular this does not reinterpret any
+    // committed record.
+    let split_cached_bsgs = m.id == "bsgs.negation_table_v2";
+    if !split_cached_bsgs {
+        measurement::begin_online(Phase::RhoSolve);
+    }
     // The rho walks keep one ledger for the whole solve; the tables and
     // the kangaroo keep set-up and search apart.  Either way the field
     // operations reported are the solve's total, known only when the
@@ -3152,6 +3282,53 @@ fn solve_generic<G: CountedGroup>(
                 bsgs_negation_table(g, gen, target, r, baby)
             };
             generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
+        "bsgs.negation_table_v2" => {
+            let baby = param_u64(m, "baby")?;
+            let baby = if baby == 0 {
+                crate::cryptanalysis::ecbench::generic::ceil_sqrt(r)
+                    .div_ceil(2)
+                    .max(1)
+            } else {
+                baby
+            };
+            let table = build_negation_table(g, gen, r, baby);
+            measurement::begin_online(Phase::RhoSolve);
+            let mut o = table.solve(g, target);
+            verify_candidate(g, gen, target, &mut o);
+            measurement::end_online();
+            let wall = t.elapsed().as_nanos() as u64;
+            let f = field_ops_of(g, &[o.setup, o.search, o.verification]);
+            let mut rep = generic_report_v2(o, wall, 2, f, "bsgs");
+
+            // Keep the top-level counters for the stable band/report schema,
+            // and also bind each native count to the phase that performed it
+            // so reusable/per-target work splits are honest.
+            for (phase_name, counter) in [
+                ("setup", "inserts_uncharged"),
+                ("setup", "point_negations_uncharged"),
+                ("search", "lookups_uncharged"),
+                ("search", "recovery_key_comparisons_uncharged"),
+                ("search", "recovery_modr_muls_uncharged"),
+                ("search", "recovery_modr_adds_uncharged"),
+            ] {
+                let Some(count) = rep.counters.get(counter).copied() else {
+                    continue;
+                };
+                rep.phases
+                    .iter_mut()
+                    .find(|p| p.name == phase_name)
+                    .expect("generic v2 report has setup and search phases")
+                    .native
+                    .insert(counter.into(), count);
+            }
+            rep.detail["cache_contract"] = json!({
+                "cold_total_charges_setup_once": true,
+                "online_excludes_setup": true,
+                "reusable_phase": "setup",
+                "per_target_phases": ["search", "verification"],
+            });
+            rep
         }
         "kangaroo.vow" => {
             let o = kangaroo(g, gen, target, r, seed, cap()?);
@@ -3298,7 +3475,9 @@ fn solve_generic<G: CountedGroup>(
         }
         other => return Err(format!("`{other}` is not a generic method")),
     };
-    measurement::end_online();
+    if !split_cached_bsgs {
+        measurement::end_online();
+    }
     Ok(rep)
 }
 
@@ -3705,13 +3884,21 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
     if !prime_only {
         return Ok(());
     }
-    let Instance::Prime(i) = inst else {
-        return Err(format!(
-            "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
-            m.id
-        ));
+    // `wwalk` (without `sib`/`aut`, which need x-only siblings and the
+    // order-3 automorphism of a prime curve) also runs on a single-word
+    // binary curve: the walk is generic over `CountedGroup`.
+    let bin_walk = matches!(inst, Instance::Binary(_)) && or_name == "wwalk";
+    let (r, prime) = match inst {
+        Instance::Prime(i) => (i.r, Some(i)),
+        Instance::Binary(b) if bin_walk && fb_name != "prime-interval" => (b.r, None),
+        _ => {
+            return Err(format!(
+                "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
+                m.id
+            ));
+        }
     };
-    if fb_name == "prime-interval" {
+    if let (Some(i), "prime-interval") = (prime, fb_name.as_str()) {
         PrimeIntervalBase::interval(&fb, i.curve.p)?;
     }
     match or_name.as_str() {
@@ -3755,7 +3942,7 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
             // The target walk packs coefficients in a u128 word (62 bits a
             // seed); the plain walk table in 32 bits.
             let coef_bits = if tw > 0 { TW_COEF_BITS } else { 32 };
-            wwalk_plan_check_bits(i.r, x, jumps, opts, coef_bits)?;
+            wwalk_plan_check_bits(r, x, jumps, opts, coef_bits)?;
             let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
             if cj && tw == 0 {
                 return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
@@ -3779,6 +3966,9 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                     if tw == 0 {
                         return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
                     }
+                    let Some(i) = prime else {
+                        return Err("wwalk: aut=3 runs on prime curves only".into());
+                    };
                     use crate::cryptanalysis::ic_boundary::CountedGroup;
                     let mut ops = crate::cryptanalysis::ic_boundary::GroupOps::default();
                     if i.curve
@@ -4444,6 +4634,25 @@ fn solve_inner(
             solve_strong(m, i, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Binary(i), "claw") => solve_claw(m, i, FastPoint::affine(tx, ty), seed),
+        (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v6" => {
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let res = signed_frobenius_rho_v3_partition_counted(
+                i,
+                FastPoint::affine(tx, ty),
+                seed,
+                rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
+                RhoV3::v6(true),
+            )
+            .ok_or("not a Koblitz instance")?;
+            measurement::end_online();
+            Ok(rho_report_v2(
+                res,
+                t.elapsed().as_nanos() as u64,
+                None,
+                GroupOps::default(),
+            ))
+        }
         (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v5" => {
             let t = Instant::now();
             measurement::begin_online(Phase::RhoSolve);
@@ -4456,6 +4665,15 @@ fn solve_inner(
             )
             .ok_or("not a Koblitz instance")?;
             measurement::end_online();
+            let mut res = res;
+            // The per-step jump-index selection, tallied as the strong
+            // reference tallies its partition hash (one per step), so the
+            // §5a band prices it alike (owner decision 2026-11-19,
+            // research/koblitz_rho_reference_20261115/DECISION.md).  A
+            // native counter only: the walk, the outcome and every group
+            // operation are unchanged.
+            res.counters
+                .insert(V5_JUMP_INDEX_COUNTER.into(), res.jump_index_selections);
             Ok(rho_report_v2(
                 res,
                 t.elapsed().as_nanos() as u64,
@@ -4717,6 +4935,21 @@ fn jacobian_phase(name: &str, ops: HcdlpGroupOps) -> PhaseRecord {
     }
 }
 
+fn jacobian_phase_timed(name: &str, ops: HcdlpGroupOps, wall_ns: u64) -> PhaseRecord {
+    PhaseRecord {
+        wall_ns: Some(wall_ns),
+        ..jacobian_phase(name, ops)
+    }
+}
+
+fn empty_timed_phase(name: &str, wall_ns: u64) -> PhaseRecord {
+    PhaseRecord {
+        name: name.into(),
+        wall_ns: Some(wall_ns),
+        ..Default::default()
+    }
+}
+
 /// Execute a named solver on the exact image of the certified same-field
 /// degree-three pullback. The planted logarithm is not an input. The solver
 /// verifies its candidate in the destination group and ecbench independently
@@ -4731,8 +4964,15 @@ fn solve_jacobian_image(
         return Err("jacobian-image adapter requires an affine target".into());
     }
     let started = Instant::now();
+    let nine_phase = matches!(
+        method.id.as_str(),
+        "jacobian_image.rho3_v2"
+            | "jacobian_image.bsgs_v2"
+            | "jacobian_image.genus3_projected_ic_v1"
+    );
     let field_tally_enabled = method.id.ends_with("_field_tally");
     let field_tally = field_tally_enabled.then(OperationTally::begin);
+    let construction_started = Instant::now();
     let cover = OrdinaryBinaryCover::new(
         inst.n,
         inst.irreducible.clone(),
@@ -4740,39 +4980,93 @@ fn solve_jacobian_image(
         F2mElement::from_biguint(&BigUint::from(inst.b), inst.n),
     )
     .map_err(|e| format!("constructing the certified genus-three cover: {e}"))?;
+    if nine_phase {
+        cover
+            .verify_certificate()
+            .map_err(|e| format!("verifying the genus-three cover certificate: {e}"))?;
+    }
+    let construction_wall_ns = construction_started.elapsed().as_nanos() as u64;
+
+    let forward_started = Instant::now();
     let source_generator = crate::binary_ecc::BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(inst.generator.x), inst.n),
         y: F2mElement::from_biguint(&BigUint::from(inst.generator.y), inst.n),
     };
-    let image_generator = cover
-        .pullback_point_class(&source_generator)
-        .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?;
-
-    measurement::begin_online(Phase::RhoSolve);
     let source_target = crate::binary_ecc::BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(target.x), inst.n),
         y: F2mElement::from_biguint(&BigUint::from(target.y), inst.n),
     };
-    let image_target = cover
-        .pullback_point_class(&source_target)
-        .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?;
     let order = BigUint::from(inst.r);
-    let outcome = match method.id.as_str() {
-        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" => hcdlp_bsgs_counted(
-            &image_generator,
-            &image_target,
-            &order,
-            cover.source_curve(),
-        ),
-        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" => hcdlp_pollard_rho_counted(
-            &image_generator,
-            &image_target,
-            &order,
-            cover.source_curve(),
+    if nine_phase {
+        match cover
+            .subgroup_transfer_status(&order)
+            .map_err(|e| format!("checking the order-r pullback condition: {e}"))?
+        {
+            SubgroupTransferStatus::InjectiveIfExactSubgroupOrder { .. } => {}
+            SubgroupTransferStatus::KernelIntersectionUnresolved { common_factor, .. } => {
+                return Err(format!(
+                    "degree-three pullback does not certify injectivity: gcd(3,r)={common_factor}"
+                ))
+            }
+        }
+    }
+    let (image_generator, image_target) = if nine_phase {
+        let generator = cover
+            .pull_push_composition_certificate(&source_generator)
+            .map_err(|e| format!("certifying the generator pullback: {e}"))?;
+        let target = cover
+            .pull_push_composition_certificate(&source_target)
+            .map_err(|e| format!("certifying the target pullback: {e}"))?;
+        (generator.pullback, target.pullback)
+    } else {
+        (
+            cover
+                .pullback_point_class(&source_generator)
+                .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?,
+            cover
+                .pullback_point_class(&source_target)
+                .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?,
+        )
+    };
+    let forward_wall_ns = forward_started.elapsed().as_nanos() as u64;
+
+    if method.id == "jacobian_image.genus3_projected_ic_v1" {
+        return solve_genus3_projected_ic(
+            method,
+            inst,
+            target,
             seed,
-            rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
-            param_u64(method, "max_restarts")?,
-        ),
+            started,
+            cover,
+            image_generator,
+            image_target,
+            order,
+            construction_wall_ns,
+            forward_wall_ns,
+        );
+    }
+
+    measurement::begin_online(Phase::RhoSolve);
+    let outcome = match method.id.as_str() {
+        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" | "jacobian_image.bsgs_v2" => {
+            hcdlp_bsgs_counted(
+                &image_generator,
+                &image_target,
+                &order,
+                cover.source_curve(),
+            )
+        }
+        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" | "jacobian_image.rho3_v2" => {
+            hcdlp_pollard_rho_counted(
+                &image_generator,
+                &image_target,
+                &order,
+                cover.source_curve(),
+                seed,
+                rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
+                param_u64(method, "max_restarts")?,
+            )
+        }
         other => return Err(format!("unknown Jacobian-image solver `{other}`")),
     }
     .map_err(|e| format!("destination Jacobian solver failed: {e}"))?;
@@ -4789,6 +5083,7 @@ fn solve_jacobian_image(
             .unwrap_or(0),
     });
 
+    let recovery_started = Instant::now();
     let recovered = outcome
         .recovered
         .as_ref()
@@ -4798,6 +5093,28 @@ fn solve_jacobian_image(
             })
         })
         .transpose()?;
+    let recovery_wall_ns = recovery_started.elapsed().as_nanos() as u64;
+
+    let source_verification_started = Instant::now();
+    let mut source_verification = GroupOps::default();
+    if nine_phase {
+        if let Some(value) = outcome.recovered.as_ref() {
+            let scalar = value
+                .to_u64()
+                .ok_or("destination solver returned a scalar wider than the source subgroup")?;
+            let replay = CountedGroup::mul(
+                &BinaryGroup(&inst.fast),
+                &mut source_verification,
+                inst.generator,
+                scalar,
+            );
+            if replay != target {
+                return Err("destination scalar failed charged source replay".into());
+            }
+        }
+    }
+    let source_verification_wall_ns = source_verification_started.elapsed().as_nanos() as u64;
+    let solve_wall_ns = started.elapsed().as_nanos() as u64;
     let native_operations = outcome
         .setup
         .operations()
@@ -4826,28 +5143,74 @@ fn solve_jacobian_image(
         counters.insert(format!("complete_route_{name}_uncharged"), count);
     }
     counters.retain(|_, value| *value > 0);
-    let phases = vec![
-        jacobian_phase("setup", outcome.setup),
-        jacobian_phase("search", outcome.search),
-        jacobian_phase("internal_verification", outcome.verification),
-    ];
+    let phases = if nine_phase {
+        let individually_clocked = construction_wall_ns
+            .saturating_add(forward_wall_ns)
+            .saturating_add(outcome.setup_wall_ns)
+            .saturating_add(outcome.search_wall_ns)
+            .saturating_add(outcome.verification_wall_ns)
+            .saturating_add(recovery_wall_ns)
+            .saturating_add(source_verification_wall_ns);
+        let setup_wall_ns = outcome
+            .setup_wall_ns
+            .saturating_add(solve_wall_ns.saturating_sub(individually_clocked));
+        let mut verification = jacobian_phase_timed(
+            "verification",
+            outcome.verification,
+            outcome
+                .verification_wall_ns
+                .saturating_add(source_verification_wall_ns),
+        );
+        verification.adds = source_verification.adds;
+        verification.doubles = source_verification.doubles;
+        verification.scalar_mults = source_verification.scalar_mults;
+        verification.gae = source_verification.gae();
+        verification.native.insert(
+            "source_verification_additions".into(),
+            source_verification.adds,
+        );
+        verification.native.insert(
+            "source_verification_doublings".into(),
+            source_verification.doubles,
+        );
+        vec![
+            empty_timed_phase("route_search", 0),
+            empty_timed_phase("construction", construction_wall_ns),
+            empty_timed_phase("forward_map", forward_wall_ns),
+            jacobian_phase_timed("solver_setup", outcome.setup, setup_wall_ns),
+            jacobian_phase_timed("relation_or_walk", outcome.search, outcome.search_wall_ns),
+            empty_timed_phase("linear_algebra", 0),
+            empty_timed_phase("individual_log_or_descent", 0),
+            empty_timed_phase("source_recovery", recovery_wall_ns),
+            verification,
+        ]
+    } else {
+        vec![
+            jacobian_phase("setup", outcome.setup),
+            jacobian_phase("search", outcome.search),
+            jacobian_phase("internal_verification", outcome.verification),
+        ]
+    };
+    let phase_wall_sum_ns = phases.iter().filter_map(|phase| phase.wall_ns).sum::<u64>();
+    let total_gae = phases.iter().map(|phase| phase.gae).sum();
     let unpriced = unpriced_of(&counters);
     Ok(SolveReport {
         recovered,
         exhausted: outcome.exhausted,
         phases,
-        // Deliberately zero until a versioned source-GAE conversion is
-        // supplied. `unpriced` makes the resulting record a lower bound.
-        total_gae: 0.0,
+        // The v2 adapters charge only the source replay. Destination work
+        // remains unpriced until a versioned source-GAE conversion exists,
+        // so `unpriced` keeps the record visibly a lower bound.
+        total_gae,
         automorphisms_used: 1,
         counters,
         unpriced,
         deterministic: true,
         nondeterminism: Vec::new(),
-        solve_wall_ns: started.elapsed().as_nanos() as u64,
+        solve_wall_ns,
         factor_base: None,
         detail: json!({
-            "adapter": "binary_cubic_pullback_v1",
+            "adapter": if nine_phase { "binary_cubic_pullback_nine_phase_v2" } else { "binary_cubic_pullback_v1" },
             "destination": "genus_3_jacobian_image",
             "destination_solver": method.id,
             "map_degree": 3,
@@ -4860,14 +5223,303 @@ fn solve_jacobian_image(
             },
             "inversion_count_includes_its_mul_and_square_cost": true,
             "complete_machine_instruction_count": false,
+            "nine_phase_cold_wall_complete": nine_phase,
+            "phase_wall_sum_ns": phase_wall_sum_ns,
             "source_gae_conversion": "unavailable",
             "destination_candidate_verified": recovered.is_some(),
-            "source_reverification": "performed independently by the ecbench runner"
+            "source_reverification": if nine_phase {
+                "performed and charged inside the adapter, then performed independently by the ecbench runner"
+            } else {
+                "performed independently by the ecbench runner"
+            }
         }),
         online: None,
         online_error: None,
         solver: None,
         field_ops,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_genus3_projected_ic(
+    method: &ResolvedMethod,
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    route_started: Instant,
+    cover: OrdinaryBinaryCover,
+    image_generator: crate::binary_ecc::MumfordDivisor,
+    image_target: crate::binary_ecc::MumfordDivisor,
+    order: BigUint,
+    construction_wall_ns: u64,
+    forward_wall_ns: u64,
+) -> Result<SolveReport, String> {
+    let destination_started = Instant::now();
+    let number = |name: &str| -> Result<usize, String> {
+        usize::try_from(param_u64(method, name)?)
+            .map_err(|_| format!("parameter `{name}` does not fit usize"))
+    };
+    let fb_size = number("fb_size")?;
+    let extra_relations = number("extra_relations")?;
+    let branches = number("branches")?;
+    let d_step_in = param_u64(method, "d_step_in")?;
+    let max_trials = number("max_trials")?;
+    let threads = number("threads")?;
+    if fb_size > (1 << 24)
+        || extra_relations > (1 << 20)
+        || branches == 0
+        || branches > (1 << 20)
+        || d_step_in < 2
+        || max_trials == 0
+        || max_trials > 1_000_000_000
+        || !(1..=256).contains(&threads)
+    {
+        return Err(
+            "genus-3 projected IC parameters exceed their checked resource envelope".into(),
+        );
+    }
+
+    let params = BhecIndexCalculusParams {
+        fb_size,
+        extra_relations,
+        max_trials,
+        seed,
+        search:
+            crate::cryptanalysis::hyperelliptic_index_calculus::RelationSearch::FactorBaseWalk {
+                branches,
+                d_step_in,
+            },
+        linear_algebra: crate::cryptanalysis::hyperelliptic_index_calculus::LinearAlgebra::Sparse,
+        smoothness:
+            crate::cryptanalysis::binary_hyperelliptic_index_calculus::BhecSmoothnessTest::Trace,
+        threads,
+    };
+
+    // For every destination relation, phi_* maps the two image labels to
+    // [3]G and [3]Q.  Multiplication by the exact source cofactor maps every
+    // factor-base pushforward into the unique order-r subgroup because
+    // #E = h*r and r does not divide h.  Thus both known labels are scaled by
+    // 3h and every unknown column has a well-defined logarithm modulo r.
+    let exact_group_order = inst
+        .cofactor
+        .checked_mul(inst.r)
+        .ok_or("source cofactor times subgroup order overflows")?;
+    if exact_group_order != inst.group_order || inst.cofactor.is_multiple_of(inst.r) {
+        return Err(
+            "projected genus-3 IC requires exact #E=h*r with r occurring to the first power".into(),
+        );
+    }
+    let label_scale = BigUint::from(3u64) * BigUint::from(inst.cofactor);
+    if (&label_scale % &order).is_zero() {
+        return Err("cover degree times source cofactor vanishes modulo r".into());
+    }
+
+    let source_generator = crate::binary_ecc::BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&BigUint::from(inst.generator.x), inst.n),
+        y: F2mElement::from_biguint(&BigUint::from(inst.generator.y), inst.n),
+    };
+    let source_target = crate::binary_ecc::BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&BigUint::from(target.x), inst.n),
+        y: F2mElement::from_biguint(&BigUint::from(target.y), inst.n),
+    };
+    for (source, image, label) in [
+        (&source_generator, &image_generator, "generator"),
+        (&source_target, &image_target, "target"),
+    ] {
+        let typed = cover
+            .pull_push_composition_certificate(source)
+            .map_err(|e| format!("certifying projected-IC {label} composition: {e}"))?;
+        let general = cover
+            .jacobian_pushforward_certificate(image)
+            .map_err(|e| format!("certifying projected-IC {label} arbitrary pushforward: {e}"))?;
+        if general.general_pushforward != typed.formal_pushforward {
+            return Err(format!(
+                "projected-IC {label} arbitrary pushforward differs from the typed composition"
+            ));
+        }
+    }
+
+    measurement::begin_online(Phase::TargetQuery);
+    let (scalar, ic) = binary_hec_projected_index_calculus_dlp(
+        cover.source_curve(),
+        &image_generator,
+        &image_target,
+        &order,
+        &label_scale,
+        &params,
+        |stage| {
+            measurement::mark(match stage {
+                BhecIndexCalculusStage::FactorBase => Phase::TargetQuery,
+                BhecIndexCalculusStage::RelationCollection => Phase::TargetPdp,
+                BhecIndexCalculusStage::LinearAlgebra => Phase::TargetDescent,
+                BhecIndexCalculusStage::Verification => Phase::RecoveryCheck,
+            });
+        },
+    );
+    let destination_wall_ns = destination_started.elapsed().as_nanos() as u64;
+
+    let recovery_started = Instant::now();
+    let recovered = scalar
+        .as_ref()
+        .map(|value| {
+            ExactScalar::from_biguint(value).ok_or_else(|| {
+                "recovered scalar exceeds ecbench's 256-bit record width".to_string()
+            })
+        })
+        .transpose()?;
+    let recovery_wall_ns = recovery_started.elapsed().as_nanos() as u64;
+
+    measurement::mark(Phase::RecoveryCheck);
+    let source_verification_started = Instant::now();
+    let mut source_verification = GroupOps::default();
+    if let Some(value) = scalar.as_ref() {
+        let value = value
+            .to_u64()
+            .ok_or("genus-3 solver returned a scalar wider than the source subgroup")?;
+        let replay = CountedGroup::mul(
+            &BinaryGroup(&inst.fast),
+            &mut source_verification,
+            inst.generator,
+            value,
+        );
+        if replay != target {
+            return Err("genus-3 projected IC scalar failed charged source replay".into());
+        }
+    }
+    let source_verification_wall_ns = source_verification_started.elapsed().as_nanos() as u64;
+    measurement::end_online();
+
+    let relation_wall_ns = ic.relation_collection_wall_ns;
+    let linear_algebra_wall_ns = ic.solve_wall_ns;
+    let destination_verification_wall_ns = ic.verification_wall_ns;
+    let named_destination_wall_ns = relation_wall_ns
+        .saturating_add(linear_algebra_wall_ns)
+        .saturating_add(destination_verification_wall_ns);
+    let mut solver_setup_wall_ns = destination_wall_ns.saturating_sub(named_destination_wall_ns);
+    let solve_wall_ns = route_started.elapsed().as_nanos() as u64;
+    let named_route_wall_ns = construction_wall_ns
+        .saturating_add(forward_wall_ns)
+        .saturating_add(destination_wall_ns)
+        .saturating_add(recovery_wall_ns)
+        .saturating_add(source_verification_wall_ns);
+    solver_setup_wall_ns =
+        solver_setup_wall_ns.saturating_add(solve_wall_ns.saturating_sub(named_route_wall_ns));
+
+    let setup_ops = HcdlpGroupOps {
+        additions: ic.precompute_ops as u64,
+        ..Default::default()
+    };
+    let relation_ops = HcdlpGroupOps {
+        additions: ic.jacobian_ops.saturating_sub(ic.precompute_ops) as u64,
+        ..Default::default()
+    };
+    let destination_verification_ops = HcdlpGroupOps {
+        additions: ic.verification_adds as u64,
+        doublings: ic.verification_doubles as u64,
+        scalar_multiplications: u64::from(recovered.is_some()),
+    };
+    let mut verification = jacobian_phase_timed(
+        "verification",
+        destination_verification_ops,
+        destination_verification_wall_ns.saturating_add(source_verification_wall_ns),
+    );
+    verification.adds = source_verification.adds;
+    verification.doubles = source_verification.doubles;
+    verification.scalar_mults = source_verification.scalar_mults;
+    verification.gae = source_verification.gae();
+    verification.native.insert(
+        "source_verification_additions".into(),
+        source_verification.adds,
+    );
+    verification.native.insert(
+        "source_verification_doublings".into(),
+        source_verification.doubles,
+    );
+    let mut linear_algebra = empty_timed_phase("linear_algebra", linear_algebra_wall_ns);
+    linear_algebra
+        .native
+        .insert("modular_row_operations".into(), ic.solve_row_ops as u64);
+    let mut solver_setup = jacobian_phase_timed("solver_setup", setup_ops, solver_setup_wall_ns);
+    solver_setup
+        .native
+        .insert("factor_base_columns".into(), ic.factor_base_size as u64);
+    solver_setup
+        .native
+        .insert("factor_base_wall_ns".into(), ic.factor_base_wall_ns);
+    let phases = vec![
+        empty_timed_phase("route_search", 0),
+        empty_timed_phase("construction", construction_wall_ns),
+        empty_timed_phase("forward_map", forward_wall_ns),
+        solver_setup,
+        jacobian_phase_timed("relation_or_walk", relation_ops, relation_wall_ns),
+        linear_algebra,
+        empty_timed_phase("individual_log_or_descent", 0),
+        empty_timed_phase("source_recovery", recovery_wall_ns),
+        verification,
+    ];
+    let phase_wall_sum_ns = phases.iter().filter_map(|phase| phase.wall_ns).sum::<u64>();
+    let total_gae = phases.iter().map(|phase| phase.gae).sum();
+    let mut counters = BTreeMap::from([
+        ("cover_constructions_uncharged".into(), 1),
+        ("cover_pullbacks_uncharged".into(), 2),
+        ("arbitrary_pushforward_certificates_uncharged".into(), 2),
+        ("factor_base_columns".into(), ic.factor_base_size as u64),
+        ("relation_trials_uncharged".into(), ic.trials as u64),
+        ("smooth_relations".into(), ic.smooth_trials as u64),
+        ("retained_relations".into(), ic.relations as u64),
+        (
+            "jacobian_group_operations_uncharged".into(),
+            (ic.jacobian_ops + ic.verification_adds + ic.verification_doubles) as u64,
+        ),
+        ("smoothness_oracle_calls_uncharged".into(), ic.trials as u64),
+        (
+            "linear_algebra_row_ops_uncharged".into(),
+            ic.solve_row_ops as u64,
+        ),
+    ]);
+    counters.retain(|_, count| *count > 0);
+    let unpriced = unpriced_of(&counters);
+    Ok(SolveReport {
+        recovered,
+        exhausted: !ic.solved,
+        phases,
+        total_gae,
+        automorphisms_used: 1,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns,
+        factor_base: None,
+        detail: json!({
+            "adapter": "binary_cubic_pullback_projected_ic_nine_phase_v1",
+            "destination": "genus_3_jacobian_image",
+            "destination_solver": method.id,
+            "solver_family": "characteristic_two_hyperelliptic_index_calculus",
+            "map_degree": 3,
+            "source_cofactor": inst.cofactor,
+            "relation_label_scale": label_scale.to_string(),
+            "projection_contract": "apply phi_* to every destination relation and clear the exact source cofactor; factor-base images then lie in the unique order-r source subgroup, while pulled-back G and Q acquire the common label scale 3h",
+            "projection_runtime_check": "the arbitrary-class pushforward certificate matched the typed phi_*phi^*=[3] composition for both generator and target",
+            "factor_base_kind": "seeded degree-one places on the exact genus-3 cover",
+            "factor_base_size": ic.factor_base_size,
+            "relation_trials": ic.trials,
+            "smooth_relations": ic.smooth_trials,
+            "retained_relations": ic.relations,
+            "linear_algebra": "sparse Markowitz-lite elimination modulo r",
+            "linear_algebra_row_ops": ic.solve_row_ops,
+            "destination_candidate_verified": ic.solved,
+            "native_operation_unit": "Cantor additions/doublings in Jac(H)(F_2^m), modular row operations, and characteristic-two smoothness calls",
+            "source_gae_conversion": "unavailable",
+            "nine_phase_cold_wall_complete": true,
+            "phase_wall_sum_ns": phase_wall_sum_ns,
+            "source_reverification": "performed and charged inside the adapter when a candidate exists, then performed independently by the ecbench runner",
+            "exhaustion_is_evidence": true,
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
     })
 }
 
@@ -6165,6 +6817,12 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
     if id == "rho.preprocessing" {
         w.start_event = "first target-dependent operation (G + Q and the online stride) after the target-blind jump table and distinguished-point table are complete".into();
         w.mapping = "preprocessing rho: the online walks on the precomputation's map, table lookups at distinguished points, and final [d]G=Q verification".into();
+    }
+    if id == "bsgs.negation_table_v2" {
+        w.start_event = "first target-dependent giant-step lookup after the G-only negation baby table and giant stride are complete".into();
+        w.stop_event = "[d]G = Q verified inside the method".into();
+        w.included_stages = vec!["giant_steps".into(), "recovery_check".into()];
+        w.mapping = "cached BSGS: setup and table inserts are reusable and excluded from the online clock; giant steps, table lookups, collision recovery, and final scalar replay are per-target and inside it".into();
     }
     Some(w)
 }
@@ -8160,6 +8818,18 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
+        // Generic over the group: one probe a target into the negation-folded
+        // table of every signed m-sum of the base (as on prime curves).
+        // Restored from d87eb39548 (lost in the 2026-11-16 merges).
+        "ksum" => Box::new(KSumOracle::new(ms)),
+        // Restored: present in 2476332d22 (the binary k-sum study's build) and
+        // lost from main since, which made `ksum` refuse binary curves.
+        "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
+        // Koblitz: the same probe into a table folded by the signed
+        // Frobenius as well, over a Frobenius-closed base.
+        "ksum-frobenius" => Box::new(
+            crate::cryptanalysis::ic_framework::plugins::FrobeniusKSumOracle::new(ms, inst),
+        ),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
@@ -8168,6 +8838,9 @@ fn solve_ic_binary(
         }
         "mitm-fiber" => Box::new(FiberMitmOracle::new(ms)),
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
+        "ksum" => Box::new(KSumOracle::new(ms)),
+        "ksum-frobenius" => Box::new(FrobeniusKSumOracle::new(ms, inst)),
+        "wwalk" => Box::new(WWalkOracle::new()),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),
         "rootfind-pairs" => Box::new(RootfindPairsOracle::new(ms)),
         "descent-algebraic" => Box::new(DescentAlgebraicOracle::new(
@@ -8455,10 +9128,15 @@ fn solve_koblitz_descent(
     let q = inst.fast.lower(target);
     let started = Instant::now();
     let top_layout = m.id == "ic.koblitz_descent_v2";
-    let out = if top_layout {
-        koblitz_descent::run_top(kc, &q, &p)?
-    } else {
-        koblitz_descent::run(kc, &q, &p)?
+    let store = koblitz_descent::log_store_dir(&m.params)?;
+    let (out, log_table) = match &store {
+        // Opt-in only: a factor-base log store (`log_store=<dir|env>`).
+        Some(dir) => {
+            let (out, prov) = koblitz_descent::run_stored(kc, &q, &p, top_layout, dir)?;
+            (out, Some(prov))
+        }
+        None if top_layout => (koblitz_descent::run_top(kc, &q, &p)?, None),
+        None => (koblitz_descent::run(kc, &q, &p)?, None),
     };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
@@ -8567,7 +9245,16 @@ fn solve_koblitz_descent(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout),
+        detail: {
+            let mut d = koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout);
+            // Only with a store: where the log table came from.  A
+            // `log_table_source: "store"` run is amortized, and the runner
+            // moves its cost off the cold fields (`Cost::s_store`).
+            if let Some(prov) = log_table {
+                d["log_table"] = prov;
+            }
+            d
+        },
         online,
         online_error,
         // Sparse logs mod r (block Wiedemann), not a polynomial-system solve:
@@ -9393,6 +10080,135 @@ mod tests {
     }
 
     #[test]
+    fn v2_jacobian_image_adapters_emit_complete_nine_phase_wall_and_source_replay() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+        let spec = CurveSpec::Koblitz { a: 0, n: 7 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(binary) = &inst else {
+            unreachable!()
+        };
+        let scalar = 13u64;
+        let target = binary.fast.mul_u64(binary.generator, scalar);
+        let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        for id in ["jacobian_image.rho3_v2", "jacobian_image.bsgs_v2"] {
+            let method = resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
+            assert_eq!(
+                report.recovered,
+                Some(ExactScalar::from(u128::from(scalar)))
+            );
+            assert!(!report.exhausted);
+            assert_eq!(
+                report
+                    .phases
+                    .iter()
+                    .map(|phase| phase.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec![
+                    "route_search",
+                    "construction",
+                    "forward_map",
+                    "solver_setup",
+                    "relation_or_walk",
+                    "linear_algebra",
+                    "individual_log_or_descent",
+                    "source_recovery",
+                    "verification"
+                ]
+            );
+            assert!(report.phases.iter().all(|phase| phase.wall_ns.is_some()));
+            assert_eq!(
+                report
+                    .phases
+                    .iter()
+                    .filter_map(|phase| phase.wall_ns)
+                    .sum::<u64>(),
+                report.solve_wall_ns
+            );
+            assert!(report.total_gae > 0.0);
+            assert!(report
+                .unpriced
+                .contains(&"jacobian_group_operations_uncharged".into()));
+            assert_eq!(report.detail["nine_phase_cold_wall_complete"], true);
+            assert_eq!(
+                report.detail["source_reverification"],
+                "performed and charged inside the adapter, then performed independently by the ecbench runner"
+            );
+        }
+    }
+
+    #[test]
+    fn projected_genus3_ic_recovers_through_the_exact_cover_image() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+        let spec = CurveSpec::Koblitz { a: 0, n: 7 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(binary) = &inst else {
+            unreachable!()
+        };
+        let scalar = 13u64;
+        let target = binary.fast.mul_u64(binary.generator, scalar);
+        let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        let method = resolve(&MethodSpec {
+            id: "jacobian_image.genus3_projected_ic_v1".into(),
+            params: [
+                ("fb_size", "32"),
+                ("extra_relations", "8"),
+                ("branches", "32"),
+                ("d_step_in", "4"),
+                ("max_trials", "200000"),
+                ("threads", "1"),
+            ]
+            .into_iter()
+            .map(|(name, value)| (name.into(), value.into()))
+            .collect(),
+        })
+        .unwrap();
+        let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
+        assert_eq!(report.recovered, Some(ExactScalar::from(scalar as u128)));
+        assert!(!report.exhausted);
+        assert_eq!(report.detail["relation_label_scale"], "12");
+        assert_eq!(report.detail["destination_candidate_verified"], true);
+        assert_eq!(
+            report
+                .phases
+                .iter()
+                .map(|phase| phase.name.as_str())
+                .collect::<Vec<_>>(),
+            vec![
+                "route_search",
+                "construction",
+                "forward_map",
+                "solver_setup",
+                "relation_or_walk",
+                "linear_algebra",
+                "individual_log_or_descent",
+                "source_recovery",
+                "verification"
+            ]
+        );
+        assert_eq!(
+            report
+                .phases
+                .iter()
+                .filter_map(|phase| phase.wall_ns)
+                .sum::<u64>(),
+            report.solve_wall_ns
+        );
+        assert!(report.total_gae > 0.0);
+        assert!(report
+            .unpriced
+            .contains(&"linear_algebra_row_ops_uncharged".into()));
+    }
+
+    #[test]
     fn best2_model_registry_prime_recovery_and_replay() {
         use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
         let spec = CurveSpec::PrimeSearch {
@@ -9444,6 +10260,30 @@ mod tests {
         .unwrap();
         assert_eq!(a.method_id, b.method_id);
         assert!(a.method_id.starts_with("ECM1h"));
+    }
+
+    #[test]
+    fn frozen_negation_table_identity_stays_on_its_original_entry() {
+        let historical = resolve(&MethodSpec {
+            id: "bsgs.negation_table".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_eq!(historical.params["baby"], "0");
+        assert_eq!(historical.entry, "ecbench::generic::bsgs_negation_table");
+        assert_eq!(historical.method_id, "ECM1hae967a248ea2");
+        assert_eq!(
+            historical.method_sha256,
+            "ae967a248ea21c4a34ec79a0130ebaa412891a6ea97e61532b0ce51199a08d97"
+        );
+
+        let versioned = resolve(&MethodSpec {
+            id: "bsgs.negation_table_v2".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_ne!(versioned.method_id, historical.method_id);
+        assert_ne!(versioned.entry, historical.entry);
     }
 
     #[test]
@@ -10709,12 +11549,14 @@ mod accounting_rules_tests {
             ("rho.negation_v6", &[], true),
             ("rho.plain_v6", &[], true),
             ("rho.signed_frobenius_v5", &[], false),
+            ("rho.signed_frobenius_v6", &[], false),
             ("rho.signed_frobenius_v2", &[], false),
             ("rho.signed_frobenius_v3", &[], false),
             ("rho.signed_frobenius_strong_v2", &[], false),
             ("bsgs.textbook_v2", &[], true),
             ("bsgs.interleaved_v2", &[], true),
             ("bsgs.negation_v2", &[], true),
+            ("bsgs.negation_table_v2", &[], true),
             ("kangaroo.vow_v2", &[], true),
             ("claw.pair_table_v2", claw, false),
         ];
@@ -10756,6 +11598,39 @@ mod accounting_rules_tests {
         }
     }
 
+    #[test]
+    fn signed_frobenius_v6_only_adds_exact_partition_accounting() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 0, n: 19 });
+        let old = run(
+            &method("rho.signed_frobenius_v5", &[]),
+            &inst,
+            &facts,
+            100_003,
+            71,
+        );
+        let counted = run(
+            &method("rho.signed_frobenius_v6", &[]),
+            &inst,
+            &facts,
+            100_003,
+            71,
+        );
+
+        assert_eq!(counted.recovered, old.recovered);
+        assert_eq!(counted.exhausted, old.exhausted);
+        assert_eq!(counted.total_gae, old.total_gae);
+        assert_eq!(counted.phases, old.phases);
+        assert!(!old.counters.contains_key("partition_hashes_uncharged"));
+        let hashes = counted.counters["partition_hashes_uncharged"];
+        assert!(hashes >= counted.counters["walk_operations"]);
+        assert!(counted
+            .unpriced
+            .contains(&"partition_hashes_uncharged".to_string()));
+        let mut counted_counters = counted.counters.clone();
+        counted_counters.remove("partition_hashes_uncharged");
+        assert_eq!(counted_counters, old.counters);
+    }
+
     /// The verification a BSGS, kangaroo or claw run pays is the one
     /// `[d]G = Q` rho and index calculus already pay: about `1.5·log₂ r`.
     #[test]
@@ -10792,6 +11667,56 @@ mod accounting_rules_tests {
             assert_eq!(a_total, a.total_gae, "{old}");
             assert_eq!(b.total_gae, a.total_gae + v.gae, "{new}");
         }
+    }
+
+    #[test]
+    fn cached_bsgs_v2_separates_reusable_setup_from_verified_online_query() {
+        let (inst, facts) = built(&CurveSpec::PrimeSearch {
+            bits: 18,
+            seed: 59297,
+        });
+        let rep = run(
+            &method("bsgs.negation_table_v2", &[("baby", "128")]),
+            &inst,
+            &facts,
+            100_003,
+            9,
+        );
+        assert_eq!(rep.recovered, Some(ExactScalar::from(100_003u64)));
+        let setup = rep.phases.iter().find(|p| p.name == "setup").unwrap();
+        let search = rep.phases.iter().find(|p| p.name == "search").unwrap();
+        let verification = rep
+            .phases
+            .iter()
+            .find(|p| p.name == "verification")
+            .unwrap();
+        assert_eq!(
+            setup.native["inserts_uncharged"],
+            rep.counters["inserts_uncharged"]
+        );
+        assert_eq!(
+            search.native["lookups_uncharged"],
+            rep.counters["lookups_uncharged"]
+        );
+        assert_eq!(setup.native["point_negations_uncharged"], 1);
+        assert_eq!(search.native["recovery_key_comparisons_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_muls_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_adds_uncharged"], 1);
+        assert_eq!(verification.scalar_mults, 1);
+        assert_phases_sum("bsgs.negation_table_v2", &rep);
+
+        let online = rep.online.expect("cached query has an online window");
+        assert!(online.wall_ns > 0 && online.wall_ns < rep.solve_wall_ns);
+        assert!(online.start_event.contains("after the G-only negation baby table"));
+        assert_eq!(
+            online.phases_ns.values().sum::<u64>(),
+            online.wall_ns,
+            "exclusive online phases sum to the online interval"
+        );
+        assert_eq!(
+            rep.detail["cache_contract"]["cold_total_charges_setup_once"],
+            json!(true)
+        );
     }
 
     /// A kangaroo restart is neither set-up nor a jump: v2 charges it to
@@ -10954,7 +11879,9 @@ mod accounting_rules_tests {
     #[test]
     fn tuned_rho_window_compares_are_priced_through_work_native() {
         use crate::cryptanalysis::ecbench::work::{price, Priceable};
-        use crate::cryptanalysis::ic_boundary::{BRENT_WORD_OPS, WINDOW_WORD_OPS};
+        use crate::cryptanalysis::ic_boundary::{
+            BRENT_WORD_OPS, JUMP_SELECTIONS, JUMP_SELECT_WORD_OPS, WINDOW_WORD_OPS,
+        };
         for (spec, id) in [
             (
                 CurveSpec::PrimeSearch {
@@ -10978,11 +11905,20 @@ mod accounting_rules_tests {
                 "rho.negation_v2",
             ),
             (CurveSpec::Koblitz { a: 0, n: 19 }, "rho.signed_frobenius"),
+            (
+                CurveSpec::Koblitz { a: 0, n: 19 },
+                "rho.signed_frobenius_v5",
+            ),
         ] {
             let (inst, facts) = built(&spec);
             let rep = run(&method(id, &[]), &inst, &facts, 5555, 8);
             assert!(rep.recovered.is_some(), "{id}");
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+            for name in [
+                WINDOW_WORD_OPS,
+                BRENT_WORD_OPS,
+                JUMP_SELECT_WORD_OPS,
+                JUMP_SELECTIONS,
+            ] {
                 assert!(
                     !rep.counters.contains_key(name),
                     "{id}: {name} is a counter"
@@ -11001,7 +11937,30 @@ mod accounting_rules_tests {
             // Every step scans the ring and pushes into it.
             assert!(window >= 2 * rep.counters["steps"], "{id}: {window}");
             let brent = search.work_native.get(BRENT_WORD_OPS).copied().unwrap_or(0);
-            assert_eq!(brent > 0, id.ends_with("_v2"), "{id}: brent {brent}");
+            // v2 and v5 (a tuned v3 walk) run Brent's checks; the others do not.
+            let has_brent = id.ends_with("_v2") || id.ends_with("_v5");
+            assert_eq!(brent > 0, has_brent, "{id}: brent {brent}");
+            // Every step selects a jump: two word operations each, at least.
+            let select = search
+                .work_native
+                .get(JUMP_SELECT_WORD_OPS)
+                .copied()
+                .unwrap_or(0);
+            assert!(select >= 2 * rep.counters["steps"], "{id}: select {select}");
+            // The band's count: one per selection, behind its marker.
+            assert_eq!(
+                search.work_native.get(JUMP_SELECTIONS).copied(),
+                Some(select / 2),
+                "{id}"
+            );
+            assert_eq!(
+                search
+                    .work_native
+                    .get(&format!("counted:{JUMP_SELECTIONS}"))
+                    .copied(),
+                Some(1),
+                "{id}"
+            );
             let priced = |phases: &[PhaseRecord]| {
                 price(&Priceable {
                     method_id: id,
@@ -11016,7 +11975,7 @@ mod accounting_rules_tests {
             let with = priced(&rep.phases);
             // The window counters are priced (v2 keeps its own table counters
             // unpriced, as before).
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS, JUMP_SELECT_WORD_OPS] {
                 assert!(
                     !with.unpriced.iter().any(|u| u == name),
                     "{id}: {name} unpriced"
@@ -11033,7 +11992,7 @@ mod accounting_rules_tests {
             let gates = with.widths.gates(word).expect("word_op priced");
             let diff: u128 =
                 with.bitops.parse::<u128>().unwrap() - without.bitops.parse::<u128>().unwrap();
-            assert_eq!(diff, gates * u128::from(window + brent), "{id}");
+            assert_eq!(diff, gates * u128::from(window + brent + select), "{id}");
         }
     }
 
@@ -11070,6 +12029,88 @@ mod accounting_rules_tests {
             assert!(s.distinct_jumps >= last.distinct_jumps, "{bits}");
             last = s;
         }
+    }
+
+    /// `rho.signed_frobenius_v5` tallies its per-step jump-index selection
+    /// as `partition_hashes_uncharged` (owner decision 2026-11-19): the
+    /// report is the pre-tally report (the same walk, recovered scalar,
+    /// phases, group operations, GAE and every other counter) plus that one
+    /// counter, which equals the walk steps (strong's definition: one
+    /// partition hash per step) and is listed as unpriced, so the band
+    /// prices it at `w` per step.
+    #[test]
+    fn v5_jump_index_tally_adds_one_counter_equal_to_steps_and_changes_nothing_else() {
+        let m = method("rho.signed_frobenius_v5", &[]);
+        let cap = param_u64(&m, "cap_multiple").unwrap() as f64;
+        for (a, n) in [(0u8, 13u32), (1, 17), (0, 23), (1, 29)] {
+            let (inst, facts) = built(&CurveSpec::Koblitz { a, n });
+            let Instance::Binary(bi) = &inst else {
+                unreachable!()
+            };
+            for i in 0..6u64 {
+                let k = (1_009 + 7_919 * i) % bi.r;
+                let tgt = bi.fast.mul_u64(bi.generator, k);
+                let hex = [format!("0x{:x}", tgt.x), format!("0x{:x}", tgt.y)];
+                let seed = 40 + i;
+                let tallied = solve(&m, &inst, &facts, &hex, seed).unwrap();
+                let res = signed_frobenius_rho_v3(
+                    bi,
+                    FastPoint::affine(tgt.x, tgt.y),
+                    seed,
+                    rho_cap(bi.r, cap),
+                    RhoV3::v6(true),
+                )
+                .unwrap();
+                let steps = res.steps;
+                assert_eq!(res.jump_index_selections, steps, "a={a} n={n} i={i}");
+                let before = rho_report_v2(res, 0, None, GroupOps::default());
+                assert_eq!(tallied.recovered, before.recovered);
+                assert_eq!(tallied.recovered, Some(ExactScalar::from(k)));
+                assert_eq!(tallied.exhausted, before.exhausted);
+                assert_eq!(tallied.total_gae.to_bits(), before.total_gae.to_bits());
+                assert_eq!(tallied.phases.len(), before.phases.len());
+                for (p, q) in tallied.phases.iter().zip(&before.phases) {
+                    assert_eq!(
+                        (&p.name, p.adds, p.doubles, p.scalar_mults, p.gae.to_bits()),
+                        (&q.name, q.adds, q.doubles, q.scalar_mults, q.gae.to_bits())
+                    );
+                    assert_eq!(p.native, q.native);
+                    assert_eq!(p.work_native, q.work_native);
+                }
+                assert_eq!(tallied.field_ops, before.field_ops);
+                assert_eq!(tallied.automorphisms_used, before.automorphisms_used);
+                let mut extra = tallied.counters.clone();
+                assert_eq!(extra.remove(V5_JUMP_INDEX_COUNTER), Some(steps));
+                assert_eq!(extra, before.counters, "a={a} n={n} i={i}");
+                assert_eq!(tallied.counters["steps"], steps);
+                assert!(steps > 0);
+                let mut unpriced = tallied.unpriced.clone();
+                assert!(unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+                unpriced.retain(|u| u != V5_JUMP_INDEX_COUNTER);
+                assert_eq!(unpriced, before.unpriced);
+                assert!(v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &before.counters
+                ));
+                assert!(!v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &tallied.counters
+                ));
+            }
+        }
+        // Strong's definition, for the record: one partition hash per step.
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let s = run(
+            &method("rho.signed_frobenius_strong", &[]),
+            &inst,
+            &facts,
+            4_321,
+            3,
+        );
+        assert_eq!(
+            s.counters["partition_hashes_uncharged"],
+            s.counters["walk_steps"]
+        );
     }
 
     /// The v2 strong reference's fixed set-up against the frozen one at the
@@ -11440,6 +12481,7 @@ mod accounting_rules_tests {
             ("bsgs.textbook_v2", &[], &prime),
             ("bsgs.interleaved_v2", &[], &prime),
             ("bsgs.negation_v2", &[], &prime),
+            ("bsgs.negation_table_v2", &[], &prime),
             ("kangaroo.vow_v2", &[], &prime),
             ("claw.pair_table_v2", claw, &koblitz),
         ];
@@ -11550,6 +12592,7 @@ mod accounting_tests {
             &json!({
                 "schema": SPEC_SCHEMA,
                 "label": "accounting",
+                "curve_policy": {"mode": "diagnostic", "off_panel_reason": "method accounting applicability fixture"},
                 "workloads": {"curves": [curve], "targets_per_curve": 1, "target_seed": 1},
                 "arms": [{"name": "a", "role": "candidate", "method": {"id": id, "params": params}}],
                 "measurement": {"rounds": 1, "seed": 9},
