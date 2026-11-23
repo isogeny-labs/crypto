@@ -1,0 +1,29 @@
+name: Prime31 Run75 frozen native Rust cold-preoracle floor
+
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "examples/prime31_run75_cost_floor.rs"
+      - "research/prime31_f4_admission_20261121/RUN72_RESULTS.json"
+      - ".github/workflows/prime31-run75-cost-floor.yml"
+  pull_request:
+    paths:
+      - "examples/prime31_run75_cost_floor.rs"
+      - "research/prime31_f4_admission_20261121/RUN72_RESULTS.json"
+      - ".github/workflows/prime31-run75-cost-floor.yml"
+  workflow_dispatch:
+
+jobs:
+  original-rust-run72-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Test all nine matched complete cold cells
+        run: cargo test --locked --release --example prime31_run75_cost_floor
+      - name: Print independently recomputed fixed-pre-stage lower floor
+        run: cargo run --locked --release --example prime31_run75_cost_floor

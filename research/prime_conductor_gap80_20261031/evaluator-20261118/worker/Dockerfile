@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libmpfr-dev=4.2.2-1 libgmp-dev \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
+COPY optimized.c complete_pipeline.cpp projective_walk.hpp prepared_norm.hpp ./
 COPY optimized.c complete_pipeline.cpp projective_walk.hpp ./
 RUN mkdir -p /opt/conductor \
     && cc -O3 -Wall -Wextra -std=c11 \
@@ -12,6 +13,7 @@ RUN mkdir -p /opt/conductor \
        -c optimized.c -o optimized.o \
     && c++ -O2 -Wall -Wextra -std=c++17 complete_pipeline.cpp optimized.o \
        -lpari -lflint -lgmpxx -lgmp -o /opt/conductor/complete_pipeline \
+    && sha256sum optimized.c complete_pipeline.cpp projective_walk.hpp prepared_norm.hpp > /opt/conductor/sources.sha256 \
     && sha256sum optimized.c complete_pipeline.cpp projective_walk.hpp > /opt/conductor/sources.sha256 \
     && sha256sum /opt/conductor/complete_pipeline > /opt/conductor/binary.sha256 \
     && dpkg-query -W g++ gcc libflint-dev libpari-dev libmpfr-dev libgmp-dev \

@@ -1,0 +1,186 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/local-20261119/run-pilot96.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T18:15:11+00:00",
+      "wall_s": 674.453
+    },
+    {
+      "argv": [
+        "/workspace/tools/conductor-local-20261119/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_conductor_gap80_20261031/local-20261119/results/pilot96-l0",
+        "--replay-all",
+        "--replay-seed",
+        "20261119",
+        "--out",
+        "research/prime_conductor_gap80_20261031/local-20261119/pilot96-audit.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T18:27:29+00:00",
+      "wall_s": 739.181
+    }
+  ],
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T18:14:58+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/local-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T1814Z-conductor-local-pilot96-20261119",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp96-tm125000000302577-0b06b926.bsgs-exact-key.mean_solve",
+      "note": "Native descriptive L0 mean, one shared target/two rounds; setup included; unpriced work; no wall or ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 86.72433495199999
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp96-tm125000000302577-0b06b926.rho-aa.mean_solve",
+      "note": "Native descriptive L0 mean, one shared target/two rounds; setup included; unpriced work; no wall or ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 33.995480389499996
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp96-tm125000000302577-0b06b926.rho-counted.mean_solve",
+      "note": "Native descriptive L0 mean, one shared target/two rounds; setup included; unpriced work; no wall or ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 35.6719895585
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp96-tm125000000302577-2550b472.bsgs-exact-key.mean_solve",
+      "note": "Native descriptive L0 mean, one shared target/two rounds; setup included; unpriced work; no wall or ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 83.397685889
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp96-tm125000000302577-2550b472.rho-aa.mean_solve",
+      "note": "Native descriptive L0 mean, one shared target/two rounds; setup included; unpriced work; no wall or ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 47.7529433215
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp96-tm125000000302577-2550b472.rho-counted.mean_solve",
+      "note": "Native descriptive L0 mean, one shared target/two rounds; setup included; unpriced work; no wall or ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 49.069838047
+    }
+  ],
+  "problem": "ecdlp:local-conductor-control96",
+  "publication_pending": "research/prime_conductor_gap80_20261031/local-20261119/publication-pending.json",
+  "raw": [
+    {
+      "bytes": 3737,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/pilot96-l0/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/87/87035135349c990c8916aee71600cca6a6286f5791f79dde685fbd6877cfd7ae",
+      "sha256": "87035135349c990c8916aee71600cca6a6286f5791f79dde685fbd6877cfd7ae",
+      "uploaded": false
+    },
+    {
+      "bytes": 6370,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/pilot96-l0/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ea/ead9fc1146e7649217828bba013f565f06fa89579c3e71bfd6303adb441ff85c",
+      "sha256": "ead9fc1146e7649217828bba013f565f06fa89579c3e71bfd6303adb441ff85c",
+      "uploaded": false
+    },
+    {
+      "bytes": 74538,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/pilot96-l0/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/37075906a771ab0da10cb90116006d6fbec3e5cf751545d9e536265685f3526f",
+      "sha256": "37075906a771ab0da10cb90116006d6fbec3e5cf751545d9e536265685f3526f",
+      "uploaded": false
+    },
+    {
+      "bytes": 2220,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/pilot96-l0/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/77/77cfe436112b4954d6f319b42a05c1d91c9a56f8f12f2a31ff8a605b1e422797",
+      "sha256": "77cfe436112b4954d6f319b42a05c1d91c9a56f8f12f2a31ff8a605b1e422797",
+      "uploaded": false
+    },
+    {
+      "bytes": 1849,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/results/pilot96-l0/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f2/f22684baa0846ea0fe6a4f900afb6e4d2348bddc04824e6ba5973a59737ce2fa",
+      "sha256": "f22684baa0846ea0fe6a4f900afb6e4d2348bddc04824e6ba5973a59737ce2fa",
+      "uploaded": false
+    },
+    {
+      "bytes": 136624,
+      "path": "research/prime_conductor_gap80_20261031/local-20261119/local-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9cc1e5008cb9c1def70c1022a29143ec48c8028044181e0d73d6cd48855d2795",
+      "sha256": "9cc1e5008cb9c1def70c1022a29143ec48c8028044181e0d73d6cd48855d2795",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/local-20261119/reports/report.pdf",
+    "png": [
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/ecdLP.png",
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/scalar.png"
+    ],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/ecdLP.svg",
+      "research/prime_conductor_gap80_20261031/local-20261119/reports/scalar.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor-local-pilot96-20261119",
+  "status": "open",
+  "summary": "12 verified solves and exact native replays; independent PARI checks pass. L0 capacity pilot, one target and two rounds. Record remains open pending authenticated raw-data publication.",
+  "validation": "research/prime_conductor_gap80_20261031/local-20261119/summary.json"
+}

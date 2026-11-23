@@ -9,7 +9,8 @@
 use crate::common::{inv_mod_u64, Rng, K, KONE, KZERO};
 use crate::ghs::{Inst, EP};
 use std::cell::Cell;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::fmt::Write as _;
 use std::time::Instant;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -843,6 +844,94 @@ impl<'a, const COUNT: bool> FastEc<'a, COUNT> {
     }
 }
 
+/// Minimal, dependency-free SHA-256 used to bind deterministic worker starts
+/// and transcripts in the standalone `rustc` build.  This is deliberately
+/// local to the research driver: the production library uses its normal hash
+/// dependencies, while this file must remain directly compilable.
+pub fn sha256(bytes: &[u8]) -> [u8; 32] {
+    const K256: [u32; 64] = [
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
+        0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
+        0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
+        0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+        0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc,
+        0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
+        0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116,
+        0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
+        0xc67178f2,
+    ];
+    let mut data = bytes.to_vec();
+    let bit_len = (data.len() as u64).wrapping_mul(8);
+    data.push(0x80);
+    while data.len() % 64 != 56 {
+        data.push(0);
+    }
+    data.extend_from_slice(&bit_len.to_be_bytes());
+    let mut h = [
+        0x6a09e667u32,
+        0xbb67ae85,
+        0x3c6ef372,
+        0xa54ff53a,
+        0x510e527f,
+        0x9b05688c,
+        0x1f83d9ab,
+        0x5be0cd19,
+    ];
+    for block in data.chunks_exact(64) {
+        let mut w = [0u32; 64];
+        for (i, word) in block.chunks_exact(4).enumerate() {
+            w[i] = u32::from_be_bytes(word.try_into().expect("four-byte SHA word"));
+        }
+        for i in 16..64 {
+            let s0 = w[i - 15].rotate_right(7) ^ w[i - 15].rotate_right(18) ^ (w[i - 15] >> 3);
+            let s1 = w[i - 2].rotate_right(17) ^ w[i - 2].rotate_right(19) ^ (w[i - 2] >> 10);
+            w[i] = w[i - 16]
+                .wrapping_add(s0)
+                .wrapping_add(w[i - 7])
+                .wrapping_add(s1);
+        }
+        let (mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut hh) =
+            (h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]);
+        for i in 0..64 {
+            let s1 = e.rotate_right(6) ^ e.rotate_right(11) ^ e.rotate_right(25);
+            let ch = (e & f) ^ ((!e) & g);
+            let t1 = hh
+                .wrapping_add(s1)
+                .wrapping_add(ch)
+                .wrapping_add(K256[i])
+                .wrapping_add(w[i]);
+            let s0 = a.rotate_right(2) ^ a.rotate_right(13) ^ a.rotate_right(22);
+            let maj = (a & b) ^ (a & c) ^ (b & c);
+            let t2 = s0.wrapping_add(maj);
+            hh = g;
+            g = f;
+            f = e;
+            e = d.wrapping_add(t1);
+            d = c;
+            c = b;
+            b = a;
+            a = t1.wrapping_add(t2);
+        }
+        for (dst, value) in h.iter_mut().zip([a, b, c, d, e, f, g, hh].into_iter()) {
+            *dst = dst.wrapping_add(value);
+        }
+    }
+    let mut out = [0u8; 32];
+    for (chunk, word) in out.chunks_exact_mut(4).zip(h) {
+        chunk.copy_from_slice(&word.to_be_bytes());
+    }
+    out
+}
+
+pub fn hex_digest(digest: &[u8]) -> String {
+    let mut out = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        write!(&mut out, "{byte:02x}").expect("writing to String cannot fail");
+    }
+    out
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct StrongOpts {
     pub batch: usize,
@@ -899,6 +988,71 @@ pub struct StrongOut {
     pub setup_native: NativeCounts,
     pub walk_native: NativeCounts,
     pub wall_s: f64,
+}
+
+/// Deterministic production-path control for the parallel distinguished-point
+/// coordinator.  It deliberately has no clock fields.  `run-parallel` remains
+/// a separate admission-gated implementation obligation.
+#[derive(Clone, Debug)]
+pub struct ParallelCheckOpts {
+    pub strong: StrongOpts,
+    pub workers: usize,
+    pub dp_shards: usize,
+    pub queue_depth: usize,
+    pub stop_check_steps: u64,
+    pub stop_delay_checks: u64,
+    pub active_lanes: usize,
+    pub inject_collision_step: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParallelDpRecord {
+    pub worker: usize,
+    pub lane: usize,
+    pub walker_index: u64,
+    pub step: u64,
+    pub x: K,
+    pub y: K,
+    pub a: u64,
+    pub b: u64,
+    pub injected: bool,
+}
+
+#[derive(Clone, Debug)]
+pub struct ParallelCheckOut {
+    pub ok: bool,
+    pub found: Option<u64>,
+    pub control_only: bool,
+    pub useful_steps: u64,
+    pub overshoot_steps: u64,
+    pub total_steps: u64,
+    pub per_worker_total_steps: Vec<u64>,
+    pub dp_tests: u64,
+    pub dp_emitted: u64,
+    pub dp_inserted: u64,
+    pub dp_duplicates: u64,
+    pub sterile_collisions: u64,
+    pub usable_collisions: u64,
+    pub rejected_records: u64,
+    pub queue_submitted: u64,
+    pub queue_processed: u64,
+    pub queue_peak_depth: usize,
+    pub queue_block_events: u64,
+    pub shard_occupancy: Vec<usize>,
+    pub restarts: u64,
+    pub lookahead: u64,
+    pub cycles: u64,
+    pub cycle_adds: u64,
+    pub setup_field: FieldCounts,
+    pub walk_field: FieldCounts,
+    pub verify_field: FieldCounts,
+    pub setup_native: NativeCounts,
+    pub walk_native: NativeCounts,
+    pub transition_digest: String,
+    pub jump_digest: String,
+    pub worker_start_digest: String,
+    pub dp_transcript_digest: String,
+    pub transcript: Vec<ParallelDpRecord>,
 }
 
 #[derive(Clone)]
@@ -1299,6 +1453,668 @@ fn collision_scalar<N: NativeSink>(
     Some(smul(num, di, n, c))
 }
 
+fn append_point_bytes(out: &mut Vec<u8>, point: &EP) {
+    match point {
+        EP::Inf => out.push(0),
+        EP::A(x, y) => {
+            out.push(1);
+            for limb in x.iter().chain(y.iter()) {
+                out.extend_from_slice(&limb.to_be_bytes());
+            }
+        }
+    }
+}
+
+fn digest_mod(digest: [u8; 32], modulus: u64) -> u64 {
+    assert!(modulus > 0);
+    let mut value = 0u128;
+    for byte in digest {
+        value = ((value << 8) + u128::from(byte)) % u128::from(modulus);
+    }
+    value as u64
+}
+
+fn indexed_coeff(
+    job_digest: &[u8; 32],
+    worker: usize,
+    walker_index: u64,
+    component: u8,
+    modulus: u64,
+) -> u64 {
+    let mut input = Vec::with_capacity(32 + 8 + 8 + 32);
+    input.extend_from_slice(b"ghs-rho/indexed-sha256-v1/walker");
+    input.extend_from_slice(job_digest);
+    input.extend_from_slice(&(worker as u64).to_be_bytes());
+    input.extend_from_slice(&walker_index.to_be_bytes());
+    input.push(component);
+    digest_mod(sha256(&input), modulus)
+}
+
+fn indexed_walker<const COUNT: bool, N: NativeSink>(
+    ec: &FastEc<'_, COUNT>,
+    f: &FastF3<COUNT>,
+    g: &EP,
+    target: &EP,
+    n: u64,
+    job_digest: &[u8; 32],
+    worker: usize,
+    cursor: &mut u64,
+    native: &mut N,
+    start_bytes: &mut Vec<u8>,
+) -> (Walker, u64) {
+    loop {
+        let index = *cursor;
+        *cursor = cursor.checked_add(1).expect("walker index exhausted");
+        let a = indexed_coeff(job_digest, worker, index, 0, n);
+        let b = indexed_coeff(job_digest, worker, index, 1, n - 1) + 1;
+        native.bump_rng_draws(2);
+        let p = ec.add(&ec.mul(g, a as u128), &ec.mul(target, b as u128));
+        start_bytes.extend_from_slice(&(worker as u64).to_be_bytes());
+        start_bytes.extend_from_slice(&index.to_be_bytes());
+        start_bytes.extend_from_slice(&a.to_be_bytes());
+        start_bytes.extend_from_slice(&b.to_be_bytes());
+        if p != EP::Inf {
+            let (p, a, b) = canon(f, p, a, b, n, native);
+            return (
+                Walker {
+                    p,
+                    h: None,
+                    a,
+                    b,
+                    tail: 0,
+                    local: 0,
+                    snapshot: None,
+                },
+                index,
+            );
+        }
+    }
+}
+
+fn parallel_job_digest(inst: &Inst, target: &EP, seed: u64, opts: &ParallelCheckOpts) -> [u8; 32] {
+    let mut bytes = Vec::new();
+    bytes.extend_from_slice(b"ghs-rho/parallel-check/v1");
+    bytes.extend_from_slice(&inst.q.to_be_bytes());
+    bytes.extend_from_slice(&inst.ell.to_be_bytes());
+    bytes.extend_from_slice(&seed.to_be_bytes());
+    for value in [
+        opts.strong.batch as u64,
+        opts.strong.r as u64,
+        opts.strong.dp_bits as u64,
+        opts.workers as u64,
+    ] {
+        bytes.extend_from_slice(&value.to_be_bytes());
+    }
+    append_point_bytes(&mut bytes, target);
+    sha256(&bytes)
+}
+
+#[derive(Default)]
+struct DpStats {
+    emitted: u64,
+    inserted: u64,
+    duplicates: u64,
+    sterile: u64,
+    usable: u64,
+    rejected: u64,
+    submitted: u64,
+    processed: u64,
+    queue_peak: usize,
+    queue_block_events: u64,
+}
+
+fn process_parallel_dp<N: NativeSink>(
+    record: ParallelDpRecord,
+    inst: &Inst,
+    target: &EP,
+    verifier: &FastEc<'_, true>,
+    shards: &mut [HashMap<K, ParallelDpRecord>],
+    transcript: &mut Vec<ParallelDpRecord>,
+    native: &mut N,
+    stats: &mut DpStats,
+) -> Option<u64> {
+    stats.processed += 1;
+    transcript.push(record.clone());
+    let point = EP::A(record.x, record.y);
+    let reconstructed = verifier.add(
+        &verifier.mul(&inst.g, record.a as u128),
+        &verifier.mul(target, record.b as u128),
+    );
+    if reconstructed != point {
+        stats.rejected += 1;
+        return None;
+    }
+    let shard = (hx(&record.x) as usize) % shards.len();
+    native.bump_table_ops(1);
+    if let Some(previous) = shards[shard].get(&record.x).cloned() {
+        if previous.a == record.a && previous.b == record.b && previous.y == record.y {
+            stats.duplicates += 1;
+            return None;
+        }
+        let Some(candidate) = collision_scalar(
+            inst.ell,
+            &record.y,
+            record.a,
+            record.b,
+            &previous.y,
+            previous.a,
+            previous.b,
+            native,
+        ) else {
+            stats.sterile += 1;
+            return None;
+        };
+        if verifier.mul(&inst.g, candidate as u128) == *target {
+            stats.usable += 1;
+            return Some(candidate);
+        }
+        stats.rejected += 1;
+        return None;
+    }
+    shards[shard].insert(record.x, record);
+    native.bump_table_ops(1);
+    stats.inserted += 1;
+    None
+}
+
+fn canonical_transcript_digest(records: &mut [ParallelDpRecord]) -> String {
+    records.sort_by_key(|r| {
+        (
+            r.step,
+            r.worker,
+            r.lane,
+            r.walker_index,
+            r.x,
+            r.y,
+            r.a,
+            r.b,
+            r.injected,
+        )
+    });
+    let mut bytes = Vec::new();
+    for r in records {
+        bytes.extend_from_slice(&r.step.to_be_bytes());
+        bytes.extend_from_slice(&(r.worker as u64).to_be_bytes());
+        bytes.extend_from_slice(&(r.lane as u64).to_be_bytes());
+        bytes.extend_from_slice(&r.walker_index.to_be_bytes());
+        for limb in r.x.iter().chain(r.y.iter()) {
+            bytes.extend_from_slice(&limb.to_be_bytes());
+        }
+        bytes.extend_from_slice(&r.a.to_be_bytes());
+        bytes.extend_from_slice(&r.b.to_be_bytes());
+        bytes.push(u8::from(r.injected));
+    }
+    hex_digest(&sha256(&bytes))
+}
+
+/// Exercise the production curve transition, indexed starts, shared DP table,
+/// bounded coordinator queue, collision equations and stop accounting without
+/// observing a clock.  Workers are deterministically round-robin scheduled in
+/// this control; it is not a latency implementation and cannot support a
+/// worker-scaling claim.
+pub fn strong_rho_parallel_check(
+    inst: &Inst,
+    k_true: u64,
+    seed: u64,
+    opts: ParallelCheckOpts,
+) -> ParallelCheckOut {
+    assert!(opts.workers > 0);
+    assert!(opts.dp_shards > 0);
+    assert!(opts.queue_depth > 0);
+    assert!(opts.stop_check_steps > 0);
+    assert!(opts.active_lanes <= opts.strong.batch);
+    assert!(opts.strong.batch > 0 && opts.strong.r > 0 && (1..=44).contains(&opts.strong.dp_bits));
+
+    let n = inst.ell;
+    let f = FastF3::<true>::from_instance_with_mul5(inst, opts.strong.use_mul5);
+    let ec = FastEc::from_instance(&f, inst);
+    let verify_f = FastF3::<true>::from_instance_with_mul5(inst, opts.strong.use_mul5);
+    let verifier = FastEc::from_instance(&verify_f, inst);
+    let mut native = CountedNative::default();
+    let target = ec.mul(&inst.g, k_true as u128);
+    let job_digest = parallel_job_digest(inst, &target, seed, &opts);
+
+    // One shared transition identity: jumps are constructed once, before any
+    // worker starts, and every worker receives the same immutable vectors.
+    let mut jump_rng = Rng::new(seed ^ 0x4E45_47);
+    let InitialState { ma, mb, mp, .. } = initial_state(
+        &ec,
+        &f,
+        &inst.g,
+        &target,
+        n,
+        opts.strong.r,
+        0,
+        &mut jump_rng,
+        &mut native,
+        opts.strong.batch_setup,
+        false,
+    );
+    let mut jump_bytes = Vec::new();
+    for ((a, b), point) in ma.iter().zip(&mb).zip(&mp) {
+        jump_bytes.extend_from_slice(&a.to_be_bytes());
+        jump_bytes.extend_from_slice(&b.to_be_bytes());
+        append_point_bytes(&mut jump_bytes, point);
+    }
+    let jump_digest = hex_digest(&sha256(&jump_bytes));
+    let mut transition_bytes = jump_bytes.clone();
+    transition_bytes.extend_from_slice(&opts.strong.dp_bits.to_be_bytes());
+    transition_bytes.extend_from_slice(&opts.strong.snapshot_period.to_be_bytes());
+    transition_bytes.extend_from_slice(b"negation-canon/lookahead/cycle-escape-v1");
+    let transition_digest = hex_digest(&sha256(&transition_bytes));
+
+    let mut start_bytes = Vec::new();
+    let mut cursors = vec![0u64; opts.workers];
+    let mut walker_indices = vec![Vec::new(); opts.workers];
+    let mut worker_walkers = Vec::with_capacity(opts.workers);
+    for worker in 0..opts.workers {
+        let mut lanes = Vec::with_capacity(opts.active_lanes);
+        for _ in 0..opts.active_lanes {
+            let (walker, index) = indexed_walker(
+                &ec,
+                &f,
+                &inst.g,
+                &target,
+                n,
+                &job_digest,
+                worker,
+                &mut cursors[worker],
+                &mut native,
+                &mut start_bytes,
+            );
+            lanes.push(walker);
+            walker_indices[worker].push(index);
+        }
+        worker_walkers.push(lanes);
+    }
+    let unique_indices: HashSet<_> = walker_indices
+        .iter()
+        .enumerate()
+        .flat_map(|(worker, indices)| indices.iter().map(move |&index| (worker, index)))
+        .collect();
+    assert_eq!(
+        unique_indices.len(),
+        opts.workers * opts.active_lanes,
+        "duplicate indexed worker start"
+    );
+
+    let setup_field = f.counts();
+    let setup_native = native.snapshot();
+    let mask = (1u64 << opts.strong.dp_bits) - 1;
+    let tail_cap = 20u64 << opts.strong.dp_bits;
+    let mut scratches: Vec<_> = (0..opts.workers)
+        .map(|_| StepScratch::with_capacity(opts.active_lanes))
+        .collect();
+    let mut shards: Vec<HashMap<K, ParallelDpRecord>> = (0..opts.dp_shards)
+        .map(|_| HashMap::with_capacity(128 / opts.dp_shards + 1))
+        .collect();
+    let mut queue = VecDeque::with_capacity(opts.queue_depth);
+    let mut transcript = Vec::new();
+    let mut stats = DpStats::default();
+    let mut per_worker_steps = vec![0u64; opts.workers];
+    let (mut useful_steps, mut overshoot_steps) = (0u64, 0u64);
+    let (mut restarts, mut lookahead, mut cycles, mut cycle_adds) = (0u64, 0u64, 0u64, 0u64);
+    let mut found = None;
+    let mut injected = false;
+    let mut overshoot_remaining = 0u64;
+    let control_only = opts.active_lanes < opts.strong.batch;
+
+    'main: while useful_steps + overshoot_steps <= opts.strong.max_steps {
+        if opts.active_lanes == 0 {
+            break;
+        }
+        for worker in 0..opts.workers {
+            let walkers = &mut worker_walkers[worker];
+            let scratch = &mut scratches[worker];
+            scratch.first.clear();
+            for walker in walkers.iter_mut() {
+                let h = match walker.h {
+                    Some(h) => h,
+                    None => {
+                        let EP::A(x, _) = walker.p else {
+                            unreachable!()
+                        };
+                        let h = hx(&x);
+                        walker.h = Some(h);
+                        native.bump_hashes(1);
+                        h
+                    }
+                };
+                scratch.first.push(partition_index(h, opts.strong.r));
+            }
+            lookahead += batched_lookahead_step(&ec, &mp, walkers, &mut native, scratch);
+
+            for lane in 0..walkers.len() {
+                let was_found = found.is_some();
+                if was_found {
+                    overshoot_steps += 1;
+                    if overshoot_remaining > 0 {
+                        overshoot_remaining -= 1;
+                    }
+                } else {
+                    useful_steps += 1;
+                }
+                per_worker_steps[worker] += 1;
+                let total_step = useful_steps + overshoot_steps;
+                let j = scratch.chosen[lane];
+                let a = sadd(walkers[lane].a, ma[j], n, &mut native);
+                let b = sadd(walkers[lane].b, mb[j], n, &mut native);
+                if scratch.next[lane] == EP::Inf {
+                    restarts += 1;
+                    let (replacement, index) = indexed_walker(
+                        &ec,
+                        &f,
+                        &inst.g,
+                        &target,
+                        n,
+                        &job_digest,
+                        worker,
+                        &mut cursors[worker],
+                        &mut native,
+                        &mut start_bytes,
+                    );
+                    walkers[lane] = replacement;
+                    walker_indices[worker][lane] = index;
+                    continue;
+                }
+                let (mut p, mut a, mut b) = canon(&f, scratch.next[lane], a, b, n, &mut native);
+                let EP::A(mut x, _) = p else { unreachable!() };
+                let mut h = scratch.next_hash[lane].expect("affine candidate hash");
+                walkers[lane].local += 1;
+                let mut cycle_len = None;
+                if let Some((snapshot, snapshot_step)) = walkers[lane].snapshot {
+                    native.bump_cycle_compares(1);
+                    if snapshot == p {
+                        cycle_len = Some(walkers[lane].local - snapshot_step);
+                    }
+                }
+                if let Some(cycle_len) = cycle_len {
+                    cycles += 1;
+                    let (mut cp, mut ca, mut cb) = (p, a, b);
+                    let (mut best, mut best_a, mut best_b) = (p, a, b);
+                    let mut failed = false;
+                    for _ in 0..cycle_len {
+                        let Some((np, na, nb, adds, extra)) = single_lookahead_step(
+                            &ec,
+                            &f,
+                            &mp,
+                            &ma,
+                            &mb,
+                            &cp,
+                            ca,
+                            cb,
+                            n,
+                            &mut native,
+                        ) else {
+                            failed = true;
+                            break;
+                        };
+                        cycle_adds += adds;
+                        lookahead += extra;
+                        (cp, ca, cb) = (np, na, nb);
+                        if point_key(&cp) < point_key(&best) {
+                            (best, best_a, best_b) = (cp, ca, cb);
+                        }
+                    }
+                    if failed {
+                        restarts += 1;
+                        let (replacement, index) = indexed_walker(
+                            &ec,
+                            &f,
+                            &inst.g,
+                            &target,
+                            n,
+                            &job_digest,
+                            worker,
+                            &mut cursors[worker],
+                            &mut native,
+                            &mut start_bytes,
+                        );
+                        walkers[lane] = replacement;
+                        walker_indices[worker][lane] = index;
+                        continue;
+                    }
+                    let doubled = ec.add(&best, &best);
+                    cycle_adds += 1;
+                    if doubled == EP::Inf {
+                        restarts += 1;
+                        let (replacement, index) = indexed_walker(
+                            &ec,
+                            &f,
+                            &inst.g,
+                            &target,
+                            n,
+                            &job_digest,
+                            worker,
+                            &mut cursors[worker],
+                            &mut native,
+                            &mut start_bytes,
+                        );
+                        walkers[lane] = replacement;
+                        walker_indices[worker][lane] = index;
+                        continue;
+                    }
+                    let da = sadd(best_a, best_a, n, &mut native);
+                    let db = sadd(best_b, best_b, n, &mut native);
+                    (p, a, b) = canon(&f, doubled, da, db, n, &mut native);
+                    walkers[lane].snapshot = None;
+                    let EP::A(nx, _) = p else { unreachable!() };
+                    x = nx;
+                    h = hx(&x);
+                    native.bump_hashes(1);
+                }
+                if walkers[lane].local % opts.strong.snapshot_period == 0 {
+                    walkers[lane].snapshot = Some((p, walkers[lane].local));
+                }
+                walkers[lane].p = p;
+                walkers[lane].h = Some(h);
+                walkers[lane].a = a;
+                walkers[lane].b = b;
+                walkers[lane].tail += 1;
+
+                native.bump_dp_tests(1);
+                let is_dp = (h >> 20) & mask == 0;
+                let should_inject = !injected
+                    && opts.inject_collision_step > 0
+                    && total_step >= opts.inject_collision_step;
+                if is_dp || should_inject {
+                    let EP::A(_, y) = p else { unreachable!() };
+                    let base = ParallelDpRecord {
+                        worker,
+                        lane,
+                        walker_index: walker_indices[worker][lane],
+                        step: total_step,
+                        x,
+                        y,
+                        a,
+                        b,
+                        injected: should_inject && !is_dp,
+                    };
+                    let mut records = vec![base.clone()];
+                    if should_inject {
+                        let b2 = if b + 1 == n { 0 } else { b + 1 };
+                        let a2 = if a >= k_true {
+                            a - k_true
+                        } else {
+                            a + n - k_true
+                        };
+                        records.push(ParallelDpRecord {
+                            a: a2,
+                            b: b2,
+                            injected: true,
+                            ..base
+                        });
+                        injected = true;
+                    }
+                    for record in records {
+                        while queue.len() == opts.queue_depth {
+                            stats.queue_block_events += 1;
+                            let queued = queue.pop_front().expect("full queue is nonempty");
+                            if found.is_none() {
+                                let candidate = process_parallel_dp(
+                                    queued,
+                                    inst,
+                                    &target,
+                                    &verifier,
+                                    &mut shards,
+                                    &mut transcript,
+                                    &mut native,
+                                    &mut stats,
+                                );
+                                if candidate.is_some() {
+                                    found = candidate;
+                                    overshoot_remaining = opts
+                                        .stop_delay_checks
+                                        .saturating_mul(opts.stop_check_steps)
+                                        .saturating_mul(opts.workers as u64);
+                                }
+                            } else {
+                                let _ = process_parallel_dp(
+                                    queued,
+                                    inst,
+                                    &target,
+                                    &verifier,
+                                    &mut shards,
+                                    &mut transcript,
+                                    &mut native,
+                                    &mut stats,
+                                );
+                            }
+                        }
+                        queue.push_back(record);
+                        stats.submitted += 1;
+                        stats.emitted += 1;
+                        stats.queue_peak = stats.queue_peak.max(queue.len());
+                    }
+                }
+                if found.is_some() && overshoot_remaining == 0 {
+                    break 'main;
+                }
+                if !is_dp && walkers[lane].tail > tail_cap {
+                    restarts += 1;
+                    let (replacement, index) = indexed_walker(
+                        &ec,
+                        &f,
+                        &inst.g,
+                        &target,
+                        n,
+                        &job_digest,
+                        worker,
+                        &mut cursors[worker],
+                        &mut native,
+                        &mut start_bytes,
+                    );
+                    walkers[lane] = replacement;
+                    walker_indices[worker][lane] = index;
+                } else if is_dp {
+                    walkers[lane].tail = 0;
+                }
+                if was_found && overshoot_remaining == 0 {
+                    break 'main;
+                }
+            }
+
+            while let Some(queued) = queue.pop_front() {
+                let candidate = process_parallel_dp(
+                    queued,
+                    inst,
+                    &target,
+                    &verifier,
+                    &mut shards,
+                    &mut transcript,
+                    &mut native,
+                    &mut stats,
+                );
+                if found.is_none() {
+                    found = candidate;
+                    if found.is_some() {
+                        overshoot_remaining = opts
+                            .stop_delay_checks
+                            .saturating_mul(opts.stop_check_steps)
+                            .saturating_mul(opts.workers as u64);
+                    }
+                }
+            }
+            if found.is_some() && overshoot_remaining == 0 {
+                break 'main;
+            }
+            if useful_steps + overshoot_steps > opts.strong.max_steps {
+                break 'main;
+            }
+        }
+    }
+
+    while let Some(queued) = queue.pop_front() {
+        let candidate = process_parallel_dp(
+            queued,
+            inst,
+            &target,
+            &verifier,
+            &mut shards,
+            &mut transcript,
+            &mut native,
+            &mut stats,
+        );
+        if found.is_none() {
+            found = candidate;
+        }
+    }
+    let walk_field_end = f.counts();
+    let walk_native_end = native.snapshot();
+    let recovered_scalar_check = found
+        .map(|k| verifier.mul(&inst.g, k as u128) == target)
+        .unwrap_or(false);
+    let verify_field = verify_f.counts();
+    let total_steps = useful_steps + overshoot_steps;
+    let mut canonical_transcript = transcript.clone();
+    let dp_transcript_digest = canonical_transcript_digest(&mut canonical_transcript);
+    let worker_start_digest = hex_digest(&sha256(&start_bytes));
+    let shard_occupancy = shards.iter().map(HashMap::len).collect();
+    ParallelCheckOut {
+        ok: if opts.active_lanes == 0 {
+            found.is_none()
+                && total_steps == 0
+                && stats.emitted == 0
+                && stats.processed == 0
+                && transcript.is_empty()
+        } else {
+            recovered_scalar_check && found == Some(k_true)
+        },
+        found,
+        control_only,
+        useful_steps,
+        overshoot_steps,
+        total_steps,
+        per_worker_total_steps: per_worker_steps,
+        dp_tests: walk_native_end.since(setup_native).dp_tests,
+        dp_emitted: stats.emitted,
+        dp_inserted: stats.inserted,
+        dp_duplicates: stats.duplicates,
+        sterile_collisions: stats.sterile,
+        usable_collisions: stats.usable,
+        rejected_records: stats.rejected,
+        queue_submitted: stats.submitted,
+        queue_processed: stats.processed,
+        queue_peak_depth: stats.queue_peak,
+        queue_block_events: stats.queue_block_events,
+        shard_occupancy,
+        restarts,
+        lookahead,
+        cycles,
+        cycle_adds,
+        setup_field,
+        walk_field: walk_field_end.since(setup_field),
+        verify_field,
+        setup_native,
+        walk_native: walk_native_end.since(setup_native),
+        transition_digest,
+        jump_digest,
+        worker_start_digest,
+        dp_transcript_digest,
+        transcript: canonical_transcript,
+    }
+}
+
 fn strong_rho_impl<const FIELD_COUNT: bool, N: NativeSink + Default>(
     inst: &Inst,
     k_true: u64,
@@ -1509,6 +2325,17 @@ pub fn strong_rho_bare(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) ->
 /// the frozen standalone N4 module is compiled exactly as it is in its driver
 /// (its own `cfg(test)` suite depends on Cargo-only test dependencies).
 pub fn selftest() {
+    {
+        assert_eq!(
+            hex_digest(&sha256(b"abc")),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        assert_eq!(
+            hex_digest(&sha256(b"")),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        );
+        eprintln!("selftest: standalone SHA-256 matches public vectors");
+    }
     {
         let reduce = |q: u64, a: u64, b: u64| {
             assert!(a < q && b < q);

@@ -1,0 +1,76 @@
+{
+  "schema": "prime31-iteration6-render-receipt/v1",
+  "purpose": "Document layout and artifact verification only; no cryptographic calculations",
+  "pdf_pages": 7,
+  "pdf_links": 4,
+  "validation_status": "pending_repaired_ci",
+  "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+  "tools": {
+    "python": "3.12.14",
+    "reportlab": "4.4.9",
+    "pypdf": "6.21.4",
+    "pymupdf": "1.26.6"
+  },
+  "files": [
+    {
+      "path": "REPORT.pdf",
+      "bytes": 55904,
+      "sha256": "d97913ceeeef9d035bfc528cf05c9995771c1cd5fcd4174998273cc1f0ba195e"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 20642,
+      "sha256": "bb79783351240f8305db363df113bd56b0981b907c1831f6a2e19376998b4ac5"
+    },
+    {
+      "path": "render_report.py",
+      "bytes": 30895,
+      "sha256": "6189cd5594dad73153e20cecd168ae540cca70b7a09072c530c1b5f59d4f20cd"
+    },
+    {
+      "path": "report-validation.json",
+      "bytes": 1953,
+      "sha256": "f0dd71d4014c773209228599f8767336a287072ab5f847e763c55c5ccf651fd7"
+    },
+    {
+      "path": "figures/rational-chain-topology.svg",
+      "bytes": 9738,
+      "sha256": "6c22a0058ab21809ee56b81d5d7b826c0f585c870c49eb027a7a231354504b74"
+    },
+    {
+      "path": "figures/rational-chain-topology.png",
+      "bytes": 32733,
+      "sha256": "23c92a09b3e0238f3745ddab127c6beb7ecef03add2321c8cd6ef0b0191dc0d5"
+    }
+  ],
+  "render_command": "python3 research/prime31_summation_compression_20261122/iteration6/render_report.py",
+  "qa_command": "pdftoppm -r 110 -png REPORT.pdf <external-qa-folder>/page",
+  "visual_check": {
+    "status": "passed",
+    "reviewed_pdf_sha256": "d97913ceeeef9d035bfc528cf05c9995771c1cd5fcd4174998273cc1f0ba195e",
+    "pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "method": "Poppler 110-dpi inspection of all seven pages in the pending-rerun edition; page 7 reinspected after exact cost/sampling and final source-link updates. Pages 1-6 retain the unchanged checked layout.",
+    "findings": "No clipping, overlap, missing glyphs, broken equations, table overflow, or margin collisions. The unchanged standalone diagram retains its prior inspection.",
+    "qa_location": "tmp/pdfs/prime31-iteration6-family/ outside published artifacts",
+    "scope": "Document rendering only. Current original-lock rerun is pending; no new passing test, native issuance, performance or signed proof is asserted."
+  },
+  "source_note_sha256": {
+    "iteration7/SMOOTH_TORUS_FAMILY.md": "d4898626a557ff220ed7ddbb4d75042cd2909bdc654e54d30aa1f129a195fa66",
+    "iteration7/INDEPENDENT_REVIEW.md": "dd54122c5b9703b948d2ab590cecfc8a27e26ba34e7105531b02d9bb2900087c",
+    "iteration7/FIXED_CURVE_FIBRE_DENSITY.md": "c1725df2f00f61a972edbb5cfee803fe97bd2c27d8f761fbb08b73385c70b7a1",
+    "iteration7/SELECTABLE_CURVE_AVAILABILITY.md": "245693a861b7f40f687045ffee79637ce3b6251d29c05595f46718894d9c8da6"
+  },
+  "pcc_prose_lint": {
+    "command": "python crypto-instructions/pcc.py --repo /workspace/scratch/2f841b0b9a19/repo-audit lint-prose repo-audit/research/prime31_summation_compression_20261122/iteration6/REPORT.md",
+    "exit_code": 0,
+    "findings": 0
+  }
+}
