@@ -31,3 +31,17 @@ Existing `graph-ic-gain-native.yml` GitHub-hosted exact-source Rust harness only
 ## Evidence ledger
 
 - Registered before authoring the native test; no new correctness or performance result yet.
+
+## Implemented native test and evidence (2026-11-23 15:47 UTC)
+
+The exact source/test commit `a15e0cd0ad1f0c653ebe24fbe31f2c397ffa59ba` was checked by hosted [Actions #45208649527](https://github.com/isogeny-labs/crypto/actions/runs/45208649527), job `137811171128`: **35/35 original-module Rust 1.100.0 release tests passed**, including `raw_block_rank_identity_independently_checks_forest_pivot_mst`. This test exercised 128 seeded arity<=2 streams over five primes (including subgroup-order ell=2147446831), raw repeated/canceling small terms, LP-free rows, protected column u32::MAX, replay for all three arms and deliberate atomic MST refusal with charged pivot fallback. Exact rank([L|S])-rank(L) and rank([L|S|b])-rank(L) matched forest's sparse projected-rank and augmented-rank audits on all 128 systems. Pivot and MST/fallback ranks did not exceed the raw oracle. A fixed three-row F7 contradiction had LP rank 1, zero useful small rank and one augmented-rank increment. No natural elliptic-curve input is claimed.
+
+Original source hashes reported by the run: `large_prime_graph.rs` SHA256 `48070937d7c7a6d046c545438c1a40794bec5d544c63f075f6bd48b35ec8d597`, `witness.rs` `80dfe96e62779b661ca5a28a593ac91c65b23ec022d90f9a996e48d92b304fdc`, `projected_rank.rs` `9c7c2cef51323ce9be930fdf4c8142002d13c55902b9c642eabf47c3747a1fec`, and test `large_prime_graph.rs` `cbd67d310e35276322f64d636a850f04590165c33c7b6cfd8addfeb06cd9b78c`. The exact checkout was the workflow-generated merge commit `107d3ece2857b4f8019958cd0872bac1506084c7`.
+
+The first passing build emitted an **unused import warning** in the new test; no test failure. It was removed in source/test revision `db7257021de5a2d00dcdfb9f023d90dde5036166` without changing executable assertions. A terminal exact-source receipt on this final revision is separately required before describing it as tested. [pcc:unverified]
+
+This is a new *independent correctness oracle*, not a faster filter: dense raw-rank computations cost O(R(C+B) min(R,C+B)) and may be prohibitively expensive in production. The result does not measure wall time, memory, genuine independent elliptic-curve relation yield or a complete cold solver. The raw rank check is specifically a small-fixture falsification gate and should not be inserted in the hot collector.
+
+## Next executable step
+
+On the frozen natural, group-verified Prime31 two-LP source (if/when identified), run forest/pivot/MST with identical source IDs, field ell, target column convention, caps and seed, replay each source curve identity, compare useful rank and RHS augmented rank, then charge output witness/FB payload nonzeros, processing wall time, peak RSS, refusal/fallback and full recovery. Do **not** substitute these 128 constructed finite-field systems for authentic Prime31 or extrapolate the pass into an asymptotic claim. Root-crate and signed PCC gates remain pending. No spending/merge was initiated.
