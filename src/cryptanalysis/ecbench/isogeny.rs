@@ -428,7 +428,9 @@ mod tests {
                     2 => vec![3, 0, 0, 2],
                     _ => vec![3, 2, 4, 7],
                 };
-                assert_eq!(f.rem(&dividend, &modulus), old_rem(&mut f, &dividend, &modulus));
+                let got = f.rem(&dividend, &modulus);
+                let expected = old_rem(&mut f, &dividend, &modulus);
+                assert_eq!(got, expected);
                 if i < 15 {
                     let optimized = f.powmod(&[1, 1], p, &modulus);
                     // Independent square-and-multiply with the original reducer.
