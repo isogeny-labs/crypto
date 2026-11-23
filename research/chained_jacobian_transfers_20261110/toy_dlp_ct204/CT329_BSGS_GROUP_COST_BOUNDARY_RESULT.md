@@ -30,7 +30,7 @@ For the explicit separable degree-three map `pi:C/F103 -> E/F103` defined by `pi
 
 ## Reproducibility and unresolved gates
 
-Reproduce from the [CT329 protocol](CT329_BSGS_GROUP_COST_BOUNDARY_PROTOCOL.md) and [workflow](../../../../.github/workflows/ct329-f103-bsgs-cost-boundary.yml):
+Reproduce from the [CT329 protocol](CT329_BSGS_GROUP_COST_BOUNDARY_PROTOCOL.md) and [workflow](../../../.github/workflows/ct329-f103-bsgs-cost-boundary.yml):
 
 ```sh
 python3 -B research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_independent_oracle.py
