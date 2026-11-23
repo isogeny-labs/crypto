@@ -165,5 +165,20 @@
     "action": "Independent review; separate authorized root repair and odd-m test; no production edits or new benchmark",
     "workers": "One coordinator; no native agent slots or cryptographic runs",
     "pcc": "unverified"
+  },
+  "explicit_q8_jacobian_counterexample": {
+    "note": "iteration10/source_reconstruction_followup/HASSE_Q8_JACOBIAN_COUNTEREXAMPLE.md",
+    "input_head": "f0e7a7dc32bc3a7c954e14cae63014661e4e7c91",
+    "source_candidate_blob": "616422524711c1dd0e54b6bb6c557348b999e262",
+    "curve": "F_8: y^2+y=x^5+x^3, genus 2",
+    "curve_F8_points": 17,
+    "curve_F64_points": 65,
+    "jacobian_order": 169,
+    "inherited_hi": 81,
+    "conservative_hi": 256,
+    "standing": "exact written trace/Weil-polynomial derivation, source-bound producer only; [pcc:unverified]",
+    "scope": "actual Jacobian cardinality excluded by inherited interval; no executed divisor_order_bsgs failure or original Rust test",
+    "workers": "one coordinator; no native worker slots; Rust edits deferred; independent validation still required",
+    "next_step": "separate authorized both-parent root repair; exact m=3,g=2 Rust regression and full original-root compilation"
   }
 }
