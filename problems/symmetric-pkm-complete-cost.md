@@ -104,3 +104,15 @@ then the full matched independent-rank/cold-cost comparison specified in
 [the admission draft](../research/pkm_larger_scale_20261123/PROTOCOL.md).
 Recheck when the existing telemetry route or approved identity supplies the
 readback. No new build/job is authorized while the balance is unknown.
+
+### 2026-11-23 native-workload continuation (#5088)
+
+The shared native manifest generator/validator now has six passing release
+unit tests and an immutable CLI fixture receipt. Production IC/rho import is
+implemented but not integration-qualified: the full consumer test build emits
+ten E0425 unresolved names in unchanged prime_root_trace.rs. Source code and
+[development receipts](../research/pkm_larger_scale_20261123/CONTINUATION.md)
+retain that boundary. Existing telemetry raw logs specifically show OIDC
+AssumeRoleWithWebIdentity denial; this narrows the access blocker without
+supplying a budget balance or permitting a launch. Exit conditions above
+remain open. [pcc:unverified]

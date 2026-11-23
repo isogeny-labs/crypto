@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:05:31Z",
+ "id": "PCC-20261123-32bcfc",
+ "kind": "statement",
+ "producer": {
+  "commit": "dab9d076e9c88e823574d07d68ff80c47d8ba323",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pkm_larger_scale_20261123/native-check-01/test.stdout",
+    "sha256": "9d8b6dada89ac8898afa2373e941703e97e9073517431bb11b1eeb511d9e6e9f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pkm_larger_scale_20261123/native-check-01/result.json",
+    "sha256": "f6be6ea43c734b5d5b79405beb2b45cb2a1141c33b09656ded90cb15065909a8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pkm_larger_scale_20261123/native-check-01/postcall-source-check.txt",
+    "sha256": "a54e3ad59f56d993c76b0b76a0a3a3b20f7eebae8e90b0713b11dd4015136999"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/bin/ic/prime_workload.rs",
+    "sha256": "0fb8a19915239b3a9203c4777ac294b0e31bd0a4486d103dc1fef6fa6f3f378c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PKM native workload development only; no full IC qualification or benchmark",
+ "statement": "Six release tests of the shared native frozen-workload module and CLI validation/overwrite-refusal checks passed; exact listed pre/post source hashes match. The full IC consumer and larger-scale experiment remain unqualified and unexecuted."
+}
