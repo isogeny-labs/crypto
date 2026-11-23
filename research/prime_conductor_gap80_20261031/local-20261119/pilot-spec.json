@@ -1,0 +1,70 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Authorized local capacity pilot, actual202bit field; conductor ratio2 control",
+  "description": "Distinct bounded local pilot; not the original80bit crossing or an admitted endpoint speedup.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_mont4_explicit",
+        "p": "4794168233664648458988367110514316682522236917173341621535751",
+        "a": "4794168233664648458988367110514316682522236917173341621535611",
+        "b": "784",
+        "group_order": "4794168233664648458988367110509937564696162391583477974939208",
+        "r": 1125023250121,
+        "gx": "603209182794240622510892080705207481693427956682909708617837",
+        "gy": "1682738350748939452891832813322046124324576766734042502997852"
+      },
+      {
+        "kind": "prime_mont4_explicit",
+        "p": "4794168233664648458988367110514316682522236917173341621535751",
+        "a": "4794168233664648458988367110514316682522236917173341621533371",
+        "b": "44688",
+        "group_order": "4794168233664648458988367110509937564696162391583477974939208",
+        "r": 1125023250121,
+        "gx": "3830700172962753045136944603079627544692712584332017444780236",
+        "gy": "555819600865158768051076467992696641572484555242648919783299"
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261119,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-counted",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "bsgs-exact-key",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.prime_mont4_v1"
+      }
+    },
+    {
+      "name": "rho-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "paired_curves_v1",
+    "seed": 20261119,
+    "isolation_required": "L2",
+    "timeout_seconds": 45,
+    "algorithm_seed_round": "measured_index"
+  }
+}

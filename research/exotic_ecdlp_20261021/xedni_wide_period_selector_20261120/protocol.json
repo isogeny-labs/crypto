@@ -1,0 +1,16 @@
+{
+  "schema": "xedni-wide-period-selector-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1722 ordered distinct nonidentity pairs on the fixed 43-point E(F47), with centered rational coordinate lifts",
+  "auxiliary_primes": [7, 11],
+  "local_curve_orders": [5, 11],
+  "why_orders": "lcm(5,11)=55 exceeds the 41 admissible reduced coefficients; fixed before measurement",
+  "geometry": "skip same rational x and x collisions at 7 or 11, then require two independent point-incidence rows; preserve every skipped status",
+  "local_curve_selection": "enumerate every a1,a2,a3 residue at each prime, solve a4,a6 through both lifted points, retain every nonsingular curve of order 5 at 7 and order 11 at 11",
+  "crt": "for each ordered pair of local witnesses choose centered k1,k2,k3 in [-38,38] for a_i=47*k_i, then solve rational a4,a6 through both lifted points",
+  "local_coefficient_selector": "find the unique k mod 5 and mod 11 satisfying P+kQ=O on each local curve; CRT gives one k mod 55 per rational CRT curve; retain it if k is in 1..41",
+  "analysis_only": "after candidate selection, enumerate the true reduced coefficient on E(F47) and compare coverage; never use it to choose local curves or coefficients",
+  "records": "complete per-pair statuses and per-candidate selected coefficients with raw digests; exact stage operation counts",
+  "resource": "complete finite enumeration, no wall-time comparison or rational relation checks",
+  "claim_boundary": "local uniqueness and coverage under these exact order gates and centered representatives; no implication that a selected coefficient gives a rational relation"
+}

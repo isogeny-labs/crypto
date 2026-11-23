@@ -1,0 +1,279 @@
+{
+  "schema": "prime31-sparse-h2.development-receipt/v2",
+  "created_at": "2026-11-23T03:14:02.078Z",
+  "scope": "Focused optimized native correctness, replay, parser, exact-source and fixed identity checks; no campaign or performance comparison",
+  "pcc_standing": "unverified",
+  "signed_verdict": false,
+  "source_base_revision": "b12f1ea5c42e1fd288f1513f4a48a0ebb59418d7",
+  "tracking_commit": "119a80e149336827faf9408656d136cbc4ea0a1d",
+  "upstream_solver_revision": "33b3bc3c7485df0fe80aae41e2093cf940d87ff3",
+  "build": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "exit_code": 101,
+        "reason": "Existing choice-audit test constructor omitted new optional OracleResult.backend_work; no tests executed"
+      },
+      {
+        "attempt": 2,
+        "exit_code": 0
+      }
+    ],
+    "profile": "release",
+    "opt_level": 3,
+    "jobs": 2,
+    "offline": true,
+    "locked": true,
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+    "source_manifest_sha256": "f0138d0a11156c00b456524eb46691843561597274ff0497d439801d15e41345"
+  },
+  "tests": {
+    "schema": "prime31-isogeny-choice.development-tests/v1",
+    "scope": "fixed arithmetic and parser contracts; no benchmark or campaign",
+    "tests_passed": 76,
+    "tests_failed": 0,
+    "tests_ignored": 0,
+    "test_executables": 17,
+    "exit_code": 0,
+    "pre_post_binary_hashes_match": true,
+    "results": [
+      {
+        "test": "adversarial_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/adversarial_contracts --test-threads=1",
+        "log": "logs/adversarial_contracts.txt",
+        "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "audit_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/audit_contracts --test-threads=1",
+        "log": "logs/audit_contracts.txt",
+        "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "exit_code": 0,
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "base_certificates",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/base_certificates --test-threads=1",
+        "log": "logs/base_certificates.txt",
+        "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "choice_audit_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/choice_audit_contract --test-threads=1",
+        "log": "logs/choice_audit_contract.txt",
+        "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.23s",
+        "exit_code": 0,
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "collector_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/collector_contracts --test-threads=1",
+        "log": "logs/collector_contracts.txt",
+        "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "domain_modes_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/domain_modes_contract --test-threads=1",
+        "log": "logs/domain_modes_contract.txt",
+        "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "identity_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/identity_contract --test-threads=1",
+        "log": "logs/identity_contract.txt",
+        "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "kernel_fiber_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/kernel_fiber_contract --test-threads=1",
+        "log": "logs/kernel_fiber_contract.txt",
+        "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s",
+        "exit_code": 0,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "oracle_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/oracle_contracts --test-threads=1",
+        "log": "logs/oracle_contracts.txt",
+        "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "pair_control_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/pair_control_contract --test-threads=1",
+        "log": "logs/pair_control_contract.txt",
+        "summary": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "plain_reference_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/plain_reference_contract --test-threads=1",
+        "log": "logs/plain_reference_contract.txt",
+        "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s",
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "provenance_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/provenance_contracts --test-threads=1",
+        "log": "logs/provenance_contracts.txt",
+        "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "rho_v6_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/rho_v6_contract --test-threads=1",
+        "log": "logs/rho_v6_contract.txt",
+        "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "sparse_h2_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/sparse_h2_contract --test-threads=1",
+        "log": "logs/sparse_h2_contract.txt",
+        "summary": "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s",
+        "exit_code": 0,
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "staged_panel_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/staged_panel_contract --test-threads=1",
+        "log": "logs/staged_panel_contract.txt",
+        "summary": "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.06s",
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "target_transport_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/target_transport_contract --test-threads=1",
+        "log": "logs/target_transport_contract.txt",
+        "summary": "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s",
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "tower4_contract",
+        "command": "/workspace/scratch/caf932c2ca37/tmp/sparse_h2_followup/qualification-1/bin/tower4_contract --test-threads=1",
+        "log": "logs/tower4_contract.txt",
+        "summary": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "exit_code": 0,
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  "binaries": [
+    {
+      "file": "bin/prime31-isogeny-choices",
+      "sha256": "745255397836ca0e6d85768032e519aed4ab8f4c6ea26c447fb8dbd467a9299d"
+    },
+    {
+      "file": "bin/prime31-sparse-identity",
+      "sha256": "8568b1447f0e7f4ebdbb29a25fdae9be8285307a725fe4b077be7ee075b7c4ce"
+    }
+  ],
+  "cli": {
+    "pre_post_binary_hashes_match": true,
+    "screening_inputs": 77,
+    "recovery_candidate_inputs": 385,
+    "selected_for_execution": 0,
+    "natural_query_campaigns_attempted": 0,
+    "complete_recovery_campaigns_attempted": 0,
+    "legacy_230_panel_byte_equality_test": "staged_panel_contract::legacy_panel_stays_byte_equal_and_v1_rejects_new_semantics",
+    "identity_id": "IDC1hf4aada9d1a00f5d4",
+    "identity_field": "2305843009213693951",
+    "issuer_points": 64,
+    "extra_checker_points": 32,
+    "formal_proof": null,
+    "identity_field_representation": "exact decimal string copied from the native certificate"
+  },
+  "integration_gate": {
+    "command": "cargo test --release --offline --locked --lib",
+    "exit_code": 101,
+    "tests_executed": 0,
+    "reason": "Unchanged inherited root Cargo.toml duplicate name key at line132; isolated native workspace succeeds separately",
+    "wall_cap_seconds": 180,
+    "address_space_cap_mib": 2048,
+    "working_manifest_diff_empty": true
+  },
+  "experiment_admission": {
+    "status": "blocked_before_launch",
+    "checkpoint_exit_code": 1,
+    "checkpoint_reason": "No uploader token or AWS profile",
+    "first_checkpoint_attempt": "Interrupted during bundle preparation; narrow fetch mappings fixed before bounded retry",
+    "authenticated_runner": false,
+    "current_budget_and_capacity_receipt": false,
+    "canonical_protocol_frozen": false,
+    "actual_executions": 0
+  },
+  "artifacts": {
+    "raw": "evidence/development-raw.tar.gz",
+    "raw_sha256": "b9f2175fdbc9e2dbc84169c3f130a9c1d2c17976adb85e3aa5804467bea044fd",
+    "test_summary": "evidence/development-tests.json",
+    "test_summary_sha256": "38a6086d561f6f49a64c64325f3d843a7291ee5e7a941afd044dcc41400b4ec7",
+    "identity": "identity/certificate.json",
+    "identity_sha256": "16c277575d831d5c09bfff177584f904acd86e4a43d9e6ac3805a2c35ac4eff9",
+    "identity_audit": "identity/identity-audit.json",
+    "identity_audit_sha256": "3b9aa60eb9b92196a9d09391226d7f109fcbd9496a3b08c717344a0a8470d404"
+  },
+  "limitations": [
+    "No signed execution or mathematical-proof verdict.",
+    "No Prime31 natural-query yield, rank trajectory, full scalar recovery or performance ranking measured.",
+    "Whole-repository library gate remains open.",
+    "Historical study reference-preparation cost is unavailable, not zero.",
+    "Current operation ledgers are partial; no complete common cost total is asserted."
+  ],
+  "corrects": {
+    "path": "DEVELOPMENT_RECEIPT.json",
+    "sha256": "20ee2bf5de8c9a2b2bfee68453b205dd9e21922c49864f8cfc89495298d90926",
+    "field": "cli.identity_field",
+    "reason": "JSON Number parsing rounded an integer above2^53 in metadata packaging. Native certificate arithmetic and original source bytes are unchanged."
+  }
+}

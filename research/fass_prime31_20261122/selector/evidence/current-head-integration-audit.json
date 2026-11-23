@@ -1,0 +1,142 @@
+{
+  "schema": "fass-selector.current-head-integration-audit/v1",
+  "recorded_at_utc": "2026-11-23T02:35:23Z",
+  "reviewer": "same-team read-only source review",
+  "standing": "unsigned source-review observations; no signed verification",
+  "scope": "Assess the moved PR #4921 head and preserve source-drift limitations before scoped publication.",
+  "reviewed_head": "dda2a143d639526060d1feaf12bfa87269fe932e",
+  "prior_review": {
+    "path": "research/fass_prime31_20261122/selector/evidence/main-integration-audit.json",
+    "pinned_main_commit": "856dfeb0be25df78ab3877741544f64940128fac",
+    "interpretation": "The prior record remains unchanged and applies only to its older pin. In particular, its PKM-prefix byte-identity observation must not be applied to dda2a143d639526060d1feaf12bfa87269fe932e."
+  },
+  "immutable_branch_evidence": {
+    "source_evidence_commit": "883e2d2dda223ae1b8eafdc83b289a49fa178855",
+    "metadata_commit": "a2569c6234f4896b19bf99a9036f7698199061da",
+    "attempt3_manifest": "research/fass_prime31_20261122/selector/evidence/attempt3/source.build.json",
+    "limitation": "These commit identities were supplied by the parent publication workflow. This review does not assert that either became a branch head, nor transfer their historical tests to the moved head."
+  },
+  "methods": [
+    "Fetched AGENTS.md, the root cryptanalysis registry, semaev_projection.rs and pkm_smooth_tower.rs at the exact reviewed head through the connected GitHub file API.",
+    "Fetched the semaev_prime_poly.rs, identity_certificate.rs and hash/sha256.rs blob metadata at that same head and compared it with the earlier source bindings.",
+    "Inspected the selector's actual imports and qualifier Cargo.toml/lib.rs without modification.",
+    "Compared the selected PKM prefix against the local attempt3 source in memory, using the existing Hilbert-section anchor; recorded SHA-256 for both prefixes.",
+    "Confirmed the suspect projection syntax through a second exact-range fetch of source lines 245 through 305.",
+    "Compared the complete current cryptanalysis module registry with the tested local registry.",
+    "Read the current standing-workflow, merge and persistent-research instructions relevant to this integration review.",
+    "No build, test, benchmark, compiler/parser invocation, source repair or merge was performed by this review."
+  ],
+  "source_blobs": {
+    "AGENTS.md": "bc5217fe9f49242c46ab25c6b84f149bda4a02a2",
+    "src/cryptanalysis/mod.rs": "fc19e34713bcbcdeb845891611148a7a2cf7b4fd",
+    "src/cryptanalysis/semaev_projection.rs": "63984e18b2a3b014616fa7138baff7e300850cc1",
+    "src/cryptanalysis/pkm_smooth_tower.rs": "9a801f27ae779cd35a6ee21a80252922324a9089",
+    "src/cryptanalysis/semaev_prime_poly.rs": "123ccac36794ed3ce043e01b3a9c27ed3e2ca096",
+    "src/cryptanalysis/identity_certificate.rs": "114f1f4a3f2a1be027a9b046ef166259df49dd45",
+    "src/hash/sha256.rs": "9566e3de448e21ff98811cfc4c6992ff3448962e"
+  },
+  "unchanged_reused_files": [
+    "src/cryptanalysis/semaev_prime_poly.rs",
+    "src/cryptanalysis/identity_certificate.rs",
+    "src/hash/sha256.rs"
+  ],
+  "pkm_prefix": {
+    "path": "src/cryptanalysis/pkm_smooth_tower.rs",
+    "selection_anchor": "// ------------------------------- Method 2 with class number > 1 (Hilbert)",
+    "attempt3": {
+      "start": 0,
+      "end_exclusive": 40482,
+      "sha256": "f248c6c41a8cd1c1d4320414e7d3dddb541ddb84b61d029f0eb000efc7528d79"
+    },
+    "reviewed_head": {
+      "start": 0,
+      "end_exclusive": 41436,
+      "sha256": "9fd8351cb748331dfbb09592c1ce36fe3d72fbefd2bb21440c1110ba71705e33"
+    },
+    "status": "changed",
+    "change": "The current prefix adds a cfg(test) thread-local operation-counter module and counter increments in mulm, invm and sqrtm. The inspected arithmetic expressions remain unchanged.",
+    "implication": "A new qualification needs a fresh source binding. Mathematical similarity and conditional compilation do not make the source bytes identical."
+  },
+  "selector_api_compatibility": {
+    "status": "compatible signatures and variants by source inspection; not compiled",
+    "used_projection_items": [
+      "QuadraticRootKey::{Base, Irreducible}",
+      "QuadraticRoots::{None, Finite, All}",
+      "s3_quadratic(&Curve, u64, u64) -> [u64; 3]",
+      "quadratic_root_keys([u64; 3], u64) -> QuadraticRoots"
+    ],
+    "current_wrapper_dependency": "quadratic_root_keys constructs FpOpCounts::default() and calls quadratic_root_keys_counted.",
+    "arithmetic_observation": "The inspected counted classifier retains the linear/quadratic branches used by the selector, with canonicalization and counter updates. No selector source change is indicated solely by these API differences.",
+    "current_whole_file_dependencies": [
+      "num_bigint::BigUint",
+      "num_traits::{One, Zero}",
+      "super::ec_index_calculus::sqrt_mod_p",
+      "super::prime_fast::{Fp64, MAX_BITS}",
+      "crate::ecc::field::FieldElement"
+    ],
+    "qualifier_limitation": "The old focused qualifier copies the whole projection file and does not provide these newer dependency modules."
+  },
+  "observed_dependency_defects": [
+    {
+      "path": "src/cryptanalysis/semaev_projection.rs",
+      "blob_sha": "63984e18b2a3b014616fa7138baff7e300850cc1",
+      "affected_items": [
+        "batch_invm, beginning at line 250",
+        "fast_den, beginning at line 274",
+        "fast_inv_den, beginning at line 281"
+      ],
+      "source_observation": "The exact fetched text contains incomplete Rust block syntax: batch_invm lacks closing braces for conditional/loop blocks; fast_den lacks closing braces; fast_inv_den contains two bare result expressions without its expected conditional structure.",
+      "confirmation": "The same text was observed in the full file and in an independent exact-range API retrieval of lines 245 through 305.",
+      "scope": "These items occur after the complete primitive bodies used by the selector, but belong to the same production module.",
+      "limitation": "No compiler or parser was run here. This is a source-inspection finding, not a captured compiler diagnostic or a new compile attempt."
+    },
+    {
+      "path": "src/cryptanalysis/mod.rs",
+      "blob_sha": "fc19e34713bcbcdeb845891611148a7a2cf7b4fd",
+      "source_observation": "The registry declares pub mod hec_dlp twice: the existing declaration before hilbert_class_poly and another declaration after hwcost.",
+      "content_binding": "The parent reported independently reproducing the Git blob SHA from the fetched registry bytes; this review inspected the same exact-head source.",
+      "scope": "Existing current-head registry defect, separate from adding semaev_selector.",
+      "limitation": "No whole-library build was attempted by this review."
+    }
+  ],
+  "registry_preservation": {
+    "path": "src/cryptanalysis/mod.rs",
+    "current_distinct_additions_to_preserve": [
+      "diem_kgrow",
+      "diem_kgrow_linelog",
+      "diem_kgrow_semaev",
+      "aux_tower_solver",
+      "growing_arity",
+      "binary_radical_root",
+      "hky_closure_io",
+      "koblitz_log_store",
+      "prime_summation_roots",
+      "semaev_field_profile"
+    ],
+    "publication_scope": "Use the current registry plus the semaev_selector declaration. Do not replace the current registry with the older attempt3 file. Existing unrelated defects remain explicitly open under the parent's publication plan."
+  },
+  "minimum_component_requalification": {
+    "candidate_source_change": "None indicated solely by the inspected compatible API signatures.",
+    "qualifier_adaptation": "Bind complete, exact current-source projection items, rather than hand-rewriting their arithmetic: the PKM helper import, QuadraticRootKey and QuadraticRoots with derives, FpOpCounts with derives, s3_quadratic, quadratic_root_keys, quadratic_root_keys_counted, and eval_quadratic if required. Record the full originating file hash and each selected byte range/hash. Alternatively, qualify the complete module after its dependency and syntax defects are repaired.",
+    "pkm_adaptation": "Use and bind the new exact current PKM prefix ending at byte 41436.",
+    "required_checks": [
+      "Preserve attempt3 and its immutable build/pre-call/post-call evidence unchanged.",
+      "Create a new source-bound build manifest at an exact reconciled commit.",
+      "Rebuild and rerun the unchanged complete selector correctness suite and record/certificate checks against the selected current primitive bodies.",
+      "Retain fresh separate build, pre-call and post-call bindings and copied-executable identities.",
+      "Keep the whole-library gate separate; component-item selection does not repair or validate malformed unrelated code in the full projection module."
+    ],
+    "scope_warning": "A successful selected-item qualifier would establish component behavior only. It would not establish current-head production integration or whole-library compilation."
+  },
+  "publication_recommendation": {
+    "action": "Preserve the moved branch tree and history while publishing only the scoped additions, using the current module registry plus the selector declaration.",
+    "historical_evidence": "Keep attempt3 labeled as qualification of its exact historical branch sources.",
+    "open_dependencies": [
+      "Current-head dependency-source repair",
+      "Current-head source-bound requalification",
+      "Whole-library build/test gate",
+      "Signed verification and admitted performance comparison"
+    ],
+    "claim_boundary": "No current-head compile, integration, build, test or performance claim is made by this review."
+  }
+}

@@ -1,0 +1,40 @@
+error: the loop variable `i` is only used to index `b`
+   --> tests/../src/bin/ecbench/../../ecc/mont_vt.rs:106:18
+    |
+106 |         for i in 0..N {
+    |                  ^^^^
+    |
+note: for this index operation
+   --> tests/../src/bin/ecbench/../../ecc/mont_vt.rs:107:22
+    |
+107 |             let bi = b[i] as u128;
+    |                      ^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+    |
+106 -         for i in 0..N {
+106 +         for <item> in b.iter().take(N) {
+    |
+
+error: the loop variable `i` is only used to index `b`
+   --> tests/../src/bin/ecbench/../../ecc/mont_vt.rs:300:14
+    |
+300 |     for i in 0..4 {
+    |              ^^^^
+    |
+note: for this index operation
+   --> tests/../src/bin/ecbench/../../ecc/mont_vt.rs:301:18
+    |
+301 |         let bi = b[i] as u128;
+    |                  ^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+help: consider using an iterator
+    |
+300 -     for i in 0..4 {
+300 +     for <item> in b.iter().take(4) {
+    |
+
+error: aborting due to 2 previous errors
+

@@ -1,0 +1,14 @@
+{
+  "action": "replay sampled keys with the GENUS_LADDER_EXPORT_CORE build (scratchpad genus_ladder.blpt), require its rows to equal the committed ones, take L = coord_out*h_inv mod r, rebuild (G,t,T) from the seeds with your own Cantor code (cross-check against val_po dumps on both sqrt branches) and check L = t, [L]G = T",
+  "created": "2026-11-23T01:51:32Z",
+  "evidence": [
+    "research/genus_ladder_scaling_20261119/validation/validator-report.md (section 5)"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "genus_ladder run rows carry only ok/certified booleans and no Rust build is allowed",
+  "why": "lead C certified 12 genus-5 logs this way without building; val_po is genus-4 only"
+}

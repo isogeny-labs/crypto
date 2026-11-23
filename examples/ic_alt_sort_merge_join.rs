@@ -439,6 +439,8 @@ fn median(v: &mut [f64]) -> f64 {
     v[v.len() / 2]
 }
 
+// The on-curve check is a guard on the hard-coded constants.
+#[allow(clippy::assertions_on_constants)]
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let n: usize = args.get(1).map(|s| s.parse().unwrap()).unwrap_or(48550);

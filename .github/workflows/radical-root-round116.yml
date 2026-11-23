@@ -1,0 +1,32 @@
+name: Rootfinding Round116 source-exact Rust normalization A/B
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round116_normalization_ab.py'
+      - '.github/workflows/radical-root-round116.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-rust-normalization:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round116_normalization_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact equivalence and 13 alternating A/B trials
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round116_normalization_ab.py | tee round116_native_rust.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round116-rust-ab
+          path: round116_native_rust.txt
+          if-no-files-found: warn
