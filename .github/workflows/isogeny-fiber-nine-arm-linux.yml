@@ -2,6 +2,7 @@ name: Isogeny fiber nine-arm independent Linux replay
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/isogeny-fiber-nine-arm-linux.yml'
       - 'research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/different_j_resultant_20261016/RUN_HELDOUT_NINE_ARM_LINUX_V1.sh'
@@ -14,6 +15,7 @@ permissions:
 
 jobs:
   replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

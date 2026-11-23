@@ -7,7 +7,7 @@ explains the gap with hardware counters where the host has them.
 
 Record schema: `optlevel.record/v1`
 ([`tools/optlevel/schema/optlevel.record.v1.schema.json`](../tools/optlevel/schema/optlevel.record.v1.schema.json)).
-Skill: [`.claude/skills/optlevel/SKILL.md`](../.claude/skills/optlevel/SKILL.md).
+Skill: [`isogeny-labs/workspace:.agents/skills/optlevel/SKILL.md`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/optlevel/SKILL.md).
 Kernel registry across the three repositories:
 [`tools/optlevel/registry.json`](../tools/optlevel/registry.json).
 Validation on a host without a PMU or GPU:

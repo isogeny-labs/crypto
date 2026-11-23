@@ -9,6 +9,10 @@ digraph yield_rank_frontier {
   ycensus [label="measured\nsmall-field yield census", fillcolor="#d8f3dc", color="#2d7d46"];
   rcensus [label="measured\nsmall-field rank deficits", fillcolor="#d8f3dc", color="#2d7d46"];
   left [label="checked\nsingle-target left kernel", fillcolor="#d8f3dc", color="#2d7d46"];
+  visbound [label="checked\nvisible yield <= math yield\nequality needs completeness", fillcolor="#d8f3dc", color="#2d7d46"];
+  meanshape [label="REFUTED\nmean determines yield shape", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
+  censorcex [label="REFUTED\nsuccess-only is unbiased", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
+  rankcex [label="REFUTED\nrow surplus gives full right rank", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
 
   yvector [label="defined\nfixed yield count vector", fillcolor="#e7f1fb"];
   rtrace [label="defined\nrank + support trace", fillcolor="#e7f1fb"];
@@ -29,13 +33,17 @@ digraph yield_rank_frontier {
   compose [label="open\nyield-to-rank composition", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
   e2e [label="open\ncomplete IC exponent", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
 
-  producer [label="READY target\npublic population contract", shape=note, fillcolor="#e8f5e9", color="#2d7d46"];
+  producer [label="IMPLEMENTED contract\nschema + validator + tests", shape=note, fillcolor="#d8f3dc", color="#2d7d46"];
   visaudit [label="READY target\nsolver-visibility audit", shape=note, fillcolor="#e8f5e9", color="#2d7d46"];
   modeaudit [label="READY target\nkernel-mode census", shape=note, fillcolor="#e8f5e9", color="#2d7d46"];
   scaling [label="BLOCKED target\nyield scaling certificate", shape=note, fillcolor="#ffd9d9", color="#a64b4b"];
   rankcert [label="BLOCKED target\nrank/support certificate", shape=note, fillcolor="#ffd9d9", color="#a64b4b"];
 
   mean -> ylaw [label="qualifies"];
+  mean -> meanshape [label="does not imply", color="#a64b4b"];
+  meanshape -> ylaw [label="refuted bridge", color="#a64b4b"];
+  visbound -> visible [label="qualifies"];
+  censorcex -> censor [label="refuted bridge", color="#a64b4b"];
   ycensus -> ylaw [label="measures"];
   ycensus -> strata [label="qualifies"];
   yvector -> ylaw [label="defines"];
@@ -49,6 +57,8 @@ digraph yield_rank_frontier {
   rcensus -> support [label="measures"];
   rcensus -> terminal [label="qualifies"];
   left -> scope [label="qualifies"];
+  rankcex -> terminal [label="refuted bridge", color="#a64b4b"];
+  rankcex -> scope [label="separates modes", color="#a64b4b"];
   rtrace -> rows [label="defines"];
   rtrace -> support [label="defines"];
   rtrace -> terminal [label="defines"];

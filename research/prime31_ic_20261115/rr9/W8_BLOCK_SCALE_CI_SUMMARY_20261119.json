@@ -1,0 +1,153 @@
+{
+  "schema": "prime31.w8.blockscale.ci-summary.v1",
+  "created_utc": "2026-11-19",
+  "pr": 4808,
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "generator": [
+      625037715,
+      2100627251
+    ]
+  },
+  "artifact_source": "https://github.com/isogeny-labs/crypto/actions/runs/44543792457/artifacts/14539671492",
+  "source_commit": "082177565c87fac47bbd0c61ba032eb4c5274cf8",
+  "raw_json_sha256": "681efda3b729f103cea62e82072989ef6032bf3ea9cfeaedc1f339b79c69431b",
+  "independent_replay_sha256": "a8ad22d243fc4cd4db8f3689fda64d7ddb635a29496369417d367da79088a08b",
+  "protocol_commit": "25a649d0eb15c247a456be44e92457f47bfc4414",
+  "seed": "424c4f434b534341",
+  "samples_per_window": 128,
+  "windows": 4,
+  "observed": [
+    {
+      "k": 4,
+      "hits": 452,
+      "total_witnesses": 1052,
+      "witness_square_sum": 3140,
+      "max_multiplicity": 6
+    },
+    {
+      "k": 5,
+      "hits": 440,
+      "total_witnesses": 1063,
+      "witness_square_sum": 3341,
+      "max_multiplicity": 8
+    },
+    {
+      "k": 6,
+      "hits": 440,
+      "total_witnesses": 1026,
+      "witness_square_sum": 3072,
+      "max_multiplicity": 8
+    },
+    {
+      "k": 7,
+      "hits": 444,
+      "total_witnesses": 1027,
+      "witness_square_sum": 3041,
+      "max_multiplicity": 7
+    },
+    {
+      "k": 8,
+      "hits": 448,
+      "total_witnesses": 979,
+      "witness_square_sum": 2821,
+      "max_multiplicity": 7
+    }
+  ],
+  "window_hits_by_k": {
+    "0": [
+      117,
+      110,
+      114,
+      112,
+      113
+    ],
+    "1": [
+      107,
+      109,
+      111,
+      111,
+      105
+    ],
+    "2": [
+      116,
+      111,
+      112,
+      111,
+      118
+    ],
+    "3": [
+      112,
+      110,
+      103,
+      110,
+      112
+    ]
+  },
+  "four_slot_unique_by_window": [
+    65536,
+    65496,
+    65536,
+    65536
+  ],
+  "pairwise_a_miss_b_hit": [
+    [
+      0,
+      52,
+      51,
+      47,
+      52
+    ],
+    [
+      64,
+      0,
+      59,
+      61,
+      61
+    ],
+    [
+      63,
+      59,
+      0,
+      64,
+      58
+    ],
+    [
+      55,
+      57,
+      60,
+      0,
+      58
+    ],
+    [
+      56,
+      53,
+      50,
+      54,
+      0
+    ]
+  ],
+  "prespecified_paired_k4_k5": {
+    "k4_only": 64,
+    "k5_only": 52,
+    "two_sided_exact_binomial_p_approx": 0.30708966364918366
+  },
+  "validation": {
+    "original_rust_lib_tests": 40,
+    "focused_rust_tests": 4,
+    "independent_ec_certificates": 20,
+    "public_targets": 512,
+    "exact_multiplicity_cells": 2560,
+    "original_source_ci": "passed",
+    "signed_pcc": "unverified"
+  },
+  "scope": {
+    "generic_four_plus_four_grading_only": true,
+    "algebraic_extraction_implemented": false,
+    "complete_ecdlp_solved": false
+  }
+}

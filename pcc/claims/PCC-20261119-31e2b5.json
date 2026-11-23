@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T05:43:18Z",
+ "id": "PCC-20261119-31e2b5",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f7c592e225884de304b42dae0f5ea80f3c91f0d3",
+  "model": "Codex",
+  "session": "semaev-character-projector-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "04dd3f36ce999c44b4fb51657427eeae3a7759b262baed61a586673df2a7a701",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.characterProjector_isolates_term"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This checks the finite character-projector algebra used in Lemma N'. It does not construct the Kummer extension, prove character orthogonality for the supplied square classes, or prove torsion-coordinate algebraicity.",
+ "statement": "For a finite orthogonal family of integer-valued sign characters, transformed zero-sum relations imply that the character projector isolates a chosen term and |Gamma| times its integer coefficient annihilates the chosen point."
+}
