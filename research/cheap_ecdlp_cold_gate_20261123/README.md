@@ -227,3 +227,20 @@ reads were independent parallel tool calls but **not separately spawned
 workers**. Python and JS group calculations are separate mathematical
 replays, **not independently signed validation**. No competing build,
 paid compute, reserved runner, merge, or speed claim was made.
+
+## Live baseline-head reconciliation (2026-11-23)
+
+A fresh [#4956](https://github.com/isogeny-labs/crypto/pull/4956)
+read finds this PR **merged**, but its single changed file was
+`docs/ACTIVE.md`. That tracking-only merge did **not** bring a new
+`prime_fast` or specialized batched complete-cold reference, an accepted
+Wiener–Zuccherato negation-rho implementation, or a new matched-cost
+receipt into main. The reference-selection dependency remains open and
+must be satisfied against actual executable source rather than a PR's
+merged label. Separately [#4901](https://github.com/isogeny-labs/crypto/pull/4901)
+is merged and has 109 changed files, including the retained Run72/75
+**generic** negative controls. Those do not become nonenumerative
+measurements merely by landing in main. The distinct genuine RR5 B8
+fixed-positive witness above likewise does not establish a cold-cost
+comparison. These are repository-status observations, not new timings or
+performance conclusions. [pcc:unverified]
