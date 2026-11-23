@@ -679,12 +679,18 @@ pub fn decompose_trace_zero_linearized(
             return out;
         }
         let x = x_key(fx);
-        let known_sign = by_x.get(&x).is_some_and(|ids| {
+        // Hold one entry search across admission instead of finding the
+        // same key again for insertion. No entry is inserted until admitted.
+        let entry = by_x.entry(x);
+        let known_sign = if let std::collections::btree_map::Entry::Occupied(known) = &entry {
+            let ids = known.get();
             let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
                 unreachable!()
             };
             fy == known || *fy == known.add(fx)
-        });
+        } else {
+            false
+        };
         // is_in_4e performs the field-width and curve-equation checks itself.
         // Once one ordinate is admitted, its identical/opposite lift is also
         // admitted; every supplied sign/index is still retained below.
@@ -696,7 +702,7 @@ pub fn decompose_trace_zero_linearized(
             out.relation.reason = Some("invalid linearized target/base");
             return out;
         }
-        by_x.entry(x).or_default().push(i);
+        entry.or_default().push(i);
     }
     let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
     let products: Vec<_> = xs

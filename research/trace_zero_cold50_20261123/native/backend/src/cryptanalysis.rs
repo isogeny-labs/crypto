@@ -12,7 +12,11 @@ pub mod sat;
 pub mod trace_zero_point_chain;
 #[path = "../../../../../src/cryptanalysis/trace_zero_relations.rs"]
 pub mod trace_zero_relations;
+#[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/cryptanalysis/trace_zero_linearized.rs"]
+pub mod trace_zero_linearized;
+#[cfg(any(feature = "legacy-halftrace", feature = "incumbent"))]
+#[path = "../../../baseline_linearized_snapshot.rs"]
 pub mod trace_zero_linearized;
 #[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/cryptanalysis/trace_zero_word_field.rs"]
