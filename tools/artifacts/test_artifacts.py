@@ -773,7 +773,8 @@ class WorkflowStalePullEntries(unittest.TestCase):
             self.assertEqual(self._main(wf, "--check").returncode, 0)
 
     def test_check_rejects_soft_fail_reintroduced_in_validation_gate(self):
-        source = self.BEFORE.replace("python3 build.py", "python3 scripts/validation_gate.py check")
+        # BEFORE never named build.py; append a real gate run so soft_fail=False.
+        source = self.BEFORE + "      - run: python3 scripts/validation_gate.py check\n"
         wired = wire_workflows.wire(source, self._paths(source))[0]
         self.assertNotIn("continue-on-error: true", wired)
         stale = wired.replace("        shell: bash", "        continue-on-error: true\n        shell: bash", 1)
