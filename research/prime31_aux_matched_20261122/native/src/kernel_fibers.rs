@@ -22,6 +22,23 @@ pub enum KernelChoice {
     AminusH2,
 }
 
+/// Alternative decompositions of the same normalized quotient. The standard
+/// route is omitted from serialized records so historical inputs retain their
+/// shape. FullTwoTorsionFirst applies only to the existing H2 subgroup.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum KernelFactorization {
+    #[default]
+    Standard,
+    FullTwoTorsionFirst,
+}
+
+impl KernelFactorization {
+    pub fn is_standard(&self) -> bool {
+        *self == Self::Standard
+    }
+}
+
 /// Actual modular operations in map construction/evaluation and certification.
 /// inversion_calls is metadata: its powering work is already included in muls
 /// and sqrs, so do not price the inversion a second time.
@@ -64,6 +81,8 @@ pub struct KernelCertificate {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct KernelFiber {
     pub choice: KernelChoice,
+    #[serde(default, skip_serializing_if = "KernelFactorization::is_standard")]
+    pub factorization: KernelFactorization,
     pub coset_scalar: u64,
     pub v: Vec<u64>,
     pub tower: TowerDescription,
@@ -275,11 +294,28 @@ pub fn build_fiber(
     coset_scalar: u64,
     ops: &mut GroupOps,
 ) -> Result<KernelFiber, String> {
+    build_fiber_with_factorization(choice, coset_scalar, KernelFactorization::Standard, ops)
+}
+
+/// Construct the same whole fiber using the selected quotient factorization.
+/// The alternate H2 route first quotients by all rational two-torsion and then
+/// by the order-256 image of <2K>. It keeps the original coordinates, kernel,
+/// source point, normalized codomain and full membership set unchanged.
+pub fn build_fiber_with_factorization(
+    choice: KernelChoice,
+    coset_scalar: u64,
+    factorization: KernelFactorization,
+    ops: &mut GroupOps,
+) -> Result<KernelFiber, String> {
+    if factorization == KernelFactorization::FullTwoTorsionFirst && choice != KernelChoice::AminusH2
+    {
+        return Err("full-two-torsion-first factorization requires the AminusH2 kernel".into());
+    }
     if coset_scalar == 0 || coset_scalar & 1 == 0 || coset_scalar >= 1 << 20 {
         return Err("coset scalar must be nonzero, odd and less than 2^20".into());
     }
     let mut local_ops = GroupOps::default();
-    let result = build_inner(choice, coset_scalar, &mut local_ops);
+    let result = build_inner(choice, coset_scalar, factorization, &mut local_ops);
     ops.merge(local_ops);
     result.map(|mut fiber| {
         fiber.group_work = GroupWork::from_ops(&local_ops);
@@ -290,6 +326,7 @@ pub fn build_fiber(
 fn build_inner(
     choice: KernelChoice,
     coset_scalar: u64,
+    factorization: KernelFactorization,
     ops: &mut GroupOps,
 ) -> Result<KernelFiber, String> {
     let plus = choice == KernelChoice::AplusCyclic;
@@ -336,6 +373,35 @@ fn build_inner(
             vec![k],
             vec![1024],
         )
+    } else if factorization == KernelFactorization::FullTwoTorsionFirst {
+        let twice_k = e.double(ops, k);
+        // Quotient first by U=(0,0), then by the image of (1,0). The x maps
+        // x-1/x and z+4/z compose to delta_x=(x^2+1)^2/[x(x^2-1)].
+        let first = f.step(&e, u)?;
+        let middle_curve = first.codomain.production();
+        let second_kernel = f.apply(&first, PrimePoint::affine(1, 0))?;
+        let second = f.step(&middle_curve, second_kernel)?;
+        let residual_curve = second.codomain.production();
+        if (first.alpha, first.tau, middle_curve.a, middle_curve.b) != (0, P - 1, 4, 0)
+            || (second.alpha, second.tau, residual_curve.a, residual_curve.b) != (0, 4, P - 16, 0)
+        {
+            return Err("normalized full-two-torsion prefix has unexpected coefficients".into());
+        }
+        let mut steps = vec![first, second];
+        // delta(2K), not delta(K), has the required residual order 256.
+        let residual_generator = f.chain(&steps, twice_k)?;
+        if residual_generator.infinity
+            || !f.on_curve(&CurveDefinition::from(&residual_curve), residual_generator)
+            || !residual_curve.mul(ops, residual_generator, 256).infinity
+            || residual_curve.mul(ops, residual_generator, 128).infinity
+        {
+            return Err("H2 residual kernel generator does not have exact order 256".into());
+        }
+        steps.extend(f.cyclic_chain(&residual_curve, residual_generator, 8, ops)?);
+        let mut points = cyclic_points(&e, twice_k, DEGREE / 2, ops)?;
+        let translated = points.iter().map(|&q| e.add(ops, q, u)).collect::<Vec<_>>();
+        points.extend(translated);
+        (steps, points, vec![twice_k, u], vec![512, 2])
     } else {
         let twice_k = e.double(ops, k);
         let mut steps = f.cyclic_chain(&e, twice_k, 9, ops)?;
@@ -472,6 +538,7 @@ fn build_inner(
     };
     Ok(KernelFiber {
         choice,
+        factorization,
         coset_scalar,
         v,
         tower,
