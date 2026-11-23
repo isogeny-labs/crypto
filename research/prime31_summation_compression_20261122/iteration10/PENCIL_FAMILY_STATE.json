@@ -180,5 +180,29 @@
     "scope": "actual Jacobian cardinality excluded by inherited interval; no executed divisor_order_bsgs failure or original Rust test",
     "workers": "one coordinator; no native worker slots; Rust edits deferred; independent validation still required",
     "next_step": "separate authorized both-parent root repair; exact m=3,g=2 Rust regression and full original-root compilation"
+  },
+  "explicit_q8_cyclic_bsgs_counterexample": {
+    "note": "iteration10/source_reconstruction_followup/HASSE_Q8_CYCLIC_117_BSGS_FAILURE.md",
+    "input_head": "0ab8d705183d6f58bfb2679aa944797c6453ba27",
+    "curve": "C/F8: y^2+y=x^5+x+1, genus 2",
+    "N1": 13,
+    "N2": 81,
+    "jacobian_order": 117,
+    "group_structure": "Z/117Z",
+    "inherited_interval": [
+      1,
+      81
+    ],
+    "inherited_bsgs_candidate_range": [
+      1,
+      110
+    ],
+    "conclusion": "For a divisor of order 117 (exists because J(F8) is cyclic), inherited divisor_order_bsgs returns None; no compiled Rust instance run",
+    "verification": "written finite-field and 3-adic Tate-module derivation plus coordinator-only GF64 enumeration, unverified producer evidence",
+    "source_ref_blob": "616422524711c1dd0e54b6bb6c557348b999e262",
+    "native_workers": 0,
+    "cryptographic_benchmarks": 0,
+    "pcc": "unverified",
+    "next_step": "independently verify cyclicity and loop limits, then authorized original-Rust source-frozen concrete divisor regression; preserve both parents and original tests"
   }
 }
