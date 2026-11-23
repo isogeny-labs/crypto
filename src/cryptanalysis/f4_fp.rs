@@ -674,6 +674,12 @@ pub struct F4Options {
     /// more than one substitution.  Off by default, and never used with a
     /// trace sink or a trace-reuse pool.
     pub sibling_batch: bool,
+    /// Measure exclusive wall-time phases of the recursive visitor. Off by
+    /// default; no timing field is then serialized in [`VisitReport`]. This
+    /// observes the selected plain, traced, or trace-reuse path without
+    /// changing its arithmetic, domains, or stopping policy. Clock reads can
+    /// consume a small part of an existing cooperative deadline.
+    pub visit_timing: bool,
 }
 
 /// Root extraction for a univariate whose variable has a finite domain `D`.
@@ -746,7 +752,15 @@ impl F4Options {
             checkpoint_stop_in_rref: None,
             domain_roots: DomainRootMode::Scan,
             sibling_batch: false,
+            visit_timing: false,
         }
+    }
+
+    /// Enable or disable recursive-visitor wall phases ([`VisitTimings`]).
+    /// Native F4 calls outside a visitor are unaffected.
+    pub fn with_visit_timing(mut self, on: bool) -> Self {
+        self.visit_timing = on;
+        self
     }
 
     /// Turn batched sibling extraction on or off ([`F4Options::sibling_batch`]).
@@ -7292,6 +7306,35 @@ fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<P
 
 // ── Solving ────────────────────────────────────────────────────────
 
+/// Opt-in, exclusive wall-time phases of one recursive visitor call.
+///
+/// The four phase buckets partition `total_ns`. They measure elapsed time,
+/// not CPU time or a complete arithmetic-operation count. In particular,
+/// [`VisitReport::field_ops`] and the root multiplication counters remain
+/// their existing partial diagnostics. A trace sink runs in
+/// `traversal_other_ns`; `callback_ns` is only the solution visitor.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitTimings {
+    /// Elapsed time from entry into the shared visitor implementation through
+    /// traversal and stop classification. Caller setup, final state destruction,
+    /// and serialization of the returned report are outside this interval.
+    pub total_ns: u64,
+    /// The selected native-call path: plain F4, recorded F4, or trace-pool
+    /// dispatch including profile/statistics bookkeeping and its
+    /// learning/replay/certification work. This is not just row elimination.
+    pub native_f4_ns: u64,
+    /// Recognized-univariate processing: coefficient preparation, finite-domain
+    /// scanning or root factoring/filtering, and the batched path's univariate
+    /// gcd/root recovery. General specialization remains traversal work.
+    pub root_recovery_ns: u64,
+    /// Time inside solution-visitor callbacks, including a callback that asks
+    /// to stop. The caller can separately subdivide this bucket.
+    pub callback_ns: u64,
+    /// Remaining elapsed work: validation, traversal, specialization, candidate
+    /// checks, trace-sink callbacks, and timing/dispatch overhead.
+    pub traversal_other_ns: u64,
+}
+
 /// Observations from the opt-in streaming/domain solver. These are stage
 /// diagnostics, not complete operation accounting or a performance claim.
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -7365,6 +7408,88 @@ pub struct VisitReport {
     /// univariate gcds, square roots, root finding and substitution.
     #[serde(skip_serializing_if = "is_zero_u64")]
     pub batched_field_multiplications: u64,
+    /// Wall-time accounting, only when [`F4Options::with_visit_timing`] enabled
+    /// it. Omitted when disabled, preserving existing serialized reports.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timings: Option<VisitTimings>,
+}
+
+// Interior-mutability keeps the clock independent of VisitState's mutable
+// traversal borrow. Scope guards close phases even on early return; none
+// spans recursive traversal or another measured phase.
+struct VisitClock {
+    started: Instant,
+    native_f4_ns: std::cell::Cell<u64>,
+    root_recovery_ns: std::cell::Cell<u64>,
+    callback_ns: std::cell::Cell<u64>,
+}
+
+impl VisitClock {
+    fn new() -> Self {
+        Self {
+            started: Instant::now(),
+            native_f4_ns: std::cell::Cell::new(0),
+            root_recovery_ns: std::cell::Cell::new(0),
+            callback_ns: std::cell::Cell::new(0),
+        }
+    }
+
+    fn finish(&self) -> VisitTimings {
+        let total_ns = visit_elapsed_ns(self.started);
+        let native_f4_ns = self.native_f4_ns.get();
+        let root_recovery_ns = self.root_recovery_ns.get();
+        let callback_ns = self.callback_ns.get();
+        let accounted = native_f4_ns
+            .saturating_add(root_recovery_ns)
+            .saturating_add(callback_ns);
+        debug_assert!(
+            accounted <= total_ns,
+            "visitor wall phases must not overlap"
+        );
+        VisitTimings {
+            total_ns,
+            native_f4_ns,
+            root_recovery_ns,
+            callback_ns,
+            traversal_other_ns: total_ns.saturating_sub(accounted),
+        }
+    }
+}
+
+fn visit_elapsed_ns(started: Instant) -> u64 {
+    u64::try_from(started.elapsed().as_nanos()).unwrap_or(u64::MAX)
+}
+
+enum VisitPhase {
+    NativeF4,
+    RootRecovery,
+    Callback,
+}
+
+struct VisitPhaseScope<'a> {
+    started: Instant,
+    elapsed: &'a std::cell::Cell<u64>,
+}
+
+impl Drop for VisitPhaseScope<'_> {
+    fn drop(&mut self) {
+        self.elapsed.set(
+            self.elapsed
+                .get()
+                .saturating_add(visit_elapsed_ns(self.started)),
+        );
+    }
+}
+
+fn visit_phase_scope(clock: Option<&VisitClock>, phase: VisitPhase) -> Option<VisitPhaseScope<'_>> {
+    clock.map(|clock| VisitPhaseScope {
+        started: Instant::now(),
+        elapsed: match phase {
+            VisitPhase::NativeF4 => &clock.native_f4_ns,
+            VisitPhase::RootRecovery => &clock.root_recovery_ns,
+            VisitPhase::Callback => &clock.callback_ns,
+        },
+    })
 }
 
 fn is_zero_u64(v: &u64) -> bool {
@@ -7432,6 +7557,7 @@ struct VisitState<'a, F, S> {
     pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
+    timing: Option<&'a VisitClock>,
     /// Lazily built value → position index of each original variable's
     /// finite domain, shared by every node of the traversal.
     domain_index: Vec<Option<FxMap<u64, usize>>>,
@@ -7527,7 +7653,11 @@ where
                 return VisitEnd::Complete;
             }
             self.report.solutions_visited += 1;
-            return if (self.visitor)(&self.assignment) {
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
                 VisitEnd::Stopped
             } else {
                 VisitEnd::Complete
@@ -7540,22 +7670,25 @@ where
             return VisitEnd::Complete;
         }
         let mut native_calls = 1;
-        let (r, trace) = if let Some(pool) = &mut self.pool {
-            let profile: Vec<_> = active
-                .iter()
-                .map(|&i| self.domains[i].as_ref().map(Vec::len))
-                .collect();
-            let before = pool.stats();
-            let r = pool.run(input, active.len(), self.p, self.opts, &profile);
-            let after = pool.stats();
-            native_calls = (after.learned - before.learned + after.replay_attempts
-                - before.replay_attempts) as usize;
-            (r, None)
-        } else if self.sink.is_some() {
-            let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
-            (r, Some(trace))
-        } else {
-            (f4(input, active.len(), self.p, self.opts), None)
+        let (r, trace) = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::NativeF4);
+            if let Some(pool) = &mut self.pool {
+                let profile: Vec<_> = active
+                    .iter()
+                    .map(|&i| self.domains[i].as_ref().map(Vec::len))
+                    .collect();
+                let before = pool.stats();
+                let r = pool.run(input, active.len(), self.p, self.opts, &profile);
+                let after = pool.stats();
+                native_calls = (after.learned - before.learned + after.replay_attempts
+                    - before.replay_attempts) as usize;
+                (r, None)
+            } else if self.sink.is_some() {
+                let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
+                (r, Some(trace))
+            } else {
+                (f4(input, active.len(), self.p, self.opts), None)
+            }
         };
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
@@ -7630,6 +7763,7 @@ where
                 continue;
             }
             let var = *vars.iter().next().unwrap();
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
             let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
                 match self.opts.domain_roots {
                     DomainRootMode::Scan => false,
@@ -7849,7 +7983,11 @@ where
                 return VisitEnd::Complete;
             }
             self.report.solutions_visited += 1;
-            return if (self.visitor)(&self.assignment) {
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
                 VisitEnd::Stopped
             } else {
                 VisitEnd::Complete
@@ -7879,6 +8017,7 @@ where
                 }
             }
             if let (true, Some(j)) = (single, support) {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
                 let degree = g.iter().map(|(e, _)| e[j]).max().unwrap_or(0) as usize;
                 let mut dense = vec![0u64; degree + 1];
                 for (e, c) in g {
@@ -7894,6 +8033,7 @@ where
             if us.is_empty() {
                 continue;
             }
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
             let h = us
                 .iter()
                 .skip(1)
@@ -7919,21 +8059,25 @@ where
             return self.walk(&normalised, vars, Some(node_id));
         };
         let z_original = vars[z];
-        let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+        let roots = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::TimedOut;
+            };
+            if self.domains[z_original].is_some() {
+                self.ensure_domain_index(z_original);
+                let index = self.domain_index[z_original].as_ref().expect("built above");
+                let mut hits: Vec<(usize, u64)> = roots
+                    .iter()
+                    .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
+                    .collect();
+                hits.sort_unstable_by_key(|&(pos, _)| pos);
+                roots = hits.into_iter().map(|(_, r)| r).collect();
+            }
             self.report.batched_field_multiplications += muls;
-            return VisitEnd::TimedOut;
+            roots
         };
-        if self.domains[z_original].is_some() {
-            self.ensure_domain_index(z_original);
-            let index = self.domain_index[z_original].as_ref().expect("built above");
-            let mut hits: Vec<(usize, u64)> = roots
-                .iter()
-                .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
-                .collect();
-            hits.sort_unstable_by_key(|&(pos, _)| pos);
-            roots = hits.into_iter().map(|(_, r)| r).collect();
-        }
-        self.report.batched_field_multiplications += muls;
         let mut rest = vars.to_vec();
         rest.remove(z);
         for r in roots {
@@ -8052,6 +8196,7 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    let timing = opts.visit_timing.then(VisitClock::new);
     if opts.checkpoint.is_some()
         || opts.checkpoint_stop_after.is_some()
         || opts.checkpoint_in_step.is_some()
@@ -8084,13 +8229,307 @@ where
         pool,
         next_node: 0,
         report: VisitReport::default(),
+        timing: timing.as_ref(),
         domain_index: vec![None; n_vars],
     };
     let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
+    state.report.timings = timing.as_ref().map(VisitClock::finish);
     Ok(state.report)
+}
+
+#[cfg(test)]
+mod visit_timing_tests {
+    use super::*;
+
+    fn partition(report: &VisitReport) -> VisitTimings {
+        let timing = report.timings.expect("opt-in wall accounting is present");
+        assert_eq!(
+            timing.total_ns,
+            timing.native_f4_ns
+                + timing.root_recovery_ns
+                + timing.callback_ns
+                + timing.traversal_other_ns,
+            "exclusive wall buckets must partition the total"
+        );
+        timing
+    }
+
+    fn diagnostics(report: &VisitReport) -> serde_json::Value {
+        let mut value = serde_json::to_value(report).unwrap();
+        let fields = value.as_object_mut().unwrap();
+        fields.remove("timings");
+        // Native row-operation counts are process-wide unless explicitly
+        // configured otherwise. Parallel tests can affect this one field.
+        fields.remove("field_ops");
+        value
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn coupled_fixture(
+        timing: bool,
+        traced: bool,
+        mode: DomainRootMode,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        // x^2=1, y=x over F7: an unrestricted root followed by a
+        // finite-domain variable exercises both kinds of root recovery.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 0], 1), (vec![0, 1], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 4)
+            .with_domain_roots(mode)
+            .with_visit_timing(timing);
+        let domains = [Some(vec![1, 2, 3, 6]), None];
+        let mut solutions = Vec::new();
+        let mut branches = Vec::new();
+        let visitor = |s: &[u64]| {
+            solutions.push(s.to_vec());
+            false
+        };
+        let report = if traced {
+            solve_visit_traced(&input, 2, 7, &opts, &domains, visitor, |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            })
+        } else {
+            solve_visit(&input, 2, 7, &opts, &domains, visitor)
+        }
+        .unwrap();
+        (solutions, branches, report)
+    }
+
+    #[test]
+    fn default_off_preserves_serialized_report_shape() {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        assert!(!opts.visit_timing);
+        assert!(
+            !opts
+                .clone()
+                .with_visit_timing(true)
+                .with_visit_timing(false)
+                .visit_timing
+        );
+        for traced in [false, true] {
+            let (_, _, report) = coupled_fixture(false, traced, DomainRootMode::Scan);
+            assert!(report.timings.is_none());
+            assert!(serde_json::to_value(&report)
+                .unwrap()
+                .get("timings")
+                .is_none());
+        }
+        assert!(serde_json::to_value(VisitReport::default())
+            .unwrap()
+            .get("timings")
+            .is_none());
+    }
+
+    #[test]
+    fn opt_in_preserves_each_visitors_solutions_branches_and_diagnostics() {
+        for traced in [false, true] {
+            for mode in [
+                DomainRootMode::Scan,
+                DomainRootMode::Frobenius,
+                DomainRootMode::Auto,
+            ] {
+                let (before, before_branches, old) = coupled_fixture(false, traced, mode);
+                let (after, after_branches, timed) = coupled_fixture(true, traced, mode);
+                assert_eq!(after, before);
+                assert_eq!(after_branches, before_branches);
+                assert_eq!(diagnostics(&timed), diagnostics(&old));
+                let mut expected = after;
+                expected.sort();
+                assert_eq!(expected, vec![vec![1, 1], vec![6, 6]]);
+                assert!(timed.complete && !timed.stopped_early && !timed.timed_out);
+                partition(&timed);
+            }
+        }
+    }
+
+    #[test]
+    fn callback_stop_retains_callback_time_without_native_work() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let mut callbacks = 0;
+        let report = solve_visit(&[], 0, 7, &opts, &[], |_| {
+            callbacks += 1;
+            // Deliberate callback work distinguishes this bucket from
+            // residual traversal without assuming the solver's speed.
+            std::thread::sleep(Duration::from_millis(2));
+            true
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert_eq!(callbacks, 1);
+        assert!(report.stopped_early && !report.complete && !report.timed_out);
+        assert_eq!(timing.native_f4_ns, 0);
+        assert_eq!(timing.root_recovery_ns, 0);
+        assert!(timing.callback_ns >= 1_000_000);
+    }
+
+    #[test]
+    fn empty_domain_and_expired_deadline_retain_zero_work_partitions() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let empty = solve_visit(&[], 1, 7, &opts, &[Some(vec![])], |_| {
+            panic!("empty domain must not visit a solution")
+        })
+        .unwrap();
+        assert!(empty.complete);
+        let expired = opts.with_budget(Duration::ZERO);
+        let timeout = solve_visit(&[], 0, 7, &expired, &[], |_| {
+            panic!("expired deadline must not visit a solution")
+        })
+        .unwrap();
+        assert!(timeout.timed_out && !timeout.complete);
+        for report in [&empty, &timeout] {
+            let timing = partition(report);
+            assert_eq!(timing.native_f4_ns, 0);
+            assert_eq!(timing.root_recovery_ns, 0);
+            assert_eq!(timing.callback_ns, 0);
+            assert_eq!(timing.total_ns, timing.traversal_other_ns);
+        }
+    }
+
+    #[test]
+    fn empty_univariate_root_set_retains_recovery_time() {
+        // -1 is not a square in F7. Native F4 leaves a univariate, whose
+        // empty field-root set returns directly from the recovery loop.
+        let input = vec![vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let report = solve_visit(&input, 1, 7, &opts, &[None], |_| {
+            panic!("x^2+1 has no F7 root")
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert!(report.complete && !report.timed_out);
+        assert_eq!(report.factored_univariates, 1);
+        assert_eq!(report.solutions_visited, 0);
+        assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+        assert_eq!(timing.callback_ns, 0);
+    }
+
+    #[test]
+    fn trace_stop_retains_prior_work_and_charges_sink_time_to_other() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        for after_roots in [false, true] {
+            let report = solve_visit_traced(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                |_| panic!("trace sink stops before the first solution"),
+                |event| {
+                    if !after_roots || matches!(event, VisitEvent::Branch { .. }) {
+                        std::thread::sleep(Duration::from_millis(2));
+                        Err("timing test sink stop".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap();
+            let timing = partition(&report);
+            assert!(report.trace_stopped && !report.complete && !report.timed_out);
+            assert_eq!(timing.callback_ns, 0);
+            assert!(timing.traversal_other_ns >= 1_000_000);
+            if after_roots {
+                assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+            } else {
+                assert_eq!(timing.native_f4_ns, 0);
+                assert_eq!(timing.root_recovery_ns, 0);
+            }
+        }
+    }
+
+    #[test]
+    fn batched_back_substitution_preserves_results_and_phase_partition() {
+        let input = vec![vec![(vec![0, 2], 1), (vec![1, 0], 6)]];
+        let domains = [Some(vec![4]), None];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 4)
+                .with_sibling_batch(true)
+                .with_visit_timing(enabled);
+            let mut solutions = Vec::new();
+            let report = solve_visit(&input, 2, 7, &opts, &domains, |s| {
+                solutions.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            assert!(report.complete && report.batched_nodes > 0);
+            if enabled {
+                let timing = partition(&report);
+                assert!(timing.root_recovery_ns > 0);
+            } else {
+                assert!(report.timings.is_none());
+            }
+            results.push((solutions, diagnostics(&report)));
+        }
+        assert_eq!(results[0], results[1]);
+        let mut solutions = results.remove(0).0;
+        solutions.sort();
+        assert_eq!(solutions, vec![vec![4, 2], vec![4, 5]]);
+    }
+
+    #[test]
+    fn cold_and_warm_trace_reuse_preserve_results_with_timing_enabled() {
+        // The native reuse module's xy=1, x^2=1 fixture exercises both
+        // learning and certified replay, with separately initialized pools.
+        let input = vec![
+            vec![(vec![1, 1], 1), (vec![0, 0], 4)],
+            vec![(vec![2, 0], 1), (vec![0, 0], 4)],
+        ];
+        let domains = [Some((0..5).collect()), Some((0..5).collect())];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 8).with_visit_timing(enabled);
+            let mut pool = TracePool::new("visit-timing-control", 4, 10_000).unwrap();
+            let mut runs = Vec::new();
+            for _ in 0..2 {
+                let mut solutions = Vec::new();
+                let report = solve_visit_reusing(&input, 2, 5, &opts, &domains, &mut pool, |s| {
+                    solutions.push(s.to_vec());
+                    false
+                })
+                .unwrap();
+                assert!(report.complete);
+                if enabled {
+                    let timing = partition(&report);
+                    assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+                } else {
+                    assert!(report.timings.is_none());
+                }
+                let mut sorted = solutions.clone();
+                sorted.sort();
+                assert_eq!(sorted, vec![vec![1, 1], vec![4, 4]]);
+                let stats = pool.stats();
+                runs.push((
+                    solutions,
+                    diagnostics(&report),
+                    stats.learned,
+                    stats.replay_attempts,
+                    stats.accepted,
+                    stats.certification_reductions,
+                ));
+            }
+            assert!(pool.stats().accepted > 0);
+            assert!(pool.stats().certification_reductions > 0);
+            results.push(runs);
+        }
+        assert_eq!(results[0], results[1]);
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

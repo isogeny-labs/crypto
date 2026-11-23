@@ -2,14 +2,20 @@
 //!
 //! This is an export and correctness harness, not a comparison experiment.
 //! `--check` includes one bounded, complete, tiny-field solve_visit control.
-//! `--export --m 4 --depth 3` emits all three arms on a public planted fixture.
-//! No Prime31 solve, sweep, elapsed time, or speed claim is produced here.
+//! `--export --m 4 --depth 3` emits all four arms on a public planted fixture.
+//! `--check-m31-accounting` attempts one fixed public Prime31 control.
+//! Accounting timings are diagnostic development observations, not speed claims.
 //!
 //! Every arm uses D_(2^depth)(x, 1) = 0 and the same finite intermediate-x
 //! chain. The input-degree reduction does not imply a solving-degree reduction.
 //! Invariant Q preserves the quartic zero set over the coefficient field;
 //! line L additionally requires an F_p-rational line and can exclude twist-only
 //! triples. All accepted relations still require signed, exact point replay.
+//! The parent-oriented O arm reuses the all-node formulation from PR #4928.
+//! Its slopes and shared internal ordinates retain the actual root orientation.
+
+#[path = "dickson_s3_quadratic/accounting.rs"]
+mod accounting;
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly, VisitReport};
 use crypto_lib::cryptanalysis::fp_backend::{Fp32, PrimeField};
@@ -32,16 +38,18 @@ enum Arm {
     Quartic,
     Invariant,
     Line,
+    Oriented,
 }
 
 impl Arm {
-    const ALL: [Self; 3] = [Self::Quartic, Self::Invariant, Self::Line];
+    const ALL: [Self; 4] = [Self::Quartic, Self::Invariant, Self::Line, Self::Oriented];
 
     fn name(self) -> &'static str {
         match self {
             Self::Quartic => "quartic_s3",
             Self::Invariant => "invariant_q",
             Self::Line => "line_l",
+            Self::Oriented => "oriented_o",
         }
     }
 
@@ -184,6 +192,8 @@ impl Coordinate {
 struct Block {
     coordinates: [Coordinate; 3],
     auxiliaries: Vec<usize>,
+    /// The oriented parent's ordinate; absent in the three x-only arms.
+    parent_y: Option<Coordinate>,
 }
 
 struct System {
@@ -195,6 +205,8 @@ struct System {
     names: Vec<String>,
     ladders: Vec<Vec<usize>>,
     intermediates: Vec<usize>,
+    /// Shared ordinates of the finite nonroot prefix points, for O only.
+    intermediate_ys: Vec<usize>,
     blocks: Vec<Block>,
     labels: Vec<String>,
     equations: Vec<Poly>,
@@ -268,6 +280,21 @@ fn block_equations(ps: &Polys, curve: &PrimeCurve, arm: Arm, block: &Block) -> V
                 ps.sub(&ps.add(&ps.mul(&r, &z), &b), &ps.square(&nu)),
             ]
         }
+        Arm::Oriented => {
+            let lambda = ps.variable(block.auxiliaries[0]);
+            let parent_y = block
+                .parent_y
+                .expect("oriented block requires its parent ordinate")
+                .polynomial(ps);
+            let numerator = ps.sub(
+                &ps.mul(&ps.sub(&x, &z), &ps.sub(&y, &z)),
+                &ps.add(&ps.scale(&ps.square(&z), 3), &a),
+            );
+            vec![
+                ps.sub(&ps.square(&lambda), &ps.add(&sum_xy, &z)),
+                ps.sub(&ps.scale(&ps.mul(&parent_y, &lambda), 2), &numerator),
+            ]
+        }
     }
 }
 
@@ -319,6 +346,13 @@ impl System {
         let intermediates: Vec<usize> = (0..m - 2)
             .map(|j| append_variable(&mut names, format!("t_{j}")))
             .collect();
+        let intermediate_ys: Vec<usize> = if arm == Arm::Oriented {
+            (0..m - 2)
+                .map(|j| append_variable(&mut names, format!("y_t_{j}")))
+                .collect()
+        } else {
+            Vec::new()
+        };
         let mut blocks = Vec::new();
         for j in 0..m - 1 {
             let left = if j == 0 {
@@ -341,6 +375,16 @@ impl System {
                     .iter()
                     .map(|s| append_variable(&mut names, format!("{s}_{j}")))
                     .collect(),
+                Arm::Oriented => vec![append_variable(&mut names, format!("lambda_{j}"))],
+            };
+            let parent_y = if arm == Arm::Oriented {
+                Some(if j == m - 2 {
+                    Coordinate::Constant(target.y)
+                } else {
+                    Coordinate::Variable(intermediate_ys[j])
+                })
+            } else {
+                None
             };
             blocks.push(Block {
                 coordinates: [
@@ -349,6 +393,7 @@ impl System {
                     third,
                 ],
                 auxiliaries,
+                parent_y,
             });
         }
         let ps = Polys::new(curve.p, names.len());
@@ -376,6 +421,16 @@ impl System {
                 labels.push(format!("{}_block_{j}_{k}", arm.name()));
                 equations.push(equation);
             }
+            if arm == Arm::Oriented && j > 0 {
+                let lambda = ps.variable(block.auxiliaries[0]);
+                let parent_x = block.coordinates[2].polynomial(&ps);
+                let parent_y = block.parent_y.unwrap().polynomial(&ps);
+                let left_x = block.coordinates[0].polynomial(&ps);
+                let oriented_left_y =
+                    ps.sub(&ps.mul(&lambda, &ps.sub(&left_x, &parent_x)), &parent_y);
+                equations.push(ps.sub(&ps.variable(intermediate_ys[j - 1]), &oriented_left_y));
+                labels.push(format!("oriented_o_propagate_{}_from_{j}", j - 1));
+            }
         }
         if equations
             .iter()
@@ -392,6 +447,7 @@ impl System {
             names,
             ladders,
             intermediates,
+            intermediate_ys,
             blocks,
             labels,
             equations,
@@ -452,6 +508,7 @@ impl System {
         }
         let mut ops = GroupOps::default();
         let mut prefix = points[0];
+        let mut prefixes = Vec::with_capacity(self.m - 1);
         for j in 0..self.m - 1 {
             prefix = self.curve.add(&mut ops, prefix, points[j + 1]);
             if prefix.infinity {
@@ -459,15 +516,24 @@ impl System {
             }
             if j < self.intermediates.len() {
                 values[self.intermediates[j]] = prefix.x;
+                if self.arm == Arm::Oriented {
+                    values[self.intermediate_ys[j]] = prefix.y;
+                }
             }
+            prefixes.push(prefix);
         }
         if prefix != self.target {
             return Err("signed point sum differs from the full target point".into());
         }
-        for block in &self.blocks {
-            let xs = block.coordinates.map(|c| c.evaluate(&values));
-            let aux = block_assignment(&self.curve, self.arm, xs)
-                .ok_or("no coefficient-field lift for a block")?;
+        for (j, block) in self.blocks.iter().enumerate() {
+            let aux = if self.arm == Arm::Oriented {
+                let left = if j == 0 { points[0] } else { prefixes[j - 1] };
+                vec![signed_chord_slope(&self.curve, left, points[j + 1])?]
+            } else {
+                let xs = block.coordinates.map(|c| c.evaluate(&values));
+                block_assignment(&self.curve, self.arm, xs)
+                    .ok_or("no coefficient-field lift for a block")?
+            };
             for (index, value) in block.auxiliaries.iter().zip(aux) {
                 values[*index] = value;
             }
@@ -489,11 +555,22 @@ impl System {
             "domain_semantics": "null means the full coefficient field for every variable",
             "leaf_indices": self.ladders.iter().map(|l| l[0]).collect::<Vec<_>>(),
             "intermediate_indices": self.intermediates,
+            "intermediate_y_indices": self.intermediate_ys,
+            "oriented_slope_indices": if self.arm == Arm::Oriented {
+                self.blocks.iter().map(|block| block.auxiliaries[0]).collect::<Vec<_>>()
+            } else {
+                Vec::new()
+            },
             "input_maximum_total_degree": self.equations.iter().map(total_degree).max(),
             "term_encoding": "[exponent_vector, canonical_coefficient]; equations equal zero",
             "equations": equations,
             "chart": "finite affine chain; partial sums at infinity require a separate chart",
             "signed_validation": "lift_abscissae followed by literal full-point target replay",
+            "oriented_semantics": if self.arm == Arm::Oriented {
+                Some("shared signed prefix ordinates and chord slopes; y_child=lambda*(x_child-x_parent)-y_parent; no division by parent y")
+            } else {
+                None
+            },
         })
     }
 }
@@ -529,7 +606,47 @@ fn block_assignment(curve: &PrimeCurve, arm: Arm, xs: [u64; 3]) -> Option<Vec<u6
             }
             Some(vec![r, lambda, nu])
         }
+        // Abscissae alone do not select an oriented lift at a 2-torsion
+        // parent. The signed assignment constructor supplies actual children.
+        Arm::Oriented => None,
     }
+}
+
+/// The slope of the true signed chord/tangent. A finite 2-torsion parent is
+/// permitted: the denominator is a child abscissa difference or a tangent's
+/// nonzero child ordinate, never the parent's ordinate. A vertical chord or
+/// the tangent at a 2-torsion child has sum O and is outside this finite chart.
+fn signed_chord_slope(
+    curve: &PrimeCurve,
+    left: PrimePoint,
+    right: PrimePoint,
+) -> Result<u64, String> {
+    if left.infinity
+        || right.infinity
+        || left.x >= curve.p
+        || left.y >= curve.p
+        || right.x >= curve.p
+        || right.y >= curve.p
+        || !curve.is_on_curve(left)
+        || !curve.is_on_curve(right)
+    {
+        return Err("chord children must be canonical finite curve points".into());
+    }
+    let f = Field::new(curve.p);
+    let (numerator, denominator) = if left.x != right.x {
+        (f.sub(right.y, left.y), f.sub(right.x, left.x))
+    } else if left.y == right.y && left.y != 0 {
+        (
+            f.add(f.mul(3, f.mul(left.x, left.x)), curve.a),
+            f.mul(2, left.y),
+        )
+    } else {
+        return Err("vertical chord or 2-torsion tangent has an infinity parent".into());
+    };
+    let inverse = f
+        .inv(denominator)
+        .ok_or("noninvertible chord denominator")?;
+    Ok(f.mul(numerator, inverse))
 }
 
 fn point_json(point: PrimePoint) -> Value {
@@ -640,6 +757,7 @@ fn check_block_identities() -> Result<Value, String> {
                 Coordinate::Variable(2),
             ],
             auxiliaries: vec![3, 4, 5],
+            parent_y: None,
         };
         let quartic = block_equations(&ps, &curve, Arm::Quartic, &block);
         let q = block_equations(&ps, &curve, Arm::Invariant, &block);
@@ -718,6 +836,7 @@ fn check_exceptional_charts() -> Result<Value, String> {
             Coordinate::Variable(2),
         ],
         auxiliaries: vec![3, 4, 5],
+        parent_y: None,
     };
     let ps = Polys::new(M31, 6);
     for arm in [Arm::Invariant, Arm::Line] {
@@ -778,6 +897,187 @@ fn check_exceptional_charts() -> Result<Value, String> {
     Ok(json!({
         "horizontal": {"p": M31, "x": xs, "e1": e1, "retained_by_q_and_l": true, "excluded_by_e1_inverse_chart": true},
         "twist_only": {"p": 5, "a": 2, "b": 1, "x": twist_xs, "quartic_and_q": true, "line_l": false},
+    }))
+}
+
+/// Constructor and exceptional-case controls only. The separate accounting
+/// module owns complete target extraction and signed-output enumeration.
+fn check_oriented_charts() -> Result<Value, String> {
+    let curve = PrimeCurve { p: 7, a: 0, b: 3 };
+    let a = PrimePoint::affine(3, 3);
+    let b = PrimePoint::affine(4, 2);
+    let target = PrimePoint::affine(1, 2);
+    let minus_b = curve.neg(b);
+    let cases = [
+        ("pair", vec![a, b], vec![6]),
+        ("repeated_tangent", vec![b, b, b], vec![5, 6]),
+        ("horizontal_root", vec![a, a, minus_b], vec![1, 0]),
+        ("same_leaf_x_first", vec![a, b, b, minus_b], vec![6, 0, 0]),
+        ("same_leaf_x_second", vec![a, b, minus_b, b], vec![6, 1, 6]),
+        (
+            "child_x_equals_parent",
+            vec![a, minus_b, b, b],
+            vec![2, 5, 6],
+        ),
+    ];
+    let mut checked = Vec::new();
+    let mut same_leaf_x_assignments = BTreeSet::new();
+    for (label, points, slopes) in cases {
+        let m = points.len();
+        let system = System::new(curve.clone(), target, Arm::Oriented, m, 1)?;
+        let assignment = system.assignment_for_points(&points)?;
+        require(
+            system.names.len() == 4 * m - 5 && system.equations.len() == 4 * m - 4,
+            "oriented variable/equation counts differ from the lean construction",
+        )?;
+        require(
+            system.intermediate_ys.len() == m - 2
+                && system.domains().iter().all(Option::is_none)
+                && system.equations.iter().all(|p| total_degree(p) <= 2),
+            "oriented shared-y, degree, or full-field domain contract failed",
+        )?;
+        let f = Field::new(curve.p);
+        for (j, (block, expected_slope)) in system.blocks.iter().zip(slopes).enumerate() {
+            let lambda = assignment[block.auxiliaries[0]];
+            require(
+                lambda == expected_slope,
+                "signed chord slope differs from the fixed fixture",
+            )?;
+            let parent_x = block.coordinates[2].evaluate(&assignment);
+            let parent_y = block.parent_y.unwrap().evaluate(&assignment);
+            let left = if j == 0 {
+                points[0]
+            } else {
+                PrimePoint::affine(
+                    assignment[system.intermediates[j - 1]],
+                    assignment[system.intermediate_ys[j - 1]],
+                )
+            };
+            for child in [left, points[j + 1]] {
+                require(
+                    f.sub(f.mul(lambda, f.sub(child.x, parent_x)), parent_y) == child.y,
+                    "downward orientation differs from the supplied signed child",
+                )?;
+            }
+        }
+        if let Some(index) = system.intermediate_ys.first() {
+            let mut altered = assignment.clone();
+            altered[*index] = f.add(altered[*index], 1);
+            require(
+                system.check_assignment(&altered).is_err(),
+                "altered shared ordinate accepted",
+            )?;
+        }
+        if m == 4 {
+            require(
+                system.leaf_xs(&assignment) == vec![3, 4, 4, 4],
+                "fixed leaf x tuple changed",
+            )?;
+            same_leaf_x_assignments.insert(assignment);
+        }
+        checked.push(json!({"case": label, "m": m, "variables": system.names.len(), "equations": system.equations.len()}));
+    }
+    require(
+        same_leaf_x_assignments.len() == 3,
+        "distinct signed chains with the same leaf abscissae were collapsed",
+    )?;
+
+    let positive = System::new(curve.clone(), target, Arm::Oriented, 2, 1)?;
+    let negative = System::new(curve.clone(), curve.neg(target), Arm::Oriented, 2, 1)?;
+    let positive_assignment = positive.assignment_for_points(&[a, b])?;
+    let negative_assignment = negative.assignment_for_points(&[curve.neg(a), minus_b])?;
+    require(
+        positive.leaf_xs(&positive_assignment) == negative.leaf_xs(&negative_assignment)
+            && positive.check_assignment(&negative_assignment).is_err()
+            && negative.assignment_for_points(&[a, b]).is_err(),
+        "signed-root flip was confused with an x-only target check",
+    )?;
+    let finite = System::new(curve.clone(), target, Arm::Oriented, 4, 1)?;
+    require(
+        finite
+            .assignment_for_points(&[a, curve.neg(a), a, b])
+            .is_err()
+            && System::new(curve.clone(), curve.identity(), Arm::Oriented, 2, 1).is_err(),
+        "an infinity prefix or root was silently admitted",
+    )?;
+
+    // On this separate even-order curve, the finite target has ordinate zero.
+    // Both sign choices are valid oriented assignments; no inversion of 2s
+    // or odd-order uniqueness assumption is permitted here.
+    let torsion_curve = PrimeCurve { p: 7, a: 3, b: 3 };
+    let torsion_target = PrimePoint::affine(1, 0);
+    let p = PrimePoint::affine(3, 2);
+    let q = PrimePoint::affine(4, 3);
+    let torsion = System::new(torsion_curve.clone(), torsion_target, Arm::Oriented, 2, 1)?;
+    let first = torsion.assignment_for_points(&[p, q])?;
+    let second = torsion.assignment_for_points(&[torsion_curve.neg(p), torsion_curve.neg(q)])?;
+    let slope_index = torsion.blocks[0].auxiliaries[0];
+    require(
+        torsion.leaf_xs(&first) == torsion.leaf_xs(&second)
+            && first[slope_index] == 1
+            && second[slope_index] == 6
+            && first != second,
+        "finite 2-torsion parent lost one of its two signed lifts",
+    )?;
+    let internal_torsion = System::new(
+        torsion_curve.clone(),
+        torsion_curve.neg(p),
+        Arm::Oriented,
+        3,
+        1,
+    )?;
+    let internal_first = internal_torsion.assignment_for_points(&[p, q, q])?;
+    let internal_second =
+        internal_torsion.assignment_for_points(&[torsion_curve.neg(p), torsion_curve.neg(q), q])?;
+    require(
+        internal_first[internal_torsion.intermediates[0]] == torsion_target.x
+            && internal_first[internal_torsion.intermediate_ys[0]] == 0
+            && internal_second[internal_torsion.intermediate_ys[0]] == 0
+            && internal_first[internal_torsion.blocks[0].auxiliaries[0]] == 1
+            && internal_second[internal_torsion.blocks[0].auxiliaries[0]] == 6,
+        "shared zero ordinate lost a valid internal 2-torsion branch",
+    )?;
+    require(
+        signed_chord_slope(&torsion_curve, torsion_target, torsion_target).is_err(),
+        "2-torsion doubling admitted a finite tangent",
+    )?;
+
+    // A rational 2-torsion parent can also support a quartic ghost. Here the
+    // numerator of Q2 is zero but Q1 would require lambda^2=3 in F7.
+    let ghost_block = Block {
+        coordinates: [
+            Coordinate::Variable(0),
+            Coordinate::Variable(1),
+            Coordinate::Variable(2),
+        ],
+        auxiliaries: vec![3],
+        parent_y: Some(Coordinate::Constant(0)),
+    };
+    let ps = Polys::new(7, 4);
+    let equations = block_equations(&ps, &torsion_curve, Arm::Oriented, &ghost_block);
+    require(
+        eval_s3_u64(2, 0, 1, 3, 3, 7) == 0
+            && torsion_curve.sqrt(torsion_curve.rhs(2)).is_none()
+            && torsion_curve.sqrt(torsion_curve.rhs(0)).is_none(),
+        "2-torsion-parent ghost fixture changed",
+    )?;
+    for lambda in 0..7 {
+        require(
+            equations
+                .iter()
+                .any(|eq| evaluate(eq, &[2, 0, 1, lambda], &ps.field) != 0),
+            "oriented equations admitted a nonrational 2-torsion-parent ghost",
+        )?;
+    }
+    Ok(json!({
+        "purpose": "oriented constructors and exceptional cases; no extraction or performance result",
+        "finite_odd_order_fixture": {"p": 7, "a": 0, "b": 3, "target": point_json(target), "cases": checked},
+        "same_leaf_x_distinct_signed_chains": same_leaf_x_assignments.len(),
+        "root_sign_flip_checked": true,
+        "infinity_prefix_and_root_rejected": true,
+        "finite_two_torsion_parent": {"p": 7, "a": 3, "b": 3, "target": point_json(torsion_target), "distinct_slopes": [1, 6]},
+        "finite_two_torsion_intermediate_checked": true,
+        "two_torsion_parent_quartic_ghost_rejected": true,
     }))
 }
 
@@ -980,6 +1280,7 @@ fn correctness() -> Result<Value, String> {
         "schema": "dickson-s3-quadratic-correctness/v1",
         "block_identities": check_block_identities()?,
         "exceptional_charts": check_exceptional_charts()?,
+        "oriented_charts": check_oriented_charts()?,
         "selector": check_all_m31_roots()?,
         "prime31_assignments": check_m31_assignments()?,
         "tiny_complete_solve": check_tiny_solve()?,
@@ -996,14 +1297,15 @@ fn plan() -> Value {
         "selector": {"a": 1, "lo": 0, "c_top": 0, "root_test_depth": 12, "root_count": 4096},
         "arms": Arm::ALL.map(Arm::name),
         "m": [2, 3, 4],
-        "variable_count": {"quartic": "m*depth + m - 2", "invariant_q_or_line_l": "m*depth + m - 2 + 3*(m-1)"},
-        "equation_count": {"quartic": "m*depth + m - 1", "invariant_q_or_line_l": "m*depth + 4*(m-1)"},
+        "variable_count": {"quartic": "m*depth + m - 2", "invariant_q_or_line_l": "m*depth + m - 2 + 3*(m-1)", "oriented_o": "m*depth + 3*m - 5"},
+        "equation_count": {"quartic": "m*depth + m - 1", "invariant_q_or_line_l": "m*depth + 4*(m-1)", "oriented_o": "m*depth + 3*m - 4"},
         "domain_policy": "full field for every variable; identical zero-selector equations on leaves",
         "finite_chart_limit": "prefix sums at infinity are rejected and require a separate chart",
         "q_projection": "exact quartic S3 zero set, including twist-only triples",
         "l_projection": "rational-line locus; signed point recovery and exact target replay still required",
+        "o_projection": "root-oriented finite rational chain; shared internal y; 2-torsion parents may have distinct signed slope lifts",
         "not_yet_measured": ["Prime31 coupled extraction", "matched solving degree and peak matrices", "complete useful-relation cost", "independent target cohort", "full DLP recovery"],
-        "commands": ["--check", "--export --m 4 --depth 3", "--plan"],
+        "commands": ["--check", "--check-accounting", "--export --m 4 --depth 3", "--plan"],
     })
 }
 
@@ -1015,8 +1317,17 @@ fn run() -> Result<Value, String> {
     if args == ["--check"] {
         return correctness();
     }
+    if args == ["--check-accounting"] {
+        return accounting::check();
+    }
+    if args == ["--check-m31-accounting"] {
+        return accounting::check_m31();
+    }
+    if args.len() == 2 && args[0] == "--extract-accounting" {
+        return accounting::extract_file(&args[1]);
+    }
     if args.first().map(String::as_str) != Some("--export") {
-        return Err("usage: --plan | --check | --export [--m 2|3|4] [--depth 1..12]".into());
+        return Err("usage: --plan | --check | --check-accounting | --check-m31-accounting | --extract-accounting REQUEST.json | --export [--m 2|3|4] [--depth 1..12]".into());
     }
     let mut parameters = BTreeMap::from([("--m", 4usize), ("--depth", 3usize)]);
     let mut seen = BTreeSet::new();
@@ -1075,6 +1386,11 @@ mod tests {
     #[test]
     fn horizontal_and_twist_only_charts_are_explicit() {
         check_exceptional_charts().unwrap();
+    }
+
+    #[test]
+    fn oriented_signs_shared_ordinates_and_two_torsion_are_explicit() {
+        check_oriented_charts().unwrap();
     }
 
     #[test]
