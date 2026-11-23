@@ -307,12 +307,14 @@ impl ForestWitnessExtractor {
         let mut cache_hits = 0u64;
         for (&root, &gamma) in &projection.roots {
             if let Some(anchor_idx) = self.anchor[root] {
+                // Borrow warm source maps instead of cloning a potentially
+                // long anchor path for each incoming dependent equation.
                 let normalization = if let Some(cached) = self.anchor_cache[root]
                     .as_ref()
                     .filter(|cache| cache.row_index == anchor_idx)
                 {
                     cache_hits += 1;
-                    cached.clone()
+                    std::borrow::Cow::Borrowed(cached)
                 } else {
                     let anchor_projection = self.project(&self.rows[anchor_idx])?;
                     scans += anchor_projection.scans;
@@ -322,18 +324,19 @@ impl ForestWitnessExtractor {
                         value: alpha,
                     })?;
                     inversions += 1;
-                    let cached = CachedAnchor {
+                    std::borrow::Cow::Owned(CachedAnchor {
                         row_index: anchor_idx,
                         inv_root_coefficient: inverse,
                         basis: anchor_projection.basis,
-                    };
-                    new_anchor_caches.push((root, cached.clone()));
-                    cached
+                    })
                 };
                 let factor = neg_mod(mul_mod(gamma, normalization.inv_root_coefficient, p), p);
                 add_term(&mut source, anchor_idx, factor, p);
-                for (i, a) in normalization.basis {
+                for (&i, &a) in &normalization.basis {
                     add_term(&mut source, i, mul_mod(factor, a, p), p);
+                }
+                if let std::borrow::Cow::Owned(cached) = normalization {
+                    new_anchor_caches.push((root, cached));
                 }
             } else {
                 outstanding.push(root);
