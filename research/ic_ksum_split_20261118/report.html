@@ -1,0 +1,652 @@
+<!doctype html><html><head><meta charset="utf-8"><title>ksum split and stride-renew, Table B</title><style>body{font-family:DejaVu Sans,Arial;font-size:10pt;margin:0 8mm}table{border-collapse:collapse;font-size:8pt}td,th{border:1px solid #bbb;padding:2px 4px}h1{font-size:15pt}h2{font-size:12pt}svg{max-width:100%;height:auto}</style></head><body>
+<p><em>Run report (observations; the registered verdicts are those of PROTOCOL.md section 3). Session records: 24 sessions, binary sha256 808511395723…, digests in data/sessions.sha256. [pcc:unverified]</em></p>
+<h1
+id="k-sum-split1-pair-sum-build-and-stride-renew-targets-against-the-pruned-incumbent-table-bs-eight-curves">k-sum
+<code>split=1</code> (pair-sum build) and <code>stride-renew</code>
+targets against the pruned incumbent, Table B's eight curves</h1>
+<p><strong>Standing: counted cost at L0,
+<code>[pcc:unverified]</code>.</strong> No pcc claim filed; no
+independent validator report or <code>VALIDATION.json</code> yet, so the
+validation gate is not met and no leaderboard row is added. Wall time is
+not claimed. Track: generic decomposition (bounded by sqrt(r); cannot
+beat rho or BSGS).</p>
+<h2 id="outcome">Outcome</h2>
+<ul>
+<li><strong>Step 1, where the incumbent's cost goes</strong>
+(<code>analysis/phases.json</code>, from the validated prune study's
+sessions): table build 29-55 % of S (ksum5-p, w = 0), walk steps 13-55
+%, walk set-up and restarts (16 jumps, start, pooled restarts: about 48
+scalar multiplications a run) 5-47 %, everything else at most 4 %.</li>
+<li><strong>Lever A, <code>split=1</code> (new, commit fc0babc73e):
+holds on all 8 rows for k = 5 and k = 4</strong> (T1: pooled and every
+replicate upper end below 1 at w = 0, 0.1, 1).
+<code>ksum5-ps / ksum5-p</code> = <strong>0.910-0.943</strong> at w = 0,
+0.920-0.950 at w = 0.1, 0.954-0.976 at w = 1;
+<code>ksum4-ps / ksum4-p</code> = 0.939-0.965 / 0.945-0.967 /
+0.972-0.982. Correctness: 9,216 target pairs (24 sessions x 2 k x 192
+runs) identical in outcome, log, counters, factor base, every native and
+work counter and every phase cost except the build adds, which fall by
+exactly <code>2^{k-2} C(a-1, k-1) - 2 C(a-k+2, 2)</code> on every run
+(60-2,568 adds by row and k). The director's prediction (R_0 within
++/-0.03 of 0.91-0.94) held on all 8 rows.</li>
+<li><strong>Lever B, <code>targets=stride-renew</code> (existing
+option), with split: <code>ksum5-psr / ksum5-p</code> = 0.536-0.866 at w
+= 0, 0.564-0.881 at w = 0.1, 0.716-0.937 at w = 1;</strong> every pooled
+upper end below 1. The registered rule (every replicate too) holds on 7
+of 8 rows for k = 5 (fails on B24: one replicate's upper end at w = 1 is
+1.011) and 6 of 8 for k = 4 (fails on P24 and B27 at w = 1).
+Stride-renew alone (<code>-pr</code>) gives 0.611-0.956 at w = 0: it
+removes the walk's jump table and pooled restarts (about 42 of 48 scalar
+multiplications), the largest gain on the small rows B15/B18 where
+set-up is half of S.</li>
+<li><strong>Best against best</strong> (cheaper of k = 4/5 before and
+after, by mean S): <strong>0.525-0.866 at w = 0</strong>, 0.554-0.881 at
+w = 0.1, 0.710-0.937 at w = 1, every 95 % interval below 1.</li>
+<li><strong>Distance remaining to matched rho-neg (best k-sum /
+rho-neg):</strong> w = 0 <strong>4.95-5.73 → 2.78-4.97</strong>; w = 0.1
+5.08-5.90 → 2.92-5.20; w = 1 5.15-6.70 → 3.66-6.28. Split alone:
+4.55-5.22 at w = 0. Rho is still ahead on every row at every
+weight.</li>
+<li><strong>Controls.</strong> <code>rho-neg-aa / rho-neg</code> =
+1.0000 on every row and weight. All 46,080 runs verified; 24/24 sessions
+pass <code>ecbench verify --replay-all --exit-code</code> (46,080
+records, 34,560 replays reproduced, 0 problems; same binary, same
+host).</li>
+<li><strong>Not an accounting change.</strong> Split removes group
+additions the build performed (the (k-1)-summand partial sums) and
+replaces them with a smaller pair-sum table, all counted; stride-renew
+removes scalar multiplications the walk performed. Both arms priced by
+the same harness. The gains are constant factors that shrink as r grows
+(fixed set-up against sqrt(r); 1/a of the build); no exponent
+changes.</li>
+</ul>
+<h2 id="deviations-all-recorded-in-protocolmd">Deviations (all recorded
+in PROTOCOL.md)</h2>
+<ul>
+<li>Route: local L0 <code>--cpus none</code> instead of isolab-eks (no
+AWS/S3 in this container: token rejected, checkpoint token expired); no
+S3 checkpoint or raw-data upload; conductor and research-kb
+unavailable.</li>
+<li>A1/A2: two launch-script fixes before any session ran. A3: the first
+full launch errored on every binary row because merge 833a35d21e had
+dropped <code>ksum</code>/<code>ksum-frobenius</code> from the binary
+oracle match (restored in e93c3cb2da); binary rebuilt, full re-run, only
+status counts of the failed launch read. A4: a container restart killed
+the run with B27-r3 at 928/1,920 records; that session was deleted
+unread and re-run, the 23 complete sessions kept.</li>
+<li>Raw session trees (256 MB) are not committed (disk/size limits);
+<code>data/sessions.sha256</code> pins them, the verify reports are in
+<code>data/*.verify.json.gz</code>. They are kept outside Git on the
+producing host; an independent replay needs them (open thread).</li>
+<li>The Holm 97.5 % reading of the protocol was not computed; the split
+margins (largest upper 0.977) and the combined failures (per-replicate
+at w = 1) would not change direction.</li>
+</ul>
+<h2 id="files">Files</h2>
+<p><code>PROTOCOL.md</code> (registered 55310069ea, amendments A1-A4),
+<code>specs/</code>, <code>run_all.sh</code>, <code>analysis/</code>
+(phases, predictions, evaluate, correctness, summary, plot, render),
+<code>results.md</code>/<code>results.json</code> (all ratios),
+<code>summary.json</code>, <code>data/</code> (run log, verify reports,
+correctness), <code>ratios.svg/png</code>, <code>gap.svg/png</code>,
+<code>report.pdf</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">row</th>
+<th style="text-align: right;">w</th>
+<th style="text-align: left;">best before (S)</th>
+<th style="text-align: left;">best after (S)</th>
+<th style="text-align: left;">after / before [95%]</th>
+<th style="text-align: left;">gap to rho before → after</th>
+<th style="text-align: left;">ksum5-ps / ksum5-p [95%]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P20</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum5-p 6.359</td>
+<td style="text-align: left;">ksum5-psr 4.926</td>
+<td style="text-align: left;"><strong>0.7746</strong> [0.7569,
+0.7926]</td>
+<td style="text-align: left;">5.02 → 3.89</td>
+<td style="text-align: left;">0.9185 [0.9173, 0.9198]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum5-p 7.091</td>
+<td style="text-align: left;">ksum5-psr 5.660</td>
+<td style="text-align: left;"><strong>0.7981</strong> [0.7791,
+0.8176]</td>
+<td style="text-align: left;">5.15 → 4.11</td>
+<td style="text-align: left;">0.9270 [0.9258, 0.9281]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum5-p 13.684</td>
+<td style="text-align: left;">ksum5-psr 12.267</td>
+<td style="text-align: left;"><strong>0.8965</strong> [0.8714,
+0.9223]</td>
+<td style="text-align: left;">5.77 → 5.17</td>
+<td style="text-align: left;">0.9621 [0.9614, 0.9629]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P22</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum5-p 6.096</td>
+<td style="text-align: left;">ksum5-psr 4.965</td>
+<td style="text-align: left;"><strong>0.8145</strong> [0.7986,
+0.8306]</td>
+<td style="text-align: left;">5.42 → 4.42</td>
+<td style="text-align: left;">0.9127 [0.9116, 0.9137]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum5-p 6.835</td>
+<td style="text-align: left;">ksum5-psr 5.695</td>
+<td style="text-align: left;"><strong>0.8332</strong> [0.8162,
+0.8505]</td>
+<td style="text-align: left;">5.57 → 4.64</td>
+<td style="text-align: left;">0.9221 [0.9211, 0.9231]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum5-p 13.488</td>
+<td style="text-align: left;">ksum5-psr 12.265</td>
+<td style="text-align: left;"><strong>0.9093</strong> [0.8873,
+0.9319]</td>
+<td style="text-align: left;">6.27 → 5.70</td>
+<td style="text-align: left;">0.9605 [0.9599, 0.9611]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P24</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum5-p 6.015</td>
+<td style="text-align: left;">ksum5-psr 5.105</td>
+<td style="text-align: left;"><strong>0.8488</strong> [0.8323,
+0.8656]</td>
+<td style="text-align: left;">5.42 → 4.60</td>
+<td style="text-align: left;">0.9183 [0.9172, 0.9194]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum5-p 6.797</td>
+<td style="text-align: left;">ksum5-psr 5.873</td>
+<td style="text-align: left;"><strong>0.8640</strong> [0.8464,
+0.8819]</td>
+<td style="text-align: left;">5.62 → 4.85</td>
+<td style="text-align: left;">0.9277 [0.9267, 0.9288]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum5-p 13.837</td>
+<td style="text-align: left;">ksum5-psr 12.779</td>
+<td style="text-align: left;"><strong>0.9235</strong> [0.9016,
+0.9460]</td>
+<td style="text-align: left;">6.56 → 6.06</td>
+<td style="text-align: left;">0.9645 [0.9639, 0.9651]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B15</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum4-p 10.551</td>
+<td style="text-align: left;">ksum4-psr 5.536</td>
+<td style="text-align: left;"><strong>0.5247</strong> [0.5165,
+0.5331]</td>
+<td style="text-align: left;">5.30 → 2.78</td>
+<td style="text-align: left;">0.9245 [0.9239, 0.9251]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum4-p 11.252</td>
+<td style="text-align: left;">ksum4-psr 6.230</td>
+<td style="text-align: left;"><strong>0.5537</strong> [0.5445,
+0.5630]</td>
+<td style="text-align: left;">5.27 → 2.92</td>
+<td style="text-align: left;">0.9291 [0.9285, 0.9296]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum4-p 17.565</td>
+<td style="text-align: left;">ksum4-psr 12.475</td>
+<td style="text-align: left;"><strong>0.7102</strong> [0.6953,
+0.7254]</td>
+<td style="text-align: left;">5.15 → 3.66</td>
+<td style="text-align: left;">0.9541 [0.9536, 0.9545]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">B18</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum4-p 9.456</td>
+<td style="text-align: left;">ksum4-psr 5.338</td>
+<td style="text-align: left;"><strong>0.5645</strong> [0.5458,
+0.5838]</td>
+<td style="text-align: left;">5.11 → 2.88</td>
+<td style="text-align: left;">0.9383 [0.9376, 0.9391]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum4-p 10.201</td>
+<td style="text-align: left;">ksum4-psr 6.086</td>
+<td style="text-align: left;"><strong>0.5966</strong> [0.5760,
+0.6180]</td>
+<td style="text-align: left;">5.12 → 3.05</td>
+<td style="text-align: left;">0.9426 [0.9419, 0.9434]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum4-p 16.907</td>
+<td style="text-align: left;">ksum5-psr 12.644</td>
+<td style="text-align: left;"><strong>0.7479</strong> [0.7272,
+0.7691]</td>
+<td style="text-align: left;">5.15 → 3.85</td>
+<td style="text-align: left;">0.9647 [0.9642, 0.9653]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B21</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum5-p 6.436</td>
+<td style="text-align: left;">ksum5-psr 5.014</td>
+<td style="text-align: left;"><strong>0.7791</strong> [0.7635,
+0.7951]</td>
+<td style="text-align: left;">4.95 → 3.86</td>
+<td style="text-align: left;">0.9195 [0.9185, 0.9205]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum5-p 7.179</td>
+<td style="text-align: left;">ksum5-psr 5.762</td>
+<td style="text-align: left;"><strong>0.8027</strong> [0.7858,
+0.8199]</td>
+<td style="text-align: left;">5.08 → 4.08</td>
+<td style="text-align: left;">0.9279 [0.9269, 0.9288]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum5-p 13.865</td>
+<td style="text-align: left;">ksum5-psr 12.492</td>
+<td style="text-align: left;"><strong>0.9010</strong> [0.8789,
+0.9236]</td>
+<td style="text-align: left;">5.69 → 5.13</td>
+<td style="text-align: left;">0.9626 [0.9621, 0.9632]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">B24</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum4-p 6.415</td>
+<td style="text-align: left;">ksum5-psr 5.291</td>
+<td style="text-align: left;"><strong>0.8247</strong> [0.8040,
+0.8458]</td>
+<td style="text-align: left;">5.26 → 4.34</td>
+<td style="text-align: left;">0.9432 [0.9421, 0.9444]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum4-p 7.176</td>
+<td style="text-align: left;">ksum4-psr 6.151</td>
+<td style="text-align: left;"><strong>0.8571</strong> [0.8421,
+0.8725]</td>
+<td style="text-align: left;">5.39 → 4.62</td>
+<td style="text-align: left;">0.9500 [0.9489, 0.9510]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum4-p 14.019</td>
+<td style="text-align: left;">ksum4-psr 13.042</td>
+<td style="text-align: left;"><strong>0.9303</strong> [0.9106,
+0.9504]</td>
+<td style="text-align: left;">6.04 → 5.61</td>
+<td style="text-align: left;">0.9758 [0.9753, 0.9764]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B27</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">ksum5-p 6.055</td>
+<td style="text-align: left;">ksum5-psr 5.246</td>
+<td style="text-align: left;"><strong>0.8665</strong> [0.8522,
+0.8809]</td>
+<td style="text-align: left;">5.73 → 4.97</td>
+<td style="text-align: left;">0.9103 [0.9094, 0.9112]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: left;">ksum5-p 6.812</td>
+<td style="text-align: left;">ksum5-psr 5.998</td>
+<td style="text-align: left;"><strong>0.8805</strong> [0.8653,
+0.8960]</td>
+<td style="text-align: left;">5.90 → 5.20</td>
+<td style="text-align: left;">0.9203 [0.9194, 0.9211]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ksum5-p 13.622</td>
+<td style="text-align: left;">ksum5-psr 12.761</td>
+<td style="text-align: left;"><strong>0.9368</strong> [0.9174,
+0.9566]</td>
+<td style="text-align: left;">6.70 → 6.28</td>
+<td style="text-align: left;">0.9601 [0.9596, 0.9607]</td>
+</tr>
+</tbody>
+</table>
+<p>Full per-arm tables: <code>results.md</code>.</p>
+<h2>Figure 1. Cost ratio against the incumbent (ksum5-p)</h2>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="460" font-family="DejaVu Sans, Arial" font-size="12"><rect width="100%" height="100%" fill="#fff"/><text x="70" y="22" font-size="15" font-weight="bold">Counted cost against the incumbent ksum5-p (prune=1, walk), paired by target; 95% CI [pcc:unverified]</text><text x="70" y="42" fill="#444">Per row: three arms, each at w = 0 / 0.1 / 1 GAE per native op (left to right). 432 paired runs per row (3 sessions x 48 targets x 3 rounds). Below 1 = cheaper.</text><line x1="70" x2="1140" y1="380" y2="380" stroke="#ddd"/><text x="62" y="384" text-anchor="end">0.4</text><line x1="70" x2="1140" y1="330.76923076923083" y2="330.76923076923083" stroke="#ddd"/><text x="62" y="334.76923076923083" text-anchor="end">0.5</text><line x1="70" x2="1140" y1="281.53846153846155" y2="281.53846153846155" stroke="#ddd"/><text x="62" y="285.53846153846155" text-anchor="end">0.6</text><line x1="70" x2="1140" y1="232.30769230769232" y2="232.30769230769232" stroke="#ddd"/><text x="62" y="236.30769230769232" text-anchor="end">0.7</text><line x1="70" x2="1140" y1="183.07692307692315" y2="183.07692307692315" stroke="#ddd"/><text x="62" y="187.07692307692315" text-anchor="end">0.8</text><line x1="70" x2="1140" y1="133.8461538461539" y2="133.8461538461539" stroke="#ddd"/><text x="62" y="137.8461538461539" text-anchor="end">0.9</text><line x1="70" x2="1140" y1="84.6153846153847" y2="84.6153846153847" stroke="#000"/><text x="62" y="88.6153846153847" text-anchor="end">1.0</text><text x="136.875" y="402" text-anchor="middle" font-weight="bold">P20</text><line x1="86.31944444444444" x2="86.31944444444444" y1="124.11182915003724" y2="125.31930030907009" stroke="#1b6ec2" stroke-width="2"/><circle cx="86.31944444444444" cy="124.71596774896682" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="98.95833333333333" x2="98.95833333333333" y1="120.00353475345082" y2="121.14362621457036" stroke="#1b6ec2" stroke-width="2"/><circle cx="98.95833333333333" cy="120.57393651843608" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="111.59722222222223" x2="111.59722222222223" y1="102.89200701859933" y2="103.60858852195935" stroke="#1b6ec2" stroke-width="2"/><circle cx="111.59722222222223" cy="103.25043327762401" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="124.2361111111111" x2="124.2361111111111" y1="146.16088287881774" y2="164.60962833347622" stroke="#d9822b" stroke-width="2"/><circle cx="124.2361111111111" cy="155.48619464008164" r="3" fill="#d9822b" fill-opacity="1"/><line x1="136.875" x2="136.875" y1="138.04591773837927" y2="157.8249096711302" stroke="#d9822b" stroke-width="2"/><circle cx="136.875" cy="148.0494206290026" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="149.51388888888889" x2="149.51388888888889" y1="103.99740256208719" y2="129.5402372937226" stroke="#d9822b" stroke-width="2"/><circle cx="149.51388888888889" cy="116.94608714071083" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="162.15277777777777" x2="162.15277777777777" y1="186.69558260100524" y2="204.2753902150988" stroke="#2a9d5c" stroke-width="2"/><circle cx="162.15277777777777" cy="195.5867777736638" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="174.79166666666666" x2="174.79166666666666" y1="174.41405724803667" y2="193.37321415665645" stroke="#2a9d5c" stroke-width="2"/><circle cx="174.79166666666666" cy="184.00797253205405" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="187.43055555555554" x2="187.43055555555554" y1="122.89177779108407" y2="147.91584908644379" stroke="#2a9d5c" stroke-width="2"/><circle cx="187.43055555555554" cy="135.5811358029502" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="270.625" y="402" text-anchor="middle" font-weight="bold">P22</text><line x1="220.06944444444446" x2="220.06944444444446" y1="127.10361170516947" y2="128.12351539976905" stroke="#1b6ec2" stroke-width="2"/><circle cx="220.06944444444446" cy="127.61385294203546" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="232.70833333333334" x2="232.70833333333334" y1="122.48298056636656" y2="123.44421995941534" stroke="#1b6ec2" stroke-width="2"/><circle cx="232.70833333333334" cy="122.96385468577341" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="245.34722222222223" x2="245.34722222222223" y1="103.75200901632812" y2="104.34611743559024" stroke="#1b6ec2" stroke-width="2"/><circle cx="245.34722222222223" cy="104.04915652904793" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="257.9861111111111" x2="257.9861111111111" y1="124.63881503578509" y2="141.13075428155713" stroke="#d9822b" stroke-width="2"/><circle cx="257.9861111111111" cy="132.96135674658657" r="3" fill="#d9822b" fill-opacity="1"/><line x1="270.625" x2="270.625" y1="119.49210457371095" y2="137.1226047793729" stroke="#d9822b" stroke-width="2"/><circle cx="270.625" cy="128.3939723909346" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="283.26388888888886" x2="283.26388888888886" y1="98.49852206497442" y2="120.86442900445238" stroke="#d9822b" stroke-width="2"/><circle cx="283.26388888888886" cy="109.81532102551529" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="295.90277777777777" x2="295.90277777777777" y1="168.00849191142888" y2="183.75654477451536" stroke="#2a9d5c" stroke-width="2"/><circle cx="295.90277777777777" cy="175.95982507323743" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="308.54166666666663" x2="308.54166666666663" y1="158.19110326617957" y2="175.11914631302514" stroke="#2a9d5c" stroke-width="2"/><circle cx="308.54166666666663" cy="166.74244246132383" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="321.18055555555554" x2="321.18055555555554" y1="118.15147581606422" y2="140.07826034676117" stroke="#2a9d5c" stroke-width="2"/><circle cx="321.18055555555554" cy="129.2490929391786" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="404.375" y="402" text-anchor="middle" font-weight="bold">P24</text><line x1="353.81944444444446" x2="353.81944444444446" y1="124.27096712347527" y2="125.35755333425236" stroke="#1b6ec2" stroke-width="2"/><circle cx="353.81944444444446" cy="124.81458666300313" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="366.4583333333333" x2="366.4583333333333" y1="119.68186076498576" y2="120.69396423335078" stroke="#1b6ec2" stroke-width="2"/><circle cx="366.4583333333333" cy="120.18819284591665" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="379.09722222222223" x2="379.09722222222223" y1="101.79181866722305" y2="102.38635385874232" stroke="#1b6ec2" stroke-width="2"/><circle cx="379.09722222222223" cy="102.0891793144848" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="391.73611111111114" x2="391.73611111111114" y1="110.19781492516631" y2="127.37931934184243" stroke="#d9822b" stroke-width="2"/><circle cx="391.73611111111114" cy="118.86911936280555" r="3" fill="#d9822b" fill-opacity="1"/><line x1="404.375" x2="404.375" y1="106.80912149316896" y2="125.01921421697605" stroke="#d9822b" stroke-width="2"/><circle cx="404.375" cy="116.00409014685539" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="417.0138888888889" x2="417.0138888888889" y1="93.516566288556" y2="115.81175684162017" stroke="#d9822b" stroke-width="2"/><circle cx="417.0138888888889" cy="104.79574848862302" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="429.65277777777777" x2="429.65277777777777" y1="150.79105711085464" y2="167.18480665303576" stroke="#2a9d5c" stroke-width="2"/><circle cx="429.65277777777777" cy="159.06832141042412" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="442.29166666666663" x2="442.29166666666663" y1="142.74939892582927" y2="160.22491954521502" stroke="#2a9d5c" stroke-width="2"/><circle cx="442.29166666666663" cy="151.57689837738712" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="454.93055555555554" x2="454.93055555555554" y1="111.2079568902223" y2="133.0683965694268" stroke="#2a9d5c" stroke-width="2"/><circle cx="454.93055555555554" cy="122.26954318772312" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="538.125" y="402" text-anchor="middle" font-weight="bold">B15</text><line x1="487.56944444444446" x2="487.56944444444446" y1="121.51141773732118" y2="122.05623832402075" stroke="#1b6ec2" stroke-width="2"/><circle cx="487.56944444444446" cy="121.78390955228743" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="500.2083333333333" x2="500.2083333333333" y1="119.26971484970004" y2="119.80426203880569" stroke="#1b6ec2" stroke-width="2"/><circle cx="500.2083333333333" cy="119.53706653493154" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="512.8472222222222" x2="512.8472222222222" y1="107.01273487223617" y2="107.45176588508905" stroke="#1b6ec2" stroke-width="2"/><circle cx="512.8472222222222" cy="107.23230167523627" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="525.4861111111111" x2="525.4861111111111" y1="272.9030596046522" y2="278.97136851714083" stroke="#d9822b" stroke-width="2"/><circle cx="525.4861111111111" cy="275.9525076814533" r="3" fill="#d9822b" fill-opacity="1"/><line x1="538.125" x2="538.125" y1="261.10352687347734" y2="267.86408259445363" stroke="#d9822b" stroke-width="2"/><circle cx="538.125" cy="264.5020908679663" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="550.7638888888888" x2="550.7638888888888" y1="196.27247673376854" y2="207.2359130471553" stroke="#d9822b" stroke-width="2"/><circle cx="550.7638888888888" cy="201.7942446378835" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="563.4027777777778" x2="563.4027777777778" y1="310.2412216639201" y2="315.96974542730635" stroke="#2a9d5c" stroke-width="2"/><circle cx="563.4027777777778" cy="313.12103261835614" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="576.0416666666667" x2="576.0416666666667" y1="296.18842527540744" y2="302.62183429497946" stroke="#2a9d5c" stroke-width="2"/><circle cx="576.0416666666667" cy="299.42377278751366" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="588.6805555555555" x2="588.6805555555555" y1="219.02178936554503" y2="229.71937943466472" stroke="#2a9d5c" stroke-width="2"/><circle cx="588.6805555555555" cy="224.41116169773517" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="671.875" y="402" text-anchor="middle" font-weight="bold">B18</text><line x1="621.3194444444445" x2="621.3194444444445" y1="114.58356006012511" y2="115.3497390844231" stroke="#1b6ec2" stroke-width="2"/><circle cx="621.3194444444445" cy="114.9668084158261" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="633.9583333333334" x2="633.9583333333334" y1="112.48239983140945" y2="113.22459885734034" stroke="#1b6ec2" stroke-width="2"/><circle cx="633.9583333333334" cy="112.8536477217705" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="646.5972222222222" x2="646.5972222222222" y1="101.69664589399875" y2="102.25438685622169" stroke="#1b6ec2" stroke-width="2"/><circle cx="646.5972222222222" cy="101.97559824599281" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="659.2361111111111" x2="659.2361111111111" y1="263.93472424731044" y2="275.64406384889446" stroke="#d9822b" stroke-width="2"/><circle cx="659.2361111111111" cy="269.84520081040563" r="3" fill="#d9822b" fill-opacity="1"/><line x1="671.875" x2="671.875" y1="250.658572310287" y2="263.55364939233255" stroke="#d9822b" stroke-width="2"/><circle cx="671.875" cy="257.1711089320859" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="684.5138888888888" x2="684.5138888888888" y1="182.09190597491286" y2="201.51884796520093" stroke="#d9822b" stroke-width="2"/><circle cx="684.5138888888888" cy="191.9278934488796" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="697.1527777777778" x2="697.1527777777778" y1="294.56034019893934" y2="305.7204023147507" stroke="#2a9d5c" stroke-width="2"/><circle cx="697.1527777777778" cy="300.19662461084715" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="709.7916666666667" x2="709.7916666666667" y1="279.1591639078084" y2="291.5283852863128" stroke="#2a9d5c" stroke-width="2"/><circle cx="709.7916666666667" cy="285.40937203847176" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="722.4305555555555" x2="722.4305555555555" y1="199.64554806004458" y2="218.68421902130171" stroke="#2a9d5c" stroke-width="2"/><circle cx="722.4305555555555" cy="209.2881070794877" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="805.625" y="402" text-anchor="middle" font-weight="bold">B21</text><line x1="755.0694444444445" x2="755.0694444444445" y1="123.73277604169438" y2="124.73091768935444" stroke="#1b6ec2" stroke-width="2"/><circle cx="755.0694444444445" cy="124.23212196668206" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="767.7083333333334" x2="767.7083333333334" y1="119.66195684183518" y2="120.60214772379268" stroke="#1b6ec2" stroke-width="2"/><circle cx="767.7083333333334" cy="120.13229417655786" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="780.3472222222222" x2="780.3472222222222" y1="102.71152015281295" y2="103.2977551096022" stroke="#1b6ec2" stroke-width="2"/><circle cx="780.3472222222222" cy="103.00472827746358" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="792.9861111111111" x2="792.9861111111111" y1="145.59616806160517" y2="161.73105165162247" stroke="#d9822b" stroke-width="2"/><circle cx="792.9861111111111" cy="153.7405006699064" r="3" fill="#d9822b" fill-opacity="1"/><line x1="805.625" x2="805.625" y1="137.510036315546" y2="154.8180197549321" stroke="#d9822b" stroke-width="2"/><circle cx="805.625" cy="146.25096658149698" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="818.2638888888888" x2="818.2638888888888" y1="103.65191433374054" y2="126.00269887074973" stroke="#d9822b" stroke-width="2"/><circle cx="818.2638888888888" cy="114.96246003452875" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="830.9027777777778" x2="830.9027777777778" y1="185.49169451067428" y2="201.06472886274517" stroke="#2a9d5c" stroke-width="2"/><circle cx="830.9027777777778" cy="193.3572380212038" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="843.5416666666667" x2="843.5416666666667" y1="173.2893557704975" y2="190.06830111811394" stroke="#2a9d5c" stroke-width="2"/><circle cx="843.5416666666667" cy="181.7678761426701" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="856.1805555555555" x2="856.1805555555555" y1="122.20725390625319" y2="144.22321368460024" stroke="#2a9d5c" stroke-width="2"/><circle cx="856.1805555555555" cy="133.3518036966077" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="939.375" y="402" text-anchor="middle" font-weight="bold">B24</text><line x1="888.8194444444445" x2="888.8194444444445" y1="112.00942535239122" y2="113.1213558630774" stroke="#1b6ec2" stroke-width="2"/><circle cx="888.8194444444445" cy="112.56572343034608" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="901.4583333333334" x2="901.4583333333334" y1="108.7340356793031" y2="109.74885740253885" stroke="#1b6ec2" stroke-width="2"/><circle cx="901.4583333333334" cy="109.24172179853386" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="914.0972222222222" x2="914.0972222222222" y1="96.23241352283242" y2="96.7879943815021" stroke="#1b6ec2" stroke-width="2"/><circle cx="914.0972222222222" cy="96.510284265928" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="926.7361111111111" x2="926.7361111111111" y1="132.88231647322328" y2="156.57205609300217" stroke="#d9822b" stroke-width="2"/><circle cx="926.7361111111111" cy="144.8895285205731" r="3" fill="#d9822b" fill-opacity="1"/><line x1="939.375" x2="939.375" y1="124.77686353567684" y2="149.78525472709524" stroke="#d9822b" stroke-width="2"/><circle cx="939.375" cy="137.4589158126926" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="952.0138888888888" x2="952.0138888888888" y1="93.64931889876854" y2="123.8602289301587" stroke="#d9822b" stroke-width="2"/><circle cx="952.0138888888888" cy="108.99852619856794" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="964.6527777777778" x2="964.6527777777778" y1="161.21348601783393" y2="184.1410871811357" stroke="#2a9d5c" stroke-width="2"/><circle cx="964.6527777777778" cy="172.8398673355345" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="977.2916666666667" x2="977.2916666666667" y1="149.75115059030048" y2="174.06322225504937" stroke="#2a9d5c" stroke-width="2"/><circle cx="977.2916666666667" cy="162.08525299584176" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="989.9305555555555" x2="989.9305555555555" y1="105.73666184251337" y2="135.5626386704476" stroke="#2a9d5c" stroke-width="2"/><circle cx="989.9305555555555" cy="120.8934258491113" r="5" fill="#2a9d5c" fill-opacity="0.4"/><text x="1073.125" y="402" text-anchor="middle" font-weight="bold">B27</text><line x1="1022.5694444444445" x2="1022.5694444444445" y1="128.31620953672555" y2="129.2112697661723" stroke="#1b6ec2" stroke-width="2"/><circle cx="1022.5694444444445" cy="128.76396310239244" r="3" fill="#1b6ec2" fill-opacity="1"/><line x1="1035.2083333333333" x2="1035.2083333333333" y1="123.43734407623622" y2="124.28135770524418" stroke="#1b6ec2" stroke-width="2"/><circle cx="1035.2083333333333" cy="123.85954743018893" r="4" fill="#1b6ec2" fill-opacity="0.7"/><line x1="1047.8472222222222" x2="1047.8472222222222" y1="103.97985114320338" y2="104.49886667148365" stroke="#1b6ec2" stroke-width="2"/><circle cx="1047.8472222222222" cy="104.23943014343877" r="5" fill="#1b6ec2" fill-opacity="0.4"/><line x1="1060.486111111111" x2="1060.486111111111" y1="98.79058402876336" y2="113.51541038583991" stroke="#d9822b" stroke-width="2"/><circle cx="1060.486111111111" cy="106.21057142977065" r="3" fill="#d9822b" fill-opacity="1"/><line x1="1073.125" x2="1073.125" y1="96.27685350805822" y2="111.97321561148016" stroke="#d9822b" stroke-width="2"/><circle cx="1073.125" cy="104.19017673867512" r="4" fill="#d9822b" fill-opacity="0.7"/><line x1="1085.763888888889" x2="1085.763888888889" y1="86.19738219471017" y2="105.81765482441651" stroke="#d9822b" stroke-width="2"/><circle cx="1085.763888888889" cy="96.10758679233498" r="5" fill="#d9822b" fill-opacity="0.4"/><line x1="1098.4027777777776" x2="1098.4027777777776" y1="143.23756789187087" y2="157.36378791316469" stroke="#2a9d5c" stroke-width="2"/><circle cx="1098.4027777777776" cy="150.35914991677845" r="3" fill="#2a9d5c" fill-opacity="1"/><line x1="1111.0416666666665" x2="1111.0416666666665" y1="135.80297758080894" y2="150.93367923642694" stroke="#2a9d5c" stroke-width="2"/><circle cx="1111.0416666666665" cy="143.43433955347948" r="4" fill="#2a9d5c" fill-opacity="0.7"/><line x1="1123.6805555555554" x2="1123.6805555555554" y1="105.99671227201057" y2="125.26531354363084" stroke="#2a9d5c" stroke-width="2"/><circle cx="1123.6805555555554" cy="115.73163232038911" r="5" fill="#2a9d5c" fill-opacity="0.4"/><circle cx="80" cy="438" r="5" fill="#1b6ec2"/><text x="90" y="442">split</text><circle cx="300" cy="438" r="5" fill="#d9822b"/><text x="310" y="442">stride-renew</text><circle cx="520" cy="438" r="5" fill="#2a9d5c"/><text x="530" y="442">split + stride-renew</text><text x="770" y="442" fill="#444">marker size grows with w (0, 0.1, 1)</text></svg>
+<h2>Figure 2. Distance remaining to matched rho</h2>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="420" font-family="DejaVu Sans, Arial" font-size="12"><rect width="100%" height="100%" fill="#fff"/><text x="70" y="22" font-size="15" font-weight="bold">Distance remaining: S(best k-sum arm) / S(matched rho-neg), before and after [pcc:unverified]</text><text x="70" y="42" fill="#444">Grey: cheaper of ksum4-p / ksum5-p (incumbent). Green: cheaper of ksum4-psr / ksum5-psr. Bars per row at w = 0, 0.1, 1. 1 = parity with rho.</text><line x1="70" x2="1140" y1="350" y2="350" stroke="#e3e3e3"/><text x="62" y="354" text-anchor="end">0</text><line x1="70" x2="1140" y1="313.75" y2="313.75" stroke="#c00"/><text x="62" y="317.75" text-anchor="end">1</text><line x1="70" x2="1140" y1="277.5" y2="277.5" stroke="#e3e3e3"/><text x="62" y="281.5" text-anchor="end">2</text><line x1="70" x2="1140" y1="241.25" y2="241.25" stroke="#e3e3e3"/><text x="62" y="245.25" text-anchor="end">3</text><line x1="70" x2="1140" y1="205" y2="205" stroke="#e3e3e3"/><text x="62" y="209" text-anchor="end">4</text><line x1="70" x2="1140" y1="168.75" y2="168.75" stroke="#e3e3e3"/><text x="62" y="172.75" text-anchor="end">5</text><line x1="70" x2="1140" y1="132.5" y2="132.5" stroke="#e3e3e3"/><text x="62" y="136.5" text-anchor="end">6</text><line x1="70" x2="1140" y1="96.25" y2="96.25" stroke="#e3e3e3"/><text x="62" y="100.25" text-anchor="end">7</text><line x1="70" x2="1140" y1="60" y2="60" stroke="#e3e3e3"/><text x="62" y="64" text-anchor="end">8</text><text x="136.875" y="372" text-anchor="middle" font-weight="bold">P20</text><rect x="85" y="168.1031465722687" width="16.291666666666668" height="181.8968534277313" fill="#9a9a9a"/><rect x="102.29166666666667" y="209.10463314535835" width="16.291666666666668" height="140.89536685464165" fill="#2a9d5c"/><text x="102.29166666666667" y="164.1031465722687" text-anchor="middle" font-size="9">0</text><rect x="119.58333333333334" y="163.40937226033378" width="16.291666666666668" height="186.59062773966622" fill="#9a9a9a"/><rect x="136.875" y="201.08037692229274" width="16.291666666666668" height="148.91962307770726" fill="#2a9d5c"/><text x="136.875" y="159.40937226033378" text-anchor="middle" font-size="9">0.1</text><rect x="154.16666666666669" y="140.83542521224882" width="16.291666666666668" height="209.16457478775118" fill="#9a9a9a"/><rect x="171.45833333333334" y="162.48901674139077" width="16.291666666666668" height="187.51098325860923" fill="#2a9d5c"/><text x="171.45833333333334" y="136.83542521224882" text-anchor="middle" font-size="9">1</text><text x="270.625" y="372" text-anchor="middle" font-weight="bold">P22</text><rect x="218.75" y="153.34441780009217" width="16.291666666666668" height="196.65558219990783" fill="#9a9a9a"/><rect x="236.04166666666666" y="189.8325621042376" width="16.291666666666668" height="160.1674378957624" fill="#2a9d5c"/><text x="236.04166666666666" y="149.34441780009217" text-anchor="middle" font-size="9">0</text><rect x="253.33333333333334" y="147.99218888474667" width="16.291666666666668" height="202.00781111525333" fill="#9a9a9a"/><rect x="270.625" y="181.69125036198437" width="16.291666666666668" height="168.30874963801563" fill="#2a9d5c"/><text x="270.625" y="143.99218888474667" text-anchor="middle" font-size="9">0.1</text><rect x="287.9166666666667" y="122.84448670125582" width="16.291666666666668" height="227.15551329874418" fill="#9a9a9a"/><rect x="305.20833333333337" y="143.43890982958902" width="16.291666666666668" height="206.56109017041098" fill="#2a9d5c"/><text x="305.20833333333337" y="118.84448670125582" text-anchor="middle" font-size="9">1</text><text x="404.375" y="372" text-anchor="middle" font-weight="bold">P24</text><rect x="352.5" y="153.6704643231982" width="16.291666666666668" height="196.3295356768018" fill="#9a9a9a"/><rect x="369.7916666666667" y="183.36187629814782" width="16.291666666666668" height="166.63812370185218" fill="#2a9d5c"/><text x="369.7916666666667" y="149.6704643231982" text-anchor="middle" font-size="9">0</text><rect x="387.0833333333333" y="146.44881702147347" width="16.291666666666668" height="203.55118297852653" fill="#9a9a9a"/><rect x="404.375" y="174.13494818143417" width="16.291666666666668" height="175.86505181856583" fill="#2a9d5c"/><text x="404.375" y="142.44881702147347" text-anchor="middle" font-size="9">0.1</text><rect x="421.6666666666667" y="112.23414077108521" width="16.291666666666668" height="237.7658592289148" fill="#9a9a9a"/><rect x="438.95833333333337" y="130.41966479677583" width="16.291666666666668" height="219.58033520322417" fill="#2a9d5c"/><text x="438.95833333333337" y="108.23414077108521" text-anchor="middle" font-size="9">1</text><text x="538.125" y="372" text-anchor="middle" font-weight="bold">B15</text><rect x="486.25" y="157.94842223071484" width="16.291666666666668" height="192.05157776928516" fill="#9a9a9a"/><rect x="503.5416666666667" y="249.2291427817512" width="16.291666666666668" height="100.7708572182488" fill="#2a9d5c"/><text x="503.5416666666667" y="153.94842223071484" text-anchor="middle" font-size="9">0</text><rect x="520.8333333333334" y="158.8010982617226" width="16.291666666666668" height="191.1989017382774" fill="#9a9a9a"/><rect x="538.125" y="244.1403564466604" width="16.291666666666668" height="105.8596435533396" fill="#2a9d5c"/><text x="538.125" y="154.8010982617226" text-anchor="middle" font-size="9">0.1</text><rect x="555.4166666666666" y="163.2825576390697" width="16.291666666666668" height="186.7174423609303" fill="#9a9a9a"/><rect x="572.7083333333333" y="217.3949239360883" width="16.291666666666668" height="132.6050760639117" fill="#2a9d5c"/><text x="572.7083333333333" y="159.2825576390697" text-anchor="middle" font-size="9">1</text><text x="671.875" y="372" text-anchor="middle" font-weight="bold">B18</text><rect x="620" y="164.85335489980562" width="16.291666666666668" height="185.14664510019438" fill="#9a9a9a"/><rect x="637.2916666666666" y="245.4816598580207" width="16.291666666666668" height="104.51834014197931" fill="#2a9d5c"/><text x="637.2916666666666" y="160.85335489980562" text-anchor="middle" font-size="9">0</text><rect x="654.5833333333334" y="164.57488659428648" width="16.291666666666668" height="185.42511340571352" fill="#9a9a9a"/><rect x="671.875" y="239.37118384720193" width="16.291666666666668" height="110.62881615279807" fill="#2a9d5c"/><text x="671.875" y="160.57488659428648" text-anchor="middle" font-size="9">0.1</text><rect x="689.1666666666666" y="163.16037054954302" width="16.291666666666668" height="186.83962945045698" fill="#9a9a9a"/><rect x="706.4583333333333" y="210.26944624339671" width="16.291666666666668" height="139.73055375660329" fill="#2a9d5c"/><text x="706.4583333333333" y="159.16037054954302" text-anchor="middle" font-size="9">1</text><text x="805.625" y="372" text-anchor="middle" font-weight="bold">B21</text><rect x="753.75" y="170.48125306770356" width="16.291666666666668" height="179.51874693229644" fill="#9a9a9a"/><rect x="771.0416666666666" y="210.13369313217314" width="16.291666666666668" height="139.86630686782686" fill="#2a9d5c"/><text x="771.0416666666666" y="166.48125306770356" text-anchor="middle" font-size="9">0</text><rect x="788.3333333333334" y="165.8561647700127" width="16.291666666666668" height="184.1438352299873" fill="#9a9a9a"/><rect x="805.625" y="202.19529306622854" width="16.291666666666668" height="147.80470693377146" fill="#2a9d5c"/><text x="805.625" y="161.8561647700127" text-anchor="middle" font-size="9">0.1</text><rect x="822.9166666666666" y="143.6459218499685" width="16.291666666666668" height="206.3540781500315" fill="#9a9a9a"/><rect x="840.2083333333333" y="164.07411947714223" width="16.291666666666668" height="185.92588052285777" fill="#2a9d5c"/><text x="840.2083333333333" y="139.6459218499685" text-anchor="middle" font-size="9">1</text><text x="939.375" y="372" text-anchor="middle" font-weight="bold">B24</text><rect x="887.5" y="159.40867868351685" width="16.291666666666668" height="190.59132131648315" fill="#9a9a9a"/><rect x="904.7916666666666" y="192.8250715850086" width="16.291666666666668" height="157.1749284149914" fill="#2a9d5c"/><text x="904.7916666666666" y="155.40867868351685" text-anchor="middle" font-size="9">0</text><rect x="922.0833333333334" y="154.4876108978977" width="16.291666666666668" height="195.5123891021023" fill="#9a9a9a"/><rect x="939.375" y="182.41762372433857" width="16.291666666666668" height="167.58237627566143" fill="#2a9d5c"/><text x="939.375" y="150.4876108978977" text-anchor="middle" font-size="9">0.1</text><rect x="956.6666666666666" y="131.22293339085547" width="16.291666666666668" height="218.77706660914453" fill="#9a9a9a"/><rect x="973.9583333333333" y="146.4739536136633" width="16.291666666666668" height="203.5260463863367" fill="#2a9d5c"/><text x="973.9583333333333" y="127.22293339085547" text-anchor="middle" font-size="9">1</text><text x="1073.125" y="372" text-anchor="middle" font-weight="bold">B27</text><rect x="1021.25" y="142.15105803368652" width="16.291666666666668" height="207.84894196631348" fill="#9a9a9a"/><rect x="1038.5416666666667" y="169.90762627807587" width="16.291666666666668" height="180.09237372192413" fill="#2a9d5c"/><text x="1038.5416666666667" y="138.15105803368652" text-anchor="middle" font-size="9">0</text><rect x="1055.8333333333333" y="135.9813586266867" width="16.291666666666668" height="214.0186413733133" fill="#9a9a9a"/><rect x="1073.125" y="161.5514502980993" width="16.291666666666668" height="188.4485497019007" fill="#2a9d5c"/><text x="1073.125" y="131.9813586266867" text-anchor="middle" font-size="9">0.1</text><rect x="1090.4166666666667" y="107.14220108729704" width="16.291666666666668" height="242.85779891270295" fill="#9a9a9a"/><rect x="1107.7083333333335" y="122.49199867554321" width="16.291666666666668" height="227.50800132445679" fill="#2a9d5c"/><text x="1107.7083333333335" y="103.14220108729704" text-anchor="middle" font-size="9">1</text></svg>
+<h2>Step 1 phase breakdown and protocol</h2>
+<h1
+id="protocol-k-sum-split1-pair-sum-build-and-targetsstride-renew-against-the-pruned-incumbent-pccunverified">Protocol:
+k-sum <code>split=1</code> (pair-sum build) and
+<code>targets=stride-renew</code> against the pruned incumbent
+<code>[pcc:unverified]</code></h1>
+<p><strong>Track: generic decomposition (bounded by sqrt(r); cannot beat
+rho or BSGS).</strong> Nothing here moves the algebraic track.</p>
+<h2 id="1-baseline-phase-breakdown-and-levers">1. Baseline, phase
+breakdown and levers</h2>
+<p><strong>Baseline (incumbent).</strong> The pruned k-sum pipeline of
+<code>research/ic_ksum_prune_20261115</code> (validated,
+VAL-20261115-276156): <code>ic.pipeline</code> with
+<code>oracle = ksum:m=&lt;k&gt;,prune=1</code>, the factor bases of that
+study, default target source <code>walk</code>, k = 4 and 5.</p>
+<p><strong>Phase breakdown (step 1; prior data only).</strong>
+<code>analysis/phases.mjs</code> reads the prune study's committed
+sessions (measured rounds, 432 runs per row and arm) and splits the
+counted cost S (w = 0) of <code>ksum5-p</code> / <code>ksum4-p</code>
+(<code>analysis/phases.json</code>):</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">phase</th>
+<th style="text-align: right;">share of S, ksum5-p (8 rows)</th>
+<th style="text-align: right;">share of S, ksum4-p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">table build (<code>oracle_setup</code>
+adds)</td>
+<td style="text-align: right;">29-55 %</td>
+<td style="text-align: right;">22-53 %</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">walk steps (one add a trial)</td>
+<td style="text-align: right;">13-55 %</td>
+<td style="text-align: right;">16-49 %</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">walk set-up and restarts (16 jumps, start,
+pooled offsets: about 48 scalar multiplications a run)</td>
+<td style="text-align: right;">5-47 %</td>
+<td style="text-align: right;">5-52 %</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">probe confirmations, linear algebra,
+factor base, verify</td>
+<td style="text-align: right;">at most 4 %</td>
+<td style="text-align: right;">at most 4 %</td>
+</tr>
+</tbody>
+</table>
+<p>The set-up share is largest on the small rows (B15 47 %, B18 45 %),
+where 48 scalar multiplications are large against sqrt(r).</p>
+<p><strong>Lever A (new code, commit fc0babc73e):
+<code>split=1</code>.</strong>
+<code>KSumTable::build_negation_folded_split</code> forms every k-sum as
+its (k-2)-summand prefix plus one precomputed pair sum
+<code>P_j + P_l</code> (two additions per abscissa pair; the other sign
+patterns are negatives). The <code>2^{k-2} C(a-1, k-1)</code> partial
+sums of level k-1 are never formed; the pair table costs
+<code>2 C(a-k+2, 2)</code> adds. Same visiting order and identity skips:
+identical table, keys, inserts and collisions (unit tests
+<code>split_build_is_the_same_table_with_fewer_adds</code>,
+<code>split_runs_are_identical_but_for_fewer_setup_adds</code>). Default
+off. Real group additions removed from the build, not an accounting
+change; the pair table is a vector indexed by point pair (memory reads,
+as the base's own point reads, not counted by either arm).</p>
+<p><strong>Lever B (existing option):
+<code>targets=stride-renew</code>.</strong> The pipeline's existing
+target source <code>R &lt;- R + S</code>, <code>S &lt;- S + T</code>
+after each relation (<code>TargetSource::StrideRenew</code>): three
+draws of <code>[a]G + [b]Q</code> (S, T, R0; 6 scalar multiplications)
+instead of the walk's 16 jumps, start and pooled restarts, and no
+self-collision restarts (<code>R0 + kS</code> repeats only after r
+steps). One addition a trial, as the walk. A different target stream:
+outputs are not identical, so this lever is tested on verified answers
+and paired cost.</p>
+<p><strong>Questions.</strong> (Q1) Is <code>split=1</code> cheaper than
+the incumbent, row by row, at every weight of the section 5a band, with
+identical outputs? (Q2) Is the combined pipeline (<code>split=1</code> +
+<code>stride-renew</code>) cheaper than the incumbent, row by row, at
+every weight?</p>
+<p><em>Sources checked (research-kb MCP server and lead atlas
+unavailable in this container):</em>
+<code>research/ic_ksum_prune_20261115/</code> (PROTOCOL, README,
+summary.json, sessions, validator/VALIDATION.json),
+<code>research/ksum_m67_pilot_20261115/</code> (m = 6/7 null, named by
+the caller), <code>src/cryptanalysis/ic_boundary.rs</code>
+(<code>KSumTable</code>, <code>collect_relations</code> target sources),
+<code>src/cryptanalysis/ ic_framework/stages.rs</code>
+(<code>Targets</code>),
+<code>src/cryptanalysis/ic_framework/mod.rs</code> test
+<code>the_strides_recover_the_logarithm_without_a_jump_table</code>.</p>
+<h2 id="2-design">2. Design</h2>
+<p><strong>Rows.</strong> The eight curves of the prune study
+(<code>rows.mjs</code>): P20, P22, P24
+(<code>icv1-fp20-t1293-3c2999ba</code>,
+<code>icv1-fp22-tm1267-a5acaf6d</code>,
+<code>icv1-fp24-t1577-77336155</code>), B15, B18, B21, B24, B27
+(<code>icv1-f2m15-t131-ed7256f0</code>,
+<code>icv1-f2m18-t393-d2c04152</code>,
+<code>icv1-f2m21-t2591-de54d72e</code>,
+<code>icv1-f2m24-tm3047-2d0c0e8c</code>,
+<code>icv1-f2m27-t12543-569dca8b</code>). 3 replicate sessions per row,
+24 sessions, <code>specs/&lt;row&gt;-r&lt;1..3&gt;.json</code> written
+by <code>make_specs.mjs</code>: curve, <code>targets_per_curve</code> =
+48, 3 measured rounds, 1 warm-up, order <code>alternate</code>,
+isolation L0, timeout and factor-base sizes copied from the prune
+study's spec of the same name (not re-tuned). <strong>Fresh
+seeds:</strong> <code>target_seed = 20261118000 + idx</code>,
+measurement <code>seed = 20261118500 + idx</code>,
+<code>idx = 10 * (row index in rows.mjs) + rep</code> (public targets
+never used before).</p>
+<p><strong>Arms</strong> (same curve, targets and algorithm seed per
+round for every arm): <code>rho-neg</code> (reference),
+<code>rho-neg-aa</code> (control), and for k in {4, 5}:
+<code>ksum&lt;k&gt;-p</code> (incumbent:
+<code>ksum:m=&lt;k&gt;,prune=1</code>, walk),
+<code>ksum&lt;k&gt;-ps</code>
+(<code>ksum:m=&lt;k&gt;,prune=1,split=1</code>, walk),
+<code>ksum&lt;k&gt;-pr</code> (<code>ksum:m=&lt;k&gt;,prune=1</code>,
+<code>targets=stride-renew</code>), <code>ksum&lt;k&gt;-psr</code>
+(<code>ksum:m=&lt;k&gt;,prune=1,split=1</code>,
+<code>targets=stride-renew</code>). <code>max_trials</code> 13528399621
+as in the prune study.</p>
+<p><strong>Binary.</strong> <code>ecbench</code> built with
+<code>cargo build --release --locked --bin ecbench</code> in a clean
+worktree of commit fc0babc73e plus the working-tree fix of the broken
+merge 833a35d21e in <code>src/cryptanalysis/f4_fp.rs</code> (duplicate
+<code>VisitReport</code> fields; HEAD does not compile without it; patch
+<code>f4_fp_mergefix.diff</code>, sha256
+<code>c73f69e6c2c8823308475d137c3032762082d6a217e1b04ebe98e20f1f17d5f0</code>,
+touches no code path of these arms). Binary sha256
+<code>5fea35b044291caf8c001706bdec3f48404418b70af78aa59f210c8ecfdaf149</code>
+(<code>BINARY.sha256</code>); <code>run_all.sh</code> refuses any other
+binary. <strong>Route.</strong> Local, <code>--cpus none</code>,
+isolation L0, counted cost only, one session at a time under
+<code>/tmp/crypto-bench.lock</code>. Deviation from the default
+isolab-eks route: no EKS or S3 access in this container (AWS token
+rejected, checkpoint token expired); counted cost does not depend on the
+host; wall time is not claimed. <strong>Verification.</strong>
+<code>ecbench verify --dir &lt;session&gt; --replay-all --exit-code</code>
+on every session, same binary, same host. Budget: at most 3 CPU-hours in
+total.</p>
+<p><strong>Pilot.</strong> None. No value of any run of this study
+enters this protocol; predictions come from the prune study's committed
+data.</p>
+<h2
+id="3-registered-tests-agentsmd-section-5a-band-w--0-01-1-gae-per-unpriced-native-operation">3.
+Registered tests (AGENTS.md section 5a band: w = 0, 0.1, 1 GAE per
+unpriced native operation)</h2>
+<p>For a row, k and candidate X,
+<code>R_w(X) = cost(X) / cost(ksum&lt;k&gt;-p)</code>, paired by target
+and round:
+<code>ecbench compare --dir &lt;the 3 sessions&gt; --a ksum&lt;k&gt;-p --b X --weight w --resamples 4000 --seed 20261118</code>
+(the printed <code>ratio_b_over_a</code>), and the same per replicate
+session. Upper end = the larger of the linearised-t and bootstrap 95 %
+upper ends.</p>
+<p><strong>T1 (primary, Q1): X = <code>ksum5-ps</code>; secondary
+<code>ksum4-ps</code>.</strong> Holds on a row if the upper end of
+<code>R_w</code> is below 1 at w = 0, 0.1, 1, pooled and in each of the
+3 replicate sessions, and the paired A/A gate holds
+(<code>1 - max_w upper &gt; max_w |R_aa(w) - 1|</code>,
+<code>R_aa</code> = <code>rho-neg-aa</code> over <code>rho-neg</code>,
+expected exactly 1). <strong>Correctness (every target, every round
+incl. warm-up, every session;
+<code>analysis/correctness.mjs</code>):</strong>
+<code>ksum&lt;k&gt;-ps</code> equals <code>ksum&lt;k&gt;-p</code> in
+outcome status and recovered log, <code>counters</code>,
+<code>factor_base</code>, every phase's <code>native</code> and
+<code>work_native</code>, every phase except <code>oracle_setup</code>
+in adds, doubles, scalar multiplications and GAE, the
+<code>oracle_setup</code> doubles, scalar multiplications,
+<code>native</code> and <code>work_native</code>; and the
+<code>oracle_setup</code> adds of <code>-ps</code> are below those of
+<code>-p</code> by at most
+<code>2^{k-2} C(a-1, k-1) - 2 C(a-k+2, 2)</code> (equal when no partial
+sum is the identity). Any other difference is a failure.</p>
+<p><strong>T2 (primary, Q2): X = <code>ksum5-psr</code>; secondary
+<code>ksum4-psr</code>.</strong> Same rule (pooled and per replicate,
+all three weights, A/A gate). Correctness: every run of every arm
+verified (<code>outcome.status = verified</code>,
+<code>matches_target</code>).</p>
+<p><strong>Attribution (reported, not a gate):</strong>
+<code>R_w(ksum&lt;k&gt;-pr)</code> and
+<code>cost(ksum&lt;k&gt;-psr) / cost(ksum&lt;k&gt;-pr)</code>.</p>
+<p><strong>Best against best (reported, the leaderboard
+reading):</strong> per row and weight, the incumbent is the cheaper
+(mean S, this study) of <code>ksum4-p</code> and <code>ksum5-p</code>,
+the candidate the cheaper of <code>ksum4-psr</code> and
+<code>ksum5-psr</code>; their paired ratio by
+<code>ecbench compare</code> (the selection of the cheaper arm by point
+estimate is stated next to it). <strong>Distance remaining (not a
+gate):</strong> <code>S(arm) / S(rho-neg)</code> per weight for every
+k-sum arm, and <code>ecbench band --ranks</code> per row.</p>
+<p><strong>Multiplicity.</strong> Two primary questions (T1, T2 at k =
+5); a row counts toward an "all rows" verdict only when it holds; the
+Holm-adjusted reading (each primary test at 97.5 %) is reported beside
+the 95 % verdict when the two differ.</p>
+<p><strong>Predictions</strong> (director's, from
+<code>analysis/predictions.json</code>, fixed before data):
+<code>R_0(ksum5-ps)</code> = 0.91-0.94 by row (the closed-form saved
+adds over the incumbent's S), <code>R_0(ksum4-ps)</code> = 0.94-0.97;
+<code>R_0(ksum5-psr)</code> = 0.52 (B15, B18 ~0.52-0.56), 0.77-0.87
+elsewhere; <code>R_1</code> closer to 1 for split (native work
+unchanged), not necessarily for stride-renew (it also removes the walk's
+step hashes). A prediction holds if the observed <code>R_0</code> lies
+within +/- 0.03 (split) or +/- 0.06 (stride-renew combined) of the row's
+value.</p>
+<p><strong>Verdict booleans (summary.json):</strong>
+<code>split5_holds_all_rows</code>, <code>split4_holds_all_rows</code>,
+<code>combined5_holds_all_rows</code>,
+<code>combined4_holds_all_rows</code>, the row lists,
+<code>correctness_ok</code> (T1), <code>all_verified</code> (T2),
+<code>all_sessions_verified</code>.</p>
+<p><strong>Not claimed:</strong> wall time, scaling beyond these curves,
+an algebraic-track result, a security statement, any ranking against
+tables A and C. All numbers <code>[pcc:unverified]</code> until an
+independent validator's report and <code>VALIDATION.json</code> exist; a
+leaderboard component section is added only if T1 or T2 holds and the
+validation gate is met.</p>
+<h2 id="4-landing">4. Landing</h2>
+<p>Study directory with README.md, summary.json, results.md, graph (SVG
++ PNG), report.pdf;
+<code>benchmarks/&lt;date&gt;-ksum-split-stride-tableb/</code> and a
+<code>benchmarks/README.md</code> row; <code>benchmarks/records/</code>
+record (<code>tools/benchrec.py</code>) and regenerated
+<code>benchmarks/progress/</code>; on a win a validator report,
+<code>VALIDATION.json</code> and a component section in
+<code>scripts/build_ic_leaderboard.py</code>. Session directories
+committed as in the prune study (the validator replays them by path). No
+push, no PR (the caller pushes).</p>
+<h2 id="amendment-a1-2026-11-18-before-any-session-ran">Amendment A1
+(2026-11-18, before any session ran)</h2>
+<p>The first launch stopped at <code>run_all.sh</code>'s binary check,
+before any session: the check compared both lines of
+<code>BINARY.sha256</code> against the binary's hash. The check now
+reads the first line only (<code>head -1</code>). No session, spec, arm,
+test or prediction changed; <code>REGISTRATION.sha256</code> is
+re-written for <code>run_all.sh</code> and this file
+(<code>REGISTRATION.A1.sha256</code>).</p>
+<h2
+id="amendment-a2-2026-11-18-before-any-session-produced-data">Amendment
+A2 (2026-11-18, before any session produced data)</h2>
+<p>The second launch held <code>/tmp/crypto-bench.lock</code> with an
+outer <code>flock</code>, and <code>ecbench run</code> takes the same
+lock itself, so every session refused to start (exit 2, no records; the
+partial <code>data/</code> and <code>sessions/</code> were deleted).
+<code>run_all.sh</code> now runs without the outer <code>flock</code>
+and passes <code>--wait</code> to <code>ecbench run</code>, which queues
+on the lock. Nothing else changed
+(<code>REGISTRATION.A2.sha256</code>).</p>
+<h2
+id="amendment-a3-2026-11-18-binary-replaced-no-cost-data-read">Amendment
+A3 (2026-11-18, binary replaced; no cost data read)</h2>
+<p>The third launch ran all 24 sessions with binary
+<code>5fea35b0…</code>: every <strong>binary-curve</strong> k-sum arm
+(incumbent included) ended
+<code>error: oracle ksum does not run on a binary curve</code> (5 rows x
+8 arms x 576 runs), because the merge 833a35d21e dropped the
+<code>ksum</code> and <code>ksum-frobenius</code> arms from the binary
+<code>ic.pipeline</code> oracle match (present at 3a9e85e644, where the
+prune study's binary was built). Commit e93c3cb2da restores the two
+lines verbatim. Only the status counts of that launch were read
+(<code>launch-a2-binary-oracle-missing/status-counts.json</code>,
+<code>runlog.tsv</code>, <code>verify.txt</code>); its sessions were
+deleted unread and the study is re-run in full. <strong>New
+binary:</strong>
+<code>cargo build --release --locked --bin ecbench</code> in a clean
+worktree of e93c3cb2da (which also contains the committed f4_fp.rs merge
+fix 1b9590d88e, so <code>f4_fp_mergefix.diff</code> is no longer
+applied), sha256
+<code>808511395723f84505d4fe8edaf32e66e8d8bff34cdad57777360c5999ffe161</code>
+(<code>BINARY.sha256</code>). Commits between fc0babc73e and e93c3cb2da
+touch <code>f4_fp.rs</code>, <code>compact-orbit-scan</code> (Koblitz
+base) and this study only: no code path of these arms. Specs, arms,
+seeds, tests and predictions unchanged
+(<code>REGISTRATION.A3.sha256</code>).</p>
+<h2
+id="amendment-a4-2026-11-18-container-restart-during-the-run-no-cost-data-read">Amendment
+A4 (2026-11-18, container restart during the run; no cost data
+read)</h2>
+<p>The container restarted during the A3 launch and killed it: 23
+sessions had completed (<code>launch-a3-interrupted/runlog.tsv</code>);
+B27-r3 stopped at 928 of 1,920 records (status <code>interrupted</code>,
+<code>launch-a3-interrupted/B27-r3.status.json</code>) and no session
+had been verified. Each session is an independent, self-contained
+measurement unit with its own seeds, so the 23 complete sessions are
+kept; the interrupted B27-r3 was deleted unread and re-run from its spec
+under a fresh <code>benchrec.py run</code> with the same binary
+(<code>run_all.sh</code> skips complete sessions), then all 24 sessions
+are verified with <code>--replay-all</code>. Raw session trees live
+outside Git (disk limit; <code>sessions/</code> is a local link, not
+committed): the committed evidence is the gzipped verify reports, the
+analysis outputs and the per-session digests in
+<code>data/sessions.sha256</code>.</p>
+</body></html>
