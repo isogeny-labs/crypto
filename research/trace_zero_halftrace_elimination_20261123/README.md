@@ -38,3 +38,9 @@ The [locked workspace](native/Cargo.toml) imports actual production numerical mo
 ## Sources and next lead
 
 KB unavailable: wrapper127 and no loaded MCP. Read actual cache/compact-field sources and baseline profile. [FLINT Lemma5](https://flintlib.org/doc/algorithms/multivariate/modp-factoring.html) supplies Artin–Schreier image/kernel and linearity. Normalized inversion is established linear algebra; no novelty claim. Next measure repeated compact-map construction/cache access under a separately frozen warmed-oracle boundary, addressing the observed oracle penalty. Existing earlier-study ratios are not compounded.
+
+
+Artifact transport: source-freeze [run45247559161](https://github.com/isogeny-labs/crypto/actions/runs/45247559161) failed its original authenticated HeadObject operation with403 Forbidden. [Exact log](checks/artifact-autofix-source-freeze.txt), [continuing infrastructure record](../../problems/ecc2k-adjoint-artifact-store-upload.md). A403 establishes neither object absence nor custody; no bypass or identity change was attempted. [pcc:unverified]
+
+
+Historical leaderboard regeneration was attempted with unchanged gates and exact restored inputs. It refuses pre-existing E27 validator tolerances; E30/E32 also fail the current tolerance contract. [Observed failures](checks/leaderboard-existing-gate-failure.json), [continuing problem](../../problems/ic-leaderboard-historical-tolerances.md). No leaderboard output or historical evidence was changed, and no new row was admitted. [pcc:unverified]
