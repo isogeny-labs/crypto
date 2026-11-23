@@ -1,0 +1,43 @@
+name: Rootfind Round 136 source-exact Rust A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-round136-cipolla-p3guard-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round136/**
+      - .github/workflows/rootfind_round136.yml
+permissions:
+  contents: read
+jobs:
+  native-source-exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round134
+            research/rootfind_round135
+            research/rootfind_round136
+      - name: Compile source-exact production baseline and optimized modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin automation/rootfind-round135-atkin-p5mod8-20261123
+          mkdir -p /tmp/rootfind_round136
+          git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round136/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round136/optimized.rs
+          for target in baseline optimized; do
+            cat research/rootfind_round134/bench_helper.rs >> "/tmp/rootfind_round136/${target}.rs"
+            cat research/rootfind_round135/bench_helper.rs >> "/tmp/rootfind_round136/${target}.rs"
+            cat research/rootfind_round136/bench_helper.rs >> "/tmp/rootfind_round136/${target}.rs"
+          done
+          cp research/rootfind_round136/source_exact_main.rs /tmp/rootfind_round136/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round136/main.rs -o /tmp/rootfind_round136/bench
+      - name: Independent Euler/root oracles and 13 alternating A/B trials
+        run: /tmp/rootfind_round136/bench

@@ -1,0 +1,13 @@
+digraph actual {
+ graph [rankdir=LR, bgcolor="white", pad="0.12", ranksep="0.8", nodesep="0.5", fontname="DejaVu Sans", fontsize=13, label="Actual rational divisor maps; finite qualification, unsigned", labelloc=t];
+ node [shape=box, style="rounded,filled", fillcolor="#edf3f9", color="#34536d", fontname="DejaVu Sans", fontsize=12, margin="0.15,0.1"];
+ edge [fontname="DejaVu Sans", fontsize=11, color="#34536d"];
+ c [label="Jac(C) / F3\ny^2=x^6+x^5+x^2+1\n21 rational classes"];
+ a [label="Jac(C0) / F3\ny^2=x^6+x^5+x^3+x^2+1\n21 classes; unique stable dual"];
+ b [label="Jac(C2) / F3\ny^2=2x^6+x^5+2x^3+x^2+1\n21 classes; unique stable dual"];
+ c -> a [label="Richelot 0: 21/21 bijection\n441 addition pairs"];
+ a -> c [label="raw dual: 21/21 bijection\ncomposite exactly -[2]", color="#99612f"];
+ c -> b [label="Richelot 2: 21/21 bijection\n441 addition pairs"];
+ b -> c [label="raw dual: 21/21 bijection\ncomposite exactly -[2]", color="#99612f"];
+ a -> b [style=dashed, color="#89939e", label="F3 model-isomorphism check\nprospective; not evaluated here", constraint=false];
+}

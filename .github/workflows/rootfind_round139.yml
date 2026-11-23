@@ -1,0 +1,40 @@
+name: Rootfind Round 139 source-exact Rust A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-round139-even-quartic-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round139/**
+      - .github/workflows/rootfind_round139.yml
+permissions:
+  contents: read
+jobs:
+  native-source-exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round139
+      - name: Compile baseline and optimized production Rust code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin automation/rootfind-round138-sparse-kernels-20261123
+          mkdir -p /tmp/rootfind_round139
+          git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round139/baseline.rs
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round139/optimized.rs
+          for target in baseline optimized; do
+            cat research/rootfind_round139/bench_helper.rs >> "/tmp/rootfind_round139/${target}.rs"
+          done
+          cp research/rootfind_round139/source_exact_main.rs /tmp/rootfind_round139/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round139/main.rs -o /tmp/rootfind_round139/bench
+      - name: Brute-force root oracle and source-exact paired A/B
+        shell: bash
+        run: /tmp/rootfind_round139/bench

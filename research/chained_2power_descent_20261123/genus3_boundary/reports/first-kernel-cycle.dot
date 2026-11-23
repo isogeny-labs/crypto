@@ -1,0 +1,11 @@
+digraph first_kernels {
+  graph [rankdir=LR, bgcolor="white", pad="0.12", nodesep="0.55", ranksep="0.55"];
+  node [shape=box, style="rounded,filled", color="#315778", fillcolor="#eef4f8", fontname="DejaVu Sans", fontsize=10, margin="0.14,0.12"];
+  edge [color="#315778", fontname="DejaVu Sans", fontsize=9, arrowsize=0.8];
+  L0 [label="L0\n3000030000300003"];
+  L1 [label="L1\n5000050000500005"];
+  L2 [label="L2\n9000090000900009"];
+  L0 -> L1 [label="Frobenius"];
+  L1 -> L2 [label="Frobenius"];
+  L2 -> L0 [label="Frobenius", constraint=false];
+}

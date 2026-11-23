@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T17:01:17Z",
+ "id": "PCC-20261123-bfa51a",
+ "kind": "statement",
+ "producer": {
+  "commit": "7e58383e2a007acbca7a16ea8a0d0e40d0e45d98",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/SIGNING_REPLAY.md",
+    "sha256": "6925dee512d28e7b945aad3ae3cb9c91ec5e6925064696774731f4018882b478"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/SIGNING_REPLAY.pdf",
+    "sha256": "411767e41ad66c6665711809e76fc9feccabf87b845a903df359e96903fc53d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/signing.py",
+    "sha256": "74f5d8b932e63b116e8aef012d9cd1b3422b69841c53becccf306ebaba2fe9b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/signing.svg",
+    "sha256": "291de88d9bcbccf5493cf21f3ad484d0110b1b10ae97d04c63aa5c17d5d90693"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/signing.png",
+    "sha256": "1b9b99f284b9d799ba0190df668e6638476ebb3fcd8029791aa5565108406073"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/evidence/main-manifest-bindings.json",
+    "sha256": "a6f4989913b0346ee2a33afb50b13c4933f9905fed3b3e32b89cd59348a6b02f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-admission-and-closure",
+ "statement": "Main signing replay successor report retains passing fixed replay, successful ZIP byte recovery and33 exact source/input/binary/record manifest matches. Main-only signer fails closed with existing secret unset; reports are unsigned and proof preview has no content errors. One-page PDF and workflow diagram inspected, no new collection or admitted performance result."
+}
