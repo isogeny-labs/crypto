@@ -1,0 +1,7 @@
+UTC trigger: 2026-11-23T17:16:42Z
+Source: scheduled Assess relation finding benchmark
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen synthetic Koblitz GF(2^23), a=0, m=2 (not ECC2K-130)
+Baseline: results/relation_baseline.json
+Anomaly threshold: >20% deviation in relations/sec or success rate, or execution failure
+Output: results/hourly_log.csv, commit to hourly-runs; open GitHub issue on anomaly
