@@ -375,9 +375,88 @@ fn mul_into(r: &mut [u64], a: &[u64], b: &[u64]) {
     }
 }
 
+/// Operand length (in limbs) below which `sqr_limbs` uses the quadratic loop.
+pub const SQR_KARATSUBA_LIMBS: usize = 48;
+
+/// `r = a^2` for zeroed `r` of length `2*a.len()`: off-diagonal products
+/// once, doubled, plus the diagonal squares.
+fn sqr_schoolbook_into(r: &mut [u64], a: &[u64]) {
+    let n = a.len();
+    debug_assert_eq!(r.len(), 2 * n);
+    for i in 0..n.saturating_sub(1) {
+        let x = a[i];
+        if x == 0 {
+            continue;
+        }
+        let row = &mut r[2 * i + 1..i + n + 1];
+        let mut c = 0u64;
+        for (rj, &y) in row.iter_mut().zip(&a[i + 1..]) {
+            let s = *rj as u128 + x as u128 * y as u128 + c as u128;
+            *rj = s as u64;
+            c = (s >> 64) as u64;
+        }
+        r[i + n] = c;
+    }
+    let mut top = 0u64;
+    for v in r.iter_mut() {
+        let next = *v >> 63;
+        *v = (*v << 1) | top;
+        top = next;
+    }
+    debug_assert_eq!(top, 0);
+    let mut c = 0u64;
+    for (i, &x) in a.iter().enumerate() {
+        let sq = x as u128 * x as u128;
+        let lo = r[2 * i] as u128 + (sq as u64) as u128 + c as u128;
+        r[2 * i] = lo as u64;
+        let hi = r[2 * i + 1] as u128 + (sq >> 64) + (lo >> 64);
+        r[2 * i + 1] = hi as u64;
+        c = (hi >> 64) as u64;
+    }
+    debug_assert_eq!(c, 0);
+}
+
+/// Karatsuba squaring, `r = a^2`, `r` zeroed of length `2*a.len()`.
+fn sqr_karatsuba_into(r: &mut [u64], a: &[u64]) {
+    let n = a.len();
+    if n < SQR_KARATSUBA_LIMBS {
+        sqr_schoolbook_into(r, a);
+        return;
+    }
+    let h = n / 2;
+    let (a0, a1) = a.split_at(h);
+    let (low, high) = r.split_at_mut(2 * h);
+    sqr_karatsuba_into(low, a0);
+    sqr_karatsuba_into(high, a1);
+    let mut sum = a1.to_vec();
+    let carry = add_into(&mut sum, a0);
+    sum.push(carry);
+    let sum = trim(&sum);
+    let mut mid = vec![0u64; 2 * sum.len()];
+    sqr_karatsuba_into(&mut mid, sum);
+    sub_into(&mut mid, &r[..2 * h]);
+    sub_into(&mut mid, &r[2 * h..]);
+    let carry = add_into(&mut r[h..], trim(&mid));
+    debug_assert_eq!(carry, 0);
+}
+
+/// Exact square of a little-endian limb slice (length `2*a.len()`, not
+/// normalized).
+pub fn sqr_limbs(a: &[u64]) -> Vec<u64> {
+    let mut r = vec![0u64; 2 * a.len()];
+    if !a.is_empty() {
+        sqr_karatsuba_into(&mut r, a);
+    }
+    r
+}
+
 /// Exact product of little-endian limb slices (length `a.len()+b.len()`,
-/// not normalized). Karatsuba above `KARATSUBA_LIMBS`.
+/// not normalized). Karatsuba above `KARATSUBA_LIMBS`; equal operands use
+/// `sqr_limbs`.
 pub fn mul_limbs(a: &[u64], b: &[u64]) -> Vec<u64> {
+    if a == b {
+        return sqr_limbs(a);
+    }
     let mut r = vec![0u64; a.len() + b.len()];
     if !a.is_empty() && !b.is_empty() {
         mul_into(&mut r, a, b);
@@ -616,6 +695,24 @@ mod mul_tests {
                     let b = fixture(y, 0x2545_f491_4f6c_dd1d ^ y as u64, dense);
                     assert_eq!(a.mul(&b), a.mul_schoolbook(&b), "{x}x{y} dense={dense}");
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn squaring_matches_schoolbook() {
+        for n in [0, 1, 2, 3, 47, 48, 49, 95, 96, 97, 130, 255, 256, 257, 700] {
+            for dense in [false, true] {
+                let a = fixture(n, 0x1234_5678 ^ n as u64, dense);
+                let mut r = vec![0u64; 2 * a.0.len()];
+                sqr_schoolbook_into(&mut r, &a.0);
+                assert_eq!(Big::norm(r), a.mul_schoolbook(&a), "schoolbook {n} {dense}");
+                assert_eq!(
+                    Big::norm(sqr_limbs(&a.0)),
+                    a.mul_schoolbook(&a),
+                    "{n} {dense}"
+                );
+                assert_eq!(a.mul(&a.clone()), a.mul_schoolbook(&a), "mul {n} {dense}");
             }
         }
     }

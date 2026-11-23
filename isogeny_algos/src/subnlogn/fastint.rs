@@ -63,17 +63,55 @@ pub fn multiply_with_work(a: &Big, b: &Big) -> (Big, Work) {
         work.schoolbook_leaves = 1;
         return (a.mul(b), work);
     }
-    let n = top_ring_bits(bits);
-    // a*b < 2^bits <= 2^n, so the modular result is the ordinary product.
-    let value = multiply_mod_with(a, b, n, LEAF_BITS, &mut work);
+    let value = multiply_top(a, b, bits, LEAF_BITS, &mut work);
     (value, work)
 }
 
-/// Smallest multiple of a power-of-two granule near sqrt(bits) that is >= bits.
-fn top_ring_bits(bits: usize) -> usize {
-    let granule = pow2_floor(bits.isqrt()).max(64);
-    bits.checked_next_multiple_of(granule)
-        .expect("product length overflow")
+/// Exact product through one top-level Fermat node whose ring size n >= bits
+/// is chosen together with its dimensions, so that the coefficient ring is
+/// not rounded up by a whole granule when the product length is a power of
+/// two.
+fn multiply_top(a: &Big, b: &Big, bits: usize, leaf: usize, work: &mut Work) -> Big {
+    let (n, len, width, child) = plan_top(bits, leaf);
+    // a*b < 2^bits <= 2^n, so the modular result is the ordinary product.
+    let m = n / 64;
+    let load = |x: &Big| {
+        let mut v = vec![0u64; m + 1];
+        v[..x.0.len()].copy_from_slice(&x.0);
+        v
+    };
+    let (x, y) = (load(a), load(b));
+    let mut out = vec![0u64; m + 1];
+    let square = a == b;
+    node(&x, &y, &mut out, square, leaf, work, 0, (len, width, child));
+    Big::from_limbs(&out)
+}
+
+/// Top-level dimensions (n, len, width, child) with n = len*width >= bits,
+/// n a multiple of 64, minimizing `node_cost`.
+fn plan_top(bits: usize, leaf: usize) -> (usize, usize, usize, usize) {
+    let mut best: Option<(f64, (usize, usize, usize, usize))> = None;
+    for i in 2..=30u32 {
+        let len = 1usize << i;
+        if len * 64 > bits {
+            break;
+        }
+        let unit = (64 / len).max(1);
+        let width = bits.div_ceil(len).next_multiple_of(unit);
+        let n = len * width;
+        let needed = 2 * width + i as usize + 2;
+        for t in 0..GRANULE_STEPS {
+            let child = needed.next_multiple_of(len.max(64) << t);
+            if child >= n {
+                continue;
+            }
+            let cost = node_cost(len, child, leaf);
+            if best.is_none_or(|(c, _)| cost < c) {
+                best = Some((cost, (n, len, width, child)));
+            }
+        }
+    }
+    best.expect("invalid top-level Fermat dimensions").1
 }
 
 fn pow2_floor(x: usize) -> usize {
@@ -85,6 +123,7 @@ fn pow2_floor(x: usize) -> usize {
 }
 
 /// `a*b mod 2^n+1` for `a, b <= 2^n`, `n` a multiple of 64.
+#[cfg(test)]
 fn multiply_mod_with(a: &Big, b: &Big, n: usize, leaf: usize, work: &mut Work) -> Big {
     assert!(n.is_multiple_of(64) && n > 0);
     let m = n / 64;
@@ -317,12 +356,22 @@ impl Scratch {
     }
 }
 
-/// Forward DIF transform of `len` elements of stride `s` in Z/(2^K+1),
-/// with root 2^(2K/len); output in bit-reversed order.
-fn forward(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut Work) {
+/// Forward DIF stages with block sizes `hi, hi/2, ..., lo` over all of
+/// `data` (stride `s`) in Z/(2^K+1); block `B` uses root 2^(2K/B). Running
+/// every stage from the full length down to 2 gives the bit-reversed
+/// transform; disjoint sub-blocks of the low stages are independent.
+fn forward_stages(
+    data: &mut [u64],
+    s: usize,
+    hi: usize,
+    lo: usize,
+    sc: &mut Scratch,
+    work: &mut Work,
+) {
     let k = 64 * (s - 1);
-    let mut block = len;
-    while block >= 2 {
+    let count = data.len() / s;
+    let mut block = hi;
+    while block >= lo.max(2) {
         let half = block / 2;
         let step = 2 * k / block;
         for chunk in data.chunks_exact_mut(block * s) {
@@ -337,16 +386,24 @@ fn forward(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut 
                 shift_mod(&sc.t, j * step, b, &mut sc.wide);
             }
         }
-        work.butterflies = work.butterflies.saturating_add((len / 2) as u64);
+        work.butterflies = work.butterflies.saturating_add((count / 2) as u64);
         block /= 2;
     }
 }
 
-/// Inverse DIT transform (without the 1/len scaling), bit-reversed input.
-fn inverse(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut Work) {
+/// Inverse DIT stages with block sizes `lo, 2lo, ..., hi` (no 1/len scaling).
+fn inverse_stages(
+    data: &mut [u64],
+    s: usize,
+    lo: usize,
+    hi: usize,
+    sc: &mut Scratch,
+    work: &mut Work,
+) {
     let k = 64 * (s - 1);
-    let mut block = 2;
-    while block <= len {
+    let count = data.len() / s;
+    let mut block = lo.max(2);
+    while block <= hi {
         let half = block / 2;
         let step = 2 * k / block;
         for chunk in data.chunks_exact_mut(block * s) {
@@ -361,21 +418,146 @@ fn inverse(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut 
                 add_mod(a, &sc.t);
             }
         }
-        work.butterflies = work.butterflies.saturating_add((len / 2) as u64);
+        work.butterflies = work.butterflies.saturating_add((count / 2) as u64);
         block *= 2;
     }
 }
 
+/// Forward DIF transform of `len` elements; output in bit-reversed order.
+fn forward(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut Work) {
+    forward_stages(data, s, len, 2, sc, work);
+}
+
+/// Inverse DIT transform (without the 1/len scaling), bit-reversed input.
+fn inverse(data: &mut [u64], len: usize, s: usize, sc: &mut Scratch, work: &mut Work) {
+    inverse_stages(data, s, 2, len, sc, work);
+}
+
+// ---------------------------------------------------------------------------
+// Parallelism (std scoped threads only; results never depend on it).
+
+static THREADS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+/// Nodes with K at least this many bits use worker threads.
+pub const PARALLEL_BITS: usize = 1 << 18;
+
+/// Set the worker-thread cap for large products: 0 (default) means
+/// `std::thread::available_parallelism`, 1 disables threading (for isolated
+/// single-core measurements). Products are identical for every setting.
+pub fn set_threads(threads: usize) {
+    THREADS.store(threads, std::sync::atomic::Ordering::Relaxed);
+}
+
+fn threads() -> usize {
+    match THREADS.load(std::sync::atomic::Ordering::Relaxed) {
+        0 => std::thread::available_parallelism().map_or(1, |n| n.get()),
+        n => n,
+    }
+}
+
+impl Work {
+    fn absorb(&mut self, other: &Work) {
+        self.transform_nodes = self.transform_nodes.saturating_add(other.transform_nodes);
+        self.schoolbook_leaves = self
+            .schoolbook_leaves
+            .saturating_add(other.schoolbook_leaves);
+        self.butterflies = self.butterflies.saturating_add(other.butterflies);
+        self.depth = self.depth.max(other.depth);
+    }
+}
+
+/// Run `f` on `parts` disjoint equal pieces of `data` (each a whole number of
+/// stride-`s` elements) on scoped threads, merging their work counters.
+fn par_pieces<F>(data: &mut [u64], parts: usize, work: &mut Work, f: F)
+where
+    F: Fn(usize, &mut [u64], &mut Work) + Sync,
+{
+    let piece = data.len() / parts;
+    let results: Vec<Work> = std::thread::scope(|scope| {
+        let handles: Vec<_> = data
+            .chunks_mut(piece)
+            .enumerate()
+            .map(|(index, chunk)| {
+                let f = &f;
+                scope.spawn(move || {
+                    let mut local = Work::default();
+                    f(index, chunk, &mut local);
+                    local
+                })
+            })
+            .collect();
+        handles
+            .into_iter()
+            .map(|h| h.join().expect("fastint worker panicked"))
+            .collect()
+    });
+    for w in &results {
+        work.absorb(w);
+    }
+}
+
+/// Full forward transform, splitting the low stages over `parts` threads.
+fn forward_par(
+    data: &mut [u64],
+    len: usize,
+    s: usize,
+    parts: usize,
+    sc: &mut Scratch,
+    work: &mut Work,
+) {
+    if parts <= 1 {
+        forward(data, len, s, sc, work);
+        return;
+    }
+    let sub = len / parts;
+    forward_stages(data, s, len, 2 * sub, sc, work);
+    let mc = s - 1;
+    par_pieces(data, parts, work, |_, piece, w| {
+        forward_stages(piece, s, sub, 2, &mut Scratch::new(mc), w);
+    });
+}
+
+/// Full inverse transform, splitting the low stages over `parts` threads.
+fn inverse_par(
+    data: &mut [u64],
+    len: usize,
+    s: usize,
+    parts: usize,
+    sc: &mut Scratch,
+    work: &mut Work,
+) {
+    if parts <= 1 {
+        inverse(data, len, s, sc, work);
+        return;
+    }
+    let sub = len / parts;
+    let mc = s - 1;
+    par_pieces(data, parts, work, |_, piece, w| {
+        inverse_stages(piece, s, 2, sub, &mut Scratch::new(mc), w);
+    });
+    inverse_stages(data, s, 2 * sub, len, sc, work);
+}
+
+/// Granule choices: the child ring size is a multiple of max(len, 64) << t.
+const GRANULE_STEPS: usize = 7;
+
 /// Valid recursive dimensions for a K-bit node: (len, chunk width, child K').
-fn candidates(k: usize) -> impl Iterator<Item = (usize, usize, usize)> {
-    (2..=k.trailing_zeros().min(40)).filter_map(move |i| {
+fn candidates(k: usize) -> Vec<(usize, usize, usize)> {
+    let mut out = Vec::new();
+    for i in 2..=k.trailing_zeros().min(40) {
         let len = 1usize << i;
         let width = k / len;
         let needed = 2 * width + i as usize + 2;
-        let granule = pow2_floor(needed.isqrt()).max(64).max(len);
-        let child = needed.next_multiple_of(granule);
-        (child < k).then_some((len, width, child))
-    })
+        let mut last = 0;
+        for t in 0..GRANULE_STEPS {
+            let child = needed.next_multiple_of(len.max(64) << t);
+            if child < k && child != last {
+                out.push((len, width, child));
+            }
+            last = child;
+        }
+    }
+    out
 }
 
 /// Relative cost model (seconds-like units) used only to choose dimensions:
@@ -384,40 +566,45 @@ fn candidates(k: usize) -> impl Iterator<Item = (usize, usize, usize)> {
 const KARATSUBA_COST: f64 = 4.2e-9;
 const BUTTERFLY_COST: f64 = 3.0e-9;
 
-fn model_cost(k: usize, leaf_bits: usize, depth: usize) -> f64 {
-    if k <= leaf_bits || depth > 8 {
-        return KARATSUBA_COST * ((k / 64) as f64).powf(1.585);
-    }
-    candidates(k)
-        .map(|(len, _, child)| node_cost(len, child, leaf_bits, depth))
-        .fold(f64::INFINITY, f64::min)
+type PlanCache = std::collections::HashMap<(usize, usize), ((usize, usize, usize), f64)>;
+
+thread_local! {
+    static PLANS: std::cell::RefCell<PlanCache> = Default::default();
 }
 
-fn node_cost(len: usize, child: usize, leaf_bits: usize, depth: usize) -> f64 {
+/// Best (dimensions, cost) for a K-bit node above the leaf, memoized.
+fn best_plan(k: usize, leaf_bits: usize) -> ((usize, usize, usize), f64) {
+    if let Some(hit) = PLANS.with(|c| c.borrow().get(&(k, leaf_bits)).copied()) {
+        return hit;
+    }
+    let best = candidates(k)
+        .into_iter()
+        .map(|d| (d, node_cost(d.0, d.2, leaf_bits)))
+        .min_by(|x, y| x.1.total_cmp(&y.1))
+        .expect("invalid recursive Fermat dimensions");
+    PLANS.with(|c| c.borrow_mut().insert((k, leaf_bits), best));
+    best
+}
+
+fn model_cost(k: usize, leaf_bits: usize) -> f64 {
+    if k <= leaf_bits {
+        return KARATSUBA_COST * ((k / 64) as f64).powf(1.585);
+    }
+    best_plan(k, leaf_bits).1
+}
+
+fn node_cost(len: usize, child: usize, leaf_bits: usize) -> f64 {
     let limbs = (child / 64 + 1) as f64;
     let log_len = len.trailing_zeros() as f64;
     // Three transforms (two forward, one inverse) plus spread/untwist passes.
     let transforms = (3.0 * log_len + 4.0) * (len / 2) as f64 * limbs * BUTTERFLY_COST;
-    transforms + len as f64 * model_cost(child, leaf_bits, depth + 1)
+    transforms + len as f64 * model_cost(child, leaf_bits)
 }
 
 /// Recursive dimensions for a K-bit node, chosen by `node_cost`.
 fn plan(k: usize, leaf_bits: usize) -> (usize, usize, usize) {
     debug_assert!(k.is_multiple_of(64));
-    thread_local! {
-        static CACHE: std::cell::RefCell<std::collections::HashMap<(usize, usize), (usize, usize, usize)>> =
-            Default::default();
-    }
-    if let Some(hit) = CACHE.with(|c| c.borrow().get(&(k, leaf_bits)).copied()) {
-        return hit;
-    }
-    let best = candidates(k)
-        .map(|d| (node_cost(d.0, d.2, leaf_bits, 0), d))
-        .min_by(|x, y| x.0.total_cmp(&y.0))
-        .map(|(_, d)| d)
-        .expect("invalid recursive Fermat dimensions");
-    CACHE.with(|c| c.borrow_mut().insert((k, leaf_bits), best));
-    best
+    best_plan(k, leaf_bits).0
 }
 
 /// Split the K-bit value `src` (< 2^K) into `len` chunks of `width` bits and
@@ -508,34 +695,91 @@ fn mul_mod(
         leaf(a, b, out, square);
         return;
     }
+    let dims = plan(k, leaf_bits);
+    node(a, b, out, square, leaf_bits, work, depth, dims);
+}
+
+/// One Fermat node with explicit dimensions; `a, b < 2^K` nonzero.
+#[allow(clippy::too_many_arguments)]
+fn node(
+    a: &[u64],
+    b: &[u64],
+    out: &mut [u64],
+    square: bool,
+    leaf_bits: usize,
+    work: &mut Work,
+    depth: usize,
+    (len, width, child): (usize, usize, usize),
+) {
+    work.depth = work.depth.max(depth);
     work.transform_nodes = work.transform_nodes.saturating_add(1);
-    let (len, width, child) = plan(k, leaf_bits);
+    let m = out.len() - 1;
+    let k = 64 * m;
     let mc = child / 64;
     let s = mc + 1;
     let twist = child / len;
     let log_len = len.trailing_zeros() as usize;
     let mut sc = Scratch::new(mc);
-
-    let mut fa = vec![0u64; len * s];
-    spread(&a[..m], width, len, twist, &mut fa, &mut sc);
-    forward(&mut fa, len, s, &mut sc, work);
-    let fb = if square {
-        None
+    let parts = if k >= PARALLEL_BITS {
+        threads().min(len / 4).max(1)
     } else {
-        let mut fb = vec![0u64; len * s];
-        spread(&b[..m], width, len, twist, &mut fb, &mut sc);
-        forward(&mut fb, len, s, &mut sc, work);
-        Some(fb)
+        1
     };
-    let mut product = vec![0u64; s];
-    for j in 0..len {
-        let x = &fa[j * s..(j + 1) * s];
-        let y = fb.as_ref().map_or(x, |f| &f[j * s..(j + 1) * s]);
-        mul_mod(x, y, &mut product, square, leaf_bits, work, depth + 1);
-        fa[j * s..(j + 1) * s].copy_from_slice(&product);
+    // Equal power-of-two pieces keep transform sub-blocks aligned.
+    let parts = if parts > 1 { pow2_floor(parts) } else { 1 };
+
+    let load = |x: &[u64], sc: &mut Scratch, w: &mut Work| {
+        let mut f = vec![0u64; len * s];
+        spread(&x[..m], width, len, twist, &mut f, sc);
+        forward_par(&mut f, len, s, parts, sc, w);
+        f
+    };
+    let (mut fa, fb) = if square {
+        (load(a, &mut sc, work), None)
+    } else if parts > 1 {
+        let (fa, (fb, wb)) = std::thread::scope(|scope| {
+            let hb = scope.spawn(|| {
+                let mut w = Work::default();
+                let f = load(b, &mut Scratch::new(mc), &mut w);
+                (f, w)
+            });
+            let fa = load(a, &mut sc, work);
+            (fa, hb.join().expect("fastint worker panicked"))
+        });
+        work.absorb(&wb);
+        (fa, Some(fb))
+    } else {
+        let fa = load(a, &mut sc, work);
+        let fb = load(b, &mut sc, work);
+        (fa, Some(fb))
+    };
+    let piece = len / parts;
+    let pointwise = |index: usize, chunk: &mut [u64], w: &mut Work| {
+        let mut product = vec![0u64; s];
+        for (j, x) in chunk.chunks_exact_mut(s).enumerate() {
+            let global = index * piece + j;
+            match &fb {
+                Some(f) => mul_mod(
+                    x,
+                    &f[global * s..(global + 1) * s],
+                    &mut product,
+                    false,
+                    leaf_bits,
+                    w,
+                    depth + 1,
+                ),
+                None => mul_mod(x, x, &mut product, true, leaf_bits, w, depth + 1),
+            }
+            x.copy_from_slice(&product);
+        }
+    };
+    if parts > 1 {
+        par_pieces(&mut fa, parts, work, pointwise);
+    } else {
+        pointwise(0, &mut fa, work);
     }
     drop(fb);
-    inverse(&mut fa, len, s, &mut sc, work);
+    inverse_par(&mut fa, len, s, parts, &mut sc, work);
 
     // Untwist, divide by len, read each coefficient as a signed integer in
     // (-2^(K'-1), 2^(K'-1)], and accumulate sum c_j 2^(j*width).
@@ -577,6 +821,11 @@ mod tests {
 
     fn pow2(n: usize) -> Big {
         Big::from_u64(1).shl(n)
+    }
+
+    /// A ring size >= bits usable with `multiply_mod_with`.
+    fn top_ring_bits(bits: usize) -> usize {
+        bits.next_multiple_of(pow2_floor(bits.isqrt()).max(64))
     }
 
     fn modulus(n: usize) -> Big {
@@ -788,6 +1037,76 @@ mod tests {
             }
             k *= 2;
         }
+    }
+
+    #[test]
+    fn top_level_plan_is_valid_and_tight() {
+        for base in [BASE_BITS, 1 << 18, 1 << 20, 1 << 23, 1 << 26] {
+            for bits in [
+                base + 1,
+                base + 64,
+                base * 5 / 4,
+                base * 3 / 2,
+                base * 2 - 7,
+                base * 2,
+            ] {
+                let (n, len, width, child) = plan_top(bits, LEAF_BITS);
+                assert!(n >= bits && n.is_multiple_of(64));
+                assert_eq!(len * width, n);
+                assert!(len.is_power_of_two() && len >= 4);
+                assert!(child.is_multiple_of(64) && child.is_multiple_of(len));
+                assert!(child >= 2 * width + len.trailing_zeros() as usize + 2);
+                assert!(child < n);
+                // The ring is never more than one chunk row per element above bits.
+                assert!(
+                    n - bits < len * (64 / len).max(1) + len,
+                    "bits {bits} n {n}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn top_level_path_near_powers_of_two() {
+        for limbs in [64usize, 127, 128, 129, 255, 256, 300] {
+            for leaf in [256, 1024] {
+                let a = fixture(limbs, 5 + limbs as u64);
+                let b = fixture(limbs + 1, 17 + limbs as u64);
+                let mut work = Work::default();
+                let bits = a.bits() + b.bits();
+                assert_eq!(
+                    multiply_top(&a, &b, bits, leaf, &mut work),
+                    a.mul_schoolbook(&b)
+                );
+                assert!(work.transform_nodes > 0);
+                let mut work = Work::default();
+                assert_eq!(
+                    multiply_top(&a, &a, 2 * a.bits(), leaf, &mut work),
+                    a.mul_schoolbook(&a)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn threaded_products_are_identical() {
+        // Above PARALLEL_BITS so worker threads are used when allowed.
+        let a = fixture(9000, 3);
+        let b = fixture(8100, 4);
+        let expected = a.mul(&b);
+        let expected_square = a.mul(&a);
+        for threads in [1, 2, 4, 0] {
+            set_threads(threads);
+            let (got, work) = multiply_with_work(&a, &b);
+            assert_eq!(got, expected, "threads {threads}");
+            assert!(work.transform_nodes > 0);
+            assert_eq!(
+                multiply(&a, &a),
+                expected_square,
+                "square threads {threads}"
+            );
+        }
+        set_threads(0);
     }
 
     #[test]
