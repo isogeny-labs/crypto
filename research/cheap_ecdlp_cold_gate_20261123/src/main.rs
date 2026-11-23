@@ -21,6 +21,10 @@ struct Target {
 #[serde(deny_unknown_fields)]
 struct Certificate {
     base: Vec<[u64; 2]>, relations: Vec<Relation>, targets: Vec<Target>,
+    // Opt-in prefix experiment: authenticate and process only the consumed
+    // relation prefix. Parsed but unconsumed tail rows are NOT checked.
+    #[serde(default)]
+    stop_when_all_targets_determined: bool,
 }
 #[derive(Debug, Serialize)]
 struct TargetResult {
@@ -36,6 +40,8 @@ struct TargetResult {
 #[derive(Debug, Serialize)]
 struct Report {
     p: u64, n: u64, base_size: usize, relation_count: usize,
+    checked_relation_count: usize, unchecked_relation_count: usize,
+    stop_when_all_targets_determined: bool, prefix_span_queries: usize,
     relation_rank: usize, dependent_relations: usize,
     target_count: usize, determined_targets: usize,
     targets: Vec<TargetResult>, arithmetic_diagnostic: Counts,
@@ -116,6 +122,17 @@ impl Echelon {
         Some((neg(c[cols]),earliest_prefix))
     }
 }
+// A prefix query is charged even when it finds an undetermined target.
+// This counts queries, not finite-field operations or relation-extraction cost.
+fn all_targets_visible(
+    matrix:&Echelon, targets:&[(Point, Vec<u64>)], queries:&mut usize
+)->bool {
+    for (_,row) in targets {
+        *queries+=1;
+        if matrix.projected(row.clone()).is_none() {return false}
+    }
+    true
+}
 fn verify(data:&Certificate)->Result<Report,String>{
     if data.base.is_empty() || data.base.len()>4096 ||
         data.relations.len()>65_536 || data.targets.len()>4096 {
@@ -130,19 +147,10 @@ fn verify(data:&Certificate)->Result<Report,String>{
         if data.base[..i].contains(&xy){return Err(format!("duplicate base[{i}]"))}
         base.push(p);
     }
-    let mut matrix=Echelon::new(base.len());
-    let mut dependent=0;
-    for (i,r) in data.relations.iter().enumerate(){
-        if r.rhs>=N {return Err(format!("relation[{i}] RHS out of range"))}
-        let lhs=group_sum(&mut ar,&base,&r.terms)?;
-        let rhs=ar.scalar(PRIME31,r.rhs,Some(PRIME31.g));
-        if lhs!=rhs {return Err(format!("relation[{i}] EC replay failed"))}
-        let mut row=coefficient_row(&r.terms,base.len())?;
-        row[base.len()]=r.rhs;
-        if !matrix.insert(row,i+1)?{dependent+=1}
-    }
-    let mut targets=Vec::new();
-    let mut determined=0;
+    // Preflight every public target/witness before the first relation. A
+    // caller-provided known log is independently checked but never affects
+    // a span decision. This work is charged even for a zero-relation stop.
+    let mut prepared=Vec::with_capacity(data.targets.len());
     for (i,t) in data.targets.iter().enumerate(){
         if t.offset>=N {return Err(format!("target[{i}] offset out of range"))}
         let q=to_point(t.q);
@@ -152,17 +160,44 @@ fn verify(data:&Certificate)->Result<Report,String>{
         if witness!=ar.add(PRIME31,q,shift) {
             return Err(format!("target[{i}] public decomposition failed EC replay"))
         }
-        // Harness known answer only: never incorporated into the row space.
         if let Some(k)=t.claimed_log {
             if k>=N || ar.scalar(PRIME31,k,Some(PRIME31.g))!=q {
                 return Err(format!("target[{i}] claimed_log independent replay failed"))
             }
         }
-        let projection=matrix.projected(coefficient_row(&t.terms,base.len())?);
+        prepared.push((q,coefficient_row(&t.terms,base.len())?));
+    }
+    let mut matrix=Echelon::new(base.len());
+    let mut dependent=0;
+    let mut checked_relations=0;
+    let mut prefix_span_queries=0;
+    let mut ready=data.stop_when_all_targets_determined &&
+        all_targets_visible(&matrix,&prepared,&mut prefix_span_queries);
+    for (i,r) in data.relations.iter().enumerate(){
+        if ready {break}
+        if r.rhs>=N {return Err(format!("relation[{i}] RHS out of range"))}
+        let lhs=group_sum(&mut ar,&base,&r.terms)?;
+        let rhs=ar.scalar(PRIME31,r.rhs,Some(PRIME31.g));
+        if lhs!=rhs {return Err(format!("relation[{i}] EC replay failed"))}
+        let mut row=coefficient_row(&r.terms,base.len())?;
+        row[base.len()]=r.rhs;
+        let independent=matrix.insert(row,i+1)?;
+        if !independent {dependent+=1}
+        checked_relations+=1;
+        // A dependent row cannot enlarge the authenticated row span.
+        if independent && data.stop_when_all_targets_determined {
+            ready=all_targets_visible(&matrix,&prepared,&mut prefix_span_queries);
+        }
+    }
+    let mut targets=Vec::new();
+    let mut determined=0;
+    for (i,t) in data.targets.iter().enumerate(){
+        let (q,coefficients)=&prepared[i];
+        let projection=matrix.projected(coefficients.clone());
         let first_determined_relation_prefix=projection.map(|(_,prefix)|prefix);
         let recovered=projection.map(|(v,_)|sub(v,t.offset));
         if let Some(d)=recovered {
-            if ar.scalar(PRIME31,d,Some(PRIME31.g))!=q {
+            if ar.scalar(PRIME31,d,Some(PRIME31.g))!=*q {
                 return Err(format!("target[{i}] recovered scalar EC replay failed"))
             }
             if let Some(k)=t.claimed_log {
@@ -177,10 +212,17 @@ fn verify(data:&Certificate)->Result<Report,String>{
             group_replay_passed:true,scalar_replay_passed:recovered.is_some()});
     }
     Ok(Report{p:PRIME31.p,n:N,base_size:base.len(),
-        relation_count:data.relations.len(),relation_rank:matrix.rank,
+        relation_count:data.relations.len(),checked_relation_count:checked_relations,
+        unchecked_relation_count:data.relations.len()-checked_relations,
+        stop_when_all_targets_determined:data.stop_when_all_targets_determined,
+        prefix_span_queries,relation_rank:matrix.rank,
         dependent_relations:dependent,target_count:targets.len(),
         determined_targets:determined,targets,arithmetic_diagnostic:ar.counts,
-        scope:"source-reusing public-certificate verification; no solver/timing/PCC claims"})
+        scope:if data.stop_when_all_targets_determined {
+            "opt-in prefix-only EC authentication; unchecked tail is untrusted; no extractor/timing/PCC claims"
+        } else {
+            "source-reusing public-certificate verification; no solver/timing/PCC claims"
+        }})
 }
 fn main(){
     let args=env::args().collect::<Vec<_>>();
@@ -204,7 +246,7 @@ mod tests {
             [x,y]
         }).collect();
         let q=ar.scalar(PRIME31,3,g).map(|(x,y)|[x,y]);
-        Certificate{base,relations:vec![
+        Certificate{base,stop_when_all_targets_determined:false,relations:vec![
             Relation{terms:vec![[0,1]],rhs:1},
             Relation{terms:vec![[1,1]],rhs:2},
         ],targets:vec![
@@ -294,6 +336,47 @@ mod tests {
         assert_eq!(r.targets[0].recovered,Some(0));
         assert!(r.targets[0].group_replay_passed);
         assert!(r.targets[0].scalar_replay_passed);
+    }
+    #[test]
+    fn prefix_stop_saves_only_post_visibility_replays(){
+        let mut c=sample();
+        c.stop_when_all_targets_determined=true;
+        c.targets.truncate(1);
+        c.relations.push(Relation{terms:vec![[0,-1]],rhs:N-1});
+        let out=verify(&c).expect("first two signed relations suffice");
+        assert_eq!(out.relation_count,3);
+        assert_eq!((out.checked_relation_count,out.unchecked_relation_count),(2,1));
+        assert_eq!(out.targets[0].first_determined_relation_prefix,Some(2));
+        assert_eq!(out.targets[0].recovered,Some(3));
+        assert!(out.prefix_span_queries>=2);
+        c.stop_when_all_targets_determined=false;
+        let full=verify(&c).expect("all three rows valid");
+        assert_eq!((full.checked_relation_count,full.unchecked_relation_count),(3,0));
+        assert_eq!(full.targets[0].recovered,out.targets[0].recovered);
+    }
+    #[test]
+    fn prefix_stop_never_authenticates_an_unprocessed_poisoned_tail(){
+        let mut c=sample();
+        c.targets.truncate(1);
+        c.relations.push(Relation{terms:vec![[0,1]],rhs:2});
+        c.stop_when_all_targets_determined=true;
+        let r=verify(&c).expect("a streaming stop does not read the later poison");
+        assert_eq!(r.unchecked_relation_count,1);
+        assert_eq!(r.targets[0].recovered,Some(3));
+        c.stop_when_all_targets_determined=false;
+        assert!(verify(&c).is_err());
+    }
+    #[test]
+    fn prefix_zero_and_target_preflight(){
+        let mut c=sample();
+        c.stop_when_all_targets_determined=true;
+        c.targets=vec![Target{q:None,offset:0,terms:vec![[0,1],[0,-1]],claimed_log:None}];
+        let out=verify(&c).expect("identity visibility requires no relations");
+        assert_eq!(out.checked_relation_count,0);
+        assert_eq!(out.unchecked_relation_count,2);
+        assert_eq!(out.targets[0].first_determined_relation_prefix,Some(0));
+        c.targets[0].q=Some([PRIME31.g.0,PRIME31.g.1]);
+        assert!(verify(&c).is_err());
     }
     #[test]
     fn reject_false_rhs(){let mut c=sample();c.relations[0].rhs=2;assert!(verify(&c).is_err());}
