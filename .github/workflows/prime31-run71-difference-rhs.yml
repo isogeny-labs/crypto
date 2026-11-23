@@ -1,0 +1,32 @@
+name: Prime31 run71 authentic target-difference rank
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run71_difference_rhs.rs"
+      - "research/prime31_ic_20261115/native/examples/prime31_run69_genuine_partial_rank.rs"
+      - "research/prime31_f4_admission_20261121/run57_basis.json"
+      - "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv"
+      - ".github/workflows/prime31-run71-difference-rhs.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run71_difference_rhs.rs"
+      - ".github/workflows/prime31-run71-difference-rhs.yml"
+  workflow_dispatch:
+jobs:
+  difference-rhs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Original Rust library tests
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo test --locked --release --lib
+      - name: Measure exact authentic-RHS incremental rank and recover 32 public logs
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run71_difference_rhs
