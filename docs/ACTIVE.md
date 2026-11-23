@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Qualify the fixed250 bielliptic plane-quartic F5 source models for genuine nonhyperelliptic genus3 Jacobians, exact elliptic Weil factor and Phi3-cube mod2/PE-cube gates (Codex, started 2026-11-23, branch lane/chained-genus3-quartic-20261123; stacked on completed finite lane PR #5007). [pcc:unverified]
+- [ ] Qualify the fixed250 bielliptic plane-quartic F5 source models for genuine nonhyperelliptic genus3 Jacobians, exact elliptic Weil factor and Phi3-cube mod2/PE-cube gates (Codex, started 2026-11-23, branch lane/chained-genus3-quartic-20261123, PR #5012; stacked on completed finite lane PR #5007). [pcc:unverified]
 
 - [x] Classify all PGL2(F3) changes and evaluate scalar-free cross-model Richelot chains with an actual F9 twist/Frobenius control:12 isomorphisms,4 three-hop chains, original order7 actions+/-2, full report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, source96aa5f9c, unsigned331403/efc6e3; full costs/Weil8/formal/CI/custody separate follow-ups). [pcc:unverified]
 - [x] Qualify full rational Jacobian Richelot maps and exact raw dual -[2] on three21-class groups:4 bijections/1764 map additions/84 composites, finite dual-only kernel result and complete report (Codex, 2026-11-23, branch lane/chained-realcurve-torsion-20261123, PR #5007, resultdde79a33, unsigned6b4fb5/4b7b49). [pcc:unverified]
