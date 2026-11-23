@@ -1,0 +1,14 @@
+{
+  "action": "Select every manifest path explicitly, then check each exists and hashes correctly in the fetched Git commit; a clean working tree plus local sha256sum does not prove committed coverage",
+  "created": "2026-11-23T13:06:23Z",
+  "evidence": [
+    "research/hashed_ecdl_cpu_scale_20261123/reviews/COHORT-PUBLICATION-REVIEW-08.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "A published checksum manifest includes an ignored nested Cargo.lock or other untracked build input",
+  "why": "Original result commit omitted exact standalone adapter lockfile; corrective successor and review09 establish all386 committed paths"
+}
