@@ -1,0 +1,47 @@
+[
+  {
+    "declaration": "TwoHopDescent.doubled_range",
+    "complete_declaration_utf8": "theorem doubled_range (x : Mixed) : twiceM x = zeroM \u2228 twiceM x = pointM := by\n  cases x with\n  | mk a b c d => cases a <;> cases b <;> cases c <;> cases d <;> decide\n",
+    "complete_declaration_sha256": "0f8cdb1a9790a0175ff1a29a8460274b0d28b182b94c628e2cd0603987b1bde3"
+  },
+  {
+    "declaration": "TwoHopDescent.doubled_generator",
+    "complete_declaration_utf8": "theorem doubled_generator : twiceM generatorM = pointM := by decide\n",
+    "complete_declaration_sha256": "cfcc42c4935380267b992c3f70d26f80070337a8fa094854bde3bec1c0a507b7"
+  },
+  {
+    "declaration": "TwoHopDescent.doubled_point_nonzero",
+    "complete_declaration_utf8": "theorem doubled_point_nonzero : pointM \u2260 zeroM := by decide\n",
+    "complete_declaration_sha256": "34f2509985a9d2c1731bf4722a8d967fbecdb38489f8bf74406129d64dd708d2"
+  },
+  {
+    "declaration": "TwoHopDescent.additive_injection_fixes_doubled_point",
+    "complete_declaration_utf8": "theorem additive_injection_fixes_doubled_point\n    (F : Mixed \u2192 Mixed)\n    (hzero : F zeroM = zeroM)\n    (hinj : Function.Injective F)\n    (hadd : \u2200 x y, F (addM x y) = addM (F x) (F y)) :\n    F pointM = pointM := by\n  have hp : F pointM = twiceM (F generatorM) := by\n    calc\n      F pointM = F (twiceM generatorM) := congrArg F doubled_generator.symm\n      _ = twiceM (F generatorM) := hadd generatorM generatorM\n  cases doubled_range (F generatorM) with\n  | inl h => exact False.elim (doubled_point_nonzero (hinj (hp.trans (h.trans hzero.symm))))\n  | inr h => exact hp.trans h\n",
+    "complete_declaration_sha256": "81ec7712667ddfb77b6546ac30a6f86582fbefd93c772d35acc7b46518401465"
+  },
+  {
+    "declaration": "TwoHopDescent.no_fixed_free_mixed_automorphism",
+    "complete_declaration_utf8": "theorem no_fixed_free_mixed_automorphism\n    (F : Mixed \u2192 Mixed)\n    (hzero : F zeroM = zeroM)\n    (hinj : Function.Injective F)\n    (hadd : \u2200 x y, F (addM x y) = addM (F x) (F y))\n    (hfree : \u2200 x, F x = x \u2192 x = zeroM) : False := by\n  exact doubled_point_nonzero\n    (hfree pointM (additive_injection_fixes_doubled_point F hzero hinj hadd))",
+    "complete_declaration_sha256": "074551a39ff49988bb9ca0d729888b31df873cfd12764a377574c328f8e2b8f4"
+  },
+  {
+    "declaration": "TwoHopDescent.doubling_covariance",
+    "complete_declaration_utf8": "theorem doubling_covariance (F : Good \u2192 Good)\n    (hadd : \u2200 x y, F (addG x y) = addG (F x) (F y)) (x : Good) :\n    F (twiceG x) = twiceG (F x) := hadd x x\n",
+    "complete_declaration_sha256": "544dff6eceeea96a8555c75473ba086708791bcd50c2a36d7b714ee3d47056dc"
+  },
+  {
+    "declaration": "TwoHopDescent.doubled_image_preserved",
+    "complete_declaration_utf8": "theorem doubled_image_preserved (F : Good \u2192 Good)\n    (hadd : \u2200 x y, F (addG x y) = addG (F x) (F y))\n    (x : Good) (hx : InDouble x) : InDouble (F x) := by\n  cases hx with\n  | intro y hy => exact \u27e8F y, (doubling_covariance F hadd y).symm.trans (congrArg F hy)\u27e9",
+    "complete_declaration_sha256": "199ab17465cc2d2d729f674150b8f399634ee53ec28d7961c7a432d18b51a38b"
+  },
+  {
+    "declaration": "TwoHopDescent.cubic_fixed_only_zero",
+    "complete_declaration_utf8": "theorem cubic_fixed_only_zero (v : V) : cubic v = v \u2192 v = zeroV := by\n  cases v with\n  | mk a b c d => cases a <;> cases b <;> cases c <;> cases d <;> decide\n",
+    "complete_declaration_sha256": "3383a48a8f3744c9ff888d52e1774c8cb674c8f0e09d1027434c6ddbf81122e8"
+  },
+  {
+    "declaration": "TwoHopDescent.cubic_order_three",
+    "complete_declaration_utf8": "theorem cubic_order_three (v : V) : cubic (cubic (cubic v)) = v := by\n  cases v with\n  | mk a b c d => cases a <;> cases b <;> cases c <;> cases d <;> decide",
+    "complete_declaration_sha256": "825e421da849d64d2726e3a9c6667c08d7c6ca2adbcff1495a6e7542925f8b5f"
+  }
+]
