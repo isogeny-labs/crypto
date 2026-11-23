@@ -1,0 +1,38 @@
+⚠ [3141/3146] Replayed ConductorOrthogonality
+warning: ConductorOrthogonality.lean: imports `Mathlib.Algebra.Module.Submodule.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ConductorOrthogonality.lean: imports `Mathlib.Data.Nat.Prime.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ConductorOrthogonality.lean: imports `Mathlib.NumberTheory.Padics.PadicVal.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ConductorOrthogonality.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3144/3146] Replayed HasseTransferCeiling
+warning: HasseTransferCeiling.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: HasseTransferCeiling.lean:37:58: Variable name `hf` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hf
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: HasseTransferCeiling.lean:78:58: Variable name `hf` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hf
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: HasseTransferCeiling.lean:137:68: This simp argument is unused:
+  Nat.add_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [transfer_cost, DeepGap.comp_cost, IsogenyChain.costSum, hc, Nat.add_left_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: HasseTransferCeiling.lean:138:4: This simp argument is unused:
+  Nat.add_left_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [transfer_cost, DeepGap.comp_cost, IsogenyChain.costSum, hc, Nat.add_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [3145/3146] Replayed FloorCraterEcdlp
+warning: FloorCraterEcdlp.lean: imports `Mathlib.Data.Nat.Prime.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FloorCraterEcdlp.lean: imports `Mathlib.NumberTheory.Padics.PadicVal.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FloorCraterEcdlp.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+Build completed successfully (3146 jobs).

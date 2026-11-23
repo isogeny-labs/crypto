@@ -1477,7 +1477,6 @@ Recorded again at the freeze. At the freeze the first four lines go into the pre
 hashes are recorded here, and no script checks them.
 
 | file | SHA-256 |
-|:--|:--|
 | `common.sh` | `e6b716a5f862d5c9056e295b7ba057bc152855c8198edb27964113d21de79e23` |
 | `run.sh` | `5476bca055eadbe8c1b98baf3316c2c8967c86d561d27bde5bc926ff9ca02bbb` |
 | `fetch.sh` | `3027d1bb25bd19d0686aed8b1fe4caaefc51a948d86d419f5149af72f41391d5` |
@@ -1489,3 +1488,60 @@ hashes are recorded here, and no script checks them.
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
 | `server_pinned.py` | `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550` (= `runpod/server.py` at `d2a16c723d`) |
 | retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `dd75c92a7d86ba0927886c0926f2b25f59fd4645cd22a8a7a9713af4b62ddd8d`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |
+
+## Amendment 33 (2026-11-18; relaunch of the Amendment 31 batch, attempt 2, on REST v2; before any row of these jobs)
+
+Every number is `[pcc:unverified]`.
+
+- **Owner decision (2026-11-18, session 01TCbLH6osebpnEbutNogBzD).** The owner said "resume". Asked which relaunch to run, with
+  the overrun stated, the owner chose **"Full batch"**: both routes of Amendment 31, all 8 jobs. The study ceiling rises from
+  US$500 to **about US$690** (Amendment 20 amended). This answer is also the per-batch balance confirmation (decision 18,
+  Amendment 29).
+- **Jobs, stages, hosts, limits, readings and the validation gate.** Exactly as in Amendment 31, with the job names suffixed
+  `-v2`. The client is `rp.sh` on REST v2 (Amendment 32), flavor `cpu5m` (8 GB per vCPU; US$2.08/h at 32 vCPU, US$1.04/h at
+  16 vCPU).
+- **Pod lifetime (new; the Amendment 32 overrun).** A pod is billed until it is deleted, so:
+  - `rp.sh reap ID OUTDIR DEADLINE` fetches the results, checks them against the pod's manifest, and deletes the pod once its
+    job is done, or once the deadline passes, whatever the job's state. Deadline: launch + job limit + 30 min.
+  - The session runs the reaper every 15 minutes. Scheduled check-ins, which survive a session restart, also run it hourly and
+    at each deadline.
+- **Spend.** Job guards: 2 × US$51.65 (F) + 2 × US$49.92 (C decisive) + 4 × US$4.16 (C validation) = US$219.8 worst case,
+  plus at most 30 min of reap lag per pod. With about US$466 already spent, that is about US$690 worst case.
+- No hypothesis, §6 rule, seed or draw changes.
+
+## Amendment 34 (2026-11-19; the `t = 13` validation cells with a longer job limit; before any row of the reruns)
+
+
+- **State.**
+  - Validation `t = 12`, both draws: the closure gives `d_F = 6`, uncensored, `grid_zeros = 0` (2.3 h each).
+  - Validation `t = 13`, draw 0: stopped by the 14,400 s job limit with no row (the pilot writes on completion only). Censored,
+    so its gate cell is undecided (Amendment 31). Draw 1 runs to the same limit at 01:28Z.
+  - Route F `t = 14`, draw 0: aborted with an allocation failure at degree 6 on the 256 GB pod. Censored: `d_F ≥ 7` stands.
+- **Owner instruction (2026-11-19, ~00:40Z).** The `t = 13` reruns were offered with a 12 h limit at about US$11–13 each. The
+  owner said "resume".
+- **Change.** Jobs `pfd-m2c-t13-k{0,1}-rp-v3`: stage `m2c:13:K:7:13958643712:4000000:86400`, unchanged. Same 16 vCPU / 128 GB
+  pods, same binaries and hashes. Job limit 43,200 s, cap US$40; reaped at the limit + 30 min (Amendment 33).
+  - Draw 1 is rerun only if its current job is also censored.
+- **Spend.** At most 2 × US$13.5, within the US$690 ceiling (Amendment 33).
+- Gate, readings, seeds and draws are unchanged.
+
+## Amendment 35 (2026-11-19; record of the Amendment 33–34 batch outcome; no job launched)
+
+Every number is `[pcc:unverified]`. Spend comes from `GET /v2/billing/pods?podId=…`.
+
+- **Rows obtained.**
+  - Validation `t = 12`, draws 0 and 1: `d_F = 6`, uncensored (Amendment 34).
+  - Route F `t = 14`, draw 0: aborted on an allocation failure at degree 6. Draw 1: stopped `oversize` (`--max-nnz`) at
+    degree 7, step 35, with 41.2·10⁹ nonzeros. Both are censored, so `d_F ≥ 7` stands. Route F cannot decide `t = 14` on
+    256 GB hosts.
+  - Validation `t = 13`, the first attempts: both censored by the 14,400 s limit.
+- **Lost.** All four remaining pods disappeared at about 07:45Z on 2026-11-19. RunPod returns 404 for them, and every other
+  running pod on the account went at the same time. No rows exist from:
+  - the `t = 14` closures `0pj4vejkpzvoec` and `b0n2ty4prxtg6o`, after about 9.3 h of their 24 h limit;
+  - the `t = 13` reruns `zvab5ld49rak17` and `4zsd29k4seqw47`, after about 7 h and 6.2 h.
+  - The closure writes a row only on completion, so nothing partial was fetchable. The cause is not visible through the API.
+    An account-level stop, such as the balance being exhausted, matches the simultaneous loss.
+- **Spend of the Amendment 33–34 pods.** US$82.85 in total; the four lost pods account for US$46.33. The study total is about
+  US$549 of the US$690 ceiling.
+- **State of the question.** At `m = 2`, `t = 14`: `d_F ≥ 7`, unchanged. The validation gate is 2 of 4 pass and 2 undecided.
+  No relaunch without the owner's balance confirmation (decision 18).

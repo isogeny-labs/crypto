@@ -1,0 +1,16 @@
+{
+  "schema": "xedni-threshold-rational-cost-protocol-v1",
+  "source_panel_protocol": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/protocol.json",
+  "source_threshold_result": "research/exotic_ecdlp_20261021/xedni_radius_threshold_20261120/result.json",
+  "source_threshold_result_raw_sha256": "63c6021c256d0382e003f0a4e38560441d28274af8519f3620a94696fa2b0322",
+  "cells": [
+    {"p": 1531, "q": 1553, "R_over_Q": 11, "radius": 65},
+    {"p": 2287, "q": 2251, "R_over_Q": 1238, "radius": 54}
+  ],
+  "candidate_law": "all nonzero integer (a,b) in [-B,B]^2, ascending frozen Decimal quadratic height score, then a,b",
+  "point_law": "construct exact rational P=aQ+bR with accepted Sage; check finite reduction equals a*Qbar+b*Rbar; include every evaluated point, zero reduction and duplicate",
+  "stop_rule": "first prefix covering all q-1 nonidentity reduced points, full coefficient box, or per-cell 300-second wall cap; retain censored status and counts",
+  "cache_policy": "each cell starts a fresh rational-point evaluation sequence; no cross-cell cache; curve and pairing setup outside per-cell evaluation interval",
+  "measurements": "candidate evaluations, first finite collision or zero-reduction relation, nonidentity coverage at stop, exact rational coordinate bit peak, per-cell construction-and-reduction wall time, process max RSS, status",
+  "claim_boundary": "ordinary-host construction-cost diagnostic on two prior selected cells; timings are exploratory and do not establish a calibrated IC/rho comparison"
+}

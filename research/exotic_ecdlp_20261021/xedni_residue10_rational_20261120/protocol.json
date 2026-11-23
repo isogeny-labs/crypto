@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-residue10-rational-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "local_selector_candidate_rows_raw_sha256": "6d7506f8bb57ca02ab4a5b509d7a00a58d45de373fc8f88e6b439f2271c445c0",
+  "input_law": "all 1722 ordered pairs and all 32256 frozen centered CRT candidates",
+  "selector": "retain every candidate whose precomputed local residue set contains 10; do not read the reduced true-coefficient field or reduced relation flag for selection",
+  "coefficient": 10,
+  "rational_check": "for every selected candidate reconstruct the exact rational curve and compute P+10Q with checked Sage point arithmetic; retain every status and certificate",
+  "postcheck": "for every positive rational relation independently verify T+10G=O in E(F47)",
+  "resource": "complete finite run over all 1488 locally selected candidates; record every failed or censored status",
+  "claim_boundary": "rational relation incidence for one local residue on centered CRT curves; query and precomputation costs remain charged and scalar recovery is a separate question"
+}
