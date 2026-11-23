@@ -513,6 +513,7 @@ impl Engine<'_> {
                     let product = self.field(FieldOp::Mul, c, v)?;
                     r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
                 }
+                r[shift + b.len() - 1] = 0;
                 // lead(r) - c * lead(b) is zero in F_p, so removing this
                 // coefficient is exact for both monic and nonmonic divisors.
                 r.pop();
@@ -2614,6 +2615,31 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round76_identity_pruning_preserves_root_certificates() {
+        // Exercise monic and nonmonic divisors, dense products, sparse
+        // products, and monic GCD normalization through the full solver.
+        for p in [17, 65521, 1_000_000_007, MAX_PRIME] {
+            let a = vproduct(&[p - 1, 1], &[p - 2, 1], p);
+            let polynomials = [
+                a.clone(),
+                vproduct(&a, &[1, 0, 0, 1], p),
+                vproduct(&a, &[1, 2, 3], p),
+            ];
+            for f in polynomials {
+                let report = run(&f, p);
+                assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
+                verify(&report).unwrap();
+                assert!(report.roots.contains(&1) && report.roots.contains(&2));
+                // First nonzero convolution term is assigned rather than
+                // charged as an addition of zero.
+                assert!(!report.events.iter().any(|e| matches!(
+                    e, RootEvent::Field {op: FieldOp::Add, a: 0, ..}
+                )));
+            }
+        }
+    }
 
     #[test]
     fn round75_cached_barrett_matches_frozen_field_and_noncanonical_fallback() {
