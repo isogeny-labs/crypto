@@ -1,0 +1,28 @@
+name: Prime31 exact four-leaf representation-density gate
+on:
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_m4_representation_density.rs"
+      - "research/prime31_m4_density_20261123/**"
+      - ".github/workflows/prime31-m4-density.yml"
+  workflow_dispatch:
+
+jobs:
+  original-rust-density:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Verify original frozen 168-point Y7 fixture
+        run: |
+          echo "fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46  research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv" | sha256sum --check
+      - name: Compile/test native original-Rust Prime31 density gate
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo test --locked --release --example prime31_m4_representation_density -- --nocapture
+      - name: Evaluate public Base B677 and emit exact expectation CSV
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_m4_representation_density

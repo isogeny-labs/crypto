@@ -8,10 +8,13 @@
 //! cargo test --release --example chained_s3_prime31_pilot
 //! cargo run --release --example chained_s3_prime31_pilot
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::time::Instant;
 
-use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
+use crypto_lib::cryptanalysis::ic_boundary::{
+    CountedGroup, GroupOps, PrimeCurve, PrimePoint, RelationSolver,
+};
+use crypto_lib::cryptanalysis::ic_framework::linalg::StructuredGauss;
 use crypto_lib::cryptanalysis::semaev_prime_poly::Curve as SemaevCurve;
 
 const P: u64 = 2_147_483_647;
@@ -538,6 +541,42 @@ fn small_field_panel(arm: &str, m: usize, size: usize) {
     );
 }
 
+fn recover_from_signed_rows(
+    c: &PrimeCurve,
+    generator: PrimePoint,
+    target: PrimePoint,
+    order: u64,
+    base: &[PrimePoint],
+    relations: impl IntoIterator<Item = (RelationRow, u64, u64)>,
+) -> Option<(u64, usize, u64)> {
+    let mut solver = StructuredGauss::new(base.len() + 1, order);
+    let mut seen = HashSet::new();
+    let mut accepted = 0usize;
+    for (coefficients, u, v) in relations {
+        // Sum(coefficients_i * base_i) = [u]G + [v]Q.
+        // Thus A*ell - v*z = u, with the last column reserved for z.
+        if !seen.insert((coefficients.clone(), u % order, v % order)) {
+            continue;
+        }
+        let mut matrix_row: Vec<u64> = coefficients
+            .into_iter()
+            .map(|value| (value as i64).rem_euclid(order as i64) as u64)
+            .collect();
+        matrix_row.push((order - v % order) % order);
+        solver.add_row(matrix_row, u % order);
+        accepted += 1;
+        if let Some(z) = solver.pinned(base.len()) {
+            assert_eq!(
+                scalar(c, generator, z),
+                target,
+                "recovered log fails verification"
+            );
+            return Some((z, accepted, solver.work().0));
+        }
+    }
+    None
+}
+
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     if args.get(1).is_some_and(|value| value == "--small-field") {
@@ -720,6 +759,48 @@ mod tests {
                 expected_successes
             );
             assert_eq!(rows.iter().map(BTreeSet::len).sum::<usize>(), expected_rows);
+        }
+    }
+
+    #[test]
+    fn target_dependency_recovers_log_with_repeated_factor_rows() {
+        let c = PrimeCurve { p: 101, a: 7, b: 4 };
+        let sem = SemaevCurve::new(c.p, c.a, c.b);
+        let base = factor_base(&c, 4);
+        let generator = base[0];
+        let known_log = 37;
+        let target = scalar(&c, generator, known_log);
+        assert_eq!(scalar(&c, generator, 97), PrimePoint::INFINITY);
+        for m in [3, 4] {
+            let table = build_s3_pairs(&c, &sem, &base, &mut Stats::default());
+            let right = right_summands(&c, &base, m, &mut Stats::default());
+            let mut relations = Vec::new();
+            for v in [0, 1] {
+                for u in 0..97 {
+                    let public_point = c.add(
+                        &mut GroupOps::default(),
+                        scalar(&c, generator, u),
+                        scalar(&c, target, v),
+                    );
+                    for coefficients in all_s3_rows(
+                        &c,
+                        &base,
+                        public_point,
+                        &right,
+                        &table,
+                        &mut Stats::default(),
+                    ) {
+                        relations.push((coefficients, u, v));
+                    }
+                }
+            }
+            assert!(relations.iter().any(|(a, u, v)| {
+                relations
+                    .iter()
+                    .any(|(b, w, t)| a == b && (*u, *v) != (*w, *t))
+            }));
+            let result = recover_from_signed_rows(&c, generator, target, 97, &base, relations);
+            assert_eq!(result.map(|value| value.0), Some(known_log));
         }
     }
 
