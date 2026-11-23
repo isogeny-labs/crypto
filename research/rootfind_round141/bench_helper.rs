@@ -149,5 +149,22 @@ pub fn round141_oracle() {
             }
         }
     }
+    // Random full-width leading coefficients, compared against independent
+    // Fermat inversion. This probes beyond the small deterministic coefficients.
+    for p in [65_521u64, 1_000_000_007, 4_294_967_291, (1u64 << 61)-1] {
+        let mut tally=FieldTally::default();
+        let mut field=Fp {p,tally:&mut tally};
+        let mut state=p^0x141_5054_2026u64;
+        for _ in 0..4096 {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let lead=1+state%(p-1);
+            let mut polynomial=vec![1,lead];
+            field.make_monic(&mut polynomial);
+            assert_eq!(polynomial[0],field.pow(lead,p-2),
+                       "random full-width leading inverse p={p}, lead={lead}");
+        }
+    }
     println!("round141 independent inversion and quadratic oracles PASS");
 }
