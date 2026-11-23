@@ -2,7 +2,7 @@
 title: "A phased curve panel for ecbench"
 subtitle: "20-, 30-, 60-, and 80-bit subgroup gates"
 author: "Isogeny Labs research planning"
-date: "2026-11-17"
+date: "2026-11-17; lane revision 2026-11-20"
 geometry: margin=0.72in
 colorlinks: true
 linkcolor: blue
@@ -29,6 +29,26 @@ The exact identities, parameters, and current execution states are frozen in
 [`panel.json`](panel.json). Promotion is a scientific-readiness decision. The
 separate end-to-end claim gate in [`PROTOCOL.md`](PROTOCOL.md) is required for
 any speedup statement. [pcc:unverified]
+
+The curve ladder is crossed with four independently promoted lanes. Algebraic
+decomposition and generic table/root-finding decomposition remain separate
+tracks. Direct hyperelliptic/Jacobian work is a third lane, and a typed
+cover/transfer plus destination-solver and source-recovery pipeline is a fourth.
+Phase 1 now pins one exact direct Jacobian cell and one exact typed cover route.
+The direct entry is an 18-bit prime subgroup of a genus-2 Jacobian with
+same-Jacobian negation rho and hyperelliptic index calculus. The transfer entry
+is a degree-three same-field pullback from `P1-K0-23` to a genus-3 Jacobian
+image with source rho, generic destination rho/BSGS controls, a
+pushforward-projected characteristic-two hyperelliptic relation candidate,
+source replay, and nine-phase cold wall accounting. Phases 2–4 remain blocked. These are executable
+preregistrations, not completed measurements or speedup results [12–15].
+
+| Lane | P1 | P2 | P3 | P4 |
+|---|---|---|---|---|
+| elliptic algebraic | ready | ready | partially blocked | blocked |
+| elliptic generic decomposition | ready | ready | partially blocked | blocked |
+| hyperelliptic/Jacobian | ready | blocked | blocked | blocked |
+| cover/transfer | ready | blocked | blocked | blocked |
 
 ![Four phased panels separated by admission, correctness, rank, replay, and resource gates. The speedup-claim gate is a separate branch. [pcc:unverified]](phased-panel.svg)
 
@@ -73,6 +93,7 @@ not evidence that this study’s methods solve them faster. [pcc:unverified]
 | P1-P20 | 20 | 20-bit prime | 1 | generic short Weierstrass | runnable narrow |
 | P1-P25-J0 | 21 | 25-bit prime | 12 | `j=0`, order-6 automorphism sentinel | runnable narrow |
 | P1-P28-J1728 | 23 | 28-bit prime | 50 | `j=1728`, order-4 automorphism sentinel | runnable narrow |
+| P1-JG2-18 | 18 | `F_769`, genus-2 Jacobian | 3 | direct higher-genus destination | runnable narrow |
 | P2-KOBLITZ-37 | 28 | `GF(2^37)` | 596 | Koblitz high-cofactor stress | runnable narrow |
 | P2-B27 | 27 | `GF(2^27)` | 2 | general binary | runnable narrow |
 | P2-P32a | 32 | 32-bit prime | 1 | standard-panel `a=-3` prime | runnable narrow |
@@ -90,6 +111,15 @@ The two external anchors use the exact Certicom parameters mirrored at pinned
 `efd49aa0a802cda679748533ec5bc5e44ab9ea71`, blob
 `a82dc0ee00a6d25bbfc09f260a4e5430a2a52f9e` [7]. They deliberately have no
 local ICV1 or EC1 yet. [pcc:unverified]
+
+The Phase 1 transfer route is not another source cell. It maps the exact
+`P1-K0-23` order-`2095853` subgroup through
+`phi(u,v)=(u^3,u*v+1)` to the pullback image in
+`Jac(v^2+u^2*v=u^7+u)` over the same `GF(2^23)`. Because `gcd(3,r)=1`, the
+implemented degree-three composition certificate makes the restriction
+injective conditional on the registered exact source order. Destination
+Jacobian operations remain unpriced in source GAE; wall-time comparisons and
+that lower-bound operation ledger must be reported separately [13–15].
 
 ### Trait cautions
 
@@ -161,9 +191,12 @@ sequence is:
 5. **Resources:** the next preregistered envelope fits the approved budget with
    4× headroom or receives an explicit revised cap before running.
 
-At least one candidate in each mandatory core family must complete the phase.
-Phase 1’s four extra sentinels are also mandatory. A failed family stops at that
-boundary; a redesigned algorithm restarts at Phase 1 under a new ID.
+At least one candidate in each mandatory core family must complete a ready
+elliptic lane. Phase 1’s four extra sentinels are also mandatory. Higher-genus
+and transfer lanes have their own mandatory destination objects and route
+obligations. Promotion is per lane: a failed or blocked lane stops at that
+boundary without blocking or promoting another lane. A redesigned algorithm
+restarts at Phase 1 under a new ID.
 
 The default 0.80 full-rank probability, 16 episodes, 2× maximum yield shortfall,
 and 4× resource headroom are operational program thresholds, not mathematical
@@ -205,9 +238,12 @@ the committed registry/traits catalogues, repository protocols, and the primary
 standards/challenge sources below. No curve facts were filled from an unpinned
 search result.
 
-The crypto source snapshot used for selection was
-`46ad9d87de45e372f8a741a3a38dee5b385425eb`. This report creates no ecbench
-session and makes no performance observation.
+The original curve-ladder selection used crypto source snapshot
+`46ad9d87de45e372f8a741a3a38dee5b385425eb`; the Phase 1 adapter revision is
+implemented in this report's PR source. One-target L0 smoke runs checked both
+direct-Jacobian arms and both transfer adapters, but they are correctness
+diagnostics only. No 32-target canonical Phase 1 session has run, and this
+report makes no performance observation.
 
 ## Sources
 
@@ -222,3 +258,7 @@ session and makes no performance observation.
 9. Isogeny Labs crypto, [`docs/ecbench/README.md`](../../docs/ecbench/README.md) and [`src/cryptanalysis/ecbench/workload.rs`](../../src/cryptanalysis/ecbench/workload.rs), current constructor and method boundaries.
 10. Isogeny Labs crypto, [`research/relation_yield_pruning_20261031/PROTOCOL.md`](../relation_yield_pruning_20261031/PROTOCOL.md), familywise pruning and full-rank success protocol.
 11. Isogeny Labs crypto, [`docs/ic/SUCCESS_CRITERIA.md`](../../docs/ic/SUCCESS_CRITERIA.md), end-to-end evidence and target-count gates.
+12. Isogeny Labs crypto, [`research/ic_acct3_hec_ecbench_20261021/AUDIT_IR.md`](../ic_acct3_hec_ecbench_20261021/AUDIT_IR.md), direct hyperelliptic/Jacobian ecbench arm audit and its validation boundary.
+13. Isogeny Labs crypto, [`docs/curves/COVERS.md`](../../docs/curves/COVERS.md), executable cover catalogue and its explicit non-solver boundary.
+14. Isogeny Labs crypto, [`research/binary_genus2_cover_20261014/REPORT.md`](../binary_genus2_cover_20261014/REPORT.md), checked binary genus-2 cover maps without a destination-solver speed claim.
+15. Isogeny Labs crypto, [`docs/transfer-assessment/MEASUREMENT.md`](../../docs/transfer-assessment/MEASUREMENT.md), three-arm and nine-phase transfer measurement contract.

@@ -1,0 +1,42 @@
+name: CT235 Q73-only frozen native cost audit
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_*'
+      - '.github/workflows/ct235-single-target-audit.yml'
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_*'
+      - '.github/workflows/ct235-single-target-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_single_target_cost_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_native_panel.jsonl
+      - name: Independent code path synthetic corruption controls (not PCC)
+        run: |
+          set -euo pipefail
+          SCRIPT=research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_single_target_cost_audit.py
+          python3 "$SCRIPT" --self-test
+          python3 -O "$SCRIPT" --self-test
+          PANEL=research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_native_panel.jsonl
+          if test -f "$PANEL"; then
+            python3 "$SCRIPT" "$PANEL"
+            python3 -O "$SCRIPT" "$PANEL"
+          else
+            echo "CT235_PANEL_PENDING: self-test only; no native measurement audit yet"
+          fi

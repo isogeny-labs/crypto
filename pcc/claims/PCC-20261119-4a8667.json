@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T18:40:19Z",
+ "id": "PCC-20261119-4a8667",
+ "kind": "statement",
+ "producer": {
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "model": "codex",
+  "session": "conductor-local-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pilot-analysis.json",
+    "sha256": "14b3a23364cce8b5296b936c0f7566a393f2b85deab99192000a328ee6b84e52"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/analysis.rs",
+    "sha256": "b0c539318a1b89ec3733bb3a69f79e1279e558c6769cd5c7e88fb18bcab2d0f6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pilot-audit.json",
+    "sha256": "9aa6c28cecdcdd9a174df16c9073826f663c16dbee17afd3e17adb5d3b6286c3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "local-pilot-descriptive-analysis",
+ "statement": "Native analysis of the audited202bit-field pilot reports two measured runs per arm/endpoint on one shared target. Mean rho solve times are7.534853429s source and4.506049617s image; BSGS means13.549424225s and13.082871995s. These are descriptive L0 observations with differing rho work counts and unpriced native work, not an admitted endpoint ratio or conductor-effect claim."
+}

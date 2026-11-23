@@ -1,0 +1,5 @@
+# Fresh leaf-sum F4 replay on msolve 0.11.0
+
+Use the archived, independently validated `sum_coordinate.ms` for the same ordinary N31 residual `R=(551855874,2085658254)` and factor-base point set as the 30-variable control. Its invertible map is `s=u+v`, with the inverse `v=u+s`; the Boolean equation-row operation preserves the ideal. Preserve the earlier same-binary control from the sparse-equation packet, then run the leaf-sum input followed by a fresh control, making an exploratory control–candidate–control bracket.
+
+All three arms use the same hash-pinned msolve 0.11.0 binary and FLINT 3.6.0 library, `-g 2 -t 1 -v 2 -m 256`, one thread, fresh process state, 300-second wall cap, 1-GiB observed process-tree RSS gate, and 20-MiB output cap. The wrapper runs through the checked repository Sage launcher, with runtime information saved first. Preserve every completion, cap, and failure, including logs and basis files. Compare exact solver row/pair/matrix data; treat local wall time as exploratory. A completed candidate requires mapping all roots back through `v=u+s`, checking the original equations, and independent curve-point replay.

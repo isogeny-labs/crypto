@@ -1,0 +1,67 @@
+name: Prime31 RR9 cached Vandermonde original-curve B8 gate
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-rowupdate-gate-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_cached_vandermonde.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_cached_vandermonde.py
+      - research/prime31_ic_20261115/rr9/RR9_CACHED_VANDERMONDE_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-cached-vandermonde.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_cached_vandermonde.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_cached_vandermonde.py
+      - .github/workflows/prime31-rr9-cached-vandermonde.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pinned-prime31-vandermonde:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+      - name: Checkout original Prime31 arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only candidate RR9 algebraic examples
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_cached_vandermonde.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_cached_vandermonde.rs
+      - name: Original Rust library regression tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Complete signed B8 equality and failure-closed Rust tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_cached_vandermonde
+      - name: Preregistered paired A-B-B-A B8 half-table build benchmark
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_cached_vandermonde > prime31-rr9-cached-vandermonde-raw.json
+      - name: Independent Python BigInt chart and full 8x8 verification
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_rr9_cached_vandermonde.py prime31-rr9-cached-vandermonde-raw.json
+      - name: Preserve evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-cached-vandermonde-raw
+          path: prime31-rr9-cached-vandermonde-raw.json
+          if-no-files-found: warn
+          retention-days: 30
