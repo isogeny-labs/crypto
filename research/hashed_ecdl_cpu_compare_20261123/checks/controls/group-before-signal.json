@@ -1,0 +1,80 @@
+{
+  "scope": "Owned process-group signal propagation canary only; not memory-threshold or4GiB enforcement test",
+  "leader": 43659,
+  "observed": [
+    {
+      "pid": 43659,
+      "comm": "timeout",
+      "state": "S",
+      "parent": 43653,
+      "group": 43659,
+      "start_ticks": "2622012"
+    },
+    {
+      "pid": 43661,
+      "comm": "flock",
+      "state": "S",
+      "parent": 43659,
+      "group": 43659,
+      "start_ticks": "2622013"
+    },
+    {
+      "pid": 43662,
+      "comm": "bash",
+      "state": "S",
+      "parent": 43661,
+      "group": 43659,
+      "start_ticks": "2622014"
+    },
+    {
+      "pid": 43663,
+      "comm": "timeout",
+      "state": "S",
+      "parent": 43662,
+      "group": 43659,
+      "start_ticks": "2622015"
+    },
+    {
+      "pid": 43664,
+      "comm": "timeout",
+      "state": "S",
+      "parent": 43662,
+      "group": 43659,
+      "start_ticks": "2622015"
+    },
+    {
+      "pid": 43665,
+      "comm": "timeout",
+      "state": "S",
+      "parent": 43662,
+      "group": 43659,
+      "start_ticks": "2622015"
+    },
+    {
+      "pid": 43666,
+      "comm": "sleep",
+      "state": "S",
+      "parent": 43664,
+      "group": 43659,
+      "start_ticks": "2622015"
+    },
+    {
+      "pid": 43667,
+      "comm": "sleep",
+      "state": "S",
+      "parent": 43665,
+      "group": 43659,
+      "start_ticks": "2622015"
+    },
+    {
+      "pid": 43668,
+      "comm": "sleep",
+      "state": "S",
+      "parent": 43663,
+      "group": 43659,
+      "start_ticks": "2622015"
+    }
+  ],
+  "all_three_paths_share_guarded_group": true,
+  "expected_threshold_exercised": false
+}

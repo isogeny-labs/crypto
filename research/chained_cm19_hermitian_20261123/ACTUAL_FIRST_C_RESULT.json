@@ -1,0 +1,309 @@
+{
+  "schema": "chained-hermitian-first-call-outcome/v1",
+  "source": "323ece1140a7346630a2f172acc9303e723f3bd0",
+  "recorded": "2026-11-23T16:32:12.934545+00:00",
+  "exit": 0,
+  "phases": [
+    {
+      "recorded": "2026-11-23T16:30:11.275806+00:00",
+      "name": "clippy-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 38,
+        "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    {
+      "recorded": "2026-11-23T16:30:13.450046+00:00",
+      "name": "clippy",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    {
+      "recorded": "2026-11-23T16:30:13.291137+00:00",
+      "name": "compile",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    {
+      "recorded": "2026-11-23T16:30:11.400371+00:00",
+      "name": "format",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    {
+      "recorded": "2026-11-23T16:30:11.210435+00:00",
+      "name": "rustc-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 36,
+        "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    {
+      "recorded": "2026-11-23T16:30:11.333314+00:00",
+      "name": "rustfmt-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 46,
+        "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    {
+      "recorded": "2026-11-23T16:30:14.180945+00:00",
+      "name": "similitudes",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 82374,
+        "sha256": "484eca83180791abc44cafa7d5712c0babddd88b36223055bdfb41adea211ba8",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    }
+  ],
+  "guard_failures": [],
+  "native_summary_verbatim": "SUMMARY\tautomorphisms=12\tfour_maps=156\t2divisible=12\tmixed4422=144\tcomplete_fixed_H_multiplier4=PASS\tactual_alpha_divisor_maps=OPEN\tDLP_cost=UNMEASURED",
+  "native_lattice_counts_classes_verbatim": [
+    "LATTICE\tH=[[Z(2, 0), Z(1, 0), Z(-1, 0)], [Z(1, 0), Z(3, 0), Z(-2, 1)], [Z(-1, 0), Z(-1, -1), Z(3, 0)]]\tinverse=[[Z(2, 0), Z(-2, 1), Z(1, 1)], [Z(-1, -1), Z(5, 0), Z(3, -2)], [Z(2, -1), Z(1, 2), Z(5, 0)]]\ttrace_Gram=[[4, 2, 2, 1, -2, -1], [2, 20, 1, 10, -1, -10], [2, 1, 6, 3, -3, -11], [1, 10, 3, 30, 8, -15], [-2, -1, -3, 8, 6, 3], [-1, -10, -11, -15, 3, 30]]\tdet_trace=6859",
+    "VECTOR_GRID\tfirst=35\tother=85\tgrid=252875\tcomplete bounds [24,60,60]\tnorm1=0",
+    "VECTOR_COUNT\tnorm=1\tcount=0",
+    "VECTOR_COUNT\tnorm=2\tcount=6",
+    "VECTOR_COUNT\tnorm=3\tcount=14",
+    "VECTOR_COUNT\tnorm=4\tcount=12",
+    "VECTOR_COUNT\tnorm=5\tcount=60",
+    "VECTOR_COUNT\tnorm=6\tcount=42",
+    "VECTOR_COUNT\tnorm=7\tcount=90",
+    "VECTOR_COUNT\tnorm=8\tcount=90",
+    "VECTOR_COUNT\tnorm=9\tcount=102",
+    "VECTOR_COUNT\tnorm=10\tcount=144",
+    "VECTOR_COUNT\tnorm=11\tcount=192",
+    "VECTOR_COUNT\tnorm=12\tcount=194",
+    "KERNEL_CLASSES\t{[1, 1, 2, 2, 4, 4]: 144, [2, 2, 2, 2, 2, 2]: 12}",
+    "FIRST_LEX_MIXED\tSome([[Z(-4, 0), Z(-2, 0), Z(2, 0)], [Z(2, 2), Z(-1, 2), Z(-1, -2)], [Z(-4, 2), Z(-3, 1), Z(3, -1)]])"
+  ],
+  "native_first_map_verbatim": "FOUR_MAP\tid=0\tS=[[Z(-4, 0), Z(-2, 0), Z(2, 0)], [Z(2, 2), Z(-1, 2), Z(-1, -2)], [Z(-4, 2), Z(-3, 1), Z(3, -1)]]\tdet=Z(8, 0)\tNorm=64\tSmith=[1, 1, 2, 2, 4, 4]\tF4rank=1\tdet_at3=8\tdet_at9=8\t2divisible=false",
+  "complete_stdout": {
+    "bytes": 82374,
+    "sha256": "484eca83180791abc44cafa7d5712c0babddd88b36223055bdfb41adea211ba8"
+  },
+  "files": {
+    "BUILD_MANIFEST.json": {
+      "bytes": 18561,
+      "sha256": "401a56f67b3a6a877ba2da23032006cf780bd457b2151d3c8644e6335c8c381e"
+    },
+    "CONTEXT.json": {
+      "bytes": 5184,
+      "sha256": "dae02ac581ad59ed2d78275a66b5d9c9af0a726ee21d6b1945e7feb106401a89"
+    },
+    "POST_CALL_MANIFEST.json": {
+      "bytes": 18791,
+      "sha256": "5b852ef164cafbd64b1f2cf58b121360370fc6df8dfade683ea90d998b1cbcd0"
+    },
+    "PRE_CALL_MANIFEST.json": {
+      "bytes": 18682,
+      "sha256": "c91bf58c76b7d418ec67deaff049fde5dce65cfbd580d01781ae32fdb67a0d33"
+    },
+    "clippy-version.argv": {
+      "bytes": 43,
+      "sha256": "76845bb28fc4cca7a47668988a31ba3a650a88808014e5dac29b8f2812391548"
+    },
+    "clippy-version.phase.json": {
+      "bytes": 401,
+      "sha256": "5c352ee8d287d2e4f9ee181fc3ab725e07dc0ab7ac01c5be0e93eca386f8c0a8"
+    },
+    "clippy-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy-version.stdout": {
+      "bytes": 38,
+      "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038"
+    },
+    "clippy.argv": {
+      "bytes": 251,
+      "sha256": "dcd00cda75ef5fd667685e36a7ce4ba31222ad931b863e8a380b626fafd4d012"
+    },
+    "clippy.phase.json": {
+      "bytes": 392,
+      "sha256": "36db07ca713dc3040894dc1446a8c2064d680a1e971433747058ed846c652ebb"
+    },
+    "clippy.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "compile.argv": {
+      "bytes": 318,
+      "sha256": "dcabba66e5c285fea2148f2dfb72540864f2724bf5f132f86d447e75717b50fa"
+    },
+    "compile.phase.json": {
+      "bytes": 393,
+      "sha256": "db85539e90ea424b1d7c6d48c54d760820ef38d05c1a1cd0a83f6362b43c62b8"
+    },
+    "compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final-guards.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final-guards.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "format.argv": {
+      "bytes": 168,
+      "sha256": "4a72fecdd5375677d119c7b857b65ddbcb210c51bea6f483c7fa709aca17bca7"
+    },
+    "format.phase.json": {
+      "bytes": 392,
+      "sha256": "bab359e52e08be661523d9404582269cff2ed73a1085f5e85403e1b7fb0932bf"
+    },
+    "format.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "format.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "init.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "init.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pre-call.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pre-call.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rustc-version.argv": {
+      "bytes": 35,
+      "sha256": "0c84f2e54be6a2a8da3f7574fbb69a9de26a77188e5b56a10aef6e49ded0004f"
+    },
+    "rustc-version.phase.json": {
+      "bytes": 400,
+      "sha256": "42ebe9497db662b154d680d528bb718b89474c92fca159011a554818b57cc86b"
+    },
+    "rustc-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rustc-version.stdout": {
+      "bytes": 36,
+      "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98"
+    },
+    "rustfmt-version.argv": {
+      "bytes": 37,
+      "sha256": "29d02920eed6ed38c5977a39ed0de2ff173f7555bacd2b97b0e8f7ac242bb168"
+    },
+    "rustfmt-version.phase.json": {
+      "bytes": 402,
+      "sha256": "b7a9a2a611f34e93150403978d499526a16f8b41003c2640c3117b781f6ee92b"
+    },
+    "rustfmt-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rustfmt-version.stdout": {
+      "bytes": 46,
+      "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be"
+    },
+    "similitudes.argv": {
+      "bytes": 43,
+      "sha256": "b5aa611a717edac4c574b9ae3ef5d38515f9123cd4b50f6dca085943a773d1e3"
+    },
+    "similitudes.phase.json": {
+      "bytes": 401,
+      "sha256": "9a3229ce8c713b11e03f0c3057635d766d861b5cf785cc796c135801ef812154"
+    },
+    "similitudes.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "similitudes.stdout": {
+      "bytes": 82374,
+      "sha256": "484eca83180791abc44cafa7d5712c0babddd88b36223055bdfb41adea211ba8"
+    }
+  },
+  "original_ELF": {
+    "bytes": 4671000,
+    "sha256": "40cd998a8339c4a0a54bf288c59079686f9bd9f5e01821c3ce45f4007f91e8e1",
+    "mode": 365
+  },
+  "original_ELF_local_path": "/dev/shm/ct23-hermitian-first-C/qualifier",
+  "original_ELF_custody": "Whole original bytes temporarily retained; approved-store/CI custody pending.",
+  "limits_unchanged": true,
+  "scope": "Complete fixed primary CM19 H/multiplier4 integral search under proved coordinate bounds, not all lattices/polarizations or an actual divisor map.",
+  "standing": "Unsigned native finite arithmetic. Cited equivalence/classification supply abstract genuine-source bridge; actual coordinate alpha/J4/correspondence/target maps, independent generic Mathlib/replay and complete ECDLP costs remain open."
+}

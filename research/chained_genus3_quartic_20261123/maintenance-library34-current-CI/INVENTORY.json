@@ -1,0 +1,112 @@
+{
+  "schema": "chained-shared-formal-CI-review/v1",
+  "observed_at": "2026-11-23T15:28:21.504112+00:00",
+  "pr": "aburan28/crypto-lean#34",
+  "head": "b0c73236f22b988feba0a73e58e57e0b5272bbad",
+  "review_scope": "Scheduled current-head review; earlier first inventory concerned cd0a840a. This is not a theorem execution or retry.",
+  "all_attempt_checks": [
+    {
+      "id": 137657420576,
+      "name": "selftest",
+      "head_sha": "b0c73236f22b988feba0a73e58e57e0b5272bbad",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-23T11:20:52Z",
+      "completed_at": "2026-11-23T11:20:55Z",
+      "html_url": "https://github.com/aburan28/crypto-lean/actions/runs/45164375447/job/137657420576",
+      "output": {
+        "title": null,
+        "summary": null,
+        "text": null,
+        "annotations_count": 1,
+        "annotations_url": "https://api.github.com/repos/aburan28/crypto-lean/check-runs/137657420576/annotations"
+      }
+    },
+    {
+      "id": 137657420105,
+      "name": "build-and-audit",
+      "head_sha": "b0c73236f22b988feba0a73e58e57e0b5272bbad",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-23T11:20:52Z",
+      "completed_at": "2026-11-23T11:20:54Z",
+      "html_url": "https://github.com/aburan28/crypto-lean/actions/runs/45164375447/job/137657420105",
+      "output": {
+        "title": null,
+        "summary": null,
+        "text": null,
+        "annotations_count": 1,
+        "annotations_url": "https://api.github.com/repos/aburan28/crypto-lean/check-runs/137657420105/annotations"
+      }
+    }
+  ],
+  "all_event_workflow_runs": [
+    {
+      "id": 45164375447,
+      "name": "CI",
+      "head_sha": "b0c73236f22b988feba0a73e58e57e0b5272bbad",
+      "status": "completed",
+      "conclusion": "failure",
+      "event": "pull_request",
+      "run_attempt": 1,
+      "created_at": "2026-11-23T11:20:52Z",
+      "updated_at": "2026-11-23T11:20:55Z",
+      "html_url": "https://github.com/aburan28/crypto-lean/actions/runs/45164375447"
+    }
+  ],
+  "pagination_complete": true,
+  "within30_check_budget": true,
+  "complete_public_annotations": [
+    {
+      "name": "selftest",
+      "path": "research/chained_genus3_quartic_20261123/maintenance-library34-current-CI/ct23-library34-latest-selftest-public-annotations.json",
+      "bytes": 410,
+      "sha256": "a0d34269269d81433c529baed3da46e8e39ff9405b6c3c82d00d3763e6f06aad",
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/aburan28/crypto-lean/blob/b0c73236f22b988feba0a73e58e57e0b5272bbad/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because your account is locked due to a billing issue.",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "path": "research/chained_genus3_quartic_20261123/maintenance-library34-current-CI/ct23-library34-latest-build-public-annotations.json",
+      "bytes": 410,
+      "sha256": "a0d34269269d81433c529baed3da46e8e39ff9405b6c3c82d00d3763e6f06aad",
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/aburan28/crypto-lean/blob/b0c73236f22b988feba0a73e58e57e0b5272bbad/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because your account is locked due to a billing issue.",
+          "raw_details": ""
+        }
+      ]
+    }
+  ],
+  "finding": "Both required jobs never started because account is locked due to billing issue. No selftest/build/instance/axiom audit executed.",
+  "connector_annotation_error": "Generic annotation URL not in connector allowlist; full error retained privately. Same public REST annotation endpoint fetched via ordinary unauthenticated curl, no credential/account/backend change.",
+  "private_complete_API_responses": [
+    "/dev/shm/ct23-library34-second-CI-0.json",
+    "/dev/shm/ct23-library34-second-CI-1.json",
+    "/dev/shm/ct23-library34-second-CI-2.json"
+  ],
+  "private_API_custody": "Whole original wrappers retained temporarily; full remote custody pending.",
+  "next_unchanged_review_not_before": "2026-11-23T19:28:21.504112+00:00",
+  "unchanged_limits_and_no_retry": true,
+  "standing": "Unsigned metadata; billing access block, not mathematical rejection or gate waiver."
+}

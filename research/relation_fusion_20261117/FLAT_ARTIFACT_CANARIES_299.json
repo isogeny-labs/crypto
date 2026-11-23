@@ -1,0 +1,24 @@
+{
+  "schema": "flat-saved-artifact-canary-qualification/v1",
+  "auditor_source": "FLAT_ARTIFACT_AUDIT_SOURCE_296.json",
+  "positive_audit": "FLAT_ARTIFACT_AUDIT_297.json",
+  "positive_exit_code": 0,
+  "canaries": [
+    {
+      "id": 298,
+      "changed": "copied direct outcome+summary remove mutation obligations",
+      "exit_code": 1,
+      "error": "complete mutation roster"
+    },
+    {
+      "id": "299b",
+      "changed": "copied worker summary contradicts negative-control expectation",
+      "exit_code": 1,
+      "error": "negative control summary binding"
+    }
+  ],
+  "earlier_299_receipt": "first shell appended cat, so shell exit0 was not the analyzer exit; direct299b rerun records exit1, first logs retained",
+  "originals_not_overwritten": "canary copies use atomic replacement, never shared inode writes",
+  "timing_claim": false,
+  "signed_execution_verdict": false
+}

@@ -1,0 +1,14 @@
+FINDING: schema: created: '2026-11-23T13:59:53.807Z' does not match '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+FINDING: schema: decision_rule: 'comparison_ids' is a required property
+FINDING: schema: decision_rule: 'statistic' is a required property
+FINDING: schema: decision_rule: 'interval' is a required property
+FINDING: schema: decision_rule: 'multiple_comparison_correction' is a required property
+FINDING: schema: decision_rule: 'effect_size_measure' is a required property
+FINDING: schema: execution/retries/infrastructure_only: True was expected
+FINDING: schema: freeze: 'protocol_sha256' is a required property
+FINDING: schema: freeze: 'commit' is a required property
+FINDING: schema: freeze: 'frozen_at' is a required property
+FINDING: schema: freeze: 'filed_before_affected_data' is a required property
+FINDING: schema: metrics/primary/0/aggregation: 'none' is not one of ['per_row', 'median', 'mean', 'min', 'max', 'sum', 'rank', 'distribution', 'paired_ratio']
+FINDING: schema: randomization/seed_derivation/method: 'explicit' is not one of ['protocol_hash_sha256', 'explicit_list', 'external_nonce', 'harness_drawn']
+FAIL: experiment.protocol/v1 research/hashed_ecdl_cpu_compare_20261123/protocol.draft.json (13 finding(s))

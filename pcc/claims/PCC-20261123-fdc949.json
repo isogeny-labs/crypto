@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:16:26Z",
+ "id": "PCC-20261123-fdc949",
+ "kind": "execution",
+ "producer": {
+  "commit": "92b9dae5db72775a0c4b2244253f082d37a0807a",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/trace-integration-20261123/validation/post-execution-qualification.json",
+    "sha256": "de605daad10e13a679bca6ac7e80fe660542704a212ac4957479233d8ac6900d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/trace-integration-20261123/validation/one-arm-recorded-proof.json",
+    "sha256": "c595e56eae3cd026ec903ae7731fa24979f13dac616ad046d7eb4486240c1d6c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned native Rust development receipts report 51 worker tests and 155 qualifier tests passing, strict scoped Clippy passing, and one-worker recorded Run51 graph/kernel/affine/coordinate/elliptic replay completing under an 8GiB address-space cap. Current-root release library compilation separately exits101 on unchanged base syntax; scoped code explicitly links pinned Root41. No new natural-yield or paid performance trial or parity result."
+}

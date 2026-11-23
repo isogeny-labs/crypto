@@ -1,0 +1,12 @@
+Diff in /dev/shm/ct23-model-isomorphism-first-C/source/research/chained_realcurve_torsion_20261123/model_isomorphism/main_c.rs:406:
+     let charts = MODELS.map(|model| Chart::new(&f, &model));
+     for chart in &charts {
+         chart.controls();
+-        println!("MODEL coefficients={:?} roots={:?}", chart.model, chart.roots);
++        println!(
++            "MODEL coefficients={:?} roots={:?}",
++            chart.model, chart.roots
++        );
+     }
+     let fixtures: Vec<_> = LABELS
+         .iter()
