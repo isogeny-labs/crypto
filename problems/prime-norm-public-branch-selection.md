@@ -334,3 +334,53 @@ coefficient and complete expected bit cost remain separate. Published fast
 interpolation with one Lagrange ordinate per abscissa is not automatically
 admitted for this list input. Optional anchored cubic/norm restriction
 sketch is unvalidated and does not close the finder.
+
+
+## 2026-11-23: fixed four-point helper has a canonical quadratic residual
+
+[Current factor status](../research/prime_orientation_layers_20261114/transport/public-input-evidence/STATUS-20261123-005.md)
+and [versioned report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-norm-factors-001.pdf)
+record source056/build059/local029:147primary statements,14new since133,
+default-limit exit0/no warnings/all standard printed dependencies.
+For the actual fixed support4control, a nonzero actual curve normN of degree
+at most30 has the derived monic degree28factor
+L=(X-Cxt)^4*product_{x in S}(X-Cx)^8, and actual quotientQ=N /ₘL
+satisfies N=LQ,Qnonzero,degreeQ<=2. Neither successful factor nor quotient
+is supplied. PCC-20261123-148f8a/6e7e87remain unsigned, outside shared
+Transport53/57 audit/fresh [pcc:unverified].
+
+The missing semantic arrow from actual mixed jets to original branch
+evaluation is now closed through a separately audited public evaluation
+identity. Evaluated remainder equality at the derived formal root gives
+norm factorization into plus/minus original branch evaluations; paired
+full4gives normseriesorder8, target full4gives order4. A separately audited
+series/root-power equivalence and actual coprime product prove the factors.
+No ambient remainder jets, favorable branch, hidden rank, residual
+splitting or scalar labels are assumed [pcc:unverified].
+
+The algebraic statements need cubic degree3 and the explicit local point,
+nonzero2y and distinct-node premises, not an already identified globally
+nonsingular elliptic group. An elliptic/scalar conclusion must still bind
+f to the actual Weierstrass cubic and required nonsingularity/subgroup
+hypotheses. Existing NormGroupBridge.principalPointProduct/fullNormPointSum
+provide a norm-to-group route for their distinct-simple-point/nodal-norm
+hypotheses, and targetScalarFromSum exposes supplied-other-label premises.
+Repeated factors do not automatically instantiate those hypotheses.
+Source-only review PCC-20261123-8fa3bdpins exact prior statements; no
+unchanged old proof/native replay was run [pcc:unverified].
+
+Next discriminator: derive actual paired-factor normalization in A andB,
+not only their norm. Test G^4|A,B for actual G=productS(X-Cx), using both
+branch evaluations and unit2y. Construct canonical A'=A /ₘG^4,
+B'=B /ₘG^4 and derive degreeA'<=3,degreeB'<=1. This is prospective, not an
+accepted normalization theorem. Then map the actual function to
+multiplicity-aware principal ideals/group relations, handling residual
+degree0/1/2, field of definition, infinity/zero/ramification/duplicates.
+Check whether public known scalar labels are produced. Degree-two residual
+alone supplies neither base-field roots nor their logarithms [pcc:unverified].
+
+Original public-finder, full input/subgroup coverage and complete
+exp(o(log r)) expected bit-cost exit criteria remain unchanged. Fixed
+support4does not grow with subgroup size. No algorithm, timing/scaling
+claim or universal nonexistence follows. No paid/cloud/native/attack
+campaign, vault/signing, protected-ledger rewrite or gate bypass was used.

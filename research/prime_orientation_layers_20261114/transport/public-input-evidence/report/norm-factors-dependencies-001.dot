@@ -1,0 +1,13 @@
+digraph G {
+ graph[rankdir=TB,bgcolor="white",ranksep=.24];
+ node[shape=box,fontname="Helvetica",fontsize=11,style="rounded,filled",fillcolor="#edf4fa"];
+ jets[label="ACTUAL ORIGINAL HELPER FULL JETS\nDerived formal branch + exact evaluation equality"];
+ norm[label="ACTUAL NORM SERIES ORDERS\nPaired full4 -> at least8; targetfull4 -> at least4\nOriginal branch product; evaluated remainder identity"];
+ root[label="ACTUAL POLYNOMIAL ROOT POWERS\nSeries order iff (X-Cx)^r divides polynomial"];
+ factor[label="ACTUAL FORCED FACTOR L\nDistinct coprime root powers; monic degree28"];
+ quotient[label="CANONICAL Q=N /m L\nN=LQ, Q nonzero, degreeQ<=2\nActual nonzero norm has degree<=30"];
+ map[label="OPEN: paired A/B normalization and model binding\nMultiplicity-aware principal ideal / actual group relation",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ cost[label="OPEN: useful residual base membership / known logs\nGrowing public finder / retries / complete bit cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ jets->norm->root->factor->quotient;
+ quotient->map[style=dashed];map->cost[style=dashed];
+}
