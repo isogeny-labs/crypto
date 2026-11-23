@@ -1,0 +1,574 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "HASHED-ECDL-CPU-SCRATCH-PUBLIC-TARGETS-20261123",
+  "version": 1,
+  "created": "2026-11-23",
+  "repository": "crypto",
+  "study_dir": "research/hashed_ecdl_cpu_compare_20261123",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "preflight": "PREFLIGHT.md",
+    "historical_errata": "../hashed_ecdl_cpu_scale_20261123/SOURCE-RECONCILIATION-ERRATA.md",
+    "source_review": "reviews/SOURCE-RECONCILIATION-10.json",
+    "preflight_design_review": "reviews/PREFLIGHT-DESIGN-REVIEW-11.json"
+  },
+  "question": "On twelve fixed public targets at m8/batch64, do staged-numerator parent and reverse-pass candidate preserve complete recovery, certificates and counters, and what L0 complete/driver/oracle clock ranges and matched ratios are recorded?",
+  "claims": [
+    {
+      "id": "C-exact",
+      "class": "exact_computation",
+      "text": "All360fixed cells complete within declared limits with identical full certificates/structural counters, successful Native replay and required OpenSSL positive/corruption checks.",
+      "decided_by": []
+    },
+    {
+      "id": "C-diagnostic",
+      "class": "exact_computation",
+      "text": "Frozen native analysis reports observed per-target/arm medians, full ranges and parent/candidate clock ratios; these are descriptive summaries of recorded data.",
+      "decided_by": []
+    },
+    {
+      "id": "C-unpriced",
+      "class": "out_of_scope",
+      "text": "No total-operation S, ranked timing, asymptotic exponent, global strongest solver or population/security claim is decided by these L0 clocks.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "a",
+      "role": "baseline",
+      "description": "Staged numerator Scratch parent, batch64",
+      "parameters": {
+        "m": 8,
+        "batch": 64,
+        "max_rows": 20000000,
+        "max_trials": 16,
+        "max_columns": 16384,
+        "max_work": 20000000
+      },
+      "instrument": {
+        "repo": "crypto",
+        "commit": "310d7fb0d908e9ca32c7d9282e31810b700d52cd",
+        "binary_sha256": "abd2bd503e39073c33c2725a4bd4f8dc88a146d88e0a90a0cafbb45bfd4094ca",
+        "threads": 1,
+        "flags": {
+          "native_arm": "u",
+          "variant_lib_origin": "4939261c9fcc48bf86f17ac36fa458f52a155b2e",
+          "common_source": "108-input snapshot; sole replacement is CPUlib; see checks/source-*-before-build.sha256"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml",
+            "--bins",
+            "--examples"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "b",
+      "role": "candidate",
+      "description": "Current reverse-pass numerator candidate, batch64",
+      "parameters": {
+        "m": 8,
+        "batch": 64,
+        "max_rows": 20000000,
+        "max_trials": 16,
+        "max_columns": 16384,
+        "max_work": 20000000
+      },
+      "instrument": {
+        "repo": "crypto",
+        "commit": "310d7fb0d908e9ca32c7d9282e31810b700d52cd",
+        "binary_sha256": "2a648031cf8f02c6dc6f69f4cd457941b907411e743ed0e36d67a8d52ccaee69",
+        "threads": 1,
+        "flags": {
+          "native_arm": "u",
+          "variant_lib_origin": "c47886258a0e2b3d00a0734f059aaaa3373ca322",
+          "common_source": "108-input snapshot; sole replacement is CPUlib; see checks/source-*-before-build.sha256"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml",
+            "--bins",
+            "--examples"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "c",
+      "role": "control_aa",
+      "description": "Staged numerator Scratch parent, batch64",
+      "parameters": {
+        "m": 8,
+        "batch": 64,
+        "max_rows": 20000000,
+        "max_trials": 16,
+        "max_columns": 16384,
+        "max_work": 20000000
+      },
+      "instrument": {
+        "repo": "crypto",
+        "commit": "310d7fb0d908e9ca32c7d9282e31810b700d52cd",
+        "binary_sha256": "abd2bd503e39073c33c2725a4bd4f8dc88a146d88e0a90a0cafbb45bfd4094ca",
+        "threads": 1,
+        "flags": {
+          "native_arm": "u",
+          "variant_lib_origin": "4939261c9fcc48bf86f17ac36fa458f52a155b2e",
+          "common_source": "108-input snapshot; sole replacement is CPUlib; see checks/source-*-before-build.sha256"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml",
+            "--bins",
+            "--examples"
+          ]
+        ]
+      },
+      "same_instrument_as": "a"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No separate target-treatment population. Both47-case known-answer suites and the36-call preflight validate recovery; every main certificate must pass Native and separately implemented OpenSSL point verification."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No sampled statistical null or timing-rejection claim. Every worker requires scalar-corruption rejection, and each main certificate has OpenSSL wrong-scalar and consistent-negated-target rejection controls."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "staged numerator parent",
+          "reverse-pass candidate"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "Common current108-input source snapshot; only exact CPUlib493/c478 differs. Original Rust1.99.1,locked offline release,two build jobs outside runs,separate targets and readonly qualifiers.",
+        "how": "Separate source/build paths and binary layout are disclosed. a/c use identical parent executable; b is intended library treatment. All source/binary hashes pinned before and after."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Six fixed curves,fieldbits20/24/28/32/36/40; orderbits20/25/28/32/36/41; public seeds101/202 each; m8,tau=2ceil(r^(1/8))+2,trials16,rows20M,columns16384.",
+        "how": "Same unchanged scale.rs x-search public-target construction; no supplied target scalar. Canonical instance_id=case-seed; two seeds are different targets."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing local shared host; one worker,no concurrent builds/tests; worker/external Native affinity CPU4; L0. Capture CPU/kernel/cgroups/affinity. No isolated-host inference."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh process per cell;ASLR and source-separated link layout remain.4GiB worker virtual limit;15,032,385,536-byte sampled whole-cgroup stop including retained data. Table capacity excludes scratch/other allocations; peak RSS unmeasured."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Round0 warmup retains preflight order. Measured rounds1..9 use3Latin rotation blocks of3, middle block reversed. Every arm occupies each position exactly3times per target. Case and seed ordinal rotate starting labels."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Unblinded producer knows source mapping. Frozen native summaries use neutral a/b/c labels; no significance/equivalence verdict or population generalization is licensed."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "a",
+          "c"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-parent-candidate",
+        "arms": [
+          "a",
+          "b"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa-candidate",
+        "arms": [
+          "c",
+          "b"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Source mapping is known; exact control outcome and descriptive timings only. Frozen analyzer, no inferential timing decision.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Census of existing six public-target fixtures and both fixed seeds;12targets,no population/scale extrapolation."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        101,
+        202
+      ],
+      "nonce": null,
+      "note": "Frozen public target/oracle seeds shared across arms. Logical replicate is round0..9, warmup onlyround0; raw native fields remain unchanged."
+    }
+  },
+  "sample_size": {
+    "instances": 12,
+    "replicates": 9,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact certificate/counter census needs no sampling power. Nine fresh-process observations characterize full observed ranges; no p-value,equivalence or timing-significance rejection is planned.",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 1300,
+      "per_sample_seconds": null,
+      "fixed_seconds": null,
+      "threads": 1,
+      "measured_on": "Published warmup-only36-cell phase05:13:37:24..13:39:07UTC,36complete and all point controls. Conservative104s whole-phase span x10 x1.25=1300s planning estimate,not guarantee. Main driver ceiling1500s; finalization/audit120s each; nominal1800s including grace/metadata. No preflight rows pooled."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "completed_calls",
+        "name": "Complete verified executions",
+        "kind": "exact",
+        "unit": "calls",
+        "definition": "Every scheduled cell must recover and externally verify its fixed public target; full certificate/counter equality and all point controls required.",
+        "source": "analysis.json and point-audit/summary.json",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "complete_seconds",
+        "name": "Complete internal worker interval",
+        "kind": "timed",
+        "unit": "seconds",
+        "definition": "Curve/public-target construction, all setup/trials/oracle/reduction/internal replay, Archive verification and serialization; excludes launch,I/O,external verifier and point audit.",
+        "source": "summary.csv complete_*",
+        "aggregation": "median",
+        "resolution": "Rust Instant as f64 seconds; effective host resolution unestablished",
+        "uncertainty": "range"
+      },
+      {
+        "id": "driver_seconds",
+        "name": "Enclosing worker and Native replay interval",
+        "kind": "timed",
+        "unit": "seconds",
+        "definition": "Monotonic interval from spawning worker through worker completion/I/O and external Native replay. Independent OpenSSL audit and final summary are outside interval.",
+        "source": "summary.csv driver_*",
+        "aggregation": "median",
+        "resolution": "Rust Instant as f64 seconds; effective host resolution unestablished",
+        "uncertainty": "range"
+      },
+      {
+        "id": "oracle_seconds",
+        "name": "Cumulative oracle interval",
+        "kind": "timed",
+        "unit": "seconds",
+        "definition": "All recorded oracle preparation/queries and discarded-trial work at fixed scope.",
+        "source": "summary.csv oracle_*",
+        "aggregation": "median",
+        "resolution": "Rust Instant as f64 seconds; effective host resolution unestablished",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "clock": "monotonic",
+    "counters": [
+      "scalar",
+      "relations",
+      "attempts",
+      "preparations",
+      "built_rows",
+      "probed_rows",
+      "query_inversions",
+      "table_bytes"
+    ],
+    "isolation_required": "L0",
+    "order": "alternate",
+    "record": [
+      "Each unchanged raw24-column worker row,complete certificate,worker/replay exits/logs",
+      "Logical a/b/c,case+seed instance_id,round,warmup; raw native arm/replicate/warmup preserved",
+      "Host CPU/kernel/cgroup/affinity; all source/executable/launcher identities before and after",
+      "Main failure/partial/unattempted flow and every OpenSSL control output"
+    ],
+    "warmups": 1,
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "explicit-user-local",
+    "measurement_class": "throughput",
+    "placement": {
+      "threads": 1,
+      "worker_affinity_cpu": 4,
+      "compiler_jobs_outside_run": 2,
+      "existing_machine_only": true,
+      "whole_cgroup_guard_bytes": 15032385536,
+      "retained_host_data_included_in_cgroup_readings": true,
+      "binary_source": "Common310d7fb0 snapshot plus exact493/c478CPUlib; separate source and qualified binary paths; V2 driver/launcher source pinned separately",
+      "worker_virtual_address_limit_bytes": 4294967296,
+      "virtual_limit_scope": "Worker wrapper and its timeout/taskset/worker only; driver,external Native verifier and point auditor do not have this4GiB ulimit."
+    },
+    "timeout_seconds": 1500,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "max_attempts": 1,
+      "infrastructure_only": true
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "3arms x12targets x10rounds=360cells,36warmups/324measured. No additional repeats,case changes,selective pooling or resume."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Any incorrect output,certificate/counter mismatch,failed replay/control,missing cell,source/hash mismatch or deadline invalidates complete-panel acceptance. Driver stops on first failed call; all planned/unattempted cells remain in final analysis. No retry."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "1500s driver phase; always-run separate120s finalization;120s point audit only after successful complete analysis. Outer kill grace10s per phase; nominal total ceiling1800s.120s worker/60s Native replay and original resource guard."
+    }
+  ],
+  "invalidation_rules": [
+    "Any required cell,certificate,counter or point-control failure invalidates complete-panel acceptance; retain every raw record and cause.",
+    "Malformed/nonfinite clock or inconsistent exit flags is invalid measurement metadata; do not infer algorithm impossibility.",
+    "No main clock from interrupted/resumed execution is valid; no resume/retry planned."
+  ],
+  "decision_rule": {
+    "text": "supported_within_scope only if360/360cells complete with byte-identical per-target certificates and structural counters, successful full Native replay,360OpenSSL positives and720intended negative rejections. Otherwise invalid_measurement or inconclusive with full flow and reason. Numeric L0 timing ratios/ranges are descriptive only.",
+    "threshold": "All360required cells and every required check,zero omissions/mismatches.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ],
+    "comparison_ids": [
+      "C-parent-candidate",
+      "C-aa-candidate"
+    ],
+    "statistic": "Exact full-flow/certificate/counter/point-control checks; per-target observed clock medians,ranges and paired-source median ratios only.",
+    "interval": "Exact counts; full observed range of9fresh-process repetitions,no confidence interval or timing-significance test.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Observed parent a/b and c/b complete-second median ratios beside a/c A/A range; all unrankedL0."
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/src/bin/panel-v2.rs",
+      "sha256": "fb8269af1d4b7e7059f07ab2cb09f0db514f84b06e8ddbba731992b66e3055df"
+    },
+    "inputs": [
+      "main/config.json",
+      "main/schedule.tsv",
+      "main/*/row.csv",
+      "main/*/status.json",
+      "main/*/scale-u-*.json"
+    ],
+    "outputs": [
+      "main/analysis.json",
+      "main/summary.csv",
+      "main/latency.svg",
+      "main/point-audit/summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Observed per-arm,target complete seconds,median and full range,n9; parentA/A alongside candidate"
+    ],
+    "report_dir": "research/hashed_ecdl_cpu_compare_20261123/reports/main"
+  },
+  "inadmissible": [
+    "Inferring S,total machine work or peak RSS from retained-table/inversion counters",
+    "Ranked timing,exponent,external/rho advantage or global strongest solver claims from L0 clock summaries",
+    "Treating36preflight rows,control-canary failures or historical round24timings as main observations",
+    "Calling CachedMitm tensor contraction or a new algebraic mechanism",
+    "Editing frozen originals or reducing360-cell census after outcomes",
+    "Pooling synthetic measured-summary canary records or its n9 figures as new empirical samples"
+  ],
+  "literature": [
+    {
+      "ref": "../hashed_ecdl_cpu_20261030/residual-scratch/README.md",
+      "provenance": "retrieved",
+      "claim": "Exact numerator scheduling/storage delta; reverse-pass y loads/branches may offset saved vector stream.",
+      "verified_by": "Read exact493/c478/current library sources and source delta;47native checks per source; independent source review10."
+    },
+    {
+      "ref": "../hashed_ecdl_cpu_20261030/round24/EXECUTION.md",
+      "provenance": "retrieved",
+      "claim": "Actual180-call early-filter panel exists and informed revert; no old timing rows pooled.",
+      "verified_by": "Exact Git execution/rows/summary and separate source/status review10; stale combined absence claim corrected in sibling erratum."
+    },
+    {
+      "ref": "../hashed_ecdl_cpu_20261030/round25/protocol.json",
+      "provenance": "retrieved",
+      "claim": "Existing unexecuted-at-snapshot numerator-scratch proposal guides mechanism but has a different toy workload and cloud admission/attempt.",
+      "verified_by": "Exact protocol/source patch read; currentlib equalsc478. New public-target protocol is separate."
+    },
+    {
+      "ref": "https://docs.openssl.org/3.5/man3/EC_POINT_add/",
+      "provenance": "retrieved",
+      "claim": "Separate point add/double operations with explicit unreduced scalar loop support target/scalar audits.",
+      "verified_by": "Existing frozen C checker/source and qualified preflight36positives/72negatives; no independent prime/Hasse/full-relation proof."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "local_policy": {
+      "classical_only": true,
+      "S3_used": false,
+      "new_cloud_spend_usd": 0,
+      "old_protocols_and_attempts_unchanged": true
+    },
+    "controls_v2": {
+      "native_tests_per_worker": 47,
+      "driver_tests": 10,
+      "guard_signal_canary": "Nine recorded owned processes across three foreground-timeout paths terminate after groupTERM; memory threshold/4GiB enforcement not exercised.",
+      "failure_finalization_canary": "Mock worker exits23; driver/finalizer fail and retain360planned/1attempted/0completed/359not_attempted; no solver executed.",
+      "valid_data_readback": "V2 analysis/CSV/SVG of copied36-cell preflight are byte-identical; no solver or point replay.",
+      "synthetic_measured_summary": "Metadata-only fixture:36originalwarmups copied into360synthetic cell directories. NativeV2 analyzes36groups with9identical values each; min/median/max identities pass. No new timing or solver observation; not main data."
+    },
+    "finalization": {
+      "supervisor": "reproduction/run-main-v2.sh",
+      "outer_guard": "reproduction/run-stage-v2.sh",
+      "finalizer": "reproduction/finalize-main-v2.sh",
+      "worker_wrapper": "invoke-worker-v2.sh",
+      "driver": "native/src/bin/panel-v2.rs",
+      "point_audit": "native/src/bin/point-audit-v2.rs",
+      "original_driver_exit_retained": true,
+      "always_attempt_after_terminal": true,
+      "output_condition": "Finalization may be refused by its resource guard or hit120s; retain that status and incomplete-analysis gap. No promise of guaranteed output on resource failure."
+    },
+    "field_bits": [
+      20,
+      24,
+      28,
+      32,
+      36,
+      40
+    ],
+    "prime_order_bits": [
+      20,
+      25,
+      28,
+      32,
+      36,
+      41
+    ],
+    "metric_limits": {
+      "S": null,
+      "total_operations": null,
+      "peak_RSS": null,
+      "clock_ranking": "unrankedL0"
+    },
+    "provenance": "Unsigned producer/source-team records; no authenticated independent execution or official independent-session review acceptance",
+    "host_receipt": "/tmp/ecdlp-cpu-comparison-20261123/main-host-before/receipt.json",
+    "budget_scope": "Enforced phase maxima1500/120/120 and10s kill grace each;1770s maximum nominal phase budget before supervisor/post-hash I/O.1800s is a planning envelope,not a hard overall watchdog.",
+    "source_custody": "OriginalV2pre-unit receipt pinned binaries only; retained inreview12. Later15-input prehashed clean-target reproduction matches all4originalbinaries,then source+copied-binary before-unit manifest and10controls pass. These are prospective local build bindings,not authenticated execution."
+  }
+}

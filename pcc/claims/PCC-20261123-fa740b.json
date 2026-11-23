@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:25:49Z",
+ "id": "PCC-20261123-fa740b",
+ "kind": "statement",
+ "producer": {
+  "commit": "a419ff7cdbecd8a1b404dad29233a46684eca7bc",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-unique-path/observation.json",
+    "sha256": "2df49712ae9274a2a9b93a6924f5334b1148c28bfb730dc1bf4df356ab778417"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-unique-path/certificate-summary.json",
+    "sha256": "cc0ce89bd221bb5c0e437b190461397fe4530e6c88b6563cb4cefb600030ce22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-unique-path/comparison.json",
+    "sha256": "f84014789df1ff4ce2801b763ed99063459ca447909b348a24adce42c08dedd6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-unique-path/pipeline-clock.json",
+    "sha256": "60e5257b891552346e96b0158c2bc8e2be01e21715022a988fba3eca312f0943"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-unique-path/certificate-clock.json",
+    "sha256": "601d1981a03b58f8b0b23c56c52e25c5871e15c1d3aab2664efe87983227a078"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-publication-collision.json",
+    "sha256": "1fef340298bfae90ada18f0e63377f23429f50b06fe19f01176b099acaecd855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": ".github/workflows/p192-relation-replay.yml",
+    "sha256": "5c70663adc30d98ef20735ba4cc6bc066907a4e3cf7f32f3d7f93af8a55d7b4f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-independent-replay",
+ "statement": "CI45130692659 at a419ff7cdb passes the unchanged P192 fixed-fixture arithmetic with fresh run/attempt-scoped output after publication-directory failures; four public summary/comparison/clock records recovered and hashes checked, thirteen further exported digests recorded without payload recovery. Six bindings/six relations/rank6/three new corruptions unchanged. Signing skipped; not admitted performance."
+}

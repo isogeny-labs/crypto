@@ -1,0 +1,12 @@
+digraph Query {
+  graph [rankdir=LR,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.35",label="Supplied-section query: implemented component and open constructor",labelloc=t,fontname="Helvetica",fontsize=14];
+  node [shape=box,style="rounded,filled",fillcolor="#e8f1fb",color="#406080",fontname="Helvetica",fontsize=11];
+  coeff [label="Unknown coefficient\nconstructor",style="rounded,dashed,filled",fillcolor="#fff1d6",color="#a06a10"];
+  input [label="Public Spec,R,Q,c\nsupplied section"];
+  query [label="Free quotient\ngeometric product\nKaratsuba + chirp"];
+  restrict [label="Interval gcd\nretain primary\nmultiplicities"];
+  lift [label="Local signs + indices\noriginal circuits\nindexed group replay"];
+  output [label="Checked original row\nknown-answer controls",fillcolor="#e3f2e8"];
+  coeff -> input [style=dashed,label="open",fontname="Helvetica",fontsize=10];
+  input -> query -> restrict -> lift -> output;
+}

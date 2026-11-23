@@ -46,12 +46,40 @@ struct Fp<'t> {
 impl Fp<'_> {
     fn mul(&mut self, a: u64, b: u64) -> u64 {
         self.tally.muls += 1;
+        // Root-polynomial arithmetic uses canonical residues. Keep the
+        // original wide remainder for external/noncanonical operands.
+        if a < self.p && b < self.p {
+            if self.p <= u16::MAX as u64 {
+                return ((a as u32 * b as u32) % self.p as u32) as u64;
+            }
+            if self.p <= u32::MAX as u64 {
+                return (a * b) % self.p;
+            }
+            // Fast reduction for p=2^61-1 (two end-around-carry limbs).
+            if self.p == (1u64 << 61) - 1 {
+                let product = a as u128 * b as u128;
+                let folded = ((product as u64) & self.p) + (product >> 61) as u64;
+                return if folded >= self.p {
+                    folded - self.p
+                } else {
+                    folded
+                };
+            }
+        }
         ((a as u128 * b as u128) % self.p as u128) as u64
     }
     fn add(&self, a: u64, b: u64) -> u64 {
+        // p<=2^63-1 and canonical operands imply the sum fits in u64.
+        if self.p <= u64::MAX / 2 && a < self.p && b < self.p {
+            let sum = a + b;
+            return if sum >= self.p { sum - self.p } else { sum };
+        }
         ((a as u128 + b as u128) % self.p as u128) as u64
     }
     fn sub(&self, a: u64, b: u64) -> u64 {
+        if self.p <= u64::MAX / 2 && a < self.p && b < self.p {
+            return if a >= b { a - b } else { a + self.p - b };
+        }
         ((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64
     }
     fn small(&self, c: u64) -> u64 {
@@ -63,8 +91,11 @@ impl Fp<'_> {
             if e & 1 == 1 {
                 r = self.mul(r, a);
             }
-            a = self.mul(a, a);
             e >>= 1;
+            // Do not square the base after consuming the final exponent bit.
+            if e != 0 {
+                a = self.mul(a, a);
+            }
         }
         r
     }
@@ -79,24 +110,102 @@ impl Fp<'_> {
         f.pow(a, self.p - 2)
     }
 
+    // Tonelli-Shanks square root for odd prime fields p = 1 (mod 4).
+    // The p = 3 (mod 4) callers already use a cheaper single exponent.
+    // A nonresidue returns None; a repeated root (zero) requires no powers.
+    fn sqrt_tonelli_shanks(&mut self, value: u64) -> Option<u64> {
+        if value == 0 {
+            return Some(0);
+        }
+        let p = self.p;
+        if self.pow(value, (p - 1) / 2) != 1 {
+            return None;
+        }
+        let s = (p - 1).trailing_zeros();
+        let q = (p - 1) >> s;
+        let mut z = 2u64;
+        while self.pow(z, (p - 1) / 2) != p - 1 {
+            z += 1;
+        }
+        let mut c = self.pow(z, q);
+        let mut t = self.pow(value, q);
+        let mut r = self.pow(value, (q + 1) / 2);
+        let mut m = s;
+        while t != 1 {
+            let mut i = 0u32;
+            let mut tt = t;
+            while tt != 1 && i < m {
+                tt = self.mul(tt, tt);
+                i += 1;
+            }
+            if i == m {
+                return None;
+            }
+            let mut b = c;
+            for _ in 0..(m - i - 1) {
+                b = self.mul(b, b);
+            }
+            r = self.mul(r, b);
+            c = self.mul(b, b);
+            t = self.mul(t, c);
+            m = i;
+        }
+        Some(r)
+    }
+
     // Polynomials, lowest degree first.
     fn trim(v: &mut Vec<u64>) {
         while v.last() == Some(&0) {
             v.pop();
         }
     }
+
+    // Root extraction repeatedly reduces modulo the same polynomial.
+    // Convert it to monic once so each subsequent remainder avoids a
+    // full Fermat inversion of the leading coefficient. The zero set is
+    // unchanged because the scaling factor is nonzero in F_p.
+    fn make_monic(&mut self, polynomial: &mut Vec<u64>) {
+        if polynomial.len() <= 1 || polynomial.last() == Some(&1) {
+            return;
+        }
+        let degree = polynomial.len() - 1;
+        let inverse = self.inv(polynomial[degree]);
+        for coefficient in &mut polynomial[..degree] {
+            *coefficient = self.mul(*coefficient, inverse);
+        }
+        polynomial[degree] = 1;
+    }
+
     fn rem(&mut self, a: &[u64], m: &[u64]) -> Vec<u64> {
-        let mut r = a.to_vec();
+        self.rem_owned(a.to_vec(), m)
+    }
+
+    // Polynomial multiplication already owns its coefficient buffer. Reduce
+    // it in-place rather than cloning a second Vec for each powmod step.
+    fn rem_owned(&mut self, mut r: Vec<u64>, m: &[u64]) -> Vec<u64> {
         Self::trim(&mut r);
         let dm = m.len() - 1;
-        let inv = self.inv(m[dm]);
+        // Monic moduli dominate x^p mod f and Cantor-Zassenhaus splitting.
+        // Their leading inverse is 1: avoid a Fermat inversion per remainder.
+        let monic = m[dm] == 1;
+        let inv = if monic { 1 } else { self.inv(m[dm]) };
         while r.len() > dm {
-            let c = self.mul(*r.last().unwrap(), inv);
+            let top = *r.last().unwrap();
+            let c = if monic && top < self.p {
+                top
+            } else {
+                self.mul(top, inv)
+            };
             let s = r.len() - 1 - dm;
-            for (i, &mi) in m.iter().enumerate() {
-                let t = self.mul(c, mi);
-                r[s + i] = self.sub(r[s + i], t);
+            // The leading coefficient cancels exactly, so do not multiply
+            // and subtract it. Skip zero terms in sparse divisors.
+            for (i, &mi) in m[..dm].iter().enumerate() {
+                if mi != 0 {
+                    let t = self.mul(c, mi);
+                    r[s + i] = self.sub(r[s + i], t);
+                }
             }
+            r[s + dm] = 0;
             Self::trim(&mut r);
         }
         r
@@ -112,7 +221,7 @@ impl Fp<'_> {
                 t[i + j] = self.add(t[i + j], v);
             }
         }
-        self.rem(&t, m)
+        self.rem_owned(t, m)
     }
     fn powmod(&mut self, base: &[u64], mut e: u64, m: &[u64]) -> Vec<u64> {
         let mut r = vec![1];
@@ -121,8 +230,11 @@ impl Fp<'_> {
             if e & 1 == 1 {
                 r = self.mulmod(&r, &b, m);
             }
-            b = self.mulmod(&b, &b, m);
             e >>= 1;
+            // An unused final polynomial square is especially expensive.
+            if e != 0 {
+                b = self.mulmod(&b, &b, m);
+            }
         }
         r
     }
@@ -149,6 +261,44 @@ impl Fp<'_> {
         if f.len() <= 1 {
             return vec![];
         }
+        self.make_monic(&mut f);
+        // Degree one needs no Frobenius/GCD computation: a monic linear
+        // polynomial x + c has exactly one rational root, -c.
+        if f.len() == 2 {
+            return vec![self.sub(0, f[0])];
+        }
+        // Every odd prime supports direct quadratic extraction. For
+        // p = 1 (mod 4) use Tonelli-Shanks instead of a polynomial
+        // Frobenius power, GCD, and splitting. Handle zero discriminants
+        // before exponentiation (also faster for p = 3 mod 4).
+        if f.len() == 3 && (p & 1) == 1 {
+            let b_squared = self.mul(f[1], f[1]);
+            let four_c = self.mul(4 % p, f[0]);
+            let discriminant = self.sub(b_squared, four_c);
+            let neg_b = self.sub(0, f[1]);
+            // p <= 2^63-1, so odd v + p cannot overflow u64.
+            let half = |v: u64| if v & 1 == 0 { v >> 1 } else { (v + p) >> 1 };
+            if discriminant == 0 {
+                return vec![half(neg_b)];
+            }
+            let square_root = if (p & 3) == 3 {
+                Some(self.pow(discriminant, (p + 1) / 4))
+            } else {
+                self.sqrt_tonelli_shanks(discriminant)
+            };
+            let Some(s) = square_root else {
+                return Vec::new();
+            };
+            if self.mul(s, s) != discriminant {
+                return Vec::new();
+            }
+            let plus = self.add(neg_b, s);
+            let minus = self.sub(neg_b, s);
+            let mut roots = vec![half(plus), half(minus)];
+            roots.sort_unstable();
+            roots.dedup();
+            return roots;
+        }
         let xp = self.powmod(&[0, 1], p, &f);
         let mut h = xp;
         if h.len() < 2 {
@@ -156,11 +306,14 @@ impl Fp<'_> {
         }
         h[1] = self.sub(h[1], 1);
         Self::trim(&mut h);
-        let g = if h.is_empty() {
+        let mut g = if h.is_empty() {
             f.clone()
         } else {
             self.gcd(&f, &h)
         };
+        // Euclidean gcd does not necessarily return a monic polynomial.
+        // Normalize before all subsequent equal-degree splitting.
+        self.make_monic(&mut g);
         let mut out = Vec::new();
         self.split(g, &mut out, 0);
         out.sort_unstable();
@@ -172,13 +325,46 @@ impl Fp<'_> {
         match g.len() {
             0 | 1 => {}
             2 => {
-                // g = g1 x + g0.
-                let inv = self.inv(g[1]);
+                // Every factor emitted by roots() is monic. Preserve a
+                // fallback for nonmonic callers of this private helper.
                 let neg = self.sub(0, g[0]);
-                let r = self.mul(neg, inv);
-                out.push(r);
+                let root = if g[1] == 1 {
+                    neg
+                } else {
+                    let inv = self.inv(g[1]);
+                    self.mul(neg, inv)
+                };
+                out.push(root);
             }
-            _ => loop {
+            _ => {
+                // A degree-two split factor can also be solved directly
+                // for p = 1 (mod 4), avoiding another polynomial power/GCD.
+                if g.len() == 3 && g[2] == 1 && (p & 1) == 1 {
+                    let b_squared = self.mul(g[1], g[1]);
+                    let four_c = self.mul(4 % p, g[0]);
+                    let discriminant = self.sub(b_squared, four_c);
+                    let neg_b = self.sub(0, g[1]);
+                    let half = |v: u64| {
+                        if v & 1 == 0 { v >> 1 } else { (v + p) >> 1 }
+                    };
+                    if discriminant == 0 {
+                        out.push(half(neg_b));
+                        return;
+                    }
+                    let square_root = if (p & 3) == 3 {
+                        Some(self.pow(discriminant, (p + 1) / 4))
+                    } else {
+                        self.sqrt_tonelli_shanks(discriminant)
+                    };
+                    if let Some(s) = square_root {
+                        if self.mul(s, s) == discriminant {
+                            out.push(half(self.add(neg_b, s)));
+                            out.push(half(self.sub(neg_b, s)));
+                            return;
+                        }
+                    }
+                }
+                loop {
                 let shift = self.small(delta);
                 let e = self.powmod(&[shift, 1], (p - 1) / 2, &g);
                 let mut e = e;
@@ -186,22 +372,28 @@ impl Fp<'_> {
                     e = vec![0];
                 }
                 e[0] = self.sub(e[0], 1);
-                let d = self.gcd(&g, &e);
+                let mut d = self.gcd(&g, &e);
                 delta += 1;
                 if d.len() > 1 && d.len() < g.len() {
+                    // GCD factors are only defined up to a field scalar.
+                    // Make them monic before division and recursion: this
+                    // eliminates repeated inversions within both branches.
+                    self.make_monic(&mut d);
                     let other = {
-                        // g / d
+                        // Exact division g / d, where d is now monic.
                         let mut q = vec![0u64; g.len() - d.len() + 1];
                         let mut r = g.clone();
-                        let inv = self.inv(*d.last().unwrap());
                         while r.len() >= d.len() && !r.is_empty() {
-                            let c = self.mul(*r.last().unwrap(), inv);
+                            let c = *r.last().unwrap();
                             let s = r.len() - d.len();
                             q[s] = c;
-                            for (i, &di) in d.iter().enumerate() {
-                                let t = self.mul(c, di);
-                                r[s + i] = self.sub(r[s + i], t);
+                            for (i, &di) in d[..d.len() - 1].iter().enumerate() {
+                                if di != 0 {
+                                    let t = self.mul(c, di);
+                                    r[s + i] = self.sub(r[s + i], t);
+                                }
                             }
+                            r[s + d.len() - 1] = 0;
                             Self::trim(&mut r);
                         }
                         q
@@ -212,6 +404,7 @@ impl Fp<'_> {
                 }
                 if delta > 4 * 64 + p.min(1 << 20) {
                     return;
+                }
                 }
             },
         }
@@ -322,6 +515,91 @@ mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::{find_prime_order_curve, CountedGroup, GroupOps};
 
+    #[test]
+    fn round128_arithmetic_matches_wide_modulo() {
+        let primes = [101u64, 65_521, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1];
+        for p in primes {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x9e37_79b9_7f4a_7c15;
+            for _ in 0..20_000 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let a = state % p;
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let b = state % p;
+                assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64);
+                assert_eq!(f.add(a, b), ((a as u128 + b as u128) % p as u128) as u64);
+                assert_eq!(f.sub(a, b), ((a as u128 + p as u128 - b as u128) % p as u128) as u64);
+            }
+        }
+    }
+
+    #[test]
+    fn round128_remainders_and_powers_match_naive_division() {
+        fn old_rem(f: &mut Fp<'_>, a: &[u64], m: &[u64]) -> Vec<u64> {
+            let mut r = a.to_vec();
+            Fp::trim(&mut r);
+            let dm = m.len() - 1;
+            let inv = f.inv(m[dm]);
+            while r.len() > dm {
+                let c = f.mul(*r.last().unwrap(), inv);
+                let shift = r.len() - 1 - dm;
+                for (i, &mi) in m.iter().enumerate() {
+                    let t = f.mul(c, mi);
+                    r[shift + i] = f.sub(r[shift + i], t);
+                }
+                Fp::trim(&mut r);
+            }
+            r
+        }
+        for p in [101u64, 65_521, 1_000_000_007, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0xabc1_2500_0000_0028;
+            for i in 0..250 {
+                let mut dividend = Vec::new();
+                for _ in 0..8 {
+                    state ^= state << 13;
+                    state ^= state >> 7;
+                    state ^= state << 17;
+                    dividend.push(state % p);
+                }
+                let modulus = match i % 4 {
+                    0 => vec![3, 0, 0, 1],
+                    1 => vec![3, 2, 4, 1],
+                    2 => vec![3, 0, 0, 2],
+                    _ => vec![3, 2, 4, 7],
+                };
+                let got = f.rem(&dividend, &modulus);
+                let expected = old_rem(&mut f, &dividend, &modulus);
+                assert_eq!(got, expected);
+                if i < 15 {
+                    let optimized = f.powmod(&[1, 1], p, &modulus);
+                    // Independent square-and-multiply with the original reducer.
+                    let mut exponent = p;
+                    let mut acc = vec![1];
+                    let mut base = old_rem(&mut f, &[1, 1], &modulus);
+                    while exponent > 0 {
+                        if exponent & 1 == 1 {
+                            let product = f.mulmod(&acc, &base, &modulus);
+                            acc = old_rem(&mut f, &product, &modulus);
+                        }
+                        exponent >>= 1;
+                        if exponent != 0 {
+                            let square = f.mulmod(&base, &base, &modulus);
+                            base = old_rem(&mut f, &square, &modulus);
+                        }
+                    }
+                    assert_eq!(optimized, acc);
+                }
+            }
+        }
+    }
+
     /// On prime-order curves with a rational 3-isogeny, φ lands on E′, is a
     /// homomorphism on ⟨G⟩, and keeps the order.
     #[test]
@@ -373,4 +651,186 @@ mod tests {
         };
         assert_eq!(f.roots(&poly), vec![3, 50]);
     }
+
+    #[test]
+    fn round131_quadratic_fast_split_matches_exhaustive_roots() {
+        // Cover p = 3 (mod 4) with two distinct roots, a repeated root,
+        // nonresidue discriminants, and p = 1 (mod 4) fallback cases.
+        for p in [3u64, 5, 7, 11, 13, 19, 23, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for b in 0..p {
+                for c in 0..p {
+                    let polynomial = [c, b, 1];
+                    let expected: Vec<u64> = (0..p).filter(|&x| {
+                        let x2 = field.mul(x, x);
+                        let bx = field.mul(b, x);
+                        let x2_bx = field.add(x2, bx);
+                        field.add(x2_bx, c) == 0
+                    }).collect();
+                    assert_eq!(field.roots(&polynomial), expected,
+                        "p={p}, b={b}, c={c}");
+                }
+            }
+        }
+    }
+
+
+    #[test]
+    fn round132_low_degree_paths_match_linear_quadratic_oracles() {
+        // Small fields: all monic quadratics, and nonmonic scaled linear
+        // polynomials with padded trailing zeros.
+        for p in [3u64, 5, 7, 11, 13, 19, 23, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for a in 1..p {
+                for b in 0..p {
+                    let expected: Vec<u64> = (0..p).filter(|&x| {
+                        let ax = field.mul(a, x);
+                        field.add(ax, b) == 0
+                    }).collect();
+                    assert_eq!(field.roots(&[b, a, 0, 0]), expected,
+                        "linear p={p} a={a} b={b}");
+                }
+            }
+            for b in 0..p {
+                for c in 0..p {
+                    let expected: Vec<u64> = (0..p).filter(|&x| {
+                        let x_squared = field.mul(x, x);
+                        let bx = field.mul(b, x);
+                        field.add(field.add(x_squared, bx), c) == 0
+                    }).collect();
+                    for scalar in [1u64, 2, 3] {
+                        let poly = [field.mul(c, scalar), field.mul(b, scalar),
+                                    scalar % p];
+                        if scalar % p == 0 { continue; }
+                        assert_eq!(field.roots(&poly), expected,
+                            "quadratic p={p} b={b} c={c} scale={scalar}");
+                    }
+                }
+            }
+        }
+
+        for p in [65_521u64, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for i in 0..80u64 {
+                let root = (31 + i * 7919) % p;
+                let leading = [1u64, 3, 7, p - 1][(i as usize) % 4];
+                let constant = field.sub(0, field.mul(leading, root));
+                assert_eq!(field.roots(&[constant, leading, 0]), vec![root]);
+                let r2 = (root + 1237) % p;
+                let sum = field.add(root, r2);
+                let product = field.mul(root, r2);
+                let mut expected = vec![root, r2];
+                expected.sort_unstable();
+                expected.dedup();
+                let quadratic = [product, field.sub(0, sum), 1];
+                assert_eq!(field.roots(&quadratic), expected);
+                // Repeated roots must not be returned twice.
+                let repeated_product = field.mul(root, root);
+                let twice_root = field.add(root, root);
+                let repeated = [repeated_product, field.sub(0, twice_root), 1];
+                assert_eq!(field.roots(&repeated), vec![root]);
+            }
+        }
+    }
+
+    #[test]
+    fn round133_tonelli_shanks_quadratic_roots_and_nonresidues() {
+        // p=1 mod 4 exercises Tonelli-Shanks; p=3 mod 4 checks the
+        // previously-fast path and the new zero-discriminant case.
+        for p in [5u64, 13, 17, 29, 101, 65_521, 1_000_000_009,
+                  1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            for i in 0..64u64 {
+                let r1 = (3 + 139 * i) % p;
+                let r2 = (11 + 127 * i) % p;
+                let sum = f.add(r1, r2);
+                let product = f.mul(r1, r2);
+                let monic = [product, f.sub(0, sum), 1];
+                let mut expected = vec![r1, r2];
+                expected.sort_unstable();
+                expected.dedup();
+                assert_eq!(f.roots(&monic), expected, "p={p}, i={i}");
+                for scalar in [2u64, 3, 7] {
+                    let scaled = [
+                        f.mul(monic[0], scalar % p),
+                        f.mul(monic[1], scalar % p),
+                        scalar % p,
+                    ];
+                    assert_eq!(f.roots(&scaled), expected, "scaled p={p}, i={i}");
+                }
+                let repeated_coeff = f.add(r1, r1);
+                let repeated_constant = f.mul(r1, r1);
+                let double = [repeated_constant, f.sub(0, repeated_coeff), 1];
+                assert_eq!(f.roots(&double), vec![r1], "repeated p={p}, i={i}");
+            }
+            // x^2 - n must have no roots for independently selected
+            // Euler-criterion nonresidue n.
+            let mut n = 2u64;
+            while f.pow(n, (p - 1) / 2) != p - 1 {
+                n += 1;
+            }
+            let constant = f.sub(0, n);
+            assert!(f.roots(&[constant, 0, 1]).is_empty(), "nonresidue p={p}");
+        }
+    }
+
+    #[test]
+    fn round129_monic_factor_roots_match_known_factors() {
+        for p in [101u64, 65_521, 1_000_000_007, 4_294_967_291, (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for i in 0..24u64 {
+                let factors = [(3 + 7 * i) % p, (13 + 7 * i) % p,
+                    (29 + 7 * i) % p, (47 + 7 * i) % p];
+                let mut polynomial = vec![1u64];
+                for &root in &factors {
+                    let mut next = vec![0u64; polynomial.len() + 1];
+                    for (j, &coefficient) in polynomial.iter().enumerate() {
+                        let term = field.mul(coefficient, root);
+                        next[j] = field.sub(next[j], term);
+                        next[j + 1] = field.add(next[j + 1], coefficient);
+                    }
+                    polynomial = next;
+                }
+                let mut expected = factors.to_vec();
+                expected.sort_unstable();
+                expected.dedup();
+                assert_eq!(field.roots(&polynomial), expected, "monic p={p} i={i}");
+                for scalar in [2u64, 3, 7] {
+                    let scaled: Vec<u64> = polynomial.iter()
+                        .map(|&coefficient| field.mul(coefficient, scalar))
+                        .collect();
+                    assert_eq!(field.roots(&scaled), expected, "scaled p={p} i={i}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round129_isogeny_psi3_roots_match_small_field_exhaustive_search() {
+        let p = 101u64;
+        let mut tally = FieldTally::default();
+        let mut field = Fp { p, tally: &mut tally };
+        for a in 0..12u64 {
+            for b in 0..12u64 {
+                // ψ3(x) = 3 x^4 + 6 a x^2 + 12 b x - a^2.
+                let aa = field.mul(a, a);
+                let poly = vec![field.sub(0, aa), field.mul(12, b),
+                    field.mul(6, a), 0, 3];
+                let roots = field.roots(&poly);
+                let brute_force: Vec<u64> = (0..p).filter(|&x| {
+                    poly.iter().rev().fold(0u64, |acc, &c| {
+                        let prod = field.mul(acc, x);
+                        field.add(prod, c)
+                    }) == 0
+                }).collect();
+                assert_eq!(roots, brute_force, "ψ3 a={a} b={b}");
+            }
+        }
+    }
+
 }

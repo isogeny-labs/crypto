@@ -10,6 +10,8 @@ use sha2::{Digest, Sha256};
 const UPSTREAM_REVISION: &str = "33b3bc3c7485df0fe80aae41e2093cf940d87ff3";
 const UPSTREAM_MANIFEST: &str =
     "research/prime31_aux_matched_20261122/sparse-h2-followup/upstream/manifest.json";
+const SPECIALIZED_MANIFEST: &str =
+    "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/manifest.json";
 
 struct Range<'a> {
     start: &'a str,
@@ -154,6 +156,45 @@ fn upstream_sources(root: &Path) -> Value {
     manifest
 }
 
+/// A separate exact source closure keeps the maintained specialized table's
+/// types and arithmetic independent of the historical study's frozen module.
+fn specialized_sources(root: &Path) -> Value {
+    let bytes = read(root, SPECIALIZED_MANIFEST);
+    let manifest: Value = serde_json::from_slice(&bytes).expect("specialized source manifest");
+    assert_eq!(
+        manifest["schema"],
+        "prime31-specialized-incumbent-upstream/v1"
+    );
+    assert_eq!(manifest["repository"], "isogeny-labs/cryptanalysis");
+    assert_eq!(
+        manifest["upstream_revision"],
+        "457ae1818aaf8134bd833ad9c1b9d57015264510"
+    );
+    let snapshots = manifest["snapshots"]
+        .as_array()
+        .expect("specialized snapshots");
+    assert_eq!(snapshots.len(), 4);
+    for source in snapshots {
+        let path = source["path"].as_str().expect("specialized snapshot path");
+        let bytes = read(root, path);
+        assert_eq!(
+            digest(&bytes),
+            source["sha256"]
+                .as_str()
+                .expect("specialized source SHA256"),
+            "specialized snapshot changed: {path}"
+        );
+        assert_eq!(
+            bytes.len() as u64,
+            source["bytes"]
+                .as_u64()
+                .expect("specialized source byte count")
+        );
+        assert_eq!(source["rewritten"], false);
+    }
+    manifest
+}
+
 /// Keep the real F4 parent/child layout when it is attached through #[path].
 /// The parent is named mod.rs so its unchanged `pub mod reuse/certified`
 /// declarations resolve the original children in the same directory.
@@ -234,6 +275,7 @@ fn main() {
         .expect("qualifier must stay inside its repository");
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
     let upstream_source_provenance = upstream_sources(&root);
+    let specialized_source_provenance = specialized_sources(&root);
     let f4_layout = f4_layout(&root, &out);
     let extracted = vec![
         extract(
@@ -421,6 +463,11 @@ fn main() {
                     end: "// ── Index calculus: factor base, pair table, relations, linear algebra",
                     scope: "complete production prime_fast RhoConfig, RhoResult, operation counts, collision verification, rho_parallel, and worker/lane implementation; prescribed one-thread tuned wall reference, no index-calculus substitute",
                 },
+                Range {
+                    start: "// ── Index calculus: factor base, pair table, relations, linear algebra",
+                    end: "// ── Shared factor-base subproduct tree & lock-step multi-walker IC",
+                    scope: "complete production FastFactorBase, PairTable, relation collectors and linear algebra, collect_setup_batched, ic_solve_fast, ic_multi_solve_ex, and ic_solve_table; exact complete cold single-target incumbent, without the later subproduct-tree/lockstep experimental path",
+                },
             ],
             "prime_fast.rs",
         ),
@@ -581,11 +628,49 @@ fn main() {
             ));
         }
     }
+    full.push(inventory(
+        &root,
+        SPECIALIZED_MANIFEST,
+        "separate specialized incumbent source snapshot and byte-selection declaration",
+    ));
+    for snapshot in specialized_source_provenance["snapshots"]
+        .as_array()
+        .unwrap()
+    {
+        full.push(inventory(
+            &root,
+            snapshot["path"].as_str().unwrap(),
+            "complete pinned cryptanalysis specialized incumbent snapshot",
+        ));
+    }
+    let specialized_crate =
+        "research/prime31_aux_matched_20261122/fiber-domain-followup/specialized-native";
+    for filename in ["Cargo.toml", "build.rs"] {
+        full.push(inventory(
+            &root,
+            &format!("{specialized_crate}/{filename}"),
+            "actual specialized incumbent path dependency build input",
+        ));
+    }
+    let mut specialized_rust = Vec::new();
+    rust_sources(
+        &root,
+        &root.join(specialized_crate).join("src"),
+        &mut specialized_rust,
+    );
+    for relative in specialized_rust {
+        full.push(inventory(
+            &root,
+            &relative,
+            "complete specialized incumbent path dependency source tree",
+        ));
+    }
     let manifest = json!({
         "schema": "prime31-aux-matched-source-manifest/v1",
         "scope": "matched auxiliary study with unchanged production F4 and exact declared source closure",
         "evidence_status": "build provenance only; test results require a separate receipt; PCC-unverified",
         "upstream_source_provenance": upstream_source_provenance,
+        "specialized_source_provenance": specialized_source_provenance,
         "extracted_production_ranges": extracted,
         "layout_preserving_f4_copy": f4_layout,
         "whole_files": full,
@@ -593,6 +678,9 @@ fn main() {
         "full_root_library_tests_included": false,
         "legacy_module_unit_tests_included": false,
         "f4_solver_included": true,
+        "prime_fast_complete_ic_included": true,
+        "prime_fast_ic_source_revision": UPSTREAM_REVISION,
+        "specialized_cryptanalysis_prime_batch_included": true,
         "integration_example_included": false,
         "integration_example_rewritten": false,
         "algorithm_substitutions": false,
