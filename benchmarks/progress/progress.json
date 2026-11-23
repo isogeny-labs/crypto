@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261123T1913Z-ecc2k-halftrace-preflight",
+  "latest_record": "20261123T1918Z-ecc2k-halftrace-primary",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 8,
-    "measured": 314,
+    "measured": 315,
     "open": 62
   },
   "repo": "crypto",
@@ -31224,6 +31224,84 @@
           ],
           "summary": "Two identical-source baseline A/A cold profiles; known query output matches native; hotspot diagnosis only, unsigned producer evidence.",
           "value": 44038405.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 34999782.0,
+      "latest": 34999782.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_cold_ir",
+      "points": [
+        {
+          "commit": "8453eb6263d6",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1918Z-ecc2k-halftrace-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            34999782.0,
+            34999782.0
+          ],
+          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+          "value": 34999782.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 18107673.0,
+      "latest": 18107673.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_oracle_ir",
+      "points": [
+        {
+          "commit": "8453eb6263d6",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1918Z-ecc2k-halftrace-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            18107673.0,
+            18107673.0
+          ],
+          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+          "value": 18107673.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 15966306.0,
+      "latest": 15966306.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_setup_ir",
+      "points": [
+        {
+          "commit": "8453eb6263d6",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1918Z-ecc2k-halftrace-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            15966306.0,
+            15966306.0
+          ],
+          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+          "value": 15966306.0
         }
       ],
       "problem": "kernel:ecc2k130-ic-halftrace-setup",
