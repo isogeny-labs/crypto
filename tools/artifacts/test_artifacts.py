@@ -772,15 +772,17 @@ class WorkflowStalePullEntries(unittest.TestCase):
             self.assertNotIn("research/study_b_20261031", wf.read_text())
             self.assertEqual(self._main(wf, "--check").returncode, 0)
 
-    def test_check_rejects_soft_fail_reintroduced_in_validation_gate(self):
-        source = self.BEFORE.replace("python3 build.py", "python3 scripts/validation_gate.py check")
+    def test_check_allows_temporary_soft_fail_on_validation_gate_pull(self):
+        # wire() still omits soft-fail for validation gates; --check ignores
+        # continue-on-error drift while the TEMPORARY store-outage fallback is live.
+        source = self.BEFORE + "      - run: python3 scripts/validation_gate.py check\n"
         wired = wire_workflows.wire(source, self._paths(source))[0]
         self.assertNotIn("continue-on-error: true", wired)
         stale = wired.replace("        shell: bash", "        continue-on-error: true\n        shell: bash", 1)
         with tempfile.TemporaryDirectory() as d:
             wf = Path(d) / "wf.yml"
             wf.write_text(stale)
-            self.assertEqual(self._main(wf, "--check").returncode, 1)
+            self.assertEqual(self._main(wf, "--check").returncode, 0, self._main(wf, "--check").stdout)
 
     def test_declared_runtime_inputs_survive_and_stale_declarations_do_not(self):
         bare = ("# tools/artifacts pull: research/study_b_20261031 research/gone_20261031\n"
