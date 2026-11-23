@@ -62,3 +62,52 @@ PATH="$HOME/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin:$PATH" \
 
 Raw logs: `a3_32bit_mitm_u64.log`, `a3_32bit_u64_seeds.jsonl`,
 `a3_32bit_sweep.log`.
+
+---
+
+## Correction (2026-11-22, same day): the rho arm was not a tuned rho
+
+**Status:** the IC-vs-rho sentences above are withdrawn. The `rho_ms` column
+there is a *single unoptimised walk* inside `examples/a3_s4_ladder.rs`
+(`pollard_rho_ecdlp`, no negation map, no distinguished points, one walker),
+so `IC/rho 0.19–1.16` compares IC against a reference that is roughly three
+orders of magnitude slower than the tuned reference implementation in the
+`cryptanalysis` repo. The IC-internal numbers (before/after u64 probe path,
+stage split, four-seed spread) are unaffected.
+
+**Paired re-measurement on the identical four public targets**, using
+`cryptanalysis`'s rho (r-adding walk, negation map, distinguished points,
+batched affine addition; `ops/sqrt(n)` reported as `S`):
+
+```sh
+cd ~/cryptanalysis && make cli
+./build/ca solve --alg rho --group ec \
+  --p 4294967291 --a 4294967288 --b 267 --order 4295072597 \
+  --g 1,2811385579 --h <public_target_q>
+```
+
+Two independent paired runs, because rho is randomised and its single-run
+spread at this size is itself a factor of ~7:
+
+| seed | IC ms (archived) | ladder `rho_ms` | tuned rho ms (A / artifact B) | rho ops (A / B) | IC / tuned rho (A / B) | scalar agrees |
+|--:|--:|--:|--:|--:|--:|:--|
+| 20261121 | 2536.9 | 3610.5 | 8.6 / 12.5 | 167671 / 86364 | 295× / 203× | yes |
+| 20261122 | 2450.0 | 12694.8 | 6.0 / 5.5 | 97775 / 76974 | 408× / 445× | yes |
+| 20261123 | 2827.7 | 4941.9 | 2.2 / 3.7 | 61692 / 57713 | 1285× / 765× | yes |
+| 20261124 | 3120.4 | 2682.8 | 3.0 / 1.9 | 30539 / 47908 | 1040× / 1674× | yes |
+
+Column B is the committed artifact
+`research/prime_36bit_20261122/a3_32bit_rho_paired.jsonl` (written by
+`run_rung.sh`). S = ops/√n over the eight observations spans 0.47–2.56, i.e.
+around the 1.25 textbook constant. All eight tuned-rho runs return the
+archived `x_truth` exactly, so the two arms agree on the answer and differ
+only in cost.
+
+**Consequence.** The 32-bit rung does not put IC "in the same band" as rho;
+it is **≈2×10²–1.7×10³** away from a tuned rho at 32 bits, the spread coming
+almost entirely from rho's own run-to-run variance. Any `vs_rho` statement
+for the prime regime has to be made against `cryptanalysis`
+`ca solve --alg rho` (or an equivalent tuned arm), never against the
+ladder's built-in walk. The ladder's `rho_ms` field should be read as a
+*fixture sanity check that the target is a genuine DLP instance*, not as a
+cost baseline.

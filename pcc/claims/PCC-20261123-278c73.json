@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T05:13:26Z",
+ "id": "PCC-20261123-278c73",
+ "kind": "statement",
+ "producer": {
+  "commit": "240f04abc38fcea95930971376331c1ac5082069",
+  "model": "gpt-6-astra",
+  "session": "fass-quotient-query-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/qualifier.stdout.jsonl",
+    "sha256": "f19a4806299fa117bb24fda0a2da4bf599fe22337ea5732e4dba7763f4d23ef3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/pre-call-manifest.txt",
+    "sha256": "e50aedb8d540b61d01f6e212beb9efc79337a5b511c8f6eb81d3e6c064d6931c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/post-call-manifest.txt",
+    "sha256": "5de439ffe45226751ddb0b3d6d1b3596bd29a9c241b3f42906d6271524cd21dd"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Protocol SHA256 6b7732995c5f6f2864d90ff0ae64d3f459c67d82bfef0ba9f69534d7fdf2211f; F97 and the existing Prime31 fixture; source-bound standalone Rust component",
+ "statement": "The immutable Rust quotient-query development qualifier returned exit 0 on its first call and reports 95 cases, 83 direct tensor-norm comparisons, 618 polynomial identities, 24454 finite-grid comparisons, 318 rejected certificate mutations, 13 refused invalid inputs, and 27 persisted proof objects. These are unsigned fixed-fixture correctness observations, not a performance, signed-relation, or execution-verification verdict."
+}

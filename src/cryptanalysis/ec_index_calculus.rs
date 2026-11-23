@@ -2325,6 +2325,29 @@ fn inv_prime_u64(a: u64, p: u64) -> u64 {
     (t.rem_euclid(p as i128)) as u64
 }
 
+/// Montgomery batch inversion over a prime `p`: one extended-Euclid inverse
+/// and `3n` multiplications for `n` nonzero inputs. Zero inputs must be
+/// replaced by 1 by the caller (their inverses are unused).
+fn batch_inv_prime_u64(vals: &[u64], p: u64) -> Vec<u64> {
+    let n = vals.len();
+    let mut out = vec![0u64; n];
+    if n == 0 {
+        return out;
+    }
+    let mut prefix = Vec::with_capacity(n + 1);
+    prefix.push(1u64);
+    for &v in vals {
+        let last = *prefix.last().unwrap();
+        prefix.push(mul_mod_u64(last, v, p));
+    }
+    let mut acc = inv_prime_u64(prefix[n], p);
+    for i in (0..n).rev() {
+        out[i] = mul_mod_u64(acc, prefix[i], p);
+        acc = mul_mod_u64(acc, vals[i], p);
+    }
+    out
+}
+
 /// Affine `(x1,y1) + (x2,y2)` over `F_p`, `p < 2^63`, with `u128`
 /// products. Returns `None` for the point at infinity.
 fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(u64, u64)> {
@@ -2357,7 +2380,7 @@ fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(
 /// sign is not stored: the probe tests both `R − F_k` and `R + F_k` and
 /// [`try_finalise_s4`] resolves the eight sign patterns in the group, so
 /// an `x` collision (two pair sums `±S`) only costs one failed verify.
-pub struct PairSumTable {
+pub struct WordPairSumTable {
     by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>>,
     /// Word-sized mirror of `by_x` for `p < 2^63`; empty otherwise.
     by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>>,
@@ -2373,8 +2396,35 @@ pub struct PairSumTable {
     pub build_additions: usize,
 }
 
+impl WordPairSumTable {
+    /// `true` when the table was built in word arithmetic.
+    pub fn uses_word_path(&self) -> bool {
+        !self.by_x_u64.is_empty() && self.by_x.is_empty()
+    }
+
+    /// Flattened `(sum abscissa, i, j)` list.  Word keys when the word path
+    /// ran, otherwise the BigUint keys reduced to one word (the caller is
+    /// only here for `p < 2^64`).
+    pub fn entries_word(&self) -> Vec<(u64, u32, u32)> {
+        if self.uses_word_path() {
+            self.by_x_u64
+                .iter()
+                .flat_map(|(k, v)| v.iter().map(move |&(i, j)| (*k, i, j)))
+                .collect()
+        } else {
+            self.by_x
+                .iter()
+                .flat_map(|(k, v)| {
+                    let key = k.to_u64_digits().first().copied().unwrap_or(0);
+                    v.iter().map(move |&(i, j)| (key, i, j))
+                })
+                .collect()
+        }
+    }
+}
+
 /// Build the pair-sum table for `factor_base` (`B(B+1)/2` additions).
-pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_word_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> WordPairSumTable {
     let a_fe = curve.a_fe();
     let n = factor_base.len();
     let p_u64 = if curve.p.bits() <= 63 {
@@ -2407,23 +2457,43 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
         vec![None; n]
     };
     let mut pairs = 0usize;
-    for i in 0..n {
-        for j in i..n {
-            if let Point::Affine { x, .. } = factor_base[i].point.add(&factor_base[j].point, &a_fe)
-            {
-                let key = x.value.clone();
-                if fast {
-                    if let Some(k) = key.to_u64_digits().first().copied() {
-                        by_x_u64.entry(k).or_default().push((i as u32, j as u32));
+    match (p_u64, a_u64) {
+        (Some(p), Some(a_u64)) => {
+            // Word-sized build: the same `B(B+1)/2` sums, but in u64 with one
+            // extended-Euclid inversion per pair.  The BigUint affine add
+            // spends a modular exponentiation on every pair, which is why
+            // the table stage dominated the 36-bit rung.
+            let mut flat: Vec<(u64, u32, u32)> = Vec::with_capacity(n * (n + 1) / 2);
+            for i in 0..n {
+                let Some((xi, yi)) = fb_u64[i] else { continue };
+                for j in i..n {
+                    let Some((xj, yj)) = fb_u64[j] else { continue };
+                    if let Some((x3, _)) = add_point_u64(p, a_u64, xi, yi, xj, yj) {
+                        flat.push((x3, i as u32, j as u32));
                     }
-                } else {
-                    by_x.entry(key).or_default().push((i as u32, j as u32));
                 }
-                pairs += 1;
+            }
+            pairs = flat.len();
+            for (key, i, j) in flat {
+                by_x_u64.entry(key).or_default().push((i, j));
+            }
+        }
+        _ => {
+            for i in 0..n {
+                for j in i..n {
+                    if let Point::Affine { x, .. } =
+                        factor_base[i].point.add(&factor_base[j].point, &a_fe)
+                    {
+                        by_x.entry(x.value.clone())
+                            .or_default()
+                            .push((i as u32, j as u32));
+                        pairs += 1;
+                    }
+                }
             }
         }
     }
-    PairSumTable {
+    WordPairSumTable {
         by_x,
         by_x_u64,
         fb_u64,
@@ -2436,7 +2506,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
 
 /// **Meet-in-the-middle 3-decomposition**: the third factor-base point is
 /// enumerated (both signs), and the remaining two-point sum is answered by
-/// one hash probe into [`PairSumTable`] instead of the `B²` pair sweep of
+/// one hash probe into [`WordPairSumTable`] instead of the `B²` pair sweep of
 /// [`find_one_relation_s4_via_s3_counted`].
 ///
 /// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
@@ -2451,7 +2521,7 @@ pub fn find_one_relation_s4_via_mitm_counted(
     g: &Point,
     q: &Point,
     factor_base: &[FactorBaseEntry],
-    table: &PairSumTable,
+    table: &WordPairSumTable,
     max_trials: usize,
 ) -> Option<(Relation, usize)> {
     use crate::utils::random::random_scalar;
@@ -2475,16 +2545,66 @@ pub fn find_one_relation_s4_via_mitm_counted(
                     let rx = x.value.to_u64_digits().first().copied();
                     let ry = y.value.to_u64_digits().first().copied();
                     if let (Some(rx), Some(ry)) = (rx, ry) {
-                        for k in 0..factor_base.len() {
+                        // R + F_k and R - F_k share the denominator
+                        // x(F_k) - x(R); invert all of them at once.
+                        let nfb = factor_base.len();
+                        let mut dens = Vec::with_capacity(nfb);
+                        let mut raw = Vec::with_capacity(nfb);
+                        for k in 0..nfb {
+                            let d = match table.fb_u64[k] {
+                                Some((fx, _)) => sub_mod_u64(fx, rx, p),
+                                None => 0,
+                            };
+                            raw.push(d);
+                            dens.push(if d == 0 { 1 } else { d });
+                        }
+                        let invs = batch_inv_prime_u64(&dens, p);
+                        for k in 0..nfb {
                             let Some((fx, fy)) = table.fb_u64[k] else {
                                 continue;
                             };
-                            let candidates = [
-                                add_point_u64(p, a_u64, rx, ry, fx, sub_mod_u64(p, fy, p)),
-                                add_point_u64(p, a_u64, rx, ry, fx, fy),
-                            ];
-                            for candidate in candidates.into_iter().flatten() {
-                                let Some(pairs) = table.by_x_u64.get(&candidate.0) else {
+                            let mut cand = [0u64; 2];
+                            let mut nc = 0usize;
+                            if raw[k] == 0 {
+                                if let Some((cx, _)) = add_point_u64(
+                                    p,
+                                    a_u64,
+                                    rx,
+                                    ry,
+                                    fx,
+                                    sub_mod_u64(p, fy, p),
+                                ) {
+                                    cand[nc] = cx;
+                                    nc += 1;
+                                }
+                                if let Some((cx, _)) =
+                                    add_point_u64(p, a_u64, rx, ry, fx, fy)
+                                {
+                                    cand[nc] = cx;
+                                    nc += 1;
+                                }
+                            } else {
+                                let inv = invs[k];
+                                let lam_p = mul_mod_u64(sub_mod_u64(fy, ry, p), inv, p);
+                                let lam_m = mul_mod_u64(
+                                    sub_mod_u64(sub_mod_u64(0, fy, p), ry, p),
+                                    inv,
+                                    p,
+                                );
+                                cand[0] = sub_mod_u64(
+                                    sub_mod_u64(mul_mod_u64(lam_m, lam_m, p), rx, p),
+                                    fx,
+                                    p,
+                                );
+                                cand[1] = sub_mod_u64(
+                                    sub_mod_u64(mul_mod_u64(lam_p, lam_p, p), rx, p),
+                                    fx,
+                                    p,
+                                );
+                                nc = 2;
+                            }
+                            for &cx in &cand[..nc] {
+                                let Some(pairs) = table.by_x_u64.get(&cx) else {
                                     continue;
                                 };
                                 for &(i, j) in pairs {
@@ -3789,7 +3909,7 @@ fn x_fingerprint(x: &BigUint) -> u64 {
 /// checked against the factor-base points (one addition, only on a hit), so a fingerprint
 /// collision is a miss, never a wrong relation; the hit set equals the exact table's, and among
 /// sums with the same x the earliest inserted answers, as in the exact table.
-pub struct PairSumTable {
+pub struct CompactPairSumTable {
     fps: Vec<u64>,
     vals: Vec<u32>,
     points: Vec<Point>,
@@ -3797,7 +3917,7 @@ pub struct PairSumTable {
     entries: usize,
 }
 
-impl PairSumTable {
+impl CompactPairSumTable {
     fn slot(&self, fp: u64) -> usize {
         ((u128::from(fp) * self.fps.len() as u128) >> 64) as usize
     }
@@ -3885,7 +4005,7 @@ impl PairSumTable {
     }
 }
 
-pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_compact_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> CompactPairSumTable {
     assert!(
         factor_base.len() <= PAIR_SUM_TABLE_MAX_FB,
         "compact pair-sum table indexes at most {PAIR_SUM_TABLE_MAX_FB} factor-base points"
@@ -3893,7 +4013,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
     let a_fe = curve.a_fe();
     let f = factor_base.len();
     let slots = (f * f * 5 / 3).max(16);
-    let mut table = PairSumTable {
+    let mut table = CompactPairSumTable {
         fps: vec![0; slots],
         vals: vec![0; slots],
         points: factor_base.iter().map(|e| e.point.clone()).collect(),
@@ -3969,7 +4089,7 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
-    table: &PairSumTable,
+    table: &CompactPairSumTable,
     max_trials: usize,
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
@@ -4101,7 +4221,7 @@ fn find_one_relation_table_walk<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
-    table: &PairSumTable,
+    table: &CompactPairSumTable,
     walk: &mut SampleWalk,
     max_trials: usize,
     rng: &mut R,
@@ -4190,7 +4310,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         count("sweep_collector_work_not_counted", 1);
     }
     let sum_table = if use_table {
-        Some(build_pair_sum_table(curve, &fb))
+        Some(build_compact_pair_sum_table(curve, &fb))
     } else {
         None
     };
@@ -4199,7 +4319,13 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     // the old per-attempt rebuild for A/A comparison (ignored with
     // `IC_FAST_SWEEP=1`, whose word loop always takes the hoisted index);
     // `IC_HOIST_SWEEP=1` is accepted and is the default.
-    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
+    // Default: word sweep when p fits u64 (`IC_FAST_SWEEP=0` forces BigUint sweep).
+    let word_sweep = if !use_table && std::env::var("IC_FAST_SWEEP").as_deref() != Ok("0") {
+        WordSweep::new(curve, &fb)
+    } else {
+        None
+    };
+    let fast_sweep = word_sweep.is_some();
     let hoist_sweep = fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() != Ok("0");
     let hoisted_index = if !use_table && hoist_sweep {
         Some(factor_base_x_index(&fb))
@@ -4546,7 +4672,7 @@ pub fn ec_index_calculus_dlp_s4_mitm_staged(
         max_trials_per_relation,
         max_relation_attempts,
         |fb| {
-            let table = build_pair_sum_table(curve, fb);
+            let table = build_word_pair_sum_table(curve, fb);
             move |curve: &CurveParams,
                   g: &Point,
                   q: &Point,
@@ -4584,7 +4710,7 @@ pub fn ec_index_calculus_dlp_s4_mitm_staged_with_la(
         max_trials_per_relation,
         max_relation_attempts,
         |fb| {
-            let table = build_pair_sum_table(curve, fb);
+            let table = build_word_pair_sum_table(curve, fb);
             move |curve: &CurveParams,
                   g: &Point,
                   q: &Point,
@@ -4807,6 +4933,51 @@ pub fn pollard_rho_ecdlp(
 mod tests {
     use super::*;
     use num_bigint::BigUint;
+
+    /// The word-sized pair table must contain exactly the sums the BigUint
+    /// affine add produces -- same abscissae, same index pairs.  The table
+    /// build used to call `Point::add` for every pair (one modular
+    /// exponentiation each); the u64 path is only a faster way to the same
+    /// `B(B+1)/2` sums.
+    #[test]
+    fn word_sized_pair_table_matches_biguint_build() {
+        use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
+
+        let (_, curve) = bench_curves_a_minus_3()
+            .into_iter()
+            .find(|(bits, c)| *bits == 16 && c.name.contains("p256"))
+            .expect("16-bit a=-3 fixture");
+        let fb = build_factor_base(&curve, 20);
+        let a_fe = curve.a_fe();
+        let table = build_word_pair_sum_table(&curve, &fb);
+        assert!(!table.by_x_u64.is_empty(), "word path took the table");
+        assert!(
+            table.by_x.is_empty(),
+            "BigUint mirror unused on the word path"
+        );
+
+        let mut want: Vec<(u64, u32, u32)> = Vec::new();
+        for i in 0..fb.len() {
+            for j in i..fb.len() {
+                if let Point::Affine { x, .. } = fb[i].point.add(&fb[j].point, &a_fe) {
+                    want.push((
+                        x.value.to_u64_digits().first().copied().expect("one word"),
+                        i as u32,
+                        j as u32,
+                    ));
+                }
+            }
+        }
+        let mut got: Vec<(u64, u32, u32)> = table
+            .by_x_u64
+            .iter()
+            .flat_map(|(k, v)| v.iter().map(move |&(i, j)| (*k, i, j)))
+            .collect();
+        want.sort_unstable();
+        got.sort_unstable();
+        assert_eq!(got, want, "word table differs from the BigUint build");
+        assert_eq!(table.pairs, want.len());
+    }
 
     /// Cantor–Zassenhaus root finder agrees with brute force on a prime
     /// past the brute-force cutoff (p = 1048568 + 3 has 21 bits) for a
@@ -5539,7 +5710,7 @@ mod tests {
         };
         let fb = build_factor_base(&curve, 12);
         let exact = build_pair_sum_table_exact(&curve, &fb);
-        let compact = build_pair_sum_table(&curve, &fb);
+        let compact = build_compact_pair_sum_table(&curve, &fb);
         assert!(compact.slot_bytes() < exact.len() * 170);
         let mut hits = 0usize;
         let mut k = BigUint::from(1u32);
@@ -5574,11 +5745,11 @@ mod tests {
             k += 1u32;
         }
         assert!(hits > 0, "no pair sum was hit");
-        let packed = PairSumTable::pack(11, -1, 7, 1);
-        assert_eq!(PairSumTable::unpack(packed), (11, -1, 7, 1));
-        let top = PairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
+        let packed = CompactPairSumTable::pack(11, -1, 7, 1);
+        assert_eq!(CompactPairSumTable::unpack(packed), (11, -1, 7, 1));
+        let top = CompactPairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
         assert_eq!(
-            PairSumTable::unpack(top),
+            CompactPairSumTable::unpack(top),
             (PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1)
         );
     }
@@ -5597,7 +5768,7 @@ mod tests {
         };
         let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
         let fb = build_factor_base(&curve, 12);
-        let table = build_pair_sum_table(&curve, &fb);
+        let table = build_compact_pair_sum_table(&curve, &fb);
         let check = |rel: &Relation| {
             let lhs = g
                 .scalar_mul(&rel.coef_a, &a_fe)
@@ -5749,7 +5920,7 @@ mod tests {
         let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
         for fb_size in [6usize, 12] {
             let fb = build_factor_base(&curve, fb_size);
-            let table = build_pair_sum_table(&curve, &fb);
+            let table = build_compact_pair_sum_table(&curve, &fb);
             let mut rng = rand::rngs::StdRng::seed_from_u64(31 + fb_size as u64);
             let m = fb.len();
             let mut rows = Vec::new();

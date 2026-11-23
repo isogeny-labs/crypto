@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:07:45Z",
+ "id": "PCC-20261123-2e7cca",
+ "kind": "statement",
+ "producer": {
+  "commit": "f86b451e9ed60339021931943b8cdb02564923d7",
+  "model": "",
+  "session": "codex-ecc2k-adjoint-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/final-tests.txt",
+    "sha256": "52c04e6d24320fbe5f430416803481d8178bbd01003fa788649a4f0e38d2c80c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/root-tests.txt",
+    "sha256": "3ecb79a633558c2d58d8a62024a83790e7525f949006f1a1dd342bda4ad0a0cb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/root-tests.exit",
+    "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/export-final-check.txt",
+    "sha256": "8238e108d1b618a912452e0fe0a53dc7fa048b39f014db920cdf7e9ac14b4ffc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/archive-custody.json",
+    "sha256": "3d633b7b1fd570d7dbf4ed0143339cd35acea74e6c7e577804f17f5836413d60"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/pdf-review.json",
+    "sha256": "a247f85b48dc87f22c70c0968c214474bd7114f4a32d473acc8b8ef8dc2a21d3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR5015 scoped implementation and fixed instruction study; root integration and independent admission remain pending.",
+ "statement": "The adjoint projector delivery has24 passing focused tests,90 matching primary rows,60 saved tuple replays, a strict canonical export check and an inspected three-page result PDF plus one-page pilot PDF. The separate full-root release compilation ended at its600second timeout with exit124 before tests ran. Artifact custody is producer-checked; no signed independent validation is claimed."
+}

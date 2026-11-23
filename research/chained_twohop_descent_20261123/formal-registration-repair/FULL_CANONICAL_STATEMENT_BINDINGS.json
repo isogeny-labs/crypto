@@ -1,0 +1,92 @@
+[
+  {
+    "theorem": "TwoHopDescent.doubled_range",
+    "full_canonical_statement_utf8": "theorem doubled_range (x : Mixed) : twiceM x = zeroM \u2228 twiceM x = pointM",
+    "decl_sha256": "98b6f118b17c604b73d2dbb7c4f85fc9efb4d8d570ed270cd3ca2751b7417e00",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.doubled_range",
+      "complete_declaration_utf8": "theorem doubled_range (x : Mixed) : twiceM x = zeroM \u2228 twiceM x = pointM := by\n  cases x with\n  | mk a b c d => cases a <;> cases b <;> cases c <;> cases d <;> decide\n",
+      "complete_declaration_sha256": "0f8cdb1a9790a0175ff1a29a8460274b0d28b182b94c628e2cd0603987b1bde3"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.doubled_generator",
+    "full_canonical_statement_utf8": "theorem doubled_generator : twiceM generatorM = pointM",
+    "decl_sha256": "31842d0d8decd550b6713b8c1c25ab3a7a41b0f7aa41077a1bcd675abafc2aa1",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.doubled_generator",
+      "complete_declaration_utf8": "theorem doubled_generator : twiceM generatorM = pointM := by decide\n",
+      "complete_declaration_sha256": "cfcc42c4935380267b992c3f70d26f80070337a8fa094854bde3bec1c0a507b7"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.doubled_point_nonzero",
+    "full_canonical_statement_utf8": "theorem doubled_point_nonzero : pointM \u2260 zeroM",
+    "decl_sha256": "3993346d0de7580a9187fc6808d52a020a8f79b6d3083cf2de2762548ea5adab",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.doubled_point_nonzero",
+      "complete_declaration_utf8": "theorem doubled_point_nonzero : pointM \u2260 zeroM := by decide\n",
+      "complete_declaration_sha256": "34f2509985a9d2c1731bf4722a8d967fbecdb38489f8bf74406129d64dd708d2"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.additive_injection_fixes_doubled_point",
+    "full_canonical_statement_utf8": "theorem additive_injection_fixes_doubled_point (F : Mixed \u2192 Mixed) (hzero : F zeroM = zeroM) (hinj : Function.Injective F) (hadd : \u2200 x y, F (addM x y) = addM (F x) (F y)) : F pointM = pointM",
+    "decl_sha256": "abd855496bef6f8b3311396c1a60b47be3360bbf039c95eecf3d17be2de23736",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.additive_injection_fixes_doubled_point",
+      "complete_declaration_utf8": "theorem additive_injection_fixes_doubled_point\n    (F : Mixed \u2192 Mixed)\n    (hzero : F zeroM = zeroM)\n    (hinj : Function.Injective F)\n    (hadd : \u2200 x y, F (addM x y) = addM (F x) (F y)) :\n    F pointM = pointM := by\n  have hp : F pointM = twiceM (F generatorM) := by\n    calc\n      F pointM = F (twiceM generatorM) := congrArg F doubled_generator.symm\n      _ = twiceM (F generatorM) := hadd generatorM generatorM\n  cases doubled_range (F generatorM) with\n  | inl h => exact False.elim (doubled_point_nonzero (hinj (hp.trans (h.trans hzero.symm))))\n  | inr h => exact hp.trans h\n",
+      "complete_declaration_sha256": "81ec7712667ddfb77b6546ac30a6f86582fbefd93c772d35acc7b46518401465"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.no_fixed_free_mixed_automorphism",
+    "full_canonical_statement_utf8": "theorem no_fixed_free_mixed_automorphism (F : Mixed \u2192 Mixed) (hzero : F zeroM = zeroM) (hinj : Function.Injective F) (hadd : \u2200 x y, F (addM x y) = addM (F x) (F y)) (hfree : \u2200 x, F x = x \u2192 x = zeroM) : False",
+    "decl_sha256": "4c7f2e66366891678907872722f841c75ef7591209d8b320482c7347677082be",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.no_fixed_free_mixed_automorphism",
+      "complete_declaration_utf8": "theorem no_fixed_free_mixed_automorphism\n    (F : Mixed \u2192 Mixed)\n    (hzero : F zeroM = zeroM)\n    (hinj : Function.Injective F)\n    (hadd : \u2200 x y, F (addM x y) = addM (F x) (F y))\n    (hfree : \u2200 x, F x = x \u2192 x = zeroM) : False := by\n  exact doubled_point_nonzero\n    (hfree pointM (additive_injection_fixes_doubled_point F hzero hinj hadd))",
+      "complete_declaration_sha256": "074551a39ff49988bb9ca0d729888b31df873cfd12764a377574c328f8e2b8f4"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.doubling_covariance",
+    "full_canonical_statement_utf8": "theorem doubling_covariance (F : Good \u2192 Good) (hadd : \u2200 x y, F (addG x y) = addG (F x) (F y)) (x : Good) : F (twiceG x) = twiceG (F x)",
+    "decl_sha256": "6cd8c19e5095287b088e09a538a1eb4f67c8e6d1dfc2e7e0f8e264a3c1d1091e",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.doubling_covariance",
+      "complete_declaration_utf8": "theorem doubling_covariance (F : Good \u2192 Good)\n    (hadd : \u2200 x y, F (addG x y) = addG (F x) (F y)) (x : Good) :\n    F (twiceG x) = twiceG (F x) := hadd x x\n",
+      "complete_declaration_sha256": "544dff6eceeea96a8555c75473ba086708791bcd50c2a36d7b714ee3d47056dc"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.doubled_image_preserved",
+    "full_canonical_statement_utf8": "theorem doubled_image_preserved (F : Good \u2192 Good) (hadd : \u2200 x y, F (addG x y) = addG (F x) (F y)) (x : Good) (hx : InDouble x) : InDouble (F x)",
+    "decl_sha256": "91ab322481a569e32e352083c7c3c22931422e4fe3dc7ea41c436ad61d62348d",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.doubled_image_preserved",
+      "complete_declaration_utf8": "theorem doubled_image_preserved (F : Good \u2192 Good)\n    (hadd : \u2200 x y, F (addG x y) = addG (F x) (F y))\n    (x : Good) (hx : InDouble x) : InDouble (F x) := by\n  cases hx with\n  | intro y hy => exact \u27e8F y, (doubling_covariance F hadd y).symm.trans (congrArg F hy)\u27e9",
+      "complete_declaration_sha256": "199ab17465cc2d2d729f674150b8f399634ee53ec28d7961c7a432d18b51a38b"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.cubic_fixed_only_zero",
+    "full_canonical_statement_utf8": "theorem cubic_fixed_only_zero (v : V) : cubic v = v \u2192 v = zeroV",
+    "decl_sha256": "38651fe458edecfdc8944dc27479cafd80ede557ec1df250512bb69e9f5253e2",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.cubic_fixed_only_zero",
+      "complete_declaration_utf8": "theorem cubic_fixed_only_zero (v : V) : cubic v = v \u2192 v = zeroV := by\n  cases v with\n  | mk a b c d => cases a <;> cases b <;> cases c <;> cases d <;> decide\n",
+      "complete_declaration_sha256": "3383a48a8f3744c9ff888d52e1774c8cb674c8f0e09d1027434c6ddbf81122e8"
+    }
+  },
+  {
+    "theorem": "TwoHopDescent.cubic_order_three",
+    "full_canonical_statement_utf8": "theorem cubic_order_three (v : V) : cubic (cubic (cubic v)) = v",
+    "decl_sha256": "a50df12a45e661785593495cd2b35a5de0626ff1b0e25c690a30e7ec436cb4c9",
+    "full_declaration_with_proof": {
+      "declaration": "TwoHopDescent.cubic_order_three",
+      "complete_declaration_utf8": "theorem cubic_order_three (v : V) : cubic (cubic (cubic v)) = v := by\n  cases v with\n  | mk a b c d => cases a <;> cases b <;> cases c <;> cases d <;> decide",
+      "complete_declaration_sha256": "825e421da849d64d2726e3a9c6667c08d7c6ca2adbcff1495a6e7542925f8b5f"
+    }
+  }
+]

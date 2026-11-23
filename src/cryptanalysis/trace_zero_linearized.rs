@@ -43,6 +43,80 @@ fn parity(a: &WordMask, b: &WordMask) -> u64 {
     (((a[0] & b[0]) ^ (a[1] & b[1]) ^ (a[2] & b[2])).count_ones() & 1) as u64
 }
 
+/// Conjugate transposed multiplication to ordinary multiplication. For
+/// f=X^n+sum X^t, N(r)=(I+S)reverse_n(r), S(a)=sum_{t>0} a>>(n-t).
+/// N M_h^T = M_h N. These sparse moduli need at most two inverse folds.
+/// This changes the construction cost, not any projected equation.
+struct AdjointMap {
+    n: usize,
+    shifts: [usize; 3],
+}
+impl AdjointMap {
+    fn new(c: &BinaryCurve) -> Option<Self> {
+        let mut terms = c.irreducible.low_terms.clone();
+        terms.sort_unstable();
+        let n = c.m as usize;
+        let shifts = match (c.m, c.irreducible.degree, terms.as_slice()) {
+            (83, 83, [0, 1, 2, 45]) => [82, 81, 38],
+            (131, 131, [0, 1, 2, 13]) => [130, 129, 118],
+            _ => return None,
+        };
+        Some(Self { n, shifts })
+    }
+    fn shr(a: WordMask, shift: usize) -> WordMask {
+        let word = shift / 64;
+        let bit = shift % 64;
+        std::array::from_fn(|i| {
+            let j = i + word;
+            if j >= 3 {
+                return 0;
+            }
+            (a[j] >> bit)
+                ^ if bit != 0 && j + 1 < 3 {
+                    a[j + 1] << (64 - bit)
+                } else {
+                    0
+                }
+        })
+    }
+    fn reverse(&self, a: WordMask) -> WordMask {
+        Self::shr(
+            [
+                a[2].reverse_bits(),
+                a[1].reverse_bits(),
+                a[0].reverse_bits(),
+            ],
+            192 - self.n,
+        )
+    }
+    fn sparse(&self, a: WordMask) -> WordMask {
+        let mut out = [0; 3];
+        for shift in self.shifts {
+            let term = Self::shr(a, shift);
+            for i in 0..3 {
+                out[i] ^= term[i];
+            }
+        }
+        out
+    }
+    fn forward(&self, r: WordMask) -> WordMask {
+        let a = self.reverse(r);
+        let s = self.sparse(a);
+        std::array::from_fn(|i| a[i] ^ s[i])
+    }
+    fn inverse(&self, a: WordMask) -> WordMask {
+        let mut result = a;
+        let mut term = self.sparse(a);
+        while term != [0; 3] {
+            for i in 0..3 {
+                result[i] ^= term[i];
+            }
+            term = self.sparse(term);
+        }
+        self.reverse(result)
+    }
+}
+
 /// Four-bit combination tables for the first sixteen projected equations.
 /// Four 16-bit coefficient rows share each word; RHS bits remain separate.
 /// This evaluates the existing F2-linear maps, without changing their order.
@@ -148,6 +222,15 @@ impl ProductProjection {
         c: &BinaryCurve,
         field: &WordField,
     ) -> Self {
+        Self::build(xs, ws, c, field, true)
+    }
+    fn build(
+        xs: &[F2mElement],
+        ws: &[F2mElement],
+        c: &BinaryCurve,
+        field: &WordField,
+        adjoint: bool,
+    ) -> Self {
         assert!(xs.len() < 63 && c.m <= 192);
         let pivots: Vec<_> = ws
             .iter()
@@ -177,16 +260,25 @@ impl ProductProjection {
             })
             .collect();
         let mut equations = vec![vec![[0; 3]; xs.len() + 1]; coordinates.len()];
-        for (i, h) in halves.iter().enumerate() {
-            let mut multiple = words(h);
-            for bit in 0..c.m as usize {
-                let image = Self::reduce_with(&pivots, multiple);
-                for (j, &coord) in coordinates.iter().enumerate() {
-                    if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
-                        equations[j][i][bit / 64] |= 1u64 << (bit % 64);
-                    }
+        if let Some(map) = adjoint.then(|| AdjointMap::new(c)).flatten() {
+            for (row, mask) in equations.iter_mut().zip(&rhs) {
+                let numerator = map.forward(*mask);
+                for (i, h) in halves.iter().enumerate() {
+                    row[i] = map.inverse(field.mul(numerator, words(h)));
                 }
-                multiple = field.times_x(multiple);
+            }
+        } else {
+            for (i, h) in halves.iter().enumerate() {
+                let mut multiple = words(h);
+                for bit in 0..c.m as usize {
+                    let image = Self::reduce_with(&pivots, multiple);
+                    for (j, &coord) in coordinates.iter().enumerate() {
+                        if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
+                            equations[j][i][bit / 64] |= 1u64 << (bit % 64);
+                        }
+                    }
+                    multiple = field.times_x(multiple);
+                }
             }
         }
         for (row, mask) in equations.iter_mut().zip(&rhs) {
@@ -817,6 +909,89 @@ pub fn decompose_trace_zero_linearized(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn adjoint_curve(n: u32) -> BinaryCurve {
+        BinaryCurve {
+            m: n,
+            irreducible: IrreduciblePoly {
+                degree: n,
+                low_terms: if n == 83 {
+                    vec![0, 1, 2, 45]
+                } else {
+                    vec![0, 1, 2, 13]
+                },
+            },
+            a: F2mElement::zero(n),
+            b: F2mElement::one(n),
+            generator: BinaryPoint::Infinity,
+            order: 1u32.into(),
+            cofactor: 4u32.into(),
+        }
+    }
+
+    #[test]
+    fn adjoint_matches_reference_multiplication_on_every_bilinear_basis_triple() {
+        for n in [83, 131] {
+            // Only the field is used; no group operations or order assertions.
+            let c = adjoint_curve(n);
+            let map = AdjointMap::new(&c).unwrap();
+            let field = WordField::new(&c);
+            let basis: Vec<_> = (0..n)
+                .map(|i| F2mElement::from_bit_positions(&[i], n))
+                .collect();
+            let products: Vec<Vec<_>> = basis
+                .iter()
+                .map(|h| {
+                    basis
+                        .iter()
+                        .map(|z| words(&h.mul(z, &c.irreducible)))
+                        .collect()
+                })
+                .collect();
+            for (j, r) in basis.iter().enumerate() {
+                let r = words(r);
+                assert_eq!(map.inverse(map.forward(r)), r);
+                assert_eq!(map.forward(map.inverse(r)), r);
+                for (i, h) in basis.iter().enumerate() {
+                    let mask = map.inverse(field.mul(map.forward(r), words(h)));
+                    for k in 0..n as usize {
+                        assert_eq!(
+                            (mask[k / 64] >> (k % 64)) & 1,
+                            (products[i][k][j / 64] >> (j % 64)) & 1,
+                            "n{n}/r{j}/h{i}/z{k}"
+                        );
+                    }
+                }
+            }
+            let mut wrong = c.clone();
+            wrong.irreducible.low_terms.push(3);
+            assert!(AdjointMap::new(&wrong).is_none());
+        }
+        assert!(AdjointMap::new(&small_curve()).is_none());
+    }
+
+    #[test]
+    fn adjoint_projector_preserves_every_coefficient_and_quotient_coordinate() {
+        for n in [83, 131] {
+            let c = adjoint_curve(n);
+            let field = WordField::new(&c);
+            for d in [1, 3, 8, 12, 17] {
+                let xs: Vec<_> = (0..d)
+                    .map(|i| F2mElement::from_bit_positions(&[i, i + 19], n))
+                    .collect();
+                let ws: Vec<_> = (0..d + 3)
+                    .map(|i| F2mElement::from_bit_positions(&[i, i + 29], n))
+                    .collect();
+                let old = ProductProjection::build(&xs, &ws, &c, &field, false);
+                let new = ProductProjection::build(&xs, &ws, &c, &field, true);
+                assert_eq!(old.equations, new.equations, "n{n}/d{d}");
+                assert_eq!(old.rhs, new.rhs);
+                assert_eq!(old.w_pivots, new.w_pivots);
+                assert_eq!(old.halves, new.halves);
+                assert_eq!(old.w_support, new.w_support);
+            }
+        }
+    }
 
     #[test]
     fn packed_row_maps_match_all_input_basis_vectors_and_independent_random_pairs() {

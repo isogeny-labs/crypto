@@ -1,0 +1,173 @@
+   Compiling dickson-s3-qualifier v0.1.0 (/workspace/scratch/108b275c78dd/crypto-dickson/research/dickson_s3_quadratic_20261122/qualifier)
+warning: struct `MaskHasher` is never constructed
+  --> src/../../../../src/cryptanalysis/fx_hash.rs:89:19
+   |
+89 | pub(crate) struct MaskHasher(u64);
+   |                   ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: type alias `MaskMap` is never used
+   --> src/../../../../src/cryptanalysis/fx_hash.rs:128:17
+    |
+128 | pub(crate) type MaskMap<V> = HashMap<Mask, V, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: type alias `MaskSet` is never used
+   --> src/../../../../src/cryptanalysis/fx_hash.rs:131:17
+    |
+131 | pub(crate) type MaskSet = HashSet<Mask, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: struct `OpenCoefMap` is never constructed
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:167:8
+    |
+167 | struct OpenCoefMap {
+    |        ^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:177:8
+    |
+176 | impl OpenCoefMap {
+    | ---------------- associated items in this implementation
+177 |     fn with_capacity(slots: usize) -> Self {
+    |        ^^^^^^^^^^^^^
+...
+191 |     fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+198 |     fn home(&self, key: u64) -> usize {
+    |        ^^^^
+...
+203 |     fn prefetch(&self, key: u64) {
+    |        ^^^^^^^^
+...
+208 |     fn len(&self) -> usize {
+    |        ^^^
+...
+214 |     fn insert_vacant(&mut self, key: u64, val: (u128, u64, u64)) -> Result<(), (u128, u64, u64)> {
+    |        ^^^^^^^^^^^^^
+...
+238 |     fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+    |        ^^^
+...
+255 |     fn grow(&mut self) {
+    |        ^^^^
+
+warning: struct `OpenRefMap` is never constructed
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:273:8
+    |
+273 | struct OpenRefMap {
+    |        ^^^^^^^^^^
+
+warning: associated items `with_capacity_bound`, `home`, `insert`, `grow`, and `get` are never used
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:284:8
+    |
+283 | impl OpenRefMap {
+    | --------------- associated items in this implementation
+284 |     fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+298 |     fn home(&self, key: u64) -> usize {
+    |        ^^^^
+...
+303 |     fn insert(&mut self, key: u64, val: (usize, usize, bool, u64)) {
+    |        ^^^^^^
+...
+328 |     fn grow(&mut self) {
+    |        ^^^^
+...
+345 |     fn get(&self, key: u64) -> Option<(usize, usize, bool, u64)> {
+    |        ^^^
+
+warning: function `powmod` is never used
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:441:4
+    |
+441 | fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
+    |    ^^^^^^
+
+warning: field `r` is never read
+    --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:1120:5
+     |
+1119 | pub struct CubicClasses {
+     |            ------------ field in this struct
+1120 |     r: u64,
+     |     ^
+
+warning: function `prefetch_cache_line` is never used
+    --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:2300:4
+     |
+2300 | fn prefetch_cache_line<T>(lines: &[T], index: usize) {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `add_mod` is never used
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/prime_fast.rs:394:4
+    |
+394 | fn add_mod(a: u64, b: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: function `neg_mod` is never used
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/prime_fast.rs:404:4
+    |
+404 | fn neg_mod(a: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: method `jac_to_affine_many` is never used
+   --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/prime_fast.rs:666:8
+    |
+462 | impl FastCurve {
+    | -------------- method in this implementation
+...
+666 |     fn jac_to_affine_many(
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `add_mod` is never used
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/residual_arithmetic.rs:22:4
+   |
+22 | fn add_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: function `sub_mod` is never used
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/residual_arithmetic.rs:29:4
+   |
+29 | fn sub_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: constant `SHOUP_MAX_MODULUS` is never used
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/residual_arithmetic.rs:37:7
+   |
+37 | const SHOUP_MAX_MODULUS: u64 = 1 << 63;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: struct `FixedFactor` is never constructed
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/residual_arithmetic.rs:48:8
+   |
+48 | struct FixedFactor {
+   |        ^^^^^^^^^^^
+
+warning: associated items `new` and `mul` are never used
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/residual_arithmetic.rs:55:8
+   |
+53 | impl FixedFactor {
+   | ---------------- associated items in this implementation
+54 |     #[inline]
+55 |     fn new<const SHOUP: bool>(w: u64, n: u64) -> FixedFactor {
+   |        ^^^
+...
+70 |     fn mul<const SHOUP: bool>(self, x: u64, n: u64) -> u64 {
+   |        ^^^
+
+warning: function `pow_u64` is never used
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/numeric_s3.rs:26:4
+   |
+26 | fn pow_u64(mut base: u64, mut exp: u64, p: u64, mults: &mut u64) -> u64 {
+   |    ^^^^^^^
+
+warning: function `inv_u64` is never used
+  --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/numeric_s3.rs:42:4
+   |
+42 | fn inv_u64(a: u64, p: u64, mults: &mut u64) -> Option<u64> {
+   |    ^^^^^^^
+
+warning: `dickson-s3-qualifier` (lib) generated 20 warnings
+    Finished `release` profile [optimized] target(s) in 7.27s

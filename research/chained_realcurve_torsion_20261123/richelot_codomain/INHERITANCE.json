@@ -1,0 +1,29 @@
+{
+  "schema": "actual-richelot-source-inheritance/v1",
+  "generic_polynomials": {
+    "source": "coordinates/inherited_d.rs",
+    "selection": "entire prefix before Jacobians comment; no selected body changes",
+    "sha256": "841412081ccf076614fa536a2501942223e36b6d252a5555742148ba74f4b275"
+  },
+  "counts": {
+    "source": "census_b.rs",
+    "functions": [
+      "add9",
+      "mul9",
+      "point_counts",
+      "weil"
+    ],
+    "selected_bodies_unchanged": true,
+    "sha256": "7f0573eb28ae5addadabe5f30455e27fbe10e7017d6203129ad64ecee60b5fe2",
+    "signature_delta": "Only point_counts and weil gain pub(crate) visibility to be called from the standalone parent module; all selected function bodies unchanged."
+  },
+  "richelot_reference": {
+    "repository": "isogeny-labs/crypto",
+    "commit": "816f9c3a942efed569049618c056d12a0c56d693",
+    "path": "cd_attack/src/richelot.rs",
+    "git_blob": "2495980bd87bebc676da701056b8aa8b69f3771f",
+    "whole_source_sha256": "6188571e832bc8defe711d18e5d2c069a47de25683f629c03b5971a8ddffa5c9",
+    "usage": "Exact determinant/cyclic-bracket/correspondence convention audited; actual new F27 polynomial implementation, not whole legacy pushforward execution."
+  },
+  "scope": "No old census/J8 population rerun; new actual-codomain and F27 correspondence input."
+}

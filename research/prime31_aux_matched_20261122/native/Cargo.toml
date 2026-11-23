@@ -28,11 +28,25 @@ path = "src/choice_main.rs"
 test = false
 bench = false
 
+[[bin]]
+name = "prime31-sparse-identity"
+path = "src/identity_main.rs"
+test = false
+bench = false
+
+[[bin]]
+name = "prime31-ic-incumbent"
+path = "src/incumbent_main.rs"
+test = false
+bench = false
+
 [features]
 default = []
 wide-vars = []
 
 [dependencies]
+prime31-specialized-incumbent = { path = "../fiber-domain-followup/specialized-native" }
+hex = "0.4"
 certified-relations = { path = "../../../crates/certified-relations" }
 relation-replay-checker = { path = "../../../crates/relation-replay-checker" }
 num-bigint = { version = "0.4", features = ["rand"] }

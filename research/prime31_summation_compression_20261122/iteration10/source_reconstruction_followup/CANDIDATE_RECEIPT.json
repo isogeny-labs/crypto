@@ -1,0 +1,48 @@
+{
+  "schema": "binary-hec-complete-union-candidate-v1",
+  "date": "2026-11-23",
+  "pr": 4977,
+  "source_parent": "f566c6faa6a7c69d58a20f59ffd4a1dbe2a1778c",
+  "parents": [
+    {
+      "sha": "a9d68fbd9c2dc5b6db267746c483febd22cb5501",
+      "blob": "12758d4edc3f1d5f6c6c66ebb32397d04c991af7"
+    },
+    {
+      "sha": "0d4721abfeb0c402cb7de6227e0f2108101162dc",
+      "blob": "89a190d53bcd20a8141c219db2f0f8fd963b9ce2"
+    }
+  ],
+  "malformed_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+  "candidate_path": "research/prime31_summation_compression_20261122/iteration10/source_reconstruction_followup/BINARY_HEC_COMPLETE_UNION_CANDIDATE.rs",
+  "candidate_blob": "616422524711c1dd0e54b6bb6c557348b999e262",
+  "lines": 1543,
+  "edits": [
+    {
+      "type": "replace",
+      "anchor": "if let Some(entries) = classified",
+      "with": "match classified { Some(entries), None }"
+    },
+    {
+      "type": "replace",
+      "anchor": "let g = curve.genus;",
+      "with": "let g = curve.genus as u32;"
+    }
+  ],
+  "checks": {
+    "all_parent_public_exports_retained": true,
+    "byte_identical_test_module": true,
+    "raw_braces_balanced": true,
+    "production_root_changed": false,
+    "rust_compiled": false,
+    "original_root_tested": false,
+    "independent_signature": false
+  },
+  "workers": {
+    "native_worker_slots": 0,
+    "coordinator": "source audit, text reconstruction, literature/contract review",
+    "rust": "isolated noncompiled reference only",
+    "validation": "test matrix prepared; not executed"
+  },
+  "status": "unverified_source_only"
+}

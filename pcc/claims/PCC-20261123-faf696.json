@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:13:51Z",
+ "id": "PCC-20261123-faf696",
+ "kind": "statement",
+ "producer": {
+  "commit": "2e3e496be74639b01960d5a7386b8b56675e5939",
+  "model": "",
+  "session": "codex-ecc2k-adjoint-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/store-failure-correction.json",
+    "sha256": "1d24c85a92d2d527ecd20ca660f7d307fea2562a5f452504e32c961abed0ceb6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_projection_setup_20261123/checks/artifact-autofix-failed-step.txt",
+    "sha256": "a2d229005583f2bdbfa0f795f751f72b53b2aac01517d2ead05e75f80a94b912"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Corrected administrative request/object count; no scientific result or frozen raw measurement changed.",
+ "statement": "Correction to unsigned PCC-20261123-e89520: artifact-autofix run45213255631 logged five failed HeadObject requests identifying FOUR distinct keys, one repeated, rather than five distinct objects. The original authenticated migration failed403; cause and object existence remain unknown. All original source payloads are preserved and migration/merge gates remain unresolved."
+}

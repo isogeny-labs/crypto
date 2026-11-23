@@ -1,0 +1,1 @@
+bash -c ulimit\ -v\ 2097152\;\ exec\ env\ RAYON_NUM_THREADS=1\ timeout\ 180\ \"\$@\" rr5-unit /workspace/scratch/25ba7b3118bf/rr5-frozen/b677-02/public-example-tests --test-threads=1 --nocapture 

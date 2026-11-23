@@ -9,7 +9,9 @@ use sha2::{Digest, Sha256};
 
 const UPSTREAM_REVISION: &str = "33b3bc3c7485df0fe80aae41e2093cf940d87ff3";
 const UPSTREAM_MANIFEST: &str =
-    "research/prime31_aux_matched_20261122/isogeny-choice/upstream/manifest.json";
+    "research/prime31_aux_matched_20261122/sparse-h2-followup/upstream/manifest.json";
+const SPECIALIZED_MANIFEST: &str =
+    "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/manifest.json";
 
 struct Range<'a> {
     start: &'a str,
@@ -132,7 +134,7 @@ fn inventory(root: &Path, relative: &str, role: &str) -> Value {
 fn upstream_sources(root: &Path) -> Value {
     let bytes = read(root, UPSTREAM_MANIFEST);
     let manifest: Value = serde_json::from_slice(&bytes).expect("valid upstream source manifest");
-    assert_eq!(manifest["schema"], "prime31-isogeny-upstream-source/v1");
+    assert_eq!(manifest["schema"], "prime31-isogeny-upstream-source/v2");
     assert_eq!(manifest["upstream_revision"], UPSTREAM_REVISION);
     let snapshots = manifest["snapshots"]
         .as_array()
@@ -140,7 +142,7 @@ fn upstream_sources(root: &Path) -> Value {
     let unchanged = manifest["unchanged_dependencies"]
         .as_array()
         .expect("unchanged upstream dependencies");
-    assert_eq!(snapshots.len(), 4);
+    assert_eq!(snapshots.len(), 6);
     assert_eq!(snapshots.len() + unchanged.len(), 43);
     for source in snapshots.iter().chain(unchanged) {
         let path = source["path"].as_str().expect("upstream source path");
@@ -150,6 +152,45 @@ fn upstream_sources(root: &Path) -> Value {
             expected,
             "upstream bytes changed: {path}"
         );
+    }
+    manifest
+}
+
+/// A separate exact source closure keeps the maintained specialized table's
+/// types and arithmetic independent of the historical study's frozen module.
+fn specialized_sources(root: &Path) -> Value {
+    let bytes = read(root, SPECIALIZED_MANIFEST);
+    let manifest: Value = serde_json::from_slice(&bytes).expect("specialized source manifest");
+    assert_eq!(
+        manifest["schema"],
+        "prime31-specialized-incumbent-upstream/v1"
+    );
+    assert_eq!(manifest["repository"], "isogeny-labs/cryptanalysis");
+    assert_eq!(
+        manifest["upstream_revision"],
+        "457ae1818aaf8134bd833ad9c1b9d57015264510"
+    );
+    let snapshots = manifest["snapshots"]
+        .as_array()
+        .expect("specialized snapshots");
+    assert_eq!(snapshots.len(), 4);
+    for source in snapshots {
+        let path = source["path"].as_str().expect("specialized snapshot path");
+        let bytes = read(root, path);
+        assert_eq!(
+            digest(&bytes),
+            source["sha256"]
+                .as_str()
+                .expect("specialized source SHA256"),
+            "specialized snapshot changed: {path}"
+        );
+        assert_eq!(
+            bytes.len() as u64,
+            source["bytes"]
+                .as_u64()
+                .expect("specialized source byte count")
+        );
+        assert_eq!(source["rewritten"], false);
     }
     manifest
 }
@@ -234,6 +275,7 @@ fn main() {
         .expect("qualifier must stay inside its repository");
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
     let upstream_source_provenance = upstream_sources(&root);
+    let specialized_source_provenance = specialized_sources(&root);
     let f4_layout = f4_layout(&root, &out);
     let extracted = vec![
         extract(
@@ -356,14 +398,29 @@ fn main() {
                     scope: "complete FactorBase type, count_index_build, and inherent implementation including from_column_map",
                 },
                 Range {
-                    start: "#[inline(always)]\n#[allow(unused_unsafe)]\nfn prefetch_cache_line<T>(lines: &[T], index: usize) {\n",
-                    end: "struct GuardLineSet {\n",
-                    scope: "complete production cache-line prefetch helper used by OpenCoefMap, including unchanged x86_64 intrinsic and non-x86_64 cfg branches",
+                    start: "/// What building a table cost, folded into the factor-base phase of\n",
+                    end: "    /// The binary negation-folded table in the scalar builder's exact pair\n",
+                    scope: "complete production TableCost, table layouts, prefetch helper, PairTable and generic scalar/batched builders; original impl opening retained",
                 },
                 Range {
-                    start: "/// Resolve the signs of a witness of abscissae: which points above them\n",
+                    start: "    /// The same negation-folded table and emission order as\n",
+                    end: "    /// Probe a binary sum returned by [`FastCurve::add_many_lazy`]. Its\n",
+                    scope: "complete production generic/prime folded batched table builders, lookup and exact probe; binary-only methods omitted",
+                },
+                Range {
+                    start: "    pub fn calibrate_lookup(&self, samples: u64) -> f64 {\n        let mut rng = StdRng::seed_from_u64(7);\n        let keys: Vec<u64> = (0..1024).map(|_| rng.gen::<u64>() >> 1).collect();\n",
+                    end: "/// Largest arity a [`KSumTable`] builds, and the most bits a packed summand\n",
+                    scope: "complete production PairTable calibration and original impl closing brace; calibration is not invoked by the study",
+                },
+                Range {
+                    start: "/// Native counters of the oracle, per phase.\n",
                     end: "/// Run one oracle on one target: indices of a decomposition, or `None`.\n",
-                    scope: "actual lift_abscissae signed-witness enumeration",
+                    scope: "actual production oracle counters and lift_abscissae signed-witness enumeration",
+                },
+                Range {
+                    start: "/// Meet in the middle on a built pair table: one probe for `m = 2`,\n",
+                    end: "/// Meet in the middle on the Frobenius-folded table: the same loop as\n",
+                    scope: "complete production scalar pair-table decomposition reference for adapter correctness checks",
                 },
             ],
             "ic_boundary.rs",
@@ -405,6 +462,11 @@ fn main() {
                     start: "// ── Parallel distinguished-point rho",
                     end: "// ── Index calculus: factor base, pair table, relations, linear algebra",
                     scope: "complete production prime_fast RhoConfig, RhoResult, operation counts, collision verification, rho_parallel, and worker/lane implementation; prescribed one-thread tuned wall reference, no index-calculus substitute",
+                },
+                Range {
+                    start: "// ── Index calculus: factor base, pair table, relations, linear algebra",
+                    end: "// ── Shared factor-base subproduct tree & lock-step multi-walker IC",
+                    scope: "complete production FastFactorBase, PairTable, relation collectors and linear algebra, collect_setup_batched, ic_solve_fast, ic_multi_solve_ex, and ic_solve_table; exact complete cold single-target incumbent, without the later subproduct-tree/lockstep experimental path",
                 },
             ],
             "prime_fast.rs",
@@ -453,7 +515,7 @@ fn main() {
             "hyperelliptic_ops.rs",
         ),
         extract(
-            &root, &out, "src/cryptanalysis/ic_framework/prime_tower.rs",
+            &root, &out, "research/prime31_aux_matched_20261122/sparse-h2-followup/upstream/prime_tower.rs",
             "d05e73e5420f1c60a554c725a746d2cd6b47ea9509ac81873b7f72578297d0b2",
             &[
                 Range { start: "fn mul(a: u64, b: u64, p: u64) -> u64 {", end: "/// A primitive `2^t`-th root of unity", scope: "unchanged auxiliary modular product" },
@@ -481,6 +543,10 @@ fn main() {
             "exact-revision upstream snapshots and unchanged dependency provenance",
         ),
         (
+            "research/prime31_aux_matched_20261122/isogeny-choice/upstream/manifest.json",
+            "unchanged historical parent source manifest",
+        ),
+        (
             "research/prime31_aux_matched_20261122/isogeny-choice/fixtures/kernel_correctness_fixtures.json",
             "exact kernel fixture included in the kernel_fiber_contract test executable",
         ),
@@ -496,8 +562,10 @@ fn main() {
             "src/cryptanalysis/f4_fp/certified.rs",
             "complete production relation certificate child",
         ),
-        ("src/cryptanalysis/fp_backend.rs", "complete field backend"),
+        ("research/prime31_aux_matched_20261122/sparse-h2-followup/upstream/fp_backend.rs", "complete pinned field backend"),
         ("src/cryptanalysis/fx_hash.rs", "complete hasher"),
+        ("src/cryptanalysis/identity_certificate.rs", "complete existing native identity issuer and checker; source-bound separately from solver pin"),
+        ("src/hash/sha256.rs", "complete existing native SHA256 for identity certificates"),
         ("src/cryptanalysis/jv_bitops.rs", "complete counter hooks"),
         (
             "src/cryptanalysis/jv_bitops_uniform.rs",
@@ -560,11 +628,49 @@ fn main() {
             ));
         }
     }
+    full.push(inventory(
+        &root,
+        SPECIALIZED_MANIFEST,
+        "separate specialized incumbent source snapshot and byte-selection declaration",
+    ));
+    for snapshot in specialized_source_provenance["snapshots"]
+        .as_array()
+        .unwrap()
+    {
+        full.push(inventory(
+            &root,
+            snapshot["path"].as_str().unwrap(),
+            "complete pinned cryptanalysis specialized incumbent snapshot",
+        ));
+    }
+    let specialized_crate =
+        "research/prime31_aux_matched_20261122/fiber-domain-followup/specialized-native";
+    for filename in ["Cargo.toml", "build.rs"] {
+        full.push(inventory(
+            &root,
+            &format!("{specialized_crate}/{filename}"),
+            "actual specialized incumbent path dependency build input",
+        ));
+    }
+    let mut specialized_rust = Vec::new();
+    rust_sources(
+        &root,
+        &root.join(specialized_crate).join("src"),
+        &mut specialized_rust,
+    );
+    for relative in specialized_rust {
+        full.push(inventory(
+            &root,
+            &relative,
+            "complete specialized incumbent path dependency source tree",
+        ));
+    }
     let manifest = json!({
         "schema": "prime31-aux-matched-source-manifest/v1",
         "scope": "matched auxiliary study with unchanged production F4 and exact declared source closure",
         "evidence_status": "build provenance only; test results require a separate receipt; PCC-unverified",
         "upstream_source_provenance": upstream_source_provenance,
+        "specialized_source_provenance": specialized_source_provenance,
         "extracted_production_ranges": extracted,
         "layout_preserving_f4_copy": f4_layout,
         "whole_files": full,
@@ -572,6 +678,9 @@ fn main() {
         "full_root_library_tests_included": false,
         "legacy_module_unit_tests_included": false,
         "f4_solver_included": true,
+        "prime_fast_complete_ic_included": true,
+        "prime_fast_ic_source_revision": UPSTREAM_REVISION,
+        "specialized_cryptanalysis_prime_batch_included": true,
         "integration_example_included": false,
         "integration_example_rewritten": false,
         "algorithm_substitutions": false,

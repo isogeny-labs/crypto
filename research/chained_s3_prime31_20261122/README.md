@@ -53,3 +53,11 @@ For uniformly distributed subgroup targets, if there are at most O(B^3) signed t
 - Repository primary sources: `src/cryptanalysis/ic_boundary.rs`, `src/cryptanalysis/semaev_prime_poly.rs`, `RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md`, PRs #4812, #4891, #4901. The shared research-KB MCP was unavailable through this runtime; this is **not** a complete novelty audit.
 
 **2026-11-22 progress gate:** exact S3 quotient design and original-repository Rust prototype checked in; mathematical identity checked symbolically on the recorded ordinary Prime31 example, but no Rust compiler/test receipt, measured time, linear-algebra integration, cold DLP recovery, or asymptotic gain from this pilot.
+
+## 2026-11-23 complete-row and dependency control
+
+The pilot now has complete signed-row enumeration for m=3 and m=4. A point-pair table and a balanced S3 x-root table feed the same signed right-summand set. For every target on the ordinary, prime-order 97 curve `y²=x³+7x+4/F101` with B=4, both arms produce exactly the exhaustive signed-tuple row set. A separate Python integer group law gives aggregate `(successful targets, distinct rows)` of `(58,96)`, `(97,704)`, `(85,225)`, `(97,2945)` for `(m,B)=(3,4),(3,8),(4,4),(4,8)`, and Rust agrees. Cancellation yields shorter or zero rows and projective infinity intermediates remain explicit.
+
+The example also feeds signed relations into the existing `StructuredGauss` solver with an additional target column. For a verified decomposition `Aℓ = u + vz`, it inserts the augmented row `[A, -v]` with right-hand side `u`. It deduplicates the full `(A,u,v)` triple, so identical factor-base rows with different target coefficients are retained. A focused F101 test recovers `z=37` for both m values and checks `[z]G=Q`.
+
+These checks establish exact row and small-field dependency behavior for the prototype. They do not identify a faster strategy. The projective x quotient merges positive and negative pair sums, so a match must still recover signs and verify the full point. At m=4 the balanced join is meet in the middle and its pair table and collision work must be charged. The registered timing panel in `SMALL_FIELD_PROTOCOL.md` remains unrun because the required checkpoint upload credentials are absent in this runtime. The full cold Prime31 solver, rank-aware relation yield, and optimized rho comparison remain pending.

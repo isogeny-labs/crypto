@@ -1001,6 +1001,19 @@ impl OpenCoefMap {
         Self::with_capacity(slots)
     }
 
+    // Complete occupied-entry views used by the original collision-ledger tests.
+    #[cfg(test)]
+    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
+        self.keys.iter().enumerate().filter_map(move |(i, &key)| {
+            (key != 0).then(|| (key, (self.us[i], self.zs[i], self.bs[i])))
+        })
+    }
+
+    #[cfg(test)]
+    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
+        self.iter().map(|(_, value)| value)
+    }
+
     #[inline(always)]
     fn home(&self, key: u64) -> usize {
         (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
@@ -1669,10 +1682,13 @@ pub trait CountedGroup {
     /// `mitm-coset` oracle counts them, uncharged).
     fn coset_parity_squarings(&self) -> u64 {
         0
+    }
     /// Exclusive upper bound on abscissa-style table keys (`x + 1`), when
     /// every key the walk stores is below it — enables a dense array map.
     /// `None` (default) keeps open-addressing.
     fn abscissa_key_bound(&self) -> Option<u64> {
+        None
+    }
     /// An opt-in addition path for the relation walk.  The closure lives for
     /// one solve, so an implementation may retain native field state between
     /// steps.  Other group operations keep their established accounting.
@@ -1816,6 +1832,8 @@ pub trait CountedGroup {
     /// or they share an abscissa (`J = ±P`): the caller then forms both
     /// signs with full additions.  Used by the `walk_sib` giant-step walk.
     fn x_sibling_pair(&self, _p: Self::Elt, _j: Self::Elt) -> Option<(Self::Elt, u64)> {
+        None
+    }
     /// [`CountedGroup::x_sibling_pair`] with the field work tallied into
     /// `ops.field_ops` as performed, for a group that counts field
     /// operations ([`CountedGroup::counts_field_ops`]); `ops.adds` is NOT
@@ -1829,6 +1847,7 @@ pub trait CountedGroup {
         j: Self::Elt,
     ) -> Option<(Self::Elt, u64)> {
         self.x_sibling_pair(p, j)
+    }
     /// `[k]P` by double-and-add, counted exactly.
     fn mul(&self, ops: &mut GroupOps, p: Self::Elt, k: u64) -> Self::Elt {
         ops.scalar_mults += 1;
@@ -7075,6 +7094,7 @@ impl CountedGroup for PrimeCurve {
         let pair = self.sibling_pair(ops, p, j, true)?;
         let plus = self.sibling_lift(ops, p, pair.key_plus, pair.lambda_plus)?;
         Some((plus, pair.key_minus - 1))
+    }
     fn neg(&self, p: PrimePoint) -> PrimePoint {
         if p.infinity {
             p
@@ -7923,6 +7943,8 @@ impl CountedGroup for BinaryGroup<'_> {
             lambda_plus: lp,
             key_minus: 0,
             lambda_minus: 0,
+            y_plus: None,
+            y_minus: None,
         };
         if want_minus {
             let lm = lp ^ f.mul(j.x, inv);
@@ -7988,9 +8010,12 @@ impl CountedGroup for BinaryGroup<'_> {
     }
     fn coset_parity_squarings(&self) -> u64 {
         2 * u64::from(self.0.n.saturating_sub(1))
+    }
     fn x_sibling_pair(&self, p: FastPoint, j: FastPoint) -> Option<(FastPoint, u64)> {
         if p.infinity || j.infinity || p.x == j.x {
             return None;
+        }
+        let f = &self.0.field;
         let inv = f.inv(p.x ^ j.x);
         let lp = f.mul(p.y ^ j.y, inv);
         let lm = lp ^ f.mul(j.x, inv);
@@ -7998,6 +8023,7 @@ impl CountedGroup for BinaryGroup<'_> {
         let x_plus = f.sqr(lp) ^ lp ^ base;
         let y_plus = f.mul(lp, p.x ^ x_plus) ^ x_plus ^ p.y;
         Some((FastPoint::affine(x_plus, y_plus), f.sqr(lm) ^ lm ^ base))
+    }
 }
 
 /// Trial-division factorisation of a word.

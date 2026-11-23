@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:49:47Z",
+ "id": "PCC-20261123-be5351",
+ "kind": "statement",
+ "producer": {
+  "commit": "03bc5f4fadf147f6d81e45fae632ad4126d6fa5b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/native-v1/controls.jsonl.gz",
+    "sha256": "42d9cfbeb4eb06e5febbeb75d32400f29916e5f5fd954c9d0b534e849e883f73"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/PRECALL.json",
+    "sha256": "1ec0962c867b9de51081960833bc7bc1ffb142c42b9fc4177a82dc2c159bff34"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/POSTCALL.json",
+    "sha256": "4e5a32287efa43d71c984146f1127e4227184c542604c10d870d9736423b14e2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/BUILD.json",
+    "sha256": "393bc6c1955c8c7501becd56d646e900dd9d88c9a2efb8e2cf992fd398a06df0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/SOURCE_QUALIFICATION.json",
+    "sha256": "772256536b242d415b559312564d1d5b3552c74e4734cb8eedf540a0b899df23"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/source-v1.tar.xz",
+    "sha256": "80999002de541aa8c7505cc21fc5f501e6f3ca7fc636dfacf5e50620cbab1c4a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/native-v1/binary-qualifier-precall.json",
+    "sha256": "38873196f548591862bfe11357acf81196fd1a4b5c491ac8ce42b6d1002cd511"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/development/qualified-tests.stdout.log",
+    "sha256": "841b38331e1f61a3770888e9ce328645c708dec124d125795ef23aaf42d6ac57"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-query-v1/development/qualified-clippy.stderr.log",
+    "sha256": "1cb8e54441f7afaf76b84f3056b21fd910d22894da38ec7f9e7bc6c5df7a7a35"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "section-query-v1 fixed native supplied-section controls",
+ "statement": "Frozen Rust supplied-section query returned original circuit/index/group checked six-member rows for fixed toy and actual q213156431 cases at k31 and k20633, with actual labels j1..6,t0 supplied through constructed coefficients. All118 prospective arms complete:14 scalar convolution comparisons,96 full remainder comparisons and8 other controls including full-length degree1,alias,nonzero nilpotent,repeated-row refusal and16 malformed/cap guards. Native summary119records includes completion. Four focused lib tests,fmt,strictClippy/build are retained November17 qualification;30source/8compiled hashes and1533160-byte binary eaa3e8c6 match before/after. Producer unsigned; no coefficient discovery, arbitrary-target yield, timing, complete cold cost or changed attack exponent."
+}

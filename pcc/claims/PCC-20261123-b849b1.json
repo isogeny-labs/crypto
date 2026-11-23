@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T05:35:32Z",
+ "id": "PCC-20261123-b849b1",
+ "kind": "statement",
+ "producer": {
+  "commit": "240f04abc38fcea95930971376331c1ac5082069",
+  "model": "gpt-6-astra",
+  "session": "fass-quotient-query-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/replay2/comparison-status.txt",
+    "sha256": "22b20ed6b644ecad5db14fead0760c6ea17f0a813e772910a1b44c0fa0a2851a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/replay2/post-call-manifest.txt",
+    "sha256": "d3433b3849da1e6006de0f083cd5ec34e338b2dee0c6c1d044f00268a41843fb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/checker2/checker.stdout.json",
+    "sha256": "4bc08baee8aa5577d70ff832f2bccfcdcfcc182a98b200ccef70a2568dec9261"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/checker2/post-call-manifest.txt",
+    "sha256": "4b3b67cd8cb7bfcc7d4996ac54ace6298bb3b7ff0344e279a41a41d435d4a830"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/controls2/controls.stdout.json",
+    "sha256": "8f80fc42b50e757980d615c7062334f1c5513231f73d1a93d537b7c14a45cedd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/controls2/post-call-manifest.txt",
+    "sha256": "452de5b89f4160d02d6ceb13059023db0d76742e83fb77c3f2ef745319473e11"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/CHECKER_BINDING_DEFECT.md",
+    "sha256": "b74d6ed48e8d6ac06a50232b3a7176bd19c8a0a57aaef5f9676b6eb8833b88df"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "CORRECTION_PROTOCOL.md; unchanged95-case fixture panel,27 persisted objects, no signed-relation or performance conclusion.",
+ "statement": "The separate-role corrected replay, persisted-proof reader and fixed input-binding controls each returned exit 0 with stable source, executable, proof and raw-record hashes. Replay matches the corrected40665-byte producer output and all27 certificate/input pairs exactly. The reader checks27 certificates,20 S3 inputs,111 identities and275 grid cells with fixed-fixture and exact sidecar-byte bindings. All39 preregistered rejection controls and3 positive controls pass, including the original kind downgrade in both raw-bound and bare modes. This is same-host unsigned checking, not a signed execution verdict or formal proof."
+}

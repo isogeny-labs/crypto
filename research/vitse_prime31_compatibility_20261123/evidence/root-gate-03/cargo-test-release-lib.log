@@ -1,0 +1,71 @@
+COMMAND ["/workspace/scratch/857f9e575d1c/tmp/vitse-rust-toolchain/installed/bin/cargo", "test", "--release", "--lib", "--locked"]
+ROOT_SHA 7d61e3b45de6e93d235345a0061dae08db1f8b44
+PROTOCOL_SHA256 e02e092adf9082dba2657f2d80a4d326570205ea35b4b637b3c289a702951c4b
+   Compiling crypto v0.1.0 (/workspace/scratch/857f9e575d1c/work/vitse-current-root)
+error: mismatched closing delimiter: `)`
+   --> src/prime_ecc/efd/tests.rs:370:59
+    |
+344 |                 let attempt = (|| -> Result<()> {
+    |                               - closing delimiter possibly meant for this
+...
+370 |                     for (index, point) in &encoded_points {
+    |                                                           ^ unclosed delimiter
+...
+395 |                 })();
+    |                  ^ mismatched closing delimiter
+
+error: mismatched closing delimiter: `}`
+   --> src/prime_ecc/efd/tests.rs:775:31
+    |
+756 |             let attempt = (|| -> Result<()> {
+    |                                             - closing delimiter possibly meant for this
+...
+775 |                     assert_eq!(
+    |                               ^ unclosed delimiter
+...
+780 |             })();
+    |             ^ mismatched closing delimiter
+
+error: mismatched closing delimiter: `)`
+   --> src/prime_ecc/efd/tests.rs:769:54
+    |
+756 |             let attempt = (|| -> Result<()> {
+    |                           - closing delimiter possibly meant for this
+...
+769 |                 for (index, point) in encoded_points {
+    |                                                      ^ unclosed delimiter
+...
+780 |             })();
+    |              ^ mismatched closing delimiter
+
+error: this file contains an unclosed delimiter
+   --> src/prime_ecc/efd/tests.rs:875:2
+    |
+ 37 | fn modulus() -> BigUint {
+    |                         - unclosed delimiter
+...
+ 40 | fn fe(v: u64) -> FieldElement {
+    |                               - unclosed delimiter
+ 41 |     FieldElement::new(BigUint::from(v % prime()), modulus())
+ 42 | fn fe_i(v: i64) -> FieldElement {
+    |                                 - unclosed delimiter
+...
+ 45 | fn one() -> FieldElement {
+    |                          - unclosed delimiter
+ 46 |     fe(1)
+ 47 | fn zero() -> FieldElement {
+    |                           - unclosed delimiter
+...
+ 50 | fn coordinates(model: &Model) -> Vec<String> {
+    |                                              - another 130 unclosed delimiters begin from here
+...
+774 |                 for (index, point) in expected {
+    |                                                - this delimiter might not be properly closed...
+...
+780 |             })();
+    |             - ...as it matches this but it has different indentation
+...
+875 |
+    | ^
+
+error: could not compile `crypto` (lib test) due to 4 previous errors

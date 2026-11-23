@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:10:19Z",
+ "id": "PCC-20261123-72e23f",
+ "kind": "statement",
+ "producer": {
+  "commit": "fcc9079069993385b6d5b169f4d72208a46ae1b6",
+  "model": "",
+  "session": "chained-twohop-descent-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/PROSPECTIVE_D_LEAN_ONLY.md",
+    "sha256": "1ed9ff173d50ea7edd3b1f3532ed9c7cb89a3c5d43dbcf8238769d2feb8ddf8d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/SOURCE_LOCK_D.json",
+    "sha256": "82f9b9a924a5f712c9afa4feb4c60e3928de50c72b4f94b36ccef76d96ec755b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Explicit smaller allocator reservation and Lean-only schedule before affected data. No Rust/native replay or overall-C pass claim.",
+ "statement": "Prospective Lean-only D resumes the never-executed proof phase from unchanged source459bbe14, without repeating completed Rust native C. It requests64MiB mimalloc arenas through documented arena_reserve, with the same2GiB cap,120s deadlines,one worker and default logical proof limits. Four actual Lean shared-library hashes are additionally pinned. All prior startup failures stay failures; repair success remains untested."
+}
