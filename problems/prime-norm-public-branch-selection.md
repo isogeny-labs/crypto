@@ -405,3 +405,18 @@ Next construct actual integral residual ideal J with(span h)=I^4*J,
 derive actual quotient/length residual bound<=2, then group/residual-field/
 known-label/publicfinder/full expected-cost bridge. Original criteria and
 nonscalar-origin/rank-directed W-jet obligations unchanged.
+
+## 2026-11-23: actual integral residual factor, degree gap retained
+
+Source070/build074/local037/PCC-20261123-cba56c accepts186local statements/
+4new since182,0warnings/all printed foundations standard, unsigned.
+Actual nonsingular target/helper constructs integralJ and exact
+span{h}=I^4J with actual finite residualquotient/finrank<=SIX.
+No successfulJ supplied; no residualdegree2/subtraction4 claimed.
+Generic owner InvertibleIdealResidual2 committed ba07267/audit2/0/0.
+[pcc:unverified]
+
+Next derive invertible-module finite-quotient dimension and actual
+idealproduct codimension additivity, then targetI^4dimension4/residual<=2,
+actualgroup/knownlabel coverage/publicfinder/full expectedcost.
+Original criteria, earlier failure history and public input scope unchanged.

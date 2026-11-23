@@ -1,0 +1,9 @@
+# Active research continuation: integral residual to actual codimension two
+
+Read latest Nov23 journal, public-input-evidence/STATUS-20261123-008.md and PROTOCOL-012.md. Source070/build074/local037/PCC-20261123-cba56c accepts186local statements/4new since182,0warnings/all printed foundations standard. Actual nonsingular target/helper constructs integralJ, exact span{h}=I^4J and actual residualquotientfinite/finrank<=SIX, not two. Parent182/normalization/actualbranch/coordinate norm/I^4/nonsingularpoint exact. All unsigned outside shared53/57/fresh. [pcc:unverified]
+
+Generic owner CryptoLean.InvertibleIdealResidual2 atba07267c3e1f255ce8ab909c611a859c0dfb1d88: focusbuild/audit2/0/0, report1page inspected0warnings/prose/overflow; postcall31new+5compiled/check168prior chainbindings. Failed001API/warning002003/clean004 exact. Actual75fileoverlay preserves70,234candidateinputs. No componentjobrunning after074; inspect before any rerun.
+
+Next actual proof: generic finite-algebra basechange of an actual invertible module has derived F-linear equivalence/dimension to that algebra, via public Picard semilocal triviality (exactsource pointers PROTOCOL012). Owner-first/no favorable basis. Then actual ideal quotient/tensor/short exact sequence gives product codimension additivity, actual targetI^4dimension4, residualdimension<=2. Do not assume any of these desired conclusions as premises. After actual group/residual-field bridge, check fixed known-log base coverage before calling this a relation finder; full public expectedbitcost remains open.
+
+Protected canonical PCC ledger divergence still remote-publication-only; do not push/merge/rechain/waive/forcepush/alternatebranch evade or rearm watcher. Preserve every frozen report/raw/source/claim/local ledgerprefix and both histories, no paidcloud/nativecrypto/attack/timingscaling/vault/signing/privateimport/trust/resource/gate overrides or unrelated edits. Goal active, no success/ETA/background-job claim.

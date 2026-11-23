@@ -1,0 +1,8 @@
+# Actual integral residual ideal and finite quotient
+
+1. Actual affineW/target nonsingularpoint, actualh from accepted actualfullkernel witness, h!=0/normdegree<=6/h in I^4. All original shortform/nonzero2ordinates/e/card3/targetoutsideS retained. No residualJ supplied.
+2. New committed owner ba07267 generic actual integral residual2; public XYIdealprime/XYIdealprime_eq actualunit and span_singleton_le_iff_mem. Existing quotientFinite and finrank_quotient_span_eq_natDegree_norm; quotient factor_surjective/FiniteDimensional.of_surjective/finrank monotonicity/idealmul_le_right as stated.
+3. Derive H=span{h}<=I^4; actual nonsingularity givesactualtargetIunit, genericlaw constructs integralJand exactH=I^4J. Principalquotient finite/dimension<=6 from actualnorm; residualquotient finite/dimension<=6 via derivedH<=J and actualquotientsurjection. Actual global witness binds every assumption.
+4. Four endpoints expected standard/no warnings; actual residualbound SIX only. Do not subtract4 or assume residualdegree2. Parent068/182exactafteronepublicnewimport,75fileoverlay preservesold70,234inputpins/defaultreadonlysinglecheck.
+5. No targetI^4quotientdimension4/lengthadditivity/principal residualpointfactorization/group/knownlabels/publicfinder/full expectedcost inferred. Algebraic factor existence not bit-costed representation.
+6. Ownerfirst generic2focusbuild/audit/commit completed beforeconsumer, no privatebody/class/resource/trust/linter overrides/oldreplay/frozenchange/ledgerrewrite/remotepublicationevasion/paidcloud/nativecrypto/timingscalingcampaign. KB unavailable/exactpublicsourcefallback. [pcc:unverified]
