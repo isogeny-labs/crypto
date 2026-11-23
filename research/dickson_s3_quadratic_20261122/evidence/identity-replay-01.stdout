@@ -1,0 +1,700 @@
+{
+  "all_expected_outcomes": true,
+  "certificate_checks": [
+    {
+      "certificate_id": "IDC1hd994b0d5226e6c27",
+      "observed": {
+        "checker_reported_false_accept_log2": -3776.0,
+        "extra_points": 32,
+        "outcome": "accepted_evaluations",
+        "points": 32
+      }
+    },
+    {
+      "certificate_id": "IDC1hfb0e29a3d5d6734b",
+      "observed": {
+        "checker_reported_false_accept_log2": -3776.0,
+        "extra_points": 32,
+        "outcome": "accepted_evaluations",
+        "points": 32
+      }
+    }
+  ],
+  "checker_seed": 11184661427159343365,
+  "evidence_note": "Finite evaluations over F_(2^61-1), not a formal proof over Z. The checker's reported false-accept estimate assumes independent uniform points; its actual streams are deterministic from seeds. No relation-completeness, group-law replay, or performance claim is made by these records.",
+  "evidence_tier": "evaluated",
+  "extra_points_per_certificate": 32,
+  "input_receipts_trusted": false,
+  "modulus": 2305843009213693951,
+  "negative_controls": [
+    {
+      "expected_outcome": "counterexample",
+      "expected_outcome_observed": true,
+      "name": "s3_wrong_sign",
+      "observed": {
+        "assignment_in_statement_variable_order": [
+          1706434393602726182,
+          92345138389100679,
+          761759377379063313,
+          1171264644410920902,
+          1945868568726246882
+        ],
+        "index": 0,
+        "lhs": 1633904655353161746,
+        "outcome": "counterexample",
+        "rhs": 67441173832473455
+      },
+      "operation": "issue",
+      "points": 32,
+      "seed": 11184661427159343365,
+      "statement": {
+        "degree_bound": 4,
+        "lhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": {
+                            "args": "y",
+                            "op": "var"
+                          },
+                          "op": "neg"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": {
+                            "args": "y",
+                            "op": "var"
+                          },
+                          "op": "neg"
+                        }
+                      ],
+                      "op": "add"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "z",
+                      "op": "var"
+                    },
+                    {
+                      "args": "z",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -2,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "y",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": "A",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "add"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": 2,
+                          "op": "const"
+                        },
+                        {
+                          "args": "B",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": "z",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": {
+                        "args": "A",
+                        "op": "var"
+                      },
+                      "op": "neg"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": {
+                        "args": "A",
+                        "op": "var"
+                      },
+                      "op": "neg"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -4,
+                  "op": "const"
+                },
+                {
+                  "args": "B",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        "name": "Standard expanded S3 equals (e2-A)^2 - 4 e1 (e3+B) [negative control: +4 instead of -4]",
+        "rhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "z",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "z",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": {
+                        "args": "A",
+                        "op": "var"
+                      },
+                      "op": "neg"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "z",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "z",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": {
+                        "args": "A",
+                        "op": "var"
+                      },
+                      "op": "neg"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": 4,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "z",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        },
+                        {
+                          "args": "z",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": "B",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        "source": "src/cryptanalysis/symmetrized_semaev.rs::expand_s3_in_xs; research/dickson_s3_quadratic_20261122",
+        "variables": [
+          "x",
+          "y",
+          "z",
+          "A",
+          "B"
+        ]
+      }
+    },
+    {
+      "expected_outcome": "counterexample",
+      "expected_outcome_observed": true,
+      "name": "chord_wrong_mixed_coefficient",
+      "observed": {
+        "assignment_in_statement_variable_order": [
+          937540541460905994,
+          1445453291404760608,
+          1932304435216668507,
+          884971376176505697,
+          458066585058107710
+        ],
+        "index": 0,
+        "lhs": 1170576095352790563,
+        "outcome": "counterexample",
+        "rhs": 311275759823591133
+      },
+      "operation": "issue",
+      "points": 32,
+      "seed": 11184661427159343365,
+      "statement": {
+        "degree_bound": 4,
+        "lhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "T",
+                  "op": "var"
+                },
+                {
+                  "args": "T",
+                  "op": "var"
+                },
+                {
+                  "args": "T",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": "T",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "B",
+              "op": "var"
+            },
+            {
+              "args": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "lambda",
+                            "op": "var"
+                          },
+                          {
+                            "args": "T",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": "nu",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "lambda",
+                            "op": "var"
+                          },
+                          {
+                            "args": "T",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": "nu",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  }
+                ],
+                "op": "mul"
+              },
+              "op": "neg"
+            }
+          ],
+          "op": "add"
+        },
+        "name": "Short-Weierstrass polynomial minus squared line: coefficient expansion [negative control: -1 instead of -2]",
+        "rhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "T",
+                  "op": "var"
+                },
+                {
+                  "args": "T",
+                  "op": "var"
+                },
+                {
+                  "args": "T",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "lambda",
+                      "op": "var"
+                    },
+                    {
+                      "args": "lambda",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "T",
+                      "op": "var"
+                    },
+                    {
+                      "args": "T",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "A",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": "lambda",
+                          "op": "var"
+                        },
+                        {
+                          "args": "nu",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": "T",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "B",
+              "op": "var"
+            },
+            {
+              "args": {
+                "args": [
+                  {
+                    "args": "nu",
+                    "op": "var"
+                  },
+                  {
+                    "args": "nu",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              "op": "neg"
+            }
+          ],
+          "op": "add"
+        },
+        "source": "research/dickson_s3_quadratic_20261122: f(T)=T^3+A*T+B and line(T)=lambda*T+nu",
+        "variables": [
+          "T",
+          "A",
+          "B",
+          "lambda",
+          "nu"
+        ]
+      }
+    },
+    {
+      "expected_outcome": "digest_mismatch",
+      "expected_outcome_observed": true,
+      "name": "digest_tamper",
+      "observed": {
+        "outcome": "digest_mismatch",
+        "recomputed": "d932c92bda6a6e3ee678b67217dce82b067d16f45e66e68169c1ae22854eb049",
+        "recorded": "0932c92bda6a6e3ee678b67217dce82b067d16f45e66e68169c1ae22854eb049"
+      },
+      "operation": "check_with_extra",
+      "source_certificate_id": "IDC1hd994b0d5226e6c27"
+    }
+  ],
+  "schema": "dickson-s3-identity-replay/v1",
+  "seed_freshness": "Distinct from issuer seeds; caller must ensure freshness across checker runs."
+}

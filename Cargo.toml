@@ -129,12 +129,14 @@ path = "src/bin/hecx.rs"
 
 # Finite, replayable enumeration of the explicit cover shapes implemented by
 # this repository. Empty searches retain an explicit nonexistence disclaimer.
+[[bin]]
 name = "curve-transfer-sweep"
 path = "src/bin/curve_transfer_sweep.rs"
 
 # Deterministic export and byte-for-byte replay of the retained
 # odd-characteristic named-subgroup transfer corpus. Unsupported rows are
 # preserved and make the command exit nonzero after writing its result.
+[[bin]]
 name = "odd-transfer-catalog"
 path = "src/bin/odd_transfer_catalog.rs"
 
@@ -693,6 +695,7 @@ harness = false
 [[example]]
 name = "hw_counter_ab_bench"
 path = "examples/hw_counter_ab_bench.rs"
+[[example]]
 name = "floor_crater_bridge_cost"
 path = "research/floor_crater_ecdlp_gap_20261120/bridge_cost.rs"
 
