@@ -203,6 +203,14 @@ mod tests {
         assert_eq!(r.targets[1].recovered,Some(3));
     }
     #[test]
+    fn recover_unknown_target_without_harness_scalar(){
+        let mut c=sample();
+        for t in &mut c.targets {t.claimed_log=None;}
+        let result=verify(&c).expect("solver uses only public targets and rows");
+        assert_eq!(result.targets[0].recovered,Some(3));
+        assert_eq!(result.targets[1].recovered,None);
+    }
+    #[test]
     fn reject_false_rhs(){let mut c=sample();c.relations[0].rhs=2;assert!(verify(&c).is_err());}
     #[test]
     fn reject_false_target_witness(){let mut c=sample();c.targets[0].offset=1;assert!(verify(&c).is_err());}
