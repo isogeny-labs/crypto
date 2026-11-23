@@ -500,7 +500,8 @@ impl Fp<'_> {
             let y_roots = self.roots(&[f[0], f[2], 1]);
             let mut out = Vec::new();
             for y in y_roots {
-                out.extend(self.roots(&[self.sub(0, y), 0, 1]));
+                let negative_y = self.sub(0, y);
+                out.extend(self.roots(&[negative_y, 0, 1]));
             }
             out.sort_unstable();
             out.dedup();
@@ -754,7 +755,8 @@ mod tests {
                         let expected: Vec<u64> = (0..p).filter(|&x| {
                             let mut value = 0;
                             for &coefficient in poly.iter().rev() {
-                                value = field.add(field.mul(value, x), coefficient);
+                                let prod = field.mul(value, x);
+                                value = field.add(prod, coefficient);
                             }
                             value == 0
                         }).collect();
@@ -804,7 +806,7 @@ mod tests {
                 let mut tally = FieldTally::default();
                 let mut field = Fp { p, tally: &mut tally };
                 let poly = [
-                    field.sub(0, field.mul(a, a)), 0,
+                    { let aa = field.mul(a, a); field.sub(0, aa) }, 0,
                     field.mul(6 % p, a), 0, 3,
                 ];
                 let roots = field.roots(&poly);
