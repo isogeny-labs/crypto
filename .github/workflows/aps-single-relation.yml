@@ -55,7 +55,7 @@ jobs:
     # A cold release build of the lib-test target exceeds 25 min on a
     # 2-core runner, and a timed-out job never saves its cache, so every
     # run would stay cold. Same tests; only the compile budget changes.
-    timeout-minutes: 50
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 50 }}
     strategy:
       fail-fast: false
       matrix:

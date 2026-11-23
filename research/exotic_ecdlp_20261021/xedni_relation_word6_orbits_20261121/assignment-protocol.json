@@ -1,0 +1,9 @@
+{
+  "schema": "xedni-word6-anchored-assignment-protocol-v1",
+  "source_result_sha256": "427c6efe8870d0c32f28d9d740f5fe05fbf27f8b0ba766a2d3928cfd20f4234b",
+  "curve": "E/F47: y^2=x^3-x-2, order 43",
+  "generator": "lexicographically first nonidentity affine point; prime group order implies it generates",
+  "assignments": "identify each point as scalar k times G; f(k)=k; g(k)=k+maskedLog(2,k), where maskedLog(2,k)=k exactly on the -6 multiplier orbit of scalar 2 and zero elsewhere",
+  "checks": "all 42 saved P+6Q relations under both assignments, sign oddness for every nonidentity point, common known generator value 1, different values at 2G, and agreement with the saved folded matrix rows",
+  "resource": "300-second checked local Sage process cap; save runtime and exact result"
+}

@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-t1059-6df599df | 23.97 | inc | 12/12 | 3.059 | 3.420 | 6.663 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ksum5f-n13 | 12/12 | 8.479 | 9.273 | 16.423 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | mitmbatch-n160 | 12/12 | 13.289 | 15.236 | 32.751 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | mitmblocked-n160 | 12/12 | 13.289 | 15.236 | 32.751 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | rho-neg | 12/12 | 1.517 | 1.659 | 2.942 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | wsum-b12-n4 | 12/12 | 48.452 | 53.275 | 96.686 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | wsum-b20-n4 | 12/12 | 470.458 | 515.801 | 923.894 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-t1059-6df599df | inc vs ksum5f-n13 | inc < ksum5f-n13 |
+| icv1-fp24-t1059-6df599df | inc vs mitmbatch-n160 | inc < mitmbatch-n160 |
+| icv1-fp24-t1059-6df599df | inc vs mitmblocked-n160 | inc < mitmblocked-n160 |
+| icv1-fp24-t1059-6df599df | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-t1059-6df599df | inc vs wsum-b12-n4 | inc < wsum-b12-n4 |
+| icv1-fp24-t1059-6df599df | inc vs wsum-b20-n4 | inc < wsum-b20-n4 |
+| icv1-fp24-t1059-6df599df | ksum5f-n13 vs mitmbatch-n160 | ksum5f-n13 < mitmbatch-n160 |
+| icv1-fp24-t1059-6df599df | ksum5f-n13 vs mitmblocked-n160 | ksum5f-n13 < mitmblocked-n160 |
+| icv1-fp24-t1059-6df599df | ksum5f-n13 vs rho-neg | rho-neg < ksum5f-n13 |
+| icv1-fp24-t1059-6df599df | ksum5f-n13 vs wsum-b12-n4 | ksum5f-n13 < wsum-b12-n4 |
+| icv1-fp24-t1059-6df599df | ksum5f-n13 vs wsum-b20-n4 | ksum5f-n13 < wsum-b20-n4 |
+| icv1-fp24-t1059-6df599df | mitmbatch-n160 vs mitmblocked-n160 | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | mitmbatch-n160 vs rho-neg | rho-neg < mitmbatch-n160 |
+| icv1-fp24-t1059-6df599df | mitmbatch-n160 vs wsum-b12-n4 | mitmbatch-n160 < wsum-b12-n4 |
+| icv1-fp24-t1059-6df599df | mitmbatch-n160 vs wsum-b20-n4 | mitmbatch-n160 < wsum-b20-n4 |
+| icv1-fp24-t1059-6df599df | mitmblocked-n160 vs rho-neg | rho-neg < mitmblocked-n160 |
+| icv1-fp24-t1059-6df599df | mitmblocked-n160 vs wsum-b12-n4 | mitmblocked-n160 < wsum-b12-n4 |
+| icv1-fp24-t1059-6df599df | mitmblocked-n160 vs wsum-b20-n4 | mitmblocked-n160 < wsum-b20-n4 |
+| icv1-fp24-t1059-6df599df | rho-neg vs wsum-b12-n4 | rho-neg < wsum-b12-n4 |
+| icv1-fp24-t1059-6df599df | rho-neg vs wsum-b20-n4 | rho-neg < wsum-b20-n4 |
+| icv1-fp24-t1059-6df599df | wsum-b12-n4 vs wsum-b20-n4 | wsum-b12-n4 < wsum-b20-n4 |
