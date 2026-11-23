@@ -1,0 +1,534 @@
+{
+  "schema": "fass-selector.development-receipt/v1",
+  "created_at": "2026-11-23T02:15:00.187336+00:00",
+  "standing": "unsigned_producer_attestation; not a signed PCC verdict",
+  "scope": "Exact frozen FASS source inventory only; algebraic two-coordinate extraction and rational signed lifting; no current-main integration or performance claim.",
+  "source_parent_commit": "e68f631c492c15bb54d79b96714e56ff72cf9f9d",
+  "source_manifest": {
+    "path": "research/fass_prime31_20261122/selector/evidence/attempt3/source.build.json",
+    "sha256": "1789c86a27db6be11afed8e877f63cee442ae61a0753c12b090b2d785b87d69f",
+    "bytes": 4209
+  },
+  "source_inventory_matches_at_receipt_creation": true,
+  "qualifier_scope": {
+    "whole_library": false,
+    "pkm_prefix_bytes": 40482,
+    "unchanged_selected_algorithm_bytes": true,
+    "inventory_entries": 14,
+    "source_extraction_explained_in": "research/fass_prime31_20261122/selector/qualifier/README.md"
+  },
+  "build_reproduction_command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "research/fass_prime31_20261122/selector/qualifier/Cargo.toml",
+    "--release",
+    "--offline",
+    "--test",
+    "semaev_selector",
+    "--no-run",
+    "--message-format=json"
+  ],
+  "build_command_record_limit": "Raw Cargo build output and source bindings are retained; the reproduction command is documented separately from the original tool invocation.",
+  "toolchain_observed_at_receipt": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
+  },
+  "failed_builds": [
+    {
+      "attempt": "attempt1",
+      "observed_exit_code": 101,
+      "cause": "qualifier manifest omitted existing identity_certificate hex dependency",
+      "tests_executed": false,
+      "correction": "add hex 0.4 only; preserve arithmetic and acceptance criteria",
+      "evidence_prefix": "research/fass_prime31_20261122/selector/evidence/attempt1/"
+    }
+  ],
+  "unit_executions": [
+    {
+      "attempt": "attempt2",
+      "kind": "bounded_development_unit_tests",
+      "passed": 13,
+      "failed": 0,
+      "exit_code": 0,
+      "deadline_seconds": null,
+      "source_manifest": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt2/source.build.json",
+        "sha256": "ad09143c960fe248e207582f661de1692ab389fcaeb2c6cd5fd1036a450c91fb",
+        "bytes": 4209
+      },
+      "precall": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.precall.json",
+        "sha256": "935badea661966c4b01ab5d46fdd4d2281de54808cb260a2a6b0e85a69edf583",
+        "bytes": 4400
+      },
+      "postcall": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.postcall.json",
+        "sha256": "935badea661966c4b01ab5d46fdd4d2281de54808cb260a2a6b0e85a69edf583",
+        "bytes": 4400
+      },
+      "stdout": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.stdout.log",
+        "sha256": "28c3e79eaac307c384e3b661cd6d22bf77a9b562465a6b57ebeb716ac8008962",
+        "bytes": 2272
+      },
+      "stderr": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "binary": {
+        "bytes": 1280704,
+        "filename": "selector-tests",
+        "sha256": "f92f7cd83a79fe1e585ad0c85b5f275b0a67799aef986d5e8a469bd158f38f39"
+      },
+      "elapsed_output_is_performance_evidence": false,
+      "argument_record": "The retained attempt2 log records outcome; its separate original deadline/argv record was not preserved here. Listed flags are reproduction flags.",
+      "reproduction_arguments": [
+        "--nocapture",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "attempt": "attempt3",
+      "kind": "bounded_development_unit_tests",
+      "passed": 15,
+      "failed": 0,
+      "exit_code": 0,
+      "deadline_seconds": 120,
+      "arguments": [
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "source_manifest": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt3/source.build.json",
+        "sha256": "1789c86a27db6be11afed8e877f63cee442ae61a0753c12b090b2d785b87d69f",
+        "bytes": 4209
+      },
+      "precall": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.precall.json",
+        "sha256": "84c0905922b5579d80132fd59e71e72c82c17d21c23f4a72e65d12be5f450a48",
+        "bytes": 4400
+      },
+      "postcall": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.postcall.json",
+        "sha256": "84c0905922b5579d80132fd59e71e72c82c17d21c23f4a72e65d12be5f450a48",
+        "bytes": 4400
+      },
+      "stdout": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.stdout.log",
+        "sha256": "6d194342b9209de81aface149855c7fefc6aa80b763a8061ca7c5cb05ae9291f",
+        "bytes": 2950
+      },
+      "stderr": {
+        "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "binary": {
+        "bytes": 1296344,
+        "filename": "selector-tests",
+        "sha256": "a5cc8f507977c9136ec2daa9f3977dd0ff205eb445234545a7958d6d5e1f3ede"
+      },
+      "elapsed_output_is_performance_evidence": false
+    }
+  ],
+  "final_observations": {
+    "scalar_sylvester_specializations": 2808,
+    "polynomial_product_specializations": 50,
+    "small_field_coordinate_cases": 360,
+    "small_field_empty_cases": 225,
+    "small_field_coordinate_pairs": 489,
+    "rational_target_cases": 388,
+    "signed_pairs_small_fields": 450,
+    "prime31": {
+      "p": 2147483647,
+      "d1302_diagonal": {
+        "target": [
+          1934056707,
+          318060938
+        ],
+        "coordinate_pairs": 1,
+        "signed_pairs": 1
+      },
+      "d1302_distinct_abscissae": {
+        "target": [
+          1207772219,
+          406744988
+        ],
+        "coordinate_pairs": 2,
+        "signed_pairs": 2
+      },
+      "d1302_fixed_generator": {
+        "target": [
+          625037715,
+          2100627251
+        ],
+        "coordinate_pairs": 0,
+        "signed_pairs": 0
+      },
+      "independent_point_count_performed": false
+    }
+  },
+  "whole_library_attempts": [
+    {
+      "command": [
+        "timeout",
+        "180",
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--offline",
+        "-j",
+        "1"
+      ],
+      "exit_code": 124,
+      "outcome": "deadline_during_dependency_compilation",
+      "library_test_result_produced": false,
+      "stdout": {
+        "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests.stderr.log",
+        "sha256": "5715ffabfc570a5ae6cba36ebefd2ef59f49e29d7ca3a32911a0299a5b56a064",
+        "bytes": 5460
+      },
+      "exit_record": {
+        "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests.exit",
+        "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+        "bytes": 4
+      }
+    },
+    {
+      "command": [
+        "timeout",
+        "300",
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--offline",
+        "-j",
+        "1"
+      ],
+      "exit_code": 124,
+      "outcome": "deadline_during_dependency_compilation",
+      "library_test_result_produced": false,
+      "stdout": {
+        "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.stderr.log",
+        "sha256": "6c68e10416818256468fb5abc1bc99beab977d04ee0a55e206e96795bf8f3b24",
+        "bytes": 1430
+      },
+      "exit_record": {
+        "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.exit",
+        "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+        "bytes": 4
+      }
+    }
+  ],
+  "plan_deviations": [
+    {
+      "issue": "attempt3 qualifier build overlapped first whole-library build",
+      "scope": "compilation only",
+      "handling": "actual attempt3 unit-test execution waited for root compilation to end; retain deviation and exclude elapsed time from performance claims"
+    },
+    {
+      "issue": "original three Prime31 positive fixtures all selected same diagonal target",
+      "handling": "preserve attempt2; plan addendum before attempt3 adds distinct-abscissa and fixed-public-target cases"
+    }
+  ],
+  "identity_controls": {
+    "count": 3,
+    "certificate_points_each": 32,
+    "extra_checker_points_each": 32,
+    "status": "existing native checker accepted bounded deterministic evaluations; not universal proof or signed validation",
+    "receipt": {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/certificates.stdout.json",
+      "sha256": "030de002992fb056691ccfe6af04d7b9a2339930c5cab5927eb0c915d74fa2e9",
+      "bytes": 784
+    }
+  },
+  "audits": {
+    "source": {
+      "path": "research/fass_prime31_20261122/selector/evidence/source-audit.json",
+      "sha256": "98e1d90fb81d8f024f0bcfd4ebe8b9f4d0dd6fe1061ec6c4252aca2d94ea554a",
+      "bytes": 24763
+    },
+    "source_audit_manuscript_scope": "prior manuscript hashes; final report includes a subsequently reviewed-by-author integration paragraph",
+    "current_main": {
+      "path": "research/fass_prime31_20261122/selector/evidence/main-integration-audit.json",
+      "sha256": "2613ae293ba739b983575d819fbf16a8d58b01b951bbe5ff085acfbda54ea55b",
+      "bytes": 10413
+    },
+    "standing": "unsigned same-team reviews; integration-test author participated"
+  },
+  "current_main_integration": {
+    "pinned_main": "856dfeb0be25df78ab3877741544f64940128fac",
+    "status": "open; semaev_projection changes require fresh source-bound qualification",
+    "additional_comparator": "resultant_decompose_m2 / ResultantOracleM2"
+  },
+  "report_qa": {
+    "pdf_pages": 4,
+    "status": "report author rendered and visually inspected each final page; no clipping or overlap reported",
+    "pdf": {
+      "path": "research/fass_prime31_20261122/selector/report.pdf",
+      "sha256": "9a1e03bc4874ce88cf1d0caed41b9707f23061179fbfa964e6adedfb111cbf1c",
+      "bytes": 370350
+    }
+  },
+  "open_requirements": [
+    "whole-library qualification",
+    "current-main source reconciliation and fresh qualifier binding",
+    "Lean compilation and kernel proof",
+    "authenticated checkpoint and admitted matched F4/ResultantOracleM2 comparison",
+    "useful rank and full cold index-calculus accounting"
+  ],
+  "performance_runs": 0,
+  "paid_jobs": 0,
+  "admission_blocker_evidence": "docs/session-logs/2026-11-22.md; observed missing supported checkpoint transport, no separate transport receipt retained",
+  "artifacts": [
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt1/build-tests.stderr.log",
+      "sha256": "fa05e037051a8333090549ee71069730cbbd44dc60c8527cc15f3c27895a5789",
+      "bytes": 1032
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt1/build-tests.stdout.jsonl",
+      "sha256": "93e1c7e43b325f736300e83e3ef2c417c43b3450817deb16921ce7b5cea2e89e",
+      "bytes": 59278
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt1/qualifier.Cargo.toml.txt",
+      "sha256": "08511f3a1405b99937aa3abfe4b7620e7a081861973f48c61b7d25ae227d2c97",
+      "bytes": 572
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt1/source.build.json",
+      "sha256": "7a582623528080bc076736eb66b2c8cef44ab7cc34ed4690b573618610d5ec47",
+      "bytes": 4209
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/binaries.postcall.sha256",
+      "sha256": "b47509389db69034b7b75f56452f80d6bb2a1102df74acd5215219f557a3d48b",
+      "bytes": 271
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/binaries.precall.sha256",
+      "sha256": "b47509389db69034b7b75f56452f80d6bb2a1102df74acd5215219f557a3d48b",
+      "bytes": 271
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/build-tests.stderr.log",
+      "sha256": "bc039fb5dde380436dacac8a257e6c80b2dd6839072a66b5cc0d9b63dc19839f",
+      "bytes": 221
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/build-tests.stdout.jsonl",
+      "sha256": "8e2490af8841ea4c193ae72626d2222f800175819e5418f3e27df1a52ac4e9b3",
+      "bytes": 57105
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/certificates.postcall.json",
+      "sha256": "d51376009760a246c1c674559553b6d7d2b0a0bb7cd475f8041009917e8f9a8d",
+      "bytes": 4400
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/certificates.precall.json",
+      "sha256": "d51376009760a246c1c674559553b6d7d2b0a0bb7cd475f8041009917e8f9a8d",
+      "bytes": 4400
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/certificates.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/certificates.stdout.json",
+      "sha256": "030de002992fb056691ccfe6af04d7b9a2339930c5cab5927eb0c915d74fa2e9",
+      "bytes": 784
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/source.build.json",
+      "sha256": "ad09143c960fe248e207582f661de1692ab389fcaeb2c6cd5fd1036a450c91fb",
+      "bytes": 4209
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.postcall.json",
+      "sha256": "935badea661966c4b01ab5d46fdd4d2281de54808cb260a2a6b0e85a69edf583",
+      "bytes": 4400
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.precall.json",
+      "sha256": "935badea661966c4b01ab5d46fdd4d2281de54808cb260a2a6b0e85a69edf583",
+      "bytes": 4400
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt2/tests.stdout.log",
+      "sha256": "28c3e79eaac307c384e3b661cd6d22bf77a9b562465a6b57ebeb716ac8008962",
+      "bytes": 2272
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/binaries.postcall.sha256",
+      "sha256": "f03b310f62476795facd4a0b9597da244b343aefe3dc3216d0bf64b8be4cb5a1",
+      "bytes": 271
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/binaries.precall.sha256",
+      "sha256": "f03b310f62476795facd4a0b9597da244b343aefe3dc3216d0bf64b8be4cb5a1",
+      "bytes": 271
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/build-tests.stderr.log",
+      "sha256": "9ddba446b8e04b87a9a04316fe62b3829ed0dc15d7f45c7f3d262efec83dfcb7",
+      "bytes": 197
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/build-tests.stdout.jsonl",
+      "sha256": "2ee56192641dd1601fb690edd902ed66e3d59bd1d8a5897644e20c8f6738d9fa",
+      "bytes": 57104
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/source.build.json",
+      "sha256": "1789c86a27db6be11afed8e877f63cee442ae61a0753c12b090b2d785b87d69f",
+      "bytes": 4209
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.postcall.json",
+      "sha256": "84c0905922b5579d80132fd59e71e72c82c17d21c23f4a72e65d12be5f450a48",
+      "bytes": 4400
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.precall.json",
+      "sha256": "84c0905922b5579d80132fd59e71e72c82c17d21c23f4a72e65d12be5f450a48",
+      "bytes": 4400
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/attempt3/tests.stdout.log",
+      "sha256": "6d194342b9209de81aface149855c7fefc6aa80b763a8061ca7c5cb05ae9291f",
+      "bytes": 2950
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.postcall.sha256",
+      "sha256": "1b1142a9b88ce7c964566b5422fc649d9ad48ea3b18c84dd5af52ce056de8489",
+      "bytes": 439
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.precall.sha256",
+      "sha256": "1b1142a9b88ce7c964566b5422fc649d9ad48ea3b18c84dd5af52ce056de8489",
+      "bytes": 439
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.stderr.log",
+      "sha256": "6c68e10416818256468fb5abc1bc99beab977d04ee0a55e206e96795bf8f3b24",
+      "bytes": 1430
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests-attempt2.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests.stderr.log",
+      "sha256": "5715ffabfc570a5ae6cba36ebefd2ef59f49e29d7ca3a32911a0299a5b56a064",
+      "bytes": 5460
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/library/root-tests.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/main-integration-audit.json",
+      "sha256": "2613ae293ba739b983575d819fbf16a8d58b01b951bbe5ff085acfbda54ea55b",
+      "bytes": 10413
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/evidence/source-audit.json",
+      "sha256": "98e1d90fb81d8f024f0bcfd4ebe8b9f4d0dd6fe1061ec6c4252aca2d94ea554a",
+      "bytes": 24763
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/identities/IDC1h6d456b2a22da4771.json",
+      "sha256": "76482e1b420428647f3dfba8eafb99d9109f4f1a82d027f98c0d132b41b1d78b",
+      "bytes": 6320
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/identities/IDC1h902fa2049de745c9.json",
+      "sha256": "83535b68b74e7673adb899909d22d26567fbf9b05620f1b40a5623f51e99eaf8",
+      "bytes": 2370
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/identities/IDC1he093a3eae6a97efd.json",
+      "sha256": "b80e13390da1be4e8f6946ac08ffec4925150981b56f37e32f7775968ec50098",
+      "bytes": 3547
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/PLAN.md",
+      "sha256": "6818a134d4e8de7361fc8e00468ddfc437ee08c60cc71c2cd5ab969c278b3a30",
+      "bytes": 5752
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/REPORT.md",
+      "sha256": "f83d87a0faa2c0548b6a33b2c8caaac982a2849a03e130bf7f620b6cbe311b23",
+      "bytes": 24843
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/PROOF_MAP.md",
+      "sha256": "4b8686d02033c208bb40094801e1b139c33b30f2a44649a45dae1539e865f5de",
+      "bytes": 9791
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/report.tex",
+      "sha256": "352ba1dbdecb54129122f4da5b8f9476677c457f4db9931f01b22837145daa60",
+      "bytes": 14608
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/report.pdf",
+      "sha256": "9a1e03bc4874ce88cf1d0caed41b9707f23061179fbfa964e6adedfb111cbf1c",
+      "bytes": 370350
+    },
+    {
+      "path": "research/fass_prime31_20261122/selector/diagram.svg",
+      "sha256": "c1d8c0e8392be9b596479b0d10186d3af915f3e95a78039734a27e147902fd7e",
+      "bytes": 4074
+    }
+  ]
+}
