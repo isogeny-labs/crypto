@@ -3612,6 +3612,69 @@ mod round79_terminal_power_regression {
     }
 }
 
+#[cfg(test)]
+mod round80_identity_arithmetic {
+    use super::*;
+
+    fn test_limits() -> RootLimits {
+        RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: MAX_EVENTS,
+            degree: MAX_DEGREE,
+        }
+    }
+
+    #[test]
+    fn identity_reduction_and_first_power_bit_preserve_verified_roots() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            // Include a monic linear, split quadratic, irreducible
+            // quadratic, and a quartic with two known distinct roots.
+            let polynomials = [
+                vec![p - 3, 1],
+                vec![6, p - 5, 1],
+                vec![1, 0, 1],
+                vec![6, p - 5, 7, p - 5, 1],
+                vec![1],
+            ];
+            for (i, f) in polynomials.iter().enumerate() {
+                let mut sink = |_event: &RootEvent| Ok(());
+                let report = solve(f, p, 0x8080 + i as u64, test_limits(), &mut sink).unwrap();
+                assert!(report.complete(), "p={p} f={f:?}: {:?}", report.stop);
+                verify(&report).expect("full independent certificate");
+                for &r in &report.roots {
+                    let mut value = 0u64;
+                    for &c in f.iter().rev() {
+                        value = ((value as u128 * r as u128 + c as u128) % p as u128) as u64;
+                    }
+                    assert_eq!(value, 0, "root must satisfy polynomial");
+                }
+            }
+
+    fn smallest_odd_primes_and_constant_modulus_preserve_certificates() {
+        for p in [3u64, 5, 7, 11] {
+            for f in [vec![p - 2, 1], vec![1], vec![0, 1]] {
+                let report = solve(&f, p, 4, test_limits(), &mut sink).unwrap();
+                assert!(report.complete(), "p={p} f={f:?}");
+                verify(&report).unwrap();
+
+    fn limited_work_and_sink_failures_remain_verifiable() {
+        for p in [65_521, MAX_PRIME] {
+            let mut sink = |_event: &RootEvent| Ok(());
+            let limited = RootLimits { field_work: 12, ..test_limits() };
+            let r = solve(&[6, p - 5, 1], p, 123, limited, &mut sink).unwrap();
+            assert_eq!(r.stop, RootStop::WorkLimit);
+            verify(&r).expect("work-limit prefix");
+            let mut received = 0usize;
+            let mut failing = |_event: &RootEvent| {
+                received += 1;
+                if received == 3 { Err("sink failed".into()) } else { Ok(()) }
+            };
+            let s = solve(&[6, p - 5, 1], p, 123, test_limits(), &mut failing).unwrap();
+            assert_eq!(s.stop, RootStop::SinkFailure);
+            verify(&s).expect("failed-sink prefix");
+}
+
 mod round89_column_accumulators {
 
     // Independent wide-arithmetic oracle. Never uses vproduct or vsquare.
@@ -3663,10 +3726,6 @@ mod round89_column_accumulators {
                         "right binomial p={p} width={width} case={case}");
 
     fn certificate_replay_matches_solver_after_clone_elimination() {
-            field_work: MAX_WORK,
-            split_attempts: 1000,
-            events: MAX_EVENTS,
-            degree: MAX_DEGREE,
             for polynomial in [vec![p - 3, 1], vec![6, p - 5, 1]] {
                 let report = solve(&polynomial, p, 13, limits.clone(),
                     &mut |_| Ok(())).unwrap();
@@ -3885,9 +3944,6 @@ mod round100_traced_multiplication {
             field_work: MAX_WORK, split_attempts: 1000,
         for p in [13u64, 65_521, 1_000_000_007, MAX_PRIME] {
             for f in [
-                vec![p - 3, 1],
-                vec![6, p - 5, 1],
-                vec![1, 0, 1],
                 let report = solve(&f, p, 17, limits.clone(),
                 assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
 
