@@ -176,7 +176,37 @@ def canonicalized_extraction(candidate, a, b, base_size, label):
     return terms, a, b
 
 
-def validate(data, base, q, rows, producer=None):
+def verify_dual_certificate(originals, weights, scalar, base_size):
+    """Check a sparse separating combination against authenticated raw rows.
+
+    Rows are [C|-b|a], and a certificate must sum to [0,...,0,1,d].
+    No factor-base logarithm or secret target scalar is an input.
+    """
+    if not isinstance(weights, list) or not 0 < len(weights) <= base_size + 1:
+        raise ValueError("dual target certificate: invalid support")
+    scalar = need_int(scalar, N, "dual target scalar")
+    total = [0] * (base_size + 2)
+    previous = 0
+    for term in weights:
+        if not isinstance(term, list) or len(term) != 2:
+            raise ValueError("dual target certificate: malformed term")
+        number, weight = term
+        if type(number) is not int or number <= previous or number not in originals:
+            raise ValueError("dual target certificate: noncanonical or absent row reference")
+        previous = number
+        weight = need_int(weight, N, "dual target weight")
+        if weight == 0:
+            raise ValueError("dual target certificate: zero weight")
+        row = originals[number]
+        if len(row) != base_size + 2:
+            raise ValueError("dual target certificate: malformed source row")
+        total = [(v + weight * x) % N for v, x in zip(total, row)]
+    if total != [0] * base_size + [1, scalar]:
+        raise ValueError("dual target certificate: separating equation mismatch")
+    return True
+
+
+def validate(data, base, q, rows, producer=None, emit_dual_certificate=False):
     if not 0 < len(base) <= 4096 or len(rows) > 65536:
         raise ValueError("unsupported row/base size")
     # Enforce the original Rust adapter's base contract even when validate()
@@ -194,9 +224,15 @@ def validate(data, base, q, rows, producer=None):
     if len(set(base)) != len(base):
         raise ValueError("duplicate factor-base points")
     bsize = len(base)
+    if type(emit_dual_certificate) is not bool or (emit_dual_certificate and bsize > 1024):
+        raise ValueError("dual target certificate requires a Boolean opt-in and B<=1024")
     full, without_q = (LinearSpan(bsize+1), LinearSpan(bsize))
     # For the scalar, eliminate base variables in a separate augmented system.
     base_pivots = {}
+    # Opt-in sparse elimination provenance for a fully checkable target witness.
+    # Each pivot references only the rows that created the base-column basis;
+    # avoid retaining all failed/dependent input rows. Not a new extractor.
+    pivot_sources, originals, dual_certificate = {}, {}, None
     first, recovered, dependent = None, (0 if q is None else None), 0
     if q is None:
         first = 0
@@ -245,22 +281,49 @@ def validate(data, base, q, rows, producer=None):
                 raise ValueError(f"row {number}: producer disposition mismatch {expected}")
         # Separate base-only reduction identifies a leftover q equation.
         rest = augmented[:]
+        witness = {number: 1} if emit_dual_certificate and recovered is None else None
         for col in sorted(base_pivots):
             if rest[col]:
                 factor = rest[col]
                 rest = [(x-factor*y) % N for x,y in zip(rest,base_pivots[col])]
+                if witness is not None:
+                    for rid, weight in pivot_sources[col].items():
+                        updated = (witness.get(rid, 0) - factor * weight) % N
+                        if updated:
+                            witness[rid] = updated
+                        else:
+                            witness.pop(rid, None)
         candidate_col = next((j for j in range(bsize) if rest[j]), None)
         if candidate_col is not None:
             inv = pow(rest[candidate_col], N-2, N)
             base_pivots[candidate_col] = [(v*inv) % N for v in rest]
+            if witness is not None:
+                pivot_sources[candidate_col] = {
+                    rid: weight * inv % N for rid, weight in witness.items()
+                    if weight * inv % N
+                }
+                originals[number] = augmented
         elif rest[bsize]:
-            candidate = rest[-1] * pow(rest[bsize], N-2, N) % N
+            target_inverse = pow(rest[bsize], N-2, N)
+            candidate = rest[-1] * target_inverse % N
             if recovered is not None and recovered != candidate:
                 raise ValueError(f"row {number}: contradictory target scalar")
             if recovered is None:
                 recovered, first = candidate, number
                 if scale(candidate, G) != q:
                     raise ValueError(f"row {number}: recovered scalar does not replay")
+                if witness is not None:
+                    originals[number] = augmented
+                    weights = [[rid, weight * target_inverse % N]
+                               for rid, weight in sorted(witness.items())
+                               if weight * target_inverse % N]
+                    verify_dual_certificate(originals, weights, candidate, bsize)
+                    dual_certificate = {
+                        "relation_weights": weights,
+                        "target_coefficient": 1,
+                        "scalar": candidate,
+                        "first_target_prefix": number,
+                    }
         elif rest[-1]:
             raise ValueError(f"row {number}: contradictory augmented system")
         if (full.rank-without_q.rank == 1) != (recovered is not None):
@@ -269,11 +332,14 @@ def validate(data, base, q, rows, producer=None):
                 raise ValueError(f"row {number}: rank-gap/target-visibility mismatch")
         if producer and relation.get("recovered_scalar") != recovered:
             raise ValueError(f"row {number}: producer recovered_scalar mismatch")
-    return {"curve":"ordinary_prime31","p":P,"n":N,"base_size":bsize,
-            "authenticated_rows":len(rows),"independent_rank":full.rank,"dependent_rows":dependent,
-            "rank_without_target_column":without_q.rank,"first_target_prefix":first,
-            "recovered":recovered,"scalar_replay_passed":recovered is not None,
-            "source":"coordinator-authored Python development replay; no independent PCC or native Rust pass"}
+    report = {"curve":"ordinary_prime31","p":P,"n":N,"base_size":bsize,
+              "authenticated_rows":len(rows),"independent_rank":full.rank,"dependent_rows":dependent,
+              "rank_without_target_column":without_q.rank,"first_target_prefix":first,
+              "recovered":recovered,"scalar_replay_passed":recovered is not None,
+              "source":"coordinator-authored Python development replay; no independent PCC or native Rust pass"}
+    if emit_dual_certificate:
+        report["dual_target_certificate"] = dual_certificate
+    return report
 
 
 def main():
@@ -285,6 +351,8 @@ def main():
                         help="optional native u64 SplitMix64 query seed; requires --max-queries")
     parser.add_argument("--max-queries", type=int,
                         help="optional external native query cap; requires --seed")
+    parser.add_argument("--emit-dual-certificate", action="store_true",
+                        help="opt-in sparse separating weights for independently replaying a unique target")
     args = parser.parse_args()
     if bool(args.receipt) == bool(args.record) or bool(args.record) != bool(args.base):
         parser.error("provide --receipt OR both --record and --base")
@@ -350,7 +418,8 @@ def main():
                 "query_schedule_checked":checked_schedule is not None,
                 "source_exact_scheduled_queries":checked_schedule,
                 "declared_max_queries":args.max_queries}
-    result=validate(raw,base,q,rows,producer=bool(args.record))
+    result=validate(raw,base,q,rows,producer=bool(args.record),
+                    emit_dual_certificate=args.emit_dual_certificate)
     if args.record:
         if raw.get("rank") != result["independent_rank"] or raw.get("scalar") != result["recovered"]:
             raise ValueError("producer terminal rank/scalar mismatch")
