@@ -1209,6 +1209,7 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
     use crypto::cryptanalysis::large_prime_graph::witness::*;
     let mut rng = Rng(0x1a21_9f3c_6b70_42d1);
     let mut total_skips = 0u64;
+    let mut saved_anchor_inversions = 0u64;
     for trial in 0..150 {
         let p = [3u64, 7, 101, 1_000_003][trial % 4];
         let count = 1 + rng.below(42) as usize;
@@ -1219,7 +1220,11 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
         assert_eq!(old.rank, lazy.rank, "rank mismatch at trial {trial}");
         assert_eq!(lazy.rank, dense_rank(&index.rows, index.num_columns(), p).unwrap());
         assert_eq!(old.witnesses, lazy.witnesses, "witness mismatch at trial {trial}");
-        assert_eq!(old.stats.inverse_calls, lazy.stats.inverse_calls);
+        // The old arm needlessly normalizes an anchor on some independent
+        // anchored-to-unanchored joins. The lazy arm must never use MORE
+        // inversions, but can avoid those unnecessary cache misses.
+        assert!(lazy.stats.inverse_calls <= old.stats.inverse_calls);
+        saved_anchor_inversions += old.stats.inverse_calls - lazy.stats.inverse_calls;
         assert!(lazy.stats.path_steps <= old.stats.path_steps);
         assert!(lazy.stats.parent_path_reads <= old.stats.parent_path_reads);
         total_skips += lazy.stats.independent_projection_skips;
@@ -1228,4 +1233,5 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
         assert_eq!(a, b, "small-payload replay mismatch at trial {trial}");
     }
     assert!(total_skips > 0, "random workload missed independent-row fast path");
+    assert!(saved_anchor_inversions > 0, "random workload missed redundant anchor inversion");
 }
