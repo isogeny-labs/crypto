@@ -4006,7 +4006,7 @@ pub fn decomposable_points(
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::PrimeInstance;
-    use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
+    use crate::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeKummerBase};
     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
     use rand::{rngs::StdRng, Rng, SeedableRng};
 

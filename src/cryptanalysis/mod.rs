@@ -450,6 +450,7 @@ pub mod weil_charts;
 pub mod wide_gf2m;
 pub mod wide_groebner;
 pub mod wide_sixsum;
+pub mod jv_action_operator;
 pub mod zero_dim_la;
 
 pub use aut_folded_rho::{

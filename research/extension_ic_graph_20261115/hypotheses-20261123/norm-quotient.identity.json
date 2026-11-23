@@ -1,0 +1,234 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h3a70da000d31ad8a",
+  "statement": {
+    "name": "Nagao norm quotient with H = v^2 + u W",
+    "source": "Joux–Vitse 2012 section 3.1; hypotheses-20261123 H4, direct expansion",
+    "variables": [
+      "u",
+      "v",
+      "W",
+      "C",
+      "L"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "C"
+                },
+                {
+                  "op": "var",
+                  "args": "C"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "v"
+                    },
+                    {
+                      "op": "var",
+                      "args": "v"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "u"
+                    },
+                    {
+                      "op": "var",
+                      "args": "W"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "u"
+                      },
+                      {
+                        "op": "var",
+                        "args": "L"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "C"
+                        },
+                        {
+                          "op": "var",
+                          "args": "v"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "u"
+                      },
+                      {
+                        "op": "var",
+                        "args": "L"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "C"
+                        },
+                        {
+                          "op": "var",
+                          "args": "v"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "var",
+          "args": "u"
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "C"
+                    },
+                    {
+                      "op": "var",
+                      "args": "C"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "W"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 2
+                },
+                {
+                  "op": "var",
+                  "args": "C"
+                },
+                {
+                  "op": "var",
+                  "args": "v"
+                },
+                {
+                  "op": "var",
+                  "args": "L"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "u"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "L"
+                      },
+                      {
+                        "op": "var",
+                        "args": "L"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557901564039220,
+  "value_digest": "d7a7e8bc7532e6a31de5a2a6d9a657a30a0d222d3a852ce3592c1062f98f6f88",
+  "independence": "Producer-issued; reused repository checker and producer integer expansion. No independent or signed verdict.",
+  "proof": null
+}
