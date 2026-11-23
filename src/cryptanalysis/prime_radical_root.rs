@@ -42,6 +42,9 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
+    // floor(2^64/p), computed once for canonical 32-bit residues.
+    // 0 disables the reciprocal path for larger field moduli.
+    reciprocal32: u64,
     // floor(2^64 / p): quotient estimate for canonical 32-bit products.
     // Calculated once per field rather than dividing on every multiply.
     reciprocal_64: u64,
