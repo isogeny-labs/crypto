@@ -3,6 +3,9 @@
 import copy
 import json
 import random
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 import independent_rr5_replay as checker
@@ -70,6 +73,52 @@ class ReplayChecks(unittest.TestCase):
     def test_infinity_is_known_at_prefix_zero(self):
         r=checker.validate({},self.base,None,[])
         self.assertEqual((r["first_target_prefix"],r["recovered"]),(0,0))
+
+    def test_direct_programmatic_replay_rejects_identity_and_offcurve_base(self):
+        # The native adapter never permits infinity as a factor-base leaf.
+        # The read-only Python interface must reject it even outside the CLI.
+        base=self.base.copy()
+        base[0]=None
+        with self.assertRaisesRegex(ValueError,"identity is not an admissible"):
+            checker.validate({},base,self.q,[])
+        base[0]=(checker.P,1)
+        with self.assertRaisesRegex(ValueError,"noncanonical"):
+            checker.validate({},base,self.q,[])
+        with self.assertRaisesRegex(ValueError,"off curve"):
+            checker.validate({},self.base,(1,1),[])
+
+    def test_producer_extracted_but_not_accepted_rows_are_not_successes(self):
+        # Query 0G+0Q costs an attempted extraction; none of its claimed
+        # candidate rows enters the authenticated relation matrix.
+        manifest={"curve":"ordinary_prime31","p":checker.P,"n":checker.N,
+                  "a":checker.A,"b":checker.B,"g":list(checker.G),
+                  "base":[list(p) for p in self.base]}
+        record={"target":list(self.q),"attempts":[
+                  {"a":0,"b":0,"point":None,
+                   "extraction":{"relations":[{}, {}, {}]},"receipts":[]}],
+                "rank":0,"scalar":None,"final_replay_passed":False,
+                "status":"query_limit"}
+        with tempfile.TemporaryDirectory() as td:
+            manifest_path=Path(td)/"base.json"
+            record_path=Path(td)/"record.json"
+            manifest_path.write_text(json.dumps(manifest))
+            record_path.write_text(json.dumps(record))
+            cmd=[sys.executable,str(HERE/"independent_rr5_replay.py"),
+                 "--record",str(record_path),"--base",str(manifest_path)]
+            done=subprocess.run(cmd,capture_output=True,text=True,check=False)
+            self.assertEqual(done.returncode,0,done.stderr)
+            report=json.loads(done.stdout)
+            self.assertEqual(report["extracted_candidate_rows"],3)
+            self.assertEqual(report["accepted_rows"],0)
+            self.assertEqual(report["extracted_but_not_accepted_rows"],3)
+            self.assertEqual(report["attempts_without_accepted_rows"],1)
+            self.assertEqual(report["independent_rank"],0)
+            self.assertIsNone(report["recovered"])
+            record["status"]="solved"
+            record_path.write_text(json.dumps(record))
+            bad=subprocess.run(cmd,capture_output=True,text=True,check=False)
+            self.assertNotEqual(bad.returncode,0)
+            self.assertIn("terminal status/scalar contradiction",bad.stderr)
 
     def test_extracted_grevlex_b8_row_stays_underdetermined(self):
         # Exported from RR5 development09 b8-positive.stdout, not a planted
