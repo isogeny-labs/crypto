@@ -1,0 +1,7 @@
+# Fresh-instance replication of PKM degree-32 seed 5 — 2026-11-23
+
+The degree-32 adaptive screen selected ordinary t5 auxiliary seed 5 and passed on CLI seed 20261128. Freeze an independent instance search before inspecting another timed result. For CLI seeds 20261129..20261140 in ascending order, use exactly 16 repeats, `subtract`, one trial and zero rho runs to measure seed-5 t5 and `prime-abscissa:below=32`. Select the first instance on which both have exactly equal lifting-abscissa counts. Stop if none matches. Selection uses size and instance only.
+
+On the selected fresh instance, run interval, candidate, candidate, interval. Use the same pinned binary, m=2 Semaev F4 chain mode, degree bound 8, 1,000 target trials, five-second solver-call budget, one rho context run and 240-second outer cap. Preserve every preflight, timed record, failure, external wall and child CPU in an append-only store. Require all four invocations to complete and verify the same 16 scalars with equal base size.
+
+The replication gate requires candidate/interval charged GAE <0.9, wall <1 and child CPU <1 in both mirrored pairs, plus combined charged GAE <0.9. Report relation/trial and relations/charged-GAE ratios. A pass establishes a repeated small-instance relation-extraction component lead only. It does not establish full cold same-target rho crossover, source-exact replay, asymptotic behavior or transfer to s59/P-192/NIST.
