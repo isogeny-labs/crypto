@@ -80,3 +80,18 @@ grow as `p^(2/3)`, and `la_mul ≈ 2.55 · rows · cols · w`.
 
 This is the direct test R13-C asked for: the log factor is not an artifact of the fit, it
 is the observed growth of the merged core's row weight.
+
+## Instrument ceiling: genus 3 stops at p ≈ 2.08e6
+
+The ladder stores `#J`, the subgroup order `r` and every scalar in `u64`, and
+`JCurve::new` requires `(√p + 1)^6 < 9e18`, i.e. `p^3 < 9e18`. For genus 3 this caps
+`p` at about **2,080,083**. The largest measured prime, 1,572,869, is below the cap.
+
+A probe at p = 4,194,311 (2^22) with `--order-method bsgs2` (and again with `bsgs1`)
+rejected all 600 admission seeds immediately with reason `other`: the rejection is the
+63-bit `#J` check, not the order window or the index calculus. `bsgs2` would additionally
+need an `F_{p^2}` point count, which is infeasible at this size.
+
+Extending R13-C to 2^22–2^23 therefore needs a **u128 order/scalar rewrite** of the
+ladder (`Instance.order`, `r`, `split_order`, `mul_ltr`/`mul_rtl`, JSON schema), not a
+new order source. The present result is the ceiling of the current instrument.
