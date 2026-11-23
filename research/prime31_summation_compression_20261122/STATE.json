@@ -79,11 +79,13 @@
         "Derived exact recurrence I_(h+1) from I_h and signed A, with no false negatives, group identity and duplicates preserved",
         "Charged L^m preprocessing, memory, verification, child labels and amortization; exact E[output tuples]=T*L^m/n for uniform targets",
         "Derived conditional full-rank m=2 Omega(B+n/B), and explicit complete m-sum dictionary exponent m/(2m-1)>1/2; not an unconditional ECDLP lower bound",
-        "Reconciled #4924 monic oracle newer source to successful original-Rust CI run 45089472283 at checkout 96c910...; current head 70e... changes only a protocol Markdown file"
+        "Reconciled #4924 monic oracle newer source to successful original-Rust CI run 45089472283 at checkout 96c910...; current head 70e... changes only a protocol Markdown file",
+        "Checked ICALP 2026 Dinur-Golovnev 3SUM-Indexing primary HTML: T*S=~O(B^2.5) space-query tradeoff, but ~O(B^2) preprocessing and one-witness probabilistic semantics; no justified direct translation of modular bucketing to elliptic prime-order group encodings"
       ],
       "outcome": "Fermat-trace normal form cannot deliver sublinear cold empty queries because it materializes dimension N. Complete signed sum index gives exact O(1) expected ONLINE emptiness but Omega(B^m) charged setup; its optimistic full-rank exponent remains above rho. No asymptotic gain.",
       "status": "written mathematical derivation only; unverified; no code/benchmarks",
-      "source_commit": "ad1daae2543553aafe2bd58991dd1557f87d2909"
+      "source_commit": "ad1daae2543553aafe2bd58991dd1557f87d2909",
+      "prior_art": "NEXT_IMPLICIT_INDEX.md Section E; Dinur-Golovnev ICALP 2026 and Chung-Larsen SODA 2023"
     }
   ],
   "claims": [
@@ -123,7 +125,7 @@
     "scope": "Native evaluated tier over 2^61-1 plus separate checked-i128 coefficient expansion; all proof fields null; no formal kernel proof",
     "root_replay": "identity-certificates/root-replay.json"
   },
-  "next_mathematical_gate": "Design and prove a non-enumerative higher-arity S3/implicit signed m-sum index with exact zero certification and a sublinear CHARGED setup/query/failed-branch/memory tradeoff. The explicit Fermat-trace state and full signed sum dictionary have failed the cold criterion. See NEXT_IMPLICIT_INDEX.md.",
+  "next_mathematical_gate": "Source-gated next problem: a genuinely implicit m>=3 original-curve signed relation index with DLP-free compatible hashing, exact empty certification, independent-row output and charged subquadratic preprocessing; avoid rebranding ICALP 2026 3SUM-Indexing (quadratic preprocessing, one-witness query) as a cold ECDLP speedup.",
   "next_empirical_gate": "Commit the exact Rust hash-to-curve natural-target generator and freeze source/corpus before performance work, then obtain repository checkpoint/EKS admission and compare strongest maintained scan/product-tree controls; no benchmark launched.",
   "growing_family_obligation": "A fixed 31-bit prime cannot establish an asymptotic exponent. Specify growing prime fields and smooth p+1 structure without assuming infinitely many Mersenne primes, and include complete index-calculus costs.",
   "overlap_exclusions": [
