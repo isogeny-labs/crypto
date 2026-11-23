@@ -31,10 +31,13 @@ pub struct ProjectedRankAudit {
     /// [small | fixed-known-RHS] row space. Always includes every independent
     /// small-coordinate row and at most one nonzero residual-RHS row.
     /// This is valid only when all unknowns are explicit small columns.
+    #[serde(default)]
     pub augmented_basis_row_indices: Vec<usize>,
     /// Sparse payload retained by this exact affine row-space basis.
+    #[serde(default)]
     pub augmented_basis_nonzeros: usize,
     /// Original source coefficients retained, without combining witnesses.
+    #[serde(default)]
     pub augmented_basis_source_terms: usize,
     /// Field operations do not include ordered-map/search overhead.
     pub elimination_steps: u64,
