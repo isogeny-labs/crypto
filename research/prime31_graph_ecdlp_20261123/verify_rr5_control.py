@@ -108,7 +108,41 @@ def verify_cycle():
             "factor_base_terms": terms, "point_replay_ok": True}
 
 
+def verify_public_panel():
+    data = json.loads((EVIDENCE / "public-panel.json").read_text())
+    assert data["curve"] == {"p": P, "a": A, "b": B, "n": N, "g": list(G)}
+    points = [tuple(point) for point in data["base"] + data["large_prime_pool"]]
+    assert len(points) == 8 and len({x for x, _ in points}) == 8
+    q = tuple(data["public_target"])
+    assert q == mul(987_654_321, G)
+    assert len(data["queries"]) == 16
+    total_witnesses = 0
+    for label, row in enumerate(data["queries"]):
+        assert row["label"] == label
+        query = tuple(row["query"])
+        assert query == add(mul(row["a"], G), mul(row["b"], q))
+        witnesses = set()
+        for three in itertools.combinations(range(7), 3):
+            for signs in itertools.product((-1, 1), repeat=4):
+                terms = tuple(sorted(zip((*three, 7), signs)))
+                if signed_sum(points, terms) == query:
+                    witnesses.add(terms)
+        actual = set()
+        for relation in row["one_lp_relations"]:
+            terms = tuple(tuple(term) for term in relation["terms"])
+            assert signed_sum(points, terms) == query
+            actual.add(terms)
+        assert actual == witnesses, (label, actual, witnesses)
+        if row["status"] == "Empty":
+            assert not witnesses
+        total_witnesses += len(witnesses)
+    return {"control": "public_aG_plus_bQ_panel", "queries": 16,
+            "independent_one_lp_witnesses": total_witnesses,
+            "all_query_and_witness_replays_ok": True}
+
+
 if __name__ == "__main__":
     assert mul(N, G) is None
     print(json.dumps([verify("positive"), verify("smoke"),
-                      verify("wide"), verify("wide2"), verify_cycle()], indent=2))
+                      verify("wide"), verify("wide2"), verify_cycle(),
+                      verify_public_panel()], indent=2))

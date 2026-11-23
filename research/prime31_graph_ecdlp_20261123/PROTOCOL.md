@@ -159,12 +159,37 @@ were refreshed after reviewing current-main changes: `ic_boundary.rs` gained
 test-only map views and binary-group provenance fields; `semaev_prime_poly.rs`
 gained support diagnostics and factored `poly_mulmod` through `poly_mul`.
 The selected source ranges and current hashes are checked at build time.
-The native diagnostics report incomplete phase accounting. This is a
+The native diagnostics report incomplete phase accounting. These are
 planted correctness controls at `B=4,S=1` and `B=7,S=1`, not evidence of
 random-query yield, useful graph rank, cold solve cost, or a speed advantage.
 The cycle control only has public point queries; their IC scalars `a,b` are
 not supplied, so it validates graph cancellation without becoming a target
 discrete-log solve.
+
+### Unplanted public-query panel and fixed-selector gate
+
+The same native executable also ran 16 fixed SplitMix-labelled public queries
+`R=aG+bQ` on the `B=7,S=1` selector. It reported 16 `Empty` charts, zero
+accepted one-LP rows, 1,895 ms total extractor wall time, and 118.5 ms median
+per query on this host. The independent checker recomputed every `aG+bQ`
+with its own integer group law and enumerated all 560 signed one-LP tuples
+after extraction; each had zero witnesses. The frozen labels, per-query
+statuses, and diagnostics are in `evidence/rr5-control-01/public-panel.json`.
+These 16 fixed labels are a correctness and timing panel, not a statistical
+yield estimate or a cold solve cost.
+
+For independent uniform public queries on this fixed selector, the exact
+expected **witness tuple** count is `560/n = 2.607698365e-7` per draw. The
+16-draw expectation is `4.172317384e-6`, consistent with the observed zero.
+Even if each witness produced a distinct accepted partial, and the single LP
+column were occupied, a full `B+1=8` factor-base-rank route would require at
+least `E=9` accepted partials. The first integer number of draws whose
+**expected witness count** reaches nine is 34,513,195, about 594 times the
+unfolded birthday-rho step expectation before algebraic extraction, setup,
+graph filtering, and linear algebra. This is a derived gate on this
+`B=7,S=1` producer size, not a lower bound on every target-recovery path or
+on larger structured selectors. It makes increasing algebraic support while
+controlling extractor cost the next necessary experiment.
 
 ## Prior work and claim boundary
 
