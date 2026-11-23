@@ -279,6 +279,11 @@ pub fn evaluate_stream(
             Some(b.snapshot().large_rank_lower_bound)
         })
         .flatten();
+    // The same bounded admission gate controls *all* extra exact audits.
+    // Otherwise requesting the forest on an unsupported/oversized stream
+    // could unexpectedly run unbounded pivot/MST sparse elimination.
+    let compare_exact_forest =
+        params.compare_exact_forest && r <= params.forest_max_rows && domain.len() == r;
     let domain_support: Vec<Vec<usize>> = domain
         .iter()
         .map(|row| row.iter().map(|&(col, _)| col).collect())
@@ -355,7 +360,7 @@ pub fn evaluate_stream(
     let (pivot_out, pivot_report) = filter_large_primes(relations.to_vec(), &options)
         .map_err(|_| LpGraphError::InvalidModulus)?;
     let pivot_ns = ns(t);
-    let (pivot_exact_rank, pivot_rank_ns) = if params.compare_exact_forest {
+    let (pivot_exact_rank, pivot_rank_ns) = if compare_exact_forest {
         let t = Instant::now();
         let rank = projected_rank::audit_projected_rank(&pivot_out, modulus)?;
         (Some(rank), Some(ns(t)))
@@ -388,7 +393,7 @@ pub fn evaluate_stream(
         .map_err(|_| LpGraphError::InvalidModulus)?;
     let mst_ns = ns(t);
     let mst_out = attempt.relations.as_deref().unwrap_or(&[]);
-    let (mst_exact_rank, mst_rank_ns) = if params.compare_exact_forest && attempt.relations.is_some() {
+    let (mst_exact_rank, mst_rank_ns) = if compare_exact_forest && attempt.relations.is_some() {
         let t = Instant::now();
         let rank = projected_rank::audit_projected_rank(mst_out, modulus)?;
         (Some(rank), Some(ns(t)))
