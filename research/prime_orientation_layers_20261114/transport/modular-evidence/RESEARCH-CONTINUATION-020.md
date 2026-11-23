@@ -1,0 +1,9 @@
+# Research continuation: actual paired normalization to point-ideal multiplicity
+
+The broad objective remains active. Read latest Nov23 journal and public-input-evidence/STATUS-20261123-006.md plus PROTOCOL-010.md. Primary062/build066/local033 accepted170local statements,23new since147: actual D=G^4divides both A/B, canonical quotients degree3/1, actual nonzero normalized normdegree<=6/targetpower4, actual target branchsign/order4 and explicit Weierstrass coordinate norm/nonzero/simpletargetmembership. All local unsigned, outside shared53/57/fresh. PCC-a66281/2aebc0/00ed3f/f359d0 carry prefixPCC-20261123. [pcc:unverified]
+
+Exact next proof is original full mixed jets -> actual targetpointideal I^4. Owner PolynomialBivariateIdealOrder draft001 has standalone acceptance1(PCC-f68d78); inspect actual focused build/audit/commit state before any rerun or consumer import. It proves generic ideal-power evaluation by actual finite coefficients, not yet study shifted binding. Current ownerhead04d23b3 may gain this separate module; resolve actual head. [pcc:unverified]
+
+Consumer must bind actual original shifted coefficients/evaluation/coordinate class, explicit curveEquation(cubicW)=W.polynomial undera1=a3=0, class factor D*reducedFunction, then derived cancellation of D at I^4 using D(xt)nonzero. Simple idealmembership or normroot is insufficient. After that actual multiplicity-aware principal product/degree exhaustion/group relation/residual fields/known labels/public finder/complete bit cost remain open.
+
+Do not reopen watcher or publish around protected canonical PCC divergence; it blocks remote publication only. Preserve frozen earlier reports, sources, raw whitespace, claims and ledgerprefix. No paid/cloud/attack/native crypto/timing/scaling campaign or overrides. No component stop marks broad goal achieved, and no background progress is claimed without a running process.

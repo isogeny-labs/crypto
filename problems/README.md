@@ -179,4 +179,4 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
-| [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection and full expected bit cost; fixed four-point nonzero norm/canonical residual degree<=2, multiplicity/group and known-label map open [pcc:unverified] | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |
+| [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection and full expected bit cost; fixed three-pair canonical normalization and actual target ideal^4/nonzero normdegree<=6, principal/group and known-label map open [pcc:unverified] | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |

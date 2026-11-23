@@ -1,0 +1,8 @@
+# Actual normalized function retains target point-ideal fourth power
+
+1. Actual affine Weierstrass W, f=cubicW, explicit a1=a3=0; actual finiteOperator kernel/coefficientEmbedding, paired point/nonzero2ordinates, xt outside S. No successful norm/idealpower witness supplied.
+2. Reuse actual original_full_jet_ideal_power, actual pair factors/monic reconstruction, exact W.polynomial/AdjoinRoot.mk_eq_mk and dvd_modByMonic_sub, coprime polynomial product/powers/map and ideal closure/Bezout as stated.
+3. Derive actual curveEquation=cubicW equation and actual remainder/original coordinate-class equality. Actual class factors as Dclass*reducedFunction. Derived coprimality D with target(X-Cxt)^4 maps to coordinate-ring Bezout; actual XClass^4 lies I^4, so original class membership I^4 cancels D. This constructs actual normalized targetI^4membership.
+4. Five new endpoints expected standard/no warnings; inherited064/172exact, no new import. Same229inputpins/defaultreadonlysinglejob; direct actual source/API checked, no generic new gap hidden as hypothesis.
+5. Does not produce complete principal ideal factorization/degree exhaustion or residual rational points/known labels/group/scalar/full public expected bitcost. This general theorem can include off-curve targets; eventual actual target witness retains old point equations/nonsingularity premises when mapped to points.
+6. Preserve failed/warning/raw/frozen evidence/ledgerprefix, no private/class/transparency/resource/trust overrides, paid/cloud/native crypto/timing/scaling campaign, ledger rewrite/publication evasion or watcher edits. KB unavailable/direct prior/public sources fallback. [pcc:unverified]

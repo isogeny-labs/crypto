@@ -1,0 +1,8 @@
+# Explicit actual Weierstrass function with normalized target idealfour
+
+1. Actual affine W over FieldK, explicit actualCubic=X^3+Ca2X^2+Ca4X+Ca6 and actualFunction=Anew•1+Bnew•mkY. Actual finiteOperator kernel/pointdata, a1=a3=0,2andordinatesnonzero,xtoutsideS; no favorable idealpower/function/norm witness.
+2. Public Mathlib.norm_smul_basis and actual W.polynomial definitions, accepted actual normalization/fulljet idealpower, public quotient/dvd_modByMonic_sub/copime/map/Bezout/idealclosure laws. No new generic gap assumed.
+3. Derive explicit cubicdegree3, exact actual norm/nonzero, exact equation equality, original remainderclass, actual Dclassfactor, mapped actualcoprime Bezout cancellation, targetI^4. Actual global witness derives nonzero coordinatefunction/normdegree<=6/I^4 under unchanged original pointkernel premises.
+4. Nine endpoints expected standard/no warnings, parent064/172exact/no newimports. Same229pinnedinputs/defaultreadonlysinglejob; no privatebody/importall/class/resource/trust/linter override.
+5. Earlier accepted old NormGroupBridge alias adapter remains exact but is not unfolded or equated to this explicit interface. New explicit actual equation/norm proved directly, not supplied surrogate. Existing pointSumOfPrincipal on arbitrary actual coordinatefunction remains intended group bridge.
+6. No complete principal factorization/weighted degree exhaustion/group/residualfields/knownlabels/publicfinder/full expectedcost assertion. Preserve rejected065 and every prior source/raw/report/claim/ledgerprefix; no paid/cloud/nativecrypto/timing/scaling or remote publication evasion. KB unavailable/directsourcefallback. [pcc:unverified]

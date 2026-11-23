@@ -384,3 +384,24 @@ exp(o(log r)) expected bit-cost exit criteria remain unchanged. Fixed
 support4does not grow with subgroup size. No algorithm, timing/scaling
 claim or universal nonexistence follows. No paid/cloud/native/attack
 campaign, vault/signing, protected-ledger rewrite or gate bypass was used.
+
+## 2026-11-23: paired normalization and actual target ideal power
+
+Local source068/build072/local036 accepts182statements/35new since147,
+zero warnings/all printed dependencies standard; PCC-20261123-f01f40 is
+unsigned local data, no shared/fresh/signed inference. [pcc:unverified]
+
+Actual paired mixed jets derive G^4divisibility of both actual norm
+coefficients. Canonical quotients degree<=3/1 yield actual nonzero
+normalized normdegree<=6, target branch sign/order4, and explicit actual
+Weierstrass equation/norm/class identities. Original mixed jets give actual
+pointideal powers via separately audited/committed generic owner1; derived
+mapped coprime Bezout cancelsG^4. Actual nonsingular point data constructs
+nonzero actual coordinatefunction h with normdegree<=6 and h in targetI^4.
+No successful helper/norm/idealpower witness supplied. [pcc:unverified]
+
+This is not a principal ideal exhaustion or useful known-log group relation.
+Next construct actual integral residual ideal J with(span h)=I^4*J,
+derive actual quotient/length residual bound<=2, then group/residual-field/
+known-label/publicfinder/full expected-cost bridge. Original criteria and
+nonscalar-origin/rank-directed W-jet obligations unchanged.
