@@ -1,0 +1,5 @@
+# Clean-source PKM F4 replay — frozen 2026-11-23 12:01 PST
+
+The pinned older `ic` binary embedded no Git commit. Build `ic` from this PR's clean source tree with locked dependencies and Rust 1.99.1, in a separate target directory. Record source tree hash, binary SHA-256, toolchain, command and build outcome. Do not overwrite the older binary or raw records.
+
+Replay the exact 128 random-scalar target list in `replication_height4_random.jsonl` (SHA-256 `de0291fd492c7b534515ed29e3012ce5cc7c6d0ad1eb8bb73467a72b230adcdf`) with the new binary, preserving the same degree-16 candidate and six-abscissa interval, m=2 Semaev F4 settings, trial and solver budgets. Write a separate append-only store and verify each target scalar, instance, base size and solver completion. The source replay passes only if all 128 pairs verify and the new binary's ratio of summed setup-charged GAE, wall and child CPU remains below one. This replay checks source/build stability; it does not provide independent target samples because the scalar list is reused. Preserve any failure or changed result rather than modifying the original panel.

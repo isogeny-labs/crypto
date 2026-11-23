@@ -1,0 +1,228 @@
+{
+  "all_verified": false,
+  "calibration": {
+    "ns_per_add": 48.680835,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 46.78242847750501,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": 21.329264451075,
+    "ns_per_legendre": 12.526893228045,
+    "ns_per_lookup": 0.6040318006800001,
+    "ns_per_row_op": 0.80693352096,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": 14.719575398115001,
+    "ns_per_word_xor": 0.11498413227,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 0.000549416,
+  "instance": "icv1-fp10-t5-192cb216",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp10-t5-192cb216 | prime-abscissa[below=16] + subtract + — + walk | 12 | 6 | 2.0 | 0.000 | 1 | 0 | 0 | — | — | 15.009 | — | gave up |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": null,
+  "rho_reference_candidates": [],
+  "rho_reference_plain": null,
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 425.161304,
+          "group_ops": {
+            "adds": 162,
+            "doubles": 263,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 12,
+            "relations": 0,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 1,
+            "trials": 1,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 0
+          },
+          "wall_ns": 63209,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34
+          }
+        },
+        "description": "for each signed base point P, test whether R − P is in the base",
+        "gae_before_solver": 425.161304,
+        "hit_rate": 0.0,
+        "name": "subtract",
+        "relations_found": 0,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 27750,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 1
+      },
+      "exhausted": true,
+      "factor_base": {
+        "abscissae": 6,
+        "columns": 6,
+        "cost": {
+          "gae": 5.416792,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 14,
+            "legendre_symbols": 14,
+            "sqrt_solves": 6
+          },
+          "wall_ns": 132292,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 18,
+            "index_point_negations": 6,
+            "index_sort_word_ops": 24
+          }
+        },
+        "description": "every abscissa in [1, 16) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 12
+      },
+      "group_order": 823,
+      "instance": "icv1-fp10-t5-192cb216",
+      "label": "prime-abscissa[below=16] + subtract + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 7,
+            "pinned_by_repeated_row": 0,
+            "rank": 0,
+            "repeated_column_rows": 0,
+            "row_ops": 0,
+            "rows": 0,
+            "single_column_rows": 0,
+            "two_column_rows": 0
+          },
+          "wall_ns": 0,
+          "work_native": {
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 0,
+        "rows": 0,
+        "work": 0,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 9.684748620421626,
+      "r": 823,
+      "recovered": null,
+      "rho_s": null,
+      "s": 15.009008908867715,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "16"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1,
+        "oracle": "subtract",
+        "oracle_params": {},
+        "seed": 20261214,
+        "solver": null,
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 430.57809599999996,
+      "verified": false,
+      "verify": {
+        "gae": 0.0,
+        "group_ops": {
+          "adds": 0,
+          "doubles": 0,
+          "scalar_mults": 0
+        },
+        "native": {},
+        "wall_ns": 0
+      },
+      "wall_seconds": 0.000384916
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "217cb14dba455c846e1069d7afc1a833791ba87077b8f425ffa5620a03004d7a",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "incomplete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}
