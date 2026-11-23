@@ -1,0 +1,17 @@
+{
+  "schema": "h4-n35-triangular-pair-protocol-v1",
+  "status": "frozen before measurement",
+  "question": "Does triangular enumeration preserve every first ordered pair in the n35 pair index while reducing build cost?",
+  "source_pipeline": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_full_pipeline_20261120/run.py",
+  "source_pipeline_sha256": "c19b76ed28c57f1e19269b493659b73cd9a4627347a77dd1f78fc544921b965f",
+  "source_instance": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_packed_pair_20261120/result.json",
+  "source_instance_sha256": "35ab89bb753c2bc6ba1faf65246efd2d548a7349963a2a48dfd9a2d5c840b27e",
+  "base_points": 4096,
+  "base_sha256": "d5f897f0bf5c6f4ca2a19377bb09a56db4e568a0f5237cc3437478275597123c",
+  "expected_distinct_pair_sums": 8321091,
+  "arms": ["ordered i=0..B-1 then j=0..B-1 with setdefault", "triangular i=0..B-1 then j=i..B-1 with setdefault"],
+  "order": [["ordered", "triangular"], ["triangular", "ordered"]],
+  "equality_gate": "compare all 8321091 key-to-packed-first-pair entries exactly in each repeat; replay 256 seeded witness pairs against group addition",
+  "resource_envelope": "one checked local Sage process, sequential arms, 8 GiB observed peak RSS gate, 1200 second process cap",
+  "claim_boundary": "local component build cost and equality on one exact n35 base; no changed target-online interval or end-to-end candidate result"
+}

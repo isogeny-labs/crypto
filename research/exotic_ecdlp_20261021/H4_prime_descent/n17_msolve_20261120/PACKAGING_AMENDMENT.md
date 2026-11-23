@@ -1,0 +1,5 @@
+# Lossless n17 input packaging after the solver run
+
+The PR artifact migration check failed on S3 `HeadObject` 403 responses for keys `805cb12f19b7350db8ecb32a0ff6af1f042fed22140f9f400afaf74da5b5ab9d` and `587da63e90c083cbc9bec567bb113c083e71de28a59531bf4acd3f3d1442c6c2`. Those keys are the exact SHA-256 digests of the frozen planted and ordinary `.ms` inputs. Their byte sizes triggered the large-artifact path. The experiment and exhaustive audit had already completed before this storage change.
+
+`package.py pack` encoded each input as deterministic gzip (`mtime=0`) followed by wrapped base64 text. `packaging.json` records raw and encoded digests and sizes. `package.py restore` was run and verified byte-for-byte recovery of both original inputs. The raw `.ms` files are removed from Git custody and ignored locally, while the encoded text and hashes are committed. The original source builder, protocol, solver commands and caps, raw solver logs, timeout statuses, and validation receipt remain unchanged. This packaging addresses the two known migration keys; CI must still be rerun to confirm the storage gate.

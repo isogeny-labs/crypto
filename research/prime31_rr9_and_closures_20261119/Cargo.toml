@@ -1,0 +1,27 @@
+[package]
+name = "prime31-rr9-and-closures"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "rr9_non_enumerative_bench"
+path = "src/bin/rr9_non_enumerative_bench.rs"
+
+[[bin]]
+name = "cover_and_deuring_closures"
+path = "src/bin/cover_and_deuring_closures.rs"
+
+[[bin]]
+name = "run_all_and_emit"
+path = "src/bin/run_all_and_emit.rs"
+
+[dependencies]
+rayon = "1.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+rand = { version = "0.8", features = ["std_rng"] }
