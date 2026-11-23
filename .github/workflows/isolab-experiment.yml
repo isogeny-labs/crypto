@@ -240,21 +240,24 @@ jobs:
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
           # Harness scripts are Git-tracked. ic-size-sweep-20261026 validation
-          # blobs are store-backed, unrecovered while S3 is AllAccessDisabled
-          # (see build job note), and are not inputs for ordinary m45-t4-finish /
-          # non-size_sweep launch — quarantine their manifests so pull can finish.
+          # blobs are store-backed and unrecovered while S3 is AllAccessDisabled
+          # (see build job note). Moving .artifacts.json is insufficient: pull
+          # still reads tracked manifests via git index. Omit that tree from the
+          # path list so ordinary m45-t4-finish / non-size_sweep launch can proceed.
           set -euo pipefail
-          skip_root=taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026
-          if [[ -d "$skip_root" ]]; then
-            mkdir -p "$RUNNER_TEMP/skipped-ic-size-sweep-manifests"
-            while IFS= read -r -d '' m; do
-              rel="${m#./}"
-              mv "$m" "$RUNNER_TEMP/skipped-ic-size-sweep-manifests/${rel//\//_}"
-            done < <(find "$skip_root" -name '.artifacts.json' -print0)
-            echo "Skipping unrecovered $skip_root store pull (S3 disabled; not required for ordinary experiment launch)."
-            find "$RUNNER_TEMP/skipped-ic-size-sweep-manifests" -type f | wc -l
+          skip=taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026
+          pull_paths=()
+          while IFS= read -r -d '' p; do
+            pull_paths+=("$p")
+          done < <(find taskq/deploy/eks-karpenter -mindepth 1 -maxdepth 1 ! -name validation -print0)
+          if [[ -d taskq/deploy/eks-karpenter/validation ]]; then
+            while IFS= read -r -d '' p; do
+              pull_paths+=("$p")
+            done < <(find taskq/deploy/eks-karpenter/validation -mindepth 1 -maxdepth 1 ! -name 'ic-size-sweep-20261026' -print0)
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 taskq/deploy/eks-karpenter
+          echo "Skipping unrecovered $skip store pull (S3 disabled; not required for ordinary experiment launch)."
+          printf 'pull_paths=%s\n' "${#pull_paths[@]}"
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${pull_paths[@]}"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
