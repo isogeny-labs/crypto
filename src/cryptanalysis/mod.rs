@@ -299,6 +299,7 @@ pub mod koblitz_sym_s4;
 pub mod koblitz_symmetrised;
 pub mod koblitz_wide;
 pub mod large_prime_filter;
+pub mod large_prime_graph;
 pub mod lattice;
 pub mod legacy_curve_attacks;
 pub mod line_oracle;
